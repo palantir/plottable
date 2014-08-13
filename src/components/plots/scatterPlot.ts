@@ -12,7 +12,7 @@ export module Plot {
     };
 
     /**
-     * Creates a ScatterPlot.
+     * Creates a Plot.Scatter.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
@@ -27,6 +27,11 @@ export module Plot {
       this.project("fill", () => Core.Colors.INDIGO); // default
     }
 
+    /**
+     * @param {string} attrToSet One of ["x", "y", "cx", "cy", "r",
+     * "fill"]. "cx" and "cy" are aliases for "x" and "y". "r" is the datum's
+     * radius, and "fill" is the CSS color of the datum.
+     */
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
       attrToSet = attrToSet === "cx" ? "x" : attrToSet;
       attrToSet = attrToSet === "cy" ? "y" : attrToSet;

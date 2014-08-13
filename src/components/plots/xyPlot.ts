@@ -8,6 +8,9 @@ export module Abstract {
     /**
      * Creates an XYPlot.
      *
+     * An XYPlot is a plot from drawing 2-dimensional data. Common examples
+     * include Scale.Line and Scale.Bar.
+     *
      * @constructor
      * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.
      * @param {Scale} xScale The x scale to use.
@@ -22,6 +25,10 @@ export module Abstract {
       this.project("y", "y", yScale); // default accessor
     }
 
+    /**
+     * @param {string} attrToSet One of ["x", "y"] which determines the point's
+     * x and y position in the Plot.
+     */
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
       // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.

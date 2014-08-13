@@ -28,8 +28,14 @@ export module Abstract {
     /**
      * Creates a Plot.
      *
+     * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
+     *
+     * A bare Plot has a DataSource and any number of projectors, which take
+     * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
+     *
      * @constructor
-     * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Plot.
+     * @param {any[]|DataSource} [dataset] The data or DataSource to be
+     * associated with this Plot.
      */
     constructor();
     constructor(dataset: any[]);
@@ -73,17 +79,12 @@ export module Abstract {
     }
 
     /**
-     * Gets the Plot's DataSource.
+     * Set or get the Plot's DataSource.
      *
-     * @return {DataSource} The current DataSource.
+     * @param {DataSource} [source] The DataSource the Plot should use.
+     * @return {Plot|DataSource} The calling Plot, or the current DataSource.
      */
     public dataSource(): DataSource;
-    /**
-     * Sets the Plot's DataSource.
-     *
-     * @param {DataSource} source The DataSource the Plot should use.
-     * @return {Plot} The calling Plot.
-     */
     public dataSource(source: DataSource): Plot;
     public dataSource(source?: DataSource): any {
       if (source == null) {
@@ -106,13 +107,36 @@ export module Abstract {
       this._render();
     }
 
+    /**
+     * Set an attribute of every data point.
+     *
+     * Here's a common use case:
+     * ```typescript
+     * plot.project("r", function(d) { return d.foo; });
+     * ```
+     * This will set the radius of each datum `d` to be `d.foo`.
+     *
+     * @param {string} attrToSet The attribute to set across each data
+     * point. Popular examples include "x", "y", "r". Scales that inherit from
+     * Plot define their meaning.
+     *
+     * @param {Function|string|any} accessor Function to apply to each element
+     * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
+     * `d[accessor]` is used. If anything else, use `accessor` as a constant
+     * across all data points.
+     *
+     * @param {Abstract.Scale} [scale] If provided, the result of the accessor
+     * is passed through the scale, such as `scale.scale(accessor(d, i))`.
+     *
+     * @returns {Plot} The calling Plot.
+     */
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
       attrToSet = attrToSet.toLowerCase();
       var currentProjection = this._projectors[attrToSet];
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
 
       if (existingScale != null) {
-        existingScale.removeExtent(this._plottableID, attrToSet);
+        existingScale._removeExtent(this._plottableID, attrToSet);
         existingScale.broadcaster.deregisterListener(this);
       }
 
@@ -186,9 +210,9 @@ export module Abstract {
       if (projector.scale != null) {
         var extent = this.dataSource()._getExtent(projector.accessor);
         if (extent.length === 0 || !this._isAnchored) {
-          projector.scale.removeExtent(this._plottableID, attr);
+          projector.scale._removeExtent(this._plottableID, attr);
         } else {
-          projector.scale.updateExtent(this._plottableID, attr, extent);
+          projector.scale._updateExtent(this._plottableID, attr, extent);
         }
       }
       return this;
@@ -217,20 +241,14 @@ export module Abstract {
     }
 
     /**
-     * Gets the animator associated with the specified Animator key.
+     * Set or get the animator associated with the specified Animator key.
      *
+     * @param {Animator.IPlotAnimator} [animator] An Animator to be assigned to
+     *                                          the specified key.
      * @param {string} animatorKey The key for the Animator.
-     * @return {Animator.IPlotAnimator} The Animator for the specified key.
+     * @return {Plot|Animator.IPlotAnimator} The Animator for the specified key.
      */
     public animator(animatorKey: string): Animator.IPlotAnimator;
-    /**
-     * Sets the animator associated with the specified Animator key.
-     *
-     * @param {string} animatorKey The key for the Animator.
-     * @param {Animator.IPlotAnimator} animator An Animator to be assigned to
-     *                                          the specified key.
-     * @return {Plot} The calling Plot.
-     */
     public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
     public animator(animatorKey: string, animator?: Animator.IPlotAnimator): any {
       if (animator === undefined){

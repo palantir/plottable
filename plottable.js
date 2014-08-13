@@ -1839,12 +1839,12 @@ var Plottable;
             Scale.prototype.copy = function () {
                 return new Scale(this._d3Scale.copy());
             };
-            Scale.prototype.updateExtent = function (rendererID, attr, extent) {
+            Scale.prototype._updateExtent = function (rendererID, attr, extent) {
                 this._rendererAttrID2Extent[rendererID + attr] = extent;
                 this._autoDomainIfAutomaticMode();
                 return this;
             };
-            Scale.prototype.removeExtent = function (rendererID, attr) {
+            Scale.prototype._removeExtent = function (rendererID, attr) {
                 delete this._rendererAttrID2Extent[rendererID + attr];
                 this._autoDomainIfAutomaticMode();
                 return this;
@@ -1935,7 +1935,7 @@ var Plottable;
                 var currentProjection = this._projectors[attrToSet];
                 var existingScale = (currentProjection != null) ? currentProjection.scale : null;
                 if (existingScale != null) {
-                    existingScale.removeExtent(this._plottableID, attrToSet);
+                    existingScale._removeExtent(this._plottableID, attrToSet);
                     existingScale.broadcaster.deregisterListener(this);
                 }
                 if (scale != null) {
@@ -1991,10 +1991,10 @@ var Plottable;
                 if (projector.scale != null) {
                     var extent = this.dataSource()._getExtent(projector.accessor);
                     if (extent.length === 0 || !this._isAnchored) {
-                        projector.scale.removeExtent(this._plottableID, attr);
+                        projector.scale._removeExtent(this._plottableID, attr);
                     }
                     else {
-                        projector.scale.updateExtent(this._plottableID, attr, extent);
+                        projector.scale._updateExtent(this._plottableID, attr, extent);
                     }
                 }
                 return this;
@@ -2338,32 +2338,11 @@ var Plottable;
                 }
                 _super.prototype._setDomain.call(this, values);
             };
-            QuantitativeScale.prototype.interpolate = function (factory) {
-                if (factory == null) {
-                    return this._d3Scale.interpolate();
-                }
-                this._d3Scale.interpolate(factory);
-                return this;
-            };
-            QuantitativeScale.prototype.rangeRound = function (values) {
-                this._d3Scale.rangeRound(values);
-                return this;
-            };
-            QuantitativeScale.prototype.clamp = function (clamp) {
-                if (clamp == null) {
-                    return this._d3Scale.clamp();
-                }
-                this._d3Scale.clamp(clamp);
-                return this;
-            };
             QuantitativeScale.prototype.ticks = function (count) {
                 if (count != null) {
                     this._lastRequestedTickCount = count;
                 }
                 return this._d3Scale.ticks(this._lastRequestedTickCount);
-            };
-            QuantitativeScale.prototype.tickFormat = function (count, format) {
-                return this._d3Scale.tickFormat(count, format);
             };
             QuantitativeScale.prototype._niceDomain = function (domain, count) {
                 return this._d3Scale.copy().domain(domain).nice(count).domain();
@@ -2736,7 +2715,7 @@ var Plottable;
                 _super.call(this, scale == null ? d3.time.scale() : scale);
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
             }
-            Time.prototype.tickInterval = function (interval, step) {
+            Time.prototype._tickInterval = function (interval, step) {
                 var tempScale = d3.time.scale();
                 tempScale.domain(this.domain());
                 tempScale.range(this.range());
@@ -3368,7 +3347,7 @@ var Plottable;
                 return i;
             };
             Time.prototype._getTickIntervalValues = function (interval) {
-                return this._scale.tickInterval(interval.timeUnit, interval.step);
+                return this._scale._tickInterval(interval.timeUnit, interval.step);
             };
             Time.prototype._getTickValues = function () {
                 var index = this.getTickLevel();
@@ -3385,7 +3364,7 @@ var Plottable;
             Time.prototype.renderTickLabels = function (container, interval, height) {
                 var _this = this;
                 container.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).remove();
-                var tickPos = this._scale.tickInterval(interval.timeUnit, interval.step);
+                var tickPos = this._scale._tickInterval(interval.timeUnit, interval.step);
                 tickPos.splice(0, 0, this._scale.domain()[0]);
                 tickPos.push(this._scale.domain()[1]);
                 var shouldCenterText = interval.step === 1;

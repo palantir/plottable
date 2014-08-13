@@ -174,7 +174,7 @@ export module Axis {
     }
 
     public _getTickIntervalValues(interval: ITimeInterval): any[] {
-      return this._scale.tickInterval(interval.timeUnit, interval.step);
+      return this._scale._tickInterval(interval.timeUnit, interval.step);
     }
 
     public _getTickValues(): any[] {
@@ -193,7 +193,7 @@ export module Axis {
 
     private renderTickLabels(container: D3.Selection, interval: ITimeInterval, height: number) {
       container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).remove();
-      var tickPos = this._scale.tickInterval(interval.timeUnit,
+      var tickPos = this._scale._tickInterval(interval.timeUnit,
                                               interval.step);
       tickPos.splice(0, 0, this._scale.domain()[0]);
       tickPos.push(this._scale.domain()[1]);

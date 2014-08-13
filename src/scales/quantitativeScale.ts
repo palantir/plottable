@@ -12,8 +12,12 @@ export module Abstract {
     /**
      * Creates a new QuantitativeScale.
      *
+     * A QuantitativeScale is an Abstract.Scale that maps anys to numbers. It
+     * is invertible and continuous.
+     *
      * @constructor
-     * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale backing the QuantitativeScale.
+     * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale
+     * backing the QuantitativeScale.
      */
     constructor(scale: D3.Scale.QuantitativeScale) {
       super(scale);
@@ -58,56 +62,9 @@ export module Abstract {
     }
 
     /**
-     * Sets or gets the QuantitativeScale's output interpolator
+     * Returns the locations in the range where ticks will show up.
      *
-     * @param {D3.Transition.Interpolate} [factory] The output interpolator to use.
-     * @returns {D3.Transition.Interpolate|QuantitativeScale} The current output interpolator, or the calling QuantitativeScale.
-     */
-    public interpolate(): D3.Transition.Interpolate;
-    public interpolate(factory: D3.Transition.Interpolate): QuantitativeScale;
-    public interpolate(factory?: D3.Transition.Interpolate): any {
-      if (factory == null) {
-        return this._d3Scale.interpolate();
-      }
-      this._d3Scale.interpolate(factory);
-      return this;
-    }
-
-    /**
-     * Sets the range of the QuantitativeScale and sets the interpolator to d3.interpolateRound.
-     *
-     * @param {number[]} values The new range value for the range.
-     */
-    public rangeRound(values: number[]) {
-      this._d3Scale.rangeRound(values);
-      return this;
-    }
-
-    /**
-     * Gets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
-     *
-     * @returns {boolean} The current clamp status.
-     */
-    public clamp(): boolean;
-    /**
-     * Sets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
-     *
-     * @param {boolean} clamp Whether or not to clamp the QuantitativeScale.
-     * @returns {QuantitativeScale} The calling QuantitativeScale.
-     */
-    public clamp(clamp: boolean): QuantitativeScale;
-    public clamp(clamp?: boolean): any {
-      if (clamp == null) {
-        return this._d3Scale.clamp();
-      }
-      this._d3Scale.clamp(clamp);
-      return this;
-    }
-
-    /**
-     * Generates tick values.
-     *
-     * @param {number} [count] The number of ticks to generate.
+     * @param {number} [count] The suggested number of ticks to generate.
      * @returns {any[]} The generated ticks.
      */
     public ticks(count?: number) {
@@ -115,17 +72,6 @@ export module Abstract {
         this._lastRequestedTickCount = count;
       }
       return this._d3Scale.ticks(this._lastRequestedTickCount);
-    }
-
-    /**
-     * Gets a tick formatting function for displaying tick values.
-     *
-     * @param {number} count The number of ticks to be displayed
-     * @param {string} [format] A format specifier string.
-     * @returns {(n: number) => string} A formatting function.
-     */
-    public tickFormat(count: number, format?: string): (n: number) => string {
-      return this._d3Scale.tickFormat(count, format);
     }
 
     /**
@@ -137,23 +83,17 @@ export module Abstract {
     }
 
     /**
-     * Retrieve a Domainer of a scale. A Domainer is responsible for combining
-     * multiple extents into a single domain.
-     *
-     * @return {QuantitativeScale} The scale's current domainer.
-     */
-    public domainer(): Domainer;
-    /**
-     * Sets a Domainer of a scale. A Domainer is responsible for combining
+     * Set or get a Domainer of a scale. A Domainer is responsible for combining
      * multiple extents into a single domain.
      *
      * When you set domainer, we assume that you know what you want the domain
      * to look like better that we do. Ensuring that the domain is padded,
      * includes 0, etc., will be the responsability of the new domainer.
      *
-     * @param {Domainer} domainer The domainer to be set.
-     * @return {QuantitativeScale} The calling scale.
+     * @return {QuantitativeScale|Domainer} The calling QuantitativeScale, or
+     * the scale's current domainer.
      */
+    public domainer(): Domainer;
     public domainer(domainer: Domainer): QuantitativeScale;
     public domainer(domainer?: Domainer): any {
       if (domainer == null) {

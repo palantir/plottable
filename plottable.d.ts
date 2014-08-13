@@ -319,8 +319,6 @@ declare module Plottable {
             range(): any[];
             range(values: any[]): Scale;
             copy(): Scale;
-            updateExtent(rendererID: number, attr: string, extent: any[]): Scale;
-            removeExtent(rendererID: number, attr: string): Scale;
         }
     }
 }
@@ -482,13 +480,7 @@ declare module Plottable {
             copy(): QuantitativeScale;
             domain(): any[];
             domain(values: any[]): QuantitativeScale;
-            interpolate(): D3.Transition.Interpolate;
-            interpolate(factory: D3.Transition.Interpolate): QuantitativeScale;
-            rangeRound(values: number[]): QuantitativeScale;
-            clamp(): boolean;
-            clamp(clamp: boolean): QuantitativeScale;
             ticks(count?: number): any[];
-            tickFormat(count: number, format?: string): (n: number) => string;
             domainer(): Domainer;
             domainer(domainer: Domainer): QuantitativeScale;
         }
@@ -566,7 +558,6 @@ declare module Plottable {
         class Time extends Plottable.Abstract.QuantitativeScale {
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            tickInterval(interval: D3.Time.Interval, step?: number): any[];
             domain(): any[];
             domain(values: any[]): Time;
             copy(): Time;

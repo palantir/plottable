@@ -13,7 +13,7 @@ export module Plot {
     };
 
     /**
-     * Creates a LinePlot.
+     * Creates a Plot.Line.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.

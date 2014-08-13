@@ -187,18 +187,16 @@ export module Scale {
     }
 
     /**
-     * @returns {boolean}
-     * Whether or not to return tick values other than powers of base.
+     * Get or set or not to return tick values other than powers of base.
      *
      * This defaults to false, so you'll normally only see ticks like
      * [10, 100, 1000]. If you turn it on, you might see ticks values
      * like [10, 50, 100, 500, 1000].
+     * @param {boolean} [show] The desired setting.
+     * @returns {ModifiedLog|boolean} The calling ModifiedLog, or the current
+     * setting.
      */
     public showIntermediateTicks(): boolean;
-    /**
-     * @param {boolean} show
-     * Whether or not to return ticks values other than powers of the base.
-     */
     public showIntermediateTicks(show: boolean): ModifiedLog;
     public showIntermediateTicks(show?: boolean): any {
       if (show == null) {

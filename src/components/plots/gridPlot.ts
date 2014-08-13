@@ -13,14 +13,17 @@ export module Plot {
     };
 
     /**
-     * Creates a GridPlot.
+     * Creates a Plot.Grid.
+     *
+     * A Grid is used to shade a grid of data. Each datum is a cell on the
+     * grid, and the datum can control what color it is.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
-     * @param {OrdinalScale} xScale The x scale to use.
-     * @param {OrdinalScale} yScale The y scale to use.
-     * @param {ColorScale|InterpolatedColorScale} colorScale The color scale to use for each grid
-     *     cell.
+     * @param {Scale.Ordinal} xScale The x scale to use.
+     * @param {Scale.Ordinal} yScale The y scale to use.
+     * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
+     * to use for each grid cell.
      */
     constructor(dataset: any, xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
@@ -34,6 +37,10 @@ export module Plot {
       this.project("fill", "value", colorScale); // default
     }
 
+    /**
+     * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
+     * the data should return a valid CSS color.
+     */
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "fill") {
