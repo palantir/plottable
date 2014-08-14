@@ -5143,9 +5143,7 @@ var Plottable;
                         _this._hoverOut();
                     }
                 });
-                this.dispatcher.mouseout(function (p) {
-                    _this._hoverOut();
-                });
+                this.dispatcher.mouseout(function (p) { return _this._hoverOut(); });
                 this.dispatcher.connect();
             };
             BarHover.prototype._hoverOut = function () {

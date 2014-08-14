@@ -42,9 +42,7 @@ export module Interaction {
 
       });
 
-      this.dispatcher.mouseout((p: Point) => {
-        this._hoverOut();
-      });
+      this.dispatcher.mouseout((p: Point) => this._hoverOut());
 
       this.dispatcher.connect();
     }
@@ -79,10 +77,11 @@ export module Interaction {
      */
     public hoverMode(): string;
     /**
-     * Chooses the hover mode for the interaction. There are two modes:
-     *     - "point": Selects the bar under the mouse cursor.
-     *     - "line" : Selects any bar that would be hit by a line parallel
-     *                to the bar and passing through the cursor.
+     * Sets the hover mode for the interaction. There are two modes:
+     *     - "point": Selects the bar under the mouse cursor (default).
+     *     - "line" : Selects any bar that would be hit by a line extending
+     *                in the same direction as the bar and passing through
+     *                the cursor.
      *
      * @param {string} mode The desired hover mode.
      * @return {BarHover} The calling Interaction.BarHover.
