@@ -31,6 +31,17 @@ export module Abstract {
     private _gutter = 15;
     private _showEndTickLabels = false;
 
+    /**
+     * Contructs an axis. An axis is a wrapper around a scale for rendering.
+     *
+     * @constructor
+     * @param {Abstract.Scale} scale The scale for this axis to render.
+     * @param {string} orientation One of ["top", "left", "bottom", "right"];
+     * on which side the axis will appear. On most axes, this is either "left"
+     * or "bottom".
+     * @param {Function} Data is passed through this formatter before being
+     * displayed.
+     */
     constructor(scale: Abstract.Scale, orientation: string, formatter = Formatters.identity()) {
       super();
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
@@ -291,7 +302,8 @@ export module Abstract {
     }
 
     /**
-     * Get the current formatter on the axis.
+     * Get the current formatter on the axis. Data is passed through the
+     * formatter before being displayed.
      *
      * @returns {Formatter} the axis formatter
      */

@@ -316,7 +316,7 @@ describe("TimeAxis", function () {
         assert.throws(function () { return new Plottable.Axis.Time(scale, "right"); }, "unsupported");
     });
     it("major and minor intervals arrays are the same length", function () {
-        assert.equal(Plottable.Axis.Time.majorIntervals.length, Plottable.Axis.Time.minorIntervals.length, "major and minor interval arrays must be same size");
+        assert.equal(Plottable.Axis.Time._majorIntervals.length, Plottable.Axis.Time._minorIntervals.length, "major and minor interval arrays must be same size");
     });
     it("Computing the default ticks doesn't error out for edge cases", function () {
         var svg = generateSVG(400, 100);

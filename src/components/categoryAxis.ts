@@ -7,10 +7,11 @@ export module Axis {
     private measurer: Util.Text.CachingCharacterMeasurer;
 
     /**
-     * Creates a CategoryAxis.
+     * Constructs an Axis.Category.
      *
-     * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to try to
-     * display the scale as efficiently as possible.
+     * An Axis.Category takes a Scale.Ordinal and includes word-wrapping
+     * algorithms and advanced layout logic to try to display the scale as
+     * efficiently as possible.
      *
      * @constructor
      * @param {OrdinalScale} scale The scale to base the Axis on.

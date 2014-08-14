@@ -11,10 +11,13 @@ export module Axis {
     private showLastTickLabel = false;
 
     /**
-     * Creates a NumericAxis.
+     * Creates an Axis.Numeric.
+     *
+     * Just as an Axis.Category is for rendering Scale.Ordinal, an Axis.Numeric
+     * is for rendering Abstact.QuantitativeScale.
      *
      * @constructor
-     * @param {QuantitativeScale} scale The QuantitativeScale to base the NumericAxis on.
+     * @param {QuantitativeScale} scale The Abstract.QuantitativeScale to base the axis on.
      * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
      * @param {Formatter} [formatter] A function to format tick labels (default Formatters.general(3, false)).
      */
@@ -178,6 +181,7 @@ export module Axis {
      * @param {string} position The relative position of the tick label.
      *                          [top/center/bottom] for a vertical NumericAxis,
      *                          [left/center/right] for a horizontal NumericAxis.
+     *                          Defaults to center.
      * @returns {NumericAxis} The calling NumericAxis.
      */
     public tickLabelPosition(position: string): Axis.Numeric;

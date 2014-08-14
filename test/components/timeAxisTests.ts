@@ -10,7 +10,7 @@ describe("TimeAxis", () => {
     });
 
     it("major and minor intervals arrays are the same length", () => {
-        assert.equal(Plottable.Axis.Time.majorIntervals.length, Plottable.Axis.Time.minorIntervals.length,
+        assert.equal(Plottable.Axis.Time._majorIntervals.length, Plottable.Axis.Time._minorIntervals.length,
                 "major and minor interval arrays must be same size");
     });
 
