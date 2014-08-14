@@ -151,101 +151,44 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Abstract {
-        class Formatter {
-            constructor(precision: number);
-            format(d: any): string;
-            precision(): number;
-            precision(value: number): Formatter;
-            showOnlyUnchangedValues(): boolean;
-            showOnlyUnchangedValues(showUnchanged: boolean): Formatter;
-        }
+    interface Formatter {
+        (d: any): string;
     }
-}
-
-
-declare module Plottable {
-    module Formatter {
-        class Identity extends Plottable.Abstract.Formatter {
-            constructor();
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Formatter {
-        class General extends Plottable.Abstract.Formatter {
-            constructor(precision?: number);
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Formatter {
-        class Fixed extends Plottable.Abstract.Formatter {
-            constructor(precision?: number);
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Formatter {
-        class Currency extends Fixed {
-            constructor(precision?: number, symbol?: string, prefix?: boolean);
-            format(d: any): string;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Formatter {
-        class Percentage extends Fixed {
-            constructor(precision?: number);
-            format(d: any): string;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Formatter {
-        class SISuffix extends Plottable.Abstract.Formatter {
-            constructor(precision?: number);
-            precision(): number;
-            precision(value: number): SISuffix;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Formatter {
-        class Custom extends Plottable.Abstract.Formatter {
-            constructor(customFormatFunction: (d: any, formatter: Custom) => string, precision?: number);
-        }
-    }
-}
-
-
-declare module Plottable {
-    interface FilterFormat {
-        format: string;
-        filter: (d: any) => any;
-    }
-    module Formatter {
-        class Time extends Plottable.Abstract.Formatter {
-            constructor();
-        }
+    var MILLISECONDS_IN_ONE_DAY: number;
+    class Formatters {
+        static currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
+        static fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        static general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        static identity(): (d: any) => string;
+        static percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        static siSuffix(precision?: number): (d: any) => string;
+        static time(): (d: any) => string;
+        static relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
     }
 }
 
 
 declare module Plottable {
     var version: string;
+}
+
+
+declare module Plottable {
+    module Core {
+        class Colors {
+            static CORAL_RED: string;
+            static INDIGO: string;
+            static ROBINS_EGG_BLUE: string;
+            static FERN: string;
+            static BURNING_ORANGE: string;
+            static ROYAL_HEATH: string;
+            static CONIFER: string;
+            static CERISE_RED: string;
+            static BRIGHT_SUN: string;
+            static JACARTA: string;
+            static PLOTTABLE_COLORS: string[];
+        }
+    }
 }
 
 
@@ -658,18 +601,21 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Axis extends Component {
+            static END_TICK_MARK_CLASS: string;
             static TICK_MARK_CLASS: string;
             static TICK_LABEL_CLASS: string;
-            constructor(scale: Scale, orientation: string, formatter?: any);
+            constructor(scale: Scale, orientation: string, formatter?: (d: any) => string);
             remove(): void;
             width(): number;
             width(w: any): Axis;
             height(): number;
             height(h: any): Axis;
             formatter(): Formatter;
-            formatter(formatter: any): Axis;
+            formatter(formatter: Formatter): Axis;
             tickLength(): number;
             tickLength(length: number): Axis;
+            endTickLength(): number;
+            endTickLength(length: number): Axis;
             tickLabelPadding(): number;
             tickLabelPadding(padding: number): Axis;
             gutter(): number;
@@ -705,7 +651,7 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Numeric extends Plottable.Abstract.Axis {
-            constructor(scale: Plottable.Abstract.QuantitativeScale, orientation: string, formatter?: any);
+            constructor(scale: Plottable.Abstract.QuantitativeScale, orientation: string, formatter?: (d: any) => string);
             tickLabelPosition(): string;
             tickLabelPosition(position: string): Numeric;
             showEndTickLabel(orientation: string): boolean;
@@ -718,7 +664,7 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Category extends Plottable.Abstract.Axis {
-            constructor(scale: Plottable.Scale.Ordinal, orientation?: string, formatter?: any);
+            constructor(scale: Plottable.Scale.Ordinal, orientation?: string, formatter?: (d: any) => string);
         }
     }
 }
@@ -771,16 +717,6 @@ declare module Plottable {
         class Gridlines extends Plottable.Abstract.Component {
             constructor(xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.QuantitativeScale);
             remove(): Gridlines;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Util {
-        module Axis {
-            var ONE_DAY: number;
-            function generateRelativeDateFormatter(baseValue: number, increment?: number, label?: string): (tickValue: any) => string;
         }
     }
 }
@@ -980,7 +916,7 @@ declare module Plottable {
         class PanZoom extends Plottable.Abstract.Interaction {
             xScale: Plottable.Abstract.QuantitativeScale;
             yScale: Plottable.Abstract.QuantitativeScale;
-            constructor(componentToListenTo: Plottable.Abstract.Component, xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.QuantitativeScale);
+            constructor(componentToListenTo: Plottable.Abstract.Component, xScale?: Plottable.Abstract.QuantitativeScale, yScale?: Plottable.Abstract.QuantitativeScale);
             resetZoom(): void;
         }
     }

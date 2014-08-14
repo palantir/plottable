@@ -133,7 +133,7 @@ describe("NumericAxis", () => {
     var scale = new Plottable.Scale.Linear();
     scale.range([0, SVG_HEIGHT]);
 
-    var formatter = new Plottable.Formatter.Fixed(2);
+    var formatter = Plottable.Formatters.fixed(2);
 
     var numericAxis = new Plottable.Axis.Numeric(scale, "left", formatter);
     numericAxis.renderTo(svg);
@@ -141,7 +141,7 @@ describe("NumericAxis", () => {
     var tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
     tickLabels.each(function(d: any, i: number) {
       var labelText = d3.select(this).text();
-      var formattedValue = formatter.format(d);
+      var formattedValue = formatter(d);
       assert.strictEqual(labelText, formattedValue, "The supplied Formatter was used to format the tick label");
     });
 
@@ -229,13 +229,12 @@ describe("NumericAxis", () => {
     scale.domain([5, -5]);
     scale.range([0, SVG_HEIGHT]);
 
-    var customFormatFunction = (d: any, formatter: Plottable.Formatter.Custom) => {
+    var formatter = (d: any) => {
       if (d === 0) {
         return "This is zero";
       }
       return String(d);
     };
-    var formatter = new Plottable.Formatter.Custom(customFormatFunction, 0);
 
     var numericAxis = new Plottable.Axis.Numeric(scale, "left", formatter);
     numericAxis.renderTo(svg);
@@ -263,7 +262,7 @@ describe("NumericAxis", () => {
     scale.domain([5, -5]);
     scale.range([0, SVG_WIDTH]);
 
-    var formatter = new Plottable.Formatter.Fixed(2);
+    var formatter = Plottable.Formatters.fixed(2);
 
     var numericAxis = new Plottable.Axis.Numeric(scale, "bottom", formatter);
     numericAxis.renderTo(svg);

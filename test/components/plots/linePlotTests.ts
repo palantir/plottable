@@ -3,17 +3,15 @@
 var assert = chai.assert;
 
 describe("Plots", () => {
-  describe("AreaPlot", () => {
+  describe("LinePlot", () => {
     var svg: D3.Selection;
     var xScale: Plottable.Scale.Linear;
     var yScale: Plottable.Scale.Linear;
     var xAccessor: any;
     var yAccessor: any;
-    var y0Accessor: any;
     var colorAccessor: any;
-    var fillAccessor: any;
     var simpleDataset: Plottable.DataSource;
-    var areaPlot: Plottable.Plot.Area;
+    var linePlot: Plottable.Plot.Line;
     var renderArea: D3.Selection;
     var verifier: MultiTestVerifier;
     // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
@@ -26,45 +24,54 @@ describe("Plots", () => {
       yScale = new Plottable.Scale.Linear().domain([0, 1]);
       xAccessor = (d: any) => d.foo;
       yAccessor = (d: any) => d.bar;
-      y0Accessor = () => 0;
       colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
-      fillAccessor = () => "steelblue";
       simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
-      areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
-      areaPlot.project("x", xAccessor, xScale)
+      linePlot = new Plottable.Plot.Line(simpleDataset, xScale, yScale);
+      linePlot.project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)
-              .project("y0", y0Accessor, yScale)
-              .project("fill", fillAccessor)
               .project("stroke", colorAccessor)
               .renderTo(svg);
-      renderArea = areaPlot.renderArea;
+      renderArea = linePlot.renderArea;
     });
 
     beforeEach(() => {
       verifier.start();
     });
 
-    it("draws area and line correctly", () => {
-      var areaPath = renderArea.select(".area");
-      assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
-      assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
-      var areaComputedStyle = window.getComputedStyle(areaPath.node());
-      assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
-
+    it("draws a line correctly", () => {
       var linePath = renderArea.select(".line");
       assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
-      assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
       var lineComputedStyle = window.getComputedStyle(linePath.node());
       assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
       verifier.end();
     });
 
-    it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
-      areaPlot.project("y0", (d: any) => d.bar/2, yScale);
-      areaPlot.renderTo(svg);
-      renderArea = areaPlot.renderArea;
-      var areaPath = renderArea.select(".area");
-      assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
+    it("attributes set appropriately from accessor", () => {
+      var areaPath = renderArea.select(".line");
+      assert.equal(areaPath.attr("stroke"), "#000000", "stroke set correctly");
+      verifier.end();
+    });
+
+    it("attributes can be changed by projecting new accessor and re-render appropriately", () => {
+      var newColorAccessor = () => "pink";
+      linePlot.project("stroke", newColorAccessor);
+      linePlot.renderTo(svg);
+      var linePath = renderArea.select(".line");
+      assert.equal(linePath.attr("stroke"), "pink", "stroke changed correctly");
+      verifier.end();
+    });
+
+    it("attributes can be changed by projecting attribute accessor (sets to first datum attribute)", () => {
+      var data = simpleDataset.data();
+      data.forEach(function(d: any) { d.stroke = "pink"; });
+      simpleDataset.data(data);
+      linePlot.project("stroke", "stroke");
+      var areaPath = renderArea.select(".line");
+      assert.equal(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
+
+      data[0].stroke = "green";
+      simpleDataset.data(data);
+      assert.equal(areaPath.attr("stroke"), "green", "stroke set to first datum stroke color");
       verifier.end();
     });
 

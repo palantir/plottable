@@ -32,7 +32,7 @@ export module Abstract {
     constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
       this.classed("bar-plot", true);
-      this.project("fill", () => "steelblue");
+      this.project("fill", () => Core.Colors.INDIGO);
       // because this._baselineValue was not initialized during the super()
       // call, we must call this in order to get this._baselineValue
       // to be used by the Domainer.
@@ -43,7 +43,6 @@ export module Abstract {
       super._setup();
       this._baseline = this.renderArea.append("line").classed("baseline", true);
       this._bars = this.renderArea.selectAll("rect").data([]);
-      return this;
     }
 
     public _paint() {
@@ -200,11 +199,11 @@ export module Abstract {
               .removePaddingException("BAR_PLOT+" + this._plottableID)
               .removeIncludedValue("BAR_PLOT+" + this._plottableID);
           }
+          qscale.domainer().pad();
         }
             // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         qscale._autoDomainIfAutomaticMode();
       }
-      return this;
     }
 
     public _generateAttrToProjector() {

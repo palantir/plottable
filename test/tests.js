@@ -257,14 +257,53 @@ describe("BaseAxis", function () {
             return tickValues;
         };
         baseAxis.renderTo(svg);
-        var firstTickMark = svg.select("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        var secondTickMark = svg.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS + ":nth-child(2)");
+        assert.strictEqual(secondTickMark.attr("x1"), "50");
+        assert.strictEqual(secondTickMark.attr("x2"), "50");
+        assert.strictEqual(secondTickMark.attr("y1"), "0");
+        assert.strictEqual(secondTickMark.attr("y2"), String(baseAxis.tickLength()));
+        baseAxis.tickLength(10);
+        assert.strictEqual(secondTickMark.attr("y2"), String(baseAxis.tickLength()), "tick length was updated");
+        assert.throws(function () { return baseAxis.tickLength(-1); }, "must be positive");
+        svg.remove();
+    });
+    it("endTickLength()", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.domain([0, 10]);
+        scale.range([0, SVG_WIDTH]);
+        var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        baseAxis._getTickValues = function () { return tickValues; };
+        baseAxis.renderTo(svg);
+        var firstTickMark = svg.selectAll("." + Plottable.Abstract.Axis.END_TICK_MARK_CLASS);
         assert.strictEqual(firstTickMark.attr("x1"), "0");
         assert.strictEqual(firstTickMark.attr("x2"), "0");
         assert.strictEqual(firstTickMark.attr("y1"), "0");
-        assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.tickLength()));
+        assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.endTickLength()));
+        baseAxis.endTickLength(10);
+        assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.endTickLength()), "end tick length was updated");
+        assert.throws(function () { return baseAxis.endTickLength(-1); }, "must be positive");
+        svg.remove();
+    });
+    it("height is adjusted to greater of tickLength or endTickLength", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        baseAxis.showEndTickLabels(true);
+        baseAxis.renderTo(svg);
+        var expectedHeight = Math.max(baseAxis.tickLength(), baseAxis.endTickLength()) + baseAxis.gutter();
+        assert.strictEqual(baseAxis.height(), expectedHeight, "height should be equal to the maximum of the two");
+        baseAxis.tickLength(20);
+        assert.strictEqual(baseAxis.height(), 20 + baseAxis.gutter(), "height should increase to tick length");
+        baseAxis.endTickLength(30);
+        assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should increase to end tick length");
         baseAxis.tickLength(10);
-        assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.tickLength()), "tick length was updated");
-        assert.throws(function () { return baseAxis.tickLength(-1); }, "must be positive");
+        assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should not decrease");
         svg.remove();
     });
 });
@@ -455,13 +494,13 @@ describe("NumericAxis", function () {
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scale.Linear();
         scale.range([0, SVG_HEIGHT]);
-        var formatter = new Plottable.Formatter.Fixed(2);
+        var formatter = Plottable.Formatters.fixed(2);
         var numericAxis = new Plottable.Axis.Numeric(scale, "left", formatter);
         numericAxis.renderTo(svg);
         var tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
         tickLabels.each(function (d, i) {
             var labelText = d3.select(this).text();
-            var formattedValue = formatter.format(d);
+            var formattedValue = formatter(d);
             assert.strictEqual(labelText, formattedValue, "The supplied Formatter was used to format the tick label");
         });
         svg.remove();
@@ -530,13 +569,12 @@ describe("NumericAxis", function () {
         var scale = new Plottable.Scale.Linear();
         scale.domain([5, -5]);
         scale.range([0, SVG_HEIGHT]);
-        var customFormatFunction = function (d, formatter) {
+        var formatter = function (d) {
             if (d === 0) {
                 return "This is zero";
             }
             return String(d);
         };
-        var formatter = new Plottable.Formatter.Custom(customFormatFunction, 0);
         var numericAxis = new Plottable.Axis.Numeric(scale, "left", formatter);
         numericAxis.renderTo(svg);
         var visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
@@ -558,7 +596,7 @@ describe("NumericAxis", function () {
         var scale = new Plottable.Scale.Linear();
         scale.domain([5, -5]);
         scale.range([0, SVG_WIDTH]);
-        var formatter = new Plottable.Formatter.Fixed(2);
+        var formatter = Plottable.Formatters.fixed(2);
         var numericAxis = new Plottable.Axis.Numeric(scale, "bottom", formatter);
         numericAxis.renderTo(svg);
         var visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
@@ -656,7 +694,7 @@ describe("Labels", function () {
         assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
         var text = content.select("text");
         var bbox = Plottable.Util.DOM.getBBox(text);
-        assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
+        assert.closeTo(bbox.height, label.availableHeight, 0.5, "text height === label.minimumHeight()");
         assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
@@ -876,10 +914,12 @@ describe("Legends", function () {
         }
         verifyCircleHeight();
         style.text(".plottable .legend text { font-size: 60px; }");
-        legend._computeLayout()._render();
+        legend._computeLayout();
+        legend._render();
         verifyCircleHeight();
         style.text(".plottable .legend text { font-size: 10px; }");
-        legend._computeLayout()._render();
+        legend._computeLayout();
+        legend._render();
         verifyCircleHeight();
         svg.remove();
     });
@@ -1192,7 +1232,8 @@ describe("Plots", function () {
             var svg = generateSVG(400, 300);
             var d1 = new Plottable.DataSource(["foo"], { cssClass: "bar" });
             var r = new Plottable.Abstract.Plot(d1);
-            r._anchor(svg)._computeLayout();
+            r._anchor(svg);
+            r._computeLayout();
             var renderArea = r.content.select(".render-area");
             assert.isNotNull(renderArea.node(), "there is a render-area");
             svg.remove();
@@ -1302,6 +1343,79 @@ describe("Plots", function () {
 
 var assert = chai.assert;
 describe("Plots", function () {
+    describe("LinePlot", function () {
+        var svg;
+        var xScale;
+        var yScale;
+        var xAccessor;
+        var yAccessor;
+        var colorAccessor;
+        var simpleDataset;
+        var linePlot;
+        var renderArea;
+        var verifier;
+        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
+        before(function () {
+            svg = generateSVG(500, 500);
+            verifier = new MultiTestVerifier();
+            xScale = new Plottable.Scale.Linear().domain([0, 1]);
+            yScale = new Plottable.Scale.Linear().domain([0, 1]);
+            xAccessor = function (d) { return d.foo; };
+            yAccessor = function (d) { return d.bar; };
+            colorAccessor = function (d, i, m) { return d3.rgb(d.foo, d.bar, i).toString(); };
+            simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+            linePlot = new Plottable.Plot.Line(simpleDataset, xScale, yScale);
+            linePlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).renderTo(svg);
+            renderArea = linePlot.renderArea;
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        it("draws a line correctly", function () {
+            var linePath = renderArea.select(".line");
+            assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
+            var lineComputedStyle = window.getComputedStyle(linePath.node());
+            assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
+            verifier.end();
+        });
+        it("attributes set appropriately from accessor", function () {
+            var areaPath = renderArea.select(".line");
+            assert.equal(areaPath.attr("stroke"), "#000000", "stroke set correctly");
+            verifier.end();
+        });
+        it("attributes can be changed by projecting new accessor and re-render appropriately", function () {
+            var newColorAccessor = function () { return "pink"; };
+            linePlot.project("stroke", newColorAccessor);
+            linePlot.renderTo(svg);
+            var linePath = renderArea.select(".line");
+            assert.equal(linePath.attr("stroke"), "pink", "stroke changed correctly");
+            verifier.end();
+        });
+        it("attributes can be changed by projecting attribute accessor (sets to first datum attribute)", function () {
+            var data = simpleDataset.data();
+            data.forEach(function (d) {
+                d.stroke = "pink";
+            });
+            simpleDataset.data(data);
+            linePlot.project("stroke", "stroke");
+            var areaPath = renderArea.select(".line");
+            assert.equal(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
+            data[0].stroke = "green";
+            simpleDataset.data(data);
+            assert.equal(areaPath.attr("stroke"), "green", "stroke set to first datum stroke color");
+            verifier.end();
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+    });
+});
+
+var assert = chai.assert;
+describe("Plots", function () {
     describe("AreaPlot", function () {
         var svg;
         var xScale;
@@ -1345,20 +1459,6 @@ describe("Plots", function () {
             assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
             var lineComputedStyle = window.getComputedStyle(linePath.node());
             assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
-            verifier.end();
-        });
-        it("fill colors set appropriately from accessor", function () {
-            var areaPath = renderArea.select(".area");
-            assert.equal(areaPath.attr("fill"), "steelblue", "fill set correctly");
-            verifier.end();
-        });
-        it("fill colors can be changed by projecting new accessor and re-render appropriately", function () {
-            var newFillAccessor = function () { return "pink"; };
-            areaPlot.project("fill", newFillAccessor);
-            areaPlot.renderTo(svg);
-            renderArea = areaPlot.renderArea;
-            var areaPath = renderArea.select(".area");
-            assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
             verifier.end();
         });
         it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", function () {
@@ -1639,6 +1739,7 @@ describe("Plots", function () {
                 var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
                 axisWidth = yAxis.availableWidth;
                 bandWidth = yScale.rangeBand();
+                xScale.domainer(xScale.domainer().pad(0));
             });
             beforeEach(function () {
                 verifier.start();
@@ -1867,7 +1968,8 @@ describe("Plots", function () {
                 verifier.end();
             });
             it("rendering is idempotent", function () {
-                circlePlot._render()._render();
+                circlePlot._render();
+                circlePlot._render();
                 circlePlot.renderArea.selectAll("circle").each(getCirclePlotVerifier());
                 assert.equal(circlesInArea, 10, "10 circles were drawn");
                 verifier.end();
@@ -2244,7 +2346,8 @@ describe("Component behavior", function () {
     });
     describe("computeLayout", function () {
         it("computeLayout defaults and updates intelligently", function () {
-            c._anchor(svg)._computeLayout();
+            c._anchor(svg);
+            c._computeLayout();
             assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
             assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
@@ -2262,7 +2365,8 @@ describe("Component behavior", function () {
             parent.style("width", "400px");
             parent.style("height", "200px");
             svg.attr("width", null).attr("height", null);
-            c._anchor(svg)._computeLayout();
+            c._anchor(svg);
+            c._computeLayout();
             assert.equal(c.availableWidth, 400, "defaults to width of parent if width is not specified on <svg>");
             assert.equal(c.availableHeight, 200, "defaults to height of parent if width is not specified on <svg>");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
@@ -2299,7 +2403,8 @@ describe("Component behavior", function () {
             var yOff = 20;
             var width = 100;
             var height = 200;
-            c._anchor(svg)._computeLayout(xOff, yOff, width, height);
+            c._anchor(svg);
+            c._computeLayout(xOff, yOff, width, height);
             var translate = getTranslate(c.element);
             assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
             assert.equal(c.availableWidth, width, "the width set properly");
@@ -2369,7 +2474,9 @@ describe("Component behavior", function () {
         assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
         c.clipPathEnabled = true;
         var expectedClipPathID = c._plottableID;
-        c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
+        c._anchor(svg);
+        c._computeLayout(0, 0, 100, 100);
+        c._render();
         var expectedClipPathURL = "url(#clipPath" + expectedClipPathID + ")";
         var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
         assert.isTrue(normalizeClipPath(c.element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
@@ -2882,6 +2989,14 @@ describe("Domainer", function () {
         var domain = domainer.computeDomain([[0, 100]], scale);
         assert.deepEqual(domain, [-5, 105]);
     });
+    it("pad() works with scales that have 0-size domain", function () {
+        scale.domain([5, 5]);
+        var domain = domainer.computeDomain([[0, 100]], scale);
+        assert.deepEqual(domain, [0, 100]);
+        domainer.pad(0.1);
+        domain = domainer.computeDomain([[0, 100]], scale);
+        assert.deepEqual(domain, [0, 100]);
+    });
     it("paddingException(n) will not pad beyond n", function () {
         domainer.pad(0.1).addPaddingException(0, "key").addPaddingException(200);
         var domain = domainer.computeDomain([[0, 100]], scale);
@@ -3343,6 +3458,13 @@ describe("Scales", function () {
             assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
             assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
         });
+        it("ticks() is always non-empty", function () {
+            [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach(function (domain) {
+                scale.updateExtent(1, "x", domain);
+                var ticks = scale.ticks();
+                assert.operator(ticks.length, ">", 0);
+            });
+        });
     });
 });
 
@@ -3452,151 +3574,164 @@ var assert = chai.assert;
 describe("Formatters", function () {
     describe("fixed", function () {
         it("shows exactly [precision] digits", function () {
-            var fixed3 = new Plottable.Formatter.Fixed();
-            var result = fixed3.format(1);
+            var fixed3 = Plottable.Formatters.fixed();
+            var result = fixed3(1);
             assert.strictEqual(result, "1.000", "defaults to three decimal places");
-            result = fixed3.format(1.234);
+            result = fixed3(1.234);
             assert.strictEqual(result, "1.234", "shows three decimal places");
-            result = fixed3.format(1.2345);
+            result = fixed3(1.2345);
             assert.strictEqual(result, "", "changed values are not shown (get turned into empty strings)");
         });
         it("precision can be changed", function () {
-            var fixed2 = new Plottable.Formatter.Fixed();
-            fixed2.precision(2);
-            var result = fixed2.format(1);
+            var fixed2 = Plottable.Formatters.fixed(2);
+            var result = fixed2(1);
             assert.strictEqual(result, "1.00", "formatter was changed to show only two decimal places");
         });
         it("can be set to show rounded values", function () {
-            var fixed3 = new Plottable.Formatter.Fixed();
-            fixed3.showOnlyUnchangedValues(false);
-            var result = fixed3.format(1.2349);
+            var fixed3 = Plottable.Formatters.fixed(3, false);
+            var result = fixed3(1.2349);
             assert.strictEqual(result, "1.235", "long values are rounded correctly");
         });
     });
     describe("general", function () {
         it("formats number to show at most [precision] digits", function () {
-            var general = new Plottable.Formatter.General();
-            var result = general.format(1);
+            var general = Plottable.Formatters.general();
+            var result = general(1);
             assert.strictEqual(result, "1", "shows no decimals if formatting an integer");
-            result = general.format(1.234);
+            result = general(1.234);
             assert.strictEqual(result, "1.234", "shows up to three decimal places");
-            result = general.format(1.2345);
+            result = general(1.2345);
             assert.strictEqual(result, "", "(changed) values with more than three decimal places are not shown");
         });
         it("stringifies non-number values", function () {
-            var general = new Plottable.Formatter.General();
-            var result = general.format("blargh");
+            var general = Plottable.Formatters.general();
+            var result = general("blargh");
             assert.strictEqual(result, "blargh", "string values are passed through unchanged");
-            result = general.format(null);
+            result = general(null);
             assert.strictEqual(result, "null", "non-number inputs are stringified");
         });
         it("throws an error on strange precision", function () {
             assert.throws(function () {
-                var general = new Plottable.Formatter.General(-1);
-                var result = general.format(5);
+                var general = Plottable.Formatters.general(-1);
+                var result = general(5);
             });
             assert.throws(function () {
-                var general = new Plottable.Formatter.General(100);
-                var result = general.format(5);
+                var general = Plottable.Formatters.general(100);
+                var result = general(5);
             });
         });
     });
     describe("identity", function () {
         it("stringifies inputs", function () {
-            var identity = new Plottable.Formatter.Identity();
-            var result = identity.format(1);
+            var identity = Plottable.Formatters.identity();
+            var result = identity(1);
             assert.strictEqual(result, "1", "numbers are stringified");
-            result = identity.format(0.999999);
+            result = identity(0.999999);
             assert.strictEqual(result, "0.999999", "long numbers are stringified");
-            result = identity.format(null);
+            result = identity(null);
             assert.strictEqual(result, "null", "formats null");
-            result = identity.format(undefined);
+            result = identity(undefined);
             assert.strictEqual(result, "undefined", "formats undefined");
         });
     });
     describe("currency", function () {
         it("uses reasonable defaults", function () {
-            var currencyFormatter = new Plottable.Formatter.Currency();
-            var result = currencyFormatter.format(1);
+            var currencyFormatter = Plottable.Formatters.currency();
+            var result = currencyFormatter(1);
             assert.strictEqual(result.charAt(0), "$", "defaults to $ for currency symbol");
             var decimals = result.substring(result.indexOf(".") + 1, result.length);
             assert.strictEqual(decimals.length, 2, "defaults to 2 decimal places");
-            result = currencyFormatter.format(-1);
+            result = currencyFormatter(-1);
             assert.strictEqual(result.charAt(0), "-", "prefixes negative values with \"-\"");
             assert.strictEqual(result.charAt(1), "$", "places the currency symbol after the negative sign");
         });
         it("can change the type and position of the currency symbol", function () {
-            var centsFormatter = new Plottable.Formatter.Currency(0, "c", false);
-            var result = centsFormatter.format(1);
+            var centsFormatter = Plottable.Formatters.currency(0, "c", false);
+            var result = centsFormatter(1);
             assert.strictEqual(result.charAt(result.length - 1), "c", "The specified currency symbol was appended");
         });
     });
     describe("time", function () {
         it("uses reasonable defaults", function () {
-            var timeFormatter = new Plottable.Formatter.Time();
-            var result = timeFormatter.format(new Date(2000, 0, 1, 0, 0, 0, 0));
+            var timeFormatter = Plottable.Formatters.time();
+            var result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
             assert.strictEqual(result, "2000", "only the year was displayed");
-            result = timeFormatter.format(new Date(2000, 2, 1, 0, 0, 0, 0));
+            result = timeFormatter(new Date(2000, 2, 1, 0, 0, 0, 0));
             assert.strictEqual(result, "Mar", "only the month was displayed");
-            result = timeFormatter.format(new Date(2000, 2, 2, 0, 0, 0, 0));
+            result = timeFormatter(new Date(2000, 2, 2, 0, 0, 0, 0));
             assert.strictEqual(result, "Thu 02", "month and date displayed");
-            result = timeFormatter.format(new Date(2000, 2, 1, 20, 0, 0, 0));
+            result = timeFormatter(new Date(2000, 2, 1, 20, 0, 0, 0));
             assert.strictEqual(result, "08 PM", "only hour was displayed");
-            result = timeFormatter.format(new Date(2000, 2, 1, 20, 34, 0, 0));
+            result = timeFormatter(new Date(2000, 2, 1, 20, 34, 0, 0));
             assert.strictEqual(result, "08:34", "hour and minute was displayed");
-            result = timeFormatter.format(new Date(2000, 2, 1, 20, 34, 53, 0));
+            result = timeFormatter(new Date(2000, 2, 1, 20, 34, 53, 0));
             assert.strictEqual(result, ":53", "seconds was displayed");
-            result = timeFormatter.format(new Date(2000, 0, 1, 0, 0, 0, 950));
+            result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 950));
             assert.strictEqual(result, ".950", "milliseconds was displayed");
         });
     });
     describe("percentage", function () {
         it("uses reasonable defaults", function () {
-            var percentFormatter = new Plottable.Formatter.Percentage();
-            var result = percentFormatter.format(1);
+            var percentFormatter = Plottable.Formatters.percentage();
+            var result = percentFormatter(1);
             assert.strictEqual(result, "100%", "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
         });
     });
     describe("time", function () {
         it("uses reasonable defaults", function () {
-            var timeFormatter = new Plottable.Formatter.Time();
-            var result = timeFormatter.format(new Date(2000, 0, 1, 0, 0, 0, 0));
+            var timeFormatter = Plottable.Formatters.time();
+            var result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
             assert.strictEqual(result, "2000", "only the year was displayed");
-            result = timeFormatter.format(new Date(2000, 2, 1, 0, 0, 0, 0));
+            result = timeFormatter(new Date(2000, 2, 1, 0, 0, 0, 0));
             assert.strictEqual(result, "Mar", "only the month was displayed");
-            result = timeFormatter.format(new Date(2000, 2, 2, 0, 0, 0, 0));
+            result = timeFormatter(new Date(2000, 2, 2, 0, 0, 0, 0));
             assert.strictEqual(result, "Thu 02", "month and date displayed");
-            result = timeFormatter.format(new Date(2000, 2, 1, 20, 0, 0, 0));
+            result = timeFormatter(new Date(2000, 2, 1, 20, 0, 0, 0));
             assert.strictEqual(result, "08 PM", "only hour was displayed");
-            result = timeFormatter.format(new Date(2000, 2, 1, 20, 34, 0, 0));
+            result = timeFormatter(new Date(2000, 2, 1, 20, 34, 0, 0));
             assert.strictEqual(result, "08:34", "hour and minute was displayed");
-            result = timeFormatter.format(new Date(2000, 2, 1, 20, 34, 53, 0));
+            result = timeFormatter(new Date(2000, 2, 1, 20, 34, 53, 0));
             assert.strictEqual(result, ":53", "seconds was displayed");
-            result = timeFormatter.format(new Date(2000, 0, 1, 0, 0, 0, 950));
+            result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 950));
             assert.strictEqual(result, ".950", "milliseconds was displayed");
-        });
-    });
-    describe("custom", function () {
-        it("can take a custom formatting function", function () {
-            var customFormatter;
-            var blargify = function (d, f) {
-                assert.strictEqual(f, customFormatter, "Formatter itself was supplied as second argument");
-                return String(d) + "-blargh";
-            };
-            customFormatter = new Plottable.Formatter.Custom(blargify);
-            var result = customFormatter.format(1);
-            assert.strictEqual(result, "1-blargh", "it uses the custom formatting function");
         });
     });
     describe("SISuffix", function () {
         it("shortens long numbers", function () {
-            var lnFormatter = new Plottable.Formatter.SISuffix();
-            var result = lnFormatter.format(1);
+            var lnFormatter = Plottable.Formatters.siSuffix();
+            var result = lnFormatter(1);
             assert.strictEqual(result, "1.00", "shows 3 signifigicant figures by default");
-            result = lnFormatter.format(Math.pow(10, 12));
+            result = lnFormatter(Math.pow(10, 12));
             assert.operator(result.length, "<=", 5, "large number was formatted to a short string");
-            result = lnFormatter.format(Math.pow(10, -12));
+            result = lnFormatter(Math.pow(10, -12));
             assert.operator(result.length, "<=", 5, "small number was formatted to a short string");
+        });
+    });
+    describe("relativeDate", function () {
+        it("uses reasonable defaults", function () {
+            var relativeDateFormatter = Plottable.Formatters.relativeDate();
+            var result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "7", "7 day difference from epoch, incremented by days, no suffix");
+        });
+        it("resulting value is difference from base value", function () {
+            var relativeDateFormatter = Plottable.Formatters.relativeDate(5 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            var result = relativeDateFormatter(9 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "4", "4 days greater from base value");
+            var result = relativeDateFormatter(Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "-4", "4 days less from base value");
+        });
+        it("can increment by different time types (hours, minutes)", function () {
+            var hoursRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / 24);
+            var result = hoursRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "72", "72 hour difference from epoch");
+            var minutesRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / (24 * 60));
+            var result = minutesRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "4320", "4320 minute difference from epoch");
+        });
+        it("can append a suffix", function () {
+            var relativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY, "days");
+            var result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "7days", "days appended to the end");
         });
     });
 });
@@ -4183,7 +4318,7 @@ describe("Interactions", function () {
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
             var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
-            var dragBox = renderer.foregroundContainer.select(dragBoxClass);
+            var dragBox = renderer.backgroundContainer.select(dragBoxClass);
             assert.isNotNull(dragBox, "the dragbox was created");
             var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
             var expectedStartPosition = { x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY) };
@@ -4247,7 +4382,7 @@ describe("Interactions", function () {
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
             var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
-            var dragBox = renderer.foregroundContainer.select(dragBoxClass);
+            var dragBox = renderer.backgroundContainer.select(dragBoxClass);
             assert.isNotNull(dragBox, "the dragbox was created");
             var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
             var expectedStartPosition = { x: 0, y: Math.min(dragstartY, dragendY) };

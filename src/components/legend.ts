@@ -142,7 +142,6 @@ export module Component {
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
       this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.availableHeight / textHeight));
-      return this;
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
@@ -176,7 +175,7 @@ export module Component {
       return textHeight;
     }
 
-    public _doRender(): Legend {
+    public _doRender() {
       super._doRender();
       var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
       var textHeight = this.measureTextHeight();
@@ -213,7 +212,6 @@ export module Component {
 
       this.updateClasses();
       this.updateListeners();
-      return this;
     }
 
     private updateListeners() {

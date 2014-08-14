@@ -7,13 +7,14 @@ function run(div, data, Plottable) {
 
         var renderers = [];
 
-        var colors = new Plottable.Scale.Color("10").range();
         var numRenderers = 5;
         var names = ["bat", "cat", "mat", "rat", "pat"];
         var colorScale = new Plottable.Scale.Color();
-        colorScale.range(colors);
+        if (colorScale.range().length === 0) { // cross-compatibility on color scale change
+            colorScale = new Plottable.Scale.Color("10");
+        }
         colorScale.domain(names);
-
+        var colors = colorScale.range();
 
         var xScale = new Plottable.Scale.Linear();
         var yScale = new Plottable.Scale.Linear();
@@ -39,14 +40,14 @@ function run(div, data, Plottable) {
                                   [yAxis, cg],
                                   [null,  xAxis]
                                 ]);
-        
+
         var legendLabel = new Plottable.Component.TitleLabel("fat");
         var legend = new Plottable.Component.Legend(colorScale);
-        var legendTable = new Plottable.Component.Table([[legendLabel], [legend]]); 
+        var legendTable = new Plottable.Component.Table([[legendLabel], [legend]]);
 
         var outerTable = new Plottable.Component.Table([[chart, legendTable]]);
         outerTable.renderTo(svg);
-          
+
         cb = function(xy) {
             if (xy == null) {console.log("starting drag"); return;}
             var invertedXMin = xScale.invert(xy.xMin);
@@ -70,5 +71,5 @@ function run(div, data, Plottable) {
         var doubleClickInteraction = new Plottable.Interaction.DoubleClick(cg)
              .callback(cb2)
              .registerWithComponent();
-             
+
 }
