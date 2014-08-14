@@ -59,6 +59,10 @@ svg.plottable {
   stroke-width: 1px;
 }
 
+.plottable .gridlines .baseline {
+  visibility: hidden;
+}
+
 .plottable .drag-box {
   fill: aliceblue;
   opacity: .7;

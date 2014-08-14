@@ -62,7 +62,8 @@ export module Component {
               .attr("y1", 0)
               .attr("x2", getScaledXValue)
               .attr("y2", this.availableHeight)
-             .classed("zeroline", (t: number) => t === 0);
+              .classed("zeroline", (t: number) => t === 0)
+              .classed("baseline", (t: number) => getScaledXValue(t) === 0 || getScaledXValue(t) === this.availableWidth);
         xLines.exit().remove();
       }
     }
@@ -77,7 +78,8 @@ export module Component {
               .attr("y1", getScaledYValue)
               .attr("x2", this.availableWidth)
               .attr("y2", getScaledYValue)
-              .classed("zeroline", (t: number) => t === 0);
+              .classed("zeroline", (t: number) => t === 0)
+              .classed("baseline", (t: number) => getScaledYValue(t) === 0 || getScaledYValue(t) === this.availableHeight);
         yLines.exit().remove();
       }
     }
