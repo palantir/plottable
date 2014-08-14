@@ -7,7 +7,7 @@ export module Interaction {
     private dispatcher: Dispatcher.Mouse;
     private plotIsVertical = true;
     private hoverCallback: (datum: any, bar: D3.Selection) => any;
-    private unhoverCallback: () => any;
+    private unhoverCallback: (datum: any, bar: D3.Selection) => any;
     private currentBar: D3.Selection = null;
     private _hoverMode = "point";
 
@@ -52,10 +52,10 @@ export module Interaction {
     private _hoverOut() {
       this.componentToListenTo._bars.classed("not-hovered hovered", false);
       if (this.currentBar != null) { // trigger callback only if a hoverout transition is occurring
-        this.currentBar = null;
         if (this.unhoverCallback != null) {
-          this.unhoverCallback();
+          this.unhoverCallback(this.currentBar.data()[0], this.currentBar); // last known information
         }
+        this.currentBar = null;
       }
     }
 
@@ -106,6 +106,7 @@ export module Interaction {
      * Attaches an callback to be called when the user mouses over a bar.
      *
      * @param {(datum: any, bar: D3.Selection) => any} The callback to be called.
+     *      The callback will be passed the data from the hovered-over bar.
      * @return {BarHover} The calling Interaction.BarHover.
      */
     public onHover(callback: (datum: any, bar: D3.Selection) => any) {
@@ -116,10 +117,11 @@ export module Interaction {
     /**
      * Attaches a callback to be called when the user mouses off of a bar.
      *
-     * @param {() => any} The callback to be called.
+     * @param {(datum: any, bar: D3.Selection) => any} The callback to be called.
+     *      The callback will be passed the data from the last-hovered bar.
      * @return {BarHover} The calling Interaction.BarHover.
      */
-    public onUnhover(callback: () => any) {
+    public onUnhover(callback: (datum: any, bar: D3.Selection) => any) {
       this.unhoverCallback = callback;
       return this;
     }

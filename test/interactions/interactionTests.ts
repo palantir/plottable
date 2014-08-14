@@ -311,7 +311,8 @@ describe("Interactions", () => {
       });
 
       var unhoverCalled = false;
-      bhi.onUnhover(() => {
+      bhi.onUnhover((datum: any, bar: D3.Selection) => {
+        barDatum = datum;
         unhoverCalled = true;
       });
 
@@ -326,8 +327,12 @@ describe("Interactions", () => {
       triggerFakeMouseEvent("mousemove", hitbox, 100, 201);
       assert.isNull(barDatum, "hover callback isn't called if the hovered bar didn't change");
 
+      barDatum = null;
       triggerFakeMouseEvent("mousemove", hitbox, 10, 10);
       assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing away from a bar");
+      assert.deepEqual(barDatum, dataset[0], "the unhover callback was passed the last-hovered bar");
+
+
       unhoverCalled = false;
       triggerFakeMouseEvent("mousemove", hitbox, 11, 11);
       assert.isFalse(unhoverCalled, "unhover callback isn't triggered multiple times in succession");
@@ -337,6 +342,7 @@ describe("Interactions", () => {
       assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing out of the chart");
 
       bhi.hoverMode("line");
+      barDatum = null;
       triggerFakeMouseEvent("mousemove", hitbox, 100, 1);
       assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
 

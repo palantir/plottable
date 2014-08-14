@@ -931,7 +931,7 @@ declare module Plottable {
             hoverMode(): string;
             hoverMode(mode: string): BarHover;
             onHover(callback: (datum: any, bar: D3.Selection) => any): BarHover;
-            onUnhover(callback: () => any): BarHover;
+            onUnhover(callback: (datum: any, bar: D3.Selection) => any): BarHover;
         }
     }
 }

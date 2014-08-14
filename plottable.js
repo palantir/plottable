@@ -5164,10 +5164,10 @@ var Plottable;
             BarHover.prototype._hoverOut = function () {
                 this.componentToListenTo._bars.classed("not-hovered hovered", false);
                 if (this.currentBar != null) {
-                    this.currentBar = null;
                     if (this.unhoverCallback != null) {
-                        this.unhoverCallback();
+                        this.unhoverCallback(this.currentBar.data()[0], this.currentBar);
                     }
+                    this.currentBar = null;
                 }
             };
             BarHover.prototype.getHoveredBar = function (p) {
