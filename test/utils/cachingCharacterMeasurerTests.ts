@@ -10,7 +10,7 @@ describe("CachingCharacterMeasurer", () => {
   beforeEach(() => {
     svg = generateSVG(100, 100);
     g = svg.append("g");
-    measurer = new Plottable.Util.Text.CachingCharacterMeasurer(g);
+    measurer = new Plottable.Util.Text.CachingCharacterMeasurer(g.append("text"));
   });
 
   afterEach(() => {

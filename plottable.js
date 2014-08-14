@@ -1,5 +1,5 @@
 /*!
-Plottable 0.23.2 (https://github.com/palantir/plottable)
+Plottable 0.24.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -286,30 +286,24 @@ var Plottable;
 (function (Plottable) {
     (function (Util) {
         (function (Text) {
+            Text.HEIGHT_TEXT = "bqpdl";
             ;
             ;
-            function getTextMeasure(selection) {
+            function getTextMeasurer(selection) {
+                var parentNode = selection.node().parentNode;
+                selection.remove();
                 return function (s) {
                     if (s.trim() === "") {
                         return { width: 0, height: 0 };
                     }
-                    var bb;
-                    if (selection.node().nodeName === "text") {
-                        var originalText = selection.text();
-                        selection.text(s);
-                        bb = Util.DOM.getBBox(selection);
-                        selection.text(originalText);
-                        return { width: bb.width, height: bb.height };
-                    }
-                    else {
-                        var t = selection.append("text").text(s);
-                        bb = Util.DOM.getBBox(t);
-                        t.remove();
-                        return { width: bb.width, height: bb.height };
-                    }
+                    parentNode.appendChild(selection.node());
+                    selection.text(s);
+                    var bb = Util.DOM.getBBox(selection);
+                    selection.remove();
+                    return { width: bb.width, height: bb.height };
                 };
             }
-            Text.getTextMeasure = getTextMeasure;
+            Text.getTextMeasurer = getTextMeasurer;
             function combineWhitespace(tm) {
                 return function (s) { return tm(s.replace(/\s+/g, " ")); };
             }
@@ -345,9 +339,9 @@ var Plottable;
                 };
             }
             var CachingCharacterMeasurer = (function () {
-                function CachingCharacterMeasurer(g) {
+                function CachingCharacterMeasurer(textSelection) {
                     var _this = this;
-                    this.cache = new Util.Cache(getTextMeasure(g), CANONICAL_CHR, Util.Methods.objEq);
+                    this.cache = new Util.Cache(getTextMeasurer(textSelection), CANONICAL_CHR, Util.Methods.objEq);
                     this.measure = combineWhitespace(measureByCharacter(wrapWhitespace(function (s) { return _this.cache.get(s); })));
                 }
                 CachingCharacterMeasurer.prototype.clear = function () {
@@ -366,14 +360,6 @@ var Plottable;
                 }
             }
             Text.getTruncatedText = getTruncatedText;
-            function getTextHeight(selection) {
-                return getTextMeasure(selection)("bqpdl").height;
-            }
-            Text.getTextHeight = getTextHeight;
-            function getTextWidth(textElement, text) {
-                return getTextMeasure(textElement)(text).width;
-            }
-            Text.getTextWidth = getTextWidth;
             function _addEllipsesToLine(line, width, measureText) {
                 var mutatedLine = line.trim();
                 var widthMeasure = function (s) { return measureText(s).width; };
@@ -446,7 +432,7 @@ var Plottable;
             function writeTextHorizontally(brokenText, g, width, height, xAlign, yAlign) {
                 if (xAlign === void 0) { xAlign = "left"; }
                 if (yAlign === void 0) { yAlign = "top"; }
-                var h = getTextHeight(g);
+                var h = getTextMeasurer(g.append("text"))(Text.HEIGHT_TEXT).height;
                 var maxWidth = 0;
                 var blockG = g.append("g");
                 brokenText.forEach(function (line, i) {
@@ -463,12 +449,11 @@ var Plottable;
                 Util.DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
                 return { width: maxWidth, height: usedSpace };
             }
-            Text.writeTextHorizontally = writeTextHorizontally;
             function writeTextVertically(brokenText, g, width, height, xAlign, yAlign, rotation) {
                 if (xAlign === void 0) { xAlign = "left"; }
                 if (yAlign === void 0) { yAlign = "top"; }
                 if (rotation === void 0) { rotation = "left"; }
-                var h = getTextHeight(g);
+                var h = getTextMeasurer(g.append("text"))(Text.HEIGHT_TEXT).height;
                 var maxHeight = 0;
                 var blockG = g.append("g");
                 brokenText.forEach(function (line, i) {
@@ -485,7 +470,6 @@ var Plottable;
                 Util.DOM.translate(blockG, freeSpace * translator[xAlign], 0);
                 return { width: usedSpace, height: maxHeight };
             }
-            Text.writeTextVertically = writeTextVertically;
             ;
             function writeText(text, width, height, tm, horizontally, write) {
                 var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
@@ -831,8 +815,12 @@ var Plottable;
             if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
             var fixedFormatter = Formatters.fixed(precision);
             return function (d) {
-                var formattedValue = fixedFormatter(d * 100);
-                if (onlyShowUnchanged && Formatters._valueChanged(d * 100, formattedValue)) {
+                var valToFormat = d * 100;
+                var valString = d.toString();
+                var integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
+                valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
+                var formattedValue = fixedFormatter(valToFormat);
+                if (onlyShowUnchanged && Formatters._valueChanged(valToFormat, formattedValue)) {
                     return "";
                 }
                 if (formattedValue !== "") {
@@ -915,7 +903,42 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.23.2";
+    Plottable.version = "0.24.0";
+})(Plottable || (Plottable = {}));
+
+var Plottable;
+(function (Plottable) {
+    (function (Core) {
+        var Colors = (function () {
+            function Colors() {
+            }
+            Colors.CORAL_RED = "#fd373e";
+            Colors.INDIGO = "#5177c4";
+            Colors.ROBINS_EGG_BLUE = "#06bdbd";
+            Colors.FERN = "#62bb60";
+            Colors.BURNING_ORANGE = "#ff7939";
+            Colors.ROYAL_HEATH = "#962565";
+            Colors.CONIFER = "#99ce50";
+            Colors.CERISE_RED = "#db2e65";
+            Colors.BRIGHT_SUN = "#ffe43d";
+            Colors.JACARTA = "#2c2b6f";
+            Colors.PLOTTABLE_COLORS = [
+                Colors.CORAL_RED,
+                Colors.INDIGO,
+                Colors.ROBINS_EGG_BLUE,
+                Colors.FERN,
+                Colors.BURNING_ORANGE,
+                Colors.ROYAL_HEATH,
+                Colors.CONIFER,
+                Colors.CERISE_RED,
+                Colors.BRIGHT_SUN,
+                Colors.JACARTA
+            ];
+            return Colors;
+        })();
+        Core.Colors = Colors;
+    })(Plottable.Core || (Plottable.Core = {}));
+    var Core = Plottable.Core;
 })(Plottable || (Plottable = {}));
 
 var Plottable;
@@ -2642,6 +2665,10 @@ var Plottable;
             function Color(scaleType) {
                 var scale;
                 switch (scaleType) {
+                    case null:
+                    case undefined:
+                        scale = d3.scale.ordinal().range(Plottable.Core.Colors.PLOTTABLE_COLORS);
+                        break;
                     case "Category10":
                     case "category10":
                     case "10":
@@ -2661,10 +2688,6 @@ var Plottable;
                     case "category20c":
                     case "20c":
                         scale = d3.scale.category20c();
-                        break;
-                    case null:
-                    case undefined:
-                        scale = d3.scale.ordinal();
                         break;
                     default:
                         throw new Error("Unsupported ColorScale type");
@@ -2925,8 +2948,8 @@ var Plottable;
                 this._height = "auto";
                 this._endTickLength = 5;
                 this._tickLength = 5;
-                this._tickLabelPadding = 3;
-                this._gutter = 10;
+                this._tickLabelPadding = 10;
+                this._gutter = 15;
                 this._showEndTickLabels = false;
                 if (scale == null || orientation == null) {
                     throw new Error("Axis requires a scale and orientation");
@@ -3293,7 +3316,7 @@ var Plottable;
             };
             Time.prototype.calculateWorstWidth = function (container, format) {
                 var longDate = new Date(9999, 8, 29, 12, 59, 9999);
-                return Plottable.Util.Text.getTextWidth(container, d3.time.format(format)(longDate));
+                return this.measurer(d3.time.format(format)(longDate)).width;
             };
             Time.prototype.getIntervalLength = function (interval) {
                 var startDate = this._scale.domain()[0];
@@ -3313,6 +3336,7 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._majorTickLabels = this.content.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 this._minorTickLabels = this.content.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                this.measurer = Plottable.Util.Text.getTextMeasurer(this._majorTickLabels.append("text"));
             };
             Time.prototype.getTickLevel = function () {
                 for (var i = 0; i < Time.minorIntervals.length; i++) {
@@ -3337,7 +3361,7 @@ var Plottable;
             };
             Time.prototype._measureTextHeight = function (container) {
                 var fakeTickLabel = container.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                var textHeight = Plottable.Util.Text.getTextHeight(fakeTickLabel.append("text"));
+                var textHeight = this.measurer(Plottable.Util.Text.HEIGHT_TEXT).height;
                 fakeTickLabel.remove();
                 return textHeight;
             };
@@ -3378,7 +3402,7 @@ var Plottable;
             Time.prototype.canFitLabelFilter = function (container, position, label, isCentered) {
                 var endPosition;
                 var startPosition;
-                var width = Plottable.Util.Text.getTextWidth(container, label) + this.tickLabelPadding();
+                var width = this.measurer(label).width + this.tickLabelPadding();
                 if (isCentered) {
                     endPosition = this._scale.scale(position) + width / 2;
                     startPosition = this._scale.scale(position) - width / 2;
@@ -3509,16 +3533,17 @@ var Plottable;
                 this.showFirstTickLabel = false;
                 this.showLastTickLabel = false;
             }
+            Numeric.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this.measurer = Plottable.Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true));
+            };
             Numeric.prototype._computeWidth = function () {
                 var _this = this;
                 var tickValues = this._getTickValues();
-                var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
                 var textLengths = tickValues.map(function (v) {
                     var formattedValue = _this._formatter(v);
-                    return measurer(formattedValue).width;
+                    return _this.measurer(formattedValue).width;
                 });
-                testTextEl.remove();
                 var maxTextLength = d3.max(textLengths);
                 if (this.tickLabelPositioning === "center") {
                     this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
@@ -3529,10 +3554,7 @@ var Plottable;
                 return this._computedWidth;
             };
             Numeric.prototype._computeHeight = function () {
-                var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
-                var textHeight = measurer("test").height;
-                testTextEl.remove();
+                var textHeight = this.measurer(Plottable.Util.Text.HEIGHT_TEXT).height;
                 if (this.tickLabelPositioning === "center") {
                     this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
                 }
@@ -3705,7 +3727,7 @@ var Plottable;
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelContainer);
+                this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
             };
             Category.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
@@ -3859,7 +3881,7 @@ var Plottable;
             Label.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.textContainer = this.content.append("g");
-                this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer);
+                this.measurer = Plottable.Util.Text.getTextMeasurer(this.textContainer.append("text"));
                 this.text(this._text);
             };
             Label.prototype.text = function (displayText) {
@@ -3885,8 +3907,8 @@ var Plottable;
                 }
             };
             Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                this.measurer = Plottable.Util.Text.getTextMeasurer(this.textContainer.append("text"));
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer);
                 return this;
             };
             return Label;
@@ -3999,8 +4021,8 @@ var Plottable;
                 var totalNumRows = this.colorScale.domain().length;
                 var rowsICanFit = Math.min(totalNumRows, Math.floor((offeredHeight - 2 * Legend.MARGIN) / textHeight));
                 var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-                var fakeText = fakeLegendEl.append("text");
-                var maxWidth = d3.max(this.colorScale.domain(), function (d) { return Plottable.Util.Text.getTextWidth(fakeText, d); });
+                var measure = Plottable.Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
+                var maxWidth = d3.max(this.colorScale.domain(), function (d) { return measure(d).width; });
                 fakeLegendEl.remove();
                 maxWidth = maxWidth === undefined ? 0 : maxWidth;
                 var desiredWidth = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;
@@ -4014,7 +4036,7 @@ var Plottable;
             };
             Legend.prototype.measureTextHeight = function () {
                 var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-                var textHeight = Plottable.Util.Text.getTextHeight(fakeLegendEl.append("text"));
+                var textHeight = Plottable.Util.Text.getTextMeasurer(fakeLegendEl.append("text"))(Plottable.Util.Text.HEIGHT_TEXT).height;
                 if (textHeight === 0) {
                     textHeight = 1;
                 }
@@ -4035,7 +4057,7 @@ var Plottable;
                 legend.selectAll("circle").attr("cx", textHeight / 2).attr("cy", textHeight / 2).attr("r", r).attr("fill", this.colorScale._d3Scale);
                 legend.selectAll("g.text-container").text("").attr("transform", "translate(" + textHeight + ", 0)").each(function (d) {
                     var d3this = d3.select(this);
-                    var measure = Plottable.Util.Text.getTextMeasure(d3this);
+                    var measure = Plottable.Util.Text.getTextMeasurer(d3this.append("text"));
                     var writeLine = Plottable.Util.Text.getTruncatedText(d, availableWidth, measure);
                     var writeLineMeasure = measure(writeLine);
                     Plottable.Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
@@ -4269,7 +4291,8 @@ var Plottable;
                 };
                 this.classed("scatter-plot", true);
                 this.project("r", 3);
-                this.project("fill", function () { return "steelblue"; });
+                this.project("opacity", 0.6);
+                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
             }
             Scatter.prototype.project = function (attrToSet, accessor, scale) {
                 attrToSet = attrToSet === "cx" ? "x" : attrToSet;
@@ -4371,7 +4394,7 @@ var Plottable;
                     "baseline": new Plottable.Animator.Null()
                 };
                 this.classed("bar-plot", true);
-                this.project("fill", function () { return "steelblue"; });
+                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
                 this.baseline(this._baselineValue);
             }
             BarPlot.prototype._setup = function () {
@@ -4598,7 +4621,7 @@ var Plottable;
                     "line": new Plottable.Animator.Default().duration(600).easing("exp-in-out")
                 };
                 this.classed("line-plot", true);
-                this.project("stroke", function () { return "steelblue"; });
+                this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; });
                 this.project("stroke-width", function () { return "2px"; });
             }
             Line.prototype._setup = function () {
@@ -4679,9 +4702,9 @@ var Plottable;
                 _super.call(this, dataset, xScale, yScale);
                 this.classed("area-plot", true);
                 this.project("y0", 0, yScale);
-                this.project("fill", function () { return "steelblue"; });
-                this.project("fill-opacity", function () { return 0.5; });
-                this.project("stroke", function () { return "none"; });
+                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
+                this.project("fill-opacity", function () { return 0.25; });
+                this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; });
                 this._animators["area-reset"] = new Plottable.Animator.Null();
                 this._animators["area"] = new Plottable.Animator.Default().duration(600).easing("exp-in-out");
             }
@@ -5040,8 +5063,11 @@ var Plottable;
             function PanZoom(componentToListenTo, xScale, yScale) {
                 _super.call(this, componentToListenTo);
                 var _this = this;
-                if (xScale == null || yScale == null) {
-                    throw new Error("panZoomInteractions require an xScale and yScale");
+                if (xScale == null) {
+                    xScale = new Plottable.Scale.Linear();
+                }
+                if (yScale == null) {
+                    yScale = new Plottable.Scale.Linear();
                 }
                 this.xScale = xScale;
                 this.yScale = yScale;
@@ -5214,8 +5240,8 @@ var Plottable;
             DragBox.prototype._anchor = function (hitBox) {
                 _super.prototype._anchor.call(this, hitBox);
                 var cname = DragBox.CLASS_DRAG_BOX;
-                var foreground = this.componentToListenTo.foregroundContainer;
-                this.dragBox = foreground.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
+                var background = this.componentToListenTo.backgroundContainer;
+                this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
                 return this;
             };
             DragBox.CLASS_DRAG_BOX = "drag-box";

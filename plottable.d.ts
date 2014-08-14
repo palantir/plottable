@@ -70,6 +70,7 @@ declare module Plottable {
 declare module Plottable {
     module Util {
         module Text {
+            var HEIGHT_TEXT: string;
             interface Dimensions {
                 width: number;
                 height: number;
@@ -77,29 +78,19 @@ declare module Plottable {
             interface TextMeasurer {
                 (s: string): Dimensions;
             }
-            function getTextMeasure(selection: D3.Selection): TextMeasurer;
+            function getTextMeasurer(selection: D3.Selection): TextMeasurer;
             class CachingCharacterMeasurer {
                 measure: TextMeasurer;
-                constructor(g: D3.Selection);
+                constructor(textSelection: D3.Selection);
                 clear(): CachingCharacterMeasurer;
             }
             function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;
-            function getTextHeight(selection: D3.Selection): number;
-            function getTextWidth(textElement: D3.Selection, text: string): number;
             function _addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
             function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
                 width: number;
                 height: number;
             };
             function writeLineVertically(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
-                width: number;
-                height: number;
-            };
-            function writeTextHorizontally(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
-                width: number;
-                height: number;
-            };
-            function writeTextVertically(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
                 width: number;
                 height: number;
             };
@@ -170,6 +161,25 @@ declare module Plottable {
 
 declare module Plottable {
     var version: string;
+}
+
+
+declare module Plottable {
+    module Core {
+        class Colors {
+            static CORAL_RED: string;
+            static INDIGO: string;
+            static ROBINS_EGG_BLUE: string;
+            static FERN: string;
+            static BURNING_ORANGE: string;
+            static ROYAL_HEATH: string;
+            static CONIFER: string;
+            static CERISE_RED: string;
+            static BRIGHT_SUN: string;
+            static JACARTA: string;
+            static PLOTTABLE_COLORS: string[];
+        }
+    }
 }
 
 
@@ -894,7 +904,7 @@ declare module Plottable {
         class PanZoom extends Plottable.Abstract.Interaction {
             xScale: Plottable.Abstract.QuantitativeScale;
             yScale: Plottable.Abstract.QuantitativeScale;
-            constructor(componentToListenTo: Plottable.Abstract.Component, xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.QuantitativeScale);
+            constructor(componentToListenTo: Plottable.Abstract.Component, xScale?: Plottable.Abstract.QuantitativeScale, yScale?: Plottable.Abstract.QuantitativeScale);
             resetZoom(): void;
         }
     }
