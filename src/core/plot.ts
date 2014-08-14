@@ -143,7 +143,7 @@ export module Abstract {
       if (scale != null) {
         scale.broadcaster.registerListener(this, () => this._render());
       }
-      var activatedAccessor = Util.Methods._applyAccessor(accessor, this);
+      var activatedAccessor = _Util.Methods.applyAccessor(accessor, this);
       this._projectors[attrToSet] = {accessor: activatedAccessor, scale: scale};
       this.updateProjector(attrToSet);
       this._render(); // queue a re-render upon changing projector

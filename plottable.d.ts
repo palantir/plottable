@@ -1,14 +1,14 @@
 
 declare module Plottable {
-    module Util {
+    module _Util {
         module Methods {
             function inRange(x: number, a: number, b: number): boolean;
             function warn(warning: string): void;
             function addArrays(alist: number[], blist: number[]): number[];
             function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
-            function _accessorize(accessor: any): IAccessor;
+            function accessorize(accessor: any): IAccessor;
             function union(set1: D3.Set, set2: D3.Set): D3.Set;
-            function _applyAccessor(accessor: IAccessor, plot: Plottable.Abstract.Plot): (d: any, i: number) => any;
+            function applyAccessor(accessor: IAccessor, plot: Plottable.Abstract.Plot): (d: any, i: number) => any;
             function uniq(strings: string[]): string[];
             function uniqNumbers(a: number[]): number[];
             function createFilledArray(value: any, count: number): any[];
@@ -21,7 +21,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
+    module _Util {
         module OpenSource {
             function sortedIndex(val: number, arr: number[]): number;
             function sortedIndex(val: number, arr: any[], accessor: IAccessor): number;
@@ -31,7 +31,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
+    module _Util {
         class IDCounter {
             increment(id: any): number;
             decrement(id: any): number;
@@ -42,7 +42,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
+    module _Util {
         class StrictEqualityAssociativeArray {
             set(key: any, value: any): boolean;
             get(key: any): any;
@@ -57,7 +57,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
+    module _Util {
         class Cache<T> {
             constructor(compute: (k: string) => T, canonicalKey?: string, valueEq?: (v: T, w: T) => boolean);
             get(k: string): T;
@@ -68,7 +68,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
+    module _Util {
         module Text {
             interface Dimensions {
                 width: number;
@@ -86,7 +86,7 @@ declare module Plottable {
             function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;
             function getTextHeight(selection: D3.Selection): number;
             function getTextWidth(textElement: D3.Selection, text: string): number;
-            function _addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
+            function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
             function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
                 width: number;
                 height: number;
@@ -120,7 +120,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
+    module _Util {
         module WordWrap {
             interface IWrappedText {
                 originalText: string;
@@ -134,7 +134,7 @@ declare module Plottable {
 }
 
 declare module Plottable {
-    module Util {
+    module _Util {
         module DOM {
             function getBBox(element: D3.Selection): SVGRect;
             var POLYFILL_TIMEOUT_MSEC: number;
@@ -581,7 +581,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
+    module _Util {
         class ScaleDomainCoordinator {
             constructor(scales: Plottable.Abstract.Scale[]);
             rescale(scale: Plottable.Abstract.Scale): void;

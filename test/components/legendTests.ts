@@ -52,9 +52,9 @@ describe("Legends", () => {
     color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
     legend.renderTo(svg);
 
-    var contentBBox = Plottable.Util.DOM.getBBox(legend.content);
+    var contentBBox = Plottable._Util.DOM.getBBox(legend.content);
     var contentBottomEdge = contentBBox.y + contentBBox.height;
-    var bboxBBox = Plottable.Util.DOM.getBBox(legend.element.select(".bounding-box"));
+    var bboxBBox = Plottable._Util.DOM.getBBox(legend.element.select(".bounding-box"));
     var bboxBottomEdge = bboxBBox.y + bboxBBox.height;
 
     assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
@@ -153,8 +153,8 @@ describe("Legends", () => {
     function verifyCircleHeight() {
       var text = legend.content.select("text");
       var circle = legend.content.select("circle");
-      var textHeight = Plottable.Util.DOM.getBBox(text).height;
-      var circleHeight = Plottable.Util.DOM.getBBox(circle).height;
+      var textHeight = Plottable._Util.DOM.getBBox(text).height;
+      var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
       assert.operator(circleHeight, "<", textHeight, "icons are too big. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
       assert.operator(circleHeight, ">", textHeight / 2, "icons are too small. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
     }

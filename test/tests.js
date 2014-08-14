@@ -348,7 +348,7 @@ describe("TimeAxis", function () {
                     for (var j = i + 1; j < numLabels; j++) {
                         box1 = visibleTickLabels[0][i].getBoundingClientRect();
                         box2 = visibleTickLabels[0][j].getBoundingClientRect();
-                        assert.isFalse(Plottable.Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
+                        assert.isFalse(Plottable._Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
                     }
                 }
             }
@@ -545,7 +545,7 @@ describe("NumericAxis", function () {
             for (var j = i + 1; j < numLabels; j++) {
                 box1 = visibleTickLabels[0][i].getBoundingClientRect();
                 box2 = visibleTickLabels[0][j].getBoundingClientRect();
-                assert.isFalse(Plottable.Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
+                assert.isFalse(Plottable._Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
             }
         }
         numericAxis.orient("bottom");
@@ -557,7 +557,7 @@ describe("NumericAxis", function () {
             for (j = i + 1; j < numLabels; j++) {
                 box1 = visibleTickLabels[0][i].getBoundingClientRect();
                 box2 = visibleTickLabels[0][j].getBoundingClientRect();
-                assert.isFalse(Plottable.Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
+                assert.isFalse(Plottable._Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
             }
         }
         svg.remove();
@@ -693,7 +693,7 @@ describe("Labels", function () {
         var textChildren = content.selectAll("text");
         assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
         var text = content.select("text");
-        var bbox = Plottable.Util.DOM.getBBox(text);
+        var bbox = Plottable._Util.DOM.getBBox(text);
         assert.closeTo(bbox.height, label.availableHeight, 0.5, "text height === label.minimumHeight()");
         assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
@@ -704,7 +704,7 @@ describe("Labels", function () {
         label.renderTo(svg);
         var content = label.content;
         var text = content.select("text");
-        var textBBox = Plottable.Util.DOM.getBBox(text);
+        var textBBox = Plottable._Util.DOM.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
@@ -715,7 +715,7 @@ describe("Labels", function () {
         label.renderTo(svg);
         var content = label.content;
         var text = content.select("text");
-        var textBBox = Plottable.Util.DOM.getBBox(text);
+        var textBBox = Plottable._Util.DOM.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
@@ -739,7 +739,7 @@ describe("Labels", function () {
         label.renderTo(svg);
         var content = label.content;
         var text = content.select("text");
-        var bbox = Plottable.Util.DOM.getBBox(text);
+        var bbox = Plottable._Util.DOM.getBBox(text);
         assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
         assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
         svg.remove();
@@ -759,7 +759,7 @@ describe("Labels", function () {
         t.renderTo(svg);
         var textTranslate = d3.transform(label.content.select("g").attr("transform")).translate;
         var eleTranslate = d3.transform(label.element.attr("transform")).translate;
-        var textWidth = Plottable.Util.DOM.getBBox(label.content.select("text")).width;
+        var textWidth = Plottable._Util.DOM.getBBox(label.content.select("text")).width;
         assert.closeTo(eleTranslate[0] + textTranslate[0] + textWidth / 2, 200, 5, "label is centered");
         svg.remove();
     });
@@ -820,9 +820,9 @@ describe("Legends", function () {
     it("a legend with many labels does not overflow vertically", function () {
         color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
         legend.renderTo(svg);
-        var contentBBox = Plottable.Util.DOM.getBBox(legend.content);
+        var contentBBox = Plottable._Util.DOM.getBBox(legend.content);
         var contentBottomEdge = contentBBox.y + contentBBox.height;
-        var bboxBBox = Plottable.Util.DOM.getBBox(legend.element.select(".bounding-box"));
+        var bboxBBox = Plottable._Util.DOM.getBBox(legend.element.select(".bounding-box"));
         var bboxBottomEdge = bboxBBox.y + bboxBBox.height;
         assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
         svg.remove();
@@ -907,8 +907,8 @@ describe("Legends", function () {
         function verifyCircleHeight() {
             var text = legend.content.select("text");
             var circle = legend.content.select("circle");
-            var textHeight = Plottable.Util.DOM.getBBox(text).height;
-            var circleHeight = Plottable.Util.DOM.getBBox(circle).height;
+            var textHeight = Plottable._Util.DOM.getBBox(text).height;
+            var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
             assert.operator(circleHeight, "<", textHeight, "icons are too big. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
             assert.operator(circleHeight, ">", textHeight / 2, "icons are too small. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
         }
@@ -2503,7 +2503,7 @@ describe("Component behavior", function () {
         boxStrings.forEach(function (s) {
             var box = boxContainer.select(s);
             assert.isNotNull(box.node(), s + " box was created and placed inside boxContainer");
-            var bb = Plottable.Util.DOM.getBBox(box);
+            var bb = Plottable._Util.DOM.getBBox(box);
             assert.equal(bb.width, SVG_WIDTH, s + " width as expected");
             assert.equal(bb.height, SVG_HEIGHT, s + " height as expected");
         });
@@ -2648,7 +2648,7 @@ describe("DataSource", function () {
         var metadata = { foo: 11 };
         var dataSource = new Plottable.DataSource(data, metadata);
         var plot = new Plottable.Abstract.Plot(dataSource);
-        var apply = function (a) { return Plottable.Util.Methods._applyAccessor(a, plot); };
+        var apply = function (a) { return Plottable._Util.Methods.applyAccessor(a, plot); };
         var a1 = function (d, i, m) { return d + i - 2; };
         assert.deepEqual(dataSource._getExtent(apply(a1)), [-1, 5], "extent for numerical data works properly");
         var a2 = function (d, i, m) { return d + m.foo; };
@@ -2748,7 +2748,7 @@ describe("Tables", function () {
         assert.deepEqual(translates[1], [200, 0], "second element is located properly");
         assert.deepEqual(translates[2], [0, 200], "third element is located properly");
         assert.deepEqual(translates[3], [200, 200], "fourth element is located properly");
-        var bboxes = elements.map(function (e) { return Plottable.Util.DOM.getBBox(e); });
+        var bboxes = elements.map(function (e) { return Plottable._Util.DOM.getBBox(e); });
         bboxes.forEach(function (b) {
             assert.equal(b.width, 200, "bbox is 200 pixels wide");
             assert.equal(b.height, 200, "bbox is 200 pixels tall");
@@ -2764,7 +2764,7 @@ describe("Tables", function () {
         table.renderTo(svg);
         var elements = components.map(function (r) { return r.element; });
         var translates = elements.map(function (e) { return getTranslate(e); });
-        var bboxes = elements.map(function (e) { return Plottable.Util.DOM.getBBox(e); });
+        var bboxes = elements.map(function (e) { return Plottable._Util.DOM.getBBox(e); });
         assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
         assert.deepEqual(translates[1], [210, 0], "second element is located properly");
         assert.deepEqual(translates[2], [0, 210], "third element is located properly");
@@ -2787,7 +2787,7 @@ describe("Tables", function () {
         table.renderTo(svg);
         var elements = components.map(function (r) { return r.element; });
         var translates = elements.map(function (e) { return getTranslate(e); });
-        var bboxes = elements.map(function (e) { return Plottable.Util.DOM.getBBox(e); });
+        var bboxes = elements.map(function (e) { return Plottable._Util.DOM.getBBox(e); });
         assert.deepEqual(translates[0], [50, 0], "top axis translate");
         assert.deepEqual(translates[4], [50, 370], "bottom axis translate");
         assert.deepEqual(translates[1], [0, 30], "left axis translate");
@@ -3103,7 +3103,7 @@ describe("Coordinators", function () {
             var s1 = new Plottable.Scale.Linear();
             var s2 = new Plottable.Scale.Linear();
             var s3 = new Plottable.Scale.Linear();
-            var dc = new Plottable.Util.ScaleDomainCoordinator([s1, s2, s3]);
+            var dc = new Plottable._Util.ScaleDomainCoordinator([s1, s2, s3]);
             s1.domain([0, 100]);
             assert.deepEqual(s1.domain(), [0, 100]);
             assert.deepEqual(s1.domain(), s2.domain());
@@ -3450,7 +3450,7 @@ describe("Scales", function () {
             assert.deepEqual(b.slice().reverse(), b.slice().sort(function (x, y) { return x - y; }));
             var ticks = scale.ticks();
             assert.deepEqual(ticks, ticks.slice().sort(function (x, y) { return x - y; }), "ticks should be sorted");
-            assert.deepEqual(ticks, Plottable.Util.Methods.uniqNumbers(ticks), "ticks should not be repeated");
+            assert.deepEqual(ticks, Plottable._Util.Methods.uniqNumbers(ticks), "ticks should not be repeated");
             var beforePivot = ticks.filter(function (x) { return x <= -base; });
             var afterPivot = ticks.filter(function (x) { return base <= x; });
             var betweenPivots = ticks.filter(function (x) { return -base < x && x < base; });
@@ -3460,7 +3460,7 @@ describe("Scales", function () {
         });
         it("ticks() is always non-empty", function () {
             [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach(function (domain) {
-                scale.updateExtent(1, "x", domain);
+                scale._updateExtent(1, "x", domain);
                 var ticks = scale.ticks();
                 assert.operator(ticks.length, ">", 0);
             });
@@ -3513,11 +3513,11 @@ describe("TimeScale tests", function () {
 });
 
 var assert = chai.assert;
-describe("Util.DOM", function () {
+describe("_Util.DOM", function () {
     it("getBBox works properly", function () {
         var svg = generateSVG();
         var rect = svg.append("rect").attr("x", 0).attr("y", 0).attr("width", 5).attr("height", 5);
-        var bb1 = Plottable.Util.DOM.getBBox(rect);
+        var bb1 = Plottable._Util.DOM.getBBox(rect);
         var bb2 = rect.node().getBBox();
         assert.deepEqual(bb1, bb2);
         svg.remove();
@@ -3528,17 +3528,17 @@ describe("Util.DOM", function () {
             parent.style("width", "300px");
             parent.style("height", "200px");
             var parentElem = parent[0][0];
-            var width = Plottable.Util.DOM.getElementWidth(parentElem);
+            var width = Plottable._Util.DOM.getElementWidth(parentElem);
             assert.equal(width, 300, "measured width matches set width");
-            var height = Plottable.Util.DOM.getElementHeight(parentElem);
+            var height = Plottable._Util.DOM.getElementHeight(parentElem);
             assert.equal(height, 200, "measured height matches set height");
         });
         it("can get the svg's size", function () {
             var svg = generateSVG(450, 120);
             var svgElem = svg[0][0];
-            var width = Plottable.Util.DOM.getElementWidth(svgElem);
+            var width = Plottable._Util.DOM.getElementWidth(svgElem);
             assert.equal(width, 450, "measured width matches set width");
-            var height = Plottable.Util.DOM.getElementHeight(svgElem);
+            var height = Plottable._Util.DOM.getElementHeight(svgElem);
             assert.equal(height, 120, "measured height matches set height");
             svg.remove();
         });
@@ -3549,20 +3549,20 @@ describe("Util.DOM", function () {
             var childElem = child[0][0];
             parent.style("width", "200px");
             parent.style("height", "50px");
-            assert.equal(Plottable.Util.DOM.getElementWidth(parentElem), 200, "width is correct");
-            assert.equal(Plottable.Util.DOM.getElementHeight(parentElem), 50, "height is correct");
+            assert.equal(Plottable._Util.DOM.getElementWidth(parentElem), 200, "width is correct");
+            assert.equal(Plottable._Util.DOM.getElementHeight(parentElem), 50, "height is correct");
             child.style("width", "20px");
             child.style("height", "10px");
-            assert.equal(Plottable.Util.DOM.getElementWidth(childElem), 20, "width is correct");
-            assert.equal(Plottable.Util.DOM.getElementHeight(childElem), 10, "height is correct");
+            assert.equal(Plottable._Util.DOM.getElementWidth(childElem), 20, "width is correct");
+            assert.equal(Plottable._Util.DOM.getElementHeight(childElem), 10, "height is correct");
             child.style("width", "100%");
             child.style("height", "100%");
-            assert.equal(Plottable.Util.DOM.getElementWidth(childElem), 200, "width is correct");
-            assert.equal(Plottable.Util.DOM.getElementHeight(childElem), 50, "height is correct");
+            assert.equal(Plottable._Util.DOM.getElementWidth(childElem), 200, "width is correct");
+            assert.equal(Plottable._Util.DOM.getElementHeight(childElem), 50, "height is correct");
             child.style("width", "50%");
             child.style("height", "50%");
-            assert.equal(Plottable.Util.DOM.getElementWidth(childElem), 100, "width is correct");
-            assert.equal(Plottable.Util.DOM.getElementHeight(childElem), 25, "height is correct");
+            assert.equal(Plottable._Util.DOM.getElementWidth(childElem), 100, "width is correct");
+            assert.equal(Plottable._Util.DOM.getElementHeight(childElem), 25, "height is correct");
             parent.style("width", "auto");
             parent.style("height", "auto");
             child.remove();
@@ -3739,7 +3739,7 @@ describe("Formatters", function () {
 var assert = chai.assert;
 describe("IDCounter", function () {
     it("IDCounter works as expected", function () {
-        var i = new Plottable.Util.IDCounter();
+        var i = new Plottable._Util.IDCounter();
         assert.equal(i.get("f"), 0);
         assert.equal(i.increment("f"), 1);
         assert.equal(i.increment("g"), 1);
@@ -3754,7 +3754,7 @@ describe("IDCounter", function () {
 var assert = chai.assert;
 describe("StrictEqualityAssociativeArray", function () {
     it("StrictEqualityAssociativeArray works as expected", function () {
-        var s = new Plottable.Util.StrictEqualityAssociativeArray();
+        var s = new Plottable._Util.StrictEqualityAssociativeArray();
         var o1 = {};
         var o2 = {};
         assert.isFalse(s.has(o1));
@@ -3777,7 +3777,7 @@ describe("StrictEqualityAssociativeArray", function () {
         assert.equal(s.get("3"), "ball");
     });
     it("Array-level operations (retrieve keys, vals, and map)", function () {
-        var s = new Plottable.Util.StrictEqualityAssociativeArray();
+        var s = new Plottable._Util.StrictEqualityAssociativeArray();
         s.set(2, "foo");
         s.set(3, "bar");
         s.set(4, "baz");
@@ -3795,7 +3795,7 @@ describe("CachingCharacterMeasurer", function () {
     beforeEach(function () {
         svg = generateSVG(100, 100);
         g = svg.append("g");
-        measurer = new Plottable.Util.Text.CachingCharacterMeasurer(g);
+        measurer = new Plottable._Util.Text.CachingCharacterMeasurer(g);
     });
     afterEach(function () {
         svg.remove();
@@ -3831,7 +3831,7 @@ describe("Cache", function () {
     var cache;
     beforeEach(function () {
         callbackCalled = false;
-        cache = new Plottable.Util.Cache(f);
+        cache = new Plottable._Util.Cache(f);
     });
     it("Doesn't call its function if it already called", function () {
         assert.equal(cache.get("hello"), "hellohello");
@@ -3842,7 +3842,7 @@ describe("Cache", function () {
     });
     it("Clears its cache when .clear() is called", function () {
         var prefix = "hello";
-        cache = new Plottable.Util.Cache(function (s) {
+        cache = new Plottable._Util.Cache(function (s) {
             callbackCalled = true;
             return prefix + s;
         });
@@ -3857,7 +3857,7 @@ describe("Cache", function () {
         assert.isTrue(callbackCalled);
     });
     it("Doesn't clear the cache when canonicalKey doesn't change", function () {
-        cache = new Plottable.Util.Cache(f, "x");
+        cache = new Plottable._Util.Cache(f, "x");
         assert.equal(cache.get("hello"), "hellohello");
         assert.isTrue(callbackCalled);
         cache.clear();
@@ -3867,7 +3867,7 @@ describe("Cache", function () {
     });
     it("Clears the cache when canonicalKey changes", function () {
         var prefix = "hello";
-        cache = new Plottable.Util.Cache(function (s) {
+        cache = new Plottable._Util.Cache(function (s) {
             callbackCalled = true;
             return prefix + s;
         });
@@ -3881,7 +3881,7 @@ describe("Cache", function () {
     });
     it("uses valueEq to check if it should clear", function () {
         var decider = true;
-        cache = new Plottable.Util.Cache(f, "x", function (a, b) { return decider; });
+        cache = new Plottable._Util.Cache(f, "x", function (a, b) { return decider; });
         cache.get("hello");
         assert.isTrue(callbackCalled);
         cache.clear();
@@ -3896,17 +3896,17 @@ describe("Cache", function () {
 });
 
 var assert = chai.assert;
-describe("Util.Text", function () {
+describe("_Util.Text", function () {
     it("getTruncatedText works properly", function () {
         var svg = generateSVG();
         var textEl = svg.append("text").attr("x", 20).attr("y", 50);
         textEl.text("foobar");
-        var measure = Plottable.Util.Text.getTextMeasure(textEl);
-        var fullText = Plottable.Util.Text.getTruncatedText("hellom world!", 200, measure);
+        var measure = Plottable._Util.Text.getTextMeasure(textEl);
+        var fullText = Plottable._Util.Text.getTruncatedText("hellom world!", 200, measure);
         assert.equal(fullText, "hellom world!", "text untruncated");
-        var partialText = Plottable.Util.Text.getTruncatedText("hellom world!", 70, measure);
+        var partialText = Plottable._Util.Text.getTruncatedText("hellom world!", 70, measure);
         assert.equal(partialText, "hello...", "text truncated");
-        var tinyText = Plottable.Util.Text.getTruncatedText("hellom world!", 5, measure);
+        var tinyText = Plottable._Util.Text.getTruncatedText("hellom world!", 5, measure);
         assert.equal(tinyText, "", "empty string for tiny text");
         assert.equal(textEl.text(), "foobar", "truncate had no side effect on textEl");
         svg.remove();
@@ -3916,27 +3916,27 @@ describe("Util.Text", function () {
         var textEl = svg.append("text").attr("x", 20).attr("y", 50);
         textEl.style("font-size", "20pt");
         textEl.text("hello, world");
-        var height1 = Plottable.Util.Text.getTextHeight(textEl);
+        var height1 = Plottable._Util.Text.getTextHeight(textEl);
         textEl.style("font-size", "30pt");
-        var height2 = Plottable.Util.Text.getTextHeight(textEl);
+        var height2 = Plottable._Util.Text.getTextHeight(textEl);
         assert.operator(height1, "<", height2, "measured height is greater when font size is increased");
         assert.equal(textEl.text(), "hello, world", "getTextHeight did not modify the text in the element");
         textEl.text("");
-        assert.equal(Plottable.Util.Text.getTextHeight(textEl), height2, "works properly if there is no text in the element");
+        assert.equal(Plottable._Util.Text.getTextHeight(textEl), height2, "works properly if there is no text in the element");
         assert.equal(textEl.text(), "", "getTextHeight did not modify the text in the element");
         textEl.text(" ");
-        assert.equal(Plottable.Util.Text.getTextHeight(textEl), height2, "works properly if there is just a space in the element");
+        assert.equal(Plottable._Util.Text.getTextHeight(textEl), height2, "works properly if there is just a space in the element");
         assert.equal(textEl.text(), " ", "getTextHeight did not modify the text in the element");
         svg.remove();
     });
-    describe("_addEllipsesToLine", function () {
+    describe("addEllipsesToLine", function () {
         var svg;
         var measure;
         var e;
         before(function () {
             svg = generateSVG();
-            measure = Plottable.Util.Text.getTextMeasure(svg);
-            e = function (text, width) { return Plottable.Util.Text._addEllipsesToLine(text, width, measure); };
+            measure = Plottable._Util.Text.getTextMeasure(svg);
+            e = function (text, width) { return Plottable._Util.Text.addEllipsesToLine(text, width, measure); };
         });
         it("works on an empty string", function () {
             assert.equal(e("", 200), "...", "produced \"...\" with plenty of space");
@@ -3970,13 +3970,13 @@ describe("Util.Text", function () {
             var svg = generateSVG();
             var width = 1;
             var height = 1;
-            var measure = Plottable.Util.Text.getTextMeasure(svg);
-            var results = Plottable.Util.Text.writeText("hello world", width, height, measure, true);
+            var measure = Plottable._Util.Text.getTextMeasure(svg);
+            var results = Plottable._Util.Text.writeText("hello world", width, height, measure, true);
             assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "measurement mode: no width used");
             assert.equal(0, results.usedHeight, "measurement mode: no height used");
             var writeOptions = { g: svg, xAlign: "center", yAlign: "center" };
-            results = Plottable.Util.Text.writeText("hello world", width, height, measure, true, writeOptions);
+            results = Plottable._Util.Text.writeText("hello world", width, height, measure, true, writeOptions);
             assert.isFalse(results.textFits, "write mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "write mode: no width used");
             assert.equal(0, results.usedHeight, "write mode: no height used");
@@ -3987,13 +3987,13 @@ describe("Util.Text", function () {
             var svg = generateSVG();
             var width = 500;
             var height = 1;
-            var measure = Plottable.Util.Text.getTextMeasure(svg);
-            var results = Plottable.Util.Text.writeText("hello world", width, height, measure, true);
+            var measure = Plottable._Util.Text.getTextMeasure(svg);
+            var results = Plottable._Util.Text.writeText("hello world", width, height, measure, true);
             assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "measurement mode: no width used");
             assert.equal(0, results.usedHeight, "measurement mode: no height used");
             var writeOptions = { g: svg, xAlign: "center", yAlign: "center" };
-            results = Plottable.Util.Text.writeText("hello world", width, height, measure, true, writeOptions);
+            results = Plottable._Util.Text.writeText("hello world", width, height, measure, true, writeOptions);
             assert.isFalse(results.textFits, "write mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "write mode: no width used");
             assert.equal(0, results.usedHeight, "write mode: no height used");
@@ -4010,23 +4010,23 @@ describe("Util.Text", function () {
             svg = generateSVG(200, 200);
             t = svg.append("text");
             t.text("hi there");
-            canonicalBB = Plottable.Util.DOM.getBBox(t);
+            canonicalBB = Plottable._Util.DOM.getBBox(t);
             canonicalResult = { width: canonicalBB.width, height: canonicalBB.height };
             t.text("bla bla bla");
         });
         it("works on empty string", function () {
-            var measure = Plottable.Util.Text.getTextMeasure(t);
+            var measure = Plottable._Util.Text.getTextMeasure(t);
             var result = measure("");
             assert.deepEqual(result, { width: 0, height: 0 }, "empty string has 0 width and height");
         });
         it("works on non-empty string and has no side effects", function () {
-            var measure = Plottable.Util.Text.getTextMeasure(t);
+            var measure = Plottable._Util.Text.getTextMeasure(t);
             var result2 = measure("hi there");
             assert.deepEqual(result2, canonicalResult, "measurement is as expected");
             assert.equal(t.text(), "bla bla bla", "the text was unchanged");
         });
         it("works when operating on the top svg instead of text selection, and has no side effects", function () {
-            var measure2 = Plottable.Util.Text.getTextMeasure(svg);
+            var measure2 = Plottable._Util.Text.getTextMeasure(svg);
             var result3 = measure2("hi there");
             assert.deepEqual(result3, canonicalResult, "measurement is as expected for svg measure");
             assert.lengthOf(svg.node().childNodes, 1, "no nodes were added to the svg");
@@ -4044,7 +4044,7 @@ describe("Util.Text", function () {
             it("writes no text if there is insufficient space", function () {
                 svg = generateSVG(20, 20);
                 g = svg.append("g");
-                var wh = Plottable.Util.Text.writeLineHorizontally(text, g, 20, 20);
+                var wh = Plottable._Util.Text.writeLineHorizontally(text, g, 20, 20);
                 assert.equal(wh.width, 0, "no width used");
                 assert.equal(wh.height, 0, "no height used");
                 var textEl = g.select("text");
@@ -4054,11 +4054,11 @@ describe("Util.Text", function () {
             it("performs basic functionality and defaults to left, top", function () {
                 svg = generateSVG(400, 400);
                 g = svg.append("g");
-                var wh = Plottable.Util.Text.writeLineHorizontally(text, g, 400, 400);
+                var wh = Plottable._Util.Text.writeLineHorizontally(text, g, 400, 400);
                 var textEl = g.select("text");
-                var bb = Plottable.Util.DOM.getBBox(textEl);
-                var x = bb.x + Plottable.Util.DOM.translate(g.select("g"))[0];
-                var y = bb.y + Plottable.Util.DOM.translate(g.select("g"))[1];
+                var bb = Plottable._Util.DOM.getBBox(textEl);
+                var x = bb.x + Plottable._Util.DOM.translate(g.select("g"))[0];
+                var y = bb.y + Plottable._Util.DOM.translate(g.select("g"))[1];
                 if (hideResults) {
                     svg.remove();
                 }
@@ -4067,12 +4067,12 @@ describe("Util.Text", function () {
             it("center, center alignment works", function () {
                 svg = generateSVG(400, 400);
                 g = svg.append("g");
-                var wh = Plottable.Util.Text.writeLineHorizontally(text, g, 400, 400, "center", "center");
+                var wh = Plottable._Util.Text.writeLineHorizontally(text, g, 400, 400, "center", "center");
                 svg.append("circle").attr({ cx: 200, cy: 200, r: 5 });
                 var textEl = g.select("text");
-                var bb = Plottable.Util.DOM.getBBox(textEl);
-                var x = bb.x + Plottable.Util.DOM.translate(g.select("g"))[0] + bb.width / 2;
-                var y = bb.y + Plottable.Util.DOM.translate(g.select("g"))[1] + bb.height / 2;
+                var bb = Plottable._Util.DOM.getBBox(textEl);
+                var x = bb.x + Plottable._Util.DOM.translate(g.select("g"))[0] + bb.width / 2;
+                var y = bb.y + Plottable._Util.DOM.translate(g.select("g"))[1] + bb.height / 2;
                 if (hideResults) {
                     svg.remove();
                 }
@@ -4081,11 +4081,11 @@ describe("Util.Text", function () {
             it("right, bottom alignment works", function () {
                 svg = generateSVG(400, 400);
                 g = svg.append("g");
-                var wh = Plottable.Util.Text.writeLineHorizontally(text, g, 400, 400, "right", "bottom");
+                var wh = Plottable._Util.Text.writeLineHorizontally(text, g, 400, 400, "right", "bottom");
                 var textEl = g.select("text");
-                var bb = Plottable.Util.DOM.getBBox(textEl);
-                var x = bb.x + Plottable.Util.DOM.translate(g.select("g"))[0] + bb.width;
-                var y = bb.y + Plottable.Util.DOM.translate(g.select("g"))[1] + bb.height;
+                var bb = Plottable._Util.DOM.getBBox(textEl);
+                var x = bb.x + Plottable._Util.DOM.translate(g.select("g"))[0] + bb.width;
+                var y = bb.y + Plottable._Util.DOM.translate(g.select("g"))[1] + bb.height;
                 if (hideResults) {
                     svg.remove();
                 }
@@ -4104,8 +4104,8 @@ describe("Util.Text", function () {
             it("performs basic functionality and defaults to right, left, top", function () {
                 svg = generateSVG(60, 400);
                 g = svg.append("g");
-                var wh = Plottable.Util.Text.writeLineVertically(text, g, 60, 400);
-                var bb = Plottable.Util.DOM.getBBox(g.select("g"));
+                var wh = Plottable._Util.Text.writeLineVertically(text, g, 60, 400);
+                var bb = Plottable._Util.DOM.getBBox(g.select("g"));
                 if (hideResults) {
                     svg.remove();
                 }
@@ -4114,8 +4114,8 @@ describe("Util.Text", function () {
             it("right, center, center", function () {
                 svg = generateSVG(60, 400);
                 g = svg.append("g");
-                var wh = Plottable.Util.Text.writeLineVertically("x", g, 60, 400, "center", "center", "right");
-                var bb = Plottable.Util.DOM.getBBox(g.select("g"));
+                var wh = Plottable._Util.Text.writeLineVertically("x", g, 60, 400, "center", "center", "right");
+                var bb = Plottable._Util.DOM.getBBox(g.select("g"));
                 if (hideResults) {
                     svg.remove();
                 }
@@ -4124,8 +4124,8 @@ describe("Util.Text", function () {
             it("right, right, bottom", function () {
                 svg = generateSVG(60, 400);
                 g = svg.append("g");
-                var wh = Plottable.Util.Text.writeLineVertically(text, g, 60, 400, "right", "bottom", "right");
-                var bb = Plottable.Util.DOM.getBBox(g.select("g"));
+                var wh = Plottable._Util.Text.writeLineVertically(text, g, 60, 400, "right", "bottom", "right");
+                var bb = Plottable._Util.DOM.getBBox(g.select("g"));
                 if (hideResults) {
                     svg.remove();
                 }
@@ -4134,8 +4134,8 @@ describe("Util.Text", function () {
             it("left, left, top", function () {
                 svg = generateSVG(60, 400);
                 g = svg.append("g");
-                var wh = Plottable.Util.Text.writeLineVertically(text, g, 60, 400, "left", "top", "left");
-                var bb = Plottable.Util.DOM.getBBox(g.select("g"));
+                var wh = Plottable._Util.Text.writeLineVertically(text, g, 60, 400, "left", "top", "left");
+                var bb = Plottable._Util.DOM.getBBox(g.select("g"));
                 if (hideResults) {
                     svg.remove();
                 }
@@ -4144,7 +4144,7 @@ describe("Util.Text", function () {
             it("left, center, center", function () {
                 svg = generateSVG(60, 400);
                 g = svg.append("g");
-                var wh = Plottable.Util.Text.writeLineVertically(text, g, 60, 400, "center", "center", "left");
+                var wh = Plottable._Util.Text.writeLineVertically(text, g, 60, 400, "center", "center", "left");
                 if (hideResults) {
                     svg.remove();
                 }
@@ -4153,7 +4153,7 @@ describe("Util.Text", function () {
             it("left, right, bottom", function () {
                 svg = generateSVG(60, 400);
                 g = svg.append("g");
-                var wh = Plottable.Util.Text.writeLineVertically(text, g, 60, 400, "right", "bottom", "left");
+                var wh = Plottable._Util.Text.writeLineVertically(text, g, 60, 400, "right", "bottom", "left");
                 if (hideResults) {
                     svg.remove();
                 }
@@ -4164,15 +4164,15 @@ describe("Util.Text", function () {
 });
 
 var assert = chai.assert;
-describe("Util.s", function () {
+describe("_Util.s", function () {
     it("inRange works correct", function () {
-        assert.isTrue(Plottable.Util.Methods.inRange(0, -1, 1), "basic functionality works");
-        assert.isTrue(Plottable.Util.Methods.inRange(0, 0, 1), "it is a closed interval");
-        assert.isTrue(!Plottable.Util.Methods.inRange(0, 1, 2), "returns false when false");
+        assert.isTrue(Plottable._Util.Methods.inRange(0, -1, 1), "basic functionality works");
+        assert.isTrue(Plottable._Util.Methods.inRange(0, 0, 1), "it is a closed interval");
+        assert.isTrue(!Plottable._Util.Methods.inRange(0, 1, 2), "returns false when false");
     });
     it("sortedIndex works properly", function () {
         var a = [1, 2, 3, 4, 5];
-        var si = Plottable.Util.OpenSource.sortedIndex;
+        var si = Plottable._Util.OpenSource.sortedIndex;
         assert.equal(si(0, a), 0, "return 0 when val is <= arr[0]");
         assert.equal(si(6, a), a.length, "returns a.length when val >= arr[arr.length-1]");
         assert.equal(si(1.5, a), 1, "returns 1 when val is between the first and second elements");
@@ -4180,28 +4180,28 @@ describe("Util.s", function () {
     it("accessorize works properly", function () {
         var datum = { "foo": 2, "bar": 3, "key": 4 };
         var f = function (d, i, m) { return d + i; };
-        var a1 = Plottable.Util.Methods._accessorize(f);
+        var a1 = Plottable._Util.Methods.accessorize(f);
         assert.equal(f, a1, "function passes through accessorize unchanged");
-        var a2 = Plottable.Util.Methods._accessorize("key");
+        var a2 = Plottable._Util.Methods.accessorize("key");
         assert.equal(a2(datum, 0, null), 4, "key accessor works appropriately");
-        var a3 = Plottable.Util.Methods._accessorize("#aaaa");
+        var a3 = Plottable._Util.Methods.accessorize("#aaaa");
         assert.equal(a3(datum, 0, null), "#aaaa", "strings beginning with # are returned as final value");
-        var a4 = Plottable.Util.Methods._accessorize(33);
+        var a4 = Plottable._Util.Methods.accessorize(33);
         assert.equal(a4(datum, 0, null), 33, "numbers are return as final value");
-        var a5 = Plottable.Util.Methods._accessorize(datum);
+        var a5 = Plottable._Util.Methods.accessorize(datum);
         assert.equal(a5(datum, 0, null), datum, "objects are return as final value");
     });
     it("uniq works as expected", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
-        assert.deepEqual(Plottable.Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
+        assert.deepEqual(Plottable._Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
     });
     it("objEq works as expected", function () {
-        assert.isTrue(Plottable.Util.Methods.objEq({}, {}));
-        assert.isTrue(Plottable.Util.Methods.objEq({ a: 5 }, { a: 5 }));
-        assert.isFalse(Plottable.Util.Methods.objEq({ a: 5, b: 6 }, { a: 5 }));
-        assert.isFalse(Plottable.Util.Methods.objEq({ a: 5 }, { a: 5, b: 6 }));
-        assert.isTrue(Plottable.Util.Methods.objEq({ a: "hello" }, { a: "hello" }));
-        assert.isFalse(Plottable.Util.Methods.objEq({ constructor: {}.constructor }, {}), "using \"constructor\" isn't hidden");
+        assert.isTrue(Plottable._Util.Methods.objEq({}, {}));
+        assert.isTrue(Plottable._Util.Methods.objEq({ a: 5 }, { a: 5 }));
+        assert.isFalse(Plottable._Util.Methods.objEq({ a: 5, b: 6 }, { a: 5 }));
+        assert.isFalse(Plottable._Util.Methods.objEq({ a: 5 }, { a: 5, b: 6 }));
+        assert.isTrue(Plottable._Util.Methods.objEq({ a: "hello" }, { a: "hello" }));
+        assert.isFalse(Plottable._Util.Methods.objEq({ constructor: {}.constructor }, {}), "using \"constructor\" isn't hidden");
     });
 });
 

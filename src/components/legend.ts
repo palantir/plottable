@@ -128,7 +128,7 @@ export module Component {
 
     private updateDomain() {
       if (this._toggleCallback != null) {
-        this.isOff = Util.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
+        this.isOff = _Util.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
       }
       if (this._hoverCallback != null) {
         this.datumCurrentlyFocusedOn = this.scale().domain().indexOf(this.datumCurrentlyFocusedOn) >= 0 ?
@@ -150,7 +150,7 @@ export module Component {
       var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend.MARGIN) / textHeight));
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var fakeText = fakeLegendEl.append("text");
-      var maxWidth = d3.max(this.colorScale.domain(), (d: string) => Util.Text.getTextWidth(fakeText, d));
+      var maxWidth = d3.max(this.colorScale.domain(), (d: string) => _Util.Text.getTextWidth(fakeText, d));
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
       var desiredWidth  = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;
@@ -166,7 +166,7 @@ export module Component {
     private measureTextHeight(): number {
       // note: can't be called before anchoring atm
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-      var textHeight = Util.Text.getTextHeight(fakeLegendEl.append("text"));
+      var textHeight = _Util.Text.getTextHeight(fakeLegendEl.append("text"));
       // HACKHACK
       if (textHeight === 0) {
         textHeight = 1;
@@ -200,10 +200,10 @@ export module Component {
         .attr("transform", "translate(" + textHeight + ", 0)")
         .each(function(d: string) {
           var d3this = d3.select(this);
-          var measure = Util.Text.getTextMeasure(d3this);
-          var writeLine = Util.Text.getTruncatedText(d, availableWidth, measure);
+          var measure = _Util.Text.getTextMeasure(d3this);
+          var writeLine = _Util.Text.getTruncatedText(d, availableWidth, measure);
           var writeLineMeasure = measure(writeLine);
-          Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
+          _Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
         });
 
       legend.attr("transform", (d: string) => {

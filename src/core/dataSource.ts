@@ -8,7 +8,7 @@ module Plottable {
   export class DataSource extends Abstract.PlottableObject implements Core.IListenable {
     private _data: any[];
     private _metadata: any;
-    private accessor2cachedExtent: Util.StrictEqualityAssociativeArray;
+    private accessor2cachedExtent: _Util.StrictEqualityAssociativeArray;
     public broadcaster = new Core.Broadcaster(this);
 
     /**
@@ -25,7 +25,7 @@ module Plottable {
       super();
       this._data = data;
       this._metadata = metadata;
-      this.accessor2cachedExtent = new Util.StrictEqualityAssociativeArray();
+      this.accessor2cachedExtent = new _Util.StrictEqualityAssociativeArray();
     }
 
     /**
@@ -41,7 +41,7 @@ module Plottable {
         return this._data;
       } else {
         this._data = data;
-        this.accessor2cachedExtent = new Util.StrictEqualityAssociativeArray();
+        this.accessor2cachedExtent = new _Util.StrictEqualityAssociativeArray();
         this.broadcaster.broadcast();
         return this;
       }
@@ -61,7 +61,7 @@ module Plottable {
         return this._metadata;
       } else {
         this._metadata = metadata;
-        this.accessor2cachedExtent = new Util.StrictEqualityAssociativeArray();
+        this.accessor2cachedExtent = new _Util.StrictEqualityAssociativeArray();
         this.broadcaster.broadcast();
         return this;
       }
@@ -81,7 +81,7 @@ module Plottable {
       if (mappedData.length === 0){
         return [];
       } else if (typeof(mappedData[0]) === "string") {
-        return Util.Methods.uniq(mappedData);
+        return _Util.Methods.uniq(mappedData);
       } else {
         var extent = d3.extent(mappedData);
         if (extent[0] == null || extent[1] == null) {

@@ -38,7 +38,7 @@ export module Core {
    * The listeners are called synchronously.
    */
   export class Broadcaster extends Abstract.PlottableObject {
-    private key2callback = new Util.StrictEqualityAssociativeArray();
+    private key2callback = new _Util.StrictEqualityAssociativeArray();
     public listenable: IListenable;
 
     /**
@@ -94,7 +94,7 @@ export module Core {
      * @returns {Broadcaster} this object
      */
     public deregisterAllListeners() {
-      this.key2callback = new Util.StrictEqualityAssociativeArray();
+      this.key2callback = new _Util.StrictEqualityAssociativeArray();
     }
   }
 }

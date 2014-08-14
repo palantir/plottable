@@ -17,7 +17,7 @@ describe("Labels", () => {
     assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
 
     var text = content.select("text");
-    var bbox = Plottable.Util.DOM.getBBox(text);
+    var bbox = Plottable._Util.DOM.getBBox(text);
     assert.closeTo(bbox.height, label.availableHeight, 0.5, "text height === label.minimumHeight()");
     assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
     svg.remove();
@@ -29,7 +29,7 @@ describe("Labels", () => {
     label.renderTo(svg);
     var content = label.content;
     var text = content.select("text");
-    var textBBox = Plottable.Util.DOM.getBBox(text);
+    var textBBox = Plottable._Util.DOM.getBBox(text);
     assertBBoxInclusion(label.element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
     svg.remove();
@@ -41,7 +41,7 @@ describe("Labels", () => {
     label.renderTo(svg);
     var content = label.content;
     var text = content.select("text");
-    var textBBox = Plottable.Util.DOM.getBBox(text);
+    var textBBox = Plottable._Util.DOM.getBBox(text);
     assertBBoxInclusion(label.element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
     svg.remove();
@@ -68,7 +68,7 @@ describe("Labels", () => {
     label.renderTo(svg);
     var content = label.content;
     var text = content.select("text");
-    var bbox = Plottable.Util.DOM.getBBox(text);
+    var bbox = Plottable._Util.DOM.getBBox(text);
     assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
     assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
     svg.remove();
@@ -91,7 +91,7 @@ describe("Labels", () => {
     t.renderTo(svg);
     var textTranslate = d3.transform(label.content.select("g").attr("transform")).translate;
     var eleTranslate  = d3.transform(label.element.attr("transform")).translate;
-    var textWidth = Plottable.Util.DOM.getBBox(label.content.select("text")).width;
+    var textWidth = Plottable._Util.DOM.getBBox(label.content.select("text")).width;
     assert.closeTo(eleTranslate[0] + textTranslate[0] + textWidth / 2, 200, 5, "label is centered");
     svg.remove();
   });

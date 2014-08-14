@@ -4,7 +4,7 @@ module Plottable {
 export module Axis {
   export class Category extends Abstract.Axis {
     public _scale: Scale.Ordinal;
-    private measurer: Util.Text.CachingCharacterMeasurer;
+    private measurer: _Util.Text.CachingCharacterMeasurer;
 
     /**
      * Constructs an Axis.Category.
@@ -29,7 +29,8 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this.measurer = new Util.Text.CachingCharacterMeasurer(this._tickLabelContainer);
+      this.measurer = new _Util.Text.CachingCharacterMeasurer(this._tickLabelContainer);
+      return this;
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
@@ -66,16 +67,16 @@ export module Axis {
      *
      * @param {string[]} data The strings that will be printed on the ticks.
      */
-    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, data: string[]): Util.Text.IWriteTextResult;
+    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, data: string[]): _Util.Text.IWriteTextResult;
     /**
      * Measures the size of the ticks while also writing them to the DOM.
      * @param {D3.Selection} ticks The tick elements to be written to.
      */
-    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection): Util.Text.IWriteTextResult;
-    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, dataOrTicks: any): Util.Text.IWriteTextResult {
+    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection): _Util.Text.IWriteTextResult;
+    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, dataOrTicks: any): _Util.Text.IWriteTextResult {
       var draw = typeof dataOrTicks[0] !== "string";
       var self = this;
-      var textWriteResults: Util.Text.IWriteTextResult[] = [];
+      var textWriteResults: _Util.Text.IWriteTextResult[] = [];
       var tm = (s: string) => self.measurer.measure(s);
       var iterator = draw ? (f: Function) => dataOrTicks.each(f) : (f: Function) => dataOrTicks.forEach(f);
 
@@ -84,19 +85,19 @@ export module Axis {
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
         var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
 
-        var textWriteResult: Util.Text.IWriteTextResult;
+        var textWriteResult: _Util.Text.IWriteTextResult;
         var formatter = self._formatter;
         if (draw) {
           var d3this = d3.select(this);
           var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
           var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
-          textWriteResult = Util.Text.writeText(formatter(d), width, height, tm, true, {
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, true, {
                                                     g: d3this,
                                                     xAlign: xAlign[self._orientation],
                                                     yAlign: yAlign[self._orientation]
           });
         } else {
-          textWriteResult = Util.Text.writeText(formatter(d), width, height, tm, true);
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, true);
         }
 
         textWriteResults.push(textWriteResult);
@@ -105,9 +106,9 @@ export module Axis {
       var widthFn  = this._isHorizontal() ? d3.sum : d3.max;
       var heightFn = this._isHorizontal() ? d3.max : d3.sum;
       return {
-        textFits: textWriteResults.every((t: Util.Text.IWriteTextResult) => t.textFits),
-        usedWidth : widthFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedWidth),
-        usedHeight: heightFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedHeight)
+        textFits: textWriteResults.every((t: _Util.Text.IWriteTextResult) => t.textFits),
+        usedWidth : widthFn(textWriteResults, (t: _Util.Text.IWriteTextResult) => t.usedWidth),
+        usedHeight: heightFn(textWriteResults, (t: _Util.Text.IWriteTextResult) => t.usedHeight)
       };
     }
 
@@ -132,8 +133,9 @@ export module Axis {
 
       var xTranslate = this._orientation === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this._orientation === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
-      Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
+      _Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
+      _Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
+      return this;
     }
 
 

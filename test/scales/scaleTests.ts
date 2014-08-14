@@ -389,7 +389,7 @@ describe("Scales", () => {
 
       var ticks = scale.ticks();
       assert.deepEqual(ticks, ticks.slice().sort((x, y) => x - y), "ticks should be sorted");
-      assert.deepEqual(ticks, Plottable.Util.Methods.uniqNumbers(ticks), "ticks should not be repeated");
+      assert.deepEqual(ticks, Plottable._Util.Methods.uniqNumbers(ticks), "ticks should not be repeated");
       var beforePivot = ticks.filter((x) => x <= -base);
       var afterPivot = ticks.filter((x) => base <= x);
       var betweenPivots = ticks.filter((x) => -base < x && x < base);
@@ -400,7 +400,7 @@ describe("Scales", () => {
 
     it("ticks() is always non-empty", () => {
       [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach((domain) => {
-        scale.updateExtent(1, "x", domain);
+        scale._updateExtent(1, "x", domain);
         var ticks = scale.ticks();
         assert.operator(ticks.length, ">", 0);
       });

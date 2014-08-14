@@ -17,12 +17,12 @@ export module RenderController {
 
     export class AnimationFrame implements IRenderPolicy {
       public render() {
-        Util.DOM.requestAnimationFramePolyfill(RenderController.flush);
+        _Util.DOM.requestAnimationFramePolyfill(RenderController.flush);
       }
     }
 
     export class Timeout implements IRenderPolicy {
-      public _timeoutMsec: number = Util.DOM.POLYFILL_TIMEOUT_MSEC;
+      public _timeoutMsec: number = _Util.DOM.POLYFILL_TIMEOUT_MSEC;
 
       public render() {
         setTimeout(RenderController.flush, this._timeoutMsec);

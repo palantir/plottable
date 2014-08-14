@@ -28,7 +28,7 @@ export module Scale {
 
     public _getExtent(): any[] {
       var extents: string[][] = this._getAllExtents();
-      return Util.Methods.uniq(Util.Methods.flatten(extents));
+      return _Util.Methods.uniq(_Util.Methods.flatten(extents));
     }
 
     public domain(): any[];

@@ -6,7 +6,7 @@ export module Component {
     private textContainer: D3.Selection;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private orientation: string;
-    private measurer: Util.Text.TextMeasurer;
+    private measurer: _Util.Text.TextMeasurer;
     private xAlignment: string;
     private yAlignment: string;
 
@@ -66,7 +66,7 @@ export module Component {
     public _setup() {
       super._setup();
       this.textContainer = this.content.append("g");
-      this.measurer = Util.Text.getTextMeasure(this.textContainer);
+      this.measurer = _Util.Text.getTextMeasure(this.textContainer);
       this.text(this._text);
     }
 
@@ -92,19 +92,19 @@ export module Component {
       super._doRender();
       this.textContainer.text("");
       var dimension = this.orientation === "horizontal" ? this.availableWidth : this.availableHeight;
-      var truncatedText = Util.Text.getTruncatedText(this._text, dimension, this.measurer);
+      var truncatedText = _Util.Text.getTruncatedText(this._text, dimension, this.measurer);
       if (this.orientation === "horizontal") {
-        Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.availableWidth, this.availableHeight,
+        _Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.availableWidth, this.availableHeight,
                                         this.xAlignment, this.yAlignment);
       } else {
-        Util.Text.writeLineVertically(truncatedText, this.textContainer, this.availableWidth, this.availableHeight,
+        _Util.Text.writeLineVertically(truncatedText, this.textContainer, this.availableWidth, this.availableHeight,
                                         this.xAlignment, this.yAlignment, this.orientation);
       }
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-      this.measurer = Util.Text.getTextMeasure(this.textContainer); // reset it in case fonts have changed
+      this.measurer = _Util.Text.getTextMeasure(this.textContainer); // reset it in case fonts have changed
       return this;
     }
   }

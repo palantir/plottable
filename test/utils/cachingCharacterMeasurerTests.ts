@@ -4,13 +4,13 @@ var assert = chai.assert;
 
 describe("CachingCharacterMeasurer", () => {
   var g: D3.Selection;
-  var measurer: Plottable.Util.Text.CachingCharacterMeasurer;
+  var measurer: Plottable._Util.Text.CachingCharacterMeasurer;
   var svg: D3.Selection;
 
   beforeEach(() => {
     svg = generateSVG(100, 100);
     g = svg.append("g");
-    measurer = new Plottable.Util.Text.CachingCharacterMeasurer(g);
+    measurer = new Plottable._Util.Text.CachingCharacterMeasurer(g);
   });
 
   afterEach(() => {

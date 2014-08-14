@@ -29,7 +29,7 @@ export module Axis {
       var tickValues = this._getTickValues();
       var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       // create a new text measurerer every time; see issue #643
-      var measurer = Util.Text.getTextMeasure(testTextEl);
+      var measurer = _Util.Text.getTextMeasure(testTextEl);
       var textLengths = tickValues.map((v: any) => {
         var formattedValue = this._formatter(v);
         return measurer(formattedValue).width;
@@ -50,7 +50,7 @@ export module Axis {
     public _computeHeight() {
       var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       // create a new text measurerer every time; see issue #643
-      var measurer = Util.Text.getTextMeasure(testTextEl);
+      var measurer = _Util.Text.getTextMeasure(testTextEl);
       var textHeight = measurer("test").height;
       testTextEl.remove();
 

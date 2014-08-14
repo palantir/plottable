@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Util {
+export module _Util {
   export module Text {
 
     export interface Dimensions {
@@ -140,7 +140,7 @@ export module Util {
       if (measurer(text).width <= availableWidth) {
         return text;
       } else {
-        return _addEllipsesToLine(text, availableWidth, measurer);
+        return addEllipsesToLine(text, availableWidth, measurer);
       }
     }
 
@@ -169,7 +169,7 @@ export module Util {
      * Takes a line, a width to fit it in, and a text measurer. Will attempt to add ellipses to the end of the line,
      * shortening the line as required to ensure that it fits within width.
      */
-    export function _addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string {
+    export function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string {
       var mutatedLine = line.trim(); // Leave original around for debugging utility
       var widthMeasure = (s: string) => measureText(s).width;
       var lineWidth = widthMeasure(line);
@@ -184,7 +184,7 @@ export module Util {
         lineWidth = widthMeasure(mutatedLine);
       }
       if (widthMeasure(mutatedLine + "...") > width) {
-        throw new Error("_addEllipsesToLine failed :(");
+        throw new Error("addEllipsesToLine failed :(");
       }
       return mutatedLine + "...";
     }
@@ -204,7 +204,7 @@ export module Util {
       var h = bb.height;
       var w = bb.width;
       if (w > width || h > height) {
-        Util.Methods.warn("Insufficient space to fit text: " + line);
+        _Util.Methods.warn("Insufficient space to fit text: " + line);
         textEl.text("");
         return {width: 0, height: 0};
       }
@@ -307,7 +307,7 @@ export module Util {
       var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
       var primaryDimension = orientHorizontally ? width : height;
       var secondaryDimension = orientHorizontally ? height : width;
-      var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
+      var wrappedText = _Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
 
       if (wrappedText.lines.length === 0) {
         return {textFits: wrappedText.textFits, usedWidth: 0, usedHeight: 0};

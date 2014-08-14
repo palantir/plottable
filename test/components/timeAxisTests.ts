@@ -55,7 +55,7 @@ describe("TimeAxis", () => {
             box1 = visibleTickLabels[0][i].getBoundingClientRect();
             box2 = visibleTickLabels[0][j].getBoundingClientRect();
 
-            assert.isFalse(Plottable.Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
+            assert.isFalse(Plottable._Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
           }
         }
       }

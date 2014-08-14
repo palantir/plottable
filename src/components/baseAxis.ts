@@ -505,7 +505,7 @@ export module Abstract {
       visibleTickLabels.each(function (d: any) {
         var clientRect = this.getBoundingClientRect();
         var tickLabel = d3.select(this);
-        if (lastLabelClientRect != null && Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
+        if (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
           tickLabel.style("visibility", "hidden");
         } else {
           lastLabelClientRect = clientRect;

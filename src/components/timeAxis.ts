@@ -120,7 +120,7 @@ export module Axis {
       // returns the worst case width for a format
       // September 29, 9999 at 12:59.9999 PM Wednesday
       var longDate = new Date(9999, 8, 29, 12, 59, 9999);
-      return Util.Text.getTextWidth(container, d3.time.format(format)(longDate));
+      return _Util.Text.getTextWidth(container, d3.time.format(format)(longDate));
     }
 
     private getIntervalLength(interval: ITimeInterval) {
@@ -165,7 +165,7 @@ export module Axis {
       i = Math.min(i, Time._minorIntervals.length - 1);
       if (i < 0) {
         i = 0;
-        Util.Methods.warn("could not find suitable interval to display labels");
+        _Util.Methods.warn("could not find suitable interval to display labels");
       }
       this.previousIndex = Math.max(0, i - 1);
       this.previousSpan = curSpan;
@@ -186,7 +186,7 @@ export module Axis {
 
     public _measureTextHeight(container: D3.Selection): number {
       var fakeTickLabel = container.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      var textHeight = Util.Text.getTextHeight(fakeTickLabel.append("text"));
+      var textHeight = _Util.Text.getTextHeight(fakeTickLabel.append("text"));
       fakeTickLabel.remove();
       return textHeight;
     }
@@ -220,7 +220,7 @@ export module Axis {
           (this.availableHeight - this._maxLabelTickLength() / 2 * height + 2 * this.tickLabelPadding()));
       var textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
-        Util.DOM.translate(textSelection, xTranslate, yTranslate);
+        _Util.DOM.translate(textSelection, xTranslate, yTranslate);
       }
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
@@ -232,7 +232,7 @@ export module Axis {
     private canFitLabelFilter(container: D3.Selection, position: Date, label: string, isCentered: boolean): boolean {
       var endPosition: number;
       var startPosition: number;
-      var width = Util.Text.getTextWidth(container, label) + this.tickLabelPadding();
+      var width = _Util.Text.getTextWidth(container, label) + this.tickLabelPadding();
       if (isCentered) {
           endPosition = this._scale.scale(position) + width / 2;
           startPosition = this._scale.scale(position) - width / 2;
