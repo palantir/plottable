@@ -59,7 +59,7 @@ svg.plottable {
   stroke-width: 1px;
 }
 
-.plottable .gridlines .baseline {
+.plottable .gridlines line.baseline {
   visibility: hidden;
 }
 
