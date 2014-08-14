@@ -9,6 +9,7 @@ export module Axis {
     // the label is cut off.
     private showFirstTickLabel = false;
     private showLastTickLabel = false;
+    private measurer: Util.Text.TextMeasurer;
 
     /**
      * Creates a NumericAxis.
@@ -22,16 +23,17 @@ export module Axis {
       super(scale, orientation, formatter);
     }
 
+    public _setup() {
+      super._setup();
+      this.measurer = Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true));
+    }
+
     public _computeWidth() {
       var tickValues = this._getTickValues();
-      var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      // create a new text measurerer every time; see issue #643
-      var measurer = Util.Text.getTextMeasure(testTextEl);
       var textLengths = tickValues.map((v: any) => {
         var formattedValue = this._formatter(v);
-        return measurer(formattedValue).width;
+        return this.measurer(formattedValue).width;
       });
-      testTextEl.remove();
 
       var maxTextLength = d3.max(textLengths);
 
@@ -45,11 +47,7 @@ export module Axis {
     }
 
     public _computeHeight() {
-      var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      // create a new text measurerer every time; see issue #643
-      var measurer = Util.Text.getTextMeasure(testTextEl);
-      var textHeight = measurer("test").height;
-      testTextEl.remove();
+      var textHeight = this.measurer(Util.Text.HEIGHT_TEXT).height;
 
       if (this.tickLabelPositioning === "center") {
         this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;

@@ -83,6 +83,7 @@ export module Axis {
 
     private previousSpan: number;
     private previousIndex: number;
+    private measurer: Util.Text.TextMeasurer;
 
     /**
      * Creates a TimeAxis
@@ -118,7 +119,7 @@ export module Axis {
       // returns the worst case width for a format
       // September 29, 9999 at 12:59.9999 PM Wednesday
       var longDate = new Date(9999, 8, 29, 12, 59, 9999);
-      return Util.Text.getTextWidth(container, d3.time.format(format)(longDate));
+      return this.measurer(d3.time.format(format)(longDate)).width;
     }
 
     public getIntervalLength(interval: ITimeInterval) {
@@ -140,6 +141,7 @@ export module Axis {
       super._setup();
       this._majorTickLabels = this.content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       this._minorTickLabels = this.content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      this.measurer = Util.Text.getTextMeasurer(this._majorTickLabels.append("text"));
     }
 
     // returns a number to index into the major/minor intervals
@@ -184,7 +186,7 @@ export module Axis {
 
     public _measureTextHeight(container: D3.Selection): number {
       var fakeTickLabel = container.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      var textHeight = Util.Text.getTextHeight(fakeTickLabel.append("text"));
+      var textHeight = this.measurer(Util.Text.HEIGHT_TEXT).height;
       fakeTickLabel.remove();
       return textHeight;
     }
@@ -230,7 +232,7 @@ export module Axis {
     private canFitLabelFilter(container: D3.Selection, position: Date, label: string, isCentered: boolean): boolean {
       var endPosition: number;
       var startPosition: number;
-      var width = Util.Text.getTextWidth(container, label) + this.tickLabelPadding();
+      var width = this.measurer(label).width + this.tickLabelPadding();
       if (isCentered) {
           endPosition = this._scale.scale(position) + width / 2;
           startPosition = this._scale.scale(position) - width / 2;
