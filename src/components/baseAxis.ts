@@ -54,7 +54,6 @@ export module Abstract {
       } else {
         this.classed("y-axis", true);
       }
-      var x: Formatter = formatter;
 
       this.formatter(formatter);
 

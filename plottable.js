@@ -2950,7 +2950,6 @@ var Plottable;
                 else {
                     this.classed("y-axis", true);
                 }
-                var x = formatter;
                 this.formatter(formatter);
                 this._scale.broadcaster.registerListener(this, function () { return _this.rescale(); });
             }
