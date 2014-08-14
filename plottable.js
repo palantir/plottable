@@ -2722,7 +2722,6 @@ var Plottable;
             __extends(Time, _super);
             function Time(scale) {
                 _super.call(this, scale == null ? d3.time.scale() : scale);
-                this._PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
             }
             Time.prototype.tickInterval = function (interval, step) {
                 var tempScale = d3.time.scale();
@@ -2743,6 +2742,11 @@ var Plottable;
             };
             Time.prototype.copy = function () {
                 return new Time(this._d3Scale.copy());
+            };
+            Time.prototype._defaultExtent = function () {
+                var endTime = new Date().valueOf();
+                var startTime = endTime - Plottable.MILLISECONDS_IN_ONE_DAY;
+                return [startTime, endTime];
             };
             return Time;
         })(Plottable.Abstract.QuantitativeScale);
@@ -3298,8 +3302,6 @@ var Plottable;
                 }
                 _super.call(this, scale, orientation);
                 this.classed("time-axis", true);
-                this.previousSpan = 0;
-                this.previousIndex = Time.minorIntervals.length - 1;
                 this.tickLabelPadding(5);
             }
             Time.prototype._computeHeight = function () {
@@ -3317,8 +3319,12 @@ var Plottable;
                 return this.measurer(d3.time.format(format)(longDate)).width;
             };
             Time.prototype.getIntervalLength = function (interval) {
-                var testDate = this._scale.domain()[0];
-                var stepLength = Math.abs(this._scale.scale(interval.timeUnit.offset(testDate, interval.step)) - this._scale.scale(testDate));
+                var startDate = this._scale.domain()[0];
+                var endDate = interval.timeUnit.offset(startDate, interval.step);
+                if (endDate > this._scale.domain()[1]) {
+                    return this.availableWidth;
+                }
+                var stepLength = Math.abs(this._scale.scale(endDate) - this._scale.scale(startDate));
                 return stepLength;
             };
             Time.prototype.isEnoughSpace = function (container, interval) {
@@ -3333,26 +3339,15 @@ var Plottable;
                 this.measurer = Plottable.Util.Text.getTextMeasurer(this._majorTickLabels.append("text"));
             };
             Time.prototype.getTickLevel = function () {
-                var startingPoint = Time.minorIntervals.length - 1;
-                var curSpan = Math.abs(this._scale.domain()[1] - this._scale.domain()[0]);
-                if (curSpan <= this.previousSpan + 1) {
-                    startingPoint = this.previousIndex;
-                }
-                var i = startingPoint;
-                while (i >= 0) {
-                    if (!(this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i]) && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i]))) {
-                        i++;
+                for (var i = 0; i < Time.minorIntervals.length; i++) {
+                    if (this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i]) && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i])) {
                         break;
                     }
-                    i--;
                 }
-                i = Math.min(i, Time.minorIntervals.length - 1);
-                if (i < 0) {
-                    i = 0;
-                    Plottable.Util.Methods.warn("could not find suitable interval to display labels");
+                if (i >= Time.minorIntervals.length) {
+                    Plottable.Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
+                    i = Time.minorIntervals.length - 1;
                 }
-                this.previousIndex = Math.max(0, i - 1);
-                this.previousSpan = curSpan;
                 return i;
             };
             Time.prototype._getTickIntervalValues = function (interval) {

@@ -631,9 +631,6 @@ declare module Plottable {
             static minorIntervals: ITimeInterval[];
             static majorIntervals: ITimeInterval[];
             constructor(scale: Plottable.Scale.Time, orientation: string);
-            calculateWorstWidth(container: D3.Selection, format: string): number;
-            getIntervalLength(interval: ITimeInterval): number;
-            isEnoughSpace(container: D3.Selection, interval: ITimeInterval): boolean;
         }
     }
 }
