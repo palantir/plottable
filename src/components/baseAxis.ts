@@ -341,7 +341,6 @@ export module Abstract {
     }
 
     /**
-<<<<<<< HEAD
      * Gets the current end tick mark length.
      *
      * @returns {number} The current end tick mark length.
@@ -376,10 +375,7 @@ export module Abstract {
     }
 
     /**
-     * Gets the padding between each tick mark and its associated label.
-=======
      * Get or set the padding between each tick mark and its associated label.
->>>>>>> 189d47f... Put getter/setters into one docstring
      *
      * @param {number} [padding] If provided, the desired padding.
      * @returns {Axis|number} The calling Axis, or the current padding.
