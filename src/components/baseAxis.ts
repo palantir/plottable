@@ -54,6 +54,7 @@ export module Abstract {
       } else {
         this.classed("y-axis", true);
       }
+      var x: Formatter = formatter;
 
       this.formatter(formatter);
 
@@ -244,17 +245,14 @@ export module Abstract {
     }
 
     /**
-     * Gets the current width.
+     * Gets or sets the current width.
      *
-     * @returns {number} The current width.
+     * @param {number|String} w When provided, a fixed width for the Axis, or
+     * "auto" for automatic mode.
+     * @returns {number|Axis} The current width if w was provided, otherwise,
+     * the calling Axis.
      */
     public width(): number;
-    /**
-     * Sets a user-specified width.
-     *
-     * @param {number|String} w A fixed width for the Axis, or "auto" for automatic mode.
-     * @returns {Axis} The calling Axis.
-     */
     public width(w: any): Axis;
     public width(w?: any): any {
       if (w == null) {
@@ -273,17 +271,14 @@ export module Abstract {
     }
 
     /**
-     * Gets the current height.
+     * Gets or sets the current height.
      *
-     * @returns {number} The current height.
+     * @param {number|String} h When provided, a fixed height for the Axis, or
+     * "auto" for automatic mode.
+     * @returns {number|Axis} The current height if w was provided, otherwise,
+     * the calling Axis.
      */
     public height(): number;
-    /**
-     * Sets a user-specified height.
-     *
-     * @param {number|String} h A fixed height for the Axis, or "auto" for automatic mode.
-     * @returns {Axis} The calling Axis.
-     */
     public height(h: any): Axis;
     public height(h?: any): any {
       if (h == null) {
@@ -302,20 +297,19 @@ export module Abstract {
     }
 
     /**
-     * Get the current formatter on the axis. Data is passed through the
+     * Get or set the current formatter on the axis. Data is passed through the
      * formatter before being displayed.
      *
-     * @returns {Formatter} the axis formatter
-     */
-    public formatter(): Formatter;
-    /**
-     * Sets a new tick formatter.
-     *
-     * @param {Formatter} formatter
+     * @param {Formatter} formatter If provided and a
+     * function, the data will be passed through `formatter(data)`. If provided
+     * and a Formatter, data will be passed though `formatter.format(data)`.
+     * @returns {Axis|Abstract.Formatter} The calling Axis, or the current
+     * Formatter.
      * @returns {Abstract.Axis} The calling Axis.
      */
+    public formatter(): Formatter;
     public formatter(formatter: Formatter): Abstract.Axis;
-    public formatter(formatter?: Formatter): any {
+    public formatter(formatter?: any): any {
       if (formatter === undefined) {
         return this._formatter;
       }
@@ -325,17 +319,13 @@ export module Abstract {
     }
 
     /**
-     * Gets the current tick mark length.
+     * Get or set the current tick mark length.
      *
-     * @returns {number} The current tick mark length.
+     * @param {number} [length] If provided, length of each tick.
+     * @returns {Axis|number} The calling Axis, or the current tick mark
+     * length.
      */
     public tickLength(): number;
-    /**
-     * Sets the tick mark length.
-     *
-     * @param {number} length The length of each tick.
-     * @returns {BaseAxis} The calling Axis.
-     */
     public tickLength(length: number): Axis;
     public tickLength(length?: number): any {
       if (length == null) {
@@ -351,6 +341,7 @@ export module Abstract {
     }
 
     /**
+<<<<<<< HEAD
      * Gets the current end tick mark length.
      *
      * @returns {number} The current end tick mark length.
@@ -386,16 +377,15 @@ export module Abstract {
 
     /**
      * Gets the padding between each tick mark and its associated label.
+=======
+     * Get or set the padding between each tick mark and its associated label.
+>>>>>>> 189d47f... Put getter/setters into one docstring
      *
-     * @returns {number} The current padding, in pixels.
+     * @param {number} [padding] If provided, the desired padding.
+     * @returns {Axis|number} The calling Axis, or the current padding.
+     * length.
      */
     public tickLabelPadding(): number;
-    /**
-     * Sets the padding between each tick mark and its associated label.
-     *
-     * @param {number} padding The desired padding, in pixels.
-     * @returns {Axis} The calling Axis.
-     */
     public tickLabelPadding(padding: number): Axis;
     public tickLabelPadding(padding?: number): any {
       if (padding == null) {
@@ -411,17 +401,14 @@ export module Abstract {
     }
 
     /**
-     * Gets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
+     * Get or set the size of the gutter (the extra space between the tick
+     * labels and the outer edge of the axis).
      *
-     * @returns {number} The current size of the gutter, in pixels.
+     * @param {number} [size] If provided, the desired gutter.
+     * @returns {Axis|number} The calling Axis, or the current gutter.
+     * length.
      */
     public gutter(): number;
-    /**
-     * Sets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
-     *
-     * @param {number} size The desired size of the gutter, in pixels.
-     * @returns {Axis} The calling Axis.
-     */
     public gutter(size: number): Axis;
     public gutter(size?: number): any {
       if (size == null) {
@@ -437,17 +424,12 @@ export module Abstract {
     }
 
     /**
-     * Gets the orientation of the Axis.
+     * Get or set or set the orientation of the Axis.
      *
-     * @returns {string} The current orientation.
+     * @param {number} [newOrientation] If provided, the desired orientation (top/bottom/left/right).
+     * @returns {Axis|number} The calling Axis, or the current orientation.
      */
     public orient(): string;
-    /**
-     * Sets the orientation of the Axis.
-     *
-     * @param {string} newOrientation The desired orientation (top/bottom/left/right).
-     * @returns {Axis} The calling Axis.
-     */
     public orient(newOrientation: string): Axis;
     public orient(newOrientation?: string): any {
       if (newOrientation == null) {
@@ -467,18 +449,15 @@ export module Abstract {
     }
 
     /**
-     * Checks whether the Axis is currently set to show the first and last
+     * Get or set whether the Axis is currently set to show the first and last
      * tick labels.
      *
-     * @returns {boolean}
+     * @param {boolean} [show] Whether or not to show the first and last
+     * labels.
+     * @returns {Axis|boolean} The calling Axis, or whether or not the last
+     * tick labels are showing.
      */
     public showEndTickLabels(): boolean;
-    /**
-     * Set whether or not to show the first and last tick labels.
-     *
-     * @param {boolean} show Whether or not to show the first and last labels.
-     * @returns {Axis} The calling Axis.
-     */
     public showEndTickLabels(show: boolean): Axis;
     public showEndTickLabels(show?: boolean): any {
       if (show == null) {

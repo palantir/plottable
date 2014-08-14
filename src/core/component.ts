@@ -197,16 +197,10 @@ export module Abstract {
     /**
      * Renders the Component into a given DOM element. The element must be as <svg>.
      *
-     * @param {String} selector A CSS selector for getting the element to render into.
+     * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
      * @return {Component} The calling component.
      */
     public renderTo(selector: String): Component;
-    /**
-     * Renders the Component into a given DOM element. The element must be as <svg>.
-     *
-     * @param {D3.Selection} element A D3 selection for getting the element to render into.
-     * @return {Component} The calling component.
-     */
     public renderTo(element: D3.Selection): Component;
     public renderTo(element: any): Component {
       if (element != null) {
@@ -348,6 +342,7 @@ export module Abstract {
       var parentElement = parentElement == null ? this.boxContainer : parentElement;
       var box = parentElement.append("rect");
       if (className != null) {box.classed(className, true);};
+
       this.boxes.push(box);
       if (this.availableWidth  != null && this.availableHeight != null) {
         box.attr("width", this.availableWidth ).attr("height", this.availableHeight);
@@ -387,19 +382,13 @@ export module Abstract {
 
 
     /**
-     * Checks if the Component has a particular CSS class.
+     * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
      *
-     * @param {string} cssClass The CSS class to check for.
-     * @return {boolean} Whether the Component has the given CSS class.
+     * @param {string} cssClass The CSS class to add/remove/check for.
+     * @param {boolean} [addClass] Whether to add or remove the CSS class. If not supplied, checks for the CSS class.
+     * @return {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
      */
     public classed(cssClass: string): boolean;
-    /**
-     * Adds/removes a given CSS class to/from the Component.
-     *
-     * @param {string} cssClass The CSS class to add/remove for.
-     * @param {boolean} [addClass] Whether to add or remove the CSS class.
-     * @return {Component} The calling Component.
-     */
     public classed(cssClass: string, addClass: boolean): Component;
     public classed(cssClass: string, addClass?: boolean): any {
       if (addClass == null) {
