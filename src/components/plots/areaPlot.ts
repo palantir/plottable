@@ -20,9 +20,9 @@ export module Plot {
       super(dataset, xScale, yScale);
       this.classed("area-plot", true);
       this.project("y0", 0, yScale); // default
-      this.project("fill", () => "steelblue"); // default
-      this.project("fill-opacity", () => 0.5); // default
-      this.project("stroke", () => "none"); // default
+      this.project("fill", () => Core.Colors.INDIGO); // default
+      this.project("fill-opacity", () => 0.25); // default
+      this.project("stroke", () => Core.Colors.INDIGO); // default
       this._animators["area-reset"] = new Animator.Null();
       this._animators["area"]       = new Animator.Default()
                                         .duration(600)

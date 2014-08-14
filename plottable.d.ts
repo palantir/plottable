@@ -145,6 +145,7 @@ declare module Plottable {
     interface Formatter {
         (d: any): string;
     }
+    var MILLISECONDS_IN_ONE_DAY: number;
     class Formatters {
         static currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
         static fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
@@ -153,12 +154,32 @@ declare module Plottable {
         static percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
         static siSuffix(precision?: number): (d: any) => string;
         static time(): (d: any) => string;
+        static relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
     }
 }
 
 
 declare module Plottable {
     var version: string;
+}
+
+
+declare module Plottable {
+    module Core {
+        class Colors {
+            static CORAL_RED: string;
+            static INDIGO: string;
+            static ROBINS_EGG_BLUE: string;
+            static FERN: string;
+            static BURNING_ORANGE: string;
+            static ROYAL_HEATH: string;
+            static CONIFER: string;
+            static CERISE_RED: string;
+            static BRIGHT_SUN: string;
+            static JACARTA: string;
+            static PLOTTABLE_COLORS: string[];
+        }
+    }
 }
 
 
@@ -693,16 +714,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
-        module Axis {
-            var ONE_DAY: number;
-            function generateRelativeDateFormatter(baseValue: number, increment?: number, label?: string): (tickValue: any) => string;
-        }
-    }
-}
-
-
-declare module Plottable {
     module Abstract {
         class XYPlot extends Plot {
             xScale: Scale;
@@ -896,7 +907,7 @@ declare module Plottable {
         class PanZoom extends Plottable.Abstract.Interaction {
             xScale: Plottable.Abstract.QuantitativeScale;
             yScale: Plottable.Abstract.QuantitativeScale;
-            constructor(componentToListenTo: Plottable.Abstract.Component, xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.QuantitativeScale);
+            constructor(componentToListenTo: Plottable.Abstract.Component, xScale?: Plottable.Abstract.QuantitativeScale, yScale?: Plottable.Abstract.QuantitativeScale);
             resetZoom(): void;
         }
     }

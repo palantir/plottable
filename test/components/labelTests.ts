@@ -18,7 +18,7 @@ describe("Labels", () => {
 
     var text = content.select("text");
     var bbox = Plottable.Util.DOM.getBBox(text);
-    assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
+    assert.closeTo(bbox.height, label.availableHeight, 0.5, "text height === label.minimumHeight()");
     assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
     svg.remove();
   });

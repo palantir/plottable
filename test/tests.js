@@ -694,7 +694,7 @@ describe("Labels", function () {
         assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
         var text = content.select("text");
         var bbox = Plottable.Util.DOM.getBBox(text);
-        assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
+        assert.closeTo(bbox.height, label.availableHeight, 0.5, "text height === label.minimumHeight()");
         assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
@@ -3458,6 +3458,13 @@ describe("Scales", function () {
             assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
             assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
         });
+        it("ticks() is always non-empty", function () {
+            [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach(function (domain) {
+                scale.updateExtent(1, "x", domain);
+                var ticks = scale.ticks();
+                assert.operator(ticks.length, ">", 0);
+            });
+        });
     });
 });
 
@@ -3698,6 +3705,33 @@ describe("Formatters", function () {
             assert.operator(result.length, "<=", 5, "large number was formatted to a short string");
             result = lnFormatter(Math.pow(10, -12));
             assert.operator(result.length, "<=", 5, "small number was formatted to a short string");
+        });
+    });
+    describe("relativeDate", function () {
+        it("uses reasonable defaults", function () {
+            var relativeDateFormatter = Plottable.Formatters.relativeDate();
+            var result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "7", "7 day difference from epoch, incremented by days, no suffix");
+        });
+        it("resulting value is difference from base value", function () {
+            var relativeDateFormatter = Plottable.Formatters.relativeDate(5 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            var result = relativeDateFormatter(9 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "4", "4 days greater from base value");
+            var result = relativeDateFormatter(Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "-4", "4 days less from base value");
+        });
+        it("can increment by different time types (hours, minutes)", function () {
+            var hoursRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / 24);
+            var result = hoursRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "72", "72 hour difference from epoch");
+            var minutesRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / (24 * 60));
+            var result = minutesRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "4320", "4320 minute difference from epoch");
+        });
+        it("can append a suffix", function () {
+            var relativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY, "days");
+            var result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "7days", "days appended to the end");
         });
     });
 });
@@ -4263,7 +4297,7 @@ describe("Interactions", function () {
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
             var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
-            var dragBox = renderer.foregroundContainer.select(dragBoxClass);
+            var dragBox = renderer.backgroundContainer.select(dragBoxClass);
             assert.isNotNull(dragBox, "the dragbox was created");
             var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
             var expectedStartPosition = { x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY) };
@@ -4327,7 +4361,7 @@ describe("Interactions", function () {
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
             var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
-            var dragBox = renderer.foregroundContainer.select(dragBoxClass);
+            var dragBox = renderer.backgroundContainer.select(dragBoxClass);
             assert.isNotNull(dragBox, "the dragbox was created");
             var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
             var expectedStartPosition = { x: 0, y: Math.min(dragstartY, dragendY) };

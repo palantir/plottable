@@ -1,5 +1,5 @@
 /*!
-Plottable 0.23.2 (https://github.com/palantir/plottable)
+Plottable 0.24.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -746,6 +746,7 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
+    Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
     var Formatters = (function () {
         function Formatters() {
         }
@@ -874,6 +875,15 @@ var Plottable;
                 }
             };
         };
+        Formatters.relativeDate = function (baseValue, increment, label) {
+            if (baseValue === void 0) { baseValue = 0; }
+            if (increment === void 0) { increment = Plottable.MILLISECONDS_IN_ONE_DAY; }
+            if (label === void 0) { label = ""; }
+            return function (d) {
+                var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
+                return relativeDate.toString() + label;
+            };
+        };
         Formatters.verifyPrecision = function (precision) {
             if (precision < 0 || precision > 20) {
                 throw new RangeError("Formatter precision must be between 0 and 20");
@@ -889,7 +899,42 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.23.2";
+    Plottable.version = "0.24.0";
+})(Plottable || (Plottable = {}));
+
+var Plottable;
+(function (Plottable) {
+    (function (Core) {
+        var Colors = (function () {
+            function Colors() {
+            }
+            Colors.CORAL_RED = "#fd373e";
+            Colors.INDIGO = "#5177c4";
+            Colors.ROBINS_EGG_BLUE = "#06bdbd";
+            Colors.FERN = "#62bb60";
+            Colors.BURNING_ORANGE = "#ff7939";
+            Colors.ROYAL_HEATH = "#962565";
+            Colors.CONIFER = "#99ce50";
+            Colors.CERISE_RED = "#db2e65";
+            Colors.BRIGHT_SUN = "#ffe43d";
+            Colors.JACARTA = "#2c2b6f";
+            Colors.PLOTTABLE_COLORS = [
+                Colors.CORAL_RED,
+                Colors.INDIGO,
+                Colors.ROBINS_EGG_BLUE,
+                Colors.FERN,
+                Colors.BURNING_ORANGE,
+                Colors.ROYAL_HEATH,
+                Colors.CONIFER,
+                Colors.CERISE_RED,
+                Colors.BRIGHT_SUN,
+                Colors.JACARTA
+            ];
+            return Colors;
+        })();
+        Core.Colors = Colors;
+    })(Plottable.Core || (Plottable.Core = {}));
+    var Core = Plottable.Core;
 })(Plottable || (Plottable = {}));
 
 var Plottable;
@@ -2456,7 +2501,11 @@ var Plottable;
                 var negativeLogTicks = this.logTicks(-negativeUpper, -negativeLower).map(function (x) { return -x; }).reverse();
                 var positiveLogTicks = this.logTicks(positiveLower, positiveUpper);
                 var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this.howManyTicks(negativeUpper, positiveLower)) : [-this.pivot, 0, this.pivot].filter(function (x) { return min <= x && x <= max; });
-                return negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
+                var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
+                if (ticks.length <= 1) {
+                    ticks = d3.scale.linear().domain([min, max]).ticks(this._lastRequestedTickCount);
+                }
+                return ticks;
             };
             ModifiedLog.prototype.logTicks = function (lower, upper) {
                 var _this = this;
@@ -2612,6 +2661,10 @@ var Plottable;
             function Color(scaleType) {
                 var scale;
                 switch (scaleType) {
+                    case null:
+                    case undefined:
+                        scale = d3.scale.ordinal().range(Plottable.Core.Colors.PLOTTABLE_COLORS);
+                        break;
                     case "Category10":
                     case "category10":
                     case "10":
@@ -2631,10 +2684,6 @@ var Plottable;
                     case "category20c":
                     case "20c":
                         scale = d3.scale.category20c();
-                        break;
-                    case null:
-                    case undefined:
-                        scale = d3.scale.ordinal();
                         break;
                     default:
                         throw new Error("Unsupported ColorScale type");
@@ -2891,8 +2940,8 @@ var Plottable;
                 this._height = "auto";
                 this._endTickLength = 5;
                 this._tickLength = 5;
-                this._tickLabelPadding = 3;
-                this._gutter = 10;
+                this._tickLabelPadding = 10;
+                this._gutter = 15;
                 this._showEndTickLabels = false;
                 if (scale == null || orientation == null) {
                     throw new Error("Axis requires a scale and orientation");
@@ -4164,27 +4213,6 @@ var Plottable;
     var Component = Plottable.Component;
 })(Plottable || (Plottable = {}));
 
-var Plottable;
-(function (Plottable) {
-    (function (Util) {
-        (function (Axis) {
-            Axis.ONE_DAY = 24 * 60 * 60 * 1000;
-            function generateRelativeDateFormatter(baseValue, increment, label) {
-                if (increment === void 0) { increment = Axis.ONE_DAY; }
-                if (label === void 0) { label = ""; }
-                var formatter = function (tickValue) {
-                    var relativeDate = Math.round((tickValue.valueOf() - baseValue) / increment);
-                    return relativeDate.toString() + label;
-                };
-                return formatter;
-            }
-            Axis.generateRelativeDateFormatter = generateRelativeDateFormatter;
-        })(Util.Axis || (Util.Axis = {}));
-        var Axis = Util.Axis;
-    })(Plottable.Util || (Plottable.Util = {}));
-    var Util = Plottable.Util;
-})(Plottable || (Plottable = {}));
-
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -4264,7 +4292,8 @@ var Plottable;
                 };
                 this.classed("scatter-plot", true);
                 this.project("r", 3);
-                this.project("fill", function () { return "steelblue"; });
+                this.project("opacity", 0.6);
+                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
             }
             Scatter.prototype.project = function (attrToSet, accessor, scale) {
                 attrToSet = attrToSet === "cx" ? "x" : attrToSet;
@@ -4366,7 +4395,7 @@ var Plottable;
                     "baseline": new Plottable.Animator.Null()
                 };
                 this.classed("bar-plot", true);
-                this.project("fill", function () { return "steelblue"; });
+                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
                 this.baseline(this._baselineValue);
             }
             BarPlot.prototype._setup = function () {
@@ -4593,7 +4622,7 @@ var Plottable;
                     "line": new Plottable.Animator.Default().duration(600).easing("exp-in-out")
                 };
                 this.classed("line-plot", true);
-                this.project("stroke", function () { return "steelblue"; });
+                this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; });
                 this.project("stroke-width", function () { return "2px"; });
             }
             Line.prototype._setup = function () {
@@ -4674,9 +4703,9 @@ var Plottable;
                 _super.call(this, dataset, xScale, yScale);
                 this.classed("area-plot", true);
                 this.project("y0", 0, yScale);
-                this.project("fill", function () { return "steelblue"; });
-                this.project("fill-opacity", function () { return 0.5; });
-                this.project("stroke", function () { return "none"; });
+                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
+                this.project("fill-opacity", function () { return 0.25; });
+                this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; });
                 this._animators["area-reset"] = new Plottable.Animator.Null();
                 this._animators["area"] = new Plottable.Animator.Default().duration(600).easing("exp-in-out");
             }
@@ -5035,8 +5064,11 @@ var Plottable;
             function PanZoom(componentToListenTo, xScale, yScale) {
                 _super.call(this, componentToListenTo);
                 var _this = this;
-                if (xScale == null || yScale == null) {
-                    throw new Error("panZoomInteractions require an xScale and yScale");
+                if (xScale == null) {
+                    xScale = new Plottable.Scale.Linear();
+                }
+                if (yScale == null) {
+                    yScale = new Plottable.Scale.Linear();
                 }
                 this.xScale = xScale;
                 this.yScale = yScale;
@@ -5209,8 +5241,8 @@ var Plottable;
             DragBox.prototype._anchor = function (hitBox) {
                 _super.prototype._anchor.call(this, hitBox);
                 var cname = DragBox.CLASS_DRAG_BOX;
-                var foreground = this.componentToListenTo.foregroundContainer;
-                this.dragBox = foreground.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
+                var background = this.componentToListenTo.backgroundContainer;
+                this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
                 return this;
             };
             DragBox.CLASS_DRAG_BOX = "drag-box";
