@@ -6,6 +6,8 @@ module Plottable {
     (d: any): string;
   }
 
+  export var MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
+
   interface TimeFilterFormat {
     format: string;
     filter: (d: any) => any;
@@ -112,8 +114,15 @@ module Plottable {
     public static percentage(precision = 0, onlyShowUnchanged = true) {
       var fixedFormatter = Formatters.fixed(precision);
       return function(d: any) {
-        var formattedValue = fixedFormatter(d * 100);
-        if (onlyShowUnchanged && Formatters._valueChanged(d * 100, formattedValue)) {
+        var valToFormat = d * 100;
+
+        // Account for float imprecision
+        var valString = d.toString();
+        var integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
+        valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
+
+        var formattedValue = fixedFormatter(valToFormat);
+        if (onlyShowUnchanged && Formatters._valueChanged(valToFormat, formattedValue)) {
           return "";
         }
         if (formattedValue !== "") {
@@ -190,6 +199,22 @@ module Plottable {
             return d3.time.format(timeFormat[i].format)(d);
           }
         }
+      };
+    }
+
+    /**
+     * Creates a formatter for relative dates.
+     *
+     * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
+     * @param {number} increment The unit used in calculating relative date values (default MILLISECONDS_IN_ONE_DAY)
+     * @param {string} label The label to append to the formatted string (default "")
+     *
+     * @returns {Formatter} A formatter for time/date values.
+     */
+    public static relativeDate(baseValue: number = 0, increment: number = MILLISECONDS_IN_ONE_DAY, label: string = "") {
+      return function (d: any) {
+        var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
+        return relativeDate.toString() + label;
       };
     }
 

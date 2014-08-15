@@ -3,7 +3,6 @@
 module Plottable {
 export module Scale {
   export class Color extends Abstract.Scale {
-
     /**
      * Creates a ColorScale.
      *
@@ -15,6 +14,10 @@ export module Scale {
     constructor(scaleType?: string) {
       var scale: D3.Scale.OrdinalScale;
       switch (scaleType) {
+        case null:
+        case undefined:
+          scale = d3.scale.ordinal().range(Core.Colors.PLOTTABLE_COLORS);
+          break;
         case "Category10":
         case "category10":
         case "10":
@@ -34,10 +37,6 @@ export module Scale {
         case "category20c":
         case "20c":
           scale = d3.scale.category20c();
-          break;
-        case null:
-        case undefined:
-          scale = d3.scale.ordinal();
           break;
         default:
           throw new Error("Unsupported ColorScale type");

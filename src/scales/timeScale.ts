@@ -3,8 +3,6 @@
 module Plottable {
 export module Scale {
   export class Time extends Abstract.QuantitativeScale {
-    public _PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
-
     /**
      * Creates a new Time Scale.
      *
@@ -48,6 +46,12 @@ export module Scale {
      */
     public copy(): Time {
       return new Time(this._d3Scale.copy());
+    }
+
+    public _defaultExtent(): any[] {
+      var endTime = new Date().valueOf();
+      var startTime = endTime - Plottable.MILLISECONDS_IN_ONE_DAY;
+      return [startTime, endTime];
     }
   }
 }

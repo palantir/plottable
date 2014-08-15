@@ -27,8 +27,8 @@ export module Abstract {
     public _computedHeight: number;
     private _endTickLength = 5;
     private _tickLength = 5;
-    private _tickLabelPadding = 3;
-    private _gutter = 10;
+    private _tickLabelPadding = 10;
+    private _gutter = 15;
     private _showEndTickLabels = false;
 
     constructor(scale: Abstract.Scale, orientation: string, formatter = Formatters.identity()) {
@@ -46,7 +46,7 @@ export module Abstract {
 
       this.formatter(formatter);
 
-      this._scale.broadcaster.registerListener(this, () => this.rescale());
+      this._scale.broadcaster.registerListener(this, () => this._render());
     }
 
     public remove() {
@@ -220,10 +220,6 @@ export module Abstract {
       }
 
       return tickMarkAttrHash;
-    }
-
-    private rescale() {
-      return (this.element != null) ? this._render() : null;
     }
 
     public _invalidateLayout() {

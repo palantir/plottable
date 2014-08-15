@@ -895,7 +895,7 @@ describe("Labels", function () {
 
         var text = content.select("text");
         var bbox = Plottable.Util.DOM.getBBox(text);
-        assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
+        assert.closeTo(bbox.height, label.availableHeight, 0.5, "text height === label.minimumHeight()");
         assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
@@ -1679,6 +1679,100 @@ describe("Plots", function () {
             r.remove();
             var key2callback = s.broadcaster.key2callback;
             assert.isUndefined(key2callback.get(r), "the plot is no longer attached to the scale");
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+describe("Plots", function () {
+    describe("New Style Plots", function () {
+        var p;
+        var oldWarn = Plottable.Util.Methods.warn;
+
+        beforeEach(function () {
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            p = new Plottable.Abstract.NewStylePlot(xScale, yScale);
+            p._getDrawer = function (k) {
+                return new Plottable._Drawer.Rect(k);
+            };
+        });
+
+        afterEach(function () {
+            Plottable.Util.Methods.warn = oldWarn;
+        });
+
+        it("Datasets can be added and removed as expected", function () {
+            p.addDataset("foo", [1, 2, 3]);
+            var d2 = new Plottable.DataSource([4, 5, 6]);
+            p.addDataset("bar", d2);
+            p.addDataset([7, 8, 9]);
+            var d4 = new Plottable.DataSource([10, 11, 12]);
+            p.addDataset(d4);
+
+            assert.deepEqual(p._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
+            var datasets = p._getDatasetsInOrder();
+            assert.deepEqual(datasets[0].data(), [1, 2, 3]);
+            assert.equal(datasets[1], d2);
+            assert.deepEqual(datasets[2].data(), [7, 8, 9]);
+            assert.equal(datasets[3], d4);
+
+            p.removeDataset("foo");
+            p.removeDataset("_0");
+
+            assert.deepEqual(p._datasetKeysInOrder, ["bar", "_1"]);
+            assert.lengthOf(p._getDatasetsInOrder(), 2);
+        });
+
+        it("Datasets are listened to appropriately", function () {
+            var callbackCounter = 0;
+            var callback = function () {
+                return callbackCounter++;
+            };
+            p._onDataSourceUpdate = callback;
+            var d = new Plottable.DataSource([1, 2, 3]);
+            p.addDataset("foo", d);
+            assert.equal(callbackCounter, 1, "adding dataset triggers listener");
+            d.data([1, 2, 3, 4]);
+            assert.equal(callbackCounter, 2, "modifying data triggers listener");
+            p.removeDataset("foo");
+            assert.equal(callbackCounter, 3, "removing dataset triggers listener");
+        });
+
+        it("Datasets can be reordered", function () {
+            p.addDataset("foo", [1]);
+            p.addDataset("bar", [2]);
+            p.addDataset("baz", [3]);
+            assert.deepEqual(p.datasetOrder(), ["foo", "bar", "baz"]);
+            p.datasetOrder(["bar", "baz", "foo"]);
+            assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
+            var warned = 0;
+            Plottable.Util.Methods.warn = function () {
+                return warned++;
+            }; // suppress expected warnings
+            p.datasetOrder(["blah", "blee", "bar", "baz", "foo"]);
+            assert.equal(warned, 1);
+            assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
+        });
+
+        it("Has proper warnings", function () {
+            var warned = 0;
+            Plottable.Util.Methods.warn = function () {
+                return warned++;
+            };
+            p.addDataset("_foo", []);
+            assert.equal(warned, 1);
+            p.addDataset("2", []);
+            p.addDataset("4", []);
+
+            // get warning for not a permutation
+            p.datasetOrder(["_bar", "4", "2"]);
+            assert.equal(warned, 2);
+
+            // do not get warning for a permutation
+            p.datasetOrder(["2", "_foo", "4"]);
+            assert.equal(warned, 2);
         });
     });
 });
@@ -2490,6 +2584,202 @@ describe("Plots", function () {
                 }
                 ;
             });
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+
+describe("Plots", function () {
+    describe("Stacked Bar Plot", function () {
+        var verifier = new MultiTestVerifier();
+        var svg;
+        var dataset1;
+        var dataset2;
+        var xScale;
+        var yScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var axisHeight = 0;
+        var bandWidth = 0;
+
+        var numAttr = function (s, a) {
+            return parseFloat(s.attr(a));
+        };
+
+        before(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Ordinal();
+            yScale = new Plottable.Scale.Linear().domain([0, 3]);
+
+            var data1 = [
+                { x: "A", y: 1 },
+                { x: "B", y: 2 }
+            ];
+            var data2 = [
+                { x: "A", y: 2 },
+                { x: "B", y: 1 }
+            ];
+            dataset1 = new Plottable.DataSource(data1);
+            dataset2 = new Plottable.DataSource(data2);
+
+            renderer = new Plottable.Plot.StackedBar(xScale, yScale);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.baseline(0);
+            var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+            axisHeight = xAxis.availableHeight;
+            bandWidth = xScale.rangeBand();
+        });
+
+        beforeEach(function () {
+            verifier.start();
+        });
+
+        afterEach(function () {
+            verifier.end();
+        });
+
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+
+        it("renders correctly", function () {
+            var bars = renderer.renderArea.selectAll("rect");
+            var bar0 = d3.select(bars[0][0]);
+            var bar1 = d3.select(bars[0][1]);
+            var bar2 = d3.select(bars[0][2]);
+            var bar3 = d3.select(bars[0][3]);
+            var bar0X = bar0.data()[0].x;
+            var bar1X = bar1.data()[0].x;
+            var bar2X = bar2.data()[0].x;
+            var bar3X = bar3.data()[0].x;
+
+            // check widths
+            assert.closeTo(numAttr(bar0, "width"), bandWidth, 2);
+            assert.closeTo(numAttr(bar1, "width"), bandWidth, 2);
+            assert.closeTo(numAttr(bar2, "width"), bandWidth, 2);
+            assert.closeTo(numAttr(bar3, "width"), bandWidth, 2);
+
+            // check heights
+            assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 3, 0.01, "height is correct for bar0");
+            assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight) / 3 * 2, 0.01, "height is correct for bar1");
+            assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight) / 3 * 2, 0.01, "height is correct for bar2");
+            assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 3, 0.01, "height is correct for bar3");
+
+            // check that bar is aligned on the center of the scale
+            assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) + bandWidth / 2, 0.01, "x pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2, 0.01, "x pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2, 0.01, "x pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2, 0.01, "x pos correct for bar3");
+
+            // now check y values to ensure they do indeed stack
+            assert.closeTo(numAttr(bar0, "y"), (400 - axisHeight) / 3 * 2, 0.01, "y is correct for bar0");
+            assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 3, 0.01, "y is correct for bar1");
+            assert.closeTo(numAttr(bar2, "y"), 0, 0.01, "y is correct for bar2");
+            assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+
+describe("Plots", function () {
+    describe("Clustered Bar Plot", function () {
+        var verifier = new MultiTestVerifier();
+        var svg;
+        var dataset1;
+        var dataset2;
+        var xScale;
+        var yScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var axisHeight = 0;
+        var bandWidth = 0;
+
+        var numAttr = function (s, a) {
+            return parseFloat(s.attr(a));
+        };
+
+        before(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Ordinal();
+            yScale = new Plottable.Scale.Linear().domain([0, 2]);
+
+            var data1 = [
+                { x: "A", y: 1 },
+                { x: "B", y: 2 }
+            ];
+            var data2 = [
+                { x: "A", y: 2 },
+                { x: "B", y: 1 }
+            ];
+            dataset1 = new Plottable.DataSource(data1);
+            dataset2 = new Plottable.DataSource(data2);
+
+            renderer = new Plottable.Plot.ClusteredBar(xScale, yScale);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.baseline(0);
+            var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+            axisHeight = xAxis.availableHeight;
+            bandWidth = xScale.rangeBand();
+        });
+
+        beforeEach(function () {
+            verifier.start();
+        });
+
+        afterEach(function () {
+            verifier.end();
+        });
+
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+
+        it("renders correctly", function () {
+            var bars = renderer.renderArea.selectAll("rect");
+            var bar0 = d3.select(bars[0][0]);
+            var bar1 = d3.select(bars[0][1]);
+            var bar2 = d3.select(bars[0][2]);
+            var bar3 = d3.select(bars[0][3]);
+            var bar0X = bar0.data()[0].x;
+            var bar1X = bar1.data()[0].x;
+            var bar2X = bar2.data()[0].x;
+            var bar3X = bar3.data()[0].x;
+
+            // check widths
+            var width = bandWidth / 2 * .518;
+            assert.closeTo(numAttr(bar0, "width"), width, 2);
+            assert.closeTo(numAttr(bar1, "width"), width, 2);
+            assert.closeTo(numAttr(bar2, "width"), width, 2);
+            assert.closeTo(numAttr(bar3, "width"), width, 2);
+
+            // check heights
+            assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar0");
+            assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight), 0.01, "height is correct for bar1");
+            assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight), 0.01, "height is correct for bar2");
+            assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
+
+            // check that clustering is correct
+            var off = renderer.innerScale.scale("_0");
+            assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) + bandWidth / 2 - off, 0.01, "x pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2 - off, 0.01, "x pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2 + off, 0.01, "x pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2 + off, 0.01, "x pos correct for bar3");
         });
     });
 });
@@ -3669,7 +3959,7 @@ describe("Domainer", function () {
     });
 
     it("pad() works in general case", function () {
-        scale.updateExtent(1, "x", [100, 200]);
+        scale.updateExtent("1", "x", [100, 200]);
         scale.domainer(new Plottable.Domainer().pad(0.2));
         assert.deepEqual(scale.domain(), [90, 210]);
     });
@@ -3679,7 +3969,7 @@ describe("Domainer", function () {
         var f = d3.time.format("%x");
         var d1 = f.parse("06/02/2014");
         var d2 = f.parse("06/03/2014");
-        timeScale.updateExtent(1, "x", [d1, d2]);
+        timeScale.updateExtent("1", "x", [d1, d2]);
         timeScale.domainer(new Plottable.Domainer().pad());
         var dd1 = timeScale.domain()[0];
         var dd2 = timeScale.domain()[1];
@@ -3693,7 +3983,7 @@ describe("Domainer", function () {
 
     it("pad() works on log scales", function () {
         var logScale = new Plottable.Scale.Log();
-        logScale.updateExtent(1, "x", [10, 100]);
+        logScale.updateExtent("1", "x", [10, 100]);
         logScale.range([0, 1]);
         logScale.domainer(domainer.pad(2.0));
         assert.closeTo(logScale.domain()[0], 1, 0.001);
@@ -3723,7 +4013,7 @@ describe("Domainer", function () {
         // the result of computeDomain() will be number[], but when it
         // gets fed back into timeScale, it will be adjusted back to a Date.
         // That's why I'm using updateExtent() instead of domainer.computeDomain()
-        timeScale.updateExtent(1, "x", [d, d]);
+        timeScale.updateExtent("1", "x", [d, d]);
         timeScale.domainer(new Plottable.Domainer().pad());
         assert.deepEqual(timeScale.domain(), [dayBefore, dayAfter]);
     });
@@ -3770,7 +4060,7 @@ describe("Domainer", function () {
         var b = new Date(2003, 0, 1);
         domainer.pad().addPaddingException(a);
         var timeScale = new Plottable.Scale.Time();
-        timeScale.updateExtent(1, "x", [a, b]);
+        timeScale.updateExtent("1", "x", [a, b]);
         timeScale.domainer(domainer);
         var domain = timeScale.domain();
         assert.deepEqual(domain[0], a);
@@ -3813,7 +4103,7 @@ describe("Domainer", function () {
         var d = new Date(2003, 0, 1);
         domainer.addIncludedValue(b);
         var timeScale = new Plottable.Scale.Time();
-        timeScale.updateExtent(1, "x", [c, d]);
+        timeScale.updateExtent("1", "x", [c, d]);
         timeScale.domainer(domainer);
         assert.deepEqual(timeScale.domain(), [b, d]);
     });
@@ -3912,7 +4202,7 @@ describe("Scales", function () {
         assert.isTrue(callbackWasCalled, "The registered callback was called");
 
         scale.autoDomainAutomatically = true;
-        scale.updateExtent(1, "x", [0.08, 9.92]);
+        scale.updateExtent("1", "x", [0.08, 9.92]);
         callbackWasCalled = false;
         scale.domainer(new Plottable.Domainer().nice());
         assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
@@ -3933,7 +4223,7 @@ describe("Scales", function () {
         });
 
         it("scale autoDomain flag is not overwritten without explicitly setting the domain", function () {
-            scale.updateExtent(1, "x", d3.extent(data, function (e) {
+            scale.updateExtent("1", "x", d3.extent(data, function (e) {
                 return e.foo;
             }));
             scale.domainer(new Plottable.Domainer().pad().nice());
@@ -3974,19 +4264,19 @@ describe("Scales", function () {
 
         it("scale perspectives can be removed appropriately", function () {
             assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled1");
-            scale.updateExtent(1, "x", d3.extent(data, function (e) {
+            scale.updateExtent("1", "x", d3.extent(data, function (e) {
                 return e.foo;
             }));
-            scale.updateExtent(2, "x", d3.extent(data, function (e) {
+            scale.updateExtent("2", "x", d3.extent(data, function (e) {
                 return e.bar;
             }));
             assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled2");
             assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
             assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled3");
-            scale.removeExtent(1, "x");
+            scale.removeExtent("1", "x");
             assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled4");
             assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
-            scale.updateExtent(2, "x", d3.extent(data, function (e) {
+            scale.updateExtent("2", "x", d3.extent(data, function (e) {
                 return e.foo;
             }));
             assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled5");
@@ -4236,7 +4526,7 @@ describe("Scales", function () {
         });
 
         it("works with a domainer", function () {
-            scale.updateExtent(1, "x", [0, base * 2]);
+            scale.updateExtent("1", "x", [0, base * 2]);
             var domain = scale.domain();
             scale.domainer(new Plottable.Domainer().pad(0.1));
             assert.operator(scale.domain()[0], "<", domain[0]);
@@ -4252,11 +4542,11 @@ describe("Scales", function () {
         });
 
         it("gives reasonable values for ticks()", function () {
-            scale.updateExtent(1, "x", [0, base / 2]);
+            scale.updateExtent("1", "x", [0, base / 2]);
             var ticks = scale.ticks();
             assert.operator(ticks.length, ">", 0);
 
-            scale.updateExtent(1, "x", [-base * 2, base * 2]);
+            scale.updateExtent("1", "x", [-base * 2, base * 2]);
             ticks = scale.ticks();
             var beforePivot = ticks.filter(function (x) {
                 return x <= -base;
@@ -4273,7 +4563,7 @@ describe("Scales", function () {
         });
 
         it("works on inverted domain", function () {
-            scale.updateExtent(1, "x", [200, -100]);
+            scale.updateExtent("1", "x", [200, -100]);
             var range = scale.range();
             assert.closeTo(scale.scale(-100), range[1], epsilon);
             assert.closeTo(scale.scale(200), range[0], epsilon);
@@ -4304,6 +4594,14 @@ describe("Scales", function () {
             assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
             assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
             assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
+        });
+
+        it("ticks() is always non-empty", function () {
+            [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach(function (domain) {
+                scale.updateExtent("1", "x", domain);
+                var ticks = scale.ticks();
+                assert.operator(ticks.length, ">", 0);
+            });
         });
     });
 });
@@ -4560,6 +4858,15 @@ describe("Formatters", function () {
             var result = percentFormatter(1);
             assert.strictEqual(result, "100%", "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
         });
+
+        it("can handle float imprecision", function () {
+            var percentFormatter = Plottable.Formatters.percentage();
+            var result = percentFormatter(0.07);
+            assert.strictEqual(result, "7%", "does not have trailing zeros and is not empty string");
+            percentFormatter = Plottable.Formatters.percentage(2);
+            var result2 = percentFormatter(0.0035);
+            assert.strictEqual(result2, "0.35%", "works even if multiplying by 100 does not make it an integer");
+        });
     });
 
     describe("time", function () {
@@ -4593,6 +4900,38 @@ describe("Formatters", function () {
             assert.operator(result.length, "<=", 5, "large number was formatted to a short string");
             result = lnFormatter(Math.pow(10, -12));
             assert.operator(result.length, "<=", 5, "small number was formatted to a short string");
+        });
+    });
+
+    describe("relativeDate", function () {
+        it("uses reasonable defaults", function () {
+            var relativeDateFormatter = Plottable.Formatters.relativeDate();
+            var result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "7", "7 day difference from epoch, incremented by days, no suffix");
+        });
+
+        it("resulting value is difference from base value", function () {
+            var relativeDateFormatter = Plottable.Formatters.relativeDate(5 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            var result = relativeDateFormatter(9 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "4", "4 days greater from base value");
+            var result = relativeDateFormatter(Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "-4", "4 days less from base value");
+        });
+
+        it("can increment by different time types (hours, minutes)", function () {
+            var hoursRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / 24);
+            var result = hoursRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "72", "72 hour difference from epoch");
+
+            var minutesRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / (24 * 60));
+            var result = minutesRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "4320", "4320 minute difference from epoch");
+        });
+
+        it("can append a suffix", function () {
+            var relativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY, "days");
+            var result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            assert.strictEqual(result, "7days", "days appended to the end");
         });
     });
 });
@@ -4666,7 +5005,7 @@ describe("CachingCharacterMeasurer", function () {
     beforeEach(function () {
         svg = generateSVG(100, 100);
         g = svg.append("g");
-        measurer = new Plottable.Util.Text.CachingCharacterMeasurer(g);
+        measurer = new Plottable.Util.Text.CachingCharacterMeasurer(g.append("text"));
     });
 
     afterEach(function () {
@@ -4787,7 +5126,7 @@ describe("Util.Text", function () {
         var svg = generateSVG();
         var textEl = svg.append("text").attr("x", 20).attr("y", 50);
         textEl.text("foobar");
-        var measure = Plottable.Util.Text.getTextMeasure(textEl);
+        var measure = Plottable.Util.Text.getTextMeasurer(textEl);
         var fullText = Plottable.Util.Text.getTruncatedText("hellom world!", 200, measure);
         assert.equal(fullText, "hellom world!", "text untruncated");
         var partialText = Plottable.Util.Text.getTruncatedText("hellom world!", 70, measure);
@@ -4795,26 +5134,6 @@ describe("Util.Text", function () {
         var tinyText = Plottable.Util.Text.getTruncatedText("hellom world!", 5, measure);
         assert.equal(tinyText, "", "empty string for tiny text");
 
-        assert.equal(textEl.text(), "foobar", "truncate had no side effect on textEl");
-        svg.remove();
-    });
-
-    it("getTextHeight works properly", function () {
-        var svg = generateSVG();
-        var textEl = svg.append("text").attr("x", 20).attr("y", 50);
-        textEl.style("font-size", "20pt");
-        textEl.text("hello, world");
-        var height1 = Plottable.Util.Text.getTextHeight(textEl);
-        textEl.style("font-size", "30pt");
-        var height2 = Plottable.Util.Text.getTextHeight(textEl);
-        assert.operator(height1, "<", height2, "measured height is greater when font size is increased");
-        assert.equal(textEl.text(), "hello, world", "getTextHeight did not modify the text in the element");
-        textEl.text("");
-        assert.equal(Plottable.Util.Text.getTextHeight(textEl), height2, "works properly if there is no text in the element");
-        assert.equal(textEl.text(), "", "getTextHeight did not modify the text in the element");
-        textEl.text(" ");
-        assert.equal(Plottable.Util.Text.getTextHeight(textEl), height2, "works properly if there is just a space in the element");
-        assert.equal(textEl.text(), " ", "getTextHeight did not modify the text in the element");
         svg.remove();
     });
 
@@ -4822,10 +5141,12 @@ describe("Util.Text", function () {
         var svg;
         var measure;
         var e;
+        var textSelection;
 
         before(function () {
             svg = generateSVG();
-            measure = Plottable.Util.Text.getTextMeasure(svg);
+            textSelection = svg.append("text");
+            measure = Plottable.Util.Text.getTextMeasurer(textSelection);
             e = function (text, width) {
                 return Plottable.Util.Text._addEllipsesToLine(text, width, measure);
             };
@@ -4869,7 +5190,8 @@ describe("Util.Text", function () {
             var svg = generateSVG();
             var width = 1;
             var height = 1;
-            var measure = Plottable.Util.Text.getTextMeasure(svg);
+            var textSelection = svg.append("text");
+            var measure = Plottable.Util.Text.getTextMeasurer(textSelection);
             var results = Plottable.Util.Text.writeText("hello world", width, height, measure, true);
             assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "measurement mode: no width used");
@@ -4880,6 +5202,7 @@ describe("Util.Text", function () {
             assert.isFalse(results.textFits, "write mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "write mode: no width used");
             assert.equal(0, results.usedHeight, "write mode: no height used");
+            textSelection.remove();
             assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
             svg.remove();
         });
@@ -4888,7 +5211,8 @@ describe("Util.Text", function () {
             var svg = generateSVG();
             var width = 500;
             var height = 1;
-            var measure = Plottable.Util.Text.getTextMeasure(svg);
+            var textSelection = svg.append("text");
+            var measure = Plottable.Util.Text.getTextMeasurer(textSelection);
             var results = Plottable.Util.Text.writeText("hello world", width, height, measure, true);
             assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "measurement mode: no width used");
@@ -4899,43 +5223,35 @@ describe("Util.Text", function () {
             assert.isFalse(results.textFits, "write mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "write mode: no width used");
             assert.equal(0, results.usedHeight, "write mode: no height used");
+            textSelection.remove();
             assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
             svg.remove();
         });
     });
 
-    describe("getTextMeasure", function () {
+    describe("getTextMeasurer", function () {
         var svg;
-        var t;
+        var measurer;
         var canonicalBB;
         var canonicalResult;
 
         before(function () {
             svg = generateSVG(200, 200);
-            t = svg.append("text");
+            var t = svg.append("text");
             t.text("hi there");
             canonicalBB = Plottable.Util.DOM.getBBox(t);
             canonicalResult = { width: canonicalBB.width, height: canonicalBB.height };
             t.text("bla bla bla");
+            measurer = Plottable.Util.Text.getTextMeasurer(t);
         });
 
         it("works on empty string", function () {
-            var measure = Plottable.Util.Text.getTextMeasure(t);
-            var result = measure("");
+            var result = measurer("");
             assert.deepEqual(result, { width: 0, height: 0 }, "empty string has 0 width and height");
         });
         it("works on non-empty string and has no side effects", function () {
-            var measure = Plottable.Util.Text.getTextMeasure(t);
-            var result2 = measure("hi there");
+            var result2 = measurer("hi there");
             assert.deepEqual(result2, canonicalResult, "measurement is as expected");
-            assert.equal(t.text(), "bla bla bla", "the text was unchanged");
-        });
-
-        it("works when operating on the top svg instead of text selection, and has no side effects", function () {
-            var measure2 = Plottable.Util.Text.getTextMeasure(svg);
-            var result3 = measure2("hi there");
-            assert.deepEqual(result3, canonicalResult, "measurement is as expected for svg measure");
-            assert.lengthOf(svg.node().childNodes, 1, "no nodes were added to the svg");
         });
         after(function () {
             svg.remove();
@@ -5276,7 +5592,7 @@ describe("Interactions", function () {
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
             var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
-            var dragBox = renderer.foregroundContainer.select(dragBoxClass);
+            var dragBox = renderer.backgroundContainer.select(dragBoxClass);
             assert.isNotNull(dragBox, "the dragbox was created");
             var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
             var expectedStartPosition = { x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY) };
@@ -5351,7 +5667,7 @@ describe("Interactions", function () {
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
             var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
-            var dragBox = renderer.foregroundContainer.select(dragBoxClass);
+            var dragBox = renderer.backgroundContainer.select(dragBoxClass);
             assert.isNotNull(dragBox, "the dragbox was created");
             var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
             var expectedStartPosition = { x: 0, y: Math.min(dragstartY, dragendY) };
