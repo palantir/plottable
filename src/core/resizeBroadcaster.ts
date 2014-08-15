@@ -37,6 +37,11 @@ export module Core {
       return _resizing;
     }
 
+    /**
+     * Claim that you're not resizing anymore. Good if it stubbornly thinks
+     * you're still resizing, or you want to cancel the effects of resizing
+     * prematurely.
+     */
     export function clearResizing(): any {
       _resizing = false;
     }
