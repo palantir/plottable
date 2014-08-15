@@ -83,19 +83,23 @@ export module Scale {
     }
 
     /**
-     * Set or get the range type.
+     * Get the range type.
      *
-     * @param {string} [rangeType] Either "points" or "bands" indicating the
+     * @returns {string} The current range type.
+     */
+    public rangeType() : string;
+    /**
+     * Set the range type.
+     *
+     * @param {string} rangeType Either "points" or "bands" indicating the
      *     d3 method used to generate range bounds.
      * @param {number} [outerPadding] The padding outside the range,
      *     proportional to the range step.
      * @param {number} [innerPadding] The padding between bands in the range,
      *     proportional to the range step. This parameter is only used in
      *     "bands" type ranges.
-     * @returns {Ordinal|string} The calling Scale.Ordinal, or the current
-     * range type.
+     * @returns {Ordinal} The calling Ordinal.
      */
-    public rangeType() : string;
     public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number) : Ordinal;
     public rangeType(rangeType?: string, outerPadding?: number, innerPadding?: number) : any {
       if (rangeType == null) {

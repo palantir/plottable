@@ -136,17 +136,21 @@ export module Scale {
     }
 
     /**
-     * Set or get the color range.
+     * Get the color range.
      *
-     * @param {string|string[]} [colorRange]. If colorRange is one of
-     *     (reds/blues/posneg), uses the built-in color groups. If colorRange
-     *     is an array of strings with at least 2 values
-     *     (e.g. ["#FF00FF", "red", "dodgerblue"], the resulting scale
-     *     will interpolate between the color values across the domain.
-     * @returns {InterpolatedColor|string[]} The calling InterpolatedColor, or
-     * the current color values for the range as strings.
+     * @returns {string[]} the current color values for the range as strings.
      */
     public colorRange(): string[];
+    /**
+     * Set the color range.
+     *
+     * @param {string|string[]} [colorRange]. If colorRange is one of
+     * (reds/blues/posneg), uses the built-in color groups. If colorRange is an
+     * array of strings with at least 2 values (e.g. ["#FF00FF", "red",
+     * "dodgerblue"], the resulting scale will interpolate between the color
+     * values across the domain.
+     * @returns {InterpolatedColor} The calling InterpolatedColor.
+     */
     public colorRange(colorRange: any): InterpolatedColor;
     public colorRange(colorRange?: any): any {
       if (colorRange == null) {
@@ -158,14 +162,15 @@ export module Scale {
     }
 
     /**
-     * Set or get the internal scale type.
+     * Get the internal scale type.
      *
-     * @param {string} [scaleType]. The type of d3 scale to use internally.
-     *                            (linear/log/sqrt/pow).
-     * @returns {InterpolatedColor|string} The calling InterpolatedColor, or
-     * the current scale type.
+     * @returns {string} The calling InterpolatedColor, or the current scale type.
      */
     public scaleType(): string;
+    /**
+     * @param {string} scaleType The type of d3 scale to use internally.  (linear/log/sqrt/pow).
+     * @returns {InterpolatedColor}
+     */
     public scaleType(scaleType: string): InterpolatedColor;
     public scaleType(scaleType?: string): any {
       if (scaleType == null){

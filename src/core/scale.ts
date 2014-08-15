@@ -67,15 +67,20 @@ export module Abstract {
     }
 
     /**
-     * Set or get the domain.
+     * Get the domain.
      *
-     * @param {any[]} [values] The new value for the domain. On
+     * @returns {any[]} The current domain.
+     */
+    public domain(): any[];
+    /**
+     * Set the domain.
+     *
+     * @param {any[]} values The new value for the domain. On
      * Scale.Quantitative, this is a [min, max] pair, or a [max, min] pair to
      * make the function decreasing. On Scale.Ordinal, this is an array of all
      * input values.
-     * @returns {Scale|any[]} The calling Scale, or the current domain.
+     * @returs {Scale} The calling Scale.
      */
-    public domain(): any[];
     public domain(values: any[]): Scale;
     public domain(values?: any[]): any {
       if (values == null) {
@@ -97,16 +102,25 @@ export module Abstract {
     }
 
     /**
-     * Set or get the range.
+     * Set the range.
      *
      * In the case of having a numeric range, it will be a [min, max] pair. In
      * the case of string range (e.g. Scale.InterpolatedColor), it will be a
      * list of all possible outputs.
      *
-     * @param {any[]} [values] The new values for the range.
-     * @returns {Scale|any[]} The calling Scale, or the current range.
+     * @returns {any[]} The current range.
      */
     public range(): any[];
+    /**
+     * Get the range.
+     *
+     * In the case of having a numeric range, it will be a [min, max] pair. In
+     * the case of string range (e.g. Scale.InterpolatedColor), it will be a
+     * list of all possible outputs.
+     *
+     * @param {any[]} values The new values for the range.
+     * @returns {Scale} The calling Scale.
+     */
     public range(values: any[]): Scale;
     public range(values?: any[]): any {
       if (values == null) {

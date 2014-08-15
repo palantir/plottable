@@ -68,12 +68,17 @@ export module Abstract {
     }
 
     /**
-     * Set or get the Plot's DataSource.
+     * Get the Plot's DataSource.
      *
-     * @param {DataSource} [source] The DataSource the Plot should use.
-     * @return {Plot|DataSource} The calling Plot, or the current DataSource.
+     * @return {DataSource} The current DataSource.
      */
     public dataSource(): DataSource;
+    /**
+     * Set the Plot's DataSource.
+     *
+     * @param {DataSource} source The DataSource the Plot should use.
+     * @returns {Plot} The calling Plot.
+     */
     public dataSource(source: DataSource): Plot;
     public dataSource(source?: DataSource): any {
       if (source == null) {
@@ -228,14 +233,19 @@ export module Abstract {
     }
 
     /**
-     * Set or get the animator associated with the specified Animator key.
+     * Get the animator associated with the specified Animator key.
      *
-     * @param {Animator.IPlotAnimator} [animator] An Animator to be assigned to
-     *                                          the specified key.
-     * @param {string} animatorKey The key for the Animator.
-     * @return {Plot|Animator.IPlotAnimator} The Animator for the specified key.
+     * @return {Animator.IPlotAnimator} The Animator for the specified key.
      */
     public animator(animatorKey: string): Animator.IPlotAnimator;
+    /**
+     * Set the animator associated with the specified Animator key.
+     *
+     * @param {string} animatorKey The key for the Animator.
+     * @param {Animator.IPlotAnimator} animator An Animator to be assigned to
+     * the specified key.
+     * @returns {Plot} The calling Plot.
+     */
     public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
     public animator(animatorKey: string, animator?: Animator.IPlotAnimator): any {
       if (animator === undefined){

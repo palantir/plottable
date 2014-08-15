@@ -200,18 +200,24 @@ export module Axis {
     }
 
     /**
-     * Get or set whether or not the tick labels at the end of the graph are
+     * Get whether or not the tick labels at the end of the graph are
      * displayed when partially cut off.
      *
      * @param {string} orientation Where on the scale to change tick labels.
      *                 On a "top" or "bottom" axis, this can be "left" or
      *                 "right". On a "left" or "right" axis, this can be "top"
      *                 or "bottom".
-     * @param {boolean} [show] Whether or not the given tick should be
-     * displayed.
      * @returns {Numeric|boolean} The calling Numeric, or the current setting.
      */
     public showEndTickLabel(orientation: string): boolean;
+    /**
+     * Get whether or not the tick labels at the end of the graph are
+     * displayed when partially cut off.
+     *
+     * @param {boolean} [show] Whether or not the given tick should be
+     * displayed.
+     * @returns {Numeric} The calling Numeric.
+     */
     public showEndTickLabel(orientation: string, show: boolean): Numeric;
     public showEndTickLabel(orientation: string, show?: boolean): any {
       if ((this._isHorizontal() && orientation === "left") ||

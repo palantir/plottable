@@ -71,12 +71,17 @@ export module Component {
     }
 
     /**
-     * Get or set the current text on the Label.
+     * Get the current text on the Label.
      *
-     * @param {string} [displayText] The new text for the Label.
-     * @returns {Label|string} The calling Label, or the text on the label.
+     * @returns {string} the text on the label.
      */
     public text(): string;
+    /**
+     * Set the current text on the Label.
+     *
+     * @param {string} displayText The new text for the Label.
+     * @returns {Label} The calling Label.
+     */
     public text(displayText: string): Label;
     public text(displayText?: string): any {
       if (displayText === undefined) {
