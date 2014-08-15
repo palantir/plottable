@@ -6,9 +6,7 @@ declare module Plottable {
             function warn(warning: string): void;
             function addArrays(alist: number[], blist: number[]): number[];
             function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
-            function _accessorize(accessor: any): IAccessor;
             function union(set1: D3.Set, set2: D3.Set): D3.Set;
-            function _applyAccessor(accessor: IAccessor, plot: Plottable.Abstract.Plot): (d: any, i: number) => any;
             function uniq(strings: string[]): string[];
             function uniqNumbers(a: number[]): number[];
             function createFilledArray(value: any, count: number): any[];
@@ -85,7 +83,6 @@ declare module Plottable {
                 clear(): CachingCharacterMeasurer;
             }
             function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;
-            function _addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
             function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
                 width: number;
                 height: number;
@@ -369,7 +366,6 @@ declare module Plottable {
 declare module Plottable {
     module Core {
         module RenderController {
-            var _renderPolicy: RenderPolicy.IRenderPolicy;
             function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): any;
             function registerToRender(c: Plottable.Abstract.Component): void;
             function registerToComputeLayout(c: Plottable.Abstract.Component): void;
@@ -748,9 +744,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class BarPlot extends XYPlot {
-            static _BarAlignmentToFactor: {
-                [x: string]: number;
-            };
             constructor(dataset: any, xScale: Scale, yScale: Scale);
             baseline(value: number): BarPlot;
             barAlignment(alignment: string): BarPlot;
@@ -767,9 +760,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class VerticalBar extends Plottable.Abstract.BarPlot {
-            static _BarAlignmentToFactor: {
-                [x: string]: number;
-            };
             constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
         }
     }
@@ -779,9 +769,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class HorizontalBar extends Plottable.Abstract.BarPlot {
-            static _BarAlignmentToFactor: {
-                [x: string]: number;
-            };
             isVertical: boolean;
             constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.Scale);
         }
