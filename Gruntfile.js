@@ -65,7 +65,7 @@ module.exports = function(grunt) {
                          "bower.json",
                          "package.json"];
 
-  var prefixMatch = "\\n *";
+  var prefixMatch = "\\n *(function |var |static )?";
   var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
   var nestedBraceMatch = ": \\{[^{}]*\\}";
   var typeNameMatch = ": [^;]*";
