@@ -57,6 +57,8 @@ export module Abstract {
     /**
      * Sets the baseline for the bars to the specified value.
      *
+     * The baseline is the line that the bars are drawn from, defaulting to 0.
+     *
      * @param {number} value The value to position the baseline at.
      * @return {NewStyleBarPlot} The calling NewStyleBarPlot.
      */

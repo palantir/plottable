@@ -16,6 +16,11 @@ export module Abstract {
     /**
      * Creates a NewStylePlot.
      *
+     * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
+     *
+     * A bare Plot has a DataSource and any number of projectors, which take
+     * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
+     *
      * @constructor
      * @param [Scale] xScale The x scale to use
      * @param [Scale] yScale The y scale to use
