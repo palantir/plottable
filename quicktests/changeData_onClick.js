@@ -18,29 +18,29 @@ function run(div, data, Plottable) {
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
     domainer_y = new Plottable.Domainer()
-        .addIncludedValue(1.3)
-        .pad();
+    .addIncludedValue(1.3)
+    .pad();
     domainer_x = new Plottable.Domainer()
-        .pad(.1)
-        .addIncludedValue(0)
-        .addPaddingException(0);
+    .pad(.1)
+    .addIncludedValue(0)
+    .addPaddingException(0);
 
     xScale.domainer(domainer_x);
     yScale.domainer(domainer_y);
 
 
     var barPlot = new Plottable.Plot.VerticalBar(dataseries1, xScale, yScale)
-        .animate(true)
-        .baseline(1.3); 
+    .animate(true)
+    .baseline(1.3); 
 
     var toggle2 = new Plottable.Component.TitleLabel("Include 2");
-     
+    
     
     var basicTable = new Plottable.Component.Table()
-                .addComponent(2, 0, yAxis)
-                .addComponent(2, 1, barPlot)
-                .addComponent(3, 1, xAxis)
-                .addComponent(4, 1, toggle2);
+    .addComponent(2, 0, yAxis)
+    .addComponent(2, 1, barPlot)
+    .addComponent(3, 1, xAxis)
+    .addComponent(4, 1, toggle2);
 
     basicTable.renderTo(svg);
 
@@ -62,10 +62,10 @@ function run(div, data, Plottable) {
 
 
     clickInteraction = new Plottable.Interaction.Click(barPlot)
-        .callback(cb)
-        .registerWithComponent();
+    .callback(cb)
+    .registerWithComponent();
     toggleInteraction = new Plottable.Interaction.Click(toggle2)
-        .callback(toggleinclude)
-        .registerWithComponent();
+    .callback(toggleinclude)
+    .registerWithComponent();
 
 }

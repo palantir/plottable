@@ -5,7 +5,7 @@ function makeData() {
 function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
 
-    d = data[0].slice(0, 8);
+  d = data[0].slice(0, 8);
 
 
     //Axis
@@ -14,8 +14,8 @@ function run(div, data, Plottable) {
 
     var axis_array = [];
     for(var i = 0; i < 5; i++){
-        axis_array.push(new Plottable.Axis.Numeric(xScale, "bottom"));
-        axis_array.push(new Plottable.Axis.Numeric(yScale, "left"));
+      axis_array.push(new Plottable.Axis.Numeric(xScale, "bottom"));
+      axis_array.push(new Plottable.Axis.Numeric(yScale, "left"));
     }
 
     //rendering
@@ -28,19 +28,19 @@ function run(div, data, Plottable) {
     //title + legend
     
     var scatterTable = new Plottable.Component.Table([[axis_array[1], null],
-                                                     [null, axis_array[0]]]);
+     [null, axis_array[0]]]);
     var lineTable = new Plottable.Component.Table([[axis_array[3], null],
-                                                     [null, axis_array[2]]]);
+     [null, axis_array[2]]]);
     var areaTable = new Plottable.Component.Table([[axis_array[5], null],
-                                                     [null, axis_array[4]]]);
+     [null, axis_array[4]]]);
     var vbarTable = new Plottable.Component.Table([[axis_array[7], null],
-                                                     [null, axis_array[6]]]);
+     [null, axis_array[6]]]);
     var hbarTable = new Plottable.Component.Table([[axis_array[9], null],
-                                                     [null, axis_array[8]]]);
+     [null, axis_array[8]]]);
     var bigTable = new Plottable.Component.Table([[scatterTable, lineTable],
-                                                  [areaTable, vbarTable],
-                                                  [hbarTable, null]]);
+      [areaTable, vbarTable],
+      [hbarTable, null]]);
 
     bigTable.renderTo(svg);
     
-}
+  }

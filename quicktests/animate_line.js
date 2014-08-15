@@ -1,10 +1,11 @@
 
 function makeData() {
-  return [makeRandomData(50), makeRandomData(50)];
+	return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
-  var svg = div.append("svg").attr("height", 500);
+	var svg = div.append("svg").attr("height", 500);
+	console.log(data);
 	var doAnimate = true;
 	var lineRenderer;
 	var xScale = new Plottable.Scale.Linear();
@@ -18,15 +19,15 @@ function run(div, data, Plottable) {
 	lineRenderer.animate(doAnimate);
 
 	var lineChart = new Plottable.Component.Table([[yAxis, lineRenderer],
-	                                         [null,  xAxis]]);
+		[null,  xAxis]]);
 	lineChart.renderTo(svg);
 
-    cb = function(x, y){
-    d = lineRenderer.dataSource().data();
-    lineRenderer.dataSource().data(d);
-  }  
+	cb = function(x, y){
+		d = lineRenderer.dataSource().data();
+		lineRenderer.dataSource().data(d);
+	}  
 
-  window.xy = new Plottable.Interaction.Click(lineRenderer)
-    .callback(cb)
-    .registerWithComponent();
+	plotClick = new Plottable.Interaction.Click(lineRenderer)
+	.callback(cb)
+	.registerWithComponent();
 }

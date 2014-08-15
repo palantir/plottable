@@ -15,7 +15,7 @@ function run(div, data, Plottable) {
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var renderGroup = renderAreaD1.merge(gridlines);
   var chart = new Plottable.Component.Table([[yAxis, renderGroup],
-                                         [null,  xAxis]]);
+   [null,  xAxis]]);
 
   chart.renderTo(svg);
 

@@ -29,7 +29,7 @@ function run(div, data, Plottable) {
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
 
   var circleChart = new Plottable.Component.Table([[yAxis, circleRenderer.merge(gridlines)],
-                                           [null,  xAxis]]);
+   [null,  xAxis]]);
   circleChart.renderTo(svg);
 
   cb = function(x, y){
@@ -38,6 +38,6 @@ function run(div, data, Plottable) {
   };
 
   window.xy = new Plottable.Interaction.Click(circleRenderer)
-    .callback(cb)
-    .registerWithComponent();
+  .callback(cb)
+  .registerWithComponent();
 }
