@@ -17,6 +17,16 @@ module Plottable {
     (datum: any, index: number) : any;
   }
 
+  export interface _IProjector {
+    accessor: IAccessor;
+    scale?: Abstract.Scale;
+    attribute: string;
+  }
+
+  export interface IAttributeToProjector {
+    [attrToSet: string]: IAppliedAccessor;
+  }
+
   export interface SelectionArea {
     xMin: number;
     xMax: number;
@@ -53,3 +63,4 @@ module Plottable {
     y: number;
   }
 }
+
