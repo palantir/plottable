@@ -3,9 +3,9 @@
 module Plottable {
 export module Plot {
   export class Grid extends Abstract.XYPlot {
-    public colorScale: Abstract.Scale;
-    public xScale: Scale.Ordinal;
-    public yScale: Scale.Ordinal;
+    public _colorScale: Abstract.Scale;
+    public _xScale: Scale.Ordinal;
+    public _yScale: Scale.Ordinal;
 
 
     public _animators: Animator.IPlotAnimatorMap = {
@@ -30,10 +30,10 @@ export module Plot {
       this.classed("grid-plot", true);
 
       // The x and y scales should render in bands with no padding
-      this.xScale.rangeType("bands", 0, 0);
-      this.yScale.rangeType("bands", 0, 0);
+      this._xScale.rangeType("bands", 0, 0);
+      this._yScale.rangeType("bands", 0, 0);
 
-      this.colorScale = colorScale;
+      this._colorScale = colorScale;
       this.project("fill", "value", colorScale); // default
     }
 
@@ -44,7 +44,7 @@ export module Plot {
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "fill") {
-        this.colorScale = this._projectors["fill"].scale;
+        this._colorScale = this._projectors["fill"].scale;
       }
       return this;
     }
@@ -55,8 +55,8 @@ export module Plot {
       var cells = this.renderArea.selectAll("rect").data(this._dataSource.data());
       cells.enter().append("rect");
 
-      var xStep = this.xScale.rangeBand();
-      var yStep = this.yScale.rangeBand();
+      var xStep = this._xScale.rangeBand();
+      var yStep = this._yScale.rangeBand();
 
       var attrToProjector = this._generateAttrToProjector();
       attrToProjector["width"]  = () => xStep;

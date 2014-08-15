@@ -757,9 +757,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Grid extends Plottable.Abstract.XYPlot {
-            colorScale: Plottable.Abstract.Scale;
-            xScale: Plottable.Scale.Ordinal;
-            yScale: Plottable.Scale.Ordinal;
             constructor(dataset: any, xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale): Grid;
         }

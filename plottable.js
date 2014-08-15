@@ -4494,15 +4494,15 @@ var Plottable;
                     "cells": new Plottable.Animator.Null()
                 };
                 this.classed("grid-plot", true);
-                this.xScale.rangeType("bands", 0, 0);
-                this.yScale.rangeType("bands", 0, 0);
-                this.colorScale = colorScale;
+                this._xScale.rangeType("bands", 0, 0);
+                this._yScale.rangeType("bands", 0, 0);
+                this._colorScale = colorScale;
                 this.project("fill", "value", colorScale);
             }
             Grid.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 if (attrToSet === "fill") {
-                    this.colorScale = this._projectors["fill"].scale;
+                    this._colorScale = this._projectors["fill"].scale;
                 }
                 return this;
             };
@@ -4510,8 +4510,8 @@ var Plottable;
                 _super.prototype._paint.call(this);
                 var cells = this.renderArea.selectAll("rect").data(this._dataSource.data());
                 cells.enter().append("rect");
-                var xStep = this.xScale.rangeBand();
-                var yStep = this.yScale.rangeBand();
+                var xStep = this._xScale.rangeBand();
+                var yStep = this._yScale.rangeBand();
                 var attrToProjector = this._generateAttrToProjector();
                 attrToProjector["width"] = function () { return xStep; };
                 attrToProjector["height"] = function () { return yStep; };
