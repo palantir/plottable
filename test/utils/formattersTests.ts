@@ -120,6 +120,15 @@ describe("Formatters", () => {
       assert.strictEqual(result, "100%",
         "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
     });
+
+    it("can handle float imprecision", ()=> {
+      var percentFormatter = Plottable.Formatters.percentage();
+      var result = percentFormatter(0.07);
+      assert.strictEqual(result, "7%", "does not have trailing zeros and is not empty string");
+      percentFormatter = Plottable.Formatters.percentage(2);
+      var result2 = percentFormatter(0.0035);
+      assert.strictEqual(result2, "0.35%", "works even if multiplying by 100 does not make it an integer");
+    });
   });
 
   describe("time", () => {

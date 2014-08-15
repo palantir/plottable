@@ -29,8 +29,7 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this.measurer = new _Util.Text.CachingCharacterMeasurer(this._tickLabelContainer);
-      return this;
+      this.measurer = new _Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {

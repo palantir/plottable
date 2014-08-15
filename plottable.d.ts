@@ -70,6 +70,7 @@ declare module Plottable {
 declare module Plottable {
     module _Util {
         module Text {
+            var HEIGHT_TEXT: string;
             interface Dimensions {
                 width: number;
                 height: number;
@@ -77,29 +78,19 @@ declare module Plottable {
             interface TextMeasurer {
                 (s: string): Dimensions;
             }
-            function getTextMeasure(selection: D3.Selection): TextMeasurer;
+            function getTextMeasurer(selection: D3.Selection): TextMeasurer;
             class CachingCharacterMeasurer {
                 measure: TextMeasurer;
-                constructor(g: D3.Selection);
+                constructor(textSelection: D3.Selection);
                 clear(): CachingCharacterMeasurer;
             }
             function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;
-            function getTextHeight(selection: D3.Selection): number;
-            function getTextWidth(textElement: D3.Selection, text: string): number;
             function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
             function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
                 width: number;
                 height: number;
             };
             function writeLineVertically(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
-                width: number;
-                height: number;
-            };
-            function writeTextHorizontally(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
-                width: number;
-                height: number;
-            };
-            function writeTextVertically(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
                 width: number;
                 height: number;
             };

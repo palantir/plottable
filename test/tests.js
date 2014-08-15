@@ -3676,6 +3676,14 @@ describe("Formatters", function () {
             var result = percentFormatter(1);
             assert.strictEqual(result, "100%", "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
         });
+        it("can handle float imprecision", function () {
+            var percentFormatter = Plottable.Formatters.percentage();
+            var result = percentFormatter(0.07);
+            assert.strictEqual(result, "7%", "does not have trailing zeros and is not empty string");
+            percentFormatter = Plottable.Formatters.percentage(2);
+            var result2 = percentFormatter(0.0035);
+            assert.strictEqual(result2, "0.35%", "works even if multiplying by 100 does not make it an integer");
+        });
     });
     describe("time", function () {
         it("uses reasonable defaults", function () {
@@ -3795,7 +3803,7 @@ describe("CachingCharacterMeasurer", function () {
     beforeEach(function () {
         svg = generateSVG(100, 100);
         g = svg.append("g");
-        measurer = new Plottable._Util.Text.CachingCharacterMeasurer(g);
+        measurer = new Plottable._Util.Text.CachingCharacterMeasurer(g.append("text"));
     });
     afterEach(function () {
         svg.remove();
@@ -3901,7 +3909,7 @@ describe("_Util.Text", function () {
         var svg = generateSVG();
         var textEl = svg.append("text").attr("x", 20).attr("y", 50);
         textEl.text("foobar");
-        var measure = Plottable._Util.Text.getTextMeasure(textEl);
+        var measure = Plottable._Util.Text.getTextMeasurer(textEl);
         var fullText = Plottable._Util.Text.getTruncatedText("hellom world!", 200, measure);
         assert.equal(fullText, "hellom world!", "text untruncated");
         var partialText = Plottable._Util.Text.getTruncatedText("hellom world!", 70, measure);
@@ -3911,31 +3919,15 @@ describe("_Util.Text", function () {
         assert.equal(textEl.text(), "foobar", "truncate had no side effect on textEl");
         svg.remove();
     });
-    it("getTextHeight works properly", function () {
-        var svg = generateSVG();
-        var textEl = svg.append("text").attr("x", 20).attr("y", 50);
-        textEl.style("font-size", "20pt");
-        textEl.text("hello, world");
-        var height1 = Plottable._Util.Text.getTextHeight(textEl);
-        textEl.style("font-size", "30pt");
-        var height2 = Plottable._Util.Text.getTextHeight(textEl);
-        assert.operator(height1, "<", height2, "measured height is greater when font size is increased");
-        assert.equal(textEl.text(), "hello, world", "getTextHeight did not modify the text in the element");
-        textEl.text("");
-        assert.equal(Plottable._Util.Text.getTextHeight(textEl), height2, "works properly if there is no text in the element");
-        assert.equal(textEl.text(), "", "getTextHeight did not modify the text in the element");
-        textEl.text(" ");
-        assert.equal(Plottable._Util.Text.getTextHeight(textEl), height2, "works properly if there is just a space in the element");
-        assert.equal(textEl.text(), " ", "getTextHeight did not modify the text in the element");
-        svg.remove();
-    });
     describe("addEllipsesToLine", function () {
         var svg;
         var measure;
         var e;
+        var textSelection;
         before(function () {
             svg = generateSVG();
-            measure = Plottable._Util.Text.getTextMeasure(svg);
+            textSelection = svg.append("text");
+            measure = Plottable._Util.Text.getTextMeasurer(textSelection);
             e = function (text, width) { return Plottable._Util.Text.addEllipsesToLine(text, width, measure); };
         });
         it("works on an empty string", function () {
@@ -3970,7 +3962,8 @@ describe("_Util.Text", function () {
             var svg = generateSVG();
             var width = 1;
             var height = 1;
-            var measure = Plottable._Util.Text.getTextMeasure(svg);
+            var textSelection = svg.append("text");
+            var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
             var results = Plottable._Util.Text.writeText("hello world", width, height, measure, true);
             assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "measurement mode: no width used");
@@ -3980,6 +3973,7 @@ describe("_Util.Text", function () {
             assert.isFalse(results.textFits, "write mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "write mode: no width used");
             assert.equal(0, results.usedHeight, "write mode: no height used");
+            textSelection.remove();
             assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
             svg.remove();
         });
@@ -3987,7 +3981,8 @@ describe("_Util.Text", function () {
             var svg = generateSVG();
             var width = 500;
             var height = 1;
-            var measure = Plottable._Util.Text.getTextMeasure(svg);
+            var textSelection = svg.append("text");
+            var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
             var results = Plottable._Util.Text.writeText("hello world", width, height, measure, true);
             assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "measurement mode: no width used");
@@ -3997,39 +3992,32 @@ describe("_Util.Text", function () {
             assert.isFalse(results.textFits, "write mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "write mode: no width used");
             assert.equal(0, results.usedHeight, "write mode: no height used");
+            textSelection.remove();
             assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
             svg.remove();
         });
     });
-    describe("getTextMeasure", function () {
+    describe("getTextMeasurer", function () {
         var svg;
-        var t;
+        var measurer;
         var canonicalBB;
         var canonicalResult;
         before(function () {
             svg = generateSVG(200, 200);
-            t = svg.append("text");
+            var t = svg.append("text");
             t.text("hi there");
             canonicalBB = Plottable._Util.DOM.getBBox(t);
             canonicalResult = { width: canonicalBB.width, height: canonicalBB.height };
             t.text("bla bla bla");
+            measurer = Plottable._Util.Text.getTextMeasurer(t);
         });
         it("works on empty string", function () {
-            var measure = Plottable._Util.Text.getTextMeasure(t);
-            var result = measure("");
+            var result = measurer("");
             assert.deepEqual(result, { width: 0, height: 0 }, "empty string has 0 width and height");
         });
         it("works on non-empty string and has no side effects", function () {
-            var measure = Plottable._Util.Text.getTextMeasure(t);
-            var result2 = measure("hi there");
+            var result2 = measurer("hi there");
             assert.deepEqual(result2, canonicalResult, "measurement is as expected");
-            assert.equal(t.text(), "bla bla bla", "the text was unchanged");
-        });
-        it("works when operating on the top svg instead of text selection, and has no side effects", function () {
-            var measure2 = Plottable._Util.Text.getTextMeasure(svg);
-            var result3 = measure2("hi there");
-            assert.deepEqual(result3, canonicalResult, "measurement is as expected for svg measure");
-            assert.lengthOf(svg.node().childNodes, 1, "no nodes were added to the svg");
         });
         after(function () {
             svg.remove();

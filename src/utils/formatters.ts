@@ -114,8 +114,15 @@ module Plottable {
     public static percentage(precision = 0, onlyShowUnchanged = true) {
       var fixedFormatter = Formatters.fixed(precision);
       return function(d: any) {
-        var formattedValue = fixedFormatter(d * 100);
-        if (onlyShowUnchanged && Formatters._valueChanged(d * 100, formattedValue)) {
+        var valToFormat = d * 100;
+
+        // Account for float imprecision
+        var valString = d.toString();
+        var integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
+        valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
+
+        var formattedValue = fixedFormatter(valToFormat);
+        if (onlyShowUnchanged && Formatters._valueChanged(valToFormat, formattedValue)) {
           return "";
         }
         if (formattedValue !== "") {
