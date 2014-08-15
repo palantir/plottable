@@ -352,8 +352,8 @@ module.exports = function(grunt) {
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
   grunt.registerTask("test", ["dev-compile", "blanket_mocha", "tslint", "ts:verify_d_ts"]);
-  // Disable saucelabs for external pull requests. Check if external by checking if we have access to SAUCE_USERNAME
-  if (process.env.TRAVIS_SECURE_ENV_VARS) {
+  // Disable saucelabs for external pull requests. Check if we have access to environment variables
+  if (!process.env.TRAVIS_SECURE_ENV_VARS) {
     grunt.registerTask("test-travis", ["test", "test-sauce"]);
   } else {
     grunt.registerTask("test-travis", ["test"]);
