@@ -13,7 +13,7 @@ export module Plot {
    */
   export class HorizontalBar extends Abstract.BarPlot {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {"top": 0, "center": 0.5, "bottom": 1};
-    public isVertical = false;
+    private isVertical = false;
 
     /**
      * Creates a HorizontalBarPlot.
