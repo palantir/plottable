@@ -62,6 +62,12 @@ export module Core {
       }
     }
 
+    /**
+     * Render everything that is waiting to be rendered right now, instead of
+     * waiting until the next frame.
+     *
+     * Useful to call when debugging.
+     */
     export function flush() {
       if (_animationRequested) {
         // Layout
