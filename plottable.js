@@ -7290,13 +7290,13 @@ var Plottable;
                 return leftValue <= val && val <= rightValue;
             };
 
-            DragBox.prototype.enableResize = function () {
-                this.resizeEnabled = true;
-                return this;
-            };
-
-            DragBox.prototype.disableResize = function () {
-                this.resizeEnabled = false;
+            /**
+            * Enables or disables resizing.
+            *
+            * @param {boolean} enabled
+            */
+            DragBox.prototype.resize = function (enabled) {
+                this.resizeEnabled = enabled;
                 return this;
             };
 

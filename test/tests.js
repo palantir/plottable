@@ -5309,7 +5309,7 @@ describe("Interactions", function () {
                 });
 
                 // fake another drag event to resize the box.
-                interaction.enableResize();
+                interaction.resize(true);
                 fakeDragSequence(interaction, dragstartX2, dragstartY2, dragmidX, dragmidY);
                 assert.equal(timesCalled, 1, "drag callback not called once");
             }
@@ -5490,7 +5490,7 @@ describe("Interactions", function () {
                 });
 
                 // fake another drag event to resize the box.
-                interaction.enableResize();
+                interaction.resize(true);
                 fakeDragSequence(interaction, dragstartX2, dragstartY2, dragendX2, dragendY2);
                 assert.equal(timesCalled, 1, "drag callback called");
             });
@@ -5519,7 +5519,7 @@ describe("Interactions", function () {
                 });
 
                 // fake another drag event to resize the box.
-                interaction.enableResize();
+                interaction.resize(true);
                 fakeDragSequence(interaction, dragstartX2, dragstartY2, dragendX2, dragendY2);
                 assert.equal(timesCalled, 1, "drag callback called");
             });

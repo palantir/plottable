@@ -2438,8 +2438,12 @@ declare module Plottable {
             public resizePadding: number;
             public selection: SelectionArea;
             public lastCursorStyle: string;
-            public enableResize(): DragBox;
-            public disableResize(): DragBox;
+            /**
+            * Enables or disables resizing.
+            *
+            * @param {boolean} enabled
+            */
+            public resize(enabled: boolean): DragBox;
             /**
             * Clears the highlighted drag-selection box drawn by the AreaInteraction.
             *

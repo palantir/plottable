@@ -29,13 +29,13 @@ export module Interaction {
       return leftValue <= val && val <= rightValue;
     }
 
-    public enableResize() {
-      this.resizeEnabled = true;
-      return this;
-    }
-
-    public disableResize() {
-      this.resizeEnabled = false;
+    /**
+     * Enables or disables resizing.
+     *
+     * @param {boolean} enabled
+     */
+    public resize(enabled: boolean) {
+      this.resizeEnabled = enabled;
       return this;
     }
 
