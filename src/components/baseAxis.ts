@@ -308,7 +308,7 @@ export module Abstract {
      */
     public formatter(): Formatter;
     public formatter(formatter: Formatter): Abstract.Axis;
-    public formatter(formatter?: any): any {
+    public formatter(formatter?: Formatter): any {
       if (formatter === undefined) {
         return this._formatter;
       }
