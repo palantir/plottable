@@ -57,7 +57,7 @@ export module Abstract {
 
       this.formatter(formatter);
 
-      this._scale.broadcaster.registerListener(this, () => this.rescale());
+      this._scale.broadcaster.registerListener(this, () => this._render());
     }
 
     public remove() {
@@ -231,10 +231,6 @@ export module Abstract {
       }
 
       return tickMarkAttrHash;
-    }
-
-    private rescale() {
-      return (this.element != null) ? this._render() : null;
     }
 
     public _invalidateLayout() {

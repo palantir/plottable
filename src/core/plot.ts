@@ -2,23 +2,12 @@
 
 module Plottable {
 export module Abstract {
-  export interface _IProjector {
-    accessor: IAccessor;
-    scale?: Abstract.Scale;
-  }
-
-  export interface IAttributeToProjector {
-    [attrToSet: string]: IAppliedAccessor;
-  }
-
   export class Plot extends Component {
     public _dataSource: DataSource;
     public _dataChanged = false;
 
     public renderArea: D3.Selection;
     public element: D3.Selection;
-    private scales: Abstract.Scale[];
-    public _colorAccessor: IAccessor;
     public _animate: boolean = false;
     public _animators: Animator.IPlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
@@ -62,7 +51,7 @@ export module Abstract {
       super._anchor(element);
       this.animateOnNextRender = true;
       this._dataChanged = true;
-      this.updateAllProjectors();
+      this._updateAllProjectors();
     }
 
     public remove() {
@@ -101,7 +90,7 @@ export module Abstract {
     }
 
     public _onDataSourceUpdate() {
-      this.updateAllProjectors();
+      this._updateAllProjectors();
       this.animateOnNextRender = true;
       this._dataChanged = true;
       this._render();
@@ -136,7 +125,7 @@ export module Abstract {
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
 
       if (existingScale != null) {
-        existingScale._removeExtent(this._plottableID, attrToSet);
+        existingScale._removeExtent(this._plottableID.toString(), attrToSet);
         existingScale.broadcaster.deregisterListener(this);
       }
 
@@ -144,8 +133,8 @@ export module Abstract {
         scale.broadcaster.registerListener(this, () => this._render());
       }
       var activatedAccessor = _Util.Methods.applyAccessor(accessor, this);
-      this._projectors[attrToSet] = {accessor: activatedAccessor, scale: scale};
-      this.updateProjector(attrToSet);
+      this._projectors[attrToSet] = {accessor: activatedAccessor, scale: scale, attribute: attrToSet};
+      this._updateProjector(attrToSet);
       this._render(); // queue a re-render upon changing projector
       return this;
     }
@@ -192,7 +181,7 @@ export module Abstract {
     public detach() {
       super.detach();
       // make the domain resize
-      this.updateAllProjectors();
+      this._updateAllProjectors();
       return this;
     }
 
@@ -200,22 +189,20 @@ export module Abstract {
      * This function makes sure that all of the scales in this._projectors
      * have an extent that includes all the data that is projected onto them.
      */
-    private updateAllProjectors(): Plot {
-      d3.keys(this._projectors).forEach((attr: string) => this.updateProjector(attr));
-      return this;
+    public _updateAllProjectors() {
+      d3.keys(this._projectors).forEach((attr: string) => this._updateProjector(attr));
     }
 
-    private updateProjector(attr: string) {
+    public _updateProjector(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
         var extent = this.dataSource()._getExtent(projector.accessor);
         if (extent.length === 0 || !this._isAnchored) {
-          projector.scale._removeExtent(this._plottableID, attr);
+          projector.scale._removeExtent(this._plottableID.toString(), attr);
         } else {
-          projector.scale._updateExtent(this._plottableID, attr, extent);
+          projector.scale._updateExtent(this._plottableID.toString(), attr, extent);
         }
       }
-      return this;
     }
 
     /**
@@ -229,10 +216,10 @@ export module Abstract {
      *
      * @param {D3.Selection} selection The selection of elements to update.
      * @param {string} animatorKey The key for the animator.
-     * @param {Abstract.IAttributeToProjector} attrToProjector The set of attributes to set on the selection.
+     * @param {IAttributeToProjector} attrToProjector The set of attributes to set on the selection.
      * @return {D3.Selection} The resulting selection (potentially after the transition)
      */
-    public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: Abstract.IAttributeToProjector): any {
+    public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any {
       if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
         return this._animators[animatorKey].animate(selection, attrToProjector, this);
       } else {

@@ -1343,6 +1343,78 @@ describe("Plots", function () {
 
 var assert = chai.assert;
 describe("Plots", function () {
+    describe("New Style Plots", function () {
+        var p;
+        var oldWarn = Plottable._Util.Methods.warn;
+        beforeEach(function () {
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            p = new Plottable.Abstract.NewStylePlot(xScale, yScale);
+            p._getDrawer = function (k) { return new Plottable._Drawer.Rect(k); };
+        });
+        afterEach(function () {
+            Plottable._Util.Methods.warn = oldWarn;
+        });
+        it("Datasets can be added and removed as expected", function () {
+            p.addDataset("foo", [1, 2, 3]);
+            var d2 = new Plottable.DataSource([4, 5, 6]);
+            p.addDataset("bar", d2);
+            p.addDataset([7, 8, 9]);
+            var d4 = new Plottable.DataSource([10, 11, 12]);
+            p.addDataset(d4);
+            assert.deepEqual(p._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
+            var datasets = p._getDatasetsInOrder();
+            assert.deepEqual(datasets[0].data(), [1, 2, 3]);
+            assert.equal(datasets[1], d2);
+            assert.deepEqual(datasets[2].data(), [7, 8, 9]);
+            assert.equal(datasets[3], d4);
+            p.removeDataset("foo");
+            p.removeDataset("_0");
+            assert.deepEqual(p._datasetKeysInOrder, ["bar", "_1"]);
+            assert.lengthOf(p._getDatasetsInOrder(), 2);
+        });
+        it("Datasets are listened to appropriately", function () {
+            var callbackCounter = 0;
+            var callback = function () { return callbackCounter++; };
+            p._onDataSourceUpdate = callback;
+            var d = new Plottable.DataSource([1, 2, 3]);
+            p.addDataset("foo", d);
+            assert.equal(callbackCounter, 1, "adding dataset triggers listener");
+            d.data([1, 2, 3, 4]);
+            assert.equal(callbackCounter, 2, "modifying data triggers listener");
+            p.removeDataset("foo");
+            assert.equal(callbackCounter, 3, "removing dataset triggers listener");
+        });
+        it("Datasets can be reordered", function () {
+            p.addDataset("foo", [1]);
+            p.addDataset("bar", [2]);
+            p.addDataset("baz", [3]);
+            assert.deepEqual(p.datasetOrder(), ["foo", "bar", "baz"]);
+            p.datasetOrder(["bar", "baz", "foo"]);
+            assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
+            var warned = 0;
+            Plottable._Util.Methods.warn = function () { return warned++; };
+            p.datasetOrder(["blah", "blee", "bar", "baz", "foo"]);
+            assert.equal(warned, 1);
+            assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
+        });
+        it("Has proper warnings", function () {
+            var warned = 0;
+            Plottable._Util.Methods.warn = function () { return warned++; };
+            p.addDataset("_foo", []);
+            assert.equal(warned, 1);
+            p.addDataset("2", []);
+            p.addDataset("4", []);
+            p.datasetOrder(["_bar", "4", "2"]);
+            assert.equal(warned, 2);
+            p.datasetOrder(["2", "_foo", "4"]);
+            assert.equal(warned, 2);
+        });
+    });
+});
+
+var assert = chai.assert;
+describe("Plots", function () {
     describe("LinePlot", function () {
         var svg;
         var xScale;
@@ -1995,6 +2067,164 @@ describe("Plots", function () {
                 }
                 ;
             });
+        });
+    });
+});
+
+var assert = chai.assert;
+describe("Plots", function () {
+    describe("Stacked Bar Plot", function () {
+        var verifier = new MultiTestVerifier();
+        var svg;
+        var dataset1;
+        var dataset2;
+        var xScale;
+        var yScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var axisHeight = 0;
+        var bandWidth = 0;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        before(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Ordinal();
+            yScale = new Plottable.Scale.Linear().domain([0, 3]);
+            var data1 = [
+                { x: "A", y: 1 },
+                { x: "B", y: 2 }
+            ];
+            var data2 = [
+                { x: "A", y: 2 },
+                { x: "B", y: 1 }
+            ];
+            dataset1 = new Plottable.DataSource(data1);
+            dataset2 = new Plottable.DataSource(data2);
+            renderer = new Plottable.Plot.StackedBar(xScale, yScale);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.baseline(0);
+            var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+            axisHeight = xAxis.availableHeight;
+            bandWidth = xScale.rangeBand();
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        afterEach(function () {
+            verifier.end();
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+        it("renders correctly", function () {
+            var bars = renderer.renderArea.selectAll("rect");
+            var bar0 = d3.select(bars[0][0]);
+            var bar1 = d3.select(bars[0][1]);
+            var bar2 = d3.select(bars[0][2]);
+            var bar3 = d3.select(bars[0][3]);
+            var bar0X = bar0.data()[0].x;
+            var bar1X = bar1.data()[0].x;
+            var bar2X = bar2.data()[0].x;
+            var bar3X = bar3.data()[0].x;
+            assert.closeTo(numAttr(bar0, "width"), bandWidth, 2);
+            assert.closeTo(numAttr(bar1, "width"), bandWidth, 2);
+            assert.closeTo(numAttr(bar2, "width"), bandWidth, 2);
+            assert.closeTo(numAttr(bar3, "width"), bandWidth, 2);
+            assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 3, 0.01, "height is correct for bar0");
+            assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight) / 3 * 2, 0.01, "height is correct for bar1");
+            assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight) / 3 * 2, 0.01, "height is correct for bar2");
+            assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 3, 0.01, "height is correct for bar3");
+            assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) + bandWidth / 2, 0.01, "x pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2, 0.01, "x pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2, 0.01, "x pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2, 0.01, "x pos correct for bar3");
+            assert.closeTo(numAttr(bar0, "y"), (400 - axisHeight) / 3 * 2, 0.01, "y is correct for bar0");
+            assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 3, 0.01, "y is correct for bar1");
+            assert.closeTo(numAttr(bar2, "y"), 0, 0.01, "y is correct for bar2");
+            assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
+        });
+    });
+});
+
+var assert = chai.assert;
+describe("Plots", function () {
+    describe("Clustered Bar Plot", function () {
+        var verifier = new MultiTestVerifier();
+        var svg;
+        var dataset1;
+        var dataset2;
+        var xScale;
+        var yScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var axisHeight = 0;
+        var bandWidth = 0;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        before(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Ordinal();
+            yScale = new Plottable.Scale.Linear().domain([0, 2]);
+            var data1 = [
+                { x: "A", y: 1 },
+                { x: "B", y: 2 }
+            ];
+            var data2 = [
+                { x: "A", y: 2 },
+                { x: "B", y: 1 }
+            ];
+            dataset1 = new Plottable.DataSource(data1);
+            dataset2 = new Plottable.DataSource(data2);
+            renderer = new Plottable.Plot.ClusteredBar(xScale, yScale);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.baseline(0);
+            var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+            axisHeight = xAxis.availableHeight;
+            bandWidth = xScale.rangeBand();
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        afterEach(function () {
+            verifier.end();
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+        it("renders correctly", function () {
+            var bars = renderer.renderArea.selectAll("rect");
+            var bar0 = d3.select(bars[0][0]);
+            var bar1 = d3.select(bars[0][1]);
+            var bar2 = d3.select(bars[0][2]);
+            var bar3 = d3.select(bars[0][3]);
+            var bar0X = bar0.data()[0].x;
+            var bar1X = bar1.data()[0].x;
+            var bar2X = bar2.data()[0].x;
+            var bar3X = bar3.data()[0].x;
+            var width = bandWidth / 2 * .518;
+            assert.closeTo(numAttr(bar0, "width"), width, 2);
+            assert.closeTo(numAttr(bar1, "width"), width, 2);
+            assert.closeTo(numAttr(bar2, "width"), width, 2);
+            assert.closeTo(numAttr(bar3, "width"), width, 2);
+            assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar0");
+            assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight), 0.01, "height is correct for bar1");
+            assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight), 0.01, "height is correct for bar2");
+            assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
+            var off = renderer.innerScale.scale("_0");
+            assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) + bandWidth / 2 - off, 0.01, "x pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2 - off, 0.01, "x pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2 + off, 0.01, "x pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2 + off, 0.01, "x pos correct for bar3");
         });
     });
 });
@@ -2929,7 +3159,7 @@ describe("Domainer", function () {
         domainer = new Plottable.Domainer();
     });
     it("pad() works in general case", function () {
-        scale._updateExtent(1, "x", [100, 200]);
+        scale._updateExtent("1", "x", [100, 200]);
         scale.domainer(new Plottable.Domainer().pad(0.2));
         assert.deepEqual(scale.domain(), [90, 210]);
     });
@@ -2938,7 +3168,7 @@ describe("Domainer", function () {
         var f = d3.time.format("%x");
         var d1 = f.parse("06/02/2014");
         var d2 = f.parse("06/03/2014");
-        timeScale._updateExtent(1, "x", [d1, d2]);
+        timeScale._updateExtent("1", "x", [d1, d2]);
         timeScale.domainer(new Plottable.Domainer().pad());
         var dd1 = timeScale.domain()[0];
         var dd2 = timeScale.domain()[1];
@@ -2951,7 +3181,7 @@ describe("Domainer", function () {
     });
     it("pad() works on log scales", function () {
         var logScale = new Plottable.Scale.Log();
-        logScale._updateExtent(1, "x", [10, 100]);
+        logScale._updateExtent("1", "x", [10, 100]);
         logScale.range([0, 1]);
         logScale.domainer(domainer.pad(2.0));
         assert.closeTo(logScale.domain()[0], 1, 0.001);
@@ -2975,7 +3205,7 @@ describe("Domainer", function () {
         var dayBefore = new Date(2000, 5, 4);
         var dayAfter = new Date(2000, 5, 6);
         var timeScale = new Plottable.Scale.Time();
-        timeScale._updateExtent(1, "x", [d, d]);
+        timeScale._updateExtent("1", "x", [d, d]);
         timeScale.domainer(new Plottable.Domainer().pad());
         assert.deepEqual(timeScale.domain(), [dayBefore, dayAfter]);
     });
@@ -3017,7 +3247,7 @@ describe("Domainer", function () {
         var b = new Date(2003, 0, 1);
         domainer.pad().addPaddingException(a);
         var timeScale = new Plottable.Scale.Time();
-        timeScale._updateExtent(1, "x", [a, b]);
+        timeScale._updateExtent("1", "x", [a, b]);
         timeScale.domainer(domainer);
         var domain = timeScale.domain();
         assert.deepEqual(domain[0], a);
@@ -3055,7 +3285,7 @@ describe("Domainer", function () {
         var d = new Date(2003, 0, 1);
         domainer.addIncludedValue(b);
         var timeScale = new Plottable.Scale.Time();
-        timeScale._updateExtent(1, "x", [c, d]);
+        timeScale._updateExtent("1", "x", [c, d]);
         timeScale.domainer(domainer);
         assert.deepEqual(timeScale.domain(), [b, d]);
     });
@@ -3140,7 +3370,7 @@ describe("Scales", function () {
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
         scale.autoDomainAutomatically = true;
-        scale._updateExtent(1, "x", [0.08, 9.92]);
+        scale._updateExtent("1", "x", [0.08, 9.92]);
         callbackWasCalled = false;
         scale.domainer(new Plottable.Domainer().nice());
         assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
@@ -3158,7 +3388,7 @@ describe("Scales", function () {
             scale = new Plottable.Scale.Linear();
         });
         it("scale autoDomain flag is not overwritten without explicitly setting the domain", function () {
-            scale._updateExtent(1, "x", d3.extent(data, function (e) { return e.foo; }));
+            scale._updateExtent("1", "x", d3.extent(data, function (e) { return e.foo; }));
             scale.domainer(new Plottable.Domainer().pad().nice());
             assert.isTrue(scale.autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
@@ -3192,15 +3422,15 @@ describe("Scales", function () {
         });
         it("scale perspectives can be removed appropriately", function () {
             assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled1");
-            scale._updateExtent(1, "x", d3.extent(data, function (e) { return e.foo; }));
-            scale._updateExtent(2, "x", d3.extent(data, function (e) { return e.bar; }));
+            scale._updateExtent("1", "x", d3.extent(data, function (e) { return e.foo; }));
+            scale._updateExtent("2", "x", d3.extent(data, function (e) { return e.bar; }));
             assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled2");
             assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
             assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled3");
-            scale._removeExtent(1, "x");
+            scale._removeExtent("1", "x");
             assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled4");
             assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
-            scale._updateExtent(2, "x", d3.extent(data, function (e) { return e.foo; }));
+            scale._updateExtent("2", "x", d3.extent(data, function (e) { return e.foo; }));
             assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled5");
             assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
         });
@@ -3415,7 +3645,7 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [0, 1]);
         });
         it("works with a domainer", function () {
-            scale._updateExtent(1, "x", [0, base * 2]);
+            scale._updateExtent("1", "x", [0, base * 2]);
             var domain = scale.domain();
             scale.domainer(new Plottable.Domainer().pad(0.1));
             assert.operator(scale.domain()[0], "<", domain[0]);
@@ -3428,10 +3658,10 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [0, 1]);
         });
         it("gives reasonable values for ticks()", function () {
-            scale._updateExtent(1, "x", [0, base / 2]);
+            scale._updateExtent("1", "x", [0, base / 2]);
             var ticks = scale.ticks();
             assert.operator(ticks.length, ">", 0);
-            scale._updateExtent(1, "x", [-base * 2, base * 2]);
+            scale._updateExtent("1", "x", [-base * 2, base * 2]);
             ticks = scale.ticks();
             var beforePivot = ticks.filter(function (x) { return x <= -base; });
             var afterPivot = ticks.filter(function (x) { return base <= x; });
@@ -3441,7 +3671,7 @@ describe("Scales", function () {
             assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
         });
         it("works on inverted domain", function () {
-            scale._updateExtent(1, "x", [200, -100]);
+            scale._updateExtent("1", "x", [200, -100]);
             var range = scale.range();
             assert.closeTo(scale.scale(-100), range[1], epsilon);
             assert.closeTo(scale.scale(200), range[0], epsilon);
@@ -3460,7 +3690,7 @@ describe("Scales", function () {
         });
         it("ticks() is always non-empty", function () {
             [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach(function (domain) {
-                scale._updateExtent(1, "x", domain);
+                scale._updateExtent("1", "x", domain);
                 var ticks = scale.ticks();
                 assert.operator(ticks.length, ">", 0);
             });
@@ -3916,7 +4146,6 @@ describe("_Util.Text", function () {
         assert.equal(partialText, "hello...", "text truncated");
         var tinyText = Plottable._Util.Text.getTruncatedText("hellom world!", 5, measure);
         assert.equal(tinyText, "", "empty string for tiny text");
-        assert.equal(textEl.text(), "foobar", "truncate had no side effect on textEl");
         svg.remove();
     });
     describe("addEllipsesToLine", function () {

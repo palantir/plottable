@@ -13,7 +13,7 @@ describe("_Util.Text", () => {
     assert.equal(partialText, "hello...", "text truncated");
     var tinyText = Plottable._Util.Text.getTruncatedText("hellom world!", 5, measure);
     assert.equal(tinyText, "", "empty string for tiny text");
-    assert.equal(textEl.text(), "foobar", "truncate had no side effect on textEl");
+
     svg.remove();
   });
 
