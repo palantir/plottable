@@ -41,9 +41,9 @@ function run(div, data, Plottable) {
     var obj = {x: date, y: data[1][pts] * 500 - 250};
 
     d.push(obj);
-    ds.data(d);
-    
+    ds.data(d);  
   }
+
   clickInteraction = new Plottable.Interaction.Click(title)
   .callback(addData)
   .registerWithComponent();
