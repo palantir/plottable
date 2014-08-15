@@ -637,6 +637,17 @@ describe("Category Axes", function () {
         assert.isFalse(s.wantsHeight, "it doesn't want height");
         svg.remove();
     });
+    it("width and height account for gutter. ticklength, and padding", function () {
+        var svg = generateSVG(400, 400);
+        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+        var ca = new Plottable.Axis.Category(xScale, "left");
+        var ca2 = new Plottable.Axis.Category(xScale, "bottom");
+        ca.renderTo(svg);
+        ca2.renderTo(svg);
+        assert.operator(ca.width(), ">", ca.tickLabelPadding() + ca.gutter() + ca.tickLength());
+        assert.operator(ca2.height(), ">", ca2.tickLabelPadding() + ca2.gutter() + ca2.tickLength());
+        svg.remove();
+    });
 });
 
 var assert = chai.assert;
