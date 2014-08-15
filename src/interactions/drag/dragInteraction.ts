@@ -32,7 +32,7 @@ export module Interaction {
      * in a SelectionArea in pixels.
      * @returns {Drag} The calling Drag.
      */
-    public callback(cb?: (a: any) => any) {
+    public callback(cb?: (a: SelectionArea) => any) {
       this.callbackToCall = cb;
       return this;
     }
@@ -81,7 +81,7 @@ export module Interaction {
       var xDomainOriginal = xScale != null ? xScale.domain() : null;
       var yDomainOriginal = yScale != null ? yScale.domain() : null;
       var resetOnNextClick = false;
-      function callback(pixelArea: IPixelArea) {
+      function callback(pixelArea: _IPixelArea) {
         if (pixelArea == null) {
           if (resetOnNextClick) {
             if (xScale != null) {

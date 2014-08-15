@@ -50,7 +50,7 @@ export module Component {
       return this;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
       var desiredWH = this.measurer(this._text);
       var desiredWidth  = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height);
       var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);

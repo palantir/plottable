@@ -81,7 +81,7 @@ export module Abstract {
       return this._computedHeight;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
       var requestedWidth = this._width;
       var requestedHeight = this._height;
 

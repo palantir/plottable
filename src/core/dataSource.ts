@@ -2,7 +2,7 @@
 
 module Plottable {
   interface ICachedExtent {
-    accessor: IAccessor;
+    accessor: _IAccessor;
     extent: any[];
   }
   export class DataSource extends Abstract.PlottableObject implements Core.IListenable {
@@ -77,7 +77,7 @@ module Plottable {
       }
     }
 
-    public _getExtent(accessor: IAccessor): any[] {
+    public _getExtent(accessor: _IAccessor): any[] {
       var cachedExtent = this.accessor2cachedExtent.get(accessor);
       if (cachedExtent === undefined) {
         cachedExtent = this.computeExtent(accessor);
@@ -86,7 +86,7 @@ module Plottable {
       return cachedExtent;
     }
 
-    private computeExtent(accessor: IAccessor): any[] {
+    private computeExtent(accessor: _IAccessor): any[] {
       var mappedData = this._data.map(accessor);
       if (mappedData.length === 0){
         return [];

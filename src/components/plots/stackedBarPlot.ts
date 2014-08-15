@@ -5,7 +5,7 @@ export module Plot {
 
   export class StackedBar extends Abstract.NewStyleBarPlot {
     public stackedData: any[][] = [];
-    public _yAccessor: IAccessor;
+    public _yAccessor: _IAccessor;
     public _isVertical = true;
     public _baselineValue = 0;
     public _baseline: D3.Selection;
@@ -42,7 +42,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    private stack(accessor: IAccessor) {
+    private stack(accessor: _IAccessor) {
       var datasets = d3.values(this._key2DatasetDrawerKey);
       var lengths = datasets.map((d) => d.dataset.data().length);
       if (_Util.Methods.uniqNumbers(lengths).length > 1) {

@@ -10,7 +10,7 @@ export module _Util {
      * Takes a number and an array of numbers OR an array of objects and an accessor that returns a number.
      * @param {number} value: The numerical value to insert
      * @param {any[]} arr: Array to find insertion index, can be number[] or any[] (if accessor provided)
-     * @param {IAccessor} accessor: If provided, this function is called on members of arr to determine insertion index
+     * @param {_IAccessor} accessor: If provided, this function is called on members of arr to determine insertion index
      * @returns {number} The insertion index.
      * The behavior is undefined for arrays that are unsorted
      * If there are multiple valid insertion indices that maintain sorted order (e.g. addign 1 to [1,1,1,1,1]) then
@@ -42,8 +42,8 @@ export module _Util {
      *  OTHER DEALINGS IN THE SOFTWARE.
      */
     export function sortedIndex(val: number, arr: number[]): number;
-    export function sortedIndex(val: number, arr: any[], accessor: IAccessor): number;
-    export function sortedIndex(val: number, arr: any[], accessor?: IAccessor): number {
+    export function sortedIndex(val: number, arr: any[], accessor: _IAccessor): number;
+    export function sortedIndex(val: number, arr: any[], accessor?: _IAccessor): number {
       var low = 0;
       var high = arr.length;
       while (low < high) {

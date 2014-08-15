@@ -20,14 +20,14 @@ export module Component {
       components.forEach((c: Abstract.Component) => this._addComponent(c));
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
       var requests = this._components.map((c: Abstract.Component) => c._requestedSpace(offeredWidth, offeredHeight));
       var isEmpty = this.empty();
       return {
-        width : isEmpty ? 0 : d3.max(requests, (request: ISpaceRequest) => request.width ),
-        height: isEmpty ? 0 : d3.max(requests, (request: ISpaceRequest) => request.height),
-        wantsWidth : isEmpty ? false : requests.map((r: ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
-        wantsHeight: isEmpty ? false : requests.map((r: ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
+        width : isEmpty ? 0 : d3.max(requests, (request: _ISpaceRequest) => request.width ),
+        height: isEmpty ? 0 : d3.max(requests, (request: _ISpaceRequest) => request.height),
+        wantsWidth : isEmpty ? false : requests.map((r: _ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
+        wantsHeight: isEmpty ? false : requests.map((r: _ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
       };
     }
 

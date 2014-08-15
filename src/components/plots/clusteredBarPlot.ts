@@ -23,7 +23,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    private cluster(accessor: IAccessor) {
+    private cluster(accessor: _IAccessor) {
       this.innerScale.domain(this._datasetKeysInOrder);
       var lengths = this._getDatasetsInOrder().map((d) => d.data().length);
       if (_Util.Methods.uniqNumbers(lengths).length > 1) {

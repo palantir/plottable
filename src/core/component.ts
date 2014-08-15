@@ -98,7 +98,7 @@ export module Abstract {
       this._isSetup = true;
     }
 
-    public _requestedSpace(availableWidth : number, availableHeight: number): ISpaceRequest {
+    public _requestedSpace(availableWidth : number, availableHeight: number): _ISpaceRequest {
       return {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
     }
 
