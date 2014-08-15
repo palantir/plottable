@@ -7,11 +7,21 @@ export module Plot {
     public _isVertical = true;
     private innerScale: Scale.Ordinal;
 
+    /**
+     * Creates an ClusteredBar.
+     *
+     * A ClusteredBar is a plot that plots several bar plots next to each
+     * other. For example, when plotting life expectancy across each country,
+     * you would want each country to have a "male" and "female" bar.
+     *
+     * @constructor
+     * @param {Scale} xScale The x scale to use.
+     * @param {Scale} yScale The y scale to use.
+     */
     constructor(xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale) {
       super(xScale, yScale);
       this.innerScale = new Scale.Ordinal();
     }
-
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
