@@ -691,14 +691,14 @@ describe("Gridlines", function () {
         var basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
         basicTable.renderTo(svg);
         var xBaselines = gridlines.element.select(".x-gridlines").selectAll(".baseline");
-        assert.equal(xBaselines[0].length, 2);
+        assert.lengthOf(xBaselines[0], 2);
         var xBaselineValues = [];
         xBaselines.each(function () {
             xBaselineValues.push(parseInt(d3.select(this).attr("x1"), 10));
         });
         assert.includeMembers([0, Math.floor(gridlines.availableWidth)], xBaselineValues, "xBaseline values are either availableWidth or 0");
         var yBaselines = gridlines.element.select(".y-gridlines").selectAll(".baseline");
-        assert.equal(yBaselines[0].length, 2);
+        assert.lengthOf(yBaselines[0], 2);
         var yBaselineValues = [];
         yBaselines.each(function () {
             yBaselineValues.push(parseInt(d3.select(this).attr("y1"), 10));

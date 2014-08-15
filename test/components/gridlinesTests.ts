@@ -69,7 +69,7 @@ describe("Gridlines", () => {
     basicTable.renderTo(svg);
 
     var xBaselines = gridlines.element.select(".x-gridlines").selectAll(".baseline");
-    assert.equal(xBaselines[0].length, 2);
+    assert.lengthOf(xBaselines[0], 2);
     var xBaselineValues: number[] = [];
     xBaselines.each(function() {
       xBaselineValues.push(parseInt(d3.select(this).attr("x1"), 10));
@@ -77,7 +77,7 @@ describe("Gridlines", () => {
     assert.includeMembers([0, Math.floor(gridlines.availableWidth)], xBaselineValues, "xBaseline values are either availableWidth or 0");
 
     var yBaselines = gridlines.element.select(".y-gridlines").selectAll(".baseline");
-    assert.equal(yBaselines[0].length, 2);
+    assert.lengthOf(yBaselines[0], 2);
     var yBaselineValues: number[] = [];
     yBaselines.each(function() {
       yBaselineValues.push(parseInt(d3.select(this).attr("y1"), 10));
