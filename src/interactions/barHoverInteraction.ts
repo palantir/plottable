@@ -27,19 +27,25 @@ export module Interaction {
       this.dispatcher.mousemove((p: Point) => {
         var selectedBar = this.getHoveredBar(p);
 
-        if (selectedBar != null) {
-          if (this.currentBar == null || this.currentBar.node() !== selectedBar.node()) {
-            this.componentToListenTo._bars.classed("not-hovered", true).classed("hovered", false);
-            selectedBar.classed("not-hovered", false).classed("hovered", true);
-            if (this.hoverCallback != null) {
-              this.hoverCallback(selectedBar.data()[0], selectedBar);
+        if (selectedBar == null) {
+          this._hoverOut();
+        } else {
+          if (this.currentBar != null) {
+            if (this.currentBar.node() === selectedBar.node()) {
+              return; // no message if bar is the same
+            } else {
+              this._hoverOut();
             }
           }
-          this.currentBar = selectedBar;
-        } else if (this.currentBar != null) {
-          this._hoverOut();
+
+          this.componentToListenTo._bars.classed("not-hovered", true).classed("hovered", false);
+          selectedBar.classed("not-hovered", false).classed("hovered", true);
+          if (this.hoverCallback != null) {
+            this.hoverCallback(selectedBar.data()[0], selectedBar);
+          }
         }
 
+        this.currentBar = selectedBar;
       });
 
       this.dispatcher.mouseout((p: Point) => this._hoverOut());
@@ -49,12 +55,10 @@ export module Interaction {
 
     private _hoverOut() {
       this.componentToListenTo._bars.classed("not-hovered hovered", false);
-      if (this.currentBar != null) { // trigger callback only if a hoverout transition is occurring
-        if (this.unhoverCallback != null) {
-          this.unhoverCallback(this.currentBar.data()[0], this.currentBar); // last known information
-        }
-        this.currentBar = null;
+      if (this.unhoverCallback != null && this.currentBar != null) {
+        this.unhoverCallback(this.currentBar.data()[0], this.currentBar); // last known information
       }
+      this.currentBar = null;
     }
 
     private getHoveredBar(p: Point) {

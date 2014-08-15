@@ -341,6 +341,11 @@ describe("Interactions", () => {
       triggerFakeMouseEvent("mouseout", hitbox, 100, 9999);
       assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing out of the chart");
 
+      triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
+      unhoverCalled = false;
+      triggerFakeMouseEvent("mousemove", hitbox, 250, 200);
+      assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing from one bar to another");
+
       bhi.hoverMode("line");
       barDatum = null;
       triggerFakeMouseEvent("mousemove", hitbox, 100, 1);
@@ -385,6 +390,12 @@ describe("Interactions", () => {
       triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
       triggerFakeMouseEvent("mouseout", hitbox, -999, 250);
       assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing out of the chart");
+
+      triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
+      unhoverCalled = false;
+      triggerFakeMouseEvent("mousemove", hitbox, 200, 100);
+      assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing from one bar to another");
+
 
       bhi.hoverMode("line");
       triggerFakeMouseEvent("mousemove", hitbox, 399, 250);

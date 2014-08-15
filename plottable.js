@@ -5129,31 +5129,35 @@ var Plottable;
                 this.dispatcher = new Plottable.Dispatcher.Mouse(hitBox);
                 this.dispatcher.mousemove(function (p) {
                     var selectedBar = _this.getHoveredBar(p);
-                    if (selectedBar != null) {
-                        if (_this.currentBar == null || _this.currentBar.node() !== selectedBar.node()) {
-                            _this.componentToListenTo._bars.classed("not-hovered", true).classed("hovered", false);
-                            selectedBar.classed("not-hovered", false).classed("hovered", true);
-                            if (_this.hoverCallback != null) {
-                                _this.hoverCallback(selectedBar.data()[0], selectedBar);
-                            }
-                        }
-                        _this.currentBar = selectedBar;
-                    }
-                    else if (_this.currentBar != null) {
+                    if (selectedBar == null) {
                         _this._hoverOut();
                     }
+                    else {
+                        if (_this.currentBar != null) {
+                            if (_this.currentBar.node() === selectedBar.node()) {
+                                return;
+                            }
+                            else {
+                                _this._hoverOut();
+                            }
+                        }
+                        _this.componentToListenTo._bars.classed("not-hovered", true).classed("hovered", false);
+                        selectedBar.classed("not-hovered", false).classed("hovered", true);
+                        if (_this.hoverCallback != null) {
+                            _this.hoverCallback(selectedBar.data()[0], selectedBar);
+                        }
+                    }
+                    _this.currentBar = selectedBar;
                 });
                 this.dispatcher.mouseout(function (p) { return _this._hoverOut(); });
                 this.dispatcher.connect();
             };
             BarHover.prototype._hoverOut = function () {
                 this.componentToListenTo._bars.classed("not-hovered hovered", false);
-                if (this.currentBar != null) {
-                    if (this.unhoverCallback != null) {
-                        this.unhoverCallback(this.currentBar.data()[0], this.currentBar);
-                    }
-                    this.currentBar = null;
+                if (this.unhoverCallback != null && this.currentBar != null) {
+                    this.unhoverCallback(this.currentBar.data()[0], this.currentBar);
                 }
+                this.currentBar = null;
             };
             BarHover.prototype.getHoveredBar = function (p) {
                 if (this._hoverMode === "point") {
