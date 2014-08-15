@@ -271,7 +271,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
-        interface IterateLayoutResult {
+        interface _IterateLayoutResult {
             colProportionalSpace: number[];
             rowProportionalSpace: number[];
             guaranteedWidths: number[];

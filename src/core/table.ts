@@ -2,14 +2,14 @@
 
 module Plottable {
 export module Component {
-  interface LayoutAllocation {
+  interface _LayoutAllocation {
     guaranteedWidths : number[];
     guaranteedHeights: number[];
     wantsWidthArr : boolean[];
     wantsHeightArr: boolean[];
   }
 
-  export interface IterateLayoutResult {
+  export interface _IterateLayoutResult {
     colProportionalSpace: number[];
     rowProportionalSpace: number[];
     guaranteedWidths    : number[];
@@ -107,7 +107,7 @@ export module Component {
       }
     }
 
-    private iterateLayout(availableWidth : number, availableHeight: number): IterateLayoutResult {
+    private iterateLayout(availableWidth : number, availableHeight: number): _IterateLayoutResult {
     /*
      * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
      *
@@ -210,7 +210,7 @@ export module Component {
               wantsHeight         : wantsHeight                 };
     }
 
-    private determineGuarantees(offeredWidths: number[], offeredHeights: number[]): LayoutAllocation {
+    private determineGuarantees(offeredWidths: number[], offeredHeights: number[]): _LayoutAllocation {
       var requestedWidths  = _Util.Methods.createFilledArray(0, this.nCols);
       var requestedHeights = _Util.Methods.createFilledArray(0, this.nRows);
       var layoutWantsWidth  = _Util.Methods.createFilledArray(false, this.nCols);
