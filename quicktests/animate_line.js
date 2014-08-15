@@ -5,21 +5,22 @@ function makeData() {
 
 function run(div, data, Plottable) {
 	var svg = div.append("svg").attr("height", 500);
-	console.log(data);
+
 	var doAnimate = true;
-	var lineRenderer;
+
 	var xScale = new Plottable.Scale.Linear();
 	var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
 	var yScale = new Plottable.Scale.Linear();
 	var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-	lineRenderer = new Plottable.Plot.Line(data[0].slice(0, 20), xScale, yScale);
+	var lineRenderer = new Plottable.Plot.Line(data[0].slice(0, 20), xScale, yScale);
 	lineRenderer.project("opacity", 0.75);
 	lineRenderer.animate(doAnimate);
 
 	var lineChart = new Plottable.Component.Table([[yAxis, lineRenderer],
 		[null,  xAxis]]);
+	
 	lineChart.renderTo(svg);
 
 	cb = function(x, y){

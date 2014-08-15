@@ -6,7 +6,6 @@ function makeData() {
 
 function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
-  data = _.cloneDeep(data);
 
   var data = [
   {x: "5/2/2014", y: "twentyfourteen"},
@@ -19,6 +18,7 @@ function run(div, data, Plottable) {
   xScale.domain(["1/1/2000", "12/31/2025"]);
   
   yScale = new Plottable.Scale.Ordinal();
+
   hBarPlot = new Plottable.Plot.HorizontalBar(data, xScale, yScale)
   .project("x", function (d) { return d3.time.format("%x").parse(d.x)}, xScale);
 
@@ -27,7 +27,9 @@ function run(div, data, Plottable) {
 
   gridlines = new Plottable.Component.Gridlines(xScale, null);
   renderGroup = hBarPlot.merge(gridlines);
+
   new Plottable.Template.StandardChart().center(renderGroup).xAxis(xAxis).yAxis(yAxis).renderTo(svg);
+  
   new Plottable.Interaction.PanZoom(hBarPlot, xScale, yScale).registerWithComponent();
 
 }

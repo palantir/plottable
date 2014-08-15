@@ -6,8 +6,6 @@ function makeData() {
 
 function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
-  data = _.cloneDeep(data);
-
 
   var dataseries = data[0].slice(0, 30);
 
@@ -30,8 +28,10 @@ function run(div, data, Plottable) {
   .project("r", rAccessor)
   .project("fill", colorAccessor)
   .project("opacity", opacityAccessor);
+
   var chartTable = new Plottable.Component.Table([[yAxis, renderer],
     [null, xAxis]]);
+
   chartTable.renderTo(svg);
 
 }

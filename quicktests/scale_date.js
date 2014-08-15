@@ -10,9 +10,6 @@ function run(div, data, Plottable) {
   {x: "05/06/2014", y: 4}
   ]
 
-  // Will receive function arguments: (svg, data, Plottable)
-
-
   var xScale = new Plottable.Scale.Time();
   var yScale = new Plottable.Scale.Linear();
   var linePlot = new Plottable.Plot.Line(dataPts, xScale, yScale)
@@ -21,11 +18,7 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
   
   var chart = new Plottable.Component.Table([[yAxis, linePlot],[null, xAxis]]);
+
   chart.renderTo(svg);
-
-
-
-
-
 
 }

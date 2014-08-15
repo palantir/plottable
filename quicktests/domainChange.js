@@ -6,19 +6,13 @@ function makeData() {
 
 function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
-  data = _.cloneDeep(data);
 
   var boringData = function () {
     return [{x: 0, y: 0}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 2, y: 6}, {x: 30, y: 70}];
   }
 
+  var dataseries = new Plottable.DataSource(boringData());
 
-  var dataseries1 = new Plottable.DataSource(boringData());
-  var dataseries2 = new Plottable.DataSource(boringData());
-  var dataseries3 = new Plottable.DataSource(boringData());
-
-
-    //Axis
   var xScale = new Plottable.Scale.Linear();
   var yScale = new Plottable.Scale.Linear();
   xScale.domain([0, 3]);
@@ -29,8 +23,8 @@ function run(div, data, Plottable) {
   var yAxis2 = new Plottable.Axis.Numeric(yScale, "left");
 
   //rendering
-  var linePlot = new Plottable.Plot.Line(dataseries2, xScale, yScale);
-  var scatterPlot = new Plottable.Plot.Scatter(dataseries3, xScale, yScale);
+  var linePlot = new Plottable.Plot.Line(dataseries1, xScale, yScale);
+  var scatterPlot = new Plottable.Plot.Scatter(dataseries1, xScale, yScale);
   
   var autoXLabel = new Plottable.Component.Label("autodomain X");
   var focusXLabel = new Plottable.Component.Label("focus X");
@@ -63,6 +57,7 @@ function run(div, data, Plottable) {
   function yFocus(){
     yScale.domain([0, 8]);
   }
+  
   xAutoInteraction = new            
   Plottable.Interaction.Click(autoXLabel)
   .callback(xAuto)

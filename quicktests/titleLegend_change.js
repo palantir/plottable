@@ -141,4 +141,4 @@ function run(div, data, Plottable) {
     basicTable.renderTo();
   }
 
-  }
+}

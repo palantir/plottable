@@ -6,9 +6,6 @@ function makeData() {
 
 function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
-  data = _.cloneDeep(data);
-
-
 
   var bigger = function(d){
     d.x = Math.pow(100, d.x);
@@ -39,29 +36,27 @@ function run(div, data, Plottable) {
   var colorScale1 = new Plottable.Scale.Color();
   colorScale1.domain(["series1", "series2", "series3", "series4"]);
 
-  //Axis
   xScale = new Plottable.Scale.ModifiedLog();
   yScale = new Plottable.Scale.ModifiedLog();
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-
 
   var colorProjector = function(d, i, m) {
     return colorScale1.scale(m.name);
   };
 
   //rendering
-  renderAreaD1 = new Plottable.Plot.Line(dataseries1, xScale, yScale);   
-  renderAreaD2 = new Plottable.Plot.Line(dataseries2, xScale, yScale);
-  renderAreaD3 = new Plottable.Plot.Line(dataseries3, xScale, yScale);
-  renderAreaD4 = new Plottable.Plot.Line(dataseries4, xScale, yScale);
-  renderAreaD1.project("stroke", colorProjector);
-  renderAreaD2.project("stroke", colorProjector);
-  renderAreaD3.project("stroke", colorProjector);
-  renderAreaD4.project("stroke", colorProjector);
-  renderAreas = renderAreaD1.merge(renderAreaD2)
-  .merge(renderAreaD3).merge(renderAreaD4);
-  var renderers = [renderAreaD1, renderAreaD2, renderAreaD3, renderAreaD4];
+  plot1 = new Plottable.Plot.Line(dataseries1, xScale, yScale);   
+  plot2= new Plottable.Plot.Line(dataseries2, xScale, yScale);
+  plot3 = new Plottable.Plot.Line(dataseries3, xScale, yScale);
+  plot4 = new Plottable.Plot.Line(dataseries4, xScale, yScale);
+  plot1.project("stroke", colorProjector);
+  plot2.project("stroke", colorProjector);
+  plot3.project("stroke", colorProjector);
+  plot4.project("stroke", colorProjector);
+  renderAreas = plot1.merge(plot2)
+  .merge(plot3).merge(plot4);
+  var renderers = [plot1, plot2, plot3, plot4];
   var renderersIncluded = [1, 1, 1, 1];
 
 

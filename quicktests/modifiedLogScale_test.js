@@ -37,7 +37,7 @@ function run(div, data, Plottable) {
     circleRenderer.dataSource().data(d);
   };
 
-  window.xy = new Plottable.Interaction.Click(circleRenderer)
+  clickInteraction = new Plottable.Interaction.Click(circleRenderer)
   .callback(cb)
   .registerWithComponent();
 }

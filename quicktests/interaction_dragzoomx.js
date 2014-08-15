@@ -13,8 +13,9 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var renderAreaD1 = new Plottable.Plot.Area(dataseries, xScale, yScale);
   var fillAccessor = function() { return "steelblue"; }
+
+  var renderAreaD1 = new Plottable.Plot.Area(dataseries, xScale, yScale);
   renderAreaD1.project("fill", fillAccessor)
 
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
@@ -24,6 +25,6 @@ function run(div, data, Plottable) {
   .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
   .renderTo(svg);
 
-  window.x = new Plottable.Interaction.XDragBox(renderGroup).setupZoomCallback(xScale, null).registerWithComponent();
+  dragBoxInteraction = new Plottable.Interaction.XDragBox(renderGroup).setupZoomCallback(xScale, null).registerWithComponent();
 
 }

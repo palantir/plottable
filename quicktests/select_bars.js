@@ -15,9 +15,9 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  renderAreaD1 = new Plottable.Plot.VerticalBar(dataseries, xScale, yScale);
+  plot1 = new Plottable.Plot.VerticalBar(dataseries, xScale, yScale);
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-  var renderGroup = gridlines.merge(renderAreaD1);
+  var renderGroup = gridlines.merge(plot1);
   var title = new Plottable.Component.TitleLabel("reset");
 
   new Plottable.Template.StandardChart()
@@ -26,41 +26,40 @@ function run(div, data, Plottable) {
   .center(renderGroup)
   .renderTo(svg);
 
-    //callbacks
-    cb_drag = function(xy) {
-        if (xy == null) {return;}
-        var invertedXMin = xScale.invert(xy.xMin);
-        var invertedXMax = xScale.invert(xy.xMax);
-        var invertedYMin = yScale.invert(xy.yMax);
-        var invertedYMax = yScale.invert(xy.yMin);
-        renderAreaD1.selectBar({min: xy.xMin, max: xy.xMax}, 
-           {min: xy.yMin, max: xy.yMax}, 
-           true);
-        drag_interaction.clearBox();
-    }
-    
-    cb_click = function(x, y) {
-        renderAreaD1.selectBar(x, y, true);
-    }
-    
-    cb_reset = function() {
-        renderAreaD1.deselectAll();
-    }        
-    
-    //register interactions        
-    var drag_interaction = new            
-    Plottable.Interaction.XYDragBox(renderGroup)
-    .callback(cb_drag)
-    .registerWithComponent();
-    
-    var click_interaction = new            
-    Plottable.Interaction.Click(renderGroup)
-    .callback(cb_click)
-    .registerWithComponent();
-    
-    var reset_interaction = new            
-    Plottable.Interaction.Click(title)
-    .callback(cb_reset)
-    .registerWithComponent();
+  cb_drag = function(xy) {
+      if (xy == null) {return;}
+      var invertedXMin = xScale.invert(xy.xMin);
+      var invertedXMax = xScale.invert(xy.xMax);
+      var invertedYMin = yScale.invert(xy.yMax);
+      var invertedYMax = yScale.invert(xy.yMin);
+      plot1.selectBar({min: xy.xMin, max: xy.xMax}, 
+         {min: xy.yMin, max: xy.yMax}, 
+         true);
+      drag_interaction.clearBox();
+  }
+  
+  cb_click = function(x, y) {
+      plot1.selectBar(x, y, true);
+  }
+  
+  cb_reset = function() {
+      plot1.deselectAll();
+  }        
+  
+  //register interactions        
+  var drag_interaction = new            
+  Plottable.Interaction.XYDragBox(renderGroup)
+  .callback(cb_drag)
+  .registerWithComponent();
+  
+  var click_interaction = new            
+  Plottable.Interaction.Click(renderGroup)
+  .callback(cb_click)
+  .registerWithComponent();
+  
+  var reset_interaction = new            
+  Plottable.Interaction.Click(title)
+  .callback(cb_reset)
+  .registerWithComponent();
 
 }

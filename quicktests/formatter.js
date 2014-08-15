@@ -7,19 +7,19 @@ function run(div, data, Plottable) {
   data = _.cloneDeep(data);
 
   var large_x = function(d){
-   d.x = d.x*100000000;   
- }
- custFormatter = function(d) {
-  if(parseInt(d) < 1){
-   d = "less than 1";   
- }
- return d; 
-};
+    d.x = d.x*100000000;   
+  }
+  custFormatter = function(d) {
+    if(parseInt(d) < 1){
+      d = "less than 1";   
+    }
+    return d; 
+  };
 
 
-var big_numbers = data[0].slice(0, 5);
-big_numbers.forEach(large_x);
-var dataseries1 = new Plottable.DataSource(big_numbers);
+  var big_numbers = data[0].slice(0, 5);
+  big_numbers.forEach(large_x);
+  var dataseries1 = new Plottable.DataSource(big_numbers);
 
   //Axis
   var xScale = new Plottable.Scale.Linear();
@@ -41,6 +41,7 @@ var dataseries1 = new Plottable.DataSource(big_numbers);
   var formatChoices = new Plottable.Component.Table([[IdTitle, GenTitle, FixTitle],[CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);                
   var bigTable = new Plottable.Component.Table([[basicTable],[formatChoices]]);
   formatChoices.xAlign("center");
+
   bigTable.renderTo(svg);
   
 
@@ -67,32 +68,31 @@ var dataseries1 = new Plottable.DataSource(big_numbers);
   function SI_frmt(){
    xAxis.formatter(Plottable.Formatters.siSuffix(2)); 
    yAxis.formatter(Plottable.Formatters.siSuffix(2));   
- }
- function custom_frmt(){
-   xAxis.formatter(custFormatter);   
-   yAxis.formatter(custFormatter);      
- }
- idClick = new Plottable.Interaction.Click(IdTitle)
- .callback(identity_frmt)
- .registerWithComponent();
- genClick = new Plottable.Interaction.Click(GenTitle)
- .callback(general_frmt)
- .registerWithComponent();
- fixClick = new Plottable.Interaction.Click(FixTitle)
- .callback(fixed_frmt)
- .registerWithComponent();
- currClick = new Plottable.Interaction.Click(CurrTitle)
- .callback(currency_frmt)
- .registerWithComponent();
- percClick = new Plottable.Interaction.Click(PerTitle)
- .callback(percentage_frmt)
- .registerWithComponent();
- siClick = new Plottable.Interaction.Click(SITitle)
- .callback(SI_frmt)
- .registerWithComponent();  
- custClick = new Plottable.Interaction.Click(CustTitle)
- .callback(custom_frmt)
- .registerWithComponent();
-
+  }
+  function custom_frmt(){
+    xAxis.formatter(custFormatter);   
+    yAxis.formatter(custFormatter);      
+  }
+  idClick = new Plottable.Interaction.Click(IdTitle)
+  .callback(identity_frmt)
+  .registerWithComponent();
+  genClick = new Plottable.Interaction.Click(GenTitle)
+  .callback(general_frmt)
+  .registerWithComponent();
+  fixClick = new Plottable.Interaction.Click(FixTitle)
+  .callback(fixed_frmt)
+  .registerWithComponent();
+  currClick = new Plottable.Interaction.Click(CurrTitle)
+  .callback(currency_frmt)
+  .registerWithComponent();
+  percClick = new Plottable.Interaction.Click(PerTitle)
+  .callback(percentage_frmt)
+  .registerWithComponent();
+  siClick = new Plottable.Interaction.Click(SITitle)
+  .callback(SI_frmt)
+  .registerWithComponent();  
+  custClick = new Plottable.Interaction.Click(CustTitle)
+  .callback(custom_frmt)
+  .registerWithComponent();
 
 }

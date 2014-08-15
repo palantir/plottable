@@ -29,6 +29,4 @@ function run(div, data, Plottable) {
   window.xy = new Plottable.Interaction.Click(circleRenderer)
   .callback(cb)
   .registerWithComponent();
-
-
 }

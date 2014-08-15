@@ -19,46 +19,32 @@ function run(div, data, Plottable) {
   var yAxis2 = new Plottable.Axis.Numeric(yScale, "left");
   var yAxis3 = new Plottable.Axis.Numeric(yScale, "left");
 
-    //test Component constructor (default, should be no issues)
+  var Plot0 = new Plottable.Plot.Line(dataseries1, xScale, yScale);
+  var Plot1 = new Plottable.Plot.Line(dataseries2, xScale, yScale)
+  .project( "stroke", function(){return "red"});   
+  var Plot2 = new Plottable.Plot.Area(dataseries1, xScale, yScale);
+  var Plot3 = new Plottable.Plot.Area(dataseries2, xScale, yScale)
+  .project( "fill", function(){return "red"});
 
+  var basicTable0 = new Plottable.Component.Table([[yAxis0]])
+  var basicTable1 = new Plottable.Component.Table([[Plot0]])
 
+  var basicTable2 = new Plottable.Component.Table([[yAxis2, Plot1],
+    []null, xAxis2]);
 
-    var renderAreaD0 = new Plottable.Plot.Line(dataseries1, xScale, yScale);
-    var renderAreaD1 = new Plottable.Plot.Line(dataseries2, xScale, yScale).project( "stroke", function(){return "red"});   
-    var renderAreaD2 = new Plottable.Plot.Area(dataseries1, xScale, yScale);
-    var renderAreaD3 = new Plottable.Plot.Area(dataseries2, xScale, yScale).project( "fill", function(){return "red"});
+  var renderGroup = Plot3.merge(Plot2);
+  var basicTable3 = new Plottable.Component.Table([[renderGroup],
+    [xAxis3]]);
+  
+  var line1 = new Plottable.Component.Label("Tables in Tables", "horizontal");
+  var line2 = new Plottable.Component.Label("for Dan", "horizontal");
+  
+  bigtable = new Plottable.Component.Table().addComponent(0,0, basicTable0)
+  .addComponent(0,2, basicTable1)
+  .addComponent(3,0, basicTable2)
+  .addComponent(3,2,basicTable3)  
+  .addComponent(1, 1, line1)
+  .addComponent(2, 1, line2)
 
-    
-    //test merge: 
-    //empty component + empty component
-
-    var basicTable0 = new Plottable.Component.Table().addComponent(0,0, yAxis0);
-    
-    //empty component + XYRenderer
-    var basicTable1 = new Plottable.Component.Table().addComponent(0,1, renderAreaD0);
-
-    
-    //XYRenderer + empty component
-    var basicTable2 = new Plottable.Component.Table().addComponent(0,0, yAxis2)
-    .addComponent(0,1, renderAreaD1)
-    .addComponent(1,1,xAxis2);   
-    //XYRenderer + XYRenderer
-    var renderGroup3 = renderAreaD3.merge(renderAreaD2);
-    var basicTable3 = new Plottable.Component.Table().addComponent(0,1, renderGroup3)
-    .addComponent(1,1,xAxis3);
-
-    var bigtable = new Plottable.Component.Table();
-    
-    var line1 = new Plottable.Component.Label("Tables in Tables", "horizontal");
-    var line2 = new Plottable.Component.Label("for Dan", "horizontal");
-    
-    bigtable = new Plottable.Component.Table().addComponent(0,0, basicTable0)
-    .addComponent(0,2, basicTable1)
-    .addComponent(3,0, basicTable2)
-    .addComponent(3,2,basicTable3)  
-    .addComponent(1, 1, line1)
-    .addComponent(2, 1, line2)
-    bigtable.renderTo(svg);
-
-
-  }
+  bigtable.renderTo(svg);
+}

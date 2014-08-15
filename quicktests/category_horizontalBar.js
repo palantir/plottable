@@ -29,5 +29,4 @@ function run(div, data, Plottable) {
 
     chart.renderTo(svg);
 
-
 }

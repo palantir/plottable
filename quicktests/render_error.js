@@ -47,7 +47,6 @@ function run(div, data, Plottable) {
   _run(div, data, Plottable);
   setTimeout(function() {
     Plottable.Plot.Area._doRender = doRender;
-    console.log("fixed it now?");
     _run(div, data, Plottable);
   }, 100);
 }

@@ -10,24 +10,22 @@ function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
 
   dates = [];
+  var ds = new Plottable.DataSource(dates);
 
-  var plot;
-  var ds;
   xScale = new Plottable.Scale.Time();
   yScale = new Plottable.Scale.Linear();
-  ds = new Plottable.DataSource(dates);
-  plot = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
+  var plot = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
   .project("x", function (d) { return d3.time.format("%x").parse(d.x)}, xScale);
 
   xAxis = new Plottable.Axis.Time(xScale, "bottom");
   yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   title = new Plottable.Component.TitleLabel("Click to add data");
-
   gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-  renderGroup = plot.merge(gridlines);
-  new Plottable.Template.StandardChart().center(renderGroup).xAxis(xAxis).yAxis(yAxis).titleLabel(title).renderTo("svg");
 
+  renderGroup = plot.merge(gridlines);
+  
+  new Plottable.Template.StandardChart().center(renderGroup).xAxis(xAxis).yAxis(yAxis).titleLabel(title).renderTo("svg");
 
   function addData(){
     var d = ds.data()

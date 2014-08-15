@@ -39,7 +39,9 @@ function run(div, data, Plottable) {
   var basicTable = new Plottable.Component.Table([[null, xAxisTable2, null],
                                     [yAxisTable, renderAreaD1.merge(gridlines), yAxisTable2],
                                     [null, xAxisTable, null]]);
+  
   basicTable.renderTo(svg);
+
   var pzi = new Plottable.Interaction.PanZoom(renderAreaD1, xScale, yScale);
   pzi.registerWithComponent();
 
