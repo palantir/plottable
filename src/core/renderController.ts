@@ -71,7 +71,7 @@ export module Core {
 
         // now we are flusing
         _isCurrentlyFlushing = true;
-        
+
         // Finally, perform render of all components
         var failed: {[key: string]: Abstract.Component} = {};
         Object.keys(_componentsNeedingRender).forEach((k) => {
