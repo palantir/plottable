@@ -70,7 +70,7 @@ export module Abstract {
 
       this._bars.exit().remove();
 
-      var baselineAttr: Abstract.IAttributeToProjector = {
+      var baselineAttr: IAttributeToProjector = {
         "x1": this._isVertical ? 0 : scaledBaseline,
         "y1": this._isVertical ? scaledBaseline : 0,
         "x2": this._isVertical ? this.availableWidth : scaledBaseline,
@@ -206,6 +206,22 @@ export module Abstract {
       }
     }
 
+    public _updateYDomainer() {
+      if (this._isVertical) {
+        this._updateDomainer(this.yScale);
+      } else {
+        super._updateYDomainer();
+      }
+    }
+
+    public _updateXDomainer() {
+      if (!this._isVertical) {
+        this._updateDomainer(this.xScale);
+      } else {
+        super._updateXDomainer();
+      }
+    }
+
     public _generateAttrToProjector() {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
@@ -246,6 +262,8 @@ export module Abstract {
 
       return attrToProjector;
     }
+
   }
 }
 }
+
