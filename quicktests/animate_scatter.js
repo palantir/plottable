@@ -18,7 +18,7 @@ function run(div, data, Plottable) {
   circleRenderer.animate(doAnimate);
 
   var circleChart = new Plottable.Component.Table([[yAxis, circleRenderer],
-                                           [null,  xAxis]]);
+   [null,  xAxis]]);
   circleChart.renderTo(svg);
 
   cb = function(x, y){
@@ -27,8 +27,8 @@ function run(div, data, Plottable) {
   }  
 
   window.xy = new Plottable.Interaction.Click(circleRenderer)
-    .callback(cb)
-    .registerWithComponent();
+  .callback(cb)
+  .registerWithComponent();
 
 
 }

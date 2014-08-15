@@ -38,8 +38,8 @@ function run(div, data, Plottable) {
   var renderGroup = new Plottable.Component.Group([gridlines, renderAreaD1, renderAreaD2]);
 
   var chart = new Plottable.Template.StandardChart()
-                  .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
-                  .renderTo(svg);
+  .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
+  .renderTo(svg);
 
 
 }

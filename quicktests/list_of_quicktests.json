@@ -64,7 +64,7 @@
     "categories":["Linear Scale", "Numeric Axis", "Line Plot", "Area Plot", "Layout", "Label", "Table", "Project"]
   },  {
     "name":"legend_basic",
-    "categories":["Legend", "Title", "Gridlines", "Color Scale", "Scatter Plot", "Line Plot", "Numeric Axis", "Metadata", "Project", "Merge", "Linear Scale"]
+    "categories":["Legend", "Title", "Gridlines", "Color Scale", "Axis Label", "Scatter Plot", "Line Plot", "Numeric Axis", "Metadata", "Project", "Merge", "Linear Scale"]
   },  {
     "name":"modifiedLog",
     "categories":["Datasource", "Metadata", "Modified Log Scale", "Color Scale", "Line Plot", "Numeric Axis", "Accessor", "Project", "Toggle Legend"]

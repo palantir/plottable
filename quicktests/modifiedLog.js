@@ -6,25 +6,25 @@ function makeData() {
 
 function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
-        data = _.cloneDeep(data);
+  data = _.cloneDeep(data);
 
 
 
-    var bigger = function(d){
-        d.x = Math.pow(100, d.x);
-        d.y = Math.pow(100, d.y);
-    }
-    
-    var d1 = makeRandomData(50);
-    d1.forEach(bigger);
-    var d2 = makeRandomData(50);
-    d2.forEach(bigger);
-    var d3 = makeRandomData(50);
-    d3.forEach(bigger);
-    var d4 = makeRandomData(50);
-    d4.forEach(bigger);
-    
-    
+  var bigger = function(d){
+    d.x = Math.pow(100, d.x);
+    d.y = Math.pow(100, d.y);
+}
+
+var d1 = makeRandomData(50);
+d1.forEach(bigger);
+var d2 = makeRandomData(50);
+d2.forEach(bigger);
+var d3 = makeRandomData(50);
+d3.forEach(bigger);
+var d4 = makeRandomData(50);
+d4.forEach(bigger);
+
+
     //data
     dataseries1 = new Plottable.DataSource(d1);
     dataseries1.metadata({name: "series1"});
@@ -45,11 +45,11 @@ function run(div, data, Plottable) {
     var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-        
-    var colorProjector = function(d, i, m) {
-       return colorScale1.scale(m.name);
-    };
     
+    var colorProjector = function(d, i, m) {
+     return colorScale1.scale(m.name);
+ };
+ 
     //rendering
     renderAreaD1 = new Plottable.Plot.Line(dataseries1, xScale, yScale);   
     renderAreaD2 = new Plottable.Plot.Line(dataseries2, xScale, yScale);
@@ -60,7 +60,7 @@ function run(div, data, Plottable) {
     renderAreaD3.project("stroke", colorProjector);
     renderAreaD4.project("stroke", colorProjector);
     renderAreas = renderAreaD1.merge(renderAreaD2)
-                        .merge(renderAreaD3).merge(renderAreaD4);
+    .merge(renderAreaD3).merge(renderAreaD4);
     var renderers = [renderAreaD1, renderAreaD2, renderAreaD3, renderAreaD4];
     var renderersIncluded = [1, 1, 1, 1];
 
@@ -79,26 +79,26 @@ function run(div, data, Plottable) {
                 renderersIncluded[index] = 1;
             }
         }
-    );
+        );
     var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
-                                          .addComponent(0,1, legend1);
+    .addComponent(0,1, legend1);
     
     basicTable = new Plottable.Component.Table().addComponent(0,2, titleTable)
-                .addComponent(1, 1, yAxis)
-                .addComponent(1, 2, renderAreas)
-                .addComponent(2, 2, xAxis)
+    .addComponent(1, 1, yAxis)
+    .addComponent(1, 2, renderAreas)
+    .addComponent(2, 2, xAxis)
 
     basicTable.renderTo(svg);
     flipData();
 
-function flipy(element, index, array) {
-  element.y = -1 * element.y;
-}
-function flipx(element, index, array) {
-  element.x = -1 * element.x;
-}
+    function flipy(element, index, array) {
+      element.y = -1 * element.y;
+  }
+  function flipx(element, index, array) {
+      element.x = -1 * element.x;
+  }
 
-function flipData(){
+  function flipData(){
     ds = dataseries4.data();
     ds.forEach(flipy);
     dataseries4.data(ds);  

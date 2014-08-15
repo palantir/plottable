@@ -16,7 +16,7 @@ function _run(div, data, Plottable) {
   areaRenderer.animate(doAnimate);
 
   var areaChart = new Plottable.Component.Table([[yAxis, areaRenderer],
-                                           [null,  xAxis]]);
+   [null,  xAxis]]);
   var svg = div.append("svg").attr("height", 500);
   areaChart.renderTo(svg);
 
@@ -26,8 +26,8 @@ function _run(div, data, Plottable) {
   }
 
   window.xy = new Plottable.Interaction.Click(areaRenderer)
-    .callback(cb)
-    .registerWithComponent();
+  .callback(cb)
+  .registerWithComponent();
 }
 
 function foo() {

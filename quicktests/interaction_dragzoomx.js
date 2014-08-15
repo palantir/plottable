@@ -21,8 +21,8 @@ function run(div, data, Plottable) {
   var renderGroup = new Plottable.Component.Group([gridlines, renderAreaD1]);
 
   var chart = new Plottable.Template.StandardChart()
-                  .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
-                  .renderTo(svg);
+  .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
+  .renderTo(svg);
 
   window.x = new Plottable.Interaction.XDragBox(renderGroup).setupZoomCallback(xScale, null).registerWithComponent();
 

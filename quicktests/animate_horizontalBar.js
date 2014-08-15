@@ -17,7 +17,7 @@ function run(div, data, Plottable) {
   hBarRenderer.animate(doAnimate);
 
   var hBarChart = new Plottable.Component.Table([[yAxis, hBarRenderer],
-                                           [null,  xAxis]]);
+   [null,  xAxis]]);
   hBarChart.renderTo(svg);
 
   cb = function(x, y){
@@ -26,7 +26,7 @@ function run(div, data, Plottable) {
   }  
 
   window.xy = new Plottable.Interaction.Click(hBarRenderer)
-    .callback(cb)
-    .registerWithComponent();
+  .callback(cb)
+  .registerWithComponent();
 
 }
