@@ -7,7 +7,7 @@ export module Animator {
    * The default animator implementation with easing, duration, and delay.
    */
   export class Default implements IPlotAnimator {
-    public _durationMsec: Number = 300;
+    public _durationMsec: Number = 305;
     public _delayMsec: Number    = 0;
     public _easing: string       = "exp-out";
 
