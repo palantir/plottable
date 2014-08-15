@@ -352,7 +352,12 @@ module.exports = function(grunt) {
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
   grunt.registerTask("test", ["dev-compile", "blanket_mocha", "tslint", "ts:verify_d_ts"]);
-  grunt.registerTask("test-travis", ["test", "test-sauce"]);
+  // Disable saucelabs for external pull requests. Check if we can see the SAUCE_USERNAME
+  var travisTests = ["test"];
+  if (process.env.SAUCE_USERNAME) {
+    travisTests.push("test-sauce");
+  }
+  grunt.registerTask("test-travis", travisTests);
   grunt.registerTask("bm", ["blanket_mocha"]);
 
   grunt.registerTask("sublime", [
