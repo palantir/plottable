@@ -26,15 +26,47 @@ describe("Category Axes", () => {
     svg.remove();
   });
 
-  it("width and height account for gutter. ticklength, and padding", () => {
+  it("width and height account for gutter. ticklength, and padding on vertical axes", () => {
     var svg = generateSVG(400, 400);
     var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
     var ca = new Plottable.Axis.Category(xScale, "left");
-    var ca2 = new Plottable.Axis.Category(xScale, "bottom");
     ca.renderTo(svg);
-    ca2.renderTo(svg);
-    assert.operator(ca.width(), ">", ca.tickLabelPadding() + ca.gutter() + ca.tickLength());
-    assert.operator(ca2.height(), ">", ca2.tickLabelPadding() + ca2.gutter() + ca2.tickLength());
+
+    var axisWidth = ca.width();
+    assert.operator(axisWidth, ">", ca.tickLabelPadding() + ca.gutter() + ca.tickLength());
+    ca.tickLabelPadding(ca.tickLabelPadding() + 5);
+    assert.operator(ca.width(), ">", axisWidth);
+
+    axisWidth = ca.width();
+    ca.gutter(ca.gutter() + 5);
+    assert.operator(ca.width(), ">", axisWidth);
+
+    axisWidth = ca.width();
+    ca.tickLength(ca.tickLength() + 5);
+    assert.operator(ca.width(), ">", axisWidth);
+
+    svg.remove();
+  });
+
+  it("width and height account for gutter. ticklength, and padding on horizontal axes", () => {
+    var svg = generateSVG(400, 400);
+    var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+    var ca = new Plottable.Axis.Category(xScale, "bottom");
+    ca.renderTo(svg);
+
+    var axisHeight = ca.height();
+    assert.operator(axisHeight, ">", ca.tickLabelPadding() + ca.gutter() + ca.tickLength());
+    ca.tickLabelPadding(ca.tickLabelPadding() + 5);
+    assert.operator(ca.height(), ">", axisHeight);
+
+    axisHeight = ca.height();
+    ca.gutter(ca.gutter() + 5);
+    assert.operator(ca.width(), ">", axisHeight);
+
+    axisHeight = ca.height();
+    ca.tickLength(ca.tickLength() + 5);
+    assert.operator(ca.height(), ">", axisHeight);
+
     svg.remove();
   });
 });
