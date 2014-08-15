@@ -7,8 +7,13 @@ function run(div, data, Plottable) {
 
 
     //data
+<<<<<<< HEAD
     var dataseries1 = new Plottable.DataSource(data[0]);
     
+=======
+  var dataseries1 = new Plottable.DataSource(data[0]);
+  
+>>>>>>> 6d59614ef2466efcb6cfd0a31c1c5c101d536dc3
   //Axis
   var xScale = new Plottable.Scale.Linear();
   var yScale = new Plottable.Scale.Linear();
@@ -20,13 +25,21 @@ function run(div, data, Plottable) {
     return 25-(d.y*7);
   };
 
+<<<<<<< HEAD
   var colorProjector = function(d, i, m) {
+=======
+ var colorProjector = function(d, i, m) {
+>>>>>>> 6d59614ef2466efcb6cfd0a31c1c5c101d536dc3
     var x = 22;
     x += Math.floor(d.y*30);
     var y = 10;
     y += Math.floor(d.x*40);
     return ("#11" + x + y);
+<<<<<<< HEAD
   };
+=======
+ };
+>>>>>>> 6d59614ef2466efcb6cfd0a31c1c5c101d536dc3
 
   var opacityProjector = function(d, i, m){
     return (d.x);  
@@ -51,4 +64,8 @@ function run(div, data, Plottable) {
   
   basicTable.renderTo(svg);
 
+<<<<<<< HEAD
 }
+=======
+  }
+>>>>>>> 6d59614ef2466efcb6cfd0a31c1c5c101d536dc3
