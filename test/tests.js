@@ -416,9 +416,9 @@ describe("NumericAxis", function () {
         scale.range([0, SVG_WIDTH]);
         var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
         numericAxis.renderTo(svg);
-        var tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        var tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
         assert.operator(tickLabels[0].length, ">=", 2, "at least two tick labels were drawn");
-        var tickMarks = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        var tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
         assert.strictEqual(tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
         var i;
         var markBB;
@@ -431,16 +431,16 @@ describe("NumericAxis", function () {
             assert.closeTo(labelCenter, markCenter, 1, "tick label is centered on mark");
         }
         numericAxis.tickLabelPosition("left");
-        tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
-        tickMarks = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
         for (i = 0; i < tickLabels[0].length; i++) {
             markBB = tickMarks[0][i].getBoundingClientRect();
             labelBB = tickLabels[0][i].getBoundingClientRect();
             assert.operator(labelBB.left, "<=", markBB.right, "tick label is to left of mark");
         }
         numericAxis.tickLabelPosition("right");
-        tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
-        tickMarks = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
         for (i = 0; i < tickLabels[0].length; i++) {
             markBB = tickMarks[0][i].getBoundingClientRect();
             labelBB = tickLabels[0][i].getBoundingClientRect();
@@ -456,9 +456,9 @@ describe("NumericAxis", function () {
         scale.range([0, SVG_HEIGHT]);
         var numericAxis = new Plottable.Axis.Numeric(scale, "left");
         numericAxis.renderTo(svg);
-        var tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        var tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
         assert.operator(tickLabels[0].length, ">=", 2, "at least two tick labels were drawn");
-        var tickMarks = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        var tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
         assert.strictEqual(tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
         var i;
         var markBB;
@@ -471,16 +471,16 @@ describe("NumericAxis", function () {
             assert.closeTo(labelCenter, markCenter, 1, "tick label is centered on mark");
         }
         numericAxis.tickLabelPosition("top");
-        tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
-        tickMarks = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
         for (i = 0; i < tickLabels[0].length; i++) {
             markBB = tickMarks[0][i].getBoundingClientRect();
             labelBB = tickLabels[0][i].getBoundingClientRect();
             assert.operator(labelBB.bottom, "<=", markBB.top, "tick label is above mark");
         }
         numericAxis.tickLabelPosition("bottom");
-        tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
-        tickMarks = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
         for (i = 0; i < tickLabels[0].length; i++) {
             markBB = tickMarks[0][i].getBoundingClientRect();
             labelBB = tickLabels[0][i].getBoundingClientRect();
@@ -497,7 +497,7 @@ describe("NumericAxis", function () {
         var formatter = Plottable.Formatters.fixed(2);
         var numericAxis = new Plottable.Axis.Numeric(scale, "left", formatter);
         numericAxis.renderTo(svg);
-        var tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        var tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
         tickLabels.each(function (d, i) {
             var labelText = d3.select(this).text();
             var formattedValue = formatter(d);
@@ -519,7 +519,7 @@ describe("NumericAxis", function () {
         assert.throws(function () { return numericAxis.showEndTickLabel("top", true); }, Error);
         assert.throws(function () { return numericAxis.showEndTickLabel("bottom", true); }, Error);
         numericAxis.renderTo(svg);
-        var tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        var tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
         var firstLabel = d3.select(tickLabels[0][0]);
         assert.strictEqual(firstLabel.style("visibility"), "hidden", "first label is hidden");
         var lastLabel = d3.select(tickLabels[0][tickLabels[0].length - 1]);
@@ -535,7 +535,7 @@ describe("NumericAxis", function () {
         var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
         numericAxis.showEndTickLabel("left", false).showEndTickLabel("right", false);
         numericAxis.renderTo(svg);
-        var visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
         var numLabels = visibleTickLabels[0].length;
@@ -549,7 +549,7 @@ describe("NumericAxis", function () {
             }
         }
         numericAxis.orient("bottom");
-        visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+        visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
         numLabels = visibleTickLabels[0].length;
@@ -577,11 +577,11 @@ describe("NumericAxis", function () {
         };
         var numericAxis = new Plottable.Axis.Numeric(scale, "left", formatter);
         numericAxis.renderTo(svg);
-        var visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
         var numLabels = visibleTickLabels[0].length;
-        var boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
+        var boundingBox = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
         var labelBox;
         for (var i = 0; i < numLabels; i++) {
             labelBox = visibleTickLabels[0][i].getBoundingClientRect();
@@ -599,11 +599,11 @@ describe("NumericAxis", function () {
         var formatter = Plottable.Formatters.fixed(2);
         var numericAxis = new Plottable.Axis.Numeric(scale, "bottom", formatter);
         numericAxis.renderTo(svg);
-        var visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
         var numLabels = visibleTickLabels[0].length;
-        var boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
+        var boundingBox = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
         var labelBox;
         for (var i = 0; i < numLabels; i++) {
             labelBox = visibleTickLabels[0][i].getBoundingClientRect();
@@ -653,19 +653,19 @@ describe("Gridlines", function () {
         var basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
         basicTable._anchor(svg);
         basicTable._computeLayout();
-        xScale.range([0, xAxis.availableWidth]);
-        yScale.range([yAxis.availableHeight, 0]);
+        xScale.range([0, xAxis._availableWidth]);
+        yScale.range([yAxis._availableHeight, 0]);
         basicTable._render();
-        var xAxisTickMarks = xAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS)[0];
-        var xGridlines = gridlines.element.select(".x-gridlines").selectAll("line")[0];
+        var xAxisTickMarks = xAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS)[0];
+        var xGridlines = gridlines._element.select(".x-gridlines").selectAll("line")[0];
         assert.equal(xAxisTickMarks.length, xGridlines.length, "There is an x gridline for each x tick");
         for (var i = 0; i < xAxisTickMarks.length; i++) {
             var xTickMarkRect = xAxisTickMarks[i].getBoundingClientRect();
             var xGridlineRect = xGridlines[i].getBoundingClientRect();
             assert.closeTo(xTickMarkRect.left, xGridlineRect.left, 1, "x tick and gridline align");
         }
-        var yAxisTickMarks = yAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS)[0];
-        var yGridlines = gridlines.element.select(".y-gridlines").selectAll("line")[0];
+        var yAxisTickMarks = yAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS)[0];
+        var yGridlines = gridlines._element.select(".y-gridlines").selectAll("line")[0];
         assert.equal(yAxisTickMarks.length, yGridlines.length, "There is an x gridline for each x tick");
         for (var j = 0; j < yAxisTickMarks.length; j++) {
             var yTickMarkRect = yAxisTickMarks[j].getBoundingClientRect();
@@ -687,14 +687,14 @@ describe("Labels", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.Component.TitleLabel("A CHART TITLE");
         label.renderTo(svg);
-        var content = label.content;
-        assert.isTrue(label.element.classed("label"), "title element has label css class");
-        assert.isTrue(label.element.classed("title-label"), "title element has title-label css class");
+        var content = label._content;
+        assert.isTrue(label._element.classed("label"), "title element has label css class");
+        assert.isTrue(label._element.classed("title-label"), "title element has title-label css class");
         var textChildren = content.selectAll("text");
         assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
         var text = content.select("text");
         var bbox = Plottable._Util.DOM.getBBox(text);
-        assert.closeTo(bbox.height, label.availableHeight, 0.5, "text height === label.minimumHeight()");
+        assert.closeTo(bbox.height, label._availableHeight, 0.5, "text height === label.minimumHeight()");
         assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
@@ -702,34 +702,34 @@ describe("Labels", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "vertical-left");
         label.renderTo(svg);
-        var content = label.content;
+        var content = label._content;
         var text = content.select("text");
         var textBBox = Plottable._Util.DOM.getBBox(text);
-        assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
+        assertBBoxInclusion(label._element.select(".bounding-box"), text);
+        assert.closeTo(textBBox.height, label._availableWidth, window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
     it("Right-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "vertical-right");
         label.renderTo(svg);
-        var content = label.content;
+        var content = label._content;
         var text = content.select("text");
         var textBBox = Plottable._Util.DOM.getBBox(text);
-        assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
+        assertBBoxInclusion(label._element.select(".bounding-box"), text);
+        assert.closeTo(textBBox.height, label._availableWidth, window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
     it("Label text can be changed after label is created", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.Component.TitleLabel();
         label.renderTo(svg);
-        assert.equal(label.content.select("text").text(), "", "the text defaulted to empty string");
-        assert.equal(label.availableHeight, 0, "rowMin is 0 for empty string");
+        assert.equal(label._content.select("text").text(), "", "the text defaulted to empty string");
+        assert.equal(label._availableHeight, 0, "rowMin is 0 for empty string");
         label.text("hello world");
         label.renderTo(svg);
-        assert.equal(label.content.select("text").text(), "hello world", "the label text updated properly");
-        assert.operator(label.availableHeight, ">", 0, "rowMin is > 0 for non-empty string");
+        assert.equal(label._content.select("text").text(), "hello world", "the label text updated properly");
+        assert.operator(label._availableHeight, ">", 0, "rowMin is > 0 for non-empty string");
         svg.remove();
     });
     it.skip("Superlong text is handled in a sane fashion", function () {
@@ -737,10 +737,10 @@ describe("Labels", function () {
         var svg = generateSVG(svgWidth, 80);
         var label = new Plottable.Component.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
         label.renderTo(svg);
-        var content = label.content;
+        var content = label._content;
         var text = content.select("text");
         var bbox = Plottable._Util.DOM.getBBox(text);
-        assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
+        assert.equal(bbox.height, label._availableHeight, "text height === label.minimumHeight()");
         assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
         svg.remove();
     });
@@ -748,7 +748,7 @@ describe("Labels", function () {
         var svg = generateSVG(10, 10);
         var label = new Plottable.Component.TitleLabel("Yeah, not gonna fit...");
         label.renderTo(svg);
-        var text = label.content.select("text");
+        var text = label._content.select("text");
         assert.equal(text.text(), "", "text was truncated to empty string");
         svg.remove();
     });
@@ -757,9 +757,9 @@ describe("Labels", function () {
         var label = new Plottable.Component.TitleLabel("X");
         var t = new Plottable.Component.Table().addComponent(0, 0, label).addComponent(1, 0, new Plottable.Abstract.Component());
         t.renderTo(svg);
-        var textTranslate = d3.transform(label.content.select("g").attr("transform")).translate;
-        var eleTranslate = d3.transform(label.element.attr("transform")).translate;
-        var textWidth = Plottable._Util.DOM.getBBox(label.content.select("text")).width;
+        var textTranslate = d3.transform(label._content.select("g").attr("transform")).translate;
+        var eleTranslate = d3.transform(label._element.attr("transform")).translate;
+        var textWidth = Plottable._Util.DOM.getBBox(label._content.select("text")).width;
         assert.closeTo(eleTranslate[0] + textTranslate[0] + textWidth / 2, 200, 5, "label is centered");
         svg.remove();
     });
@@ -768,7 +768,7 @@ describe("Labels", function () {
         var label = new Plottable.Component.TitleLabel("foo");
         label.renderTo(svg);
         label.text("");
-        assert.equal(label.availableWidth, 0, "width updated to 0");
+        assert.equal(label._availableWidth, 0, "width updated to 0");
         svg.remove();
     });
     it("unsupported alignments and orientations are unsupported", function () {
@@ -789,7 +789,7 @@ describe("Legends", function () {
     it("a basic legend renders", function () {
         color.domain(["foo", "bar", "baz"]);
         legend.renderTo(svg);
-        var rows = legend.content.selectAll(".legend-row");
+        var rows = legend._content.selectAll(".legend-row");
         assert.lengthOf(rows[0], 3, "there are 3 legend entries");
         rows.each(function (d, i) {
             assert.equal(d, color.domain()[i], "the data is set properly");
@@ -807,22 +807,22 @@ describe("Legends", function () {
         assert.equal(legend._requestedSpace(200, 200).height, 0, "there is no requested height when domain is empty");
         color.domain(["foo", "bar"]);
         var height1 = legend._requestedSpace(400, 400).height;
-        var actualHeight1 = legend.availableHeight;
+        var actualHeight1 = legend._availableHeight;
         assert.operator(height1, ">", 0, "changing the domain gives a positive height");
         color.domain(["foo", "bar", "baz"]);
         assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
-        var actualHeight2 = legend.availableHeight;
+        var actualHeight2 = legend._availableHeight;
         assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
-        var numRows = legend.content.selectAll(".legend-row")[0].length;
+        var numRows = legend._content.selectAll(".legend-row")[0].length;
         assert.equal(numRows, 3, "there are 3 rows");
         svg.remove();
     });
     it("a legend with many labels does not overflow vertically", function () {
         color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
         legend.renderTo(svg);
-        var contentBBox = Plottable._Util.DOM.getBBox(legend.content);
+        var contentBBox = Plottable._Util.DOM.getBBox(legend._content);
         var contentBottomEdge = contentBBox.y + contentBBox.height;
-        var bboxBBox = Plottable._Util.DOM.getBBox(legend.element.select(".bounding-box"));
+        var bboxBBox = Plottable._Util.DOM.getBBox(legend._element.select(".bounding-box"));
         var bboxBottomEdge = bboxBBox.y + bboxBBox.height;
         assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
         svg.remove();
@@ -831,10 +831,10 @@ describe("Legends", function () {
         color.domain(["foooboooloonoogoorooboopoo"]);
         svg.attr("width", 100);
         legend.renderTo(svg);
-        var text = legend.content.select("text").text();
+        var text = legend._content.select("text").text();
         assert.notEqual(text, "foooboooloonoogoorooboopoo", "the text was truncated");
-        var rightEdge = legend.content.select("text").node().getBoundingClientRect().right;
-        var bbox = legend.element.select(".bounding-box");
+        var rightEdge = legend._content.select("text").node().getBoundingClientRect().right;
+        var bbox = legend._element.select(".bounding-box");
         var rightEdgeBBox = bbox.node().getBoundingClientRect().right;
         assert.operator(rightEdge, "<=", rightEdgeBBox, "the long text did not overflow the legend");
         svg.remove();
@@ -842,10 +842,10 @@ describe("Legends", function () {
     it("calling legend.render multiple times does not add more elements", function () {
         color.domain(["foo", "bar", "baz"]);
         legend.renderTo(svg);
-        var numRows = legend.content.selectAll(".legend-row")[0].length;
+        var numRows = legend._content.selectAll(".legend-row")[0].length;
         assert.equal(numRows, 3, "there are 3 legend rows initially");
         legend._render();
-        numRows = legend.content.selectAll(".legend-row")[0].length;
+        numRows = legend._content.selectAll(".legend-row")[0].length;
         assert.equal(numRows, 3, "there are 3 legend rows after second render");
         svg.remove();
     });
@@ -855,14 +855,14 @@ describe("Legends", function () {
         var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
         color.domain(newDomain);
         var newDomainActualOrder = ["foo", "baz", "mushu", "persei", "eight"];
-        legend.content.selectAll(".legend-row").each(function (d, i) {
+        legend._content.selectAll(".legend-row").each(function (d, i) {
             assert.equal(d, newDomainActualOrder[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
             var fill = d3.select(this).select("circle").attr("fill");
             assert.equal(fill, color.scale(d), "the fill was set properly");
         });
-        assert.lengthOf(legend.content.selectAll(".legend-row")[0], 5, "there are the right number of legend elements");
+        assert.lengthOf(legend._content.selectAll(".legend-row")[0], 5, "there are the right number of legend elements");
         svg.remove();
     });
     it("legend.scale() replaces domain", function () {
@@ -872,7 +872,7 @@ describe("Legends", function () {
         var newColorScale = new Plottable.Scale.Color("20");
         newColorScale.domain(newDomain);
         legend.scale(newColorScale);
-        legend.content.selectAll(".legend-row").each(function (d, i) {
+        legend._content.selectAll(".legend-row").each(function (d, i) {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
@@ -890,7 +890,7 @@ describe("Legends", function () {
         legend.scale(newColorScale);
         var newDomain = ["a", "foo", "d"];
         newColorScale.domain(newDomain);
-        legend.content.selectAll(".legend-row").each(function (d, i) {
+        legend._content.selectAll(".legend-row").each(function (d, i) {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
@@ -902,11 +902,11 @@ describe("Legends", function () {
     it("icon radius is not too small or too big", function () {
         color.domain(["foo"]);
         legend.renderTo(svg);
-        var style = legend.element.append("style");
+        var style = legend._element.append("style");
         style.attr("type", "text/css");
         function verifyCircleHeight() {
-            var text = legend.content.select("text");
-            var circle = legend.content.select("circle");
+            var text = legend._content.select("text");
+            var circle = legend._content.select("circle");
             var textHeight = Plottable._Util.DOM.getBBox(text).height;
             var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
             assert.operator(circleHeight, "<", textHeight, "icons are too big. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
@@ -935,7 +935,7 @@ describe("Legends", function () {
             assert.equal(selection.classed("toggled-off"), !b, msg);
         }
         function getSelection(datum) {
-            var selection = toggleLegend.content.selectAll(".legend-row").filter(function (d, i) { return d === datum; });
+            var selection = toggleLegend._content.selectAll(".legend-row").filter(function (d, i) { return d === datum; });
             return selection;
         }
         function verifyEntry(datum, b, msg) {
@@ -947,7 +947,7 @@ describe("Legends", function () {
         it("basic initialization test", function () {
             color.domain(["a", "b", "c", "d", "e"]);
             toggleLegend.renderTo(svg);
-            toggleLegend.content.selectAll(".legend-row").each(function (d, i) {
+            toggleLegend._content.selectAll(".legend-row").each(function (d, i) {
                 var selection = d3.select(this);
                 verifyState(selection, true);
             });
@@ -956,7 +956,7 @@ describe("Legends", function () {
         it("basic toggling test", function () {
             color.domain(["a"]);
             toggleLegend.renderTo(svg);
-            toggleLegend.content.selectAll(".legend-row").each(function (d, i) {
+            toggleLegend._content.selectAll(".legend-row").each(function (d, i) {
                 var selection = d3.select(this);
                 selection.on("click")(d, i);
                 verifyState(selection, false);
@@ -1076,7 +1076,7 @@ describe("Legends", function () {
             assert.equal(selection.classed("focus"), false, msg);
         }
         function getSelection(datum) {
-            var selection = hoverLegend.content.selectAll(".legend-row").filter(function (d, i) { return d === datum; });
+            var selection = hoverLegend._content.selectAll(".legend-row").filter(function (d, i) { return d === datum; });
             return selection;
         }
         function verifyFocus(datum, b, msg) {
@@ -1094,7 +1094,7 @@ describe("Legends", function () {
         it("basic initialization test", function () {
             color.domain(["a", "b", "c", "d", "e"]);
             hoverLegend.renderTo(svg);
-            hoverLegend.content.selectAll(".legend-row").each(function (d, i) {
+            hoverLegend._content.selectAll(".legend-row").each(function (d, i) {
                 verifyEmpty(d);
             });
             svg.remove();
@@ -1234,7 +1234,7 @@ describe("Plots", function () {
             var r = new Plottable.Abstract.Plot(d1);
             r._anchor(svg);
             r._computeLayout();
-            var renderArea = r.content.select(".render-area");
+            var renderArea = r._content.select(".render-area");
             assert.isNotNull(renderArea.node(), "there is a render-area");
             svg.remove();
         });
@@ -1809,7 +1809,7 @@ describe("Plots", function () {
                 renderer.animate(false);
                 var yAxis = new Plottable.Axis.Category(yScale, "left");
                 var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
-                axisWidth = yAxis.availableWidth;
+                axisWidth = yAxis._availableWidth;
                 bandWidth = yScale.rangeBand();
                 xScale.domainer(xScale.domainer().pad(0));
             });
@@ -2106,7 +2106,7 @@ describe("Plots", function () {
             renderer.baseline(0);
             var xAxis = new Plottable.Axis.Category(xScale, "bottom");
             var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
-            axisHeight = xAxis.availableHeight;
+            axisHeight = xAxis._availableHeight;
             bandWidth = xScale.rangeBand();
         });
         beforeEach(function () {
@@ -2186,7 +2186,7 @@ describe("Plots", function () {
             renderer.baseline(0);
             var xAxis = new Plottable.Axis.Category(xScale, "bottom");
             var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
-            axisHeight = xAxis.availableHeight;
+            axisHeight = xAxis._availableHeight;
             bandWidth = xScale.rangeBand();
         });
         beforeEach(function () {
@@ -2416,9 +2416,9 @@ describe("ComponentGroups", function () {
         var svg = generateSVG();
         cg._anchor(svg);
         cg._computeLayout(50, 50, 350, 350);
-        var cgTranslate = d3.transform(cg.element.attr("transform")).translate;
-        var c1Translate = d3.transform(c1.element.attr("transform")).translate;
-        var c2Translate = d3.transform(c2.element.attr("transform")).translate;
+        var cgTranslate = d3.transform(cg._element.attr("transform")).translate;
+        var c1Translate = d3.transform(c1._element.attr("transform")).translate;
+        var c2Translate = d3.transform(c2._element.attr("transform")).translate;
         assert.equal(cgTranslate[0], 50, "componentGroup has 50 xOffset");
         assert.equal(cgTranslate[1], 50, "componentGroup has 50 yOffset");
         assert.equal(c1Translate[0], 0, "componentGroup has 0 xOffset");
@@ -2542,7 +2542,7 @@ describe("ComponentGroups", function () {
 
 var assert = chai.assert;
 function assertComponentXY(component, x, y, message) {
-    var translate = d3.transform(component.element.attr("transform")).translate;
+    var translate = d3.transform(component._element.attr("transform")).translate;
     var xActual = translate[0];
     var yActual = translate[1];
     assert.equal(xActual, x, "X: " + message);
@@ -2560,7 +2560,7 @@ describe("Component behavior", function () {
     describe("anchor", function () {
         it("anchoring works as expected", function () {
             c._anchor(svg);
-            assert.equal(c.element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
+            assert.equal(c._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
             assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
             svg.remove();
         });
@@ -2568,7 +2568,7 @@ describe("Component behavior", function () {
             c._anchor(svg);
             var svg2 = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             c._anchor(svg2);
-            assert.equal(c.element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
+            assert.equal(c._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
             assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
             svg.remove();
             svg2.remove();
@@ -2578,14 +2578,14 @@ describe("Component behavior", function () {
         it("computeLayout defaults and updates intelligently", function () {
             c._anchor(svg);
             c._computeLayout();
-            assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
-            assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
+            assert.equal(c._availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
+            assert.equal(c._availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
             assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
             svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
             c._computeLayout();
-            assert.equal(c.availableWidth, 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
-            assert.equal(c.availableHeight, 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
+            assert.equal(c._availableWidth, 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
+            assert.equal(c._availableHeight, 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
             assert.equal(c.xOrigin, 0, "xOrigin is still 0");
             assert.equal(c.yOrigin, 0, "yOrigin is still 0");
             svg.remove();
@@ -2597,20 +2597,20 @@ describe("Component behavior", function () {
             svg.attr("width", null).attr("height", null);
             c._anchor(svg);
             c._computeLayout();
-            assert.equal(c.availableWidth, 400, "defaults to width of parent if width is not specified on <svg>");
-            assert.equal(c.availableHeight, 200, "defaults to height of parent if width is not specified on <svg>");
+            assert.equal(c._availableWidth, 400, "defaults to width of parent if width is not specified on <svg>");
+            assert.equal(c._availableHeight, 200, "defaults to height of parent if width is not specified on <svg>");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
             assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
             svg.style("width", "50%").style("height", "50%");
             c._computeLayout();
-            assert.equal(c.availableWidth, 200, "computeLayout defaulted width to svg width");
-            assert.equal(c.availableHeight, 100, "computeLayout defaulted height to svg height");
+            assert.equal(c._availableWidth, 200, "computeLayout defaulted width to svg width");
+            assert.equal(c._availableHeight, 100, "computeLayout defaulted height to svg height");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
             assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
             svg.style("width", "25%").style("height", "25%");
             c._computeLayout();
-            assert.equal(c.availableWidth, 100, "computeLayout updated width to new svg width");
-            assert.equal(c.availableHeight, 50, "computeLayout updated height to new svg height");
+            assert.equal(c._availableWidth, 100, "computeLayout updated width to new svg width");
+            assert.equal(c._availableHeight, 50, "computeLayout updated height to new svg height");
             assert.equal(c.xOrigin, 0, "xOrigin is still 0");
             assert.equal(c.yOrigin, 0, "yOrigin is still 0");
             parent.style("width", "auto");
@@ -2635,16 +2635,16 @@ describe("Component behavior", function () {
             var height = 200;
             c._anchor(svg);
             c._computeLayout(xOff, yOff, width, height);
-            var translate = getTranslate(c.element);
+            var translate = getTranslate(c._element);
             assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
-            assert.equal(c.availableWidth, width, "the width set properly");
-            assert.equal(c.availableHeight, height, "the height set propery");
+            assert.equal(c._availableWidth, width, "the width set properly");
+            assert.equal(c._availableHeight, height, "the height set propery");
             svg.remove();
         });
     });
     it("subelement containers are ordered properly", function () {
         c.renderTo(svg);
-        var gs = c.element.selectAll("g");
+        var gs = c._element.selectAll("g");
         var g0 = d3.select(gs[0][0]);
         var g1 = d3.select(gs[0][1]);
         var g2 = d3.select(gs[0][2]);
@@ -2709,7 +2709,7 @@ describe("Component behavior", function () {
         c._render();
         var expectedClipPathURL = "url(#clipPath" + expectedClipPathID + ")";
         var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
-        assert.isTrue(normalizeClipPath(c.element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
+        assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
         var clipRect = c.boxContainer.select(".clip-rect");
         assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
         assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");
@@ -2727,7 +2727,7 @@ describe("Component behavior", function () {
         assert.throws(function () { return c.addBox("pre-anchor"); }, Error, "Adding boxes before anchoring is currently disallowed");
         c.renderTo(svg);
         c.addBox("post-anchor");
-        var e = c.element;
+        var e = c._element;
         var boxContainer = e.select(".box-container");
         var boxStrings = [".bounding-box", ".post-anchor"];
         boxStrings.forEach(function (s) {
@@ -2830,12 +2830,12 @@ describe("Component behavior", function () {
         var c = makeFixedSizeComponent(10, 10);
         cg._addComponent(c);
         cg.renderTo(svg);
-        assert.equal(cg.availableHeight, 10, "availableHeight initially 10 for fixed-size component");
-        assert.equal(cg.availableWidth, 10, "availableWidth initially 10 for fixed-size component");
+        assert.equal(cg._availableHeight, 10, "availableHeight initially 10 for fixed-size component");
+        assert.equal(cg._availableWidth, 10, "availableWidth initially 10 for fixed-size component");
         fixComponentSize(c, 50, 50);
         c._invalidateLayout();
-        assert.equal(cg.availableHeight, 50, "invalidateLayout propagated to parent and caused resized height");
-        assert.equal(cg.availableWidth, 50, "invalidateLayout propagated to parent and caused resized width");
+        assert.equal(cg._availableHeight, 50, "invalidateLayout propagated to parent and caused resized height");
+        assert.equal(cg._availableWidth, 50, "invalidateLayout propagated to parent and caused resized width");
         svg.remove();
     });
     it("components can be detached even if not anchored", function () {
@@ -2972,7 +2972,7 @@ describe("Tables", function () {
         var components = tableAndcomponents.components;
         var svg = generateSVG();
         table.renderTo(svg);
-        var elements = components.map(function (r) { return r.element; });
+        var elements = components.map(function (r) { return r._element; });
         var translates = elements.map(function (e) { return getTranslate(e); });
         assert.deepEqual(translates[0], [0, 0], "first element is centered at origin");
         assert.deepEqual(translates[1], [200, 0], "second element is located properly");
@@ -2992,7 +2992,7 @@ describe("Tables", function () {
         table.padding(5, 5);
         var svg = generateSVG(415, 415);
         table.renderTo(svg);
-        var elements = components.map(function (r) { return r.element; });
+        var elements = components.map(function (r) { return r._element; });
         var translates = elements.map(function (e) { return getTranslate(e); });
         var bboxes = elements.map(function (e) { return Plottable._Util.DOM.getBBox(e); });
         assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
@@ -3015,7 +3015,7 @@ describe("Tables", function () {
         var table = new Plottable.Component.Table([[null, c1, null], [c3, c4, c5], [null, c7, null]]);
         var components = [c1, c3, c4, c5, c7];
         table.renderTo(svg);
-        var elements = components.map(function (r) { return r.element; });
+        var elements = components.map(function (r) { return r._element; });
         var translates = elements.map(function (e) { return getTranslate(e); });
         var bboxes = elements.map(function (e) { return Plottable._Util.DOM.getBBox(e); });
         assert.deepEqual(translates[0], [50, 0], "top axis translate");
@@ -4460,7 +4460,7 @@ describe("Interactions", function () {
             var yDomainBefore = yScale.domain();
             var interaction = new Plottable.Interaction.PanZoom(renderer, xScale, yScale);
             interaction.registerWithComponent();
-            var hb = renderer.element.select(".hit-box").node();
+            var hb = renderer._element.select(".hit-box").node();
             var dragDistancePixelX = 10;
             var dragDistancePixelY = 20;
             $(hb).simulate("drag", {
@@ -4535,7 +4535,7 @@ describe("Interactions", function () {
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
             var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
-            var dragBox = renderer.backgroundContainer.select(dragBoxClass);
+            var dragBox = renderer._backgroundContainer.select(dragBoxClass);
             assert.isNotNull(dragBox, "the dragbox was created");
             var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
             var expectedStartPosition = { x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY) };
@@ -4599,7 +4599,7 @@ describe("Interactions", function () {
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
             var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
-            var dragBox = renderer.backgroundContainer.select(dragBoxClass);
+            var dragBox = renderer._backgroundContainer.select(dragBoxClass);
             assert.isNotNull(dragBox, "the dragbox was created");
             var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
             var expectedStartPosition = { x: 0, y: Math.min(dragstartY, dragendY) };

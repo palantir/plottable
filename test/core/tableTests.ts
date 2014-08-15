@@ -96,7 +96,7 @@ describe("Tables", () => {
     var svg = generateSVG();
     table.renderTo(svg);
 
-    var elements = components.map((r) => r.element);
+    var elements = components.map((r) => r._element);
     var translates = elements.map((e) => getTranslate(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered at origin");
     assert.deepEqual(translates[1], [200, 0], "second element is located properly");
@@ -119,7 +119,7 @@ describe("Tables", () => {
     var svg = generateSVG(415, 415);
     table.renderTo(svg);
 
-    var elements = components.map((r) => r.element);
+    var elements = components.map((r) => r._element);
     var translates = elements.map((e) => getTranslate(e));
     var bboxes = elements.map((e) => Plottable._Util.DOM.getBBox(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
@@ -152,7 +152,7 @@ describe("Tables", () => {
 
     table.renderTo(svg);
 
-    var elements = components.map((r) => r.element);
+    var elements = components.map((r) => r._element);
     var translates = elements.map((e) => getTranslate(e));
     var bboxes = elements.map((e) => Plottable._Util.DOM.getBBox(e));
     // test the translates

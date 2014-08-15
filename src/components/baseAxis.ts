@@ -122,19 +122,19 @@ export module Abstract {
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       if (this._isHorizontal()) {
-        this._scale.range([0, this.availableWidth]);
+        this._scale.range([0, this._availableWidth]);
       } else {
-        this._scale.range([this.availableHeight, 0]);
+        this._scale.range([this._availableHeight, 0]);
       }
     }
 
     public _setup() {
       super._setup();
-      this._tickMarkContainer = this.content.append("g")
+      this._tickMarkContainer = this._content.append("g")
                                             .classed(Axis.TICK_MARK_CLASS + "-container", true);
-      this._tickLabelContainer = this.content.append("g")
+      this._tickLabelContainer = this._content.append("g")
                                              .classed(Axis.TICK_LABEL_CLASS + "-container", true);
-      this._baseline = this.content.append("line").classed("baseline", true);
+      this._baseline = this._content.append("line").classed("baseline", true);
     }
 
     /*
@@ -168,23 +168,23 @@ export module Abstract {
 
       switch(this._orientation) {
         case "bottom":
-          baselineAttrHash.x2 = this.availableWidth;
+          baselineAttrHash.x2 = this._availableWidth;
           break;
 
         case "top":
-          baselineAttrHash.x2 = this.availableWidth;
-          baselineAttrHash.y1 = this.availableHeight;
-          baselineAttrHash.y2 = this.availableHeight;
+          baselineAttrHash.x2 = this._availableWidth;
+          baselineAttrHash.y1 = this._availableHeight;
+          baselineAttrHash.y2 = this._availableHeight;
           break;
 
         case "left":
-          baselineAttrHash.x1 = this.availableWidth;
-          baselineAttrHash.x2 = this.availableWidth;
-          baselineAttrHash.y2 = this.availableHeight;
+          baselineAttrHash.x1 = this._availableWidth;
+          baselineAttrHash.x2 = this._availableWidth;
+          baselineAttrHash.y2 = this._availableHeight;
           break;
 
         case "right":
-          baselineAttrHash.y2 = this.availableHeight;
+          baselineAttrHash.y2 = this._availableHeight;
           break;
       }
 
@@ -216,13 +216,13 @@ export module Abstract {
           break;
 
         case "top":
-          tickMarkAttrHash["y1"] = this.availableHeight;
-          tickMarkAttrHash["y2"] = this.availableHeight - tickLength;
+          tickMarkAttrHash["y1"] = this._availableHeight;
+          tickMarkAttrHash["y2"] = this._availableHeight - tickLength;
           break;
 
         case "left":
-          tickMarkAttrHash["x1"] = this.availableWidth;
-          tickMarkAttrHash["x2"] = this.availableWidth - tickLength;
+          tickMarkAttrHash["x1"] = this._availableWidth;
+          tickMarkAttrHash["x2"] = this._availableWidth - tickLength;
           break;
 
         case "right":
@@ -255,7 +255,7 @@ export module Abstract {
     public width(w: any): Axis;
     public width(w?: any): any {
       if (w == null) {
-        return this.availableWidth;
+        return this._availableWidth;
       } else {
         if (this._isHorizontal()) {
           throw new Error("width cannot be set on a horizontal Axis");
@@ -285,7 +285,7 @@ export module Abstract {
     public height(h: any): Axis;
     public height(h?: any): any {
       if (h == null) {
-        return this.availableHeight;
+        return this._availableHeight;
       } else {
         if (!this._isHorizontal()) {
           throw new Error("height cannot be set on a vertical Axis");
@@ -501,14 +501,14 @@ export module Abstract {
     }
 
     public _hideEndTickLabels() {
-      var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
+      var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
 
       var isInsideBBox = (tickBox: ClientRect) => {
         return (
           Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
           Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
-          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.availableWidth) &&
-          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.availableHeight)
+          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this._availableWidth) &&
+          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this._availableHeight)
         );
       };
 

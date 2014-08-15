@@ -170,7 +170,7 @@ export module Abstract {
 
     public _setup() {
       super._setup();
-      this.renderArea = this.content.append("g").classed("render-area", true);
+      this.renderArea = this._content.append("g").classed("render-area", true);
     }
 
     /**

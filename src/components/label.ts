@@ -65,7 +65,7 @@ export module Component {
 
     public _setup() {
       super._setup();
-      this.textContainer = this.content.append("g");
+      this.textContainer = this._content.append("g");
       this.measurer = _Util.Text.getTextMeasurer(this.textContainer.append("text"));
       this.text(this._text);
     }
@@ -96,13 +96,13 @@ export module Component {
     public _doRender() {
       super._doRender();
       this.textContainer.text("");
-      var dimension = this.orientation === "horizontal" ? this.availableWidth : this.availableHeight;
+      var dimension = this.orientation === "horizontal" ? this._availableWidth : this._availableHeight;
       var truncatedText = _Util.Text.getTruncatedText(this._text, dimension, this.measurer);
       if (this.orientation === "horizontal") {
-        _Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.availableWidth, this.availableHeight,
+        _Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this._availableWidth, this._availableHeight,
                                         this.xAlignment, this.yAlignment);
       } else {
-        _Util.Text.writeLineVertically(truncatedText, this.textContainer, this.availableWidth, this.availableHeight,
+        _Util.Text.writeLineVertically(truncatedText, this.textContainer, this._availableWidth, this._availableHeight,
                                         this.xAlignment, this.yAlignment, this.orientation);
       }
     }

@@ -49,8 +49,8 @@ export module Abstract {
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-      this.xScale.range([0, this.availableWidth]);
-      this.yScale.range([this.availableHeight, 0]);
+      this.xScale.range([0, this._availableWidth]);
+      this.yScale.range([this._availableHeight, 0]);
     }
 
     public _updateXDomainer() {

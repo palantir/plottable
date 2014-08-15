@@ -141,14 +141,14 @@ export module Component {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
-      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.availableHeight / textHeight));
+      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this._availableHeight / textHeight));
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
       var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend.MARGIN) / textHeight));
-      var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+      var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var measure = _Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
       var maxWidth = d3.max(this.colorScale.domain(), (d: string) => measure(d).width);
       fakeLegendEl.remove();
@@ -165,7 +165,7 @@ export module Component {
 
     private measureTextHeight(): number {
       // note: can't be called before anchoring atm
-      var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+      var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var textHeight = _Util.Text.getTextMeasurer(fakeLegendEl.append("text"))(_Util.Text.HEIGHT_TEXT).height;
       // HACKHACK
       if (textHeight === 0) {
@@ -179,9 +179,9 @@ export module Component {
       super._doRender();
       var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
       var textHeight = this.measureTextHeight();
-      var availableWidth  = this.availableWidth  - textHeight - Legend.MARGIN;
+      var availableWidth  = this._availableWidth  - textHeight - Legend.MARGIN;
       var r = textHeight * 0.3;
-      var legend: D3.UpdateSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, (d) => d);
+      var legend: D3.UpdateSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, (d) => d);
       var legendEnter = legend.enter()
           .append("g").classed(Legend.SUBELEMENT_CLASS, true);
 
@@ -218,7 +218,7 @@ export module Component {
       if (!this._isSetup) {
         return;
       }
-      var dataSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS);
+      var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
       if (this._hoverCallback != null) {
         // tag the element that is being hovered over with the class "focus"
         // this callback will trigger with the specific element being hovered over.
@@ -256,7 +256,7 @@ export module Component {
       if (!this._isSetup) {
         return;
       }
-      var dataSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS);
+      var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
       if (this._hoverCallback != null) {
         dataSelection.classed("focus", (d: string) => this.datumCurrentlyFocusedOn === d);
         dataSelection.classed("hover", this.datumCurrentlyFocusedOn !== undefined);

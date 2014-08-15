@@ -4,24 +4,24 @@ module Plottable {
 export module Abstract {
   export class Component extends PlottableObject {
 
-    public element: D3.Selection;
-    public content: D3.Selection;
+    public _element: D3.Selection;
+    public _content: D3.Selection;
     private hitBox: D3.Selection;
     private interactionsToRegister: Interaction[] = [];
     private boxes: D3.Selection[] = [];
     private boxContainer: D3.Selection;
-    public backgroundContainer: D3.Selection;
-    public foregroundContainer: D3.Selection;
+    public _backgroundContainer: D3.Selection;
+    public _foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
 
     private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
     public _parent: ComponentContainer;
 
-    public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
-    public availableHeight: number;
-    public xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
-    public yOrigin: number;
+    public _availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
+    public _availableHeight: number;
+    private xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
+    private yOrigin: number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
     public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
@@ -55,11 +55,11 @@ export module Abstract {
         this.isTopLevelComponent = true;
       }
 
-      if (this.element != null) {
+      if (this._element != null) {
         // reattach existing element
-        element.node().appendChild(this.element.node());
+        element.node().appendChild(this._element.node());
       } else {
-        this.element = element.append("g");
+        this._element = element.append("g");
         this._setup();
       }
       this._isAnchored = true;
@@ -75,14 +75,14 @@ export module Abstract {
         return;
       }
       this.cssClasses.forEach((cssClass: string) => {
-        this.element.classed(cssClass, true);
+        this._element.classed(cssClass, true);
       });
       this.cssClasses = null;
 
-      this.backgroundContainer = this.element.append("g").classed("background-container", true);
-      this.content = this.element.append("g").classed("content", true);
-      this.foregroundContainer = this.element.append("g").classed("foreground-container", true);
-      this.boxContainer = this.element.append("g").classed("box-container", true);
+      this._backgroundContainer = this._element.append("g").classed("background-container", true);
+      this._content = this._element.append("g").classed("content", true);
+      this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
+      this.boxContainer = this._element.append("g").classed("box-container", true);
 
       if (this.clipPathEnabled) {
         this.generateClipPath();
@@ -114,7 +114,7 @@ export module Abstract {
      */
     public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
       if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
-        if (this.element == null) {
+        if (this._element == null) {
           throw new Error("anchor must be called before computeLayout");
         } else if (this.isTopLevelComponent) {
           // we are the root node, retrieve height/width from root SVG
@@ -158,10 +158,10 @@ export module Abstract {
         availableHeight = Math.min(availableHeight, requestedSpace.height);
       }
 
-      this.availableWidth   = availableWidth ;
-      this.availableHeight = availableHeight;
-      this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth ).attr("height", this.availableHeight));
+      this._availableWidth   = availableWidth ;
+      this._availableHeight = availableHeight;
+      this._element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
+      this.boxes.forEach((b: D3.Selection) => b.attr("width", this._availableWidth ).attr("height", this._availableHeight));
     }
 
     /**
@@ -336,7 +336,7 @@ export module Abstract {
     }
 
     private addBox(className?: string, parentElement?: D3.Selection) {
-      if (this.element == null) {
+      if (this._element == null) {
         throw new Error("Adding boxes before anchoring is currently disallowed");
       }
       var parentElement = parentElement == null ? this.boxContainer : parentElement;
@@ -344,15 +344,15 @@ export module Abstract {
       if (className != null) {box.classed(className, true);};
 
       this.boxes.push(box);
-      if (this.availableWidth  != null && this.availableHeight != null) {
-        box.attr("width", this.availableWidth ).attr("height", this.availableHeight);
+      if (this._availableWidth  != null && this._availableHeight != null) {
+        box.attr("width", this._availableWidth ).attr("height", this._availableHeight);
       }
       return box;
     }
 
     private generateClipPath() {
       // The clip path will prevent content from overflowing its component space.
-      this.element.attr("clip-path", "url(#clipPath" + this._plottableID + ")");
+      this._element.attr("clip-path", "url(#clipPath" + this._plottableID + ")");
       var clipPathParent = this.boxContainer.append("clipPath")
                                       .attr("id", "clipPath" + this._plottableID);
       this.addBox("clip-rect", clipPathParent);
@@ -368,7 +368,7 @@ export module Abstract {
       // Interactions can be registered before or after anchoring. If registered before, they are
       // pushed to this.interactionsToRegister and registered during anchoring. If after, they are
       // registered immediately
-      if (this.element != null) {
+      if (this._element != null) {
         if (this.hitBox == null) {
             this.hitBox = this.addBox("hit-box");
             this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
@@ -394,16 +394,16 @@ export module Abstract {
       if (addClass == null) {
         if (cssClass == null) {
           return false;
-        } else if (this.element == null) {
+        } else if (this._element == null) {
           return (this.cssClasses.indexOf(cssClass) !== -1);
         } else {
-          return this.element.classed(cssClass);
+          return this._element.classed(cssClass);
         }
       } else {
         if (cssClass == null) {
           return this;
         }
-        if (this.element == null) {
+        if (this._element == null) {
           var classIndex = this.cssClasses.indexOf(cssClass);
           if (addClass && classIndex === -1) {
             this.cssClasses.push(cssClass);
@@ -411,7 +411,7 @@ export module Abstract {
             this.cssClasses.splice(classIndex, 1);
           }
         } else {
-          this.element.classed(cssClass, addClass);
+          this._element.classed(cssClass, addClass);
         }
         return this;
       }
@@ -475,7 +475,7 @@ export module Abstract {
      */
     public detach() {
       if (this._isAnchored) {
-        this.element.remove();
+        this._element.remove();
       }
       if (this._parent != null) {
         this._parent._removeComponent(this);

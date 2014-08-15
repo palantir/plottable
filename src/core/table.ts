@@ -251,7 +251,7 @@ export module Component {
     // xOffset is relative to parent element, not absolute
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth , availableHeight);
-      var layout = this.iterateLayout(this.availableWidth , this.availableHeight);
+      var layout = this.iterateLayout(this._availableWidth , this._availableHeight);
 
       var sumPair = (p: number[]) => p[0] + p[1];
       var rowHeights = _Util.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);

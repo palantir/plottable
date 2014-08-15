@@ -38,8 +38,8 @@ export module Interaction {
     }
 
     public _dragstart(){
-      var availableWidth  = this.componentToListenTo.availableWidth;
-      var availableHeight = this.componentToListenTo.availableHeight;
+      var availableWidth  = this.componentToListenTo._availableWidth;
+      var availableHeight = this.componentToListenTo._availableHeight;
       // the constraint functions ensure that the selection rectangle will not exceed the hit box
       var constraintFunction = (min: number, max: number) => (x: number) => Math.min(Math.max(x, min), max);
       this.constrainX = constraintFunction(0, availableWidth );

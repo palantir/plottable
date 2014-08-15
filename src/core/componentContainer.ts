@@ -11,7 +11,7 @@ export module Abstract {
 
     public _anchor(element: D3.Selection) {
       super._anchor(element);
-      this._components.forEach((c) => c._anchor(this.content));
+      this._components.forEach((c) => c._anchor(this._content));
     }
 
     public _render() {
@@ -38,7 +38,7 @@ export module Abstract {
       }
       c._parent = this;
       if (this._isAnchored) {
-        c._anchor(this.content);
+        c._anchor(this._content);
       }
       this._invalidateLayout();
       return true;
