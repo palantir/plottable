@@ -5187,7 +5187,7 @@ var Plottable;
     (function (Animator) {
         var Default = (function () {
             function Default() {
-                this._durationMsec = 300;
+                this._durationMsec = 305;
                 this._delayMsec = 0;
                 this._easing = "exp-out";
             }
