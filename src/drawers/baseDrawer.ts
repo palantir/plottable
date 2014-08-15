@@ -4,6 +4,7 @@ module Plottable {
 export module Abstract {
   export class _Drawer {
     public renderArea: D3.Selection;
+    public key: string;
 
     /**
      * Creates a Drawer
@@ -11,7 +12,8 @@ export module Abstract {
      * @constructor
      * @param{string} key The key associated with this Drawer
      */
-    constructor(public key: string) {
+    constructor(key: string) {
+        this.key = key;
     }
 
     /**

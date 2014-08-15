@@ -17,7 +17,6 @@ export module Plot {
 
     public _addDataset(key: string, dataset: any) {
       super._addDataset(key, dataset);
-      // HACKHACK: this seems rather inefficient, but we don't want to call this.stack() in paint() (#821)
       this.stackedData = this.stack(this._projectors["y"].accessor);
     }
 

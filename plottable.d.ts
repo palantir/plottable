@@ -636,8 +636,8 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class _Drawer {
-            key: string;
             renderArea: D3.Selection;
+            key: string;
             constructor(key: string);
             remove(): void;
             draw(data: any[][], attrToProjector: IAttributeToProjector): void;
