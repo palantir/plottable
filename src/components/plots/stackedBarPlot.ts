@@ -4,7 +4,7 @@ module Plottable {
 export module Plot {
 
   export class StackedBar extends Abstract.NewStyleBarPlot {
-    public stackedData: any[][] = [];
+    private stackedData: any[][] = [];
     public _yAccessor: _IAccessor;
     public _isVertical = true;
     public _baselineValue = 0;
