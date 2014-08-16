@@ -3,7 +3,6 @@
 module Plottable {
 export module Plot {
   export class ClusteredBar extends Abstract.NewStyleBarPlot {
-    public static DEFAULT_WIDTH = 10;
     public _isVertical = true;
     private innerScale: Scale.Ordinal;
 

@@ -4,7 +4,7 @@ module Plottable {
 export module Abstract {
   export class NewStyleBarPlot extends NewStylePlot {
     public static _barAlignmentToFactor: {[alignment: string]: number} = {};
-    public static DEFAULT_WIDTH = 10;
+    private static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignmentFactor = 0;

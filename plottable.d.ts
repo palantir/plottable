@@ -820,7 +820,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class NewStyleBarPlot extends NewStylePlot {
-            static DEFAULT_WIDTH: number;
             constructor(xScale: Scale, yScale: Scale);
             baseline(value: number): any;
         }
@@ -831,7 +830,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
-            static DEFAULT_WIDTH: number;
             constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
         }
     }

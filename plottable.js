@@ -5059,7 +5059,6 @@ var Plottable;
                 var clusteredData = this.cluster(accessor);
                 this._getDrawersInOrder().forEach(function (d) { return d.draw(clusteredData[d.key], attrHash); });
             };
-            ClusteredBar.DEFAULT_WIDTH = 10;
             return ClusteredBar;
         })(Plottable.Abstract.NewStyleBarPlot);
         Plot.ClusteredBar = ClusteredBar;
