@@ -658,7 +658,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Axis {
-        interface ITimeInterval {
+        interface _ITimeInterval {
             timeUnit: D3.Time.Interval;
             step: number;
             formatString: string;
