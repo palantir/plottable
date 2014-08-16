@@ -13,6 +13,9 @@ export module Interaction {
      * null.
      */
     public dragBox: D3.Selection;
+    /**
+     * Whether or not dragBox has been rendered in a visible area.
+     */
     public boxIsDrawn = false;
 
     public _dragstart() {
