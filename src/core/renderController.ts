@@ -69,7 +69,7 @@ export module Core {
         var toRender = d3.values(_componentsNeedingRender);
         toRender.forEach((c) => c._render());
 
-        // now we are flusing
+        // now we are flushing
         _isCurrentlyFlushing = true;
 
         // Finally, perform render of all components
