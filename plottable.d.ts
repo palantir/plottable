@@ -843,9 +843,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class NewStyleBarPlot extends NewStylePlot {
-            static _barAlignmentToFactor: {
-                [x: string]: number;
-            };
             static DEFAULT_WIDTH: number;
             constructor(xScale: Scale, yScale: Scale);
             baseline(value: number): any;
