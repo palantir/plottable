@@ -2478,9 +2478,6 @@ declare module Plottable {
         class Drag extends Abstract.Interaction {
             public origin: number[];
             public location: number[];
-            public ondragstart: (startLocation: Point) => void;
-            public ondrag: (startLocation: Point, endLocation: Point) => void;
-            public ondragend: (startLocation: Point, endLocation: Point) => void;
             /**
             * Creates a Drag.
             *
