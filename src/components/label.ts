@@ -37,12 +37,27 @@ export module Component {
       this._fixedWidthFlag = true;
     }
 
+    /**
+     * If the label is given more space that it needs, which side should it go
+     * to?
+     *
+     * @param {string} alignment The new setting, one of `["left", "center",
+     * "right"]`. Defaults to `"center"`.
+     */
     public xAlign(alignment: string): Label {
       var alignmentLC = alignment.toLowerCase();
       super.xAlign(alignmentLC);
       this.xAlignment = alignmentLC;
       return this;
     }
+
+    /**
+     * If the label is given more space that it needs, which side should it go
+     * to?
+     *
+     * @param {string} alignment The new setting, one of `["top", "center",
+     * "bottom"]`. Defaults to `"center"`.
+     */
     public yAlign(alignment: string): Label {
       var alignmentLC = alignment.toLowerCase();
       super.yAlign(alignmentLC);
@@ -126,12 +141,12 @@ export module Component {
     }
   }
 
-  /**
-   * Creates a AxisLabel, a type of label made for rendering axis labels.
-   *
-   * @constructor
-   */
   export class AxisLabel extends Label {
+    /**
+     * Creates a AxisLabel, a type of label made for rendering axis labels.
+     *
+     * @constructor
+     */
     constructor(text?: string, orientation?: string) {
       super(text, orientation);
       this.classed("axis-label", true);
