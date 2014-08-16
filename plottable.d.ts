@@ -1032,19 +1032,19 @@ declare module Plottable {
     module Template {
         class StandardChart extends Plottable.Component.Table {
             constructor();
-            yAxis(y: Plottable.Abstract.Axis): StandardChart;
             yAxis(): Plottable.Abstract.Axis;
-            xAxis(x: Plottable.Abstract.Axis): StandardChart;
+            yAxis(y: Plottable.Abstract.Axis): StandardChart;
             xAxis(): Plottable.Abstract.Axis;
+            xAxis(x: Plottable.Abstract.Axis): StandardChart;
+            yLabel(): Plottable.Component.AxisLabel;
             yLabel(y: Plottable.Component.AxisLabel): StandardChart;
             yLabel(y: string): StandardChart;
-            yLabel(): Plottable.Component.AxisLabel;
+            xLabel(): Plottable.Component.AxisLabel;
             xLabel(x: Plottable.Component.AxisLabel): StandardChart;
             xLabel(x: string): StandardChart;
-            xLabel(): Plottable.Component.AxisLabel;
+            titleLabel(): Plottable.Component.TitleLabel;
             titleLabel(x: Plottable.Component.TitleLabel): StandardChart;
             titleLabel(x: string): StandardChart;
-            titleLabel(): Plottable.Component.TitleLabel;
             center(c: Plottable.Abstract.Component): StandardChart;
         }
     }
