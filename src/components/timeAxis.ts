@@ -81,8 +81,7 @@ export module Axis {
       {timeUnit: d3.time.year,   step: 100000, formatString: ""}
     ];
 
-    private previousSpan: number;
-    private previousIndex: number;
+    private measurer: Util.Text.TextMeasurer;
 
     /**
      * Creates a TimeAxis
@@ -98,8 +97,6 @@ export module Axis {
       }
       super(scale, orientation);
       this.classed("time-axis", true);
-      this.previousSpan = 0;
-      this.previousIndex = Time.minorIntervals.length - 1;
       this.tickLabelPadding(5);
     }
 
@@ -114,21 +111,26 @@ export module Axis {
       return this._computedHeight;
     }
 
-    public calculateWorstWidth(container: D3.Selection, format: string): number {
+    private calculateWorstWidth(container: D3.Selection, format: string): number {
       // returns the worst case width for a format
       // September 29, 9999 at 12:59.9999 PM Wednesday
       var longDate = new Date(9999, 8, 29, 12, 59, 9999);
-      return Util.Text.getTextWidth(container, d3.time.format(format)(longDate));
+      return this.measurer(d3.time.format(format)(longDate)).width;
     }
 
-    public getIntervalLength(interval: ITimeInterval) {
-      var testDate = this._scale.domain()[0]; // any date could go here
-      // meausre how much space one date can get
-      var stepLength = Math.abs(this._scale.scale(interval.timeUnit.offset(testDate, interval.step)) - this._scale.scale(testDate));
+    private getIntervalLength(interval: ITimeInterval) {
+      var startDate = this._scale.domain()[0];
+      var endDate = interval.timeUnit.offset(startDate, interval.step);
+      if (endDate > this._scale.domain()[1]) {
+        // this offset is too large, so just return available width
+        return this.availableWidth;
+      }
+      // measure how much space one date can get
+      var stepLength = Math.abs(this._scale.scale(endDate) - this._scale.scale(startDate));
       return stepLength;
     }
 
-    public isEnoughSpace(container: D3.Selection, interval: ITimeInterval) {
+    private isEnoughSpace(container: D3.Selection, interval: ITimeInterval) {
       // compute number of ticks
       // if less than a certain threshold
       var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
@@ -140,34 +142,21 @@ export module Axis {
       super._setup();
       this._majorTickLabels = this.content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       this._minorTickLabels = this.content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      this.measurer = Util.Text.getTextMeasurer(this._majorTickLabels.append("text"));
     }
 
     // returns a number to index into the major/minor intervals
     private getTickLevel(): number {
-      // for zooming, don't start search all the way from beginning.
-      var startingPoint = Time.minorIntervals.length - 1;
-      var curSpan = Math.abs(this._scale.domain()[1] - this._scale.domain()[0]);
-      if (curSpan <= this.previousSpan + 1) {
-        startingPoint = this.previousIndex;
-      }
-      // find lowest granularity that will fit
-      var i = startingPoint;
-      while (i >= 0) {
-        if (!(this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i])
-            && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i]))) {
-          i++;
+      for (var i = 0; i < Time.minorIntervals.length; i++) {
+        if (this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i])
+            && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i])) {
           break;
         }
-        i--;
       }
-      i = Math.min(i, Time.minorIntervals.length - 1);
-      if (i < 0) {
-        i = 0;
-        Util.Methods.warn("could not find suitable interval to display labels");
+      if (i >= Time.minorIntervals.length) {
+        Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
+        i = Time.minorIntervals.length - 1;
       }
-      this.previousIndex = Math.max(0, i - 1);
-      this.previousSpan = curSpan;
-
       return i;
     }
 
@@ -184,7 +173,7 @@ export module Axis {
 
     public _measureTextHeight(container: D3.Selection): number {
       var fakeTickLabel = container.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      var textHeight = Util.Text.getTextHeight(fakeTickLabel.append("text"));
+      var textHeight = this.measurer(Util.Text.HEIGHT_TEXT).height;
       fakeTickLabel.remove();
       return textHeight;
     }
@@ -230,7 +219,7 @@ export module Axis {
     private canFitLabelFilter(container: D3.Selection, position: Date, label: string, isCentered: boolean): boolean {
       var endPosition: number;
       var startPosition: number;
-      var width = Util.Text.getTextWidth(container, label) + this.tickLabelPadding();
+      var width = this.measurer(label).width + this.tickLabelPadding();
       if (isCentered) {
           endPosition = this._scale.scale(position) + width / 2;
           startPosition = this._scale.scale(position) - width / 2;

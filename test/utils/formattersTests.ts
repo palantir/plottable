@@ -120,6 +120,15 @@ describe("Formatters", () => {
       assert.strictEqual(result, "100%",
         "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
     });
+
+    it("can handle float imprecision", ()=> {
+      var percentFormatter = Plottable.Formatters.percentage();
+      var result = percentFormatter(0.07);
+      assert.strictEqual(result, "7%", "does not have trailing zeros and is not empty string");
+      percentFormatter = Plottable.Formatters.percentage(2);
+      var result2 = percentFormatter(0.0035);
+      assert.strictEqual(result2, "0.35%", "works even if multiplying by 100 does not make it an integer");
+    });
   });
 
   describe("time", () => {
@@ -152,6 +161,38 @@ describe("Formatters", () => {
       assert.operator(result.length, "<=", 5, "large number was formatted to a short string");
       result = lnFormatter(Math.pow(10, -12));
       assert.operator(result.length, "<=", 5, "small number was formatted to a short string");
+    });
+  });
+
+  describe("relativeDate", () => {
+    it("uses reasonable defaults", () => {
+      var relativeDateFormatter = Plottable.Formatters.relativeDate();
+      var result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      assert.strictEqual(result, "7", "7 day difference from epoch, incremented by days, no suffix");
+    });
+
+    it("resulting value is difference from base value", () => {
+      var relativeDateFormatter = Plottable.Formatters.relativeDate(5 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      var result = relativeDateFormatter(9 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      assert.strictEqual(result, "4", "4 days greater from base value");
+      var result = relativeDateFormatter(Plottable.MILLISECONDS_IN_ONE_DAY);
+      assert.strictEqual(result, "-4", "4 days less from base value");
+    });
+
+    it("can increment by different time types (hours, minutes)", () => {
+      var hoursRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / 24);
+      var result = hoursRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      assert.strictEqual(result, "72", "72 hour difference from epoch");
+
+      var minutesRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / (24 * 60));
+      var result = minutesRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      assert.strictEqual(result, "4320", "4320 minute difference from epoch");
+    });
+
+    it("can append a suffix", () => {
+      var relativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY, "days");
+      var result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      assert.strictEqual(result, "7days", "days appended to the end");
     });
   });
 });

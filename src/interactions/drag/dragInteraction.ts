@@ -7,11 +7,11 @@ export module Interaction {
     private dragBehavior: D3.Behavior.Drag;
     public origin = [0,0];
     public location = [0,0];
-    private constrainX: (n: number) => number;
-    private constrainY: (n: number) => number;
-    public ondragstart: (start: Point) => void;
-    public      ondrag: (start: Point, end: Point) => void;
-    public   ondragend: (start: Point, end: Point) => void;
+    private  constrainX: (n: number) => number;
+    private  constrainY: (n: number) => number;
+    private ondragstart: (start: Point) => void;
+    private      ondrag: (start: Point, end: Point) => void;
+    private   ondragend: (start: Point, end: Point) => void;
 
     /**
      * Creates a Drag.

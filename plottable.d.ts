@@ -33,11 +33,6 @@ declare module Plottable {
             */
             function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
             /**
-            * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
-            * and "activate" it by turning it into a function in (datum, index, metadata)
-            */
-            function _accessorize(accessor: any): IAccessor;
-            /**
             * Takes two sets and returns the union
             *
             * @param{D3.Set} set1 The first set
@@ -45,10 +40,6 @@ declare module Plottable {
             * @return{D3.Set} A set that contains elements that appear in either set1 or set2
             */
             function union(set1: D3.Set, set2: D3.Set): D3.Set;
-            /**
-            * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
-            */
-            function _applyAccessor(accessor: IAccessor, plot: Abstract.Plot): (d: any, i: number) => any;
             function uniq(strings: string[]): string[];
             function uniqNumbers(a: number[]): number[];
             /**
@@ -244,6 +235,7 @@ declare module Plottable {
 declare module Plottable {
     module Util {
         module Text {
+            var HEIGHT_TEXT: string;
             interface Dimensions {
                 width: number;
                 height: number;
@@ -253,11 +245,13 @@ declare module Plottable {
             }
             /**
             * Returns a quasi-pure function of typesignature (t: string) => Dimensions which measures height and width of text
+            * in the given text selection
             *
-            * @param {D3.Selection} selection: The selection in which text will be drawn and measured
+            * @param {D3.Selection} selection: A temporary text selection that the string will be placed into for measurement.
+            *                                  Will be removed on function creation and appended only for measurement.
             * @returns {Dimensions} width and height of the text
             */
-            function getTextMeasure(selection: D3.Selection): TextMeasurer;
+            function getTextMeasurer(selection: D3.Selection): TextMeasurer;
             /**
             * This class will measure text by measuring each character individually,
             * then adding up the dimensions. It will also cache the dimensions of each
@@ -270,11 +264,11 @@ declare module Plottable {
                 */
                 public measure: TextMeasurer;
                 /**
-                * @param {D3.Selection} g The element that will have text inserted into
+                * @param {D3.Selection} textSelection The element that will have text inserted into
                 *        it in order to measure text. The styles present for text in
                 *        this element will to the text being measured.
                 */
-                constructor(g: D3.Selection);
+                constructor(textSelection: D3.Selection);
                 /**
                 * Clear the cache, if it seems that the text has changed size.
                 */
@@ -289,38 +283,11 @@ declare module Plottable {
             * @returns {string} text - the shortened text
             */
             function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;
-            /**
-            * Gets the height of a text element, as rendered.
-            *
-            * @param {D3.Selection} textElement
-            * @return {number} The height of the text element, in pixels.
-            */
-            function getTextHeight(selection: D3.Selection): number;
-            /**
-            * Gets the width of a text element, as rendered.
-            *
-            * @param {D3.Selection} textElement
-            * @return {number} The width of the text element, in pixels.
-            */
-            function getTextWidth(textElement: D3.Selection, text: string): number;
-            /**
-            * Takes a line, a width to fit it in, and a text measurer. Will attempt to add ellipses to the end of the line,
-            * shortening the line as required to ensure that it fits within width.
-            */
-            function _addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
             function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
                 width: number;
                 height: number;
             };
             function writeLineVertically(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
-                width: number;
-                height: number;
-            };
-            function writeTextHorizontally(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
-                width: number;
-                height: number;
-            };
-            function writeTextVertically(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
                 width: number;
                 height: number;
             };
@@ -395,6 +362,7 @@ declare module Plottable {
     interface Formatter {
         (d: any): string;
     }
+    var MILLISECONDS_IN_ONE_DAY: number;
     class Formatters {
         /**
         * Creates a formatter for currency values.
@@ -457,12 +425,41 @@ declare module Plottable {
         * @returns {Formatter} A formatter for time/date values.
         */
         static time(): (d: any) => string;
+        /**
+        * Creates a formatter for relative dates.
+        *
+        * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
+        * @param {number} increment The unit used in calculating relative date values (default MILLISECONDS_IN_ONE_DAY)
+        * @param {string} label The label to append to the formatted string (default "")
+        *
+        * @returns {Formatter} A formatter for time/date values.
+        */
+        static relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
     }
 }
 
 
 declare module Plottable {
     var version: string;
+}
+
+
+declare module Plottable {
+    module Core {
+        class Colors {
+            static CORAL_RED: string;
+            static INDIGO: string;
+            static ROBINS_EGG_BLUE: string;
+            static FERN: string;
+            static BURNING_ORANGE: string;
+            static ROYAL_HEATH: string;
+            static CONIFER: string;
+            static CERISE_RED: string;
+            static BRIGHT_SUN: string;
+            static JACARTA: string;
+            static PLOTTABLE_COLORS: string[];
+        }
+    }
 }
 
 
@@ -875,8 +872,8 @@ declare module Plottable {
             * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
             * @param {any[]} extent The new extent to be included in the scale.
             */
-            public updateExtent(rendererID: number, attr: string, extent: any[]): Scale;
-            public removeExtent(rendererID: number, attr: string): Scale;
+            public updateExtent(plotProvidedKey: string, attr: string, extent: any[]): Scale;
+            public removeExtent(plotProvidedKey: string, attr: string): Scale;
         }
     }
 }
@@ -884,13 +881,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        interface _IProjector {
-            accessor: IAccessor;
-            scale?: Scale;
-        }
-        interface IAttributeToProjector {
-            [attrToSet: string]: IAppliedAccessor;
-        }
         class Plot extends Component {
             public renderArea: D3.Selection;
             public element: D3.Selection;
@@ -947,6 +937,80 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Abstract {
+        class XYPlot extends Plot {
+            public xScale: Scale;
+            public yScale: Scale;
+            /**
+            * Creates an XYPlot.
+            *
+            * @constructor
+            * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.
+            * @param {Scale} xScale The x scale to use.
+            * @param {Scale} yScale The y scale to use.
+            */
+            constructor(dataset: any, xScale: Scale, yScale: Scale);
+            public project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
+        }
+    }
+}
+
+
+declare module Plottable {
+    interface DatasetDrawerKey {
+        dataset: DataSource;
+        drawer: Abstract._Drawer;
+        key: string;
+    }
+    module Abstract {
+        class NewStylePlot extends XYPlot {
+            /**
+            * Creates a NewStylePlot.
+            *
+            * @constructor
+            * @param [Scale] xScale The x scale to use
+            * @param [Scale] yScale The y scale to use
+            */
+            constructor(xScale?: Scale, yScale?: Scale);
+            public remove(): void;
+            /**
+            * Adds a dataset to this plot. Identify this dataset with a key.
+            *
+            * A key is automatically generated if not supplied.
+            *
+            * @param {string} [key] The key of the dataset.
+            * @param {any[]|DataSource} dataset dataset to add.
+            * @return {NewStylePlot} The calling NewStylePlot.
+            */
+            public addDataset(key: string, dataset: DataSource): NewStylePlot;
+            public addDataset(key: string, dataset: any[]): NewStylePlot;
+            public addDataset(dataset: DataSource): NewStylePlot;
+            public addDataset(dataset: any[]): NewStylePlot;
+            /**
+            * Gets the dataset order by key
+            *
+            * @return {string[]} a string array of the keys in order
+            */
+            public datasetOrder(): string[];
+            /**
+            * Sets the dataset order by key
+            *
+            * @param {string[]} order A string array which represents the order of the keys. This must be a permutation of existing keys.
+            */
+            public datasetOrder(order: string[]): NewStylePlot;
+            /**
+            * Removes a dataset
+            *
+            * @param {string} key The key of the dataset
+            * @return {NewStylePlot} The calling NewStylePlot.
+            */
+            public removeDataset(key: string): NewStylePlot;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Core {
         module RenderController {
             module RenderPolicy {
@@ -981,7 +1045,6 @@ declare module Plottable {
         * perform enqueued layout and rendering serially.
         */
         module RenderController {
-            var _renderPolicy: RenderPolicy.IRenderPolicy;
             function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): any;
             /**
             * If the RenderController is enabled, we enqueue the component for
@@ -1052,14 +1115,14 @@ declare module Plottable {
             * Applies the supplied attributes to a D3.Selection with some animation.
             *
             * @param {D3.Selection} selection The update selection or transition selection that we wish to animate.
-            * @param {Abstract.IAttributeToProjector} attrToProjector The set of
+            * @param {IAttributeToProjector} attrToProjector The set of
             *     IAccessors that we will use to set attributes on the selection.
             * @param {Abstract.Plot} plot The plot being animated.
             * @return {D3.Selection} Animators should return the selection or
             *     transition object so that plots may chain the transitions between
             *     animators.
             */
-            animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any;
         }
         interface IPlotAnimatorMap {
             [animatorKey: string]: IPlotAnimator;
@@ -1081,6 +1144,14 @@ declare module Plottable {
     }
     interface IAppliedAccessor {
         (datum: any, index: number): any;
+    }
+    interface _IProjector {
+        accessor: IAccessor;
+        scale?: Abstract.Scale;
+        attribute: string;
+    }
+    interface IAttributeToProjector {
+        [attrToSet: string]: IAppliedAccessor;
     }
     interface SelectionArea {
         xMin: number;
@@ -1588,6 +1659,43 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
+        class _Drawer {
+            public renderArea: D3.Selection;
+            public key: string;
+            /**
+            * Creates a Drawer
+            *
+            * @constructor
+            * @param{string} key The key associated with this Drawer
+            */
+            constructor(key: string);
+            /**
+            * Removes the Drawer and its renderArea
+            */
+            public remove(): void;
+            /**
+            * Draws the data into the renderArea using the attrHash for attributes
+            *
+            * @param{any[][]} data The data to be drawn
+            * @param{attrHash} IAttributeToProjector The list of attributes to set on the data
+            */
+            public draw(data: any[][], attrToProjector: IAttributeToProjector): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Rect extends Abstract._Drawer {
+            public draw(data: any[][], attrToProjector: IAttributeToProjector): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
         class Axis extends Component {
             /**
             * The css class applied to each end tick mark (the line on the end tick).
@@ -1744,9 +1852,6 @@ declare module Plottable {
             * @param {string} orientation The orientation of the Axis (top/bottom)
             */
             constructor(scale: Scale.Time, orientation: string);
-            public calculateWorstWidth(container: D3.Selection, format: string): number;
-            public getIntervalLength(interval: ITimeInterval): number;
-            public isEnoughSpace(container: D3.Selection, interval: ITimeInterval): boolean;
         }
     }
 }
@@ -1944,43 +2049,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
-        module Axis {
-            var ONE_DAY: number;
-            /**
-            * Generates a relative date axis formatter.
-            *
-            * @param {number} baseValue The start date (as epoch time) used in computing relative dates
-            * @param {number} increment The unit used in calculating relative date tick values
-            * @param {string} label The label to append to tick values
-            */
-            function generateRelativeDateFormatter(baseValue: number, increment?: number, label?: string): (tickValue: any) => string;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
-        class XYPlot extends Plot {
-            public xScale: Scale;
-            public yScale: Scale;
-            /**
-            * Creates an XYPlot.
-            *
-            * @constructor
-            * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.
-            * @param {Scale} xScale The x scale to use.
-            * @param {Scale} yScale The y scale to use.
-            */
-            constructor(dataset: any, xScale: Scale, yScale: Scale);
-            public project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
-        }
-    }
-}
-
-
-declare module Plottable {
     module Plot {
         class Scatter extends Abstract.XYPlot {
             /**
@@ -2024,9 +2092,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class BarPlot extends XYPlot {
-            static _BarAlignmentToFactor: {
-                [alignment: string]: number;
-            };
             /**
             * Creates an AbstractBarPlot.
             *
@@ -2089,9 +2154,6 @@ declare module Plottable {
         *  - "y" - the vertical height of a bar
         */
         class VerticalBar extends Abstract.BarPlot {
-            static _BarAlignmentToFactor: {
-                [alignment: string]: number;
-            };
             /**
             * Creates a VerticalBarPlot.
             *
@@ -2118,9 +2180,6 @@ declare module Plottable {
         *  - "y" - the vertical position of a bar
         */
         class HorizontalBar extends Abstract.BarPlot {
-            static _BarAlignmentToFactor: {
-                [alignment: string]: number;
-            };
             public isVertical: boolean;
             /**
             * Creates a HorizontalBarPlot.
@@ -2175,13 +2234,57 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Abstract {
+        class NewStyleBarPlot extends NewStylePlot {
+            static DEFAULT_WIDTH: number;
+            /**
+            * Creates an NewStyleBarPlot.
+            *
+            * @constructor
+            * @param {Scale} xScale The x scale to use.
+            * @param {Scale} yScale The y scale to use.
+            */
+            constructor(xScale: Scale, yScale: Scale);
+            /**
+            * Sets the baseline for the bars to the specified value.
+            *
+            * @param {number} value The value to position the baseline at.
+            * @return {NewStyleBarPlot} The calling NewStyleBarPlot.
+            */
+            public baseline(value: number): any;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
+        class ClusteredBar extends Abstract.NewStyleBarPlot {
+            static DEFAULT_WIDTH: number;
+            constructor(xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
+        class StackedBar extends Abstract.NewStyleBarPlot {
+            public stackedData: any[][];
+            constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale);
+        }
+    }
+}
+
+
+declare module Plottable {
     module Animator {
         /**
         * An animator implementation with no animation. The attributes are
         * immediately set on the selection.
         */
         class Null implements IPlotAnimator {
-            public animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any;
+            public animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any;
         }
     }
 }
@@ -2193,7 +2296,7 @@ declare module Plottable {
         * The default animator implementation with easing, duration, and delay.
         */
         class Default implements IPlotAnimator {
-            public animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any;
+            public animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any;
             /**
             * Gets the duration of the animation in milliseconds.
             *
@@ -2247,7 +2350,7 @@ declare module Plottable {
         * The delay between animations can be configured with the .delay getter/setter.
         */
         class IterativeDelay extends Default {
-            public animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any;
+            public animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any;
         }
     }
 }
@@ -2360,11 +2463,59 @@ declare module Plottable {
             *
             * @constructor
             * @param {Component} componentToListenTo The component to listen for interactions on.
-            * @param {QuantitativeScale} xScale The X scale to update on panning/zooming.
-            * @param {QuantitativeScale} yScale The Y scale to update on panning/zooming.
+            * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
+            * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
             */
-            constructor(componentToListenTo: Abstract.Component, xScale: Abstract.QuantitativeScale, yScale: Abstract.QuantitativeScale);
+            constructor(componentToListenTo: Abstract.Component, xScale?: Abstract.QuantitativeScale, yScale?: Abstract.QuantitativeScale);
             public resetZoom(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
+        class BarHover extends Abstract.Interaction {
+            public componentToListenTo: Abstract.BarPlot;
+            /**
+            * Creates a new BarHover Interaction.
+            *
+            * @param {Abstract.BarPlot} barPlot The Bar Plot to listen for hover events on.
+            */
+            constructor(barPlot: Abstract.BarPlot);
+            /**
+            * Gets the current hover mode.
+            *
+            * @return {string} The current hover mode.
+            */
+            public hoverMode(): string;
+            /**
+            * Sets the hover mode for the interaction. There are two modes:
+            *     - "point": Selects the bar under the mouse cursor (default).
+            *     - "line" : Selects any bar that would be hit by a line extending
+            *                in the same direction as the bar and passing through
+            *                the cursor.
+            *
+            * @param {string} mode The desired hover mode.
+            * @return {BarHover} The calling Interaction.BarHover.
+            */
+            public hoverMode(mode: string): BarHover;
+            /**
+            * Attaches an callback to be called when the user mouses over a bar.
+            *
+            * @param {(datum: any, bar: D3.Selection) => any} The callback to be called.
+            *      The callback will be passed the data from the hovered-over bar.
+            * @return {BarHover} The calling Interaction.BarHover.
+            */
+            public onHover(callback: (datum: any, bar: D3.Selection) => any): BarHover;
+            /**
+            * Attaches a callback to be called when the user mouses off of a bar.
+            *
+            * @param {(datum: any, bar: D3.Selection) => any} The callback to be called.
+            *      The callback will be passed the data from the last-hovered bar.
+            * @return {BarHover} The calling Interaction.BarHover.
+            */
+            public onUnhover(callback: (datum: any, bar: D3.Selection) => any): BarHover;
         }
     }
 }
@@ -2375,9 +2526,6 @@ declare module Plottable {
         class Drag extends Abstract.Interaction {
             public origin: number[];
             public location: number[];
-            public ondragstart: (start: Point) => void;
-            public ondrag: (start: Point, end: Point) => void;
-            public ondragend: (start: Point, end: Point) => void;
             /**
             * Creates a Drag.
             *
