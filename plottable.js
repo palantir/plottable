@@ -7608,6 +7608,130 @@ var Plottable;
     var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
 
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Interaction) {
+        var BarHover = (function (_super) {
+            __extends(BarHover, _super);
+            /**
+            * Creates a new BarHover Interaction.
+            *
+            * @param {Abstract.BarPlot} barPlot The Bar Plot to listen for hover events on.
+            */
+            function BarHover(barPlot) {
+                _super.call(this, barPlot);
+                this.plotIsVertical = true;
+                this.currentBar = null;
+                this._hoverMode = "point";
+                this.plotIsVertical = Plottable.Plot.VerticalBar.prototype.isPrototypeOf(this.componentToListenTo);
+            }
+            BarHover.prototype._anchor = function (hitBox) {
+                var _this = this;
+                this.dispatcher = new Plottable.Dispatcher.Mouse(hitBox);
+
+                this.dispatcher.mousemove(function (p) {
+                    var selectedBar = _this.getHoveredBar(p);
+
+                    if (selectedBar == null) {
+                        _this._hoverOut();
+                    } else {
+                        if (_this.currentBar != null) {
+                            if (_this.currentBar.node() === selectedBar.node()) {
+                                return;
+                            } else {
+                                _this._hoverOut();
+                            }
+                        }
+
+                        _this.componentToListenTo._bars.classed("not-hovered", true).classed("hovered", false);
+                        selectedBar.classed("not-hovered", false).classed("hovered", true);
+                        if (_this.hoverCallback != null) {
+                            _this.hoverCallback(selectedBar.data()[0], selectedBar);
+                        }
+                    }
+
+                    _this.currentBar = selectedBar;
+                });
+
+                this.dispatcher.mouseout(function (p) {
+                    return _this._hoverOut();
+                });
+
+                this.dispatcher.connect();
+            };
+
+            BarHover.prototype._hoverOut = function () {
+                this.componentToListenTo._bars.classed("not-hovered hovered", false);
+                if (this.unhoverCallback != null && this.currentBar != null) {
+                    this.unhoverCallback(this.currentBar.data()[0], this.currentBar); // last known information
+                }
+                this.currentBar = null;
+            };
+
+            BarHover.prototype.getHoveredBar = function (p) {
+                if (this._hoverMode === "point") {
+                    return this.componentToListenTo.selectBar(p.x, p.y, false);
+                }
+
+                var maxExtent = { min: -Infinity, max: Infinity };
+                if (this.plotIsVertical) {
+                    return this.componentToListenTo.selectBar(p.x, maxExtent, false);
+                } else {
+                    return this.componentToListenTo.selectBar(maxExtent, p.y, false);
+                }
+            };
+
+            BarHover.prototype.hoverMode = function (mode) {
+                if (mode == null) {
+                    return this._hoverMode;
+                }
+
+                var modeLC = mode.toLowerCase();
+                if (modeLC !== "point" && modeLC !== "line") {
+                    throw new Error(mode + " is not a valid hover mode for Interaction.BarHover");
+                }
+
+                this._hoverMode = modeLC;
+                return this;
+            };
+
+            /**
+            * Attaches an callback to be called when the user mouses over a bar.
+            *
+            * @param {(datum: any, bar: D3.Selection) => any} The callback to be called.
+            *      The callback will be passed the data from the hovered-over bar.
+            * @return {BarHover} The calling Interaction.BarHover.
+            */
+            BarHover.prototype.onHover = function (callback) {
+                this.hoverCallback = callback;
+                return this;
+            };
+
+            /**
+            * Attaches a callback to be called when the user mouses off of a bar.
+            *
+            * @param {(datum: any, bar: D3.Selection) => any} The callback to be called.
+            *      The callback will be passed the data from the last-hovered bar.
+            * @return {BarHover} The calling Interaction.BarHover.
+            */
+            BarHover.prototype.onUnhover = function (callback) {
+                this.unhoverCallback = callback;
+                return this;
+            };
+            return BarHover;
+        })(Plottable.Abstract.Interaction);
+        Interaction.BarHover = BarHover;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
+})(Plottable || (Plottable = {}));
+
 ///<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
