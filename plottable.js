@@ -2243,12 +2243,16 @@ var Plottable;
             var _componentsNeedingRender = {};
             var _componentsNeedingComputeLayout = {};
             var _animationRequested = false;
+            var _isCurrentlyFlushing = false;
             RenderController._renderPolicy = new RenderController.RenderPolicy.AnimationFrame();
             function setRenderPolicy(policy) {
                 RenderController._renderPolicy = policy;
             }
             RenderController.setRenderPolicy = setRenderPolicy;
             function registerToRender(c) {
+                if (_isCurrentlyFlushing) {
+                    Plottable.Util.Methods.warn("Registered to render while other components are flushing: request may be ignored");
+                }
                 _componentsNeedingRender[c._plottableID] = c;
                 requestRender();
             }
@@ -2271,6 +2275,7 @@ var Plottable;
                     toCompute.forEach(function (c) { return c._computeLayout(); });
                     var toRender = d3.values(_componentsNeedingRender);
                     toRender.forEach(function (c) { return c._render(); });
+                    _isCurrentlyFlushing = true;
                     var failed = {};
                     Object.keys(_componentsNeedingRender).forEach(function (k) {
                         try {
@@ -2286,6 +2291,7 @@ var Plottable;
                     _componentsNeedingComputeLayout = {};
                     _componentsNeedingRender = failed;
                     _animationRequested = false;
+                    _isCurrentlyFlushing = false;
                 }
                 Core.ResizeBroadcaster.clearResizing();
             }
