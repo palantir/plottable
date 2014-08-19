@@ -3279,6 +3279,7 @@ var Plottable;
             var _componentsNeedingRender = {};
             var _componentsNeedingComputeLayout = {};
             var _animationRequested = false;
+            var _isCurrentlyFlushing = false;
             RenderController._renderPolicy = new RenderController.RenderPolicy.AnimationFrame();
 
             function setRenderPolicy(policy) {
@@ -3293,6 +3294,9 @@ var Plottable;
             * @param {Abstract.Component} component Any Plottable component.
             */
             function registerToRender(c) {
+                if (_isCurrentlyFlushing) {
+                    Plottable.Util.Methods.warn("Registered to render while other components are flushing: request may be ignored");
+                }
                 _componentsNeedingRender[c._plottableID] = c;
                 requestRender();
             }
@@ -3334,6 +3338,9 @@ var Plottable;
                         return c._render();
                     });
 
+                    // now we are flushing
+                    _isCurrentlyFlushing = true;
+
                     // Finally, perform render of all components
                     var failed = {};
                     Object.keys(_componentsNeedingRender).forEach(function (k) {
@@ -3353,6 +3360,7 @@ var Plottable;
                     _componentsNeedingComputeLayout = {};
                     _componentsNeedingRender = failed;
                     _animationRequested = false;
+                    _isCurrentlyFlushing = false;
                 }
 
                 // Reset resize flag regardless of queue'd components
