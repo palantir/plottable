@@ -59,10 +59,10 @@ export module Interaction {
       var y2 = height + y1;
       var halfwidth = width / 2;
       var halfheight = height / 2;
-      var left = this._isCloseEnoughXY(x, x1, halfwidth, false);
-      var top = this._isCloseEnoughXY(y, y1, halfheight, false);
-      var right = this._isCloseEnoughXY(x, x2, halfwidth, true);
-      var bottom = this._isCloseEnoughXY(y, y2, halfheight, true);
+      var left = this._isCloseEnoughXY(x, x1, this.resizePadding, halfwidth, true);
+      var top = this._isCloseEnoughXY(y, y1, this.resizePadding, halfheight, true);
+      var right = this._isCloseEnoughXY(x, x2, this.resizePadding, halfwidth, false);
+      var bottom = this._isCloseEnoughXY(y, y2, this.resizePadding, halfheight, false);
       var cursorStyle = "";
 
       if (this.isResizingX && this.isResizingY) {

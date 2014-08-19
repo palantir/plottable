@@ -20,7 +20,8 @@ export module Interaction {
     public _cursorStyle(x: number, y: number): string {
       var c1 = parseInt(this.dragBox.attr("y"), 10);
       var c2 = parseInt(this.dragBox.attr("height"), 10) + c1;
-      if (this._isCloseEnough(y, c1) || this._isCloseEnough(y, c2)) {
+      if (this._isCloseEnough(y, c1, this.resizePadding) ||
+          this._isCloseEnough(y, c2, this.resizePadding)) {
         return "ns-resize";
       } else {
         return "";

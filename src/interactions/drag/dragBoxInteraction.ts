@@ -13,18 +13,18 @@ export module Interaction {
     public isResizing = false;
     public _lastCursorStyle = "";
 
-    public _isCloseEnough(val1: number, val2: number, padding: number): boolean {
-      return val2 - padding <= val1 && val1 <= val2 + padding;
+    public _isCloseEnough(val: number, position: number, padding: number): boolean {
+      return position - padding <= val && val <= position + padding;
     }
 
-    public _isCloseEnoughXY(val: number, t: number, pad: number, left: boolean): boolean {
+    public _isCloseEnoughXY(val: number, position: number, padding: number, halfLength: number, isLeft: boolean): boolean {
       var leftValue: number, rightValue: number;
-      if (left) {
-        leftValue = t - Math.min(pad, this.resizePadding);
-        rightValue = t + this.resizePadding;
+      if (isLeft) {
+        leftValue = position - padding;
+        rightValue = position + Math.min(halfLength, padding);
       } else {
-        leftValue = t - this.resizePadding;
-        rightValue = t + Math.min(pad, this.resizePadding);
+        leftValue = position - Math.min(halfLength, padding);
+        rightValue = position + padding;
       }
       return leftValue <= val && val <= rightValue;
     }
