@@ -53,6 +53,10 @@ svg.plottable {
   stroke: #999;
 }
 
+.bar-plot .render-area rect.not-hovered {
+  opacity: 0.5;
+}
+
 .plottable .gridlines line {
   stroke: #3C3C3C; /* hackhack: gridlines should be solid; see #820 */
   opacity: 0.25;
@@ -88,14 +92,6 @@ svg.plottable {
 
 .plottable .plot.toggled-on {
   visibility:visible;
-}
-
-.plottable .hover {
-  opacity:.2;
-}
-
-.plottable .hover.focus {
-  opacity:1;
 }
 
 .plottable .plot.toggled-off {
