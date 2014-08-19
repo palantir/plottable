@@ -54,12 +54,17 @@ describe("Plots", () => {
       if (verifier.passed) {svg.remove();};
     });
 
-    it("renders correctly", () => {
+    it("correctly stacks", () => {
       var areas = renderer.renderArea.selectAll(".area");
       var area0 = d3.select(areas[0][0]);
+      var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
+      var d0Ys = d0.slice(1, d0.length - 1).map((s) => parseFloat(s.split(",")[1]));
+      assert.strictEqual(d0Ys.indexOf(0), -1);
+
       var area1 = d3.select(areas[0][1]);
-      assert.strictEqual(normalizePath(area0.attr("d")), "M0,266.87109375L600,177.9140625L600,355.828125L0,355.828125Z", "area0 d was set correctly");
-      assert.strictEqual(normalizePath(area1.attr("d")), "M0,0L600,88.95703125L600,177.9140625L0,266.87109375Z", "area1 d was set correctly");
+      var d1 = normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
+      var d1Ys = d1.slice(1, d1.length - 1).map((s) => parseFloat(s.split(",")[1]));
+      assert.operator(d1Ys.indexOf(0), ">", -1);
     });
   });
 });
