@@ -56,19 +56,11 @@ export module Interaction {
       var c2 = parseInt(this.dragBox.attr(attr2), 10) + c1;
       var result1 = this._isCloseEnough(origin, c1, this.resizePadding);
       if (result1) {
-        if (attr1 === "x") {
-          this._selectionOrigin[0] = c2;
-        } else {
-          this._selectionOrigin[1] = c2;
-        }
+        this._selectionOrigin[i] = c2;
       }
       var result2 = this._isCloseEnough(origin, c2, this.resizePadding);
       if (result2) {
-        if (attr1 === "x") {
-          this._selectionOrigin[0] = c1;
-        } else {
-          this._selectionOrigin[1] = c1;
-        }
+        this._selectionOrigin[i] = c1;
       }
       return result1 || result2;
     }
