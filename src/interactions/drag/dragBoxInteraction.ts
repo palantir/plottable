@@ -13,8 +13,8 @@ export module Interaction {
     public isResizing = false;
     public _lastCursorStyle = "";
 
-    public _isCloseEnough(val: number, t: number): boolean {
-      return t - this.resizePadding <= val && val <= t + this.resizePadding;
+    public _isCloseEnough(val1: number, val2: number, padding: number): boolean {
+      return val2 - padding <= val1 && val1 <= val2 + padding;
     }
 
     public _isCloseEnoughXY(val: number, t: number, pad: number, left: boolean): boolean {
@@ -43,7 +43,7 @@ export module Interaction {
       var origin = this.origin[i];
       var c1 = parseInt(this.dragBox.attr(attr1), 10);
       var c2 = parseInt(this.dragBox.attr(attr2), 10) + c1;
-      var result1 = this._isCloseEnough(origin, c1);
+      var result1 = this._isCloseEnough(origin, c1, this.resizePadding);
       if (result1) {
         if (attr1 === "x") {
           this._selectionOrigin[0] = c2;
@@ -51,7 +51,7 @@ export module Interaction {
           this._selectionOrigin[1] = c2;
         }
       }
-      var result2 = this._isCloseEnough(origin, c2);
+      var result2 = this._isCloseEnough(origin, c2, this.resizePadding);
       if (result2) {
         if (attr1 === "x") {
           this._selectionOrigin[0] = c1;
