@@ -78,7 +78,7 @@ export module Interaction {
     }
 
     public _doDragstart() {
-      this._selectionOrigin = [this.origin[0], this.origin[1]];
+      this._selectionOrigin = this.origin.slice();
       if (this.boxIsDrawn) {
         if (!this._resizeEnabled || !(this.isResizing = this._isResizeStart())) {
           this.clearBox();
