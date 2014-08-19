@@ -10,7 +10,7 @@ export module Interaction {
     public resizePadding = 10;
     public _selectionOrigin: number[];
     public selection: SelectionArea;
-    private isResizing = false;
+    public isResizing = false;
     public _lastCursorStyle = "";
 
     public _isCloseEnough(val: number, t: number): boolean {
