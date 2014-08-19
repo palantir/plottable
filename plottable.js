@@ -4427,7 +4427,7 @@ var Plottable;
                     var getScaledXValue = function (tickVal) { return _this.xScale.scale(tickVal); };
                     var xLines = this.xLinesContainer.selectAll("line").data(xTicks);
                     xLines.enter().append("line");
-                    xLines.attr("x1", getScaledXValue).attr("y1", 0).attr("x2", getScaledXValue).attr("y2", this.availableHeight).classed("zeroline", function (t) { return t === 0; });
+                    xLines.attr("x1", getScaledXValue).attr("y1", 0).attr("x2", getScaledXValue).attr("y2", this.availableHeight).classed("zeroline", function (t) { return t === 0; }).classed("baseline", function (t) { return getScaledXValue(t) < Gridlines.BASELINE_EPSILON || Math.abs(getScaledXValue(t) - _this.availableWidth) < Gridlines.BASELINE_EPSILON; });
                     xLines.exit().remove();
                 }
             };
@@ -4438,10 +4438,11 @@ var Plottable;
                     var getScaledYValue = function (tickVal) { return _this.yScale.scale(tickVal); };
                     var yLines = this.yLinesContainer.selectAll("line").data(yTicks);
                     yLines.enter().append("line");
-                    yLines.attr("x1", 0).attr("y1", getScaledYValue).attr("x2", this.availableWidth).attr("y2", getScaledYValue).classed("zeroline", function (t) { return t === 0; });
+                    yLines.attr("x1", 0).attr("y1", getScaledYValue).attr("x2", this.availableWidth).attr("y2", getScaledYValue).classed("zeroline", function (t) { return t === 0; }).classed("baseline", function (t) { return getScaledYValue(t) < Gridlines.BASELINE_EPSILON || Math.abs(getScaledYValue(t) - _this.availableHeight) < Gridlines.BASELINE_EPSILON; });
                     yLines.exit().remove();
                 }
             };
+            Gridlines.BASELINE_EPSILON = 10;
             return Gridlines;
         })(Plottable.Abstract.Component);
         Component.Gridlines = Gridlines;

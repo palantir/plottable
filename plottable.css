@@ -58,9 +58,12 @@ svg.plottable {
 }
 
 .plottable .gridlines line {
-  stroke: #3C3C3C; /* hackhack: gridlines should be solid; see #820 */
-  opacity: 0.25;
+  stroke: #EFEFEF;
   stroke-width: 1px;
+}
+
+.plottable .gridlines line.baseline {
+  visibility: hidden;
 }
 
 .plottable .drag-box {
