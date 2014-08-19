@@ -33,17 +33,16 @@ describe("Category Axes", () => {
     ca.renderTo(svg);
 
     var axisWidth = ca.width();
-    assert.operator(axisWidth, ">", ca.tickLabelPadding() + ca.gutter() + ca.tickLength());
     ca.tickLabelPadding(ca.tickLabelPadding() + 5);
-    assert.operator(ca.width(), ">", axisWidth);
+    assert.operator(ca.width(), ">", axisWidth, "increasing tickLabelPadding increases width");
 
     axisWidth = ca.width();
     ca.gutter(ca.gutter() + 5);
-    assert.operator(ca.width(), ">", axisWidth);
+    assert.operator(ca.width(), ">", axisWidth, "increasing gutter increases width");
 
     axisWidth = ca.width();
     ca.tickLength(ca.tickLength() + 5);
-    assert.operator(ca.width(), ">", axisWidth);
+    assert.operator(ca.width(), ">", axisWidth, "increasing tickLength increases width");
 
     svg.remove();
   });
@@ -57,15 +56,15 @@ describe("Category Axes", () => {
     var axisHeight = ca.height();
     assert.operator(axisHeight, ">", ca.tickLabelPadding() + ca.gutter() + ca.tickLength());
     ca.tickLabelPadding(ca.tickLabelPadding() + 5);
-    assert.operator(ca.height(), ">", axisHeight);
+    assert.operator(ca.height(), ">", axisHeight, "increasing tickLabelPadding increases height");
 
     axisHeight = ca.height();
     ca.gutter(ca.gutter() + 5);
-    assert.operator(ca.width(), ">", axisHeight);
+    assert.operator(ca.width(), ">", axisHeight, "increasing gutter increases height");
 
     axisHeight = ca.height();
     ca.tickLength(ca.tickLength() + 5);
-    assert.operator(ca.height(), ">", axisHeight);
+    assert.operator(ca.height(), ">", axisHeight, "increasing ticklength increases height");
 
     svg.remove();
   });

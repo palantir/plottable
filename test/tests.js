@@ -643,15 +643,14 @@ describe("Category Axes", function () {
         var ca = new Plottable.Axis.Category(xScale, "left");
         ca.renderTo(svg);
         var axisWidth = ca.width();
-        assert.operator(axisWidth, ">", ca.tickLabelPadding() + ca.gutter() + ca.tickLength());
         ca.tickLabelPadding(ca.tickLabelPadding() + 5);
-        assert.operator(ca.width(), ">", axisWidth);
+        assert.operator(ca.width(), ">", axisWidth, "increasing tickLabelPadding increases width");
         axisWidth = ca.width();
         ca.gutter(ca.gutter() + 5);
-        assert.operator(ca.width(), ">", axisWidth);
+        assert.operator(ca.width(), ">", axisWidth, "increasing gutter increases width");
         axisWidth = ca.width();
         ca.tickLength(ca.tickLength() + 5);
-        assert.operator(ca.width(), ">", axisWidth);
+        assert.operator(ca.width(), ">", axisWidth, "increasing tickLength increases width");
         svg.remove();
     });
     it("width and height account for gutter. ticklength, and padding on horizontal axes", function () {
@@ -662,13 +661,13 @@ describe("Category Axes", function () {
         var axisHeight = ca.height();
         assert.operator(axisHeight, ">", ca.tickLabelPadding() + ca.gutter() + ca.tickLength());
         ca.tickLabelPadding(ca.tickLabelPadding() + 5);
-        assert.operator(ca.height(), ">", axisHeight);
+        assert.operator(ca.height(), ">", axisHeight, "increasing tickLabelPadding increases height");
         axisHeight = ca.height();
         ca.gutter(ca.gutter() + 5);
-        assert.operator(ca.width(), ">", axisHeight);
+        assert.operator(ca.width(), ">", axisHeight, "increasing gutter increases height");
         axisHeight = ca.height();
         ca.tickLength(ca.tickLength() + 5);
-        assert.operator(ca.height(), ">", axisHeight);
+        assert.operator(ca.height(), ">", axisHeight, "increasing ticklength increases height");
         svg.remove();
     });
 });
