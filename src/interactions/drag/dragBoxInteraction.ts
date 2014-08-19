@@ -50,10 +50,20 @@ export module Interaction {
       }
     }
 
-    public _isResizeStartAttr(i: number, attr1: string, attr2: string): boolean {
+    public _isResizeStartAttr(isX: boolean): boolean {
+      var i: number, positionAttr: string, lengthAttr: string;
+      if (isX) {
+        i = 0;
+        positionAttr = "x";
+        lengthAttr = "width";
+      } else {
+        i = 1;
+        positionAttr = "y";
+        lengthAttr = "height";
+      }
       var origin = this.origin[i];
-      var c1 = parseInt(this.dragBox.attr(attr1), 10);
-      var c2 = parseInt(this.dragBox.attr(attr2), 10) + c1;
+      var c1 = parseInt(this.dragBox.attr(positionAttr), 10);
+      var c2 = parseInt(this.dragBox.attr(lengthAttr), 10) + c1;
       var result1 = this._isCloseEnough(origin, c1, this.resizePadding);
       if (result1) {
         this._selectionOrigin[i] = c2;

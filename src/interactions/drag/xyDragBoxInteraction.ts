@@ -45,8 +45,8 @@ export module Interaction {
     }
 
     public _isResizeStart(): boolean {
-      this.isResizingX = this._isResizeStartAttr(0, "x", "width");
-      this.isResizingY = this._isResizeStartAttr(1, "y", "height");
+      this.isResizingX = this._isResizeStartAttr(true);
+      this.isResizingY = this._isResizeStartAttr(false);
       return this.isResizingX || this.isResizingY;
     }
 
