@@ -3144,6 +3144,34 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (_Drawer) {
+        var Area = (function (_super) {
+            __extends(Area, _super);
+            function Area() {
+                _super.apply(this, arguments);
+            }
+            Area.prototype.draw = function (data, attrToProjector) {
+                var svgElement = "path";
+                var dataElements = this.renderArea.selectAll(svgElement).data(data);
+                dataElements.enter().append(svgElement);
+                dataElements.attr(attrToProjector).classed("area", true);
+                dataElements.exit().remove();
+            };
+            return Area;
+        })(Plottable.Abstract._Drawer);
+        _Drawer.Area = Area;
+    })(Plottable._Drawer || (Plottable._Drawer = {}));
+    var _Drawer = Plottable._Drawer;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (_Drawer) {
         var Rect = (function (_super) {
             __extends(Rect, _super);
             function Rect() {
@@ -5082,6 +5110,118 @@ var Plottable;
             return ClusteredBar;
         })(Plottable.Abstract.NewStyleBarPlot);
         Plot.ClusteredBar = ClusteredBar;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Plot) {
+        var StackedArea = (function (_super) {
+            __extends(StackedArea, _super);
+            function StackedArea(xScale, yScale) {
+                _super.call(this, xScale, yScale);
+                this.stackedData = [];
+                this._baselineValue = 0;
+                this._isVertical = true;
+                this.stackedExtent = [];
+                this.classed("area-plot", true);
+                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
+            }
+            StackedArea.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Area(key);
+            };
+            StackedArea.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._baseline = this.renderArea.append("line").classed("baseline", true);
+            };
+            StackedArea.prototype._paint = function () {
+                var _this = this;
+                _super.prototype._paint.call(this);
+                var primaryScale = this.yScale;
+                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var baselineAttr = {
+                    "x1": 0,
+                    "y1": scaledBaseline,
+                    "x2": this.availableWidth,
+                    "y2": scaledBaseline
+                };
+                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
+                var attrToProjector = this._generateAttrToProjector();
+                var xFunction = attrToProjector["x"];
+                var y0Function = attrToProjector["y0"];
+                var yFunction = attrToProjector["y"];
+                delete attrToProjector["x"];
+                delete attrToProjector["y0"];
+                delete attrToProjector["y"];
+                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+                this._getDrawersInOrder().forEach(function (d, i) { return d.draw([_this.stackedData[i]], attrToProjector); });
+            };
+            StackedArea.prototype._updateYDomainer = function () {
+                return Plot.Area.prototype._updateYDomainer.apply(this);
+            };
+            StackedArea.prototype._addDataset = function (key, dataset) {
+                _super.prototype._addDataset.call(this, key, dataset);
+                this.stackedData = this.stack(this._projectors["y"].accessor);
+            };
+            StackedArea.prototype._onDataSourceUpdate = function () {
+                return Plot.Area.prototype._onDataSourceUpdate.apply(this);
+            };
+            StackedArea.prototype._updateAllProjectors = function () {
+                _super.prototype._updateAllProjectors.call(this);
+                if (this.yScale == null) {
+                    return;
+                }
+                if (this._isAnchored && this.stackedExtent.length > 0) {
+                    this.yScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+                }
+                else {
+                    this.yScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+                }
+            };
+            StackedArea.prototype._generateAttrToProjector = function () {
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var primaryScale = this._isVertical ? this.yScale : this.xScale;
+                var getY0 = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0); };
+                var getY = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y); };
+                attrToProjector["y"] = function (d) { return getY(d); };
+                attrToProjector["y0"] = function (d) { return getY0(d); };
+                return attrToProjector;
+            };
+            StackedArea.prototype.stack = function (accessor) {
+                var datasets = d3.values(this._key2DatasetDrawerKey);
+                var lengths = datasets.map(function (d) { return d.dataset.data().length; });
+                if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
+                    Plottable.Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
+                }
+                var currentBase = Plottable.Util.Methods.createFilledArray(0, lengths[0]);
+                var stacks = this._getDatasetsInOrder().map(function (dataset) {
+                    var data = dataset.data();
+                    var base = currentBase.slice();
+                    var vals = data.map(accessor);
+                    if (vals.some(function (x) { return x < 0; })) {
+                        Plottable.Util.Methods.warn("Warning: Behavior for stacked area undefined when data includes negative values");
+                    }
+                    currentBase = Plottable.Util.Methods.addArrays(base, vals);
+                    return data.map(function (d, i) {
+                        d["_PLOTTABLE_PROTECTED_FIELD_Y0"] = base[i];
+                        d["_PLOTTABLE_PROTECTED_FIELD_Y"] = currentBase[i];
+                        return d;
+                    });
+                });
+                this.stackedExtent = [0, d3.max(currentBase)];
+                this._onDataSourceUpdate();
+                return stacks;
+            };
+            return StackedArea;
+        })(Plottable.Abstract.NewStylePlot);
+        Plot.StackedArea = StackedArea;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
