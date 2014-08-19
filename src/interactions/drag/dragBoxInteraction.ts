@@ -11,7 +11,7 @@ export module Interaction {
     public _selectionOrigin: number[];
     public selection: SelectionArea;
     private isResizing = false;
-    public lastCursorStyle = "";
+    public _lastCursorStyle = "";
 
     public _isCloseEnough(val: number, t: number): boolean {
       return t - this.resizePadding <= val && val <= t + this.resizePadding;
@@ -126,7 +126,7 @@ export module Interaction {
           var position = d3.mouse(this.hitBox[0][0].parentNode);
           cursorStyle = this._cursorStyle(position[0], position[1]);
         } else if (this.isResizing) {
-          cursorStyle = this.lastCursorStyle;
+          cursorStyle = this._lastCursorStyle;
         } else {
           cursorStyle = "";
         }

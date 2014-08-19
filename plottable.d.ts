@@ -2585,7 +2585,7 @@ declare module Plottable {
             public resizeEnabled: boolean;
             public resizePadding: number;
             public selection: SelectionArea;
-            public lastCursorStyle: string;
+            public isResizing: boolean;
             /**
             * Enables or disables resizing.
             *

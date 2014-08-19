@@ -7918,7 +7918,7 @@ var Plottable;
                 this.resizeEnabled = false;
                 this.resizePadding = 10;
                 this.isResizing = false;
-                this.lastCursorStyle = "";
+                this._lastCursorStyle = "";
             }
             DragBox.prototype._isCloseEnough = function (val, t) {
                 return t - this.resizePadding <= val && val <= t + this.resizePadding;
@@ -8040,7 +8040,7 @@ var Plottable;
                         var position = d3.mouse(this.hitBox[0][0].parentNode);
                         cursorStyle = this._cursorStyle(position[0], position[1]);
                     } else if (this.isResizing) {
-                        cursorStyle = this.lastCursorStyle;
+                        cursorStyle = this._lastCursorStyle;
                     } else {
                         cursorStyle = "";
                     }
@@ -8191,13 +8191,13 @@ var Plottable;
 
                     // Using the last cursor in case `this._cursorStyle()` returns empty.
                     // This is to cover the cases where the user drags too fast.
-                    return this.lastCursorStyle = cursorStyle || this.lastCursorStyle;
+                    return this._lastCursorStyle = cursorStyle || this._lastCursorStyle;
                 } else if (this.isResizingX) {
                     cursorStyle = left || right ? "ew-resize" : "";
-                    return this.lastCursorStyle = cursorStyle || this.lastCursorStyle;
+                    return this._lastCursorStyle = cursorStyle || this._lastCursorStyle;
                 } else if (this.isResizingY) {
                     cursorStyle = top || bottom ? "ns-resize" : "";
-                    return this.lastCursorStyle = cursorStyle || this.lastCursorStyle;
+                    return this._lastCursorStyle = cursorStyle || this._lastCursorStyle;
                 }
 
                 var hovering = y1 - this.resizePadding <= y && y <= y2 + this.resizePadding && x1 - this.resizePadding <= x && x <= x2 + this.resizePadding;

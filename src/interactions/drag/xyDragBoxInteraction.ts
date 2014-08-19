@@ -73,15 +73,15 @@ export module Interaction {
         }
         // Using the last cursor in case `this._cursorStyle()` returns empty.
         // This is to cover the cases where the user drags too fast.
-        return this.lastCursorStyle = cursorStyle || this.lastCursorStyle;
+        return this._lastCursorStyle = cursorStyle || this._lastCursorStyle;
 
       } else if (this.isResizingX) {
         cursorStyle = left || right ? "ew-resize" : "";
-        return this.lastCursorStyle = cursorStyle || this.lastCursorStyle;
+        return this._lastCursorStyle = cursorStyle || this._lastCursorStyle;
 
       } else if (this.isResizingY) {
         cursorStyle = top || bottom ? "ns-resize": "";
-        return this.lastCursorStyle = cursorStyle || this.lastCursorStyle;
+        return this._lastCursorStyle = cursorStyle || this._lastCursorStyle;
       }
 
       var hovering = y1 - this.resizePadding <= y && y <= y2 + this.resizePadding &&
