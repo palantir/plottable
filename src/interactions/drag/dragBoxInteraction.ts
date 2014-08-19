@@ -6,7 +6,7 @@ export module Interaction {
     private static CLASS_DRAG_BOX = "drag-box";
     public dragBox: D3.Selection;
     public boxIsDrawn = false;
-    public resizeEnabled = false;
+    public _resizeEnabled = false;
     public resizePadding = 10;
     public _selectionOrigin: number[];
     public selection: SelectionArea;
@@ -30,13 +30,24 @@ export module Interaction {
     }
 
     /**
+     * Gets wether resizing is enabled or not.
+     *
+     * @returns {boolean}
+     */
+    public resize(): boolean;
+    /**
      * Enables or disables resizing.
      *
      * @param {boolean} enabled
      */
-    public resize(enabled: boolean) {
-      this.resizeEnabled = enabled;
-      return this;
+    public resize(enabled: boolean): DragBox;
+    public resize(enabled?: boolean): any {
+      if (enabled == null) {
+        return this._resizeEnabled;
+      } else {
+        this._resizeEnabled = enabled;
+        return this;
+      }
     }
 
     public _isResizeStartAttr(i: number, attr1: string, attr2: string): boolean {
@@ -69,7 +80,7 @@ export module Interaction {
     public _doDragstart() {
       this._selectionOrigin = [this.origin[0], this.origin[1]];
       if (this.boxIsDrawn) {
-        if (!this.resizeEnabled || !(this.isResizing = this._isResizeStart())) {
+        if (!this._resizeEnabled || !(this.isResizing = this._isResizeStart())) {
           this.clearBox();
         }
       }
@@ -120,7 +131,7 @@ export module Interaction {
     }
 
     public _hover() {
-      if (this.resizeEnabled) {
+      if (this._resizeEnabled) {
         var cursorStyle: string;
         if (this.boxIsDrawn) {
           var position = d3.mouse(this.hitBox[0][0].parentNode);
