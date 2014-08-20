@@ -48,19 +48,23 @@ function run(div, data, Plottable) {
         var outerTable = new Plottable.Component.Table([[chart, legendTable]]);
         outerTable.renderTo(svg);
 
-        cb = function(xy) {
-            if (xy == null) {console.log("starting drag"); return;}
-            var invertedXMin = xScale.invert(xy.xMin);
-            var invertedXMax = xScale.invert(xy.xMax);
-            var invertedYMin = yScale.invert(xy.yMax);
-            var invertedYMax = yScale.invert(xy.yMin);
+        cb = function(start, end) {
+            if (start == null || end == null) {return;}
+            var xMin = Math.min(start.x, end.x);
+            var xMax = Math.max(start.x, end.x);
+            var yMin = Math.min(start.y, end.y);
+            var yMax = Math.max(start.y, end.y);
+            var invertedXMin = xScale.invert(xMin);
+            var invertedXMax = xScale.invert(xMax);
+            var invertedYMin = yScale.invert(yMax);
+            var invertedYMax = yScale.invert(yMin);
             xScale.domain([invertedXMin, invertedXMax]);
             yScale.domain([invertedYMin, invertedYMax]);
             dragboxInteraction.clearBox();
         }
 
         var dragboxInteraction = new Plottable.Interaction.XYDragBox(cg)
-             .callback(cb)
+             .dragend(cb)
              .registerWithComponent();
 
         cb2 = function(xy) {

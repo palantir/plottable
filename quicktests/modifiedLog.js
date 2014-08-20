@@ -24,7 +24,7 @@ function run(div, data, Plottable) {
     var d4 = data[0].slice(0, 20);
     d4.forEach(bigger);
 
-    console.log(d1, d2, d3, d4);
+    // console.log(d1, d2, d3, d4);
 
 
     //data
