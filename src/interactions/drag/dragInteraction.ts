@@ -36,7 +36,7 @@ export module Interaction {
     /**
      * Sets the callback to be called when dragging starts.
      *
-     * @param {(startLocation: Point) => any} cb The function to be called.
+     * @param {(startLocation: Point) => any} cb The function to be called. Takes in a Point in pixels.
      * @returns {Drag}
      */
     public dragstart(cb: (startLocation: Point) => any): Drag;
@@ -58,7 +58,7 @@ export module Interaction {
     /**
      * Adds a callback to be called during dragging.
      *
-     * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called.
+     * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called. Takes in Points in pixels.
      * @returns {Drag}
      */
     public drag(cb: (startLocation: Point, endLocation: Point) => any): Drag;
@@ -80,7 +80,7 @@ export module Interaction {
     /**
      * Adds a callback to be called when the dragging ends.
      *
-     * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called. Takes in a SelectionArea in pixels.
+     * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called. Takes in Points in pixels.
      * @returns {Drag} The calling Drag.
      */
     public dragend(cb: (startLocation: Point, endLocation: Point) => any): Drag;
