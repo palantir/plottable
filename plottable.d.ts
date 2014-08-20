@@ -417,7 +417,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         interface IPlotAnimator {
-            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
         }
         interface IPlotAnimatorMap {
             [animatorKey: string]: IPlotAnimator;
@@ -868,7 +868,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         class Null implements IPlotAnimator {
-            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
         }
     }
 }
@@ -877,7 +877,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         class Default implements IPlotAnimator {
-            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
             duration(): Number;
             duration(duration: Number): Default;
             delay(): Number;
@@ -892,7 +892,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         class IterativeDelay extends Default {
-            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
         }
     }
 }
