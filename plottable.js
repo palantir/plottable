@@ -1,5 +1,5 @@
 /*!
-Plottable 0.24.0 (https://github.com/palantir/plottable)
+Plottable 0.25.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -903,7 +903,7 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.24.0";
+    Plottable.version = "0.25.0";
 })(Plottable || (Plottable = {}));
 
 var Plottable;
@@ -2243,12 +2243,16 @@ var Plottable;
             var _componentsNeedingRender = {};
             var _componentsNeedingComputeLayout = {};
             var _animationRequested = false;
+            var _isCurrentlyFlushing = false;
             RenderController._renderPolicy = new RenderController.RenderPolicy.AnimationFrame();
             function setRenderPolicy(policy) {
                 RenderController._renderPolicy = policy;
             }
             RenderController.setRenderPolicy = setRenderPolicy;
             function registerToRender(c) {
+                if (_isCurrentlyFlushing) {
+                    Plottable.Util.Methods.warn("Registered to render while other components are flushing: request may be ignored");
+                }
                 _componentsNeedingRender[c._plottableID] = c;
                 requestRender();
             }
@@ -2271,6 +2275,7 @@ var Plottable;
                     toCompute.forEach(function (c) { return c._computeLayout(); });
                     var toRender = d3.values(_componentsNeedingRender);
                     toRender.forEach(function (c) { return c._render(); });
+                    _isCurrentlyFlushing = true;
                     var failed = {};
                     Object.keys(_componentsNeedingRender).forEach(function (k) {
                         try {
@@ -2286,6 +2291,7 @@ var Plottable;
                     _componentsNeedingComputeLayout = {};
                     _componentsNeedingRender = failed;
                     _animationRequested = false;
+                    _isCurrentlyFlushing = false;
                 }
                 Core.ResizeBroadcaster.clearResizing();
             }
@@ -3989,8 +3995,8 @@ var Plottable;
                 this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
             };
             Category.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
-                var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+                var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
+                var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
                 if (this._scale.domain().length === 0) {
                     return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
                 }
@@ -5724,9 +5730,32 @@ var Plottable;
                 this.dragBehavior.on("drag", function () { return _this._drag(); });
                 this.dragBehavior.on("dragend", function () { return _this._dragend(); });
             }
-            Drag.prototype.callback = function (cb) {
-                this.callbackToCall = cb;
-                return this;
+            Drag.prototype.dragstart = function (cb) {
+                if (cb === undefined) {
+                    return this.ondragstart;
+                }
+                else {
+                    this.ondragstart = cb;
+                    return this;
+                }
+            };
+            Drag.prototype.drag = function (cb) {
+                if (cb === undefined) {
+                    return this.ondrag;
+                }
+                else {
+                    this.ondrag = cb;
+                    return this;
+                }
+            };
+            Drag.prototype.dragend = function (cb) {
+                if (cb === undefined) {
+                    return this.ondragend;
+                }
+                else {
+                    this.ondragend = cb;
+                    return this;
+                }
             };
             Drag.prototype._dragstart = function () {
                 var availableWidth = this.componentToListenTo.availableWidth;
@@ -5735,12 +5764,26 @@ var Plottable;
                 this.constrainX = constraintFunction(0, availableWidth);
                 this.constrainY = constraintFunction(0, availableHeight);
             };
+            Drag.prototype._doDragstart = function () {
+                if (this.ondragstart != null) {
+                    this.ondragstart({ x: this.origin[0], y: this.origin[1] });
+                }
+            };
             Drag.prototype._drag = function () {
                 if (!this.dragInitialized) {
                     this.origin = [d3.event.x, d3.event.y];
                     this.dragInitialized = true;
+                    this._doDragstart();
                 }
                 this.location = [this.constrainX(d3.event.x), this.constrainY(d3.event.y)];
+                this._doDrag();
+            };
+            Drag.prototype._doDrag = function () {
+                if (this.ondrag != null) {
+                    var startLocation = { x: this.origin[0], y: this.origin[1] };
+                    var endLocation = { x: this.location[0], y: this.location[1] };
+                    this.ondrag(startLocation, endLocation);
+                }
             };
             Drag.prototype._dragend = function () {
                 if (!this.dragInitialized) {
@@ -5750,8 +5793,10 @@ var Plottable;
                 this._doDragend();
             };
             Drag.prototype._doDragend = function () {
-                if (this.callbackToCall != null) {
-                    this.callbackToCall([this.origin, this.location]);
+                if (this.ondragend != null) {
+                    var startLocation = { x: this.origin[0], y: this.origin[1] };
+                    var endLocation = { x: this.location[0], y: this.location[1] };
+                    this.ondragend(startLocation, endLocation);
                 }
             };
             Drag.prototype._anchor = function (hitBox) {
@@ -5763,8 +5808,8 @@ var Plottable;
                 var xDomainOriginal = xScale != null ? xScale.domain() : null;
                 var yDomainOriginal = yScale != null ? yScale.domain() : null;
                 var resetOnNextClick = false;
-                function callback(pixelArea) {
-                    if (pixelArea == null) {
+                function callback(upperLeft, lowerRight) {
+                    if (upperLeft == null || lowerRight == null) {
                         if (resetOnNextClick) {
                             if (xScale != null) {
                                 xScale.domain(xDomainOriginal);
@@ -5778,15 +5823,16 @@ var Plottable;
                     }
                     resetOnNextClick = false;
                     if (xScale != null) {
-                        xScale.domain([xScale.invert(pixelArea.xMin), xScale.invert(pixelArea.xMax)]);
+                        xScale.domain([xScale.invert(upperLeft.x), xScale.invert(lowerRight.x)]);
                     }
                     if (yScale != null) {
-                        yScale.domain([yScale.invert(pixelArea.yMax), yScale.invert(pixelArea.yMin)]);
+                        yScale.domain([yScale.invert(lowerRight.y), yScale.invert(upperLeft.y)]);
                     }
                     this.clearBox();
                     return;
                 }
-                this.callback(callback);
+                this.drag(callback);
+                this.dragend(callback);
                 return this;
             };
             return Drag;
@@ -5813,9 +5859,6 @@ var Plottable;
             }
             DragBox.prototype._dragstart = function () {
                 _super.prototype._dragstart.call(this);
-                if (this.callbackToCall != null) {
-                    this.callbackToCall(null);
-                }
                 this.clearBox();
             };
             DragBox.prototype.clearBox = function () {
@@ -5871,15 +5914,6 @@ var Plottable;
                 _super.prototype._drag.call(this);
                 this.setBox(this.origin[0], this.location[0]);
             };
-            XDragBox.prototype._doDragend = function () {
-                if (this.callbackToCall == null) {
-                    return;
-                }
-                var xMin = Math.min(this.origin[0], this.location[0]);
-                var xMax = Math.max(this.origin[0], this.location[0]);
-                var pixelArea = { xMin: xMin, xMax: xMax };
-                this.callbackToCall(pixelArea);
-            };
             XDragBox.prototype.setBox = function (x0, x1) {
                 _super.prototype.setBox.call(this, x0, x1, 0, this.componentToListenTo.availableHeight);
                 return this;
@@ -5909,17 +5943,6 @@ var Plottable;
                 _super.prototype._drag.call(this);
                 this.setBox(this.origin[0], this.location[0], this.origin[1], this.location[1]);
             };
-            XYDragBox.prototype._doDragend = function () {
-                if (this.callbackToCall == null) {
-                    return;
-                }
-                var xMin = Math.min(this.origin[0], this.location[0]);
-                var xMax = Math.max(this.origin[0], this.location[0]);
-                var yMin = Math.min(this.origin[1], this.location[1]);
-                var yMax = Math.max(this.origin[1], this.location[1]);
-                var pixelArea = { xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax };
-                this.callbackToCall(pixelArea);
-            };
             return XYDragBox;
         })(Interaction.DragBox);
         Interaction.XYDragBox = XYDragBox;
@@ -5944,15 +5967,6 @@ var Plottable;
             YDragBox.prototype._drag = function () {
                 _super.prototype._drag.call(this);
                 this.setBox(this.origin[1], this.location[1]);
-            };
-            YDragBox.prototype._doDragend = function () {
-                if (this.callbackToCall == null) {
-                    return;
-                }
-                var yMin = Math.min(this.origin[1], this.location[1]);
-                var yMax = Math.max(this.origin[1], this.location[1]);
-                var pixelArea = { yMin: yMin, yMax: yMax };
-                this.callbackToCall(pixelArea);
             };
             YDragBox.prototype.setBox = function (y0, y1) {
                 _super.prototype.setBox.call(this, 0, this.componentToListenTo.availableWidth, y0, y1);

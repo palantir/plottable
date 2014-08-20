@@ -637,6 +637,38 @@ describe("Category Axes", function () {
         assert.isFalse(s.wantsHeight, "it doesn't want height");
         svg.remove();
     });
+    it("width accounts for gutter. ticklength, and padding on vertical axes", function () {
+        var svg = generateSVG(400, 400);
+        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+        var ca = new Plottable.Axis.Category(xScale, "left");
+        ca.renderTo(svg);
+        var axisWidth = ca.width();
+        ca.tickLabelPadding(ca.tickLabelPadding() + 5);
+        assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing tickLabelPadding increases width");
+        axisWidth = ca.width();
+        ca.gutter(ca.gutter() + 5);
+        assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing gutter increases width");
+        axisWidth = ca.width();
+        ca.tickLength(ca.tickLength() + 5);
+        assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing tickLength increases width");
+        svg.remove();
+    });
+    it("height accounts for gutter. ticklength, and padding on horizontal axes", function () {
+        var svg = generateSVG(400, 400);
+        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+        var ca = new Plottable.Axis.Category(xScale, "bottom");
+        ca.renderTo(svg);
+        var axisHeight = ca.height();
+        ca.tickLabelPadding(ca.tickLabelPadding() + 5);
+        assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing tickLabelPadding increases height");
+        axisHeight = ca.height();
+        ca.gutter(ca.gutter() + 5);
+        assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing gutter increases height");
+        axisHeight = ca.height();
+        ca.tickLength(ca.tickLength() + 5);
+        assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing ticklength increases height");
+        svg.remove();
+    });
 });
 
 var assert = chai.assert;
@@ -4568,29 +4600,33 @@ describe("Interactions", function () {
             interaction.registerWithComponent();
         });
         afterEach(function () {
-            interaction.callback();
+            interaction.dragstart(null);
+            interaction.drag(null);
+            interaction.dragend(null);
             interaction.clearBox();
         });
-        it("All callbacks are notified with appropriate data when a drag finishes", function () {
+        it("All callbacks are notified with appropriate data on drag", function () {
             var timesCalled = 0;
-            var areaCallback = function (a) {
+            interaction.dragstart(function (a) {
                 timesCalled++;
-                if (timesCalled === 1) {
-                    assert.deepEqual(a, null, "areaCallback called with null arg on dragstart");
-                }
-                if (timesCalled === 2) {
-                    var expectedPixelArea = {
-                        xMin: dragstartX,
-                        xMax: dragendX,
-                        yMin: dragstartY,
-                        yMax: dragendY
-                    };
-                    assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
-                }
-            };
-            interaction.callback(areaCallback);
+                var expectedStartLocation = { x: dragstartX, y: dragstartY };
+                assert.deepEqual(a, expectedStartLocation, "areaCallback called with null arg on dragstart");
+            });
+            interaction.dragend(function (a, b) {
+                timesCalled++;
+                var expectedStart = {
+                    x: dragstartX,
+                    y: dragstartY,
+                };
+                var expectedEnd = {
+                    x: dragendX,
+                    y: dragendY
+                };
+                assert.deepEqual(a, expectedStart, "areaCallback was passed the correct starting point");
+                assert.deepEqual(b, expectedEnd, "areaCallback was passed the correct ending point");
+            });
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            assert.equal(timesCalled, 2, "areaCallback was called twice");
+            assert.equal(timesCalled, 2, "drag callbacks are called twice");
         });
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
@@ -4634,27 +4670,27 @@ describe("Interactions", function () {
             interaction.registerWithComponent();
         });
         afterEach(function () {
-            interaction.callback();
+            interaction.dragstart(null);
+            interaction.drag(null);
+            interaction.dragend(null);
             interaction.clearBox();
         });
         it("All callbacks are notified with appropriate data when a drag finishes", function () {
             var timesCalled = 0;
-            var areaCallback = function (a) {
+            interaction.dragstart(function (a) {
                 timesCalled++;
-                if (timesCalled === 1) {
-                    assert.deepEqual(a, null, "areaCallback called with null arg on dragstart");
-                }
-                if (timesCalled === 2) {
-                    var expectedPixelArea = {
-                        yMin: dragstartY,
-                        yMax: dragendY
-                    };
-                    assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
-                }
-            };
-            interaction.callback(areaCallback);
+                var expectedY = dragstartY;
+                assert.deepEqual(a.y, expectedY, "areaCallback called with null arg on dragstart");
+            });
+            interaction.dragend(function (a, b) {
+                timesCalled++;
+                var expectedStartY = dragstartY;
+                var expectedEndY = dragendY;
+                assert.deepEqual(a.y, expectedStartY);
+                assert.deepEqual(b.y, expectedEndY);
+            });
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            assert.equal(timesCalled, 2, "areaCallback was called twice");
+            assert.equal(timesCalled, 2, "drag callbacks area called twice");
         });
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);

@@ -464,12 +464,6 @@ declare module Plottable {
         wantsWidth: boolean;
         wantsHeight: boolean;
     }
-    interface IPixelArea {
-        xMin: number;
-        xMax: number;
-        yMin: number;
-        yMax: number;
-    }
     interface IExtent {
         min: number;
         max: number;
@@ -1011,9 +1005,13 @@ declare module Plottable {
         class Drag extends Plottable.Abstract.Interaction {
             origin: number[];
             location: number[];
-            callbackToCall: (dragInfo: any) => any;
             constructor(componentToListenTo: Plottable.Abstract.Component);
-            callback(cb?: (a: any) => any): Drag;
+            dragstart(): (startLocation: Point) => void;
+            dragstart(cb: (startLocation: Point) => any): Drag;
+            drag(): (startLocation: Point, endLocation: Point) => void;
+            drag(cb: (startLocation: Point, endLocation: Point) => any): Drag;
+            dragend(): (startLocation: Point, endLocation: Point) => void;
+            dragend(cb: (startLocation: Point, endLocation: Point) => any): Drag;
             setupZoomCallback(xScale?: Plottable.Abstract.QuantitativeScale, yScale?: Plottable.Abstract.QuantitativeScale): Drag;
         }
     }
