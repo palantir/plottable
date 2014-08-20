@@ -5132,7 +5132,6 @@ var Plottable;
                 this._isVertical = true;
                 this.stackedExtent = [];
                 this.classed("area-plot", true);
-                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
             }
             StackedArea.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Area(key);
@@ -5142,7 +5141,6 @@ var Plottable;
                 this._baseline = this.renderArea.append("line").classed("baseline", true);
             };
             StackedArea.prototype._paint = function () {
-                var _this = this;
                 _super.prototype._paint.call(this);
                 var primaryScale = this.yScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -5153,6 +5151,9 @@ var Plottable;
                     "y2": scaledBaseline
                 };
                 this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
+                var stackedData = d3.layout.stack().values(function (d) {
+                    return d.values;
+                })(this.stackedData);
                 var attrToProjector = this._generateAttrToProjector();
                 var xFunction = attrToProjector["x"];
                 var y0Function = attrToProjector["y0"];
@@ -5160,15 +5161,19 @@ var Plottable;
                 delete attrToProjector["x"];
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
-                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
-                this._getDrawersInOrder().forEach(function (d, i) { return d.draw([_this.stackedData[i]], attrToProjector); });
+                attrToProjector["d"] = function (d) { return d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction)(d.values); };
+                var colorScale = new Plottable.Scale.Color();
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    attrToProjector["fill"] = function () { return colorScale.scale(i); };
+                    d.draw([stackedData[i]], attrToProjector);
+                });
             };
             StackedArea.prototype._updateYDomainer = function () {
                 return Plot.Area.prototype._updateYDomainer.apply(this);
             };
             StackedArea.prototype._addDataset = function (key, dataset) {
                 _super.prototype._addDataset.call(this, key, dataset);
-                this.stackedData = this.stack(this._projectors["y"].accessor);
+                this.stackedData.push({ key: key, values: dataset.data() });
             };
             StackedArea.prototype._onDataSourceUpdate = function () {
                 return Plot.Area.prototype._onDataSourceUpdate.apply(this);
@@ -5188,36 +5193,9 @@ var Plottable;
             StackedArea.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var primaryScale = this._isVertical ? this.yScale : this.xScale;
-                var getY0 = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0); };
-                var getY = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y); };
-                attrToProjector["y"] = function (d) { return getY(d); };
-                attrToProjector["y0"] = function (d) { return getY0(d); };
+                attrToProjector["y"] = function (d) { return primaryScale.scale(d.y + d.y0); };
+                attrToProjector["y0"] = function (d) { return primaryScale.scale(d.y0); };
                 return attrToProjector;
-            };
-            StackedArea.prototype.stack = function (accessor) {
-                var datasets = d3.values(this._key2DatasetDrawerKey);
-                var lengths = datasets.map(function (d) { return d.dataset.data().length; });
-                if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
-                    Plottable.Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
-                }
-                var currentBase = Plottable.Util.Methods.createFilledArray(0, lengths[0]);
-                var stacks = this._getDatasetsInOrder().map(function (dataset) {
-                    var data = dataset.data();
-                    var base = currentBase.slice();
-                    var vals = data.map(accessor);
-                    if (vals.some(function (x) { return x < 0; })) {
-                        Plottable.Util.Methods.warn("Warning: Behavior for stacked area undefined when data includes negative values");
-                    }
-                    currentBase = Plottable.Util.Methods.addArrays(base, vals);
-                    return data.map(function (d, i) {
-                        d["_PLOTTABLE_PROTECTED_FIELD_Y0"] = base[i];
-                        d["_PLOTTABLE_PROTECTED_FIELD_Y"] = currentBase[i];
-                        return d;
-                    });
-                });
-                this.stackedExtent = [0, d3.max(currentBase)];
-                this._onDataSourceUpdate();
-                return stacks;
             };
             return StackedArea;
         })(Plottable.Abstract.NewStylePlot);

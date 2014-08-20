@@ -13,23 +13,22 @@ describe("Plots", () => {
     var renderer: Plottable.Plot.StackedArea;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
-    var axisHeight = 0;
 
     var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
     var normalizePath = (s: string) => s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
 
     before(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Linear().domain([1, 2]);
+      xScale = new Plottable.Scale.Linear().domain([1, 3]);
       yScale = new Plottable.Scale.Linear().domain([0, 4]);
 
       var data1 = [
         {x: 1, y: 1},
-        {x: 2, y: 2}
+        {x: 3, y: 2}
       ];
       var data2 = [
         {x: 1, y: 3},
-        {x: 2, y: 1}
+        {x: 3, y: 1}
       ];
       dataset1 = new Plottable.DataSource(data1);
       dataset2 = new Plottable.DataSource(data2);
@@ -39,7 +38,6 @@ describe("Plots", () => {
       renderer.addDataset(data2);
       var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
-      axisHeight = xAxis.availableHeight;
     });
 
     beforeEach(() => {
@@ -59,12 +57,12 @@ describe("Plots", () => {
       var area0 = d3.select(areas[0][0]);
       var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
       var d0Ys = d0.slice(1, d0.length - 1).map((s) => parseFloat(s.split(",")[1]));
-      assert.strictEqual(d0Ys.indexOf(0), -1);
+      assert.notEqual(d0Ys.indexOf(renderer.availableHeight), -1, "bottom area is at the bottom");
 
       var area1 = d3.select(areas[0][1]);
       var d1 = normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
       var d1Ys = d1.slice(1, d1.length - 1).map((s) => parseFloat(s.split(",")[1]));
-      assert.operator(d1Ys.indexOf(0), ">", -1);
+      assert.strictEqual(d1Ys.indexOf(renderer.availableHeight), -1, "never touches the bottom");
     });
   });
 });

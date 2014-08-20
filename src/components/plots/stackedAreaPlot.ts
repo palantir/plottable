@@ -4,7 +4,7 @@ module Plottable {
 export module Plot {
   export class StackedArea extends Abstract.NewStylePlot {
 
-    private stackedData: any[][] = [];
+    private stackedData: any[] = [];
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _isVertical = true;
@@ -20,9 +20,10 @@ export module Plot {
     constructor(xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(xScale, yScale);
       this.classed("area-plot", true);
-      this.project("fill", () => Core.Colors.INDIGO);
+
     }
 
+    // Method not used.  Required for inheritance.
     public _getDrawer(key: string) {
       return new Plottable._Drawer.Area(key);
     }
@@ -45,6 +46,9 @@ export module Plot {
       };
       this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
 
+      var stackedData = d3.layout.stack()
+        .values(function(d) { return d.values; })(this.stackedData);
+
       var attrToProjector = this._generateAttrToProjector();
       var xFunction       = attrToProjector["x"];
       var y0Function      = attrToProjector["y0"];
@@ -53,12 +57,16 @@ export module Plot {
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
 
-      attrToProjector["d"] = d3.svg.area()
-        .x(xFunction)
-        .y0(y0Function)
-        .y1(yFunction);
+      attrToProjector["d"] = (d) => d3.svg.area()
+                                    .x(xFunction)
+                                    .y0(y0Function)
+                                    .y1(yFunction)(d.values);
 
-      this._getDrawersInOrder().forEach((d, i) => d.draw([this.stackedData[i]], attrToProjector));
+      var colorScale = new Scale.Color();
+      this._getDrawersInOrder().forEach((d, i) => {
+        attrToProjector["fill"] = () => colorScale.scale(i);
+        d.draw([stackedData[i]], attrToProjector);
+      });
     }
 
     public _updateYDomainer() {
@@ -67,7 +75,7 @@ export module Plot {
 
     public _addDataset(key: string, dataset: any) {
       super._addDataset(key, dataset);
-      this.stackedData = this.stack(this._projectors["y"].accessor);
+      this.stackedData.push({key: key, values: (<DataSource> dataset).data()});
     }
 
     public _onDataSourceUpdate() {
@@ -88,39 +96,10 @@ export module Plot {
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale    = this._isVertical ? this.yScale : this.xScale;
-      var getY0 = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0);
-      var getY = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y);
-      attrToProjector["y"] = (d) => getY(d);
-      attrToProjector["y0"] = (d) => getY0(d);
+      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      attrToProjector["y"] = (d: any) => primaryScale.scale(d.y + d.y0);
+      attrToProjector["y0"] = (d: any) => primaryScale.scale(d.y0);
       return attrToProjector;
-    }
-
-    private stack(accessor: IAccessor) {
-      var datasets = d3.values(this._key2DatasetDrawerKey);
-      var lengths = datasets.map((d) => d.dataset.data().length);
-      if (Util.Methods.uniqNumbers(lengths).length > 1) {
-        Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
-      }
-      var currentBase = Util.Methods.createFilledArray(0, lengths[0]);
-      var stacks = this._getDatasetsInOrder().map((dataset) => {
-        var data = dataset.data();
-        var base = currentBase.slice();
-        var vals = data.map(accessor);
-        if (vals.some((x: number) => x<0)) {
-          Util.Methods.warn("Warning: Behavior for stacked area undefined when data includes negative values");
-        }
-        currentBase = Util.Methods.addArrays(base, vals);
-
-        return data.map((d: any, i: number) => {
-          d["_PLOTTABLE_PROTECTED_FIELD_Y0"] = base[i];
-          d["_PLOTTABLE_PROTECTED_FIELD_Y"] = currentBase[i];
-          return d;
-        });
-      });
-      this.stackedExtent = [0, d3.max(currentBase)];
-      this._onDataSourceUpdate();
-      return stacks;
     }
   }
 }
