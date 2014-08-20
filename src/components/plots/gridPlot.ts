@@ -8,7 +8,7 @@ export module Plot {
     public _yScale: Scale.Ordinal;
 
 
-    public _animators: Animator.IPlotAnimatorMap = {
+    public _animators: IPlotAnimatorMap = {
       "cells" : new Animator.Null()
     };
 
@@ -52,7 +52,7 @@ export module Plot {
     public _paint() {
       super._paint();
 
-      var cells = this.renderArea.selectAll("rect").data(this._dataSource.data());
+      var cells = this._renderArea.selectAll("rect").data(this._dataSource.data());
       cells.enter().append("rect");
 
       var xStep = this._xScale.rangeBand();

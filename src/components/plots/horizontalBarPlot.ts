@@ -28,7 +28,7 @@ export module Plot {
     }
 
     public _updateXDomainer() {
-      this._updateDomainer(this.xScale);
+      this._updateDomainer(this._xScale);
     }
 
     public _generateAttrToProjector() {

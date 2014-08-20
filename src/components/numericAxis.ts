@@ -170,14 +170,18 @@ export module Axis {
     /**
      * Gets the tick label position relative to the tick marks.
      *
-     * @param {string} [position] The relative position of the tick label.
+     * @returns {string} The current tick label position.
+     */
+    public tickLabelPosition(): string;
+    /**
+     * Sets the tick label position relative to the tick marks.
+     *
+     * @param {string} position The relative position of the tick label.
      *                          [top/center/bottom] for a vertical NumericAxis,
      *                          [left/center/right] for a horizontal NumericAxis.
      *                          Defaults to center.
-     * @returns {Numeric|string} The calling Numeric, or the current tick
-     * label position.
+     * @returns {Numeric} The calling Axis.Numeric.
      */
-    public tickLabelPosition(): string;
     public tickLabelPosition(position: string): Numeric;
     public tickLabelPosition(position?: string): any {
       if (position == null) {
@@ -200,23 +204,27 @@ export module Axis {
     }
 
     /**
-     * Get whether or not the tick labels at the end of the graph are
+     * Gets whether or not the tick labels at the end of the graph are
      * displayed when partially cut off.
      *
      * @param {string} orientation Where on the scale to change tick labels.
      *                 On a "top" or "bottom" axis, this can be "left" or
      *                 "right". On a "left" or "right" axis, this can be "top"
      *                 or "bottom".
-     * @returns {Numeric|boolean} The calling Numeric, or the current setting.
+     * @returns {boolean} The current setting.
      */
     public showEndTickLabel(orientation: string): boolean;
     /**
-     * Get whether or not the tick labels at the end of the graph are
+     * Sets whether or not the tick labels at the end of the graph are
      * displayed when partially cut off.
      *
-     * @param {boolean} [show] Whether or not the given tick should be
+     * @param {string} orientation Where on the scale to change tick labels.
+     *                 On a "top" or "bottom" axis, this can be "left" or
+     *                 "right". On a "left" or "right" axis, this can be "top"
+     *                 or "bottom".
+     * @param {boolean} show Whether or not the given tick should be
      * displayed.
-     * @returns {Numeric} The calling Numeric.
+     * @returns {Numeric} The calling Axis.Numeric.
      */
     public showEndTickLabel(orientation: string, show: boolean): Numeric;
     public showEndTickLabel(orientation: string, show?: boolean): any {

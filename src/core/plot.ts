@@ -6,10 +6,9 @@ export module Abstract {
     public _dataSource: DataSource;
     public _dataChanged = false;
 
-    public renderArea: D3.Selection;
-    public element: D3.Selection;
+    public _renderArea: D3.Selection;
     public _animate: boolean = false;
-    public _animators: Animator.IPlotAnimatorMap = {};
+    public _animators: IPlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
     private animateOnNextRender = true;
@@ -170,7 +169,7 @@ export module Abstract {
 
     public _setup() {
       super._setup();
-      this.renderArea = this._content.append("g").classed("render-area", true);
+      this._renderArea = this._content.append("g").classed("render-area", true);
     }
 
     /**
@@ -235,19 +234,19 @@ export module Abstract {
     /**
      * Get the animator associated with the specified Animator key.
      *
-     * @return {Animator.IPlotAnimator} The Animator for the specified key.
+     * @return {IPlotAnimator} The Animator for the specified key.
      */
-    public animator(animatorKey: string): Animator.IPlotAnimator;
+    public animator(animatorKey: string): IPlotAnimator;
     /**
      * Set the animator associated with the specified Animator key.
      *
      * @param {string} animatorKey The key for the Animator.
-     * @param {Animator.IPlotAnimator} animator An Animator to be assigned to
+     * @param {IPlotAnimator} animator An Animator to be assigned to
      * the specified key.
      * @returns {Plot} The calling Plot.
      */
-    public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
-    public animator(animatorKey: string, animator?: Animator.IPlotAnimator): any {
+    public animator(animatorKey: string, animator: IPlotAnimator): Plot;
+    public animator(animatorKey: string, animator?: IPlotAnimator): any {
       if (animator === undefined){
         return this._animators[animatorKey];
       } else {

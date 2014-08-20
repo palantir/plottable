@@ -319,7 +319,7 @@ describe("Interactions", () => {
       barPlot.renderTo(svg);
       bhi.registerWithComponent();
 
-      var hitbox = barPlot.element.select(".hit-box");
+      var hitbox = barPlot._element.select(".hit-box");
 
       triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
       assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
@@ -373,7 +373,7 @@ describe("Interactions", () => {
       barPlot.renderTo(svg);
       bhi.registerWithComponent();
 
-      var hitbox = barPlot.element.select(".hit-box");
+      var hitbox = barPlot._element.select(".hit-box");
 
       triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
       assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");

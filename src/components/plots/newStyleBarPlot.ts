@@ -10,7 +10,7 @@ export module Abstract {
     public _barAlignmentFactor = 0;
     public _isVertical: boolean;
 
-    public _animators: Animator.IPlotAnimatorMap = {
+    public _animators: IPlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
       "bars"       : new Animator.IterativeDelay(),
       "baseline"   : new Animator.Null()
@@ -37,13 +37,13 @@ export module Abstract {
 
     public _setup() {
       super._setup();
-      this._baseline = this.renderArea.append("line").classed("baseline", true);
+      this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
     public _paint() {
       super._paint();
 
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       var baselineAttr: IAttributeToProjector = {
         "x1": this._isVertical ? 0 : scaledBaseline,

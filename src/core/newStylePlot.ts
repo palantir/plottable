@@ -1,12 +1,6 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export interface DatasetDrawerKey {
-    dataset: DataSource;
-    drawer: Abstract._Drawer;
-    key: string;
-  }
-
 export module Abstract {
   export class NewStylePlot extends XYPlot {
     private nextSeriesIndex = 0;
@@ -32,7 +26,7 @@ export module Abstract {
 
     public _setup() {
       super._setup();
-      this._getDrawersInOrder().forEach((d) => d.renderArea = this.renderArea.append("g"));
+      this._getDrawersInOrder().forEach((d) => d._renderArea = this._renderArea.append("g"));
     }
 
     public remove() {
@@ -78,7 +72,7 @@ export module Abstract {
       this._key2DatasetDrawerKey[key] = ddk;
 
       if (this._isSetup) {
-        drawer.renderArea = this.renderArea.append("g");
+        drawer._renderArea = this._renderArea.append("g");
       }
       dataset.broadcaster.registerListener(this, () => this._onDataSourceUpdate());
       this._onDataSourceUpdate();

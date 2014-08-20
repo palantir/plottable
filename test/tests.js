@@ -1470,7 +1470,7 @@ describe("Plots", function () {
             simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
             linePlot = new Plottable.Plot.Line(simpleDataset, xScale, yScale);
             linePlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).renderTo(svg);
-            renderArea = linePlot.renderArea;
+            renderArea = linePlot._renderArea;
         });
         beforeEach(function () {
             verifier.start();
@@ -1547,7 +1547,7 @@ describe("Plots", function () {
             simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
             areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
             areaPlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
-            renderArea = areaPlot.renderArea;
+            renderArea = areaPlot._renderArea;
         });
         beforeEach(function () {
             verifier.start();
@@ -1568,7 +1568,7 @@ describe("Plots", function () {
         it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", function () {
             areaPlot.project("y0", function (d) { return d.bar / 2; }, yScale);
             areaPlot.renderTo(svg);
-            renderArea = areaPlot.renderArea;
+            renderArea = areaPlot._renderArea;
             var areaPath = renderArea.select(".area");
             assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
             verifier.end();
@@ -1614,7 +1614,7 @@ describe("Plots", function () {
                 verifier.start();
             });
             it("renders correctly", function () {
-                var renderArea = renderer.renderArea;
+                var renderArea = renderer._renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
@@ -1636,7 +1636,7 @@ describe("Plots", function () {
             });
             it("baseline value can be changed; renderer updates appropriately", function () {
                 renderer.baseline(-1);
-                var renderArea = renderer.renderArea;
+                var renderArea = renderer._renderArea;
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
@@ -1653,7 +1653,7 @@ describe("Plots", function () {
             });
             it("bar alignment can be changed; renderer updates appropriately", function () {
                 renderer.barAlignment("center");
-                var renderArea = renderer.renderArea;
+                var renderArea = renderer._renderArea;
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
@@ -1662,7 +1662,7 @@ describe("Plots", function () {
                 assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
                 assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
                 renderer.barAlignment("right");
-                renderArea = renderer.renderArea;
+                renderArea = renderer._renderArea;
                 bars = renderArea.selectAll("rect");
                 bar0 = d3.select(bars[0][0]);
                 bar1 = d3.select(bars[0][1]);
@@ -1749,7 +1749,7 @@ describe("Plots", function () {
                 verifier.start();
             });
             it("renders correctly", function () {
-                var renderArea = renderer.renderArea;
+                var renderArea = renderer._renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
@@ -1771,7 +1771,7 @@ describe("Plots", function () {
             });
             it("baseline value can be changed; renderer updates appropriately", function () {
                 renderer.baseline(-1);
-                var renderArea = renderer.renderArea;
+                var renderArea = renderer._renderArea;
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
@@ -1788,7 +1788,7 @@ describe("Plots", function () {
             });
             it("bar alignment can be changed; renderer updates appropriately", function () {
                 renderer.barAlignment("center");
-                var renderArea = renderer.renderArea;
+                var renderArea = renderer._renderArea;
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
@@ -1797,7 +1797,7 @@ describe("Plots", function () {
                 assert.equal(bar0.attr("y"), "295", "bar0 y is correct");
                 assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
                 renderer.barAlignment("bottom");
-                renderArea = renderer.renderArea;
+                renderArea = renderer._renderArea;
                 bars = renderArea.selectAll("rect");
                 bar0 = d3.select(bars[0][0]);
                 bar1 = d3.select(bars[0][1]);
@@ -1855,7 +1855,7 @@ describe("Plots", function () {
                 ;
             });
             it("renders correctly", function () {
-                var bars = renderer.renderArea.selectAll("rect");
+                var bars = renderer._renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 var bar0y = bar0.data()[0].y;
@@ -1869,7 +1869,7 @@ describe("Plots", function () {
                 verifier.end();
             });
             it("width projector may be overwritten, and calling project queues rerender", function () {
-                var bars = renderer.renderArea.selectAll("rect");
+                var bars = renderer._renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 var bar0y = bar0.data()[0].y;
@@ -1932,7 +1932,7 @@ describe("Plots", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var renderer = new Plottable.Plot.Grid(DATA, xScale, yScale, colorScale).project("fill", "magnitude", colorScale);
             renderer.renderTo(svg);
-            VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
+            VERIFY_CELLS(renderer._renderArea.selectAll("rect")[0]);
             svg.remove();
         });
         it("renders correctly when data is set after construction", function () {
@@ -1943,7 +1943,7 @@ describe("Plots", function () {
             var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude", colorScale);
             renderer.renderTo(svg);
             renderer.dataSource().data(DATA);
-            VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
+            VERIFY_CELLS(renderer._renderArea.selectAll("rect")[0]);
             svg.remove();
         });
         it("can invert y axis correctly", function () {
@@ -1955,7 +1955,7 @@ describe("Plots", function () {
             renderer.renderTo(svg);
             yScale.domain(["U", "V"]);
             renderer.dataSource().data(DATA);
-            var cells = renderer.renderArea.selectAll("rect")[0];
+            var cells = renderer._renderArea.selectAll("rect")[0];
             var cellAU = d3.select(cells[0]);
             var cellAV = d3.select(cells[2]);
             cellAU.attr("fill", "#000000");
@@ -1965,7 +1965,7 @@ describe("Plots", function () {
             cellAV.attr("x", "0");
             cellAV.attr("y", "0");
             yScale.domain(["V", "U"]);
-            cells = renderer.renderArea.selectAll("rect")[0];
+            cells = renderer._renderArea.selectAll("rect")[0];
             cellAU = d3.select(cells[0]);
             cellAV = d3.select(cells[2]);
             cellAU.attr("fill", "#000000");
@@ -1995,7 +1995,7 @@ describe("Plots", function () {
             var dataSource = new Plottable.DataSource(data, metadata);
             var renderer = new Plottable.Plot.Scatter(dataSource, xScale, yScale).project("x", xAccessor).project("y", yAccessor);
             renderer.renderTo(svg);
-            var circles = renderer.renderArea.selectAll("circle");
+            var circles = renderer._renderArea.selectAll("circle");
             var c1 = d3.select(circles[0][0]);
             var c2 = d3.select(circles[0][1]);
             assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
@@ -2033,7 +2033,7 @@ describe("Plots", function () {
             var quadraticDataset = makeQuadraticSeries(10);
             function getCirclePlotVerifier() {
                 circlesInArea = 0;
-                var renderArea = circlePlot.renderArea;
+                var renderArea = circlePlot._renderArea;
                 var renderAreaTransform = d3.transform(renderArea.attr("transform"));
                 var translate = renderAreaTransform.translate;
                 var scale = renderAreaTransform.scale;
@@ -2067,14 +2067,14 @@ describe("Plots", function () {
             it("setup is handled properly", function () {
                 assert.deepEqual(xScale.range(), [0, SVG_WIDTH], "xScale range was set by the renderer");
                 assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "yScale range was set by the renderer");
-                circlePlot.renderArea.selectAll("circle").each(getCirclePlotVerifier());
+                circlePlot._renderArea.selectAll("circle").each(getCirclePlotVerifier());
                 assert.equal(circlesInArea, 10, "10 circles were drawn");
                 verifier.end();
             });
             it("rendering is idempotent", function () {
                 circlePlot._render();
                 circlePlot._render();
-                circlePlot.renderArea.selectAll("circle").each(getCirclePlotVerifier());
+                circlePlot._renderArea.selectAll("circle").each(getCirclePlotVerifier());
                 assert.equal(circlesInArea, 10, "10 circles were drawn");
                 verifier.end();
             });
@@ -2086,7 +2086,7 @@ describe("Plots", function () {
                     dataAreaPart = { xMin: 1, xMax: 3, yMin: 6, yMax: 3 };
                 });
                 it("the circles re-rendered properly", function () {
-                    var renderArea = circlePlot.renderArea;
+                    var renderArea = circlePlot._renderArea;
                     var circles = renderArea.selectAll("circle");
                     circles.each(getCirclePlotVerifier());
                     assert.equal(circlesInArea, 4, "four circles were found in the render area");
@@ -2154,7 +2154,7 @@ describe("Plots", function () {
             ;
         });
         it("renders correctly", function () {
-            var bars = renderer.renderArea.selectAll("rect");
+            var bars = renderer._renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -2234,7 +2234,7 @@ describe("Plots", function () {
             ;
         });
         it("renders correctly", function () {
-            var bars = renderer.renderArea.selectAll("rect");
+            var bars = renderer._renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -4713,7 +4713,7 @@ describe("Interactions", function () {
             });
             barPlot.renderTo(svg);
             bhi.registerWithComponent();
-            var hitbox = barPlot.element.select(".hit-box");
+            var hitbox = barPlot._element.select(".hit-box");
             triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
             barDatum = null;
@@ -4754,7 +4754,7 @@ describe("Interactions", function () {
             });
             barPlot.renderTo(svg);
             bhi.registerWithComponent();
-            var hitbox = barPlot.element.select(".hit-box");
+            var hitbox = barPlot._element.select(".hit-box");
             triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
             barDatum = null;

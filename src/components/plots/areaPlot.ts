@@ -31,19 +31,19 @@ export module Plot {
 
     public _setup() {
       super._setup();
-      this.areaPath = this.renderArea.append("path").classed("area", true);
+      this.areaPath = this._renderArea.append("path").classed("area", true);
     }
 
     public _onDataSourceUpdate() {
       super._onDataSourceUpdate();
-      if (this.yScale != null) {
+      if (this._yScale != null) {
         this._updateYDomainer();
       }
     }
 
     public _updateYDomainer() {
       super._updateYDomainer();
-      var scale = <Abstract.QuantitativeScale> this.yScale;
+      var scale = <Abstract.QuantitativeScale> this._yScale;
 
       var y0Projector = this._projectors["y0"];
       var y0Accessor = y0Projector != null ? y0Projector.accessor : null;

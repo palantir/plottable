@@ -44,7 +44,7 @@ export module Plot {
         var vals = data.map((d) => accessor(d));
 
         clusters[key] = data.map((d, i) => {
-          d["_PLOTTABLE_PROTECTED_FIELD_X"] = this.xScale.scale(vals[i]) + this.innerScale.scale(key);
+          d["_PLOTTABLE_PROTECTED_FIELD_X"] = this._xScale.scale(vals[i]) + this.innerScale.scale(key);
           return d;
         });
       });

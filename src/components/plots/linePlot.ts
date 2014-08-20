@@ -5,7 +5,7 @@ export module Plot {
   export class Line extends Abstract.XYPlot {
     private linePath: D3.Selection;
 
-    public _animators: Animator.IPlotAnimatorMap = {
+    public _animators: IPlotAnimatorMap = {
       "line-reset" : new Animator.Null(),
       "line"       : new Animator.Default()
         .duration(600)
@@ -29,12 +29,12 @@ export module Plot {
 
     public _setup() {
       super._setup();
-      this.linePath = this.renderArea.append("path").classed("line", true);
+      this.linePath = this._renderArea.append("path").classed("line", true);
     }
 
     public _getResetYFunction() {
       // gets the y-value generator for the animation start point
-      var yDomain = this.yScale.domain();
+      var yDomain = this._yScale.domain();
       var domainMax = Math.max(yDomain[0], yDomain[1]);
       var domainMin = Math.min(yDomain[0], yDomain[1]);
       // start from zero, or the closest domain value to zero
@@ -45,7 +45,7 @@ export module Plot {
       } else if (domainMin > 0) {
         startValue = domainMin;
       }
-      var scaledStartValue = this.yScale.scale(startValue);
+      var scaledStartValue = this._yScale.scale(startValue);
       return (d: any, i: number) => scaledStartValue;
     }
 

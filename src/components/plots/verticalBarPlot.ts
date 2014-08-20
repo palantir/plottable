@@ -28,7 +28,7 @@ export module Plot {
     }
 
     public _updateYDomainer() {
-      this._updateDomainer(this.yScale);
+      this._updateDomainer(this._yScale);
     }
   }
 }

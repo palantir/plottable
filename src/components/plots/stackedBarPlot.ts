@@ -22,19 +22,19 @@ export module Plot {
 
     public _updateAllProjectors() {
       super._updateAllProjectors();
-      if (this.yScale == null) {
+      if (this._yScale == null) {
         return;
       }
       if (this._isAnchored && this.stackedExtent.length > 0) {
-        this.yScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+        this._yScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
       } else {
-        this.yScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+        this._yScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
       }
     }
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale    = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale    = this._isVertical ? this._yScale : this._xScale;
       var getY0 = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0);
       var getY = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y);
       attrToProjector["height"] = (d) => Math.abs(getY(d) - getY0(d));

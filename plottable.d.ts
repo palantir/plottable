@@ -310,8 +310,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Plot extends Component {
-            renderArea: D3.Selection;
-            element: D3.Selection;
             constructor();
             constructor(dataset: any[]);
             constructor(dataset: DataSource);
@@ -321,8 +319,8 @@ declare module Plottable {
             project(attrToSet: string, accessor: any, scale?: Scale): Plot;
             animate(enabled: boolean): Plot;
             detach(): Plot;
-            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
-            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
+            animator(animatorKey: string): IPlotAnimator;
+            animator(animatorKey: string, animator: IPlotAnimator): Plot;
         }
     }
 }
@@ -331,8 +329,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class XYPlot extends Plot {
-            xScale: Scale;
-            yScale: Scale;
             constructor(dataset: any, xScale: Scale, yScale: Scale);
             project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
         }
@@ -341,11 +337,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    interface DatasetDrawerKey {
-        dataset: DataSource;
-        drawer: Plottable.Abstract._Drawer;
-        key: string;
-    }
     module Abstract {
         class NewStylePlot extends XYPlot {
             constructor(xScale?: Scale, yScale?: Scale);
@@ -410,12 +401,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Animator {
-        interface IPlotAnimator {
-            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
-        }
-        interface IPlotAnimatorMap {
-            [animatorKey: string]: IPlotAnimator;
-        }
     }
 }
 
@@ -467,6 +452,17 @@ declare module Plottable {
     interface Point {
         x: number;
         y: number;
+    }
+    interface IPlotAnimator {
+        animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
+    }
+    interface IPlotAnimatorMap {
+        [animatorKey: string]: IPlotAnimator;
+    }
+    interface DatasetDrawerKey {
+        dataset: DataSource;
+        drawer: Plottable.Abstract._Drawer;
+        key: string;
     }
 }
 
@@ -606,7 +602,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class _Drawer {
-            renderArea: D3.Selection;
             key: string;
             constructor(key: string);
             remove(): void;
@@ -723,12 +718,12 @@ declare module Plottable {
             static SUBELEMENT_CLASS: string;
             constructor(colorScale?: Plottable.Scale.Color);
             remove(): void;
-            toggleCallback(callback: ToggleCallback): Legend;
             toggleCallback(): ToggleCallback;
-            hoverCallback(callback: HoverCallback): Legend;
+            toggleCallback(callback: ToggleCallback): Legend;
             hoverCallback(): HoverCallback;
-            scale(scale: Plottable.Scale.Color): Legend;
+            hoverCallback(callback: HoverCallback): Legend;
             scale(): Plottable.Scale.Color;
+            scale(scale: Plottable.Scale.Color): Legend;
         }
     }
 }
@@ -939,8 +934,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class PanZoom extends Plottable.Abstract.Interaction {
-            xScale: Plottable.Abstract.QuantitativeScale;
-            yScale: Plottable.Abstract.QuantitativeScale;
             constructor(componentToListenTo: Plottable.Abstract.Component, xScale?: Plottable.Abstract.QuantitativeScale, yScale?: Plottable.Abstract.QuantitativeScale);
             resetZoom(): void;
         }
@@ -965,8 +958,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Drag extends Plottable.Abstract.Interaction {
-            origin: number[];
-            location: number[];
             constructor(componentToListenTo: Plottable.Abstract.Component);
             dragstart(): (startLocation: Point) => void;
             dragstart(cb: (startLocation: Point) => any): Drag;

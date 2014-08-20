@@ -5,8 +5,8 @@ export module Interaction {
   export class Drag extends Abstract.Interaction {
     private dragInitialized = false;
     private dragBehavior: D3.Behavior.Drag;
-    public origin = [0,0];
-    public location = [0,0];
+    public _origin = [0,0];
+    public _location = [0,0];
     private  constrainX: (n: number) => number;
     private  constrainY: (n: number) => number;
     private ondragstart: (startLocation: Point) => void;
@@ -104,25 +104,25 @@ export module Interaction {
 
     public _doDragstart() {
       if (this.ondragstart != null) {
-        this.ondragstart({x: this.origin[0], y: this.origin[1]});
+        this.ondragstart({x: this._origin[0], y: this._origin[1]});
       }
     }
 
     public _drag(){
       if (!this.dragInitialized) {
-        this.origin = [d3.event.x, d3.event.y];
+        this._origin = [d3.event.x, d3.event.y];
         this.dragInitialized = true;
         this._doDragstart();
       }
 
-      this.location = [this.constrainX(d3.event.x), this.constrainY(d3.event.y)];
+      this._location = [this.constrainX(d3.event.x), this.constrainY(d3.event.y)];
       this._doDrag();
     }
 
     public _doDrag() {
       if (this.ondrag != null) {
-        var startLocation = {x: this.origin[0], y: this.origin[1]};
-        var endLocation = {x: this.location[0], y: this.location[1]};
+        var startLocation = {x: this._origin[0], y: this._origin[1]};
+        var endLocation = {x: this._location[0], y: this._location[1]};
         this.ondrag(startLocation, endLocation);
       }
     }
@@ -137,8 +137,8 @@ export module Interaction {
 
     public _doDragend() {
       if (this.ondragend != null) {
-        var startLocation = {x: this.origin[0], y: this.origin[1]};
-        var endLocation = {x: this.location[0], y: this.location[1]};
+        var startLocation = {x: this._origin[0], y: this._origin[1]};
+        var endLocation = {x: this._location[0], y: this._location[1]};
         this.ondragend(startLocation, endLocation);
       }
     }

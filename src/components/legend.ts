@@ -57,17 +57,28 @@ export module Component {
     }
 
     /**
-     * Assigns or gets the callback to the Legend
+     * Gets the toggle callback from the Legend.
      *
      * This callback is associated with toggle events, which trigger when a legend row is clicked.
      * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
      * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
      * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
      *
-     * @param {ToggleCallback} callback The new callback function
+     * @returns {ToggleCallback} The current toggle callback.
+     */
+    public toggleCallback(): ToggleCallback;
+    /**
+     * Assigns a toggle callback to the Legend.
+     *
+     * This callback is associated with toggle events, which trigger when a legend row is clicked.
+     * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
+     * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
+     * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
+     *
+     * @param {ToggleCallback} callback The new callback function.
+     * @returns {Legend} The calling Legend.
      */
     public toggleCallback(callback: ToggleCallback): Legend;
-    public toggleCallback(): ToggleCallback;
     public toggleCallback(callback?: ToggleCallback): any {
       if (callback !== undefined) {
         this._toggleCallback = callback;
@@ -81,16 +92,28 @@ export module Component {
     }
 
     /**
-     * Assigns or gets the callback to the Legend
+     * Gets the hover callback from the Legend.
+     *
      * This callback is associated with hover events, which trigger when the mouse enters or leaves a legend row
      * Setting a callback will also set the class "hover" to all legend row,
      * as well as the class "focus" to the legend row being hovered over.
      * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
      *
-     * @param{HoverCallback} callback The new callback function
+     * @returns {HoverCallback} The new current hover callback.
+     */
+    public hoverCallback(): HoverCallback;
+    /**
+     * Assigns a hover callback to the Legend.
+     *
+     * This callback is associated with hover events, which trigger when the mouse enters or leaves a legend row
+     * Setting a callback will also set the class "hover" to all legend row,
+     * as well as the class "focus" to the legend row being hovered over.
+     * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
+     *
+     * @param {HoverCallback} callback The new callback function.
+     * @returns {Legend} The calling Legend.
      */
     public hoverCallback(callback: HoverCallback): Legend;
-    public hoverCallback(): HoverCallback;
     public hoverCallback(callback?: HoverCallback): any {
       if (callback !== undefined) {
         this._hoverCallback = callback;
@@ -103,15 +126,19 @@ export module Component {
       }
     }
 
-
     /**
-     * Assigns a new ColorScale to the Legend.
+     * Gets the current color scale from the Legend.
      *
-     * @param {ColorScale} scale
+     * @returns {Scale.Color} The current color scale.
+     */
+    public scale(): Scale.Color;
+    /**
+     * Assigns a new color scale to the Legend.
+     *
+     * @param {Scale.Color} scale The new scale.
      * @returns {Legend} The calling Legend.
      */
     public scale(scale: Scale.Color): Legend;
-    public scale(): Scale.Color;
     public scale(scale?: Scale.Color): any {
       if (scale != null) {
         if (this.colorScale != null) {
