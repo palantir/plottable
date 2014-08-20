@@ -13,6 +13,10 @@ function run(div, data, Plottable) {
 
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+
+  if (!Plottable.Plot.StackedArea) {
+    return;
+  }
   stackedBarRenderer = new Plottable.Plot.StackedArea(xScale, yScale)
     .addDataset("d1", data[0])
     .addDataset("d2", data[1])
