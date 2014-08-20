@@ -57,12 +57,12 @@ describe("Plots", () => {
       var area0 = d3.select(areas[0][0]);
       var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
       var d0Ys = d0.slice(1, d0.length - 1).map((s) => parseFloat(s.split(",")[1]));
-      assert.notEqual(d0Ys.indexOf(renderer.availableHeight), -1, "bottom area is at the bottom");
+      assert.strictEqual(d0Ys.indexOf(0), -1, "bottom area never touches the top");
 
       var area1 = d3.select(areas[0][1]);
       var d1 = normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
       var d1Ys = d1.slice(1, d1.length - 1).map((s) => parseFloat(s.split(",")[1]));
-      assert.strictEqual(d1Ys.indexOf(renderer.availableHeight), -1, "never touches the bottom");
+      assert.notEqual(d1Ys.indexOf(0), -1, "touches the top");
     });
   });
 });
