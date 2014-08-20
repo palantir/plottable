@@ -157,7 +157,7 @@ module.exports = function(grunt) {
     version: "35"
   }, {
     browserName: "internet explorer",
-    version: "10",
+    version: "9",
     platform: "WIN8"
   }];
 
