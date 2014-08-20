@@ -157,8 +157,8 @@ module.exports = function(grunt) {
     version: "35"
   }, {
     browserName: "internet explorer",
-    version: "10",
-    platform: "WIN8"
+    version: "9",
+    platform: "WIN7"
   }];
 
   var configJSON = {
