@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Util {
+export module _Util {
   export module WordWrap {
 
     var LINE_BREAKS_BEFORE = /[{\[]/;
@@ -27,7 +27,7 @@ export module Util {
         lines = lines.splice(0, nLinesThatFit);
         if (nLinesThatFit > 0) {
           // Overwrite the last line to one that has had a ... appended to the end
-          lines[nLinesThatFit-1] = Text._addEllipsesToLine(lines[nLinesThatFit-1], width, measureText);
+          lines[nLinesThatFit-1] = Text.addEllipsesToLine(lines[nLinesThatFit-1], width, measureText);
         }
       }
       return {originalText: text, lines: lines, textFits: textFit};

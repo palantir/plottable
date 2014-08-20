@@ -14,6 +14,28 @@ export module Template {
       private xyTable: Component.Table;
       private fullTable: Component.Table;
 
+      /**
+       * Creates a StandartChart.
+       *
+       * A StandardChart is a Component.Table with presets set to what users
+       * generally want.
+       *
+       * If you want to do this:
+       * ```typescript
+       * var table = new Table([[xAxis.merge(xLabel), plot.merge(title)],
+       *                        [null,                yAxis.merge(yLabel)]]);
+       * ```
+       * and laboriously create xLabel, xAxis, etc., you can do this:
+       * ```typescript
+       * var table = new StandardChart();
+       * table.xLabel("foo");
+       * table.xAxis(xAxis);
+       * ...
+       * ```
+       *
+       * StandardChart is what you should use if you just want a freakin'
+       * chart.
+       */
       constructor() {
         super();
         this.xTable    = new Component.Table();
@@ -26,8 +48,8 @@ export module Template {
       }
 
 
-      public yAxis(y: Abstract.Axis): StandardChart;
       public yAxis(): Abstract.Axis;
+      public yAxis(y: Abstract.Axis): StandardChart;
       public yAxis(y?: Abstract.Axis): any {
         if (y != null) {
           if (this._yAxis != null) {
@@ -41,8 +63,8 @@ export module Template {
         }
       }
 
-      public xAxis(x: Abstract.Axis): StandardChart;
       public xAxis(): Abstract.Axis;
+      public xAxis(x: Abstract.Axis): StandardChart;
       public xAxis(x?: Abstract.Axis): any {
         if (x != null) {
           if (this._xAxis != null) {
@@ -56,9 +78,21 @@ export module Template {
         }
       }
 
-    public yLabel(y: Component.AxisLabel): StandardChart;
-    public yLabel(y: string): StandardChart;
+    /**
+     * @return {Component.AxisLabel} The label along the y-axis, such as
+     * "profit".
+     */
     public yLabel(): Component.AxisLabel;
+    /**
+     * @param {Component.AxisLabel} y The desired label along the y-axis.
+     * @return {StandardChart} The calling StandardChart.
+     */
+    public yLabel(y: Component.AxisLabel): StandardChart;
+    /**
+     * @param {string} y The desired label along the y-axis. A
+     * Component.AxisLabel will be generated out of this string.
+     */
+    public yLabel(y: string): StandardChart;
     public yLabel(y?: any): any {
       if (y != null) {
         if (this._yLabel != null) {
@@ -80,9 +114,21 @@ export module Template {
       }
     }
 
-    public xLabel(x: Component.AxisLabel): StandardChart;
-    public xLabel(x: string): StandardChart;
+    /**
+     * @return {Component.AxisLabel} The label along the x-axis, such as
+     * "profit".
+     */
     public xLabel(): Component.AxisLabel;
+    /**
+     * @param {Component.AxisLabel} x The desired label along the x-axis.
+     * @return {StandardChart} The calling StandardChart.
+     */
+    public xLabel(x: Component.AxisLabel): StandardChart;
+    /**
+     * @param {string} x The desired label along the x-axis. A
+     * Component.AxisLabel will be generated out of this string.
+     */
+    public xLabel(x: string): StandardChart;
     public xLabel(x?: any): any {
       if (x != null) {
         if (this._xLabel != null) {
@@ -104,9 +150,21 @@ export module Template {
       }
     }
 
-    public titleLabel(x: Component.TitleLabel): StandardChart;
-    public titleLabel(x: string): StandardChart;
+    /**
+     * @return {Component.TitleLabel} The label for the title, such as
+     * "profit".
+     */
     public titleLabel(): Component.TitleLabel;
+    /**
+     * @param {Component.TitleLabel} x The desired label for the title.
+     * @return {StandardChart} The calling StandardChart.
+     */
+    public titleLabel(x: Component.TitleLabel): StandardChart;
+    /**
+     * @param {string} x The desired label for the title. A
+     * Component.TitleLabel will be generated out of this string.
+     */
+    public titleLabel(x: string): StandardChart;
     public titleLabel(x?: any): any {
       if (x != null) {
         if (this._titleLabel != null) {
@@ -128,6 +186,12 @@ export module Template {
       }
     }
 
+    /**
+     * Sets the component in the center, typically a plot.
+     *
+     * @param {Abstract.Component} c The component to place in the center.
+     * @return {StandardChart} The calling StandardChart.
+     */
     public center(c: Abstract.Component): StandardChart {
       this.centerComponent.merge(c);
       return this;

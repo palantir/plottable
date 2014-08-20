@@ -153,9 +153,9 @@ export module Scale {
       var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
       var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
       var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
-      var uniqMultiples = Util.Methods.uniqNumbers(multiples);
+      var uniqMultiples = _Util.Methods.uniqNumbers(multiples);
       var clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this.base, b - 1) * x));
-      var flattened = Util.Methods.flatten(clusters);
+      var flattened = _Util.Methods.flatten(clusters);
       var filtered = flattened.filter((x) => lower <= x && x <= upper);
       var sorted = filtered.sort((x, y) => x - y);
       return sorted;
@@ -187,17 +187,19 @@ export module Scale {
     }
 
     /**
-     * @returns {boolean}
-     * Whether or not to return tick values other than powers of base.
+     * Get whether or not to return tick values other than powers of base.
      *
      * This defaults to false, so you'll normally only see ticks like
      * [10, 100, 1000]. If you turn it on, you might see ticks values
      * like [10, 50, 100, 500, 1000].
+     * @returns {boolean} the current setting.
      */
     public showIntermediateTicks(): boolean;
     /**
-     * @param {boolean} show
-     * Whether or not to return ticks values other than powers of the base.
+     * Set whether or not to return ticks values other than powers or base.
+     *
+     * @param {boolean} show The desired setting.
+     * @returns {ModifiedLog} The calling ModifiedLog.
      */
     public showIntermediateTicks(show: boolean): ModifiedLog;
     public showIntermediateTicks(show?: boolean): any {

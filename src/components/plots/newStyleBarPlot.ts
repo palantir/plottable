@@ -4,13 +4,13 @@ module Plottable {
 export module Abstract {
   export class NewStyleBarPlot extends NewStylePlot {
     public static _barAlignmentToFactor: {[alignment: string]: number} = {};
-    public static DEFAULT_WIDTH = 10;
+    private static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignmentFactor = 0;
     public _isVertical: boolean;
 
-    public _animators: Animator.IPlotAnimatorMap = {
+    public _animators: IPlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
       "bars"       : new Animator.IterativeDelay(),
       "baseline"   : new Animator.Null()
@@ -37,25 +37,27 @@ export module Abstract {
 
     public _setup() {
       super._setup();
-      this._baseline = this.renderArea.append("line").classed("baseline", true);
+      this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
     public _paint() {
       super._paint();
 
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       var baselineAttr: IAttributeToProjector = {
         "x1": this._isVertical ? 0 : scaledBaseline,
         "y1": this._isVertical ? scaledBaseline : 0,
-        "x2": this._isVertical ? this.availableWidth : scaledBaseline,
-        "y2": this._isVertical ? scaledBaseline : this.availableHeight
+        "x2": this._isVertical ? this._availableWidth : scaledBaseline,
+        "y2": this._isVertical ? scaledBaseline : this._availableHeight
       };
       this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
     }
 
     /**
      * Sets the baseline for the bars to the specified value.
+     *
+     * The baseline is the line that the bars are drawn from, defaulting to 0.
      *
      * @param {number} value The value to position the baseline at.
      * @return {NewStyleBarPlot} The calling NewStyleBarPlot.

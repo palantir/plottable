@@ -40,14 +40,14 @@ describe("Plots", () => {
       renderer.baseline(0);
       var xAxis = new Plottable.Axis.Category(xScale, "bottom");
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
-      axisHeight = xAxis.availableHeight;
+      axisHeight = xAxis._availableHeight;
       bandWidth = xScale.rangeBand();
     });
 
     beforeEach(() => {
       verifier.start();
     });
-    
+
     afterEach(() => {
       verifier.end();
     });
@@ -57,7 +57,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = renderer.renderArea.selectAll("rect");
+      var bars = renderer._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);

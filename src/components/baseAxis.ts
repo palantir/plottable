@@ -31,6 +31,17 @@ export module Abstract {
     private _gutter = 15;
     private _showEndTickLabels = false;
 
+    /**
+     * Contructs an axis. An axis is a wrapper around a scale for rendering.
+     *
+     * @constructor
+     * @param {Abstract.Scale} scale The scale for this axis to render.
+     * @param {string} orientation One of ["top", "left", "bottom", "right"];
+     * on which side the axis will appear. On most axes, this is either "left"
+     * or "bottom".
+     * @param {Function} Data is passed through this formatter before being
+     * displayed.
+     */
     constructor(scale: Abstract.Scale, orientation: string, formatter = Formatters.identity()) {
       super();
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
@@ -70,7 +81,7 @@ export module Abstract {
       return this._computedHeight;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
       var requestedWidth = this._width;
       var requestedHeight = this._height;
 
@@ -111,19 +122,19 @@ export module Abstract {
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       if (this._isHorizontal()) {
-        this._scale.range([0, this.availableWidth]);
+        this._scale.range([0, this._availableWidth]);
       } else {
-        this._scale.range([this.availableHeight, 0]);
+        this._scale.range([this._availableHeight, 0]);
       }
     }
 
     public _setup() {
       super._setup();
-      this._tickMarkContainer = this.content.append("g")
+      this._tickMarkContainer = this._content.append("g")
                                             .classed(Axis.TICK_MARK_CLASS + "-container", true);
-      this._tickLabelContainer = this.content.append("g")
+      this._tickLabelContainer = this._content.append("g")
                                              .classed(Axis.TICK_LABEL_CLASS + "-container", true);
-      this._baseline = this.content.append("line").classed("baseline", true);
+      this._baseline = this._content.append("line").classed("baseline", true);
     }
 
     /*
@@ -157,23 +168,23 @@ export module Abstract {
 
       switch(this._orientation) {
         case "bottom":
-          baselineAttrHash.x2 = this.availableWidth;
+          baselineAttrHash.x2 = this._availableWidth;
           break;
 
         case "top":
-          baselineAttrHash.x2 = this.availableWidth;
-          baselineAttrHash.y1 = this.availableHeight;
-          baselineAttrHash.y2 = this.availableHeight;
+          baselineAttrHash.x2 = this._availableWidth;
+          baselineAttrHash.y1 = this._availableHeight;
+          baselineAttrHash.y2 = this._availableHeight;
           break;
 
         case "left":
-          baselineAttrHash.x1 = this.availableWidth;
-          baselineAttrHash.x2 = this.availableWidth;
-          baselineAttrHash.y2 = this.availableHeight;
+          baselineAttrHash.x1 = this._availableWidth;
+          baselineAttrHash.x2 = this._availableWidth;
+          baselineAttrHash.y2 = this._availableHeight;
           break;
 
         case "right":
-          baselineAttrHash.y2 = this.availableHeight;
+          baselineAttrHash.y2 = this._availableHeight;
           break;
       }
 
@@ -205,13 +216,13 @@ export module Abstract {
           break;
 
         case "top":
-          tickMarkAttrHash["y1"] = this.availableHeight;
-          tickMarkAttrHash["y2"] = this.availableHeight - tickLength;
+          tickMarkAttrHash["y1"] = this._availableHeight;
+          tickMarkAttrHash["y2"] = this._availableHeight - tickLength;
           break;
 
         case "left":
-          tickMarkAttrHash["x1"] = this.availableWidth;
-          tickMarkAttrHash["x2"] = this.availableWidth - tickLength;
+          tickMarkAttrHash["x1"] = this._availableWidth;
+          tickMarkAttrHash["x2"] = this._availableWidth - tickLength;
           break;
 
         case "right":
@@ -229,21 +240,22 @@ export module Abstract {
     }
 
     /**
-     * Gets the current width.
+     * Get the current width.
      *
      * @returns {number} The current width.
      */
     public width(): number;
     /**
-     * Sets a user-specified width.
+     * Set the current width.
      *
-     * @param {number|String} w A fixed width for the Axis, or "auto" for automatic mode.
+     * @param {number|String} w A fixed width for the Axis, or
+     * "auto" for automatic mode.
      * @returns {Axis} The calling Axis.
      */
     public width(w: any): Axis;
     public width(w?: any): any {
       if (w == null) {
-        return this.availableWidth;
+        return this._availableWidth;
       } else {
         if (this._isHorizontal()) {
           throw new Error("width cannot be set on a horizontal Axis");
@@ -258,21 +270,22 @@ export module Abstract {
     }
 
     /**
-     * Gets the current height.
+     * Get the current height.
      *
-     * @returns {number} The current height.
+     * @returns {Axis} The current height.
      */
     public height(): number;
     /**
-     * Sets a user-specified height.
+     * Get the current height.
      *
-     * @param {number|String} h A fixed height for the Axis, or "auto" for automatic mode.
+     * @param {number|String} h When provided, a fixed height for the Axis, or
+     * "auto" for automatic mode.
      * @returns {Axis} The calling Axis.
      */
     public height(h: any): Axis;
     public height(h?: any): any {
       if (h == null) {
-        return this.availableHeight;
+        return this._availableHeight;
       } else {
         if (!this._isHorizontal()) {
           throw new Error("height cannot be set on a vertical Axis");
@@ -287,18 +300,24 @@ export module Abstract {
     }
 
     /**
-     * Get the current formatter on the axis.
+     * Get the current formatter on the axis. Data is passed through the
+     * formatter before being displayed.
      *
-     * @returns {Formatter} the axis formatter
+     * @returns {Axis|Abstract.Formatter} The calling Axis, or the current
+     * Formatter.
      */
     public formatter(): Formatter;
     /**
-     * Sets a new tick formatter.
+     * Set the current formatter on the axis. Data is passed through the
+     * formatter before being displayed.
      *
-     * @param {Formatter} formatter
-     * @returns {Abstract.Axis} The calling Axis.
+     * @param {Formatter} formatter If a function, the data will be passed
+     * through `formatter(data)`. If provided and a Formatter, data will be
+     * passed though `formatter.format(data)`.  @returns {Abstract.Axis} The
+     * calling Axis.
+     * @returns {Axis} The calling Axis.
      */
-    public formatter(formatter: Formatter): Abstract.Axis;
+    public formatter(formatter: Formatter): Axis;
     public formatter(formatter?: Formatter): any {
       if (formatter === undefined) {
         return this._formatter;
@@ -309,16 +328,16 @@ export module Abstract {
     }
 
     /**
-     * Gets the current tick mark length.
+     * Get the current tick mark length.
      *
-     * @returns {number} The current tick mark length.
+     * @returns {number} the current tick mark length.
      */
     public tickLength(): number;
     /**
-     * Sets the tick mark length.
+     * Set the current tick mark length.
      *
-     * @param {number} length The length of each tick.
-     * @returns {BaseAxis} The calling Axis.
+     * @param {number} length If provided, length of each tick.
+     * @returns {Axis} The calling Axis.
      */
     public tickLength(length: number): Axis;
     public tickLength(length?: number): any {
@@ -369,15 +388,16 @@ export module Abstract {
     }
 
     /**
-     * Gets the padding between each tick mark and its associated label.
+     * Get the padding between each tick mark and its associated label.
      *
-     * @returns {number} The current padding, in pixels.
+     * @returns {number} the current padding.
+     * length.
      */
     public tickLabelPadding(): number;
     /**
-     * Sets the padding between each tick mark and its associated label.
+     * Set the padding between each tick mark and its associated label.
      *
-     * @param {number} padding The desired padding, in pixels.
+     * @param {number} padding If provided, the desired padding.
      * @returns {Axis} The calling Axis.
      */
     public tickLabelPadding(padding: number): Axis;
@@ -395,15 +415,18 @@ export module Abstract {
     }
 
     /**
-     * Gets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
+     * Get the size of the gutter (the extra space between the tick
+     * labels and the outer edge of the axis).
      *
-     * @returns {number} The current size of the gutter, in pixels.
+     * @returns {number} the current gutter.
+     * length.
      */
     public gutter(): number;
     /**
-     * Sets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
+     * Set the size of the gutter (the extra space between the tick
+     * labels and the outer edge of the axis).
      *
-     * @param {number} size The desired size of the gutter, in pixels.
+     * @param {number} size If provided, the desired gutter.
      * @returns {Axis} The calling Axis.
      */
     public gutter(size: number): Axis;
@@ -421,15 +444,16 @@ export module Abstract {
     }
 
     /**
-     * Gets the orientation of the Axis.
+     * Get the orientation of the Axis.
      *
-     * @returns {string} The current orientation.
+     * @returns {number} the current orientation.
      */
     public orient(): string;
     /**
-     * Sets the orientation of the Axis.
+     * Set the orientation of the Axis.
      *
-     * @param {string} newOrientation The desired orientation (top/bottom/left/right).
+     * @param {number} newOrientation If provided, the desired orientation
+     * (top/bottom/left/right).
      * @returns {Axis} The calling Axis.
      */
     public orient(newOrientation: string): Axis;
@@ -451,16 +475,19 @@ export module Abstract {
     }
 
     /**
-     * Checks whether the Axis is currently set to show the first and last
+     * Get whether the Axis is currently set to show the first and last
      * tick labels.
      *
-     * @returns {boolean}
+     * @returns {boolean} whether or not the last
+     * tick labels are showing.
      */
     public showEndTickLabels(): boolean;
     /**
-     * Set whether or not to show the first and last tick labels.
+     * Set whether the Axis is currently set to show the first and last tick
+     * labels.
      *
-     * @param {boolean} show Whether or not to show the first and last labels.
+     * @param {boolean} show Whether or not to show the first and last
+     * labels.
      * @returns {Axis} The calling Axis.
      */
     public showEndTickLabels(show: boolean): Axis;
@@ -474,14 +501,14 @@ export module Abstract {
     }
 
     public _hideEndTickLabels() {
-      var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
+      var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
 
       var isInsideBBox = (tickBox: ClientRect) => {
         return (
           Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
           Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
-          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.availableWidth) &&
-          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.availableHeight)
+          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this._availableWidth) &&
+          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this._availableHeight)
         );
       };
 
@@ -510,7 +537,7 @@ export module Abstract {
       visibleTickLabels.each(function (d: any) {
         var clientRect = this.getBoundingClientRect();
         var tickLabel = d3.select(this);
-        if (lastLabelClientRect != null && Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
+        if (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
           tickLabel.style("visibility", "hidden");
         } else {
           lastLabelClientRect = clientRect;

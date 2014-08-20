@@ -4,8 +4,8 @@ module Plottable {
 export module Plot {
 
   export class StackedBar extends Abstract.NewStyleBarPlot {
-    public stackedData: any[][] = [];
-    public _yAccessor: IAccessor;
+    private stackedData: any[][] = [];
+    public _yAccessor: _IAccessor;
     public _isVertical = true;
     public _baselineValue = 0;
     public _baseline: D3.Selection;
@@ -22,19 +22,19 @@ export module Plot {
 
     public _updateAllProjectors() {
       super._updateAllProjectors();
-      if (this.yScale == null) {
+      if (this._yScale == null) {
         return;
       }
       if (this._isAnchored && this.stackedExtent.length > 0) {
-        this.yScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+        this._yScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
       } else {
-        this.yScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+        this._yScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
       }
     }
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale    = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale    = this._isVertical ? this._yScale : this._xScale;
       var getY0 = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0);
       var getY = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y);
       attrToProjector["height"] = (d) => Math.abs(getY(d) - getY0(d));
@@ -42,21 +42,21 @@ export module Plot {
       return attrToProjector;
     }
 
-    private stack(accessor: IAccessor) {
+    private stack(accessor: _IAccessor) {
       var datasets = d3.values(this._key2DatasetDrawerKey);
       var lengths = datasets.map((d) => d.dataset.data().length);
-      if (Util.Methods.uniqNumbers(lengths).length > 1) {
-        Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
+      if (_Util.Methods.uniqNumbers(lengths).length > 1) {
+        _Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
       }
-      var currentBase = Util.Methods.createFilledArray(0, lengths[0]);
+      var currentBase = _Util.Methods.createFilledArray(0, lengths[0]);
       var stacks = this._getDatasetsInOrder().map((dataset) => {
         var data = dataset.data();
         var base = currentBase.slice();
         var vals = data.map(accessor);
         if (vals.some((x: number) => x<0)) {
-          Util.Methods.warn("Warning: Behavior for stacked bars undefined when data includes negative values");
+          _Util.Methods.warn("Warning: Behavior for stacked bars undefined when data includes negative values");
         }
-        currentBase = Util.Methods.addArrays(base, vals);
+        currentBase = _Util.Methods.addArrays(base, vals);
 
         return data.map((d: any, i: number) => {
           d["_PLOTTABLE_PROTECTED_FIELD_Y0"] = base[i];

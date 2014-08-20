@@ -6,13 +6,6 @@ export module Scale {
     [key: string]: string[];
   };
 
-  /**
-   * This class implements a color scale that takes quantitive input and
-   * interpolates between a list of color values. It returns a hex string
-   * representing the interpolated color.
-   *
-   * By default it generates a linear scale internally.
-   */
   export class InterpolatedColor extends Abstract.QuantitativeScale {
     private static COLOR_SCALES: ColorGroups = {
       reds : [
@@ -94,10 +87,7 @@ export module Scale {
     /**
      * Creates a d3 interpolator given the color array.
      *
-     * d3 doesn't accept more than 2 range values unless we use a ordinal
-     * scale. So, in order to interpolate smoothly between the full color
-     * range, we must override the interpolator and compute the color values
-     * manually.
+     * This class implements a scale that maps numbers to strings.
      *
      * @param {string[]} colors an array of strings representing color
      *     values in hex ("#FFFFFF") or keywords ("white").
@@ -127,7 +117,9 @@ export module Scale {
     private _scaleType: string;
 
     /**
-     * Creates a InterpolatedColorScale.
+     * Creates a Scale.InterpolatedColor.
+     *
+     * A Scale.InterpolatedColor maps numbers evenly to color strings.
      *
      * @constructor
      * @param {string|string[]} [colorRange] the type of color scale to
@@ -144,20 +136,20 @@ export module Scale {
     }
 
     /**
-     * Gets the color range.
+     * Get the color range.
      *
      * @returns {string[]} the current color values for the range as strings.
      */
     public colorRange(): string[];
     /**
-     * Sets the color range.
+     * Set the color range.
      *
-     * @param {string|string[]} colorRange. If colorRange is one of
-     *     (reds/blues/posneg), uses the built-in color groups. If colorRange
-     *     is an array of strings with at least 2 values
-     *     (e.g. ["#FF00FF", "red", "dodgerblue"], the resulting scale
-     *     will interpolate between the color values across the domain.
-     * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
+     * @param {string|string[]} [colorRange]. If colorRange is one of
+     * (reds/blues/posneg), uses the built-in color groups. If colorRange is an
+     * array of strings with at least 2 values (e.g. ["#FF00FF", "red",
+     * "dodgerblue"], the resulting scale will interpolate between the color
+     * values across the domain.
+     * @returns {InterpolatedColor} The calling InterpolatedColor.
      */
     public colorRange(colorRange: any): InterpolatedColor;
     public colorRange(colorRange?: any): any {
@@ -170,17 +162,14 @@ export module Scale {
     }
 
     /**
-     * Gets the internal scale type.
+     * Get the internal scale type.
      *
-     * @returns {string} The current scale type.
+     * @returns {string} The calling InterpolatedColor, or the current scale type.
      */
     public scaleType(): string;
     /**
-     * Sets the internal scale type.
-     *
-     * @param {string} scaleType. The type of d3 scale to use internally.
-     *                            (linear/log/sqrt/pow).
-     * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
+     * @param {string} scaleType The type of d3 scale to use internally.  (linear/log/sqrt/pow).
+     * @returns {InterpolatedColor}
      */
     public scaleType(scaleType: string): InterpolatedColor;
     public scaleType(scaleType?: string): any {

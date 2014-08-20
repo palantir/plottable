@@ -10,6 +10,10 @@ export module Abstract {
     /**
      * Creates a new Scale.
      *
+     * A Scale is a wrapper around a D3.Scale.Scale. A Scale is really just a
+     * function. Scales have a domain (input), a range (output), and a function
+     * from domain to range.
+     *
      * @constructor
      * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
      */
@@ -28,8 +32,14 @@ export module Abstract {
 
     /**
      * Modify the domain on the scale so that it includes the extent of all
-     * perspectives it depends on. Extent: The (min, max) pair for a
-     * QuantitiativeScale, all covered strings for an OrdinalScale.
+     * perspectives it depends on. This will normally happen automatically, but
+     * if you set domain explicitly with `plot.domain(x)`, you will need to
+     * call this function if you want the domain to neccessarily include all
+     * the data.
+     *
+     * Extent: The [min, max] pair for a Scale.Quantitative, all covered
+     * strings for a Scale.Ordinal.
+     *
      * Perspective: A combination of a DataSource and an Accessor that
      * represents a view in to the data.
      */
@@ -46,7 +56,8 @@ export module Abstract {
     }
 
     /**
-     * Returns the range value corresponding to a given domain value.
+     * Returns the range value corresponding to a given domain value. In other
+     * words, apply the function to value.
      *
      * @param value {any} A domain value to be scaled.
      * @returns {any} The range value corresponding to the supplied domain value.
@@ -56,19 +67,19 @@ export module Abstract {
     }
 
     /**
-     * Gets the domain.
+     * Get the domain.
      *
      * @returns {any[]} The current domain.
      */
     public domain(): any[];
     /**
-     * Sets the Scale's domain to the specified values.
+     * Set the domain.
      *
-     * @param {any[]} values The new value for the domain. This array may
-     *     contain more than 2 values if the scale type allows it (e.g.
-     *     ordinal scales). Other scales such as quantitative scales accept
-     *     only a 2-value extent array.
-     * @returns {Scale} The calling Scale.
+     * @param {any[]} values The new value for the domain. On
+     * Scale.Quantitative, this is a [min, max] pair, or a [max, min] pair to
+     * make the function decreasing. On Scale.Ordinal, this is an array of all
+     * input values.
+     * @returs {Scale} The calling Scale.
      */
     public domain(values: any[]): Scale;
     public domain(values?: any[]): any {
@@ -91,13 +102,21 @@ export module Abstract {
     }
 
     /**
-     * Gets the range.
+     * Set the range.
+     *
+     * In the case of having a numeric range, it will be a [min, max] pair. In
+     * the case of string range (e.g. Scale.InterpolatedColor), it will be a
+     * list of all possible outputs.
      *
      * @returns {any[]} The current range.
      */
     public range(): any[];
     /**
-     * Sets the Scale's range to the specified values.
+     * Get the range.
+     *
+     * In the case of having a numeric range, it will be a [min, max] pair. In
+     * the case of string range (e.g. Scale.InterpolatedColor), it will be a
+     * list of all possible outputs.
      *
      * @param {any[]} values The new values for the range.
      * @returns {Scale} The calling Scale.
@@ -113,7 +132,8 @@ export module Abstract {
     }
 
     /**
-     * Creates a copy of the Scale with the same domain and range but without any registered listeners.
+     * Creates a copy of the Scale with the same domain and range but without
+     * any registered listeners.
      *
      * @returns {Scale} A copy of the calling Scale.
      */
@@ -131,13 +151,13 @@ export module Abstract {
      * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
      * @param {any[]} extent The new extent to be included in the scale.
      */
-    public updateExtent(plotProvidedKey: string, attr: string, extent: any[]) {
+    public _updateExtent(plotProvidedKey: string, attr: string, extent: any[]) {
       this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
       this._autoDomainIfAutomaticMode();
       return this;
     }
 
-    public removeExtent(plotProvidedKey: string, attr: string) {
+    public _removeExtent(plotProvidedKey: string, attr: string) {
       delete this._rendererAttrID2Extent[plotProvidedKey + attr];
       this._autoDomainIfAutomaticMode();
       return this;

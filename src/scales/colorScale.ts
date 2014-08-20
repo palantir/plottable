@@ -51,7 +51,7 @@ export module Scale {
       extents.forEach((e) => {
         concatenatedExtents = concatenatedExtents.concat(e);
       });
-      return Util.Methods.uniq(concatenatedExtents);
+      return _Util.Methods.uniq(concatenatedExtents);
     }
   }
 }

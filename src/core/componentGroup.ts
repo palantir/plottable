@@ -5,7 +5,11 @@ export module Component {
   export class Group extends Abstract.ComponentContainer {
 
     /**
-     * Creates a ComponentGroup.
+     * Creates a Component.Group.
+     *
+     * A Component.Group is a set of Components that will be rendered on top of
+     * each other. When you call Compontent.merge(Component), it creates and
+     * return a Component.Group.
      *
      * @constructor
      * @param {Component[]} [components] The Components in the Group.
@@ -16,14 +20,14 @@ export module Component {
       components.forEach((c: Abstract.Component) => this._addComponent(c));
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
       var requests = this._components.map((c: Abstract.Component) => c._requestedSpace(offeredWidth, offeredHeight));
       var isEmpty = this.empty();
       return {
-        width : isEmpty ? 0 : d3.max(requests, (request: ISpaceRequest) => request.width ),
-        height: isEmpty ? 0 : d3.max(requests, (request: ISpaceRequest) => request.height),
-        wantsWidth : isEmpty ? false : requests.map((r: ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
-        wantsHeight: isEmpty ? false : requests.map((r: ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
+        width : isEmpty ? 0 : d3.max(requests, (request: _ISpaceRequest) => request.width ),
+        height: isEmpty ? 0 : d3.max(requests, (request: _ISpaceRequest) => request.height),
+        wantsWidth : isEmpty ? false : requests.map((r: _ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
+        wantsHeight: isEmpty ? false : requests.map((r: _ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
       };
     }
 
@@ -38,7 +42,7 @@ export module Component {
                   availableHeight?: number): Group {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
       this._components.forEach((c) => {
-        c._computeLayout(0, 0, this.availableWidth, this.availableHeight);
+        c._computeLayout(0, 0, this._availableWidth, this._availableHeight);
       });
       return this;
     }

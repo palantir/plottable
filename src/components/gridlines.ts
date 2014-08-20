@@ -42,8 +42,8 @@ export module Component {
 
     public _setup() {
       super._setup();
-      this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);
-      this.yLinesContainer = this.content.append("g").classed("y-gridlines", true);
+      this.xLinesContainer = this._content.append("g").classed("x-gridlines", true);
+      this.yLinesContainer = this._content.append("g").classed("y-gridlines", true);
     }
 
     public _doRender() {
@@ -61,7 +61,7 @@ export module Component {
         xLines.attr("x1", getScaledXValue)
               .attr("y1", 0)
               .attr("x2", getScaledXValue)
-              .attr("y2", this.availableHeight)
+              .attr("y2", this._availableHeight)
              .classed("zeroline", (t: number) => t === 0);
         xLines.exit().remove();
       }
@@ -75,7 +75,7 @@ export module Component {
         yLines.enter().append("line");
         yLines.attr("x1", 0)
               .attr("y1", getScaledYValue)
-              .attr("x2", this.availableWidth)
+              .attr("x2", this._availableWidth)
               .attr("y2", getScaledYValue)
               .classed("zeroline", (t: number) => t === 0);
         yLines.exit().remove();

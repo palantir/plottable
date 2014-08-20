@@ -1,12 +1,6 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export interface DatasetDrawerKey {
-    dataset: DataSource;
-    drawer: Abstract._Drawer;
-    key: string;
-  }
-
 export module Abstract {
   export class NewStylePlot extends XYPlot {
     private nextSeriesIndex = 0;
@@ -15,6 +9,11 @@ export module Abstract {
 
     /**
      * Creates a NewStylePlot.
+     *
+     * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
+     *
+     * A bare Plot has a DataSource and any number of projectors, which take
+     * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
      *
      * @constructor
      * @param [Scale] xScale The x scale to use
@@ -27,7 +26,7 @@ export module Abstract {
 
     public _setup() {
       super._setup();
-      this._getDrawersInOrder().forEach((d) => d.renderArea = this.renderArea.append("g"));
+      this._getDrawersInOrder().forEach((d) => d._renderArea = this._renderArea.append("g"));
     }
 
     public remove() {
@@ -53,7 +52,7 @@ export module Abstract {
         throw new Error("invalid input to addDataset");
       }
       if (typeof(keyOrDataset) === "string" && keyOrDataset[0] === "_") {
-        Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
+        _Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
       }
       var key  = typeof(keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
       var data = typeof(keyOrDataset) !== "string" ? keyOrDataset : dataset;
@@ -73,7 +72,7 @@ export module Abstract {
       this._key2DatasetDrawerKey[key] = ddk;
 
       if (this._isSetup) {
-        drawer.renderArea = this.renderArea.append("g");
+        drawer._renderArea = this._renderArea.append("g");
       }
       dataset.broadcaster.registerListener(this, () => this._onDataSourceUpdate());
       this._onDataSourceUpdate();
@@ -90,9 +89,9 @@ export module Abstract {
           var extent = ddk.dataset._getExtent(projector.accessor);
           var scaleKey = this._plottableID.toString() + "_" + ddk.key;
           if (extent.length === 0 || !this._isAnchored) {
-            projector.scale.removeExtent(scaleKey, attr);
+            projector.scale._removeExtent(scaleKey, attr);
           } else {
-            projector.scale.updateExtent(scaleKey, attr, extent);
+            projector.scale._updateExtent(scaleKey, attr, extent);
           }
         });
       }
@@ -115,7 +114,7 @@ export module Abstract {
         return this._datasetKeysInOrder;
       }
       function isPermutation(l1: string[], l2: string[]) {
-        var intersection = Util.Methods.intersection(d3.set(l1), d3.set(l2));
+        var intersection = _Util.Methods.intersection(d3.set(l1), d3.set(l2));
         var size = (<any> intersection).size(); // HACKHACK pending on borisyankov/definitelytyped/ pr #2653
         return size === l1.length && size === l2.length;
       }
@@ -123,7 +122,7 @@ export module Abstract {
         this._datasetKeysInOrder = order;
         this._onDataSourceUpdate();
       } else {
-        Util.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
+        _Util.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
       }
       return this;
     }
@@ -143,7 +142,7 @@ export module Abstract {
         var scaleKey = this._plottableID.toString() + "_" + key;
         projectors.forEach((p) => {
           if (p.scale != null) {
-            p.scale.removeExtent(scaleKey, p.attribute);
+            p.scale._removeExtent(scaleKey, p.attribute);
           }
         });
 

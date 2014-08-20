@@ -4,24 +4,24 @@ module Plottable {
 export module Abstract {
   export class Component extends PlottableObject {
 
-    public element: D3.Selection;
-    public content: D3.Selection;
+    public _element: D3.Selection;
+    public _content: D3.Selection;
     private hitBox: D3.Selection;
     private interactionsToRegister: Interaction[] = [];
     private boxes: D3.Selection[] = [];
     private boxContainer: D3.Selection;
-    public backgroundContainer: D3.Selection;
-    public foregroundContainer: D3.Selection;
+    public _backgroundContainer: D3.Selection;
+    public _foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
 
     private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
     public _parent: ComponentContainer;
 
-    public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
-    public availableHeight: number;
-    public xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
-    public yOrigin: number;
+    public _availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
+    public _availableHeight: number;
+    private xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
+    private yOrigin: number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
     public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
@@ -55,11 +55,11 @@ export module Abstract {
         this.isTopLevelComponent = true;
       }
 
-      if (this.element != null) {
+      if (this._element != null) {
         // reattach existing element
-        element.node().appendChild(this.element.node());
+        element.node().appendChild(this._element.node());
       } else {
-        this.element = element.append("g");
+        this._element = element.append("g");
         this._setup();
       }
       this._isAnchored = true;
@@ -75,14 +75,14 @@ export module Abstract {
         return;
       }
       this.cssClasses.forEach((cssClass: string) => {
-        this.element.classed(cssClass, true);
+        this._element.classed(cssClass, true);
       });
       this.cssClasses = null;
 
-      this.backgroundContainer = this.element.append("g").classed("background-container", true);
-      this.content = this.element.append("g").classed("content", true);
-      this.foregroundContainer = this.element.append("g").classed("foreground-container", true);
-      this.boxContainer = this.element.append("g").classed("box-container", true);
+      this._backgroundContainer = this._element.append("g").classed("background-container", true);
+      this._content = this._element.append("g").classed("content", true);
+      this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
+      this.boxContainer = this._element.append("g").classed("box-container", true);
 
       if (this.clipPathEnabled) {
         this.generateClipPath();
@@ -98,7 +98,7 @@ export module Abstract {
       this._isSetup = true;
     }
 
-    public _requestedSpace(availableWidth : number, availableHeight: number): ISpaceRequest {
+    public _requestedSpace(availableWidth : number, availableHeight: number): _ISpaceRequest {
       return {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
     }
 
@@ -114,7 +114,7 @@ export module Abstract {
      */
     public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
       if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
-        if (this.element == null) {
+        if (this._element == null) {
           throw new Error("anchor must be called before computeLayout");
         } else if (this.isTopLevelComponent) {
           // we are the root node, retrieve height/width from root SVG
@@ -132,8 +132,8 @@ export module Abstract {
           }
 
           var elem: HTMLScriptElement = (<HTMLScriptElement> this.rootSVG.node());
-          availableWidth  = Util.DOM.getElementWidth(elem);
-          availableHeight = Util.DOM.getElementHeight(elem);
+          availableWidth  = _Util.DOM.getElementWidth(elem);
+          availableHeight = _Util.DOM.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }
@@ -158,10 +158,10 @@ export module Abstract {
         availableHeight = Math.min(availableHeight, requestedSpace.height);
       }
 
-      this.availableWidth   = availableWidth ;
-      this.availableHeight = availableHeight;
-      this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth ).attr("height", this.availableHeight));
+      this._availableWidth   = availableWidth ;
+      this._availableHeight = availableHeight;
+      this._element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
+      this.boxes.forEach((b: D3.Selection) => b.attr("width", this._availableWidth ).attr("height", this._availableHeight));
     }
 
     /**
@@ -195,11 +195,13 @@ export module Abstract {
     }
 
     /**
-     * Renders the Component into a given DOM element.
+     * Renders the Component into a given DOM element. The element must be as <svg>.
      *
      * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
      * @return {Component} The calling component.
      */
+    public renderTo(selector: String): Component;
+    public renderTo(element: D3.Selection): Component;
     public renderTo(element: any): Component {
       if (element != null) {
         var selection: D3.Selection;
@@ -218,6 +220,9 @@ export module Abstract {
     /**
      * Cause the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
      *
+     * This function should be called when CSS changes could influence the size
+     * of the components, e.g. changing the font size.
+     *
      * @param {number} [availableWidth]  - the width of the container element
      * @param {number} [availableHeight] - the height of the container element
      */
@@ -233,7 +238,7 @@ export module Abstract {
     }
 
     /**
-     * Enables and disables auto-resize.
+     * Enables and disables resize on window resizes.
      *
      * If enabled, window resizes will enqueue this component for a re-layout
      * and re-render. Animations are disabled during window resizes when auto-
@@ -251,9 +256,14 @@ export module Abstract {
     }
 
     /**
-     * Sets the x alignment of the Component.
+     * Sets the x alignment of the Component. This will be used if the
+     * Component is given more space than it needs.
      *
-     * @param {string} alignment The x alignment of the Component (one of LEFT/CENTER/RIGHT).
+     * For example, you may want to make a Legend postition itself it the top
+     * right, so you would call `legend.xAlign("right")` and
+     * `legend.yAlign("top")`.
+     *
+     * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
      * @returns {Component} The calling Component.
      */
     public xAlign(alignment: string): Component {
@@ -272,9 +282,14 @@ export module Abstract {
     }
 
     /**
-     * Sets the y alignment of the Component.
+     * Sets the y alignment of the Component. This will be used if the
+     * Component is given more space than it needs.
      *
-     * @param {string} alignment The y alignment of the Component (one of TOP/CENTER/BOTTOM).
+     * For example, you may want to make a Legend postition itself it the top
+     * right, so you would call `legend.xAlign("right")` and
+     * `legend.yAlign("top")`.
+     *
+     * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
      * @returns {Component} The calling Component.
      */
     public yAlign(alignment: string): Component {
@@ -293,9 +308,11 @@ export module Abstract {
     }
 
     /**
-     * Sets the x offset of the Component.
+     * Sets the x offset of the Component. This will be used if the Component
+     * is given more space than it needs.
      *
-     * @param {number} offset The desired x offset, in pixels.
+     * @param {number} offset The desired x offset, in pixels, from the left
+     * side of the container.
      * @returns {Component} The calling Component.
      */
     public xOffset(offset: number): Component {
@@ -305,9 +322,11 @@ export module Abstract {
     }
 
     /**
-     * Sets the y offset of the Component.
+     * Sets the y offset of the Component. This will be used if the Component
+     * is given more space than it needs.
      *
-     * @param {number} offset The desired y offset, in pixels.
+     * @param {number} offset The desired y offset, in pixels, from the left
+     * side of the container.
      * @returns {Component} The calling Component.
      */
     public yOffset(offset: number): Component {
@@ -317,22 +336,23 @@ export module Abstract {
     }
 
     private addBox(className?: string, parentElement?: D3.Selection) {
-      if (this.element == null) {
+      if (this._element == null) {
         throw new Error("Adding boxes before anchoring is currently disallowed");
       }
       var parentElement = parentElement == null ? this.boxContainer : parentElement;
       var box = parentElement.append("rect");
       if (className != null) {box.classed(className, true);};
+
       this.boxes.push(box);
-      if (this.availableWidth  != null && this.availableHeight != null) {
-        box.attr("width", this.availableWidth ).attr("height", this.availableHeight);
+      if (this._availableWidth  != null && this._availableHeight != null) {
+        box.attr("width", this._availableWidth ).attr("height", this._availableHeight);
       }
       return box;
     }
 
     private generateClipPath() {
       // The clip path will prevent content from overflowing its component space.
-      this.element.attr("clip-path", "url(#clipPath" + this._plottableID + ")");
+      this._element.attr("clip-path", "url(#clipPath" + this._plottableID + ")");
       var clipPathParent = this.boxContainer.append("clipPath")
                                       .attr("id", "clipPath" + this._plottableID);
       this.addBox("clip-rect", clipPathParent);
@@ -348,7 +368,7 @@ export module Abstract {
       // Interactions can be registered before or after anchoring. If registered before, they are
       // pushed to this.interactionsToRegister and registered during anchoring. If after, they are
       // registered immediately
-      if (this.element != null) {
+      if (this._element != null) {
         if (this.hitBox == null) {
             this.hitBox = this.addBox("hit-box");
             this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
@@ -374,16 +394,16 @@ export module Abstract {
       if (addClass == null) {
         if (cssClass == null) {
           return false;
-        } else if (this.element == null) {
+        } else if (this._element == null) {
           return (this.cssClasses.indexOf(cssClass) !== -1);
         } else {
-          return this.element.classed(cssClass);
+          return this._element.classed(cssClass);
         }
       } else {
         if (cssClass == null) {
           return this;
         }
-        if (this.element == null) {
+        if (this._element == null) {
           var classIndex = this.cssClasses.indexOf(cssClass);
           if (addClass && classIndex === -1) {
             this.cssClasses.push(cssClass);
@@ -391,7 +411,7 @@ export module Abstract {
             this.cssClasses.splice(classIndex, 1);
           }
         } else {
-          this.element.classed(cssClass, addClass);
+          this._element.classed(cssClass, addClass);
         }
         return this;
       }
@@ -418,7 +438,9 @@ export module Abstract {
     }
 
     /**
-     * Merges this Component with another Component, returning a ComponentGroup.
+     * Merges this Component with another Component, returning a
+     * ComponentGroup. This is used to layer Components on top of each other.
+     *
      * There are four cases:
      * Component + Component: Returns a ComponentGroup with both components inside it.
      * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
@@ -446,11 +468,14 @@ export module Abstract {
     /**
      * Detaches a Component from the DOM. The component can be reused.
      *
+     * This should only be used if you plan on reusing the calling
+     * Components. Otherwise, use remove().
+     *
      * @returns The calling Component.
      */
     public detach() {
       if (this._isAnchored) {
-        this.element.remove();
+        this._element.remove();
       }
       if (this._parent != null) {
         this._parent._removeComponent(this);

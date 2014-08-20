@@ -24,7 +24,7 @@ export module Scale {
       super(scale == null ? d3.scale.log() : scale);
       if (!Log.warned) {
         Log.warned = true;
-        Util.Methods.warn("Plottable.Scale.Log is deprecated. If possible, use Plottable.Scale.ModifiedLog instead.");
+        _Util.Methods.warn("Plottable.Scale.Log is deprecated. If possible, use Plottable.Scale.ModifiedLog instead.");
       }
     }
 

@@ -15,7 +15,7 @@ export module Abstract {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public _isVertical: boolean;
 
-    public _animators: Animator.IPlotAnimatorMap = {
+    public _animators: IPlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
       "bars"       : new Animator.IterativeDelay(),
       "baseline"   : new Animator.Null()
@@ -41,16 +41,16 @@ export module Abstract {
 
     public _setup() {
       super._setup();
-      this._baseline = this.renderArea.append("line").classed("baseline", true);
-      this._bars = this.renderArea.selectAll("rect").data([]);
+      this._baseline = this._renderArea.append("line").classed("baseline", true);
+      this._bars = this._renderArea.selectAll("rect").data([]);
     }
 
     public _paint() {
       super._paint();
-      this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
+      this._bars = this._renderArea.selectAll("rect").data(this._dataSource.data());
       this._bars.enter().append("rect");
 
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       var positionAttr = this._isVertical ? "y" : "x";
       var dimensionAttr = this._isVertical ? "height" : "width";
@@ -73,8 +73,8 @@ export module Abstract {
       var baselineAttr: IAttributeToProjector = {
         "x1": this._isVertical ? 0 : scaledBaseline,
         "y1": this._isVertical ? scaledBaseline : 0,
-        "x2": this._isVertical ? this.availableWidth : scaledBaseline,
-        "y2": this._isVertical ? scaledBaseline : this.availableHeight
+        "x2": this._isVertical ? this._availableWidth : scaledBaseline,
+        "y2": this._isVertical ? scaledBaseline : this._availableHeight
       };
 
       this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
@@ -83,6 +83,8 @@ export module Abstract {
 
     /**
      * Sets the baseline for the bars to the specified value.
+     *
+     * The baseline is the line that the bars are drawn from, defaulting to 0.
      *
      * @param {number} value The value to position the baseline at.
      * @return {AbstractBarPlot} The calling AbstractBarPlot.
@@ -208,7 +210,7 @@ export module Abstract {
 
     public _updateYDomainer() {
       if (this._isVertical) {
-        this._updateDomainer(this.yScale);
+        this._updateDomainer(this._yScale);
       } else {
         super._updateYDomainer();
       }
@@ -216,7 +218,7 @@ export module Abstract {
 
     public _updateXDomainer() {
       if (!this._isVertical) {
-        this._updateDomainer(this.xScale);
+        this._updateDomainer(this._xScale);
       } else {
         super._updateXDomainer();
       }
@@ -226,8 +228,8 @@ export module Abstract {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale    = this._isVertical ? this.yScale : this.xScale;
-      var secondaryScale  = this._isVertical ? this.xScale : this.yScale;
+      var primaryScale    = this._isVertical ? this._yScale : this._xScale;
+      var secondaryScale  = this._isVertical ? this._xScale : this._yScale;
       var primaryAttr     = this._isVertical ? "y" : "x";
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
@@ -266,4 +268,3 @@ export module Abstract {
   }
 }
 }
-

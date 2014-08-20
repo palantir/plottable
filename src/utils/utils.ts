@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Util {
+export module _Util {
   export module Methods {
 
     /**
@@ -67,9 +67,9 @@ export module Util {
      * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
      * and "activate" it by turning it into a function in (datum, index, metadata)
      */
-    export function _accessorize(accessor: any): IAccessor {
+    export function accessorize(accessor: any): _IAccessor {
       if (typeof(accessor) === "function") {
-        return (<IAccessor> accessor);
+        return (<_IAccessor> accessor);
       } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
         return (d: any, i: number, s: any) => d[accessor];
       } else {
@@ -94,8 +94,8 @@ export module Util {
     /**
      * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
      */
-    export function _applyAccessor(accessor: IAccessor, plot: Abstract.Plot) {
-      var activatedAccessor = _accessorize(accessor);
+    export function applyAccessor(accessor: _IAccessor, plot: Abstract.Plot) {
+      var activatedAccessor = accessorize(accessor);
       return (d: any, i: number) => activatedAccessor(d, i, plot.dataSource().metadata());
     }
 
