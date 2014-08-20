@@ -25,6 +25,7 @@ export module Core {
     var _componentsNeedingRender: {[key: string]: Abstract.Component} = {};
     var _componentsNeedingComputeLayout: {[key: string]: Abstract.Component} = {};
     var _animationRequested: boolean = false;
+    var _isCurrentlyFlushing: boolean = false;
     export var _renderPolicy: RenderPolicy.IRenderPolicy = new RenderPolicy.AnimationFrame();
 
     export function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): any {
@@ -38,6 +39,9 @@ export module Core {
      * @param {Abstract.Component} component Any Plottable component.
      */
     export function registerToRender(c: Abstract.Component) {
+      if (_isCurrentlyFlushing) {
+        _Util.Methods.warn("Registered to render while other components are flushing: request may be ignored");
+      }
       _componentsNeedingRender[c._plottableID] = c;
       requestRender();
     }
@@ -79,6 +83,9 @@ export module Core {
         var toRender = d3.values(_componentsNeedingRender);
         toRender.forEach((c) => c._render());
 
+        // now we are flushing
+        _isCurrentlyFlushing = true;
+
         // Finally, perform render of all components
         var failed: {[key: string]: Abstract.Component} = {};
         Object.keys(_componentsNeedingRender).forEach((k) => {
@@ -98,6 +105,7 @@ export module Core {
         _componentsNeedingComputeLayout = {};
         _componentsNeedingRender = failed;
         _animationRequested = false;
+        _isCurrentlyFlushing = false;
       }
 
       // Reset resize flag regardless of queue'd components

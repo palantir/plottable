@@ -637,6 +637,38 @@ describe("Category Axes", function () {
         assert.isFalse(s.wantsHeight, "it doesn't want height");
         svg.remove();
     });
+    it("width accounts for gutter. ticklength, and padding on vertical axes", function () {
+        var svg = generateSVG(400, 400);
+        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+        var ca = new Plottable.Axis.Category(xScale, "left");
+        ca.renderTo(svg);
+        var axisWidth = ca.width();
+        ca.tickLabelPadding(ca.tickLabelPadding() + 5);
+        assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing tickLabelPadding increases width");
+        axisWidth = ca.width();
+        ca.gutter(ca.gutter() + 5);
+        assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing gutter increases width");
+        axisWidth = ca.width();
+        ca.tickLength(ca.tickLength() + 5);
+        assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing tickLength increases width");
+        svg.remove();
+    });
+    it("height accounts for gutter. ticklength, and padding on horizontal axes", function () {
+        var svg = generateSVG(400, 400);
+        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+        var ca = new Plottable.Axis.Category(xScale, "bottom");
+        ca.renderTo(svg);
+        var axisHeight = ca.height();
+        ca.tickLabelPadding(ca.tickLabelPadding() + 5);
+        assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing tickLabelPadding increases height");
+        axisHeight = ca.height();
+        ca.gutter(ca.gutter() + 5);
+        assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing gutter increases height");
+        axisHeight = ca.height();
+        ca.tickLength(ca.tickLength() + 5);
+        assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing ticklength increases height");
+        svg.remove();
+    });
 });
 
 var assert = chai.assert;
@@ -4508,29 +4540,33 @@ describe("Interactions", function () {
             interaction.registerWithComponent();
         });
         afterEach(function () {
-            interaction.callback();
+            interaction.dragstart(null);
+            interaction.drag(null);
+            interaction.dragend(null);
             interaction.clearBox();
         });
-        it("All callbacks are notified with appropriate data when a drag finishes", function () {
+        it("All callbacks are notified with appropriate data on drag", function () {
             var timesCalled = 0;
-            var areaCallback = function (a) {
+            interaction.dragstart(function (a) {
                 timesCalled++;
-                if (timesCalled === 1) {
-                    assert.deepEqual(a, null, "areaCallback called with null arg on dragstart");
-                }
-                if (timesCalled === 2) {
-                    var expectedPixelArea = {
-                        xMin: dragstartX,
-                        xMax: dragendX,
-                        yMin: dragstartY,
-                        yMax: dragendY
-                    };
-                    assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
-                }
-            };
-            interaction.callback(areaCallback);
+                var expectedStartLocation = { x: dragstartX, y: dragstartY };
+                assert.deepEqual(a, expectedStartLocation, "areaCallback called with null arg on dragstart");
+            });
+            interaction.dragend(function (a, b) {
+                timesCalled++;
+                var expectedStart = {
+                    x: dragstartX,
+                    y: dragstartY,
+                };
+                var expectedEnd = {
+                    x: dragendX,
+                    y: dragendY
+                };
+                assert.deepEqual(a, expectedStart, "areaCallback was passed the correct starting point");
+                assert.deepEqual(b, expectedEnd, "areaCallback was passed the correct ending point");
+            });
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            assert.equal(timesCalled, 2, "areaCallback was called twice");
+            assert.equal(timesCalled, 2, "drag callbacks are called twice");
         });
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
@@ -4574,27 +4610,27 @@ describe("Interactions", function () {
             interaction.registerWithComponent();
         });
         afterEach(function () {
-            interaction.callback();
+            interaction.dragstart(null);
+            interaction.drag(null);
+            interaction.dragend(null);
             interaction.clearBox();
         });
         it("All callbacks are notified with appropriate data when a drag finishes", function () {
             var timesCalled = 0;
-            var areaCallback = function (a) {
+            interaction.dragstart(function (a) {
                 timesCalled++;
-                if (timesCalled === 1) {
-                    assert.deepEqual(a, null, "areaCallback called with null arg on dragstart");
-                }
-                if (timesCalled === 2) {
-                    var expectedPixelArea = {
-                        yMin: dragstartY,
-                        yMax: dragendY
-                    };
-                    assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
-                }
-            };
-            interaction.callback(areaCallback);
+                var expectedY = dragstartY;
+                assert.deepEqual(a.y, expectedY, "areaCallback called with null arg on dragstart");
+            });
+            interaction.dragend(function (a, b) {
+                timesCalled++;
+                var expectedStartY = dragstartY;
+                var expectedEndY = dragendY;
+                assert.deepEqual(a.y, expectedStartY);
+                assert.deepEqual(b.y, expectedEndY);
+            });
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            assert.equal(timesCalled, 2, "areaCallback was called twice");
+            assert.equal(timesCalled, 2, "drag callbacks area called twice");
         });
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
@@ -4639,6 +4675,106 @@ describe("Interactions", function () {
             $hitbox.simulate("mouseout");
             $hitbox.simulate("keydown", { keyCode: code });
             assert.isFalse(callbackCalled, "callback is not called if component does not have mouse focus (after mouseout)");
+            svg.remove();
+        });
+    });
+    describe("BarHover", function () {
+        var dataset;
+        var ordinalScale;
+        var linearScale;
+        before(function () {
+            dataset = [
+                { name: "A", value: 3 },
+                { name: "B", value: 5 }
+            ];
+            ordinalScale = new Plottable.Scale.Ordinal();
+            linearScale = new Plottable.Scale.Linear();
+        });
+        it("hoverMode()", function () {
+            var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
+            var bhi = new Plottable.Interaction.BarHover(barPlot);
+            bhi.hoverMode("line");
+            bhi.hoverMode("POINT");
+            assert.throws(function () { return bhi.hoverMode("derp"); }, "not a valid");
+        });
+        it("correctly triggers callbacks (vertical)", function () {
+            var svg = generateSVG(400, 400);
+            var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
+            barPlot.project("x", "name", ordinalScale).project("y", "value", linearScale);
+            var bhi = new Plottable.Interaction.BarHover(barPlot);
+            var barDatum = null;
+            bhi.onHover(function (datum, bar) {
+                barDatum = datum;
+            });
+            var unhoverCalled = false;
+            bhi.onUnhover(function (datum, bar) {
+                barDatum = datum;
+                unhoverCalled = true;
+            });
+            barPlot.renderTo(svg);
+            bhi.registerWithComponent();
+            var hitbox = barPlot.element.select(".hit-box");
+            triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
+            assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
+            barDatum = null;
+            triggerFakeMouseEvent("mousemove", hitbox, 100, 201);
+            assert.isNull(barDatum, "hover callback isn't called if the hovered bar didn't change");
+            barDatum = null;
+            triggerFakeMouseEvent("mousemove", hitbox, 10, 10);
+            assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing away from a bar");
+            assert.deepEqual(barDatum, dataset[0], "the unhover callback was passed the last-hovered bar");
+            unhoverCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 11, 11);
+            assert.isFalse(unhoverCalled, "unhover callback isn't triggered multiple times in succession");
+            triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
+            triggerFakeMouseEvent("mouseout", hitbox, 100, 9999);
+            assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing out of the chart");
+            triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
+            unhoverCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 250, 200);
+            assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing from one bar to another");
+            bhi.hoverMode("line");
+            barDatum = null;
+            triggerFakeMouseEvent("mousemove", hitbox, 100, 1);
+            assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
+            svg.remove();
+        });
+        it("correctly triggers callbacks (hoizontal)", function () {
+            var svg = generateSVG(400, 400);
+            var barPlot = new Plottable.Plot.HorizontalBar(dataset, linearScale, ordinalScale);
+            barPlot.project("y", "name", ordinalScale).project("x", "value", linearScale);
+            var bhi = new Plottable.Interaction.BarHover(barPlot);
+            var barDatum = null;
+            bhi.onHover(function (datum, bar) {
+                barDatum = datum;
+            });
+            var unhoverCalled = false;
+            bhi.onUnhover(function () {
+                unhoverCalled = true;
+            });
+            barPlot.renderTo(svg);
+            bhi.registerWithComponent();
+            var hitbox = barPlot.element.select(".hit-box");
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
+            assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
+            barDatum = null;
+            triggerFakeMouseEvent("mousemove", hitbox, 201, 250);
+            assert.isNull(barDatum, "hover callback isn't called if the hovered bar didn't change");
+            triggerFakeMouseEvent("mousemove", hitbox, 10, 10);
+            assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing away from a bar");
+            unhoverCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 11, 11);
+            assert.isFalse(unhoverCalled, "unhover callback isn't triggered multiple times in succession");
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
+            triggerFakeMouseEvent("mouseout", hitbox, -999, 250);
+            assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing out of the chart");
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
+            unhoverCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 100);
+            assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing from one bar to another");
+            bhi.hoverMode("line");
+            triggerFakeMouseEvent("mousemove", hitbox, 399, 250);
+            assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
             svg.remove();
         });
     });

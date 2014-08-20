@@ -20,9 +20,6 @@ export module Interaction {
 
     public _dragstart() {
       super._dragstart();
-      if (this.callbackToCall != null) {
-        this.callbackToCall(null);
-      }
       this.clearBox();
     }
 

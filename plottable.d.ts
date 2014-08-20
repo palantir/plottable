@@ -950,12 +950,30 @@ declare module Plottable {
 
 declare module Plottable {
     module Interaction {
+        class BarHover extends Plottable.Abstract.Interaction {
+            componentToListenTo: Plottable.Abstract.BarPlot;
+            constructor(barPlot: Plottable.Abstract.BarPlot);
+            hoverMode(): string;
+            hoverMode(mode: string): BarHover;
+            onHover(callback: (datum: any, bar: D3.Selection) => any): BarHover;
+            onUnhover(callback: (datum: any, bar: D3.Selection) => any): BarHover;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
         class Drag extends Plottable.Abstract.Interaction {
             origin: number[];
             location: number[];
-            callbackToCall: (dragInfo: any) => any;
             constructor(componentToListenTo: Plottable.Abstract.Component);
-            callback(cb?: (a: SelectionArea) => any): Drag;
+            dragstart(): (startLocation: Point) => void;
+            dragstart(cb: (startLocation: Point) => any): Drag;
+            drag(): (startLocation: Point, endLocation: Point) => void;
+            drag(cb: (startLocation: Point, endLocation: Point) => any): Drag;
+            dragend(): (startLocation: Point, endLocation: Point) => void;
+            dragend(cb: (startLocation: Point, endLocation: Point) => any): Drag;
             setupZoomCallback(xScale?: Plottable.Abstract.QuantitativeScale, yScale?: Plottable.Abstract.QuantitativeScale): Drag;
         }
     }
