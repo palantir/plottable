@@ -12,7 +12,7 @@ export module Interaction {
     public isResizing = false;
     public _selectionOrigin: number[];
     public _resizeStartDiff: number[] = [];
-    public _lastCursorStyle = "";
+    private lastCursorStyle = "";
 
     public _isCloseEnough(val: number, position: number, padding: number): boolean {
       return position - padding <= val && val <= position + padding;
@@ -141,8 +141,12 @@ export module Interaction {
         if (this.boxIsDrawn) {
           var position = d3.mouse(this.hitBox[0][0].parentNode);
           cursorStyle = this._cursorStyle(position[0], position[1]);
+          if (!cursorStyle && this.isResizing) {
+            cursorStyle = this.lastCursorStyle;
+          }
+          this.lastCursorStyle = cursorStyle;
         } else if (this.isResizing) {
-          cursorStyle = this._lastCursorStyle;
+          cursorStyle = this.lastCursorStyle;
         } else {
           cursorStyle = "";
         }

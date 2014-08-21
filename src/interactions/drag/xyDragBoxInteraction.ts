@@ -70,25 +70,19 @@ export module Interaction {
       var top = this._isCloseEnoughXY(y, y1, this.resizePadding, halfheight, true);
       var right = this._isCloseEnoughXY(x, x2, this.resizePadding, halfwidth, false);
       var bottom = this._isCloseEnoughXY(y, y2, this.resizePadding, halfheight, false);
-      var cursorStyle = "";
 
       if (this.isResizingX && this.isResizingY) {
         if (left && top || bottom && right) {
-          cursorStyle = "nwse-resize";
+          return "nwse-resize";
         } else if (top && right || bottom && left) {
-          cursorStyle = "nesw-resize";
+          return "nesw-resize";
         }
-        // Using the last cursor in case `this._cursorStyle()` returns empty.
-        // This is to cover the cases where the user drags too fast.
-        return this._lastCursorStyle = cursorStyle || this._lastCursorStyle;
 
       } else if (this.isResizingX) {
-        cursorStyle = left || right ? "ew-resize" : "";
-        return this._lastCursorStyle = cursorStyle || this._lastCursorStyle;
+        return left || right ? "ew-resize" : "";
 
       } else if (this.isResizingY) {
-        cursorStyle = top || bottom ? "ns-resize": "";
-        return this._lastCursorStyle = cursorStyle || this._lastCursorStyle;
+        return top || bottom ? "ns-resize": "";
       }
 
       var hovering = y1 - this.resizePadding <= y && y <= y2 + this.resizePadding &&
