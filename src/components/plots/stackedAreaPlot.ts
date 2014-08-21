@@ -19,6 +19,7 @@ export module Plot {
     constructor(xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(xScale, yScale);
       this.classed("area-plot", true);
+      this.project("fill", () => Core.Colors.INDIGO);
 
     }
 
@@ -57,10 +58,12 @@ export module Plot {
                                     .y0(y0Function)
                                     .y1(yFunction)(d.values);
 
-      var colorScale = new Scale.Color();
-      this._getDrawersInOrder().forEach((d, i) => {
-        attrToProjector["fill"] = () => colorScale.scale(i);
-        d.draw([this.stackedData[i]], attrToProjector);
+      // Align fill with first index
+      var fillProjector = attrToProjector["fill"];
+      attrToProjector["fill"] = (d, i) => fillProjector(d.values[0], i);
+
+      this._getDrawersInOrder().forEach((drawer, i) => {
+        drawer.draw([this.stackedData[i]], attrToProjector);
       });
     }
 

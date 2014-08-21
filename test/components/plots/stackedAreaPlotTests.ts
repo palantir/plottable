@@ -21,14 +21,15 @@ describe("Plots", () => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Linear().domain([1, 3]);
       yScale = new Plottable.Scale.Linear().domain([0, 4]);
+      var colorScale = new Plottable.Scale.Color("10").domain(["a", "b"]);
 
       var data1 = [
-        {x: 1, y: 1},
-        {x: 3, y: 2}
+        {x: 1, y: 1, type: "a"},
+        {x: 3, y: 2, type: "a"}
       ];
       var data2 = [
-        {x: 1, y: 3},
-        {x: 3, y: 1}
+        {x: 1, y: 3, type: "b"},
+        {x: 3, y: 1, type: "b"}
       ];
       dataset1 = new Plottable.DataSource(data1);
       dataset2 = new Plottable.DataSource(data2);
@@ -36,6 +37,7 @@ describe("Plots", () => {
       renderer = new Plottable.Plot.StackedArea(xScale, yScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
+      renderer.project("fill", "type", colorScale);
       var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
     });

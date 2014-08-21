@@ -5137,6 +5137,7 @@ var Plottable;
                 this._baselineValue = 0;
                 this.stackedExtent = [];
                 this.classed("area-plot", true);
+                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
             }
             StackedArea.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Area(key);
@@ -5165,10 +5166,10 @@ var Plottable;
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
                 attrToProjector["d"] = function (d) { return d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction)(d.values); };
-                var colorScale = new Plottable.Scale.Color();
-                this._getDrawersInOrder().forEach(function (d, i) {
-                    attrToProjector["fill"] = function () { return colorScale.scale(i); };
-                    d.draw([_this.stackedData[i]], attrToProjector);
+                var fillProjector = attrToProjector["fill"];
+                attrToProjector["fill"] = function (d, i) { return fillProjector(d.values[0], i); };
+                this._getDrawersInOrder().forEach(function (drawer, i) {
+                    drawer.draw([_this.stackedData[i]], attrToProjector);
                 });
             };
             StackedArea.prototype._updateYDomainer = function () {
