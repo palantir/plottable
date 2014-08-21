@@ -7,7 +7,6 @@ export module Plot {
     private stackedData: any[] = [];
     public _baseline: D3.Selection;
     public _baselineValue = 0;
-    public _isVertical = true;
     private stackedExtent: number[] = [];
 
     /**
@@ -23,7 +22,6 @@ export module Plot {
 
     }
 
-    // Method not used.  Required for inheritance.
     public _getDrawer(key: string) {
       return new Plottable._Drawer.Area(key);
     }
@@ -96,9 +94,8 @@ export module Plot {
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
-      attrToProjector["y"] = (d: any) => primaryScale.scale(d.y + d.y0);
-      attrToProjector["y0"] = (d: any) => primaryScale.scale(d.y0);
+      attrToProjector["y"] = (d: any) => this.yScale.scale(d.y + d.y0);
+      attrToProjector["y0"] = (d: any) => this.yScale.scale(d.y0);
       return attrToProjector;
     }
   }

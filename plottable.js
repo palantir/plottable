@@ -5135,7 +5135,6 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.stackedData = [];
                 this._baselineValue = 0;
-                this._isVertical = true;
                 this.stackedExtent = [];
                 this.classed("area-plot", true);
             }
@@ -5197,10 +5196,10 @@ var Plottable;
                 }
             };
             StackedArea.prototype._generateAttrToProjector = function () {
+                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var primaryScale = this._isVertical ? this.yScale : this.xScale;
-                attrToProjector["y"] = function (d) { return primaryScale.scale(d.y + d.y0); };
-                attrToProjector["y0"] = function (d) { return primaryScale.scale(d.y0); };
+                attrToProjector["y"] = function (d) { return _this.yScale.scale(d.y + d.y0); };
+                attrToProjector["y0"] = function (d) { return _this.yScale.scale(d.y0); };
                 return attrToProjector;
             };
             return StackedArea;
