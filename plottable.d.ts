@@ -749,6 +749,18 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
+        class HorizontalLegend extends Plottable.Abstract.Component {
+            static LEGEND_ROW_CLASS: string;
+            static LEGEND_ENTRY_CLASS: string;
+            constructor(colorScale?: Plottable.Scale.Color);
+            remove(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
         class Gridlines extends Plottable.Abstract.Component {
             constructor(xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.QuantitativeScale);
             remove(): Gridlines;

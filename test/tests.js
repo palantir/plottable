@@ -1234,6 +1234,93 @@ describe("Legends", function () {
         });
     });
 });
+describe("HorizontalLegend", function () {
+    var colorScale;
+    var horizLegend;
+    var entrySelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ENTRY_CLASS;
+    var rowSelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ROW_CLASS;
+    beforeEach(function () {
+        colorScale = new Plottable.Scale.Color();
+        colorScale.domain([
+            "Washington",
+            "Adams",
+            "Jefferson",
+        ]);
+        horizLegend = new Plottable.Component.HorizontalLegend(colorScale);
+    });
+    it("renders an entry for each item in the domain", function () {
+        var svg = generateSVG(400, 100);
+        horizLegend.renderTo(svg);
+        var entries = horizLegend.element.selectAll(entrySelector);
+        assert.equal(entries[0].length, colorScale.domain().length, "one entry is created for each item in the domain");
+        var elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
+        assert.deepEqual(elementTexts, colorScale.domain(), "entry texts match scale domain");
+        var domain = colorScale.domain();
+        domain.push("Madison");
+        colorScale.domain(domain);
+        window.horizLegend = horizLegend;
+        entries = horizLegend.element.selectAll(entrySelector);
+        assert.equal(entries[0].length, colorScale.domain().length, "Legend updated to include item added to the domain");
+        svg.remove();
+    });
+    it("wraps entries onto extra rows if necessary", function () {
+        var svg = generateSVG(200, 100);
+        horizLegend.renderTo(svg);
+        var rows = horizLegend.element.selectAll(rowSelector);
+        assert.lengthOf(rows[0], 2, "Wrapped text on to two rows when space is constrained");
+        horizLegend.detach();
+        svg.remove();
+        svg = generateSVG(100, 100);
+        horizLegend.renderTo(svg);
+        rows = horizLegend.element.selectAll(rowSelector);
+        assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
+        svg.remove();
+    });
+    it("truncates and hides entries if space is constrained", function () {
+        var svg = generateSVG(70, 400);
+        horizLegend.renderTo(svg);
+        var textEls = horizLegend.element.selectAll("text");
+        textEls.each(function (d) {
+            var textEl = d3.select(this);
+            assertBBoxInclusion(horizLegend.element, textEl);
+        });
+        horizLegend.detach();
+        svg.remove();
+        svg = generateSVG(100, 50);
+        horizLegend.renderTo(svg);
+        textEls = horizLegend.element.selectAll("text");
+        textEls.each(function (d) {
+            var textEl = d3.select(this);
+            assertBBoxInclusion(horizLegend.element, textEl);
+        });
+        svg.remove();
+    });
+    it("scales icon size with entry font size", function () {
+        colorScale.domain(["A"]);
+        var svg = generateSVG(400, 100);
+        horizLegend.renderTo(svg);
+        var style = horizLegend.element.append("style");
+        style.attr("type", "text/css");
+        function verifyCircleHeight() {
+            var text = horizLegend.content.select("text");
+            var circle = horizLegend.content.select("circle");
+            var textHeight = Plottable.Util.DOM.getBBox(text).height;
+            var circleHeight = Plottable.Util.DOM.getBBox(circle).height;
+            assert.operator(circleHeight, "<", textHeight, "Icon is smaller than entry text");
+            return circleHeight;
+        }
+        var origCircleHeight = verifyCircleHeight();
+        style.text(".plottable .legend text { font-size: 30px; }");
+        horizLegend._invalidateLayout();
+        var bigCircleHeight = verifyCircleHeight();
+        assert.operator(bigCircleHeight, ">", origCircleHeight, "icon size increased with font size");
+        style.text(".plottable .legend text { font-size: 6px; }");
+        horizLegend._invalidateLayout();
+        var smallCircleHeight = verifyCircleHeight();
+        assert.operator(smallCircleHeight, "<", origCircleHeight, "icon size decreased with font size");
+        svg.remove();
+    });
+});
 
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
