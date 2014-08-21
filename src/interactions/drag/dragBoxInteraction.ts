@@ -6,11 +6,11 @@ export module Interaction {
     private static CLASS_DRAG_BOX = "drag-box";
     public dragBox: D3.Selection;
     public boxIsDrawn = false;
-    public _resizeEnabled = false;
+    private resizeEnabled = false;
     public resizePadding = 10;
-    public _selectionOrigin: number[];
     public selection: SelectionArea;
     public isResizing = false;
+    public _selectionOrigin: number[];
     public _lastCursorStyle = "";
 
     public _isCloseEnough(val: number, position: number, padding: number): boolean {
@@ -43,9 +43,9 @@ export module Interaction {
     public resize(enabled: boolean): DragBox;
     public resize(enabled?: boolean): any {
       if (enabled == null) {
-        return this._resizeEnabled;
+        return this.resizeEnabled;
       } else {
-        this._resizeEnabled = enabled;
+        this.resizeEnabled = enabled;
         return this;
       }
     }
@@ -82,7 +82,7 @@ export module Interaction {
     public _doDragstart() {
       this._selectionOrigin = this.origin.slice();
       if (this.boxIsDrawn) {
-        if (!this._resizeEnabled || !(this.isResizing = this._isResizeStart())) {
+        if (!this.resizeEnabled || !(this.isResizing = this._isResizeStart())) {
           this.clearBox();
         }
       }
@@ -133,7 +133,7 @@ export module Interaction {
     }
 
     public _hover() {
-      if (this._resizeEnabled) {
+      if (this.resizeEnabled) {
         var cursorStyle: string;
         if (this.boxIsDrawn) {
           var position = d3.mouse(this.hitBox[0][0].parentNode);
