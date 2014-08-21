@@ -3,7 +3,6 @@
 module Plottable {
 export module Interaction {
   export class Drag extends Abstract.Interaction {
-    private dragInitialized = false;
     private dragBehavior: D3.Behavior.Drag;
     public origin = [0,0];
     public location = [0,0];
@@ -99,6 +98,8 @@ export module Interaction {
       var constraintFunction = (min: number, max: number) => (x: number) => Math.min(Math.max(x, min), max);
       this.constrainX = constraintFunction(0, availableWidth );
       this.constrainY = constraintFunction(0, availableHeight);
+      this.origin = d3.mouse(this.hitBox[0][0].parentNode);
+      this._doDragstart();
     }
 
     public _doDragstart() {
@@ -108,12 +109,6 @@ export module Interaction {
     }
 
     public _drag(){
-      if (!this.dragInitialized) {
-        this.origin = [d3.event.x, d3.event.y];
-        this.dragInitialized = true;
-        this._doDragstart();
-      }
-
       this.location = [this.constrainX(d3.event.x), this.constrainY(d3.event.y)];
       this._doDrag();
     }
@@ -127,10 +122,6 @@ export module Interaction {
     }
 
     public _dragend(){
-      if (!this.dragInitialized) {
-        return;
-      }
-      this.dragInitialized = false;
       this._doDragend();
     }
 

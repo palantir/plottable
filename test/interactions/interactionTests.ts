@@ -20,7 +20,12 @@ function makeFakeEvent(x: number, y: number): D3.D3Event {
 }
 
 function fakeDragSequence(anyedInteraction: any, startX: number, startY: number, endX: number, endY: number) {
+  var originalD3Mouse = d3.mouse;
+  d3.mouse = function() {
+    return [startX, startY];
+  };
   anyedInteraction._dragstart();
+  d3.mouse = originalD3Mouse;
   d3.event = makeFakeEvent(startX, startY);
   anyedInteraction._drag();
   d3.event = makeFakeEvent(endX, endY);

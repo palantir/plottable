@@ -5512,7 +5512,12 @@ function makeFakeEvent(x, y) {
 }
 
 function fakeDragSequence(anyedInteraction, startX, startY, endX, endY) {
+    var originalD3Mouse = d3.mouse;
+    d3.mouse = function () {
+        return [startX, startY];
+    };
     anyedInteraction._dragstart();
+    d3.mouse = originalD3Mouse;
     d3.event = makeFakeEvent(startX, startY);
     anyedInteraction._drag();
     d3.event = makeFakeEvent(endX, endY);
