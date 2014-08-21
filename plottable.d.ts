@@ -2582,10 +2582,15 @@ declare module Plottable {
         class DragBox extends Drag {
             public dragBox: D3.Selection;
             public boxIsDrawn: boolean;
-            public resizeEnabled: boolean;
             public resizePadding: number;
             public selection: SelectionArea;
             public isResizing: boolean;
+            /**
+            * Gets wether resizing is enabled or not.
+            *
+            * @returns {boolean}
+            */
+            public resize(): boolean;
             /**
             * Enables or disables resizing.
             *
