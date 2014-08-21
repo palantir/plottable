@@ -5146,6 +5146,7 @@ var Plottable;
                 this._baseline = this.renderArea.append("line").classed("baseline", true);
             };
             StackedArea.prototype._paint = function () {
+                var _this = this;
                 _super.prototype._paint.call(this);
                 var primaryScale = this.yScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -5156,9 +5157,6 @@ var Plottable;
                     "y2": scaledBaseline
                 };
                 this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
-                var stackedData = d3.layout.stack().values(function (d) {
-                    return d.values;
-                })(this.stackedData);
                 var attrToProjector = this._generateAttrToProjector();
                 var xFunction = attrToProjector["x"];
                 var y0Function = attrToProjector["y0"];
@@ -5170,7 +5168,7 @@ var Plottable;
                 var colorScale = new Plottable.Scale.Color();
                 this._getDrawersInOrder().forEach(function (d, i) {
                     attrToProjector["fill"] = function () { return colorScale.scale(i); };
-                    d.draw([stackedData[i]], attrToProjector);
+                    d.draw([_this.stackedData[i]], attrToProjector);
                 });
             };
             StackedArea.prototype._updateYDomainer = function () {
@@ -5178,7 +5176,7 @@ var Plottable;
             };
             StackedArea.prototype._addDataset = function (key, dataset) {
                 _super.prototype._addDataset.call(this, key, dataset);
-                this.stackedData.push({ key: key, values: dataset.data() });
+                this.stack({ key: key, values: dataset.data() });
             };
             StackedArea.prototype._onDataSourceUpdate = function () {
                 return Plot.Area.prototype._onDataSourceUpdate.apply(this);
@@ -5201,6 +5199,12 @@ var Plottable;
                 attrToProjector["y"] = function (d) { return _this.yScale.scale(d.y + d.y0); };
                 attrToProjector["y0"] = function (d) { return _this.yScale.scale(d.y0); };
                 return attrToProjector;
+            };
+            StackedArea.prototype.stack = function (d) {
+                this.stackedData.push(d);
+                this.stackedData = d3.layout.stack().values(function (d) {
+                    return d.values;
+                })(this.stackedData);
             };
             return StackedArea;
         })(Plottable.Abstract.NewStylePlot);

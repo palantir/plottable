@@ -44,9 +44,6 @@ export module Plot {
       };
       this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
 
-      var stackedData = d3.layout.stack()
-        .values(function(d) { return d.values; })(this.stackedData);
-
       var attrToProjector = this._generateAttrToProjector();
       var xFunction       = attrToProjector["x"];
       var y0Function      = attrToProjector["y0"];
@@ -63,7 +60,7 @@ export module Plot {
       var colorScale = new Scale.Color();
       this._getDrawersInOrder().forEach((d, i) => {
         attrToProjector["fill"] = () => colorScale.scale(i);
-        d.draw([stackedData[i]], attrToProjector);
+        d.draw([this.stackedData[i]], attrToProjector);
       });
     }
 
@@ -73,7 +70,7 @@ export module Plot {
 
     public _addDataset(key: string, dataset: any) {
       super._addDataset(key, dataset);
-      this.stackedData.push({key: key, values: (<DataSource> dataset).data()});
+      this.stack({key: key, values: (<DataSource> dataset).data()});
     }
 
     public _onDataSourceUpdate() {
@@ -97,6 +94,12 @@ export module Plot {
       attrToProjector["y"] = (d: any) => this.yScale.scale(d.y + d.y0);
       attrToProjector["y0"] = (d: any) => this.yScale.scale(d.y0);
       return attrToProjector;
+    }
+
+    private stack(d: any) {
+      this.stackedData.push(d);
+      this.stackedData = d3.layout.stack()
+        .values(function(d) { return d.values; })(this.stackedData);
     }
   }
 }
