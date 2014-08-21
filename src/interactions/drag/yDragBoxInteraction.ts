@@ -5,7 +5,11 @@ export module Interaction {
   export class YDragBox extends DragBox {
     public _drag(){
       super._drag();
-      this.setBox(this._selectionOrigin[1], this.location[1]);
+      var y1 = this.location[1];
+      if (this.isResizing) {
+        y1 += this._resizeStartDiff[1];
+      }
+      this.setBox(this._selectionOrigin[1], y1);
     }
 
     public setBox(y0: number, y1: number) {

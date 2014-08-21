@@ -16,6 +16,13 @@ export module Interaction {
       var x1 = this.location[0];
       var y0 = this._selectionOrigin[1];
       var y1 = this.location[1];
+
+      if (this.isResizingX) {
+        x1 += this._resizeStartDiff[0];
+      }
+      if (this.isResizingY) {
+        y1 += this._resizeStartDiff[1];
+      }
       if (!this.resize() || this.isResizingX || !this.isResizingY) {
         attrs.width = Math.abs(x0 - x1);
         attrs.x = Math.min(x0, x1);

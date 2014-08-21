@@ -11,6 +11,7 @@ export module Interaction {
     public selection: SelectionArea;
     public isResizing = false;
     public _selectionOrigin: number[];
+    public _resizeStartDiff: number[] = [];
     public _lastCursorStyle = "";
 
     public _isCloseEnough(val: number, position: number, padding: number): boolean {
@@ -67,10 +68,12 @@ export module Interaction {
       var result1 = this._isCloseEnough(origin, c1, this.resizePadding);
       if (result1) {
         this._selectionOrigin[i] = c2;
+        this._resizeStartDiff[i] = c1 - origin;
       }
       var result2 = this._isCloseEnough(origin, c2, this.resizePadding);
       if (result2) {
         this._selectionOrigin[i] = c1;
+        this._resizeStartDiff[i] = c2 - origin;
       }
       return result1 || result2;
     }

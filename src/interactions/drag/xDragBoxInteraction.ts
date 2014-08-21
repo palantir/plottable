@@ -5,7 +5,11 @@ export module Interaction {
   export class XDragBox extends DragBox {
     public _drag(){
       super._drag();
-      this.setBox(this._selectionOrigin[0], this.location[0]);
+      var x1 = this.location[0];
+      if (this.isResizing) {
+        x1 += this._resizeStartDiff[0];
+      }
+      this.setBox(this._selectionOrigin[0], x1);
     }
 
     public setBox(x0: number, x1: number) {
