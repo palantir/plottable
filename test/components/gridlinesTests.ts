@@ -51,4 +51,42 @@ describe("Gridlines", () => {
     xScale.domain([0, 1]);
     // test passes if error is not thrown.
   });
+
+  it("Gridlines at the baselines should not be visible", () => {
+    var svg = generateSVG(640, 480);
+    var xScale = new Plottable.Scale.Linear();
+    xScale.domain([0, 10]); // manually set domain since we won't have a renderer
+    var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+
+    var yScale = new Plottable.Scale.Linear();
+    yScale.domain([0, 10]);
+    var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+
+    var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+    var basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis)
+                                          .addComponent(0, 1, gridlines)
+                                          .addComponent(1, 1, xAxis);
+    basicTable.renderTo(svg);
+
+    var xBaselines = gridlines.element.select(".x-gridlines").selectAll(".baseline");
+    assert.lengthOf(xBaselines[0], 2);
+    var xBaselineValues: number[] = [];
+    xBaselines.each(function() {
+      xBaselineValues.push(parseInt(d3.select(this).attr("x1"), 10));
+    });
+    assert.includeMembers([0, Math.floor(gridlines.availableWidth)], xBaselineValues, "xBaseline values are either availableWidth or 0");
+
+    var yBaselines = gridlines.element.select(".y-gridlines").selectAll(".baseline");
+    assert.lengthOf(yBaselines[0], 2);
+    var yBaselineValues: number[] = [];
+    yBaselines.each(function() {
+      yBaselineValues.push(parseInt(d3.select(this).attr("y1"), 10));
+    });
+    assert.includeMembers([0, Math.floor(gridlines.availableHeight)], yBaselineValues, "yBaseline values are either availablHeight or 0");
+
+    var baselines = gridlines.element.selectAll(".baseline");
+    baselines.each(function() { assert.equal(d3.select(this).style("visibility"), "hidden", "baselines are hidden") });
+
+    svg.remove();
+  });
 });

@@ -3,6 +3,9 @@
 module Plottable {
 export module Component {
   export class Gridlines extends Abstract.Component {
+
+    private static BASELINE_EPSILON = 10;
+
     private xScale: Abstract.QuantitativeScale;
     private yScale: Abstract.QuantitativeScale;
     private xLinesContainer: D3.Selection;
@@ -62,7 +65,9 @@ export module Component {
               .attr("y1", 0)
               .attr("x2", getScaledXValue)
               .attr("y2", this.availableHeight)
-             .classed("zeroline", (t: number) => t === 0);
+              .classed("zeroline", (t: number) => t === 0)
+              .classed("baseline", (t: number) => getScaledXValue(t) < Gridlines.BASELINE_EPSILON ||
+                                                    Math.abs(getScaledXValue(t) - this.availableWidth) < Gridlines.BASELINE_EPSILON);
         xLines.exit().remove();
       }
     }
@@ -77,7 +82,9 @@ export module Component {
               .attr("y1", getScaledYValue)
               .attr("x2", this.availableWidth)
               .attr("y2", getScaledYValue)
-              .classed("zeroline", (t: number) => t === 0);
+              .classed("zeroline", (t: number) => t === 0)
+              .classed("baseline", (t: number) => getScaledYValue(t) < Gridlines.BASELINE_EPSILON ||
+                                                    Math.abs(getScaledYValue(t) - this.availableHeight) < Gridlines.BASELINE_EPSILON);
         yLines.exit().remove();
       }
     }
