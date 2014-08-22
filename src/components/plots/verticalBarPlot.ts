@@ -16,10 +16,10 @@ export module Plot {
     public _isVertical = true;
 
     /**
-     * Creates a VerticalBarPlot.
+     * Constructs a VerticalBarPlot.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
+     * @param {IDataset | any} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */

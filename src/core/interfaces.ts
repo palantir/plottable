@@ -90,6 +90,9 @@ module Plottable {
     y: number;
   }
 
+  /**
+   * An animator for plots.
+   */
   export interface IPlotAnimator {
     /**
      * Applies the supplied attributes to a D3.Selection with some animation.
@@ -105,10 +108,16 @@ module Plottable {
     animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any;
   }
 
+  /**
+   * A map that maps string keys to appropriate IPlotAnimators.
+   */
   export interface IPlotAnimatorMap {
     [animatorKey: string] : IPlotAnimator;
   }
 
+  /**
+   * A key that is also coupled with a dataset and a drawer.
+   */
   export interface DatasetDrawerKey {
     dataset: DataSource;
     drawer: Abstract._Drawer;

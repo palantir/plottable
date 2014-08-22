@@ -11,7 +11,7 @@ export module _Util {
     private scales: Abstract.Scale[];
 
     /**
-     * Creates a ScaleDomainCoordinator.
+     * Constructs a ScaleDomainCoordinator.
      *
      * @constructor
      * @param {Scale[]} scales A list of scales whose domains should be linked.

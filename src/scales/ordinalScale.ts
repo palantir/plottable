@@ -12,9 +12,9 @@ export module Scale {
     private _outerPadding: number = 0.5;
 
     /**
-     * Creates a new Scale.Ordinal.
+     * Creates an OrdinalScale.
      *
-     * A Scale.Ordinal maps strings to numbers. A common use is to map the
+     * An OrdinalScale maps strings to numbers. A common use is to map the
      * labels of a bar plot (strings) to their pixel locations (numbers).
      *
      * @constructor
@@ -91,11 +91,11 @@ export module Scale {
     /**
      * Set the range type.
      *
-     * @param {string} rangeType Either "points" or "bands" indicating the
+     * @param {string} rangeType If provided, either "points" or "bands" indicating the
      *     d3 method used to generate range bounds.
-     * @param {number} [outerPadding] The padding outside the range,
+     * @param {number} [outerPadding] If provided, the padding outside the range,
      *     proportional to the range step.
-     * @param {number} [innerPadding] The padding between bands in the range,
+     * @param {number} [innerPadding] If provided, the padding between bands in the range,
      *     proportional to the range step. This parameter is only used in
      *     "bands" type ranges.
      * @returns {Ordinal} The calling Ordinal.

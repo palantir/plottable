@@ -4,12 +4,12 @@ module Plottable {
 export module Scale {
   export class Time extends Abstract.QuantitativeScale {
     /**
-     * Creates a new Scale.Time.
+     * Constructs a TimeScale.
      *
-     * A Scale.Time maps Date objects to numbers.
+     * A TimeScale maps Date objects to numbers.
      *
      * @constructor
-     * @param {D3.Scale.Time} [scale] The D3 LinearScale backing the Scale.Time. If not supplied, uses a default scale.
+     * @param {D3.Scale.Time} scale The D3 LinearScale backing the Scale.Time. If not supplied, uses a default scale.
      */
     constructor();
     constructor(scale: D3.Scale.LinearScale);

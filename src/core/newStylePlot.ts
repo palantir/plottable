@@ -8,7 +8,7 @@ export module Abstract {
     public _datasetKeysInOrder: string[] = [];
 
     /**
-     * Creates a NewStylePlot.
+     * Constructs a NewStylePlot.
      *
      * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
      *
@@ -41,7 +41,7 @@ export module Abstract {
      *
      * @param {string} [key] The key of the dataset.
      * @param {any[]|DataSource} dataset dataset to add.
-     * @return {NewStylePlot} The calling NewStylePlot.
+     * @returns {NewStylePlot} The calling NewStylePlot.
      */
     public addDataset(key: string, dataset: DataSource): NewStylePlot;
     public addDataset(key: string, dataset: any[]): NewStylePlot;
@@ -100,13 +100,16 @@ export module Abstract {
     /**
      * Gets the dataset order by key
      *
-     * @return {string[]} a string array of the keys in order
+     * @returns {string[]} A string array of the keys in order
      */
     public datasetOrder(): string[];
     /**
      * Sets the dataset order by key
      *
-     * @param {string[]} order A string array which represents the order of the keys. This must be a permutation of existing keys.
+     * @param {string[]} order If provided, a string array which represents the order of the keys.
+     * This must be a permutation of existing keys.
+     *
+     * @returns {NewStylePlot} The calling NewStylePlot.
      */
     public datasetOrder(order: string[]): NewStylePlot;
     public datasetOrder(order?: string[]): any {

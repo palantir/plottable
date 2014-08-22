@@ -16,10 +16,10 @@ export module Plot {
     private isVertical = false;
 
     /**
-     * Creates a HorizontalBarPlot.
+     * Constructs a HorizontalBarPlot.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
+     * @param {IDataset | any} dataset The dataset to render.
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */

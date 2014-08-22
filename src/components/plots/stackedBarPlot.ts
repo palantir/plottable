@@ -11,6 +11,16 @@ export module Plot {
     public _baseline: D3.Selection;
     private stackedExtent: number[] = [];
 
+    /**
+     * Constructs a StackedBarPlot.
+     *
+     * A StackedBarPlot is a plot that plots several bar plots stacking on top of each
+     * other.
+     *
+     * @constructor
+     * @param {Scale} xScale The x scale to use.
+     * @param {Scale} yScale The y scale to use.
+     */
     constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
       super(xScale, yScale);
     }

@@ -42,6 +42,8 @@ export module Interaction {
      * @param {number} x1 Right.
      * @param {number} y0 Top.
      * @param {number} y1 Bottom.
+     *
+     * @returns {DragBox} The calling DragBox.
      */
     public setBox(x0: number, x1: number, y0: number, y1: number) {
       if (this.dragBox == null) {return;} // HACKHACK #593

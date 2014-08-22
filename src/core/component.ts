@@ -107,10 +107,10 @@ export module Abstract {
      * If no parameters are supplied and the component is a root node,
      * they are inferred from the size of the component's element.
      *
-     * @param {number} xOrigin
-     * @param {number} yOrigin
-     * @param {number} availableWidth
-     * @param {number} availableHeight
+     * @param {number} xOrigin x-coordinate of the origin of the component
+     * @param {number} yOrigin y-coordinate of the origin of the component
+     * @param {number} availableWidth available width for the component to render in
+     * @param {number} availableHeight available height for the component to render in
      */
     public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
       if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
@@ -198,7 +198,7 @@ export module Abstract {
      * Renders the Component into a given DOM element. The element must be as <svg>.
      *
      * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
-     * @return {Component} The calling component.
+     * @returns {Component} The calling component.
      */
     public renderTo(selector: String): Component;
     public renderTo(element: D3.Selection): Component;
@@ -218,13 +218,14 @@ export module Abstract {
     }
 
     /**
-     * Cause the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
+     * Causes the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
      *
      * This function should be called when CSS changes could influence the size
      * of the components, e.g. changing the font size.
      *
      * @param {number} [availableWidth]  - the width of the container element
      * @param {number} [availableHeight] - the height of the container element
+     * @returns {Component} The calling component.
      */
     public resize(width?: number, height?: number): Component {
       if (!this.isTopLevelComponent) {
@@ -238,13 +239,14 @@ export module Abstract {
     }
 
     /**
-     * Enables and disables resize on window resizes.
+     * Enables or disables resize on window resizes.
      *
      * If enabled, window resizes will enqueue this component for a re-layout
      * and re-render. Animations are disabled during window resizes when auto-
      * resize is enabled.
      *
-     * @param {boolean} flag - Enables (true) or disables (false) auto-resize.
+     * @param {boolean} flag Enable (true) or disable (false) auto-resize.
+     * @returns {Component} The calling component.
      */
     public autoResize(flag: boolean): Component {
       if (flag) {
@@ -325,7 +327,7 @@ export module Abstract {
      * Sets the y offset of the Component. This will be used if the Component
      * is given more space than it needs.
      *
-     * @param {number} offset The desired y offset, in pixels, from the left
+     * @param {number} offset The desired y offset, in pixels, from the top
      * side of the container.
      * @returns {Component} The calling Component.
      */
@@ -362,7 +364,7 @@ export module Abstract {
      * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
      *
      * @param {Interaction} interaction The Interaction to attach to the Component.
-     * @return {Component} The calling Component.
+     * @returns {Component} The calling Component.
      */
     public registerInteraction(interaction: Interaction) {
       // Interactions can be registered before or after anchoring. If registered before, they are
@@ -385,8 +387,8 @@ export module Abstract {
      * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
      *
      * @param {string} cssClass The CSS class to add/remove/check for.
-     * @param {boolean} [addClass] Whether to add or remove the CSS class. If not supplied, checks for the CSS class.
-     * @return {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
+     * @param {boolean} addClass Whether to add or remove the CSS class. If not supplied, checks for the CSS class.
+     * @returns {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
      */
     public classed(cssClass: string): boolean;
     public classed(cssClass: string, addClass: boolean): Component;
@@ -421,7 +423,7 @@ export module Abstract {
      * Checks if the Component has a fixed width or false if it grows to fill available space.
      * Returns false by default on the base Component class.
      *
-     * @return {boolean} Whether the component has a fixed width.
+     * @returns {boolean} Whether the component has a fixed width.
      */
     public _isFixedWidth(): boolean {
       return this._fixedWidthFlag;
@@ -431,7 +433,7 @@ export module Abstract {
      * Checks if the Component has a fixed height or false if it grows to fill available space.
      * Returns false by default on the base Component class.
      *
-     * @return {boolean} Whether the component has a fixed height.
+     * @returns {boolean} Whether the component has a fixed height.
      */
     public _isFixedHeight(): boolean {
       return this._fixedHeightFlag;
@@ -448,7 +450,7 @@ export module Abstract {
      * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with two ComponentGroups inside it.
      *
      * @param {Component} c The component to merge in.
-     * @return {ComponentGroup}
+     * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
      */
     public merge(c: Component): Component.Group {
       var cg: Component.Group;

@@ -6,7 +6,7 @@ export module Abstract {
     public _xScale: Abstract.Scale;
     public _yScale: Abstract.Scale;
     /**
-     * Creates an XYPlot.
+     * Constructs an XYPlot.
      *
      * An XYPlot is a plot from drawing 2-dimensional data. Common examples
      * include Scale.Line and Scale.Bar.

@@ -391,16 +391,10 @@ declare module Plottable {
     module Core {
         module ResizeBroadcaster {
             function resizing(): boolean;
-            function clearResizing(): any;
+            function clearResizing(): void;
             function register(c: Plottable.Abstract.Component): void;
             function deregister(c: Plottable.Abstract.Component): void;
         }
-    }
-}
-
-
-declare module Plottable {
-    module Animator {
     }
 }
 

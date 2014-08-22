@@ -2343,7 +2343,6 @@ var Plottable;
     var Core = Plottable.Core;
 })(Plottable || (Plottable = {}));
 
-
 var Plottable;
 (function (Plottable) {
     ;

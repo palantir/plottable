@@ -84,9 +84,9 @@ export module Axis {
     private measurer: _Util.Text.TextMeasurer;
 
     /**
-     * Creates an Axis.Time.
+     * Constructs a TimeAxis.
      *
-     * An Axis.Time is used for rendering a Scale.Time.
+     * A TimeAxis is used for rendering a TimeScale.
      *
      * @constructor
      * @param {TimeScale} scale The scale to base the Axis on.

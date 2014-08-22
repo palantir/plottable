@@ -12,15 +12,15 @@ export module Axis {
     private measurer: _Util.Text.TextMeasurer;
 
     /**
-     * Creates an Axis.Numeric.
+     * Constructs a NumericAxis.
      *
-     * Just as an Axis.Category is for rendering Scale.Ordinal, an Axis.Numeric
-     * is for rendering Abstact.QuantitativeScale.
+     * Just as an CategoryAxis is for rendering an OrdinalScale, a NumericAxis
+     * is for rendering a QuantitativeScale.
      *
      * @constructor
-     * @param {QuantitativeScale} scale The Abstract.QuantitativeScale to base the axis on.
+     * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
      * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-     * @param {Formatter} [formatter] A function to format tick labels (default Formatters.general(3, false)).
+     * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
      */
     constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter = Formatters.general(3, false)) {
       super(scale, orientation, formatter);
@@ -176,7 +176,7 @@ export module Axis {
     /**
      * Sets the tick label position relative to the tick marks.
      *
-     * @param {string} position The relative position of the tick label.
+     * @param {string} position If provided, the relative position of the tick label.
      *                          [top/center/bottom] for a vertical NumericAxis,
      *                          [left/center/right] for a horizontal NumericAxis.
      *                          Defaults to center.
@@ -218,13 +218,13 @@ export module Axis {
      * Sets whether or not the tick labels at the end of the graph are
      * displayed when partially cut off.
      *
-     * @param {string} orientation Where on the scale to change tick labels.
+     * @param {string} orientation If provided, where on the scale to change tick labels.
      *                 On a "top" or "bottom" axis, this can be "left" or
      *                 "right". On a "left" or "right" axis, this can be "top"
      *                 or "bottom".
      * @param {boolean} show Whether or not the given tick should be
      * displayed.
-     * @returns {Numeric} The calling Axis.Numeric.
+     * @returns {Numeric} The calling NumericAxis.
      */
     public showEndTickLabel(orientation: string, show: boolean): Numeric;
     public showEndTickLabel(orientation: string, show?: boolean): any {

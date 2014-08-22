@@ -9,10 +9,10 @@ export module Plot {
     private areaPath: D3.Selection;
 
     /**
-     * Creates an AreaPlot.
+     * Constructs an AreaPlot.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
+     * @param {IDataset | any} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */

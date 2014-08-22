@@ -12,14 +12,14 @@ module Plottable {
     public broadcaster = new Core.Broadcaster(this);
 
     /**
-     * Creates a new DataSource.
+     * Constructs a new DataSource.
      *
      * A DataSource is mostly just a wrapper around an any[], DataSource is the
      * data you're going to plot.
      *
      * @constructor
-     * @param {any[]} data
-     * @param {any} metadata An object containing additional information.
+     * @param {any[]} data The data for this DataSource (default = []).
+     * @param {any} metadata An object containing additional information (default = {}).
      */
     constructor(data: any[] = [], metadata: any = {}) {
       super();
@@ -29,13 +29,13 @@ module Plottable {
     }
 
     /**
-     * Get the data.
+     * Gets the data.
      *
      * @returns {DataSource|any[]} The calling DataSource, or the current data.
      */
     public data(): any[];
     /**
-     * Set the data.
+     * Sets the data.
      *
      * @param {any[]} data The new data.
      * @returns {DataSource} The calling DataSource.

@@ -17,8 +17,8 @@ export module Component {
      * labels is to create a title or axis labels.
      *
      * @constructor
-     * @param {string} [displayText] The text of the Label.
-     * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
+     * @param {string} displayText The text of the Label (default = "").
+     * @param {string} orientation The orientation of the Label (horizontal/vertical-left/vertical-right) (default = "horizontal").
      */
     constructor(displayText = "", orientation = "horizontal") {
       super();
@@ -38,11 +38,11 @@ export module Component {
     }
 
     /**
-     * If the label is given more space that it needs, which side should it go
-     * to?
+     * Sets the horizontal side the label will go to given the label is given more space that it needs
      *
      * @param {string} alignment The new setting, one of `["left", "center",
      * "right"]`. Defaults to `"center"`.
+     * @returns {Label} The calling Label.
      */
     public xAlign(alignment: string): Label {
       var alignmentLC = alignment.toLowerCase();
@@ -52,11 +52,11 @@ export module Component {
     }
 
     /**
-     * If the label is given more space that it needs, which side should it go
-     * to?
+     * Sets the vertical side the label will go to given the label is given more space that it needs
      *
      * @param {string} alignment The new setting, one of `["top", "center",
      * "bottom"]`. Defaults to `"center"`.
+     * @returns {Label} The calling Label.
      */
     public yAlign(alignment: string): Label {
       var alignmentLC = alignment.toLowerCase();
@@ -86,15 +86,15 @@ export module Component {
     }
 
     /**
-     * Get the current text on the Label.
+     * Gets the current text on the Label.
      *
      * @returns {string} the text on the label.
      */
     public text(): string;
     /**
-     * Set the current text on the Label.
+     * Sets the current text on the Label.
      *
-     * @param {string} displayText The new text for the Label.
+     * @param {string} displayText If provided, the new text for the Label.
      * @returns {Label} The calling Label.
      */
     public text(displayText: string): Label;

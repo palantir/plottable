@@ -10,9 +10,9 @@ export module Abstract {
     private _domainer: Domainer = new Domainer();
 
     /**
-     * Creates a new QuantitativeScale.
+     * Constructs a new QuantitativeScale.
      *
-     * A QuantitativeScale is an Abstract.Scale that maps anys to numbers. It
+     * A QuantitativeScale is a Scale that maps anys to numbers. It
      * is invertible and continuous.
      *
      * @constructor
@@ -64,7 +64,7 @@ export module Abstract {
     /**
      * Returns the locations in the range where ticks will show up.
      *
-     * @param {number} [count] The suggested number of ticks to generate.
+     * @param {number} count The suggested number of ticks to generate.
      * @returns {any[]} The generated ticks.
      */
     public ticks(count?: number) {
@@ -83,21 +83,21 @@ export module Abstract {
     }
 
     /**
-     * Get a Domainer of a scale. A Domainer is responsible for combining
+     * Gets a Domainer of a scale. A Domainer is responsible for combining
      * multiple extents into a single domain.
      *
      * @return {Domainer} The scale's current domainer.
      */
     public domainer(): Domainer;
     /**
-     * Set a Domainer of a scale. A Domainer is responsible for combining
+     * Sets a Domainer of a scale. A Domainer is responsible for combining
      * multiple extents into a single domain.
      *
      * When you set domainer, we assume that you know what you want the domain
      * to look like better that we do. Ensuring that the domain is padded,
      * includes 0, etc., will be the responsability of the new domainer.
      *
-     * @param {Domainer} domainer The new domainer.
+     * @param {Domainer} domainer If provided, the new domainer.
      * @return {QuanitativeScale} The calling QuantitativeScale.
      */
     public domainer(domainer: Domainer): QuantitativeScale;

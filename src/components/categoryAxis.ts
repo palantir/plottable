@@ -7,16 +7,16 @@ export module Axis {
     private measurer: _Util.Text.CachingCharacterMeasurer;
 
     /**
-     * Constructs an Axis.Category.
+     * Constructs a CategoryAxis.
      *
-     * An Axis.Category takes a Scale.Ordinal and includes word-wrapping
+     * A CategoryAxis takes an OrdinalScale and includes word-wrapping
      * algorithms and advanced layout logic to try to display the scale as
      * efficiently as possible.
      *
      * @constructor
      * @param {OrdinalScale} scale The scale to base the Axis on.
-     * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-     * @param {Formatter} [formatter] The Formatter for the Axis (default Formatters.identity())
+     * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
+     * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
      */
     constructor(scale: Scale.Ordinal, orientation = "bottom", formatter = Formatters.identity()) {
       super(scale, orientation, formatter);

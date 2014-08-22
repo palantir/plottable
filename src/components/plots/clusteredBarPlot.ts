@@ -7,9 +7,9 @@ export module Plot {
     private innerScale: Scale.Ordinal;
 
     /**
-     * Creates an ClusteredBar.
+     * Creates a ClusteredBarPlot.
      *
-     * A ClusteredBar is a plot that plots several bar plots next to each
+     * A ClusteredBarPlot is a plot that plots several bar plots next to each
      * other. For example, when plotting life expectancy across each country,
      * you would want each country to have a "male" and "female" bar.
      *

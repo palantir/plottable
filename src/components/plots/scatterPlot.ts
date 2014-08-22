@@ -12,10 +12,10 @@ export module Plot {
     };
 
     /**
-     * Creates a Plot.Scatter.
+     * Constructs a ScatterPlot.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
+     * @param {IDataset | any} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */

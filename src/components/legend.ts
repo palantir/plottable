@@ -29,7 +29,7 @@ export module Component {
     private isOff: D3.Set;
 
     /**
-     * Creates a Legend.
+     * Constructs a Legend.
      *
      * A legend consists of a series of legend rows, each with a color and label taken from the `colorScale`.
      * The rows will be displayed in the order of the `colorScale` domain.
@@ -37,7 +37,7 @@ export module Component {
      * Setting a callback will also put classes on the individual rows.
      *
      * @constructor
-     * @param {Scale.Color} colorScale
+     * @param {ColorScale} colorScale
      */
     constructor(colorScale?: Scale.Color) {
       super();
@@ -110,7 +110,7 @@ export module Component {
      * as well as the class "focus" to the legend row being hovered over.
      * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
      *
-     * @param {HoverCallback} callback The new callback function.
+     * @param {HoverCallback} callback If provided, the new callback function.
      * @returns {Legend} The calling Legend.
      */
     public hoverCallback(callback: HoverCallback): Legend;
@@ -129,13 +129,13 @@ export module Component {
     /**
      * Gets the current color scale from the Legend.
      *
-     * @returns {Scale.Color} The current color scale.
+     * @returns {ColorScale} The current color scale.
      */
     public scale(): Scale.Color;
     /**
      * Assigns a new color scale to the Legend.
      *
-     * @param {Scale.Color} scale The new scale.
+     * @param {Scale.Color} scale If provided, the new scale.
      * @returns {Legend} The calling Legend.
      */
     public scale(scale: Scale.Color): Legend;

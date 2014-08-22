@@ -17,7 +17,7 @@ export module Abstract {
     };
 
     /**
-     * Creates an NewStyleBarPlot.
+     * Constructs a NewStyleBarPlot.
      *
      * @constructor
      * @param {Scale} xScale The x scale to use.
@@ -60,7 +60,7 @@ export module Abstract {
      * The baseline is the line that the bars are drawn from, defaulting to 0.
      *
      * @param {number} value The value to position the baseline at.
-     * @return {NewStyleBarPlot} The calling NewStyleBarPlot.
+     * @returns {NewStyleBarPlot} The calling NewStyleBarPlot.
      */
     public baseline(value: number) {
       return Abstract.BarPlot.prototype.baseline.apply(this, [value]);

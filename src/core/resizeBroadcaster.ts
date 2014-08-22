@@ -30,7 +30,10 @@ export module Core {
     }
 
     /**
-     * Returns true if the window has been resized and the RenderController
+     * Checks if the window has been resized and the RenderController
+     * has not yet been flushed.
+     *
+     * @returns {boolean} If the window has been resized/RenderController
      * has not yet been flushed.
      */
     export function resizing(): boolean {
@@ -38,22 +41,22 @@ export module Core {
     }
 
     /**
-     * Claim that you're not resizing anymore. Good if it stubbornly thinks
-     * you're still resizing, or you want to cancel the effects of resizing
+     * Sets that it is not resizing anymore. Good if it stubbornly thinks
+     * it is still resizing, or for cancelling the effects of resizing
      * prematurely.
      */
-    export function clearResizing(): any {
+    export function clearResizing() {
       _resizing = false;
     }
 
     /**
      * Registers a component.
      *
-     * When the window is resized, we invoke ._invalidateLayout() on the
+     * When the window is resized, ._invalidateLayout() is invoked on the
      * component, which will enqueue the component for layout and rendering
      * with the RenderController.
      *
-     * @param {Abstract.Component} component Any Plottable component.
+     * @param {Component} component Any Plottable component.
      */
     export function register(c: Abstract.Component) {
       _lazyInitialize();
@@ -65,7 +68,7 @@ export module Core {
      *
      * The component will no longer receive updates on window resize.
      *
-     * @param {Abstract.Component} component Any Plottable component.
+     * @param {Component} component Any Plottable component.
      */
     export function deregister(c: Abstract.Component) {
       if (broadcaster) {

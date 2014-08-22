@@ -33,7 +33,7 @@ export module Component {
     private nCols = 0;
 
     /**
-     * Creates a Table.
+     * Constructs a Table.
      *
      * A Table is used to combine multiple Components in the form of a grid. A
      * common case is combining a y-axis, x-axis, and the plotted data via
@@ -44,7 +44,7 @@ export module Component {
      *
      * @constructor
      * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
-     * null can be used if a cell is empty.
+     * null can be used if a cell is empty. (default = [])
      */
     constructor(rows: Abstract.Component[][] = []) {
       super();
@@ -71,6 +71,7 @@ export module Component {
      * @param {number} row The row in which to add the Component.
      * @param {number} col The column in which to add the Component.
      * @param {Component} component The Component to be added.
+     * @returns {Table} The calling Table.
      */
     public addComponent(row: number, col: number, component: Abstract.Component): Table {
       if (this._addComponent(component)) {

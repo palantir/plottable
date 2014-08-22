@@ -5,6 +5,9 @@ export module Core {
 export module RenderController {
 
   export module RenderPolicy {
+    /**
+     * A policy to render components.
+     */
     export interface IRenderPolicy {
       render(): any;
     }

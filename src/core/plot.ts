@@ -14,7 +14,7 @@ export module Abstract {
     private animateOnNextRender = true;
 
     /**
-     * Creates a Plot.
+     * Constructs a Plot.
      *
      * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
      *
@@ -67,16 +67,16 @@ export module Abstract {
     }
 
     /**
-     * Get the Plot's DataSource.
+     * Gets the Plot's DataSource.
      *
-     * @return {DataSource} The current DataSource.
+     * @returns {DataSource} The current DataSource.
      */
     public dataSource(): DataSource;
     /**
-     * Set the Plot's DataSource.
+     * Sets the Plot's DataSource.
      *
-     * @param {DataSource} source The DataSource the Plot should use.
-     * @returns {Plot} The calling Plot.
+     * @param {DataSource} source If provided, The DataSource the Plot should use.
+     * @returnss {Plot} The calling Plot.
      */
     public dataSource(source: DataSource): Plot;
     public dataSource(source?: DataSource): any {
@@ -101,7 +101,7 @@ export module Abstract {
     }
 
     /**
-     * Set an attribute of every data point.
+     * Sets an attribute of every data point.
      *
      * Here's a common use case:
      * ```typescript
@@ -118,7 +118,7 @@ export module Abstract {
      * `d[accessor]` is used. If anything else, use `accessor` as a constant
      * across all data points.
      *
-     * @param {Abstract.Scale} [scale] If provided, the result of the accessor
+     * @param {Abstract.Scale} scale If provided, the result of the accessor
      * is passed through the scale, such as `scale.scale(accessor(d, i))`.
      *
      * @returns {Plot} The calling Plot.
@@ -210,7 +210,7 @@ export module Abstract {
     }
 
     /**
-     * Apply attributes to the selection.
+     * Applies attributes to the selection.
      *
      * If animation is enabled and a valid animator's key is specified, the
      * attributes are applied with the animator. Otherwise, they are applied
@@ -221,7 +221,7 @@ export module Abstract {
      * @param {D3.Selection} selection The selection of elements to update.
      * @param {string} animatorKey The key for the animator.
      * @param {IAttributeToProjector} attrToProjector The set of attributes to set on the selection.
-     * @return {D3.Selection} The resulting selection (potentially after the transition)
+     * @returns {D3.Selection} The resulting selection (potentially after the transition)
      */
     public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any {
       if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {

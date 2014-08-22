@@ -5,14 +5,14 @@ export module Component {
   export class Group extends Abstract.ComponentContainer {
 
     /**
-     * Creates a Component.Group.
+     * Constructs a GroupComponent.
      *
-     * A Component.Group is a set of Components that will be rendered on top of
-     * each other. When you call Compontent.merge(Component), it creates and
-     * return a Component.Group.
+     * A GroupComponent is a set of Components that will be rendered on top of
+     * each other. When you call Component.merge(Component), it creates and
+     * returns a GroupComponent.
      *
      * @constructor
-     * @param {Component[]} [components] The Components in the Group.
+     * @param {Component[]} components The Components in the Group (default = []).
      */
     constructor(components: Abstract.Component[] = []){
       super();

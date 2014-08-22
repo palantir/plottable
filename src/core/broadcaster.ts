@@ -42,7 +42,7 @@ export module Core {
     public listenable: IListenable;
 
     /**
-     * Construct a broadcaster, taking the Listenable that the broadcaster will be attached to.
+     * Constructs a broadcaster, taking the Listenable that the broadcaster will be attached to.
      *
      * @constructor
      * @param {IListenable} listenable The Listenable-object that this broadcaster is attached to.

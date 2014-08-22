@@ -22,10 +22,10 @@ export module Abstract {
     };
 
     /**
-     * Creates an AbstractBarPlot.
+     * Constructs an AbstractBarPlot.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
+     * @param {IDataset | any} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
@@ -87,7 +87,7 @@ export module Abstract {
      * The baseline is the line that the bars are drawn from, defaulting to 0.
      *
      * @param {number} value The value to position the baseline at.
-     * @return {AbstractBarPlot} The calling AbstractBarPlot.
+     * @returns {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public baseline(value: number) {
       this._baselineValue = value;
@@ -103,7 +103,7 @@ export module Abstract {
      * HorizontalBarPlot supports "top", "center", "bottom"
      *
      * @param {string} alignment The desired alignment.
-     * @return {AbstractBarPlot} The calling AbstractBarPlot.
+     * @returns {AbstractBarPlot} The calling AbstractBarPlot.
      */
      public barAlignment(alignment: string) {
        var alignmentLC = alignment.toLowerCase();
@@ -137,7 +137,7 @@ export module Abstract {
      * @param {any} xValOrExtent The pixel x position, or range of x values.
      * @param {any} yValOrExtent The pixel y position, or range of y values.
      * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
-     * @return {D3.Selection} The selected bar, or null if no bar was selected.
+     * @returns {D3.Selection} The selected bar, or null if no bar was selected.
      */
     public selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
     public selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
@@ -179,7 +179,7 @@ export module Abstract {
 
     /**
      * Deselects all bars.
-     * @return {AbstractBarPlot} The calling AbstractBarPlot.
+     * @returns {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public deselectAll() {
       if (this._isSetup) {

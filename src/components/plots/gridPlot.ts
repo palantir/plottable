@@ -13,13 +13,13 @@ export module Plot {
     };
 
     /**
-     * Creates a Plot.Grid.
+     * Constructs a GridPlot.
      *
-     * A Grid is used to shade a grid of data. Each datum is a cell on the
+     * A GridPlot is used to shade a grid of data. Each datum is a cell on the
      * grid, and the datum can control what color it is.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
+     * @param {IDataset | any} dataset The dataset to render.
      * @param {Scale.Ordinal} xScale The x scale to use.
      * @param {Scale.Ordinal} yScale The y scale to use.
      * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale

@@ -39,10 +39,11 @@ export module Interaction {
     }
 
     /**
-     * Sets an callback to be called when the designated key is pressed and the
+     * Sets a callback to be called when the designated key is pressed and the
      * user is moused over the component.
      *
-     * @param {() => any} cb: Callback to be called.
+     * @param {() => any} cb Callback to be called.
+     * @returns The calling Key.
      */
     public callback(cb: () => any): Key {
       this._callback = cb;

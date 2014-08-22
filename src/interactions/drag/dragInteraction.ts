@@ -14,7 +14,7 @@ export module Interaction {
     private   ondragend: (startLocation: Point, endLocation: Point) => void;
 
     /**
-     * Creates a Drag. A Drag will signal its callbacks on mouse drag.
+     * Constructs a Drag. A Drag will signal its callbacks on mouse drag.
      *
      * @param {Component} componentToListenTo The component to listen for
      * interactions on.
@@ -30,14 +30,14 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging starts.
      *
-     * @returns {(startLocation: Point) => void}
+     * @returns {(startLocation: Point) => void} The callback called when dragging starts.
      */
     public dragstart(): (startLocation: Point) => void;
     /**
      * Sets the callback to be called when dragging starts.
      *
-     * @param {(startLocation: Point) => any} cb The function to be called. Takes in a Point in pixels.
-     * @returns {Drag}
+     * @param {(startLocation: Point) => any} cb If provided, the function to be called. Takes in a Point in pixels.
+     * @returns {Drag} The calling Drag.
      */
     public dragstart(cb: (startLocation: Point) => any): Drag;
     public dragstart(cb?: (startLocation: Point) => any): any {
@@ -52,14 +52,14 @@ export module Interaction {
     /**
      * Gets the callback that is called during dragging.
      *
-     * @returns {(startLocation: Point, endLocation: Point) => void}
+     * @returns {(startLocation: Point, endLocation: Point) => void} The callback called during dragging.
      */
     public drag(): (startLocation: Point, endLocation: Point) => void;
     /**
      * Adds a callback to be called during dragging.
      *
-     * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called. Takes in Points in pixels.
-     * @returns {Drag}
+     * @param {(startLocation: Point, endLocation: Point) => any} cb If provided, the function to be called. Takes in Points in pixels.
+     * @returns {Drag} The calling Drag.
      */
     public drag(cb: (startLocation: Point, endLocation: Point) => any): Drag;
     public drag(cb?: (startLocation: Point, endLocation: Point) => any): any {
@@ -74,13 +74,13 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging ends.
      *
-     * @returns {(startLocation: Point, endLocation: Point) => void}
+     * @returns {(startLocation: Point, endLocation: Point) => void} The callback called when dragging ends.
      */
     public dragend(): (startLocation: Point, endLocation: Point) => void;
     /**
      * Adds a callback to be called when the dragging ends.
      *
-     * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called. Takes in Points in pixels.
+     * @param {(startLocation: Point, endLocation: Point) => any} cb If provided, the function to be called. Takes in Points in pixels.
      * @returns {Drag} The calling Drag.
      */
     public dragend(cb: (startLocation: Point, endLocation: Point) => any): Drag;
@@ -150,11 +150,11 @@ export module Interaction {
     }
 
     /**
-     * Sets things up so that the xScale and yScale that are passed have their
+     * Sets up so that the xScale and yScale that are passed have their
      * domains automatically changed as you zoom.
      *
-     * @param {Abstract.QuantitativeScale} xScale The scale along the x-axis.
-     * @param {Abstract.QuantitativeScale} yScale The scale along the y-axis.
+     * @param {QuantitativeScale} xScale The scale along the x-axis.
+     * @param {QuantitativeScale} yScale The scale along the y-axis.
      * @returns {Drag} The calling Drag.
      */
     public setupZoomCallback(xScale?: Abstract.QuantitativeScale, yScale?: Abstract.QuantitativeScale) {

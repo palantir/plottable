@@ -7,7 +7,7 @@ export module Abstract {
     public key: string;
 
     /**
-     * Creates a Drawer
+     * Constructs a Drawer
      *
      * @constructor
      * @param{string} key The key associated with this Drawer

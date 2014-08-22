@@ -47,7 +47,7 @@ export module Abstract {
     /**
      * Returns a list of components in the ComponentContainer.
      *
-     * @returns{Component[]} the contained Components
+     * @returns {Component[]} the contained Components
      */
     public components(): Abstract.Component[] {
       return this._components.slice(); // return a shallow copy

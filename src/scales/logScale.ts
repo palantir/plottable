@@ -7,7 +7,7 @@ export module Scale {
     private static warned = false;
 
     /**
-     * Creates a new Scale.Log.
+     * Constructs a new Scale.Log.
      *
      * Warning: Log is deprecated; if possible, use ModifiedLog. Log scales are
      * very unstable due to the fact that they can't handle 0 or negative
@@ -31,7 +31,7 @@ export module Scale {
     /**
      * Creates a copy of the Scale.Log with the same domain and range but without any registered listeners.
      *
-     * @returns {Scale.Log} A copy of the calling Scale.Log.
+     * @returns {Log} A copy of the calling Log.
      */
     public copy(): Log {
       return new Log(this._d3Scale.copy());

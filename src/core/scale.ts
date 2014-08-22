@@ -8,7 +8,7 @@ export module Abstract {
     public broadcaster = new Plottable.Core.Broadcaster(this);
     public _rendererAttrID2Extent: {[rendererAttrID: string]: any[]} = {};
     /**
-     * Creates a new Scale.
+     * Constructs a new Scale.
      *
      * A Scale is a wrapper around a D3.Scale.Scale. A Scale is really just a
      * function. Scales have a domain (input), a range (output), and a function
@@ -31,7 +31,7 @@ export module Abstract {
     }
 
     /**
-     * Modify the domain on the scale so that it includes the extent of all
+     * Modifies the domain on the scale so that it includes the extent of all
      * perspectives it depends on. This will normally happen automatically, but
      * if you set domain explicitly with `plot.domain(x)`, you will need to
      * call this function if you want the domain to neccessarily include all
@@ -42,6 +42,8 @@ export module Abstract {
      *
      * Perspective: A combination of a DataSource and an Accessor that
      * represents a view in to the data.
+     *
+     * @returns {Scale} The calling Scale.
      */
     public autoDomain() {
       this.autoDomainAutomatically = true;
@@ -56,7 +58,7 @@ export module Abstract {
     }
 
     /**
-     * Returns the range value corresponding to a given domain value. In other
+     * Computes the range value corresponding to a given domain value. In other
      * words, apply the function to value.
      *
      * @param value {any} A domain value to be scaled.
@@ -67,16 +69,16 @@ export module Abstract {
     }
 
     /**
-     * Get the domain.
+     * Gets the domain.
      *
      * @returns {any[]} The current domain.
      */
     public domain(): any[];
     /**
-     * Set the domain.
+     * Sets the domain.
      *
-     * @param {any[]} values The new value for the domain. On
-     * Scale.Quantitative, this is a [min, max] pair, or a [max, min] pair to
+     * @param {any[]} values If provided, the new value for the domain. On
+     * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
      * make the function decreasing. On Scale.Ordinal, this is an array of all
      * input values.
      * @returs {Scale} The calling Scale.
@@ -102,7 +104,7 @@ export module Abstract {
     }
 
     /**
-     * Set the range.
+     * Gets the range.
      *
      * In the case of having a numeric range, it will be a [min, max] pair. In
      * the case of string range (e.g. Scale.InterpolatedColor), it will be a
@@ -112,13 +114,13 @@ export module Abstract {
      */
     public range(): any[];
     /**
-     * Get the range.
+     * Sets the range.
      *
      * In the case of having a numeric range, it will be a [min, max] pair. In
      * the case of string range (e.g. Scale.InterpolatedColor), it will be a
      * list of all possible outputs.
      *
-     * @param {any[]} values The new values for the range.
+     * @param {any[]} values If provided, the new values for the range.
      * @returns {Scale} The calling Scale.
      */
     public range(values: any[]): Scale;
@@ -132,7 +134,7 @@ export module Abstract {
     }
 
     /**
-     * Creates a copy of the Scale with the same domain and range but without
+     * Constructs a copy of the Scale with the same domain and range but without
      * any registered listeners.
      *
      * @returns {Scale} A copy of the calling Scale.
