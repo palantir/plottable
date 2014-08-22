@@ -867,7 +867,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class StackedArea extends Plottable.Abstract.NewStylePlot {
-            constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.Scale);
+            constructor(xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.QuantitativeScale);
         }
     }
 }

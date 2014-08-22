@@ -5133,8 +5133,8 @@ var Plottable;
             __extends(StackedArea, _super);
             function StackedArea(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this.stackedData = [];
                 this._baselineValue = 0;
+                this.stackedData = [];
                 this.stackedExtent = [];
                 this.classed("area-plot", true);
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
@@ -5149,8 +5149,7 @@ var Plottable;
             StackedArea.prototype._paint = function () {
                 var _this = this;
                 _super.prototype._paint.call(this);
-                var primaryScale = this.yScale;
-                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var scaledBaseline = this.yScale.scale(this._baselineValue);
                 var baselineAttr = {
                     "x1": 0,
                     "y1": scaledBaseline,

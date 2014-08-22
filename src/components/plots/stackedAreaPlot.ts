@@ -4,23 +4,23 @@ module Plottable {
 export module Plot {
   export class StackedArea extends Abstract.NewStylePlot {
 
-    private stackedData: any[] = [];
     public _baseline: D3.Selection;
     public _baselineValue = 0;
+
+    private stackedData: any[] = [];
     private stackedExtent: number[] = [];
 
     /**
-     * Creates a StackedArea plot.
+     * Constructs a StackedArea plot.
      *
      * @constructor
-     * @param {Scale} xScale The x scale to use.
-     * @param {Scale} yScale The y scale to use.
+     * @param {QuantitativeScale} xScale The x scale to use.
+     * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.Scale, yScale: Abstract.Scale) {
+    constructor(xScale: Abstract.QuantitativeScale, yScale: Abstract.QuantitativeScale) {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
-
     }
 
     public _getDrawer(key: string) {
@@ -35,8 +35,7 @@ export module Plot {
     public _paint() {
       super._paint();
 
-      var primaryScale = this.yScale;
-      var scaledBaseline = primaryScale.scale(this._baselineValue);
+      var scaledBaseline = this.yScale.scale(this._baselineValue);
       var baselineAttr: IAttributeToProjector = {
         "x1": 0,
         "y1": scaledBaseline,
