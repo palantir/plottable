@@ -1255,10 +1255,9 @@ describe("HorizontalLegend", function () {
         assert.equal(entries[0].length, colorScale.domain().length, "one entry is created for each item in the domain");
         var elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
         assert.deepEqual(elementTexts, colorScale.domain(), "entry texts match scale domain");
-        var domain = colorScale.domain();
-        domain.push("Madison");
-        colorScale.domain(domain);
-        window.horizLegend = horizLegend;
+        var newDomain = colorScale.domain();
+        newDomain.push("Madison");
+        colorScale.domain(newDomain);
         entries = horizLegend.element.selectAll(entrySelector);
         assert.equal(entries[0].length, colorScale.domain().length, "Legend updated to include item added to the domain");
         svg.remove();
