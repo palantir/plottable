@@ -1573,6 +1573,13 @@ describe("Plots", function () {
             assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
             verifier.end();
         });
+        it("area is appended before line", function () {
+            var paths = renderArea.selectAll("path")[0];
+            var areaSelection = renderArea.select(".area")[0][0];
+            var lineSelection = renderArea.select(".line")[0][0];
+            assert.operator(paths.indexOf(areaSelection), "<", paths.indexOf(lineSelection), "area appended before line");
+            verifier.end();
+        });
         after(function () {
             if (verifier.passed) {
                 svg.remove();

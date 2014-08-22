@@ -31,7 +31,11 @@ export module Plot {
 
     public _setup() {
       super._setup();
+    }
+
+    public _appendPath() {
       this.areaPath = this.renderArea.append("path").classed("area", true);
+      super._appendPath();
     }
 
     public _onDataSourceUpdate() {
