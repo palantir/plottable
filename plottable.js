@@ -1,5 +1,5 @@
 /*!
-Plottable 0.25.0 (https://github.com/palantir/plottable)
+Plottable 0.25.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1364,7 +1364,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.25.0";
+    Plottable.version = "0.25.1";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1926,7 +1926,10 @@ var Plottable;
 
             Component.prototype.generateClipPath = function () {
                 // The clip path will prevent content from overflowing its component space.
-                this.element.attr("clip-path", "url(#clipPath" + this._plottableID + ")");
+                // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
+                // They don't need the current URL in the clip path reference.
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                this.element.attr("clip-path", "url(" + prefix + "#clipPath" + this._plottableID + ")");
                 var clipPathParent = this.boxContainer.append("clipPath").attr("id", "clipPath" + this._plottableID);
                 this.addBox("clip-rect", clipPathParent);
             };

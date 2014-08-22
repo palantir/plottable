@@ -2739,7 +2739,8 @@ describe("Component behavior", function () {
         c._anchor(svg);
         c._computeLayout(0, 0, 100, 100);
         c._render();
-        var expectedClipPathURL = "url(#clipPath" + expectedClipPathID + ")";
+        var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+        var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
         var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
         assert.isTrue(normalizeClipPath(c.element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
         var clipRect = c.boxContainer.select(".clip-rect");
