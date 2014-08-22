@@ -1988,7 +1988,7 @@ var Plottable;
             };
             Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
                 if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
-                    return this._animators[animatorKey].animate(selection, attrToProjector, this);
+                    return this._animators[animatorKey].animate(selection, attrToProjector);
                 }
                 else {
                     return selection.attr(attrToProjector);
@@ -5179,7 +5179,7 @@ var Plottable;
         var Null = (function () {
             function Null() {
             }
-            Null.prototype.animate = function (selection, attrToProjector, plot) {
+            Null.prototype.animate = function (selection, attrToProjector) {
                 return selection.attr(attrToProjector);
             };
             return Null;
@@ -5198,7 +5198,7 @@ var Plottable;
                 this._delayMsec = 0;
                 this._easing = "exp-out";
             }
-            Default.prototype.animate = function (selection, attrToProjector, plot) {
+            Default.prototype.animate = function (selection, attrToProjector) {
                 return selection.transition().ease(this._easing).duration(this._durationMsec).delay(this._delayMsec).attr(attrToProjector);
             };
             Default.prototype.duration = function (duration) {
@@ -5250,7 +5250,7 @@ var Plottable;
                 _super.apply(this, arguments);
                 this._delayMsec = 15;
             }
-            IterativeDelay.prototype.animate = function (selection, attrToProjector, plot) {
+            IterativeDelay.prototype.animate = function (selection, attrToProjector) {
                 var _this = this;
                 return selection.transition().ease(this._easing).duration(this._durationMsec).delay(function (d, i) { return i * _this._delayMsec; }).attr(attrToProjector);
             };

@@ -11,7 +11,7 @@ export module Animator {
     public _delayMsec: Number    = 0;
     public _easing: string       = "exp-out";
 
-    public animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any {
+    public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection {
       return selection.transition()
         .ease(this._easing)
         .duration(this._durationMsec)
