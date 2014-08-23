@@ -48,6 +48,7 @@
 /// <reference path="components/categoryAxis.ts" />
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
+/// <reference path="components/horizontalLegend.ts" />
 /// <reference path="components/gridlines.ts" />
 
 /// <reference path="components/plots/scatterPlot.ts" />
