@@ -114,10 +114,17 @@ export module Util {
       return (d: any, i: number) => activatedAccessor(d, i, plot.dataSource().metadata());
     }
 
-    export function uniq<T>(a: T[]): T[] {
+    /**
+     * Take an array of values, and return the unique values.
+     * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
+     *
+     * @param {T[]} values The values to find uniqueness for
+     * @return {T[]} The unique values
+     */
+    export function uniq<T>(arr: T[]): T[] {
       var seen: D3.Set<T> = d3.set();
       var result: T[] = [];
-      a.forEach((n) =>  {
+      arr.forEach((n) =>  {
         if (!seen.has(n)) {
           seen.add(n);
           result.push(n);

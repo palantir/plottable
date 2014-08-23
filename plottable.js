@@ -73,10 +73,10 @@ var Plottable;
                 return function (d, i) { return activatedAccessor(d, i, plot.dataSource().metadata()); };
             }
             Methods._applyAccessor = _applyAccessor;
-            function uniq(a) {
+            function uniq(arr) {
                 var seen = d3.set();
                 var result = [];
-                a.forEach(function (n) {
+                arr.forEach(function (n) {
                     if (!seen.has(n)) {
                         seen.add(n);
                         result.push(n);

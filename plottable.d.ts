@@ -8,7 +8,7 @@ declare module Plottable {
             function intersection(set1: D3.Set<any>, set2: D3.Set<any>): D3.Set<string>;
             function union(set1: D3.Set<any>, set2: D3.Set<any>): D3.Set<string>;
             function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T>;
-            function uniq<T>(a: T[]): T[];
+            function uniq<T>(arr: T[]): T[];
             function createFilledArray<T>(value: T, count: number): T[];
             function createFilledArray<T>(func: () => T, count: number): T[];
             function flatten<T>(a: T[][]): T[];
