@@ -94,7 +94,7 @@ export module Component {
       };
     }
 
-    private packRows(availableWidth: number, entries: string[], entryLengths: D3.Map) {
+    private packRows(availableWidth: number, entries: string[], entryLengths: D3.Map<number>) {
       var rows: string[][] = [[]];
       var currentRow = rows[0];
       var spaceLeft = availableWidth;
