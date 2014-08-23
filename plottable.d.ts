@@ -7,6 +7,7 @@ declare module Plottable {
             function addArrays(alist: number[], blist: number[]): number[];
             function intersection(set1: D3.Set<any>, set2: D3.Set<any>): D3.Set<string>;
             function union(set1: D3.Set<any>, set2: D3.Set<any>): D3.Set<string>;
+            function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T>;
             function uniq(strings: string[]): string[];
             function uniqNumbers(a: number[]): number[];
             function createFilledArray(value: any, count: number): any[];
@@ -742,6 +743,18 @@ declare module Plottable {
             hoverCallback(): HoverCallback;
             scale(scale: Plottable.Scale.Color): Legend;
             scale(): Plottable.Scale.Color;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        class HorizontalLegend extends Plottable.Abstract.Component {
+            static LEGEND_ROW_CLASS: string;
+            static LEGEND_ENTRY_CLASS: string;
+            constructor(colorScale: Plottable.Scale.Color);
+            remove(): void;
         }
     }
 }
