@@ -13,7 +13,7 @@ function run(div, data, Plottable) {
 
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  stackedBarRenderer = new Plottable.Plot.StackedBar(xScale, yScale)
+  stackedBarRenderer = new Plottable.Plot.ClusteredBar(xScale, yScale)
     .addDataset("d1", data[0])
     .addDataset("d2", data[1])
     .addDataset("d3", data[2])
