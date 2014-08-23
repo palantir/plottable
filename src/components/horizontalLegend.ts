@@ -70,7 +70,7 @@ export module Component {
         entryLengths: entryLengths,
         rows: rows,
         numRowsToDraw: Math.min(rowsAvailable, rows.length)
-      }
+      };
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
