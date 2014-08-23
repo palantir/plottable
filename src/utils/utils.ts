@@ -53,8 +53,8 @@ export module Util {
      * @param {D3.Set} set2 The second set
      * @return {D3.Set} A set that contains elements that appear in both set1 and set2
      */
-    export function intersection(set1: D3.Set, set2: D3.Set) {
-      var set = d3.set();
+    export function intersection(set1: D3.Set<any>, set2: D3.Set<any>) {
+      var set: D3.Set<string> = d3.set();
       set1.forEach((v) => {
         if(set2.has(v)) {
           set.add(v);
@@ -80,12 +80,12 @@ export module Util {
     /**
      * Takes two sets and returns the union
      *
-     * @param{D3.Set} set1 The first set
-     * @param{D3.Set} set2 The second set
-     * @return{D3.Set} A set that contains elements that appear in either set1 or set2
+     * @param {D3.Set} set1 The first set
+     * @param {D3.Set} set2 The second set
+     * @return {D3.Set} A set that contains elements that appear in either set1 or set2
      */
-    export function union(set1: D3.Set, set2: D3.Set) {
-      var set = d3.set();
+    export function union<T>(set1: D3.Set<T>, set2: D3.Set<T>) {
+      var set: D3.Set<string> = d3.set();
       set1.forEach((v) => set.add(v));
       set2.forEach((v) => set.add(v));
       return set;
@@ -98,8 +98,8 @@ export module Util {
      * @param {(string) => any} transform A transformation function to apply to the keys.
      * @return {D3.Map} A map mapping keys to their transformed values.
      */
-    export function populateMap(keys: string[], transform: (key: string) => any) {
-      var map = d3.map();
+    export function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T> {
+      var map: D3.Map<T> = d3.map();
       keys.forEach((key: string) => {
         map.set(key, transform(key));
       });

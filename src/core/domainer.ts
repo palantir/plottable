@@ -6,11 +6,11 @@ module Plottable {
     private doNice = false;
     private niceCount: number;
     private padProportion = 0.0;
-    private paddingExceptions: D3.Map = d3.map();
-    private unregisteredPaddingExceptions: D3.Set = d3.set();
-    private includedValues: D3.Map = d3.map();
+    private paddingExceptions: D3.Map<any> = d3.map();
+    private unregisteredPaddingExceptions: D3.Set<any> = d3.set();
+    private includedValues: D3.Map<any> = d3.map();
     // includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
-    private unregisteredIncludedValues: D3.Map = d3.map();
+    private unregisteredIncludedValues: D3.Map<any> = d3.map();
     private combineExtents: (extents: any[][]) => any[];
     private static PADDING_FOR_IDENTICAL_DOMAIN = 1;
     private static ONE_DAY = 1000 * 60 * 60 * 24;

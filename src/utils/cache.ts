@@ -3,7 +3,7 @@
 module Plottable {
 export module Util {
   export class Cache<T> {
-    private cache: D3.Map = d3.map();
+    private cache: D3.Map<T> = d3.map();
     private compute: (k: string) => T;
     private canonicalKey: string = null;
     private valueEq: (v: T, w: T) => boolean;
