@@ -4905,9 +4905,6 @@ var Plottable;
                 this._animators["area-reset"] = new Plottable.Animator.Null();
                 this._animators["area"] = new Plottable.Animator.Default().duration(600).easing("exp-in-out");
             }
-            Area.prototype._setup = function () {
-                _super.prototype._setup.call(this);
-            };
             Area.prototype._appendPath = function () {
                 this.areaPath = this.renderArea.append("path").classed("area", true);
                 _super.prototype._appendPath.call(this);

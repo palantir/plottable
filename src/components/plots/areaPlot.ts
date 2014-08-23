@@ -29,10 +29,6 @@ export module Plot {
                                         .easing("exp-in-out");
     }
 
-    public _setup() {
-      super._setup();
-    }
-
     public _appendPath() {
       this.areaPath = this.renderArea.append("path").classed("area", true);
       super._appendPath();
