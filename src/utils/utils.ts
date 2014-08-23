@@ -92,18 +92,18 @@ export module Util {
     }
 
     /**
-     * Populates a dictionary from an array of keys and a transformation function.
+     * Populates a map from an array of keys and a transformation function.
      *
      * @param {string[]} keys The array of keys.
      * @param {(string) => any} transform A transformation function to apply to the keys.
-     * @return {{[key: string]: any}} A dictionary mapping keys to their transformed values.
+     * @return {D3.Map} A map mapping keys to their transformed values.
      */
-    export function populateDictionary(keys: string[], transform: (key: string) => any) {
-      var dict: {[key: string]: any} = {};
+    export function populateMap(keys: string[], transform: (key: string) => any) {
+      var map = d3.map();
       keys.forEach((key: string) => {
-        dict[key] = transform(key);
+        map.set(key, transform(key));
       });
-      return dict;
+      return map;
     }
 
     /**

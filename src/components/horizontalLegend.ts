@@ -18,7 +18,7 @@ export module Component {
     /**
      * Creates a Horizontal Legend.
      *
-     * THe legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
+     * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
      * The entries will be displayed in the order of the `colorScale` domain.
      *
      * @constructor
@@ -41,7 +41,7 @@ export module Component {
       this.scale.broadcaster.deregisterListener(this);
     }
 
-    private calculateRenderInfo(availableWidth: number, availableHeight: number) {
+    private calculateLayoutInfo(availableWidth: number, availableHeight: number) {
       var fakeLegendRow = this.content.append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
       var fakeLegendEntry = fakeLegendRow.append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
       var measure = Util.Text.getTextMeasurer(fakeLegendRow.append("text"));
@@ -55,7 +55,7 @@ export module Component {
       };
 
       var entries = this.scale.domain();
-      var entryLengths = Util.Methods.populateDictionary(entries, measureEntry);
+      var entryLengths = Util.Methods.populateMap(entries, measureEntry);
       fakeLegendRow.remove();
 
       var rows = this.packRows(availableWidthForEntries, entries, entryLengths);
@@ -69,22 +69,22 @@ export module Component {
         textHeight: textHeight,
         entryLengths: entryLengths,
         rows: rows,
-        numRowsToDraw: Math.min(rowsAvailable, rows.length)
+        numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0)
       };
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
-      var estimatedSizings = this.calculateRenderInfo(offeredWidth, offeredHeight);
+      var estimatedLayout = this.calculateLayoutInfo(offeredWidth, offeredHeight);
 
-      var rowLengths = estimatedSizings.rows.map((row: string[]) => {
-        return d3.sum(row, (entry: string) => estimatedSizings.entryLengths[entry]);
+      var rowLengths = estimatedLayout.rows.map((row: string[]) => {
+        return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
       });
       var longestRowLength = d3.max(rowLengths);
       longestRowLength = longestRowLength === undefined ? 0 : longestRowLength; // HACKHACK: #843
       var desiredWidth = this.padding + longestRowLength;
 
-      var acceptableHeight = estimatedSizings.numRowsToDraw * estimatedSizings.textHeight + 2 * this.padding;
-      var desiredHeight = estimatedSizings.rows.length * estimatedSizings.textHeight + 2 * this.padding;
+      var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this.padding;
+      var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this.padding;
 
       return {
         width : desiredWidth,
@@ -94,14 +94,13 @@ export module Component {
       };
     }
 
-    private packRows(availableWidth: number, entries: string[], entryLengths: {[entryName: string]: number}) {
+    private packRows(availableWidth: number, entries: string[], entryLengths: D3.Map) {
       var rows: string[][] = [[]];
       var currentRow = rows[0];
       var spaceLeft = availableWidth;
       entries.forEach((e: string) => {
-        var entryLength = entryLengths[e];
+        var entryLength = entryLengths.get(e);
         if (entryLength > spaceLeft) {
-          // allocate new row
           currentRow = [];
           rows.push(currentRow);
           spaceLeft = availableWidth;
@@ -115,14 +114,14 @@ export module Component {
     public _doRender() {
       super._doRender();
 
-      var sizings = this.calculateRenderInfo(this.availableWidth, this.availableHeight);
+      var layout = this.calculateLayoutInfo(this.availableWidth, this.availableHeight);
 
-      var rowsToDraw = sizings.rows.slice(0, sizings.numRowsToDraw);
+      var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
       var rows = this.content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).data(rowsToDraw);
       rows.enter().append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
       rows.exit().remove();
 
-      rows.attr("transform", (d: any, i: number) => "translate(0, " + (i * sizings.textHeight + this.padding) + ")");
+      rows.attr("transform", (d: any, i: number) => "translate(0, " + (i * layout.textHeight + this.padding) + ")");
 
       var entries = rows.selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).data((d) => d);
       var entriesEnter = entries.enter().append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
@@ -133,18 +132,18 @@ export module Component {
       var legendPadding = this.padding;
       rows.each(function (values: string[]) {
         var xShift = legendPadding;
-        d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS)
-            .attr("transform", (value: string, i: number) => {
-              var translateString = "translate(" + xShift + ", 0)";
-              xShift += sizings.entryLengths[value];
-              return translateString;
-            });
+        var entriesInRow = d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS);
+        entriesInRow.attr("transform", (value: string, i: number) => {
+          var translateString = "translate(" + xShift + ", 0)";
+          xShift += layout.entryLengths.get(value);
+          return translateString;
+        });
       });
 
       entries.select("circle")
-          .attr("cx", sizings.textHeight / 2)
-          .attr("cy", sizings.textHeight / 2)
-          .attr("r",  sizings.textHeight * 0.3)
+          .attr("cx", layout.textHeight / 2)
+          .attr("cy", layout.textHeight / 2)
+          .attr("r",  layout.textHeight * 0.3)
           .attr("fill", (value: string) => this.scale.scale(value) );
 
       var padding = this.padding;
@@ -152,11 +151,11 @@ export module Component {
       textContainers.text(""); // clear out previous results
       textContainers.append("title").text((value: string) => value);
       // HACKHACK (translate vertical shift): #864
-      textContainers.attr("transform", "translate(" + sizings.textHeight + ", " + (sizings.textHeight * 0.1) + ")")
+      textContainers.attr("transform", "translate(" + layout.textHeight + ", " + (layout.textHeight * 0.1) + ")")
              .each(function(value: string) {
                var container = d3.select(this);
                var measure = Util.Text.getTextMeasurer(container.append("text"));
-               var maxTextLength = sizings.entryLengths[value] - sizings.textHeight - padding;
+               var maxTextLength = layout.entryLengths.get(value) - layout.textHeight - padding;
                var textToWrite = Util.Text.getTruncatedText(value, maxTextLength, measure);
                var textSize = measure(textToWrite);
                Util.Text.writeLineHorizontally(textToWrite, container, textSize.width, textSize.height);

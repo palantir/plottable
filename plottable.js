@@ -60,14 +60,14 @@ var Plottable;
                 return set;
             }
             Methods.union = union;
-            function populateDictionary(keys, transform) {
-                var dict = {};
+            function populateMap(keys, transform) {
+                var map = d3.map();
                 keys.forEach(function (key) {
-                    dict[key] = transform(key);
+                    map.set(key, transform(key));
                 });
-                return dict;
+                return map;
             }
-            Methods.populateDictionary = populateDictionary;
+            Methods.populateMap = populateMap;
             function _applyAccessor(accessor, plot) {
                 var activatedAccessor = _accessorize(accessor);
                 return function (d, i) { return activatedAccessor(d, i, plot.dataSource().metadata()); };
@@ -4407,7 +4407,7 @@ var Plottable;
                 _super.prototype.remove.call(this);
                 this.scale.broadcaster.deregisterListener(this);
             };
-            HorizontalLegend.prototype.calculateRenderInfo = function (availableWidth, availableHeight) {
+            HorizontalLegend.prototype.calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
                 var fakeLegendRow = this.content.append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
                 var fakeLegendEntry = fakeLegendRow.append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
@@ -4419,7 +4419,7 @@ var Plottable;
                     return Math.min(originalEntryLength, availableWidthForEntries);
                 };
                 var entries = this.scale.domain();
-                var entryLengths = Plottable.Util.Methods.populateDictionary(entries, measureEntry);
+                var entryLengths = Plottable.Util.Methods.populateMap(entries, measureEntry);
                 fakeLegendRow.remove();
                 var rows = this.packRows(availableWidthForEntries, entries, entryLengths);
                 var rowsAvailable = Math.floor((availableHeight - 2 * this.padding) / textHeight);
@@ -4430,19 +4430,19 @@ var Plottable;
                     textHeight: textHeight,
                     entryLengths: entryLengths,
                     rows: rows,
-                    numRowsToDraw: Math.min(rowsAvailable, rows.length)
+                    numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0)
                 };
             };
             HorizontalLegend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var estimatedSizings = this.calculateRenderInfo(offeredWidth, offeredHeight);
-                var rowLengths = estimatedSizings.rows.map(function (row) {
-                    return d3.sum(row, function (entry) { return estimatedSizings.entryLengths[entry]; });
+                var estimatedLayout = this.calculateLayoutInfo(offeredWidth, offeredHeight);
+                var rowLengths = estimatedLayout.rows.map(function (row) {
+                    return d3.sum(row, function (entry) { return estimatedLayout.entryLengths.get(entry); });
                 });
                 var longestRowLength = d3.max(rowLengths);
                 longestRowLength = longestRowLength === undefined ? 0 : longestRowLength;
                 var desiredWidth = this.padding + longestRowLength;
-                var acceptableHeight = estimatedSizings.numRowsToDraw * estimatedSizings.textHeight + 2 * this.padding;
-                var desiredHeight = estimatedSizings.rows.length * estimatedSizings.textHeight + 2 * this.padding;
+                var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this.padding;
+                var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this.padding;
                 return {
                     width: desiredWidth,
                     height: acceptableHeight,
@@ -4455,7 +4455,7 @@ var Plottable;
                 var currentRow = rows[0];
                 var spaceLeft = availableWidth;
                 entries.forEach(function (e) {
-                    var entryLength = entryLengths[e];
+                    var entryLength = entryLengths.get(e);
                     if (entryLength > spaceLeft) {
                         currentRow = [];
                         rows.push(currentRow);
@@ -4469,12 +4469,12 @@ var Plottable;
             HorizontalLegend.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
-                var sizings = this.calculateRenderInfo(this.availableWidth, this.availableHeight);
-                var rowsToDraw = sizings.rows.slice(0, sizings.numRowsToDraw);
+                var layout = this.calculateLayoutInfo(this.availableWidth, this.availableHeight);
+                var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
                 var rows = this.content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).data(rowsToDraw);
                 rows.enter().append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
                 rows.exit().remove();
-                rows.attr("transform", function (d, i) { return "translate(0, " + (i * sizings.textHeight + _this.padding) + ")"; });
+                rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this.padding) + ")"; });
                 var entries = rows.selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
                 var entriesEnter = entries.enter().append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
                 entriesEnter.append("circle");
@@ -4483,21 +4483,22 @@ var Plottable;
                 var legendPadding = this.padding;
                 rows.each(function (values) {
                     var xShift = legendPadding;
-                    d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).attr("transform", function (value, i) {
+                    var entriesInRow = d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS);
+                    entriesInRow.attr("transform", function (value, i) {
                         var translateString = "translate(" + xShift + ", 0)";
-                        xShift += sizings.entryLengths[value];
+                        xShift += layout.entryLengths.get(value);
                         return translateString;
                     });
                 });
-                entries.select("circle").attr("cx", sizings.textHeight / 2).attr("cy", sizings.textHeight / 2).attr("r", sizings.textHeight * 0.3).attr("fill", function (value) { return _this.scale.scale(value); });
+                entries.select("circle").attr("cx", layout.textHeight / 2).attr("cy", layout.textHeight / 2).attr("r", layout.textHeight * 0.3).attr("fill", function (value) { return _this.scale.scale(value); });
                 var padding = this.padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text("");
                 textContainers.append("title").text(function (value) { return value; });
-                textContainers.attr("transform", "translate(" + sizings.textHeight + ", " + (sizings.textHeight * 0.1) + ")").each(function (value) {
+                textContainers.attr("transform", "translate(" + layout.textHeight + ", " + (layout.textHeight * 0.1) + ")").each(function (value) {
                     var container = d3.select(this);
                     var measure = Plottable.Util.Text.getTextMeasurer(container.append("text"));
-                    var maxTextLength = sizings.entryLengths[value] - sizings.textHeight - padding;
+                    var maxTextLength = layout.entryLengths.get(value) - layout.textHeight - padding;
                     var textToWrite = Plottable.Util.Text.getTruncatedText(value, maxTextLength, measure);
                     var textSize = measure(textToWrite);
                     Plottable.Util.Text.writeLineHorizontally(textToWrite, container, textSize.width, textSize.height);
