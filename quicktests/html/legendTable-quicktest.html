@@ -2,7 +2,7 @@
   <head>
     <title>Legend Table Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <script src="../../bower_components/d3/d3.min.js"></script>
+    <script src="../../bower_components/d3/d3.js"></script>
     <script src="../../plottable_multifile.js"></script>
     <script src="../../examples/exampleUtil.js"></script>
     <style>
@@ -22,10 +22,10 @@
         }
 
         var xScale = new Plottable.Scale.Linear();
-        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+        var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
         var yScale = new Plottable.Scale.Linear();
-        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+        var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
         var y0Accessor = function(d, i) { return dataseries[i].y; }
 

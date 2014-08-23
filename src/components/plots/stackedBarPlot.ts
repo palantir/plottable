@@ -64,7 +64,7 @@ export module Plot {
           return d;
         });
       });
-      this.stackedExtent = [0, d3.max(currentBase)];
+      this.stackedExtent = [0, Util.Methods.max(currentBase, 0)];
       this._onDataSourceUpdate();
       return stacks;
     }

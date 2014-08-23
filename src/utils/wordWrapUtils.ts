@@ -59,8 +59,7 @@ export module Util {
      */
     export function canWrapWithoutBreakingWords(text: string, width: number, widthMeasure: (s: string) => number): boolean {
       var tokens = tokenize(text);
-      var widths = tokens.map(widthMeasure);
-      var maxWidth = d3.max(widths);
+      var maxWidth = Util.Methods.max(tokens, widthMeasure, 0);
       return maxWidth <= width;
     }
 

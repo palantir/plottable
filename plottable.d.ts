@@ -13,6 +13,10 @@ declare module Plottable {
             function flatten<T>(a: T[][]): T[];
             function arrayEq<T>(a: T[], b: T[]): boolean;
             function objEq(a: any, b: any): boolean;
+            function max<T>(arr: T[], default_val: T): T;
+            function max<T, U>(arr: U[], accessor: (v: U) => T, default_val: T): T;
+            function min<T>(arr: T[], default_val: T): T;
+            function min<T, U>(arr: U[], accessor: (v: U) => T, default_val: T): T;
         }
     }
 }

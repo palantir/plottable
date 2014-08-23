@@ -4445,6 +4445,25 @@ describe("Util.s", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
         assert.deepEqual(Plottable.Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
     });
+    it("max/min work as expected", function () {
+        var alist = [1, 2, 3, 4, 5];
+        var dbl = function (x) { return x * 2; };
+        var max = Plottable.Util.Methods.max;
+        var min = Plottable.Util.Methods.min;
+        assert.deepEqual(max(alist, 0), 5);
+        assert.deepEqual(max(alist, dbl, 0), 10);
+        assert.deepEqual(max([], 0), 0);
+        assert.deepEqual(max([], dbl, 5), 5);
+        assert.deepEqual(min(alist, 0), 1);
+        assert.deepEqual(min(alist, dbl, 0), 2);
+        assert.deepEqual(min([], 0), 0);
+        assert.deepEqual(min([], dbl, 5), 5);
+        var strings = ["a", "bb", "ccc", "ddd"];
+        assert.deepEqual(max(strings, "foo"), "ddd");
+        assert.deepEqual(max([], "foo"), "foo");
+        assert.deepEqual(max(strings, function (s) { return s.length; }, 0), 3);
+        assert.deepEqual(max([], function (s) { return s.length; }, 0), 0);
+    });
     it("objEq works as expected", function () {
         assert.isTrue(Plottable.Util.Methods.objEq({}, {}));
         assert.isTrue(Plottable.Util.Methods.objEq({ a: 5 }, { a: 5 }));
