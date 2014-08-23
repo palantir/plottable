@@ -4,7 +4,6 @@ module Plottable {
 export module Plot {
 
   export class StackedBar extends Abstract.Stacked {
-    public _yAccessor: IAccessor;
     public _isVertical = true;
     public _baselineValue = 0;
     public _baseline: D3.Selection;
