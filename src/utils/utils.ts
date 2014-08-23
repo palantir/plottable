@@ -53,8 +53,8 @@ export module Util {
      * @param {D3.Set} set2 The second set
      * @return {D3.Set} A set that contains elements that appear in both set1 and set2
      */
-    export function intersection(set1: D3.Set, set2: D3.Set) {
-      var set = d3.set();
+    export function intersection(set1: D3.Set<any>, set2: D3.Set<any>) {
+      var set: D3.Set<string> = d3.set();
       set1.forEach((v) => {
         if(set2.has(v)) {
           set.add(v);
@@ -84,8 +84,8 @@ export module Util {
      * @param{D3.Set} set2 The second set
      * @return{D3.Set} A set that contains elements that appear in either set1 or set2
      */
-    export function union(set1: D3.Set, set2: D3.Set) {
-      var set = d3.set();
+    export function union(set1: D3.Set<any>, set2: D3.Set<any>) {
+      var set: D3.Set<string> = d3.set();
       set1.forEach((v) => set.add(v));
       set2.forEach((v) => set.add(v));
       return set;
@@ -98,8 +98,8 @@ export module Util {
      * @param {(string) => any} transform A transformation function to apply to the keys.
      * @return {D3.Map} A map mapping keys to their transformed values.
      */
-    export function populateMap(keys: string[], transform: (key: string) => any) {
-      var map = d3.map();
+    export function populateMap<T>(keys: string[], transform: (key: string) => T) {
+      var map: D3.Map<T> = d3.map();
       keys.forEach((key: string) => {
         map.set(key, transform(key));
       });
@@ -114,16 +114,17 @@ export module Util {
       return (d: any, i: number) => activatedAccessor(d, i, plot.dataSource().metadata());
     }
 
-    export function uniq(strings: string[]): string[] {
-      var seen: {[s: string]: boolean} = {};
-      strings.forEach((s) => seen[s] = true);
-      return d3.keys(seen);
-    }
-
-    export function uniqNumbers(a: number[]): number[] {
-      var seen = d3.set();
-      var result: number[] = [];
-      a.forEach((n) =>  {
+    /**
+     * Take an array of values, and return the unique values.
+     * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
+     *
+     * @param {T[]} values The values to find uniqueness for
+     * @return {T[]} The unique values
+     */
+    export function uniq<T>(arr: T[]): T[] {
+      var seen: D3.Set<T> = d3.set();
+      var result: T[] = [];
+      arr.forEach((n) =>  {
         if (!seen.has(n)) {
           seen.add(n);
           result.push(n);
@@ -139,8 +140,10 @@ export module Util {
      * @param {number} count The length of the array to generate
      * @return {any[]}
      */
-    export function createFilledArray(value: any, count: number) {
-      var out: any[] = [];
+    export function createFilledArray<T>(value: T, count: number): T[];
+    export function createFilledArray<T>(func: () => T, count: number): T[];
+    export function createFilledArray<T>(value: any, count: number) {
+      var out: T[] = [];
       for (var i = 0; i<count; i++) {
         out[i] = typeof(value) === "function" ? value(i) : value;
       }
