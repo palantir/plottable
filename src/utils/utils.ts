@@ -114,15 +114,9 @@ export module Util {
       return (d: any, i: number) => activatedAccessor(d, i, plot.dataSource().metadata());
     }
 
-    export function uniq(strings: string[]): string[] {
-      var seen: {[s: string]: boolean} = {};
-      strings.forEach((s) => seen[s] = true);
-      return d3.keys(seen);
-    }
-
-    export function uniqNumbers(a: number[]): number[] {
-      var seen = d3.set();
-      var result: number[] = [];
+    export function uniq<T>(a: T[]): T[] {
+      var seen: D3.Set<T> = d3.set();
+      var result: T[] = [];
       a.forEach((n) =>  {
         if (!seen.has(n)) {
           seen.add(n);
@@ -139,8 +133,10 @@ export module Util {
      * @param {number} count The length of the array to generate
      * @return {any[]}
      */
-    export function createFilledArray(value: any, count: number) {
-      var out: any[] = [];
+    export function createFilledArray<T>(value: T, count: number): T[];
+    export function createFilledArray<T>(func: () => T, count: number): T[];
+    export function createFilledArray<T>(value: any, count: number) {
+      var out: T[] = [];
       for (var i = 0; i<count; i++) {
         out[i] = typeof(value) === "function" ? value(i) : value;
       }
