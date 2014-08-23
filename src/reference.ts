@@ -60,6 +60,7 @@
 /// <reference path="components/plots/areaPlot.ts" />
 /// <reference path="components/plots/newStyleBarPlot.ts" />
 /// <reference path="components/plots/clusteredBarPlot.ts" />
+/// <reference path="components/plots/stackedPlot.ts" />
 /// <reference path="components/plots/stackedAreaPlot.ts" />
 /// <reference path="components/plots/stackedBarPlot.ts" />
 

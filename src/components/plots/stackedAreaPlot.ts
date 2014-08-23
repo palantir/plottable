@@ -2,13 +2,10 @@
 
 module Plottable {
 export module Plot {
-  export class StackedArea extends Abstract.NewStylePlot {
+  export class StackedArea extends Abstract.Stacked {
 
     public _baseline: D3.Selection;
     public _baselineValue = 0;
-
-    private stackedData: any[] = [];
-    private stackedExtent: number[] = [];
 
     /**
      * Constructs a StackedArea plot.
@@ -62,7 +59,7 @@ export module Plot {
       attrToProjector["fill"] = (d, i) => fillProjector(d.values[0], i);
 
       this._getDrawersInOrder().forEach((drawer, i) => {
-        drawer.draw([this.stackedData[i]], attrToProjector);
+        drawer.draw([this._stackedData[i]], attrToProjector);
       });
     }
 
@@ -70,25 +67,8 @@ export module Plot {
       return Plot.Area.prototype._updateYDomainer.apply(this);
     }
 
-    public _addDataset(key: string, dataset: any) {
-      super._addDataset(key, dataset);
-      this.stack({key: key, values: (<DataSource> dataset).data()});
-    }
-
     public _onDataSourceUpdate() {
       return Plot.Area.prototype._onDataSourceUpdate.apply(this);
-    }
-
-    public _updateAllProjectors() {
-      super._updateAllProjectors();
-      if (this.yScale == null) {
-        return;
-      }
-      if (this._isAnchored && this.stackedExtent.length > 0) {
-        this.yScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
-      } else {
-        this.yScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
-      }
     }
 
     public _generateAttrToProjector() {
@@ -96,12 +76,6 @@ export module Plot {
       attrToProjector["y"] = (d: any) => this.yScale.scale(d.y + d.y0);
       attrToProjector["y0"] = (d: any) => this.yScale.scale(d.y0);
       return attrToProjector;
-    }
-
-    private stack(d: any) {
-      this.stackedData.push(d);
-      this.stackedData = d3.layout.stack()
-        .values(function(d) { return d.values; })(this.stackedData);
     }
   }
 }
