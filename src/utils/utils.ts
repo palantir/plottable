@@ -84,12 +84,27 @@ export module Util {
      * @param{D3.Set} set2 The second set
      * @return{D3.Set} A set that contains elements that appear in either set1 or set2
      */
-     export function union(set1: D3.Set, set2: D3.Set) {
+    export function union(set1: D3.Set, set2: D3.Set) {
       var set = d3.set();
       set1.forEach((v) => set.add(v));
       set2.forEach((v) => set.add(v));
       return set;
-     }
+    }
+
+    /**
+     * Populates a dictionary from an array of keys and a transformation function.
+     *
+     * @param {string[]} keys The array of keys.
+     * @param {(string) => any} transform A transformation function to apply to the keys.
+     * @return {{[key: string]: any}} A dictionary mapping keys to their transformed values.
+     */
+    export function populateDictionary(keys: string[], transform: (key: string) => any) {
+      var dict: {[key: string]: any} = {};
+      keys.forEach((key: string) => {
+        dict[key] = transform(key);
+      });
+      return dict;
+    }
 
     /**
      * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata

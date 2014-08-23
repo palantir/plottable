@@ -60,6 +60,14 @@ var Plottable;
                 return set;
             }
             Methods.union = union;
+            function populateDictionary(keys, transform) {
+                var dict = {};
+                keys.forEach(function (key) {
+                    dict[key] = transform(key);
+                });
+                return dict;
+            }
+            Methods.populateDictionary = populateDictionary;
             function _applyAccessor(accessor, plot) {
                 var activatedAccessor = _accessorize(accessor);
                 return function (d, i) { return activatedAccessor(d, i, plot.dataSource().metadata()); };
@@ -4393,19 +4401,14 @@ var Plottable;
                 this.numRowsToDraw = 0;
                 this.classed("legend", true);
                 this.scale = colorScale;
-                this.scale.broadcaster.registerListener(this, function () { return _this.updateDomain(); });
-                this.xAlign("LEFT").yAlign("CENTER");
+                this.scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
+                this.xAlign("left").yAlign("center");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
             }
             HorizontalLegend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                if (this.scale != null) {
-                    this.scale.broadcaster.deregisterListener(this);
-                }
-            };
-            HorizontalLegend.prototype.updateDomain = function () {
-                this._invalidateLayout();
+                this.scale.broadcaster.deregisterListener(this);
             };
             HorizontalLegend.prototype._invalidateLayout = function () {
                 this.previousOfferedWidth = null;
@@ -4414,9 +4417,19 @@ var Plottable;
             HorizontalLegend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var _this = this;
                 if (offeredWidth !== this.previousOfferedWidth) {
+                    var fakeLegendRow = this.content.append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
+                    var fakeLegendEntry = fakeLegendRow.append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
+                    var measure = Plottable.Util.Text.getTextMeasurer(fakeLegendRow.append("text"));
+                    this.textHeight = measure(Plottable.Util.Text.HEIGHT_TEXT).height;
                     var availableWidthForEntries = Math.max(0, (offeredWidth - this.padding));
-                    this.sizeEntries(availableWidthForEntries);
+                    var measureEntry = function (entryText) {
+                        var originalEntryLength = (_this.textHeight + measure(entryText).width + _this.padding);
+                        return Math.min(originalEntryLength, availableWidthForEntries);
+                    };
+                    this.entryLengths = Plottable.Util.Methods.populateDictionary(this.scale.domain(), measureEntry);
+                    this.rows = this.packRows(availableWidthForEntries);
                     this.previousOfferedWidth = offeredWidth;
+                    fakeLegendRow.remove();
                 }
                 var rowLengths = this.rows.map(function (row) {
                     return d3.sum(row, function (entry) { return _this.entryLengths[entry]; });
@@ -4438,35 +4451,22 @@ var Plottable;
                     wantsHeight: offeredHeight < desiredHeight
                 };
             };
-            HorizontalLegend.prototype.sizeEntries = function (availableWidth) {
-                var _this = this;
-                var fakeLegendEl = this.content.append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
-                var measure = Plottable.Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
-                this.textHeight = measure(Plottable.Util.Text.HEIGHT_TEXT).height;
-                var entries = this.scale.domain();
-                this.entryLengths = {};
-                entries.forEach(function (e) {
-                    var textLength = measure(e).width;
-                    _this.entryLengths[e] = Math.min((_this.textHeight + textLength + _this.padding), availableWidth);
-                });
-                fakeLegendEl.remove();
-                this.packRows(availableWidth);
-            };
             HorizontalLegend.prototype.packRows = function (availableWidth) {
                 var _this = this;
-                this.rows = [[]];
-                var currentRow = this.rows[0];
+                var rows = [[]];
+                var currentRow = rows[0];
                 var spaceLeft = availableWidth;
                 this.scale.domain().forEach(function (e) {
                     var entryLength = _this.entryLengths[e];
                     if (entryLength > spaceLeft) {
                         currentRow = [];
-                        _this.rows.push(currentRow);
+                        rows.push(currentRow);
                         spaceLeft = availableWidth;
                     }
                     currentRow.push(e);
                     spaceLeft -= entryLength;
                 });
+                return rows;
             };
             HorizontalLegend.prototype._doRender = function () {
                 var _this = this;
@@ -4494,7 +4494,10 @@ var Plottable;
                 entries.select("circle").attr("cx", this.textHeight / 2).attr("cy", this.textHeight / 2).attr("r", this.textHeight * 0.3).attr("fill", function (value) { return _this.scale.scale(value); });
                 var padding = this.padding;
                 var textHeight = this.textHeight;
-                entries.select("g.text-container").text("").attr("transform", "translate(" + this.textHeight + ", " + (this.textHeight * 0.1) + ")").each(function (value) {
+                var textContainers = entries.select("g.text-container");
+                textContainers.text("");
+                textContainers.append("title").text(function (value) { return value; });
+                textContainers.attr("transform", "translate(" + this.textHeight + ", " + (this.textHeight * 0.1) + ")").each(function (value) {
                     var container = d3.select(this);
                     var measure = Plottable.Util.Text.getTextMeasurer(container.append("text"));
                     var maxTextLength = entryLengths[value] - textHeight - padding;

@@ -29,27 +29,21 @@ export module Component {
      * @constructor
      * @param {Scale.Color} colorScale
      */
-    constructor(colorScale?: Scale.Color) {
+    constructor(colorScale: Scale.Color) {
       super();
       this.classed("legend", true);
 
       this.scale = colorScale;
-      this.scale.broadcaster.registerListener(this, () => this.updateDomain());
+      this.scale.broadcaster.registerListener(this, () => this._invalidateLayout());
 
-      this.xAlign("LEFT").yAlign("CENTER");
+      this.xAlign("left").yAlign("center");
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
     }
 
     public remove() {
       super.remove();
-      if (this.scale != null) {
-        this.scale.broadcaster.deregisterListener(this);
-      }
-    }
-
-    private updateDomain() {
-      this._invalidateLayout();
+      this.scale.broadcaster.deregisterListener(this);
     }
 
     public _invalidateLayout() {
@@ -60,9 +54,24 @@ export module Component {
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       if (offeredWidth !== this.previousOfferedWidth) {
+        var fakeLegendRow = this.content.append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
+        var fakeLegendEntry = fakeLegendRow.append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
+        var measure = Util.Text.getTextMeasurer(fakeLegendRow.append("text"));
+
+        this.textHeight = measure(Util.Text.HEIGHT_TEXT).height;
+
         var availableWidthForEntries = Math.max(0, (offeredWidth - this.padding));
-        this.sizeEntries(availableWidthForEntries);
+        var measureEntry = (entryText: string) => {
+          var originalEntryLength = (this.textHeight + measure(entryText).width + this.padding);
+          return Math.min(originalEntryLength, availableWidthForEntries);
+        }
+
+        this.entryLengths = Util.Methods.populateDictionary(this.scale.domain(), measureEntry);
+
+        this.rows = this.packRows(availableWidthForEntries);
         this.previousOfferedWidth = offeredWidth;
+
+        fakeLegendRow.remove();
       }
 
       var rowLengths = this.rows.map((row: string[]) => {
@@ -90,38 +99,22 @@ export module Component {
       };
     }
 
-    private sizeEntries(availableWidth: number) {
-      var fakeLegendEl = this.content.append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
-      var measure = Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
-      this.textHeight = measure(Util.Text.HEIGHT_TEXT).height;
-
-      var entries = this.scale.domain();
-      this.entryLengths = {};
-
-      entries.forEach((e: string) => {
-        var textLength = measure(e).width;
-        this.entryLengths[e] = Math.min( (this.textHeight + textLength + this.padding), availableWidth );
-      });
-
-      fakeLegendEl.remove();
-      this.packRows(availableWidth);
-    }
-
     private packRows(availableWidth: number) {
-      this.rows = [[]];
-      var currentRow = this.rows[0];
+      var rows: string[][] = [[]];
+      var currentRow = rows[0];
       var spaceLeft = availableWidth;
       this.scale.domain().forEach((e: string) => {
         var entryLength = this.entryLengths[e];
         if (entryLength > spaceLeft) {
           // allocate new row
           currentRow = [];
-          this.rows.push(currentRow);
+          rows.push(currentRow);
           spaceLeft = availableWidth;
         }
         currentRow.push(e);
         spaceLeft -= entryLength;
       });
+      return rows;
     }
 
     public _doRender() {
@@ -159,9 +152,10 @@ export module Component {
 
       var padding = this.padding;
       var textHeight = this.textHeight;
-      entries.select("g.text-container")
-             .text("") // clear out previous results
-             .attr("transform", "translate(" + this.textHeight + ", " + (this.textHeight * 0.1) + ")") // HACKHACK (vertical shift): #864
+      var textContainers = entries.select("g.text-container");
+      textContainers.text(""); // clear out previous results
+      textContainers.append("title").text((value: string) => value);
+      textContainers.attr("transform", "translate(" + this.textHeight + ", " + (this.textHeight * 0.1) + ")") // HACKHACK (vertical shift): #864
              .each(function(value: string) {
                var container = d3.select(this);
                var measure = Util.Text.getTextMeasurer(container.append("text"));
