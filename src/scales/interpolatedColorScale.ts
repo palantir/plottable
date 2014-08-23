@@ -212,7 +212,7 @@ export module Scale {
       // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
       var extents = this._getAllExtents();
       if (extents.length > 0) {
-        this._setDomain([d3.min(extents, (x) => x[0]), d3.max(extents, (x) => x[1])]);
+        this._setDomain([Util.Methods.min(extents, (x) => x[0], 0), Util.Methods.max(extents, (x) => x[1], 0)]);
       }
       return this;
     }

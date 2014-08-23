@@ -46,7 +46,9 @@ module Plottable {
       } else if (extents.length === 0) {
         domain = scale._defaultExtent();
       } else {
+        /* tslint:disable:ban */ // since we handle the extents.length === 0 case explicitly
         domain = [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
+        /* tslint:enable:ban */
       }
       domain = this.includeDomain(domain);
       domain = this.padDomain(scale, domain);
@@ -163,11 +165,7 @@ module Plottable {
     }
 
     private static defaultCombineExtents(extents: any[][]): any[] {
-      if (extents.length === 0) {
-        return [0, 1];
-      } else {
-        return [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
-      }
+      return [Util.Methods.min(extents, (e) => e[0], 0), Util.Methods.max(extents, (e) => e[1], 1)];
     }
 
     private padDomain(scale: Abstract.QuantitativeScale, domain: any[]): any[] {
