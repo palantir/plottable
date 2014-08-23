@@ -31,11 +31,11 @@ export module Plot {
       }
       var clusters: {[key: string]: any[]} = {};
       this._datasetKeysInOrder.forEach((key: string) => {
-        var data = this._key2DatasetDrawerKey[key].dataset.data();
-        var vals = data.map((d) => accessor(d));
+        var data = this._key2DatasetDrawerKey.get(key).dataset.data();
 
         clusters[key] = data.map((d, i) => {
-          d["_PLOTTABLE_PROTECTED_FIELD_X"] = this.xScale.scale(vals[i]) + this.innerScale.scale(key);
+          var val = accessor(d, i);
+          d["_PLOTTABLE_PROTECTED_FIELD_X"] = this.xScale.scale(val) + this.innerScale.scale(key);
           return d;
         });
       });

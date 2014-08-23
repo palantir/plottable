@@ -115,9 +115,7 @@ export module Util {
     }
 
     export function uniq(strings: string[]): string[] {
-      var seen: {[s: string]: boolean} = {};
-      strings.forEach((s) => seen[s] = true);
-      return d3.keys(seen);
+      return d3.set(strings).values();
     }
 
     export function uniqNumbers(a: number[]): number[] {

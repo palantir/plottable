@@ -74,9 +74,7 @@ var Plottable;
             }
             Methods._applyAccessor = _applyAccessor;
             function uniq(strings) {
-                var seen = {};
-                strings.forEach(function (s) { return seen[s] = true; });
-                return d3.keys(seen);
+                return d3.set(strings).values();
             }
             Methods.uniq = uniq;
             function uniqNumbers(a) {
@@ -2090,10 +2088,10 @@ var Plottable;
         var NewStylePlot = (function (_super) {
             __extends(NewStylePlot, _super);
             function NewStylePlot(xScale, yScale) {
-                _super.call(this, new Plottable.DataSource(), xScale, yScale);
-                this.nextSeriesIndex = 0;
-                this._key2DatasetDrawerKey = {};
+                this._key2DatasetDrawerKey = d3.map();
                 this._datasetKeysInOrder = [];
+                this.nextSeriesIndex = 0;
+                _super.call(this, new Plottable.DataSource(), xScale, yScale);
             }
             NewStylePlot.prototype._setup = function () {
                 var _this = this;
@@ -2120,14 +2118,14 @@ var Plottable;
             };
             NewStylePlot.prototype._addDataset = function (key, dataset) {
                 var _this = this;
-                if (this._key2DatasetDrawerKey[key] != null) {
+                if (this._key2DatasetDrawerKey.has(key)) {
                     this.removeDataset(key);
                 }
                 ;
                 var drawer = this._getDrawer(key);
                 var ddk = { drawer: drawer, dataset: dataset, key: key };
                 this._datasetKeysInOrder.push(key);
-                this._key2DatasetDrawerKey[key] = ddk;
+                this._key2DatasetDrawerKey.set(key, ddk);
                 if (this._isSetup) {
                     drawer.renderArea = this.renderArea.append("g");
                 }
@@ -2141,9 +2139,9 @@ var Plottable;
                 var _this = this;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
-                    d3.values(this._key2DatasetDrawerKey).forEach(function (ddk) {
+                    this._key2DatasetDrawerKey.forEach(function (key, ddk) {
                         var extent = ddk.dataset._getExtent(projector.accessor);
-                        var scaleKey = _this._plottableID.toString() + "_" + ddk.key;
+                        var scaleKey = _this._plottableID.toString() + "_" + key;
                         if (extent.length === 0 || !_this._isAnchored) {
                             projector.scale.removeExtent(scaleKey, attr);
                         }
@@ -2172,8 +2170,8 @@ var Plottable;
                 return this;
             };
             NewStylePlot.prototype.removeDataset = function (key) {
-                if (this._key2DatasetDrawerKey[key] != null) {
-                    var ddk = this._key2DatasetDrawerKey[key];
+                if (this._key2DatasetDrawerKey.has(key)) {
+                    var ddk = this._key2DatasetDrawerKey.get(key);
                     ddk.drawer.remove();
                     var projectors = d3.values(this._projectors);
                     var scaleKey = this._plottableID.toString() + "_" + key;
@@ -2184,18 +2182,18 @@ var Plottable;
                     });
                     ddk.dataset.broadcaster.deregisterListener(this);
                     this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-                    delete this._key2DatasetDrawerKey[key];
+                    this._key2DatasetDrawerKey.remove(key);
                     this._onDataSourceUpdate();
                 }
                 return this;
             };
             NewStylePlot.prototype._getDatasetsInOrder = function () {
                 var _this = this;
-                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].dataset; });
+                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).dataset; });
             };
             NewStylePlot.prototype._getDrawersInOrder = function () {
                 var _this = this;
-                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].drawer; });
+                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).drawer; });
             };
             return NewStylePlot;
         })(Abstract.XYPlot);
@@ -5209,10 +5207,10 @@ var Plottable;
                 }
                 var clusters = {};
                 this._datasetKeysInOrder.forEach(function (key) {
-                    var data = _this._key2DatasetDrawerKey[key].dataset.data();
-                    var vals = data.map(function (d) { return accessor(d); });
+                    var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
                     clusters[key] = data.map(function (d, i) {
-                        d["_PLOTTABLE_PROTECTED_FIELD_X"] = _this.xScale.scale(vals[i]) + _this.innerScale.scale(key);
+                        var val = accessor(d, i);
+                        d["_PLOTTABLE_PROTECTED_FIELD_X"] = _this.xScale.scale(val) + _this.innerScale.scale(key);
                         return d;
                     });
                 });
