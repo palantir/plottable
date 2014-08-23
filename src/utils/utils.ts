@@ -114,17 +114,20 @@ export module Util {
       return (d: any, i: number) => activatedAccessor(d, i, plot.dataSource().metadata());
     }
 
-    export function uniq(strings: string[]): string[] {
-      return d3.set(strings).values();
-    }
-
-    export function uniqNumbers(a: number[]): number[] {
-      var seen = d3.set();
-      var result: number[] = [];
-      a.forEach((n) =>  {
-        if (!seen.has(n)) {
-          seen.add(n);
-          result.push(n);
+    /**
+     * Take an array of values, and return the unique values.
+     * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
+     *
+     * @param {T[]} values The values to find uniqueness for
+     * @return {T[]} The unique values
+     */
+    export function uniq<T>(arr: T[]): T[] {
+      var seen: D3.Set<T> = d3.set();
+      var result: T[] = [];
+      arr.forEach((x) =>  {
+        if (!seen.has(x)) {
+          seen.add(x);
+          result.push(x);
         }
       });
       return result;
@@ -137,8 +140,10 @@ export module Util {
      * @param {number} count The length of the array to generate
      * @return {any[]}
      */
-    export function createFilledArray(value: any, count: number) {
-      var out: any[] = [];
+    export function createFilledArray<T>(value: T, count: number): T[];
+    export function createFilledArray<T>(func: () => T, count: number): T[];
+    export function createFilledArray<T>(value: any, count: number) {
+      var out: T[] = [];
       for (var i = 0; i<count; i++) {
         out[i] = typeof(value) === "function" ? value(i) : value;
       }

@@ -73,22 +73,18 @@ var Plottable;
                 return function (d, i) { return activatedAccessor(d, i, plot.dataSource().metadata()); };
             }
             Methods._applyAccessor = _applyAccessor;
-            function uniq(strings) {
-                return d3.set(strings).values();
-            }
-            Methods.uniq = uniq;
-            function uniqNumbers(a) {
+            function uniq(arr) {
                 var seen = d3.set();
                 var result = [];
-                a.forEach(function (n) {
-                    if (!seen.has(n)) {
-                        seen.add(n);
-                        result.push(n);
+                arr.forEach(function (x) {
+                    if (!seen.has(x)) {
+                        seen.add(x);
+                        result.push(x);
                     }
                 });
                 return result;
             }
-            Methods.uniqNumbers = uniqNumbers;
+            Methods.uniq = uniq;
             function createFilledArray(value, count) {
                 var out = [];
                 for (var i = 0; i < count; i++) {
@@ -2719,7 +2715,7 @@ var Plottable;
                 var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
                 var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
                 var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
-                var uniqMultiples = Plottable.Util.Methods.uniqNumbers(multiples);
+                var uniqMultiples = Plottable.Util.Methods.uniq(multiples);
                 var clusters = bases.map(function (b) { return uniqMultiples.map(function (x) { return Math.pow(_this.base, b - 1) * x; }); });
                 var flattened = Plottable.Util.Methods.flatten(clusters);
                 var filtered = flattened.filter(function (x) { return lower <= x && x <= upper; });
@@ -5202,7 +5198,7 @@ var Plottable;
                 var _this = this;
                 this.innerScale.domain(this._datasetKeysInOrder);
                 var lengths = this._getDatasetsInOrder().map(function (d) { return d.data().length; });
-                if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
+                if (Plottable.Util.Methods.uniq(lengths).length > 1) {
                     Plottable.Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
                 }
                 var clusters = {};
@@ -5277,7 +5273,7 @@ var Plottable;
             StackedBar.prototype.stack = function (accessor) {
                 var datasets = d3.values(this._key2DatasetDrawerKey);
                 var lengths = datasets.map(function (d) { return d.dataset.data().length; });
-                if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
+                if (Plottable.Util.Methods.uniq(lengths).length > 1) {
                     Plottable.Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
                 }
                 var currentBase = Plottable.Util.Methods.createFilledArray(0, lengths[0]);
