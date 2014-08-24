@@ -153,7 +153,7 @@ export module Scale {
       var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
       var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
       var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
-      var uniqMultiples = Util.Methods.uniqNumbers(multiples);
+      var uniqMultiples = Util.Methods.uniq(multiples);
       var clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this.base, b - 1) * x));
       var flattened = Util.Methods.flatten(clusters);
       var filtered = flattened.filter((x) => lower <= x && x <= upper);
