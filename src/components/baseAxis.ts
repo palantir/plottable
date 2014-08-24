@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Abstract {
-  export class Axis extends Abstract.Component {
+  export class Axis<T> extends Abstract.Component {
     /**
      * The css class applied to each end tick mark (the line on the end tick).
      */
@@ -18,7 +18,7 @@ export module Abstract {
     public _tickMarkContainer: D3.Selection;
     public _tickLabelContainer: D3.Selection;
     public _baseline: D3.Selection;
-    public _scale: Abstract.Scale;
+    public _scale: Abstract.Scale<T, number>;
     public _formatter: Formatter;
     public _orientation: string;
     public _width: any = "auto";
@@ -31,7 +31,7 @@ export module Abstract {
     private _gutter = 15;
     private _showEndTickLabels = false;
 
-    constructor(scale: Abstract.Scale, orientation: string, formatter = Formatters.identity()) {
+    constructor(scale: Abstract.Scale<T, number>, orientation: string, formatter = Formatters.identity()) {
       super();
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
       this._scale = scale;
@@ -240,7 +240,7 @@ export module Abstract {
      * @param {number|String} w A fixed width for the Axis, or "auto" for automatic mode.
      * @returns {Axis} The calling Axis.
      */
-    public width(w: any): Axis;
+    public width(w: any): Axis<T>;
     public width(w?: any): any {
       if (w == null) {
         return this.availableWidth;
@@ -269,7 +269,7 @@ export module Abstract {
      * @param {number|String} h A fixed height for the Axis, or "auto" for automatic mode.
      * @returns {Axis} The calling Axis.
      */
-    public height(h: any): Axis;
+    public height(h: any): Axis<T>;
     public height(h?: any): any {
       if (h == null) {
         return this.availableHeight;
@@ -298,7 +298,7 @@ export module Abstract {
      * @param {Formatter} formatter
      * @returns {Abstract.Axis} The calling Axis.
      */
-    public formatter(formatter: Formatter): Abstract.Axis;
+    public formatter(formatter: Formatter): Axis<T>;
     public formatter(formatter?: Formatter): any {
       if (formatter === undefined) {
         return this._formatter;
@@ -320,7 +320,7 @@ export module Abstract {
      * @param {number} length The length of each tick.
      * @returns {BaseAxis} The calling Axis.
      */
-    public tickLength(length: number): Axis;
+    public tickLength(length: number): Axis<T>;
     public tickLength(length?: number): any {
       if (length == null) {
         return this._tickLength;
@@ -346,7 +346,7 @@ export module Abstract {
      * @param {number} length The length of the end ticks.
      * @returns {BaseAxis} The calling Axis.
      */
-    public endTickLength(length: number): Axis;
+    public endTickLength(length: number): Axis<T>;
     public endTickLength(length?: number): any {
       if (length == null) {
         return this._endTickLength;
@@ -380,7 +380,7 @@ export module Abstract {
      * @param {number} padding The desired padding, in pixels.
      * @returns {Axis} The calling Axis.
      */
-    public tickLabelPadding(padding: number): Axis;
+    public tickLabelPadding(padding: number): Axis<T>;
     public tickLabelPadding(padding?: number): any {
       if (padding == null) {
         return this._tickLabelPadding;
@@ -406,7 +406,7 @@ export module Abstract {
      * @param {number} size The desired size of the gutter, in pixels.
      * @returns {Axis} The calling Axis.
      */
-    public gutter(size: number): Axis;
+    public gutter(size: number): Axis<T>;
     public gutter(size?: number): any {
       if (size == null) {
         return this._gutter;
@@ -432,7 +432,7 @@ export module Abstract {
      * @param {string} newOrientation The desired orientation (top/bottom/left/right).
      * @returns {Axis} The calling Axis.
      */
-    public orient(newOrientation: string): Axis;
+    public orient(newOrientation: string): Axis<T>;
     public orient(newOrientation?: string): any {
       if (newOrientation == null) {
         return this._orientation;
@@ -463,7 +463,7 @@ export module Abstract {
      * @param {boolean} show Whether or not to show the first and last labels.
      * @returns {Axis} The calling Axis.
      */
-    public showEndTickLabels(show: boolean): Axis;
+    public showEndTickLabels(show: boolean): Axis<T>;
     public showEndTickLabels(show?: boolean): any {
       if (show == null) {
         return this._showEndTickLabels;

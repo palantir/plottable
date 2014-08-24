@@ -8,10 +8,10 @@ module Plottable {
   }
 
 export module Abstract {
-  export class NewStylePlot extends XYPlot {
-    private nextSeriesIndex = 0;
-    public _key2DatasetDrawerKey: { [key: string]: DatasetDrawerKey; } = {};
-    public _datasetKeysInOrder: string[] = [];
+  export class NewStylePlot<X, Y> extends XYPlot<X, Y> {
+    private nextSeriesIndex: number;
+    public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
+    public _datasetKeysInOrder: string[];
 
     /**
      * Creates a NewStylePlot.
@@ -20,8 +20,11 @@ export module Abstract {
      * @param [Scale] xScale The x scale to use
      * @param [Scale] yScale The y scale to use
      */
-    constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
+    constructor(xScale?: Abstract.Scale<X, number>, yScale?: Abstract.Scale<Y, number>) {
       // make a dummy dataSource to satisfy the base Plot (HACKHACK)
+      this._key2DatasetDrawerKey = d3.map();
+      this._datasetKeysInOrder = [];
+      this.nextSeriesIndex = 0;
       super(new Plottable.DataSource(), xScale, yScale);
     }
 
@@ -44,11 +47,11 @@ export module Abstract {
      * @param {any[]|DataSource} dataset dataset to add.
      * @return {NewStylePlot} The calling NewStylePlot.
      */
-    public addDataset(key: string, dataset: DataSource): NewStylePlot;
-    public addDataset(key: string, dataset: any[]): NewStylePlot;
-    public addDataset(dataset: DataSource): NewStylePlot;
-    public addDataset(dataset: any[]): NewStylePlot;
-    public addDataset(keyOrDataset: any, dataset?: any): NewStylePlot {
+    public addDataset(key: string, dataset: DataSource): NewStylePlot<X, Y>;
+    public addDataset(key: string, dataset: any[]): NewStylePlot<X, Y>;
+    public addDataset(dataset: DataSource): NewStylePlot<X, Y>;
+    public addDataset(dataset: any[]): NewStylePlot<X, Y>;
+    public addDataset(keyOrDataset: any, dataset?: any): NewStylePlot<X, Y> {
       if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
         throw new Error("invalid input to addDataset");
       }
@@ -64,13 +67,13 @@ export module Abstract {
     }
 
     public _addDataset(key: string, dataset: DataSource) {
-      if (this._key2DatasetDrawerKey[key] != null) {
+      if (this._key2DatasetDrawerKey.has(key)) {
         this.removeDataset(key);
       };
       var drawer = this._getDrawer(key);
       var ddk = {drawer: drawer, dataset: dataset, key: key};
       this._datasetKeysInOrder.push(key);
-      this._key2DatasetDrawerKey[key] = ddk;
+      this._key2DatasetDrawerKey.set(key, ddk);
 
       if (this._isSetup) {
         drawer.renderArea = this.renderArea.append("g");
@@ -86,9 +89,9 @@ export module Abstract {
     public _updateProjector(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
-        d3.values(this._key2DatasetDrawerKey).forEach((ddk) => {
+        this._key2DatasetDrawerKey.forEach((key, ddk) => {
           var extent = ddk.dataset._getExtent(projector.accessor);
-          var scaleKey = this._plottableID.toString() + "_" + ddk.key;
+          var scaleKey = this._plottableID.toString() + "_" + key;
           if (extent.length === 0 || !this._isAnchored) {
             projector.scale.removeExtent(scaleKey, attr);
           } else {
@@ -109,7 +112,7 @@ export module Abstract {
      *
      * @param {string[]} order A string array which represents the order of the keys. This must be a permutation of existing keys.
      */
-    public datasetOrder(order: string[]): NewStylePlot;
+    public datasetOrder(order: string[]): NewStylePlot<X, Y>;
     public datasetOrder(order?: string[]): any {
       if (order === undefined) {
         return this._datasetKeysInOrder;
@@ -134,9 +137,9 @@ export module Abstract {
      * @param {string} key The key of the dataset
      * @return {NewStylePlot} The calling NewStylePlot.
      */
-    public removeDataset(key: string): NewStylePlot {
-      if (this._key2DatasetDrawerKey[key] != null) {
-        var ddk = this._key2DatasetDrawerKey[key];
+    public removeDataset(key: string): NewStylePlot<X, Y> {
+      if (this._key2DatasetDrawerKey.has(key) != null) {
+        var ddk = this._key2DatasetDrawerKey.get(key);
         ddk.drawer.remove();
 
         var projectors = d3.values(this._projectors);
@@ -149,18 +152,18 @@ export module Abstract {
 
         ddk.dataset.broadcaster.deregisterListener(this);
         this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-        delete this._key2DatasetDrawerKey[key];
+        this._key2DatasetDrawerKey.remove(key);
         this._onDataSourceUpdate();
       }
       return this;
     }
 
     public _getDatasetsInOrder(): DataSource[] {
-      return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey[k].dataset);
+      return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).dataset);
     }
 
     public _getDrawersInOrder(): Abstract._Drawer[] {
-      return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey[k].drawer);
+      return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).drawer);
     }
   }
 }

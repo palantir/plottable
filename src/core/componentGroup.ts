@@ -18,12 +18,11 @@ export module Component {
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       var requests = this._components.map((c: Abstract.Component) => c._requestedSpace(offeredWidth, offeredHeight));
-      var isEmpty = this.empty();
       return {
-        width : isEmpty ? 0 : d3.max(requests, (request: ISpaceRequest) => request.width ),
-        height: isEmpty ? 0 : d3.max(requests, (request: ISpaceRequest) => request.height),
-        wantsWidth : isEmpty ? false : requests.map((r: ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
-        wantsHeight: isEmpty ? false : requests.map((r: ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
+        width : Util.Methods.max(requests, (request: ISpaceRequest) => request.width , 0),
+        height: Util.Methods.max(requests, (request: ISpaceRequest) => request.height, 0),
+        wantsWidth : requests.map((r: ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
+        wantsHeight: requests.map((r: ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
       };
     }
 

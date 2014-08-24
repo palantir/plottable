@@ -3,7 +3,7 @@
 var assert = chai.assert;
 
 describe("Plots", () => {
-  describe("GridPlot", () => {
+  describe("Grid<string, string>Plot", () => {
     var SVG_WIDTH  = 400;
     var SVG_HEIGHT = 200;
     var DATA       = [
@@ -47,11 +47,11 @@ describe("Plots", () => {
     };
 
     it("renders correctly", () => {
-      var xScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
-      var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
-      var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-      var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(DATA, xScale, yScale, colorScale)
+      var xScale = new Plottable.Scale.Ordinal<string>();
+      var yScale = new Plottable.Scale.Ordinal<string>();
+      var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var renderer = new Plottable.Plot.Grid<string, string, number>(DATA, xScale, yScale, colorScale)
                                                           .project("fill", "magnitude", colorScale);
       renderer.renderTo(svg);
       VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
@@ -60,11 +60,11 @@ describe("Plots", () => {
 
 
     it("renders correctly when data is set after construction", () => {
-      var xScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
-      var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
-      var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-      var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(null, xScale, yScale, colorScale)
+      var xScale = new Plottable.Scale.Ordinal<string>();
+      var yScale = new Plottable.Scale.Ordinal<string>();
+      var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var renderer = new Plottable.Plot.Grid<string, string, number>(null, xScale, yScale, colorScale)
                                                           .project("fill", "magnitude", colorScale);
       renderer.renderTo(svg);
       renderer.dataSource().data(DATA);
@@ -73,11 +73,11 @@ describe("Plots", () => {
     });
 
     it("can invert y axis correctly", () => {
-      var xScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
-      var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
-      var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-      var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(null, xScale, yScale, colorScale)
+      var xScale = new Plottable.Scale.Ordinal<string>();
+      var yScale = new Plottable.Scale.Ordinal<string>();
+      var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var renderer = new Plottable.Plot.Grid<string, string, number>([], xScale, yScale, colorScale)
                                                           .project("fill", "magnitude");
       renderer.renderTo(svg);
 

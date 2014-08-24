@@ -6,7 +6,7 @@ export module Abstract {
    * An Abstract.BarPlot is the base implementation for HorizontalBarPlot and
    * VerticalBarPlot. It should not be used on its own.
    */
-  export class BarPlot extends XYPlot {
+  export class BarPlot<X,Y> extends XYPlot<X,Y> {
     private static DEFAULT_WIDTH = 10;
     public _bars: D3.UpdateSelection;
     public _baseline: D3.Selection;
@@ -29,7 +29,7 @@ export module Abstract {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
+    constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
       super(dataset, xScale, yScale);
       this.classed("bar-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
@@ -50,7 +50,7 @@ export module Abstract {
       this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
       this._bars.enter().append("rect");
 
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale: Abstract.Scale<any, number> = this._isVertical ? this.yScale : this.xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       var positionAttr = this._isVertical ? "y" : "x";
       var dimensionAttr = this._isVertical ? "height" : "width";
@@ -70,12 +70,17 @@ export module Abstract {
 
       this._bars.exit().remove();
 
-      var baselineAttr: IAttributeToProjector = {
-        "x1": this._isVertical ? 0 : scaledBaseline,
-        "y1": this._isVertical ? scaledBaseline : 0,
-        "x2": this._isVertical ? this.availableWidth : scaledBaseline,
-        "y2": this._isVertical ? scaledBaseline : this.availableHeight
-      };
+
+      var baselineAttr: IAttributeToProjector = {};
+      var x1 = this._isVertical ? 0 : scaledBaseline;
+      var x2 = this._isVertical ? this.availableWidth : scaledBaseline;
+      var y1 = this._isVertical ? scaledBaseline : 0;
+      var y2 = this._isVertical ? scaledBaseline : this.availableHeight;
+
+      baselineAttr["x1"] = () => x1;
+      baselineAttr["x2"] = () => x2;
+      baselineAttr["y1"] = () => y1;
+      baselineAttr["y2"] = () => y2;
 
       this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
 
@@ -186,11 +191,12 @@ export module Abstract {
       return this;
     }
 
-    public _updateDomainer(scale: Scale) {
+    public _updateDomainer(scale: Scale<any, number>) {
       if (scale instanceof Abstract.QuantitativeScale) {
-        var qscale = <Abstract.QuantitativeScale> scale;
+        var qscale = <Abstract.QuantitativeScale<number>> (<any> scale);
         if (!qscale._userSetDomainer) {
           if (this._baselineValue != null) {
+            // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
             qscale.domainer()
               .addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID)
               .addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
@@ -201,7 +207,6 @@ export module Abstract {
           }
           qscale.domainer().pad();
         }
-            // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         qscale._autoDomainIfAutomaticMode();
       }
     }
@@ -226,15 +231,15 @@ export module Abstract {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale    = this._isVertical ? this.yScale : this.xScale;
-      var secondaryScale  = this._isVertical ? this.xScale : this.yScale;
-      var primaryAttr     = this._isVertical ? "y" : "x";
-      var secondaryAttr   = this._isVertical ? "x" : "y";
+      var primaryScale: Abstract.Scale<any, number>   = this._isVertical ? this.yScale : this.xScale;
+      var secondaryScale: Abstract.Scale<any, number> = this._isVertical ? this.xScale : this.yScale;
+      var primaryAttr   = this._isVertical ? "y" : "x";
+      var secondaryAttr = this._isVertical ? "x" : "y";
       var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
-                      && (<Plottable.Scale.Ordinal> secondaryScale).rangeType() === "bands";
+                      && (<Scale.Ordinal<any>> <any> secondaryScale).rangeType() === "bands";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       if (attrToProjector["width"] == null) {
-        var constantWidth = bandsMode ? (<Scale.Ordinal> secondaryScale).rangeBand() : BarPlot.DEFAULT_WIDTH;
+        var constantWidth = bandsMode ? (<Scale.Ordinal<any>> <any> secondaryScale).rangeBand() : BarPlot.DEFAULT_WIDTH;
         attrToProjector["width"] = (d: any, i: number) => constantWidth;
       }
 
@@ -243,7 +248,7 @@ export module Abstract {
       if (!bandsMode) {
         attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) * this._barAlignmentFactor;
       } else {
-        var bandWidth = (<Plottable.Scale.Ordinal> secondaryScale).rangeBand();
+        var bandWidth = (<Plottable.Scale.Ordinal<any>> <any> secondaryScale).rangeBand();
         attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2;
       }
 

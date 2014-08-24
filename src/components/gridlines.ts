@@ -2,9 +2,9 @@
 
 module Plottable {
 export module Component {
-  export class Gridlines extends Abstract.Component {
-    private xScale: Abstract.QuantitativeScale;
-    private yScale: Abstract.QuantitativeScale;
+  export class Gridlines<X,Y> extends Abstract.Component {
+    private xScale: Abstract.QuantitativeScale<X>;
+    private yScale: Abstract.QuantitativeScale<Y>;
     private xLinesContainer: D3.Selection;
     private yLinesContainer: D3.Selection;
 
@@ -12,10 +12,10 @@ export module Component {
      * Creates a set of Gridlines.
      * @constructor
      *
-     * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-     * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+     * @param {QuantitativeScale<X>} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+     * @param {QuantitativeScale<X>} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
      */
-    constructor(xScale: Abstract.QuantitativeScale, yScale: Abstract.QuantitativeScale) {
+    constructor(xScale: Abstract.QuantitativeScale<X>, yScale: Abstract.QuantitativeScale<Y>) {
       super();
       if (xScale == null && yScale == null) {throw new Error("Gridlines must have at least one scale");}
       this.classed("gridlines", true);
@@ -55,14 +55,14 @@ export module Component {
     private redrawXLines() {
       if (this.xScale != null) {
         var xTicks = this.xScale.ticks();
-        var getScaledXValue = (tickVal: number) => this.xScale.scale(tickVal);
+        var getScaledXValue = (tickVal: X) => this.xScale.scale(tickVal);
         var xLines = this.xLinesContainer.selectAll("line").data(xTicks);
         xLines.enter().append("line");
         xLines.attr("x1", getScaledXValue)
               .attr("y1", 0)
               .attr("x2", getScaledXValue)
               .attr("y2", this.availableHeight)
-             .classed("zeroline", (t: number) => t === 0);
+             .classed("zeroline", (t: X) => (<any> t) === 0);
         xLines.exit().remove();
       }
     }
@@ -70,14 +70,14 @@ export module Component {
     private redrawYLines() {
       if (this.yScale != null) {
         var yTicks = this.yScale.ticks();
-        var getScaledYValue = (tickVal: number) => this.yScale.scale(tickVal);
+        var getScaledYValue = (tickVal: Y) => this.yScale.scale(tickVal);
         var yLines = this.yLinesContainer.selectAll("line").data(yTicks);
         yLines.enter().append("line");
         yLines.attr("x1", 0)
               .attr("y1", getScaledYValue)
               .attr("x2", this.availableWidth)
               .attr("y2", getScaledYValue)
-              .classed("zeroline", (t: number) => t === 0);
+              .classed("zeroline", (t: Y) => (<any> t) === 0);
         yLines.exit().remove();
       }
     }

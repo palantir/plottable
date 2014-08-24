@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scale {
-  export class Ordinal extends Abstract.Scale {
+  export class Ordinal<D> extends Abstract.Scale<D, number> {
     public _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
     private _rangeType: string = "bands";
@@ -23,29 +23,29 @@ export module Scale {
       }
     }
 
-    public _getExtent(): any[] {
-      var extents: string[][] = this._getAllExtents();
+    public _getExtent(): D[] {
+      var extents: D[][] = this._getAllExtents();
       return Util.Methods.uniq(Util.Methods.flatten(extents));
     }
 
     /**
      * Gets the domain.
      *
-     * @returns {any[]} The current domain.
+     * @returns {D[]} The current domain.
      */
-    public domain(): any[];
+    public domain(): D[];
     /**
      * Sets the domain.
      *
-     * @param {any[]} values The new values for the domain. This array may contain more than 2 values.
+     * @param {D[]} values The new values for the domain. This array may contain more than 2 values.
      * @returns {Ordinal} The calling Ordinal Scale.
      */
-    public domain(values: any[]): Ordinal;
-    public domain(values?: any[]): any {
+    public domain(values: D[]): Ordinal<D>;
+    public domain(values?: D[]): any {
       return super.domain(values);
     }
 
-    public _setDomain(values: any[]) {
+    public _setDomain(values: D[]) {
       super._setDomain(values);
       this.range(this.range()); // update range
     }
@@ -62,7 +62,7 @@ export module Scale {
      * @param {number[]} values The pixel range to to be spanend by the scale.
      * @returns {Ordinal} The calling Ordinal Scale.
      */
-    public range(values: number[]): Ordinal;
+    public range(values: number[]): Ordinal<D>;
     public range(values?: number[]): any {
       if (values == null) {
         return this._range;
@@ -119,7 +119,7 @@ export module Scale {
      *     "bands" type ranges.
      * @returns {Ordinal} The calling Ordinal Scale.
      */
-    public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number) : Ordinal;
+    public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number) : Ordinal<D>;
     public rangeType(rangeType?: string, outerPadding?: number, innerPadding?: number) : any {
       if (rangeType == null) {
         return this._rangeType;
@@ -144,8 +144,8 @@ export module Scale {
      *
      * @returns {Ordinal} A copy of the calling Scale.
      */
-    public copy(): Ordinal {
-      return new Ordinal(this._d3Scale.copy());
+    public copy(): Ordinal<D> {
+      return new Ordinal<D>(this._d3Scale.copy());
     }
   }
 }

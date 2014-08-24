@@ -83,9 +83,9 @@ describe("Interactions", () => {
     var svgHeight = 400;
     var svg: D3.Selection;
     var dataset: Plottable.DataSource;
-    var xScale: Plottable.Abstract.QuantitativeScale;
-    var yScale: Plottable.Abstract.QuantitativeScale;
-    var renderer: Plottable.Abstract.XYPlot;
+    var xScale: Plottable.Abstract.QuantitativeScale<number>;
+    var yScale: Plottable.Abstract.QuantitativeScale<number>;
+    var renderer: Plottable.Abstract.XYPlot<number, number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
     var dragstartX = 20;
@@ -98,7 +98,7 @@ describe("Interactions", () => {
       dataset = new Plottable.DataSource(makeLinearSeries(10));
       xScale = new Plottable.Scale.Linear();
       yScale = new Plottable.Scale.Linear();
-      renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
+      renderer = new Plottable.Plot.Scatter<number, number>(dataset, xScale, yScale);
       renderer.renderTo(svg);
       interaction = new Plottable.Interaction.XYDragBox(renderer);
       interaction.registerWithComponent();
@@ -164,9 +164,9 @@ describe("Interactions", () => {
     var svgHeight = 400;
     var svg: D3.Selection;
     var dataset: Plottable.DataSource;
-    var xScale: Plottable.Abstract.QuantitativeScale;
-    var yScale: Plottable.Abstract.QuantitativeScale;
-    var renderer: Plottable.Abstract.XYPlot;
+    var xScale: Plottable.Abstract.QuantitativeScale<number>;
+    var yScale: Plottable.Abstract.QuantitativeScale<number>;
+    var renderer: Plottable.Abstract.XYPlot<number, number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
     var dragstartX = 20;
@@ -277,7 +277,7 @@ describe("Interactions", () => {
 
   describe("BarHover", () => {
     var dataset: any[];
-    var ordinalScale: Plottable.Scale.Ordinal;
+    var ordinalScale: Plottable.Scale.Ordinal<string>;
     var linearScale: Plottable.Scale.Linear;
 
     before(() => {
@@ -285,7 +285,7 @@ describe("Interactions", () => {
         { name: "A", value: 3 },
         { name: "B", value: 5 }
       ];
-      ordinalScale = new Plottable.Scale.Ordinal();
+      ordinalScale = new Plottable.Scale.Ordinal<string>();
       linearScale = new Plottable.Scale.Linear();
     });
 

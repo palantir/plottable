@@ -2,8 +2,8 @@
 
 module Plottable {
 export module Axis {
-  export class Category extends Abstract.Axis {
-    public _scale: Scale.Ordinal;
+  export class Category extends Abstract.Axis<string> {
+    public _scale: Scale.Ordinal<string>;
     private measurer: Util.Text.CachingCharacterMeasurer;
 
     /**
@@ -17,7 +17,7 @@ export module Axis {
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
      * @param {Formatter} [formatter] The Formatter for the Axis (default Formatters.identity())
      */
-    constructor(scale: Scale.Ordinal, orientation = "bottom", formatter = Formatters.identity()) {
+    constructor(scale: Scale.Ordinal<string>, orientation = "bottom", formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
       this.classed("category-axis", true);
       if (scale.rangeType() !== "bands") {
@@ -65,13 +65,16 @@ export module Axis {
      *
      * @param {string[]} data The strings that will be printed on the ticks.
      */
-    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, data: string[]): Util.Text.IWriteTextResult;
+    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal<string>
+                                                  , data: string[]): Util.Text.IWriteTextResult;
     /**
      * Measures the size of the ticks while also writing them to the DOM.
      * @param {D3.Selection} ticks The tick elements to be written to.
      */
-    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection): Util.Text.IWriteTextResult;
-    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, dataOrTicks: any): Util.Text.IWriteTextResult {
+    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal<string>
+                                                  , ticks: D3.Selection): Util.Text.IWriteTextResult;
+    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal<string>
+                                                  , dataOrTicks: any): Util.Text.IWriteTextResult {
       var draw = typeof dataOrTicks[0] !== "string";
       var self = this;
       var textWriteResults: Util.Text.IWriteTextResult[] = [];
@@ -101,8 +104,10 @@ export module Axis {
         textWriteResults.push(textWriteResult);
       });
 
-      var widthFn  = this._isHorizontal() ? d3.sum : d3.max;
-      var heightFn = this._isHorizontal() ? d3.max : d3.sum;
+      function max<T>(arr: T[], f: (a: T) => number) {return Util.Methods.max(arr, f, 0);};
+
+      var widthFn  = this._isHorizontal() ? d3.sum : max;
+      var heightFn = this._isHorizontal() ? max : d3.sum;
       return {
         textFits: textWriteResults.every((t: Util.Text.IWriteTextResult) => t.textFits),
         usedWidth : widthFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedWidth),

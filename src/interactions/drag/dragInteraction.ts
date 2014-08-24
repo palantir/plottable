@@ -147,38 +147,6 @@ export module Interaction {
       hitBox.call(this.dragBehavior);
       return this;
     }
-
-    public setupZoomCallback(xScale?: Abstract.QuantitativeScale, yScale?: Abstract.QuantitativeScale) {
-      var xDomainOriginal = xScale != null ? xScale.domain() : null;
-      var yDomainOriginal = yScale != null ? yScale.domain() : null;
-      var resetOnNextClick = false;
-      function callback(upperLeft: Point, lowerRight: Point) {
-        if (upperLeft == null || lowerRight == null) {
-          if (resetOnNextClick) {
-            if (xScale != null) {
-              xScale.domain(xDomainOriginal);
-            }
-            if (yScale != null) {
-              yScale.domain(yDomainOriginal);
-            }
-          }
-          resetOnNextClick = !resetOnNextClick;
-          return;
-        }
-        resetOnNextClick = false;
-        if (xScale != null) {
-          xScale.domain([xScale.invert(upperLeft.x), xScale.invert(lowerRight.x)]);
-        }
-        if (yScale != null) {
-          yScale.domain([yScale.invert(lowerRight.y), yScale.invert(upperLeft.y)]);
-        }
-        this.clearBox();
-        return;
-      }
-      this.drag(callback);
-      this.dragend(callback);
-      return this;
-    }
   }
 }
 }

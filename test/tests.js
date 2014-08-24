@@ -1975,7 +1975,7 @@ describe("Plots", function () {
 
 var assert = chai.assert;
 describe("Plots", function () {
-    describe("GridPlot", function () {
+    describe("Grid<string, string>Plot", function () {
         var SVG_WIDTH = 400;
         var SVG_HEIGHT = 200;
         var DATA = [
@@ -2037,7 +2037,7 @@ describe("Plots", function () {
             var yScale = new Plottable.Scale.Ordinal();
             var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude");
+            var renderer = new Plottable.Plot.Grid([], xScale, yScale, colorScale).project("fill", "magnitude");
             renderer.renderTo(svg);
             yScale.domain(["U", "V"]);
             renderer.dataSource().data(DATA);
@@ -3273,9 +3273,11 @@ var assert = chai.assert;
 describe("Domainer", function () {
     var scale;
     var domainer;
+    var dateDomainer;
     beforeEach(function () {
         scale = new Plottable.Scale.Linear();
         domainer = new Plottable.Domainer();
+        dateDomainer = new Plottable.Domainer();
     });
     it("pad() works in general case", function () {
         scale.updateExtent("1", "x", [100, 200]);
@@ -3364,10 +3366,10 @@ describe("Domainer", function () {
     it("paddingException(n) works on dates", function () {
         var a = new Date(2000, 5, 5);
         var b = new Date(2003, 0, 1);
-        domainer.pad().addPaddingException(a);
+        dateDomainer.pad().addPaddingException(a);
         var timeScale = new Plottable.Scale.Time();
         timeScale.updateExtent("1", "x", [a, b]);
-        timeScale.domainer(domainer);
+        timeScale.domainer(dateDomainer);
         var domain = timeScale.domain();
         assert.deepEqual(domain[0], a);
         assert.isTrue(b < domain[1]);
@@ -3402,10 +3404,10 @@ describe("Domainer", function () {
         var b = new Date(2000, 5, 5);
         var c = new Date(2000, 5, 6);
         var d = new Date(2003, 0, 1);
-        domainer.addIncludedValue(b);
+        dateDomainer.addIncludedValue(b);
         var timeScale = new Plottable.Scale.Time();
         timeScale.updateExtent("1", "x", [c, d]);
-        timeScale.domainer(domainer);
+        timeScale.domainer(dateDomainer);
         assert.deepEqual(timeScale.domain(), [b, d]);
     });
     it("exceptions are setup properly on an area plot", function () {
@@ -3724,13 +3726,6 @@ describe("Scales", function () {
             assert.equal("#ffffff", scale.scale(16));
             assert.equal("#e3e3e3", scale.scale(8));
         });
-        it("doesn't use a domainer", function () {
-            var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-            var startDomain = scale.domain();
-            scale.domainer().pad(1.0);
-            scale.autoDomain();
-            assert.equal(scale.domain(), startDomain);
-        });
     });
     describe("Modified Log Scale", function () {
         var scale;
@@ -3799,7 +3794,7 @@ describe("Scales", function () {
             assert.deepEqual(b.slice().reverse(), b.slice().sort(function (x, y) { return x - y; }));
             var ticks = scale.ticks();
             assert.deepEqual(ticks, ticks.slice().sort(function (x, y) { return x - y; }), "ticks should be sorted");
-            assert.deepEqual(ticks, Plottable.Util.Methods.uniqNumbers(ticks), "ticks should not be repeated");
+            assert.deepEqual(ticks, Plottable.Util.Methods.uniq(ticks), "ticks should not be repeated");
             var beforePivot = ticks.filter(function (x) { return x <= -base; });
             var afterPivot = ticks.filter(function (x) { return base <= x; });
             var betweenPivots = ticks.filter(function (x) { return -base < x && x < base; });
@@ -4530,6 +4525,25 @@ describe("Util.s", function () {
     it("uniq works as expected", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
         assert.deepEqual(Plottable.Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
+    });
+    it("max/min work as expected", function () {
+        var alist = [1, 2, 3, 4, 5];
+        var dbl = function (x) { return x * 2; };
+        var max = Plottable.Util.Methods.max;
+        var min = Plottable.Util.Methods.min;
+        assert.deepEqual(max(alist, 0), 5);
+        assert.deepEqual(max(alist, dbl, 0), 10);
+        assert.deepEqual(max([], 0), 0);
+        assert.deepEqual(max([], dbl, 5), 5);
+        assert.deepEqual(min(alist, 0), 1);
+        assert.deepEqual(min(alist, dbl, 0), 2);
+        assert.deepEqual(min([], 0), 0);
+        assert.deepEqual(min([], dbl, 5), 5);
+        var strings = ["a", "bb", "ccc", "ddd"];
+        assert.deepEqual(max(strings, "foo"), "ddd");
+        assert.deepEqual(max([], "foo"), "foo");
+        assert.deepEqual(max(strings, function (s) { return s.length; }, 0), 3);
+        assert.deepEqual(max([], function (s) { return s.length; }, 0), 0);
     });
     it("objEq works as expected", function () {
         assert.isTrue(Plottable.Util.Methods.objEq({}, {}));

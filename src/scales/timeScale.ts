@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scale {
-  export class Time extends Abstract.QuantitativeScale {
+  export class Time extends Abstract.QuantitativeScale<any> {
     /**
      * Creates a new Time Scale.
      *
@@ -45,7 +45,7 @@ export module Scale {
      * @returns {TimeScale} A copy of the calling TimeScale.
      */
     public copy(): Time {
-      return new Time(this._d3Scale.copy());
+      return new Time(<any> this._d3Scale.copy());
     }
 
     public _defaultExtent(): any[] {

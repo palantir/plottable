@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Abstract {
-  export class Scale extends PlottableObject implements Core.IListenable {
+  export class Scale<D,R> extends PlottableObject implements Core.IListenable {
     public _d3Scale: D3.Scale.Scale;
     private autoDomainAutomatically = true;
     public broadcaster = new Plottable.Core.Broadcaster(this);
@@ -18,11 +18,11 @@ export module Abstract {
       this._d3Scale = scale;
     }
 
-    public _getAllExtents(): any[][] {
+    public _getAllExtents(): D[][] {
       return d3.values(this._rendererAttrID2Extent);
     }
 
-    public _getExtent(): any[] {
+    public _getExtent(): D[] {
       return []; // this should be overwritten
     }
 
@@ -51,7 +51,7 @@ export module Abstract {
      * @param value {any} A domain value to be scaled.
      * @returns {any} The range value corresponding to the supplied domain value.
      */
-    public scale(value: any) {
+    public scale(value: D): R {
       return this._d3Scale(value);
     }
 
@@ -60,7 +60,7 @@ export module Abstract {
      *
      * @returns {any[]} The current domain.
      */
-    public domain(): any[];
+    public domain(): D[];
     /**
      * Sets the Scale's domain to the specified values.
      *
@@ -70,8 +70,8 @@ export module Abstract {
      *     only a 2-value extent array.
      * @returns {Scale} The calling Scale.
      */
-    public domain(values: any[]): Scale;
-    public domain(values?: any[]): any {
+    public domain(values: D[]): Scale<D,R>;
+    public domain(values?: D[]): any {
       if (values == null) {
         return this._getDomain();
       } else {
@@ -81,11 +81,11 @@ export module Abstract {
       }
     }
 
-    public _getDomain() {
+    public _getDomain(): D[] {
       return this._d3Scale.domain();
     }
 
-    public _setDomain(values: any[]) {
+    public _setDomain(values: D[]) {
       this._d3Scale.domain(values);
       this.broadcaster.broadcast();
     }
@@ -95,14 +95,14 @@ export module Abstract {
      *
      * @returns {any[]} The current range.
      */
-    public range(): any[];
+    public range(): R[];
     /**
      * Sets the Scale's range to the specified values.
      *
      * @param {any[]} values The new values for the range.
      * @returns {Scale} The calling Scale.
      */
-    public range(values: any[]): Scale;
+    public range(values: R[]): Scale<D,R>;
     public range(values?: any[]): any {
       if (values == null) {
         return this._d3Scale.range();
@@ -117,8 +117,8 @@ export module Abstract {
      *
      * @returns {Scale} A copy of the calling Scale.
      */
-    public copy(): Scale {
-      return new Scale(this._d3Scale.copy());
+    public copy(): Scale<D,R> {
+      return new Scale<D,R>(this._d3Scale.copy());
     }
 
     /**
@@ -131,7 +131,7 @@ export module Abstract {
      * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
      * @param {any[]} extent The new extent to be included in the scale.
      */
-    public updateExtent(plotProvidedKey: string, attr: string, extent: any[]) {
+    public updateExtent(plotProvidedKey: string, attr: string, extent: D[]) {
       this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
       this._autoDomainIfAutomaticMode();
       return this;

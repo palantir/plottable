@@ -3,17 +3,13 @@
 module Plottable {
 export module Plot {
 
-  export class StackedBar extends Abstract.NewStyleBarPlot {
+  export class StackedBar<X> extends Abstract.NewStyleBarPlot<X, number> {
     public stackedData: any[][] = [];
     public _yAccessor: IAccessor;
     public _isVertical = true;
     public _baselineValue = 0;
     public _baseline: D3.Selection;
     private stackedExtent: number[] = [];
-
-    constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
-      super(xScale, yScale);
-    }
 
     public _addDataset(key: string, dataset: any) {
       super._addDataset(key, dataset);
@@ -34,7 +30,7 @@ export module Plot {
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale    = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale: Abstract.Scale<any, number> = this._isVertical ? this.yScale : this.xScale;
       var getY0 = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0);
       var getY = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y);
       attrToProjector["height"] = (d) => Math.abs(getY(d) - getY0(d));
@@ -45,7 +41,7 @@ export module Plot {
     private stack(accessor: IAccessor) {
       var datasets = d3.values(this._key2DatasetDrawerKey);
       var lengths = datasets.map((d) => d.dataset.data().length);
-      if (Util.Methods.uniqNumbers(lengths).length > 1) {
+      if (Util.Methods.uniq(lengths).length > 1) {
         Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
       }
       var currentBase = Util.Methods.createFilledArray(0, lengths[0]);
@@ -64,7 +60,7 @@ export module Plot {
           return d;
         });
       });
-      this.stackedExtent = [0, d3.max(currentBase)];
+      this.stackedExtent = [0, Util.Methods.max(currentBase, 0)];
       this._onDataSourceUpdate();
       return stacks;
     }

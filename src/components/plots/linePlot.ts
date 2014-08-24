@@ -2,8 +2,9 @@
 
 module Plottable {
 export module Plot {
-  export class Line extends Abstract.XYPlot {
+  export class Line<X> extends Abstract.XYPlot<X, number> {
     private linePath: D3.Selection;
+    public yScale: Abstract.QuantitativeScale<number>;
 
     public _animators: Animator.IPlotAnimatorMap = {
       "line-reset" : new Animator.Null(),
@@ -20,7 +21,7 @@ export module Plot {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
+    constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.QuantitativeScale<number>) {
       super(dataset, xScale, yScale);
       this.classed("line-plot", true);
       this.project("stroke", () => Core.Colors.INDIGO); // default

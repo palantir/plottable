@@ -73,16 +73,10 @@ var Plottable;
                 return function (d, i) { return activatedAccessor(d, i, plot.dataSource().metadata()); };
             }
             Methods._applyAccessor = _applyAccessor;
-            function uniq(strings) {
-                var seen = {};
-                strings.forEach(function (s) { return seen[s] = true; });
-                return d3.keys(seen);
-            }
-            Methods.uniq = uniq;
-            function uniqNumbers(a) {
+            function uniq(arr) {
                 var seen = d3.set();
                 var result = [];
-                a.forEach(function (n) {
+                arr.forEach(function (n) {
                     if (!seen.has(n)) {
                         seen.add(n);
                         result.push(n);
@@ -90,7 +84,7 @@ var Plottable;
                 });
                 return result;
             }
-            Methods.uniqNumbers = uniqNumbers;
+            Methods.uniq = uniq;
             function createFilledArray(value, count) {
                 var out = [];
                 for (var i = 0; i < count; i++) {
@@ -129,6 +123,50 @@ var Plottable;
                 return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
             }
             Methods.objEq = objEq;
+            function max(arr, one, two) {
+                var default_value;
+                var accessor;
+                if (arguments.length === 2) {
+                    accessor = undefined;
+                    default_value = one;
+                }
+                else {
+                    accessor = one;
+                    default_value = two;
+                }
+                if (arr.length === 0) {
+                    return default_value;
+                }
+                else if (accessor === undefined) {
+                    return d3.max(arr);
+                }
+                else {
+                    return d3.max(arr, accessor);
+                }
+            }
+            Methods.max = max;
+            function min(arr, one, two) {
+                var default_value;
+                var accessor;
+                if (arguments.length === 2) {
+                    accessor = undefined;
+                    default_value = one;
+                }
+                else {
+                    accessor = one;
+                    default_value = two;
+                }
+                if (arr.length === 0) {
+                    return default_value;
+                }
+                else if (accessor === undefined) {
+                    return d3.min(arr);
+                }
+                else {
+                    return d3.min(arr, accessor);
+                }
+            }
+            Methods.min = min;
         })(Util.Methods || (Util.Methods = {}));
         var Methods = Util.Methods;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -320,7 +358,7 @@ var Plottable;
                     var whs = s.trim().split("").map(tm);
                     return {
                         width: d3.sum(whs, function (wh) { return wh.width; }),
-                        height: d3.max(whs, function (wh) { return wh.height; })
+                        height: Util.Methods.max(whs, function (wh) { return wh.height; }, 0)
                     };
                 };
             }
@@ -338,7 +376,7 @@ var Plottable;
                         });
                         return {
                             width: d3.sum(whs, function (x) { return x.width; }),
-                            height: d3.max(whs, function (x) { return x.height; })
+                            height: Util.Methods.max(whs, function (x) { return x.height; }, 0)
                         };
                     }
                     else {
@@ -489,8 +527,12 @@ var Plottable;
                 }
                 var usedWidth, usedHeight;
                 if (write == null) {
-                    var widthFn = orientHorizontally ? d3.max : d3.sum;
-                    var heightFn = orientHorizontally ? d3.sum : d3.max;
+                    function max(arr, f) {
+                        return Util.Methods.max(arr, f, 0);
+                    }
+                    ;
+                    var widthFn = orientHorizontally ? max : d3.sum;
+                    var heightFn = orientHorizontally ? d3.sum : max;
                     usedWidth = widthFn(wrappedText.lines, function (line) { return tm(line).width; });
                     usedHeight = heightFn(wrappedText.lines, function (line) { return tm(line).height; });
                 }
@@ -549,8 +591,7 @@ var Plottable;
             }
             function canWrapWithoutBreakingWords(text, width, widthMeasure) {
                 var tokens = tokenize(text);
-                var widths = tokens.map(widthMeasure);
-                var maxWidth = d3.max(widths);
+                var maxWidth = Util.Methods.max(tokens, widthMeasure, 0);
                 return maxWidth <= width;
             }
             WordWrap.canWrapWithoutBreakingWords = canWrapWithoutBreakingWords;
@@ -1497,12 +1538,11 @@ var Plottable;
             }
             Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var requests = this._components.map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
-                var isEmpty = this.empty();
                 return {
-                    width: isEmpty ? 0 : d3.max(requests, function (request) { return request.width; }),
-                    height: isEmpty ? 0 : d3.max(requests, function (request) { return request.height; }),
-                    wantsWidth: isEmpty ? false : requests.map(function (r) { return r.wantsWidth; }).some(function (x) { return x; }),
-                    wantsHeight: isEmpty ? false : requests.map(function (r) { return r.wantsHeight; }).some(function (x) { return x; })
+                    width: Plottable.Util.Methods.max(requests, function (request) { return request.width; }, 0),
+                    height: Plottable.Util.Methods.max(requests, function (request) { return request.height; }, 0),
+                    wantsWidth: requests.map(function (r) { return r.wantsWidth; }).some(function (x) { return x; }),
+                    wantsHeight: requests.map(function (r) { return r.wantsHeight; }).some(function (x) { return x; })
                 };
             };
             Group.prototype.merge = function (c) {
@@ -1664,6 +1704,9 @@ var Plottable;
                         }
                         else {
                             spaceRequest = { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
+                        }
+                        if (spaceRequest.width !== spaceRequest.width || spaceRequest.height !== spaceRequest.height) {
+                            Plottable.Util.Methods.warn("Component " + component.constructor.name + " returned NaN width or height");
                         }
                         var allocatedWidth = Math.min(spaceRequest.width, offeredWidths[colIndex]);
                         var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
@@ -2090,10 +2133,10 @@ var Plottable;
         var NewStylePlot = (function (_super) {
             __extends(NewStylePlot, _super);
             function NewStylePlot(xScale, yScale) {
-                _super.call(this, new Plottable.DataSource(), xScale, yScale);
-                this.nextSeriesIndex = 0;
-                this._key2DatasetDrawerKey = {};
+                this._key2DatasetDrawerKey = d3.map();
                 this._datasetKeysInOrder = [];
+                this.nextSeriesIndex = 0;
+                _super.call(this, new Plottable.DataSource(), xScale, yScale);
             }
             NewStylePlot.prototype._setup = function () {
                 var _this = this;
@@ -2120,14 +2163,14 @@ var Plottable;
             };
             NewStylePlot.prototype._addDataset = function (key, dataset) {
                 var _this = this;
-                if (this._key2DatasetDrawerKey[key] != null) {
+                if (this._key2DatasetDrawerKey.has(key)) {
                     this.removeDataset(key);
                 }
                 ;
                 var drawer = this._getDrawer(key);
                 var ddk = { drawer: drawer, dataset: dataset, key: key };
                 this._datasetKeysInOrder.push(key);
-                this._key2DatasetDrawerKey[key] = ddk;
+                this._key2DatasetDrawerKey.set(key, ddk);
                 if (this._isSetup) {
                     drawer.renderArea = this.renderArea.append("g");
                 }
@@ -2141,9 +2184,9 @@ var Plottable;
                 var _this = this;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
-                    d3.values(this._key2DatasetDrawerKey).forEach(function (ddk) {
+                    this._key2DatasetDrawerKey.forEach(function (key, ddk) {
                         var extent = ddk.dataset._getExtent(projector.accessor);
-                        var scaleKey = _this._plottableID.toString() + "_" + ddk.key;
+                        var scaleKey = _this._plottableID.toString() + "_" + key;
                         if (extent.length === 0 || !_this._isAnchored) {
                             projector.scale.removeExtent(scaleKey, attr);
                         }
@@ -2172,8 +2215,8 @@ var Plottable;
                 return this;
             };
             NewStylePlot.prototype.removeDataset = function (key) {
-                if (this._key2DatasetDrawerKey[key] != null) {
-                    var ddk = this._key2DatasetDrawerKey[key];
+                if (this._key2DatasetDrawerKey.has(key) != null) {
+                    var ddk = this._key2DatasetDrawerKey.get(key);
                     ddk.drawer.remove();
                     var projectors = d3.values(this._projectors);
                     var scaleKey = this._plottableID.toString() + "_" + key;
@@ -2184,18 +2227,18 @@ var Plottable;
                     });
                     ddk.dataset.broadcaster.deregisterListener(this);
                     this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-                    delete this._key2DatasetDrawerKey[key];
+                    this._key2DatasetDrawerKey.remove(key);
                     this._onDataSourceUpdate();
                 }
                 return this;
             };
             NewStylePlot.prototype._getDatasetsInOrder = function () {
                 var _this = this;
-                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].dataset; });
+                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).dataset; });
             };
             NewStylePlot.prototype._getDrawersInOrder = function () {
                 var _this = this;
-                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].drawer; });
+                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).drawer; });
             };
             return NewStylePlot;
         })(Abstract.XYPlot);
@@ -2414,7 +2457,7 @@ var Plottable;
                 this.includedValues.set(key, value);
             }
             else {
-                this.unregisteredIncludedValues.set(value, value);
+                this.unregisteredIncludedValues.set(value.toString(), value);
             }
             return this;
         };
@@ -2433,12 +2476,9 @@ var Plottable;
             return this;
         };
         Domainer.defaultCombineExtents = function (extents) {
-            if (extents.length === 0) {
-                return [0, 1];
-            }
-            else {
-                return [d3.min(extents, function (e) { return e[0]; }), d3.max(extents, function (e) { return e[1]; })];
-            }
+            var e1 = Plottable.Util.Methods.min(extents, function (e) { return e[0]; }, 0);
+            var e2 = Plottable.Util.Methods.max(extents, function (e) { return e[1]; }, 1);
+            return [e1, e2];
         };
         Domainer.prototype.padDomain = function (scale, domain) {
             var min = domain[0];
@@ -2458,12 +2498,12 @@ var Plottable;
             var p = this.padProportion / 2;
             var newMin = scale.invert(scale.scale(min) - (scale.scale(max) - scale.scale(min)) * p);
             var newMax = scale.invert(scale.scale(max) + (scale.scale(max) - scale.scale(min)) * p);
-            var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
+            var exceptionValues = this.paddingExceptions.values().map(function (x) { return x.toString(); }).concat(this.unregisteredPaddingExceptions.values());
             var exceptionSet = d3.set(exceptionValues);
-            if (exceptionSet.has(min)) {
+            if (exceptionSet.has(min.toString())) {
                 newMin = min;
             }
-            if (exceptionSet.has(max)) {
+            if (exceptionSet.has(max.toString())) {
                 newMax = max;
             }
             return [newMin, newMax];
@@ -2478,7 +2518,16 @@ var Plottable;
         };
         Domainer.prototype.includeDomain = function (domain) {
             var includedValues = this.includedValues.values().concat(this.unregisteredIncludedValues.values());
-            return includedValues.reduce(function (domain, value) { return [Math.min(domain[0], value), Math.max(domain[1], value)]; }, domain);
+            function min(a, b) {
+                return a < b ? a : b;
+            }
+            ;
+            function max(a, b) {
+                return a < b ? b : a;
+            }
+            ;
+            var include = function (domain, value) { return [min(domain[0], value), max(domain[1], value)]; };
+            return includedValues.reduce(include, domain);
         };
         Domainer.PADDING_FOR_IDENTICAL_DOMAIN = 1;
         Domainer.ONE_DAY = 1000 * 60 * 60 * 24;
@@ -2695,8 +2744,8 @@ var Plottable;
                     _super.prototype.ticks.call(this, count);
                 }
                 var middle = function (x, y, z) { return [x, y, z].sort(function (a, b) { return a - b; })[1]; };
-                var min = d3.min(this.untransformedDomain);
-                var max = d3.max(this.untransformedDomain);
+                var min = Plottable.Util.Methods.min(this.untransformedDomain, 0);
+                var max = Plottable.Util.Methods.max(this.untransformedDomain, 1);
                 var negativeLower = min;
                 var negativeUpper = middle(min, max, -this.pivot);
                 var positiveLower = middle(min, max, this.pivot);
@@ -2721,7 +2770,7 @@ var Plottable;
                 var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
                 var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
                 var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
-                var uniqMultiples = Plottable.Util.Methods.uniqNumbers(multiples);
+                var uniqMultiples = Plottable.Util.Methods.uniq(multiples);
                 var clusters = bases.map(function (b) { return uniqMultiples.map(function (x) { return Math.pow(_this.base, b - 1) * x; }); });
                 var flattened = Plottable.Util.Methods.flatten(clusters);
                 var filtered = flattened.filter(function (x) { return lower <= x && x <= upper; });
@@ -2729,8 +2778,8 @@ var Plottable;
                 return sorted;
             };
             ModifiedLog.prototype.howManyTicks = function (lower, upper) {
-                var adjustedMin = this.adjustedLog(d3.min(this.untransformedDomain));
-                var adjustedMax = this.adjustedLog(d3.max(this.untransformedDomain));
+                var adjustedMin = this.adjustedLog(Plottable.Util.Methods.min(this.untransformedDomain, 0));
+                var adjustedMax = this.adjustedLog(Plottable.Util.Methods.max(this.untransformedDomain, 1));
                 var adjustedLower = this.adjustedLog(lower);
                 var adjustedUpper = this.adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
@@ -2894,12 +2943,7 @@ var Plottable;
                 _super.call(this, scale);
             }
             Color.prototype._getExtent = function () {
-                var extents = this._getAllExtents();
-                var concatenatedExtents = [];
-                extents.forEach(function (e) {
-                    concatenatedExtents = concatenatedExtents.concat(e);
-                });
-                return Plottable.Util.Methods.uniq(concatenatedExtents);
+                return Scale.Ordinal.prototype._getExtent.apply(this);
             };
             return Color;
         })(Plottable.Abstract.Scale);
@@ -3045,7 +3089,7 @@ var Plottable;
             InterpolatedColor.prototype.autoDomain = function () {
                 var extents = this._getAllExtents();
                 if (extents.length > 0) {
-                    this._setDomain([d3.min(extents, function (x) { return x[0]; }), d3.max(extents, function (x) { return x[1]; })]);
+                    this._setDomain([Plottable.Util.Methods.min(extents, function (x) { return x[0]; }, 0), Plottable.Util.Methods.max(extents, function (x) { return x[1]; }, 0)]);
                 }
                 return this;
             };
@@ -3093,7 +3137,7 @@ var Plottable;
                 ]
             };
             return InterpolatedColor;
-        })(Plottable.Abstract.QuantitativeScale);
+        })(Plottable.Abstract.Scale);
         Scale.InterpolatedColor = InterpolatedColor;
     })(Plottable.Scale || (Plottable.Scale = {}));
     var Scale = Plottable.Scale;
@@ -3790,7 +3834,7 @@ var Plottable;
                     var formattedValue = _this._formatter(v);
                     return _this.measurer(formattedValue).width;
                 });
-                var maxTextLength = d3.max(textLengths);
+                var maxTextLength = Plottable.Util.Methods.max(textLengths, 0);
                 if (this.tickLabelPositioning === "center") {
                     this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
                 }
@@ -4026,8 +4070,12 @@ var Plottable;
                     }
                     textWriteResults.push(textWriteResult);
                 });
-                var widthFn = this._isHorizontal() ? d3.sum : d3.max;
-                var heightFn = this._isHorizontal() ? d3.max : d3.sum;
+                function max(arr, f) {
+                    return Plottable.Util.Methods.max(arr, f, 0);
+                }
+                ;
+                var widthFn = this._isHorizontal() ? d3.sum : max;
+                var heightFn = this._isHorizontal() ? max : d3.sum;
                 return {
                     textFits: textWriteResults.every(function (t) { return t.textFits; }),
                     usedWidth: widthFn(textWriteResults, function (t) { return t.usedWidth; }),
@@ -4268,7 +4316,8 @@ var Plottable;
                 var rowsICanFit = Math.min(totalNumRows, Math.floor((offeredHeight - 2 * Legend.MARGIN) / textHeight));
                 var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 var measure = Plottable.Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
-                var maxWidth = d3.max(this.colorScale.domain(), function (d) { return measure(d).width; });
+                var domain = this.colorScale.domain();
+                var maxWidth = Plottable.Util.Methods.max(domain, function (d) { return measure(d).width; }, 0);
                 fakeLegendEl.remove();
                 maxWidth = maxWidth === undefined ? 0 : maxWidth;
                 var desiredWidth = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;
@@ -4439,8 +4488,7 @@ var Plottable;
                 var rowLengths = estimatedLayout.rows.map(function (row) {
                     return d3.sum(row, function (entry) { return estimatedLayout.entryLengths.get(entry); });
                 });
-                var longestRowLength = d3.max(rowLengths);
-                longestRowLength = longestRowLength === undefined ? 0 : longestRowLength;
+                var longestRowLength = Plottable.Util.Methods.max(rowLengths, 0);
                 var desiredWidth = this.padding + longestRowLength;
                 var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this.padding;
                 var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this.padding;
@@ -4740,12 +4788,15 @@ var Plottable;
                 }
                 this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
                 this._bars.exit().remove();
-                var baselineAttr = {
-                    "x1": this._isVertical ? 0 : scaledBaseline,
-                    "y1": this._isVertical ? scaledBaseline : 0,
-                    "x2": this._isVertical ? this.availableWidth : scaledBaseline,
-                    "y2": this._isVertical ? scaledBaseline : this.availableHeight
-                };
+                var baselineAttr = {};
+                var x1 = this._isVertical ? 0 : scaledBaseline;
+                var x2 = this._isVertical ? this.availableWidth : scaledBaseline;
+                var y1 = this._isVertical ? scaledBaseline : 0;
+                var y2 = this._isVertical ? scaledBaseline : this.availableHeight;
+                baselineAttr["x1"] = function () { return x1; };
+                baselineAttr["x2"] = function () { return x2; };
+                baselineAttr["y1"] = function () { return y1; };
+                baselineAttr["y2"] = function () { return y2; };
                 this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
             };
             BarPlot.prototype.baseline = function (value) {
@@ -5054,19 +5105,18 @@ var Plottable;
             };
             Area.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
-                var scale = this.yScale;
                 var y0Projector = this._projectors["y0"];
                 var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
                 var extent = y0Accessor != null ? this.dataSource()._getExtent(y0Accessor) : [];
                 var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
-                if (!scale._userSetDomainer) {
+                if (!this.yScale._userSetDomainer) {
                     if (constantBaseline != null) {
-                        scale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+                        this.yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
                     }
                     else {
-                        scale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
+                        this.yScale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
                     }
-                    scale._autoDomainIfAutomaticMode();
+                    this.yScale._autoDomainIfAutomaticMode();
                 }
             };
             Area.prototype.project = function (attrToSet, accessor, scale) {
@@ -5143,12 +5193,15 @@ var Plottable;
                 _super.prototype._paint.call(this);
                 var primaryScale = this._isVertical ? this.yScale : this.xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
-                var baselineAttr = {
-                    "x1": this._isVertical ? 0 : scaledBaseline,
-                    "y1": this._isVertical ? scaledBaseline : 0,
-                    "x2": this._isVertical ? this.availableWidth : scaledBaseline,
-                    "y2": this._isVertical ? scaledBaseline : this.availableHeight
-                };
+                var baselineAttr = {};
+                var x1 = this._isVertical ? 0 : scaledBaseline;
+                var x2 = this._isVertical ? this.availableWidth : scaledBaseline;
+                var y1 = this._isVertical ? scaledBaseline : 0;
+                var y2 = this._isVertical ? scaledBaseline : this.availableHeight;
+                baselineAttr["x1"] = function () { return x1; };
+                baselineAttr["x2"] = function () { return x2; };
+                baselineAttr["y1"] = function () { return y1; };
+                baselineAttr["y2"] = function () { return y2; };
                 this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
             };
             NewStyleBarPlot.prototype.baseline = function (value) {
@@ -5204,15 +5257,15 @@ var Plottable;
                 var _this = this;
                 this.innerScale.domain(this._datasetKeysInOrder);
                 var lengths = this._getDatasetsInOrder().map(function (d) { return d.data().length; });
-                if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
+                if (Plottable.Util.Methods.uniq(lengths).length > 1) {
                     Plottable.Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
                 }
                 var clusters = {};
                 this._datasetKeysInOrder.forEach(function (key) {
-                    var data = _this._key2DatasetDrawerKey[key].dataset.data();
-                    var vals = data.map(function (d) { return accessor(d); });
+                    var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
                     clusters[key] = data.map(function (d, i) {
-                        d["_PLOTTABLE_PROTECTED_FIELD_X"] = _this.xScale.scale(vals[i]) + _this.innerScale.scale(key);
+                        var val = accessor(d, i);
+                        d["_PLOTTABLE_PROTECTED_FIELD_X"] = _this.xScale.scale(val) + _this.innerScale.scale(key);
                         return d;
                     });
                 });
@@ -5244,8 +5297,8 @@ var Plottable;
     (function (Plot) {
         var StackedBar = (function (_super) {
             __extends(StackedBar, _super);
-            function StackedBar(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function StackedBar() {
+                _super.apply(this, arguments);
                 this.stackedData = [];
                 this._isVertical = true;
                 this._baselineValue = 0;
@@ -5279,7 +5332,7 @@ var Plottable;
             StackedBar.prototype.stack = function (accessor) {
                 var datasets = d3.values(this._key2DatasetDrawerKey);
                 var lengths = datasets.map(function (d) { return d.dataset.data().length; });
-                if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
+                if (Plottable.Util.Methods.uniq(lengths).length > 1) {
                     Plottable.Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
                 }
                 var currentBase = Plottable.Util.Methods.createFilledArray(0, lengths[0]);
@@ -5297,7 +5350,7 @@ var Plottable;
                         return d;
                     });
                 });
-                this.stackedExtent = [0, d3.max(currentBase)];
+                this.stackedExtent = [0, Plottable.Util.Methods.max(currentBase, 0)];
                 this._onDataSourceUpdate();
                 return stacks;
             };
@@ -5602,27 +5655,17 @@ var Plottable;
             function PanZoom(componentToListenTo, xScale, yScale) {
                 _super.call(this, componentToListenTo);
                 var _this = this;
-                if (xScale == null) {
-                    xScale = new Plottable.Scale.Linear();
-                }
-                if (yScale == null) {
-                    yScale = new Plottable.Scale.Linear();
-                }
                 this.xScale = xScale;
                 this.yScale = yScale;
                 this.zoom = d3.behavior.zoom();
-                this.zoom.x(this.xScale._d3Scale);
-                this.zoom.y(this.yScale._d3Scale);
+                if (xScale != null) {
+                    this.zoom.x(this.xScale._d3Scale);
+                }
+                if (yScale != null) {
+                    this.zoom.y(this.yScale._d3Scale);
+                }
                 this.zoom.on("zoom", function () { return _this.rerenderZoomed(); });
             }
-            PanZoom.prototype.resetZoom = function () {
-                var _this = this;
-                this.zoom = d3.behavior.zoom();
-                this.zoom.x(this.xScale._d3Scale);
-                this.zoom.y(this.yScale._d3Scale);
-                this.zoom.on("zoom", function () { return _this.rerenderZoomed(); });
-                this.zoom(this.hitBox);
-            };
             PanZoom.prototype._anchor = function (hitBox) {
                 _super.prototype._anchor.call(this, hitBox);
                 this.zoom(hitBox);
@@ -5825,37 +5868,6 @@ var Plottable;
             Drag.prototype._anchor = function (hitBox) {
                 _super.prototype._anchor.call(this, hitBox);
                 hitBox.call(this.dragBehavior);
-                return this;
-            };
-            Drag.prototype.setupZoomCallback = function (xScale, yScale) {
-                var xDomainOriginal = xScale != null ? xScale.domain() : null;
-                var yDomainOriginal = yScale != null ? yScale.domain() : null;
-                var resetOnNextClick = false;
-                function callback(upperLeft, lowerRight) {
-                    if (upperLeft == null || lowerRight == null) {
-                        if (resetOnNextClick) {
-                            if (xScale != null) {
-                                xScale.domain(xDomainOriginal);
-                            }
-                            if (yScale != null) {
-                                yScale.domain(yDomainOriginal);
-                            }
-                        }
-                        resetOnNextClick = !resetOnNextClick;
-                        return;
-                    }
-                    resetOnNextClick = false;
-                    if (xScale != null) {
-                        xScale.domain([xScale.invert(upperLeft.x), xScale.invert(lowerRight.x)]);
-                    }
-                    if (yScale != null) {
-                        yScale.domain([yScale.invert(lowerRight.y), yScale.invert(upperLeft.y)]);
-                    }
-                    this.clearBox();
-                    return;
-                }
-                this.drag(callback);
-                this.dragend(callback);
                 return this;
             };
             return Drag;

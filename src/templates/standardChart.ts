@@ -3,8 +3,8 @@
 module Plottable {
 export module Template {
   export class StandardChart extends Component.Table {
-      private _xAxis: Abstract.Axis;
-      private _yAxis: Abstract.Axis;
+      private _xAxis: Abstract.Axis<any>;
+      private _yAxis: Abstract.Axis<any>;
       private _xLabel: Component.AxisLabel;
       private _yLabel: Component.AxisLabel;
       private centerComponent: Abstract.Component;
@@ -12,7 +12,6 @@ export module Template {
       private xTable: Component.Table;
       private yTable: Component.Table;
       private xyTable: Component.Table;
-      private fullTable: Component.Table;
 
       constructor() {
         super();
@@ -26,9 +25,9 @@ export module Template {
       }
 
 
-      public yAxis(y: Abstract.Axis): StandardChart;
-      public yAxis(): Abstract.Axis;
-      public yAxis(y?: Abstract.Axis): any {
+      public yAxis(y: Abstract.Axis<any>): StandardChart;
+      public yAxis(): Abstract.Axis<any>;
+      public yAxis(y?: Abstract.Axis<any>): any {
         if (y != null) {
           if (this._yAxis != null) {
             throw new Error("yAxis already assigned!");
@@ -41,9 +40,9 @@ export module Template {
         }
       }
 
-      public xAxis(x: Abstract.Axis): StandardChart;
-      public xAxis(): Abstract.Axis;
-      public xAxis(x?: Abstract.Axis): any {
+      public xAxis(x: Abstract.Axis<any>): StandardChart;
+      public xAxis(): Abstract.Axis<any>;
+      public xAxis(x?: Abstract.Axis<any>): any {
         if (x != null) {
           if (this._xAxis != null) {
             throw new Error("xAxis already assigned!");
