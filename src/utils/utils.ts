@@ -196,6 +196,52 @@ export module Util {
       var valuesB = keysB.map((k) => b[k]);
       return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
     }
+
+    export function max<T>(arr: T[], default_val: T): T;
+    export function max<T, U>(arr: U[], accessor: (v: U) => T, default_val: T): T;
+    export function max<T, U>(arr: T[], one: any, two?: any): T {
+      var default_value: T;
+      var accessor: (v: U) => T;
+      if (arguments.length === 2) {
+        accessor = undefined;
+        default_value = one;
+      } else {
+        accessor = one;
+        default_value = two;
+      }
+      if (arr.length === 0) {
+        return default_value;
+      } else if (accessor === undefined) {
+        /* tslint:disable:ban */
+        return d3.max(arr);
+      } else {
+        return d3.max(arr, accessor);
+      }
+        /* tslint:enable:ban */
+    }
+
+    export function min<T>(arr: T[], default_val: T): T;
+    export function min<T, U>(arr: U[], accessor: (v: U) => T, default_val: T): T;
+    export function min<T, U>(arr: T[], one: any, two?: any): T {
+      var default_value: T;
+      var accessor: (v: U) => T;
+      if (arguments.length === 2) {
+        accessor = undefined;
+        default_value = one;
+      } else {
+        accessor = one;
+        default_value = two;
+      }
+      if (arr.length === 0) {
+        return default_value;
+      } else if (accessor === undefined) {
+        /* tslint:disable:ban */
+        return d3.min(arr);
+      } else {
+        return d3.min(arr, accessor);
+      }
+        /* tslint:enable:ban */
+    }
   }
 }
 }

@@ -208,6 +208,10 @@ export module Component {
             spaceRequest = {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
           }
 
+          if (spaceRequest.width !== spaceRequest.width || spaceRequest.height !== spaceRequest.height) {
+            Util.Methods.warn("Component " + (<any> component.constructor).name + " returned NaN width or height");
+          }
+
           var allocatedWidth = Math.min(spaceRequest.width, offeredWidths[colIndex]);
           var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
 
