@@ -3,13 +3,13 @@
 var assert = chai.assert;
 describe("Plots", () => {
   describe("New Style Plots", () => {
-    var p: Plottable.Abstract.NewStylePlot;
+    var p: Plottable.Abstract.NewStylePlot<number, number>;
     var oldWarn = Plottable.Util.Methods.warn;
 
     beforeEach(() => {
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
-      p = new Plottable.Abstract.NewStylePlot(xScale, yScale);
+      p = new Plottable.Abstract.NewStylePlot<number, number>(xScale, yScale);
       p._getDrawer = (k: string) => new Plottable._Drawer.Rect(k);
     });
 

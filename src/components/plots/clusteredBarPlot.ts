@@ -2,16 +2,15 @@
 
 module Plottable {
 export module Plot {
-  export class ClusteredBar extends Abstract.NewStyleBarPlot {
+  export class ClusteredBar<X> extends Abstract.NewStyleBarPlot<X, number> {
     public static DEFAULT_WIDTH = 10;
     public _isVertical = true;
-    private innerScale: Scale.Ordinal;
+    private innerScale: Scale.Ordinal<string>;
 
-    constructor(xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale) {
+    constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.QuantitativeScale<number>) {
       super(xScale, yScale);
-      this.innerScale = new Scale.Ordinal();
+      this.innerScale = new Scale.Ordinal<string>();
     }
-
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();

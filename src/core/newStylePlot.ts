@@ -8,7 +8,7 @@ module Plottable {
   }
 
 export module Abstract {
-  export class NewStylePlot extends XYPlot {
+  export class NewStylePlot<X, Y> extends XYPlot<X, Y> {
     private nextSeriesIndex: number;
     public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
     public _datasetKeysInOrder: string[];
@@ -20,7 +20,7 @@ export module Abstract {
      * @param [Scale] xScale The x scale to use
      * @param [Scale] yScale The y scale to use
      */
-    constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
+    constructor(xScale?: Abstract.Scale<X, number>, yScale?: Abstract.Scale<Y, number>) {
       // make a dummy dataSource to satisfy the base Plot (HACKHACK)
       this._key2DatasetDrawerKey = d3.map();
       this._datasetKeysInOrder = [];
@@ -47,11 +47,11 @@ export module Abstract {
      * @param {any[]|DataSource} dataset dataset to add.
      * @return {NewStylePlot} The calling NewStylePlot.
      */
-    public addDataset(key: string, dataset: DataSource): NewStylePlot;
-    public addDataset(key: string, dataset: any[]): NewStylePlot;
-    public addDataset(dataset: DataSource): NewStylePlot;
-    public addDataset(dataset: any[]): NewStylePlot;
-    public addDataset(keyOrDataset: any, dataset?: any): NewStylePlot {
+    public addDataset(key: string, dataset: DataSource): NewStylePlot<X, Y>;
+    public addDataset(key: string, dataset: any[]): NewStylePlot<X, Y>;
+    public addDataset(dataset: DataSource): NewStylePlot<X, Y>;
+    public addDataset(dataset: any[]): NewStylePlot<X, Y>;
+    public addDataset(keyOrDataset: any, dataset?: any): NewStylePlot<X, Y> {
       if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
         throw new Error("invalid input to addDataset");
       }
@@ -112,7 +112,7 @@ export module Abstract {
      *
      * @param {string[]} order A string array which represents the order of the keys. This must be a permutation of existing keys.
      */
-    public datasetOrder(order: string[]): NewStylePlot;
+    public datasetOrder(order: string[]): NewStylePlot<X, Y>;
     public datasetOrder(order?: string[]): any {
       if (order === undefined) {
         return this._datasetKeysInOrder;
@@ -137,8 +137,8 @@ export module Abstract {
      * @param {string} key The key of the dataset
      * @return {NewStylePlot} The calling NewStylePlot.
      */
-    public removeDataset(key: string): NewStylePlot {
-      if (this._key2DatasetDrawerKey.has(key)) {
+    public removeDataset(key: string): NewStylePlot<X, Y> {
+      if (this._key2DatasetDrawerKey.has(key) != null) {
         var ddk = this._key2DatasetDrawerKey.get(key);
         ddk.drawer.remove();
 

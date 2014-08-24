@@ -1975,7 +1975,7 @@ describe("Plots", function () {
 
 var assert = chai.assert;
 describe("Plots", function () {
-    describe("GridPlot", function () {
+    describe("Grid<string, string>Plot", function () {
         var SVG_WIDTH = 400;
         var SVG_HEIGHT = 200;
         var DATA = [
@@ -2037,7 +2037,7 @@ describe("Plots", function () {
             var yScale = new Plottable.Scale.Ordinal();
             var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude");
+            var renderer = new Plottable.Plot.Grid([], xScale, yScale, colorScale).project("fill", "magnitude");
             renderer.renderTo(svg);
             yScale.domain(["U", "V"]);
             renderer.dataSource().data(DATA);
@@ -3273,9 +3273,11 @@ var assert = chai.assert;
 describe("Domainer", function () {
     var scale;
     var domainer;
+    var dateDomainer;
     beforeEach(function () {
         scale = new Plottable.Scale.Linear();
         domainer = new Plottable.Domainer();
+        dateDomainer = new Plottable.Domainer();
     });
     it("pad() works in general case", function () {
         scale.updateExtent("1", "x", [100, 200]);
@@ -3364,10 +3366,10 @@ describe("Domainer", function () {
     it("paddingException(n) works on dates", function () {
         var a = new Date(2000, 5, 5);
         var b = new Date(2003, 0, 1);
-        domainer.pad().addPaddingException(a);
+        dateDomainer.pad().addPaddingException(a);
         var timeScale = new Plottable.Scale.Time();
         timeScale.updateExtent("1", "x", [a, b]);
-        timeScale.domainer(domainer);
+        timeScale.domainer(dateDomainer);
         var domain = timeScale.domain();
         assert.deepEqual(domain[0], a);
         assert.isTrue(b < domain[1]);
@@ -3402,10 +3404,10 @@ describe("Domainer", function () {
         var b = new Date(2000, 5, 5);
         var c = new Date(2000, 5, 6);
         var d = new Date(2003, 0, 1);
-        domainer.addIncludedValue(b);
+        dateDomainer.addIncludedValue(b);
         var timeScale = new Plottable.Scale.Time();
         timeScale.updateExtent("1", "x", [c, d]);
-        timeScale.domainer(domainer);
+        timeScale.domainer(dateDomainer);
         assert.deepEqual(timeScale.domain(), [b, d]);
     });
     it("exceptions are setup properly on an area plot", function () {
@@ -3723,13 +3725,6 @@ describe("Scales", function () {
             assert.equal("#000000", scale.scale(0));
             assert.equal("#ffffff", scale.scale(16));
             assert.equal("#e3e3e3", scale.scale(8));
-        });
-        it("doesn't use a domainer", function () {
-            var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-            var startDomain = scale.domain();
-            scale.domainer().pad(1.0);
-            scale.autoDomain();
-            assert.equal(scale.domain(), startDomain);
         });
     });
     describe("Modified Log Scale", function () {

@@ -2215,7 +2215,7 @@ var Plottable;
                 return this;
             };
             NewStylePlot.prototype.removeDataset = function (key) {
-                if (this._key2DatasetDrawerKey.has(key)) {
+                if (this._key2DatasetDrawerKey.has(key) != null) {
                     var ddk = this._key2DatasetDrawerKey.get(key);
                     ddk.drawer.remove();
                     var projectors = d3.values(this._projectors);
@@ -2457,7 +2457,7 @@ var Plottable;
                 this.includedValues.set(key, value);
             }
             else {
-                this.unregisteredIncludedValues.set(value, value);
+                this.unregisteredIncludedValues.set(value.toString(), value);
             }
             return this;
         };
@@ -2476,7 +2476,9 @@ var Plottable;
             return this;
         };
         Domainer.defaultCombineExtents = function (extents) {
-            return [Plottable.Util.Methods.min(extents, function (e) { return e[0]; }, 0), Plottable.Util.Methods.max(extents, function (e) { return e[1]; }, 1)];
+            var e1 = Plottable.Util.Methods.min(extents, function (e) { return e[0]; }, 0);
+            var e2 = Plottable.Util.Methods.max(extents, function (e) { return e[1]; }, 1);
+            return [e1, e2];
         };
         Domainer.prototype.padDomain = function (scale, domain) {
             var min = domain[0];
@@ -2496,12 +2498,12 @@ var Plottable;
             var p = this.padProportion / 2;
             var newMin = scale.invert(scale.scale(min) - (scale.scale(max) - scale.scale(min)) * p);
             var newMax = scale.invert(scale.scale(max) + (scale.scale(max) - scale.scale(min)) * p);
-            var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
+            var exceptionValues = this.paddingExceptions.values().map(function (x) { return x.toString(); }).concat(this.unregisteredPaddingExceptions.values());
             var exceptionSet = d3.set(exceptionValues);
-            if (exceptionSet.has(min)) {
+            if (exceptionSet.has(min.toString())) {
                 newMin = min;
             }
-            if (exceptionSet.has(max)) {
+            if (exceptionSet.has(max.toString())) {
                 newMax = max;
             }
             return [newMin, newMax];
@@ -2516,7 +2518,16 @@ var Plottable;
         };
         Domainer.prototype.includeDomain = function (domain) {
             var includedValues = this.includedValues.values().concat(this.unregisteredIncludedValues.values());
-            return includedValues.reduce(function (domain, value) { return [Math.min(domain[0], value), Math.max(domain[1], value)]; }, domain);
+            function min(a, b) {
+                return a < b ? a : b;
+            }
+            ;
+            function max(a, b) {
+                return a < b ? b : a;
+            }
+            ;
+            var include = function (domain, value) { return [min(domain[0], value), max(domain[1], value)]; };
+            return includedValues.reduce(include, domain);
         };
         Domainer.PADDING_FOR_IDENTICAL_DOMAIN = 1;
         Domainer.ONE_DAY = 1000 * 60 * 60 * 24;
@@ -2932,12 +2943,7 @@ var Plottable;
                 _super.call(this, scale);
             }
             Color.prototype._getExtent = function () {
-                var extents = this._getAllExtents();
-                var concatenatedExtents = [];
-                extents.forEach(function (e) {
-                    concatenatedExtents = concatenatedExtents.concat(e);
-                });
-                return Plottable.Util.Methods.uniq(concatenatedExtents);
+                return Scale.Ordinal.prototype._getExtent.apply(this);
             };
             return Color;
         })(Plottable.Abstract.Scale);
@@ -3131,7 +3137,7 @@ var Plottable;
                 ]
             };
             return InterpolatedColor;
-        })(Plottable.Abstract.QuantitativeScale);
+        })(Plottable.Abstract.Scale);
         Scale.InterpolatedColor = InterpolatedColor;
     })(Plottable.Scale || (Plottable.Scale = {}));
     var Scale = Plottable.Scale;
@@ -4782,12 +4788,15 @@ var Plottable;
                 }
                 this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
                 this._bars.exit().remove();
-                var baselineAttr = {
-                    "x1": this._isVertical ? 0 : scaledBaseline,
-                    "y1": this._isVertical ? scaledBaseline : 0,
-                    "x2": this._isVertical ? this.availableWidth : scaledBaseline,
-                    "y2": this._isVertical ? scaledBaseline : this.availableHeight
-                };
+                var baselineAttr = {};
+                var x1 = this._isVertical ? 0 : scaledBaseline;
+                var x2 = this._isVertical ? this.availableWidth : scaledBaseline;
+                var y1 = this._isVertical ? scaledBaseline : 0;
+                var y2 = this._isVertical ? scaledBaseline : this.availableHeight;
+                baselineAttr["x1"] = function () { return x1; };
+                baselineAttr["x2"] = function () { return x2; };
+                baselineAttr["y1"] = function () { return y1; };
+                baselineAttr["y2"] = function () { return y2; };
                 this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
             };
             BarPlot.prototype.baseline = function (value) {
@@ -5096,19 +5105,18 @@ var Plottable;
             };
             Area.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
-                var scale = this.yScale;
                 var y0Projector = this._projectors["y0"];
                 var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
                 var extent = y0Accessor != null ? this.dataSource()._getExtent(y0Accessor) : [];
                 var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
-                if (!scale._userSetDomainer) {
+                if (!this.yScale._userSetDomainer) {
                     if (constantBaseline != null) {
-                        scale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+                        this.yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
                     }
                     else {
-                        scale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
+                        this.yScale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
                     }
-                    scale._autoDomainIfAutomaticMode();
+                    this.yScale._autoDomainIfAutomaticMode();
                 }
             };
             Area.prototype.project = function (attrToSet, accessor, scale) {
@@ -5185,12 +5193,15 @@ var Plottable;
                 _super.prototype._paint.call(this);
                 var primaryScale = this._isVertical ? this.yScale : this.xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
-                var baselineAttr = {
-                    "x1": this._isVertical ? 0 : scaledBaseline,
-                    "y1": this._isVertical ? scaledBaseline : 0,
-                    "x2": this._isVertical ? this.availableWidth : scaledBaseline,
-                    "y2": this._isVertical ? scaledBaseline : this.availableHeight
-                };
+                var baselineAttr = {};
+                var x1 = this._isVertical ? 0 : scaledBaseline;
+                var x2 = this._isVertical ? this.availableWidth : scaledBaseline;
+                var y1 = this._isVertical ? scaledBaseline : 0;
+                var y2 = this._isVertical ? scaledBaseline : this.availableHeight;
+                baselineAttr["x1"] = function () { return x1; };
+                baselineAttr["x2"] = function () { return x2; };
+                baselineAttr["y1"] = function () { return y1; };
+                baselineAttr["y2"] = function () { return y2; };
                 this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
             };
             NewStyleBarPlot.prototype.baseline = function (value) {
@@ -5286,8 +5297,8 @@ var Plottable;
     (function (Plot) {
         var StackedBar = (function (_super) {
             __extends(StackedBar, _super);
-            function StackedBar(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function StackedBar() {
+                _super.apply(this, arguments);
                 this.stackedData = [];
                 this._isVertical = true;
                 this._baselineValue = 0;
@@ -5644,27 +5655,17 @@ var Plottable;
             function PanZoom(componentToListenTo, xScale, yScale) {
                 _super.call(this, componentToListenTo);
                 var _this = this;
-                if (xScale == null) {
-                    xScale = new Plottable.Scale.Linear();
-                }
-                if (yScale == null) {
-                    yScale = new Plottable.Scale.Linear();
-                }
                 this.xScale = xScale;
                 this.yScale = yScale;
                 this.zoom = d3.behavior.zoom();
-                this.zoom.x(this.xScale._d3Scale);
-                this.zoom.y(this.yScale._d3Scale);
+                if (xScale != null) {
+                    this.zoom.x(this.xScale._d3Scale);
+                }
+                if (yScale != null) {
+                    this.zoom.y(this.yScale._d3Scale);
+                }
                 this.zoom.on("zoom", function () { return _this.rerenderZoomed(); });
             }
-            PanZoom.prototype.resetZoom = function () {
-                var _this = this;
-                this.zoom = d3.behavior.zoom();
-                this.zoom.x(this.xScale._d3Scale);
-                this.zoom.y(this.yScale._d3Scale);
-                this.zoom.on("zoom", function () { return _this.rerenderZoomed(); });
-                this.zoom(this.hitBox);
-            };
             PanZoom.prototype._anchor = function (hitBox) {
                 _super.prototype._anchor.call(this, hitBox);
                 this.zoom(hitBox);
@@ -5867,37 +5868,6 @@ var Plottable;
             Drag.prototype._anchor = function (hitBox) {
                 _super.prototype._anchor.call(this, hitBox);
                 hitBox.call(this.dragBehavior);
-                return this;
-            };
-            Drag.prototype.setupZoomCallback = function (xScale, yScale) {
-                var xDomainOriginal = xScale != null ? xScale.domain() : null;
-                var yDomainOriginal = yScale != null ? yScale.domain() : null;
-                var resetOnNextClick = false;
-                function callback(upperLeft, lowerRight) {
-                    if (upperLeft == null || lowerRight == null) {
-                        if (resetOnNextClick) {
-                            if (xScale != null) {
-                                xScale.domain(xDomainOriginal);
-                            }
-                            if (yScale != null) {
-                                yScale.domain(yDomainOriginal);
-                            }
-                        }
-                        resetOnNextClick = !resetOnNextClick;
-                        return;
-                    }
-                    resetOnNextClick = false;
-                    if (xScale != null) {
-                        xScale.domain([xScale.invert(upperLeft.x), xScale.invert(lowerRight.x)]);
-                    }
-                    if (yScale != null) {
-                        yScale.domain([yScale.invert(lowerRight.y), yScale.invert(upperLeft.y)]);
-                    }
-                    this.clearBox();
-                    return;
-                }
-                this.drag(callback);
-                this.dragend(callback);
                 return this;
             };
             return Drag;

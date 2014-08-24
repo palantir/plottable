@@ -13,7 +13,7 @@ describe("Plots", () => {
     var colorAccessor: any;
     var fillAccessor: any;
     var simpleDataset: Plottable.DataSource;
-    var areaPlot: Plottable.Plot.Area;
+    var areaPlot: Plottable.Plot.Area<number>;
     var renderArea: D3.Selection;
     var verifier: MultiTestVerifier;
     // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
@@ -30,7 +30,7 @@ describe("Plots", () => {
       colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
       fillAccessor = () => "steelblue";
       simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
-      areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
+      areaPlot = new Plottable.Plot.Area<number>(simpleDataset, xScale, yScale);
       areaPlot.project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)
               .project("y0", y0Accessor, yScale)

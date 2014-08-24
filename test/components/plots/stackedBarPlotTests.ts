@@ -8,9 +8,9 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var dataset1: Plottable.DataSource;
     var dataset2: Plottable.DataSource;
-    var xScale: Plottable.Scale.Ordinal;
+    var xScale: Plottable.Scale.Ordinal<string>;
     var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.StackedBar;
+    var renderer: Plottable.Plot.StackedBar<string>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var axisHeight = 0;
@@ -20,7 +20,7 @@ describe("Plots", () => {
 
     before(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Ordinal();
+      xScale = new Plottable.Scale.Ordinal<string>();
       yScale = new Plottable.Scale.Linear().domain([0, 3]);
 
       var data1 = [

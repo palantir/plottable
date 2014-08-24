@@ -48,7 +48,7 @@ describe("Plots", () => {
       var svg: D3.Selection;
       var xScale: Plottable.Scale.Linear;
       var yScale: Plottable.Scale.Linear;
-      var circlePlot: Plottable.Plot.Scatter;
+      var circlePlot: Plottable.Plot.Scatter<number, number>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 300;
       var verifier = new MultiTestVerifier();

@@ -2,8 +2,8 @@
 
 module Plottable {
 export module Axis {
-  export class Numeric extends Abstract.Axis {
-    public _scale: Abstract.QuantitativeScale;
+  export class Numeric extends Abstract.Axis<number> {
+    public _scale: Abstract.QuantitativeScale<number>;
     private tickLabelPositioning = "center";
     // Whether or not first/last tick label will still be displayed even if
     // the label is cut off.
@@ -19,7 +19,7 @@ export module Axis {
      * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
      * @param {Formatter} [formatter] A function to format tick labels (default Formatters.general(3, false)).
      */
-    constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter = Formatters.general(3, false)) {
+    constructor(scale: Abstract.QuantitativeScale<number>, orientation: string, formatter = Formatters.general(3, false)) {
       super(scale, orientation, formatter);
     }
 

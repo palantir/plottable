@@ -30,11 +30,11 @@ describe("Scales", () => {
     (<any> scale).autoDomainAutomatically = true;
     scale.updateExtent("1", "x", [0.08, 9.92]);
     callbackWasCalled = false;
-    scale.domainer(new Plottable.Domainer().nice());
+    scale.domainer(new Plottable.Domainer<number>().nice());
     assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
 
     callbackWasCalled = false;
-    scale.domainer(new Plottable.Domainer().pad());
+    scale.domainer(new Plottable.Domainer<number>().pad());
     assert.isTrue(callbackWasCalled, "The registered callback was called when padDomain() is used to set the domain");
   });
 
@@ -50,7 +50,7 @@ describe("Scales", () => {
 
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
       scale.updateExtent("1", "x", d3.extent(data, (e) => e.foo));
-      scale.domainer(new Plottable.Domainer().pad().nice());
+      scale.domainer(new Plottable.Domainer<number>().pad().nice());
       assert.isTrue((<any> scale).autoDomainAutomatically,
                           "the autoDomain flag is still set after autoranginging and padding and nice-ing");
       scale.domain([0, 5]);
@@ -114,7 +114,7 @@ describe("Scales", () => {
       var ds2 = [{x: 1, y: 1}, {x: 2, y: 2}];
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
-      xScale.domainer(new Plottable.Domainer());
+      xScale.domainer(new Plottable.Domainer<number>());
       var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
       var yAxis = new Plottable.Axis.Numeric(yScale, "left");
       var renderAreaD1 = new Plottable.Plot.Line(ds1, xScale, yScale);
@@ -299,14 +299,6 @@ describe("Scales", () => {
       assert.equal("#ffffff", scale.scale(16));
       assert.equal("#e3e3e3", scale.scale(8));
     });
-
-    it("doesn't use a domainer", () => {
-      var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-      var startDomain = scale.domain();
-      scale.domainer().pad(1.0);
-      scale.autoDomain();
-      assert.equal(scale.domain(), startDomain);
-    });
   });
   describe("Modified Log Scale", () => {
     var scale: Plottable.Scale.ModifiedLog;
@@ -349,16 +341,16 @@ describe("Scales", () => {
     it("works with a domainer", () => {
       scale.updateExtent("1", "x", [0, base * 2]);
       var domain = scale.domain();
-      scale.domainer(new Plottable.Domainer().pad(0.1));
+      scale.domainer(new Plottable.Domainer<number>().pad(0.1));
       assert.operator(scale.domain()[0], "<", domain[0]);
       assert.operator(domain[1], "<", scale.domain()[1]);
 
-      scale.domainer(new Plottable.Domainer().nice());
+      scale.domainer(new Plottable.Domainer<number>().nice());
       assert.operator(scale.domain()[0], "<=", domain[0]);
       assert.operator(domain[1], "<=", scale.domain()[1]);
 
       scale = new Plottable.Scale.ModifiedLog(base);
-      scale.domainer(new Plottable.Domainer());
+      scale.domainer(new Plottable.Domainer<number>());
       assert.deepEqual(scale.domain(), [0, 1]);
     });
 

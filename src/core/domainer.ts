@@ -2,21 +2,21 @@
 
 module Plottable {
 
-  export class Domainer {
+  export class Domainer<T> {
     private doNice = false;
     private niceCount: number;
     private padProportion = 0.0;
-    private paddingExceptions: D3.Map<any> = d3.map();
-    private unregisteredPaddingExceptions: D3.Set<any> = d3.set();
-    private includedValues: D3.Map<any> = d3.map();
+    private paddingExceptions: D3.Map<T> = d3.map();
+    private unregisteredPaddingExceptions: D3.Set<T> = d3.set();
+    private includedValues: D3.Map<T> = d3.map();
     // includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
-    private unregisteredIncludedValues: D3.Map<any> = d3.map();
-    private combineExtents: (extents: any[][]) => any[];
+    private unregisteredIncludedValues: D3.Map<T> = d3.map();
+    private combineExtents: (extents: T[][]) => T[];
     private static PADDING_FOR_IDENTICAL_DOMAIN = 1;
     private static ONE_DAY = 1000 * 60 * 60 * 24;
 
     /**
-     * @param {(extents: any[][]) => any[]} combineExtents
+     * @param {(extents: T[][]) => T[]} combineExtents
      *        If present, this function will be used by the Domainer to merge
      *        all the extents that are present on a scale.
      *
@@ -26,21 +26,21 @@ module Plottable {
      *        merging them all into one [min, max] pair. It defaults to taking
      *        the min of the first elements and the max of the second arguments.
      */
-    constructor(combineExtents?: (extents: any[][]) => any[]) {
+    constructor(combineExtents?: (extents: T[][]) => T[]) {
       this.combineExtents = combineExtents;
     }
 
     /**
-     * @param {any[][]} extents The list of extents to be reduced to a single
+     * @param {T[][]} extents The list of extents to be reduced to a single
      *        extent.
-     * @param {Abstract.QuantitativeScale} scale
+     * @param {Abstract.Scale} scale
      *        Since nice() must do different things depending on Linear, Log,
      *        or Time scale, the scale must be passed in for nice() to work.
-     * @return {any[]} The domain, as a merging of all exents, as a [min, max]
+     * @return {T[]} The domain, as a merging of all exents, as a [min, max]
      *                 pair.
      */
-    public computeDomain(extents: any[][], scale: Abstract.QuantitativeScale): any[] {
-      var domain: any[];
+    public computeDomain(extents: T[][], scale: Abstract.QuantitativeScale<T>): T[] {
+      var domain: T[];
       if (this.combineExtents != null) {
         domain = this.combineExtents(extents);
       } else if (extents.length === 0) {
@@ -70,7 +70,7 @@ module Plottable {
      *
      * @return {Domainer} The calling Domainer.
      */
-    public pad(padProportion = 0.05): Domainer {
+    public pad(padProportion = 0.05): Domainer<T> {
       this.padProportion = padProportion;
       return this;
     }
@@ -82,11 +82,11 @@ module Plottable {
      * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
      * If a key is not provided, it will be added with set semantics (Can be removed by value)
      *
-     * @param {any} exception The padding exception to add.
+     * @param {T} exception The padding exception to add.
      * @param string [key] The key to register the exception under.
      * @return Domainer The calling domainer
      */
-    public addPaddingException(exception: any, key?: string): Domainer {
+    public addPaddingException(exception: T, key?: string): Domainer<T> {
       if (key != null) {
         this.paddingExceptions.set(key, exception);
       } else {
@@ -105,7 +105,7 @@ module Plottable {
      * @param {any} keyOrException The key for the value to remove, or the value to remove
      * @return Domainer The calling domainer
      */
-    public removePaddingException(keyOrException: any): Domainer {
+    public removePaddingException(keyOrException: any): Domainer<T> {
       if (typeof(keyOrException) === "string") {
         this.paddingExceptions.remove(keyOrException);
       } else {
@@ -121,15 +121,15 @@ module Plottable {
      * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
      * If a key is not provided, it will be added with set semantics (Can be removed by value)
      *
-     * @param {any} value The included value to add.
+     * @param {T} value The included value to add.
      * @param string [key] The key to register the value under.
      * @return Domainer The calling domainer
      */
-    public addIncludedValue(value: any, key?: string): Domainer {
+    public addIncludedValue(value: T, key?: string): Domainer<T> {
       if (key != null) {
         this.includedValues.set(key, value);
       } else {
-        this.unregisteredIncludedValues.set(value, value);
+        this.unregisteredIncludedValues.set(value.toString(), value);
       }
       return this;
     }
@@ -158,25 +158,27 @@ module Plottable {
      * @param {number} [count] The number of ticks that should fit inside the new domain.
      * @return {Domainer} The calling Domainer.
      */
-    public nice(count?: number): Domainer {
+    public nice(count?: number): Domainer<T> {
       this.doNice = true;
       this.niceCount = count;
       return this;
     }
 
-    private static defaultCombineExtents(extents: any[][]): any[] {
-      return [Util.Methods.min(extents, (e) => e[0], 0), Util.Methods.max(extents, (e) => e[1], 1)];
+    private static defaultCombineExtents<U>(extents: U[][]): U[] {
+      var e1 = Util.Methods.min(extents, (e) => e[0], <U> (<any> 0));
+      var e2 = Util.Methods.max(extents, (e) => e[1], <U> (<any> 1));
+      return [e1, e2];
     }
 
-    private padDomain(scale: Abstract.QuantitativeScale, domain: any[]): any[] {
+    private padDomain(scale: Abstract.QuantitativeScale<T>, domain: T[]): T[] {
       var min = domain[0];
       var max = domain[1];
       if (min === max && this.padProportion > 0.0) {
-        var d = min.valueOf(); // valueOf accounts for dates properly
+        var d = <any> min.valueOf(); // valueOf accounts for dates properly
         if (min instanceof Date) {
-          return [d - Domainer.ONE_DAY, d + Domainer.ONE_DAY];
+          return <any> [d - Domainer.ONE_DAY, d + Domainer.ONE_DAY];
         } else {
-          return [d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN,
+          return <any> [d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN,
                   d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
         }
       }
@@ -191,18 +193,18 @@ module Plottable {
                                         (scale.scale(max) - scale.scale(min)) * p);
       var newMax = scale.invert(scale.scale(max) +
                                         (scale.scale(max) - scale.scale(min)) * p);
-      var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
+      var exceptionValues = this.paddingExceptions.values().map((x) => x.toString()).concat(this.unregisteredPaddingExceptions.values());
       var exceptionSet = d3.set(exceptionValues);
-      if (exceptionSet.has(min)) {
+      if (exceptionSet.has(min.toString())) {
         newMin = min;
       }
-      if (exceptionSet.has(max)) {
+      if (exceptionSet.has(max.toString())) {
         newMax = max;
       }
       return [newMin, newMax];
     }
 
-    private niceDomain(scale: Abstract.QuantitativeScale, domain: any[]): any[] {
+    private niceDomain(scale: Abstract.QuantitativeScale<T>, domain: T[]): T[] {
       if (this.doNice) {
         return scale._niceDomain(domain, this.niceCount);
       } else {
@@ -210,12 +212,12 @@ module Plottable {
       }
     }
 
-    private includeDomain(domain: any[]): any[] {
+    private includeDomain(domain: T[]): T[] {
       var includedValues = this.includedValues.values().concat(this.unregisteredIncludedValues.values());
-      return includedValues.reduce(
-        (domain, value) => [Math.min(domain[0], value), Math.max(domain[1], value)],
-        domain
-      );
+      function min<U>(a: U, b: U) { return a < b ? a : b; };
+      function max<U>(a: U, b: U) { return a < b ? b : a; };
+      var include = (domain: T[], value: T) => [min(domain[0], value), max(domain[1], value)];
+      return includedValues.reduce(include, domain);
     }
   }
 }

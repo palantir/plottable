@@ -4,7 +4,7 @@ var assert = chai.assert;
 describe("Category Axes", () => {
   it("re-renders appropriately when data is changed", () => {
     var svg = generateSVG(400, 400);
-    var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+    var xScale = new Plottable.Scale.Ordinal<string>().domain(["foo", "bar", "baz"]).range([400, 0]);
     var ca = new Plottable.Axis.Category(xScale, "left");
     ca.renderTo(svg);
     assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
@@ -15,7 +15,7 @@ describe("Category Axes", () => {
 
   it("requests appropriate space when the scale has no domain", () => {
     var svg = generateSVG(400, 400);
-    var scale = new Plottable.Scale.Ordinal();
+    var scale = new Plottable.Scale.Ordinal<string>();
     var ca = new Plottable.Axis.Category(scale);
     ca._anchor(svg);
     var s = ca._requestedSpace(400, 400);
@@ -28,7 +28,7 @@ describe("Category Axes", () => {
 
   it("width accounts for gutter. ticklength, and padding on vertical axes", () => {
     var svg = generateSVG(400, 400);
-    var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+    var xScale = new Plottable.Scale.Ordinal<string>().domain(["foo", "bar", "baz"]).range([400, 0]);
     var ca = new Plottable.Axis.Category(xScale, "left");
     ca.renderTo(svg);
 
@@ -49,7 +49,7 @@ describe("Category Axes", () => {
 
   it("height accounts for gutter. ticklength, and padding on horizontal axes", () => {
     var svg = generateSVG(400, 400);
-    var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+    var xScale = new Plottable.Scale.Ordinal<string>().domain(["foo", "bar", "baz"]).range([400, 0]);
     var ca = new Plottable.Axis.Category(xScale, "bottom");
     ca.renderTo(svg);
 

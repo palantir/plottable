@@ -8,15 +8,15 @@ describe("Plots", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
       var dataset: Plottable.DataSource;
-      var xScale: Plottable.Scale.Ordinal;
+      var xScale: Plottable.Scale.Ordinal<string>;
       var yScale: Plottable.Scale.Linear;
-      var renderer: Plottable.Plot.VerticalBar;
+      var renderer: Plottable.Plot.VerticalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+        xScale = new Plottable.Scale.Ordinal<string>().domain(["A", "B"]).rangeType("points");
         yScale = new Plottable.Scale.Linear();
         var data = [
           {x: "A", y: 1},
@@ -25,7 +25,7 @@ describe("Plots", () => {
         ];
         dataset = new Plottable.DataSource(data);
 
-        renderer = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
+        renderer = new Plottable.Plot.VerticalBar<string>(dataset, xScale, yScale);
         renderer.animate(false);
         renderer.renderTo(svg);
       });
@@ -151,7 +151,7 @@ describe("Plots", () => {
       });
 
       it("shouldn't blow up if members called before the first render", () => {
-        var brandNew = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
+        var brandNew = new Plottable.Plot.VerticalBar<string>(dataset, xScale, yScale);
 
         assert.isNotNull(brandNew.deselectAll(), "deselects return self");
         assert.isNull(brandNew.selectBar(0, 0), "selects return empty");
@@ -173,14 +173,14 @@ describe("Plots", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
       var dataset: Plottable.DataSource;
-      var yScale: Plottable.Scale.Ordinal;
+      var yScale: Plottable.Scale.Ordinal<string>;
       var xScale: Plottable.Scale.Linear;
-      var renderer: Plottable.Plot.HorizontalBar;
+      var renderer: Plottable.Plot.HorizontalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+        yScale = new Plottable.Scale.Ordinal<string>().domain(["A", "B"]).rangeType("points");
         xScale = new Plottable.Scale.Linear();
 
         var data = [
@@ -190,7 +190,7 @@ describe("Plots", () => {
         ];
         dataset = new Plottable.DataSource(data);
 
-        renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
+        renderer = new Plottable.Plot.HorizontalBar<string>(dataset, xScale, yScale);
         renderer.animate(false);
         renderer.renderTo(svg);
       });
@@ -279,9 +279,9 @@ describe("Plots", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
       var dataset: Plottable.DataSource;
-      var yScale: Plottable.Scale.Ordinal;
+      var yScale: Plottable.Scale.Ordinal<string>;
       var xScale: Plottable.Scale.Linear;
-      var renderer: Plottable.Plot.HorizontalBar;
+      var renderer: Plottable.Plot.HorizontalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       var axisWidth = 0;
@@ -291,7 +291,7 @@ describe("Plots", () => {
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
+        yScale = new Plottable.Scale.Ordinal<string>().domain(["A", "B"]);
         xScale = new Plottable.Scale.Linear();
 
         var data = [
@@ -300,7 +300,7 @@ describe("Plots", () => {
         ];
         dataset = new Plottable.DataSource(data);
 
-        renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
+        renderer = new Plottable.Plot.HorizontalBar<string>(dataset, xScale, yScale);
         renderer.baseline(0);
         renderer.animate(false);
         var yAxis = new Plottable.Axis.Category(yScale, "left");

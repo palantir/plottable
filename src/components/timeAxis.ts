@@ -8,7 +8,7 @@ export module Axis {
       formatString: string;
   };
 
-  export class Time extends Abstract.Axis {
+  export class Time extends Abstract.Axis<any> {
 
     public _majorTickLabels: D3.Selection;
     public _minorTickLabels: D3.Selection;

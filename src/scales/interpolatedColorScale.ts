@@ -13,7 +13,7 @@ export module Scale {
    *
    * By default it generates a linear scale internally.
    */
-  export class InterpolatedColor extends Abstract.QuantitativeScale {
+  export class InterpolatedColor extends Abstract.Scale<number, string> {
     private static COLOR_SCALES: ColorGroups = {
       reds : [
         "#FFFFFF", // white

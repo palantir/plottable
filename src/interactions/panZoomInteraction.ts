@@ -2,10 +2,10 @@
 
 module Plottable {
 export module Interaction {
-  export class PanZoom extends Abstract.Interaction {
+  export class PanZoom<X,Y> extends Abstract.Interaction {
     private zoom: D3.Behavior.Zoom;
-    public xScale: Abstract.QuantitativeScale;
-    public yScale: Abstract.QuantitativeScale;
+    public xScale: Abstract.QuantitativeScale<X>;
+    public yScale: Abstract.QuantitativeScale<Y>;
 
     /**
      * Creates a PanZoomInteraction.
@@ -15,29 +15,18 @@ export module Interaction {
      * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
      * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
      */
-    constructor(componentToListenTo: Abstract.Component, xScale?: Abstract.QuantitativeScale, yScale?: Abstract.QuantitativeScale) {
+    constructor(componentToListenTo: Abstract.Component, xScale?: Abstract.QuantitativeScale<X>, yScale?: Abstract.QuantitativeScale<Y>) {
       super(componentToListenTo);
-      if (xScale == null) {
-        xScale = new Plottable.Scale.Linear();
-      }
-      if (yScale == null) {
-        yScale = new Plottable.Scale.Linear();
-      }
       this.xScale = xScale;
       this.yScale = yScale;
       this.zoom = d3.behavior.zoom();
-      this.zoom.x(this.xScale._d3Scale);
-      this.zoom.y(this.yScale._d3Scale);
+      if (xScale != null) {
+        this.zoom.x(this.xScale._d3Scale);
+      }
+      if (yScale != null) {
+        this.zoom.y(this.yScale._d3Scale);
+      }
       this.zoom.on("zoom", () => this.rerenderZoomed());
-    }
-
-    public resetZoom() {
-      // HACKHACK #254
-      this.zoom = d3.behavior.zoom();
-      this.zoom.x(this.xScale._d3Scale);
-      this.zoom.y(this.yScale._d3Scale);
-      this.zoom.on("zoom", () => this.rerenderZoomed());
-      this.zoom(this.hitBox);
     }
 
     public _anchor(hitBox: D3.Selection) {
