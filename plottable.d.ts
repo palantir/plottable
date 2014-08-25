@@ -15,9 +15,9 @@ declare module Plottable {
             function arrayEq<T>(a: T[], b: T[]): boolean;
             function objEq(a: any, b: any): boolean;
             function max(arr: number[], default_val?: number): number;
-            function max<T>(arr: T[], default_val: number, acc: (x: T) => number): number;
+            function max<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
             function min(arr: number[], default_val?: number): number;
-            function min<T>(arr: T[], default_val: number, acc: (x: T) => number): number;
+            function min<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
         }
     }
 }

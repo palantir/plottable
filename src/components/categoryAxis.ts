@@ -101,11 +101,8 @@ export module Axis {
         textWriteResults.push(textWriteResult);
       });
 
-      function max(arr: Util.Text.IWriteTextResult[], f: (t: Util.Text.IWriteTextResult) => number) {
-        return Util.Methods.max(arr, 0, f);
-      };
-      var widthFn  = this._isHorizontal() ? d3.sum : max;
-      var heightFn = this._isHorizontal() ? max : d3.sum;
+      var widthFn  = this._isHorizontal() ? d3.sum : Util.Methods.max;
+      var heightFn = this._isHorizontal() ? Util.Methods.max : d3.sum;
       return {
         textFits: textWriteResults.every((t: Util.Text.IWriteTextResult) => t.textFits),
         usedWidth : widthFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedWidth),

@@ -194,23 +194,37 @@ export module Util {
     }
 
     export function max(arr: number[], default_val?: number): number;
-    export function max<T>(arr: T[], default_val: number, acc: (x: T) => number): number;
-    export function max(arr: any[], default_val?: number, acc?: any) {
+    export function max<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
+    export function max(arr: any[], one?: any, two?: any) {
       if (arr.length === 0) {
-        return default_val === undefined ? 0 : default_val;
+        if (typeof(one) === "number") {
+          return one;
+        } else if (typeof(two) === "number") {
+          return two;
+        } else {
+          return 0;
+        }
       }
       /* tslint:disable:ban */
-      return acc === undefined ? d3.max(arr) : d3.max(arr, acc);
+      var acc = typeof(one) === "function" ? one : typeof(two) === "function" ? two : undefined;
+      return one === undefined ? d3.max(arr) : d3.max(arr, acc);
       /* tslint:enable:ban */
     }
 
     export function min(arr: number[], default_val?: number): number;
-    export function min<T>(arr: T[], default_val: number, acc: (x: T) => number): number;
-    export function min(arr: any[], default_val?: number, acc?: any) {
+    export function min<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
+    export function min(arr: any[], one?: any, two?: any) {
       if (arr.length === 0) {
-        return default_val === undefined ? 0 : default_val;
+        if (typeof(one) === "number") {
+          return one;
+        } else if (typeof(two) === "number") {
+          return two;
+        } else {
+          return 0;
+        }
       }
       /* tslint:disable:ban */
+      var acc = typeof(one) === "function" ? one : typeof(two) === "function" ? two : undefined;
       return acc === undefined ? d3.min(arr) : d3.min(arr, acc);
       /* tslint:enable:ban */
     }

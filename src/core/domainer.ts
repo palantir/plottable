@@ -46,7 +46,7 @@ module Plottable {
       } else if (extents.length === 0) {
         domain = scale._defaultExtent();
       } else {
-        domain = [Util.Methods.min(extents, 0, (e) => e[0]), Util.Methods.max(extents, 0, (e) => e[1])];
+        domain = [Util.Methods.min(extents, (e) => e[0]), Util.Methods.max(extents, (e) => e[1])];
       }
       domain = this.includeDomain(domain);
       domain = this.padDomain(scale, domain);
@@ -163,7 +163,7 @@ module Plottable {
     }
 
     private static defaultCombineExtents(extents: any[][]): any[] {
-      return [Util.Methods.min(extents, 0, (e) => e[0]), Util.Methods.max(extents, 1, (e) => e[1])];
+      return [Util.Methods.min(extents, (e) => e[0], 0), Util.Methods.max(extents, (e) => e[1], 1)];
     }
 
     private padDomain(scale: Abstract.QuantitativeScale, domain: any[]): any[] {

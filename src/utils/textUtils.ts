@@ -55,7 +55,7 @@ export module Util {
         var whs = s.trim().split("").map(tm);
         return {
           width: d3.sum(whs, (wh) => wh.width),
-          height: Util.Methods.max(whs, 0, (wh) => wh.height)
+          height: Util.Methods.max(whs, (wh) => wh.height)
         };
       };
     }
@@ -83,7 +83,7 @@ export module Util {
           });
           return {
             width: d3.sum(whs, (x) => x.width),
-            height: Util.Methods.max(whs, 0, (x) => x.height)
+            height: Util.Methods.max(whs, (x) => x.height)
           };
         } else {
           return tm(s);
@@ -293,7 +293,7 @@ export module Util {
       var usedWidth: number, usedHeight: number;
       if (write == null) {
         function max(arr: string[], f: (t: string) => number) {
-          return Util.Methods.max(arr, 0, f);
+          return Util.Methods.max(arr, f);
         };
         var widthFn = orientHorizontally ? max : d3.sum;
         var heightFn = orientHorizontally ? d3.sum : max;
