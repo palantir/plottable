@@ -11,7 +11,7 @@ export module Plot {
     public _baseline: D3.Selection;
     private stackedExtent: number[] = [];
 
-    constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
+    constructor(xScale?: Abstract.Scale<any, number>, yScale?: Abstract.QuantitativeScale<number>) {
       super(xScale, yScale);
     }
 

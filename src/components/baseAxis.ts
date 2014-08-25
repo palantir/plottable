@@ -18,7 +18,7 @@ export module Abstract {
     public _tickMarkContainer: D3.Selection;
     public _tickLabelContainer: D3.Selection;
     public _baseline: D3.Selection;
-    public _scale: Abstract.Scale;
+    public _scale: Abstract.Scale<any, number>;
     public _formatter: Formatter;
     public _orientation: string;
     public _width: any = "auto";
@@ -31,7 +31,8 @@ export module Abstract {
     private _gutter = 15;
     private _showEndTickLabels = false;
 
-    constructor(scale: Abstract.Scale, orientation: string, formatter = Formatters.identity()) {
+    constructor(scale: Abstract.Scale<any, number>, orientation: string, formatter = Formatters.identity()) {
+      // TODO in future commit: Remove <any> typing
       super();
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
       this._scale = scale;

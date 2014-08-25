@@ -95,7 +95,7 @@ export module Abstract {
       this._render();
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
+    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
       var currentProjection = this._projectors[attrToSet];
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
