@@ -294,7 +294,8 @@ export module Util {
       if (write == null) {
         function max(arr: string[], f: (t: string) => number) {
           return Util.Methods.max(arr, 0, f);
-        };        var widthFn = orientHorizontally ? max : d3.sum;
+        };
+        var widthFn = orientHorizontally ? max : d3.sum;
         var heightFn = orientHorizontally ? d3.sum : max;
         usedWidth = widthFn(wrappedText.lines, (line: string) => tm(line).width);
         usedHeight = heightFn(wrappedText.lines, (line: string) => tm(line).height);
