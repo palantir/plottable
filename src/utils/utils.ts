@@ -58,7 +58,7 @@ export module Util {
     export function intersection<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string> {
       var set: D3.Set<string> = d3.set();
       set1.forEach((v) => {
-        if(set2.has(v)) {
+        if(set2.has(<any> v)) { // checking a string is always appropriate due to d3.set implementation
           set.add(v);
         }
       });

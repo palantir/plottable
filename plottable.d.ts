@@ -5,7 +5,7 @@ declare module Plottable {
             function inRange(x: number, a: number, b: number): boolean;
             function warn(warning: string): void;
             function addArrays(alist: number[], blist: number[]): number[];
-            function intersection(set1: D3.Set<any>, set2: D3.Set<any>): D3.Set<string>;
+            function intersection<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
             function union<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
             function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T>;
             function uniq(strings: string[]): string[];
