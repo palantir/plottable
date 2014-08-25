@@ -25,7 +25,7 @@ export module Component {
 
     private datumCurrentlyFocusedOn: string;
 
-    // this is the set of all legend elements that are currently toggled off
+    // this is the set of all legend domain strings that are currently toggled off
     private isOff: D3.Set<string>;
 
     /**
