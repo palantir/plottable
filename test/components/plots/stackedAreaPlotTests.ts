@@ -65,6 +65,10 @@ describe("Plots", () => {
       var d1 = normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
       var d1Ys = d1.slice(1, d1.length - 1).map((s) => parseFloat(s.split(",")[1]));
       assert.notEqual(d1Ys.indexOf(0), -1, "touches the top");
+
+      var domain = yScale.domain();
+      assert.strictEqual(0, domain[0], "domain starts at a min value at 0");
+      assert.operator(4, "<=", domain[1], "highest area stacking is within yScale domain");
     });
   });
 });
