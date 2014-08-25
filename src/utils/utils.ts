@@ -193,27 +193,26 @@ export module Util {
       return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
     }
 
-    export function max(arr: number[], default: number): number;
-    export function max<T>(arr: T[], default: number, acc: (x: T) => number): number;
-    export function max(arr: any, default=0, acc?: function) {
+    export function max(arr: number[], default_val?: number): number;
+    export function max<T>(arr: T[], default_val: number, acc: (x: T) => number): number;
+    export function max(arr: any[], default_val?: number, acc?: any) {
       if (arr.length === 0) {
-        return default;
+        return default_val === undefined ? 0 : default_val;
       }
-      /*tslint:disable:ban*/
+      /* tslint:disable:ban */
       return acc === undefined ? d3.max(arr) : d3.max(arr, acc);
-      /*tslint:disable:ban*/
+      /* tslint:enable:ban */
     }
-  }
 
-    export function min(arr: number[], default: number): number;
-    export function min<T>(arr: T[], default: number, acc: (x: T) => number): number;
-    export function min(arr: any, default=0, acc?: function) {
+    export function min(arr: number[], default_val?: number): number;
+    export function min<T>(arr: T[], default_val: number, acc: (x: T) => number): number;
+    export function min(arr: any[], default_val?: number, acc?: any) {
       if (arr.length === 0) {
-        return default;
+        return default_val === undefined ? 0 : default_val;
       }
-      /*tslint:disable:ban*/
+      /* tslint:disable:ban */
       return acc === undefined ? d3.min(arr) : d3.min(arr, acc);
-      /*tslint:disable:ban*/
+      /* tslint:enable:ban */
     }
   }
 }
