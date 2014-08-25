@@ -55,15 +55,14 @@ describe("Util.Methods", () => {
     assert.deepEqual(max([], dbl), 0, "default value zero as expected when fn provided");
     assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
 
-    assert.deepEqual(min(alist, 0), 1);
-    assert.deepEqual(min(alist, dbl, 0), 2);
-    assert.deepEqual(min([], 0), 0);
-    assert.deepEqual(min([], dbl, 5), 5);
+    assert.deepEqual(min(alist, 0), 1, "min works for basic list");
+    assert.deepEqual(min(alist, dbl, 0), 2, "min works with function arg");
+    assert.deepEqual(min([]), 0, "min defaults to 0");
+    assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
 
     var strings = ["a", "bb", "ccc", "ddd"];
-    assert.deepEqual(max(strings, (s: string) => s.length), 3);
-    assert.deepEqual(max([], (s: string) => s.length), 0);
-    assert.deepEqual(max([], (s: string) => s.length, 5), 5);
+    assert.deepEqual(max(strings, (s: string) => s.length), 3, "works on arrays of non-numbers with a function");
+    assert.deepEqual(max([], (s: string) => s.length, 5), 5, "defaults work even with non-number function type");
   });
 
   it("objEq works as expected", () => {
