@@ -49,14 +49,16 @@ export module Util {
     /**
      * Takes two sets and returns the intersection
      *
-     * @param {D3.Set} set1 The first set
-     * @param {D3.Set} set2 The second set
-     * @return {D3.Set} A set that contains elements that appear in both set1 and set2
+     * Due to the fact that D3.Sets store strings internally, return type is always a string set
+     *
+     * @param {D3.Set<T>} set1 The first set
+     * @param {D3.Set<T>} set2 The second set
+     * @return {D3.Set<string>} A set that contains elements that appear in both set1 and set2
      */
-    export function intersection(set1: D3.Set, set2: D3.Set) {
-      var set = d3.set();
+    export function intersection<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string> {
+      var set: D3.Set<string> = d3.set();
       set1.forEach((v) => {
-        if(set2.has(v)) {
+        if(set2.has(<any> v)) { // checking a string is always appropriate due to d3.set implementation
           set.add(v);
         }
       });
@@ -80,12 +82,14 @@ export module Util {
     /**
      * Takes two sets and returns the union
      *
-     * @param{D3.Set} set1 The first set
-     * @param{D3.Set} set2 The second set
-     * @return{D3.Set} A set that contains elements that appear in either set1 or set2
+     * Due to the fact that D3.Sets store strings internally, return type is always a string set
+     *
+     * @param {D3.Set<T>} set1 The first set
+     * @param {D3.Set<T>} set2 The second set
+     * @return {D3.Set<string>} A set that contains elements that appear in either set1 or set2
      */
-    export function union(set1: D3.Set, set2: D3.Set) {
-      var set = d3.set();
+    export function union<T>(set1: D3.Set<T>, set2: D3.Set<T>) {
+      var set: D3.Set<string> = d3.set();
       set1.forEach((v) => set.add(v));
       set2.forEach((v) => set.add(v));
       return set;
@@ -95,11 +99,11 @@ export module Util {
      * Populates a map from an array of keys and a transformation function.
      *
      * @param {string[]} keys The array of keys.
-     * @param {(string) => any} transform A transformation function to apply to the keys.
-     * @return {D3.Map} A map mapping keys to their transformed values.
+     * @param {(string) => T} transform A transformation function to apply to the keys.
+     * @return {D3.Map<T>} A map mapping keys to their transformed values.
      */
-    export function populateMap(keys: string[], transform: (key: string) => any) {
-      var map = d3.map();
+    export function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T> {
+      var map: D3.Map<T> = d3.map();
       keys.forEach((key: string) => {
         map.set(key, transform(key));
       });
