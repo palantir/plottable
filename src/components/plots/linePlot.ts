@@ -29,6 +29,10 @@ export module Plot {
 
     public _setup() {
       super._setup();
+      this._appendPath();
+    }
+
+    public _appendPath() {
       this.linePath = this.renderArea.append("path").classed("line", true);
     }
 
