@@ -17,7 +17,7 @@ export module Abstract {
       this._stackedData = d3.layout.stack()
         .x(this._projectors["x"].accessor)
         .y(this._projectors["y"].accessor)
-        .values(function(d) { return d.values; })(this._stackedData);
+        .values((d) => d.values)(this._stackedData);
     }
   }
 }

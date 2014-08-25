@@ -2163,7 +2163,7 @@ describe("Plots", function () {
             assert.notEqual(d1Ys.indexOf(0), -1, "touches the top");
             var domain = yScale.domain();
             assert.strictEqual(0, domain[0], "domain starts at a min value at 0");
-            assert.operator(4, "<=", domain[1], "highest area stacking is within yScale domain");
+            assert.strictEqual(4, domain[1], "highest area stacking is at upper limit of yScale domain");
         });
     });
 });

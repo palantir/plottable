@@ -5142,9 +5142,7 @@ var Plottable;
             };
             Stacked.prototype.stack = function (d) {
                 this._stackedData.push(d);
-                this._stackedData = d3.layout.stack().x(this._projectors["x"].accessor).y(this._projectors["y"].accessor).values(function (d) {
-                    return d.values;
-                })(this._stackedData);
+                this._stackedData = d3.layout.stack().x(this._projectors["x"].accessor).y(this._projectors["y"].accessor).values(function (d) { return d.values; })(this._stackedData);
             };
             return Stacked;
         })(Abstract.NewStylePlot);

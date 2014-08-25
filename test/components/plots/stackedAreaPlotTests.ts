@@ -68,7 +68,7 @@ describe("Plots", () => {
 
       var domain = yScale.domain();
       assert.strictEqual(0, domain[0], "domain starts at a min value at 0");
-      assert.operator(4, "<=", domain[1], "highest area stacking is within yScale domain");
+      assert.strictEqual(4, domain[1], "highest area stacking is at upper limit of yScale domain");
     });
   });
 });
