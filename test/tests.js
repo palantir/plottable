@@ -3806,7 +3806,7 @@ describe("Scales", function () {
             assert.deepEqual(b.slice().reverse(), b.slice().sort(function (x, y) { return x - y; }));
             var ticks = scale.ticks();
             assert.deepEqual(ticks, ticks.slice().sort(function (x, y) { return x - y; }), "ticks should be sorted");
-            assert.deepEqual(ticks, Plottable.Util.Methods.uniqNumbers(ticks), "ticks should not be repeated");
+            assert.deepEqual(ticks, Plottable.Util.Methods.uniq(ticks), "ticks should not be repeated");
             var beforePivot = ticks.filter(function (x) { return x <= -base; });
             var afterPivot = ticks.filter(function (x) { return base <= x; });
             var betweenPivots = ticks.filter(function (x) { return -base < x && x < base; });
@@ -4550,14 +4550,13 @@ describe("Util.Methods", function () {
         assert.deepEqual(max([], 10), 10, "works as intended with default value");
         assert.deepEqual(max([], dbl), 0, "default value zero as expected when fn provided");
         assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
-        assert.deepEqual(min(alist, 0), 1);
-        assert.deepEqual(min(alist, dbl, 0), 2);
-        assert.deepEqual(min([], 0), 0);
-        assert.deepEqual(min([], dbl, 5), 5);
+        assert.deepEqual(min(alist, 0), 1, "min works for basic list");
+        assert.deepEqual(min(alist, dbl, 0), 2, "min works with function arg");
+        assert.deepEqual(min([]), 0, "min defaults to 0");
+        assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
         var strings = ["a", "bb", "ccc", "ddd"];
-        assert.deepEqual(max(strings, function (s) { return s.length; }), 3);
-        assert.deepEqual(max([], function (s) { return s.length; }), 0);
-        assert.deepEqual(max([], function (s) { return s.length; }, 5), 5);
+        assert.deepEqual(max(strings, function (s) { return s.length; }), 3, "works on arrays of non-numbers with a function");
+        assert.deepEqual(max([], function (s) { return s.length; }, 5), 5, "defaults work even with non-number function type");
     });
     it("objEq works as expected", function () {
         assert.isTrue(Plottable.Util.Methods.objEq({}, {}));
