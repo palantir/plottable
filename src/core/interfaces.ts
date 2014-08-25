@@ -19,7 +19,7 @@ module Plottable {
 
   export interface _IProjector {
     accessor: IAccessor;
-    scale?: Abstract.Scale;
+    scale?: Abstract.Scale<any, any>;
     attribute: string;
   }
 

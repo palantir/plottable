@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scale {
-  export class Time extends Abstract.QuantitativeScale {
+  export class Time extends Abstract.QuantitativeScale<any> {
     /**
      * Creates a new Time Scale.
      *
