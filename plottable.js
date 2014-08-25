@@ -1,5 +1,5 @@
 /*!
-Plottable 0.25.1 (https://github.com/palantir/plottable)
+Plottable 0.26.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -905,7 +905,7 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.25.1";
+    Plottable.version = "0.26.0";
 })(Plottable || (Plottable = {}));
 
 var Plottable;
@@ -4954,6 +4954,9 @@ var Plottable;
             }
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
+                this._appendPath();
+            };
+            Line.prototype._appendPath = function () {
                 this.linePath = this.renderArea.append("path").classed("line", true);
             };
             Line.prototype._getResetYFunction = function () {
@@ -5036,9 +5039,9 @@ var Plottable;
                 this._animators["area-reset"] = new Plottable.Animator.Null();
                 this._animators["area"] = new Plottable.Animator.Default().duration(600).easing("exp-in-out");
             }
-            Area.prototype._setup = function () {
-                _super.prototype._setup.call(this);
+            Area.prototype._appendPath = function () {
                 this.areaPath = this.renderArea.append("path").classed("area", true);
+                _super.prototype._appendPath.call(this);
             };
             Area.prototype._onDataSourceUpdate = function () {
                 _super.prototype._onDataSourceUpdate.call(this);
