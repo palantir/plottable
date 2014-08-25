@@ -5,7 +5,6 @@ export module Abstract {
   export class Stacked extends Abstract.NewStylePlot {
 
     public _stackedData: any[] = [];
-    private stackedExtent: number[] = [];
 
     public _addDataset(key: string, dataset: DataSource) {
       super._addDataset(key, dataset);

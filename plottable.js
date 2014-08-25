@@ -5134,7 +5134,6 @@ var Plottable;
             function Stacked() {
                 _super.apply(this, arguments);
                 this._stackedData = [];
-                this.stackedExtent = [];
             }
             Stacked.prototype._addDataset = function (key, dataset) {
                 _super.prototype._addDataset.call(this, key, dataset);
