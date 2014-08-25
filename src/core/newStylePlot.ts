@@ -9,9 +9,9 @@ module Plottable {
 
 export module Abstract {
   export class NewStylePlot extends XYPlot {
-    private nextSeriesIndex = 0;
-    public _key2DatasetDrawerKey: { [key: string]: DatasetDrawerKey; } = {};
-    public _datasetKeysInOrder: string[] = [];
+    private nextSeriesIndex: number;
+    public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
+    public _datasetKeysInOrder: string[];
 
     /**
      * Creates a NewStylePlot.
@@ -22,6 +22,9 @@ export module Abstract {
      */
     constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
       // make a dummy dataSource to satisfy the base Plot (HACKHACK)
+      this._key2DatasetDrawerKey = d3.map();
+      this._datasetKeysInOrder = [];
+      this.nextSeriesIndex = 0;
       super(new Plottable.DataSource(), xScale, yScale);
     }
 
@@ -64,13 +67,13 @@ export module Abstract {
     }
 
     public _addDataset(key: string, dataset: DataSource) {
-      if (this._key2DatasetDrawerKey[key] != null) {
+      if (this._key2DatasetDrawerKey.has(key)) {
         this.removeDataset(key);
       };
       var drawer = this._getDrawer(key);
       var ddk = {drawer: drawer, dataset: dataset, key: key};
       this._datasetKeysInOrder.push(key);
-      this._key2DatasetDrawerKey[key] = ddk;
+      this._key2DatasetDrawerKey.set(key, ddk);
 
       if (this._isSetup) {
         drawer.renderArea = this.renderArea.append("g");
@@ -86,9 +89,9 @@ export module Abstract {
     public _updateProjector(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
-        d3.values(this._key2DatasetDrawerKey).forEach((ddk) => {
+        this._key2DatasetDrawerKey.forEach((key, ddk) => {
           var extent = ddk.dataset._getExtent(projector.accessor);
-          var scaleKey = this._plottableID.toString() + "_" + ddk.key;
+          var scaleKey = this._plottableID.toString() + "_" + key;
           if (extent.length === 0 || !this._isAnchored) {
             projector.scale.removeExtent(scaleKey, attr);
           } else {
@@ -135,8 +138,8 @@ export module Abstract {
      * @return {NewStylePlot} The calling NewStylePlot.
      */
     public removeDataset(key: string): NewStylePlot {
-      if (this._key2DatasetDrawerKey[key] != null) {
-        var ddk = this._key2DatasetDrawerKey[key];
+      if (this._key2DatasetDrawerKey.has(key)) {
+        var ddk = this._key2DatasetDrawerKey.get(key);
         ddk.drawer.remove();
 
         var projectors = d3.values(this._projectors);
@@ -149,18 +152,18 @@ export module Abstract {
 
         ddk.dataset.broadcaster.deregisterListener(this);
         this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-        delete this._key2DatasetDrawerKey[key];
+        this._key2DatasetDrawerKey.remove(key);
         this._onDataSourceUpdate();
       }
       return this;
     }
 
     public _getDatasetsInOrder(): DataSource[] {
-      return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey[k].dataset);
+      return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).dataset);
     }
 
     public _getDrawersInOrder(): Abstract._Drawer[] {
-      return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey[k].drawer);
+      return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).drawer);
     }
   }
 }
