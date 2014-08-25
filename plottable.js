@@ -130,15 +130,14 @@ var Plottable;
             }
             Methods.objEq = objEq;
             function max(arr, one, two) {
+                if (one === void 0) { one = 0; }
+                if (two === void 0) { two = 0; }
                 if (arr.length === 0) {
                     if (typeof (one) === "number") {
                         return one;
                     }
-                    else if (typeof (two) === "number") {
-                        return two;
-                    }
                     else {
-                        return 0;
+                        return two;
                     }
                 }
                 var acc = typeof (one) === "function" ? one : typeof (two) === "function" ? two : undefined;
@@ -146,15 +145,14 @@ var Plottable;
             }
             Methods.max = max;
             function min(arr, one, two) {
+                if (one === void 0) { one = 0; }
+                if (two === void 0) { two = 0; }
                 if (arr.length === 0) {
                     if (typeof (one) === "number") {
                         return one;
                     }
-                    else if (typeof (two) === "number") {
-                        return two;
-                    }
                     else {
-                        return 0;
+                        return two;
                     }
                 }
                 var acc = typeof (one) === "function" ? one : typeof (two) === "function" ? two : undefined;
@@ -521,12 +519,8 @@ var Plottable;
                 }
                 var usedWidth, usedHeight;
                 if (write == null) {
-                    function max(arr, f) {
-                        return Util.Methods.max(arr, f);
-                    }
-                    ;
-                    var widthFn = orientHorizontally ? max : d3.sum;
-                    var heightFn = orientHorizontally ? d3.sum : max;
+                    var widthFn = orientHorizontally ? Util.Methods.max : d3.sum;
+                    var heightFn = orientHorizontally ? d3.sum : Util.Methods.max;
                     usedWidth = widthFn(wrappedText.lines, function (line) { return tm(line).width; });
                     usedHeight = heightFn(wrappedText.lines, function (line) { return tm(line).height; });
                 }
