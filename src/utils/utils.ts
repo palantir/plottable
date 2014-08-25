@@ -194,6 +194,38 @@ export module Util {
       var valuesB = keysB.map((k) => b[k]);
       return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
     }
+
+    export function max(arr: number[], default_val?: number): number;
+    export function max<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
+    export function max(arr: any[], one: any = 0, two: any = 0) {
+      if (arr.length === 0) {
+        if (typeof(one) === "number") {
+          return one;
+        } else {
+          return two;
+        }
+      }
+      /* tslint:disable:ban */
+      var acc = typeof(one) === "function" ? one : typeof(two) === "function" ? two : undefined;
+      return acc === undefined ? d3.max(arr) : d3.max(arr, acc);
+      /* tslint:enable:ban */
+    }
+
+    export function min(arr: number[], default_val?: number): number;
+    export function min<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
+    export function min(arr: any[], one: any = 0, two: any = 0) {
+      if (arr.length === 0) {
+        if (typeof(one) === "number") {
+          return one;
+        } else {
+          return two;
+        }
+      }
+      /* tslint:disable:ban */
+      var acc = typeof(one) === "function" ? one : typeof(two) === "function" ? two : undefined;
+      return acc === undefined ? d3.min(arr) : d3.min(arr, acc);
+      /* tslint:enable:ban */
+    }
   }
 }
 }
