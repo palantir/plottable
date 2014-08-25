@@ -40,6 +40,14 @@ declare module Plottable {
             * @return{D3.Set} A set that contains elements that appear in either set1 or set2
             */
             function union(set1: D3.Set, set2: D3.Set): D3.Set;
+            /**
+            * Populates a map from an array of keys and a transformation function.
+            *
+            * @param {string[]} keys The array of keys.
+            * @param {(string) => any} transform A transformation function to apply to the keys.
+            * @return {D3.Map} A map mapping keys to their transformed values.
+            */
+            function populateMap(keys: string[], transform: (key: string) => any): D3.Map;
             function uniq(strings: string[]): string[];
             function uniqNumbers(a: number[]): number[];
             /**
@@ -1117,12 +1125,11 @@ declare module Plottable {
             * @param {D3.Selection} selection The update selection or transition selection that we wish to animate.
             * @param {IAttributeToProjector} attrToProjector The set of
             *     IAccessors that we will use to set attributes on the selection.
-            * @param {Abstract.Plot} plot The plot being animated.
             * @return {D3.Selection} Animators should return the selection or
             *     transition object so that plots may chain the transitions between
             *     animators.
             */
-            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
         }
         interface IPlotAnimatorMap {
             [animatorKey: string]: IPlotAnimator;
@@ -2033,6 +2040,33 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
+        class HorizontalLegend extends Abstract.Component {
+            /**
+            * The css class applied to each legend row
+            */
+            static LEGEND_ROW_CLASS: string;
+            /**
+            * The css class applied to each legend entry
+            */
+            static LEGEND_ENTRY_CLASS: string;
+            /**
+            * Creates a Horizontal Legend.
+            *
+            * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
+            * The entries will be displayed in the order of the `colorScale` domain.
+            *
+            * @constructor
+            * @param {Scale.Color} colorScale
+            */
+            constructor(colorScale: Scale.Color);
+            public remove(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
         class Gridlines extends Abstract.Component {
             /**
             * Creates a set of Gridlines.
@@ -2284,7 +2318,7 @@ declare module Plottable {
         * immediately set on the selection.
         */
         class Null implements IPlotAnimator {
-            public animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any;
+            public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
         }
     }
 }
@@ -2296,7 +2330,7 @@ declare module Plottable {
         * The default animator implementation with easing, duration, and delay.
         */
         class Default implements IPlotAnimator {
-            public animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any;
+            public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
             /**
             * Gets the duration of the animation in milliseconds.
             *
@@ -2350,7 +2384,7 @@ declare module Plottable {
         * The delay between animations can be configured with the .delay getter/setter.
         */
         class IterativeDelay extends Default {
-            public animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any;
+            public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
         }
     }
 }
