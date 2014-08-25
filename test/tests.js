@@ -4507,7 +4507,7 @@ describe("Util.Text", function () {
 });
 
 var assert = chai.assert;
-describe("Util.s", function () {
+describe("Util.Methods", function () {
     it("inRange works correct", function () {
         assert.isTrue(Plottable.Util.Methods.inRange(0, -1, 1), "basic functionality works");
         assert.isTrue(Plottable.Util.Methods.inRange(0, 0, 1), "it is a closed interval");
@@ -4537,6 +4537,27 @@ describe("Util.s", function () {
     it("uniq works as expected", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
         assert.deepEqual(Plottable.Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
+    });
+    it("max/min work as expected", function () {
+        var alist = [1, 2, 3, 4, 5];
+        var dbl = function (x) { return x * 2; };
+        var max = Plottable.Util.Methods.max;
+        var min = Plottable.Util.Methods.min;
+        assert.deepEqual(max(alist), 5, "max works as expected on plain array");
+        assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
+        assert.deepEqual(max(alist, dbl), 10, "max applies function appropriately");
+        assert.deepEqual(max([]), 0, "default value zero by default");
+        assert.deepEqual(max([], 10), 10, "works as intended with default value");
+        assert.deepEqual(max([], dbl), 0, "default value zero as expected when fn provided");
+        assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
+        assert.deepEqual(min(alist, 0), 1);
+        assert.deepEqual(min(alist, dbl, 0), 2);
+        assert.deepEqual(min([], 0), 0);
+        assert.deepEqual(min([], dbl, 5), 5);
+        var strings = ["a", "bb", "ccc", "ddd"];
+        assert.deepEqual(max(strings, function (s) { return s.length; }), 3);
+        assert.deepEqual(max([], function (s) { return s.length; }), 0);
+        assert.deepEqual(max([], function (s) { return s.length; }, 5), 5);
     });
     it("objEq works as expected", function () {
         assert.isTrue(Plottable.Util.Methods.objEq({}, {}));

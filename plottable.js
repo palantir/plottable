@@ -142,7 +142,7 @@ var Plottable;
                     }
                 }
                 var acc = typeof (one) === "function" ? one : typeof (two) === "function" ? two : undefined;
-                return one === undefined ? d3.max(arr) : d3.max(arr, acc);
+                return acc === undefined ? d3.max(arr) : d3.max(arr, acc);
             }
             Methods.max = max;
             function min(arr, one, two) {
