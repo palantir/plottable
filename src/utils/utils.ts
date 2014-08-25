@@ -199,6 +199,28 @@ export module Util {
       var valuesB = keysB.map((k) => b[k]);
       return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
     }
+
+    export function max(arr: number[], default_val?: number): number;
+    export function max<T>(arr: T[], default_val: number, acc: (x: T) => number): number;
+    export function max(arr: any[], default_val?: number, acc?: any) {
+      if (arr.length === 0) {
+        return default_val === undefined ? 0 : default_val;
+      }
+      /* tslint:disable:ban */
+      return acc === undefined ? d3.max(arr) : d3.max(arr, acc);
+      /* tslint:enable:ban */
+    }
+
+    export function min(arr: number[], default_val?: number): number;
+    export function min<T>(arr: T[], default_val: number, acc: (x: T) => number): number;
+    export function min(arr: any[], default_val?: number, acc?: any) {
+      if (arr.length === 0) {
+        return default_val === undefined ? 0 : default_val;
+      }
+      /* tslint:disable:ban */
+      return acc === undefined ? d3.min(arr) : d3.min(arr, acc);
+      /* tslint:enable:ban */
+    }
   }
 }
 }
