@@ -108,8 +108,8 @@ export module Scale {
       // then we're going to draw negative log ticks from -100 to -10,
       // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
       var middle = (x: number, y: number, z: number) => [x, y, z].sort((a, b) => a - b)[1];
-      var min = d3.min(this.untransformedDomain);
-      var max = d3.max(this.untransformedDomain);
+      var min = Util.Methods.min(this.untransformedDomain);
+      var max = Util.Methods.max(this.untransformedDomain);
       var negativeLower = min;
       var negativeUpper = middle(min, max, -this.pivot);
       var positiveLower = middle(min, max, this.pivot);
@@ -169,8 +169,8 @@ export module Scale {
      * distance when plotted.
      */
     private howManyTicks(lower: number, upper: number): number {
-      var adjustedMin = this.adjustedLog(d3.min(this.untransformedDomain));
-      var adjustedMax = this.adjustedLog(d3.max(this.untransformedDomain));
+      var adjustedMin = this.adjustedLog(Util.Methods.min(this.untransformedDomain));
+      var adjustedMax = this.adjustedLog(Util.Methods.max(this.untransformedDomain));
       var adjustedLower = this.adjustedLog(lower);
       var adjustedUpper = this.adjustedLog(upper);
       var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);

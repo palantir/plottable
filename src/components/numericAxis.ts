@@ -35,7 +35,7 @@ export module Axis {
         return this.measurer(formattedValue).width;
       });
 
-      var maxTextLength = d3.max(textLengths);
+      var maxTextLength = Util.Methods.max(textLengths);
 
       if (this.tickLabelPositioning === "center") {
         this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;

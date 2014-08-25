@@ -150,7 +150,7 @@ export module Component {
       var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend.MARGIN) / textHeight));
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var measure = Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
-      var maxWidth = d3.max(this.colorScale.domain(), (d: string) => measure(d).width);
+      var maxWidth = Util.Methods.max(this.colorScale.domain(), 0, (d: string) => measure(d).width);
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
       var desiredWidth  = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;
