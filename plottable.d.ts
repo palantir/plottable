@@ -866,7 +866,7 @@ declare module Plottable {
     module Plot {
         class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
             static DEFAULT_WIDTH: number;
-            constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
+            constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.Scale, isVertical?: boolean);
         }
     }
 }
@@ -876,7 +876,7 @@ declare module Plottable {
     module Plot {
         class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
             stackedData: any[][];
-            constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
+            constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale, isVertical?: boolean);
         }
     }
 }

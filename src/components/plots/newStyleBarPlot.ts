@@ -78,6 +78,12 @@ export module Abstract {
     public _updateYDomainer() {
       return Abstract.BarPlot.prototype._updateYDomainer.apply(this);
     }
+
+    public _switchHeightWidthAttributes(attrToProjector: IAttributeToProjector) {
+      var widthAttr = attrToProjector["width"];
+      attrToProjector["width"] = attrToProjector["height"];
+      attrToProjector["height"] = widthAttr;
+    }
   }
 }
 }
