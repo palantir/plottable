@@ -475,6 +475,7 @@ describe("NumericAxis", function () {
             markBB = tickMarks[0][i].getBoundingClientRect();
             var markCenter = (markBB.top + markBB.bottom) / 2;
             labelBB = tickLabels[0][i].getBoundingClientRect();
+            console.log("for label: ", tickLabels[0][i].__data__, "size was", labelBB.width, labelBB.height);
             var labelCenter = (labelBB.top + labelBB.bottom) / 2;
             assert.closeTo(labelCenter, markCenter, 1, "tick label is centered on mark");
         }
@@ -570,7 +571,7 @@ describe("NumericAxis", function () {
         }
         svg.remove();
     });
-    it("allocates enough width to show all tick labels when vertical", function () {
+    it.only("allocates enough width to show all tick labels when vertical", function () {
         var SVG_WIDTH = 100;
         var SVG_HEIGHT = 500;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -601,6 +602,7 @@ describe("NumericAxis", function () {
         boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
         visibleTickLabels[0].forEach(function (label) {
             labelBox = label.getBoundingClientRect();
+            console.log(label.textContent, boundingBox.width, boundingBox.height, labelBox.width, labelBox.height);
             assertBoxInside(labelBox, boundingBox, 0, "long tick " + label.textContent + "is inside the bounding box");
         });
         svg.remove();
