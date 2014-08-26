@@ -46,7 +46,7 @@ export module Abstract {
 
       this.formatter(formatter);
 
-      this._scale.broadcaster.registerListener(this, () => this._render());
+      this._scale.broadcaster.registerListener(this, () => this._rescale());
     }
 
     public remove() {
@@ -106,6 +106,11 @@ export module Abstract {
 
     public _isFixedWidth() {
       return !this._isHorizontal();
+    }
+
+    public _rescale() {
+      // default implementation; subclasses may call _invalidateLayout() here
+      this._render();
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
