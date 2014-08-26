@@ -610,6 +610,14 @@ describe("NumericAxis", function () {
             }
             console.log(label.textContent, boundingBox.width, boundingBox.height, labelBox.width, labelBox.height);
         });
+        var letters = "abcdefghilmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".split("");
+        letters.forEach(function (l) {
+            var t = svg.append("text");
+            t.text(l);
+            var bcr = t.node().getBoundingClientRect();
+            console.log(l, bcr.width, bcr.height);
+            t.remove();
+        });
         svg.remove();
     });
     it("allocates enough height to show all tick labels when horizontal", function () {

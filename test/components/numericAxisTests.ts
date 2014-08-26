@@ -280,6 +280,14 @@ describe("NumericAxis", () => {
       // assertBoxInside(labelBox, boundingBox, 0, "long tick " + label.textContent + "is inside the bounding box");
     });
 
+    var letters = "abcdefghilmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".split("");
+    letters.forEach((l) => {
+      var t = svg.append("text");
+      t.text(l);
+      var bcr = t.node().getBoundingClientRect();
+      console.log(l, bcr.width, bcr.height);
+      t.remove();
+    });
 
     svg.remove();
   });
