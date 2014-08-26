@@ -399,6 +399,14 @@ describe("NumericAxis", function () {
         }
         return true;
     }
+    function assertBoxInside(inner, outer, epsilon, message) {
+        if (epsilon === void 0) { epsilon = 0; }
+        if (message === void 0) { message = ""; }
+        assert.operator(inner.left, ">", outer.left - epsilon, message + " (box inside (left))");
+        assert.operator(inner.right, "<", outer.right + epsilon, message + " (box inside (right))");
+        assert.operator(inner.top, ">", outer.top - epsilon, message + " (box inside (top))");
+        assert.operator(inner.bottom, "<", outer.bottom + epsilon, message + " (box inside (bottom))");
+    }
     it("tickLabelPosition() input validation", function () {
         var scale = new Plottable.Scale.Linear();
         var horizontalAxis = new Plottable.Axis.Numeric(scale, "bottom");
@@ -563,7 +571,7 @@ describe("NumericAxis", function () {
         svg.remove();
     });
     it("allocates enough width to show all tick labels when vertical", function () {
-        var SVG_WIDTH = 100;
+        var SVG_WIDTH = 150;
         var SVG_HEIGHT = 500;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scale.Linear();
@@ -571,7 +579,7 @@ describe("NumericAxis", function () {
         scale.range([0, SVG_HEIGHT]);
         var formatter = function (d) {
             if (d === 0) {
-                return "This is zero";
+                return "ZERO";
             }
             return String(d);
         };
@@ -580,13 +588,21 @@ describe("NumericAxis", function () {
         var visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
-        var numLabels = visibleTickLabels[0].length;
         var boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
         var labelBox;
-        for (var i = 0; i < numLabels; i++) {
-            labelBox = visibleTickLabels[0][i].getBoundingClientRect();
+        visibleTickLabels[0].forEach(function (label) {
+            labelBox = label.getBoundingClientRect();
             assert.isTrue(boxIsInside(labelBox, boundingBox), "tick labels don't extend outside the bounding box");
-        }
+        });
+        scale.domain([50000000000, -50000000000]);
+        visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+            return d3.select(this).style("visibility") === "visible";
+        });
+        boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
+        visibleTickLabels[0].forEach(function (label) {
+            labelBox = label.getBoundingClientRect();
+            assertBoxInside(labelBox, boundingBox, 0, "long tick " + label.textContent + " is inside the bounding box");
+        });
         svg.remove();
     });
     it("allocates enough height to show all tick labels when horizontal", function () {
@@ -602,13 +618,12 @@ describe("NumericAxis", function () {
         var visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
-        var numLabels = visibleTickLabels[0].length;
         var boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
         var labelBox;
-        for (var i = 0; i < numLabels; i++) {
-            labelBox = visibleTickLabels[0][i].getBoundingClientRect();
+        visibleTickLabels[0].forEach(function (label) {
+            labelBox = label.getBoundingClientRect();
             assert.isTrue(boxIsInside(labelBox, boundingBox, 0.5), "tick labels don't extend outside the bounding box");
-        }
+        });
         svg.remove();
     });
 });
@@ -1657,6 +1672,13 @@ describe("Plots", function () {
             renderArea = areaPlot.renderArea;
             var areaPath = renderArea.select(".area");
             assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
+            verifier.end();
+        });
+        it("area is appended before line", function () {
+            var paths = renderArea.selectAll("path")[0];
+            var areaSelection = renderArea.select(".area")[0][0];
+            var lineSelection = renderArea.select(".line")[0][0];
+            assert.operator(paths.indexOf(areaSelection), "<", paths.indexOf(lineSelection), "area appended before line");
             verifier.end();
         });
         after(function () {
@@ -3799,7 +3821,7 @@ describe("Scales", function () {
             assert.deepEqual(b.slice().reverse(), b.slice().sort(function (x, y) { return x - y; }));
             var ticks = scale.ticks();
             assert.deepEqual(ticks, ticks.slice().sort(function (x, y) { return x - y; }), "ticks should be sorted");
-            assert.deepEqual(ticks, Plottable.Util.Methods.uniqNumbers(ticks), "ticks should not be repeated");
+            assert.deepEqual(ticks, Plottable.Util.Methods.uniq(ticks), "ticks should not be repeated");
             var beforePivot = ticks.filter(function (x) { return x <= -base; });
             var afterPivot = ticks.filter(function (x) { return base <= x; });
             var betweenPivots = ticks.filter(function (x) { return -base < x && x < base; });
@@ -4500,7 +4522,7 @@ describe("Util.Text", function () {
 });
 
 var assert = chai.assert;
-describe("Util.s", function () {
+describe("Util.Methods", function () {
     it("inRange works correct", function () {
         assert.isTrue(Plottable.Util.Methods.inRange(0, -1, 1), "basic functionality works");
         assert.isTrue(Plottable.Util.Methods.inRange(0, 0, 1), "it is a closed interval");
@@ -4530,6 +4552,26 @@ describe("Util.s", function () {
     it("uniq works as expected", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
         assert.deepEqual(Plottable.Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
+    });
+    it("max/min work as expected", function () {
+        var alist = [1, 2, 3, 4, 5];
+        var dbl = function (x) { return x * 2; };
+        var max = Plottable.Util.Methods.max;
+        var min = Plottable.Util.Methods.min;
+        assert.deepEqual(max(alist), 5, "max works as expected on plain array");
+        assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
+        assert.deepEqual(max(alist, dbl), 10, "max applies function appropriately");
+        assert.deepEqual(max([]), 0, "default value zero by default");
+        assert.deepEqual(max([], 10), 10, "works as intended with default value");
+        assert.deepEqual(max([], dbl), 0, "default value zero as expected when fn provided");
+        assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
+        assert.deepEqual(min(alist, 0), 1, "min works for basic list");
+        assert.deepEqual(min(alist, dbl, 0), 2, "min works with function arg");
+        assert.deepEqual(min([]), 0, "min defaults to 0");
+        assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
+        var strings = ["a", "bb", "ccc", "ddd"];
+        assert.deepEqual(max(strings, function (s) { return s.length; }), 3, "works on arrays of non-numbers with a function");
+        assert.deepEqual(max([], function (s) { return s.length; }, 5), 5, "defaults work even with non-number function type");
     });
     it("objEq works as expected", function () {
         assert.isTrue(Plottable.Util.Methods.objEq({}, {}));

@@ -1,5 +1,5 @@
 /*!
-Plottable 0.26.0 (https://github.com/palantir/plottable)
+Plottable 0.26.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -59,9 +59,11 @@ var Plottable;
             /**
             * Takes two sets and returns the intersection
             *
-            * @param {D3.Set} set1 The first set
-            * @param {D3.Set} set2 The second set
-            * @return {D3.Set} A set that contains elements that appear in both set1 and set2
+            * Due to the fact that D3.Sets store strings internally, return type is always a string set
+            *
+            * @param {D3.Set<T>} set1 The first set
+            * @param {D3.Set<T>} set2 The second set
+            * @return {D3.Set<string>} A set that contains elements that appear in both set1 and set2
             */
             function intersection(set1, set2) {
                 var set = d3.set();
@@ -97,9 +99,11 @@ var Plottable;
             /**
             * Takes two sets and returns the union
             *
-            * @param{D3.Set} set1 The first set
-            * @param{D3.Set} set2 The second set
-            * @return{D3.Set} A set that contains elements that appear in either set1 or set2
+            * Due to the fact that D3.Sets store strings internally, return type is always a string set
+            *
+            * @param {D3.Set<T>} set1 The first set
+            * @param {D3.Set<T>} set2 The second set
+            * @return {D3.Set<string>} A set that contains elements that appear in either set1 or set2
             */
             function union(set1, set2) {
                 var set = d3.set();
@@ -117,8 +121,8 @@ var Plottable;
             * Populates a map from an array of keys and a transformation function.
             *
             * @param {string[]} keys The array of keys.
-            * @param {(string) => any} transform A transformation function to apply to the keys.
-            * @return {D3.Map} A map mapping keys to their transformed values.
+            * @param {(string) => T} transform A transformation function to apply to the keys.
+            * @return {D3.Map<T>} A map mapping keys to their transformed values.
             */
             function populateMap(keys, transform) {
                 var map = d3.map();
@@ -140,35 +144,28 @@ var Plottable;
             }
             Methods._applyAccessor = _applyAccessor;
 
-            function uniq(strings) {
-                var seen = {};
-                strings.forEach(function (s) {
-                    return seen[s] = true;
-                });
-                return d3.keys(seen);
-            }
-            Methods.uniq = uniq;
-
-            function uniqNumbers(a) {
+            /**
+            * Take an array of values, and return the unique values.
+            * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
+            *
+            * @param {T[]} values The values to find uniqueness for
+            * @return {T[]} The unique values
+            */
+            function uniq(arr) {
                 var seen = d3.set();
                 var result = [];
-                a.forEach(function (n) {
-                    if (!seen.has(n)) {
-                        seen.add(n);
-                        result.push(n);
+                arr.forEach(function (x) {
+                    if (!seen.has(x)) {
+                        seen.add(x);
+                        result.push(x);
                     }
                 });
                 return result;
             }
-            Methods.uniqNumbers = uniqNumbers;
+            Methods.uniq = uniq;
 
-            /**
-            * Creates an array of length `count`, filled with value or (if value is a function), value()
-            *
-            * @param {any} value The value to fill the array with, or, if a function, a generator for values
-            * @param {number} count The length of the array to generate
-            * @return {any[]}
-            */
+            
+
             function createFilledArray(value, count) {
                 var out = [];
                 for (var i = 0; i < count; i++) {
@@ -230,6 +227,42 @@ var Plottable;
                 return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
             }
             Methods.objEq = objEq;
+
+            function max(arr, one, two) {
+                if (typeof one === "undefined") { one = 0; }
+                if (typeof two === "undefined") { two = 0; }
+                if (arr.length === 0) {
+                    if (typeof (one) === "number") {
+                        return one;
+                    } else {
+                        return two;
+                    }
+                }
+
+                /* tslint:disable:ban */
+                var acc = typeof (one) === "function" ? one : typeof (two) === "function" ? two : undefined;
+                return acc === undefined ? d3.max(arr) : d3.max(arr, acc);
+                /* tslint:enable:ban */
+            }
+            Methods.max = max;
+
+            function min(arr, one, two) {
+                if (typeof one === "undefined") { one = 0; }
+                if (typeof two === "undefined") { two = 0; }
+                if (arr.length === 0) {
+                    if (typeof (one) === "number") {
+                        return one;
+                    } else {
+                        return two;
+                    }
+                }
+
+                /* tslint:disable:ban */
+                var acc = typeof (one) === "function" ? one : typeof (two) === "function" ? two : undefined;
+                return acc === undefined ? d3.min(arr) : d3.min(arr, acc);
+                /* tslint:enable:ban */
+            }
+            Methods.min = min;
         })(Util.Methods || (Util.Methods = {}));
         var Methods = Util.Methods;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -548,7 +581,7 @@ var Plottable;
                         width: d3.sum(whs, function (wh) {
                             return wh.width;
                         }),
-                        height: d3.max(whs, function (wh) {
+                        height: Util.Methods.max(whs, function (wh) {
                             return wh.height;
                         })
                     };
@@ -580,7 +613,7 @@ var Plottable;
                             width: d3.sum(whs, function (x) {
                                 return x.width;
                             }),
-                            height: d3.max(whs, function (x) {
+                            height: Util.Methods.max(whs, function (x) {
                                 return x.height;
                             })
                         };
@@ -779,8 +812,8 @@ var Plottable;
 
                 var usedWidth, usedHeight;
                 if (write == null) {
-                    var widthFn = orientHorizontally ? d3.max : d3.sum;
-                    var heightFn = orientHorizontally ? d3.sum : d3.max;
+                    var widthFn = orientHorizontally ? Util.Methods.max : d3.sum;
+                    var heightFn = orientHorizontally ? d3.sum : Util.Methods.max;
                     usedWidth = widthFn(wrappedText.lines, function (line) {
                         return tm(line).width;
                     });
@@ -868,7 +901,7 @@ var Plottable;
             function canWrapWithoutBreakingWords(text, width, widthMeasure) {
                 var tokens = tokenize(text);
                 var widths = tokens.map(widthMeasure);
-                var maxWidth = d3.max(widths);
+                var maxWidth = Util.Methods.max(widths);
                 return maxWidth <= width;
             }
             WordWrap.canWrapWithoutBreakingWords = canWrapWithoutBreakingWords;
@@ -1380,7 +1413,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.26.0";
+    Plottable.version = "0.26.1";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2217,20 +2250,19 @@ var Plottable;
                 var requests = this._components.map(function (c) {
                     return c._requestedSpace(offeredWidth, offeredHeight);
                 });
-                var isEmpty = this.empty();
                 return {
-                    width: isEmpty ? 0 : d3.max(requests, function (request) {
+                    width: Plottable.Util.Methods.max(requests, function (request) {
                         return request.width;
                     }),
-                    height: isEmpty ? 0 : d3.max(requests, function (request) {
+                    height: Plottable.Util.Methods.max(requests, function (request) {
                         return request.height;
                     }),
-                    wantsWidth: isEmpty ? false : requests.map(function (r) {
+                    wantsWidth: requests.map(function (r) {
                         return r.wantsWidth;
                     }).some(function (x) {
                         return x;
                     }),
-                    wantsHeight: isEmpty ? false : requests.map(function (r) {
+                    wantsHeight: requests.map(function (r) {
                         return r.wantsHeight;
                     }).some(function (x) {
                         return x;
@@ -3095,10 +3127,10 @@ var Plottable;
             */
             function NewStylePlot(xScale, yScale) {
                 // make a dummy dataSource to satisfy the base Plot (HACKHACK)
-                _super.call(this, new Plottable.DataSource(), xScale, yScale);
-                this.nextSeriesIndex = 0;
-                this._key2DatasetDrawerKey = {};
+                this._key2DatasetDrawerKey = d3.map();
                 this._datasetKeysInOrder = [];
+                this.nextSeriesIndex = 0;
+                _super.call(this, new Plottable.DataSource(), xScale, yScale);
             }
             NewStylePlot.prototype._setup = function () {
                 var _this = this;
@@ -3133,14 +3165,14 @@ var Plottable;
 
             NewStylePlot.prototype._addDataset = function (key, dataset) {
                 var _this = this;
-                if (this._key2DatasetDrawerKey[key] != null) {
+                if (this._key2DatasetDrawerKey.has(key)) {
                     this.removeDataset(key);
                 }
                 ;
                 var drawer = this._getDrawer(key);
                 var ddk = { drawer: drawer, dataset: dataset, key: key };
                 this._datasetKeysInOrder.push(key);
-                this._key2DatasetDrawerKey[key] = ddk;
+                this._key2DatasetDrawerKey.set(key, ddk);
 
                 if (this._isSetup) {
                     drawer.renderArea = this.renderArea.append("g");
@@ -3159,9 +3191,9 @@ var Plottable;
                 var _this = this;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
-                    d3.values(this._key2DatasetDrawerKey).forEach(function (ddk) {
+                    this._key2DatasetDrawerKey.forEach(function (key, ddk) {
                         var extent = ddk.dataset._getExtent(projector.accessor);
-                        var scaleKey = _this._plottableID.toString() + "_" + ddk.key;
+                        var scaleKey = _this._plottableID.toString() + "_" + key;
                         if (extent.length === 0 || !_this._isAnchored) {
                             projector.scale.removeExtent(scaleKey, attr);
                         } else {
@@ -3196,8 +3228,8 @@ var Plottable;
             * @return {NewStylePlot} The calling NewStylePlot.
             */
             NewStylePlot.prototype.removeDataset = function (key) {
-                if (this._key2DatasetDrawerKey[key] != null) {
-                    var ddk = this._key2DatasetDrawerKey[key];
+                if (this._key2DatasetDrawerKey.has(key)) {
+                    var ddk = this._key2DatasetDrawerKey.get(key);
                     ddk.drawer.remove();
 
                     var projectors = d3.values(this._projectors);
@@ -3210,7 +3242,7 @@ var Plottable;
 
                     ddk.dataset.broadcaster.deregisterListener(this);
                     this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-                    delete this._key2DatasetDrawerKey[key];
+                    this._key2DatasetDrawerKey.remove(key);
                     this._onDataSourceUpdate();
                 }
                 return this;
@@ -3219,14 +3251,14 @@ var Plottable;
             NewStylePlot.prototype._getDatasetsInOrder = function () {
                 var _this = this;
                 return this._datasetKeysInOrder.map(function (k) {
-                    return _this._key2DatasetDrawerKey[k].dataset;
+                    return _this._key2DatasetDrawerKey.get(k).dataset;
                 });
             };
 
             NewStylePlot.prototype._getDrawersInOrder = function () {
                 var _this = this;
                 return this._datasetKeysInOrder.map(function (k) {
-                    return _this._key2DatasetDrawerKey[k].drawer;
+                    return _this._key2DatasetDrawerKey.get(k).drawer;
                 });
             };
             return NewStylePlot;
@@ -3520,9 +3552,9 @@ var Plottable;
             } else if (extents.length === 0) {
                 domain = scale._defaultExtent();
             } else {
-                domain = [d3.min(extents, function (e) {
+                domain = [Plottable.Util.Methods.min(extents, function (e) {
                         return e[0];
-                    }), d3.max(extents, function (e) {
+                    }), Plottable.Util.Methods.max(extents, function (e) {
                         return e[1];
                     })];
             }
@@ -3641,15 +3673,11 @@ var Plottable;
         };
 
         Domainer.defaultCombineExtents = function (extents) {
-            if (extents.length === 0) {
-                return [0, 1];
-            } else {
-                return [d3.min(extents, function (e) {
-                        return e[0];
-                    }), d3.max(extents, function (e) {
-                        return e[1];
-                    })];
-            }
+            return [Plottable.Util.Methods.min(extents, function (e) {
+                    return e[0];
+                }, 0), Plottable.Util.Methods.max(extents, function (e) {
+                    return e[1];
+                }, 1)];
         };
 
         Domainer.prototype.padDomain = function (scale, domain) {
@@ -4035,8 +4063,8 @@ var Plottable;
                         return a - b;
                     })[1];
                 };
-                var min = d3.min(this.untransformedDomain);
-                var max = d3.max(this.untransformedDomain);
+                var min = Plottable.Util.Methods.min(this.untransformedDomain);
+                var max = Plottable.Util.Methods.max(this.untransformedDomain);
                 var negativeLower = min;
                 var negativeUpper = middle(min, max, -this.pivot);
                 var positiveLower = middle(min, max, this.pivot);
@@ -4083,7 +4111,7 @@ var Plottable;
                 var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
                 var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
                 var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
-                var uniqMultiples = Plottable.Util.Methods.uniqNumbers(multiples);
+                var uniqMultiples = Plottable.Util.Methods.uniq(multiples);
                 var clusters = bases.map(function (b) {
                     return uniqMultiples.map(function (x) {
                         return Math.pow(_this.base, b - 1) * x;
@@ -4107,8 +4135,8 @@ var Plottable;
             * distance when plotted.
             */
             ModifiedLog.prototype.howManyTicks = function (lower, upper) {
-                var adjustedMin = this.adjustedLog(d3.min(this.untransformedDomain));
-                var adjustedMax = this.adjustedLog(d3.max(this.untransformedDomain));
+                var adjustedMin = this.adjustedLog(Plottable.Util.Methods.min(this.untransformedDomain));
+                var adjustedMax = this.adjustedLog(Plottable.Util.Methods.max(this.untransformedDomain));
                 var adjustedLower = this.adjustedLog(lower);
                 var adjustedUpper = this.adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
@@ -4520,9 +4548,9 @@ var Plottable;
                 // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
                 var extents = this._getAllExtents();
                 if (extents.length > 0) {
-                    this._setDomain([d3.min(extents, function (x) {
+                    this._setDomain([Plottable.Util.Methods.min(extents, function (x) {
                             return x[0];
-                        }), d3.max(extents, function (x) {
+                        }), Plottable.Util.Methods.max(extents, function (x) {
                             return x[1];
                         })]);
                 }
@@ -4732,7 +4760,7 @@ var Plottable;
                 this.formatter(formatter);
 
                 this._scale.broadcaster.registerListener(this, function () {
-                    return _this._render();
+                    return _this._rescale();
                 });
             }
             Axis.prototype.remove = function () {
@@ -4792,6 +4820,11 @@ var Plottable;
 
             Axis.prototype._isFixedWidth = function () {
                 return !this._isHorizontal();
+            };
+
+            Axis.prototype._rescale = function () {
+                // default implementation; subclasses may call _invalidateLayout() here
+                this._render();
             };
 
             Axis.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
@@ -5413,7 +5446,7 @@ var Plottable;
                     return _this.measurer(formattedValue).width;
                 });
 
-                var maxTextLength = d3.max(textLengths);
+                var maxTextLength = Plottable.Util.Methods.max(textLengths);
 
                 if (this.tickLabelPositioning === "center") {
                     this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
@@ -5438,6 +5471,22 @@ var Plottable;
 
             Numeric.prototype._getTickValues = function () {
                 return this._scale.ticks();
+            };
+
+            Numeric.prototype._rescale = function () {
+                if (!this._isSetup) {
+                    return;
+                }
+
+                if (!this._isHorizontal()) {
+                    var reComputedWidth = this._computeWidth();
+                    if (reComputedWidth > this.availableWidth || reComputedWidth < (this.availableWidth - this.gutter())) {
+                        this._invalidateLayout();
+                        return;
+                    }
+                }
+
+                this._render();
             };
 
             Numeric.prototype._doRender = function () {
@@ -5611,19 +5660,19 @@ var Plottable;
             function Category(scale, orientation, formatter) {
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
                 if (typeof formatter === "undefined") { formatter = Plottable.Formatters.identity(); }
-                var _this = this;
                 _super.call(this, scale, orientation, formatter);
                 this.classed("category-axis", true);
                 if (scale.rangeType() !== "bands") {
                     throw new Error("Only rangeBands category axes are implemented");
                 }
-                this._scale.broadcaster.registerListener(this, function () {
-                    return _this._invalidateLayout();
-                });
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
+            };
+
+            Category.prototype._rescale = function () {
+                return this._invalidateLayout();
             };
 
             Category.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
@@ -5690,8 +5739,8 @@ var Plottable;
                     textWriteResults.push(textWriteResult);
                 });
 
-                var widthFn = this._isHorizontal() ? d3.sum : d3.max;
-                var heightFn = this._isHorizontal() ? d3.max : d3.sum;
+                var widthFn = this._isHorizontal() ? d3.sum : Plottable.Util.Methods.max;
+                var heightFn = this._isHorizontal() ? Plottable.Util.Methods.max : d3.sum;
                 return {
                     textFits: textWriteResults.every(function (t) {
                         return t.textFits;
@@ -5979,7 +6028,7 @@ var Plottable;
                 var rowsICanFit = Math.min(totalNumRows, Math.floor((offeredHeight - 2 * Legend.MARGIN) / textHeight));
                 var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 var measure = Plottable.Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
-                var maxWidth = d3.max(this.colorScale.domain(), function (d) {
+                var maxWidth = Plottable.Util.Methods.max(this.colorScale.domain(), function (d) {
                     return measure(d).width;
                 });
                 fakeLegendEl.remove();
@@ -6199,7 +6248,7 @@ var Plottable;
                         return estimatedLayout.entryLengths.get(entry);
                     });
                 });
-                var longestRowLength = d3.max(rowLengths);
+                var longestRowLength = Plottable.Util.Methods.max(rowLengths);
                 longestRowLength = longestRowLength === undefined ? 0 : longestRowLength; // HACKHACK: #843
                 var desiredWidth = this.padding + longestRowLength;
 
@@ -6940,6 +6989,10 @@ var Plottable;
             }
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
+                this._appendPath();
+            };
+
+            Line.prototype._appendPath = function () {
                 this.linePath = this.renderArea.append("path").classed("line", true);
             };
 
@@ -7051,9 +7104,9 @@ var Plottable;
                 this._animators["area-reset"] = new Plottable.Animator.Null();
                 this._animators["area"] = new Plottable.Animator.Default().duration(600).easing("exp-in-out");
             }
-            Area.prototype._setup = function () {
-                _super.prototype._setup.call(this);
+            Area.prototype._appendPath = function () {
                 this.areaPath = this.renderArea.append("path").classed("area", true);
+                _super.prototype._appendPath.call(this);
             };
 
             Area.prototype._onDataSourceUpdate = function () {
@@ -7260,18 +7313,16 @@ var Plottable;
                 var lengths = this._getDatasetsInOrder().map(function (d) {
                     return d.data().length;
                 });
-                if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
+                if (Plottable.Util.Methods.uniq(lengths).length > 1) {
                     Plottable.Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
                 }
                 var clusters = {};
                 this._datasetKeysInOrder.forEach(function (key) {
-                    var data = _this._key2DatasetDrawerKey[key].dataset.data();
-                    var vals = data.map(function (d) {
-                        return accessor(d);
-                    });
+                    var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
 
                     clusters[key] = data.map(function (d, i) {
-                        d["_PLOTTABLE_PROTECTED_FIELD_X"] = _this.xScale.scale(vals[i]) + _this.innerScale.scale(key);
+                        var val = accessor(d, i);
+                        d["_PLOTTABLE_PROTECTED_FIELD_X"] = _this.xScale.scale(val) + _this.innerScale.scale(key);
                         return d;
                     });
                 });
@@ -7354,7 +7405,7 @@ var Plottable;
                 var lengths = datasets.map(function (d) {
                     return d.dataset.data().length;
                 });
-                if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
+                if (Plottable.Util.Methods.uniq(lengths).length > 1) {
                     Plottable.Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
                 }
                 var currentBase = Plottable.Util.Methods.createFilledArray(0, lengths[0]);
@@ -7375,7 +7426,7 @@ var Plottable;
                         return d;
                     });
                 });
-                this.stackedExtent = [0, d3.max(currentBase)];
+                this.stackedExtent = [0, Plottable.Util.Methods.max(currentBase)];
                 this._onDataSourceUpdate();
                 return stacks;
             };

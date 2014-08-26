@@ -27,37 +27,48 @@ declare module Plottable {
             /**
             * Takes two sets and returns the intersection
             *
-            * @param {D3.Set} set1 The first set
-            * @param {D3.Set} set2 The second set
-            * @return {D3.Set} A set that contains elements that appear in both set1 and set2
+            * Due to the fact that D3.Sets store strings internally, return type is always a string set
+            *
+            * @param {D3.Set<T>} set1 The first set
+            * @param {D3.Set<T>} set2 The second set
+            * @return {D3.Set<string>} A set that contains elements that appear in both set1 and set2
             */
-            function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
+            function intersection<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
             /**
             * Takes two sets and returns the union
             *
-            * @param{D3.Set} set1 The first set
-            * @param{D3.Set} set2 The second set
-            * @return{D3.Set} A set that contains elements that appear in either set1 or set2
+            * Due to the fact that D3.Sets store strings internally, return type is always a string set
+            *
+            * @param {D3.Set<T>} set1 The first set
+            * @param {D3.Set<T>} set2 The second set
+            * @return {D3.Set<string>} A set that contains elements that appear in either set1 or set2
             */
-            function union(set1: D3.Set, set2: D3.Set): D3.Set;
+            function union<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
             /**
             * Populates a map from an array of keys and a transformation function.
             *
             * @param {string[]} keys The array of keys.
-            * @param {(string) => any} transform A transformation function to apply to the keys.
-            * @return {D3.Map} A map mapping keys to their transformed values.
+            * @param {(string) => T} transform A transformation function to apply to the keys.
+            * @return {D3.Map<T>} A map mapping keys to their transformed values.
             */
-            function populateMap(keys: string[], transform: (key: string) => any): D3.Map;
-            function uniq(strings: string[]): string[];
-            function uniqNumbers(a: number[]): number[];
+            function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T>;
+            /**
+            * Take an array of values, and return the unique values.
+            * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
+            *
+            * @param {T[]} values The values to find uniqueness for
+            * @return {T[]} The unique values
+            */
+            function uniq<T>(arr: T[]): T[];
             /**
             * Creates an array of length `count`, filled with value or (if value is a function), value()
             *
-            * @param {any} value The value to fill the array with, or, if a function, a generator for values
+            * @param {any} value The value to fill the array with, or, if a function, a generator for values (called with index as arg)
             * @param {number} count The length of the array to generate
             * @return {any[]}
             */
-            function createFilledArray(value: any, count: number): any[];
+            function createFilledArray<T>(value: T, count: number): T[];
+            function createFilledArray<T>(func: (index?: number) => T, count: number): T[];
             /**
             * @param {T[][]} a The 2D array that will have its elements joined together.
             * @return {T[]} Every array in a, concatenated together in the order they appear.
@@ -76,6 +87,10 @@ declare module Plottable {
             *          with ===.
             */
             function objEq(a: any, b: any): boolean;
+            function max(arr: number[], default_val?: number): number;
+            function max<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
+            function min(arr: number[], default_val?: number): number;
+            function min<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
         }
     }
 }

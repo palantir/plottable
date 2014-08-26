@@ -23,12 +23,15 @@ export module Axis {
       if (scale.rangeType() !== "bands") {
         throw new Error("Only rangeBands category axes are implemented");
       }
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
     }
 
     public _setup() {
       super._setup();
       this.measurer = new Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
+    }
+
+    public _rescale() {
+      return this._invalidateLayout();
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
@@ -101,8 +104,8 @@ export module Axis {
         textWriteResults.push(textWriteResult);
       });
 
-      var widthFn  = this._isHorizontal() ? d3.sum : d3.max;
-      var heightFn = this._isHorizontal() ? d3.max : d3.sum;
+      var widthFn  = this._isHorizontal() ? d3.sum : Util.Methods.max;
+      var heightFn = this._isHorizontal() ? Util.Methods.max : d3.sum;
       return {
         textFits: textWriteResults.every((t: Util.Text.IWriteTextResult) => t.textFits),
         usedWidth : widthFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedWidth),
