@@ -48,7 +48,7 @@ export module Abstract {
     /**
      * Returns the range value corresponding to a given domain value.
      *
-     * @param value {D} A domain value to be scaled.
+     * @param {D} value A domain value to be scaled.
      * @returns {D} The range value corresponding to the supplied domain value.
      */
     public scale(value: D): R {
