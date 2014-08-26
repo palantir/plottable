@@ -231,7 +231,7 @@ describe("NumericAxis", () => {
 
     var formatter = (d: any) => {
       if (d === 0) {
-        return "This is zero";
+        return "ZERO";
       }
       return String(d);
     };
@@ -244,13 +244,26 @@ describe("NumericAxis", () => {
                           .filter(function(d: any, i: number) {
                             return d3.select(this).style("visibility") === "visible";
                           });
-    var numLabels = visibleTickLabels[0].length;
     var boundingBox: ClientRect = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
     var labelBox: ClientRect;
-    for (var i = 0; i < numLabels; i++) {
-      labelBox = visibleTickLabels[0][i].getBoundingClientRect();
+    visibleTickLabels[0].forEach((label: Element) => {
+      labelBox = label.getBoundingClientRect();
       assert.isTrue(boxIsInside(labelBox, boundingBox), "tick labels don't extend outside the bounding box");
-    }
+    });
+
+    scale.domain([50000000000, -50000000000]);
+    visibleTickLabels = numericAxis.element
+                          .selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS)
+                          .filter(function(d: any, i: number) {
+                            return d3.select(this).style("visibility") === "visible";
+                          });
+    boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
+    visibleTickLabels[0].forEach((label: Element) => {
+      labelBox = label.getBoundingClientRect();
+      assert.isTrue(boxIsInside(labelBox, boundingBox), "lengthened tick labels don't extend outside the bounding box");
+    });
+
+
     svg.remove();
   });
 
@@ -272,13 +285,13 @@ describe("NumericAxis", () => {
                           .filter(function(d: any, i: number) {
                             return d3.select(this).style("visibility") === "visible";
                           });
-    var numLabels = visibleTickLabels[0].length;
     var boundingBox: ClientRect = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
     var labelBox: ClientRect;
-    for (var i = 0; i < numLabels; i++) {
-      labelBox = visibleTickLabels[0][i].getBoundingClientRect();
+    visibleTickLabels[0].forEach((label: Element) => {
+      labelBox = label.getBoundingClientRect();
       assert.isTrue(boxIsInside(labelBox, boundingBox, 0.5), "tick labels don't extend outside the bounding box");
-    }
+    });
+
     svg.remove();
   });
 });

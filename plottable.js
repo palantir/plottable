@@ -3231,7 +3231,7 @@ var Plottable;
                     this.classed("y-axis", true);
                 }
                 this.formatter(formatter);
-                this._scale.broadcaster.registerListener(this, function () { return _this._render(); });
+                this._scale.broadcaster.registerListener(this, function () { return _this._rescale(); });
             }
             Axis.prototype.remove = function () {
                 _super.prototype.remove.call(this);
@@ -3281,6 +3281,9 @@ var Plottable;
             };
             Axis.prototype._isFixedWidth = function () {
                 return !this._isHorizontal();
+            };
+            Axis.prototype._rescale = function () {
+                this._render();
             };
             Axis.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
@@ -3830,6 +3833,17 @@ var Plottable;
             Numeric.prototype._getTickValues = function () {
                 return this._scale.ticks();
             };
+            Numeric.prototype._rescale = function () {
+                if (!this._isSetup) {
+                    return;
+                }
+                var reComputedWidth = this._computeWidth();
+                if (reComputedWidth > this.availableWidth || reComputedWidth < (this.availableWidth - this.gutter())) {
+                    this._invalidateLayout();
+                    return;
+                }
+                this._render();
+            };
             Numeric.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
                 var tickLabelAttrHash = {
@@ -3982,16 +3996,17 @@ var Plottable;
                 if (orientation === void 0) { orientation = "bottom"; }
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
-                var _this = this;
                 this.classed("category-axis", true);
                 if (scale.rangeType() !== "bands") {
                     throw new Error("Only rangeBands category axes are implemented");
                 }
-                this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
+            };
+            Category.prototype._rescale = function () {
+                return this._invalidateLayout();
             };
             Category.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();

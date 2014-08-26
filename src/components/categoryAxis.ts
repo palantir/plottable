@@ -23,12 +23,15 @@ export module Axis {
       if (scale.rangeType() !== "bands") {
         throw new Error("Only rangeBands category axes are implemented");
       }
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
     }
 
     public _setup() {
       super._setup();
       this.measurer = new Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
+    }
+
+    public _rescale() {
+      return this._invalidateLayout();
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
