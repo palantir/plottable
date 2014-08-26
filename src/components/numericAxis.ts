@@ -62,6 +62,22 @@ export module Axis {
       return this._scale.ticks();
     }
 
+    public _rescale() {
+      if (!this._isSetup) {
+        return;
+      }
+
+      if (!this._isHorizontal()) {
+        var reComputedWidth = this._computeWidth();
+        if (reComputedWidth > this.availableWidth || reComputedWidth < (this.availableWidth - this.gutter())) {
+          this._invalidateLayout();
+          return;
+        }
+      }
+
+      this._render();
+    }
+
     public _doRender() {
       super._doRender();
 
