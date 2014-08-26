@@ -289,6 +289,8 @@ describe("NumericAxis", () => {
       t.remove();
     });
 
+    console.log("height:", window.innerHeight, "width:", window.innerWidth);
+
     svg.remove();
   });
 
