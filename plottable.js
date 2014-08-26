@@ -3837,10 +3837,12 @@ var Plottable;
                 if (!this._isSetup) {
                     return;
                 }
-                var reComputedWidth = this._computeWidth();
-                if (reComputedWidth > this.availableWidth || reComputedWidth < (this.availableWidth - this.gutter())) {
-                    this._invalidateLayout();
-                    return;
+                if (!this._isHorizontal()) {
+                    var reComputedWidth = this._computeWidth();
+                    if (reComputedWidth > this.availableWidth || reComputedWidth < (this.availableWidth - this.gutter())) {
+                        this._invalidateLayout();
+                        return;
+                    }
                 }
                 this._render();
             };
