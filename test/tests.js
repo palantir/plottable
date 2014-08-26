@@ -601,7 +601,7 @@ describe("NumericAxis", function () {
         boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
         visibleTickLabels[0].forEach(function (label) {
             labelBox = label.getBoundingClientRect();
-            assertBoxInside(labelBox, boundingBox, 0.5, "lengthened tick labels don't extend outside the bounding box");
+            assertBoxInside(labelBox, boundingBox, 0, "long tick " + label.textContent + "is inside the bounding box");
         });
         svg.remove();
     });

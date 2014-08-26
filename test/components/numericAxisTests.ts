@@ -268,7 +268,7 @@ describe("NumericAxis", () => {
     visibleTickLabels[0].forEach((label: Element) => {
       labelBox = label.getBoundingClientRect();
       // assert.isTrue(boxIsInside(labelBox, boundingBox, 0.5), "lengthened tick labels don't extend outside the bounding box");
-      assertBoxInside(labelBox, boundingBox, 0.5, "lengthened tick labels don't extend outside the bounding box");
+      assertBoxInside(labelBox, boundingBox, 0, "long tick " + label.textContent + "is inside the bounding box");
     });
 
 
