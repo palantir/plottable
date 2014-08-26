@@ -5134,6 +5134,7 @@ var Plottable;
             function Stacked() {
                 _super.apply(this, arguments);
                 this._stackedData = [];
+                this.stackedExtent = [0, 0];
             }
             Stacked.prototype._addDataset = function (key, dataset) {
                 _super.prototype._addDataset.call(this, key, dataset);
@@ -5142,6 +5143,20 @@ var Plottable;
             Stacked.prototype.stack = function (d) {
                 this._stackedData.push(d);
                 this._stackedData = d3.layout.stack().x(this._projectors["x"].accessor).y(this._projectors["y"].accessor).values(function (d) { return d.values; })(this._stackedData);
+                this.stackedExtent[0] = Math.min(this.stackedExtent[0], d.y);
+                this.stackedExtent[1] = Math.max(this.stackedExtent[1], d.y);
+            };
+            Stacked.prototype._updateAllProjectors = function () {
+                _super.prototype._updateAllProjectors.call(this);
+                if (this.yScale == null) {
+                    return;
+                }
+                if (this._isAnchored && this.stackedExtent.length > 0) {
+                    this.yScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+                }
+                else {
+                    this.yScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+                }
             };
             return Stacked;
         })(Abstract.NewStylePlot);
