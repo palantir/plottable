@@ -4,14 +4,13 @@ module Plottable {
 export module Plot {
   export class ClusteredBar extends Abstract.NewStyleBarPlot {
     public static DEFAULT_WIDTH = 10;
-    public _isVertical = true;
     private innerScale: Scale.Ordinal;
 
-    constructor(xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale) {
+    constructor(xScale: Abstract.Scale, yScale: Abstract.Scale, isVertical = true) {
       super(xScale, yScale);
       this.innerScale = new Scale.Ordinal();
+      this._isVertical = isVertical;
     }
-
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
@@ -19,7 +18,17 @@ export module Plot {
       var widthF = attrToProjector["width"];
       this.innerScale.range([0, widthF(null, 0)]);
       attrToProjector["width"] = (d: any, i: number) => this.innerScale.rangeBand();
-      attrToProjector["x"] = (d: any) => d._PLOTTABLE_PROTECTED_FIELD_X;
+      attrToProjector["x"] = (d: any) => d._PLOTTABLE_PROTECTED_FIELD_POSITION;
+
+      if(!this._isVertical) {
+        var widthFunction = attrToProjector["width"];
+        attrToProjector["width"] = attrToProjector["height"];
+        attrToProjector["height"] = widthFunction;
+
+        attrToProjector["y"] = attrToProjector["x"];
+        attrToProjector["x"] = () => 0;
+      }
+
       return attrToProjector;
     }
 
@@ -35,7 +44,8 @@ export module Plot {
 
         clusters[key] = data.map((d, i) => {
           var val = accessor(d, i);
-          d["_PLOTTABLE_PROTECTED_FIELD_X"] = this.xScale.scale(val) + this.innerScale.scale(key);
+          var primaryScale = this._isVertical ? this.xScale : this.yScale;
+          d["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + this.innerScale.scale(key);
           return d;
         });
       });
@@ -44,8 +54,8 @@ export module Plot {
 
     public _paint() {
       super._paint();
-      var accessor = this._projectors["x"].accessor;
       var attrHash = this._generateAttrToProjector();
+      var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var clusteredData = this.cluster(accessor);
       this._getDrawersInOrder().forEach((d) => d.draw(clusteredData[d.key], attrHash));
     }
