@@ -399,6 +399,14 @@ describe("NumericAxis", function () {
         }
         return true;
     }
+    function assertBoxInside(inner, outer, epsilon, message) {
+        if (epsilon === void 0) { epsilon = 0; }
+        if (message === void 0) { message = ""; }
+        assert.operator(inner.left, ">", outer.left - epsilon, message + " (box inside (left))");
+        assert.operator(inner.right, "<", outer.right + epsilon, message + " (box inside (right))");
+        assert.operator(inner.top, ">", outer.top - epsilon, message + " (box inside (top))");
+        assert.operator(inner.bottom, "<", outer.bottom + epsilon, message + " (box inside (bottom))");
+    }
     it("tickLabelPosition() input validation", function () {
         var scale = new Plottable.Scale.Linear();
         var horizontalAxis = new Plottable.Axis.Numeric(scale, "bottom");
@@ -593,7 +601,7 @@ describe("NumericAxis", function () {
         boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
         visibleTickLabels[0].forEach(function (label) {
             labelBox = label.getBoundingClientRect();
-            assert.isTrue(boxIsInside(labelBox, boundingBox), "lengthened tick labels don't extend outside the bounding box");
+            assertBoxInside(labelBox, boundingBox, 0.5, "lengthened tick labels don't extend outside the bounding box");
         });
         svg.remove();
     });
