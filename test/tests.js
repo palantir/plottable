@@ -571,7 +571,7 @@ describe("NumericAxis", function () {
         svg.remove();
     });
     it("allocates enough width to show all tick labels when vertical", function () {
-        var SVG_WIDTH = 100;
+        var SVG_WIDTH = 150;
         var SVG_HEIGHT = 500;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scale.Linear();
@@ -601,7 +601,7 @@ describe("NumericAxis", function () {
         boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
         visibleTickLabels[0].forEach(function (label) {
             labelBox = label.getBoundingClientRect();
-            assertBoxInside(labelBox, boundingBox, 0, "long tick " + label.textContent + "is inside the bounding box");
+            assertBoxInside(labelBox, boundingBox, 0, "long tick " + label.textContent + " is inside the bounding box");
         });
         svg.remove();
     });

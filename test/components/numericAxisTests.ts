@@ -229,7 +229,7 @@ describe("NumericAxis", () => {
   });
 
   it("allocates enough width to show all tick labels when vertical", () => {
-    var SVG_WIDTH = 100;
+    var SVG_WIDTH = 150;
     var SVG_HEIGHT = 500;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
@@ -267,8 +267,7 @@ describe("NumericAxis", () => {
     boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
     visibleTickLabels[0].forEach((label: Element) => {
       labelBox = label.getBoundingClientRect();
-      // assert.isTrue(boxIsInside(labelBox, boundingBox, 0.5), "lengthened tick labels don't extend outside the bounding box");
-      assertBoxInside(labelBox, boundingBox, 0, "long tick " + label.textContent + "is inside the bounding box");
+      assertBoxInside(labelBox, boundingBox, 0, "long tick " + label.textContent + " is inside the bounding box");
     });
 
 
