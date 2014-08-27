@@ -18,8 +18,11 @@ export module Abstract {
         .x(this._projectors["x"].accessor)
         .y(this._projectors["y"].accessor)
         .values((d) => d.values)(this._stackedData);
-      this.stackedExtent[0] = Math.min(this.stackedExtent[0], d.y);
-      this.stackedExtent[1] = Math.max(this.stackedExtent[1], d.y);
+
+      var maxY = d3.max(d.values, (datum: any) => datum.y + datum.y0);
+      if (maxY > 0) {
+        this.stackedExtent[1] = maxY;
+      }
     }
 
     public _updateAllProjectors() {

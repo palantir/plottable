@@ -5143,8 +5143,10 @@ var Plottable;
             Stacked.prototype.stack = function (d) {
                 this._stackedData.push(d);
                 this._stackedData = d3.layout.stack().x(this._projectors["x"].accessor).y(this._projectors["y"].accessor).values(function (d) { return d.values; })(this._stackedData);
-                this.stackedExtent[0] = Math.min(this.stackedExtent[0], d.y);
-                this.stackedExtent[1] = Math.max(this.stackedExtent[1], d.y);
+                var maxY = d3.max(d.values, function (datum) { return datum.y + datum.y0; });
+                if (maxY > 0) {
+                    this.stackedExtent[1] = maxY;
+                }
             };
             Stacked.prototype._updateAllProjectors = function () {
                 _super.prototype._updateAllProjectors.call(this);
