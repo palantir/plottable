@@ -27,7 +27,7 @@ function run(div, data, Plottable) {
   var cb = function(x, y){
     d = areaRenderer.dataSource().data();
     areaRenderer.dataSource().data(d);
-  }  ;
+  };
 
   new Plottable.Interaction.Click(areaRenderer)
     .callback(cb)

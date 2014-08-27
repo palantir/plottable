@@ -29,7 +29,7 @@ function run(div, data, Plottable) {
     hBarRenderer.dataSource().data(d);
   };
 
-  var xy = new Plottable.Interaction.Click(hBarRenderer)
+  var click = new Plottable.Interaction.Click(hBarRenderer)
     .callback(cb)
     .registerWithComponent();
 

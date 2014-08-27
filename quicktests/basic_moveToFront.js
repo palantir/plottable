@@ -64,7 +64,7 @@ function run(div, data, Plottable) {
     plot.detach();
     plotGroup.merge(plot);
     backPlot++;
-    if(backPlot === 3){ backPlot = 0;}
+    if(backPlot === 3){ backPlot = 0; }
   }
 
 
