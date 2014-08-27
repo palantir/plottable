@@ -867,6 +867,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Stacked extends NewStylePlot {
+            removeDataset(key: string): Stacked;
         }
     }
 }

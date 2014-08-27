@@ -5139,6 +5139,11 @@ var Plottable;
                 _super.prototype._addDataset.call(this, key, dataset);
                 this.stack();
             };
+            Stacked.prototype.removeDataset = function (key) {
+                _super.prototype.removeDataset.call(this, key);
+                this.stack();
+                return this;
+            };
             Stacked.prototype.stack = function () {
                 var datasets = this._getDatasetsInOrder();
                 d3.layout.stack().x(this._projectors["x"].accessor).y(this._projectors["y"].accessor).values(function (d) { return d.data(); })(datasets);

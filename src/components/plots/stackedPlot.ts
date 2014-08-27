@@ -11,6 +11,12 @@ export module Abstract {
       this.stack();
     }
 
+    public removeDataset(key: string) {
+      super.removeDataset(key);
+      this.stack();
+      return this;
+    }
+
     private stack() {
       var datasets = this._getDatasetsInOrder();
       d3.layout.stack()
