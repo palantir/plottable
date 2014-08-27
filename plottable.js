@@ -5282,8 +5282,8 @@ var Plottable;
     (function (Plot) {
         var StackedBar = (function (_super) {
             __extends(StackedBar, _super);
-            function StackedBar(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function StackedBar() {
+                _super.apply(this, arguments);
                 this.stackedData = [];
                 this._isVertical = true;
                 this._baselineValue = 0;
