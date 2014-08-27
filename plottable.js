@@ -5288,29 +5288,18 @@ var Plottable;
                 this.isReverse = isReverse;
             }
             Rect.prototype.animate = function (selection, attrToProjector, plot) {
-                var copyAttrToProjector = {};
-                var animatedAttributes = this.getAnimateAttributes();
-                for (var i = 0; i < animatedAttributes.length; i++) {
-                    var attribute = animatedAttributes[i];
-                    copyAttrToProjector[attribute] = attrToProjector[attribute];
+                var startAttrToProjector = {};
+                this.getAnimateAttributes().forEach(function (attr) { return startAttrToProjector[attr] = attrToProjector[attr]; });
+                var growingAttr = this.isVertical ? "height" : "width";
+                var growingAttrProjector = attrToProjector[growingAttr];
+                if (!this.isReverse) {
+                    var movingAttr = this.isVertical ? "y" : "x";
+                    var movingAttrProjector = startAttrToProjector[movingAttr];
+                    var offsetProjector = this.isVertical ? growingAttrProjector : function (d, i) { return 0 - growingAttrProjector(d, i); };
+                    startAttrToProjector[movingAttr] = function (d, i) { return movingAttrProjector(d, i) + offsetProjector(d, i); };
                 }
-                if (this.isVertical) {
-                    var height = attrToProjector["height"];
-                    if (!this.isReverse) {
-                        var yFunction = copyAttrToProjector["y"];
-                        copyAttrToProjector["y"] = function (d, i) { return yFunction(d, i) + height(d, i); };
-                    }
-                    copyAttrToProjector["height"] = function () { return 0; };
-                }
-                else {
-                    var width = attrToProjector["width"];
-                    if (!this.isReverse) {
-                        var xFunction = copyAttrToProjector["x"];
-                        copyAttrToProjector["x"] = function (d, i) { return xFunction(d, i) - width(d, i); };
-                    }
-                    copyAttrToProjector["width"] = function () { return 0; };
-                }
-                selection.attr(copyAttrToProjector);
+                startAttrToProjector[growingAttr] = d3.functor(0);
+                selection.attr(startAttrToProjector);
                 return _super.prototype.animate.call(this, selection, attrToProjector, plot);
             };
             Rect.prototype.getAnimateAttributes = function () {

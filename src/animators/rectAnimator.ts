@@ -19,30 +19,22 @@ export module Animator {
 
     public animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any {
 
-      var copyAttrToProjector: IAttributeToProjector = {};
-      var animatedAttributes = this.getAnimateAttributes();
+      var startAttrToProjector: IAttributeToProjector = {};
+      this.getAnimateAttributes().forEach((attr: string) => startAttrToProjector[attr] = attrToProjector[attr]);
 
-      for (var i = 0; i < animatedAttributes.length; i++) {
-        var attribute = animatedAttributes[i];
-        copyAttrToProjector[attribute] = attrToProjector[attribute];
+      var growingAttr = this.isVertical ? "height" : "width";
+      var growingAttrProjector = attrToProjector[growingAttr];
+
+      if (!this.isReverse) {
+        var movingAttr = this.isVertical ? "y" : "x";
+        var movingAttrProjector = startAttrToProjector[movingAttr];
+        var offsetProjector = this.isVertical ? growingAttrProjector : (d: any, i: number) => 0 - growingAttrProjector(d, i);
+        startAttrToProjector[movingAttr] = (d: any, i: number) => movingAttrProjector(d, i) + offsetProjector(d, i);
       }
 
-      if (this.isVertical) {
-        var height = attrToProjector["height"];
-        if (!this.isReverse) {
-          var yFunction = copyAttrToProjector["y"];
-          copyAttrToProjector["y"] = (d: any, i: number) => yFunction(d, i) + height(d, i);
-        }
-        copyAttrToProjector["height"] = () => 0;
-      } else {
-        var width = attrToProjector["width"];
-        if (!this.isReverse) {
-          var xFunction = copyAttrToProjector["x"];
-          copyAttrToProjector["x"] = (d: any, i: number) => xFunction(d, i) - width(d, i);
-        }
-        copyAttrToProjector["width"] = () => 0;
-      }
-      selection.attr(copyAttrToProjector);
+      startAttrToProjector[growingAttr] = d3.functor(0);
+
+      selection.attr(startAttrToProjector);
       return super.animate(selection, attrToProjector, plot);
     }
 
