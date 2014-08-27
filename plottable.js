@@ -5218,7 +5218,12 @@ var Plottable;
                 });
             };
             StackedArea.prototype._updateYDomainer = function () {
-                return Plot.Area.prototype._updateYDomainer.apply(this);
+                _super.prototype._updateYDomainer.call(this);
+                var scale = this.yScale;
+                if (!scale._userSetDomainer) {
+                    scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
+                    scale._autoDomainIfAutomaticMode();
+                }
             };
             StackedArea.prototype._onDataSourceUpdate = function () {
                 _super.prototype._onDataSourceUpdate.call(this);
