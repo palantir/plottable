@@ -1806,7 +1806,7 @@ var Plottable;
             __extends(Scale, _super);
             function Scale(scale) {
                 _super.call(this);
-                this.autoDomainAutomatically = true;
+                this._autoDomainAutomatically = true;
                 this.broadcaster = new Plottable.Core.Broadcaster(this);
                 this._rendererAttrID2Extent = {};
                 this._d3Scale = scale;
@@ -1818,12 +1818,12 @@ var Plottable;
                 return [];
             };
             Scale.prototype.autoDomain = function () {
-                this.autoDomainAutomatically = true;
+                this._autoDomainAutomatically = true;
                 this._setDomain(this._getExtent());
                 return this;
             };
             Scale.prototype._autoDomainIfAutomaticMode = function () {
-                if (this.autoDomainAutomatically) {
+                if (this._autoDomainAutomatically) {
                     this.autoDomain();
                 }
             };
@@ -1835,7 +1835,7 @@ var Plottable;
                     return this._getDomain();
                 }
                 else {
-                    this.autoDomainAutomatically = false;
+                    this._autoDomainAutomatically = false;
                     this._setDomain(values);
                     return this;
                 }
@@ -3111,7 +3111,7 @@ var Plottable;
                 ]
             };
             return InterpolatedColor;
-        })(Plottable.Abstract.QuantitativeScale);
+        })(Plottable.Abstract.Scale);
         Scale.InterpolatedColor = InterpolatedColor;
     })(Plottable.Scale || (Plottable.Scale = {}));
     var Scale = Plottable.Scale;

@@ -23,7 +23,7 @@ export module Plot {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.QuantitativeScale, yScale: Abstract.Scale) {
+    constructor(dataset: any, xScale: Abstract.QuantitativeScale<number>, yScale: Abstract.Scale<any, number>) {
       super(dataset, xScale, yScale);
     }
 

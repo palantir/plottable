@@ -27,7 +27,7 @@ describe("Scales", () => {
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
 
-    (<any> scale).autoDomainAutomatically = true;
+    (<any> scale)._autoDomainAutomatically = true;
     scale.updateExtent("1", "x", [0.08, 9.92]);
     callbackWasCalled = false;
     scale.domainer(new Plottable.Domainer().nice());
@@ -51,10 +51,10 @@ describe("Scales", () => {
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
       scale.updateExtent("1", "x", d3.extent(data, (e) => e.foo));
       scale.domainer(new Plottable.Domainer().pad().nice());
-      assert.isTrue((<any> scale).autoDomainAutomatically,
+      assert.isTrue((<any> scale)._autoDomainAutomatically,
                           "the autoDomain flag is still set after autoranginging and padding and nice-ing");
       scale.domain([0, 5]);
-      assert.isFalse((<any> scale).autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
+      assert.isFalse((<any> scale)._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
     });
 
     it("scale autorange works as expected with single dataSource", () => {
@@ -94,17 +94,17 @@ describe("Scales", () => {
     });
 
     it("scale perspectives can be removed appropriately", () => {
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled1");
+      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled1");
       scale.updateExtent("1", "x", d3.extent(data, (e) => e.foo));
       scale.updateExtent("2", "x", d3.extent(data, (e) => e.bar));
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled2");
+      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled2");
       assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled3");
+      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled3");
       scale.removeExtent("1", "x");
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled4");
+      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled4");
       assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
       scale.updateExtent("2", "x", d3.extent(data, (e) => e.foo));
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled5");
+      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled5");
       assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
     });
 
@@ -298,14 +298,6 @@ describe("Scales", () => {
       assert.equal("#000000", scale.scale(0));
       assert.equal("#ffffff", scale.scale(16));
       assert.equal("#e3e3e3", scale.scale(8));
-    });
-
-    it("doesn't use a domainer", () => {
-      var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-      var startDomain = scale.domain();
-      scale.domainer().pad(1.0);
-      scale.autoDomain();
-      assert.equal(scale.domain(), startDomain);
     });
   });
   describe("Modified Log Scale", () => {

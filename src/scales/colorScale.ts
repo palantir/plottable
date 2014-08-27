@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scale {
-  export class Color extends Abstract.Scale {
+  export class Color extends Abstract.Scale<string, string> {
     /**
      * Creates a ColorScale.
      *
@@ -45,7 +45,7 @@ export module Scale {
     }
 
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
-    public _getExtent(): any[] {
+    public _getExtent(): string[] {
       var extents = this._getAllExtents();
       var concatenatedExtents: string[] = [];
       extents.forEach((e) => {
