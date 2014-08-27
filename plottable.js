@@ -3158,7 +3158,8 @@ var Plottable;
                     this.renderArea.remove();
                 }
             };
-            _Drawer.prototype.draw = function (data, attrToProjector) {
+            _Drawer.prototype.draw = function (data, attrToProjector, animator) {
+                if (animator === void 0) { animator = new Plottable.Animator.Null(); }
                 throw new Error("Abstract Method Not Implemented");
             };
             return _Drawer;
@@ -3182,11 +3183,12 @@ var Plottable;
             function Rect() {
                 _super.apply(this, arguments);
             }
-            Rect.prototype.draw = function (data, attrToProjector) {
+            Rect.prototype.draw = function (data, attrToProjector, animator) {
+                if (animator === void 0) { animator = new Plottable.Animator.Null(); }
                 var svgElement = "rect";
                 var dataElements = this.renderArea.selectAll(svgElement).data(data);
                 dataElements.enter().append(svgElement);
-                dataElements.attr(attrToProjector);
+                animator.animate(dataElements, attrToProjector);
                 dataElements.exit().remove();
             };
             return Rect;
@@ -5342,7 +5344,14 @@ var Plottable;
             StackedBar.prototype._paint = function () {
                 var _this = this;
                 var attrHash = this._generateAttrToProjector();
-                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(_this.stackedData[i], attrHash); });
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    var animator;
+                    if (_this._animate) {
+                        animator = new Plottable.Animator.Rect();
+                        animator.delay(animator.duration() * i);
+                    }
+                    d.draw(_this.stackedData[i], attrHash, animator);
+                });
             };
             return StackedBar;
         })(Plottable.Abstract.NewStyleBarPlot);
@@ -5435,6 +5444,47 @@ var Plottable;
             return IterativeDelay;
         })(Animator.Default);
         Animator.IterativeDelay = IterativeDelay;
+    })(Plottable.Animator || (Plottable.Animator = {}));
+    var Animator = Plottable.Animator;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Animator) {
+        var Rect = (function (_super) {
+            __extends(Rect, _super);
+            function Rect(isVertical, isReverse) {
+                if (isVertical === void 0) { isVertical = true; }
+                if (isReverse === void 0) { isReverse = false; }
+                _super.call(this);
+                this.isVertical = isVertical;
+                this.isReverse = isReverse;
+            }
+            Rect.prototype.animate = function (selection, attrToProjector) {
+                var startAttrToProjector = {};
+                Rect.ANIMATED_ATTRIBUTES.forEach(function (attr) { return startAttrToProjector[attr] = attrToProjector[attr]; });
+                var growingAttr = this.isVertical ? "height" : "width";
+                var growingAttrProjector = attrToProjector[growingAttr];
+                if (!this.isReverse) {
+                    var movingAttr = this.isVertical ? "y" : "x";
+                    var movingAttrProjector = startAttrToProjector[movingAttr];
+                    var offsetProjector = this.isVertical ? growingAttrProjector : function (d, i) { return 0 - growingAttrProjector(d, i); };
+                    startAttrToProjector[movingAttr] = function (d, i) { return movingAttrProjector(d, i) + offsetProjector(d, i); };
+                }
+                startAttrToProjector[growingAttr] = d3.functor(0);
+                selection.attr(startAttrToProjector);
+                return _super.prototype.animate.call(this, selection, attrToProjector);
+            };
+            Rect.ANIMATED_ATTRIBUTES = ["height", "width", "x", "y"];
+            return Rect;
+        })(Animator.Default);
+        Animator.Rect = Rect;
     })(Plottable.Animator || (Plottable.Animator = {}));
     var Animator = Plottable.Animator;
 })(Plottable || (Plottable = {}));

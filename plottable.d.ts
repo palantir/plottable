@@ -626,7 +626,7 @@ declare module Plottable {
             key: string;
             constructor(key: string);
             remove(): void;
-            draw(data: any[][], attrToProjector: IAttributeToProjector): void;
+            draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
         }
     }
 }
@@ -635,7 +635,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Rect extends Plottable.Abstract._Drawer {
-            draw(data: any[][], attrToProjector: IAttributeToProjector): void;
+            draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
         }
     }
 }
@@ -894,10 +894,10 @@ declare module Plottable {
     module Animator {
         class Default implements IPlotAnimator {
             animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
-            duration(): Number;
-            duration(duration: Number): Default;
-            delay(): Number;
-            delay(delay: Number): Default;
+            duration(): number;
+            duration(duration: number): Default;
+            delay(): number;
+            delay(delay: number): Default;
             easing(): string;
             easing(easing: string): Default;
         }
@@ -909,6 +909,18 @@ declare module Plottable {
     module Animator {
         class IterativeDelay extends Default {
             animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Animator {
+        class Rect extends Default {
+            isVertical: boolean;
+            isReverse: boolean;
+            constructor(isVertical?: boolean, isReverse?: boolean);
+            animate(selection: any, attrToProjector: IAttributeToProjector): any;
         }
     }
 }

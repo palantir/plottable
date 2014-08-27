@@ -22,6 +22,7 @@ function run(div, data, Plottable) {
     .project("fill", "type", colorScale)
     .project("type", "type")
     .project("yval", "y")
+    .animate(true)
 
   var center = stackedBarRenderer.merge(new Plottable.Component.Legend(colorScale));
 
