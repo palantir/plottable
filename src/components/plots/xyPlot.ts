@@ -9,7 +9,7 @@ export module Abstract {
      * Creates an XYPlot.
      *
      * @constructor
-     * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.
+     * @param {any[]|Dataset} [dataset] The data or Dataset to be associated with this Renderer.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */

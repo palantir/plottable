@@ -12,7 +12,7 @@ function run(div, data, Plottable) {
         { name: "Tac", age: -5 }
       ];
 
-    var ds = new Plottable.DataSource(data);
+    var ds = new Plottable.Dataset(data);
     var xScale = new Plottable.Scale.Ordinal();
     var xAxis = new Plottable.Axis.Category(xScale, "bottom");
 

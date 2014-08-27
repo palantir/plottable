@@ -25,21 +25,21 @@
           return data;
         }
 
-        dataSource = new Plottable.DataSource(randomData());
+        dataset = new Plottable.Dataset(randomData());
 
         function makeChart(svg, data) {
           xScale = new Plottable.Scale.Linear();
           yScale = new Plottable.Scale.Linear();
-          return new Plottable.Plot.Scatter(dataSource, xScale, yScale)
+          return new Plottable.Plot.Scatter(dataset, xScale, yScale)
             .animate(true)
             .autoResize(true)
             .renderTo(svg);
         };
 
         window.more = function() {
-          dataSource.data(randomData());
+          dataset.data(randomData());
         }
-        makeChart(d3.select("#things"), dataSource);
+        makeChart(d3.select("#things"), dataset);
       }
   </script>
   </head>

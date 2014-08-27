@@ -32,7 +32,7 @@
 
       var cuteFormatter = function(d) { return d + " is a pretty darn cute cat"; } ;
 
-      var ds = new Plottable.DataSource(data);
+      var ds = new Plottable.Dataset(data);
       var xScale = new Plottable.Scale.Ordinal().rangeType("bands");
       var xAxis = new Plottable.Axis.Category(xScale);
 

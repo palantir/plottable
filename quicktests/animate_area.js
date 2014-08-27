@@ -21,9 +21,9 @@ function run(div, data, Plottable) {
   areaChart.renderTo(svg);
 
   cb = function(x, y){
-    d = areaRenderer.dataSource().data();
-    areaRenderer.dataSource().data(d);
-  }  
+    d = areaRenderer.dataset().data();
+    areaRenderer.dataset().data(d);
+  }
 
   window.xy = new Plottable.Interaction.Click(areaRenderer)
     .callback(cb)

@@ -42,7 +42,7 @@ window.onload = function () {
     svg.attr("width", 500).attr("height", 300);
 
     //data
-    var dataseries = new Plottable.DataSource(Data());
+    var dataseries = new Plottable.Dataset(Data());
 
     //Axis
     var xScale = new Plottable.Scale.Linear().domain([0, 90]);

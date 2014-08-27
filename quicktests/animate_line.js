@@ -22,9 +22,9 @@ function run(div, data, Plottable) {
 	lineChart.renderTo(svg);
 
     cb = function(x, y){
-    d = lineRenderer.dataSource().data();
-    lineRenderer.dataSource().data(d);
-  }  
+    d = lineRenderer.dataset().data();
+    lineRenderer.dataset().data(d);
+  }
 
   window.xy = new Plottable.Interaction.Click(lineRenderer)
     .callback(cb)

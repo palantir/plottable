@@ -1,7 +1,7 @@
 
 function makeData() {
   return [makeRandomData(50), makeRandomData(50)];
-  
+
 }
 
 function run(div, data, Plottable) {
@@ -16,17 +16,17 @@ function run(div, data, Plottable) {
     var barRenderer;
 
 
-      ds = new Plottable.DataSource(d);
+      ds = new Plottable.Dataset(d);
       var xScale = new Plottable.Scale.Ordinal();
       var xAxis = new Plottable.Axis.Category(xScale, "bottom");
 
       var yScale = new Plottable.Scale.Linear();
       var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-        
+
       var gridlines = new Plottable.Component.Gridlines(null, yScale);
       var addLabel = new Plottable.Component.Label("add bar");
       var removeLabel = new Plottable.Component.Label("remove bar");
-        
+
         widthPicker = function(){
             var availableSpace = xAxis.width();
             var bars = d.length;
@@ -34,7 +34,7 @@ function run(div, data, Plottable) {
             console.log(w);
             return w;
 
-            
+
         }
 
       barRenderer = new Plottable.Plot.VerticalBar(ds, xScale, yScale)

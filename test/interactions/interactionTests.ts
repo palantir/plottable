@@ -82,7 +82,7 @@ describe("Interactions", () => {
     var svgWidth = 400;
     var svgHeight = 400;
     var svg: D3.Selection;
-    var dataset: Plottable.DataSource;
+    var dataset: Plottable.Dataset;
     var xScale: Plottable.Abstract.QuantitativeScale;
     var yScale: Plottable.Abstract.QuantitativeScale;
     var renderer: Plottable.Abstract.XYPlot;
@@ -95,7 +95,7 @@ describe("Interactions", () => {
 
     before(() => {
       svg = generateSVG(svgWidth, svgHeight);
-      dataset = new Plottable.DataSource(makeLinearSeries(10));
+      dataset = new Plottable.Dataset(makeLinearSeries(10));
       xScale = new Plottable.Scale.Linear();
       yScale = new Plottable.Scale.Linear();
       renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
@@ -163,7 +163,7 @@ describe("Interactions", () => {
     var svgWidth = 400;
     var svgHeight = 400;
     var svg: D3.Selection;
-    var dataset: Plottable.DataSource;
+    var dataset: Plottable.Dataset;
     var xScale: Plottable.Abstract.QuantitativeScale;
     var yScale: Plottable.Abstract.QuantitativeScale;
     var renderer: Plottable.Abstract.XYPlot;
@@ -176,7 +176,7 @@ describe("Interactions", () => {
 
     before(() => {
       svg = generateSVG(svgWidth, svgHeight);
-      dataset = new Plottable.DataSource(makeLinearSeries(10));
+      dataset = new Plottable.Dataset(makeLinearSeries(10));
       xScale = new Plottable.Scale.Linear();
       yScale = new Plottable.Scale.Linear();
       renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
