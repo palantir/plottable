@@ -1,14 +1,18 @@
 function makeData() {
+  "use strict";
+
   return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
+  "use strict";
+
   var svg = div.append("svg").attr("height", 500);
   data = _.cloneDeep(data);
 
     var large_x = function(d){
          d.x = d.x*100000000;
-    }
+    };
 
     var custFormatter = function(d) {
       if(parseInt(d) < 1){
@@ -37,7 +41,7 @@ function run(div, data, Plottable) {
     var SITitle = new Plottable.Component.Label("SI");
     var CustTitle = new Plottable.Component.Label("Custom");
 
-    var basicTable = new Plottable.Component.Table([[yAxis, plot], [null, xAxis]])
+    var basicTable = new Plottable.Component.Table([[yAxis, plot], [null, xAxis]]);
 	  var formatChoices = new Plottable.Component.Table([[IdTitle, GenTitle, FixTitle],[CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);
     var bigTable = new Plottable.Component.Table([[basicTable],[formatChoices]]);
     formatChoices.xAlign("center");

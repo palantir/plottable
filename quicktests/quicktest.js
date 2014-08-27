@@ -1,3 +1,5 @@
+(function iife(){
+"use strict";
 var quicktests = {};
 
 function loadScript(url) {
@@ -30,10 +32,6 @@ function loadPlottable(branchName) {
   });
 }
 
-
-var data1 = makeRandomData(50);
-var data2 = makeRandomData(50);
-
 function runSingleQuicktest(container, quickTest, data, Plottable) {
   container.append("p").text(quickTest.name);
   var div = container.append("div");
@@ -51,32 +49,6 @@ function runQuicktest(tableSelection, quickTest, Plottable1, Plottable2) {
   tr.append("td");
   runSingleQuicktest(tr.append("td"), quickTest, data, Plottable2);
 }
-
-function initializeByLoadingAllQuicktests() {
-  return new Promise(function(f, r) {
-    if (window.list_of_quicktests == null) {
-      loadListOfQuicktests()
-        .then(loadTheQuicktests)
-        .then(f)
-    } else {
-      f();
-    }
-  });
-}
-
-function loadListOfQuicktests() {
-  return new Promise(function (f, r) {
-    d3.json("/quicktests/list_of_quicktests.json", function (error, json) {
-      if (json !== undefined) {
-        f(json)
-      } else {
-        console.log("got an error loading quicktests json", error);
-        r(error);
-      }
-    });
-  });
-}
-
 function loadTheQuicktests(quicktestsJSONArray) {
   window.quicktests = [];
   var numToLoad = quicktestsJSONArray.length;
@@ -87,7 +59,9 @@ function loadTheQuicktests(quicktestsJSONArray) {
       d3.text("/quicktests/" + name + ".js", function(error, text) {
         if (error !== null) {
           console.warn("Tried to load nonexistant quicktest " + name);
-          if (++numLoaded === numToLoad) f();
+          if (++numLoaded === numToLoad) {
+            f();
+          }
           return;
         }
         text = "(function(){" + text +
@@ -99,20 +73,38 @@ function loadTheQuicktests(quicktestsJSONArray) {
         q.makeData = result.makeData;
         q.run = result.run;
         window.quicktests.push(q);
-        if (++numLoaded === numToLoad) f();
+        if (++numLoaded === numToLoad) {
+          f();
+        }
       });
     });
   });
-
 }
 
-function reporter(n, v) {
-  return function(x) {
-    console.log(n, x, v);
-    return x;
-  }
+function loadListOfQuicktests() {
+  return new Promise(function (f, r) {
+    d3.json("/quicktests/list_of_quicktests.json", function (error, json) {
+      if (json !== undefined) {
+        f(json);
+      } else {
+        console.log("got an error loading quicktests json", error);
+        r(error);
+      }
+    });
+  });
 }
 
+function initializeByLoadingAllQuicktests() {
+  return new Promise(function(f, r) {
+    if (window.list_of_quicktests == null) {
+      loadListOfQuicktests()
+        .then(loadTheQuicktests)
+        .then(f);
+    } else {
+      f();
+    }
+  });
+}
 
 function main() {
   //load keyword dropdown
@@ -130,8 +122,8 @@ function main() {
           );
       });
       $("#filterWord").html($("#filterWord option").sort(function (a, b) {
-          return a.text == b.text ? 0 : a.text < b.text ? -1 : 1
-      }))
+          return a.text === b.text ? 0 : a.text < b.text ? -1 : 1;
+      }));
   });
 
   d3.text("/quicktests/github_token.txt", function (err, data) {
@@ -156,13 +148,13 @@ function main() {
           );
       });
     });
-  })
+  });
 
   var table = d3.select("table");
   table.selectAll(".quicktest-row").remove();
   var firstBranch = "master";
   var secondBranch = $('#featureBranch').val();
-  if (secondBranch === "") {secondBranch = "#local"};
+  if (secondBranch === "") {secondBranch = "#local";}
   var quicktestCategory = $('#filterWord').val();
   if (quicktestCategory == null || quicktestCategory === "") {
     var query = window.location.search.substring(1);
@@ -172,7 +164,7 @@ function main() {
       if (v[0] === "filterWord") {
         quicktestCategory = v[1];
       }
-    })
+    });
   }
   console.log(quicktestCategory);
   initializeByLoadingAllQuicktests()
@@ -187,8 +179,8 @@ function main() {
           if (quicktestCategory === "" || quicktestCategory === undefined) {
             return true;
           } else {
-            return q.categories.map(function(s) {return s.toLowerCase()}).indexOf(quicktestCategory.toLowerCase()) !== -1
-          };
+            return q.categories.map(function(s) {return s.toLowerCase();}).indexOf(quicktestCategory.toLowerCase()) !== -1;
+          }
         });
       })
       .then(function(qts) {
@@ -211,3 +203,4 @@ var button = document.getElementById('button');
 button.onclick = main;
 
 window.onload = main;
+})();
