@@ -49,17 +49,18 @@ export module Plot {
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
 
-      attrToProjector["d"] = (d) => d3.svg.area()
+      attrToProjector["d"] = d3.svg.area()
                                     .x(xFunction)
                                     .y0(y0Function)
-                                    .y1(yFunction)(d.values);
+                                    .y1(yFunction);
 
       // Align fill with first index
       var fillProjector = attrToProjector["fill"];
-      attrToProjector["fill"] = (d, i) => fillProjector(d.values[0], i);
+      attrToProjector["fill"] = (d, i) => fillProjector(d[0], i);
 
+      var datasets = this._getDatasetsInOrder();
       this._getDrawersInOrder().forEach((drawer, i) => {
-        drawer.draw([this._stackedData[i]], attrToProjector);
+        drawer.draw([datasets[i].data()], attrToProjector);
       });
     }
 

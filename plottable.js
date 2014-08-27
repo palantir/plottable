@@ -5133,17 +5133,16 @@ var Plottable;
             __extends(Stacked, _super);
             function Stacked() {
                 _super.apply(this, arguments);
-                this._stackedData = [];
                 this.stackedExtent = [0, 0];
             }
             Stacked.prototype._addDataset = function (key, dataset) {
                 _super.prototype._addDataset.call(this, key, dataset);
-                this._stackedData.push({ key: key, values: dataset.data() });
                 this.stack();
             };
             Stacked.prototype.stack = function () {
-                this._stackedData = d3.layout.stack().x(this._projectors["x"].accessor).y(this._projectors["y"].accessor).values(function (d) { return d.values; })(this._stackedData);
-                var maxY = d3.max(this._stackedData[this._stackedData.length - 1].values, function (datum) { return datum.y + datum.y0; });
+                var datasets = this._getDatasetsInOrder();
+                d3.layout.stack().x(this._projectors["x"].accessor).y(this._projectors["y"].accessor).values(function (d) { return d.data(); })(datasets);
+                var maxY = d3.max(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum.y0; });
                 if (maxY > 0) {
                     this.stackedExtent[1] = maxY;
                 }
@@ -5192,7 +5191,6 @@ var Plottable;
                 this._baseline = this.renderArea.append("line").classed("baseline", true);
             };
             StackedArea.prototype._paint = function () {
-                var _this = this;
                 _super.prototype._paint.call(this);
                 var scaledBaseline = this.yScale.scale(this._baselineValue);
                 var baselineAttr = {
@@ -5209,11 +5207,12 @@ var Plottable;
                 delete attrToProjector["x"];
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
-                attrToProjector["d"] = function (d) { return d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction)(d.values); };
+                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
                 var fillProjector = attrToProjector["fill"];
-                attrToProjector["fill"] = function (d, i) { return fillProjector(d.values[0], i); };
+                attrToProjector["fill"] = function (d, i) { return fillProjector(d[0], i); };
+                var datasets = this._getDatasetsInOrder();
                 this._getDrawersInOrder().forEach(function (drawer, i) {
-                    drawer.draw([_this._stackedData[i]], attrToProjector);
+                    drawer.draw([datasets[i].data()], attrToProjector);
                 });
             };
             StackedArea.prototype._updateYDomainer = function () {

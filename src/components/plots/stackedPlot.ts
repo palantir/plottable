@@ -4,22 +4,21 @@ module Plottable {
 export module Abstract {
   export class Stacked extends Abstract.NewStylePlot {
 
-    public _stackedData: any[] = [];
     private stackedExtent = [0, 0];
 
     public _addDataset(key: string, dataset: DataSource) {
       super._addDataset(key, dataset);
-      this._stackedData.push({key: key, values: dataset.data()});
       this.stack();
     }
 
     private stack() {
-      this._stackedData = d3.layout.stack()
+      var datasets = this._getDatasetsInOrder();
+      d3.layout.stack()
         .x(this._projectors["x"].accessor)
         .y(this._projectors["y"].accessor)
-        .values((d) => d.values)(this._stackedData);
+        .values((d) => d.data())(datasets);
 
-      var maxY = d3.max(this._stackedData[this._stackedData.length - 1].values, (datum: any) => datum.y + datum.y0);
+      var maxY = d3.max(datasets[datasets.length - 1].data(), (datum: any) => datum.y + datum.y0);
       if (maxY > 0) {
         this.stackedExtent[1] = maxY;
       }
