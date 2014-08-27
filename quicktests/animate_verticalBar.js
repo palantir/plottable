@@ -21,9 +21,9 @@ function run(div, data, Plottable) {
   vBarChart.renderTo(svg);
 
   cb = function(x, y){
-    d = vBarRenderer.dataSource().data();
-    vBarRenderer.dataSource().data(d);
-  }  
+    d = vBarRenderer.dataset().data();
+    vBarRenderer.dataset().data(d);
+  }
 
   window.xy = new Plottable.Interaction.Click(vBarRenderer)
     .callback(cb)

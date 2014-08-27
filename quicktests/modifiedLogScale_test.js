@@ -33,8 +33,8 @@ function run(div, data, Plottable) {
   circleChart.renderTo(svg);
 
   cb = function(x, y){
-    d = circleRenderer.dataSource().data();
-    circleRenderer.dataSource().data(d);
+    d = circleRenderer.dataset().data();
+    circleRenderer.dataset().data(d);
   };
 
   window.xy = new Plottable.Interaction.Click(circleRenderer)

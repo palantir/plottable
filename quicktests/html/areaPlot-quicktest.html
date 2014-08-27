@@ -27,12 +27,12 @@
           return data;
         }
 
-        dataSource = new Plottable.DataSource(randomData());
+        dataset = new Plottable.Dataset(randomData());
 
         function makeChart(svg, data) {
           xScale = new Plottable.Scale.Linear();
           yScale = new Plottable.Scale.Linear();
-          return new Plottable.Plot.Area(dataSource, xScale, yScale)
+          return new Plottable.Plot.Area(dataset, xScale, yScale)
             .project("stroke", function(){return "blue";})
             .animate(true)
             .autoResize(true)
@@ -40,10 +40,10 @@
         };
 
         window.more = function() {
-          dataSource.data(randomData());
+          dataset.data(randomData());
         }
 
-        makeChart(d3.select("#things"), dataSource);
+        makeChart(d3.select("#things"), dataset);
       }
   </script>
   </head>

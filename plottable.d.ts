@@ -214,13 +214,13 @@ declare module Plottable {
 
 
 declare module Plottable {
-    class DataSource extends Plottable.Abstract.PlottableObject implements Plottable.Core.IListenable {
+    class Dataset extends Plottable.Abstract.PlottableObject implements Plottable.Core.IListenable {
         broadcaster: any;
         constructor(data?: any[], metadata?: any);
         data(): any[];
-        data(data: any[]): DataSource;
+        data(data: any[]): Dataset;
         metadata(): any;
-        metadata(metadata: any): DataSource;
+        metadata(metadata: any): Dataset;
     }
 }
 
@@ -324,11 +324,11 @@ declare module Plottable {
             renderArea: D3.Selection;
             element: D3.Selection;
             constructor();
-            constructor(dataset: any[]);
-            constructor(dataset: DataSource);
+            constructor(dataOrDataset: any[]);
+            constructor(dataOrDataset: Dataset);
             remove(): void;
-            dataSource(): DataSource;
-            dataSource(source: DataSource): Plot;
+            dataset(): Dataset;
+            dataset(source: Dataset): Plot;
             project(attrToSet: string, accessor: any, scale?: Scale): Plot;
             animate(enabled: boolean): Plot;
             detach(): Plot;
@@ -353,7 +353,7 @@ declare module Plottable {
 
 declare module Plottable {
     interface DatasetDrawerKey {
-        dataset: DataSource;
+        dataset: Dataset;
         drawer: Plottable.Abstract._Drawer;
         key: string;
     }
@@ -361,9 +361,9 @@ declare module Plottable {
         class NewStylePlot extends XYPlot {
             constructor(xScale?: Scale, yScale?: Scale);
             remove(): void;
-            addDataset(key: string, dataset: DataSource): NewStylePlot;
+            addDataset(key: string, dataset: Dataset): NewStylePlot;
             addDataset(key: string, dataset: any[]): NewStylePlot;
-            addDataset(dataset: DataSource): NewStylePlot;
+            addDataset(dataset: Dataset): NewStylePlot;
             addDataset(dataset: any[]): NewStylePlot;
             datasetOrder(): string[];
             datasetOrder(order: string[]): NewStylePlot;

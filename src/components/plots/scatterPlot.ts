@@ -43,7 +43,7 @@ export module Plot {
       delete attrToProjector["x"];
       delete attrToProjector["y"];
 
-      var circles = this.renderArea.selectAll("circle").data(this._dataSource.data());
+      var circles = this.renderArea.selectAll("circle").data(this._dataset.data());
       circles.enter().append("circle");
 
       if (this._dataChanged) {

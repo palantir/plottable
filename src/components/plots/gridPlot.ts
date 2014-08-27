@@ -45,7 +45,7 @@ export module Plot {
     public _paint() {
       super._paint();
 
-      var cells = this.renderArea.selectAll("rect").data(this._dataSource.data());
+      var cells = this.renderArea.selectAll("rect").data(this._dataset.data());
       cells.enter().append("rect");
 
       var xStep = this.xScale.rangeBand();

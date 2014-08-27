@@ -14,8 +14,8 @@ describe("Plots", () => {
       var metadata = {foo: 10, bar: 20};
       var xAccessor = (d: any, i?: number, m?: any) => d.x + i * m.foo;
       var yAccessor = (d: any, i?: number, m?: any) => m.bar;
-      var dataSource = new Plottable.DataSource(data, metadata);
-      var renderer = new Plottable.Plot.Scatter(dataSource, xScale, yScale)
+      var dataset = new Plottable.Dataset(data, metadata);
+      var renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale)
                                   .project("x", xAccessor)
                                   .project("y", yAccessor);
       renderer.renderTo(svg);
@@ -28,14 +28,14 @@ describe("Plots", () => {
       assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct");
 
       data = [{x: 2, y: 2}, {x: 4, y: 4}];
-      dataSource.data(data);
+      dataset.data(data);
       assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after data change");
       assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct after data change");
       assert.closeTo(parseFloat(c2.attr("cx")), 14, 0.01, "second circle cx is correct after data change");
       assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct after data change");
 
       metadata = {foo: 0, bar: 0};
-      dataSource.metadata(metadata);
+      dataset.metadata(metadata);
       assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after metadata change");
       assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
       assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");

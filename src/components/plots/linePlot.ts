@@ -81,7 +81,7 @@ export module Plot {
       delete attrToProjector["x"];
       delete attrToProjector["y"];
 
-      this.linePath.datum(this._dataSource.data());
+      this.linePath.datum(this._dataset.data());
 
       if (this._dataChanged) {
 

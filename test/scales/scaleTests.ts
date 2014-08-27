@@ -40,11 +40,11 @@ describe("Scales", () => {
 
   describe("autoranging behavior", () => {
     var data: any[];
-    var dataSource: Plottable.DataSource;
+    var dataset: Plottable.Dataset;
     var scale: Plottable.Scale.Linear;
     beforeEach(() => {
       data = [{foo: 2, bar: 1}, {foo: 5, bar: -20}, {foo: 0, bar: 0}];
-      dataSource = new Plottable.DataSource(data);
+      dataset = new Plottable.Dataset(data);
       scale = new Plottable.Scale.Linear();
     });
 
@@ -57,15 +57,15 @@ describe("Scales", () => {
       assert.isFalse((<any> scale).autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
     });
 
-    it("scale autorange works as expected with single dataSource", () => {
+    it("scale autorange works as expected with single dataset", () => {
       var svg = generateSVG(100, 100);
       var renderer = new Plottable.Abstract.Plot()
-                        .dataSource(dataSource)
+                        .dataset(dataset)
                         .project("x", "foo", scale)
                         .renderTo(svg);
       assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
       data.push({foo: 100, bar: 200});
-      dataSource.data(data);
+      dataset.data(data);
       assert.deepEqual(scale.domain(), [0, 100], "scale domain was autoranged properly");
       svg.remove();
     });
@@ -74,20 +74,20 @@ describe("Scales", () => {
       var svg1 = generateSVG(100, 100);
       var svg2 = generateSVG(100, 100);
       var renderer1 = new Plottable.Abstract.Plot()
-                          .dataSource(dataSource)
+                          .dataset(dataset)
                           .project("x", "foo", scale);
       renderer1.renderTo(svg1);
       var renderer2 = new Plottable.Abstract.Plot()
-                          .dataSource(dataSource)
+                          .dataset(dataset)
                           .project("x", "foo", scale);
       renderer2.renderTo(svg2);
       var otherScale = new Plottable.Scale.Linear();
       renderer1.project("x", "foo", otherScale);
-      dataSource.data([{foo: 10}, {foo: 11}]);
-      assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataSource after one perspective deregistered");
+      dataset.data([{foo: 10}, {foo: 11}]);
+      assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataset after one perspective deregistered");
       renderer2.project("x", "foo", otherScale);
-      // "scale not listening to the dataSource after all perspectives removed"
-      dataSource.data([{foo: 99}, {foo: 100}]);
+      // "scale not listening to the dataset after all perspectives removed"
+      dataset.data([{foo: 99}, {foo: 100}]);
       assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
       svg1.remove();
       svg2.remove();
@@ -213,7 +213,7 @@ describe("Scales", () => {
 
     function iterateDataChanges(...dataChanges: any[]) {
       dataChanges.forEach((dataChange) => {
-        barPlot.dataSource().data(dataChange);
+        barPlot.dataset().data(dataChange);
       });
     }
 

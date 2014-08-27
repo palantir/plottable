@@ -30,7 +30,7 @@ export module Abstract {
      * Modify the domain on the scale so that it includes the extent of all
      * perspectives it depends on. Extent: The (min, max) pair for a
      * QuantitiativeScale, all covered strings for an OrdinalScale.
-     * Perspective: A combination of a DataSource and an Accessor that
+     * Perspective: A combination of a Dataset and an Accessor that
      * represents a view in to the data.
      */
     public autoDomain() {

@@ -29,7 +29,7 @@
 ///<reference path="core/componentContainerTests.ts" />
 ///<reference path="core/componentGroupTests.ts" />
 ///<reference path="core/componentTests.ts" />
-///<reference path="core/dataSourceTests.ts" />
+///<reference path="core/datasetTests.ts" />
 ///<reference path="core/tableTests.ts" />
 ///<reference path="core/domainerTests.ts" />
 
