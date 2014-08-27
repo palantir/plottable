@@ -233,8 +233,6 @@ declare module Plottable {
             backgroundContainer: D3.Selection;
             foregroundContainer: D3.Selection;
             clipPathEnabled: boolean;
-            availableWidth: number;
-            availableHeight: number;
             xOrigin: number;
             yOrigin: number;
             static AUTORESIZE_BY_DEFAULT: boolean;
@@ -251,6 +249,8 @@ declare module Plottable {
             merge(c: Component): Plottable.Component.Group;
             detach(): Component;
             remove(): void;
+            width(): number;
+            height(): number;
         }
     }
 }
