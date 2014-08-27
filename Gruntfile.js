@@ -303,6 +303,9 @@ module.exports = function(grunt) {
   grunt.registerTask("definitions_prod", function() {
     grunt.file.copy("build/plottable.d.ts", "plottable.d.ts");
   });
+  grunt.registerTask("copy-dev-defs", function () {
+    grunt.file.copy("plottable.d.ts", "plottable-dev.d.ts");
+  });
   grunt.registerTask("test-compile", [
                                   "ts:test",
                                   "concat:tests_multifile",
@@ -323,6 +326,7 @@ module.exports = function(grunt) {
       "sed:version_number",
       "definitions_prod",
       "test-compile",
+      "copy-dev-defs",
       "sed:public_protected_definitions",
       "sed:protected_definitions",
       "concat:plottable_multifile",
