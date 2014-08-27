@@ -37,7 +37,11 @@ var data2 = makeRandomData(50);
 function runSingleQuicktest(container, quickTest, data, Plottable) {
   container.append("p").text(quickTest.name);
   var div = container.append("div");
-  quickTest.run(div, data, Plottable);
+  try {
+    quickTest.run(div, data, Plottable);
+  } catch (err) {
+    setTimeout(function() {throw err;}, 0);
+  }
 }
 
 function runQuicktest(tableSelection, quickTest, Plottable1, Plottable2) {
