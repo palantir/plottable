@@ -878,10 +878,10 @@ declare module Plottable {
     module Animator {
         class Default implements IPlotAnimator {
             animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
-            duration(): Number;
-            duration(duration: Number): Default;
-            delay(): Number;
-            delay(delay: Number): Default;
+            duration(): number;
+            duration(duration: number): Default;
+            delay(): number;
+            delay(delay: number): Default;
             easing(): string;
             easing(easing: string): Default;
         }

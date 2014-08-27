@@ -75,7 +75,7 @@ export module Plot {
         var animator: Animator.Rect;
         if (this._animate) {
           animator = new Animator.Rect();
-          animator.delay(parseFloat(String(animator.duration())) * i);
+          animator.delay(animator.duration() * i);
         }
         d.draw(this.stackedData[i], attrHash, animator);
       });

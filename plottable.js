@@ -5169,7 +5169,7 @@ var Plottable;
                     var animator;
                     if (_this._animate) {
                         animator = new Plottable.Animator.Rect();
-                        animator.delay(parseFloat(String(animator.duration())) * i);
+                        animator.delay(animator.duration() * i);
                     }
                     d.draw(_this.stackedData[i], attrHash, animator);
                 });
