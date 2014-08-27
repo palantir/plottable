@@ -7,9 +7,9 @@ export module Animator {
    * The default animator implementation with easing, duration, and delay.
    */
   export class Default implements IPlotAnimator {
-    public _durationMsec: number = 300;
-    public _delayMsec: number    = 0;
-    public _easing: string       = "exp-out";
+    public _durationMsec = 300;
+    public _delayMsec = 0;
+    public _easing = "exp-out";
 
     public animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any {
       return selection.transition()
