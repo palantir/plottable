@@ -9,17 +9,17 @@ export module Abstract {
 
     public _addDataset(key: string, dataset: DataSource) {
       super._addDataset(key, dataset);
-      this.stack({key: key, values: dataset.data()});
+      this._stackedData.push({key: key, values: dataset.data()});
+      this.stack();
     }
 
-    private stack(d: any) {
-      this._stackedData.push(d);
+    private stack() {
       this._stackedData = d3.layout.stack()
         .x(this._projectors["x"].accessor)
         .y(this._projectors["y"].accessor)
         .values((d) => d.values)(this._stackedData);
 
-      var maxY = d3.max(d.values, (datum: any) => datum.y + datum.y0);
+      var maxY = d3.max(this._stackedData[this._stackedData.length - 1].values, (datum: any) => datum.y + datum.y0);
       if (maxY > 0) {
         this.stackedExtent[1] = maxY;
       }

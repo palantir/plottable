@@ -5138,12 +5138,12 @@ var Plottable;
             }
             Stacked.prototype._addDataset = function (key, dataset) {
                 _super.prototype._addDataset.call(this, key, dataset);
-                this.stack({ key: key, values: dataset.data() });
+                this._stackedData.push({ key: key, values: dataset.data() });
+                this.stack();
             };
-            Stacked.prototype.stack = function (d) {
-                this._stackedData.push(d);
+            Stacked.prototype.stack = function () {
                 this._stackedData = d3.layout.stack().x(this._projectors["x"].accessor).y(this._projectors["y"].accessor).values(function (d) { return d.values; })(this._stackedData);
-                var maxY = d3.max(d.values, function (datum) { return datum.y + datum.y0; });
+                var maxY = d3.max(this._stackedData[this._stackedData.length - 1].values, function (datum) { return datum.y + datum.y0; });
                 if (maxY > 0) {
                     this.stackedExtent[1] = maxY;
                 }
