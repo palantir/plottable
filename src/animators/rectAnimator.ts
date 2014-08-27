@@ -8,6 +8,8 @@ export module Animator {
    */
   export class Rect extends Default {
 
+    private static ANIMATED_ATTRIBUTES = ["height", "width", "x", "y"];
+
     public isVertical: boolean;
     public isReverse: boolean;
 
@@ -20,7 +22,7 @@ export module Animator {
     public animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any {
 
       var startAttrToProjector: IAttributeToProjector = {};
-      this.getAnimateAttributes().forEach((attr: string) => startAttrToProjector[attr] = attrToProjector[attr]);
+      Rect.ANIMATED_ATTRIBUTES.forEach((attr: string) => startAttrToProjector[attr] = attrToProjector[attr]);
 
       var growingAttr = this.isVertical ? "height" : "width";
       var growingAttrProjector = attrToProjector[growingAttr];
@@ -36,10 +38,6 @@ export module Animator {
 
       selection.attr(startAttrToProjector);
       return super.animate(selection, attrToProjector, plot);
-    }
-
-    private getAnimateAttributes() {
-      return ["height", "width", "x", "y"];
     }
 
   }

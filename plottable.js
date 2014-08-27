@@ -5289,7 +5289,7 @@ var Plottable;
             }
             Rect.prototype.animate = function (selection, attrToProjector, plot) {
                 var startAttrToProjector = {};
-                this.getAnimateAttributes().forEach(function (attr) { return startAttrToProjector[attr] = attrToProjector[attr]; });
+                Rect.ANIMATED_ATTRIBUTES.forEach(function (attr) { return startAttrToProjector[attr] = attrToProjector[attr]; });
                 var growingAttr = this.isVertical ? "height" : "width";
                 var growingAttrProjector = attrToProjector[growingAttr];
                 if (!this.isReverse) {
@@ -5302,9 +5302,7 @@ var Plottable;
                 selection.attr(startAttrToProjector);
                 return _super.prototype.animate.call(this, selection, attrToProjector, plot);
             };
-            Rect.prototype.getAnimateAttributes = function () {
-                return ["height", "width", "x", "y"];
-            };
+            Rect.ANIMATED_ATTRIBUTES = ["height", "width", "x", "y"];
             return Rect;
         })(Animator.Default);
         Animator.Rect = Rect;
