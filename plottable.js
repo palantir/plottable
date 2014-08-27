@@ -5135,14 +5135,11 @@ var Plottable;
                 _super.apply(this, arguments);
                 this.stackedExtent = [0, 0];
             }
-            Stacked.prototype._addDataset = function (key, dataset) {
-                _super.prototype._addDataset.call(this, key, dataset);
-                this.stack();
-            };
-            Stacked.prototype.removeDataset = function (key) {
-                _super.prototype.removeDataset.call(this, key);
-                this.stack();
-                return this;
+            Stacked.prototype._onDataSourceUpdate = function () {
+                _super.prototype._onDataSourceUpdate.call(this);
+                if (this._datasetKeysInOrder != null) {
+                    this.stack();
+                }
             };
             Stacked.prototype.stack = function () {
                 var datasets = this._getDatasetsInOrder();
@@ -5224,7 +5221,8 @@ var Plottable;
                 return Plot.Area.prototype._updateYDomainer.apply(this);
             };
             StackedArea.prototype._onDataSourceUpdate = function () {
-                return Plot.Area.prototype._onDataSourceUpdate.apply(this);
+                _super.prototype._onDataSourceUpdate.call(this);
+                Plot.Area.prototype._onDataSourceUpdate.apply(this);
             };
             StackedArea.prototype._generateAttrToProjector = function () {
                 var _this = this;
