@@ -6,15 +6,11 @@ export module Abstract {
 
     private stackedExtent = [0, 0];
 
-    public _addDataset(key: string, dataset: DataSource) {
-      super._addDataset(key, dataset);
-      this.stack();
-    }
-
-    public removeDataset(key: string) {
-      super.removeDataset(key);
-      this.stack();
-      return this;
+    public _onDataSourceUpdate() {
+      super._onDataSourceUpdate();
+      if (this._datasetKeysInOrder != null) {
+        this.stack();
+      }
     }
 
     private stack() {

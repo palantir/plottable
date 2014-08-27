@@ -69,7 +69,8 @@ export module Plot {
     }
 
     public _onDataSourceUpdate() {
-      return Plot.Area.prototype._onDataSourceUpdate.apply(this);
+      super._onDataSourceUpdate();
+      Plot.Area.prototype._onDataSourceUpdate.apply(this);
     }
 
     public _generateAttrToProjector() {
