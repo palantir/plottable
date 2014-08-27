@@ -1234,6 +1234,92 @@ describe("Legends", function () {
         });
     });
 });
+describe("HorizontalLegend", function () {
+    var colorScale;
+    var horizLegend;
+    var entrySelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ENTRY_CLASS;
+    var rowSelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ROW_CLASS;
+    beforeEach(function () {
+        colorScale = new Plottable.Scale.Color();
+        colorScale.domain([
+            "Washington",
+            "Adams",
+            "Jefferson",
+        ]);
+        horizLegend = new Plottable.Component.HorizontalLegend(colorScale);
+    });
+    it("renders an entry for each item in the domain", function () {
+        var svg = generateSVG(400, 100);
+        horizLegend.renderTo(svg);
+        var entries = horizLegend.element.selectAll(entrySelector);
+        assert.equal(entries[0].length, colorScale.domain().length, "one entry is created for each item in the domain");
+        var elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
+        assert.deepEqual(elementTexts, colorScale.domain(), "entry texts match scale domain");
+        var newDomain = colorScale.domain();
+        newDomain.push("Madison");
+        colorScale.domain(newDomain);
+        entries = horizLegend.element.selectAll(entrySelector);
+        assert.equal(entries[0].length, colorScale.domain().length, "Legend updated to include item added to the domain");
+        svg.remove();
+    });
+    it("wraps entries onto extra rows if necessary", function () {
+        var svg = generateSVG(200, 100);
+        horizLegend.renderTo(svg);
+        var rows = horizLegend.element.selectAll(rowSelector);
+        assert.lengthOf(rows[0], 2, "Wrapped text on to two rows when space is constrained");
+        horizLegend.detach();
+        svg.remove();
+        svg = generateSVG(100, 100);
+        horizLegend.renderTo(svg);
+        rows = horizLegend.element.selectAll(rowSelector);
+        assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
+        svg.remove();
+    });
+    it("truncates and hides entries if space is constrained", function () {
+        var svg = generateSVG(70, 400);
+        horizLegend.renderTo(svg);
+        var textEls = horizLegend.element.selectAll("text");
+        textEls.each(function (d) {
+            var textEl = d3.select(this);
+            assertBBoxInclusion(horizLegend.element, textEl);
+        });
+        horizLegend.detach();
+        svg.remove();
+        svg = generateSVG(100, 50);
+        horizLegend.renderTo(svg);
+        textEls = horizLegend.element.selectAll("text");
+        textEls.each(function (d) {
+            var textEl = d3.select(this);
+            assertBBoxInclusion(horizLegend.element, textEl);
+        });
+        svg.remove();
+    });
+    it("scales icon size with entry font size", function () {
+        colorScale.domain(["A"]);
+        var svg = generateSVG(400, 100);
+        horizLegend.renderTo(svg);
+        var style = horizLegend.element.append("style");
+        style.attr("type", "text/css");
+        function verifyCircleHeight() {
+            var text = horizLegend.content.select("text");
+            var circle = horizLegend.content.select("circle");
+            var textHeight = Plottable.Util.DOM.getBBox(text).height;
+            var circleHeight = Plottable.Util.DOM.getBBox(circle).height;
+            assert.operator(circleHeight, "<", textHeight, "Icon is smaller than entry text");
+            return circleHeight;
+        }
+        var origCircleHeight = verifyCircleHeight();
+        style.text(".plottable .legend text { font-size: 30px; }");
+        horizLegend._invalidateLayout();
+        var bigCircleHeight = verifyCircleHeight();
+        assert.operator(bigCircleHeight, ">", origCircleHeight, "icon size increased with font size");
+        style.text(".plottable .legend text { font-size: 6px; }");
+        horizLegend._invalidateLayout();
+        var smallCircleHeight = verifyCircleHeight();
+        assert.operator(smallCircleHeight, "<", origCircleHeight, "icon size decreased with font size");
+        svg.remove();
+    });
+});
 
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -1571,6 +1657,13 @@ describe("Plots", function () {
             renderArea = areaPlot.renderArea;
             var areaPath = renderArea.select(".area");
             assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
+            verifier.end();
+        });
+        it("area is appended before line", function () {
+            var paths = renderArea.selectAll("path")[0];
+            var areaSelection = renderArea.select(".area")[0][0];
+            var lineSelection = renderArea.select(".line")[0][0];
+            assert.operator(paths.indexOf(areaSelection), "<", paths.indexOf(lineSelection), "area appended before line");
             verifier.end();
         });
         after(function () {
@@ -2739,7 +2832,8 @@ describe("Component behavior", function () {
         c._anchor(svg);
         c._computeLayout(0, 0, 100, 100);
         c._render();
-        var expectedClipPathURL = "url(#clipPath" + expectedClipPathID + ")";
+        var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+        var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
         var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
         assert.isTrue(normalizeClipPath(c.element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
         var clipRect = c.boxContainer.select(".clip-rect");
@@ -3712,7 +3806,7 @@ describe("Scales", function () {
             assert.deepEqual(b.slice().reverse(), b.slice().sort(function (x, y) { return x - y; }));
             var ticks = scale.ticks();
             assert.deepEqual(ticks, ticks.slice().sort(function (x, y) { return x - y; }), "ticks should be sorted");
-            assert.deepEqual(ticks, Plottable.Util.Methods.uniqNumbers(ticks), "ticks should not be repeated");
+            assert.deepEqual(ticks, Plottable.Util.Methods.uniq(ticks), "ticks should not be repeated");
             var beforePivot = ticks.filter(function (x) { return x <= -base; });
             var afterPivot = ticks.filter(function (x) { return base <= x; });
             var betweenPivots = ticks.filter(function (x) { return -base < x && x < base; });
@@ -4413,7 +4507,7 @@ describe("Util.Text", function () {
 });
 
 var assert = chai.assert;
-describe("Util.s", function () {
+describe("Util.Methods", function () {
     it("inRange works correct", function () {
         assert.isTrue(Plottable.Util.Methods.inRange(0, -1, 1), "basic functionality works");
         assert.isTrue(Plottable.Util.Methods.inRange(0, 0, 1), "it is a closed interval");
@@ -4443,6 +4537,26 @@ describe("Util.s", function () {
     it("uniq works as expected", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
         assert.deepEqual(Plottable.Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
+    });
+    it("max/min work as expected", function () {
+        var alist = [1, 2, 3, 4, 5];
+        var dbl = function (x) { return x * 2; };
+        var max = Plottable.Util.Methods.max;
+        var min = Plottable.Util.Methods.min;
+        assert.deepEqual(max(alist), 5, "max works as expected on plain array");
+        assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
+        assert.deepEqual(max(alist, dbl), 10, "max applies function appropriately");
+        assert.deepEqual(max([]), 0, "default value zero by default");
+        assert.deepEqual(max([], 10), 10, "works as intended with default value");
+        assert.deepEqual(max([], dbl), 0, "default value zero as expected when fn provided");
+        assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
+        assert.deepEqual(min(alist, 0), 1, "min works for basic list");
+        assert.deepEqual(min(alist, dbl, 0), 2, "min works with function arg");
+        assert.deepEqual(min([]), 0, "min defaults to 0");
+        assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
+        var strings = ["a", "bb", "ccc", "ddd"];
+        assert.deepEqual(max(strings, function (s) { return s.length; }), 3, "works on arrays of non-numbers with a function");
+        assert.deepEqual(max([], function (s) { return s.length; }, 5), 5, "defaults work even with non-number function type");
     });
     it("objEq works as expected", function () {
         assert.isTrue(Plottable.Util.Methods.objEq({}, {}));

@@ -45,7 +45,7 @@ export module Plot {
     private stack(accessor: IAccessor) {
       var datasets = d3.values(this._key2DatasetDrawerKey);
       var lengths = datasets.map((d) => d.dataset.data().length);
-      if (Util.Methods.uniqNumbers(lengths).length > 1) {
+      if (Util.Methods.uniq(lengths).length > 1) {
         Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
       }
       var currentBase = Util.Methods.createFilledArray(0, lengths[0]);
@@ -64,7 +64,7 @@ export module Plot {
           return d;
         });
       });
-      this.stackedExtent = [0, d3.max(currentBase)];
+      this.stackedExtent = [0, Util.Methods.max(currentBase)];
       this._onDataSourceUpdate();
       return stacks;
     }

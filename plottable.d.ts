@@ -5,14 +5,19 @@ declare module Plottable {
             function inRange(x: number, a: number, b: number): boolean;
             function warn(warning: string): void;
             function addArrays(alist: number[], blist: number[]): number[];
-            function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
-            function union(set1: D3.Set, set2: D3.Set): D3.Set;
-            function uniq(strings: string[]): string[];
-            function uniqNumbers(a: number[]): number[];
-            function createFilledArray(value: any, count: number): any[];
+            function intersection<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
+            function union<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
+            function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T>;
+            function uniq<T>(arr: T[]): T[];
+            function createFilledArray<T>(value: T, count: number): T[];
+            function createFilledArray<T>(func: (index?: number) => T, count: number): T[];
             function flatten<T>(a: T[][]): T[];
             function arrayEq<T>(a: T[], b: T[]): boolean;
             function objEq(a: any, b: any): boolean;
+            function max(arr: number[], default_val?: number): number;
+            function max<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
+            function min(arr: number[], default_val?: number): number;
+            function min<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
         }
     }
 }
@@ -417,7 +422,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         interface IPlotAnimator {
-            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
         }
         interface IPlotAnimatorMap {
             [animatorKey: string]: IPlotAnimator;
@@ -749,6 +754,18 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
+        class HorizontalLegend extends Plottable.Abstract.Component {
+            static LEGEND_ROW_CLASS: string;
+            static LEGEND_ENTRY_CLASS: string;
+            constructor(colorScale: Plottable.Scale.Color);
+            remove(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
         class Gridlines extends Plottable.Abstract.Component {
             constructor(xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.QuantitativeScale);
             remove(): Gridlines;
@@ -868,7 +885,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         class Null implements IPlotAnimator {
-            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
         }
     }
 }
@@ -877,7 +894,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         class Default implements IPlotAnimator {
-            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
             duration(): number;
             duration(duration: number): Default;
             delay(): number;
@@ -892,7 +909,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         class IterativeDelay extends Default {
-            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
         }
     }
 }
@@ -904,7 +921,7 @@ declare module Plottable {
             isVertical: boolean;
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
-            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector): any;
         }
     }
 }

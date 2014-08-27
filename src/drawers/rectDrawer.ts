@@ -9,7 +9,7 @@ export module _Drawer {
       var dataElements = this.renderArea.selectAll(svgElement).data(data);
 
       dataElements.enter().append(svgElement);
-      animator.animate(dataElements, attrToProjector, null);
+      animator.animate(dataElements, attrToProjector);
       dataElements.exit().remove();
     }
   }

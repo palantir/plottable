@@ -19,7 +19,7 @@ export module Animator {
       this.isReverse = isReverse;
     }
 
-    public animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any {
+    public animate(selection: any, attrToProjector: IAttributeToProjector): any {
 
       var startAttrToProjector: IAttributeToProjector = {};
       Rect.ANIMATED_ATTRIBUTES.forEach((attr: string) => startAttrToProjector[attr] = attrToProjector[attr]);
@@ -37,7 +37,7 @@ export module Animator {
       startAttrToProjector[growingAttr] = d3.functor(0);
 
       selection.attr(startAttrToProjector);
-      return super.animate(selection, attrToProjector, plot);
+      return super.animate(selection, attrToProjector);
     }
 
   }

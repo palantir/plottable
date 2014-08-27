@@ -12,7 +12,7 @@ export module Animator {
   export class IterativeDelay extends Default {
     _delayMsec = 15;
 
-    public animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any {
+    public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection {
       return selection.transition()
         .ease(this._easing)
         .duration(this._durationMsec)
