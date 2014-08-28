@@ -233,21 +233,21 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Component extends PlottableObject {
+            static AUTORESIZE_BY_DEFAULT: boolean;
             element: D3.Selection;
             content: D3.Selection;
             backgroundContainer: D3.Selection;
             foregroundContainer: D3.Selection;
             clipPathEnabled: boolean;
-            _parent: ComponentContainer;
             xOrigin: number;
             yOrigin: number;
+            _parent: ComponentContainer;
             _xAlignProportion: number;
             _yAlignProportion: number;
             _fixedHeightFlag: boolean;
             _fixedWidthFlag: boolean;
             _isSetup: boolean;
             _isAnchored: boolean;
-            static AUTORESIZE_BY_DEFAULT: boolean;
             _anchor(element: D3.Selection): void;
             _setup(): void;
             _requestedSpace(availableWidth: number, availableHeight: number): ISpaceRequest;
