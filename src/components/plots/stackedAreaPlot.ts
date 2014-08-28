@@ -74,6 +74,16 @@ export module Plot {
       }
     }
 
+    public _updateXDomainer() {
+      super._updateXDomainer();
+      var scale = <Abstract.QuantitativeScale> this.xScale;
+      if (!scale._userSetDomainer) {
+        scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
+        // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
+        scale._autoDomainIfAutomaticMode();
+      }
+    }
+
     public _onDataSourceUpdate() {
       super._onDataSourceUpdate();
       Plot.Area.prototype._onDataSourceUpdate.apply(this);

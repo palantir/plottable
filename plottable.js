@@ -5225,6 +5225,14 @@ var Plottable;
                     scale._autoDomainIfAutomaticMode();
                 }
             };
+            StackedArea.prototype._updateXDomainer = function () {
+                _super.prototype._updateYDomainer.call(this);
+                var scale = this.xScale;
+                if (!scale._userSetDomainer) {
+                    scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
+                    scale._autoDomainIfAutomaticMode();
+                }
+            };
             StackedArea.prototype._onDataSourceUpdate = function () {
                 _super.prototype._onDataSourceUpdate.call(this);
                 Plot.Area.prototype._onDataSourceUpdate.apply(this);
