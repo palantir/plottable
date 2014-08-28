@@ -5611,19 +5611,26 @@ var Plottable;
             Rect.prototype.animate = function (selection, attrToProjector) {
                 var startAttrToProjector = {};
                 Rect.ANIMATED_ATTRIBUTES.forEach(function (attr) { return startAttrToProjector[attr] = attrToProjector[attr]; });
-                var growingAttr = this.isVertical ? "height" : "width";
-                var growingAttrProjector = attrToProjector[growingAttr];
-                if (!this.isReverse) {
-                    var movingAttr = this.isVertical ? "y" : "x";
-                    var movingAttrProjector = startAttrToProjector[movingAttr];
-                    var offsetProjector = this.isVertical ? growingAttrProjector : function (d, i) { return 0 - growingAttrProjector(d, i); };
-                    startAttrToProjector[movingAttr] = function (d, i) { return movingAttrProjector(d, i) + offsetProjector(d, i); };
-                }
-                startAttrToProjector[growingAttr] = d3.functor(0);
+                startAttrToProjector[this._getMovingAttr()] = this._startMovingAttrProjector(attrToProjector);
+                startAttrToProjector[this._getGrowingAttr()] = d3.functor(0);
                 selection.attr(startAttrToProjector);
                 return _super.prototype.animate.call(this, selection, attrToProjector);
             };
-            Rect.ANIMATED_ATTRIBUTES = ["height", "width", "x", "y"];
+            Rect.prototype._startMovingAttrProjector = function (attrToProjector) {
+                if (this.isVertical === this.isReverse) {
+                    return attrToProjector[this._getMovingAttr()];
+                }
+                var movingAttrProjector = attrToProjector[this._getMovingAttr()];
+                var growingAttrProjector = attrToProjector[this._getGrowingAttr()];
+                return function (d, i) { return movingAttrProjector(d, i) + growingAttrProjector(d, i); };
+            };
+            Rect.prototype._getGrowingAttr = function () {
+                return this.isVertical ? "height" : "width";
+            };
+            Rect.prototype._getMovingAttr = function () {
+                return this.isVertical ? "y" : "x";
+            };
+            Rect.ANIMATED_ATTRIBUTES = ["height", "width", "x", "y", "fill"];
             return Rect;
         })(Animator.Default);
         Animator.Rect = Rect;
