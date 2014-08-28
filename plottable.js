@@ -5331,6 +5331,7 @@ var Plottable;
             Stacked.prototype.stack = function () {
                 var datasets = this._getDatasetsInOrder();
                 d3.layout.stack().x(this._projectors["x"].accessor).y(this._projectors["y"].accessor).values(function (d) { return d.data(); })(datasets);
+                this.stackedExtent = [0, 0];
                 var maxY = Plottable.Util.Methods.max(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum.y0; });
                 if (maxY > 0) {
                     this.stackedExtent[1] = maxY;

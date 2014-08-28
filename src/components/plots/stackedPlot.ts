@@ -23,6 +23,7 @@ export module Abstract {
         .y(this._projectors["y"].accessor)
         .values((d) => d.data())(datasets);
 
+      this.stackedExtent = [0, 0];
       var maxY = Util.Methods.max(datasets[datasets.length - 1].data(), (datum: any) => datum.y + datum.y0);
       if (maxY > 0) {
         this.stackedExtent[1] = maxY;
