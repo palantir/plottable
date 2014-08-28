@@ -9,8 +9,9 @@
     "!bower.json",
     "!plottable.js",
     "!plottable.css",
+    "!plottable.min.js",
     "!plottable.d.ts",
-    "!plottable.min.js"
+    "!plottable-dev.d.ts"
   ],
   "keywords": [
     "plottable",
@@ -19,7 +20,13 @@
     "d3",
     "data viz",
     "chart",
-    "plot"
+    "charts",
+    "reusable charts",
+    "visualization",
+    "scatterplot",
+    "bar chart",
+    "plot",
+    "plots"
   ],
   "dependencies": {
     "d3": "3.4.5"

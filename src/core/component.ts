@@ -3,37 +3,35 @@
 module Plottable {
 export module Abstract {
   export class Component extends PlottableObject {
+    public static AUTORESIZE_BY_DEFAULT = true;
 
     public element: D3.Selection;
     public content: D3.Selection;
-    private hitBox: D3.Selection;
-    private interactionsToRegister: Interaction[] = [];
-    private boxes: D3.Selection[] = [];
-    private boxContainer: D3.Selection;
     public backgroundContainer: D3.Selection;
     public foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
-
-    private rootSVG: D3.Selection;
-    private isTopLevelComponent = false;
-    public _parent: ComponentContainer;
-
-    public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
-    public availableHeight: number;
     public xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
     public yOrigin: number;
-    private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
-    private _yOffset = 0;
+
+    public _parent: ComponentContainer;
     public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
     public _yAlignProportion = 0;
     public _fixedHeightFlag = false;
     public _fixedWidthFlag = false;
-
-    private cssClasses: string[] = ["component"];
-
     public _isSetup = false;
     public _isAnchored = false;
-    public static AUTORESIZE_BY_DEFAULT = true;
+
+    private hitBox: D3.Selection;
+    private interactionsToRegister: Interaction[] = [];
+    private boxes: D3.Selection[] = [];
+    private boxContainer: D3.Selection;
+    private rootSVG: D3.Selection;
+    private isTopLevelComponent = false;
+    private _width : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
+    private _height: number;
+    private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
+    private _yOffset = 0;
+    private cssClasses: string[] = ["component"];
     private removed = false;
 
     /**
@@ -158,10 +156,10 @@ export module Abstract {
         availableHeight = Math.min(availableHeight, requestedSpace.height);
       }
 
-      this.availableWidth   = availableWidth ;
-      this.availableHeight = availableHeight;
+      this._width  = availableWidth;
+      this._height = availableHeight;
       this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth ).attr("height", this.availableHeight));
+      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
     }
 
     /**
@@ -324,8 +322,8 @@ export module Abstract {
       var box = parentElement.append("rect");
       if (className != null) {box.classed(className, true);};
       this.boxes.push(box);
-      if (this.availableWidth  != null && this.availableHeight != null) {
-        box.attr("width", this.availableWidth ).attr("height", this.availableHeight);
+      if (this.width() != null && this.height() != null) {
+        box.attr("width", this.width()).attr("height", this.height());
       }
       return box;
     }
@@ -472,6 +470,25 @@ export module Abstract {
       this.detach();
       Core.ResizeBroadcaster.deregister(this);
     }
+
+    /**
+     * Return the width of the component
+     *
+     * @return {number} width of the component
+     */
+    public width(): number {
+      return this._width;
+    }
+
+    /**
+     * Return the height of the component
+     *
+     * @return {number} height of the component
+     */
+    public height(): number {
+      return this._height;
+    }
+
   }
 }
 }

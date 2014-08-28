@@ -40,14 +40,14 @@ describe("Plots", () => {
       renderer.baseline(0);
       var xAxis = new Plottable.Axis.Category(xScale, "bottom");
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
-      axisHeight = xAxis.availableHeight;
+      axisHeight = xAxis.height();
       bandWidth = xScale.rangeBand();
     });
 
     beforeEach(() => {
       verifier.start();
     });
-    
+
     afterEach(() => {
       verifier.end();
     });

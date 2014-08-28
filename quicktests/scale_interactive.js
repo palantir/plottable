@@ -1,8 +1,12 @@
 function makeData() {
+  "use strict";
+
   return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
+  "use strict";
+
   var svg = div.append("svg").attr("height", 500);
   data = _.cloneDeep(data);
   var dataseries = data[0].splice(0, 20);
@@ -39,7 +43,9 @@ function run(div, data, Plottable) {
   var basicTable = new Plottable.Component.Table([[null, xAxisTable2, null],
                                     [yAxisTable, renderAreaD1.merge(gridlines), yAxisTable2],
                                     [null, xAxisTable, null]]);
+  
   basicTable.renderTo(svg);
+
   var pzi = new Plottable.Interaction.PanZoom(renderAreaD1, xScale, yScale);
   pzi.registerWithComponent();
 

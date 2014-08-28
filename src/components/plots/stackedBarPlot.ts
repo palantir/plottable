@@ -11,10 +11,6 @@ export module Plot {
     public _baseline: D3.Selection;
     private stackedExtent: number[] = [];
 
-    constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
-      super(xScale, yScale);
-    }
-
     public _addDataset(key: string, dataset: any) {
       super._addDataset(key, dataset);
       this.stackedData = this.stack(this._projectors["y"].accessor);
@@ -71,7 +67,14 @@ export module Plot {
 
     public _paint() {
       var attrHash = this._generateAttrToProjector();
-      this._getDrawersInOrder().forEach((d, i) => d.draw(this.stackedData[i], attrHash));
+      this._getDrawersInOrder().forEach((d: Abstract._Drawer, i: number) => {
+        var animator: Animator.Rect;
+        if (this._animate) {
+          animator = new Animator.Rect();
+          animator.delay(animator.duration() * i);
+        }
+        d.draw(this.stackedData[i], attrHash, animator);
+      });
     }
   }
 }

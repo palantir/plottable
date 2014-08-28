@@ -1,8 +1,12 @@
 function makeData() {
+  "use strict";
+
   return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
+  "use strict";
+
   var svg = div.append("svg").attr("height", 500);
 
   var xScale = new Plottable.Scale.Linear();
@@ -15,7 +19,7 @@ function run(div, data, Plottable) {
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var renderGroup = renderAreaD1.merge(gridlines);
   var chart = new Plottable.Component.Table([[yAxis, renderGroup],
-                                         [null,  xAxis]]);
+   [null,  xAxis]]);
 
   chart.renderTo(svg);
 

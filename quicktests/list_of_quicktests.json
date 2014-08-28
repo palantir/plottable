@@ -1,5 +1,8 @@
 [
   {
+    "name":"add_time",
+    "categories":["Standard Chart", "Time Scale", "Linear Scale", "Datasource", "Vertical Bar Plot", "Time Axis", "Numeric Axis", "Merge", "Gridlines", "Click Interaction"]
+  },  {
     "name":"animate_area",
     "categories":["Linear Scale", "Numeric Axis", "Area Plot", "Project", "Animate", "Click Interaction"]
   },  {
@@ -29,36 +32,42 @@
   },  {
     "name":"category_project",
     "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Project", "Animate", "Title", "Label"]
-  },  {  
+  },  {
     "name":"category_verticalBar",
     "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Project", "Animate"]
+  },  {
+    "name":"categoryAxis_timeAxis",
+    "categories":["Time Scale", "Ordinal Scale", "Horizontal Bar Plot", "Project", "Time Axis", "Category Axis", "Gridlines", "Group", "Standard Chart", "PanZoom Interaction"]
   },  {
     "name":"changeData_onClick",
     "categories":["Data", "Datasource", "Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Scatter Plot", "Animate", "Merge", "Click Interaction"]
   },  {
     "name":"domainChange",
     "categories":["Datasource", "Linear Scale", "Numeric Axis", "Line Plot", "Scatter Plot", "Label", "Click Interaction", "Domain"]
-  },  {    
+  },  {
     "name":"formatter",
     "categories":["Linear Scale", "Numeric Axis", "Line Plot", "Formatter", "Click Interaction", "Layout", "Data"]
   },  {
     "name":"heightWeight_project",
-    "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Accessor", "Project"]   
-  },  {    
+    "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Accessor", "Project"]
+  },  {
     "name":"interaction_dragzoomx",
     "categories":["Data", "Linear Scale", "Numeric Axis", "Accessor", "Project", "Area Plot", "Gridlines", "Merge", "Group"]
   },  {
     "name":"interaction_panzoom",
     "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Gridlines", "Merge", "PanZoom Interaction"]
   },  {
+    "name":"key_interaction",
+    "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "PanZoom Interaction", "Key Interaction"]
+  },  {
     "name":"layout_tables",
     "categories":["Linear Scale", "Numeric Axis", "Line Plot", "Area Plot", "Layout", "Label", "Table", "Project"]
   },  {
     "name":"legend_basic",
-    "categories":["Legend", "Title", "Gridlines", "Color Scale", "Scatter Plot", "Line Plot", "Numeric Axis", "Metadata", "Project", "Merge", "Linear Scale"]
+    "categories":["Legend", "Title", "Gridlines", "Color Scale", "Axis Label", "Scatter Plot", "Line Plot", "Numeric Axis", "Metadata", "Project", "Merge", "Linear Scale"]
   },  {
     "name":"modifiedLog",
-    "categories":["Datasource", "Metadata", "Modified Log Scale", "Color Scale", "Line Plot", "Numeric Axis", "Accessor", "Project", "Merge", "Detach"]
+    "categories":["Datasource", "Metadata", "Modified Log Scale", "Color Scale", "Line Plot", "Numeric Axis", "Accessor", "Project", "Toggle Legend"]
   },  {
     "name":"no_data",
     "categories":[ "Linear Scale", "Numeric Axis", "Area Plot", "Scatter Plot", "Vertical Bar Plot", "Horizontal Bar Plot", "Line Plot", "Table", "Layout"]
@@ -71,7 +80,10 @@
   },  {
     "name":"project_width",
     "categories":["Linear Scale", "Numeric Axis", "Ordinal Scale", "Category Axis", "Vertical Bar Plot", "Gridlines", "Accessor", "Project", "Click Interaction"]
-  },  {    
+  },  {
+    "name":"render_behavior",
+    "categories":["Data", "Area Plot", "Datasource", "Label", "Linear Scale", "Numeric Axis", "Click Interaction"]
+  },  {
     "name":"scale_date",
     "categories":["Data", "Time Scale", "Linear Scale", "Numeric Axis", "Project", "Accessor", "Line Plot"]
   },  {
@@ -80,8 +92,14 @@
   },  {
     "name":"select_bars",
     "categories":["Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Gridlines", "Merge", "Click Interaction", "XYDragBox Interaction", "Title"]
-  },  {    
+  },  {
     "name":"select_zoom",
     "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Merge", "Title", "Legend", "XYDragBox Interaction", "Double Click Interaction"]
+  }, {
+    "name":"titleLegend_change",
+    "categories":["Datasource", "Metadata", "Color Scale", "Scatter Plot", "Line Plot", "Area Plot", "Domain", "Linear Scale", "Numeric Axis", "Project", "Accessor", "Title", "Label", "Layout", "Click Interaction"]
+  },  {
+    "name":"stacked-bar-test",
+    "categories":["Linear Scale", "Numeric Axis", "Animate", "Legend", "Category Axis", "Linear Scale", "Vertical Bar Plot", "Stacked Plot"]
   }
 ]

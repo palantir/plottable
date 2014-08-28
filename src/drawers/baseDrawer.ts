@@ -31,7 +31,7 @@ export module Abstract {
      * @param{any[][]} data The data to be drawn
      * @param{attrHash} IAttributeToProjector The list of attributes to set on the data
      */
-    public draw(data: any[][], attrToProjector: IAttributeToProjector) {
+    public draw(data: any[][], attrToProjector: IAttributeToProjector, animator = new Animator.Null()) {
       throw new Error("Abstract Method Not Implemented");
     }
   }
