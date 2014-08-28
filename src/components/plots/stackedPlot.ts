@@ -24,6 +24,11 @@ export module Abstract {
       if (maxY > 0) {
         this.stackedExtent[1] = maxY;
       }
+
+      var minY = d3.min(datasets[datasets.length - 1].data(), (datum: any) => datum.y + datum.y0);
+      if (minY < 0) {
+        this.stackedExtent[0] = minY;
+      }
     }
 
     public _updateAllProjectors() {
