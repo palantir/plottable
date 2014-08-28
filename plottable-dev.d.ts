@@ -1152,10 +1152,14 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         class Rect extends Default {
+            static ANIMATED_ATTRIBUTES: string[];
             isVertical: boolean;
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
             animate(selection: any, attrToProjector: IAttributeToProjector): any;
+            _startMovingAttrProjector(attrToProjector: IAttributeToProjector): IAppliedAccessor;
+            _getGrowingAttr(): string;
+            _getMovingAttr(): string;
         }
     }
 }
