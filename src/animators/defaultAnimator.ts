@@ -8,7 +8,7 @@ export module Animator {
    */
   export class Default implements IPlotAnimator {
     public _durationMsec = 300;
-    public _delayMsec = 0;
+    public _delayMsec = 500;
     public _easing = "exp-out";
 
     public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection {
