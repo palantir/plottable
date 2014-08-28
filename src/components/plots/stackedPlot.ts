@@ -8,7 +8,7 @@ export module Abstract {
 
     public _onDataSourceUpdate() {
       super._onDataSourceUpdate();
-      // HACKHACK Caused since we're adding a null datasource to plot before any projectors are placed
+      // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
       if (this._datasetKeysInOrder != null &&
           this._projectors["x"] != null &&
           this._projectors["y"] != null) {
