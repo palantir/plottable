@@ -21,6 +21,7 @@
 
         var xAxis = new Plottable.Axis.Category(xScale, "bottom");
         var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+        xScale.rangeType("points");
         stackedAreaRenderer = new Plottable.Plot.StackedArea(xScale, yScale)
           .addDataset("d1", data1)
           .addDataset("d2", data2)
