@@ -634,6 +634,15 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
+        class Area extends Plottable.Abstract._Drawer {
+            draw(data: any[][], attrToProjector: IAttributeToProjector): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
         class Rect extends Plottable.Abstract._Drawer {
             draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
         }
@@ -867,6 +876,23 @@ declare module Plottable {
         class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
             static DEFAULT_WIDTH: number;
             constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class Stacked extends NewStylePlot {
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
+        class StackedArea extends Plottable.Abstract.Stacked {
+            constructor(xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.QuantitativeScale);
         }
     }
 }
