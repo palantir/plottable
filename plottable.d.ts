@@ -228,6 +228,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Component extends PlottableObject {
+            static AUTORESIZE_BY_DEFAULT: boolean;
             element: D3.Selection;
             content: D3.Selection;
             backgroundContainer: D3.Selection;
@@ -235,7 +236,6 @@ declare module Plottable {
             clipPathEnabled: boolean;
             xOrigin: number;
             yOrigin: number;
-            static AUTORESIZE_BY_DEFAULT: boolean;
             renderTo(element: any): Component;
             resize(width?: number, height?: number): Component;
             autoResize(flag: boolean): Component;

@@ -1116,19 +1116,19 @@ var Plottable;
             __extends(Component, _super);
             function Component() {
                 _super.apply(this, arguments);
-                this.interactionsToRegister = [];
-                this.boxes = [];
                 this.clipPathEnabled = false;
-                this.isTopLevelComponent = false;
-                this._xOffset = 0;
-                this._yOffset = 0;
                 this._xAlignProportion = 0;
                 this._yAlignProportion = 0;
                 this._fixedHeightFlag = false;
                 this._fixedWidthFlag = false;
-                this.cssClasses = ["component"];
                 this._isSetup = false;
                 this._isAnchored = false;
+                this.interactionsToRegister = [];
+                this.boxes = [];
+                this.isTopLevelComponent = false;
+                this._xOffset = 0;
+                this._yOffset = 0;
+                this.cssClasses = ["component"];
                 this.removed = false;
             }
             Component.prototype._anchor = function (element) {
@@ -1219,7 +1219,7 @@ var Plottable;
                 this._width = availableWidth;
                 this._height = availableHeight;
                 this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-                this.boxes.forEach(function (b) { return b.attr("width", _this._width).attr("height", _this._height); });
+                this.boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             };
             Component.prototype._render = function () {
                 if (this._isAnchored && this._isSetup) {
@@ -1332,8 +1332,8 @@ var Plottable;
                 }
                 ;
                 this.boxes.push(box);
-                if (this._width != null && this._height != null) {
-                    box.attr("width", this._width).attr("height", this._height);
+                if (this.width() != null && this.height() != null) {
+                    box.attr("width", this.width()).attr("height", this.height());
                 }
                 return box;
             };
