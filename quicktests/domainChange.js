@@ -1,16 +1,20 @@
 
 function makeData() {
+  "use strict";
+
   return [makeRandomData(50), makeRandomData(50)];
-  
+
 }
 
 function run(div, data, Plottable) {
+  "use strict";
+
   var svg = div.append("svg").attr("height", 500);
   data = _.cloneDeep(data);
 
     var boringData = function () {
         return [{x: 0, y: 0}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 2, y: 6}, {x: 30, y: 70}];
-    }
+    };
 
 
     var dataseries1 = new Plottable.DataSource(boringData());
@@ -31,7 +35,7 @@ function run(div, data, Plottable) {
     //rendering
     var linePlot = new Plottable.Plot.Line(dataseries2, xScale, yScale);
     var scatterPlot = new Plottable.Plot.Scatter(dataseries3, xScale, yScale);
-    
+
     var autoXLabel = new Plottable.Component.Label("autodomain X");
     var focusXLabel = new Plottable.Component.Label("focus X");
     var autoYLabel = new Plottable.Component.Label("autodomain Y");
@@ -52,10 +56,10 @@ function run(div, data, Plottable) {
     basicTable.renderTo(svg);
 
     function xAuto(){
-         xScale.autoDomain();   
+         xScale.autoDomain();
     }
     function yAuto(){
-         yScale.autoDomain();   
+         yScale.autoDomain();
     }
     function xFocus(){
         xScale.domain([0, 3]);
@@ -63,22 +67,22 @@ function run(div, data, Plottable) {
     function yFocus(){
         yScale.domain([0, 8]);
     }
-    xAutoInteraction = new            
+    var xAutoInteraction = new
         Plottable.Interaction.Click(autoXLabel)
         .callback(xAuto)
         .registerWithComponent();
-    yAutoInteraction = new            
+    var yAutoInteraction = new
         Plottable.Interaction.Click(autoYLabel)
         .callback(yAuto)
         .registerWithComponent();
-    xFocusInteraction = new            
+    var xFocusInteraction = new
         Plottable.Interaction.Click(focusXLabel)
         .callback(xFocus)
         .registerWithComponent();
-    yFocusInteraction = new            
+    var yFocusInteraction = new
         Plottable.Interaction.Click(focusYLabel)
         .callback(yFocus)
-        .registerWithComponent();    
+        .registerWithComponent();
 
 
 

@@ -1,4 +1,6 @@
 function makeData() {
+  "use strict";
+
   var data1 = [{name: "jon", y: 1, type: "q1"}, {name: "dan", y: 2, type: "q1"}, {name: "zoo", y: 1, type: "q1"}];
   var data2 = [{name: "jon", y: 2, type: "q2"}, {name: "dan", y: 4, type: "q2"}, {name: "zoo", y: 2, type: "q2"}];
   var data3 = [{name: "jon", y: 4, type: "q3"}, {name: "dan", y: 15, type: "q3"}, {name: "zoo", y: 15, type: "q3"}];
@@ -6,6 +8,8 @@ function makeData() {
 }
 
 function run(div, data, Plottable) {
+  "use strict";
+
   var svg = div.append("svg").attr("height", 500);
   var xScale = new Plottable.Scale.Ordinal();
   var yScale = new Plottable.Scale.Linear();
@@ -21,7 +25,7 @@ function run(div, data, Plottable) {
     .project("y", "y", yScale)
     .project("fill", "type", colorScale)
     .project("type", "type")
-    .project("yval", "y")
+    .project("yval", "y");
 
   var center = stackedBarRenderer.merge(new Plottable.Component.Legend(colorScale));
 

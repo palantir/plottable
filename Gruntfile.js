@@ -53,7 +53,7 @@ module.exports = function(grunt) {
       createTag: false,
       push: false
     }
-  }
+  };
 
   var FILES_TO_COMMIT = ['plottable.js',
                          'plottable.min.js',
@@ -69,7 +69,7 @@ module.exports = function(grunt) {
   var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
   var nestedBraceMatch = ": \\{[^{}]*\\}";
   var typeNameMatch = ": [^;]*";
-  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?\\n?;"
+  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?\\n?;";
   var jsdoc_init = "\\n *\\/\\*\\* *\\n";
   var jsdoc_mid = "( *\\*[^\\n]*\\n)+";
   var jsdoc_end = " *\\*\\/ *";
@@ -202,6 +202,29 @@ module.exports = function(grunt) {
         configuration: grunt.file.readJSON("tslint.json")
       },
       files: ["src/**/*.ts", "test/**.ts"]
+    },
+    jshint: {
+      files: ['Gruntfile.js', 'quicktests/**/*.js'],
+      options: {
+          "curly": true,
+          "eqeqeq": true,
+          "evil": true,
+          "indent": 2,
+          "latedef": true,
+          "globals": {
+            "jQuery": true,
+            "d3": true,
+            "window": true,
+            "console": true,
+            "$": true,
+            "makeRandomData": true,
+            "setTimeout": true,
+            "document": true,
+            "Plottable": true
+          },
+          "strict": true,
+          "eqnull": true
+      }
     },
     watch: {
       "options": {
@@ -355,7 +378,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
-  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "tslint", "ts:verify_d_ts"]);
+  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "tslint", "jshint", "ts:verify_d_ts"]);
   // Disable saucelabs for external pull requests. Check if we can see the SAUCE_USERNAME
   var travisTests = ["test"];
   if (process.env.SAUCE_USERNAME) {
