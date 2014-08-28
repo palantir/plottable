@@ -5148,6 +5148,10 @@ var Plottable;
                 if (maxY > 0) {
                     this.stackedExtent[1] = maxY;
                 }
+                var minY = d3.min(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum.y0; });
+                if (minY < 0) {
+                    this.stackedExtent[0] = minY;
+                }
             };
             Stacked.prototype._updateAllProjectors = function () {
                 _super.prototype._updateAllProjectors.call(this);
@@ -5220,14 +5224,6 @@ var Plottable;
             StackedArea.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
                 var scale = this.yScale;
-                if (!scale._userSetDomainer) {
-                    scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
-                    scale._autoDomainIfAutomaticMode();
-                }
-            };
-            StackedArea.prototype._updateXDomainer = function () {
-                _super.prototype._updateYDomainer.call(this);
-                var scale = this.xScale;
                 if (!scale._userSetDomainer) {
                     scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
                     scale._autoDomainIfAutomaticMode();
