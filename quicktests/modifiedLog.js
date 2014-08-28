@@ -1,20 +1,22 @@
 
 function makeData() {
-  "use strict"
+  "use strict";
+
   return [makeRandomData(50), makeRandomData(50)];
 
 }
 
 function run(div, data, Plottable) {
-  "use strict"
+  "use strict";
+
   var svg = div.append("svg").attr("height", 500);
 
-  var bigger = function(d){
-    d.x = Math.pow(3, d.x);
-    d.y = Math.pow(3, d.y);
-    if (d.x == Infinity) {d.x = Math.pow(10, 10)};
-    if (d.y == Infinity) {d.y = Math.pow(10, 10)};
-  }
+    var bigger = function(d){
+        d.x = Math.pow(3, d.x);
+        d.y = Math.pow(3, d.y);
+        if (d.x === Infinity) {d.x = Math.pow(10, 10);}
+        if (d.y === Infinity) {d.y = Math.pow(10, 10);}
+    };
 
   var d1 = data[0].slice(0, 20);
   d1.forEach(bigger);
@@ -24,9 +26,6 @@ function run(div, data, Plottable) {
   d3.forEach(bigger);
   var d4 = data[0].slice(0, 20);
   d4.forEach(bigger);
-
-  console.log(d1, d2, d3, d4);
-
 
     //data
     var dataseries1 = new Plottable.DataSource(d1);
@@ -75,64 +74,30 @@ function run(div, data, Plottable) {
     var basicTable = new Plottable.Component.Table().addComponent(0,2, titleTable)
                 .addComponent(1, 1, yAxis)
                 .addComponent(1, 2, renderAreas)
-                .addComponent(2, 2, xAxis)
+                .addComponent(2, 2, xAxis);
 
     basicTable.renderTo(svg);
+    function flipy(element, index, array) {
+      element.y = -1 * element.y;
+    }
+    function flipx(element, index, array) {
+      element.x = -1 * element.x;
+    }
+
+    function flipData() {
+        var ds = dataseries4.data();
+        ds.forEach(flipy);
+        dataseries4.data(ds);
+
+        ds = dataseries3.data();
+        ds.forEach(flipy);
+        ds.forEach(flipx);
+        dataseries3.data(ds);
+
+        ds = dataseries2.data();
+        ds.forEach(flipx);
+        dataseries2.data(ds);
+    }
     flipData();
 
-function flipy(element, index, array) {
-  element.y = -1 * element.y;
-}
-function flipx(element, index, array) {
-  element.x = -1 * element.x;
-}
-
-
-  //title + legend
-  var title1 = new Plottable.Component.TitleLabel( "Two Data Series", "horizontal");
-  var legend1 = new Plottable.Component.Legend(colorScale1);
-  legend1.toggleCallback(
-    function (d, b) {
-      var index = colorScale1.domain().indexOf(d);
-      if(renderersIncluded[index]){
-        renderers[index].detach();
-        renderersIncluded[index] = 0;
-      } else{
-        renderAreas.merge(renderers[index]);
-        renderersIncluded[index] = 1;
-      }
-    }
-    );
-  var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
-  .addComponent(0,1, legend1);
-
-  basicTable = new Plottable.Component.Table().addComponent(0,2, titleTable)
-  .addComponent(1, 1, yAxis)
-  .addComponent(1, 2, renderAreas)
-  .addComponent(2, 2, xAxis)
-
-  basicTable.renderTo(svg);
-  flipData();
-
-  function flipy(element, index, array) {
-    element.y = -1 * element.y;
-  }
-  function flipx(element, index, array) {
-    element.x = -1 * element.x;
-  }
-
-  function flipData(){
-    var ds = dataseries4.data();
-    ds.forEach(flipy);
-    dataseries4.data(ds);
-
-    ds = dataseries3.data();
-    ds.forEach(flipy);
-    ds.forEach(flipx);
-    dataseries3.data(ds);
-
-    ds = dataseries2.data();
-    ds.forEach(flipx);
-    dataseries2.data(ds);
-  }
 }

@@ -1,9 +1,13 @@
 function makeData() {
-  return [makeRandomData(50), makeRandomData(50)];
+  "use strict";
+
+    return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
-  var svg = div.append("svg").attr("height", 500);
+  "use strict";
+
+    var svg = div.append("svg").attr("height", 500);
 
   var renderers = [];
 
@@ -23,13 +27,13 @@ function run(div, data, Plottable) {
     renderers.push(renderer);
   }
 
-  var cg = new Plottable.Component.Group();
-  renderers.forEach(function(renderer, i) {
-    renderer
-    .project("fill", function() { return colors[i]; })
-    .project("r", function(){ return 6;})
-    cg.merge(renderer);
-  });
+        var cg = new Plottable.Component.Group();
+        renderers.forEach(function(renderer, i) {
+            renderer
+            .project("fill", function() { return colors[i]; })
+            .project("r", function(){ return 6;});
+            cg.merge(renderer);
+        });
 
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
@@ -45,24 +49,25 @@ function run(div, data, Plottable) {
   var outerTable = new Plottable.Component.Table([[chart, legendTable]]);
   outerTable.renderTo(svg);
 
-  var cb = function(xy) {
-    var invertedXMin = xScale.invert(xy.xMin);
-    var invertedXMax = xScale.invert(xy.xMax);
-    var invertedYMin = yScale.invert(xy.yMax);
-    var invertedYMax = yScale.invert(xy.yMin);
-    xScale.domain([invertedXMin, invertedXMax]);
-    yScale.domain([invertedYMin, invertedYMax]);
-    dragboxInteraction.clearBox();
-  }
+        var cb = function(xy) {
+            if (xy == null) {console.log("starting drag"); return;}
+            var invertedXMin = xScale.invert(xy.xMin);
+            var invertedXMax = xScale.invert(xy.xMax);
+            var invertedYMin = yScale.invert(xy.yMax);
+            var invertedYMax = yScale.invert(xy.yMin);
+            xScale.domain([invertedXMin, invertedXMax]);
+            yScale.domain([invertedYMin, invertedYMax]);
+            dragboxInteraction.clearBox();
+        };
 
-  var dragboxInteraction = new Plottable.Interaction.XYDragBox(cg)
-    .dragend(cb)
-    .registerWithComponent();
+        var dragboxInteraction = new Plottable.Interaction.XYDragBox(cg)
+             .dragend(cb)
+             .registerWithComponent();
 
-  var cb2 = function(xy) {
-    xScale.autoDomain();
-    yScale.autoDomain();
-  }
+        var cb2 = function(xy) {
+            xScale.autoDomain();
+            yScale.autoDomain();
+        };
 
   var doubleClickInteraction = new Plottable.Interaction.DoubleClick(cg)
                                             .callback(cb2)

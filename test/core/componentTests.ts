@@ -54,8 +54,8 @@ describe("Component behavior", () => {
 
       svg.attr("width", 2*SVG_WIDTH).attr("height", 2*SVG_HEIGHT);
       c._computeLayout();
-      assert.equal(c.width() , 2*SVG_WIDTH, "computeLayout updated width to new svg width");
-      assert.equal(c.height(), 2*SVG_HEIGHT, "computeLayout updated height to new svg height");
+      assert.equal(c.width() , 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
+      assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin is still 0");
 

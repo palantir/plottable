@@ -1,11 +1,13 @@
 
 function makeData() {
-  "use strict"
+  "use strict";
+
   return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
-  "use strict"
+  "use strict";
+
   var svg = div.append("svg").attr("height", 500);
 
   var alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i",
@@ -26,9 +28,9 @@ function run(div, data, Plottable) {
   var widthPicker = function(){
     var availableSpace = xAxis.availableWidth;
     var numBars = ds.data().length;
-    var w = availableSpace * .7 / numBars;
+    var w = availableSpace * 0.7 / numBars;
     return w;
-  }
+  };
 
   var barRenderer = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
                                  .project("x", "name", xScale)

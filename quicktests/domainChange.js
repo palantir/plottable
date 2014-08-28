@@ -1,15 +1,19 @@
 
 function makeData() {
+  "use strict";
+
   return [makeRandomData(50), makeRandomData(50)];
 
 }
 
 function run(div, data, Plottable) {
+  "use strict";
+
   var svg = div.append("svg").attr("height", 500);
 
-  var boringData = function () {
-    return [{x: 0, y: 0}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 2, y: 6}, {x: 30, y: 70}];
-  }
+    var boringData = function () {
+        return [{x: 0, y: 0}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 2, y: 6}, {x: 30, y: 70}];
+    };
 
   var dataseries = new Plottable.DataSource(boringData());
 
@@ -31,17 +35,14 @@ function run(div, data, Plottable) {
   var autoYLabel = new Plottable.Component.Label("autodomain Y");
   var focusYLabel = new Plottable.Component.Label("focus Y");
 
-  var basicTable = new Plottable.Component.Table()
-  .addComponent(2, 0, yAxis2)
-  .addComponent(2, 1, linePlot)
-  .addComponent(2, 2, yAxis)
-  .addComponent(2, 3, scatterPlot)
-  .addComponent(3, 3, xAxis)
-  .addComponent(3, 1, xAxis2)
-  .addComponent(4, 1, autoXLabel)
-  .addComponent(5, 1, focusXLabel)
-  .addComponent(4, 3, autoYLabel)
-  .addComponent(5, 3, focusYLabel);
+    //rendering
+    var linePlot = new Plottable.Plot.Line(dataseries2, xScale, yScale);
+    var scatterPlot = new Plottable.Plot.Scatter(dataseries3, xScale, yScale);
+
+    var autoXLabel = new Plottable.Component.Label("autodomain X");
+    var focusXLabel = new Plottable.Component.Label("focus X");
+    var autoYLabel = new Plottable.Component.Label("autodomain Y");
+    var focusYLabel = new Plottable.Component.Label("focus Y");
 
   basicTable.renderTo(svg);
 
@@ -58,22 +59,34 @@ function run(div, data, Plottable) {
     yScale.domain([0, 8]);
   }
 
-  xAutoInteraction = new
-  Plottable.Interaction.Click(autoXLabel)
-  .callback(xAuto)
-  .registerWithComponent();
-  yAutoInteraction = new
-  Plottable.Interaction.Click(autoYLabel)
-  .callback(yAuto)
-  .registerWithComponent();
-  xFocusInteraction = new
-  Plottable.Interaction.Click(focusXLabel)
-  .callback(xFocus)
-  .registerWithComponent();
-  yFocusInteraction = new
-  Plottable.Interaction.Click(focusYLabel)
-  .callback(yFocus)
-  .registerWithComponent();
+    function xAuto(){
+         xScale.autoDomain();
+    }
+    function yAuto(){
+         yScale.autoDomain();
+    }
+    function xFocus(){
+        xScale.domain([0, 3]);
+    }
+    function yFocus(){
+        yScale.domain([0, 8]);
+    }
+    var xAutoInteraction = new
+        Plottable.Interaction.Click(autoXLabel)
+        .callback(xAuto)
+        .registerWithComponent();
+    var yAutoInteraction = new
+        Plottable.Interaction.Click(autoYLabel)
+        .callback(yAuto)
+        .registerWithComponent();
+    var xFocusInteraction = new
+        Plottable.Interaction.Click(focusXLabel)
+        .callback(xFocus)
+        .registerWithComponent();
+    var yFocusInteraction = new
+        Plottable.Interaction.Click(focusYLabel)
+        .callback(yFocus)
+        .registerWithComponent();
 
 
 

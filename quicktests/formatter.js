@@ -1,22 +1,18 @@
 function makeData() {
-  "use strict"
+  "use strict";
+
   return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
-  "use strict"
+  "use strict";
+
   var svg = div.append("svg").attr("height", 500);
   data = _.cloneDeep(data);
 
-  var large_x = function(d){
-    d.x = d.x*100000000;
-  }
-  var custFormatter = function(d) {
-    if(parseInt(d) < 1){
-      d = "less than 1";
-    }
-    return d;
-  };
+    var large_x = function(d){
+         d.x = d.x*100000000;
+    };
 
 
   var big_numbers = data[0].slice(0, 5);
@@ -32,13 +28,11 @@ function run(div, data, Plottable) {
 
   var plot = new Plottable.Plot.Line(dataseries1, xScale, yScale);
 
-  var IdTitle = new Plottable.Component.Label("Identity");
-  var GenTitle = new Plottable.Component.Label("General");
-  var FixTitle = new Plottable.Component.Label("Fixed");
-  var CurrTitle = new Plottable.Component.Label("Currency");
-  var PerTitle = new Plottable.Component.Label("Percentage");
-  var SITitle = new Plottable.Component.Label("SI");
-  var CustTitle = new Plottable.Component.Label("Custom");
+    var basicTable = new Plottable.Component.Table([[yAxis, plot], [null, xAxis]]);
+	  var formatChoices = new Plottable.Component.Table([[IdTitle, GenTitle, FixTitle],[CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);
+    var bigTable = new Plottable.Component.Table([[basicTable],[formatChoices]]);
+    formatChoices.xAlign("center");
+    bigTable.renderTo(svg);
 
   var basicTable = new Plottable.Component.Table([[yAxis, plot], [null, xAxis]])
   var formatChoices = new Plottable.Component.Table([[IdTitle, GenTitle, FixTitle],[CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);
@@ -97,4 +91,6 @@ function run(div, data, Plottable) {
   new Plottable.Interaction.Click(CustTitle)
     .callback(custom_frmt)
     .registerWithComponent();
+
+
 }

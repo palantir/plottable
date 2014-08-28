@@ -1,17 +1,19 @@
 function makeData() {
-    return [makeRandomData(50), makeRandomData(50)];
+  "use strict";
+
+    return [
+        { name: "Spot", age: 8 },
+        { name: "Poptart", age: 1 },
+        { name: "Budoka", age: 3 },
+        { name: "Sugar", age: 14 },
+        { name: "Tac", age: -5 }
+      ];
 }
 
 function run(div, data, Plottable) {
-    var svg = div.append("svg").attr("height", 500);
-    var data = [
-    { name: "Spot", age: 8 },
-    { name: "Poptart", age: 1 },
-    { name: "Budoka", age: 3 },
-    { name: "Sugar", age: 14 },
-    { name: "Tac", age: -5 }
-    ];
+  "use strict";
 
+    var svg = div.append("svg").attr("height", 500);
     var ds = new Plottable.DataSource(data);
     var yScale = new Plottable.Scale.Ordinal();
     var yAxis = new Plottable.Axis.Category(yScale, "left");
