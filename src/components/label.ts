@@ -93,13 +93,13 @@ export module Component {
     public _doRender() {
       super._doRender();
       this.textContainer.text("");
-      var dimension = this.orientation === "horizontal" ? this.availableWidth : this.availableHeight;
+      var dimension = this.orientation === "horizontal" ? this.width() : this.height();
       var truncatedText = Util.Text.getTruncatedText(this._text, dimension, this.measurer);
       if (this.orientation === "horizontal") {
-        Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.availableWidth, this.availableHeight,
+        Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.width(), this.height(),
                                         this.xAlignment, this.yAlignment);
       } else {
-        Util.Text.writeLineVertically(truncatedText, this.textContainer, this.availableWidth, this.availableHeight,
+        Util.Text.writeLineVertically(truncatedText, this.textContainer, this.width(), this.height(),
                                         this.xAlignment, this.yAlignment, this.orientation);
       }
     }

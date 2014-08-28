@@ -239,8 +239,6 @@ declare module Plottable {
             foregroundContainer: D3.Selection;
             clipPathEnabled: boolean;
             _parent: ComponentContainer;
-            availableWidth: number;
-            availableHeight: number;
             xOrigin: number;
             yOrigin: number;
             _xAlignProportion: number;
@@ -273,6 +271,8 @@ declare module Plottable {
             merge(c: Component): Plottable.Component.Group;
             detach(): Component;
             remove(): void;
+            width(): number;
+            height(): number;
         }
     }
 }
@@ -745,8 +745,8 @@ declare module Plottable {
             _scale: Scale;
             _formatter: Formatter;
             _orientation: string;
-            _width: any;
-            _height: any;
+            _userRequestedWidth: any;
+            _userRequestedHeight: any;
             _computedWidth: number;
             _computedHeight: number;
             constructor(scale: Scale, orientation: string, formatter?: (d: any) => string);

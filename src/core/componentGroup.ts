@@ -37,7 +37,7 @@ export module Component {
                   availableHeight?: number): Group {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
       this._components.forEach((c) => {
-        c._computeLayout(0, 0, this.availableWidth, this.availableHeight);
+        c._computeLayout(0, 0, this.width(), this.height());
       });
       return this;
     }
