@@ -35,15 +35,11 @@ function run(div, data, Plottable) {
   var autoYLabel = new Plottable.Component.Label("autodomain Y");
   var focusYLabel = new Plottable.Component.Label("focus Y");
 
-    //rendering
-    var linePlot = new Plottable.Plot.Line(dataseries2, xScale, yScale);
-    var scatterPlot = new Plottable.Plot.Scatter(dataseries3, xScale, yScale);
-
-    var autoXLabel = new Plottable.Component.Label("autodomain X");
-    var focusXLabel = new Plottable.Component.Label("focus X");
-    var autoYLabel = new Plottable.Component.Label("autodomain Y");
-    var focusYLabel = new Plottable.Component.Label("focus Y");
-
+  var basicTable = new Plottable.Component.Table([
+    [yAxis, yAxis2, linePlot.merge(scatterPlot)],
+    [null, null, xAxis],
+    [null, null, xAxis2]
+    ]);
   basicTable.renderTo(svg);
 
   function xAuto(){
@@ -59,35 +55,21 @@ function run(div, data, Plottable) {
     yScale.domain([0, 8]);
   }
 
-    function xAuto(){
-         xScale.autoDomain();
-    }
-    function yAuto(){
-         yScale.autoDomain();
-    }
-    function xFocus(){
-        xScale.domain([0, 3]);
-    }
-    function yFocus(){
-        yScale.domain([0, 8]);
-    }
-    var xAutoInteraction = new
-        Plottable.Interaction.Click(autoXLabel)
-        .callback(xAuto)
-        .registerWithComponent();
-    var yAutoInteraction = new
-        Plottable.Interaction.Click(autoYLabel)
-        .callback(yAuto)
-        .registerWithComponent();
-    var xFocusInteraction = new
-        Plottable.Interaction.Click(focusXLabel)
-        .callback(xFocus)
-        .registerWithComponent();
-    var yFocusInteraction = new
-        Plottable.Interaction.Click(focusYLabel)
-        .callback(yFocus)
-        .registerWithComponent();
-
-
+  var xAutoInteraction = new
+      Plottable.Interaction.Click(autoXLabel)
+      .callback(xAuto)
+      .registerWithComponent();
+  var yAutoInteraction = new
+      Plottable.Interaction.Click(autoYLabel)
+      .callback(yAuto)
+      .registerWithComponent();
+  var xFocusInteraction = new
+      Plottable.Interaction.Click(focusXLabel)
+      .callback(xFocus)
+      .registerWithComponent();
+  var yFocusInteraction = new
+      Plottable.Interaction.Click(focusYLabel)
+      .callback(yFocus)
+      .registerWithComponent();
 
 }

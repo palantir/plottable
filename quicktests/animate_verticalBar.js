@@ -24,7 +24,7 @@ function run(div, data, Plottable) {
 
   var vBarChart = new Plottable.Component.Table([[yAxis, vBarRenderer],
    [null,  xAxis]]);
-  
+
   vBarChart.renderTo(svg);
 
   var cb = function(x, y){
@@ -32,7 +32,7 @@ function run(div, data, Plottable) {
     vBarRenderer.dataSource().data(d);
   };
 
-  clickInteraction = new Plottable.Interaction.Click(vBarRenderer)
-  .callback(cb)
-  .registerWithComponent();
+  new Plottable.Interaction.Click(vBarRenderer)
+        .callback(cb)
+        .registerWithComponent();
 }

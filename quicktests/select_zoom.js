@@ -49,25 +49,25 @@ function run(div, data, Plottable) {
   var outerTable = new Plottable.Component.Table([[chart, legendTable]]);
   outerTable.renderTo(svg);
 
-        var cb = function(xy) {
-            if (xy == null) {console.log("starting drag"); return;}
-            var invertedXMin = xScale.invert(xy.xMin);
-            var invertedXMax = xScale.invert(xy.xMax);
-            var invertedYMin = yScale.invert(xy.yMax);
-            var invertedYMax = yScale.invert(xy.yMin);
-            xScale.domain([invertedXMin, invertedXMax]);
-            yScale.domain([invertedYMin, invertedYMax]);
-            dragboxInteraction.clearBox();
-        };
+  var dragboxInteraction = new Plottable.Interaction.XYDragBox(cg);
 
-        var dragboxInteraction = new Plottable.Interaction.XYDragBox(cg)
-             .dragend(cb)
-             .registerWithComponent();
+  var cb = function(xy) {
+      if (xy == null) {console.log("starting drag"); return;}
+      var invertedXMin = xScale.invert(xy.xMin);
+      var invertedXMax = xScale.invert(xy.xMax);
+      var invertedYMin = yScale.invert(xy.yMax);
+      var invertedYMax = yScale.invert(xy.yMin);
+      xScale.domain([invertedXMin, invertedXMax]);
+      yScale.domain([invertedYMin, invertedYMax]);
+      dragboxInteraction.clearBox();
+  };
 
-        var cb2 = function(xy) {
-            xScale.autoDomain();
-            yScale.autoDomain();
-        };
+  dragboxInteraction.dragend(cb).registerWithComponent();
+
+  var cb2 = function(xy) {
+      xScale.autoDomain();
+      yScale.autoDomain();
+  };
 
   var doubleClickInteraction = new Plottable.Interaction.DoubleClick(cg)
                                             .callback(cb2)

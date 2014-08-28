@@ -16,7 +16,7 @@ function run(div, data, Plottable) {
 
   var dataseries = data[0].slice(0, 20);
   var dataseries_top = data[1].slice(0, 20);
-  
+
   for (var i = 0; i < 20; ++i) {
     dataseries_top[i].x = dataseries[i].x;
     dataseries_top[i].y += dataseries[i].y;
@@ -30,22 +30,22 @@ function run(div, data, Plottable) {
 
   var y0Accessor = function(d, i) { return dataseries[i].y; };
 
-  var renderAreaD1 = new Plottable.Plot.Area(dataseries, xScale, yScale);
-  var renderAreaD2 = new Plottable.Plot.Area(dataseries_top, xScale, yScale).project("y0", y0Accessor, yScale);
+  var areaPlot1 = new Plottable.Plot.Area(dataseries, xScale, yScale);
+  var areaPlot2 = new Plottable.Plot.Area(dataseries_top, xScale, yScale).project("y0", y0Accessor, yScale);
 
   var fillAccessor = function() { return "steelblue"; };
   var fillAccessorTop = function() { return "pink"; };
-  renderAreaD1.project("fill", fillAccessor);
-  renderAreaD2.project("fill", fillAccessorTop);
+  areaPlot1.project("fill", fillAccessor);
+  areaPlot2.project("fill", fillAccessorTop);
 
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-  var renderGroup = new Plottable.Component.Group([gridlines, areaPlot, areaPlot2]);
+  var renderGroup = new Plottable.Component.Group([gridlines, areaPlot1, areaPlot2]);
 
   var chart = new Plottable.Template.StandardChart()
-  .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
-  .renderTo(svg);
+    .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
+    .renderTo(svg);
 }
 
-//this test projects a new 'y0' onto areaPlot2, 
-//which basically means that it's moving the bottom of areaPlot2 
+//this test projects a new 'y0' onto areaPlot2,
+//which basically means that it's moving the bottom of areaPlot2
 //up to the top of areaPlot, so that there's no overlap

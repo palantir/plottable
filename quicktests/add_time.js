@@ -1,34 +1,34 @@
-  
-
 
 function makeData() {
+  "use strict";
   return [makeRandomData(50), makeRandomData(50)];
-  
 }
 
 function run(div, data, Plottable) {
+  "use strict";
   var svg = div.append("svg").attr("height", 500);
 
-  dates = [];
+  var dates = [];
+
+  var xScale = new Plottable.Scale.Time();
+  var yScale = new Plottable.Scale.Linear();
   var ds = new Plottable.DataSource(dates);
-
-  xScale = new Plottable.Scale.Time();
-  yScale = new Plottable.Scale.Linear();
+  var parse = function(d) {return d3.time.format("%x").parse(d.x);};
   var plot = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
-  .project("x", function (d) { return d3.time.format("%x").parse(d.x)}, xScale);
+                      .project("x", parse, xScale);
 
-  xAxis = new Plottable.Axis.Time(xScale, "bottom");
-  yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var xAxis = new Plottable.Axis.Time(xScale, "bottom");
+  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  title = new Plottable.Component.TitleLabel("Click to add data");
-  gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+  var title = new Plottable.Component.TitleLabel("Click to add data");
 
-  renderGroup = plot.merge(gridlines);
-  
+  var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+  var renderGroup = plot.merge(gridlines);
   new Plottable.Template.StandardChart().center(renderGroup).xAxis(xAxis).yAxis(yAxis).titleLabel(title).renderTo("svg");
 
+
   function addData(){
-    var d = ds.data()
+    var d = ds.data();
     var pts = d.length;
     if(pts >= 50){return;}
     var date = Math.floor((data[1][pts].x*73)%12) + 1;
@@ -39,10 +39,10 @@ function run(div, data, Plottable) {
     var obj = {x: date, y: data[1][pts] * 500 - 250};
 
     d.push(obj);
-    ds.data(d);  
-  }
+    ds.data(d);
 
-  clickInteraction = new Plottable.Interaction.Click(title)
-  .callback(addData)
-  .registerWithComponent();
+  }
+  var clickInteraction = new Plottable.Interaction.Click(title)
+    .callback(addData)
+    .registerWithComponent();
 }

@@ -26,15 +26,16 @@ function run(div, data, Plottable) {
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
+  var IdTitle = new Plottable.Component.Label("Identity");
+  var GenTitle = new Plottable.Component.Label("General");
+  var FixTitle = new Plottable.Component.Label("Fixed");
+  var CurrTitle = new Plottable.Component.Label("Currency");
+  var PerTitle = new Plottable.Component.Label("Percentage");
+  var SITitle = new Plottable.Component.Label("SI");
+  var CustTitle = new Plottable.Component.Label("Custom");
+
   var plot = new Plottable.Plot.Line(dataseries1, xScale, yScale);
-
-    var basicTable = new Plottable.Component.Table([[yAxis, plot], [null, xAxis]]);
-	  var formatChoices = new Plottable.Component.Table([[IdTitle, GenTitle, FixTitle],[CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);
-    var bigTable = new Plottable.Component.Table([[basicTable],[formatChoices]]);
-    formatChoices.xAlign("center");
-    bigTable.renderTo(svg);
-
-  var basicTable = new Plottable.Component.Table([[yAxis, plot], [null, xAxis]])
+  var basicTable = new Plottable.Component.Table([[yAxis, plot], [null, xAxis]]);
   var formatChoices = new Plottable.Component.Table([[IdTitle, GenTitle, FixTitle],[CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);
   var bigTable = new Plottable.Component.Table([[basicTable],[formatChoices]]);
   formatChoices.xAlign("center");

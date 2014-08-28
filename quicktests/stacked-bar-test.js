@@ -30,7 +30,7 @@ function run(div, data, Plottable) {
 
   var center = stackedBarPlot.merge(new Plottable.Component.Legend(colorScale));
 
-  horizChart = new Plottable.Component.Table([
+  var horizChart = new Plottable.Component.Table([
     [yAxis, center], [null, xAxis]
     ]).renderTo(svg);
 }
