@@ -49,6 +49,7 @@
 /// <reference path="components/categoryAxis.ts" />
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
+/// <reference path="components/horizontalLegend.ts" />
 /// <reference path="components/gridlines.ts" />
 
 /// <reference path="components/plots/scatterPlot.ts" />
@@ -67,6 +68,7 @@
 /// <reference path="animators/nullAnimator.ts" />
 /// <reference path="animators/defaultAnimator.ts" />
 /// <reference path="animators/iterativeDelayAnimator.ts" />
+/// <reference path="animators/rectAnimator.ts" />
 
 /// <reference path="interactions/keyEventListener.ts" />
 /// <reference path="interactions/interaction.ts" />

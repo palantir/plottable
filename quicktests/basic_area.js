@@ -1,14 +1,18 @@
 function makeData() {
+  "use strict";
+
   return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
+  "use strict";
+
   var svg = div.append("svg").attr("height", 500);
-  yScales = [];
+  var yScales = [];
   data = _.cloneDeep(data);
 
   // Will receive function arguments: (svg, data, Plottable)
-  function getY(d) { return d.y};
+  function getY(d) { return d.y; }
 
   var dataseries = data[0].slice(0, 20);
   var dataseries_top = data[1].slice(0, 20);
@@ -24,15 +28,15 @@ function run(div, data, Plottable) {
   yScales.push(yScale);
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var y0Accessor = function(d, i) { return dataseries[i].y; }
+  var y0Accessor = function(d, i) { return dataseries[i].y; };
 
   var renderAreaD1 = new Plottable.Plot.Area(dataseries, xScale, yScale);
   var renderAreaD2 = new Plottable.Plot.Area(dataseries_top, xScale, yScale).project("y0", y0Accessor, yScale);
 
-  var fillAccessor = function() { return "steelblue"; }
-  var fillAccessorTop = function() { return "pink"; }
-  renderAreaD1.project("fill", fillAccessor)
-  renderAreaD2.project("fill", fillAccessorTop)
+  var fillAccessor = function() { return "steelblue"; };
+  var fillAccessorTop = function() { return "pink"; };
+  renderAreaD1.project("fill", fillAccessor);
+  renderAreaD2.project("fill", fillAccessorTop);
 
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var renderGroup = new Plottable.Component.Group([gridlines, renderAreaD1, renderAreaD2]);

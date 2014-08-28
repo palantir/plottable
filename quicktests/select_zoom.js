@@ -1,8 +1,12 @@
 function makeData() {
+  "use strict";
+
     return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
+  "use strict";
+
     var svg = div.append("svg").attr("height", 500);
 
         var renderers = [];
@@ -29,7 +33,7 @@ function run(div, data, Plottable) {
         renderers.forEach(function(renderer, i) {
             renderer
             .project("fill", function() { return colors[i]; })
-            .project("r", function(){ return 6;})
+            .project("r", function(){ return 6;});
             cg.merge(renderer);
         });
 
@@ -48,7 +52,7 @@ function run(div, data, Plottable) {
         var outerTable = new Plottable.Component.Table([[chart, legendTable]]);
         outerTable.renderTo(svg);
 
-        cb = function(xy) {
+        var cb = function(xy) {
             if (xy == null) {console.log("starting drag"); return;}
             var invertedXMin = xScale.invert(xy.xMin);
             var invertedXMax = xScale.invert(xy.xMax);
@@ -57,16 +61,16 @@ function run(div, data, Plottable) {
             xScale.domain([invertedXMin, invertedXMax]);
             yScale.domain([invertedYMin, invertedYMax]);
             dragboxInteraction.clearBox();
-        }
+        };
 
         var dragboxInteraction = new Plottable.Interaction.XYDragBox(cg)
-             .callback(cb)
+             .dragend(cb)
              .registerWithComponent();
 
-        cb2 = function(xy) {
+        var cb2 = function(xy) {
             xScale.autoDomain();
             yScale.autoDomain();
-        }
+        };
 
         var doubleClickInteraction = new Plottable.Interaction.DoubleClick(cg)
              .callback(cb2)

@@ -8,7 +8,10 @@ export module Abstract {
 
     public _onDataSourceUpdate() {
       super._onDataSourceUpdate();
-      if (this._datasetKeysInOrder != null) {
+      // HACKHACK Caused since we're adding a null datasource to plot before any projectors are placed
+      if (this._datasetKeysInOrder != null &&
+          this._projectors["x"] != null &&
+          this._projectors["y"] != null) {
         this.stack();
       }
     }
@@ -20,12 +23,12 @@ export module Abstract {
         .y(this._projectors["y"].accessor)
         .values((d) => d.data())(datasets);
 
-      var maxY = d3.max(datasets[datasets.length - 1].data(), (datum: any) => datum.y + datum.y0);
+      var maxY = Util.Methods.max(datasets[datasets.length - 1].data(), (datum: any) => datum.y + datum.y0);
       if (maxY > 0) {
         this.stackedExtent[1] = maxY;
       }
 
-      var minY = d3.min(datasets[datasets.length - 1].data(), (datum: any) => datum.y + datum.y0);
+      var minY = Util.Methods.min(datasets[datasets.length - 1].data(), (datum: any) => datum.y + datum.y0);
       if (minY < 0) {
         this.stackedExtent[0] = minY;
       }

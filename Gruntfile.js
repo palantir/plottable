@@ -53,7 +53,7 @@ module.exports = function(grunt) {
       createTag: false,
       push: false
     }
-  }
+  };
 
   var FILES_TO_COMMIT = ['plottable.js',
                          'plottable.min.js',
@@ -69,7 +69,7 @@ module.exports = function(grunt) {
   var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
   var nestedBraceMatch = ": \\{[^{}]*\\}";
   var typeNameMatch = ": [^;]*";
-  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?\\n?;"
+  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?\\n?;";
   var jsdoc_init = "\\n *\\/\\*\\* *\\n";
   var jsdoc_mid = "( *\\*[^\\n]*\\n)+";
   var jsdoc_end = " *\\*\\/ *";
@@ -157,8 +157,8 @@ module.exports = function(grunt) {
     version: "35"
   }, {
     browserName: "internet explorer",
-    version: "10",
-    platform: "WIN8"
+    version: "9",
+    platform: "WIN7"
   }];
 
   var configJSON = {
@@ -202,6 +202,29 @@ module.exports = function(grunt) {
         configuration: grunt.file.readJSON("tslint.json")
       },
       files: ["src/**/*.ts", "test/**.ts"]
+    },
+    jshint: {
+      files: ['Gruntfile.js', 'quicktests/**/*.js'],
+      options: {
+          "curly": true,
+          "eqeqeq": true,
+          "evil": true,
+          "indent": 2,
+          "latedef": true,
+          "globals": {
+            "jQuery": true,
+            "d3": true,
+            "window": true,
+            "console": true,
+            "$": true,
+            "makeRandomData": true,
+            "setTimeout": true,
+            "document": true,
+            "Plottable": true
+          },
+          "strict": true,
+          "eqnull": true
+      }
     },
     watch: {
       "options": {
@@ -303,6 +326,9 @@ module.exports = function(grunt) {
   grunt.registerTask("definitions_prod", function() {
     grunt.file.copy("build/plottable.d.ts", "plottable.d.ts");
   });
+  grunt.registerTask("copy-dev-defs", function () {
+    grunt.file.copy("plottable.d.ts", "plottable-dev.d.ts");
+  });
   grunt.registerTask("test-compile", [
                                   "ts:test",
                                   "concat:tests_multifile",
@@ -323,6 +349,7 @@ module.exports = function(grunt) {
       "sed:version_number",
       "definitions_prod",
       "test-compile",
+      "copy-dev-defs",
       "sed:public_protected_definitions",
       "sed:protected_definitions",
       "concat:plottable_multifile",
@@ -351,7 +378,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
-  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "tslint", "ts:verify_d_ts"]);
+  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "tslint", "jshint", "ts:verify_d_ts"]);
   // Disable saucelabs for external pull requests. Check if we can see the SAUCE_USERNAME
   var travisTests = ["test"];
   if (process.env.SAUCE_USERNAME) {

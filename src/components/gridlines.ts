@@ -61,7 +61,7 @@ export module Component {
         xLines.attr("x1", getScaledXValue)
               .attr("y1", 0)
               .attr("x2", getScaledXValue)
-              .attr("y2", this.availableHeight)
+              .attr("y2", this.height())
              .classed("zeroline", (t: number) => t === 0);
         xLines.exit().remove();
       }
@@ -75,7 +75,7 @@ export module Component {
         yLines.enter().append("line");
         yLines.attr("x1", 0)
               .attr("y1", getScaledYValue)
-              .attr("x2", this.availableWidth)
+              .attr("x2", this.width())
               .attr("y2", getScaledYValue)
               .classed("zeroline", (t: number) => t === 0);
         yLines.exit().remove();
