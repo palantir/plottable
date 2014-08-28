@@ -55,7 +55,7 @@ export module _Util {
         var whs = s.trim().split("").map(tm);
         return {
           width: d3.sum(whs, (wh) => wh.width),
-          height: d3.max(whs, (wh) => wh.height)
+          height: Util.Methods.max(whs, (wh) => wh.height)
         };
       };
     }
@@ -83,7 +83,7 @@ export module _Util {
           });
           return {
             width: d3.sum(whs, (x) => x.width),
-            height: d3.max(whs, (x) => x.height)
+            height: Util.Methods.max(whs, (x) => x.height)
           };
         } else {
           return tm(s);
@@ -292,8 +292,8 @@ export module _Util {
 
       var usedWidth: number, usedHeight: number;
       if (write == null) {
-        var widthFn = orientHorizontally ? d3.max : d3.sum;
-        var heightFn = orientHorizontally ? d3.sum : d3.max;
+        var widthFn = orientHorizontally ? Util.Methods.max : d3.sum;
+        var heightFn = orientHorizontally ? d3.sum : Util.Methods.max;
         usedWidth = widthFn(wrappedText.lines, (line: string) => tm(line).width);
         usedHeight = heightFn(wrappedText.lines, (line: string) => tm(line).height);
       } else {

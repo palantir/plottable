@@ -38,7 +38,7 @@ export module Axis {
         return this.measurer(formattedValue).width;
       });
 
-      var maxTextLength = d3.max(textLengths);
+      var maxTextLength = Util.Methods.max(textLengths);
 
       if (this.tickLabelPositioning === "center") {
         this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
@@ -63,6 +63,22 @@ export module Axis {
 
     public _getTickValues(): any[] {
       return this._scale.ticks();
+    }
+
+    public _rescale() {
+      if (!this._isSetup) {
+        return;
+      }
+
+      if (!this._isHorizontal()) {
+        var reComputedWidth = this._computeWidth();
+        if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.gutter())) {
+          this._invalidateLayout();
+          return;
+        }
+      }
+
+      this._render();
     }
 
     public _doRender() {

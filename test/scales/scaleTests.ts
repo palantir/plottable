@@ -389,7 +389,11 @@ describe("Scales", () => {
 
       var ticks = scale.ticks();
       assert.deepEqual(ticks, ticks.slice().sort((x, y) => x - y), "ticks should be sorted");
+<<<<<<< HEAD
       assert.deepEqual(ticks, Plottable._Util.Methods.uniqNumbers(ticks), "ticks should not be repeated");
+=======
+      assert.deepEqual(ticks, Plottable.Util.Methods.uniq(ticks), "ticks should not be repeated");
+>>>>>>> develop
       var beforePivot = ticks.filter((x) => x <= -base);
       var afterPivot = ticks.filter((x) => base <= x);
       var betweenPivots = ticks.filter((x) => -base < x && x < base);

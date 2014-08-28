@@ -25,8 +25,8 @@ export module Component {
 
     private datumCurrentlyFocusedOn: string;
 
-    // this is the set of all elements that are currently toggled off
-    private isOff: D3.Set;
+    // this is the set of all legend domain strings that are currently toggled off
+    private isOff: D3.Set<string>;
 
     /**
      * Constructs a Legend.
@@ -168,16 +168,26 @@ export module Component {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
+<<<<<<< HEAD
       this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this._availableHeight / textHeight));
+=======
+      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.height() / textHeight));
+>>>>>>> develop
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
       var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend.MARGIN) / textHeight));
+<<<<<<< HEAD
       var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var measure = _Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
       var maxWidth = d3.max(this.colorScale.domain(), (d: string) => measure(d).width);
+=======
+      var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+      var measure = Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
+      var maxWidth = Util.Methods.max(this.colorScale.domain(), (d: string) => measure(d).width);
+>>>>>>> develop
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
       var desiredWidth  = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;
@@ -206,7 +216,11 @@ export module Component {
       super._doRender();
       var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
       var textHeight = this.measureTextHeight();
+<<<<<<< HEAD
       var availableWidth  = this._availableWidth  - textHeight - Legend.MARGIN;
+=======
+      var availableWidth  = this.width()  - textHeight - Legend.MARGIN;
+>>>>>>> develop
       var r = textHeight * 0.3;
       var legend: D3.UpdateSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, (d) => d);
       var legendEnter = legend.enter()

@@ -24,7 +24,6 @@ export module Axis {
       if (scale.rangeType() !== "bands") {
         throw new Error("Only rangeBands category axes are implemented");
       }
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
     }
 
     public _setup() {
@@ -32,7 +31,15 @@ export module Axis {
       this.measurer = new _Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
     }
 
+<<<<<<< HEAD
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
+=======
+    public _rescale() {
+      return this._invalidateLayout();
+    }
+
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+>>>>>>> develop
       var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
       var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
 
@@ -102,8 +109,8 @@ export module Axis {
         textWriteResults.push(textWriteResult);
       });
 
-      var widthFn  = this._isHorizontal() ? d3.sum : d3.max;
-      var heightFn = this._isHorizontal() ? d3.max : d3.sum;
+      var widthFn  = this._isHorizontal() ? d3.sum : Util.Methods.max;
+      var heightFn = this._isHorizontal() ? Util.Methods.max : d3.sum;
       return {
         textFits: textWriteResults.every((t: _Util.Text.IWriteTextResult) => t.textFits),
         usedWidth : widthFn(textWriteResults, (t: _Util.Text.IWriteTextResult) => t.usedWidth),
@@ -127,7 +134,11 @@ export module Axis {
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
       tickLabels.text("");
+<<<<<<< HEAD
       this.measureTicks(this._availableWidth, this._availableHeight, this._scale, tickLabels);
+=======
+      this.measureTicks(this.width(), this.height(), this._scale, tickLabels);
+>>>>>>> develop
       var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
       var xTranslate = this._orientation === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;

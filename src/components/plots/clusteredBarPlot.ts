@@ -35,16 +35,25 @@ export module Plot {
     private cluster(accessor: _IAccessor) {
       this.innerScale.domain(this._datasetKeysInOrder);
       var lengths = this._getDatasetsInOrder().map((d) => d.data().length);
+<<<<<<< HEAD
       if (_Util.Methods.uniqNumbers(lengths).length > 1) {
         _Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
+=======
+      if (Util.Methods.uniq(lengths).length > 1) {
+        Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
+>>>>>>> develop
       }
       var clusters: {[key: string]: any[]} = {};
       this._datasetKeysInOrder.forEach((key: string) => {
-        var data = this._key2DatasetDrawerKey[key].dataset.data();
-        var vals = data.map((d) => accessor(d));
+        var data = this._key2DatasetDrawerKey.get(key).dataset.data();
 
         clusters[key] = data.map((d, i) => {
+<<<<<<< HEAD
           d["_PLOTTABLE_PROTECTED_FIELD_X"] = this._xScale.scale(vals[i]) + this.innerScale.scale(key);
+=======
+          var val = accessor(d, i);
+          d["_PLOTTABLE_PROTECTED_FIELD_X"] = this.xScale.scale(val) + this.innerScale.scale(key);
+>>>>>>> develop
           return d;
         });
       });

@@ -225,7 +225,7 @@ export module Abstract {
      */
     public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any {
       if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
-        return this._animators[animatorKey].animate(selection, attrToProjector, this);
+        return this._animators[animatorKey].animate(selection, attrToProjector);
       } else {
         return selection.attr(attrToProjector);
       }

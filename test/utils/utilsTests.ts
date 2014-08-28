@@ -2,7 +2,11 @@
 
 var assert = chai.assert;
 
+<<<<<<< HEAD
 describe("_Util.s", () => {
+=======
+describe("Util.Methods", () => {
+>>>>>>> develop
   it("inRange works correct", () => {
     assert.isTrue(Plottable._Util.Methods.inRange(0, -1, 1), "basic functionality works");
     assert.isTrue(Plottable._Util.Methods.inRange(0, 0, 1), "it is a closed interval");
@@ -40,6 +44,29 @@ describe("_Util.s", () => {
   it("uniq works as expected", () => {
     var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
     assert.deepEqual(Plottable._Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
+  });
+
+  it("max/min work as expected", () => {
+    var alist = [1,2,3,4,5];
+    var dbl = (x: number) => x * 2;
+    var max = Plottable.Util.Methods.max;
+    var min = Plottable.Util.Methods.min;
+    assert.deepEqual(max(alist), 5, "max works as expected on plain array");
+    assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
+    assert.deepEqual(max(alist, dbl), 10, "max applies function appropriately");
+    assert.deepEqual(max([]), 0, "default value zero by default");
+    assert.deepEqual(max([], 10), 10, "works as intended with default value");
+    assert.deepEqual(max([], dbl), 0, "default value zero as expected when fn provided");
+    assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
+
+    assert.deepEqual(min(alist, 0), 1, "min works for basic list");
+    assert.deepEqual(min(alist, dbl, 0), 2, "min works with function arg");
+    assert.deepEqual(min([]), 0, "min defaults to 0");
+    assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
+
+    var strings = ["a", "bb", "ccc", "ddd"];
+    assert.deepEqual(max(strings, (s: string) => s.length), 3, "works on arrays of non-numbers with a function");
+    assert.deepEqual(max([], (s: string) => s.length, 5), 5, "defaults work even with non-number function type");
   });
 
   it("objEq works as expected", () => {

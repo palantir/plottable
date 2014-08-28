@@ -111,6 +111,7 @@ export module Component {
     public _doRender() {
       super._doRender();
       this.textContainer.text("");
+<<<<<<< HEAD
       var dimension = this.orientation === "horizontal" ? this._availableWidth : this._availableHeight;
       var truncatedText = _Util.Text.getTruncatedText(this._text, dimension, this.measurer);
       if (this.orientation === "horizontal") {
@@ -118,6 +119,15 @@ export module Component {
                                         this.xAlignment, this.yAlignment);
       } else {
         _Util.Text.writeLineVertically(truncatedText, this.textContainer, this._availableWidth, this._availableHeight,
+=======
+      var dimension = this.orientation === "horizontal" ? this.width() : this.height();
+      var truncatedText = Util.Text.getTruncatedText(this._text, dimension, this.measurer);
+      if (this.orientation === "horizontal") {
+        Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.width(), this.height(),
+                                        this.xAlignment, this.yAlignment);
+      } else {
+        Util.Text.writeLineVertically(truncatedText, this.textContainer, this.width(), this.height(),
+>>>>>>> develop
                                         this.xAlignment, this.yAlignment, this.orientation);
       }
     }

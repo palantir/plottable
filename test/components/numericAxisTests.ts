@@ -19,6 +19,13 @@ describe("NumericAxis", () => {
     return true;
   }
 
+  function assertBoxInside(inner: ClientRect, outer: ClientRect, epsilon = 0, message="") {
+    assert.operator(inner.left, ">", outer.left - epsilon, message + " (box inside (left))");
+    assert.operator(inner.right, "<", outer.right + epsilon, message + " (box inside (right))");
+    assert.operator(inner.top, ">", outer.top - epsilon, message + " (box inside (top))");
+    assert.operator(inner.bottom, "<", outer.bottom + epsilon, message + " (box inside (bottom))");
+  }
+
   it("tickLabelPosition() input validation", () => {
     var scale = new Plottable.Scale.Linear();
     var horizontalAxis = new Plottable.Axis.Numeric(scale, "bottom");
@@ -222,7 +229,7 @@ describe("NumericAxis", () => {
   });
 
   it("allocates enough width to show all tick labels when vertical", () => {
-    var SVG_WIDTH = 100;
+    var SVG_WIDTH = 150;
     var SVG_HEIGHT = 500;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
@@ -231,7 +238,7 @@ describe("NumericAxis", () => {
 
     var formatter = (d: any) => {
       if (d === 0) {
-        return "This is zero";
+        return "ZERO";
       }
       return String(d);
     };
@@ -244,13 +251,31 @@ describe("NumericAxis", () => {
                           .filter(function(d: any, i: number) {
                             return d3.select(this).style("visibility") === "visible";
                           });
+<<<<<<< HEAD
     var numLabels = visibleTickLabels[0].length;
     var boundingBox: ClientRect = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
+=======
+    var boundingBox: ClientRect = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
+>>>>>>> develop
     var labelBox: ClientRect;
-    for (var i = 0; i < numLabels; i++) {
-      labelBox = visibleTickLabels[0][i].getBoundingClientRect();
+    visibleTickLabels[0].forEach((label: Element) => {
+      labelBox = label.getBoundingClientRect();
       assert.isTrue(boxIsInside(labelBox, boundingBox), "tick labels don't extend outside the bounding box");
-    }
+    });
+
+    scale.domain([50000000000, -50000000000]);
+    visibleTickLabels = numericAxis.element
+                          .selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS)
+                          .filter(function(d: any, i: number) {
+                            return d3.select(this).style("visibility") === "visible";
+                          });
+    boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
+    visibleTickLabels[0].forEach((label: Element) => {
+      labelBox = label.getBoundingClientRect();
+      assertBoxInside(labelBox, boundingBox, 0, "long tick " + label.textContent + " is inside the bounding box");
+    });
+
+
     svg.remove();
   });
 
@@ -272,13 +297,18 @@ describe("NumericAxis", () => {
                           .filter(function(d: any, i: number) {
                             return d3.select(this).style("visibility") === "visible";
                           });
+<<<<<<< HEAD
     var numLabels = visibleTickLabels[0].length;
     var boundingBox: ClientRect = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
+=======
+    var boundingBox: ClientRect = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
+>>>>>>> develop
     var labelBox: ClientRect;
-    for (var i = 0; i < numLabels; i++) {
-      labelBox = visibleTickLabels[0][i].getBoundingClientRect();
+    visibleTickLabels[0].forEach((label: Element) => {
+      labelBox = label.getBoundingClientRect();
       assert.isTrue(boxIsInside(labelBox, boundingBox, 0.5), "tick labels don't extend outside the bounding box");
-    }
+    });
+
     svg.remove();
   });
 });

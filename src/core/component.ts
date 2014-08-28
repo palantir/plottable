@@ -3,7 +3,9 @@
 module Plottable {
 export module Abstract {
   export class Component extends PlottableObject {
+    public static AUTORESIZE_BY_DEFAULT = true;
 
+<<<<<<< HEAD
     public _element: D3.Selection;
     public _content: D3.Selection;
     private hitBox: D3.Selection;
@@ -24,16 +26,35 @@ export module Abstract {
     private yOrigin: number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
+=======
+    public element: D3.Selection;
+    public content: D3.Selection;
+    public backgroundContainer: D3.Selection;
+    public foregroundContainer: D3.Selection;
+    public clipPathEnabled = false;
+    public xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
+    public yOrigin: number;
+
+    public _parent: ComponentContainer;
+>>>>>>> develop
     public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
     public _yAlignProportion = 0;
     public _fixedHeightFlag = false;
     public _fixedWidthFlag = false;
-
-    private cssClasses: string[] = ["component"];
-
     public _isSetup = false;
     public _isAnchored = false;
-    public static AUTORESIZE_BY_DEFAULT = true;
+
+    private hitBox: D3.Selection;
+    private interactionsToRegister: Interaction[] = [];
+    private boxes: D3.Selection[] = [];
+    private boxContainer: D3.Selection;
+    private rootSVG: D3.Selection;
+    private isTopLevelComponent = false;
+    private _width : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
+    private _height: number;
+    private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
+    private _yOffset = 0;
+    private cssClasses: string[] = ["component"];
     private removed = false;
 
     /**
@@ -158,10 +179,17 @@ export module Abstract {
         availableHeight = Math.min(availableHeight, requestedSpace.height);
       }
 
+<<<<<<< HEAD
       this._availableWidth   = availableWidth ;
       this._availableHeight = availableHeight;
       this._element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
       this.boxes.forEach((b: D3.Selection) => b.attr("width", this._availableWidth ).attr("height", this._availableHeight));
+=======
+      this._width  = availableWidth;
+      this._height = availableHeight;
+      this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
+      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
+>>>>>>> develop
     }
 
     /**
@@ -346,15 +374,27 @@ export module Abstract {
       if (className != null) {box.classed(className, true);};
 
       this.boxes.push(box);
+<<<<<<< HEAD
       if (this._availableWidth  != null && this._availableHeight != null) {
         box.attr("width", this._availableWidth ).attr("height", this._availableHeight);
+=======
+      if (this.width() != null && this.height() != null) {
+        box.attr("width", this.width()).attr("height", this.height());
+>>>>>>> develop
       }
       return box;
     }
 
     private generateClipPath() {
       // The clip path will prevent content from overflowing its component space.
+<<<<<<< HEAD
       this._element.attr("clip-path", "url(#clipPath" + this._plottableID + ")");
+=======
+      // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
+      // They don't need the current URL in the clip path reference.
+      var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+      this.element.attr("clip-path", "url(" + prefix + "#clipPath" + this._plottableID + ")");
+>>>>>>> develop
       var clipPathParent = this.boxContainer.append("clipPath")
                                       .attr("id", "clipPath" + this._plottableID);
       this.addBox("clip-rect", clipPathParent);
@@ -496,6 +536,25 @@ export module Abstract {
       this.detach();
       Core.ResizeBroadcaster.deregister(this);
     }
+
+    /**
+     * Return the width of the component
+     *
+     * @return {number} width of the component
+     */
+    public width(): number {
+      return this._width;
+    }
+
+    /**
+     * Return the height of the component
+     *
+     * @return {number} height of the component
+     */
+    public height(): number {
+      return this._height;
+    }
+
   }
 }
 }

@@ -47,15 +47,25 @@ describe("Component behavior", () => {
     it("computeLayout defaults and updates intelligently", () => {
       c._anchor(svg);
       c._computeLayout();
+<<<<<<< HEAD
       assert.equal(c._availableWidth , SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.equal(c._availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
+=======
+      assert.equal(c.width() , SVG_WIDTH, "computeLayout defaulted width to svg width");
+      assert.equal(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
+>>>>>>> develop
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
 
       svg.attr("width", 2*SVG_WIDTH).attr("height", 2*SVG_HEIGHT);
       c._computeLayout();
+<<<<<<< HEAD
       assert.equal(c._availableWidth , 2*SVG_WIDTH, "computeLayout updated width to new svg width");
       assert.equal(c._availableHeight, 2*SVG_HEIGHT, "computeLayout updated height to new svg height");
+=======
+      assert.equal(c.width() , 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
+      assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
+>>>>>>> develop
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin is still 0");
 
@@ -72,8 +82,13 @@ describe("Component behavior", () => {
       svg.attr("width", null).attr("height", null);
       c._anchor(svg);
       c._computeLayout();
+<<<<<<< HEAD
       assert.equal(c._availableWidth, 400, "defaults to width of parent if width is not specified on <svg>");
       assert.equal(c._availableHeight, 200, "defaults to height of parent if width is not specified on <svg>");
+=======
+      assert.equal(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
+      assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
+>>>>>>> develop
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
 
@@ -81,8 +96,13 @@ describe("Component behavior", () => {
       svg.style("width", "50%").style("height", "50%");
       c._computeLayout();
 
+<<<<<<< HEAD
       assert.equal(c._availableWidth, 200, "computeLayout defaulted width to svg width");
       assert.equal(c._availableHeight, 100, "computeLayout defaulted height to svg height");
+=======
+      assert.equal(c.width(), 200, "computeLayout defaulted width to svg width");
+      assert.equal(c.height(), 100, "computeLayout defaulted height to svg height");
+>>>>>>> develop
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
 
@@ -90,8 +110,13 @@ describe("Component behavior", () => {
 
       c._computeLayout();
 
+<<<<<<< HEAD
       assert.equal(c._availableWidth, 100, "computeLayout updated width to new svg width");
       assert.equal(c._availableHeight, 50, "computeLayout updated height to new svg height");
+=======
+      assert.equal(c.width(), 100, "computeLayout updated width to new svg width");
+      assert.equal(c.height(), 50, "computeLayout updated height to new svg height");
+>>>>>>> develop
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin is still 0");
 
@@ -123,8 +148,13 @@ describe("Component behavior", () => {
       c._computeLayout(xOff, yOff, width, height);
       var translate = getTranslate(c._element);
       assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
+<<<<<<< HEAD
       assert.equal(c._availableWidth , width, "the width set properly");
       assert.equal(c._availableHeight, height, "the height set propery");
+=======
+      assert.equal(c.width() , width, "the width set properly");
+      assert.equal(c.height(), height, "the height set propery");
+>>>>>>> develop
       svg.remove();
     });
   });
@@ -205,7 +235,8 @@ it("components can be offset relative to their alignment, and throw errors if th
     c._anchor(svg);
     c._computeLayout(0, 0, 100, 100);
     c._render();
-    var expectedClipPathURL = "url(#clipPath" + expectedClipPathID+ ")";
+    var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+    var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID+ ")";
     // IE 9 has clipPath like 'url("#clipPath")', must accomodate
     var normalizeClipPath = (s: string) => s.replace(/"/g, "");
     assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL,
@@ -350,12 +381,21 @@ it("components can be offset relative to their alignment, and throw errors if th
     var c = makeFixedSizeComponent(10, 10);
     cg._addComponent(c);
     cg.renderTo(svg);
+<<<<<<< HEAD
     assert.equal(cg._availableHeight, 10, "availableHeight initially 10 for fixed-size component");
     assert.equal(cg._availableWidth, 10, "availableWidth initially 10 for fixed-size component");
     fixComponentSize(c, 50, 50);
     c._invalidateLayout();
     assert.equal(cg._availableHeight, 50, "invalidateLayout propagated to parent and caused resized height");
     assert.equal(cg._availableWidth, 50, "invalidateLayout propagated to parent and caused resized width");
+=======
+    assert.equal(cg.height(), 10, "height() initially 10 for fixed-size component");
+    assert.equal(cg.width(), 10, "width() initially 10 for fixed-size component");
+    fixComponentSize(c, 50, 50);
+    c._invalidateLayout();
+    assert.equal(cg.height(), 50, "invalidateLayout propagated to parent and caused resized height");
+    assert.equal(cg.width(), 50, "invalidateLayout propagated to parent and caused resized width");
+>>>>>>> develop
     svg.remove();
   });
 

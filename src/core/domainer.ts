@@ -6,11 +6,11 @@ module Plottable {
     private doNice = false;
     private niceCount: number;
     private padProportion = 0.0;
-    private paddingExceptions: D3.Map = d3.map();
-    private unregisteredPaddingExceptions: D3.Set = d3.set();
-    private includedValues: D3.Map = d3.map();
+    private paddingExceptions: D3.Map<any> = d3.map();
+    private unregisteredPaddingExceptions: D3.Set<any> = d3.set();
+    private includedValues: D3.Map<any> = d3.map();
     // includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
-    private unregisteredIncludedValues: D3.Map = d3.map();
+    private unregisteredIncludedValues: D3.Map<any> = d3.map();
     private combineExtents: (extents: any[][]) => any[];
     private static PADDING_FOR_IDENTICAL_DOMAIN = 1;
     private static ONE_DAY = 1000 * 60 * 60 * 24;
@@ -49,7 +49,7 @@ module Plottable {
       } else if (extents.length === 0) {
         domain = scale._defaultExtent();
       } else {
-        domain = [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
+        domain = [Util.Methods.min(extents, (e) => e[0]), Util.Methods.max(extents, (e) => e[1])];
       }
       domain = this.includeDomain(domain);
       domain = this.padDomain(scale, domain);
@@ -166,11 +166,7 @@ module Plottable {
     }
 
     private static defaultCombineExtents(extents: any[][]): any[] {
-      if (extents.length === 0) {
-        return [0, 1];
-      } else {
-        return [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
-      }
+      return [Util.Methods.min(extents, (e) => e[0], 0), Util.Methods.max(extents, (e) => e[1], 1)];
     }
 
     private padDomain(scale: Abstract.QuantitativeScale, domain: any[]): any[] {

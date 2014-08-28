@@ -1,16 +1,20 @@
 function makeData() {
+  "use strict";
+
   return [makeRandomData(50), makeRandomData(50)];
 }
 
 //test for update on data change
 
 function run(div, data, Plottable) {
+  "use strict";
+
     var svg = div.append("svg").attr("height", 500);
 
     var numPts = 5;
 
     var dataseries1 = new Plottable.DataSource(data[0].splice(0, 5));
-    
+
     var xScale = new Plottable.Scale.Linear();
     var yScale = new Plottable.Scale.Linear();
     var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
@@ -18,14 +22,14 @@ function run(div, data, Plottable) {
 
 
     var renderArea1 = new Plottable.Plot.VerticalBar(dataseries1, xScale, yScale);
-    renderArea1.animate(true); 
+    renderArea1.animate(true);
 
     var renderArea2 = new Plottable.Plot.Scatter(renderArea1.dataSource(), xScale, yScale);
     renderArea2.project("fill", function(){return "purple";});
     renderArea2.animate(true);
-     
+
     var renderGroup = renderArea1.merge(renderArea2);
-    
+
     var basicTable = new Plottable.Component.Table()
                 .addComponent(2, 0, yAxis)
                 .addComponent(2, 1, renderGroup)
@@ -34,7 +38,7 @@ function run(div, data, Plottable) {
     basicTable.renderTo(svg);
 
 
-    cb = function(x, y){
+    var cb = function(x, y){
         if(numPts === 5){
             dataseries1.data(data[1].slice(0, 10));
             numPts = 10;
@@ -42,7 +46,7 @@ function run(div, data, Plottable) {
             dataseries1.data(data[0].slice(0, 5));
             numPts = 5;
         }
-    }  
+    };
 
     window.xy = new Plottable.Interaction.Click(renderGroup)
         .callback(cb)
