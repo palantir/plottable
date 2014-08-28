@@ -67,11 +67,11 @@ export module Plot {
 
     public _paint() {
       var attrHash = this._generateAttrToProjector();
+      var scaledBaseline = this.yScale.scale(this._baselineValue);
       this._getDrawersInOrder().forEach((d: Abstract._Drawer, i: number) => {
         var animator: Animator.Rect;
         if (this._animate) {
-          animator = new Animator.Rect();
-          animator.delay(animator.duration() * i);
+          animator = new Animator.MovingRect(scaledBaseline);
         }
         d.draw(this.stackedData[i], attrHash, animator);
       });

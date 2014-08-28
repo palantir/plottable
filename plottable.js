@@ -5350,11 +5350,11 @@ var Plottable;
             StackedBar.prototype._paint = function () {
                 var _this = this;
                 var attrHash = this._generateAttrToProjector();
+                var scaledBaseline = this.yScale.scale(this._baselineValue);
                 this._getDrawersInOrder().forEach(function (d, i) {
                     var animator;
                     if (_this._animate) {
-                        animator = new Plottable.Animator.Rect();
-                        animator.delay(animator.duration() * i);
+                        animator = new Plottable.Animator.MovingRect(scaledBaseline);
                     }
                     d.draw(_this.stackedData[i], attrHash, animator);
                 });
@@ -5498,6 +5498,32 @@ var Plottable;
             return Rect;
         })(Animator.Default);
         Animator.Rect = Rect;
+    })(Plottable.Animator || (Plottable.Animator = {}));
+    var Animator = Plottable.Animator;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Animator) {
+        var MovingRect = (function (_super) {
+            __extends(MovingRect, _super);
+            function MovingRect(baseline, isVertical) {
+                if (isVertical === void 0) { isVertical = true; }
+                _super.call(this, isVertical);
+                this.baseline = baseline;
+            }
+            MovingRect.prototype._startMovingAttrProjector = function (attrToProjector) {
+                return this.isVertical ? d3.functor(this.baseline) : d3.functor(0);
+            };
+            return MovingRect;
+        })(Animator.Rect);
+        Animator.MovingRect = MovingRect;
     })(Plottable.Animator || (Plottable.Animator = {}));
     var Animator = Plottable.Animator;
 })(Plottable || (Plottable = {}));

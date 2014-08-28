@@ -66,6 +66,7 @@
 /// <reference path="animators/defaultAnimator.ts" />
 /// <reference path="animators/iterativeDelayAnimator.ts" />
 /// <reference path="animators/rectAnimator.ts" />
+/// <reference path="animators/movingRectAnimator.ts" />
 
 /// <reference path="interactions/keyEventListener.ts" />
 /// <reference path="interactions/interaction.ts" />
