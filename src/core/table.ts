@@ -72,7 +72,7 @@ export module Component {
       return this;
     }
 
-    public _removeComponent(component: Abstract.Component): Table {
+    public _removeComponent(component: Abstract.Component) {
       super._removeComponent(component);
       var rowpos: number;
       var colpos: number;
@@ -86,13 +86,9 @@ export module Component {
         }
       }
 
-      if (rowpos === undefined) {
-        return this;
+      if (rowpos !== undefined) {
+        this.rows[rowpos][colpos] = null;
       }
-
-      this.rows[rowpos][colpos] = null;
-
-      return this;
     }
 
     private iterateLayout(availableWidth : number, availableHeight: number): IterateLayoutResult {
@@ -239,7 +235,7 @@ export module Component {
     // xOffset is relative to parent element, not absolute
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth , availableHeight);
-      var layout = this.iterateLayout(this.availableWidth , this.availableHeight);
+      var layout = this.iterateLayout(this.width(), this.height());
 
       var sumPair = (p: number[]) => p[0] + p[1];
       var rowHeights = Util.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
@@ -256,7 +252,6 @@ export module Component {
         });
         childYOffset += rowHeights[rowIndex] + this.rowPadding;
       });
-      return this;
     }
 
     /**

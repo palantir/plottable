@@ -4,6 +4,10 @@ module Plottable {
 export module Abstract {
   export class Axis extends Abstract.Component {
     /**
+     * The css class applied to each end tick mark (the line on the end tick).
+     */
+    public static END_TICK_MARK_CLASS = "end-tick-mark";
+    /**
      * The css class applied to each tick mark (the line on the tick).
      */
     public static TICK_MARK_CLASS = "tick-mark";
@@ -15,19 +19,19 @@ export module Abstract {
     public _tickLabelContainer: D3.Selection;
     public _baseline: D3.Selection;
     public _scale: Abstract.Scale;
-    public _formatter: Abstract.Formatter;
+    public _formatter: Formatter;
     public _orientation: string;
-    public _width: any = "auto";
-    public _height: any = "auto";
+    public _userRequestedWidth: any = "auto";
+    public _userRequestedHeight: any = "auto";
     public _computedWidth: number;
     public _computedHeight: number;
+    private _endTickLength = 5;
     private _tickLength = 5;
-    private _tickLabelPadding = 3;
-    private _gutter = 10;
+    private _tickLabelPadding = 10;
+    private _gutter = 15;
     private _showEndTickLabels = false;
 
-
-    constructor(scale: Abstract.Scale, orientation: string, formatter?: any) {
+    constructor(scale: Abstract.Scale, orientation: string, formatter = Formatters.identity()) {
       super();
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
       this._scale = scale;
@@ -40,13 +44,9 @@ export module Abstract {
         this.classed("y-axis", true);
       }
 
-      if (formatter == null) {
-        formatter = new Plottable.Formatter.General();
-        formatter.showOnlyUnchangedValues(false);
-      }
       this.formatter(formatter);
 
-      this._scale.broadcaster.registerListener(this, () => this.rescale());
+      this._scale.broadcaster.registerListener(this, () => this._rescale());
     }
 
     public remove() {
@@ -60,22 +60,22 @@ export module Abstract {
 
     public _computeWidth() {
       // to be overridden by subclass logic
-      this._computedWidth = this._tickLength;
+      this._computedWidth = this._maxLabelTickLength();
       return this._computedWidth;
     }
 
     public _computeHeight() {
       // to be overridden by subclass logic
-      this._computedHeight = this._tickLength;
+      this._computedHeight = this._maxLabelTickLength();
       return this._computedHeight;
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
-      var requestedWidth = this._width;
-      var requestedHeight = this._height;
+      var requestedWidth = this._userRequestedWidth;
+      var requestedHeight = this._userRequestedHeight;
 
       if (this._isHorizontal()) {
-        if (this._height === "auto") {
+        if (this._userRequestedHeight === "auto") {
           if (this._computedHeight == null) {
             this._computeHeight();
           }
@@ -83,7 +83,7 @@ export module Abstract {
         }
         requestedWidth = 0;
       } else { // vertical
-        if (this._width === "auto") {
+        if (this._userRequestedWidth === "auto") {
           if (this._computedWidth == null) {
             this._computeWidth();
           }
@@ -108,14 +108,18 @@ export module Abstract {
       return !this._isHorizontal();
     }
 
+    public _rescale() {
+      // default implementation; subclasses may call _invalidateLayout() here
+      this._render();
+    }
+
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       if (this._isHorizontal()) {
-        this._scale.range([0, this.availableWidth]);
+        this._scale.range([0, this.width()]);
       } else {
-        this._scale.range([this.availableHeight, 0]);
+        this._scale.range([this.height(), 0]);
       }
-      return this;
     }
 
     public _setup() {
@@ -125,7 +129,6 @@ export module Abstract {
       this._tickLabelContainer = this.content.append("g")
                                              .classed(Axis.TICK_LABEL_CLASS + "-container", true);
       this._baseline = this.content.append("line").classed("baseline", true);
-      return this;
     }
 
     /*
@@ -141,10 +144,12 @@ export module Abstract {
       var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
       tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
+      d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true)
+                                .attr(this._generateTickMarkAttrHash(true));
+      d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
+                                                      .attr(this._generateTickMarkAttrHash(true));
       tickMarks.exit().remove();
       this._baseline.attr(this._generateBaselineAttrHash());
-
-      return this;
     }
 
     public _generateBaselineAttrHash() {
@@ -157,30 +162,30 @@ export module Abstract {
 
       switch(this._orientation) {
         case "bottom":
-          baselineAttrHash.x2 = this.availableWidth;
+          baselineAttrHash.x2 = this.width();
           break;
 
         case "top":
-          baselineAttrHash.x2 = this.availableWidth;
-          baselineAttrHash.y1 = this.availableHeight;
-          baselineAttrHash.y2 = this.availableHeight;
+          baselineAttrHash.x2 = this.width();
+          baselineAttrHash.y1 = this.height();
+          baselineAttrHash.y2 = this.height();
           break;
 
         case "left":
-          baselineAttrHash.x1 = this.availableWidth;
-          baselineAttrHash.x2 = this.availableWidth;
-          baselineAttrHash.y2 = this.availableHeight;
+          baselineAttrHash.x1 = this.width();
+          baselineAttrHash.x2 = this.width();
+          baselineAttrHash.y2 = this.height();
           break;
 
         case "right":
-          baselineAttrHash.y2 = this.availableHeight;
+          baselineAttrHash.y2 = this.height();
           break;
       }
 
       return baselineAttrHash;
     }
 
-    public _generateTickMarkAttrHash() {
+    public _generateTickMarkAttrHash(isEndTickMark = false) {
       var tickMarkAttrHash = {
         x1: <any> 0,
         y1: <any> 0,
@@ -197,37 +202,35 @@ export module Abstract {
         tickMarkAttrHash["y2"] = scalingFunction;
       }
 
+      var tickLength = isEndTickMark ? this._endTickLength : this._tickLength;
+
       switch(this._orientation) {
         case "bottom":
-          tickMarkAttrHash["y2"] = this._tickLength;
+          tickMarkAttrHash["y2"] = tickLength;
           break;
 
         case "top":
-          tickMarkAttrHash["y1"] = this.availableHeight;
-          tickMarkAttrHash["y2"] = this.availableHeight - this._tickLength;
+          tickMarkAttrHash["y1"] = this.height();
+          tickMarkAttrHash["y2"] = this.height() - tickLength;
           break;
 
         case "left":
-          tickMarkAttrHash["x1"] = this.availableWidth;
-          tickMarkAttrHash["x2"] = this.availableWidth - this._tickLength;
+          tickMarkAttrHash["x1"] = this.width();
+          tickMarkAttrHash["x2"] = this.width() - tickLength;
           break;
 
         case "right":
-          tickMarkAttrHash["x2"] = this._tickLength;
+          tickMarkAttrHash["x2"] = tickLength;
           break;
       }
 
       return tickMarkAttrHash;
     }
 
-    private rescale() {
-      return (this.element != null) ? this._render() : null;
-    }
-
     public _invalidateLayout() {
-      super._invalidateLayout();
       this._computedWidth = null;
       this._computedHeight = null;
+      super._invalidateLayout();
     }
 
     /**
@@ -245,7 +248,7 @@ export module Abstract {
     public width(w: any): Axis;
     public width(w?: any): any {
       if (w == null) {
-        return this.availableWidth;
+        return super.width();
       } else {
         if (this._isHorizontal()) {
           throw new Error("width cannot be set on a horizontal Axis");
@@ -253,7 +256,7 @@ export module Abstract {
         if (w !== "auto" && w < 0) {
           throw new Error("invalid value for width");
         }
-        this._width = w;
+        this._userRequestedWidth = w;
         this._invalidateLayout();
         return this;
       }
@@ -274,7 +277,7 @@ export module Abstract {
     public height(h: any): Axis;
     public height(h?: any): any {
       if (h == null) {
-        return this.availableHeight;
+        return super.height();
       } else {
         if (!this._isHorizontal()) {
           throw new Error("height cannot be set on a vertical Axis");
@@ -282,7 +285,7 @@ export module Abstract {
         if (h !== "auto" && h < 0) {
           throw new Error("invalid value for height");
         }
-        this._height = h;
+        this._userRequestedHeight = h;
         this._invalidateLayout();
         return this;
       }
@@ -291,23 +294,19 @@ export module Abstract {
     /**
      * Get the current formatter on the axis.
      *
-     * @returns {Abstract.Formatter} the axis formatter
+     * @returns {Formatter} the axis formatter
      */
-    public formatter(): Abstract.Formatter;
+    public formatter(): Formatter;
     /**
      * Sets a new tick formatter.
      *
-     * @param {function | Abstract.Formatter} formatter
+     * @param {Formatter} formatter
      * @returns {Abstract.Axis} The calling Axis.
      */
-    public formatter(formatter: any): Abstract.Axis;
-    public formatter(formatter?: any): any {
+    public formatter(formatter: Formatter): Abstract.Axis;
+    public formatter(formatter?: Formatter): any {
       if (formatter === undefined) {
         return this._formatter;
-      }
-      if (typeof(formatter) === "function") {
-        formatter = new Plottable.Formatter.Custom(formatter);
-        formatter.showOnlyUnchangedValues(false);
       }
       this._formatter = formatter;
       this._invalidateLayout();
@@ -337,6 +336,40 @@ export module Abstract {
         this._tickLength = length;
         this._invalidateLayout();
         return this;
+      }
+    }
+
+    /**
+     * Gets the current end tick mark length.
+     *
+     * @returns {number} The current end tick mark length.
+     */
+    public endTickLength(): number;
+    /**
+     * Sets the end tick mark length.
+     *
+     * @param {number} length The length of the end ticks.
+     * @returns {BaseAxis} The calling Axis.
+     */
+    public endTickLength(length: number): Axis;
+    public endTickLength(length?: number): any {
+      if (length == null) {
+        return this._endTickLength;
+      } else {
+        if (length < 0) {
+          throw new Error("end tick length must be positive");
+        }
+        this._endTickLength = length;
+        this._invalidateLayout();
+        return this;
+      }
+    }
+
+    public _maxLabelTickLength() {
+      if (this.showEndTickLabels()) {
+        return Math.max(this.tickLength(), this.endTickLength());
+      } else {
+        return this.tickLength();
       }
     }
 
@@ -452,8 +485,8 @@ export module Abstract {
         return (
           Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
           Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
-          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.availableWidth) &&
-          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.availableHeight)
+          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.width()) &&
+          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.height())
         );
       };
 

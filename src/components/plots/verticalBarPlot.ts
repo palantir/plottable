@@ -29,9 +29,7 @@ export module Plot {
 
     public _updateYDomainer() {
       this._updateDomainer(this.yScale);
-      return this;
     }
-
   }
 }
 }

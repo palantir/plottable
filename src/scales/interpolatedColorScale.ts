@@ -166,6 +166,7 @@ export module Scale {
       }
       this._colorRange = this._resolveColorValues(colorRange);
       this._resetScale();
+      return this;
     }
 
     /**
@@ -188,6 +189,7 @@ export module Scale {
       }
       this._scaleType = scaleType;
       this._resetScale();
+      return this;
     }
 
     private _resetScale(): any {
@@ -210,7 +212,7 @@ export module Scale {
       // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
       var extents = this._getAllExtents();
       if (extents.length > 0) {
-        this._setDomain([d3.min(extents, (x) => x[0]), d3.max(extents, (x) => x[1])]);
+        this._setDomain([Util.Methods.min(extents, (x) => x[0]), Util.Methods.max(extents, (x) => x[1])]);
       }
       return this;
     }

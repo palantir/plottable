@@ -6,18 +6,11 @@
 /// <reference path="utils/textUtils.ts" />
 /// <reference path="utils/wordWrapUtils.ts" />
 /// <reference path="utils/domUtils.ts" />
-/// <reference path="utils/formatters/formatter.ts" />
-/// <reference path="utils/formatters/identityFormatter.ts" />
-/// <reference path="utils/formatters/generalFormatter.ts" />
-/// <reference path="utils/formatters/fixedFormatter.ts" />
-/// <reference path="utils/formatters/currencyFormatter.ts" />
-/// <reference path="utils/formatters/percentageFormatter.ts" />
-/// <reference path="utils/formatters/SISuffixFormatter.ts" />
-/// <reference path="utils/formatters/customFormatter.ts" />
-/// <reference path="utils/formatters/timeFormatter.ts" />
 
+/// <reference path="utils/formatters.ts" />
 
 /// <reference path="core/version.ts" />
+/// <reference path="core/colors.ts" />
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
 /// <reference path="core/dataSource.ts" />
@@ -27,6 +20,8 @@
 /// <reference path="core/table.ts" />
 /// <reference path="core/scale.ts" />
 /// <reference path="core/plot.ts" />
+/// <reference path="components/plots/xyPlot.ts" />
+/// <reference path="core/newStylePlot.ts" />
 /// <reference path="core/renderPolicy.ts" />
 /// <reference path="core/renderController.ts" />
 /// <reference path="core/resizeBroadcaster.ts" />
@@ -44,16 +39,18 @@
 /// <reference path="scales/interpolatedColorScale.ts" />
 /// <reference path="scales/scaleDomainCoordinator.ts" />
 
+/// <reference path="drawers/baseDrawer.ts" />
+/// <reference path="drawers/rectDrawer.ts" />
+
 /// <reference path="components/baseAxis.ts" />
 /// <reference path="components/timeAxis.ts" />
 /// <reference path="components/numericAxis.ts" />
 /// <reference path="components/categoryAxis.ts" />
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
+/// <reference path="components/horizontalLegend.ts" />
 /// <reference path="components/gridlines.ts" />
-/// <reference path="components/axisUtils.ts" />
 
-/// <reference path="components/plots/xyPlot.ts" />
 /// <reference path="components/plots/scatterPlot.ts" />
 /// <reference path="components/plots/gridPlot.ts" />
 /// <reference path="components/plots/abstractBarPlot.ts" />
@@ -61,10 +58,14 @@
 /// <reference path="components/plots/horizontalBarPlot.ts" />
 /// <reference path="components/plots/linePlot.ts" />
 /// <reference path="components/plots/areaPlot.ts" />
+/// <reference path="components/plots/newStyleBarPlot.ts" />
+/// <reference path="components/plots/clusteredBarPlot.ts" />
+/// <reference path="components/plots/stackedBarPlot.ts" />
 
 /// <reference path="animators/nullAnimator.ts" />
 /// <reference path="animators/defaultAnimator.ts" />
 /// <reference path="animators/iterativeDelayAnimator.ts" />
+/// <reference path="animators/rectAnimator.ts" />
 
 /// <reference path="interactions/keyEventListener.ts" />
 /// <reference path="interactions/interaction.ts" />
@@ -72,6 +73,7 @@
 /// <reference path="interactions/mousemoveInteraction.ts" />
 /// <reference path="interactions/keyInteraction.ts" />
 /// <reference path="interactions/panZoomInteraction.ts" />
+/// <reference path="interactions/barHoverInteraction.ts" />
 /// <reference path="interactions/drag/dragInteraction.ts" />
 /// <reference path="interactions/drag/dragBoxInteraction.ts" />
 /// <reference path="interactions/drag/xDragBoxInteraction.ts" />

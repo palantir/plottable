@@ -97,7 +97,6 @@ export module Scale {
       var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
       this._d3Scale.domain(transformedDomain);
       this.broadcaster.broadcast();
-      return this;
     }
 
     public ticks(count?: number) {
@@ -109,8 +108,8 @@ export module Scale {
       // then we're going to draw negative log ticks from -100 to -10,
       // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
       var middle = (x: number, y: number, z: number) => [x, y, z].sort((a, b) => a - b)[1];
-      var min = d3.min(this.untransformedDomain);
-      var max = d3.max(this.untransformedDomain);
+      var min = Util.Methods.min(this.untransformedDomain);
+      var max = Util.Methods.max(this.untransformedDomain);
       var negativeLower = min;
       var negativeUpper = middle(min, max, -this.pivot);
       var positiveLower = middle(min, max, this.pivot);
@@ -123,7 +122,12 @@ export module Scale {
                                         .ticks(this.howManyTicks(negativeUpper, positiveLower)) :
                                 [-this.pivot, 0, this.pivot].filter((x) => min <= x && x <= max);
 
-      return negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
+      var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
+      // If you only have 1 tick, you can't tell how big the scale is.
+      if (ticks.length <= 1) {
+        ticks = d3.scale.linear().domain([min, max]).ticks(this._lastRequestedTickCount);
+      }
+      return ticks;
     }
 
     /**
@@ -149,7 +153,7 @@ export module Scale {
       var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
       var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
       var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
-      var uniqMultiples = Util.Methods.uniqNumbers(multiples);
+      var uniqMultiples = Util.Methods.uniq(multiples);
       var clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this.base, b - 1) * x));
       var flattened = Util.Methods.flatten(clusters);
       var filtered = flattened.filter((x) => lower <= x && x <= upper);
@@ -165,8 +169,8 @@ export module Scale {
      * distance when plotted.
      */
     private howManyTicks(lower: number, upper: number): number {
-      var adjustedMin = this.adjustedLog(d3.min(this.untransformedDomain));
-      var adjustedMax = this.adjustedLog(d3.max(this.untransformedDomain));
+      var adjustedMin = this.adjustedLog(Util.Methods.min(this.untransformedDomain));
+      var adjustedMax = this.adjustedLog(Util.Methods.max(this.untransformedDomain));
       var adjustedLower = this.adjustedLog(lower);
       var adjustedUpper = this.adjustedLog(upper);
       var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);

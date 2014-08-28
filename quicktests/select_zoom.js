@@ -14,7 +14,6 @@ function run(div, data, Plottable) {
   colorScale.range(colors);
   colorScale.domain(names);
 
-
   var xScale = new Plottable.Scale.Linear();
   var yScale = new Plottable.Scale.Linear();
 
@@ -36,19 +35,17 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   var chart = new Plottable.Component.Table([
-    [yAxis, cg],
-    [null,  xAxis]
-    ]);
-  
+                                            [yAxis, cg],
+                                            [null,  xAxis]]);
+
   var legendLabel = new Plottable.Component.TitleLabel("fat");
   var legend = new Plottable.Component.Legend(colorScale);
-  var legendTable = new Plottable.Component.Table([[legendLabel], [legend]]); 
+  var legendTable = new Plottable.Component.Table([[legendLabel], [legend]]);
 
   var outerTable = new Plottable.Component.Table([[chart, legendTable]]);
   outerTable.renderTo(svg);
-  
-  cb = function(xy) {
-    if (xy == null) {console.log("starting drag"); return;}
+
+  var cb = function(xy) {
     var invertedXMin = xScale.invert(xy.xMin);
     var invertedXMax = xScale.invert(xy.xMax);
     var invertedYMin = yScale.invert(xy.yMax);
@@ -59,16 +56,16 @@ function run(div, data, Plottable) {
   }
 
   var dragboxInteraction = new Plottable.Interaction.XYDragBox(cg)
-  .callback(cb)
-  .registerWithComponent();
+    .dragend(cb)
+    .registerWithComponent();
 
-  cb2 = function(xy) {
+  var cb2 = function(xy) {
     xScale.autoDomain();
     yScale.autoDomain();
   }
 
   var doubleClickInteraction = new Plottable.Interaction.DoubleClick(cg)
-  .callback(cb2)
-  .registerWithComponent();
-  
+                                            .callback(cb2)
+                                            .registerWithComponent();
+
 }

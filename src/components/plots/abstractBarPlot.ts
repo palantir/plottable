@@ -32,7 +32,7 @@ export module Abstract {
     constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
       this.classed("bar-plot", true);
-      this.project("fill", () => "steelblue");
+      this.project("fill", () => Core.Colors.INDIGO);
       // because this._baselineValue was not initialized during the super()
       // call, we must call this in order to get this._baselineValue
       // to be used by the Domainer.
@@ -43,7 +43,6 @@ export module Abstract {
       super._setup();
       this._baseline = this.renderArea.append("line").classed("baseline", true);
       this._bars = this.renderArea.selectAll("rect").data([]);
-      return this;
     }
 
     public _paint() {
@@ -71,11 +70,11 @@ export module Abstract {
 
       this._bars.exit().remove();
 
-      var baselineAttr: Abstract.IAttributeToProjector = {
+      var baselineAttr: IAttributeToProjector = {
         "x1": this._isVertical ? 0 : scaledBaseline,
         "y1": this._isVertical ? scaledBaseline : 0,
-        "x2": this._isVertical ? this.availableWidth : scaledBaseline,
-        "y2": this._isVertical ? scaledBaseline : this.availableHeight
+        "x2": this._isVertical ? this.width() : scaledBaseline,
+        "y2": this._isVertical ? scaledBaseline : this.height()
       };
 
       this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
@@ -205,7 +204,22 @@ export module Abstract {
             // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         qscale._autoDomainIfAutomaticMode();
       }
-      return this;
+    }
+
+    public _updateYDomainer() {
+      if (this._isVertical) {
+        this._updateDomainer(this.yScale);
+      } else {
+        super._updateYDomainer();
+      }
+    }
+
+    public _updateXDomainer() {
+      if (!this._isVertical) {
+        this._updateDomainer(this.xScale);
+      } else {
+        super._updateXDomainer();
+      }
     }
 
     public _generateAttrToProjector() {
@@ -248,6 +262,8 @@ export module Abstract {
 
       return attrToProjector;
     }
+
   }
 }
 }
+

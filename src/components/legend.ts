@@ -25,8 +25,8 @@ export module Component {
 
     private datumCurrentlyFocusedOn: string;
 
-    // this is the set of all elements that are currently toggled off
-    private isOff: D3.Set;
+    // this is the set of all legend domain strings that are currently toggled off
+    private isOff: D3.Set<string>;
 
     /**
      * Creates a Legend.
@@ -141,8 +141,7 @@ export module Component {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
-      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.availableHeight / textHeight));
-      return this;
+      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.height() / textHeight));
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
@@ -150,8 +149,8 @@ export module Component {
       var totalNumRows = this.colorScale.domain().length;
       var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend.MARGIN) / textHeight));
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-      var fakeText = fakeLegendEl.append("text");
-      var maxWidth = d3.max(this.colorScale.domain(), (d: string) => Util.Text.getTextWidth(fakeText, d));
+      var measure = Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
+      var maxWidth = Util.Methods.max(this.colorScale.domain(), (d: string) => measure(d).width);
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
       var desiredWidth  = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;
@@ -167,7 +166,7 @@ export module Component {
     private measureTextHeight(): number {
       // note: can't be called before anchoring atm
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-      var textHeight = Util.Text.getTextHeight(fakeLegendEl.append("text"));
+      var textHeight = Util.Text.getTextMeasurer(fakeLegendEl.append("text"))(Util.Text.HEIGHT_TEXT).height;
       // HACKHACK
       if (textHeight === 0) {
         textHeight = 1;
@@ -176,11 +175,11 @@ export module Component {
       return textHeight;
     }
 
-    public _doRender(): Legend {
+    public _doRender() {
       super._doRender();
       var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
       var textHeight = this.measureTextHeight();
-      var availableWidth  = this.availableWidth  - textHeight - Legend.MARGIN;
+      var availableWidth  = this.width()  - textHeight - Legend.MARGIN;
       var r = textHeight * 0.3;
       var legend: D3.UpdateSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, (d) => d);
       var legendEnter = legend.enter()
@@ -201,7 +200,7 @@ export module Component {
         .attr("transform", "translate(" + textHeight + ", 0)")
         .each(function(d: string) {
           var d3this = d3.select(this);
-          var measure = Util.Text.getTextMeasure(d3this);
+          var measure = Util.Text.getTextMeasurer(d3this.append("text"));
           var writeLine = Util.Text.getTruncatedText(d, availableWidth, measure);
           var writeLineMeasure = measure(writeLine);
           Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
@@ -213,7 +212,6 @@ export module Component {
 
       this.updateClasses();
       this.updateListeners();
-      return this;
     }
 
     private updateListeners() {

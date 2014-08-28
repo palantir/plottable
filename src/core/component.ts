@@ -18,8 +18,8 @@ export module Abstract {
     private isTopLevelComponent = false;
     public _parent: ComponentContainer;
 
-    public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
-    public availableHeight: number;
+    private _width : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
+    private _height: number;
     public xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
     public yOrigin: number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
@@ -40,7 +40,6 @@ export module Abstract {
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
      *
      * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
-     * @returns {Component} The calling component.
      */
     public _anchor(element: D3.Selection) {
       if (this.removed) {
@@ -64,15 +63,12 @@ export module Abstract {
         this._setup();
       }
       this._isAnchored = true;
-      return this;
     }
 
     /**
      * Creates additional elements as necessary for the Component to function.
      * Called during _anchor() if the Component's element has not been created yet.
      * Override in subclasses to provide additional functionality.
-     *
-     * @returns {Component} The calling Component.
      */
     public _setup() {
       if (this._isSetup) {
@@ -100,7 +96,6 @@ export module Abstract {
         this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
       }
       this._isSetup = true;
-      return this;
     }
 
     public _requestedSpace(availableWidth : number, availableHeight: number): ISpaceRequest {
@@ -116,7 +111,6 @@ export module Abstract {
      * @param {number} yOrigin
      * @param {number} availableWidth
      * @param {number} availableHeight
-     * @returns {Component} The calling Component.
      */
     public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
       if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
@@ -164,34 +158,29 @@ export module Abstract {
         availableHeight = Math.min(availableHeight, requestedSpace.height);
       }
 
-      this.availableWidth   = availableWidth ;
-      this.availableHeight = availableHeight;
+      this._width   = availableWidth ;
+      this._height = availableHeight;
       this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth ).attr("height", this.availableHeight));
-      return this;
+      this.boxes.forEach((b: D3.Selection) => b.attr("width", this._width ).attr("height", this._height));
     }
 
     /**
      * Renders the component.
-     *
-     * @returns {Component} The calling Component.
      */
     public _render() {
       if (this._isAnchored && this._isSetup) {
         Core.RenderController.registerToRender(this);
       }
-      return this;
     }
 
     public _scheduleComputeLayout() {
       if (this._isAnchored && this._isSetup) {
         Core.RenderController.registerToComputeLayout(this);
       }
-      return this;
     }
 
     public _doRender() {
-      return this; //no-op
+      //no-op
     }
 
 
@@ -221,7 +210,8 @@ export module Abstract {
         }
         this._anchor(selection);
       }
-      this._computeLayout()._render();
+      this._computeLayout();
+      this._render();
       return this;
     }
 
@@ -334,15 +324,18 @@ export module Abstract {
       var box = parentElement.append("rect");
       if (className != null) {box.classed(className, true);};
       this.boxes.push(box);
-      if (this.availableWidth  != null && this.availableHeight != null) {
-        box.attr("width", this.availableWidth ).attr("height", this.availableHeight);
+      if (this._width  != null && this._height != null) {
+        box.attr("width", this._width ).attr("height", this._height);
       }
       return box;
     }
 
     private generateClipPath() {
       // The clip path will prevent content from overflowing its component space.
-      this.element.attr("clip-path", "url(#clipPath" + this._plottableID + ")");
+      // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
+      // They don't need the current URL in the clip path reference.
+      var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+      this.element.attr("clip-path", "url(" + prefix + "#clipPath" + this._plottableID + ")");
       var clipPathParent = this.boxContainer.append("clipPath")
                                       .attr("id", "clipPath" + this._plottableID);
       this.addBox("clip-rect", clipPathParent);
@@ -479,6 +472,25 @@ export module Abstract {
       this.detach();
       Core.ResizeBroadcaster.deregister(this);
     }
+
+    /**
+     * Return the width of the component
+     *
+     * @return {number} width of the component
+     */
+    public width(): number {
+      return this._width;
+    }
+
+    /**
+     * Return the height of the component
+     *
+     * @return {number} height of the component
+     */
+    public height(): number {
+      return this._height;
+    }
+
   }
 }
 }

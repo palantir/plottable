@@ -1,7 +1,7 @@
 {
   "name": "plottable",
   "description": "A library for creating charts out of D3",
-  "version": "0.23.2",
+  "version": "0.26.2",
   "main": ["plottable.js", "plottable.css"],
   "license": "MIT",
   "ignore": [
@@ -9,8 +9,9 @@
     "!bower.json",
     "!plottable.js",
     "!plottable.css",
+    "!plottable.min.js",
     "!plottable.d.ts",
-    "!plottable.min.js"
+    "!plottable-dev.d.ts"
   ],
   "keywords": [
     "plottable",
@@ -19,7 +20,13 @@
     "d3",
     "data viz",
     "chart",
-    "plot"
+    "charts",
+    "reusable charts",
+    "visualization",
+    "scatterplot",
+    "bar chart",
+    "plot",
+    "plots"
   ],
   "dependencies": {
     "d3": "3.4.5"

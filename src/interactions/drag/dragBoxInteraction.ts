@@ -9,9 +9,6 @@ export module Interaction {
 
     public _dragstart() {
       super._dragstart();
-      if (this.callbackToCall != null) {
-        this.callbackToCall(null);
-      }
       this.clearBox();
     }
 
@@ -41,8 +38,8 @@ export module Interaction {
     public _anchor(hitBox: D3.Selection) {
       super._anchor(hitBox);
       var cname = DragBox.CLASS_DRAG_BOX;
-      var foreground = this.componentToListenTo.foregroundContainer;
-      this.dragBox = foreground.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
+      var background = this.componentToListenTo.backgroundContainer;
+      this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
       return this;
     }
   }

@@ -59,28 +59,20 @@ describe("Plots", () => {
       verifier.end();
     });
 
-    it("fill colors set appropriately from accessor", () => {
-      var areaPath = renderArea.select(".area");
-      assert.equal(areaPath.attr("fill"), "steelblue", "fill set correctly");
-      verifier.end();
-    });
-
-    it("fill colors can be changed by projecting new accessor and re-render appropriately", () => {
-      var newFillAccessor = () => "pink";
-      areaPlot.project("fill", newFillAccessor);
-      areaPlot.renderTo(svg);
-      renderArea = areaPlot.renderArea;
-      var areaPath = renderArea.select(".area");
-      assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
-      verifier.end();
-    });
-
     it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
       areaPlot.project("y0", (d: any) => d.bar/2, yScale);
       areaPlot.renderTo(svg);
       renderArea = areaPlot.renderArea;
       var areaPath = renderArea.select(".area");
       assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
+      verifier.end();
+    });
+
+    it("area is appended before line", () => {
+      var paths = renderArea.selectAll("path")[0];
+      var areaSelection = renderArea.select(".area")[0][0];
+      var lineSelection = renderArea.select(".line")[0][0];
+      assert.operator(paths.indexOf(areaSelection), "<", paths.indexOf(lineSelection), "area appended before line");
       verifier.end();
     });
 

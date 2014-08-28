@@ -107,7 +107,8 @@ describe("Plots", () => {
       });
 
       it("rendering is idempotent", () => {
-        circlePlot._render()._render();
+        circlePlot._render();
+        circlePlot._render();
         circlePlot.renderArea.selectAll("circle").each(getCirclePlotVerifier());
         assert.equal(circlesInArea, 10, "10 circles were drawn");
         verifier.end();

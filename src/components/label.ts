@@ -63,9 +63,8 @@ export module Component {
     public _setup() {
       super._setup();
       this.textContainer = this.content.append("g");
-      this.measurer = Util.Text.getTextMeasure(this.textContainer);
+      this.measurer = Util.Text.getTextMeasurer(this.textContainer.append("text"));
       this.text(this._text);
-      return this;
     }
 
     /**
@@ -94,21 +93,20 @@ export module Component {
     public _doRender() {
       super._doRender();
       this.textContainer.text("");
-      var dimension = this.orientation === "horizontal" ? this.availableWidth : this.availableHeight;
+      var dimension = this.orientation === "horizontal" ? this.width() : this.height();
       var truncatedText = Util.Text.getTruncatedText(this._text, dimension, this.measurer);
       if (this.orientation === "horizontal") {
-        Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.availableWidth, this.availableHeight,
+        Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.width(), this.height(),
                                         this.xAlignment, this.yAlignment);
       } else {
-        Util.Text.writeLineVertically(truncatedText, this.textContainer, this.availableWidth, this.availableHeight,
+        Util.Text.writeLineVertically(truncatedText, this.textContainer, this.width(), this.height(),
                                         this.xAlignment, this.yAlignment, this.orientation);
       }
-      return this;
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
+      this.measurer = Util.Text.getTextMeasurer(this.textContainer.append("text")); // reset it in case fonts have changed
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-      this.measurer = Util.Text.getTextMeasure(this.textContainer); // reset it in case fonts have changed
       return this;
     }
   }

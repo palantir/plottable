@@ -6,7 +6,7 @@ describe("Util.Text", () => {
     var svg = generateSVG();
     var textEl = svg.append("text").attr("x", 20).attr("y", 50);
     textEl.text("foobar");
-    var measure = Plottable.Util.Text.getTextMeasure(textEl);
+    var measure = Plottable.Util.Text.getTextMeasurer(textEl);
     var fullText = Plottable.Util.Text.getTruncatedText("hellom world!", 200, measure);
     assert.equal(fullText, "hellom world!", "text untruncated");
     var partialText = Plottable.Util.Text.getTruncatedText("hellom world!", 70, measure);
@@ -14,26 +14,6 @@ describe("Util.Text", () => {
     var tinyText = Plottable.Util.Text.getTruncatedText("hellom world!", 5, measure);
     assert.equal(tinyText, "", "empty string for tiny text");
 
-    assert.equal(textEl.text(), "foobar", "truncate had no side effect on textEl");
-    svg.remove();
-  });
-
-  it("getTextHeight works properly", () => {
-    var svg = generateSVG();
-    var textEl = svg.append("text").attr("x", 20).attr("y", 50);
-    textEl.style("font-size", "20pt");
-    textEl.text("hello, world");
-    var height1 = Plottable.Util.Text.getTextHeight(textEl);
-    textEl.style("font-size", "30pt");
-    var height2 = Plottable.Util.Text.getTextHeight(textEl);
-    assert.operator(height1, "<", height2, "measured height is greater when font size is increased");
-    assert.equal(textEl.text(), "hello, world", "getTextHeight did not modify the text in the element");
-    textEl.text("");
-    assert.equal(Plottable.Util.Text.getTextHeight(textEl), height2, "works properly if there is no text in the element");
-    assert.equal(textEl.text(), "", "getTextHeight did not modify the text in the element");
-    textEl.text(" ");
-    assert.equal(Plottable.Util.Text.getTextHeight(textEl), height2, "works properly if there is just a space in the element");
-    assert.equal(textEl.text(), " ", "getTextHeight did not modify the text in the element");
     svg.remove();
   });
 
@@ -41,10 +21,12 @@ describe("Util.Text", () => {
     var svg: D3.Selection;
     var measure: any;
     var e: any;
+    var textSelection: D3.Selection;
 
     before(() => {
       svg = generateSVG();
-      measure = Plottable.Util.Text.getTextMeasure(svg);
+      textSelection = svg.append("text");
+      measure = Plottable.Util.Text.getTextMeasurer(textSelection);
       e = (text: string, width: number) => Plottable.Util.Text._addEllipsesToLine(text, width, measure);
     });
     it("works on an empty string" ,() => {
@@ -86,7 +68,8 @@ describe("Util.Text", () => {
       var svg = generateSVG();
       var width = 1;
       var height = 1;
-      var measure = Plottable.Util.Text.getTextMeasure(svg);
+      var textSelection = svg.append("text");
+      var measure = Plottable.Util.Text.getTextMeasurer(textSelection);
       var results = Plottable.Util.Text.writeText("hello world", width, height, measure, true);
       assert.isFalse(results.textFits,    "measurement mode: text doesn't fit");
       assert.equal(0, results.usedWidth,  "measurement mode: no width used");
@@ -97,6 +80,7 @@ describe("Util.Text", () => {
       assert.isFalse(results.textFits,    "write mode: text doesn't fit");
       assert.equal(0, results.usedWidth,  "write mode: no width used");
       assert.equal(0, results.usedHeight, "write mode: no height used");
+      textSelection.remove();
       assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
       svg.remove();
     });
@@ -105,7 +89,8 @@ describe("Util.Text", () => {
       var svg = generateSVG();
       var width = 500;
       var height = 1;
-      var measure = Plottable.Util.Text.getTextMeasure(svg);
+      var textSelection = svg.append("text");
+      var measure = Plottable.Util.Text.getTextMeasurer(textSelection);
       var results = Plottable.Util.Text.writeText("hello world", width, height, measure, true);
       assert.isFalse(results.textFits,    "measurement mode: text doesn't fit");
       assert.equal(0, results.usedWidth,  "measurement mode: no width used");
@@ -116,44 +101,36 @@ describe("Util.Text", () => {
       assert.isFalse(results.textFits,    "write mode: text doesn't fit");
       assert.equal(0, results.usedWidth,  "write mode: no width used");
       assert.equal(0, results.usedHeight, "write mode: no height used");
+      textSelection.remove();
       assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
       svg.remove();
     });
   });
 
-  describe("getTextMeasure", () => {
+  describe("getTextMeasurer", () => {
     var svg: D3.Selection;
-    var t: D3.Selection;
+    var measurer: Plottable.Util.Text.TextMeasurer;
     var canonicalBB: any;
     var canonicalResult: Plottable.Util.Text.Dimensions;
 
     before(() => {
       svg = generateSVG(200, 200);
-      t = svg.append("text");
+      var t = svg.append("text");
       t.text("hi there");
       canonicalBB = Plottable.Util.DOM.getBBox(t);
       canonicalResult = {width: canonicalBB.width, height: canonicalBB.height};
       t.text("bla bla bla");
+      measurer = Plottable.Util.Text.getTextMeasurer(t);
     });
 
 
     it("works on empty string", () => {
-      var measure = Plottable.Util.Text.getTextMeasure(t);
-      var result = measure("");
+      var result = measurer("");
       assert.deepEqual(result, {width: 0, height: 0}, "empty string has 0 width and height");
     });
     it("works on non-empty string and has no side effects", () => {
-      var measure = Plottable.Util.Text.getTextMeasure(t);
-      var result2 = measure("hi there");
+      var result2 = measurer("hi there");
       assert.deepEqual(result2, canonicalResult, "measurement is as expected");
-      assert.equal(t.text(), "bla bla bla", "the text was unchanged");
-    });
-
-    it("works when operating on the top svg instead of text selection, and has no side effects", () => {
-      var measure2 = Plottable.Util.Text.getTextMeasure(svg);
-      var result3 = measure2("hi there");
-      assert.deepEqual(result3, canonicalResult, "measurement is as expected for svg measure");
-      assert.lengthOf(svg.node().childNodes, 1, "no nodes were added to the svg");
     });
     after(() => {
       svg.remove();

@@ -1,7 +1,7 @@
 
 function makeData() {
   return [makeRandomData(50), makeRandomData(50)];
-  
+
 }
 
 function run(div, data, Plottable) {
@@ -23,9 +23,9 @@ function run(div, data, Plottable) {
   var yAxis2 = new Plottable.Axis.Numeric(yScale, "left");
 
   //rendering
-  var linePlot = new Plottable.Plot.Line(dataseries1, xScale, yScale);
-  var scatterPlot = new Plottable.Plot.Scatter(dataseries1, xScale, yScale);
-  
+  var linePlot = new Plottable.Plot.Line(dataseries, xScale, yScale);
+  var scatterPlot = new Plottable.Plot.Scatter(dataseries, xScale, yScale);
+
   var autoXLabel = new Plottable.Component.Label("autodomain X");
   var focusXLabel = new Plottable.Component.Label("focus X");
   var autoYLabel = new Plottable.Component.Label("autodomain Y");
@@ -46,10 +46,10 @@ function run(div, data, Plottable) {
   basicTable.renderTo(svg);
 
   function xAuto(){
-    xScale.autoDomain();   
+    xScale.autoDomain();
   }
   function yAuto(){
-    yScale.autoDomain();   
+    yScale.autoDomain();
   }
   function xFocus(){
     xScale.domain([0, 3]);
@@ -57,23 +57,23 @@ function run(div, data, Plottable) {
   function yFocus(){
     yScale.domain([0, 8]);
   }
-  
-  xAutoInteraction = new            
+
+  xAutoInteraction = new
   Plottable.Interaction.Click(autoXLabel)
   .callback(xAuto)
   .registerWithComponent();
-  yAutoInteraction = new            
+  yAutoInteraction = new
   Plottable.Interaction.Click(autoYLabel)
   .callback(yAuto)
   .registerWithComponent();
-  xFocusInteraction = new            
+  xFocusInteraction = new
   Plottable.Interaction.Click(focusXLabel)
   .callback(xFocus)
   .registerWithComponent();
-  yFocusInteraction = new            
+  yFocusInteraction = new
   Plottable.Interaction.Click(focusYLabel)
   .callback(yFocus)
-  .registerWithComponent();    
+  .registerWithComponent();
 
 
 
