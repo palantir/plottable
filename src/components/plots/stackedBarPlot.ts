@@ -10,14 +10,19 @@ export module Plot {
     public _baseline: D3.Selection;
     private stackedExtent: number[] = [];
 
-<<<<<<< HEAD
+    /**
+     * Constructs a StackedBar plot.
+     *
+     * @constructor
+     * @param {Scale} xScale the x scale of the plot
+     * @param {Scale} yScale the y scale of the plot
+     * @param {boolean} isVertical if the plot if vertical
+     */
     constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale, isVertical = true) {
       super(xScale, yScale);
       this._isVertical = isVertical;
     }
 
-=======
->>>>>>> develop
     public _addDataset(key: string, dataset: any) {
       super._addDataset(key, dataset);
       var accessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;

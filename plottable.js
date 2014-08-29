@@ -5446,14 +5446,9 @@ var Plottable;
     (function (Plot) {
         var StackedBar = (function (_super) {
             __extends(StackedBar, _super);
-<<<<<<< HEAD
             function StackedBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale);
-=======
-            function StackedBar() {
-                _super.apply(this, arguments);
->>>>>>> develop
                 this.stackedData = [];
                 this._baselineValue = 0;
                 this.stackedExtent = [];
