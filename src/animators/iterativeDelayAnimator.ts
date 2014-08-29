@@ -16,7 +16,7 @@ export module Animator {
       return selection.transition()
         .ease(this._easing)
         .duration(this._durationMsec)
-        .delay((d: any, i: number) => i * this._delayMsec)
+        .delay((d: any, i: number) => this.delay() + i * this._delayMsec)
         .attr(attrToProjector);
     }
   }

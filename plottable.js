@@ -5544,7 +5544,7 @@ var Plottable;
         var Default = (function () {
             function Default() {
                 this._durationMsec = 300;
-                this._delayMsec = 0;
+                this._delayMsec = 500;
                 this._easing = "exp-out";
             }
             Default.prototype.animate = function (selection, attrToProjector) {
@@ -5601,7 +5601,7 @@ var Plottable;
             }
             IterativeDelay.prototype.animate = function (selection, attrToProjector) {
                 var _this = this;
-                return selection.transition().ease(this._easing).duration(this._durationMsec).delay(function (d, i) { return i * _this._delayMsec; }).attr(attrToProjector);
+                return selection.transition().ease(this._easing).duration(this._durationMsec).delay(function (d, i) { return _this.delay() + i * _this._delayMsec; }).attr(attrToProjector);
             };
             return IterativeDelay;
         })(Animator.Default);
