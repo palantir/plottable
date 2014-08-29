@@ -74,9 +74,9 @@ export module Plot {
       }
     }
 
-    public _onDataSourceUpdate() {
-      super._onDataSourceUpdate();
-      Plot.Area.prototype._onDataSourceUpdate.apply(this);
+    public _onDatasetUpdate() {
+      super._onDatasetUpdate();
+      Plot.Area.prototype._onDatasetUpdate.apply(this);
     }
 
     public _generateAttrToProjector() {

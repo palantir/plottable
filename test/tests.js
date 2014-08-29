@@ -2238,8 +2238,8 @@ describe("Plots", function () {
                 { x: 1, y: 3, type: "b" },
                 { x: 3, y: 1, type: "b" }
             ];
-            dataset1 = new Plottable.DataSource(data1);
-            dataset2 = new Plottable.DataSource(data2);
+            dataset1 = new Plottable.Dataset(data1);
+            dataset2 = new Plottable.Dataset(data2);
             renderer = new Plottable.Plot.StackedArea(xScale, yScale);
             renderer.addDataset(data1);
             renderer.addDataset(data2);
@@ -2325,7 +2325,7 @@ describe("Plots", function () {
                 { x: 1, y: 0, type: "c" },
                 { x: 3, y: 0, type: "c" }
             ];
-            renderer.addDataset("a", new Plottable.DataSource(data));
+            renderer.addDataset("a", new Plottable.Dataset(data));
             renderer.renderTo(svg);
             assert.strictEqual(oldLowerBound, yScale.domain()[0], "lower bound doesn't change with 0 added");
             assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound doesn't change with 0 added");
@@ -2336,7 +2336,7 @@ describe("Plots", function () {
                 { x: 1, y: 10, type: "d" },
                 { x: 3, y: 3, type: "d" }
             ];
-            renderer.addDataset("b", new Plottable.DataSource(data));
+            renderer.addDataset("b", new Plottable.Dataset(data));
             renderer.renderTo(svg);
             assert.closeTo(oldLowerBound, yScale.domain()[0], 2, "lower bound doesn't change on positive addition");
             assert.closeTo(oldUpperBound + 10, yScale.domain()[1], 2, "upper bound increases");
@@ -2346,7 +2346,7 @@ describe("Plots", function () {
                 { x: 1, y: 0, type: "e" },
                 { x: 3, y: 1, type: "e" }
             ];
-            renderer.addDataset("c", new Plottable.DataSource(data));
+            renderer.addDataset("c", new Plottable.Dataset(data));
             renderer.renderTo(svg);
             assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound doesn't increase since maximum doesn't increase");
             renderer.removeDataset("a");
@@ -2359,17 +2359,17 @@ describe("Plots", function () {
                 { x: 1, y: 0, type: "c" },
                 { x: 3, y: 0, type: "c" }
             ];
-            renderer.addDataset("a", new Plottable.DataSource(data));
+            renderer.addDataset("a", new Plottable.Dataset(data));
             data = [
                 { x: 1, y: 10, type: "d" },
                 { x: 3, y: 3, type: "d" }
             ];
-            renderer.addDataset("b", new Plottable.DataSource(data));
+            renderer.addDataset("b", new Plottable.Dataset(data));
             data = [
                 { x: 1, y: 0, type: "e" },
                 { x: 3, y: 1, type: "e" }
             ];
-            renderer.addDataset("c", new Plottable.DataSource(data));
+            renderer.addDataset("c", new Plottable.Dataset(data));
             renderer.renderTo(svg);
             assert.closeTo(16, yScale.domain()[1], 2, "Initially starts with around 14 at highest extent");
             renderer.detach();
@@ -2397,7 +2397,7 @@ describe("Plots", function () {
                 { x: 1, y: 0, type: "c" },
                 { x: 3, y: 0, type: "c" }
             ];
-            var dataset = new Plottable.DataSource(data);
+            var dataset = new Plottable.Dataset(data);
             renderer.addDataset(dataset);
             renderer.renderTo(svg);
             assert.strictEqual(oldLowerBound, yScale.domain()[0], "lower bound doesn't change with 0 added");
@@ -2513,6 +2513,82 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
         });
     });
+    describe("Horizontal Bar Plot", function () {
+        var verifier = new MultiTestVerifier();
+        var svg;
+        var dataset1;
+        var dataset2;
+        var xScale;
+        var yScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var rendererWidth;
+        var bandWidth = 0;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        before(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Linear().domain([0, 3]);
+            yScale = new Plottable.Scale.Ordinal();
+            var data1 = [
+                { y: "A", x: 1 },
+                { y: "B", x: 2 }
+            ];
+            var data2 = [
+                { y: "A", x: 2 },
+                { y: "B", x: 1 }
+            ];
+            dataset1 = new Plottable.Dataset(data1);
+            dataset2 = new Plottable.Dataset(data2);
+            renderer = new Plottable.Plot.StackedBar(xScale, yScale, false);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.baseline(0);
+            var yAxis = new Plottable.Axis.Category(yScale, "left");
+            var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+            rendererWidth = renderer.width();
+            bandWidth = yScale.rangeBand();
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        afterEach(function () {
+            verifier.end();
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+        it("renders correctly", function () {
+            var bars = renderer.renderArea.selectAll("rect");
+            var bar0 = d3.select(bars[0][0]);
+            var bar1 = d3.select(bars[0][1]);
+            var bar2 = d3.select(bars[0][2]);
+            var bar3 = d3.select(bars[0][3]);
+            assert.closeTo(numAttr(bar0, "height"), bandWidth, 2);
+            assert.closeTo(numAttr(bar1, "height"), bandWidth, 2);
+            assert.closeTo(numAttr(bar2, "height"), bandWidth, 2);
+            assert.closeTo(numAttr(bar3, "height"), bandWidth, 2);
+            assert.closeTo(numAttr(bar0, "width"), rendererWidth / 3, 0.01, "width is correct for bar0");
+            assert.closeTo(numAttr(bar1, "width"), rendererWidth / 3 * 2, 0.01, "width is correct for bar1");
+            assert.closeTo(numAttr(bar2, "width"), rendererWidth / 3 * 2, 0.01, "width is correct for bar2");
+            assert.closeTo(numAttr(bar3, "width"), rendererWidth / 3, 0.01, "width is correct for bar3");
+            var bar0Y = bar0.data()[0].y;
+            var bar1Y = bar1.data()[0].y;
+            var bar2Y = bar2.data()[0].y;
+            var bar3Y = bar3.data()[0].y;
+            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2, 0.01, "y pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2, 0.01, "y pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + bandWidth / 2, 0.01, "y pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + bandWidth / 2, 0.01, "y pos correct for bar3");
+            assert.closeTo(numAttr(bar0, "x"), 0, 0.01, "x is correct for bar0");
+            assert.closeTo(numAttr(bar1, "x"), 0, 0.01, "x is correct for bar1");
+            assert.closeTo(numAttr(bar2, "x"), rendererWidth / 3, 0.01, "x is correct for bar2");
+            assert.closeTo(numAttr(bar3, "x"), rendererWidth / 3 * 2, 0.01, "x is correct for bar3");
+        });
+    });
 });
 
 var assert = chai.assert;
@@ -2589,6 +2665,80 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2 - off, 0.01, "x pos correct for bar1");
             assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2 + off, 0.01, "x pos correct for bar2");
             assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2 + off, 0.01, "x pos correct for bar3");
+        });
+    });
+    describe("Horizontal Clustered Bar Plot", function () {
+        var verifier = new MultiTestVerifier();
+        var svg;
+        var dataset1;
+        var dataset2;
+        var yScale;
+        var xScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var rendererWidth;
+        var bandWidth = 0;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        before(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            yScale = new Plottable.Scale.Ordinal();
+            xScale = new Plottable.Scale.Linear().domain([0, 2]);
+            var data1 = [
+                { y: "A", x: 1 },
+                { y: "B", x: 2 }
+            ];
+            var data2 = [
+                { y: "A", x: 2 },
+                { y: "B", x: 1 }
+            ];
+            dataset1 = new Plottable.Dataset(data1);
+            dataset2 = new Plottable.Dataset(data2);
+            renderer = new Plottable.Plot.ClusteredBar(xScale, yScale, false);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.baseline(0);
+            var yAxis = new Plottable.Axis.Category(yScale, "left");
+            var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+            rendererWidth = renderer.width();
+            bandWidth = yScale.rangeBand();
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        afterEach(function () {
+            verifier.end();
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+        it("renders correctly", function () {
+            var bars = renderer.renderArea.selectAll("rect");
+            var bar0 = d3.select(bars[0][0]);
+            var bar1 = d3.select(bars[0][1]);
+            var bar2 = d3.select(bars[0][2]);
+            var bar3 = d3.select(bars[0][3]);
+            var width = bandWidth / 2 * .518;
+            assert.closeTo(numAttr(bar0, "height"), width, 2, "height is correct for bar0");
+            assert.closeTo(numAttr(bar1, "height"), width, 2, "height is correct for bar1");
+            assert.closeTo(numAttr(bar2, "height"), width, 2, "height is correct for bar2");
+            assert.closeTo(numAttr(bar3, "height"), width, 2, "height is correct for bar3");
+            assert.closeTo(numAttr(bar0, "width"), rendererWidth / 2, 0.01, "width is correct for bar0");
+            assert.closeTo(numAttr(bar1, "width"), rendererWidth, 0.01, "width is correct for bar1");
+            assert.closeTo(numAttr(bar2, "width"), rendererWidth, 0.01, "width is correct for bar2");
+            assert.closeTo(numAttr(bar3, "width"), rendererWidth / 2, 0.01, "width is correct for bar3");
+            var bar0Y = bar0.data()[0].y;
+            var bar1Y = bar1.data()[0].y;
+            var bar2Y = bar2.data()[0].y;
+            var bar3Y = bar3.data()[0].y;
+            var off = renderer.innerScale.scale("_0");
+            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + bandWidth / 2 + off, 0.01, "y pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + bandWidth / 2 + off, 0.01, "y pos correct for bar3");
         });
     });
 });

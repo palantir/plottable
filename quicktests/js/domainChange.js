@@ -15,7 +15,7 @@ function run(div, data, Plottable) {
         return [{x: 0, y: 0}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 2, y: 6}, {x: 30, y: 70}];
     };
 
-  var dataseries = new Plottable.DataSource(boringData());
+  var dataseries = new Plottable.Dataset(boringData());
 
   var xScale = new Plottable.Scale.Linear();
   var yScale = new Plottable.Scale.Linear();

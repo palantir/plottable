@@ -7,17 +7,17 @@ function run(div, data, Plottable) {
   "use strict";
   var svg = div.append("svg").attr("height", 500);
     //data
-  var dataseries1 = new Plottable.DataSource(data[0].slice(0, 10));
+  var dataseries1 = new Plottable.Dataset(data[0].slice(0, 10));
   dataseries1.metadata({name: "series1"});
-  var dataseries2 = new Plottable.DataSource(data[0].slice(10, 20));
+  var dataseries2 = new Plottable.Dataset(data[0].slice(10, 20));
   dataseries2.metadata({name: "series2"});
-  var dataseries3 = new Plottable.DataSource(data[0].slice(20, 30));
+  var dataseries3 = new Plottable.Dataset(data[0].slice(20, 30));
   dataseries3.metadata({name: "apples"});
-  var dataseries4 = new Plottable.DataSource(data[1].slice(0, 10));
+  var dataseries4 = new Plottable.Dataset(data[1].slice(0, 10));
   dataseries4.metadata({name: "oranges"});
-  var dataseries5 = new Plottable.DataSource(data[1].slice(10, 20));
+  var dataseries5 = new Plottable.Dataset(data[1].slice(10, 20));
   dataseries5.metadata({name: "bananas"});
-  var dataseries6 = new Plottable.DataSource(data[1].slice(20, 30));
+  var dataseries6 = new Plottable.Dataset(data[1].slice(20, 30));
   dataseries6.metadata({name: "grapes"});
 
   var colorScale1 = new Plottable.Scale.Color();

@@ -163,19 +163,9 @@ describe("Interactions", () => {
     var svgWidth = 400;
     var svgHeight = 400;
     var svg: D3.Selection;
-<<<<<<< HEAD
-    var dataset: Plottable.DataSource;
+    var dataset: Plottable.Dataset;
     var xScale: Plottable.Abstract.QuantitativeScale<number>;
     var yScale: Plottable.Abstract.QuantitativeScale<number>;
-||||||| merged common ancestors
-    var dataset: Plottable.DataSource;
-    var xScale: Plottable.Abstract.QuantitativeScale;
-    var yScale: Plottable.Abstract.QuantitativeScale;
-=======
-    var dataset: Plottable.Dataset;
-    var xScale: Plottable.Abstract.QuantitativeScale;
-    var yScale: Plottable.Abstract.QuantitativeScale;
->>>>>>> rename-datasource
     var renderer: Plottable.Abstract.XYPlot;
     var interaction: Plottable.Interaction.XYDragBox;
 

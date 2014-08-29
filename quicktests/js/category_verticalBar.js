@@ -14,7 +14,7 @@ function run(div, data, Plottable) {
   "use strict";
 
     var svg = div.append("svg").attr("height", 500);
-    var ds = new Plottable.DataSource(data);
+    var ds = new Plottable.Dataset(data);
 
     var xScale = new Plottable.Scale.Ordinal();
     var xAxis = new Plottable.Axis.Category(xScale, "bottom");

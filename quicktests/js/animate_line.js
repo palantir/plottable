@@ -25,8 +25,8 @@ function run(div, data, Plottable) {
   lineChart.renderTo(svg);
 
   var cb = function(x, y){
-    var d = lineRenderer.dataSource().data();
-    lineRenderer.dataSource().data(d);
+    var d = lineRenderer.dataset().data();
+    lineRenderer.dataset().data(d);
   };
 
   var xy = new Plottable.Interaction.Click(lineRenderer)

@@ -70,19 +70,18 @@ export module Abstract {
     /**
      * Sets the Plot's Dataset.
      *
-     * @param {Dataset} source The Dataset the Plot should use.
+     * @param {Dataset} dataset The Dataset the Plot should use.
      * @return {Plot} The calling Plot.
      */
     public dataset(dataset: Dataset): Plot;
     public dataset(dataset?: Dataset): any {
-      if (source == null) {
+      if (dataset == null) {
         return this._dataset;
       }
-      var oldSource = this._dataset;
-      if (oldSource != null) {
+      if (this._dataset != null) {
         this._dataset.broadcaster.deregisterListener(this);
       }
-      this._dataset = source;
+      this._dataset = dataset;
       this._dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
       this._onDatasetUpdate();
       return this;

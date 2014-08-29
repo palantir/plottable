@@ -324,22 +324,12 @@ declare module Plottable {
             renderArea: D3.Selection;
             element: D3.Selection;
             constructor();
-            constructor(dataOrDataset: any[]);
-            constructor(dataOrDataset: Dataset);
+            constructor(data: any[]);
+            constructor(dataset: Dataset);
             remove(): void;
-<<<<<<< HEAD
-            dataSource(): DataSource;
-            dataSource(source: DataSource): Plot;
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
-||||||| merged common ancestors
-            dataSource(): DataSource;
-            dataSource(source: DataSource): Plot;
-            project(attrToSet: string, accessor: any, scale?: Scale): Plot;
-=======
             dataset(): Dataset;
-            dataset(source: Dataset): Plot;
-            project(attrToSet: string, accessor: any, scale?: Scale): Plot;
->>>>>>> rename-datasource
+            dataset(dataset: Dataset): Plot;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
             animate(enabled: boolean): Plot;
             detach(): Plot;
             animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
@@ -885,7 +875,7 @@ declare module Plottable {
     module Plot {
         class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
             static DEFAULT_WIDTH: number;
-            constructor(xScale: Plottable.Abstract.Scale<any, number>, yScale: Plottable.Abstract.QuantitativeScale<number>);
+            constructor(xScale: Plottable.Abstract.Scale<any, number>, yScale: Plottable.Abstract.Scale<any, number>, isVertical?: boolean);
         }
     }
 }
@@ -912,6 +902,7 @@ declare module Plottable {
     module Plot {
         class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
             stackedData: any[][];
+            constructor(xScale?: Plottable.Abstract.Scale<any, number>, yScale?: Plottable.Abstract.Scale<any, number>, isVertical?: boolean);
         }
     }
 }

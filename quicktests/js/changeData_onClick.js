@@ -13,7 +13,7 @@ function run(div, data, Plottable) {
 
     var numPts = 5;
 
-    var dataseries1 = new Plottable.DataSource(data[0].splice(0, 5));
+    var dataseries1 = new Plottable.Dataset(data[0].splice(0, 5));
 
     var xScale = new Plottable.Scale.Linear();
     var yScale = new Plottable.Scale.Linear();
@@ -24,7 +24,7 @@ function run(div, data, Plottable) {
     var renderArea1 = new Plottable.Plot.VerticalBar(dataseries1, xScale, yScale);
     renderArea1.animate(true);
 
-    var renderArea2 = new Plottable.Plot.Scatter(renderArea1.dataSource(), xScale, yScale);
+    var renderArea2 = new Plottable.Plot.Scatter(renderArea1.dataset(), xScale, yScale);
     renderArea2.project("fill", function(){return "purple";});
     renderArea2.animate(true);
 
