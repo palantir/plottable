@@ -1,7 +1,7 @@
 # Generating Quicktest HTML pages
 
-# Make sure rake, erb and json are installed by running:
-# `gem install rake erb json`
+# Make sure rake and json are installed by running:
+# `gem install rake json`
 
 require 'rubygems'
 require 'rake'
