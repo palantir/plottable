@@ -7,7 +7,7 @@ export module Scale {
     private static warned = false;
 
     /**
-     * Creates a new Scale.Log.
+     * Constructs a new Scale.Log.
      *
      * Warning: Log is deprecated; if possible, use ModifiedLog. Log scales are
      * very unstable due to the fact that they can't handle 0 or negative
@@ -24,14 +24,14 @@ export module Scale {
       super(scale == null ? d3.scale.log() : scale);
       if (!Log.warned) {
         Log.warned = true;
-        Util.Methods.warn("Plottable.Scale.Log is deprecated. If possible, use Plottable.Scale.ModifiedLog instead.");
+        _Util.Methods.warn("Plottable.Scale.Log is deprecated. If possible, use Plottable.Scale.ModifiedLog instead.");
       }
     }
 
     /**
      * Creates a copy of the Scale.Log with the same domain and range but without any registered listeners.
      *
-     * @returns {Scale.Log} A copy of the calling Scale.Log.
+     * @returns {Log} A copy of the calling Log.
      */
     public copy(): Log {
       return new Log(this._d3Scale.copy());

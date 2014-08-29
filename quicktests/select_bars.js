@@ -54,7 +54,7 @@ function run(div, data, Plottable) {
     //register interactions
             var drag_interaction = new
             Plottable.Interaction.XYDragBox(renderGroup)
-            .callback(cb_drag)
+            .dragend(cb_drag)
             .registerWithComponent();
 
             var click_interaction = new

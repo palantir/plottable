@@ -26,13 +26,13 @@ export module Plot {
 
     public _setup() {
       super._setup();
-      this._baseline = this.renderArea.append("line").classed("baseline", true);
+      this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
     public _paint() {
       super._paint();
 
-      var scaledBaseline = this.yScale.scale(this._baselineValue);
+      var scaledBaseline = this._yScale.scale(this._baselineValue);
       var baselineAttr: IAttributeToProjector = {
         "x1": 0,
         "y1": scaledBaseline,
@@ -66,7 +66,7 @@ export module Plot {
 
     public _updateYDomainer() {
       super._updateYDomainer();
-      var scale = <Abstract.QuantitativeScale> this.yScale;
+      var scale = <Abstract.QuantitativeScale> this._yScale;
       if (!scale._userSetDomainer) {
         scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
@@ -81,8 +81,8 @@ export module Plot {
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      attrToProjector["y"] = (d: any) => this.yScale.scale(d.y + d.y0);
-      attrToProjector["y0"] = (d: any) => this.yScale.scale(d.y0);
+      attrToProjector["y"] = (d: any) => this._yScale.scale(d.y + d.y0);
+      attrToProjector["y0"] = (d: any) => this._yScale.scale(d.y0);
       return attrToProjector;
     }
   }

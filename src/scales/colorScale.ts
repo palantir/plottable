@@ -4,7 +4,7 @@ module Plottable {
 export module Scale {
   export class Color extends Abstract.Scale {
     /**
-     * Creates a ColorScale.
+     * Constructs a ColorScale.
      *
      * @constructor
      * @param {string} [scaleType] the type of color scale to create
@@ -51,7 +51,7 @@ export module Scale {
       extents.forEach((e) => {
         concatenatedExtents = concatenatedExtents.concat(e);
       });
-      return Util.Methods.uniq(concatenatedExtents);
+      return _Util.Methods.uniq(concatenatedExtents);
     }
   }
 }

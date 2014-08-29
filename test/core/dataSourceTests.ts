@@ -42,7 +42,7 @@ describe("DataSource", () => {
     var metadata = {foo: 11};
     var dataSource = new Plottable.DataSource(data, metadata);
     var plot = new Plottable.Abstract.Plot(dataSource);
-    var apply = (a: any) => Plottable.Util.Methods._applyAccessor(a, plot);
+    var apply = (a: any) => Plottable._Util.Methods.applyAccessor(a, plot);
     var a1 = (d: number, i: number, m: any) => d + i - 2;
     assert.deepEqual(dataSource._getExtent(apply(a1)), [-1, 5], "extent for numerical data works properly");
     var a2 = (d: number, i: number, m: any) => d + m.foo;

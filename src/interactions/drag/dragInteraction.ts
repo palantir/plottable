@@ -5,8 +5,8 @@ export module Interaction {
   export class Drag extends Abstract.Interaction {
     private dragInitialized = false;
     private dragBehavior: D3.Behavior.Drag;
-    public origin = [0,0];
-    public location = [0,0];
+    public _origin = [0,0];
+    public _location = [0,0];
     private  constrainX: (n: number) => number;
     private  constrainY: (n: number) => number;
     private ondragstart: (startLocation: Point) => void;
@@ -14,9 +14,10 @@ export module Interaction {
     private   ondragend: (startLocation: Point, endLocation: Point) => void;
 
     /**
-     * Creates a Drag.
+     * Constructs a Drag. A Drag will signal its callbacks on mouse drag.
      *
-     * @param {Component} componentToListenTo The component to listen for interactions on.
+     * @param {Component} componentToListenTo The component to listen for
+     * interactions on.
      */
     constructor(componentToListenTo: Abstract.Component) {
       super(componentToListenTo);
@@ -29,14 +30,14 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging starts.
      *
-     * @returns {(startLocation: Point) => void}
+     * @returns {(startLocation: Point) => void} The callback called when dragging starts.
      */
     public dragstart(): (startLocation: Point) => void;
     /**
      * Sets the callback to be called when dragging starts.
      *
-     * @param {(startLocation: Point) => any} cb The function to be called.
-     * @returns {Drag}
+     * @param {(startLocation: Point) => any} cb If provided, the function to be called. Takes in a Point in pixels.
+     * @returns {Drag} The calling Drag.
      */
     public dragstart(cb: (startLocation: Point) => any): Drag;
     public dragstart(cb?: (startLocation: Point) => any): any {
@@ -51,14 +52,14 @@ export module Interaction {
     /**
      * Gets the callback that is called during dragging.
      *
-     * @returns {(startLocation: Point, endLocation: Point) => void}
+     * @returns {(startLocation: Point, endLocation: Point) => void} The callback called during dragging.
      */
     public drag(): (startLocation: Point, endLocation: Point) => void;
     /**
      * Adds a callback to be called during dragging.
      *
-     * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called.
-     * @returns {Drag}
+     * @param {(startLocation: Point, endLocation: Point) => any} cb If provided, the function to be called. Takes in Points in pixels.
+     * @returns {Drag} The calling Drag.
      */
     public drag(cb: (startLocation: Point, endLocation: Point) => any): Drag;
     public drag(cb?: (startLocation: Point, endLocation: Point) => any): any {
@@ -73,13 +74,13 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging ends.
      *
-     * @returns {(startLocation: Point, endLocation: Point) => void}
+     * @returns {(startLocation: Point, endLocation: Point) => void} The callback called when dragging ends.
      */
     public dragend(): (startLocation: Point, endLocation: Point) => void;
     /**
      * Adds a callback to be called when the dragging ends.
      *
-     * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called. Takes in a SelectionArea in pixels.
+     * @param {(startLocation: Point, endLocation: Point) => any} cb If provided, the function to be called. Takes in Points in pixels.
      * @returns {Drag} The calling Drag.
      */
     public dragend(cb: (startLocation: Point, endLocation: Point) => any): Drag;
@@ -103,25 +104,25 @@ export module Interaction {
 
     public _doDragstart() {
       if (this.ondragstart != null) {
-        this.ondragstart({x: this.origin[0], y: this.origin[1]});
+        this.ondragstart({x: this._origin[0], y: this._origin[1]});
       }
     }
 
     public _drag(){
       if (!this.dragInitialized) {
-        this.origin = [d3.event.x, d3.event.y];
+        this._origin = [d3.event.x, d3.event.y];
         this.dragInitialized = true;
         this._doDragstart();
       }
 
-      this.location = [this.constrainX(d3.event.x), this.constrainY(d3.event.y)];
+      this._location = [this.constrainX(d3.event.x), this.constrainY(d3.event.y)];
       this._doDrag();
     }
 
     public _doDrag() {
       if (this.ondrag != null) {
-        var startLocation = {x: this.origin[0], y: this.origin[1]};
-        var endLocation = {x: this.location[0], y: this.location[1]};
+        var startLocation = {x: this._origin[0], y: this._origin[1]};
+        var endLocation = {x: this._location[0], y: this._location[1]};
         this.ondrag(startLocation, endLocation);
       }
     }
@@ -136,8 +137,8 @@ export module Interaction {
 
     public _doDragend() {
       if (this.ondragend != null) {
-        var startLocation = {x: this.origin[0], y: this.origin[1]};
-        var endLocation = {x: this.location[0], y: this.location[1]};
+        var startLocation = {x: this._origin[0], y: this._origin[1]};
+        var endLocation = {x: this._location[0], y: this._location[1]};
         this.ondragend(startLocation, endLocation);
       }
     }
@@ -148,10 +149,19 @@ export module Interaction {
       return this;
     }
 
+    /**
+     * Sets up so that the xScale and yScale that are passed have their
+     * domains automatically changed as you zoom.
+     *
+     * @param {QuantitativeScale} xScale The scale along the x-axis.
+     * @param {QuantitativeScale} yScale The scale along the y-axis.
+     * @returns {Drag} The calling Drag.
+     */
     public setupZoomCallback(xScale?: Abstract.QuantitativeScale, yScale?: Abstract.QuantitativeScale) {
       var xDomainOriginal = xScale != null ? xScale.domain() : null;
       var yDomainOriginal = yScale != null ? yScale.domain() : null;
       var resetOnNextClick = false;
+
       function callback(upperLeft: Point, lowerRight: Point) {
         if (upperLeft == null || lowerRight == null) {
           if (resetOnNextClick) {

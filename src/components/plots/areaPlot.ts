@@ -9,10 +9,10 @@ export module Plot {
     private areaPath: D3.Selection;
 
     /**
-     * Creates an AreaPlot.
+     * Constructs an AreaPlot.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
+     * @param {IDataset | any} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
@@ -30,20 +30,20 @@ export module Plot {
     }
 
     public _appendPath() {
-      this.areaPath = this.renderArea.append("path").classed("area", true);
+      this.areaPath = this._renderArea.append("path").classed("area", true);
       super._appendPath();
     }
 
     public _onDataSourceUpdate() {
       super._onDataSourceUpdate();
-      if (this.yScale != null) {
+      if (this._yScale != null) {
         this._updateYDomainer();
       }
     }
 
     public _updateYDomainer() {
       super._updateYDomainer();
-      var scale = <Abstract.QuantitativeScale> this.yScale;
+      var scale = <Abstract.QuantitativeScale> this._yScale;
 
       var y0Projector = this._projectors["y0"];
       var y0Accessor = y0Projector != null ? y0Projector.accessor : null;

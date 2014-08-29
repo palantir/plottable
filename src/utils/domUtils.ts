@@ -1,6 +1,6 @@
 
 module Plottable {
-export module Util {
+export module _Util {
   export module DOM {
     /**
      * Gets the bounding box of an element.
@@ -20,7 +20,7 @@ export module Util {
       }
     }
 
-    function _getParsedStyleValue(style: CSSStyleDeclaration, prop: string): number {
+    function getParsedStyleValue(style: CSSStyleDeclaration, prop: string): number {
       var value: any = style.getPropertyValue(prop);
       var parsedValue = parseFloat(value);
       if (parsedValue !== parsedValue) {
@@ -40,20 +40,20 @@ export module Util {
 
     export function getElementWidth(elem: HTMLScriptElement): number{
       var style: CSSStyleDeclaration = window.getComputedStyle(elem);
-      return _getParsedStyleValue(style, "width")
-        + _getParsedStyleValue(style, "padding-left")
-        + _getParsedStyleValue(style, "padding-right")
-        + _getParsedStyleValue(style, "border-left-width")
-        + _getParsedStyleValue(style, "border-right-width");
+      return getParsedStyleValue(style, "width")
+        + getParsedStyleValue(style, "padding-left")
+        + getParsedStyleValue(style, "padding-right")
+        + getParsedStyleValue(style, "border-left-width")
+        + getParsedStyleValue(style, "border-right-width");
     }
 
     export function getElementHeight(elem: HTMLScriptElement): number{
       var style: CSSStyleDeclaration = window.getComputedStyle(elem);
-      return _getParsedStyleValue(style, "height")
-        + _getParsedStyleValue(style, "padding-top")
-        + _getParsedStyleValue(style, "padding-bottom")
-        + _getParsedStyleValue(style, "border-top-width")
-        + _getParsedStyleValue(style, "border-bottom-width");
+      return getParsedStyleValue(style, "height")
+        + getParsedStyleValue(style, "padding-top")
+        + getParsedStyleValue(style, "padding-bottom")
+        + getParsedStyleValue(style, "border-top-width")
+        + getParsedStyleValue(style, "border-bottom-width");
     }
 
     export function getSVGPixelWidth(svg: D3.Selection) {

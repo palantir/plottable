@@ -9,15 +9,18 @@ export module Axis {
     // the label is cut off.
     private showFirstTickLabel = false;
     private showLastTickLabel = false;
-    private measurer: Util.Text.TextMeasurer;
+    private measurer: _Util.Text.TextMeasurer;
 
     /**
-     * Creates a NumericAxis.
+     * Constructs a NumericAxis.
+     *
+     * Just as an CategoryAxis is for rendering an OrdinalScale, a NumericAxis
+     * is for rendering a QuantitativeScale.
      *
      * @constructor
-     * @param {QuantitativeScale} scale The QuantitativeScale to base the NumericAxis on.
+     * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
      * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-     * @param {Formatter} [formatter] A function to format tick labels (default Formatters.general(3, false)).
+     * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
      */
     constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter = Formatters.general(3, false)) {
       super(scale, orientation, formatter);
@@ -25,7 +28,7 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this.measurer = Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true));
+      this.measurer = _Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true));
     }
 
     public _computeWidth() {
@@ -35,7 +38,7 @@ export module Axis {
         return this.measurer(formattedValue).width;
       });
 
-      var maxTextLength = Util.Methods.max(textLengths);
+      var maxTextLength = _Util.Methods.max(textLengths);
 
       if (this.tickLabelPositioning === "center") {
         this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
@@ -47,7 +50,7 @@ export module Axis {
     }
 
     public _computeHeight() {
-      var textHeight = this.measurer(Util.Text.HEIGHT_TEXT).height;
+      var textHeight = this.measurer(_Util.Text.HEIGHT_TEXT).height;
 
       if (this.tickLabelPositioning === "center") {
         this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
@@ -189,12 +192,13 @@ export module Axis {
     /**
      * Sets the tick label position relative to the tick marks.
      *
-     * @param {string} position The relative position of the tick label.
+     * @param {string} position If provided, the relative position of the tick label.
      *                          [top/center/bottom] for a vertical NumericAxis,
      *                          [left/center/right] for a horizontal NumericAxis.
-     * @returns {NumericAxis} The calling NumericAxis.
+     *                          Defaults to center.
+     * @returns {Numeric} The calling Axis.Numeric.
      */
-    public tickLabelPosition(position: string): Axis.Numeric;
+    public tickLabelPosition(position: string): Numeric;
     public tickLabelPosition(position?: string): any {
       if (position == null) {
         return this.tickLabelPositioning;
@@ -216,7 +220,7 @@ export module Axis {
     }
 
     /**
-     * Return whether or not the tick labels at the end of the graph are
+     * Gets whether or not the tick labels at the end of the graph are
      * displayed when partially cut off.
      *
      * @param {string} orientation Where on the scale to change tick labels.
@@ -227,15 +231,16 @@ export module Axis {
      */
     public showEndTickLabel(orientation: string): boolean;
     /**
-     * Control whether or not the tick labels at the end of the graph are
+     * Sets whether or not the tick labels at the end of the graph are
      * displayed when partially cut off.
      *
-     * @param {string} orientation Where on the scale to change tick labels.
+     * @param {string} orientation If provided, where on the scale to change tick labels.
      *                 On a "top" or "bottom" axis, this can be "left" or
      *                 "right". On a "left" or "right" axis, this can be "top"
      *                 or "bottom".
-     * @param {boolean} show Whether or not the given tick should be displayed.
-     * @returns {Numeric} The calling Numeric.
+     * @param {boolean} show Whether or not the given tick should be
+     * displayed.
+     * @returns {Numeric} The calling NumericAxis.
      */
     public showEndTickLabel(orientation: string, show: boolean): Numeric;
     public showEndTickLabel(orientation: string, show?: boolean): any {

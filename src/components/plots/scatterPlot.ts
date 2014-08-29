@@ -4,7 +4,7 @@ module Plottable {
 export module Plot {
   export class Scatter extends Abstract.XYPlot {
 
-    public _animators: Animator.IPlotAnimatorMap = {
+    public _animators: IPlotAnimatorMap = {
       "circles-reset" : new Animator.Null(),
       "circles"       : new Animator.IterativeDelay()
         .duration(250)
@@ -12,10 +12,10 @@ export module Plot {
     };
 
     /**
-     * Creates a ScatterPlot.
+     * Constructs a ScatterPlot.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
+     * @param {IDataset | any} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
@@ -27,6 +27,11 @@ export module Plot {
       this.project("fill", () => Core.Colors.INDIGO); // default
     }
 
+    /**
+     * @param {string} attrToSet One of ["x", "y", "cx", "cy", "r",
+     * "fill"]. "cx" and "cy" are aliases for "x" and "y". "r" is the datum's
+     * radius, and "fill" is the CSS color of the datum.
+     */
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
       attrToSet = attrToSet === "cx" ? "x" : attrToSet;
       attrToSet = attrToSet === "cy" ? "y" : attrToSet;
@@ -43,7 +48,7 @@ export module Plot {
       delete attrToProjector["x"];
       delete attrToProjector["y"];
 
-      var circles = this.renderArea.selectAll("circle").data(this._dataSource.data());
+      var circles = this._renderArea.selectAll("circle").data(this._dataSource.data());
       circles.enter().append("circle");
 
       if (this._dataChanged) {
