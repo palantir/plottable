@@ -33,36 +33,44 @@
 
 <body>
 <table style="width:100%"  border="0">
+
   <tr>
-    <th width = "40%"></th>
-    <th width = "20%">
+    <td>
+      <form>
+      <h2>Left Branch:</h2>
+       <select type="text" id="leftBranch" name="leftBranch" style="width:80%">
+        <option value="develop"></option>
+      </select>
+      </form>
+    </td>
+    <td>
       <form>
       <h2>Keyword:</h2>
       <select type="text" id="filterWord" name="filterWord" style="width:80%">
         <option value=""></option>
       </select>
       </form>
-      <form>
-      <h2>Feature Branch:</h2>
-       <select type="text" id="featureBranch" name="featureBranch" style="width:80%">
-        <option value=""></option>
-      </select>      
+    </td>
+    <td>
+    <form>
+      <h2>Right Branch:</h2>
+       <select type="text" id="rightBranch" name="rightBranch" style="width:80%">
+        <option value="#local"></option>
+      </select>
       </form>
-    </th>
-    <th width = "40%"></th>
+
+    </td>
   </tr>
+
+
   <tr>
-    <td></td>
+    <td><center><h1 id ="masterHeader" class="cassiePink"></h1></center></td>
     <td>
             <center><button id="button" name="button" class="cassieButton" style="width:80%">Update</button></center>
     </td>
-    <td></td>
+    <td><center><h1 id ="featureHeader" class="cassiePink"></h1></center></td>
   </tr>
-  <tr>
-    <td><center><h1 id ="masterHeader" class="cassiePink">Master</h1></center></td>
-    <td></td>
-    <td><center><h1 id ="featureHeader" class="cassiePink">Feature</h1></center></td>
-  </tr>  
+
   </table>
 
 
