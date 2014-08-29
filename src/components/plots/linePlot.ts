@@ -7,7 +7,7 @@ export module Plot {
 
     public _animators: Animator.IPlotAnimatorMap = {
       "line-reset" : new Animator.Null(),
-      "line"       : new Animator.Default()
+      "line"       : new Animator.Base()
         .duration(600)
         .easing("exp-in-out")
     };
