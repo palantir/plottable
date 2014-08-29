@@ -900,8 +900,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
-            stackedData: any[][];
+        class StackedBar extends Plottable.Abstract.Stacked {
+            constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
+            baseline(value: number): any;
         }
     }
 }

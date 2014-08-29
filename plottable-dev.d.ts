@@ -1133,16 +1133,18 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
-            stackedData: any[][];
-            _yAccessor: IAccessor;
+        class StackedBar extends Plottable.Abstract.Stacked {
             _isVertical: boolean;
             _baselineValue: number;
             _baseline: D3.Selection;
-            _addDataset(key: string, dataset: any): void;
-            _updateAllProjectors(): void;
-            _generateAttrToProjector(): IAttributeToProjector;
+            constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
+            _generateAttrToProjector(): any;
+            _getDrawer(key: string): any;
             _paint(): void;
+            baseline(value: number): any;
+            _updateDomainer(scale: Plottable.Abstract.Scale): any;
+            _updateXDomainer(): any;
+            _updateYDomainer(): any;
         }
     }
 }
