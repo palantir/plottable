@@ -114,7 +114,7 @@ export module Component {
     public _doRender() {
       super._doRender();
 
-      var layout = this.calculateLayoutInfo(this.availableWidth, this.availableHeight);
+      var layout = this.calculateLayoutInfo(this.width(), this.height());
 
       var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
       var rows = this.content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).data(rowsToDraw);

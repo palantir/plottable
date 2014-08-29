@@ -1,11 +1,15 @@
 function makeData() {
+  "use strict";
+
   return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
+  "use strict";
+
   var svg = div.append("svg").attr("height", 500);
 
-    d = data[0].slice(0, 8);
+    var d = data[0].slice(0, 8);
 
 
     //Axis
@@ -19,14 +23,14 @@ function run(div, data, Plottable) {
     }
 
     //rendering
-    var scatterPlot = new Plottable.Plot.Scatter(d, xScale, yScale);   
+    var scatterPlot = new Plottable.Plot.Scatter(d, xScale, yScale);
     var linePlot = new Plottable.Plot.Line(d, xScale, yScale);
-    var areaPlot = new Plottable.Plot.Area(d, xScale, yScale);   
+    var areaPlot = new Plottable.Plot.Area(d, xScale, yScale);
     var vbarPlot = new Plottable.Plot.VerticalBar(d, xScale, yScale);
-    var hbarPlot = new Plottable.Plot.HorizontalBar(d, xScale, yScale);   
+    var hbarPlot = new Plottable.Plot.HorizontalBar(d, xScale, yScale);
 
     //title + legend
-    
+
     var scatterTable = new Plottable.Component.Table([[axis_array[1], scatterPlot],
                                                      [null, axis_array[0]]]);
     var lineTable = new Plottable.Component.Table([[axis_array[3], linePlot],
@@ -42,5 +46,5 @@ function run(div, data, Plottable) {
                                                   [hbarTable, null]]);
 
     bigTable.renderTo(svg);
-    
+
 }

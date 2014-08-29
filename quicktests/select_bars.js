@@ -1,10 +1,14 @@
 
 function makeData() {
+  "use strict";
+
   return [makeRandomData(50), makeRandomData(50)];
 
 }
 
 function run(div, data, Plottable) {
+  "use strict";
+
   var svg = div.append("svg").attr("height", 500);
 
             var dataseries = data[0].slice(0, 20);
@@ -27,7 +31,7 @@ function run(div, data, Plottable) {
                           .renderTo(svg);
 
     //callbacks
-            cb_drag = function(xy) {
+            var cb_drag = function(xy) {
                 if (xy == null) {return;}
                 var invertedXMin = xScale.invert(xy.xMin);
                 var invertedXMax = xScale.invert(xy.xMax);
@@ -37,15 +41,15 @@ function run(div, data, Plottable) {
                                        {min: xy.yMin, max: xy.yMax},
                                        true);
                 drag_interaction.clearBox();
-            }
+            };
 
-            cb_click = function(x, y) {
+            var cb_click = function(x, y) {
                 barPlot.selectBar(x, y, true);
-            }
+            };
 
-            cb_reset = function() {
+            var cb_reset = function() {
                 barPlot.deselectAll();
-            }
+            };
 
     //register interactions
             var drag_interaction = new

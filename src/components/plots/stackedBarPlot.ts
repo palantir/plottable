@@ -10,11 +10,14 @@ export module Plot {
     public _baseline: D3.Selection;
     private stackedExtent: number[] = [];
 
+<<<<<<< HEAD
     constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale, isVertical = true) {
       super(xScale, yScale);
       this._isVertical = isVertical;
     }
 
+=======
+>>>>>>> develop
     public _addDataset(key: string, dataset: any) {
       super._addDataset(key, dataset);
       var accessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
@@ -81,7 +84,14 @@ export module Plot {
 
     public _paint() {
       var attrHash = this._generateAttrToProjector();
-      this._getDrawersInOrder().forEach((d, i) => d.draw(this.stackedData[i], attrHash));
+      this._getDrawersInOrder().forEach((d: Abstract._Drawer, i: number) => {
+        var animator: Animator.Rect;
+        if (this._animate) {
+          animator = new Animator.Rect();
+          animator.delay(animator.duration() * i);
+        }
+        d.draw(this.stackedData[i], attrHash, animator);
+      });
     }
   }
 }

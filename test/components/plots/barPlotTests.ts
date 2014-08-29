@@ -305,7 +305,7 @@ describe("Plots", () => {
         renderer.animate(false);
         var yAxis = new Plottable.Axis.Category(yScale, "left");
         var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
-        axisWidth = yAxis.availableWidth;
+        axisWidth = yAxis.width();
         bandWidth = yScale.rangeBand();
         xScale.domainer(xScale.domainer().pad(0));
       });

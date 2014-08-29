@@ -1,10 +1,14 @@
 function makeData() {
+  "use strict";
+
   var data = makeRandomData(100, 1e15);
   // data.push({x: 0, y: 0});
   return data;
 }
 
 function run(div, data, Plottable) {
+  "use strict";
+
   // doesn't exist on master yet
   if (Plottable.Scale.ModifiedLog == null) {
     return;
@@ -32,7 +36,7 @@ function run(div, data, Plottable) {
                                            [null,  xAxis]]);
   circleChart.renderTo(svg);
 
-  cb = function(x, y){
+  var cb = function(x, y){
     d = circleRenderer.dataSource().data();
     circleRenderer.dataSource().data(d);
   };

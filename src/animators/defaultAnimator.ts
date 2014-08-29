@@ -7,9 +7,9 @@ export module Animator {
    * The default animator implementation with easing, duration, and delay.
    */
   export class Default implements IPlotAnimator {
-    public _durationMsec: Number = 300;
-    public _delayMsec: Number    = 0;
-    public _easing: string       = "exp-out";
+    public _durationMsec = 300;
+    public _delayMsec = 0;
+    public _easing = "exp-out";
 
     public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection {
       return selection.transition()
@@ -22,17 +22,17 @@ export module Animator {
     /**
      * Gets the duration of the animation in milliseconds.
      *
-     * @returns {Number} The current duration.
+     * @returns {number} The current duration.
      */
-    public duration(): Number;
+    public duration(): number;
     /**
      * Sets the duration of the animation in milliseconds.
      *
-     * @param {Number} duration The duration in milliseconds.
+     * @param {number} duration The duration in milliseconds.
      * @returns {Default} The calling Default Animator.
      */
-    public duration(duration: Number): Default;
-    public duration(duration?: Number): any{
+    public duration(duration: number): Default;
+    public duration(duration?: number): any{
       if (duration === undefined) {
         return this._durationMsec;
       } else {
@@ -44,17 +44,17 @@ export module Animator {
     /**
      * Gets the delay of the animation in milliseconds.
      *
-     * @returns {Number} The current delay.
+     * @returns {number} The current delay.
      */
-    public delay(): Number;
+    public delay(): number;
     /**
      * Sets the delay of the animation in milliseconds.
      *
-     * @param {Number} delay The delay in milliseconds.
+     * @param {number} delay The delay in milliseconds.
      * @returns {Default} The calling Default Animator.
      */
-    public delay(delay: Number): Default;
-    public delay(delay?: Number): any{
+    public delay(delay: number): Default;
+    public delay(delay?: number): any{
       if (delay === undefined) {
         return this._delayMsec;
       } else {

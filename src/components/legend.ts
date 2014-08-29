@@ -141,7 +141,7 @@ export module Component {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
-      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.availableHeight / textHeight));
+      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.height() / textHeight));
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
@@ -179,7 +179,7 @@ export module Component {
       super._doRender();
       var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
       var textHeight = this.measureTextHeight();
-      var availableWidth  = this.availableWidth  - textHeight - Legend.MARGIN;
+      var availableWidth  = this.width()  - textHeight - Legend.MARGIN;
       var r = textHeight * 0.3;
       var legend: D3.UpdateSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, (d) => d);
       var legendEnter = legend.enter()
