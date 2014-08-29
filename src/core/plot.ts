@@ -21,8 +21,8 @@ export module Abstract {
      * @param {any[]|Dataset} [dataOrDataset] The data or Dataset to be associated with this Plot.
      */
     constructor();
-    constructor(dataOrDataset: any[]);
-    constructor(dataOrDataset: Dataset);
+    constructor(data: any[]);
+    constructor(dataset: Dataset);
     constructor(dataOrDataset?: any) {
       super();
       this.clipPathEnabled = true;
@@ -73,8 +73,8 @@ export module Abstract {
      * @param {Dataset} source The Dataset the Plot should use.
      * @return {Plot} The calling Plot.
      */
-    public dataset(source: Dataset): Plot;
-    public dataset(source?: Dataset): any {
+    public dataset(dataset: Dataset): Plot;
+    public dataset(dataset?: Dataset): any {
       if (source == null) {
         return this._dataset;
       }
