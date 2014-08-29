@@ -20,7 +20,7 @@ export module Abstract {
      * @param [Scale] xScale The x scale to use
      * @param [Scale] yScale The y scale to use
      */
-    constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
+    constructor(xScale?: Abstract.Scale<any, number>, yScale?: Abstract.Scale<any, number>) {
       // make a dummy dataSource to satisfy the base Plot (HACKHACK)
       this._key2DatasetDrawerKey = d3.map();
       this._datasetKeysInOrder = [];

@@ -14,7 +14,7 @@ export module Plot {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.QuantitativeScale, yScale: Abstract.QuantitativeScale) {
+    constructor(xScale: Abstract.QuantitativeScale<any>, yScale: Abstract.QuantitativeScale<any>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
@@ -33,7 +33,7 @@ export module Plot {
       super._paint();
 
       var scaledBaseline = this.yScale.scale(this._baselineValue);
-      var baselineAttr: IAttributeToProjector = {
+      var baselineAttr: any = {
         "x1": 0,
         "y1": scaledBaseline,
         "x2": this.width(),
@@ -66,7 +66,7 @@ export module Plot {
 
     public _updateYDomainer() {
       super._updateYDomainer();
-      var scale = <Abstract.QuantitativeScale> this.yScale;
+      var scale = <Abstract.QuantitativeScale<any>> this.yScale;
       if (!scale._userSetDomainer) {
         scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions

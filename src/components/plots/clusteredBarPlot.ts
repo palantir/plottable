@@ -7,7 +7,7 @@ export module Plot {
     public _isVertical = true;
     private innerScale: Scale.Ordinal;
 
-    constructor(xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale) {
+    constructor(xScale: Abstract.Scale<any, number>, yScale: Abstract.QuantitativeScale<number>) {
       super(xScale, yScale);
       this.innerScale = new Scale.Ordinal();
     }

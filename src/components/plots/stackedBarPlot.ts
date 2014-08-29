@@ -11,6 +11,7 @@ export module Plot {
     public _baseline: D3.Selection;
     private stackedExtent: number[] = [];
 
+
     public _addDataset(key: string, dataset: any) {
       super._addDataset(key, dataset);
       this.stackedData = this.stack(this._projectors["y"].accessor);

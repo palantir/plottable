@@ -3,8 +3,9 @@
 module Plottable {
 export module Abstract {
   export class XYPlot extends Plot {
-    public xScale: Abstract.Scale;
-    public yScale: Abstract.Scale;
+    public xScale: Abstract.Scale<any, number>;
+    public yScale: Abstract.Scale<any, number>;
+    // TODO - replace any typing
     /**
      * Creates an XYPlot.
      *
@@ -13,7 +14,7 @@ export module Abstract {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
+    constructor(dataset: any, xScale: Abstract.Scale<any, number>, yScale: Abstract.Scale<any, number>) {
       super(dataset);
       if (xScale == null || yScale == null) {throw new Error("XYPlots require an xScale and yScale");}
       this.classed("xy-plot", true);
@@ -22,7 +23,7 @@ export module Abstract {
       this.project("y", "y", yScale); // default accessor
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
+    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
       // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale != null) {
@@ -48,7 +49,7 @@ export module Abstract {
 
     public _updateXDomainer() {
       if (this.xScale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale> this.xScale;
+        var scale = <QuantitativeScale<any>> this.xScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
@@ -57,7 +58,7 @@ export module Abstract {
 
     public _updateYDomainer() {
       if (this.yScale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale> this.yScale;
+        var scale = <QuantitativeScale<any>> this.yScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
