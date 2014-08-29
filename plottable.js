@@ -3169,7 +3169,7 @@ var Plottable;
             }
             Area.prototype.draw = function (data, attrToProjector) {
                 var svgElement = "path";
-                var dataElements = this.renderArea.selectAll(svgElement).data(data);
+                var dataElements = this._renderArea.selectAll(svgElement).data(data);
                 dataElements.enter().append(svgElement);
                 dataElements.attr(attrToProjector).classed("area", true);
                 dataElements.exit().remove();
@@ -5311,25 +5311,25 @@ var Plottable;
                 var datasets = this._getDatasetsInOrder();
                 d3.layout.stack().x(this._projectors["x"].accessor).y(this._projectors["y"].accessor).values(function (d) { return d.data(); })(datasets);
                 this.stackedExtent = [0, 0];
-                var maxY = Plottable.Util.Methods.max(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum.y0; });
+                var maxY = Plottable._Util.Methods.max(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum.y0; });
                 if (maxY > 0) {
                     this.stackedExtent[1] = maxY;
                 }
-                var minY = Plottable.Util.Methods.min(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum.y0; });
+                var minY = Plottable._Util.Methods.min(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum.y0; });
                 if (minY < 0) {
                     this.stackedExtent[0] = minY;
                 }
             };
             Stacked.prototype._updateAllProjectors = function () {
                 _super.prototype._updateAllProjectors.call(this);
-                if (this.yScale == null) {
+                if (this._yScale == null) {
                     return;
                 }
                 if (this._isAnchored && this.stackedExtent.length > 0) {
-                    this.yScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+                    this._yScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
                 }
                 else {
-                    this.yScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+                    this._yScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
             };
             return Stacked;
@@ -5361,11 +5361,11 @@ var Plottable;
             };
             StackedArea.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._baseline = this.renderArea.append("line").classed("baseline", true);
+                this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
             StackedArea.prototype._paint = function () {
                 _super.prototype._paint.call(this);
-                var scaledBaseline = this.yScale.scale(this._baselineValue);
+                var scaledBaseline = this._yScale.scale(this._baselineValue);
                 var baselineAttr = {
                     "x1": 0,
                     "y1": scaledBaseline,
@@ -5390,7 +5390,7 @@ var Plottable;
             };
             StackedArea.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
-                var scale = this.yScale;
+                var scale = this._yScale;
                 if (!scale._userSetDomainer) {
                     scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
                     scale._autoDomainIfAutomaticMode();
@@ -5403,8 +5403,8 @@ var Plottable;
             StackedArea.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["y"] = function (d) { return _this.yScale.scale(d.y + d.y0); };
-                attrToProjector["y0"] = function (d) { return _this.yScale.scale(d.y0); };
+                attrToProjector["y"] = function (d) { return _this._yScale.scale(d.y + d.y0); };
+                attrToProjector["y0"] = function (d) { return _this._yScale.scale(d.y0); };
                 return attrToProjector;
             };
             return StackedArea;
