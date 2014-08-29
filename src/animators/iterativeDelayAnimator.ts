@@ -10,13 +10,16 @@ export module Animator {
    * The delay between animations can be configured with the .delay getter/setter.
    */
   export class IterativeDelay extends Default {
-    _delayMsec = 15;
+    /**
+     * The delay between each start of an animation
+     */
+    public static ITERATIVE_DELAY_MILLISECONDS = 15;
 
     public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection {
       return selection.transition()
-        .ease(this._easing)
-        .duration(this._durationMsec)
-        .delay((d: any, i: number) => i * this._delayMsec)
+        .ease(this.easing())
+        .duration(this.duration())
+        .delay((d: any, i: number) => this.delay() + IterativeDelay.ITERATIVE_DELAY_MILLISECONDS * i)
         .attr(attrToProjector);
     }
   }

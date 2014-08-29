@@ -919,6 +919,10 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         class Default implements IPlotAnimator {
+            static DEFAULT_DURATION_MILLISECONDS: number;
+            static DEFAULT_DELAY_MILLISECONDS: number;
+            static DEFAULT_EASING: string;
+            Default(): void;
             animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
             duration(): number;
             duration(duration: number): Default;
@@ -934,6 +938,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         class IterativeDelay extends Default {
+            static ITERATIVE_DELAY_MILLISECONDS: number;
             animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
         }
     }

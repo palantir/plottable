@@ -5543,28 +5543,30 @@ var Plottable;
     (function (Animator) {
         var Default = (function () {
             function Default() {
-                this._durationMsec = 300;
-                this._delayMsec = 0;
-                this._easing = "exp-out";
             }
+            Default.prototype.Default = function () {
+                this._duration = Default.DEFAULT_DURATION_MILLISECONDS;
+                this._delay = Default.DEFAULT_DELAY_MILLISECONDS;
+                this._easing = Default.DEFAULT_EASING;
+            };
             Default.prototype.animate = function (selection, attrToProjector) {
-                return selection.transition().ease(this._easing).duration(this._durationMsec).delay(this._delayMsec).attr(attrToProjector);
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attrToProjector);
             };
             Default.prototype.duration = function (duration) {
                 if (duration === undefined) {
-                    return this._durationMsec;
+                    return this._duration;
                 }
                 else {
-                    this._durationMsec = duration;
+                    this._duration = duration;
                     return this;
                 }
             };
             Default.prototype.delay = function (delay) {
                 if (delay === undefined) {
-                    return this._delayMsec;
+                    return this._delay;
                 }
                 else {
-                    this._delayMsec = delay;
+                    this._delay = delay;
                     return this;
                 }
             };
@@ -5577,6 +5579,9 @@ var Plottable;
                     return this;
                 }
             };
+            Default.DEFAULT_DURATION_MILLISECONDS = 300;
+            Default.DEFAULT_DELAY_MILLISECONDS = 0;
+            Default.DEFAULT_EASING = "exp-out";
             return Default;
         })();
         Animator.Default = Default;
@@ -5597,12 +5602,12 @@ var Plottable;
             __extends(IterativeDelay, _super);
             function IterativeDelay() {
                 _super.apply(this, arguments);
-                this._delayMsec = 15;
             }
             IterativeDelay.prototype.animate = function (selection, attrToProjector) {
                 var _this = this;
-                return selection.transition().ease(this._easing).duration(this._durationMsec).delay(function (d, i) { return i * _this._delayMsec; }).attr(attrToProjector);
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + IterativeDelay.ITERATIVE_DELAY_MILLISECONDS * i; }).attr(attrToProjector);
             };
+            IterativeDelay.ITERATIVE_DELAY_MILLISECONDS = 15;
             return IterativeDelay;
         })(Animator.Default);
         Animator.IterativeDelay = IterativeDelay;

@@ -7,15 +7,39 @@ export module Animator {
    * The default animator implementation with easing, duration, and delay.
    */
   export class Default implements IPlotAnimator {
-    public _durationMsec = 300;
-    public _delayMsec = 0;
-    public _easing = "exp-out";
+    /**
+     * The default duration of the animation in milliseconds
+     */
+    public static DEFAULT_DURATION_MILLISECONDS = 300;
+    /**
+     * The default starting delay of the animation in milliseconds
+     */
+    public static DEFAULT_DELAY_MILLISECONDS = 0;
+    /**
+     * The default easing of the animation
+     */
+    public static DEFAULT_EASING = "exp-out";
+
+    private _duration: number;
+    private _delay: number;
+    private _easing: string;
+
+    /**
+     * Constructs the default animator
+     *
+     * @constructor
+     */
+    public Default() {
+      this._duration = Default.DEFAULT_DURATION_MILLISECONDS;
+      this._delay = Default.DEFAULT_DELAY_MILLISECONDS;
+      this._easing = Default.DEFAULT_EASING;
+    }
 
     public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection {
       return selection.transition()
-        .ease(this._easing)
-        .duration(this._durationMsec)
-        .delay(this._delayMsec)
+        .ease(this.easing())
+        .duration(this.duration())
+        .delay(this.delay())
         .attr(attrToProjector);
     }
 
@@ -34,9 +58,9 @@ export module Animator {
     public duration(duration: number): Default;
     public duration(duration?: number): any{
       if (duration === undefined) {
-        return this._durationMsec;
+        return this._duration;
       } else {
-        this._durationMsec = duration;
+        this._duration = duration;
         return this;
       }
     }
@@ -56,9 +80,9 @@ export module Animator {
     public delay(delay: number): Default;
     public delay(delay?: number): any{
       if (delay === undefined) {
-        return this._delayMsec;
+        return this._delay;
       } else {
-        this._delayMsec = delay;
+        this._delay = delay;
         return this;
       }
     }
