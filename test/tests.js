@@ -2231,18 +2231,19 @@ describe("Plots", function () {
             yScale = new Plottable.Scale.Linear().domain([0, 4]);
             var colorScale = new Plottable.Scale.Color("10").domain(["a", "b"]);
             var data1 = [
-                { x: 1, y: 1, type: "a" },
-                { x: 3, y: 2, type: "a" }
+                { x: 1, yAccess: 1, type: "a" },
+                { x: 3, yAccess: 2, type: "a" }
             ];
             var data2 = [
-                { x: 1, y: 3, type: "b" },
-                { x: 3, y: 1, type: "b" }
+                { x: 1, yAccess: 3, type: "b" },
+                { x: 3, yAccess: 1, type: "b" }
             ];
             dataset1 = new Plottable.Dataset(data1);
             dataset2 = new Plottable.Dataset(data2);
             renderer = new Plottable.Plot.StackedArea(xScale, yScale);
             renderer.addDataset(data1);
             renderer.addDataset(data2);
+            renderer.project("y", "yAccess", yScale);
             renderer.project("fill", "type", colorScale);
             var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
             var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
