@@ -114,7 +114,7 @@ function populateDropdown(dropDown, vals, initialVal) {
   if (initialVal != null) {
     dropDown.val(initialVal);
   }
-  return dropDown
+  return dropDown;
 }
 
 function setup() {
@@ -130,7 +130,7 @@ function setup() {
     categories = categories.values();
     categories.push("#all");
     categories.sort();
-    console.log(keywordList)
+    console.log(keywordList);
     var keywordDropdown = $('#filterWord');
     populateDropdown(keywordDropdown, categories, "#all");
   });
@@ -139,7 +139,7 @@ function setup() {
     var auth = "";
     if (err != null) {
       console.log("Something went wrong acquiring the Github token. Using unauthenticated requests for feature branches");
-      console.log("The site will still work fine, but if you use it a lot you may hit an API rate limit.")
+      console.log("The site will still work fine, but if you use it a lot you may hit an API rate limit.");
       console.log("To acquire a github token, go here: https://github.com/settings/applications#personal-access-tokens");
       console.log("Make a new token (it needs no permissions) and then save it as quicktests/github_token.txt");
     } else {
