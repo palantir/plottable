@@ -5296,16 +5296,12 @@ var Plottable;
                 var primaryScale = this._isVertical ? this.yScale : this.xScale;
                 var getStart = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_START); };
                 var getEnd = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_END); };
-                attrToProjector["height"] = function (d) { return Math.abs(getEnd(d) - getStart(d)); };
+                var heightF = function (d) { return Math.abs(getEnd(d) - getStart(d)); };
+                var widthF = attrToProjector["width"];
+                attrToProjector["height"] = this._isVertical ? heightF : widthF;
+                attrToProjector["width"] = this._isVertical ? widthF : heightF;
                 var primaryAttr = this._isVertical ? "y" : "x";
-                attrToProjector[primaryAttr] = getEnd;
-                if (!this._isVertical) {
-                    var widthAttr = attrToProjector["width"];
-                    attrToProjector["width"] = attrToProjector["height"];
-                    attrToProjector["height"] = widthAttr;
-                    var xFunction = attrToProjector["x"];
-                    attrToProjector["x"] = function (d, i) { return getEnd(d) - attrToProjector["width"](d, i); };
-                }
+                attrToProjector[primaryAttr] = this._isVertical ? getEnd : function (d, i) { return getEnd(d) - heightF(d); };
                 return attrToProjector;
             };
             StackedBar.prototype.stack = function (accessor) {

@@ -41,19 +41,13 @@ export module Plot {
       var getStart = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_START);
       var getEnd = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_END);
 
-      attrToProjector["height"] = (d) => Math.abs(getEnd(d) - getStart(d));
+      var heightF = (d: any) => Math.abs(getEnd(d) - getStart(d));
+      var widthF = attrToProjector["width"];
+      attrToProjector["height"] = this._isVertical ? heightF : widthF;
+      attrToProjector["width"] = this._isVertical ? widthF : heightF;
 
       var primaryAttr = this._isVertical ? "y" : "x";
-      attrToProjector[primaryAttr] = getEnd;
-
-      if (!this._isVertical) {
-        var widthAttr = attrToProjector["width"];
-        attrToProjector["width"] = attrToProjector["height"];
-        attrToProjector["height"] = widthAttr;
-
-        var xFunction = attrToProjector["x"];
-        attrToProjector["x"] = (d, i) => getEnd(d) - attrToProjector["width"](d, i);
-      }
+      attrToProjector[primaryAttr] = this._isVertical ? getEnd : (d, i) => getEnd(d) - heightF(d);
 
       return attrToProjector;
     }
