@@ -184,17 +184,17 @@ function commitDashboard(dataManager, svg) {
   function updateData(filter) {
     var newData = dataManager(filter);
 
-    scatterPlot.dataSource().data(newData.commits);
+    scatterPlot.dataset().data(newData.commits);
 
     tscYScale.domain([0, 0]);
     dataManager.directories.forEach(function(dir) {
-      tscPlots[dir].dataSource().data(newData.directoryTimeSeries[dir]);
+      tscPlots[dir].dataset().data(newData.directoryTimeSeries[dir]);
     });
 
-    contributorBarPlot.dataSource().data(newData.linesByContributor);
+    contributorBarPlot.dataset().data(newData.linesByContributor);
     contributorBarYScale.domain([0, 0]);
 
-    directoryBarPlot.dataSource().data(newData.linesByDirectory);
+    directoryBarPlot.dataset().data(newData.linesByDirectory);
     directoryBarYScale.domain([0, 0]);
 
     timeScale.domain([startDate, endDate]).nice();

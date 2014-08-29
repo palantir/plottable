@@ -19,7 +19,7 @@ export module Plot {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
+    constructor(dataset: any, xScale: Abstract.Scale<any, number>, yScale: Abstract.Scale<any, number>) {
       super(dataset, xScale, yScale);
       this.classed("scatter-plot", true);
       this.project("r", 3); // default
@@ -27,7 +27,7 @@ export module Plot {
       this.project("fill", () => Core.Colors.INDIGO); // default
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
+    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
       attrToSet = attrToSet === "cx" ? "x" : attrToSet;
       attrToSet = attrToSet === "cy" ? "y" : attrToSet;
       super.project(attrToSet, accessor, scale);
@@ -43,7 +43,7 @@ export module Plot {
       delete attrToProjector["x"];
       delete attrToProjector["y"];
 
-      var circles = this.renderArea.selectAll("circle").data(this._dataSource.data());
+      var circles = this.renderArea.selectAll("circle").data(this._dataset.data());
       circles.enter().append("circle");
 
       if (this._dataChanged) {

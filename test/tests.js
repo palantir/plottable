@@ -1363,7 +1363,7 @@ describe("Plots", function () {
         });
         it("Base Plot functionality works", function () {
             var svg = generateSVG(400, 300);
-            var d1 = new Plottable.DataSource(["foo"], { cssClass: "bar" });
+            var d1 = new Plottable.Dataset(["foo"], { cssClass: "bar" });
             var r = new Plottable.Abstract.Plot(d1);
             r._anchor(svg);
             r._computeLayout();
@@ -1371,32 +1371,32 @@ describe("Plots", function () {
             assert.isNotNull(renderArea.node(), "there is a render-area");
             svg.remove();
         });
-        it("Allows the DataSource to be changed", function () {
-            var d1 = new Plottable.DataSource(["foo"], { cssClass: "bar" });
+        it("Allows the Dataset to be changed", function () {
+            var d1 = new Plottable.Dataset(["foo"], { cssClass: "bar" });
             var r = new Plottable.Abstract.Plot(d1);
-            assert.equal(d1, r.dataSource(), "returns the original");
-            var d2 = new Plottable.DataSource(["bar"], { cssClass: "boo" });
-            r.dataSource(d2);
-            assert.equal(d2, r.dataSource(), "returns new datasource");
+            assert.equal(d1, r.dataset(), "returns the original");
+            var d2 = new Plottable.Dataset(["bar"], { cssClass: "boo" });
+            r.dataset(d2);
+            assert.equal(d2, r.dataset(), "returns new datasource");
         });
-        it("Changes DataSource listeners when the DataSource is changed", function () {
-            var d1 = new Plottable.DataSource(["foo"], { cssClass: "bar" });
+        it("Changes Dataset listeners when the Dataset is changed", function () {
+            var d1 = new Plottable.Dataset(["foo"], { cssClass: "bar" });
             var r = new CountingPlot(d1);
             assert.equal(0, r.renders, "initially hasn't rendered anything");
             d1.broadcaster.broadcast();
             assert.equal(1, r.renders, "we re-render when our datasource changes");
-            r.dataSource();
+            r.dataset();
             assert.equal(1, r.renders, "we shouldn't redraw when querying the datasource");
-            var d2 = new Plottable.DataSource(["bar"], { cssClass: "boo" });
-            r.dataSource(d2);
+            var d2 = new Plottable.Dataset(["bar"], { cssClass: "boo" });
+            r.dataset(d2);
             assert.equal(2, r.renders, "we should redraw when we change datasource");
             d1.broadcaster.broadcast();
             assert.equal(2, r.renders, "we shouldn't listen to the old datasource");
             d2.broadcaster.broadcast();
             assert.equal(3, r.renders, "we should listen to the new datasource");
         });
-        it("Updates its projectors when the DataSource is changed", function () {
-            var d1 = new Plottable.DataSource([{ x: 5, y: 6 }], { cssClass: "bar" });
+        it("Updates its projectors when the Dataset is changed", function () {
+            var d1 = new Plottable.Dataset([{ x: 5, y: 6 }], { cssClass: "bar" });
             var r = new Plottable.Abstract.Plot(d1);
             var xScaleCalls = 0;
             var yScaleCalls = 0;
@@ -1421,8 +1421,8 @@ describe("Plots", function () {
             assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
             var metaProjector = r._generateAttrToProjector()["meta"];
             assert.equal(metaProjector(null, 0), "bar", "plot projector used the right metadata");
-            var d2 = new Plottable.DataSource([{ x: 7, y: 8 }], { cssClass: "boo" });
-            r.dataSource(d2);
+            var d2 = new Plottable.Dataset([{ x: 7, y: 8 }], { cssClass: "boo" });
+            r.dataset(d2);
             assert.equal(2, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
             assert.equal(2, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
             d1.broadcaster.broadcast();
@@ -1434,12 +1434,12 @@ describe("Plots", function () {
             metaProjector = r._generateAttrToProjector()["meta"];
             assert.equal(metaProjector(null, 0), "boo", "plot projector used the right metadata");
         });
-        it("Plot automatically generates a DataSource if only data is provided", function () {
+        it("Plot automatically generates a Dataset if only data is provided", function () {
             var data = ["foo", "bar"];
             var r = new Plottable.Abstract.Plot(data);
-            var dataSource = r.dataSource();
-            assert.isNotNull(dataSource, "A DataSource was automatically generated");
-            assert.deepEqual(dataSource.data(), data, "The generated DataSource has the correct data");
+            var dataset = r.dataset();
+            assert.isNotNull(dataset, "A Dataset was automatically generated");
+            assert.deepEqual(dataset.data(), data, "The generated Dataset has the correct data");
         });
         it("Plot.project works as intended", function () {
             var r = new Plottable.Abstract.Plot();
@@ -1449,14 +1449,14 @@ describe("Plots", function () {
             var projector = attrToProjector["attr"];
             assert.equal(projector({ "a": 0.5 }, 0), 5, "projector works as intended");
         });
-        it("Changing Plot.dataSource().data to [] causes scale to contract", function () {
-            var ds1 = new Plottable.DataSource([0, 1, 2]);
-            var ds2 = new Plottable.DataSource([1, 2, 3]);
+        it("Changing Plot.dataset().data to [] causes scale to contract", function () {
+            var ds1 = new Plottable.Dataset([0, 1, 2]);
+            var ds2 = new Plottable.Dataset([1, 2, 3]);
             var s = new Plottable.Scale.Linear();
             var svg1 = generateSVG(100, 100);
             var svg2 = generateSVG(100, 100);
-            var r1 = new Plottable.Abstract.Plot().dataSource(ds1).project("x", function (x) { return x; }, s).renderTo(svg1);
-            var r2 = new Plottable.Abstract.Plot().dataSource(ds2).project("x", function (x) { return x; }, s).renderTo(svg2);
+            var r1 = new Plottable.Abstract.Plot().dataset(ds1).project("x", function (x) { return x; }, s).renderTo(svg1);
+            var r2 = new Plottable.Abstract.Plot().dataset(ds2).project("x", function (x) { return x; }, s).renderTo(svg2);
             assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
             ds1.data([]);
             assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
@@ -1490,10 +1490,10 @@ describe("Plots", function () {
         });
         it("Datasets can be added and removed as expected", function () {
             p.addDataset("foo", [1, 2, 3]);
-            var d2 = new Plottable.DataSource([4, 5, 6]);
+            var d2 = new Plottable.Dataset([4, 5, 6]);
             p.addDataset("bar", d2);
             p.addDataset([7, 8, 9]);
-            var d4 = new Plottable.DataSource([10, 11, 12]);
+            var d4 = new Plottable.Dataset([10, 11, 12]);
             p.addDataset(d4);
             assert.deepEqual(p._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
             var datasets = p._getDatasetsInOrder();
@@ -1509,8 +1509,8 @@ describe("Plots", function () {
         it("Datasets are listened to appropriately", function () {
             var callbackCounter = 0;
             var callback = function () { return callbackCounter++; };
-            p._onDataSourceUpdate = callback;
-            var d = new Plottable.DataSource([1, 2, 3]);
+            p._onDatasetUpdate = callback;
+            var d = new Plottable.Dataset([1, 2, 3]);
             p.addDataset("foo", d);
             assert.equal(callbackCounter, 1, "adding dataset triggers listener");
             d.data([1, 2, 3, 4]);
@@ -1568,7 +1568,7 @@ describe("Plots", function () {
             xAccessor = function (d) { return d.foo; };
             yAccessor = function (d) { return d.bar; };
             colorAccessor = function (d, i, m) { return d3.rgb(d.foo, d.bar, i).toString(); };
-            simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+            simpleDataset = new Plottable.Dataset([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
             linePlot = new Plottable.Plot.Line(simpleDataset, xScale, yScale);
             linePlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).renderTo(svg);
             renderArea = linePlot.renderArea;
@@ -1645,7 +1645,7 @@ describe("Plots", function () {
             y0Accessor = function () { return 0; };
             colorAccessor = function (d, i, m) { return d3.rgb(d.foo, d.bar, i).toString(); };
             fillAccessor = function () { return "steelblue"; };
-            simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+            simpleDataset = new Plottable.Dataset([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
             areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
             areaPlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
             renderArea = areaPlot.renderArea;
@@ -1711,7 +1711,7 @@ describe("Plots", function () {
                     { x: "B", y: -1.5 },
                     { x: "B", y: 1 }
                 ];
-                dataset = new Plottable.DataSource(data);
+                dataset = new Plottable.Dataset(data);
                 renderer = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
                 renderer.animate(false);
                 renderer.renderTo(svg);
@@ -1846,7 +1846,7 @@ describe("Plots", function () {
                     { y: "B", x: -1.5 },
                     { y: "B", x: 1 }
                 ];
-                dataset = new Plottable.DataSource(data);
+                dataset = new Plottable.Dataset(data);
                 renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
                 renderer.animate(false);
                 renderer.renderTo(svg);
@@ -1943,7 +1943,7 @@ describe("Plots", function () {
                     { y: "A", x: 1 },
                     { y: "B", x: 2 },
                 ];
-                dataset = new Plottable.DataSource(data);
+                dataset = new Plottable.Dataset(data);
                 renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
                 renderer.baseline(0);
                 renderer.animate(false);
@@ -2050,7 +2050,7 @@ describe("Plots", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude", colorScale);
             renderer.renderTo(svg);
-            renderer.dataSource().data(DATA);
+            renderer.dataset().data(DATA);
             VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
             svg.remove();
         });
@@ -2062,7 +2062,7 @@ describe("Plots", function () {
             var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude");
             renderer.renderTo(svg);
             yScale.domain(["U", "V"]);
-            renderer.dataSource().data(DATA);
+            renderer.dataset().data(DATA);
             var cells = renderer.renderArea.selectAll("rect")[0];
             var cellAU = d3.select(cells[0]);
             var cellAV = d3.select(cells[2]);
@@ -2100,8 +2100,8 @@ describe("Plots", function () {
             var metadata = { foo: 10, bar: 20 };
             var xAccessor = function (d, i, m) { return d.x + i * m.foo; };
             var yAccessor = function (d, i, m) { return m.bar; };
-            var dataSource = new Plottable.DataSource(data, metadata);
-            var renderer = new Plottable.Plot.Scatter(dataSource, xScale, yScale).project("x", xAccessor).project("y", yAccessor);
+            var dataset = new Plottable.Dataset(data, metadata);
+            var renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor);
             renderer.renderTo(svg);
             var circles = renderer.renderArea.selectAll("circle");
             var c1 = d3.select(circles[0][0]);
@@ -2111,13 +2111,13 @@ describe("Plots", function () {
             assert.closeTo(parseFloat(c2.attr("cx")), 11, 0.01, "second circle cx is correct");
             assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct");
             data = [{ x: 2, y: 2 }, { x: 4, y: 4 }];
-            dataSource.data(data);
+            dataset.data(data);
             assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after data change");
             assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct after data change");
             assert.closeTo(parseFloat(c2.attr("cx")), 14, 0.01, "second circle cx is correct after data change");
             assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct after data change");
             metadata = { foo: 0, bar: 0 };
-            dataSource.metadata(metadata);
+            dataset.metadata(metadata);
             assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after metadata change");
             assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
             assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");
@@ -2238,8 +2238,8 @@ describe("Plots", function () {
                 { x: 1, y: 3, type: "b" },
                 { x: 3, y: 1, type: "b" }
             ];
-            dataset1 = new Plottable.DataSource(data1);
-            dataset2 = new Plottable.DataSource(data2);
+            dataset1 = new Plottable.Dataset(data1);
+            dataset2 = new Plottable.Dataset(data2);
             renderer = new Plottable.Plot.StackedArea(xScale, yScale);
             renderer.addDataset(data1);
             renderer.addDataset(data2);
@@ -2325,7 +2325,7 @@ describe("Plots", function () {
                 { x: 1, y: 0, type: "c" },
                 { x: 3, y: 0, type: "c" }
             ];
-            renderer.addDataset("a", new Plottable.DataSource(data));
+            renderer.addDataset("a", new Plottable.Dataset(data));
             renderer.renderTo(svg);
             assert.strictEqual(oldLowerBound, yScale.domain()[0], "lower bound doesn't change with 0 added");
             assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound doesn't change with 0 added");
@@ -2336,7 +2336,7 @@ describe("Plots", function () {
                 { x: 1, y: 10, type: "d" },
                 { x: 3, y: 3, type: "d" }
             ];
-            renderer.addDataset("b", new Plottable.DataSource(data));
+            renderer.addDataset("b", new Plottable.Dataset(data));
             renderer.renderTo(svg);
             assert.closeTo(oldLowerBound, yScale.domain()[0], 2, "lower bound doesn't change on positive addition");
             assert.closeTo(oldUpperBound + 10, yScale.domain()[1], 2, "upper bound increases");
@@ -2346,7 +2346,7 @@ describe("Plots", function () {
                 { x: 1, y: 0, type: "e" },
                 { x: 3, y: 1, type: "e" }
             ];
-            renderer.addDataset("c", new Plottable.DataSource(data));
+            renderer.addDataset("c", new Plottable.Dataset(data));
             renderer.renderTo(svg);
             assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound doesn't increase since maximum doesn't increase");
             renderer.removeDataset("a");
@@ -2359,17 +2359,17 @@ describe("Plots", function () {
                 { x: 1, y: 0, type: "c" },
                 { x: 3, y: 0, type: "c" }
             ];
-            renderer.addDataset("a", new Plottable.DataSource(data));
+            renderer.addDataset("a", new Plottable.Dataset(data));
             data = [
                 { x: 1, y: 10, type: "d" },
                 { x: 3, y: 3, type: "d" }
             ];
-            renderer.addDataset("b", new Plottable.DataSource(data));
+            renderer.addDataset("b", new Plottable.Dataset(data));
             data = [
                 { x: 1, y: 0, type: "e" },
                 { x: 3, y: 1, type: "e" }
             ];
-            renderer.addDataset("c", new Plottable.DataSource(data));
+            renderer.addDataset("c", new Plottable.Dataset(data));
             renderer.renderTo(svg);
             assert.closeTo(16, yScale.domain()[1], 2, "Initially starts with around 14 at highest extent");
             renderer.detach();
@@ -2397,7 +2397,7 @@ describe("Plots", function () {
                 { x: 1, y: 0, type: "c" },
                 { x: 3, y: 0, type: "c" }
             ];
-            var dataset = new Plottable.DataSource(data);
+            var dataset = new Plottable.Dataset(data);
             renderer.addDataset(dataset);
             renderer.renderTo(svg);
             assert.strictEqual(oldLowerBound, yScale.domain()[0], "lower bound doesn't change with 0 added");
@@ -2462,8 +2462,8 @@ describe("Plots", function () {
                 { x: "A", y: 2 },
                 { x: "B", y: 1 }
             ];
-            dataset1 = new Plottable.DataSource(data1);
-            dataset2 = new Plottable.DataSource(data2);
+            dataset1 = new Plottable.Dataset(data1);
+            dataset2 = new Plottable.Dataset(data2);
             renderer = new Plottable.Plot.StackedBar(xScale, yScale);
             renderer.addDataset(data1);
             renderer.addDataset(data2);
@@ -2513,6 +2513,82 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
         });
     });
+    describe("Horizontal Bar Plot", function () {
+        var verifier = new MultiTestVerifier();
+        var svg;
+        var dataset1;
+        var dataset2;
+        var xScale;
+        var yScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var rendererWidth;
+        var bandWidth = 0;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        before(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Linear().domain([0, 3]);
+            yScale = new Plottable.Scale.Ordinal();
+            var data1 = [
+                { y: "A", x: 1 },
+                { y: "B", x: 2 }
+            ];
+            var data2 = [
+                { y: "A", x: 2 },
+                { y: "B", x: 1 }
+            ];
+            dataset1 = new Plottable.Dataset(data1);
+            dataset2 = new Plottable.Dataset(data2);
+            renderer = new Plottable.Plot.StackedBar(xScale, yScale, false);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.baseline(0);
+            var yAxis = new Plottable.Axis.Category(yScale, "left");
+            var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+            rendererWidth = renderer.width();
+            bandWidth = yScale.rangeBand();
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        afterEach(function () {
+            verifier.end();
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+        it("renders correctly", function () {
+            var bars = renderer.renderArea.selectAll("rect");
+            var bar0 = d3.select(bars[0][0]);
+            var bar1 = d3.select(bars[0][1]);
+            var bar2 = d3.select(bars[0][2]);
+            var bar3 = d3.select(bars[0][3]);
+            assert.closeTo(numAttr(bar0, "height"), bandWidth, 2);
+            assert.closeTo(numAttr(bar1, "height"), bandWidth, 2);
+            assert.closeTo(numAttr(bar2, "height"), bandWidth, 2);
+            assert.closeTo(numAttr(bar3, "height"), bandWidth, 2);
+            assert.closeTo(numAttr(bar0, "width"), rendererWidth / 3, 0.01, "width is correct for bar0");
+            assert.closeTo(numAttr(bar1, "width"), rendererWidth / 3 * 2, 0.01, "width is correct for bar1");
+            assert.closeTo(numAttr(bar2, "width"), rendererWidth / 3 * 2, 0.01, "width is correct for bar2");
+            assert.closeTo(numAttr(bar3, "width"), rendererWidth / 3, 0.01, "width is correct for bar3");
+            var bar0Y = bar0.data()[0].y;
+            var bar1Y = bar1.data()[0].y;
+            var bar2Y = bar2.data()[0].y;
+            var bar3Y = bar3.data()[0].y;
+            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2, 0.01, "y pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2, 0.01, "y pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + bandWidth / 2, 0.01, "y pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + bandWidth / 2, 0.01, "y pos correct for bar3");
+            assert.closeTo(numAttr(bar0, "x"), 0, 0.01, "x is correct for bar0");
+            assert.closeTo(numAttr(bar1, "x"), 0, 0.01, "x is correct for bar1");
+            assert.closeTo(numAttr(bar2, "x"), rendererWidth / 3, 0.01, "x is correct for bar2");
+            assert.closeTo(numAttr(bar3, "x"), rendererWidth / 3 * 2, 0.01, "x is correct for bar3");
+        });
+    });
 });
 
 var assert = chai.assert;
@@ -2542,8 +2618,8 @@ describe("Plots", function () {
                 { x: "A", y: 2 },
                 { x: "B", y: 1 }
             ];
-            dataset1 = new Plottable.DataSource(data1);
-            dataset2 = new Plottable.DataSource(data2);
+            dataset1 = new Plottable.Dataset(data1);
+            dataset2 = new Plottable.Dataset(data2);
             renderer = new Plottable.Plot.ClusteredBar(xScale, yScale);
             renderer.addDataset(data1);
             renderer.addDataset(data2);
@@ -2589,6 +2665,80 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2 - off, 0.01, "x pos correct for bar1");
             assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2 + off, 0.01, "x pos correct for bar2");
             assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2 + off, 0.01, "x pos correct for bar3");
+        });
+    });
+    describe("Horizontal Clustered Bar Plot", function () {
+        var verifier = new MultiTestVerifier();
+        var svg;
+        var dataset1;
+        var dataset2;
+        var yScale;
+        var xScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var rendererWidth;
+        var bandWidth = 0;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        before(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            yScale = new Plottable.Scale.Ordinal();
+            xScale = new Plottable.Scale.Linear().domain([0, 2]);
+            var data1 = [
+                { y: "A", x: 1 },
+                { y: "B", x: 2 }
+            ];
+            var data2 = [
+                { y: "A", x: 2 },
+                { y: "B", x: 1 }
+            ];
+            dataset1 = new Plottable.Dataset(data1);
+            dataset2 = new Plottable.Dataset(data2);
+            renderer = new Plottable.Plot.ClusteredBar(xScale, yScale, false);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.baseline(0);
+            var yAxis = new Plottable.Axis.Category(yScale, "left");
+            var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+            rendererWidth = renderer.width();
+            bandWidth = yScale.rangeBand();
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        afterEach(function () {
+            verifier.end();
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+        it("renders correctly", function () {
+            var bars = renderer.renderArea.selectAll("rect");
+            var bar0 = d3.select(bars[0][0]);
+            var bar1 = d3.select(bars[0][1]);
+            var bar2 = d3.select(bars[0][2]);
+            var bar3 = d3.select(bars[0][3]);
+            var width = bandWidth / 2 * .518;
+            assert.closeTo(numAttr(bar0, "height"), width, 2, "height is correct for bar0");
+            assert.closeTo(numAttr(bar1, "height"), width, 2, "height is correct for bar1");
+            assert.closeTo(numAttr(bar2, "height"), width, 2, "height is correct for bar2");
+            assert.closeTo(numAttr(bar3, "height"), width, 2, "height is correct for bar3");
+            assert.closeTo(numAttr(bar0, "width"), rendererWidth / 2, 0.01, "width is correct for bar0");
+            assert.closeTo(numAttr(bar1, "width"), rendererWidth, 0.01, "width is correct for bar1");
+            assert.closeTo(numAttr(bar2, "width"), rendererWidth, 0.01, "width is correct for bar2");
+            assert.closeTo(numAttr(bar3, "width"), rendererWidth / 2, 0.01, "width is correct for bar3");
+            var bar0Y = bar0.data()[0].y;
+            var bar1Y = bar1.data()[0].y;
+            var bar2Y = bar2.data()[0].y;
+            var bar3Y = bar3.data()[0].y;
+            var off = renderer.innerScale.scale("_0");
+            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + bandWidth / 2 + off, 0.01, "y pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + bandWidth / 2 + off, 0.01, "y pos correct for bar3");
         });
     });
 });
@@ -3211,14 +3361,14 @@ describe("Component behavior", function () {
 });
 
 var assert = chai.assert;
-describe("DataSource", function () {
+describe("Dataset", function () {
     it("Updates listeners when the data is changed", function () {
-        var ds = new Plottable.DataSource();
+        var ds = new Plottable.Dataset();
         var newData = [1, 2, 3];
         var callbackCalled = false;
         var callback = function (listenable) {
-            assert.equal(listenable, ds, "Callback received the DataSource as the first argument");
-            assert.deepEqual(ds.data(), newData, "DataSource arrives with correct data");
+            assert.equal(listenable, ds, "Callback received the Dataset as the first argument");
+            assert.deepEqual(ds.data(), newData, "Dataset arrives with correct data");
             callbackCalled = true;
         };
         ds.broadcaster.registerListener(null, callback);
@@ -3226,12 +3376,12 @@ describe("DataSource", function () {
         assert.isTrue(callbackCalled, "callback was called when the data was changed");
     });
     it("Updates listeners when the metadata is changed", function () {
-        var ds = new Plottable.DataSource();
+        var ds = new Plottable.Dataset();
         var newMetadata = "blargh";
         var callbackCalled = false;
         var callback = function (listenable) {
-            assert.equal(listenable, ds, "Callback received the DataSource as the first argument");
-            assert.deepEqual(ds.metadata(), newMetadata, "DataSource arrives with correct metadata");
+            assert.equal(listenable, ds, "Callback received the Dataset as the first argument");
+            assert.deepEqual(ds.metadata(), newMetadata, "Dataset arrives with correct metadata");
             callbackCalled = true;
         };
         ds.broadcaster.registerListener(null, callback);
@@ -3241,17 +3391,17 @@ describe("DataSource", function () {
     it("_getExtent works as expected", function () {
         var data = [1, 2, 3, 4, 1];
         var metadata = { foo: 11 };
-        var dataSource = new Plottable.DataSource(data, metadata);
-        var plot = new Plottable.Abstract.Plot(dataSource);
+        var dataset = new Plottable.Dataset(data, metadata);
+        var plot = new Plottable.Abstract.Plot(dataset);
         var apply = function (a) { return Plottable.Util.Methods._applyAccessor(a, plot); };
         var a1 = function (d, i, m) { return d + i - 2; };
-        assert.deepEqual(dataSource._getExtent(apply(a1)), [-1, 5], "extent for numerical data works properly");
+        assert.deepEqual(dataset._getExtent(apply(a1)), [-1, 5], "extent for numerical data works properly");
         var a2 = function (d, i, m) { return d + m.foo; };
-        assert.deepEqual(dataSource._getExtent(apply(a2)), [12, 15], "extent uses metadata appropriately");
-        dataSource.metadata({ foo: -1 });
-        assert.deepEqual(dataSource._getExtent(apply(a2)), [0, 3], "metadata change is reflected in extent results");
+        assert.deepEqual(dataset._getExtent(apply(a2)), [12, 15], "extent uses metadata appropriately");
+        dataset.metadata({ foo: -1 });
+        assert.deepEqual(dataset._getExtent(apply(a2)), [0, 3], "metadata change is reflected in extent results");
         var a3 = function (d, i, m) { return "_" + d; };
-        assert.deepEqual(dataSource._getExtent(apply(a3)), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
+        assert.deepEqual(dataset._getExtent(apply(a3)), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
     });
 });
 
@@ -3685,7 +3835,7 @@ describe("Domainer", function () {
         assert.deepEqual(getExceptions(), [5], "projecting a different constant y0 removed the old exception and added a new one");
         r.project("y0", "y0", yScale);
         assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
-        r.dataSource().data([{ x: 0, y: 0, y0: 0 }, { x: 5, y: 5, y0: 0 }]);
+        r.dataset().data([{ x: 0, y: 0, y0: 0 }, { x: 5, y: 5, y0: 0 }]);
         assert.deepEqual(getExceptions(), [0], "changing to constant values via change in datasource adds exception");
         svg.remove();
     });
@@ -3734,7 +3884,7 @@ describe("Scales", function () {
         scale.broadcaster.registerListener(null, testCallback);
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
-        scale.autoDomainAutomatically = true;
+        scale._autoDomainAutomatically = true;
         scale.updateExtent("1", "x", [0.08, 9.92]);
         callbackWasCalled = false;
         scale.domainer(new Plottable.Domainer().nice());
@@ -3745,58 +3895,58 @@ describe("Scales", function () {
     });
     describe("autoranging behavior", function () {
         var data;
-        var dataSource;
+        var dataset;
         var scale;
         beforeEach(function () {
             data = [{ foo: 2, bar: 1 }, { foo: 5, bar: -20 }, { foo: 0, bar: 0 }];
-            dataSource = new Plottable.DataSource(data);
+            dataset = new Plottable.Dataset(data);
             scale = new Plottable.Scale.Linear();
         });
         it("scale autoDomain flag is not overwritten without explicitly setting the domain", function () {
             scale.updateExtent("1", "x", d3.extent(data, function (e) { return e.foo; }));
             scale.domainer(new Plottable.Domainer().pad().nice());
-            assert.isTrue(scale.autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
+            assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
-            assert.isFalse(scale.autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
+            assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
         });
-        it("scale autorange works as expected with single dataSource", function () {
+        it("scale autorange works as expected with single dataset", function () {
             var svg = generateSVG(100, 100);
-            var renderer = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale).renderTo(svg);
+            var renderer = new Plottable.Abstract.Plot().dataset(dataset).project("x", "foo", scale).renderTo(svg);
             assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
             data.push({ foo: 100, bar: 200 });
-            dataSource.data(data);
+            dataset.data(data);
             assert.deepEqual(scale.domain(), [0, 100], "scale domain was autoranged properly");
             svg.remove();
         });
         it("scale reference counting works as expected", function () {
             var svg1 = generateSVG(100, 100);
             var svg2 = generateSVG(100, 100);
-            var renderer1 = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale);
+            var renderer1 = new Plottable.Abstract.Plot().dataset(dataset).project("x", "foo", scale);
             renderer1.renderTo(svg1);
-            var renderer2 = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale);
+            var renderer2 = new Plottable.Abstract.Plot().dataset(dataset).project("x", "foo", scale);
             renderer2.renderTo(svg2);
             var otherScale = new Plottable.Scale.Linear();
             renderer1.project("x", "foo", otherScale);
-            dataSource.data([{ foo: 10 }, { foo: 11 }]);
-            assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataSource after one perspective deregistered");
+            dataset.data([{ foo: 10 }, { foo: 11 }]);
+            assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataset after one perspective deregistered");
             renderer2.project("x", "foo", otherScale);
-            dataSource.data([{ foo: 99 }, { foo: 100 }]);
+            dataset.data([{ foo: 99 }, { foo: 100 }]);
             assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
             svg1.remove();
             svg2.remove();
         });
         it("scale perspectives can be removed appropriately", function () {
-            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled1");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled1");
             scale.updateExtent("1", "x", d3.extent(data, function (e) { return e.foo; }));
             scale.updateExtent("2", "x", d3.extent(data, function (e) { return e.bar; }));
-            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled2");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled2");
             assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
-            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled3");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled3");
             scale.removeExtent("1", "x");
-            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled4");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled4");
             assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
             scale.updateExtent("2", "x", d3.extent(data, function (e) { return e.foo; }));
-            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled5");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
             assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
         });
         it("should resize when a plot is removed", function () {
@@ -3895,7 +4045,7 @@ describe("Scales", function () {
                 dataChanges[_i - 0] = arguments[_i];
             }
             dataChanges.forEach(function (dataChange) {
-                barPlot.dataSource().data(dataChange);
+                barPlot.dataset().data(dataChange);
             });
         }
         iterateDataChanges([], [dA, dB, dC], []);
@@ -3969,13 +4119,6 @@ describe("Scales", function () {
             assert.equal("#000000", scale.scale(0));
             assert.equal("#ffffff", scale.scale(16));
             assert.equal("#e3e3e3", scale.scale(8));
-        });
-        it("doesn't use a domainer", function () {
-            var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-            var startDomain = scale.domain();
-            scale.domainer().pad(1.0);
-            scale.autoDomain();
-            assert.equal(scale.domain(), startDomain);
         });
     });
     describe("Modified Log Scale", function () {
@@ -4884,7 +5027,7 @@ describe("Interactions", function () {
         var dragendY = svgHeight - 20;
         before(function () {
             svg = generateSVG(svgWidth, svgHeight);
-            dataset = new Plottable.DataSource(makeLinearSeries(10));
+            dataset = new Plottable.Dataset(makeLinearSeries(10));
             xScale = new Plottable.Scale.Linear();
             yScale = new Plottable.Scale.Linear();
             renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
@@ -4954,7 +5097,7 @@ describe("Interactions", function () {
         var dragendY = svgHeight - 20;
         before(function () {
             svg = generateSVG(svgWidth, svgHeight);
-            dataset = new Plottable.DataSource(makeLinearSeries(10));
+            dataset = new Plottable.Dataset(makeLinearSeries(10));
             xScale = new Plottable.Scale.Linear();
             yScale = new Plottable.Scale.Linear();
             renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);

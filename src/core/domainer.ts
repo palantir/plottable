@@ -39,7 +39,7 @@ module Plottable {
      * @return {any[]} The domain, as a merging of all exents, as a [min, max]
      *                 pair.
      */
-    public computeDomain(extents: any[][], scale: Abstract.QuantitativeScale): any[] {
+    public computeDomain(extents: any[][], scale: Abstract.QuantitativeScale<any>): any[] {
       var domain: any[];
       if (this.combineExtents != null) {
         domain = this.combineExtents(extents);
@@ -166,7 +166,7 @@ module Plottable {
       return [Util.Methods.min(extents, (e) => e[0], 0), Util.Methods.max(extents, (e) => e[1], 1)];
     }
 
-    private padDomain(scale: Abstract.QuantitativeScale, domain: any[]): any[] {
+    private padDomain(scale: Abstract.QuantitativeScale<any>, domain: any[]): any[] {
       var min = domain[0];
       var max = domain[1];
       if (min === max && this.padProportion > 0.0) {
@@ -200,7 +200,7 @@ module Plottable {
       return [newMin, newMax];
     }
 
-    private niceDomain(scale: Abstract.QuantitativeScale, domain: any[]): any[] {
+    private niceDomain(scale: Abstract.QuantitativeScale<any>, domain: any[]): any[] {
       if (this.doNice) {
         return scale._niceDomain(domain, this.niceCount);
       } else {
