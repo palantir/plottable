@@ -5260,18 +5260,24 @@ var Plottable;
     (function (Plot) {
         var ClusteredBar = (function (_super) {
             __extends(ClusteredBar, _super);
-            function ClusteredBar(xScale, yScale) {
+            function ClusteredBar(xScale, yScale, isVertical) {
+                if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale);
-                this._isVertical = true;
                 this.innerScale = new Plottable.Scale.Ordinal();
+                this._isVertical = isVertical;
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var widthF = attrToProjector["width"];
                 this.innerScale.range([0, widthF(null, 0)]);
-                attrToProjector["width"] = function (d, i) { return _this.innerScale.rangeBand(); };
-                attrToProjector["x"] = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_X; };
+                var innerWidthF = function (d, i) { return _this.innerScale.rangeBand(); };
+                var heightF = attrToProjector["height"];
+                attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
+                attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
+                var positionF = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_POSITION; };
+                attrToProjector["x"] = this._isVertical ? positionF : attrToProjector["x"];
+                attrToProjector["y"] = this._isVertical ? attrToProjector["y"] : positionF;
                 return attrToProjector;
             };
             ClusteredBar.prototype.cluster = function (accessor) {
@@ -5286,7 +5292,8 @@ var Plottable;
                     var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
                     clusters[key] = data.map(function (d, i) {
                         var val = accessor(d, i);
-                        d["_PLOTTABLE_PROTECTED_FIELD_X"] = _this.xScale.scale(val) + _this.innerScale.scale(key);
+                        var primaryScale = _this._isVertical ? _this.xScale : _this.yScale;
+                        d["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + _this.innerScale.scale(key);
                         return d;
                     });
                 });
@@ -5294,8 +5301,8 @@ var Plottable;
             };
             ClusteredBar.prototype._paint = function () {
                 _super.prototype._paint.call(this);
-                var accessor = this._projectors["x"].accessor;
                 var attrHash = this._generateAttrToProjector();
+                var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 var clusteredData = this.cluster(accessor);
                 this._getDrawersInOrder().forEach(function (d) { return d.draw(clusteredData[d.key], attrHash); });
             };

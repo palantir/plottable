@@ -1095,8 +1095,7 @@ declare module Plottable {
     module Plot {
         class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
             static DEFAULT_WIDTH: number;
-            _isVertical: boolean;
-            constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
+            constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.Scale, isVertical?: boolean);
             _generateAttrToProjector(): IAttributeToProjector;
             _paint(): void;
         }

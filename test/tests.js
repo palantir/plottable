@@ -2667,6 +2667,80 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2 + off, 0.01, "x pos correct for bar3");
         });
     });
+    describe("Horizontal Clustered Bar Plot", function () {
+        var verifier = new MultiTestVerifier();
+        var svg;
+        var dataset1;
+        var dataset2;
+        var yScale;
+        var xScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var rendererWidth;
+        var bandWidth = 0;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        before(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            yScale = new Plottable.Scale.Ordinal();
+            xScale = new Plottable.Scale.Linear().domain([0, 2]);
+            var data1 = [
+                { y: "A", x: 1 },
+                { y: "B", x: 2 }
+            ];
+            var data2 = [
+                { y: "A", x: 2 },
+                { y: "B", x: 1 }
+            ];
+            dataset1 = new Plottable.DataSource(data1);
+            dataset2 = new Plottable.DataSource(data2);
+            renderer = new Plottable.Plot.ClusteredBar(xScale, yScale, false);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.baseline(0);
+            var yAxis = new Plottable.Axis.Category(yScale, "left");
+            var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+            rendererWidth = renderer.width();
+            bandWidth = yScale.rangeBand();
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        afterEach(function () {
+            verifier.end();
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+        it("renders correctly", function () {
+            var bars = renderer.renderArea.selectAll("rect");
+            var bar0 = d3.select(bars[0][0]);
+            var bar1 = d3.select(bars[0][1]);
+            var bar2 = d3.select(bars[0][2]);
+            var bar3 = d3.select(bars[0][3]);
+            var width = bandWidth / 2 * .518;
+            assert.closeTo(numAttr(bar0, "height"), width, 2, "height is correct for bar0");
+            assert.closeTo(numAttr(bar1, "height"), width, 2, "height is correct for bar1");
+            assert.closeTo(numAttr(bar2, "height"), width, 2, "height is correct for bar2");
+            assert.closeTo(numAttr(bar3, "height"), width, 2, "height is correct for bar3");
+            assert.closeTo(numAttr(bar0, "width"), rendererWidth / 2, 0.01, "width is correct for bar0");
+            assert.closeTo(numAttr(bar1, "width"), rendererWidth, 0.01, "width is correct for bar1");
+            assert.closeTo(numAttr(bar2, "width"), rendererWidth, 0.01, "width is correct for bar2");
+            assert.closeTo(numAttr(bar3, "width"), rendererWidth / 2, 0.01, "width is correct for bar3");
+            var bar0Y = bar0.data()[0].y;
+            var bar1Y = bar1.data()[0].y;
+            var bar2Y = bar2.data()[0].y;
+            var bar3Y = bar3.data()[0].y;
+            var off = renderer.innerScale.scale("_0");
+            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + bandWidth / 2 + off, 0.01, "y pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + bandWidth / 2 + off, 0.01, "y pos correct for bar3");
+        });
+    });
 });
 
 var assert = chai.assert;
