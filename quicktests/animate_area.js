@@ -1,8 +1,12 @@
 function makeData() {
+  "use strict";
+
   return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
+  "use strict";
+
   var svg = div.append("svg").attr("height", 500);
   var doAnimate = true;
   var areaRenderer;
@@ -20,12 +24,12 @@ function run(div, data, Plottable) {
                                            [null,  xAxis]]);
   areaChart.renderTo(svg);
 
-  cb = function(x, y){
+  var cb = function(x, y){
     d = areaRenderer.dataSource().data();
     areaRenderer.dataSource().data(d);
-  }  
+  };
 
-  window.xy = new Plottable.Interaction.Click(areaRenderer)
+  new Plottable.Interaction.Click(areaRenderer)
     .callback(cb)
     .registerWithComponent();
 }

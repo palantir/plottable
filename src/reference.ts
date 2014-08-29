@@ -40,6 +40,7 @@
 /// <reference path="scales/scaleDomainCoordinator.ts" />
 
 /// <reference path="drawers/baseDrawer.ts" />
+/// <reference path="drawers/areaDrawer.ts" />
 /// <reference path="drawers/rectDrawer.ts" />
 
 /// <reference path="components/baseAxis.ts" />
@@ -60,11 +61,14 @@
 /// <reference path="components/plots/areaPlot.ts" />
 /// <reference path="components/plots/newStyleBarPlot.ts" />
 /// <reference path="components/plots/clusteredBarPlot.ts" />
+/// <reference path="components/plots/stackedPlot.ts" />
+/// <reference path="components/plots/stackedAreaPlot.ts" />
 /// <reference path="components/plots/stackedBarPlot.ts" />
 
 /// <reference path="animators/nullAnimator.ts" />
 /// <reference path="animators/defaultAnimator.ts" />
 /// <reference path="animators/iterativeDelayAnimator.ts" />
+/// <reference path="animators/rectAnimator.ts" />
 
 /// <reference path="interactions/keyEventListener.ts" />
 /// <reference path="interactions/interaction.ts" />

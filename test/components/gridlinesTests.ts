@@ -20,8 +20,8 @@ describe("Gridlines", () => {
 
     basicTable._anchor(svg);
     basicTable._computeLayout();
-    xScale.range([0, xAxis.availableWidth ]); // manually set range since we don't have a renderer
-    yScale.range([yAxis.availableHeight, 0]);
+    xScale.range([0, xAxis.width() ]); // manually set range since we don't have a renderer
+    yScale.range([yAxis.height(), 0]);
     basicTable._render();
 
     var xAxisTickMarks = xAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS)[0];

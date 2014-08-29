@@ -48,8 +48,8 @@ export module Abstract {
       var baselineAttr: IAttributeToProjector = {
         "x1": this._isVertical ? 0 : scaledBaseline,
         "y1": this._isVertical ? scaledBaseline : 0,
-        "x2": this._isVertical ? this.availableWidth : scaledBaseline,
-        "y2": this._isVertical ? scaledBaseline : this.availableHeight
+        "x2": this._isVertical ? this.width() : scaledBaseline,
+        "y2": this._isVertical ? scaledBaseline : this.height()
       };
       this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
     }

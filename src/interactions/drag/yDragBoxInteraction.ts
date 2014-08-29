@@ -9,7 +9,7 @@ export module Interaction {
     }
 
     public setBox(y0: number, y1: number) {
-      super.setBox(0, this.componentToListenTo.availableWidth, y0, y1);
+      super.setBox(0, this.componentToListenTo.width(), y0, y1);
       return this;
     }
   }

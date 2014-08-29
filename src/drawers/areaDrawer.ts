@@ -2,14 +2,14 @@
 
 module Plottable {
 export module _Drawer {
-  export class Rect extends Abstract._Drawer {
+  export class Area extends Abstract._Drawer {
 
-    public draw(data: any[][], attrToProjector: IAttributeToProjector, animator = new Animator.Null()) {
-      var svgElement = "rect";
+    public draw(data: any[][], attrToProjector: IAttributeToProjector) {
+      var svgElement = "path";
       var dataElements = this.renderArea.selectAll(svgElement).data(data);
 
       dataElements.enter().append(svgElement);
-      animator.animate(dataElements, attrToProjector);
+      dataElements.attr(attrToProjector).classed("area", true);
       dataElements.exit().remove();
     }
   }

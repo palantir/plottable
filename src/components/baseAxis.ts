@@ -21,8 +21,8 @@ export module Abstract {
     public _scale: Abstract.Scale;
     public _formatter: Formatter;
     public _orientation: string;
-    public _width: any = "auto";
-    public _height: any = "auto";
+    public _userRequestedWidth: any = "auto";
+    public _userRequestedHeight: any = "auto";
     public _computedWidth: number;
     public _computedHeight: number;
     private _endTickLength = 5;
@@ -46,7 +46,7 @@ export module Abstract {
 
       this.formatter(formatter);
 
-      this._scale.broadcaster.registerListener(this, () => this._render());
+      this._scale.broadcaster.registerListener(this, () => this._rescale());
     }
 
     public remove() {
@@ -71,11 +71,11 @@ export module Abstract {
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
-      var requestedWidth = this._width;
-      var requestedHeight = this._height;
+      var requestedWidth = this._userRequestedWidth;
+      var requestedHeight = this._userRequestedHeight;
 
       if (this._isHorizontal()) {
-        if (this._height === "auto") {
+        if (this._userRequestedHeight === "auto") {
           if (this._computedHeight == null) {
             this._computeHeight();
           }
@@ -83,7 +83,7 @@ export module Abstract {
         }
         requestedWidth = 0;
       } else { // vertical
-        if (this._width === "auto") {
+        if (this._userRequestedWidth === "auto") {
           if (this._computedWidth == null) {
             this._computeWidth();
           }
@@ -108,12 +108,17 @@ export module Abstract {
       return !this._isHorizontal();
     }
 
+    public _rescale() {
+      // default implementation; subclasses may call _invalidateLayout() here
+      this._render();
+    }
+
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       if (this._isHorizontal()) {
-        this._scale.range([0, this.availableWidth]);
+        this._scale.range([0, this.width()]);
       } else {
-        this._scale.range([this.availableHeight, 0]);
+        this._scale.range([this.height(), 0]);
       }
     }
 
@@ -157,23 +162,23 @@ export module Abstract {
 
       switch(this._orientation) {
         case "bottom":
-          baselineAttrHash.x2 = this.availableWidth;
+          baselineAttrHash.x2 = this.width();
           break;
 
         case "top":
-          baselineAttrHash.x2 = this.availableWidth;
-          baselineAttrHash.y1 = this.availableHeight;
-          baselineAttrHash.y2 = this.availableHeight;
+          baselineAttrHash.x2 = this.width();
+          baselineAttrHash.y1 = this.height();
+          baselineAttrHash.y2 = this.height();
           break;
 
         case "left":
-          baselineAttrHash.x1 = this.availableWidth;
-          baselineAttrHash.x2 = this.availableWidth;
-          baselineAttrHash.y2 = this.availableHeight;
+          baselineAttrHash.x1 = this.width();
+          baselineAttrHash.x2 = this.width();
+          baselineAttrHash.y2 = this.height();
           break;
 
         case "right":
-          baselineAttrHash.y2 = this.availableHeight;
+          baselineAttrHash.y2 = this.height();
           break;
       }
 
@@ -205,13 +210,13 @@ export module Abstract {
           break;
 
         case "top":
-          tickMarkAttrHash["y1"] = this.availableHeight;
-          tickMarkAttrHash["y2"] = this.availableHeight - tickLength;
+          tickMarkAttrHash["y1"] = this.height();
+          tickMarkAttrHash["y2"] = this.height() - tickLength;
           break;
 
         case "left":
-          tickMarkAttrHash["x1"] = this.availableWidth;
-          tickMarkAttrHash["x2"] = this.availableWidth - tickLength;
+          tickMarkAttrHash["x1"] = this.width();
+          tickMarkAttrHash["x2"] = this.width() - tickLength;
           break;
 
         case "right":
@@ -243,7 +248,7 @@ export module Abstract {
     public width(w: any): Axis;
     public width(w?: any): any {
       if (w == null) {
-        return this.availableWidth;
+        return super.width();
       } else {
         if (this._isHorizontal()) {
           throw new Error("width cannot be set on a horizontal Axis");
@@ -251,7 +256,7 @@ export module Abstract {
         if (w !== "auto" && w < 0) {
           throw new Error("invalid value for width");
         }
-        this._width = w;
+        this._userRequestedWidth = w;
         this._invalidateLayout();
         return this;
       }
@@ -272,7 +277,7 @@ export module Abstract {
     public height(h: any): Axis;
     public height(h?: any): any {
       if (h == null) {
-        return this.availableHeight;
+        return super.height();
       } else {
         if (!this._isHorizontal()) {
           throw new Error("height cannot be set on a vertical Axis");
@@ -280,7 +285,7 @@ export module Abstract {
         if (h !== "auto" && h < 0) {
           throw new Error("invalid value for height");
         }
-        this._height = h;
+        this._userRequestedHeight = h;
         this._invalidateLayout();
         return this;
       }
@@ -480,8 +485,8 @@ export module Abstract {
         return (
           Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
           Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
-          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.availableWidth) &&
-          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.availableHeight)
+          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.width()) &&
+          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.height())
         );
       };
 
