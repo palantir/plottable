@@ -17,17 +17,15 @@ export module Plot {
       // the width is constant, so set the inner scale range to that
       var widthF = attrToProjector["width"];
       this.innerScale.range([0, widthF(null, 0)]);
-      attrToProjector["width"] = (d: any, i: number) => this.innerScale.rangeBand();
-      attrToProjector["x"] = (d: any) => d._PLOTTABLE_PROTECTED_FIELD_POSITION;
 
-      if(!this._isVertical) {
-        var widthFunction = attrToProjector["width"];
-        attrToProjector["width"] = attrToProjector["height"];
-        attrToProjector["height"] = widthFunction;
+      var innerWidthF = (d: any, i: number) => this.innerScale.rangeBand();
+      var heightF = attrToProjector["height"];
+      attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
+      attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
 
-        attrToProjector["y"] = attrToProjector["x"];
-        attrToProjector["x"] = () => 0;
-      }
+      var positionF = (d: any) => d._PLOTTABLE_PROTECTED_FIELD_POSITION;
+      attrToProjector["x"] = this._isVertical ? positionF : d3.functor(0);
+      attrToProjector["y"] = this._isVertical ? attrToProjector["y"] : positionF;
 
       return attrToProjector;
     }

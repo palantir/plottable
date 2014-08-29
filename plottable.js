@@ -5218,15 +5218,13 @@ var Plottable;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var widthF = attrToProjector["width"];
                 this.innerScale.range([0, widthF(null, 0)]);
-                attrToProjector["width"] = function (d, i) { return _this.innerScale.rangeBand(); };
-                attrToProjector["x"] = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_POSITION; };
-                if (!this._isVertical) {
-                    var widthFunction = attrToProjector["width"];
-                    attrToProjector["width"] = attrToProjector["height"];
-                    attrToProjector["height"] = widthFunction;
-                    attrToProjector["y"] = attrToProjector["x"];
-                    attrToProjector["x"] = function () { return 0; };
-                }
+                var innerWidthF = function (d, i) { return _this.innerScale.rangeBand(); };
+                var heightF = attrToProjector["height"];
+                attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
+                attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
+                var positionF = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_POSITION; };
+                attrToProjector["x"] = this._isVertical ? positionF : d3.functor(0);
+                attrToProjector["y"] = this._isVertical ? attrToProjector["y"] : positionF;
                 return attrToProjector;
             };
             ClusteredBar.prototype.cluster = function (accessor) {
