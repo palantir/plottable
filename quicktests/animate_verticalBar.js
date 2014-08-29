@@ -24,10 +24,22 @@ function run(div, data, Plottable) {
                                            [null,  xAxis]]);
   vBarChart.renderTo(svg);
 
+<<<<<<< HEAD
   var cb = function(x, y){
     d = vBarRenderer.dataSource().data();
     vBarRenderer.dataSource().data(d);
   };
+||||||| merged common ancestors
+  cb = function(x, y){
+    d = vBarRenderer.dataSource().data();
+    vBarRenderer.dataSource().data(d);
+  }  
+=======
+  cb = function(x, y){
+    d = vBarRenderer.dataset().data();
+    vBarRenderer.dataset().data(d);
+  }
+>>>>>>> rename-datasource
 
   window.xy = new Plottable.Interaction.Click(vBarRenderer)
     .callback(cb)

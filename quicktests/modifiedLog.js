@@ -29,13 +29,13 @@ function run(div, data, Plottable) {
     d4.forEach(bigger);
 
     //data
-    var dataseries1 = new Plottable.DataSource(d1);
+    var dataseries1 = new Plottable.Dataset(d1);
     dataseries1.metadata({name: "series1"});
-    var dataseries2 = new Plottable.DataSource(d2);
+    var dataseries2 = new Plottable.Dataset(d2);
     dataseries2.metadata({name: "series2"});
-    var dataseries3 = new Plottable.DataSource(d3);
+    var dataseries3 = new Plottable.Dataset(d3);
     dataseries3.metadata({name: "series3"});
-    var dataseries4 = new Plottable.DataSource(d4);
+    var dataseries4 = new Plottable.Dataset(d4);
     dataseries4.metadata({name: "series4"});
 
 

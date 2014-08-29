@@ -6,8 +6,8 @@ describe("Plots", () => {
   describe("Clustered Bar Plot", () => {
     var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
-    var dataset1: Plottable.DataSource;
-    var dataset2: Plottable.DataSource;
+    var dataset1: Plottable.Dataset;
+    var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Ordinal;
     var yScale: Plottable.Scale.Linear;
     var renderer: Plottable.Plot.ClusteredBar;
@@ -31,8 +31,8 @@ describe("Plots", () => {
         {x: "A", y: 2},
         {x: "B", y: 1}
       ];
-      dataset1 = new Plottable.DataSource(data1);
-      dataset2 = new Plottable.DataSource(data2);
+      dataset1 = new Plottable.Dataset(data1);
+      dataset2 = new Plottable.Dataset(data2);
 
       renderer = new Plottable.Plot.ClusteredBar(xScale, yScale);
       renderer.addDataset(data1);

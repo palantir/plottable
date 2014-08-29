@@ -25,10 +25,22 @@ function run(div, data, Plottable) {
                                            [null,  xAxis]]);
   circleChart.renderTo(svg);
 
+<<<<<<< HEAD
   var cb = function(x, y){
     d = circleRenderer.dataSource().data();
     circleRenderer.dataSource().data(d);
   };
+||||||| merged common ancestors
+  cb = function(x, y){
+    d = circleRenderer.dataSource().data();
+    circleRenderer.dataSource().data(d);
+  }  
+=======
+  cb = function(x, y){
+    d = circleRenderer.dataset().data();
+    circleRenderer.dataset().data(d);
+  }
+>>>>>>> rename-datasource
 
   window.xy = new Plottable.Interaction.Click(circleRenderer)
     .callback(cb)

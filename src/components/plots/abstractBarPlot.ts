@@ -47,7 +47,7 @@ export module Abstract {
 
     public _paint() {
       super._paint();
-      this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
+      this._bars = this.renderArea.selectAll("rect").data(this._dataset.data());
       this._bars.enter().append("rect");
 
       var primaryScale = this._isVertical ? this.yScale : this.xScale;

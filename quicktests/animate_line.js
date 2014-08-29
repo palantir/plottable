@@ -24,10 +24,22 @@ function run(div, data, Plottable) {
                                            [null,  xAxis]]);
   lineChart.renderTo(svg);
 
+<<<<<<< HEAD
   var cb = function(x, y){
     var d = lineRenderer.dataSource().data();
     lineRenderer.dataSource().data(d);
   };
+||||||| merged common ancestors
+    cb = function(x, y){
+    d = lineRenderer.dataSource().data();
+    lineRenderer.dataSource().data(d);
+  }  
+=======
+    cb = function(x, y){
+    d = lineRenderer.dataset().data();
+    lineRenderer.dataset().data(d);
+  }
+>>>>>>> rename-datasource
 
   var xy = new Plottable.Interaction.Click(lineRenderer)
     .callback(cb)

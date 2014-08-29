@@ -62,7 +62,7 @@ export module Plot {
         });
       });
       this.stackedExtent = [0, Util.Methods.max(currentBase)];
-      this._onDataSourceUpdate();
+      this._onDatasetUpdate();
       return stacks;
     }
 

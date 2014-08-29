@@ -24,10 +24,22 @@ function run(div, data, Plottable) {
                                            [null,  xAxis]]);
   hBarChart.renderTo(svg);
 
+<<<<<<< HEAD
   var cb = function(x, y){
     d = hBarRenderer.dataSource().data();
     hBarRenderer.dataSource().data(d);
   };
+||||||| merged common ancestors
+  cb = function(x, y){
+    d = hBarRenderer.dataSource().data();
+    hBarRenderer.dataSource().data(d);
+  }  
+=======
+  cb = function(x, y){
+    d = hBarRenderer.dataset().data();
+    hBarRenderer.dataset().data(d);
+  }
+>>>>>>> rename-datasource
 
   var click = new Plottable.Interaction.Click(hBarRenderer)
     .callback(cb)

@@ -24,10 +24,22 @@ function run(div, data, Plottable) {
                                            [null,  xAxis]]);
   areaChart.renderTo(svg);
 
+<<<<<<< HEAD
   var cb = function(x, y){
     d = areaRenderer.dataSource().data();
     areaRenderer.dataSource().data(d);
   };
+||||||| merged common ancestors
+  cb = function(x, y){
+    d = areaRenderer.dataSource().data();
+    areaRenderer.dataSource().data(d);
+  }  
+=======
+  cb = function(x, y){
+    d = areaRenderer.dataset().data();
+    areaRenderer.dataset().data(d);
+  }
+>>>>>>> rename-datasource
 
   new Plottable.Interaction.Click(areaRenderer)
     .callback(cb)

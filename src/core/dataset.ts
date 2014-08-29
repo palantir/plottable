@@ -5,13 +5,13 @@ module Plottable {
     accessor: IAccessor;
     extent: any[];
   }
-  export class DataSource extends Abstract.PlottableObject implements Core.IListenable {
+  export class Dataset extends Abstract.PlottableObject implements Core.IListenable {
     private _data: any[];
     private _metadata: any;
     private accessor2cachedExtent: Util.StrictEqualityAssociativeArray;
     public broadcaster = new Core.Broadcaster(this);
     /**
-     * Creates a new DataSource.
+     * Creates a new Dataset.
      *
      * @constructor
      * @param {any[]} data
@@ -34,9 +34,9 @@ module Plottable {
      * Sets new data.
      *
      * @param {any[]} data The new data.
-     * @returns {DataSource} The calling DataSource.
+     * @returns {Dataset} The calling Dataset.
      */
-    public data(data: any[]): DataSource;
+    public data(data: any[]): Dataset;
     public data(data?: any[]): any {
       if (data == null) {
         return this._data;
@@ -58,9 +58,9 @@ module Plottable {
      * Sets the metadata.
      *
      * @param {any} metadata The new metadata.
-     * @returns {DataSource} The calling DataSource.
+     * @returns {Dataset} The calling Dataset.
      */
-    public metadata(metadata: any): DataSource;
+    public metadata(metadata: any): Dataset;
     public metadata(metadata?: any): any {
       if (metadata == null) {
         return this._metadata;

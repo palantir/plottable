@@ -17,9 +17,9 @@ function run(div, data, Plottable) {
     };
 
 
-    var dataseries1 = new Plottable.DataSource(boringData());
-    var dataseries2 = new Plottable.DataSource(boringData());
-    var dataseries3 = new Plottable.DataSource(boringData());
+    var dataseries1 = new Plottable.Dataset(boringData());
+    var dataseries2 = new Plottable.Dataset(boringData());
+    var dataseries3 = new Plottable.Dataset(boringData());
 
 
     //Axis
@@ -67,19 +67,43 @@ function run(div, data, Plottable) {
     function yFocus(){
         yScale.domain([0, 8]);
     }
+<<<<<<< HEAD
     var xAutoInteraction = new
+||||||| merged common ancestors
+    xAutoInteraction = new            
+=======
+    xAutoInteraction = new
+>>>>>>> rename-datasource
         Plottable.Interaction.Click(autoXLabel)
         .callback(xAuto)
         .registerWithComponent();
+<<<<<<< HEAD
     var yAutoInteraction = new
+||||||| merged common ancestors
+    yAutoInteraction = new            
+=======
+    yAutoInteraction = new
+>>>>>>> rename-datasource
         Plottable.Interaction.Click(autoYLabel)
         .callback(yAuto)
         .registerWithComponent();
+<<<<<<< HEAD
     var xFocusInteraction = new
+||||||| merged common ancestors
+    xFocusInteraction = new            
+=======
+    xFocusInteraction = new
+>>>>>>> rename-datasource
         Plottable.Interaction.Click(focusXLabel)
         .callback(xFocus)
         .registerWithComponent();
+<<<<<<< HEAD
     var yFocusInteraction = new
+||||||| merged common ancestors
+    yFocusInteraction = new            
+=======
+    yFocusInteraction = new
+>>>>>>> rename-datasource
         Plottable.Interaction.Click(focusYLabel)
         .callback(yFocus)
         .registerWithComponent();

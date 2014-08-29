@@ -34,8 +34,8 @@ export module Plot {
       super._appendPath();
     }
 
-    public _onDataSourceUpdate() {
-      super._onDataSourceUpdate();
+    public _onDatasetUpdate() {
+      super._onDatasetUpdate();
       if (this.yScale != null) {
         this._updateYDomainer();
       }
@@ -47,7 +47,7 @@ export module Plot {
 
       var y0Projector = this._projectors["y0"];
       var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
-      var extent:  number[] = y0Accessor != null ? this.dataSource()._getExtent(y0Accessor) : [];
+      var extent:  number[] = y0Accessor != null ? this.dataset()._getExtent(y0Accessor) : [];
       var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
 
       if (!scale._userSetDomainer) {
@@ -83,7 +83,7 @@ export module Plot {
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
 
-      this.areaPath.datum(this._dataSource.data());
+      this.areaPath.datum(this._dataset.data());
 
       if (this._dataChanged) {
         attrToProjector["d"] = d3.svg.area()
