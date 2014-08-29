@@ -29,7 +29,7 @@ export module Animator {
      *
      * @constructor
      */
-    public Base() {
+    constructor() {
       this._duration = Base.DEFAULT_DURATION_MILLISECONDS;
       this._delay = Base.DEFAULT_DELAY_MILLISECONDS;
       this._easing = Base.DEFAULT_EASING;

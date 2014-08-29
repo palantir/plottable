@@ -5543,12 +5543,10 @@ var Plottable;
     (function (Animator) {
         var Base = (function () {
             function Base() {
-            }
-            Base.prototype.Base = function () {
                 this._duration = Base.DEFAULT_DURATION_MILLISECONDS;
                 this._delay = Base.DEFAULT_DELAY_MILLISECONDS;
                 this._easing = Base.DEFAULT_EASING;
-            };
+            }
             Base.prototype.animate = function (selection, attrToProjector) {
                 return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attrToProjector);
             };
@@ -5601,13 +5599,23 @@ var Plottable;
         var IterativeDelay = (function (_super) {
             __extends(IterativeDelay, _super);
             function IterativeDelay() {
-                _super.apply(this, arguments);
+                _super.call(this);
+                this._iterativeDelay = IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
             }
             IterativeDelay.prototype.animate = function (selection, attrToProjector) {
                 var _this = this;
-                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + IterativeDelay.ITERATIVE_DELAY_MILLISECONDS * i; }).attr(attrToProjector);
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS * i; }).attr(attrToProjector);
             };
-            IterativeDelay.ITERATIVE_DELAY_MILLISECONDS = 15;
+            IterativeDelay.prototype.iterativeDelay = function (iterDelay) {
+                if (iterDelay === undefined) {
+                    return this._iterativeDelay;
+                }
+                else {
+                    this._iterativeDelay = iterDelay;
+                    return this;
+                }
+            };
+            IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
             return IterativeDelay;
         })(Animator.Base);
         Animator.IterativeDelay = IterativeDelay;
