@@ -5446,36 +5446,43 @@ var Plottable;
     (function (Plot) {
         var StackedBar = (function (_super) {
             __extends(StackedBar, _super);
-            function StackedBar() {
-                _super.apply(this, arguments);
+            function StackedBar(xScale, yScale, isVertical) {
+                if (isVertical === void 0) { isVertical = true; }
+                _super.call(this, xScale, yScale);
                 this.stackedData = [];
-                this._isVertical = true;
                 this._baselineValue = 0;
                 this.stackedExtent = [];
+                this._isVertical = isVertical;
             }
             StackedBar.prototype._addDataset = function (key, dataset) {
                 _super.prototype._addDataset.call(this, key, dataset);
-                this.stackedData = this.stack(this._projectors["y"].accessor);
+                var accessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+                this.stackedData = this.stack(accessor);
             };
             StackedBar.prototype._updateAllProjectors = function () {
                 _super.prototype._updateAllProjectors.call(this);
                 if (this.yScale == null) {
                     return;
                 }
+                var primaryScale = this._isVertical ? this.yScale : this.xScale;
                 if (this._isAnchored && this.stackedExtent.length > 0) {
-                    this.yScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+                    primaryScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
                 }
                 else {
-                    this.yScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+                    primaryScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
             };
             StackedBar.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var primaryScale = this._isVertical ? this.yScale : this.xScale;
-                var getY0 = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0); };
-                var getY = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y); };
-                attrToProjector["height"] = function (d) { return Math.abs(getY(d) - getY0(d)); };
-                attrToProjector["y"] = function (d) { return getY(d); };
+                var getStart = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_START); };
+                var getEnd = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_END); };
+                var heightF = function (d) { return Math.abs(getEnd(d) - getStart(d)); };
+                var widthF = attrToProjector["width"];
+                attrToProjector["height"] = this._isVertical ? heightF : widthF;
+                attrToProjector["width"] = this._isVertical ? widthF : heightF;
+                var primaryAttr = this._isVertical ? "y" : "x";
+                attrToProjector[primaryAttr] = this._isVertical ? getEnd : function (d, i) { return getEnd(d) - heightF(d); };
                 return attrToProjector;
             };
             StackedBar.prototype.stack = function (accessor) {
@@ -5494,8 +5501,8 @@ var Plottable;
                     }
                     currentBase = Plottable.Util.Methods.addArrays(base, vals);
                     return data.map(function (d, i) {
-                        d["_PLOTTABLE_PROTECTED_FIELD_Y0"] = base[i];
-                        d["_PLOTTABLE_PROTECTED_FIELD_Y"] = currentBase[i];
+                        d["_PLOTTABLE_PROTECTED_FIELD_START"] = base[i];
+                        d["_PLOTTABLE_PROTECTED_FIELD_END"] = currentBase[i];
                         return d;
                     });
                 });

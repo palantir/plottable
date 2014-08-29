@@ -1136,9 +1136,9 @@ declare module Plottable {
         class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
             stackedData: any[][];
             _yAccessor: IAccessor;
-            _isVertical: boolean;
             _baselineValue: number;
             _baseline: D3.Selection;
+            constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale, isVertical?: boolean);
             _addDataset(key: string, dataset: any): void;
             _updateAllProjectors(): void;
             _generateAttrToProjector(): IAttributeToProjector;
