@@ -441,6 +441,7 @@ declare module Plottable {
             removeDataset(key: string): NewStylePlot;
             _getDatasetsInOrder(): DataSource[];
             _getDrawersInOrder(): _Drawer[];
+            _draw(attrToProjector: IAttributeToProjector): void;
         }
     }
 }
