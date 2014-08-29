@@ -5276,7 +5276,7 @@ var Plottable;
                 attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
                 attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
                 var positionF = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_POSITION; };
-                attrToProjector["x"] = this._isVertical ? positionF : d3.functor(0);
+                attrToProjector["x"] = this._isVertical ? positionF : attrToProjector["x"];
                 attrToProjector["y"] = this._isVertical ? attrToProjector["y"] : positionF;
                 return attrToProjector;
             };
