@@ -23,27 +23,27 @@ export module Animator {
       var startAttrToProjector: IAttributeToProjector = {};
       Rect.ANIMATED_ATTRIBUTES.forEach((attr: string) => startAttrToProjector[attr] = attrToProjector[attr]);
 
-      startAttrToProjector[this._getMovingAttr()] = this._startMovingAttrProjector(attrToProjector);
-      startAttrToProjector[this._getGrowingAttr()] = d3.functor(0);
+      startAttrToProjector[this.getMovingAttr()] = this._startMovingProjector(attrToProjector);
+      startAttrToProjector[this.getGrowingAttr()] = () => 0;
 
       selection.attr(startAttrToProjector);
       return super.animate(selection, attrToProjector);
     }
 
-    public _startMovingAttrProjector(attrToProjector: IAttributeToProjector) {
+    public _startMovingProjector(attrToProjector: IAttributeToProjector) {
       if (this.isVertical === this.isReverse) {
-        return attrToProjector[this._getMovingAttr()];
+        return attrToProjector[this.getMovingAttr()];
       }
-      var movingAttrProjector = attrToProjector[this._getMovingAttr()];
-      var growingAttrProjector = attrToProjector[this._getGrowingAttr()];
+      var movingAttrProjector = attrToProjector[this.getMovingAttr()];
+      var growingAttrProjector = attrToProjector[this.getGrowingAttr()];
       return (d: any, i: number) => movingAttrProjector(d, i) + growingAttrProjector(d, i);
     }
 
-    public _getGrowingAttr() {
+    private getGrowingAttr() {
       return this.isVertical ? "height" : "width";
     }
 
-    public _getMovingAttr() {
+    private getMovingAttr() {
       return this.isVertical ? "y" : "x";
     }
 
