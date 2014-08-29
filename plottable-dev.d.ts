@@ -714,6 +714,15 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
+        class Area extends Plottable.Abstract._Drawer {
+            draw(data: any[][], attrToProjector: IAttributeToProjector): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
         class Rect extends Plottable.Abstract._Drawer {
             draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
         }
@@ -1055,7 +1064,7 @@ declare module Plottable {
             _isVertical: boolean;
             _animators: IPlotAnimatorMap;
             constructor(xScale: Scale, yScale: Scale);
-            _getDrawer(key: string): _Drawer.Rect;
+            _getDrawer(key: string): Plottable._Drawer.Rect;
             _setup(): void;
             _paint(): void;
             baseline(value: number): any;
@@ -1075,6 +1084,33 @@ declare module Plottable {
             constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
             _generateAttrToProjector(): IAttributeToProjector;
             _paint(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class Stacked extends NewStylePlot {
+            _onDataSourceUpdate(): void;
+            _updateAllProjectors(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
+        class StackedArea extends Plottable.Abstract.Stacked {
+            _baseline: D3.Selection;
+            _baselineValue: number;
+            constructor(xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.QuantitativeScale);
+            _getDrawer(key: string): Plottable._Drawer.Area;
+            _setup(): void;
+            _paint(): void;
+            _updateYDomainer(): void;
+            _onDataSourceUpdate(): void;
+            _generateAttrToProjector(): IAttributeToProjector;
         }
     }
 }

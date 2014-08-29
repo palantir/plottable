@@ -3162,6 +3162,34 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (_Drawer) {
+        var Area = (function (_super) {
+            __extends(Area, _super);
+            function Area() {
+                _super.apply(this, arguments);
+            }
+            Area.prototype.draw = function (data, attrToProjector) {
+                var svgElement = "path";
+                var dataElements = this.renderArea.selectAll(svgElement).data(data);
+                dataElements.enter().append(svgElement);
+                dataElements.attr(attrToProjector).classed("area", true);
+                dataElements.exit().remove();
+            };
+            return Area;
+        })(Plottable.Abstract._Drawer);
+        _Drawer.Area = Area;
+    })(Plottable._Drawer || (Plottable._Drawer = {}));
+    var _Drawer = Plottable._Drawer;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (_Drawer) {
         var Rect = (function (_super) {
             __extends(Rect, _super);
             function Rect() {
@@ -5254,6 +5282,134 @@ var Plottable;
             return ClusteredBar;
         })(Plottable.Abstract.NewStyleBarPlot);
         Plot.ClusteredBar = ClusteredBar;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var Stacked = (function (_super) {
+            __extends(Stacked, _super);
+            function Stacked() {
+                _super.apply(this, arguments);
+                this.stackedExtent = [0, 0];
+            }
+            Stacked.prototype._onDataSourceUpdate = function () {
+                _super.prototype._onDataSourceUpdate.call(this);
+                if (this._datasetKeysInOrder != null && this._projectors["x"] != null && this._projectors["y"] != null) {
+                    this.stack();
+                }
+            };
+            Stacked.prototype.stack = function () {
+                var datasets = this._getDatasetsInOrder();
+                d3.layout.stack().x(this._projectors["x"].accessor).y(this._projectors["y"].accessor).values(function (d) { return d.data(); })(datasets);
+                this.stackedExtent = [0, 0];
+                var maxY = Plottable.Util.Methods.max(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum.y0; });
+                if (maxY > 0) {
+                    this.stackedExtent[1] = maxY;
+                }
+                var minY = Plottable.Util.Methods.min(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum.y0; });
+                if (minY < 0) {
+                    this.stackedExtent[0] = minY;
+                }
+            };
+            Stacked.prototype._updateAllProjectors = function () {
+                _super.prototype._updateAllProjectors.call(this);
+                if (this.yScale == null) {
+                    return;
+                }
+                if (this._isAnchored && this.stackedExtent.length > 0) {
+                    this.yScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+                }
+                else {
+                    this.yScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+                }
+            };
+            return Stacked;
+        })(Abstract.NewStylePlot);
+        Abstract.Stacked = Stacked;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Plot) {
+        var StackedArea = (function (_super) {
+            __extends(StackedArea, _super);
+            function StackedArea(xScale, yScale) {
+                _super.call(this, xScale, yScale);
+                this._baselineValue = 0;
+                this.classed("area-plot", true);
+                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
+            }
+            StackedArea.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Area(key);
+            };
+            StackedArea.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._baseline = this.renderArea.append("line").classed("baseline", true);
+            };
+            StackedArea.prototype._paint = function () {
+                _super.prototype._paint.call(this);
+                var scaledBaseline = this.yScale.scale(this._baselineValue);
+                var baselineAttr = {
+                    "x1": 0,
+                    "y1": scaledBaseline,
+                    "x2": this.width(),
+                    "y2": scaledBaseline
+                };
+                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
+                var attrToProjector = this._generateAttrToProjector();
+                var xFunction = attrToProjector["x"];
+                var y0Function = attrToProjector["y0"];
+                var yFunction = attrToProjector["y"];
+                delete attrToProjector["x"];
+                delete attrToProjector["y0"];
+                delete attrToProjector["y"];
+                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+                var fillProjector = attrToProjector["fill"];
+                attrToProjector["fill"] = function (d, i) { return fillProjector(d[0], i); };
+                var datasets = this._getDatasetsInOrder();
+                this._getDrawersInOrder().forEach(function (drawer, i) {
+                    drawer.draw([datasets[i].data()], attrToProjector);
+                });
+            };
+            StackedArea.prototype._updateYDomainer = function () {
+                _super.prototype._updateYDomainer.call(this);
+                var scale = this.yScale;
+                if (!scale._userSetDomainer) {
+                    scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
+                    scale._autoDomainIfAutomaticMode();
+                }
+            };
+            StackedArea.prototype._onDataSourceUpdate = function () {
+                _super.prototype._onDataSourceUpdate.call(this);
+                Plot.Area.prototype._onDataSourceUpdate.apply(this);
+            };
+            StackedArea.prototype._generateAttrToProjector = function () {
+                var _this = this;
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                attrToProjector["y"] = function (d) { return _this.yScale.scale(d.y + d.y0); };
+                attrToProjector["y0"] = function (d) { return _this.yScale.scale(d.y0); };
+                return attrToProjector;
+            };
+            return StackedArea;
+        })(Plottable.Abstract.Stacked);
+        Plot.StackedArea = StackedArea;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
