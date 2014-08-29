@@ -1202,9 +1202,7 @@ declare module Plottable {
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
             animate(selection: any, attrToProjector: IAttributeToProjector): any;
-            _startMovingAttrProjector(attrToProjector: IAttributeToProjector): IAppliedAccessor;
-            _getGrowingAttr(): string;
-            _getMovingAttr(): string;
+            _startMovingProjector(attrToProjector: IAttributeToProjector): IAppliedAccessor;
         }
     }
 }

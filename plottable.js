@@ -5618,23 +5618,23 @@ var Plottable;
             Rect.prototype.animate = function (selection, attrToProjector) {
                 var startAttrToProjector = {};
                 Rect.ANIMATED_ATTRIBUTES.forEach(function (attr) { return startAttrToProjector[attr] = attrToProjector[attr]; });
-                startAttrToProjector[this._getMovingAttr()] = this._startMovingAttrProjector(attrToProjector);
-                startAttrToProjector[this._getGrowingAttr()] = d3.functor(0);
+                startAttrToProjector[this.getMovingAttr()] = this._startMovingProjector(attrToProjector);
+                startAttrToProjector[this.getGrowingAttr()] = function () { return 0; };
                 selection.attr(startAttrToProjector);
                 return _super.prototype.animate.call(this, selection, attrToProjector);
             };
-            Rect.prototype._startMovingAttrProjector = function (attrToProjector) {
+            Rect.prototype._startMovingProjector = function (attrToProjector) {
                 if (this.isVertical === this.isReverse) {
-                    return attrToProjector[this._getMovingAttr()];
+                    return attrToProjector[this.getMovingAttr()];
                 }
-                var movingAttrProjector = attrToProjector[this._getMovingAttr()];
-                var growingAttrProjector = attrToProjector[this._getGrowingAttr()];
+                var movingAttrProjector = attrToProjector[this.getMovingAttr()];
+                var growingAttrProjector = attrToProjector[this.getGrowingAttr()];
                 return function (d, i) { return movingAttrProjector(d, i) + growingAttrProjector(d, i); };
             };
-            Rect.prototype._getGrowingAttr = function () {
+            Rect.prototype.getGrowingAttr = function () {
                 return this.isVertical ? "height" : "width";
             };
-            Rect.prototype._getMovingAttr = function () {
+            Rect.prototype.getMovingAttr = function () {
                 return this.isVertical ? "y" : "x";
             };
             Rect.ANIMATED_ATTRIBUTES = ["height", "width", "x", "y", "fill"];
