@@ -884,6 +884,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Stacked extends NewStylePlot {
+            project(attrToSet: string, accessor: any, scale?: Scale): Stacked;
         }
     }
 }

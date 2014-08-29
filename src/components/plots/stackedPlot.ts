@@ -16,6 +16,16 @@ export module Abstract {
       }
     }
 
+    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
+      super.project(attrToSet, accessor, scale);
+      // HACKHACK d3.stack.layout errors on empty datasets
+      if (this._datasetKeysInOrder.length > 0 &&
+          attrToSet === "y") {
+        this.stack();
+      }
+      return this;
+    }
+
     private stack() {
       var datasets = this._getDatasetsInOrder();
       d3.layout.stack()

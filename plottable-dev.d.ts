@@ -1108,6 +1108,7 @@ declare module Plottable {
     module Abstract {
         class Stacked extends NewStylePlot {
             _onDataSourceUpdate(): void;
+            project(attrToSet: string, accessor: any, scale?: Scale): Stacked;
             _updateAllProjectors(): void;
         }
     }
