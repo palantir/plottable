@@ -4,9 +4,9 @@ module Plottable {
 export module Animator {
 
   /**
-   * The default animator implementation with easing, duration, and delay.
+   * The base animator implementation with easing, duration, and delay.
    */
-  export class Default implements IPlotAnimator {
+  export class Base implements IPlotAnimator {
     /**
      * The default duration of the animation in milliseconds
      */
@@ -29,10 +29,10 @@ export module Animator {
      *
      * @constructor
      */
-    public Default() {
-      this._duration = Default.DEFAULT_DURATION_MILLISECONDS;
-      this._delay = Default.DEFAULT_DELAY_MILLISECONDS;
-      this._easing = Default.DEFAULT_EASING;
+    public Base() {
+      this._duration = Base.DEFAULT_DURATION_MILLISECONDS;
+      this._delay = Base.DEFAULT_DELAY_MILLISECONDS;
+      this._easing = Base.DEFAULT_EASING;
     }
 
     public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection {
@@ -55,7 +55,7 @@ export module Animator {
      * @param {number} duration The duration in milliseconds.
      * @returns {Default} The calling Default Animator.
      */
-    public duration(duration: number): Default;
+    public duration(duration: number): Base;
     public duration(duration?: number): any{
       if (duration === undefined) {
         return this._duration;
@@ -77,7 +77,7 @@ export module Animator {
      * @param {number} delay The delay in milliseconds.
      * @returns {Default} The calling Default Animator.
      */
-    public delay(delay: number): Default;
+    public delay(delay: number): Base;
     public delay(delay?: number): any{
       if (delay === undefined) {
         return this._delay;
@@ -99,7 +99,7 @@ export module Animator {
      * @param {string} easing The desired easing mode.
      * @returns {Default} The calling Default Animator.
      */
-    public easing(easing: string): Default;
+    public easing(easing: string): Base;
     public easing(easing?: string): any{
       if (easing === undefined) {
         return this._easing;

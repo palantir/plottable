@@ -9,7 +9,7 @@ export module Animator {
    *
    * The delay between animations can be configured with the .delay getter/setter.
    */
-  export class IterativeDelay extends Default {
+  export class IterativeDelay extends Base {
     /**
      * The delay between each start of an animation
      */

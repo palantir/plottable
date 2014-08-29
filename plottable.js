@@ -5023,7 +5023,7 @@ var Plottable;
                 _super.call(this, dataset, xScale, yScale);
                 this._animators = {
                     "line-reset": new Plottable.Animator.Null(),
-                    "line": new Plottable.Animator.Default().duration(600).easing("exp-in-out")
+                    "line": new Plottable.Animator.Base().duration(600).easing("exp-in-out")
                 };
                 this.classed("line-plot", true);
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; });
@@ -5114,7 +5114,7 @@ var Plottable;
                 this.project("fill-opacity", function () { return 0.25; });
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; });
                 this._animators["area-reset"] = new Plottable.Animator.Null();
-                this._animators["area"] = new Plottable.Animator.Default().duration(600).easing("exp-in-out");
+                this._animators["area"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
             Area.prototype._appendPath = function () {
                 this.areaPath = this.renderArea.append("path").classed("area", true);
@@ -5541,18 +5541,18 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     (function (Animator) {
-        var Default = (function () {
-            function Default() {
+        var Base = (function () {
+            function Base() {
             }
-            Default.prototype.Default = function () {
-                this._duration = Default.DEFAULT_DURATION_MILLISECONDS;
-                this._delay = Default.DEFAULT_DELAY_MILLISECONDS;
-                this._easing = Default.DEFAULT_EASING;
+            Base.prototype.Base = function () {
+                this._duration = Base.DEFAULT_DURATION_MILLISECONDS;
+                this._delay = Base.DEFAULT_DELAY_MILLISECONDS;
+                this._easing = Base.DEFAULT_EASING;
             };
-            Default.prototype.animate = function (selection, attrToProjector) {
+            Base.prototype.animate = function (selection, attrToProjector) {
                 return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attrToProjector);
             };
-            Default.prototype.duration = function (duration) {
+            Base.prototype.duration = function (duration) {
                 if (duration === undefined) {
                     return this._duration;
                 }
@@ -5561,7 +5561,7 @@ var Plottable;
                     return this;
                 }
             };
-            Default.prototype.delay = function (delay) {
+            Base.prototype.delay = function (delay) {
                 if (delay === undefined) {
                     return this._delay;
                 }
@@ -5570,7 +5570,7 @@ var Plottable;
                     return this;
                 }
             };
-            Default.prototype.easing = function (easing) {
+            Base.prototype.easing = function (easing) {
                 if (easing === undefined) {
                     return this._easing;
                 }
@@ -5579,12 +5579,12 @@ var Plottable;
                     return this;
                 }
             };
-            Default.DEFAULT_DURATION_MILLISECONDS = 300;
-            Default.DEFAULT_DELAY_MILLISECONDS = 0;
-            Default.DEFAULT_EASING = "exp-out";
-            return Default;
+            Base.DEFAULT_DURATION_MILLISECONDS = 300;
+            Base.DEFAULT_DELAY_MILLISECONDS = 0;
+            Base.DEFAULT_EASING = "exp-out";
+            return Base;
         })();
-        Animator.Default = Default;
+        Animator.Base = Base;
     })(Plottable.Animator || (Plottable.Animator = {}));
     var Animator = Plottable.Animator;
 })(Plottable || (Plottable = {}));
@@ -5609,7 +5609,7 @@ var Plottable;
             };
             IterativeDelay.ITERATIVE_DELAY_MILLISECONDS = 15;
             return IterativeDelay;
-        })(Animator.Default);
+        })(Animator.Base);
         Animator.IterativeDelay = IterativeDelay;
     })(Plottable.Animator || (Plottable.Animator = {}));
     var Animator = Plottable.Animator;
@@ -5650,7 +5650,7 @@ var Plottable;
             };
             Rect.ANIMATED_ATTRIBUTES = ["height", "width", "x", "y"];
             return Rect;
-        })(Animator.Default);
+        })(Animator.Base);
         Animator.Rect = Rect;
     })(Plottable.Animator || (Plottable.Animator = {}));
     var Animator = Plottable.Animator;
