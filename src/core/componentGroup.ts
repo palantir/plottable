@@ -23,17 +23,10 @@ export module Component {
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
       var requests = this._components.map((c: Abstract.Component) => c._requestedSpace(offeredWidth, offeredHeight));
       return {
-<<<<<<< HEAD
-        width : isEmpty ? 0 : d3.max(requests, (request: _ISpaceRequest) => request.width ),
-        height: isEmpty ? 0 : d3.max(requests, (request: _ISpaceRequest) => request.height),
-        wantsWidth : isEmpty ? false : requests.map((r: _ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
-        wantsHeight: isEmpty ? false : requests.map((r: _ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
-=======
-        width : Util.Methods.max(requests, (request: ISpaceRequest) => request.width ),
-        height: Util.Methods.max(requests, (request: ISpaceRequest) => request.height),
-        wantsWidth : requests.map((r: ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
-        wantsHeight: requests.map((r: ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
->>>>>>> develop
+        width : _Util.Methods.max(requests, (request: _ISpaceRequest) => request.width ),
+        height: _Util.Methods.max(requests, (request: _ISpaceRequest) => request.height),
+        wantsWidth : requests.map((r: _ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
+        wantsHeight: requests.map((r: _ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
       };
     }
 
@@ -48,11 +41,7 @@ export module Component {
                   availableHeight?: number): Group {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
       this._components.forEach((c) => {
-<<<<<<< HEAD
-        c._computeLayout(0, 0, this._availableWidth, this._availableHeight);
-=======
         c._computeLayout(0, 0, this.width(), this.height());
->>>>>>> develop
       });
       return this;
     }

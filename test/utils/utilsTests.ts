@@ -2,11 +2,7 @@
 
 var assert = chai.assert;
 
-<<<<<<< HEAD
-describe("_Util.s", () => {
-=======
-describe("Util.Methods", () => {
->>>>>>> develop
+describe("_Util.Methods", () => {
   it("inRange works correct", () => {
     assert.isTrue(Plottable._Util.Methods.inRange(0, -1, 1), "basic functionality works");
     assert.isTrue(Plottable._Util.Methods.inRange(0, 0, 1), "it is a closed interval");
@@ -49,8 +45,8 @@ describe("Util.Methods", () => {
   it("max/min work as expected", () => {
     var alist = [1,2,3,4,5];
     var dbl = (x: number) => x * 2;
-    var max = Plottable.Util.Methods.max;
-    var min = Plottable.Util.Methods.min;
+    var max = Plottable._Util.Methods.max;
+    var min = Plottable._Util.Methods.min;
     assert.deepEqual(max(alist), 5, "max works as expected on plain array");
     assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
     assert.deepEqual(max(alist, dbl), 10, "max applies function appropriately");

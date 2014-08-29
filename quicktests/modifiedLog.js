@@ -28,12 +28,6 @@ function run(div, data, Plottable) {
     var d4 = data[0].slice(0, 20);
     d4.forEach(bigger);
 
-<<<<<<< HEAD
-    // console.log(d1, d2, d3, d4);
-
-
-=======
->>>>>>> develop
     //data
     var dataseries1 = new Plottable.DataSource(d1);
     dataseries1.metadata({name: "series1"});

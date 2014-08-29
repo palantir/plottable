@@ -125,11 +125,7 @@ export module Axis {
       var endDate = interval.timeUnit.offset(startDate, interval.step);
       if (endDate > this._scale.domain()[1]) {
         // this offset is too large, so just return available width
-<<<<<<< HEAD
-        return this._availableWidth;
-=======
         return this.width();
->>>>>>> develop
       }
       // measure how much space one date can get
       var stepLength = Math.abs(this._scale.scale(endDate) - this._scale.scale(startDate));
@@ -140,11 +136,7 @@ export module Axis {
       // compute number of ticks
       // if less than a certain threshold
       var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
-<<<<<<< HEAD
-      var stepLength = Math.min(this.getIntervalLength(interval), this._availableWidth);
-=======
       var stepLength = Math.min(this.getIntervalLength(interval), this.width());
->>>>>>> develop
       return worst < stepLength;
     }
 
@@ -214,11 +206,7 @@ export module Axis {
       tickLabelsEnter.append("text");
       var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
       var yTranslate = (this._orientation === "bottom" ? (this._maxLabelTickLength() / 2 * height) :
-<<<<<<< HEAD
-          (this._availableHeight - this._maxLabelTickLength() / 2 * height + 2 * this.tickLabelPadding()));
-=======
           (this.height() - this._maxLabelTickLength() / 2 * height + 2 * this.tickLabelPadding()));
->>>>>>> develop
       var textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
         _Util.DOM.translate(textSelection, xTranslate, yTranslate);
@@ -242,11 +230,7 @@ export module Axis {
           startPosition = this._scale.scale(position);
       }
 
-<<<<<<< HEAD
-      return endPosition < this._availableWidth && startPosition > 0;
-=======
       return endPosition < this.width() && startPosition > 0;
->>>>>>> develop
     }
 
     private adjustTickLength(height: number, interval: _ITimeInterval) {
@@ -258,11 +242,7 @@ export module Axis {
           tickValues.map((x: Date) => x.valueOf()).indexOf(d.valueOf()) >= 0
       );
       if (this._orientation === "top") {
-<<<<<<< HEAD
-        height = this._availableHeight - height;
-=======
         height = this.height() - height;
->>>>>>> develop
       }
       selection.attr("y2", height);
     }

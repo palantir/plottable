@@ -31,16 +31,6 @@ function run(div, data, Plottable) {
                           .renderTo(svg);
 
     //callbacks
-<<<<<<< HEAD
-            cb_drag = function(start, end) {
-                if (start == null || end == null) {return;}
-                var minX = Math.min(start.x, end.x);
-                var maxX = Math.max(start.x, end.x);
-                var minY = Math.min(start.y, end.y);
-                var maxY = Math.max(start.y, end.y);
-                barPlot.selectBar({min: minX, max: maxX},
-                                  {min: minY, max: maxY},
-=======
             var cb_drag = function(xy) {
                 if (xy == null) {return;}
                 var invertedXMin = xScale.invert(xy.xMin);
@@ -49,7 +39,6 @@ function run(div, data, Plottable) {
                 var invertedYMax = yScale.invert(xy.yMin);
                 barPlot.selectBar({min: xy.xMin, max: xy.xMax},
                                        {min: xy.yMin, max: xy.yMax},
->>>>>>> develop
                                        true);
                 drag_interaction.clearBox();
             };

@@ -11,7 +11,6 @@ export module Plot {
     public _baseline: D3.Selection;
     private stackedExtent: number[] = [];
 
-<<<<<<< HEAD
     /**
      * Constructs a StackedBarPlot.
      *
@@ -26,8 +25,6 @@ export module Plot {
       super(xScale, yScale);
     }
 
-=======
->>>>>>> develop
     public _addDataset(key: string, dataset: any) {
       super._addDataset(key, dataset);
       this.stackedData = this.stack(this._projectors["y"].accessor);
@@ -58,13 +55,8 @@ export module Plot {
     private stack(accessor: _IAccessor) {
       var datasets = d3.values(this._key2DatasetDrawerKey);
       var lengths = datasets.map((d) => d.dataset.data().length);
-<<<<<<< HEAD
-      if (_Util.Methods.uniqNumbers(lengths).length > 1) {
+      if (_Util.Methods.uniq(lengths).length > 1) {
         _Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
-=======
-      if (Util.Methods.uniq(lengths).length > 1) {
-        Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
->>>>>>> develop
       }
       var currentBase = _Util.Methods.createFilledArray(0, lengths[0]);
       var stacks = this._getDatasetsInOrder().map((dataset) => {
@@ -82,7 +74,7 @@ export module Plot {
           return d;
         });
       });
-      this.stackedExtent = [0, Util.Methods.max(currentBase)];
+      this.stackedExtent = [0, _Util.Methods.max(currentBase)];
       this._onDataSourceUpdate();
       return stacks;
     }

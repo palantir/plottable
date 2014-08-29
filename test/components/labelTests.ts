@@ -17,13 +17,8 @@ describe("Labels", () => {
     assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
 
     var text = content.select("text");
-<<<<<<< HEAD
     var bbox = Plottable._Util.DOM.getBBox(text);
-    assert.closeTo(bbox.height, label._availableHeight, 0.5, "text height === label.minimumHeight()");
-=======
-    var bbox = Plottable.Util.DOM.getBBox(text);
     assert.closeTo(bbox.height, label.height(), 0.5, "text height === label.minimumHeight()");
->>>>>>> develop
     assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
     svg.remove();
   });
@@ -34,15 +29,9 @@ describe("Labels", () => {
     label.renderTo(svg);
     var content = label._content;
     var text = content.select("text");
-<<<<<<< HEAD
     var textBBox = Plottable._Util.DOM.getBBox(text);
     assertBBoxInclusion(label._element.select(".bounding-box"), text);
-    assert.closeTo(textBBox.height, label._availableWidth, window.Pixel_CloseTo_Requirement, "text height");
-=======
-    var textBBox = Plottable.Util.DOM.getBBox(text);
-    assertBBoxInclusion(label.element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
->>>>>>> develop
     svg.remove();
   });
 
@@ -52,15 +41,9 @@ describe("Labels", () => {
     label.renderTo(svg);
     var content = label._content;
     var text = content.select("text");
-<<<<<<< HEAD
     var textBBox = Plottable._Util.DOM.getBBox(text);
     assertBBoxInclusion(label._element.select(".bounding-box"), text);
-    assert.closeTo(textBBox.height, label._availableWidth, window.Pixel_CloseTo_Requirement, "text height");
-=======
-    var textBBox = Plottable.Util.DOM.getBBox(text);
-    assertBBoxInclusion(label.element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
->>>>>>> develop
     svg.remove();
   });
 
@@ -68,21 +51,12 @@ describe("Labels", () => {
     var svg = generateSVG(400, 80);
     var label = new Plottable.Component.TitleLabel();
     label.renderTo(svg);
-<<<<<<< HEAD
     assert.equal(label._content.select("text").text(), "", "the text defaulted to empty string");
-    assert.equal(label._availableHeight, 0, "rowMin is 0 for empty string");
-    label.text("hello world");
-    label.renderTo(svg);
-    assert.equal(label._content.select("text").text(), "hello world", "the label text updated properly");
-    assert.operator(label._availableHeight, ">", 0, "rowMin is > 0 for non-empty string");
-=======
-    assert.equal(label.content.select("text").text(), "", "the text defaulted to empty string");
     assert.equal(label.height(), 0, "rowMin is 0 for empty string");
     label.text("hello world");
     label.renderTo(svg);
-    assert.equal(label.content.select("text").text(), "hello world", "the label text updated properly");
+    assert.equal(label._content.select("text").text(), "hello world", "the label text updated properly");
     assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
->>>>>>> develop
     svg.remove();
   });
 
@@ -94,13 +68,8 @@ describe("Labels", () => {
     label.renderTo(svg);
     var content = label._content;
     var text = content.select("text");
-<<<<<<< HEAD
     var bbox = Plottable._Util.DOM.getBBox(text);
-    assert.equal(bbox.height, label._availableHeight, "text height === label.minimumHeight()");
-=======
-    var bbox = Plottable.Util.DOM.getBBox(text);
     assert.equal(bbox.height, label.height(), "text height === label.minimumHeight()");
->>>>>>> develop
     assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
     svg.remove();
   });
@@ -132,11 +101,7 @@ describe("Labels", () => {
     var label = new Plottable.Component.TitleLabel("foo");
     label.renderTo(svg);
     label.text("");
-<<<<<<< HEAD
-    assert.equal(label._availableWidth, 0, "width updated to 0");
-=======
     assert.equal(label.width(), 0, "width updated to 0");
->>>>>>> develop
     svg.remove();
   });
 

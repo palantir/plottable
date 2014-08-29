@@ -1,15 +1,15 @@
 
 declare module Plottable {
-    module Util {
+    module _Util {
         module Methods {
             function inRange(x: number, a: number, b: number): boolean;
             function warn(warning: string): void;
             function addArrays(alist: number[], blist: number[]): number[];
             function intersection<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
-            function _accessorize(accessor: any): IAccessor;
+            function accessorize(accessor: any): _IAccessor;
             function union<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
             function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T>;
-            function _applyAccessor(accessor: IAccessor, plot: Plottable.Abstract.Plot): (d: any, i: number) => any;
+            function applyAccessor(accessor: _IAccessor, plot: Plottable.Abstract.Plot): (d: any, i: number) => any;
             function uniq<T>(arr: T[]): T[];
             function createFilledArray<T>(value: T, count: number): T[];
             function createFilledArray<T>(func: (index?: number) => T, count: number): T[];
@@ -26,17 +26,17 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
+    module _Util {
         module OpenSource {
             function sortedIndex(val: number, arr: number[]): number;
-            function sortedIndex(val: number, arr: any[], accessor: IAccessor): number;
+            function sortedIndex(val: number, arr: any[], accessor: _IAccessor): number;
         }
     }
 }
 
 
 declare module Plottable {
-    module Util {
+    module _Util {
         class IDCounter {
             increment(id: any): number;
             decrement(id: any): number;
@@ -47,7 +47,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
+    module _Util {
         class StrictEqualityAssociativeArray {
             set(key: any, value: any): boolean;
             get(key: any): any;
@@ -62,7 +62,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
+    module _Util {
         class Cache<T> {
             constructor(compute: (k: string) => T, canonicalKey?: string, valueEq?: (v: T, w: T) => boolean);
             get(k: string): T;
@@ -73,7 +73,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
+    module _Util {
         module Text {
             var HEIGHT_TEXT: string;
             interface Dimensions {
@@ -90,7 +90,7 @@ declare module Plottable {
                 clear(): CachingCharacterMeasurer;
             }
             function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;
-            function _addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
+            function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
             function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
                 width: number;
                 height: number;
@@ -116,7 +116,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
+    module _Util {
         module WordWrap {
             interface IWrappedText {
                 originalText: string;
@@ -130,7 +130,7 @@ declare module Plottable {
 }
 
 declare module Plottable {
-    module Util {
+    module _Util {
         module DOM {
             function getBBox(element: D3.Selection): SVGRect;
             var POLYFILL_TIMEOUT_MSEC: number;
@@ -225,7 +225,7 @@ declare module Plottable {
         data(data: any[]): DataSource;
         metadata(): any;
         metadata(metadata: any): DataSource;
-        _getExtent(accessor: IAccessor): any[];
+        _getExtent(accessor: _IAccessor): any[];
     }
 }
 
@@ -234,13 +234,11 @@ declare module Plottable {
     module Abstract {
         class Component extends PlottableObject {
             static AUTORESIZE_BY_DEFAULT: boolean;
-            element: D3.Selection;
-            content: D3.Selection;
-            backgroundContainer: D3.Selection;
-            foregroundContainer: D3.Selection;
+            _element: D3.Selection;
+            _content: D3.Selection;
+            _backgroundContainer: D3.Selection;
+            _foregroundContainer: D3.Selection;
             clipPathEnabled: boolean;
-            xOrigin: number;
-            yOrigin: number;
             _parent: ComponentContainer;
             _xAlignProportion: number;
             _yAlignProportion: number;
@@ -250,13 +248,14 @@ declare module Plottable {
             _isAnchored: boolean;
             _anchor(element: D3.Selection): void;
             _setup(): void;
-            _requestedSpace(availableWidth: number, availableHeight: number): ISpaceRequest;
+            _requestedSpace(availableWidth: number, availableHeight: number): _ISpaceRequest;
             _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             _render(): void;
             _scheduleComputeLayout(): void;
             _doRender(): void;
             _invalidateLayout(): void;
-            renderTo(element: any): Component;
+            renderTo(selector: String): Component;
+            renderTo(element: D3.Selection): Component;
             resize(width?: number, height?: number): Component;
             autoResize(flag: boolean): Component;
             xAlign(alignment: string): Component;
@@ -299,7 +298,7 @@ declare module Plottable {
     module Component {
         class Group extends Plottable.Abstract.ComponentContainer {
             constructor(components?: Plottable.Abstract.Component[]);
-            _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest;
             merge(c: Plottable.Abstract.Component): Group;
             _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
             _isFixedWidth(): boolean;
@@ -311,7 +310,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
-        interface IterateLayoutResult {
+        interface _IterateLayoutResult {
             colProportionalSpace: number[];
             rowProportionalSpace: number[];
             guaranteedWidths: number[];
@@ -323,7 +322,7 @@ declare module Plottable {
             constructor(rows?: Plottable.Abstract.Component[][]);
             addComponent(row: number, col: number, component: Plottable.Abstract.Component): Table;
             _removeComponent(component: Plottable.Abstract.Component): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             padding(rowPadding: number, colPadding: number): Table;
             rowWeight(index: number, weight: number): Table;
@@ -356,8 +355,8 @@ declare module Plottable {
             range(): any[];
             range(values: any[]): Scale;
             copy(): Scale;
-            updateExtent(plotProvidedKey: string, attr: string, extent: any[]): Scale;
-            removeExtent(plotProvidedKey: string, attr: string): Scale;
+            _updateExtent(plotProvidedKey: string, attr: string, extent: any[]): Scale;
+            _removeExtent(plotProvidedKey: string, attr: string): Scale;
         }
     }
 }
@@ -368,10 +367,9 @@ declare module Plottable {
         class Plot extends Component {
             _dataSource: DataSource;
             _dataChanged: boolean;
-            renderArea: D3.Selection;
-            element: D3.Selection;
+            _renderArea: D3.Selection;
             _animate: boolean;
-            _animators: Plottable.Animator.IPlotAnimatorMap;
+            _animators: IPlotAnimatorMap;
             _ANIMATION_DURATION: number;
             _projectors: {
                 [x: string]: _IProjector;
@@ -394,8 +392,8 @@ declare module Plottable {
             _updateAllProjectors(): void;
             _updateProjector(attr: string): void;
             _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any;
-            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
-            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
+            animator(animatorKey: string): IPlotAnimator;
+            animator(animatorKey: string, animator: IPlotAnimator): Plot;
         }
     }
 }
@@ -404,8 +402,8 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class XYPlot extends Plot {
-            xScale: Scale;
-            yScale: Scale;
+            _xScale: Scale;
+            _yScale: Scale;
             constructor(dataset: any, xScale: Scale, yScale: Scale);
             project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
@@ -417,11 +415,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    interface DatasetDrawerKey {
-        dataset: DataSource;
-        drawer: Plottable.Abstract._Drawer;
-        key: string;
-    }
     module Abstract {
         class NewStylePlot extends XYPlot {
             _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
@@ -486,21 +479,9 @@ declare module Plottable {
     module Core {
         module ResizeBroadcaster {
             function resizing(): boolean;
-            function clearResizing(): any;
+            function clearResizing(): void;
             function register(c: Plottable.Abstract.Component): void;
             function deregister(c: Plottable.Abstract.Component): void;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Animator {
-        interface IPlotAnimator {
-            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
-        }
-        interface IPlotAnimatorMap {
-            [animatorKey: string]: IPlotAnimator;
         }
     }
 }
@@ -514,14 +495,14 @@ declare module Plottable {
         cssClass?: string;
         color?: string;
     }
-    interface IAccessor {
+    interface _IAccessor {
         (datum: any, index?: number, metadata?: any): any;
     }
     interface IAppliedAccessor {
         (datum: any, index: number): any;
     }
     interface _IProjector {
-        accessor: IAccessor;
+        accessor: _IAccessor;
         scale?: Plottable.Abstract.Scale;
         attribute: string;
     }
@@ -534,15 +515,17 @@ declare module Plottable {
         yMin: number;
         yMax: number;
     }
-    interface FullSelectionArea {
-        pixel: SelectionArea;
-        data: SelectionArea;
-    }
-    interface ISpaceRequest {
+    interface _ISpaceRequest {
         width: number;
         height: number;
         wantsWidth: boolean;
         wantsHeight: boolean;
+    }
+    interface _IPixelArea {
+        xMin: number;
+        xMax: number;
+        yMin: number;
+        yMax: number;
     }
     interface IExtent {
         min: number;
@@ -551,6 +534,17 @@ declare module Plottable {
     interface Point {
         x: number;
         y: number;
+    }
+    interface IPlotAnimator {
+        animate(selection: any, attrToProjector: IAttributeToProjector): any;
+    }
+    interface IPlotAnimatorMap {
+        [animatorKey: string]: IPlotAnimator;
+    }
+    interface DatasetDrawerKey {
+        dataset: DataSource;
+        drawer: Plottable.Abstract._Drawer;
+        key: string;
     }
 }
 
@@ -583,13 +577,7 @@ declare module Plottable {
             domain(): any[];
             domain(values: any[]): QuantitativeScale;
             _setDomain(values: any[]): void;
-            interpolate(): D3.Transition.Interpolate;
-            interpolate(factory: D3.Transition.Interpolate): QuantitativeScale;
-            rangeRound(values: number[]): QuantitativeScale;
-            clamp(): boolean;
-            clamp(clamp: boolean): QuantitativeScale;
             ticks(count?: number): any[];
-            tickFormat(count: number, format?: string): (n: number) => string;
             _niceDomain(domain: any[], count?: number): any[];
             domainer(): Domainer;
             domainer(domainer: Domainer): QuantitativeScale;
@@ -677,7 +665,7 @@ declare module Plottable {
         class Time extends Plottable.Abstract.QuantitativeScale {
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            tickInterval(interval: D3.Time.Interval, step?: number): any[];
+            _tickInterval(interval: D3.Time.Interval, step?: number): any[];
             domain(): any[];
             domain(values: any[]): Time;
             copy(): Time;
@@ -702,7 +690,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
+    module _Util {
         class ScaleDomainCoordinator {
             constructor(scales: Plottable.Abstract.Scale[]);
             rescale(scale: Plottable.Abstract.Scale): void;
@@ -714,7 +702,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class _Drawer {
-            renderArea: D3.Selection;
+            _renderArea: D3.Selection;
             key: string;
             constructor(key: string);
             remove(): void;
@@ -754,7 +742,7 @@ declare module Plottable {
             _isHorizontal(): boolean;
             _computeWidth(): number;
             _computeHeight(): number;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest;
             _isFixedHeight(): boolean;
             _isFixedWidth(): boolean;
             _rescale(): void;
@@ -803,7 +791,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Axis {
-        interface ITimeInterval {
+        interface _ITimeInterval {
             timeUnit: D3.Time.Interval;
             step: number;
             formatString: string;
@@ -812,15 +800,15 @@ declare module Plottable {
             _majorTickLabels: D3.Selection;
             _minorTickLabels: D3.Selection;
             _scale: Plottable.Scale.Time;
-            static minorIntervals: ITimeInterval[];
-            static majorIntervals: ITimeInterval[];
+            static _minorIntervals: _ITimeInterval[];
+            static _majorIntervals: _ITimeInterval[];
             constructor(scale: Plottable.Scale.Time, orientation: string);
             _computeHeight(): number;
             _setup(): void;
-            _getTickIntervalValues(interval: ITimeInterval): any[];
+            _getTickIntervalValues(interval: _ITimeInterval): any[];
             _getTickValues(): any[];
             _measureTextHeight(container: D3.Selection): number;
-            _doRender(): void;
+            _doRender(): Time;
         }
     }
 }
@@ -853,9 +841,9 @@ declare module Plottable {
             constructor(scale: Plottable.Scale.Ordinal, orientation?: string, formatter?: (d: any) => string);
             _setup(): void;
             _rescale(): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest;
             _getTickValues(): string[];
-            _doRender(): void;
+            _doRender(): Category;
             _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
         }
     }
@@ -868,7 +856,7 @@ declare module Plottable {
             constructor(displayText?: string, orientation?: string);
             xAlign(alignment: string): Label;
             yAlign(alignment: string): Label;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest;
             _setup(): void;
             text(): string;
             text(displayText: string): Label;
@@ -897,14 +885,14 @@ declare module Plottable {
             static SUBELEMENT_CLASS: string;
             constructor(colorScale?: Plottable.Scale.Color);
             remove(): void;
-            toggleCallback(callback: ToggleCallback): Legend;
             toggleCallback(): ToggleCallback;
-            hoverCallback(callback: HoverCallback): Legend;
+            toggleCallback(callback: ToggleCallback): Legend;
             hoverCallback(): HoverCallback;
-            scale(scale: Plottable.Scale.Color): Legend;
+            hoverCallback(callback: HoverCallback): Legend;
             scale(): Plottable.Scale.Color;
+            scale(scale: Plottable.Scale.Color): Legend;
             _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest;
             _doRender(): void;
         }
     }
@@ -918,7 +906,7 @@ declare module Plottable {
             static LEGEND_ENTRY_CLASS: string;
             constructor(colorScale: Plottable.Scale.Color);
             remove(): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest;
             _doRender(): void;
         }
     }
@@ -940,7 +928,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Scatter extends Plottable.Abstract.XYPlot {
-            _animators: Plottable.Animator.IPlotAnimatorMap;
+            _animators: IPlotAnimatorMap;
             constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.Scale);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale): Scatter;
             _paint(): void;
@@ -952,10 +940,10 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Grid extends Plottable.Abstract.XYPlot {
-            colorScale: Plottable.Abstract.Scale;
-            xScale: Plottable.Scale.Ordinal;
-            yScale: Plottable.Scale.Ordinal;
-            _animators: Plottable.Animator.IPlotAnimatorMap;
+            _colorScale: Plottable.Abstract.Scale;
+            _xScale: Plottable.Scale.Ordinal;
+            _yScale: Plottable.Scale.Ordinal;
+            _animators: IPlotAnimatorMap;
             constructor(dataset: any, xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale): Grid;
             _paint(): void;
@@ -975,7 +963,7 @@ declare module Plottable {
                 [x: string]: number;
             };
             _isVertical: boolean;
-            _animators: Plottable.Animator.IPlotAnimatorMap;
+            _animators: IPlotAnimatorMap;
             constructor(dataset: any, xScale: Scale, yScale: Scale);
             _setup(): void;
             _paint(): void;
@@ -1015,7 +1003,6 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
-            isVertical: boolean;
             constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.Scale);
             _updateXDomainer(): void;
             _generateAttrToProjector(): IAttributeToProjector;
@@ -1027,7 +1014,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Line extends Plottable.Abstract.XYPlot {
-            _animators: Plottable.Animator.IPlotAnimatorMap;
+            _animators: IPlotAnimatorMap;
             constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.Scale);
             _setup(): void;
             _appendPath(): void;
@@ -1062,12 +1049,11 @@ declare module Plottable {
             static _barAlignmentToFactor: {
                 [x: string]: number;
             };
-            static DEFAULT_WIDTH: number;
             _baseline: D3.Selection;
             _baselineValue: number;
             _barAlignmentFactor: number;
             _isVertical: boolean;
-            _animators: Plottable.Animator.IPlotAnimatorMap;
+            _animators: IPlotAnimatorMap;
             constructor(xScale: Scale, yScale: Scale);
             _getDrawer(key: string): _Drawer.Rect;
             _setup(): void;
@@ -1085,7 +1071,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
-            static DEFAULT_WIDTH: number;
             _isVertical: boolean;
             constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
             _generateAttrToProjector(): IAttributeToProjector;
@@ -1098,11 +1083,11 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
-            stackedData: any[][];
-            _yAccessor: IAccessor;
+            _yAccessor: _IAccessor;
             _isVertical: boolean;
             _baselineValue: number;
             _baseline: D3.Selection;
+            constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
             _addDataset(key: string, dataset: any): void;
             _updateAllProjectors(): void;
             _generateAttrToProjector(): IAttributeToProjector;
@@ -1228,8 +1213,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class PanZoom extends Plottable.Abstract.Interaction {
-            xScale: Plottable.Abstract.QuantitativeScale;
-            yScale: Plottable.Abstract.QuantitativeScale;
+            _xScale: Plottable.Abstract.QuantitativeScale;
+            _yScale: Plottable.Abstract.QuantitativeScale;
             constructor(componentToListenTo: Plottable.Abstract.Component, xScale?: Plottable.Abstract.QuantitativeScale, yScale?: Plottable.Abstract.QuantitativeScale);
             resetZoom(): void;
             _anchor(hitBox: D3.Selection): void;
@@ -1256,8 +1241,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Drag extends Plottable.Abstract.Interaction {
-            origin: number[];
-            location: number[];
+            _origin: number[];
+            _location: number[];
             constructor(componentToListenTo: Plottable.Abstract.Component);
             dragstart(): (startLocation: Point) => void;
             dragstart(cb: (startLocation: Point) => any): Drag;
@@ -1357,19 +1342,19 @@ declare module Plottable {
     module Template {
         class StandardChart extends Plottable.Component.Table {
             constructor();
-            yAxis(y: Plottable.Abstract.Axis): StandardChart;
             yAxis(): Plottable.Abstract.Axis;
-            xAxis(x: Plottable.Abstract.Axis): StandardChart;
+            yAxis(y: Plottable.Abstract.Axis): StandardChart;
             xAxis(): Plottable.Abstract.Axis;
+            xAxis(x: Plottable.Abstract.Axis): StandardChart;
+            yLabel(): Plottable.Component.AxisLabel;
             yLabel(y: Plottable.Component.AxisLabel): StandardChart;
             yLabel(y: string): StandardChart;
-            yLabel(): Plottable.Component.AxisLabel;
+            xLabel(): Plottable.Component.AxisLabel;
             xLabel(x: Plottable.Component.AxisLabel): StandardChart;
             xLabel(x: string): StandardChart;
-            xLabel(): Plottable.Component.AxisLabel;
+            titleLabel(): Plottable.Component.TitleLabel;
             titleLabel(x: Plottable.Component.TitleLabel): StandardChart;
             titleLabel(x: string): StandardChart;
-            titleLabel(): Plottable.Component.TitleLabel;
             center(c: Plottable.Abstract.Component): StandardChart;
         }
     }

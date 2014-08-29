@@ -29,15 +29,11 @@ export module Plot {
 
     public _setup() {
       super._setup();
-<<<<<<< HEAD
-      this.linePath = this._renderArea.append("path").classed("line", true);
-=======
       this._appendPath();
     }
 
     public _appendPath() {
-      this.linePath = this.renderArea.append("path").classed("line", true);
->>>>>>> develop
+      this.linePath = this._renderArea.append("path").classed("line", true);
     }
 
     public _getResetYFunction() {

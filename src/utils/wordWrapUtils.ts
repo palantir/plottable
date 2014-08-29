@@ -60,7 +60,7 @@ export module _Util {
     export function canWrapWithoutBreakingWords(text: string, width: number, widthMeasure: (s: string) => number): boolean {
       var tokens = tokenize(text);
       var widths = tokens.map(widthMeasure);
-      var maxWidth = Util.Methods.max(widths);
+      var maxWidth = _Util.Methods.max(widths);
       return maxWidth <= width;
     }
 

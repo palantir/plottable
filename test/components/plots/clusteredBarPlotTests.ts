@@ -40,11 +40,7 @@ describe("Plots", () => {
       renderer.baseline(0);
       var xAxis = new Plottable.Axis.Category(xScale, "bottom");
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
-<<<<<<< HEAD
-      axisHeight = xAxis._availableHeight;
-=======
       axisHeight = xAxis.height();
->>>>>>> develop
       bandWidth = xScale.rangeBand();
     });
 

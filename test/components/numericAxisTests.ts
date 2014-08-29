@@ -251,12 +251,7 @@ describe("NumericAxis", () => {
                           .filter(function(d: any, i: number) {
                             return d3.select(this).style("visibility") === "visible";
                           });
-<<<<<<< HEAD
-    var numLabels = visibleTickLabels[0].length;
     var boundingBox: ClientRect = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
-=======
-    var boundingBox: ClientRect = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
->>>>>>> develop
     var labelBox: ClientRect;
     visibleTickLabels[0].forEach((label: Element) => {
       labelBox = label.getBoundingClientRect();
@@ -264,12 +259,12 @@ describe("NumericAxis", () => {
     });
 
     scale.domain([50000000000, -50000000000]);
-    visibleTickLabels = numericAxis.element
+    visibleTickLabels = numericAxis._element
                           .selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS)
                           .filter(function(d: any, i: number) {
                             return d3.select(this).style("visibility") === "visible";
                           });
-    boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
+    boundingBox = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
     visibleTickLabels[0].forEach((label: Element) => {
       labelBox = label.getBoundingClientRect();
       assertBoxInside(labelBox, boundingBox, 0, "long tick " + label.textContent + " is inside the bounding box");
@@ -297,12 +292,7 @@ describe("NumericAxis", () => {
                           .filter(function(d: any, i: number) {
                             return d3.select(this).style("visibility") === "visible";
                           });
-<<<<<<< HEAD
-    var numLabels = visibleTickLabels[0].length;
     var boundingBox: ClientRect = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
-=======
-    var boundingBox: ClientRect = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
->>>>>>> develop
     var labelBox: ClientRect;
     visibleTickLabels[0].forEach((label: Element) => {
       labelBox = label.getBoundingClientRect();

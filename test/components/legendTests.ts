@@ -37,19 +37,11 @@ describe("Legends", () => {
     assert.equal(legend._requestedSpace(200, 200).height, 0, "there is no requested height when domain is empty");
     color.domain(["foo", "bar"]);
     var height1 = legend._requestedSpace(400, 400).height;
-<<<<<<< HEAD
-    var actualHeight1 = legend._availableHeight;
-    assert.operator(height1, ">", 0, "changing the domain gives a positive height");
-    color.domain(["foo", "bar", "baz"]);
-    assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
-    var actualHeight2 = legend._availableHeight;
-=======
     var actualHeight1 = legend.height();
     assert.operator(height1, ">", 0, "changing the domain gives a positive height");
     color.domain(["foo", "bar", "baz"]);
     assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
     var actualHeight2 = legend.height();
->>>>>>> develop
     assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
     var numRows = legend._content.selectAll(".legend-row")[0].length;
     assert.equal(numRows, 3, "there are 3 rows");
@@ -545,7 +537,7 @@ describe("HorizontalLegend", () => {
   it("renders an entry for each item in the domain", () => {
     var svg = generateSVG(400, 100);
     horizLegend.renderTo(svg);
-    var entries = horizLegend.element.selectAll(entrySelector);
+    var entries = horizLegend._element.selectAll(entrySelector);
     assert.equal(entries[0].length, colorScale.domain().length, "one entry is created for each item in the domain");
 
     var elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
@@ -555,7 +547,7 @@ describe("HorizontalLegend", () => {
     newDomain.push("Madison");
     colorScale.domain(newDomain);
 
-    entries = horizLegend.element.selectAll(entrySelector);
+    entries = horizLegend._element.selectAll(entrySelector);
     assert.equal(entries[0].length, colorScale.domain().length, "Legend updated to include item added to the domain");
 
     svg.remove();
@@ -565,7 +557,7 @@ describe("HorizontalLegend", () => {
     var svg = generateSVG(200, 100);
     horizLegend.renderTo(svg);
 
-    var rows = horizLegend.element.selectAll(rowSelector);
+    var rows = horizLegend._element.selectAll(rowSelector);
     assert.lengthOf(rows[0], 2, "Wrapped text on to two rows when space is constrained");
 
     horizLegend.detach();
@@ -573,7 +565,7 @@ describe("HorizontalLegend", () => {
     svg = generateSVG(100, 100);
     horizLegend.renderTo(svg);
 
-    rows = horizLegend.element.selectAll(rowSelector);
+    rows = horizLegend._element.selectAll(rowSelector);
     assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
 
     svg.remove();
@@ -583,20 +575,20 @@ describe("HorizontalLegend", () => {
     var svg = generateSVG(70, 400);
     horizLegend.renderTo(svg);
 
-    var textEls = horizLegend.element.selectAll("text");
+    var textEls = horizLegend._element.selectAll("text");
     textEls.each(function(d: any) {
       var textEl = d3.select(this);
-      assertBBoxInclusion(horizLegend.element, textEl);
+      assertBBoxInclusion(horizLegend._element, textEl);
     });
 
     horizLegend.detach();
     svg.remove();
     svg = generateSVG(100, 50);
     horizLegend.renderTo(svg);
-    textEls = horizLegend.element.selectAll("text");
+    textEls = horizLegend._element.selectAll("text");
     textEls.each(function(d: any) {
       var textEl = d3.select(this);
-      assertBBoxInclusion(horizLegend.element, textEl);
+      assertBBoxInclusion(horizLegend._element, textEl);
     });
 
     svg.remove();
@@ -607,14 +599,14 @@ describe("HorizontalLegend", () => {
     var svg = generateSVG(400, 100);
     horizLegend.renderTo(svg);
 
-    var style = horizLegend.element.append("style");
+    var style = horizLegend._element.append("style");
     style.attr("type", "text/css");
 
     function verifyCircleHeight() {
-      var text = horizLegend.content.select("text");
-      var circle = horizLegend.content.select("circle");
-      var textHeight = Plottable.Util.DOM.getBBox(text).height;
-      var circleHeight = Plottable.Util.DOM.getBBox(circle).height;
+      var text = horizLegend._content.select("text");
+      var circle = horizLegend._content.select("circle");
+      var textHeight = Plottable._Util.DOM.getBBox(text).height;
+      var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
       assert.operator(circleHeight, "<", textHeight, "Icon is smaller than entry text");
       return circleHeight;
     }

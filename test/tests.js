@@ -588,22 +588,17 @@ describe("NumericAxis", function () {
         var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
-<<<<<<< HEAD
-        var numLabels = visibleTickLabels[0].length;
         var boundingBox = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
-=======
-        var boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
->>>>>>> develop
         var labelBox;
         visibleTickLabels[0].forEach(function (label) {
             labelBox = label.getBoundingClientRect();
             assert.isTrue(boxIsInside(labelBox, boundingBox), "tick labels don't extend outside the bounding box");
         });
         scale.domain([50000000000, -50000000000]);
-        visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+        visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
-        boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
+        boundingBox = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
         visibleTickLabels[0].forEach(function (label) {
             labelBox = label.getBoundingClientRect();
             assertBoxInside(labelBox, boundingBox, 0, "long tick " + label.textContent + " is inside the bounding box");
@@ -623,12 +618,7 @@ describe("NumericAxis", function () {
         var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
-<<<<<<< HEAD
-        var numLabels = visibleTickLabels[0].length;
         var boundingBox = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
-=======
-        var boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
->>>>>>> develop
         var labelBox;
         visibleTickLabels[0].forEach(function (label) {
             labelBox = label.getBoundingClientRect();
@@ -710,13 +700,8 @@ describe("Gridlines", function () {
         var basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
         basicTable._anchor(svg);
         basicTable._computeLayout();
-<<<<<<< HEAD
-        xScale.range([0, xAxis._availableWidth]);
-        yScale.range([yAxis._availableHeight, 0]);
-=======
         xScale.range([0, xAxis.width()]);
         yScale.range([yAxis.height(), 0]);
->>>>>>> develop
         basicTable._render();
         var xAxisTickMarks = xAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS)[0];
         var xGridlines = gridlines._element.select(".x-gridlines").selectAll("line")[0];
@@ -755,13 +740,8 @@ describe("Labels", function () {
         var textChildren = content.selectAll("text");
         assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
         var text = content.select("text");
-<<<<<<< HEAD
         var bbox = Plottable._Util.DOM.getBBox(text);
-        assert.closeTo(bbox.height, label._availableHeight, 0.5, "text height === label.minimumHeight()");
-=======
-        var bbox = Plottable.Util.DOM.getBBox(text);
         assert.closeTo(bbox.height, label.height(), 0.5, "text height === label.minimumHeight()");
->>>>>>> develop
         assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
@@ -771,15 +751,9 @@ describe("Labels", function () {
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
-<<<<<<< HEAD
         var textBBox = Plottable._Util.DOM.getBBox(text);
         assertBBoxInclusion(label._element.select(".bounding-box"), text);
-        assert.closeTo(textBBox.height, label._availableWidth, window.Pixel_CloseTo_Requirement, "text height");
-=======
-        var textBBox = Plottable.Util.DOM.getBBox(text);
-        assertBBoxInclusion(label.element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
->>>>>>> develop
         svg.remove();
     });
     it("Right-rotated text is handled properly", function () {
@@ -788,36 +762,21 @@ describe("Labels", function () {
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
-<<<<<<< HEAD
         var textBBox = Plottable._Util.DOM.getBBox(text);
         assertBBoxInclusion(label._element.select(".bounding-box"), text);
-        assert.closeTo(textBBox.height, label._availableWidth, window.Pixel_CloseTo_Requirement, "text height");
-=======
-        var textBBox = Plottable.Util.DOM.getBBox(text);
-        assertBBoxInclusion(label.element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
->>>>>>> develop
         svg.remove();
     });
     it("Label text can be changed after label is created", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.Component.TitleLabel();
         label.renderTo(svg);
-<<<<<<< HEAD
         assert.equal(label._content.select("text").text(), "", "the text defaulted to empty string");
-        assert.equal(label._availableHeight, 0, "rowMin is 0 for empty string");
-        label.text("hello world");
-        label.renderTo(svg);
-        assert.equal(label._content.select("text").text(), "hello world", "the label text updated properly");
-        assert.operator(label._availableHeight, ">", 0, "rowMin is > 0 for non-empty string");
-=======
-        assert.equal(label.content.select("text").text(), "", "the text defaulted to empty string");
         assert.equal(label.height(), 0, "rowMin is 0 for empty string");
         label.text("hello world");
         label.renderTo(svg);
-        assert.equal(label.content.select("text").text(), "hello world", "the label text updated properly");
+        assert.equal(label._content.select("text").text(), "hello world", "the label text updated properly");
         assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
->>>>>>> develop
         svg.remove();
     });
     it.skip("Superlong text is handled in a sane fashion", function () {
@@ -827,13 +786,8 @@ describe("Labels", function () {
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
-<<<<<<< HEAD
         var bbox = Plottable._Util.DOM.getBBox(text);
-        assert.equal(bbox.height, label._availableHeight, "text height === label.minimumHeight()");
-=======
-        var bbox = Plottable.Util.DOM.getBBox(text);
         assert.equal(bbox.height, label.height(), "text height === label.minimumHeight()");
->>>>>>> develop
         assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
         svg.remove();
     });
@@ -861,11 +815,7 @@ describe("Labels", function () {
         var label = new Plottable.Component.TitleLabel("foo");
         label.renderTo(svg);
         label.text("");
-<<<<<<< HEAD
-        assert.equal(label._availableWidth, 0, "width updated to 0");
-=======
         assert.equal(label.width(), 0, "width updated to 0");
->>>>>>> develop
         svg.remove();
     });
     it("unsupported alignments and orientations are unsupported", function () {
@@ -904,19 +854,11 @@ describe("Legends", function () {
         assert.equal(legend._requestedSpace(200, 200).height, 0, "there is no requested height when domain is empty");
         color.domain(["foo", "bar"]);
         var height1 = legend._requestedSpace(400, 400).height;
-<<<<<<< HEAD
-        var actualHeight1 = legend._availableHeight;
-        assert.operator(height1, ">", 0, "changing the domain gives a positive height");
-        color.domain(["foo", "bar", "baz"]);
-        assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
-        var actualHeight2 = legend._availableHeight;
-=======
         var actualHeight1 = legend.height();
         assert.operator(height1, ">", 0, "changing the domain gives a positive height");
         color.domain(["foo", "bar", "baz"]);
         assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
         var actualHeight2 = legend.height();
->>>>>>> develop
         assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
         var numRows = legend._content.selectAll(".legend-row")[0].length;
         assert.equal(numRows, 3, "there are 3 rows");
@@ -1324,46 +1266,46 @@ describe("HorizontalLegend", function () {
     it("renders an entry for each item in the domain", function () {
         var svg = generateSVG(400, 100);
         horizLegend.renderTo(svg);
-        var entries = horizLegend.element.selectAll(entrySelector);
+        var entries = horizLegend._element.selectAll(entrySelector);
         assert.equal(entries[0].length, colorScale.domain().length, "one entry is created for each item in the domain");
         var elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
         assert.deepEqual(elementTexts, colorScale.domain(), "entry texts match scale domain");
         var newDomain = colorScale.domain();
         newDomain.push("Madison");
         colorScale.domain(newDomain);
-        entries = horizLegend.element.selectAll(entrySelector);
+        entries = horizLegend._element.selectAll(entrySelector);
         assert.equal(entries[0].length, colorScale.domain().length, "Legend updated to include item added to the domain");
         svg.remove();
     });
     it("wraps entries onto extra rows if necessary", function () {
         var svg = generateSVG(200, 100);
         horizLegend.renderTo(svg);
-        var rows = horizLegend.element.selectAll(rowSelector);
+        var rows = horizLegend._element.selectAll(rowSelector);
         assert.lengthOf(rows[0], 2, "Wrapped text on to two rows when space is constrained");
         horizLegend.detach();
         svg.remove();
         svg = generateSVG(100, 100);
         horizLegend.renderTo(svg);
-        rows = horizLegend.element.selectAll(rowSelector);
+        rows = horizLegend._element.selectAll(rowSelector);
         assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
         svg.remove();
     });
     it("truncates and hides entries if space is constrained", function () {
         var svg = generateSVG(70, 400);
         horizLegend.renderTo(svg);
-        var textEls = horizLegend.element.selectAll("text");
+        var textEls = horizLegend._element.selectAll("text");
         textEls.each(function (d) {
             var textEl = d3.select(this);
-            assertBBoxInclusion(horizLegend.element, textEl);
+            assertBBoxInclusion(horizLegend._element, textEl);
         });
         horizLegend.detach();
         svg.remove();
         svg = generateSVG(100, 50);
         horizLegend.renderTo(svg);
-        textEls = horizLegend.element.selectAll("text");
+        textEls = horizLegend._element.selectAll("text");
         textEls.each(function (d) {
             var textEl = d3.select(this);
-            assertBBoxInclusion(horizLegend.element, textEl);
+            assertBBoxInclusion(horizLegend._element, textEl);
         });
         svg.remove();
     });
@@ -1371,13 +1313,13 @@ describe("HorizontalLegend", function () {
         colorScale.domain(["A"]);
         var svg = generateSVG(400, 100);
         horizLegend.renderTo(svg);
-        var style = horizLegend.element.append("style");
+        var style = horizLegend._element.append("style");
         style.attr("type", "text/css");
         function verifyCircleHeight() {
-            var text = horizLegend.content.select("text");
-            var circle = horizLegend.content.select("circle");
-            var textHeight = Plottable.Util.DOM.getBBox(text).height;
-            var circleHeight = Plottable.Util.DOM.getBBox(circle).height;
+            var text = horizLegend._content.select("text");
+            var circle = horizLegend._content.select("circle");
+            var textHeight = Plottable._Util.DOM.getBBox(text).height;
+            var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
             assert.operator(circleHeight, "<", textHeight, "Icon is smaller than entry text");
             return circleHeight;
         }
@@ -2007,11 +1949,7 @@ describe("Plots", function () {
                 renderer.animate(false);
                 var yAxis = new Plottable.Axis.Category(yScale, "left");
                 var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
-<<<<<<< HEAD
-                axisWidth = yAxis._availableWidth;
-=======
                 axisWidth = yAxis.width();
->>>>>>> develop
                 bandWidth = yScale.rangeBand();
                 xScale.domainer(xScale.domainer().pad(0));
             });
@@ -2308,11 +2246,7 @@ describe("Plots", function () {
             renderer.baseline(0);
             var xAxis = new Plottable.Axis.Category(xScale, "bottom");
             var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
-<<<<<<< HEAD
-            axisHeight = xAxis._availableHeight;
-=======
             axisHeight = xAxis.height();
->>>>>>> develop
             bandWidth = xScale.rangeBand();
         });
         beforeEach(function () {
@@ -2392,11 +2326,7 @@ describe("Plots", function () {
             renderer.baseline(0);
             var xAxis = new Plottable.Axis.Category(xScale, "bottom");
             var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
-<<<<<<< HEAD
-            axisHeight = xAxis._availableHeight;
-=======
             axisHeight = xAxis.height();
->>>>>>> develop
             bandWidth = xScale.rangeBand();
         });
         beforeEach(function () {
@@ -2788,24 +2718,14 @@ describe("Component behavior", function () {
         it("computeLayout defaults and updates intelligently", function () {
             c._anchor(svg);
             c._computeLayout();
-<<<<<<< HEAD
-            assert.equal(c._availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
-            assert.equal(c._availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
-=======
             assert.equal(c.width(), SVG_WIDTH, "computeLayout defaulted width to svg width");
             assert.equal(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
->>>>>>> develop
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
             assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
             svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
             c._computeLayout();
-<<<<<<< HEAD
-            assert.equal(c._availableWidth, 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
-            assert.equal(c._availableHeight, 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
-=======
             assert.equal(c.width(), 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
             assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
->>>>>>> develop
             assert.equal(c.xOrigin, 0, "xOrigin is still 0");
             assert.equal(c.yOrigin, 0, "yOrigin is still 0");
             svg.remove();
@@ -2817,35 +2737,20 @@ describe("Component behavior", function () {
             svg.attr("width", null).attr("height", null);
             c._anchor(svg);
             c._computeLayout();
-<<<<<<< HEAD
-            assert.equal(c._availableWidth, 400, "defaults to width of parent if width is not specified on <svg>");
-            assert.equal(c._availableHeight, 200, "defaults to height of parent if width is not specified on <svg>");
-=======
             assert.equal(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
             assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
->>>>>>> develop
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
             assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
             svg.style("width", "50%").style("height", "50%");
             c._computeLayout();
-<<<<<<< HEAD
-            assert.equal(c._availableWidth, 200, "computeLayout defaulted width to svg width");
-            assert.equal(c._availableHeight, 100, "computeLayout defaulted height to svg height");
-=======
             assert.equal(c.width(), 200, "computeLayout defaulted width to svg width");
             assert.equal(c.height(), 100, "computeLayout defaulted height to svg height");
->>>>>>> develop
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
             assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
             svg.style("width", "25%").style("height", "25%");
             c._computeLayout();
-<<<<<<< HEAD
-            assert.equal(c._availableWidth, 100, "computeLayout updated width to new svg width");
-            assert.equal(c._availableHeight, 50, "computeLayout updated height to new svg height");
-=======
             assert.equal(c.width(), 100, "computeLayout updated width to new svg width");
             assert.equal(c.height(), 50, "computeLayout updated height to new svg height");
->>>>>>> develop
             assert.equal(c.xOrigin, 0, "xOrigin is still 0");
             assert.equal(c.yOrigin, 0, "yOrigin is still 0");
             parent.style("width", "auto");
@@ -2872,13 +2777,8 @@ describe("Component behavior", function () {
             c._computeLayout(xOff, yOff, width, height);
             var translate = getTranslate(c._element);
             assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
-<<<<<<< HEAD
-            assert.equal(c._availableWidth, width, "the width set properly");
-            assert.equal(c._availableHeight, height, "the height set propery");
-=======
             assert.equal(c.width(), width, "the width set properly");
             assert.equal(c.height(), height, "the height set propery");
->>>>>>> develop
             svg.remove();
         });
     });
@@ -3071,21 +2971,12 @@ describe("Component behavior", function () {
         var c = makeFixedSizeComponent(10, 10);
         cg._addComponent(c);
         cg.renderTo(svg);
-<<<<<<< HEAD
-        assert.equal(cg._availableHeight, 10, "availableHeight initially 10 for fixed-size component");
-        assert.equal(cg._availableWidth, 10, "availableWidth initially 10 for fixed-size component");
-        fixComponentSize(c, 50, 50);
-        c._invalidateLayout();
-        assert.equal(cg._availableHeight, 50, "invalidateLayout propagated to parent and caused resized height");
-        assert.equal(cg._availableWidth, 50, "invalidateLayout propagated to parent and caused resized width");
-=======
         assert.equal(cg.height(), 10, "height() initially 10 for fixed-size component");
         assert.equal(cg.width(), 10, "width() initially 10 for fixed-size component");
         fixComponentSize(c, 50, 50);
         c._invalidateLayout();
         assert.equal(cg.height(), 50, "invalidateLayout propagated to parent and caused resized height");
         assert.equal(cg.width(), 50, "invalidateLayout propagated to parent and caused resized width");
->>>>>>> develop
         svg.remove();
     });
     it("components can be detached even if not anchored", function () {
@@ -3930,11 +3821,7 @@ describe("Scales", function () {
             assert.deepEqual(b.slice().reverse(), b.slice().sort(function (x, y) { return x - y; }));
             var ticks = scale.ticks();
             assert.deepEqual(ticks, ticks.slice().sort(function (x, y) { return x - y; }), "ticks should be sorted");
-<<<<<<< HEAD
-            assert.deepEqual(ticks, Plottable._Util.Methods.uniqNumbers(ticks), "ticks should not be repeated");
-=======
-            assert.deepEqual(ticks, Plottable.Util.Methods.uniq(ticks), "ticks should not be repeated");
->>>>>>> develop
+            assert.deepEqual(ticks, Plottable._Util.Methods.uniq(ticks), "ticks should not be repeated");
             var beforePivot = ticks.filter(function (x) { return x <= -base; });
             var afterPivot = ticks.filter(function (x) { return base <= x; });
             var betweenPivots = ticks.filter(function (x) { return -base < x && x < base; });
@@ -4635,11 +4522,7 @@ describe("_Util.Text", function () {
 });
 
 var assert = chai.assert;
-<<<<<<< HEAD
-describe("_Util.s", function () {
-=======
-describe("Util.Methods", function () {
->>>>>>> develop
+describe("_Util.Methods", function () {
     it("inRange works correct", function () {
         assert.isTrue(Plottable._Util.Methods.inRange(0, -1, 1), "basic functionality works");
         assert.isTrue(Plottable._Util.Methods.inRange(0, 0, 1), "it is a closed interval");
@@ -4673,8 +4556,8 @@ describe("Util.Methods", function () {
     it("max/min work as expected", function () {
         var alist = [1, 2, 3, 4, 5];
         var dbl = function (x) { return x * 2; };
-        var max = Plottable.Util.Methods.max;
-        var min = Plottable.Util.Methods.min;
+        var max = Plottable._Util.Methods.max;
+        var min = Plottable._Util.Methods.min;
         assert.deepEqual(max(alist), 5, "max works as expected on plain array");
         assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
         assert.deepEqual(max(alist, dbl), 10, "max applies function appropriately");
