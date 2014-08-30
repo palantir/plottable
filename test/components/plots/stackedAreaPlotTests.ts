@@ -6,11 +6,11 @@ describe("Plots", () => {
   describe("Stacked Area Plot", () => {
     var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
-    var dataset1: Plottable.DataSource;
-    var dataset2: Plottable.DataSource;
+    var dataset1: Plottable.Dataset;
+    var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Linear;
     var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.StackedArea;
+    var renderer: Plottable.Plot.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
@@ -31,8 +31,8 @@ describe("Plots", () => {
         {x: 1, y: 3, type: "b"},
         {x: 3, y: 1, type: "b"}
       ];
-      dataset1 = new Plottable.DataSource(data1);
-      dataset2 = new Plottable.DataSource(data2);
+      dataset1 = new Plottable.Dataset(data1);
+      dataset2 = new Plottable.Dataset(data2);
 
       renderer = new Plottable.Plot.StackedArea(xScale, yScale);
       renderer.addDataset(data1);
@@ -78,7 +78,7 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var xScale: Plottable.Scale.Linear;
     var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.StackedArea;
+    var renderer: Plottable.Plot.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
@@ -131,7 +131,7 @@ describe("Plots", () => {
         {x: 1, y: 0, type: "c"},
         {x: 3, y: 0, type: "c"}
       ];
-      renderer.addDataset("a", new Plottable.DataSource(data));
+      renderer.addDataset("a", new Plottable.Dataset(data));
       renderer.renderTo(svg);
 
       assert.strictEqual(oldLowerBound, yScale.domain()[0], "lower bound doesn't change with 0 added");
@@ -144,7 +144,7 @@ describe("Plots", () => {
         {x: 1, y: 10, type: "d"},
         {x: 3, y: 3, type: "d"}
       ];
-      renderer.addDataset("b", new Plottable.DataSource(data));
+      renderer.addDataset("b", new Plottable.Dataset(data));
       renderer.renderTo(svg);
 
       assert.closeTo(oldLowerBound, yScale.domain()[0], 2, "lower bound doesn't change on positive addition");
@@ -156,7 +156,7 @@ describe("Plots", () => {
         {x: 1, y: 0, type: "e"},
         {x: 3, y: 1, type: "e"}
       ];
-      renderer.addDataset("c", new Plottable.DataSource(data));
+      renderer.addDataset("c", new Plottable.Dataset(data));
       renderer.renderTo(svg);
 
       assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound doesn't increase since maximum doesn't increase");
@@ -173,19 +173,19 @@ describe("Plots", () => {
         {x: 1, y: 0, type: "c"},
         {x: 3, y: 0, type: "c"}
       ];
-      renderer.addDataset("a", new Plottable.DataSource(data));
+      renderer.addDataset("a", new Plottable.Dataset(data));
 
       data = [
         {x: 1, y: 10, type: "d"},
         {x: 3, y: 3, type: "d"}
       ];
-      renderer.addDataset("b", new Plottable.DataSource(data));
+      renderer.addDataset("b", new Plottable.Dataset(data));
 
       data = [
         {x: 1, y: 0, type: "e"},
         {x: 3, y: 1, type: "e"}
       ];
-      renderer.addDataset("c", new Plottable.DataSource(data));
+      renderer.addDataset("c", new Plottable.Dataset(data));
 
       renderer.renderTo(svg);
 
@@ -223,7 +223,7 @@ describe("Plots", () => {
         {x: 1, y: 0, type: "c"},
         {x: 3, y: 0, type: "c"}
       ];
-      var dataset = new Plottable.DataSource(data);
+      var dataset = new Plottable.Dataset(data);
       renderer.addDataset(dataset);
       renderer.renderTo(svg);
 

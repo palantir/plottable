@@ -10,8 +10,8 @@ describe("Plots", () => {
     var xAccessor: any;
     var yAccessor: any;
     var colorAccessor: any;
-    var simpleDataset: Plottable.DataSource;
-    var linePlot: Plottable.Plot.Line;
+    var simpleDataset: Plottable.Dataset;
+    var linePlot: Plottable.Plot.Line<number>;
     var renderArea: D3.Selection;
     var verifier: MultiTestVerifier;
     // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
@@ -25,7 +25,7 @@ describe("Plots", () => {
       xAccessor = (d: any) => d.foo;
       yAccessor = (d: any) => d.bar;
       colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
-      simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
+      simpleDataset = new Plottable.Dataset([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
       linePlot = new Plottable.Plot.Line(simpleDataset, xScale, yScale);
       linePlot.project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)

@@ -2,8 +2,8 @@
 
 module Plottable {
 export module Plot {
-  export class Grid extends Abstract.XYPlot {
-    public colorScale: Abstract.Scale;
+  export class Grid extends Abstract.XYPlot<string,string> {
+    public colorScale: Abstract.Scale<any, string>;
     public xScale: Scale.Ordinal;
     public yScale: Scale.Ordinal;
 
@@ -22,7 +22,7 @@ export module Plot {
      * @param {ColorScale|InterpolatedColorScale} colorScale The color scale to use for each grid
      *     cell.
      */
-    constructor(dataset: any, xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale) {
+    constructor(dataset: any, xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale<any, string>) {
       super(dataset, xScale, yScale);
       this.classed("grid-plot", true);
 
@@ -34,7 +34,7 @@ export module Plot {
       this.project("fill", "value", colorScale); // default
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
+    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "fill") {
         this.colorScale = this._projectors["fill"].scale;
@@ -45,7 +45,7 @@ export module Plot {
     public _paint() {
       super._paint();
 
-      var cells = this.renderArea.selectAll("rect").data(this._dataSource.data());
+      var cells = this.renderArea.selectAll("rect").data(this._dataset.data());
       cells.enter().append("rect");
 
       var xStep = this.xScale.rangeBand();

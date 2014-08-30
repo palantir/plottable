@@ -2,12 +2,13 @@
 
 module Plottable {
 export module Abstract {
-  export class Stacked extends Abstract.NewStylePlot {
+  export class Stacked<X> extends Abstract.NewStylePlot<X, number> {
+    public yScale: Abstract.QuantitativeScale<number>;
 
     private stackedExtent = [0, 0];
 
-    public _onDataSourceUpdate() {
-      super._onDataSourceUpdate();
+    public _onDatasetUpdate() {
+      super._onDatasetUpdate();
       // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
       if (this._datasetKeysInOrder != null &&
           this._projectors["x"] != null &&

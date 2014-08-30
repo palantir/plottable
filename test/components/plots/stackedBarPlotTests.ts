@@ -6,11 +6,11 @@ describe("Plots", () => {
   describe("Stacked Bar Plot", () => {
     var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
-    var dataset1: Plottable.DataSource;
-    var dataset2: Plottable.DataSource;
+    var dataset1: Plottable.Dataset;
+    var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Ordinal;
     var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.StackedBar;
+    var renderer: Plottable.Plot.StackedBar<string, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var axisHeight = 0;
@@ -31,8 +31,8 @@ describe("Plots", () => {
         {x: "A", y: 2},
         {x: "B", y: 1}
       ];
-      dataset1 = new Plottable.DataSource(data1);
-      dataset2 = new Plottable.DataSource(data2);
+      dataset1 = new Plottable.Dataset(data1);
+      dataset2 = new Plottable.Dataset(data2);
 
       renderer = new Plottable.Plot.StackedBar(xScale, yScale);
       renderer.addDataset(data1);
@@ -92,11 +92,11 @@ describe("Plots", () => {
   describe("Horizontal Bar Plot", () => {
     var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
-    var dataset1: Plottable.DataSource;
-    var dataset2: Plottable.DataSource;
+    var dataset1: Plottable.Dataset;
+    var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Linear;
     var yScale: Plottable.Scale.Ordinal;
-    var renderer: Plottable.Plot.StackedBar;
+    var renderer: Plottable.Plot.StackedBar<number, string>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var rendererWidth: number;
@@ -117,8 +117,8 @@ describe("Plots", () => {
         {y: "A", x: 2},
         {y: "B", x: 1}
       ];
-      dataset1 = new Plottable.DataSource(data1);
-      dataset2 = new Plottable.DataSource(data2);
+      dataset1 = new Plottable.Dataset(data1);
+      dataset2 = new Plottable.Dataset(data2);
 
       renderer = new Plottable.Plot.StackedBar(xScale, yScale, false);
       renderer.addDataset(data1);

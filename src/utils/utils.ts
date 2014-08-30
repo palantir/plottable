@@ -115,7 +115,7 @@ export module Util {
      */
     export function _applyAccessor(accessor: IAccessor, plot: Abstract.Plot) {
       var activatedAccessor = _accessorize(accessor);
-      return (d: any, i: number) => activatedAccessor(d, i, plot.dataSource().metadata());
+      return (d: any, i: number) => activatedAccessor(d, i, plot.dataset().metadata());
     }
 
     /**

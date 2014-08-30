@@ -26,8 +26,8 @@ function run(div, data, Plottable) {
   hBarChart.renderTo(svg);
 
   var cb = function(x, y){
-    d = hBarRenderer.dataSource().data();
-    hBarRenderer.dataSource().data(d);
+    d = hBarRenderer.dataset().data();
+    hBarRenderer.dataset().data(d);
   };
 
   var click = new Plottable.Interaction.Click(hBarRenderer)

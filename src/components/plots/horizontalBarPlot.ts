@@ -11,7 +11,7 @@ export module Plot {
    *  - "x" - the horizontal length of a bar
    *  - "y" - the vertical position of a bar
    */
-  export class HorizontalBar extends Abstract.BarPlot {
+  export class HorizontalBar<Y> extends Abstract.BarPlot<number,Y> {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {"top": 0, "center": 0.5, "bottom": 1};
     public isVertical = false;
 
@@ -23,7 +23,7 @@ export module Plot {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.QuantitativeScale, yScale: Abstract.Scale) {
+    constructor(dataset: any, xScale: Abstract.QuantitativeScale<number>, yScale: Abstract.Scale<Y,number>) {
       super(dataset, xScale, yScale);
     }
 

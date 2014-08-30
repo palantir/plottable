@@ -14,7 +14,7 @@ function run(div, data, Plottable) {
     elt.x = elt.x.toString();
   };
   rawData.forEach(change_x);
-  var dataseries1 = new Plottable.DataSource(rawData);
+  var dataseries1 = new Plottable.Dataset(rawData);
   dataseries1.metadata({name: "series1"});
 
 

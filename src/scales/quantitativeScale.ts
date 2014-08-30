@@ -2,12 +2,12 @@
 
 module Plottable {
 export module Abstract {
-  export class QuantitativeScale extends Scale {
+  export class QuantitativeScale<D> extends Scale<D, number> {
     public _d3Scale: D3.Scale.QuantitativeScale;
     public _lastRequestedTickCount = 10;
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     public _userSetDomainer: boolean = false;
-    private _domainer: Domainer = new Domainer();
+    public _domainer: Domainer = new Domainer();
 
     /**
      * Creates a new QuantitativeScale.
@@ -19,7 +19,7 @@ export module Abstract {
       super(scale);
     }
 
-    public _getExtent(): any[] {
+    public _getExtent(): D[] {
       return this._domainer.computeDomain(this._getAllExtents(), this);
     }
 
@@ -27,10 +27,10 @@ export module Abstract {
      * Retrieves the domain value corresponding to a supplied range value.
      *
      * @param {number} value: A value from the Scale's range.
-     * @returns {number} The domain value corresponding to the supplied range value.
+     * @returns {D} The domain value corresponding to the supplied range value.
      */
-    public invert(value: number) {
-      return this._d3Scale.invert(value);
+    public invert(value: number): D {
+      return <any> this._d3Scale.invert(value);
     }
 
     /**
@@ -38,17 +38,17 @@ export module Abstract {
      *
      * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
      */
-    public copy(): QuantitativeScale {
-      return new QuantitativeScale(this._d3Scale.copy());
+    public copy(): QuantitativeScale<D> {
+      return new QuantitativeScale<D>(this._d3Scale.copy());
     }
 
-    public domain(): any[];
-    public domain(values: any[]): QuantitativeScale;
-    public domain(values?: any[]): any {
+    public domain(): D[];
+    public domain(values: D[]): QuantitativeScale<D>;
+    public domain(values?: D[]): any {
       return super.domain(values); // need to override type sig to enable method chaining :/
     }
 
-    public _setDomain(values: any[]) {
+    public _setDomain(values: D[]) {
         var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
         if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
             Util.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
@@ -64,7 +64,7 @@ export module Abstract {
      * @returns {D3.Transition.Interpolate|QuantitativeScale} The current output interpolator, or the calling QuantitativeScale.
      */
     public interpolate(): D3.Transition.Interpolate;
-    public interpolate(factory: D3.Transition.Interpolate): QuantitativeScale;
+    public interpolate(factory: D3.Transition.Interpolate): QuantitativeScale<D>;
     public interpolate(factory?: D3.Transition.Interpolate): any {
       if (factory == null) {
         return this._d3Scale.interpolate();
@@ -95,7 +95,7 @@ export module Abstract {
      * @param {boolean} clamp Whether or not to clamp the QuantitativeScale.
      * @returns {QuantitativeScale} The calling QuantitativeScale.
      */
-    public clamp(clamp: boolean): QuantitativeScale;
+    public clamp(clamp: boolean): QuantitativeScale<D>;
     public clamp(clamp?: boolean): any {
       if (clamp == null) {
         return this._d3Scale.clamp();
@@ -154,7 +154,7 @@ export module Abstract {
      * @param {Domainer} domainer The domainer to be set.
      * @return {QuantitativeScale} The calling scale.
      */
-    public domainer(domainer: Domainer): QuantitativeScale;
+    public domainer(domainer: Domainer): QuantitativeScale<D>;
     public domainer(domainer?: Domainer): any {
       if (domainer == null) {
         return this._domainer;
