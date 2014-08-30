@@ -8,7 +8,6 @@ export module Abstract {
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignmentFactor = 0;
-    public _isVertical: boolean;
 
     public _animators: Animator.IPlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),

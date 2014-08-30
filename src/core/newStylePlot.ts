@@ -12,6 +12,7 @@ export module Abstract {
     private nextSeriesIndex: number;
     public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
     public _datasetKeysInOrder: string[];
+    public _isVertical: boolean;
 
     /**
      * Creates a NewStylePlot.

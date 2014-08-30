@@ -2513,7 +2513,7 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
         });
     });
-    describe("Horizontal Bar Plot", function () {
+    describe("Horizontal Stacked Bar Plot", function () {
         var verifier = new MultiTestVerifier();
         var svg;
         var dataset1;

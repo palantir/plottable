@@ -18,6 +18,7 @@ export module Plot {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
+      this._isVertical = true;
     }
 
     public _getDrawer(key: string) {
@@ -78,8 +79,8 @@ export module Plot {
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      attrToProjector["y"] = (d: any) => this.yScale.scale(d.y + d.y0);
-      attrToProjector["y0"] = (d: any) => this.yScale.scale(d.y0);
+      attrToProjector["y"] = (d: any) => this.yScale.scale(d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      attrToProjector["y0"] = (d: any) => this.yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
       return attrToProjector;
     }
   }

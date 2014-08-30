@@ -427,6 +427,7 @@ declare module Plottable {
         class NewStylePlot extends XYPlot {
             _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
             _datasetKeysInOrder: string[];
+            _isVertical: boolean;
             constructor(xScale?: Scale<any, number>, yScale?: Scale<any, number>);
             _setup(): void;
             remove(): void;
@@ -1078,7 +1079,6 @@ declare module Plottable {
             _baseline: D3.Selection;
             _baselineValue: number;
             _barAlignmentFactor: number;
-            _isVertical: boolean;
             _animators: Plottable.Animator.IPlotAnimatorMap;
             constructor(xScale: Scale<any, number>, yScale: Scale<any, number>);
             _getDrawer(key: string): Plottable._Drawer.Rect;
@@ -1135,28 +1135,15 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-<<<<<<< HEAD
         class StackedBar extends Plottable.Abstract.Stacked {
-            _isVertical: boolean;
-            _baselineValue: number;
-            _baseline: D3.Selection;
-            constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
-            _generateAttrToProjector(): any;
-            _getDrawer(key: string): any;
-=======
-        class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
-            stackedData: any[][];
-            _yAccessor: IAccessor;
             _baselineValue: number;
             _baseline: D3.Selection;
             constructor(xScale?: Plottable.Abstract.Scale<any, number>, yScale?: Plottable.Abstract.Scale<any, number>, isVertical?: boolean);
-            _addDataset(key: string, dataset: any): void;
-            _updateAllProjectors(): void;
-            _generateAttrToProjector(): IAttributeToProjector;
->>>>>>> api-breaking-changes
+            _getDrawer(key: string): any;
+            _generateAttrToProjector(): any;
             _paint(): void;
             baseline(value: number): any;
-            _updateDomainer(scale: Plottable.Abstract.Scale): any;
+            _updateDomainer(scale: Plottable.Abstract.Scale<any, number>): any;
             _updateXDomainer(): any;
             _updateYDomainer(): any;
         }
