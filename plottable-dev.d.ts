@@ -1110,13 +1110,9 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Stacked extends NewStylePlot {
-<<<<<<< HEAD
             _isVertical: boolean;
             _onDatasetUpdate(): void;
-=======
-            _onDataSourceUpdate(): void;
-            project(attrToSet: string, accessor: any, scale?: Scale): Stacked;
->>>>>>> 897 - stacks on each relevant project call
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Stacked;
             _updateAllProjectors(): void;
         }
     }
