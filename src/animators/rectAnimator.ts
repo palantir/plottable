@@ -8,7 +8,7 @@ export module Animator {
    */
   export class Rect extends Default {
 
-    private static ANIMATED_ATTRIBUTES = ["height", "width", "x", "y"];
+    public static ANIMATED_ATTRIBUTES = ["height", "width", "x", "y", "fill"];
 
     public isVertical: boolean;
     public isReverse: boolean;
@@ -20,24 +20,31 @@ export module Animator {
     }
 
     public animate(selection: any, attrToProjector: IAttributeToProjector): any {
-
       var startAttrToProjector: IAttributeToProjector = {};
       Rect.ANIMATED_ATTRIBUTES.forEach((attr: string) => startAttrToProjector[attr] = attrToProjector[attr]);
 
-      var growingAttr = this.isVertical ? "height" : "width";
-      var growingAttrProjector = attrToProjector[growingAttr];
-
-      if (!this.isReverse) {
-        var movingAttr = this.isVertical ? "y" : "x";
-        var movingAttrProjector = startAttrToProjector[movingAttr];
-        var offsetProjector = this.isVertical ? growingAttrProjector : (d: any, i: number) => 0 - growingAttrProjector(d, i);
-        startAttrToProjector[movingAttr] = (d: any, i: number) => movingAttrProjector(d, i) + offsetProjector(d, i);
-      }
-
-      startAttrToProjector[growingAttr] = d3.functor(0);
+      startAttrToProjector[this.getMovingAttr()] = this._startMovingProjector(attrToProjector);
+      startAttrToProjector[this.getGrowingAttr()] = () => 0;
 
       selection.attr(startAttrToProjector);
       return super.animate(selection, attrToProjector);
+    }
+
+    public _startMovingProjector(attrToProjector: IAttributeToProjector) {
+      if (this.isVertical === this.isReverse) {
+        return attrToProjector[this.getMovingAttr()];
+      }
+      var movingAttrProjector = attrToProjector[this.getMovingAttr()];
+      var growingAttrProjector = attrToProjector[this.getGrowingAttr()];
+      return (d: any, i: number) => movingAttrProjector(d, i) + growingAttrProjector(d, i);
+    }
+
+    private getGrowingAttr() {
+      return this.isVertical ? "height" : "width";
+    }
+
+    private getMovingAttr() {
+      return this.isVertical ? "y" : "x";
     }
 
   }
