@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class Scatter extends Abstract.XYPlot {
+  export class Scatter<X,Y> extends Abstract.XYPlot<X,Y> {
 
     public _animators: Animator.IPlotAnimatorMap = {
       "circles-reset" : new Animator.Null(),
@@ -19,7 +19,7 @@ export module Plot {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale<any, number>, yScale: Abstract.Scale<any, number>) {
+    constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
       super(dataset, xScale, yScale);
       this.classed("scatter-plot", true);
       this.project("r", 3); // default

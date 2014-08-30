@@ -3,7 +3,7 @@
 module Plottable {
 export module Plot {
 
-  export class StackedBar extends Abstract.NewStyleBarPlot {
+  export class StackedBar<X,Y> extends Abstract.NewStyleBarPlot<X,Y> {
     public stackedData: any[][] = [];
     public _yAccessor: IAccessor;
     public _baselineValue = 0;
@@ -18,7 +18,7 @@ export module Plot {
      * @param {Scale} yScale the y scale of the plot
      * @param {boolean} isVertical if the plot if vertical
      */
-    constructor(xScale?: Abstract.Scale<any,number>, yScale?: Abstract.Scale<any,number>, isVertical = true) {
+    constructor(xScale?: Abstract.Scale<X,number>, yScale?: Abstract.Scale<Y,number>, isVertical = true) {
       super(xScale, yScale);
       this._isVertical = isVertical;
     }
@@ -34,7 +34,7 @@ export module Plot {
       if (this.yScale == null) {
         return;
       }
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this.yScale : this.xScale;
       if (this._isAnchored && this.stackedExtent.length > 0) {
         primaryScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
       } else {
@@ -45,7 +45,7 @@ export module Plot {
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
 
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this.yScale : this.xScale;
       var getStart = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_START);
       var getEnd = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_END);
 

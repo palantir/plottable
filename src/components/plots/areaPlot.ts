@@ -5,7 +5,7 @@ export module Plot {
   /**
    * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
    */
-  export class Area extends Line {
+  export class Area<X> extends Line<X> {
     private areaPath: D3.Selection;
 
     /**
@@ -16,7 +16,7 @@ export module Plot {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.QuantitativeScale<any>, yScale: Abstract.QuantitativeScale<any>) {
+    constructor(dataset: any, xScale: Abstract.QuantitativeScale<X>, yScale: Abstract.QuantitativeScale<number>) {
       super(dataset, xScale, yScale);
       this.classed("area-plot", true);
       this.project("y0", 0, yScale); // default
@@ -43,21 +43,20 @@ export module Plot {
 
     public _updateYDomainer() {
       super._updateYDomainer();
-      var scale = <Abstract.QuantitativeScale<any>> <any> this.yScale;
 
       var y0Projector = this._projectors["y0"];
       var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
       var extent:  number[] = y0Accessor != null ? this.dataset()._getExtent(y0Accessor) : [];
       var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
 
-      if (!scale._userSetDomainer) {
+      if (!this.yScale._userSetDomainer) {
         if (constantBaseline != null) {
-          scale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+          this.yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
         } else {
-          scale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
+          this.yScale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
         }
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-        scale._autoDomainIfAutomaticMode();
+        this.yScale._autoDomainIfAutomaticMode();
       }
     }
 

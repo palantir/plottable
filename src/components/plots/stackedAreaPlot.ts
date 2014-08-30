@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class StackedArea extends Abstract.Stacked {
+  export class StackedArea<X> extends Abstract.Stacked<X> {
 
     public _baseline: D3.Selection;
     public _baselineValue = 0;
@@ -14,7 +14,7 @@ export module Plot {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.QuantitativeScale<any>, yScale: Abstract.QuantitativeScale<any>) {
+    constructor(xScale: Abstract.QuantitativeScale<X>, yScale: Abstract.QuantitativeScale<number>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);

@@ -10,7 +10,7 @@ describe("Plots", () => {
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Ordinal;
     var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.StackedBar;
+    var renderer: Plottable.Plot.StackedBar<string, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var axisHeight = 0;
@@ -96,7 +96,7 @@ describe("Plots", () => {
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Linear;
     var yScale: Plottable.Scale.Ordinal;
-    var renderer: Plottable.Plot.StackedBar;
+    var renderer: Plottable.Plot.StackedBar<number, string>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var rendererWidth: number;

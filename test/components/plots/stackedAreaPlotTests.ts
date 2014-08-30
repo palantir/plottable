@@ -10,7 +10,7 @@ describe("Plots", () => {
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Linear;
     var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.StackedArea;
+    var renderer: Plottable.Plot.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
@@ -78,7 +78,7 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var xScale: Plottable.Scale.Linear;
     var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.StackedArea;
+    var renderer: Plottable.Plot.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 

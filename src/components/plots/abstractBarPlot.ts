@@ -6,7 +6,7 @@ export module Abstract {
    * An Abstract.BarPlot is the base implementation for HorizontalBarPlot and
    * VerticalBarPlot. It should not be used on its own.
    */
-  export class BarPlot extends XYPlot {
+  export class BarPlot<X,Y> extends XYPlot<X,Y> {
     private static DEFAULT_WIDTH = 10;
     public _bars: D3.UpdateSelection;
     public _baseline: D3.Selection;
@@ -29,7 +29,7 @@ export module Abstract {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale<any, number>, yScale: Abstract.Scale<any, number>) {
+    constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
       super(dataset, xScale, yScale);
       this.classed("bar-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
@@ -50,7 +50,7 @@ export module Abstract {
       this._bars = this.renderArea.selectAll("rect").data(this._dataset.data());
       this._bars.enter().append("rect");
 
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this.yScale : this.xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       var positionAttr = this._isVertical ? "y" : "x";
       var dimensionAttr = this._isVertical ? "height" : "width";
@@ -226,8 +226,8 @@ export module Abstract {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale    = this._isVertical ? this.yScale : this.xScale;
-      var secondaryScale  = this._isVertical ? this.xScale : this.yScale;
+      var primaryScale: Abstract.Scale<any,number>    = this._isVertical ? this.yScale : this.xScale;
+      var secondaryScale: Abstract.Scale<any,number>  = this._isVertical ? this.xScale : this.yScale;
       var primaryAttr     = this._isVertical ? "y" : "x";
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)

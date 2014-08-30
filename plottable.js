@@ -5127,19 +5127,18 @@ var Plottable;
             };
             Area.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
-                var scale = this.yScale;
                 var y0Projector = this._projectors["y0"];
                 var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
                 var extent = y0Accessor != null ? this.dataset()._getExtent(y0Accessor) : [];
                 var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
-                if (!scale._userSetDomainer) {
+                if (!this.yScale._userSetDomainer) {
                     if (constantBaseline != null) {
-                        scale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+                        this.yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
                     }
                     else {
-                        scale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
+                        this.yScale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
                     }
-                    scale._autoDomainIfAutomaticMode();
+                    this.yScale._autoDomainIfAutomaticMode();
                 }
             };
             Area.prototype.project = function (attrToSet, accessor, scale) {

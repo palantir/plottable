@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class Grid extends Abstract.XYPlot {
+  export class Grid extends Abstract.XYPlot<string,string> {
     public colorScale: Abstract.Scale<any, string>;
     public xScale: Scale.Ordinal;
     public yScale: Scale.Ordinal;
