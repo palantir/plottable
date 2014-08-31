@@ -48,7 +48,8 @@ export module Plot {
 
     public _paint() {
       var attrHash = this._generateAttrToProjector();
-      this._draw(attrHash);
+      var datasets = this._getDatasetsInOrder();
+      this._getDrawersInOrder().forEach((d, i) => d.draw(datasets[i].data(), attrHash));
     }
 
     public baseline(value: number) {

@@ -2225,10 +2225,6 @@ var Plottable;
                 var _this = this;
                 return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).drawer; });
             };
-            NewStylePlot.prototype._draw = function (attrToProjector) {
-                var datasets = this._getDatasetsInOrder();
-                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(datasets[i].data(), attrToProjector); });
-            };
             return NewStylePlot;
         })(Abstract.XYPlot);
         Abstract.NewStylePlot = NewStylePlot;
@@ -3193,7 +3189,6 @@ var Plottable;
                 _super.apply(this, arguments);
             }
             Area.prototype.draw = function (data, attrToProjector) {
-                data = (data.length > 0 && data[0].length !== undefined) ? data : [data];
                 var svgElement = "path";
                 var dataElements = this.renderArea.selectAll(svgElement).data(data);
                 dataElements.enter().append(svgElement);
@@ -5420,7 +5415,8 @@ var Plottable;
                 attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
                 var fillProjector = attrToProjector["fill"];
                 attrToProjector["fill"] = function (d, i) { return fillProjector(d[0], i); };
-                this._draw(attrToProjector);
+                var datasets = this._getDatasetsInOrder();
+                this._getDrawersInOrder().forEach(function (d, i) { return d.draw([datasets[i].data()], attrToProjector); });
             };
             StackedArea.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
@@ -5486,7 +5482,8 @@ var Plottable;
             };
             StackedBar.prototype._paint = function () {
                 var attrHash = this._generateAttrToProjector();
-                this._draw(attrHash);
+                var datasets = this._getDatasetsInOrder();
+                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(datasets[i].data(), attrHash); });
             };
             StackedBar.prototype.baseline = function (value) {
                 return Plottable.Abstract.NewStyleBarPlot.prototype.baseline.apply(this, [value]);

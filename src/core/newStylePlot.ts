@@ -166,11 +166,6 @@ export module Abstract {
     public _getDrawersInOrder(): Abstract._Drawer[] {
       return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).drawer);
     }
-
-    public _draw(attrToProjector: IAttributeToProjector) {
-      var datasets = this._getDatasetsInOrder();
-      this._getDrawersInOrder().forEach((d, i) => d.draw(datasets[i].data(), attrToProjector));
-    }
   }
 }
 }
