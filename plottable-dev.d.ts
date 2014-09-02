@@ -427,7 +427,6 @@ declare module Plottable {
         class NewStylePlot extends XYPlot {
             _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
             _datasetKeysInOrder: string[];
-            _isVertical: boolean;
             constructor(xScale?: Scale<any, number>, yScale?: Scale<any, number>);
             _setup(): void;
             remove(): void;
@@ -1079,6 +1078,7 @@ declare module Plottable {
             _baseline: D3.Selection;
             _baselineValue: number;
             _barAlignmentFactor: number;
+            _isVertical: boolean;
             _animators: Plottable.Animator.IPlotAnimatorMap;
             constructor(xScale: Scale<any, number>, yScale: Scale<any, number>);
             _getDrawer(key: string): Plottable._Drawer.Rect;
@@ -1109,6 +1109,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Stacked extends NewStylePlot {
+            _isVertical: boolean;
             _onDatasetUpdate(): void;
             _updateAllProjectors(): void;
         }

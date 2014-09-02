@@ -5,6 +5,7 @@ export module Abstract {
   export class Stacked extends Abstract.NewStylePlot {
 
     private stackedExtent = [0, 0];
+    public _isVertical: boolean;
 
     public _onDatasetUpdate() {
       super._onDatasetUpdate();
