@@ -4035,7 +4035,7 @@ var Plottable;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
                 this.classed("category-axis", true);
-                if (scale.rangeType() !== "bands") {
+                if (scale.rangeType() !== "bands" && scale.rangeType() !== "points") {
                     throw new Error("Only rangeBands category axes are implemented");
                 }
             }

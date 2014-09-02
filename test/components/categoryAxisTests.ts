@@ -67,4 +67,9 @@ describe("Category Axes", () => {
 
     svg.remove();
   });
+
+  it("points is a valid range type for category axis", () => {
+    var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).rangeType("points");
+    assert.doesNotThrow(() => new Plottable.Axis.Category(xScale, "bottom"), Error, "points rangeType is valid for category axis");
+  });
 });
