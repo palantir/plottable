@@ -4079,12 +4079,12 @@ var Plottable;
                 return this._scale.domain();
             };
             Category.prototype.drawTicks = function (axisWidth, axisHeight, scale, ticks) {
-                return this.drawOrMeasure(axisWidth, axisHeight, scale, ticks, true);
+                return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, true);
             };
             Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, ticks) {
-                return this.drawOrMeasure(axisWidth, axisHeight, scale, ticks, false);
+                return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, false);
             };
-            Category.prototype.drawOrMeasure = function (axisWidth, axisHeight, scale, dataOrTicks, draw) {
+            Category.prototype.drawOrMeasureTicks = function (axisWidth, axisHeight, scale, dataOrTicks, draw) {
                 var self = this;
                 var textWriteResults = [];
                 var tm = function (s) { return self.measurer.measure(s); };

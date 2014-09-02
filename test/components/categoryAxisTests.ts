@@ -28,12 +28,12 @@ describe("Category Axes", () => {
 
   it("doesnt blow up for non-string data", () => {
     var svg = generateSVG(1000, 400);
-    var scale = new Plottable.Scale.Ordinal().domain([null, undefined, true, 2]);
+    var scale = new Plottable.Scale.Ordinal().domain([null, undefined, true, 2, "foo"]);
     var axis = new Plottable.Axis.Category(scale);
     var table = new Plottable.Component.Table([[axis]]);
     table.renderTo(svg);
     var texts = svg.selectAll("text")[0].map((s: any) => d3.select(s).text());
-    assert.deepEqual(texts, ["null", "undefined", "true", "2"]);
+    assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);
     svg.remove();
   });
 
