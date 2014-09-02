@@ -62,6 +62,8 @@ export module Interaction {
           return "nwse-resize";
         } else if (top && right || bottom && left) {
           return "nesw-resize";
+        } else {
+          return "";
         }
 
       } else if (this.isResizingX) {
