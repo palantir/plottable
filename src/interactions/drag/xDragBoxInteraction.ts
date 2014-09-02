@@ -21,9 +21,11 @@ export module Interaction {
 
     public _cursorStyle(x: number, y: number): string {
       var c1 = parseInt(this.dragBox.attr("x"), 10);
-      var c2 = parseInt(this.dragBox.attr("width"), 10) + c1;
-      if (this._isCloseEnough(x, c1, this.resizePadding) ||
-          this._isCloseEnough(x, c2, this.resizePadding)) {
+      var width = parseInt(this.dragBox.attr("width"), 10);
+      var c2 = width + c1;
+      var otherPadding = Math.min(this.resizePadding, width / 2);
+      if (this._isCloseEnough(x, c1, this.resizePadding, otherPadding) ||
+          this._isCloseEnough(x, c2, otherPadding, this.resizePadding)) {
         return "ew-resize";
       } else {
         return "";
