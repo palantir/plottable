@@ -443,6 +443,7 @@ declare module Plottable {
             removeDataset(key: string): NewStylePlot;
             _getDatasetsInOrder(): Dataset[];
             _getDrawersInOrder(): _Drawer[];
+            _paint(): void;
         }
     }
 }
@@ -1140,7 +1141,6 @@ declare module Plottable {
             constructor(xScale?: Plottable.Abstract.Scale<any, number>, yScale?: Plottable.Abstract.Scale<any, number>, isVertical?: boolean);
             _getDrawer(key: string): any;
             _generateAttrToProjector(): any;
-            _paint(): void;
             baseline(value: number): any;
             _updateDomainer(scale: Plottable.Abstract.Scale<any, number>): any;
             _updateXDomainer(): any;

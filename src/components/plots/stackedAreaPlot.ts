@@ -31,8 +31,6 @@ export module Plot {
     }
 
     public _paint() {
-      super._paint();
-
       var scaledBaseline = this.yScale.scale(this._baselineValue);
       var baselineAttr: any = {
         "x1": 0,

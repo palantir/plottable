@@ -46,12 +46,6 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _paint() {
-      var attrHash = this._generateAttrToProjector();
-      var datasets = this._getDatasetsInOrder();
-      this._getDrawersInOrder().forEach((d, i) => d.draw(datasets[i].data(), attrHash));
-    }
-
     public baseline(value: number) {
       return Abstract.NewStyleBarPlot.prototype.baseline.apply(this, [value]);
     }

@@ -2225,6 +2225,11 @@ var Plottable;
                 var _this = this;
                 return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).drawer; });
             };
+            NewStylePlot.prototype._paint = function () {
+                var attrHash = this._generateAttrToProjector();
+                var datasets = this._getDatasetsInOrder();
+                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(datasets[i].data(), attrHash); });
+            };
             return NewStylePlot;
         })(Abstract.XYPlot);
         Abstract.NewStylePlot = NewStylePlot;
@@ -5392,7 +5397,6 @@ var Plottable;
                 this._baseline = this.renderArea.append("line").classed("baseline", true);
             };
             StackedArea.prototype._paint = function () {
-                _super.prototype._paint.call(this);
                 var scaledBaseline = this.yScale.scale(this._baselineValue);
                 var baselineAttr = {
                     "x1": 0,
@@ -5475,11 +5479,6 @@ var Plottable;
                 attrToProjector["width"] = this._isVertical ? widthF : heightF;
                 attrToProjector[primaryAttr] = this._isVertical ? getEnd : function (d) { return getEnd(d) - heightF(d); };
                 return attrToProjector;
-            };
-            StackedBar.prototype._paint = function () {
-                var attrHash = this._generateAttrToProjector();
-                var datasets = this._getDatasetsInOrder();
-                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(datasets[i].data(), attrHash); });
             };
             StackedBar.prototype.baseline = function (value) {
                 return Plottable.Abstract.NewStyleBarPlot.prototype.baseline.apply(this, [value]);
