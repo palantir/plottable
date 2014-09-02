@@ -9,9 +9,11 @@ export module Interaction {
     private resizeEnabled = false;
     public resizePadding = 10;
     public selection: SelectionArea;
+    public isResizingX = false;
+    public isResizingY = false;
     public isResizing = false;
     public _selectionOrigin: number[];
-    public _resizeStartDiff: number[] = [];
+    private _resizeStartDiff: number[] = [];
     private lastCursorStyle = "";
 
     public _isCloseEnough(val: number, position: number, padding: number): boolean {
@@ -92,7 +94,22 @@ export module Interaction {
       super._doDragstart();
     }
 
+    public _drag() {
+      var x = d3.event.x;
+      var y = d3.event.y;
+      if (this.isResizingX) {
+        x += this._resizeStartDiff[0];
+      }
+      if (this.isResizingY) {
+        y += this._resizeStartDiff[1];
+      }
+      this.location = [this._constrainX(x), this._constrainY(y)];
+      this._doDrag();
+    }
+
     public _doDragend() {
+      this.isResizingX = false;
+      this.isResizingY = false;
       this.isResizing = false;
       super._doDragend();
     }

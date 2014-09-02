@@ -6,8 +6,8 @@ export module Interaction {
     private dragBehavior: D3.Behavior.Drag;
     public origin = [0,0];
     public location = [0,0];
-    private  constrainX: (n: number) => number;
-    private  constrainY: (n: number) => number;
+    public  _constrainX: (n: number) => number;
+    public  _constrainY: (n: number) => number;
     private ondragstart: (start: Point) => void;
     private      ondrag: (start: Point, end: Point) => void;
     private   ondragend: (start: Point, end: Point) => void;
@@ -96,8 +96,8 @@ export module Interaction {
       var availableHeight = this.componentToListenTo.availableHeight;
       // the constraint functions ensure that the selection rectangle will not exceed the hit box
       var constraintFunction = (min: number, max: number) => (x: number) => Math.min(Math.max(x, min), max);
-      this.constrainX = constraintFunction(0, availableWidth );
-      this.constrainY = constraintFunction(0, availableHeight);
+      this._constrainX = constraintFunction(0, availableWidth );
+      this._constrainY = constraintFunction(0, availableHeight);
       this.origin = d3.mouse(this.hitBox[0][0].parentNode);
       this._doDragstart();
     }
@@ -109,7 +109,7 @@ export module Interaction {
     }
 
     public _drag(){
-      this.location = [this.constrainX(d3.event.x), this.constrainY(d3.event.y)];
+      this.location = [this._constrainX(d3.event.x), this._constrainY(d3.event.y)];
       this._doDrag();
     }
 

@@ -6,9 +6,6 @@ export module Interaction {
     public _drag(){
       super._drag();
       var y1 = this.location[1];
-      if (this.isResizing) {
-        y1 += this._resizeStartDiff[1];
-      }
       this.setBox(this._selectionOrigin[1], y1);
     }
 
@@ -18,7 +15,8 @@ export module Interaction {
     }
 
     public _isResizeStart(): boolean {
-      return this._isResizeStartAttr(false);
+      this.isResizingY = this._isResizeStartAttr(false);
+      return this.isResizingY;
     }
 
     public _cursorStyle(x: number, y: number): string {

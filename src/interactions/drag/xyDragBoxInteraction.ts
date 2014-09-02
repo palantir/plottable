@@ -3,8 +3,6 @@
 module Plottable {
 export module Interaction {
   export class XYDragBox extends DragBox {
-    private isResizingX = false;
-    private isResizingY = false;
 
     public _drag(){
       super._drag();
@@ -17,12 +15,6 @@ export module Interaction {
       var y0 = this._selectionOrigin[1];
       var y1 = this.location[1];
 
-      if (this.isResizingX) {
-        x1 += this._resizeStartDiff[0];
-      }
-      if (this.isResizingY) {
-        y1 += this._resizeStartDiff[1];
-      }
       if (!this.resize() || this.isResizingX || !this.isResizingY) {
         attrs.width = Math.abs(x0 - x1);
         attrs.x = Math.min(x0, x1);
@@ -43,12 +35,6 @@ export module Interaction {
         yMax: (attrs.height || parseInt(this.dragBox.attr("height"), 10)) + yMin
       };
       this.boxIsDrawn = drawnX && drawnY;
-    }
-
-    public _doDragend() {
-      this.isResizingX = false;
-      this.isResizingY = false;
-      super._doDragend();
     }
 
     public _isResizeStart(): boolean {
