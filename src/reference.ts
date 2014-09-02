@@ -43,10 +43,11 @@
 /// <reference path="drawers/areaDrawer.ts" />
 /// <reference path="drawers/rectDrawer.ts" />
 
-/// <reference path="components/baseAxis.ts" />
-/// <reference path="components/timeAxis.ts" />
-/// <reference path="components/numericAxis.ts" />
-/// <reference path="components/categoryAxis.ts" />
+/// <reference path="components/axes/baseAxis.ts" />
+/// <reference path="components/axes/timeAxis.ts" />
+/// <reference path="components/axes/numericAxis.ts" />
+/// <reference path="components/axes/categoryAxis.ts" />
+
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
 /// <reference path="components/horizontalLegend.ts" />
