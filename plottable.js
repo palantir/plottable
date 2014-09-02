@@ -5342,13 +5342,9 @@ var Plottable;
                 d3.layout.stack().x(this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor).y(this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor).values(function (d) { return d.data(); }).out(outFunction)(datasets);
                 this.stackedExtent = [0, 0];
                 var maxY = Plottable.Util.Methods.max(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
-                if (maxY > 0) {
-                    this.stackedExtent[1] = maxY;
-                }
+                this.stackedExtent[1] = Math.max(0, maxY);
                 var minY = Plottable.Util.Methods.min(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
-                if (minY < 0) {
-                    this.stackedExtent[0] = minY;
-                }
+                this.stackedExtent[0] = Math.min(minY, 0);
             };
             Stacked.prototype._updateAllProjectors = function () {
                 _super.prototype._updateAllProjectors.call(this);

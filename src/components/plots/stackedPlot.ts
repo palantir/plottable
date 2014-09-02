@@ -31,15 +31,11 @@ export module Abstract {
       this.stackedExtent = [0, 0];
       var maxY = Util.Methods.max(datasets[datasets.length - 1].data(),
                                   (datum: any) => datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      if (maxY > 0) {
-        this.stackedExtent[1] = maxY;
-      }
+      this.stackedExtent[1] = Math.max(0, maxY);
 
       var minY = Util.Methods.min(datasets[datasets.length - 1].data(),
                                   (datum: any) => datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      if (minY < 0) {
-        this.stackedExtent[0] = minY;
-      }
+      this.stackedExtent[0] = Math.min(minY, 0);
     }
 
     public _updateAllProjectors() {
