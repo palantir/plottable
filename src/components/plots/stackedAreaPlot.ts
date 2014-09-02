@@ -57,10 +57,7 @@ export module Plot {
       var fillProjector = attrToProjector["fill"];
       attrToProjector["fill"] = (d, i) => fillProjector(d[0], i);
 
-      var datasets = this._getDatasetsInOrder();
-      this._getDrawersInOrder().forEach((drawer, i) => {
-        drawer.draw(datasets[i].data(), attrToProjector);
-      });
+      this._draw(attrToProjector);
     }
 
     public _updateYDomainer() {

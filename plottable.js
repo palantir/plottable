@@ -2227,8 +2227,11 @@ var Plottable;
             };
             NewStylePlot.prototype._paint = function () {
                 var attrHash = this._generateAttrToProjector();
+                this._draw(attrHash);
+            };
+            NewStylePlot.prototype._draw = function (attrToProjector) {
                 var datasets = this._getDatasetsInOrder();
-                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(datasets[i].data(), attrHash); });
+                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(datasets[i].data(), attrToProjector); });
             };
             return NewStylePlot;
         })(Abstract.XYPlot);
@@ -5416,10 +5419,7 @@ var Plottable;
                 attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
                 var fillProjector = attrToProjector["fill"];
                 attrToProjector["fill"] = function (d, i) { return fillProjector(d[0], i); };
-                var datasets = this._getDatasetsInOrder();
-                this._getDrawersInOrder().forEach(function (drawer, i) {
-                    drawer.draw(datasets[i].data(), attrToProjector);
-                });
+                this._draw(attrToProjector);
             };
             StackedArea.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);

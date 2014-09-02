@@ -443,6 +443,7 @@ declare module Plottable {
             _getDatasetsInOrder(): Dataset[];
             _getDrawersInOrder(): _Drawer[];
             _paint(): void;
+            _draw(attrToProjector: IAttributeToProjector): void;
         }
     }
 }
