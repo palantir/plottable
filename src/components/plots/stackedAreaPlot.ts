@@ -60,7 +60,7 @@ export module Plot {
 
       var datasets = this._getDatasetsInOrder();
       this._getDrawersInOrder().forEach((drawer, i) => {
-        drawer.draw([datasets[i].data()], attrToProjector);
+        drawer.draw(datasets[i].data(), attrToProjector);
       });
     }
 
