@@ -4078,8 +4078,13 @@ var Plottable;
             Category.prototype._getTickValues = function () {
                 return this._scale.domain();
             };
-            Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
-                var draw = typeof dataOrTicks[0] !== "string";
+            Category.prototype.drawTicks = function (axisWidth, axisHeight, scale, ticks) {
+                return this.drawOrMeasure(axisWidth, axisHeight, scale, ticks, true);
+            };
+            Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, ticks) {
+                return this.drawOrMeasure(axisWidth, axisHeight, scale, ticks, false);
+            };
+            Category.prototype.drawOrMeasure = function (axisWidth, axisHeight, scale, dataOrTicks, draw) {
                 var self = this;
                 var textWriteResults = [];
                 var tm = function (s) { return self.measurer.measure(s); };
@@ -4128,7 +4133,7 @@ var Plottable;
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", getTickLabelTransform);
                 tickLabels.text("");
-                this.measureTicks(this.width(), this.height(), this._scale, tickLabels);
+                this.drawTicks(this.width(), this.height(), this._scale, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
                 var xTranslate = this._orientation === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this._orientation === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
