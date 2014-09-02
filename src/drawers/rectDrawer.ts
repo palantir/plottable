@@ -4,7 +4,7 @@ module Plottable {
 export module _Drawer {
   export class Rect extends Abstract._Drawer {
 
-    public draw(data: any[][], attrToProjector: IAttributeToProjector, animator = new Animator.Null()) {
+    public draw(data: any[], attrToProjector: IAttributeToProjector, animator = new Animator.Null()) {
       var svgElement = "rect";
       var dataElements = this.renderArea.selectAll(svgElement).data(data);
 
