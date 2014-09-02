@@ -33,7 +33,6 @@ describe("Category Axes", () => {
     var table = new Plottable.Component.Table([[axis]]);
     table.renderTo(svg);
     var texts = svg.selectAll("text")[0].map((s: any) => d3.select(s).text());
-    console.log(texts);
     assert.deepEqual(texts, ["null", "undefined", "true", "2"]);
     svg.remove();
   });
