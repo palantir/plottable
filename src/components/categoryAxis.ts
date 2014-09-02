@@ -62,20 +62,28 @@ export module Axis {
       return this._scale.domain();
     }
 
+
+    /**
+     * Measures the size of the ticks while also writing them to the DOM.
+     * @param {D3.Selection} ticks The tick elements to be written to.
+     */
+    private drawTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection) {
+      return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, true);
+    }
+
     /**
      * Measures the size of the ticks without making any (permanent) DOM
      * changes.
      *
      * @param {string[]} data The strings that will be printed on the ticks.
      */
-    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, data: string[]): Util.Text.IWriteTextResult;
-    /**
-     * Measures the size of the ticks while also writing them to the DOM.
-     * @param {D3.Selection} ticks The tick elements to be written to.
-     */
-    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection): Util.Text.IWriteTextResult;
-    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, dataOrTicks: any): Util.Text.IWriteTextResult {
-      var draw = typeof dataOrTicks[0] !== "string";
+    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: string[]) {
+      return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, false);
+    }
+
+
+    private drawOrMeasureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal,
+                                  dataOrTicks: any, draw: boolean): Util.Text.IWriteTextResult {
       var self = this;
       var textWriteResults: Util.Text.IWriteTextResult[] = [];
       var tm = (s: string) => self.measurer.measure(s);
@@ -129,7 +137,7 @@ export module Axis {
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
       tickLabels.text("");
-      this.measureTicks(this.width(), this.height(), this._scale, tickLabels);
+      this.drawTicks(this.width(), this.height(), this._scale, tickLabels);
       var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
       var xTranslate = this._orientation === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
