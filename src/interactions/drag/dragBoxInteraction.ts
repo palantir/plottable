@@ -97,11 +97,15 @@ export module Interaction {
     public _drag() {
       var x = d3.event.x;
       var y = d3.event.y;
-      if (this.isResizingX) {
-        x += this._resizeStartDiff[0];
+      var diffX = this._resizeStartDiff[0];
+      var diffY = this._resizeStartDiff[1];
+      if (this.isResizingX && diffX !== 0) {
+        x += diffX;
+        this._resizeStartDiff[0] += diffX > 0 ? -1 : 1;
       }
-      if (this.isResizingY) {
-        y += this._resizeStartDiff[1];
+      if (this.isResizingY && diffY !== 0) {
+        y += diffY;
+        this._resizeStartDiff[1] += diffY > 0 ? -1 : 1;
       }
       this.location = [this._constrainX(x), this._constrainY(y)];
       this._doDrag();
