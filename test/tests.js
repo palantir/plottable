@@ -694,6 +694,10 @@ describe("Category Axes", function () {
         assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing ticklength increases height");
         svg.remove();
     });
+    it("points is a valid range type for category axis", function () {
+        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).rangeType("points");
+        assert.doesNotThrow(function () { return new Plottable.Axis.Category(xScale, "bottom"); }, Error, "points rangeType is valid for category axis");
+    });
 });
 
 var assert = chai.assert;
