@@ -29,7 +29,10 @@
   },  {
     "name":"category_horizontalBar",
     "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Horizontal Bar Plot", "Project", "Animate"]
-  },  {
+  }, {
+    "name": "category_axis_non_string",
+    "categories": ["Category Axis"]
+  }, {
     "name":"category_project",
     "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Project", "Animate", "Title", "Label"]
   },  {
