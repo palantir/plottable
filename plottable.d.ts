@@ -616,16 +616,14 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Component extends PlottableObject {
+            static AUTORESIZE_BY_DEFAULT: boolean;
             public element: D3.Selection;
             public content: D3.Selection;
             public backgroundContainer: D3.Selection;
             public foregroundContainer: D3.Selection;
             public clipPathEnabled: boolean;
-            public availableWidth: number;
-            public availableHeight: number;
             public xOrigin: number;
             public yOrigin: number;
-            static AUTORESIZE_BY_DEFAULT: boolean;
             /**
             * Renders the Component into a given DOM element.
             *
@@ -717,6 +715,18 @@ declare module Plottable {
             * listening to (effectively destroying it).
             */
             public remove(): void;
+            /**
+            * Return the width of the component
+            *
+            * @return {number} width of the component
+            */
+            public width(): number;
+            /**
+            * Return the height of the component
+            *
+            * @return {number} height of the component
+            */
+            public height(): number;
         }
     }
 }
@@ -1701,6 +1711,15 @@ declare module Plottable {
             * @param{any[][]} data The data to be drawn
             * @param{attrHash} IAttributeToProjector The list of attributes to set on the data
             */
+            public draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Animator.Null): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Area extends Abstract._Drawer {
             public draw(data: any[][], attrToProjector: IAttributeToProjector): void;
         }
     }
@@ -1710,7 +1729,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Rect extends Abstract._Drawer {
-            public draw(data: any[][], attrToProjector: IAttributeToProjector): void;
+            public draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Animator.Null): void;
         }
     }
 }
@@ -2310,7 +2329,31 @@ declare module Plottable {
     module Plot {
         class ClusteredBar extends Abstract.NewStyleBarPlot {
             static DEFAULT_WIDTH: number;
-            constructor(xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale);
+            constructor(xScale: Abstract.Scale, yScale: Abstract.Scale, isVertical?: boolean);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class Stacked extends NewStylePlot {
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
+        class StackedArea extends Abstract.Stacked {
+            /**
+            * Constructs a StackedArea plot.
+            *
+            * @constructor
+            * @param {QuantitativeScale} xScale The x scale to use.
+            * @param {QuantitativeScale} yScale The y scale to use.
+            */
+            constructor(xScale: Abstract.QuantitativeScale, yScale: Abstract.QuantitativeScale);
         }
     }
 }
@@ -2320,7 +2363,15 @@ declare module Plottable {
     module Plot {
         class StackedBar extends Abstract.NewStyleBarPlot {
             public stackedData: any[][];
-            constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale);
+            /**
+            * Constructs a StackedBar plot.
+            *
+            * @constructor
+            * @param {Scale} xScale the x scale of the plot
+            * @param {Scale} yScale the y scale of the plot
+            * @param {boolean} isVertical if the plot if vertical
+            */
+            constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale, isVertical?: boolean);
         }
     }
 }
@@ -2349,29 +2400,29 @@ declare module Plottable {
             /**
             * Gets the duration of the animation in milliseconds.
             *
-            * @returns {Number} The current duration.
+            * @returns {number} The current duration.
             */
-            public duration(): Number;
+            public duration(): number;
             /**
             * Sets the duration of the animation in milliseconds.
             *
-            * @param {Number} duration The duration in milliseconds.
+            * @param {number} duration The duration in milliseconds.
             * @returns {Default} The calling Default Animator.
             */
-            public duration(duration: Number): Default;
+            public duration(duration: number): Default;
             /**
             * Gets the delay of the animation in milliseconds.
             *
-            * @returns {Number} The current delay.
+            * @returns {number} The current delay.
             */
-            public delay(): Number;
+            public delay(): number;
             /**
             * Sets the delay of the animation in milliseconds.
             *
-            * @param {Number} delay The delay in milliseconds.
+            * @param {number} delay The delay in milliseconds.
             * @returns {Default} The calling Default Animator.
             */
-            public delay(delay: Number): Default;
+            public delay(delay: number): Default;
             /**
             * Gets the current easing of the animation.
             *
@@ -2400,6 +2451,22 @@ declare module Plottable {
         */
         class IterativeDelay extends Default {
             public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Animator {
+        /**
+        * The default animator implementation with easing, duration, and delay.
+        */
+        class Rect extends Default {
+            static ANIMATED_ATTRIBUTES: string[];
+            public isVertical: boolean;
+            public isReverse: boolean;
+            constructor(isVertical?: boolean, isReverse?: boolean);
+            public animate(selection: any, attrToProjector: IAttributeToProjector): any;
         }
     }
 }

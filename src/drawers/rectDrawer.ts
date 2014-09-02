@@ -4,12 +4,12 @@ module Plottable {
 export module _Drawer {
   export class Rect extends Abstract._Drawer {
 
-    public draw(data: any[][], attrToProjector: IAttributeToProjector) {
+    public draw(data: any[][], attrToProjector: IAttributeToProjector, animator = new Animator.Null()) {
       var svgElement = "rect";
       var dataElements = this.renderArea.selectAll(svgElement).data(data);
 
       dataElements.enter().append(svgElement);
-      dataElements.attr(attrToProjector);
+      animator.animate(dataElements, attrToProjector);
       dataElements.exit().remove();
     }
   }

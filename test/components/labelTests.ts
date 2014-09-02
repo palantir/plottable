@@ -18,7 +18,7 @@ describe("Labels", () => {
 
     var text = content.select("text");
     var bbox = Plottable.Util.DOM.getBBox(text);
-    assert.closeTo(bbox.height, label.availableHeight, 0.5, "text height === label.minimumHeight()");
+    assert.closeTo(bbox.height, label.height(), 0.5, "text height === label.minimumHeight()");
     assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
     svg.remove();
   });
@@ -31,7 +31,7 @@ describe("Labels", () => {
     var text = content.select("text");
     var textBBox = Plottable.Util.DOM.getBBox(text);
     assertBBoxInclusion(label.element.select(".bounding-box"), text);
-    assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
+    assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
     svg.remove();
   });
 
@@ -43,7 +43,7 @@ describe("Labels", () => {
     var text = content.select("text");
     var textBBox = Plottable.Util.DOM.getBBox(text);
     assertBBoxInclusion(label.element.select(".bounding-box"), text);
-    assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
+    assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
     svg.remove();
   });
 
@@ -52,11 +52,11 @@ describe("Labels", () => {
     var label = new Plottable.Component.TitleLabel();
     label.renderTo(svg);
     assert.equal(label.content.select("text").text(), "", "the text defaulted to empty string");
-    assert.equal(label.availableHeight, 0, "rowMin is 0 for empty string");
+    assert.equal(label.height(), 0, "rowMin is 0 for empty string");
     label.text("hello world");
     label.renderTo(svg);
     assert.equal(label.content.select("text").text(), "hello world", "the label text updated properly");
-    assert.operator(label.availableHeight, ">", 0, "rowMin is > 0 for non-empty string");
+    assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
     svg.remove();
   });
 
@@ -69,7 +69,7 @@ describe("Labels", () => {
     var content = label.content;
     var text = content.select("text");
     var bbox = Plottable.Util.DOM.getBBox(text);
-    assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
+    assert.equal(bbox.height, label.height(), "text height === label.minimumHeight()");
     assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
     svg.remove();
   });
@@ -101,7 +101,7 @@ describe("Labels", () => {
     var label = new Plottable.Component.TitleLabel("foo");
     label.renderTo(svg);
     label.text("");
-    assert.equal(label.availableWidth, 0, "width updated to 0");
+    assert.equal(label.width(), 0, "width updated to 0");
     svg.remove();
   });
 

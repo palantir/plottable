@@ -69,7 +69,7 @@ export module Axis {
 
       if (!this._isHorizontal()) {
         var reComputedWidth = this._computeWidth();
-        if (reComputedWidth > this.availableWidth || reComputedWidth < (this.availableWidth - this.gutter())) {
+        if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.gutter())) {
           this._invalidateLayout();
           return;
         }

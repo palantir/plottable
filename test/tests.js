@@ -700,8 +700,8 @@ describe("Gridlines", function () {
         var basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
         basicTable._anchor(svg);
         basicTable._computeLayout();
-        xScale.range([0, xAxis.availableWidth]);
-        yScale.range([yAxis.availableHeight, 0]);
+        xScale.range([0, xAxis.width()]);
+        yScale.range([yAxis.height(), 0]);
         basicTable._render();
         var xAxisTickMarks = xAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS)[0];
         var xGridlines = gridlines.element.select(".x-gridlines").selectAll("line")[0];
@@ -741,7 +741,7 @@ describe("Labels", function () {
         assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
         var text = content.select("text");
         var bbox = Plottable.Util.DOM.getBBox(text);
-        assert.closeTo(bbox.height, label.availableHeight, 0.5, "text height === label.minimumHeight()");
+        assert.closeTo(bbox.height, label.height(), 0.5, "text height === label.minimumHeight()");
         assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
@@ -753,7 +753,7 @@ describe("Labels", function () {
         var text = content.select("text");
         var textBBox = Plottable.Util.DOM.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
+        assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
     it("Right-rotated text is handled properly", function () {
@@ -764,7 +764,7 @@ describe("Labels", function () {
         var text = content.select("text");
         var textBBox = Plottable.Util.DOM.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
+        assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
     it("Label text can be changed after label is created", function () {
@@ -772,11 +772,11 @@ describe("Labels", function () {
         var label = new Plottable.Component.TitleLabel();
         label.renderTo(svg);
         assert.equal(label.content.select("text").text(), "", "the text defaulted to empty string");
-        assert.equal(label.availableHeight, 0, "rowMin is 0 for empty string");
+        assert.equal(label.height(), 0, "rowMin is 0 for empty string");
         label.text("hello world");
         label.renderTo(svg);
         assert.equal(label.content.select("text").text(), "hello world", "the label text updated properly");
-        assert.operator(label.availableHeight, ">", 0, "rowMin is > 0 for non-empty string");
+        assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
         svg.remove();
     });
     it.skip("Superlong text is handled in a sane fashion", function () {
@@ -787,7 +787,7 @@ describe("Labels", function () {
         var content = label.content;
         var text = content.select("text");
         var bbox = Plottable.Util.DOM.getBBox(text);
-        assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
+        assert.equal(bbox.height, label.height(), "text height === label.minimumHeight()");
         assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
         svg.remove();
     });
@@ -815,7 +815,7 @@ describe("Labels", function () {
         var label = new Plottable.Component.TitleLabel("foo");
         label.renderTo(svg);
         label.text("");
-        assert.equal(label.availableWidth, 0, "width updated to 0");
+        assert.equal(label.width(), 0, "width updated to 0");
         svg.remove();
     });
     it("unsupported alignments and orientations are unsupported", function () {
@@ -854,11 +854,11 @@ describe("Legends", function () {
         assert.equal(legend._requestedSpace(200, 200).height, 0, "there is no requested height when domain is empty");
         color.domain(["foo", "bar"]);
         var height1 = legend._requestedSpace(400, 400).height;
-        var actualHeight1 = legend.availableHeight;
+        var actualHeight1 = legend.height();
         assert.operator(height1, ">", 0, "changing the domain gives a positive height");
         color.domain(["foo", "bar", "baz"]);
         assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
-        var actualHeight2 = legend.availableHeight;
+        var actualHeight2 = legend.height();
         assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
         var numRows = legend.content.selectAll(".legend-row")[0].length;
         assert.equal(numRows, 3, "there are 3 rows");
@@ -1949,7 +1949,7 @@ describe("Plots", function () {
                 renderer.animate(false);
                 var yAxis = new Plottable.Axis.Category(yScale, "left");
                 var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
-                axisWidth = yAxis.availableWidth;
+                axisWidth = yAxis.width();
                 bandWidth = yScale.rangeBand();
                 xScale.domainer(xScale.domainer().pad(0));
             });
@@ -2213,6 +2213,230 @@ describe("Plots", function () {
 
 var assert = chai.assert;
 describe("Plots", function () {
+    describe("Stacked Area Plot", function () {
+        var verifier = new MultiTestVerifier();
+        var svg;
+        var dataset1;
+        var dataset2;
+        var xScale;
+        var yScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
+        before(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Linear().domain([1, 3]);
+            yScale = new Plottable.Scale.Linear().domain([0, 4]);
+            var colorScale = new Plottable.Scale.Color("10").domain(["a", "b"]);
+            var data1 = [
+                { x: 1, y: 1, type: "a" },
+                { x: 3, y: 2, type: "a" }
+            ];
+            var data2 = [
+                { x: 1, y: 3, type: "b" },
+                { x: 3, y: 1, type: "b" }
+            ];
+            dataset1 = new Plottable.DataSource(data1);
+            dataset2 = new Plottable.DataSource(data2);
+            renderer = new Plottable.Plot.StackedArea(xScale, yScale);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.project("fill", "type", colorScale);
+            var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        afterEach(function () {
+            verifier.end();
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+        it("renders correctly", function () {
+            var areas = renderer.renderArea.selectAll(".area");
+            var area0 = d3.select(areas[0][0]);
+            var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
+            var d0Ys = d0.slice(1, d0.length - 1).map(function (s) { return parseFloat(s.split(",")[1]); });
+            assert.strictEqual(d0Ys.indexOf(0), -1, "bottom area never touches the top");
+            var area1 = d3.select(areas[0][1]);
+            var d1 = normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
+            var d1Ys = d1.slice(1, d1.length - 1).map(function (s) { return parseFloat(s.split(",")[1]); });
+            assert.notEqual(d1Ys.indexOf(0), -1, "touches the top");
+            var domain = yScale.domain();
+            assert.strictEqual(0, domain[0], "domain starts at a min value at 0");
+            assert.strictEqual(4, domain[1], "highest area stacking is at upper limit of yScale domain");
+        });
+    });
+    describe("Stacked Area Plot Stacking", function () {
+        var verifier = new MultiTestVerifier();
+        var svg;
+        var xScale;
+        var yScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
+        before(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Linear().domain([1, 3]);
+            yScale = new Plottable.Scale.Linear();
+            var colorScale = new Plottable.Scale.Color("10").domain(["a", "b"]);
+            var data1 = [
+                { x: 1, y: 1, type: "a" },
+                { x: 3, y: 2, type: "a" }
+            ];
+            var data2 = [
+                { x: 1, y: 5, type: "b" },
+                { x: 3, y: 1, type: "b" }
+            ];
+            renderer = new Plottable.Plot.StackedArea(xScale, yScale);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.project("fill", "type", colorScale);
+            renderer.renderTo(svg);
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        afterEach(function () {
+            verifier.end();
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+        it("stacks correctly on adding datasets", function () {
+            assert.closeTo(0, yScale.domain()[0], 1, "0 is close to lower bound");
+            assert.closeTo(6, yScale.domain()[1], 1, "6 is close to upper bound");
+            var oldLowerBound = yScale.domain()[0];
+            var oldUpperBound = yScale.domain()[1];
+            renderer.detach();
+            var data = [
+                { x: 1, y: 0, type: "c" },
+                { x: 3, y: 0, type: "c" }
+            ];
+            renderer.addDataset("a", new Plottable.DataSource(data));
+            renderer.renderTo(svg);
+            assert.strictEqual(oldLowerBound, yScale.domain()[0], "lower bound doesn't change with 0 added");
+            assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound doesn't change with 0 added");
+            oldLowerBound = yScale.domain()[0];
+            oldUpperBound = yScale.domain()[1];
+            renderer.detach();
+            data = [
+                { x: 1, y: 10, type: "d" },
+                { x: 3, y: 3, type: "d" }
+            ];
+            renderer.addDataset("b", new Plottable.DataSource(data));
+            renderer.renderTo(svg);
+            assert.closeTo(oldLowerBound, yScale.domain()[0], 2, "lower bound doesn't change on positive addition");
+            assert.closeTo(oldUpperBound + 10, yScale.domain()[1], 2, "upper bound increases");
+            oldUpperBound = yScale.domain()[1];
+            renderer.detach();
+            data = [
+                { x: 1, y: 0, type: "e" },
+                { x: 3, y: 1, type: "e" }
+            ];
+            renderer.addDataset("c", new Plottable.DataSource(data));
+            renderer.renderTo(svg);
+            assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound doesn't increase since maximum doesn't increase");
+            renderer.removeDataset("a");
+            renderer.removeDataset("b");
+            renderer.removeDataset("c");
+        });
+        it("stacks correctly on removing datasets", function () {
+            renderer.detach();
+            var data = [
+                { x: 1, y: 0, type: "c" },
+                { x: 3, y: 0, type: "c" }
+            ];
+            renderer.addDataset("a", new Plottable.DataSource(data));
+            data = [
+                { x: 1, y: 10, type: "d" },
+                { x: 3, y: 3, type: "d" }
+            ];
+            renderer.addDataset("b", new Plottable.DataSource(data));
+            data = [
+                { x: 1, y: 0, type: "e" },
+                { x: 3, y: 1, type: "e" }
+            ];
+            renderer.addDataset("c", new Plottable.DataSource(data));
+            renderer.renderTo(svg);
+            assert.closeTo(16, yScale.domain()[1], 2, "Initially starts with around 14 at highest extent");
+            renderer.detach();
+            renderer.removeDataset("a");
+            renderer.renderTo(svg);
+            assert.closeTo(16, yScale.domain()[1], 2, "Remains with around 14 at highest extent");
+            var oldUpperBound = yScale.domain()[1];
+            renderer.detach();
+            renderer.removeDataset("b");
+            renderer.renderTo(svg);
+            assert.closeTo(oldUpperBound - 10, yScale.domain()[1], 2, "Highest extent decreases by around 10");
+            oldUpperBound = yScale.domain()[1];
+            renderer.detach();
+            renderer.removeDataset("c");
+            renderer.renderTo(svg);
+            assert.strictEqual(oldUpperBound, yScale.domain()[1], "Extent doesn't change if maximum doesn't change");
+        });
+        it("stacks correctly on modifying a dataset", function () {
+            assert.closeTo(0, yScale.domain()[0], 1, "0 is close to lower bound");
+            assert.closeTo(6, yScale.domain()[1], 1, "6 is close to upper bound");
+            var oldLowerBound = yScale.domain()[0];
+            var oldUpperBound = yScale.domain()[1];
+            renderer.detach();
+            var data = [
+                { x: 1, y: 0, type: "c" },
+                { x: 3, y: 0, type: "c" }
+            ];
+            var dataset = new Plottable.DataSource(data);
+            renderer.addDataset(dataset);
+            renderer.renderTo(svg);
+            assert.strictEqual(oldLowerBound, yScale.domain()[0], "lower bound doesn't change with 0 added");
+            assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound doesn't change with 0 added");
+            oldLowerBound = yScale.domain()[0];
+            oldUpperBound = yScale.domain()[1];
+            renderer.detach();
+            data = [
+                { x: 1, y: 10, type: "c" },
+                { x: 3, y: 3, type: "c" }
+            ];
+            dataset.data(data);
+            renderer.renderTo(svg);
+            assert.closeTo(oldLowerBound, yScale.domain()[0], 2, "lower bound doesn't change on positive addition");
+            assert.closeTo(oldUpperBound + 10, yScale.domain()[1], 2, "upper bound increases");
+            oldUpperBound = yScale.domain()[1];
+            renderer.detach();
+            data = [
+                { x: 1, y: 8, type: "c" },
+                { x: 3, y: 3, type: "c" }
+            ];
+            dataset.data(data);
+            renderer.renderTo(svg);
+            assert.closeTo(oldUpperBound - 2, yScale.domain()[1], 1, "upper bound decreases by 2");
+            oldUpperBound = yScale.domain()[1];
+            renderer.detach();
+            data = [
+                { x: 1, y: 8, type: "c" },
+                { x: 3, y: 1, type: "c" }
+            ];
+            dataset.data(data);
+            renderer.renderTo(svg);
+            assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound does not change");
+        });
+    });
+});
+
+var assert = chai.assert;
+describe("Plots", function () {
     describe("Stacked Bar Plot", function () {
         var verifier = new MultiTestVerifier();
         var svg;
@@ -2246,7 +2470,7 @@ describe("Plots", function () {
             renderer.baseline(0);
             var xAxis = new Plottable.Axis.Category(xScale, "bottom");
             var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
-            axisHeight = xAxis.availableHeight;
+            axisHeight = xAxis.height();
             bandWidth = xScale.rangeBand();
         });
         beforeEach(function () {
@@ -2289,6 +2513,82 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
         });
     });
+    describe("Horizontal Bar Plot", function () {
+        var verifier = new MultiTestVerifier();
+        var svg;
+        var dataset1;
+        var dataset2;
+        var xScale;
+        var yScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var rendererWidth;
+        var bandWidth = 0;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        before(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Linear().domain([0, 3]);
+            yScale = new Plottable.Scale.Ordinal();
+            var data1 = [
+                { y: "A", x: 1 },
+                { y: "B", x: 2 }
+            ];
+            var data2 = [
+                { y: "A", x: 2 },
+                { y: "B", x: 1 }
+            ];
+            dataset1 = new Plottable.DataSource(data1);
+            dataset2 = new Plottable.DataSource(data2);
+            renderer = new Plottable.Plot.StackedBar(xScale, yScale, false);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.baseline(0);
+            var yAxis = new Plottable.Axis.Category(yScale, "left");
+            var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+            rendererWidth = renderer.width();
+            bandWidth = yScale.rangeBand();
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        afterEach(function () {
+            verifier.end();
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+        it("renders correctly", function () {
+            var bars = renderer.renderArea.selectAll("rect");
+            var bar0 = d3.select(bars[0][0]);
+            var bar1 = d3.select(bars[0][1]);
+            var bar2 = d3.select(bars[0][2]);
+            var bar3 = d3.select(bars[0][3]);
+            assert.closeTo(numAttr(bar0, "height"), bandWidth, 2);
+            assert.closeTo(numAttr(bar1, "height"), bandWidth, 2);
+            assert.closeTo(numAttr(bar2, "height"), bandWidth, 2);
+            assert.closeTo(numAttr(bar3, "height"), bandWidth, 2);
+            assert.closeTo(numAttr(bar0, "width"), rendererWidth / 3, 0.01, "width is correct for bar0");
+            assert.closeTo(numAttr(bar1, "width"), rendererWidth / 3 * 2, 0.01, "width is correct for bar1");
+            assert.closeTo(numAttr(bar2, "width"), rendererWidth / 3 * 2, 0.01, "width is correct for bar2");
+            assert.closeTo(numAttr(bar3, "width"), rendererWidth / 3, 0.01, "width is correct for bar3");
+            var bar0Y = bar0.data()[0].y;
+            var bar1Y = bar1.data()[0].y;
+            var bar2Y = bar2.data()[0].y;
+            var bar3Y = bar3.data()[0].y;
+            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2, 0.01, "y pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2, 0.01, "y pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + bandWidth / 2, 0.01, "y pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + bandWidth / 2, 0.01, "y pos correct for bar3");
+            assert.closeTo(numAttr(bar0, "x"), 0, 0.01, "x is correct for bar0");
+            assert.closeTo(numAttr(bar1, "x"), 0, 0.01, "x is correct for bar1");
+            assert.closeTo(numAttr(bar2, "x"), rendererWidth / 3, 0.01, "x is correct for bar2");
+            assert.closeTo(numAttr(bar3, "x"), rendererWidth / 3 * 2, 0.01, "x is correct for bar3");
+        });
+    });
 });
 
 var assert = chai.assert;
@@ -2326,7 +2626,7 @@ describe("Plots", function () {
             renderer.baseline(0);
             var xAxis = new Plottable.Axis.Category(xScale, "bottom");
             var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
-            axisHeight = xAxis.availableHeight;
+            axisHeight = xAxis.height();
             bandWidth = xScale.rangeBand();
         });
         beforeEach(function () {
@@ -2365,6 +2665,80 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2 - off, 0.01, "x pos correct for bar1");
             assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2 + off, 0.01, "x pos correct for bar2");
             assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2 + off, 0.01, "x pos correct for bar3");
+        });
+    });
+    describe("Horizontal Clustered Bar Plot", function () {
+        var verifier = new MultiTestVerifier();
+        var svg;
+        var dataset1;
+        var dataset2;
+        var yScale;
+        var xScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var rendererWidth;
+        var bandWidth = 0;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        before(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            yScale = new Plottable.Scale.Ordinal();
+            xScale = new Plottable.Scale.Linear().domain([0, 2]);
+            var data1 = [
+                { y: "A", x: 1 },
+                { y: "B", x: 2 }
+            ];
+            var data2 = [
+                { y: "A", x: 2 },
+                { y: "B", x: 1 }
+            ];
+            dataset1 = new Plottable.DataSource(data1);
+            dataset2 = new Plottable.DataSource(data2);
+            renderer = new Plottable.Plot.ClusteredBar(xScale, yScale, false);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.baseline(0);
+            var yAxis = new Plottable.Axis.Category(yScale, "left");
+            var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+            rendererWidth = renderer.width();
+            bandWidth = yScale.rangeBand();
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        afterEach(function () {
+            verifier.end();
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+        it("renders correctly", function () {
+            var bars = renderer.renderArea.selectAll("rect");
+            var bar0 = d3.select(bars[0][0]);
+            var bar1 = d3.select(bars[0][1]);
+            var bar2 = d3.select(bars[0][2]);
+            var bar3 = d3.select(bars[0][3]);
+            var width = bandWidth / 2 * .518;
+            assert.closeTo(numAttr(bar0, "height"), width, 2, "height is correct for bar0");
+            assert.closeTo(numAttr(bar1, "height"), width, 2, "height is correct for bar1");
+            assert.closeTo(numAttr(bar2, "height"), width, 2, "height is correct for bar2");
+            assert.closeTo(numAttr(bar3, "height"), width, 2, "height is correct for bar3");
+            assert.closeTo(numAttr(bar0, "width"), rendererWidth / 2, 0.01, "width is correct for bar0");
+            assert.closeTo(numAttr(bar1, "width"), rendererWidth, 0.01, "width is correct for bar1");
+            assert.closeTo(numAttr(bar2, "width"), rendererWidth, 0.01, "width is correct for bar2");
+            assert.closeTo(numAttr(bar3, "width"), rendererWidth / 2, 0.01, "width is correct for bar3");
+            var bar0Y = bar0.data()[0].y;
+            var bar1Y = bar1.data()[0].y;
+            var bar2Y = bar2.data()[0].y;
+            var bar3Y = bar3.data()[0].y;
+            var off = renderer.innerScale.scale("_0");
+            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + bandWidth / 2 + off, 0.01, "y pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + bandWidth / 2 + off, 0.01, "y pos correct for bar3");
         });
     });
 });
@@ -2718,14 +3092,14 @@ describe("Component behavior", function () {
         it("computeLayout defaults and updates intelligently", function () {
             c._anchor(svg);
             c._computeLayout();
-            assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
-            assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
+            assert.equal(c.width(), SVG_WIDTH, "computeLayout defaulted width to svg width");
+            assert.equal(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
             assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
             svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
             c._computeLayout();
-            assert.equal(c.availableWidth, 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
-            assert.equal(c.availableHeight, 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
+            assert.equal(c.width(), 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
+            assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
             assert.equal(c.xOrigin, 0, "xOrigin is still 0");
             assert.equal(c.yOrigin, 0, "yOrigin is still 0");
             svg.remove();
@@ -2737,20 +3111,20 @@ describe("Component behavior", function () {
             svg.attr("width", null).attr("height", null);
             c._anchor(svg);
             c._computeLayout();
-            assert.equal(c.availableWidth, 400, "defaults to width of parent if width is not specified on <svg>");
-            assert.equal(c.availableHeight, 200, "defaults to height of parent if width is not specified on <svg>");
+            assert.equal(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
+            assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
             assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
             svg.style("width", "50%").style("height", "50%");
             c._computeLayout();
-            assert.equal(c.availableWidth, 200, "computeLayout defaulted width to svg width");
-            assert.equal(c.availableHeight, 100, "computeLayout defaulted height to svg height");
+            assert.equal(c.width(), 200, "computeLayout defaulted width to svg width");
+            assert.equal(c.height(), 100, "computeLayout defaulted height to svg height");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
             assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
             svg.style("width", "25%").style("height", "25%");
             c._computeLayout();
-            assert.equal(c.availableWidth, 100, "computeLayout updated width to new svg width");
-            assert.equal(c.availableHeight, 50, "computeLayout updated height to new svg height");
+            assert.equal(c.width(), 100, "computeLayout updated width to new svg width");
+            assert.equal(c.height(), 50, "computeLayout updated height to new svg height");
             assert.equal(c.xOrigin, 0, "xOrigin is still 0");
             assert.equal(c.yOrigin, 0, "yOrigin is still 0");
             parent.style("width", "auto");
@@ -2777,8 +3151,8 @@ describe("Component behavior", function () {
             c._computeLayout(xOff, yOff, width, height);
             var translate = getTranslate(c.element);
             assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
-            assert.equal(c.availableWidth, width, "the width set properly");
-            assert.equal(c.availableHeight, height, "the height set propery");
+            assert.equal(c.width(), width, "the width set properly");
+            assert.equal(c.height(), height, "the height set propery");
             svg.remove();
         });
     });
@@ -2971,12 +3345,12 @@ describe("Component behavior", function () {
         var c = makeFixedSizeComponent(10, 10);
         cg._addComponent(c);
         cg.renderTo(svg);
-        assert.equal(cg.availableHeight, 10, "availableHeight initially 10 for fixed-size component");
-        assert.equal(cg.availableWidth, 10, "availableWidth initially 10 for fixed-size component");
+        assert.equal(cg.height(), 10, "height() initially 10 for fixed-size component");
+        assert.equal(cg.width(), 10, "width() initially 10 for fixed-size component");
         fixComponentSize(c, 50, 50);
         c._invalidateLayout();
-        assert.equal(cg.availableHeight, 50, "invalidateLayout propagated to parent and caused resized height");
-        assert.equal(cg.availableWidth, 50, "invalidateLayout propagated to parent and caused resized width");
+        assert.equal(cg.height(), 50, "invalidateLayout propagated to parent and caused resized height");
+        assert.equal(cg.width(), 50, "invalidateLayout propagated to parent and caused resized width");
         svg.remove();
     });
     it("components can be detached even if not anchored", function () {

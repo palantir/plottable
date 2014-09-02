@@ -123,7 +123,7 @@ export module Axis {
       var endDate = interval.timeUnit.offset(startDate, interval.step);
       if (endDate > this._scale.domain()[1]) {
         // this offset is too large, so just return available width
-        return this.availableWidth;
+        return this.width();
       }
       // measure how much space one date can get
       var stepLength = Math.abs(this._scale.scale(endDate) - this._scale.scale(startDate));
@@ -134,7 +134,7 @@ export module Axis {
       // compute number of ticks
       // if less than a certain threshold
       var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
-      var stepLength = Math.min(this.getIntervalLength(interval), this.availableWidth);
+      var stepLength = Math.min(this.getIntervalLength(interval), this.width());
       return worst < stepLength;
     }
 
@@ -204,7 +204,7 @@ export module Axis {
       tickLabelsEnter.append("text");
       var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
       var yTranslate = (this._orientation === "bottom" ? (this._maxLabelTickLength() / 2 * height) :
-          (this.availableHeight - this._maxLabelTickLength() / 2 * height + 2 * this.tickLabelPadding()));
+          (this.height() - this._maxLabelTickLength() / 2 * height + 2 * this.tickLabelPadding()));
       var textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
         Util.DOM.translate(textSelection, xTranslate, yTranslate);
@@ -228,7 +228,7 @@ export module Axis {
           startPosition = this._scale.scale(position);
       }
 
-      return endPosition < this.availableWidth && startPosition > 0;
+      return endPosition < this.width() && startPosition > 0;
     }
 
     private adjustTickLength(height: number, interval: ITimeInterval) {
@@ -240,7 +240,7 @@ export module Axis {
           tickValues.map((x: Date) => x.valueOf()).indexOf(d.valueOf()) >= 0
       );
       if (this._orientation === "top") {
-        height = this.availableHeight - height;
+        height = this.height() - height;
       }
       selection.attr("y2", height);
     }
