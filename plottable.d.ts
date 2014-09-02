@@ -2584,6 +2584,8 @@ declare module Plottable {
             public boxIsDrawn: boolean;
             public resizePadding: number;
             public selection: SelectionArea;
+            public isResizingX: boolean;
+            public isResizingY: boolean;
             public isResizing: boolean;
             /**
             * Gets wether resizing is enabled or not.
