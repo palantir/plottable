@@ -68,7 +68,7 @@ export module Axis {
      * @param {D3.Selection} ticks The tick elements to be written to.
      */
     private drawTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection) {
-      return this.drawOrMeasure(axisWidth, axisHeight, scale, ticks, true);
+      return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, true);
     }
 
     /**
@@ -78,11 +78,11 @@ export module Axis {
      * @param {string[]} data The strings that will be printed on the ticks.
      */
     private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: string[]) {
-      return this.drawOrMeasure(axisWidth, axisHeight, scale, ticks, false);
+      return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, false);
     }
 
 
-    private drawOrMeasure(axisWidth: number, axisHeight: number, scale: Scale.Ordinal,
+    private drawOrMeasureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal,
                                   dataOrTicks: any, draw: boolean): Util.Text.IWriteTextResult {
       var self = this;
       var textWriteResults: Util.Text.IWriteTextResult[] = [];
