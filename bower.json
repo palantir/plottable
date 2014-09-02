@@ -29,7 +29,7 @@
     "plots"
   ],
   "dependencies": {
-    "d3": "3.4.5"
+    "d3": "3.4.11"
   },
   "homepage": "palantir.github.io/plottable",
   "repository": {
