@@ -654,12 +654,12 @@ describe("Category Axes", function () {
     });
     it("doesnt blow up for non-string data", function () {
         var svg = generateSVG(1000, 400);
-        var scale = new Plottable.Scale.Ordinal().domain([null, undefined, true, 2]);
+        var scale = new Plottable.Scale.Ordinal().domain([null, undefined, true, 2, "foo"]);
         var axis = new Plottable.Axis.Category(scale);
         var table = new Plottable.Component.Table([[axis]]);
         table.renderTo(svg);
         var texts = svg.selectAll("text")[0].map(function (s) { return d3.select(s).text(); });
-        assert.deepEqual(texts, ["null", "undefined", "true", "2"]);
+        assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);
         svg.remove();
     });
     it("width accounts for gutter. ticklength, and padding on vertical axes", function () {
