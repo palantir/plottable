@@ -442,6 +442,8 @@ declare module Plottable {
             removeDataset(key: string): NewStylePlot;
             _getDatasetsInOrder(): Dataset[];
             _getDrawersInOrder(): _Drawer[];
+            _paint(): void;
+            _draw(attrToProjector: IAttributeToProjector): void;
         }
     }
 }
@@ -720,7 +722,7 @@ declare module Plottable {
             key: string;
             constructor(key: string);
             remove(): void;
-            draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
+            draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
         }
     }
 }
@@ -729,7 +731,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Area extends Plottable.Abstract._Drawer {
-            draw(data: any[][], attrToProjector: IAttributeToProjector): void;
+            draw(data: any[], attrToProjector: IAttributeToProjector): void;
         }
     }
 }
@@ -738,7 +740,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Rect extends Plottable.Abstract._Drawer {
-            draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
+            draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
         }
     }
 }
@@ -1108,6 +1110,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Stacked extends NewStylePlot {
+            _isVertical: boolean;
             _onDatasetUpdate(): void;
             _updateAllProjectors(): void;
         }
@@ -1134,16 +1137,16 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
-            stackedData: any[][];
-            _yAccessor: IAccessor;
+        class StackedBar extends Plottable.Abstract.Stacked {
             _baselineValue: number;
             _baseline: D3.Selection;
             constructor(xScale?: Plottable.Abstract.Scale<any, number>, yScale?: Plottable.Abstract.Scale<any, number>, isVertical?: boolean);
-            _addDataset(key: string, dataset: any): void;
-            _updateAllProjectors(): void;
-            _generateAttrToProjector(): IAttributeToProjector;
-            _paint(): void;
+            _getDrawer(key: string): any;
+            _generateAttrToProjector(): any;
+            baseline(value: number): any;
+            _updateDomainer(scale: Plottable.Abstract.Scale<any, number>): any;
+            _updateXDomainer(): any;
+            _updateYDomainer(): any;
         }
     }
 }
