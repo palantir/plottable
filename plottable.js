@@ -945,26 +945,26 @@ var Plottable;
             function Colors() {
             }
             Colors.CORAL_RED = "#fd373e";
-            Colors.INDIGO = "#5177c4";
-            Colors.ROBINS_EGG_BLUE = "#06bdbd";
-            Colors.FERN = "#62bb60";
+            Colors.INDIGO = "#5279c7";
+            Colors.ROBINS_EGG_BLUE = "#06cccc";
+            Colors.FERN = "#63c261";
             Colors.BURNING_ORANGE = "#ff7939";
             Colors.ROYAL_HEATH = "#962565";
             Colors.CONIFER = "#99ce50";
             Colors.CERISE_RED = "#db2e65";
-            Colors.BRIGHT_SUN = "#ffe43d";
+            Colors.BRIGHT_SUN = "#fad419";
             Colors.JACARTA = "#2c2b6f";
             Colors.PLOTTABLE_COLORS = [
-                Colors.CORAL_RED,
                 Colors.INDIGO,
-                Colors.ROBINS_EGG_BLUE,
+                Colors.CORAL_RED,
                 Colors.FERN,
-                Colors.BURNING_ORANGE,
-                Colors.ROYAL_HEATH,
-                Colors.CONIFER,
-                Colors.CERISE_RED,
                 Colors.BRIGHT_SUN,
-                Colors.JACARTA
+                Colors.JACARTA,
+                Colors.BURNING_ORANGE,
+                Colors.CERISE_RED,
+                Colors.CONIFER,
+                Colors.ROYAL_HEATH,
+                Colors.ROBINS_EGG_BLUE,
             ];
             return Colors;
         })();
