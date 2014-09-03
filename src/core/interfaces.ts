@@ -29,13 +29,8 @@ module Plottable {
   }
 
   export interface _IProjector {
-<<<<<<< HEAD
     accessor: _IAccessor;
-    scale?: Abstract.Scale;
-=======
-    accessor: IAccessor;
     scale?: Abstract.Scale<any, any>;
->>>>>>> api-breaking-changes
     attribute: string;
   }
 
@@ -123,7 +118,7 @@ module Plottable {
    * A key that is also coupled with a dataset and a drawer.
    */
   export interface DatasetDrawerKey {
-    dataset: DataSource;
+    dataset: Dataset;
     drawer: Abstract._Drawer;
     key: string;
   }

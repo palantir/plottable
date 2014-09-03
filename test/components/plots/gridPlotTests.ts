@@ -67,13 +67,8 @@ describe("Plots", () => {
       var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(null, xScale, yScale, colorScale)
                                                           .project("fill", "magnitude", colorScale);
       renderer.renderTo(svg);
-<<<<<<< HEAD
-      renderer.dataSource().data(DATA);
-      VERIFY_CELLS(renderer._renderArea.selectAll("rect")[0]);
-=======
       renderer.dataset().data(DATA);
-      VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
->>>>>>> api-breaking-changes
+      VERIFY_CELLS(renderer._renderArea.selectAll("rect")[0]);
       svg.remove();
     });
 

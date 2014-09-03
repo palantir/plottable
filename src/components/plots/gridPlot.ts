@@ -3,15 +3,9 @@
 module Plottable {
 export module Plot {
   export class Grid extends Abstract.XYPlot {
-<<<<<<< HEAD
-    public _colorScale: Abstract.Scale;
+    public _colorScale: Abstract.Scale<any, string>;
     public _xScale: Scale.Ordinal;
     public _yScale: Scale.Ordinal;
-=======
-    public colorScale: Abstract.Scale<any, string>;
-    public xScale: Scale.Ordinal;
-    public yScale: Scale.Ordinal;
->>>>>>> api-breaking-changes
 
 
     public _animators: IPlotAnimatorMap = {
@@ -43,15 +37,11 @@ export module Plot {
       this.project("fill", "value", colorScale); // default
     }
 
-<<<<<<< HEAD
     /**
      * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
      * the data should return a valid CSS color.
      */
-    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
-=======
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
->>>>>>> api-breaking-changes
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "fill") {
         this._colorScale = this._projectors["fill"].scale;
@@ -62,11 +52,7 @@ export module Plot {
     public _paint() {
       super._paint();
 
-<<<<<<< HEAD
-      var cells = this._renderArea.selectAll("rect").data(this._dataSource.data());
-=======
-      var cells = this.renderArea.selectAll("rect").data(this._dataset.data());
->>>>>>> api-breaking-changes
+      var cells = this._renderArea.selectAll("rect").data(this._dataset.data());
       cells.enter().append("rect");
 
       var xStep = this._xScale.rangeBand();

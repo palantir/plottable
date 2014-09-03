@@ -68,17 +68,11 @@ var Plottable;
                 return map;
             }
             Methods.populateMap = populateMap;
-<<<<<<< HEAD
-            function applyAccessor(accessor, plot) {
-                var activatedAccessor = accessorize(accessor);
-                return function (d, i) { return activatedAccessor(d, i, plot.dataSource().metadata()); };
-=======
             function _applyAccessor(accessor, plot) {
-                var activatedAccessor = _accessorize(accessor);
+                var activatedAccessor = accessorize(accessor);
                 return function (d, i) { return activatedAccessor(d, i, plot.dataset().metadata()); };
->>>>>>> api-breaking-changes
             }
-            Methods.applyAccessor = applyAccessor;
+            Methods._applyAccessor = _applyAccessor;
             function uniq(arr) {
                 var seen = d3.set();
                 var result = [];
@@ -1972,7 +1966,7 @@ var Plottable;
                 if (scale != null) {
                     scale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
-                var activatedAccessor = Plottable._Util.Methods.applyAccessor(accessor, this);
+                var activatedAccessor = Plottable._Util.Methods._applyAccessor(accessor, this);
                 this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
                 this._updateProjector(attrToSet);
                 this._render();
@@ -2552,6 +2546,24 @@ var Plottable;
                     return;
                 }
                 _super.prototype._setDomain.call(this, values);
+            };
+            QuantitativeScale.prototype.interpolate = function (factory) {
+                if (factory == null) {
+                    return this._d3Scale.interpolate();
+                }
+                this._d3Scale.interpolate(factory);
+                return this;
+            };
+            QuantitativeScale.prototype.rangeRound = function (values) {
+                this._d3Scale.rangeRound(values);
+                return this;
+            };
+            QuantitativeScale.prototype.clamp = function (clamp) {
+                if (clamp == null) {
+                    return this._d3Scale.clamp();
+                }
+                this._d3Scale.clamp(clamp);
+                return this;
             };
             QuantitativeScale.prototype.ticks = function (count) {
                 if (count != null) {
@@ -4681,11 +4693,7 @@ var Plottable;
                 attrToProjector["cy"] = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
-<<<<<<< HEAD
-                var circles = this._renderArea.selectAll("circle").data(this._dataSource.data());
-=======
-                var circles = this.renderArea.selectAll("circle").data(this._dataset.data());
->>>>>>> api-breaking-changes
+                var circles = this._renderArea.selectAll("circle").data(this._dataset.data());
                 circles.enter().append("circle");
                 if (this._dataChanged) {
                     var rFunction = attrToProjector["r"];
@@ -4734,11 +4742,7 @@ var Plottable;
             };
             Grid.prototype._paint = function () {
                 _super.prototype._paint.call(this);
-<<<<<<< HEAD
-                var cells = this._renderArea.selectAll("rect").data(this._dataSource.data());
-=======
-                var cells = this.renderArea.selectAll("rect").data(this._dataset.data());
->>>>>>> api-breaking-changes
+                var cells = this._renderArea.selectAll("rect").data(this._dataset.data());
                 cells.enter().append("rect");
                 var xStep = this._xScale.rangeBand();
                 var yStep = this._yScale.rangeBand();
@@ -4786,11 +4790,7 @@ var Plottable;
             };
             BarPlot.prototype._paint = function () {
                 _super.prototype._paint.call(this);
-<<<<<<< HEAD
-                this._bars = this._renderArea.selectAll("rect").data(this._dataSource.data());
-=======
-                this._bars = this.renderArea.selectAll("rect").data(this._dataset.data());
->>>>>>> api-breaking-changes
+                this._bars = this._renderArea.selectAll("rect").data(this._dataset.data());
                 this._bars.enter().append("rect");
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -5117,15 +5117,9 @@ var Plottable;
                 this.areaPath = this._renderArea.append("path").classed("area", true);
                 _super.prototype._appendPath.call(this);
             };
-<<<<<<< HEAD
-            Area.prototype._onDataSourceUpdate = function () {
-                _super.prototype._onDataSourceUpdate.call(this);
-                if (this._yScale != null) {
-=======
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-                if (this.yScale != null) {
->>>>>>> api-breaking-changes
+                if (this._yScale != null) {
                     this._updateYDomainer();
                 }
             };
@@ -5295,12 +5289,8 @@ var Plottable;
                     var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
                     clusters[key] = data.map(function (d, i) {
                         var val = accessor(d, i);
-<<<<<<< HEAD
-                        d["_PLOTTABLE_PROTECTED_FIELD_X"] = _this._xScale.scale(val) + _this.innerScale.scale(key);
-=======
-                        var primaryScale = _this._isVertical ? _this.xScale : _this.yScale;
+                        var primaryScale = _this._isVertical ? _this._xScale : _this._yScale;
                         d["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + _this.innerScale.scale(key);
->>>>>>> api-breaking-changes
                         return d;
                     });
                 });
@@ -5459,12 +5449,8 @@ var Plottable;
     (function (Plot) {
         var StackedBar = (function (_super) {
             __extends(StackedBar, _super);
-<<<<<<< HEAD
-            function StackedBar(xScale, yScale) {
-=======
             function StackedBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
->>>>>>> api-breaking-changes
                 _super.call(this, xScale, yScale);
                 this.stackedData = [];
                 this._baselineValue = 0;
@@ -5481,31 +5467,17 @@ var Plottable;
                 if (this._yScale == null) {
                     return;
                 }
-                var primaryScale = this._isVertical ? this.yScale : this.xScale;
+                var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 if (this._isAnchored && this.stackedExtent.length > 0) {
-<<<<<<< HEAD
-                    this._yScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+                    primaryScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
                 }
                 else {
-                    this._yScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
-=======
-                    primaryScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
-                }
-                else {
-                    primaryScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
->>>>>>> api-breaking-changes
+                    primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
             };
             StackedBar.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-<<<<<<< HEAD
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                var getY0 = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0); };
-                var getY = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y); };
-                attrToProjector["height"] = function (d) { return Math.abs(getY(d) - getY0(d)); };
-                attrToProjector["y"] = function (d) { return getY(d); };
-=======
-                var primaryScale = this._isVertical ? this.yScale : this.xScale;
                 var getStart = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_START); };
                 var getEnd = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_END); };
                 var heightF = function (d) { return Math.abs(getEnd(d) - getStart(d)); };
@@ -5514,7 +5486,6 @@ var Plottable;
                 attrToProjector["width"] = this._isVertical ? widthF : heightF;
                 var primaryAttr = this._isVertical ? "y" : "x";
                 attrToProjector[primaryAttr] = this._isVertical ? getEnd : function (d, i) { return getEnd(d) - heightF(d); };
->>>>>>> api-breaking-changes
                 return attrToProjector;
             };
             StackedBar.prototype.stack = function (accessor) {
@@ -5538,13 +5509,8 @@ var Plottable;
                         return d;
                     });
                 });
-<<<<<<< HEAD
                 this.stackedExtent = [0, Plottable._Util.Methods.max(currentBase)];
-                this._onDataSourceUpdate();
-=======
-                this.stackedExtent = [0, Plottable.Util.Methods.max(currentBase)];
                 this._onDatasetUpdate();
->>>>>>> api-breaking-changes
                 return stacks;
             };
             StackedBar.prototype._paint = function () {

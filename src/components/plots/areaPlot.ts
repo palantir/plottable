@@ -12,15 +12,9 @@ export module Plot {
      * Constructs an AreaPlot.
      *
      * @constructor
-<<<<<<< HEAD
      * @param {IDataset | any} dataset The dataset to render.
-     * @param {Scale} xScale The x scale to use.
-     * @param {Scale} yScale The y scale to use.
-=======
-     * @param {IDataset} dataset The dataset to render.
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
->>>>>>> api-breaking-changes
      */
     constructor(dataset: any, xScale: Abstract.QuantitativeScale<any>, yScale: Abstract.QuantitativeScale<any>) {
       super(dataset, xScale, yScale);
@@ -40,26 +34,17 @@ export module Plot {
       super._appendPath();
     }
 
-<<<<<<< HEAD
-    public _onDataSourceUpdate() {
-      super._onDataSourceUpdate();
-      if (this._yScale != null) {
-=======
+
     public _onDatasetUpdate() {
       super._onDatasetUpdate();
-      if (this.yScale != null) {
->>>>>>> api-breaking-changes
+      if (this._yScale != null) {
         this._updateYDomainer();
       }
     }
 
     public _updateYDomainer() {
       super._updateYDomainer();
-<<<<<<< HEAD
-      var scale = <Abstract.QuantitativeScale> this._yScale;
-=======
-      var scale = <Abstract.QuantitativeScale<any>> <any> this.yScale;
->>>>>>> api-breaking-changes
+      var scale = <Abstract.QuantitativeScale<any>> <any> this._yScale;
 
       var y0Projector = this._projectors["y0"];
       var y0Accessor = y0Projector != null ? y0Projector.accessor : null;

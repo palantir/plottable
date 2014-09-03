@@ -4,13 +4,8 @@ module Plottable {
 export module Interaction {
   export class PanZoom extends Abstract.Interaction {
     private zoom: D3.Behavior.Zoom;
-<<<<<<< HEAD
-    public _xScale: Abstract.QuantitativeScale;
-    public _yScale: Abstract.QuantitativeScale;
-=======
-    public xScale: Abstract.QuantitativeScale<any>;
-    public yScale: Abstract.QuantitativeScale<any>;
->>>>>>> api-breaking-changes
+    public _xScale: Abstract.QuantitativeScale<any>;
+    public _yScale: Abstract.QuantitativeScale<any>;
 
     /**
      * Creates a PanZoomInteraction.

@@ -31,14 +31,8 @@ export module Plot {
 
     public _paint() {
       super._paint();
-
-<<<<<<< HEAD
       var scaledBaseline = this._yScale.scale(this._baselineValue);
-      var baselineAttr: IAttributeToProjector = {
-=======
-      var scaledBaseline = this.yScale.scale(this._baselineValue);
       var baselineAttr: any = {
->>>>>>> api-breaking-changes
         "x1": 0,
         "y1": scaledBaseline,
         "x2": this.width(),
@@ -71,11 +65,7 @@ export module Plot {
 
     public _updateYDomainer() {
       super._updateYDomainer();
-<<<<<<< HEAD
-      var scale = <Abstract.QuantitativeScale> this._yScale;
-=======
-      var scale = <Abstract.QuantitativeScale<any>> this.yScale;
->>>>>>> api-breaking-changes
+      var scale = <Abstract.QuantitativeScale<any>> this._yScale;
       if (!scale._userSetDomainer) {
         scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions

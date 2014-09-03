@@ -47,11 +47,7 @@ export module Abstract {
 
     public _paint() {
       super._paint();
-<<<<<<< HEAD
-      this._bars = this._renderArea.selectAll("rect").data(this._dataSource.data());
-=======
-      this._bars = this.renderArea.selectAll("rect").data(this._dataset.data());
->>>>>>> api-breaking-changes
+      this._bars = this._renderArea.selectAll("rect").data(this._dataset.data());
       this._bars.enter().append("rect");
 
       var primaryScale = this._isVertical ? this._yScale : this._xScale;

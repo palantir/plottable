@@ -4,43 +4,24 @@ module Plottable {
 export module Plot {
 
   export class StackedBar extends Abstract.NewStyleBarPlot {
-<<<<<<< HEAD
-    private stackedData: any[][] = [];
-    public _yAccessor: _IAccessor;
-    public _isVertical = true;
-=======
     public stackedData: any[][] = [];
-    public _yAccessor: IAccessor;
->>>>>>> api-breaking-changes
+    public _yAccessor: _IAccessor;
     public _baselineValue = 0;
     public _baseline: D3.Selection;
     private stackedExtent: number[] = [];
 
     /**
-<<<<<<< HEAD
-     * Constructs a StackedBarPlot.
-     *
+     * Constructs a StackedBar plot.
      * A StackedBarPlot is a plot that plots several bar plots stacking on top of each
      * other.
-     *
      * @constructor
-     * @param {Scale} xScale The x scale to use.
-     * @param {Scale} yScale The y scale to use.
-     */
-    constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
-      super(xScale, yScale);
-=======
-     * Constructs a StackedBar plot.
-     *
-     * @constructor
-     * @param {Scale} xScale the x scale of the plot
-     * @param {Scale} yScale the y scale of the plot
-     * @param {boolean} isVertical if the plot if vertical
+     * @param {Scale} xScale the x scale of the plot.
+     * @param {Scale} yScale the y scale of the plot.
+     * @param {boolean} isVertical if the plot if vertical.
      */
     constructor(xScale?: Abstract.Scale<any,number>, yScale?: Abstract.Scale<any,number>, isVertical = true) {
       super(xScale, yScale);
       this._isVertical = isVertical;
->>>>>>> api-breaking-changes
     }
 
     public _addDataset(key: string, dataset: any) {
@@ -54,31 +35,18 @@ export module Plot {
       if (this._yScale == null) {
         return;
       }
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale = this._isVertical ? this._yScale : this._xScale;
       if (this._isAnchored && this.stackedExtent.length > 0) {
-<<<<<<< HEAD
-        this._yScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+        primaryScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
       } else {
-        this._yScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
-=======
-        primaryScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
-      } else {
-        primaryScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
->>>>>>> api-breaking-changes
+        primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
       }
     }
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-<<<<<<< HEAD
-      var primaryScale    = this._isVertical ? this._yScale : this._xScale;
-      var getY0 = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0);
-      var getY = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y);
-      attrToProjector["height"] = (d) => Math.abs(getY(d) - getY0(d));
-      attrToProjector["y"] = (d) => getY(d);
-=======
 
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale = this._isVertical ? this._yScale : this._xScale;
       var getStart = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_START);
       var getEnd = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_END);
 
@@ -89,8 +57,6 @@ export module Plot {
 
       var primaryAttr = this._isVertical ? "y" : "x";
       attrToProjector[primaryAttr] = this._isVertical ? getEnd : (d, i) => getEnd(d) - heightF(d);
-
->>>>>>> api-breaking-changes
       return attrToProjector;
     }
 
@@ -116,13 +82,8 @@ export module Plot {
           return d;
         });
       });
-<<<<<<< HEAD
       this.stackedExtent = [0, _Util.Methods.max(currentBase)];
-      this._onDataSourceUpdate();
-=======
-      this.stackedExtent = [0, Util.Methods.max(currentBase)];
       this._onDatasetUpdate();
->>>>>>> api-breaking-changes
       return stacks;
     }
 

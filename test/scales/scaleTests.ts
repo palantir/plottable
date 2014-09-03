@@ -27,13 +27,9 @@ describe("Scales", () => {
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
 
-<<<<<<< HEAD
-    (<any> scale).autoDomainAutomatically = true;
-    scale._updateExtent("1", "x", [0.08, 9.92]);
-=======
+
     (<any> scale)._autoDomainAutomatically = true;
-    scale.updateExtent("1", "x", [0.08, 9.92]);
->>>>>>> api-breaking-changes
+    scale._updateExtent("1", "x", [0.08, 9.92]);
     callbackWasCalled = false;
     scale.domainer(new Plottable.Domainer().nice());
     assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
@@ -99,31 +95,17 @@ describe("Scales", () => {
     });
 
     it("scale perspectives can be removed appropriately", () => {
-<<<<<<< HEAD
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled1");
+      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled1");
       scale._updateExtent("1", "x", d3.extent(data, (e) => e.foo));
       scale._updateExtent("2", "x", d3.extent(data, (e) => e.bar));
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled2");
-      assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled3");
-      scale._removeExtent("1", "x");
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled4");
-      assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
-      scale._updateExtent("2", "x", d3.extent(data, (e) => e.foo));
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled5");
-=======
-      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled1");
-      scale.updateExtent("1", "x", d3.extent(data, (e) => e.foo));
-      scale.updateExtent("2", "x", d3.extent(data, (e) => e.bar));
       assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled2");
       assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
       assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled3");
-      scale.removeExtent("1", "x");
+      scale._removeExtent("1", "x");
       assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled4");
       assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
-      scale.updateExtent("2", "x", d3.extent(data, (e) => e.foo));
+      scale._updateExtent("2", "x", d3.extent(data, (e) => e.foo));
       assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled5");
->>>>>>> api-breaking-changes
       assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
     });
 

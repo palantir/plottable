@@ -31,7 +31,6 @@ export module Abstract {
     private _gutter = 15;
     private _showEndTickLabels = false;
 
-<<<<<<< HEAD
     /**
      * Constructs an axis. An axis is a wrapper around a scale for rendering.
      *
@@ -43,11 +42,7 @@ export module Abstract {
      * @param {Formatter} Data is passed through this formatter before being
      * displayed.
      */
-    constructor(scale: Abstract.Scale, orientation: string, formatter = Formatters.identity()) {
-=======
     constructor(scale: Abstract.Scale<any, number>, orientation: string, formatter = Formatters.identity()) {
-      // TODO in future commit: Remove <any> typing
->>>>>>> api-breaking-changes
       super();
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
       this._scale = scale;

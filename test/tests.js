@@ -2050,13 +2050,8 @@ describe("Plots", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude", colorScale);
             renderer.renderTo(svg);
-<<<<<<< HEAD
-            renderer.dataSource().data(DATA);
-            VERIFY_CELLS(renderer._renderArea.selectAll("rect")[0]);
-=======
             renderer.dataset().data(DATA);
-            VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
->>>>>>> api-breaking-changes
+            VERIFY_CELLS(renderer._renderArea.selectAll("rect")[0]);
             svg.remove();
         });
         it("can invert y axis correctly", function () {
@@ -2067,13 +2062,8 @@ describe("Plots", function () {
             var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude");
             renderer.renderTo(svg);
             yScale.domain(["U", "V"]);
-<<<<<<< HEAD
-            renderer.dataSource().data(DATA);
-            var cells = renderer._renderArea.selectAll("rect")[0];
-=======
             renderer.dataset().data(DATA);
-            var cells = renderer.renderArea.selectAll("rect")[0];
->>>>>>> api-breaking-changes
+            var cells = renderer._renderArea.selectAll("rect")[0];
             var cellAU = d3.select(cells[0]);
             var cellAV = d3.select(cells[2]);
             cellAU.attr("fill", "#000000");
@@ -2572,7 +2562,7 @@ describe("Plots", function () {
             ;
         });
         it("renders correctly", function () {
-            var bars = renderer.renderArea.selectAll("rect");
+            var bars = renderer._renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -2726,7 +2716,7 @@ describe("Plots", function () {
             ;
         });
         it("renders correctly", function () {
-            var bars = renderer.renderArea.selectAll("rect");
+            var bars = renderer._renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -3401,15 +3391,9 @@ describe("Dataset", function () {
     it("_getExtent works as expected", function () {
         var data = [1, 2, 3, 4, 1];
         var metadata = { foo: 11 };
-<<<<<<< HEAD
-        var dataSource = new Plottable.DataSource(data, metadata);
-        var plot = new Plottable.Abstract.Plot(dataSource);
-        var apply = function (a) { return Plottable._Util.Methods.applyAccessor(a, plot); };
-=======
         var dataset = new Plottable.Dataset(data, metadata);
         var plot = new Plottable.Abstract.Plot(dataset);
-        var apply = function (a) { return Plottable.Util.Methods._applyAccessor(a, plot); };
->>>>>>> api-breaking-changes
+        var apply = function (a) { return Plottable._Util.Methods._applyAccessor(a, plot); };
         var a1 = function (d, i, m) { return d + i - 2; };
         assert.deepEqual(dataset._getExtent(apply(a1)), [-1, 5], "extent for numerical data works properly");
         var a2 = function (d, i, m) { return d + m.foo; };
@@ -3900,13 +3884,8 @@ describe("Scales", function () {
         scale.broadcaster.registerListener(null, testCallback);
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
-<<<<<<< HEAD
-        scale.autoDomainAutomatically = true;
-        scale._updateExtent("1", "x", [0.08, 9.92]);
-=======
         scale._autoDomainAutomatically = true;
-        scale.updateExtent("1", "x", [0.08, 9.92]);
->>>>>>> api-breaking-changes
+        scale._updateExtent("1", "x", [0.08, 9.92]);
         callbackWasCalled = false;
         scale.domainer(new Plottable.Domainer().nice());
         assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
@@ -3957,31 +3936,17 @@ describe("Scales", function () {
             svg2.remove();
         });
         it("scale perspectives can be removed appropriately", function () {
-<<<<<<< HEAD
-            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled1");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled1");
             scale._updateExtent("1", "x", d3.extent(data, function (e) { return e.foo; }));
             scale._updateExtent("2", "x", d3.extent(data, function (e) { return e.bar; }));
-            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled2");
-            assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
-            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled3");
-            scale._removeExtent("1", "x");
-            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled4");
-            assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
-            scale._updateExtent("2", "x", d3.extent(data, function (e) { return e.foo; }));
-            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled5");
-=======
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled1");
-            scale.updateExtent("1", "x", d3.extent(data, function (e) { return e.foo; }));
-            scale.updateExtent("2", "x", d3.extent(data, function (e) { return e.bar; }));
             assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled2");
             assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
             assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled3");
-            scale.removeExtent("1", "x");
+            scale._removeExtent("1", "x");
             assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled4");
             assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
-            scale.updateExtent("2", "x", d3.extent(data, function (e) { return e.foo; }));
+            scale._updateExtent("2", "x", d3.extent(data, function (e) { return e.foo; }));
             assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
->>>>>>> api-breaking-changes
             assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
         });
         it("should resize when a plot is removed", function () {

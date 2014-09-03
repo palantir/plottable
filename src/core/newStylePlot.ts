@@ -1,15 +1,6 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-<<<<<<< HEAD
-=======
-  export interface DatasetDrawerKey {
-    dataset: Dataset;
-    drawer: Abstract._Drawer;
-    key: string;
-  }
-
->>>>>>> api-breaking-changes
 export module Abstract {
   export class NewStylePlot extends XYPlot {
     private nextSeriesIndex: number;
@@ -52,13 +43,8 @@ export module Abstract {
      * A key is automatically generated if not supplied.
      *
      * @param {string} [key] The key of the dataset.
-<<<<<<< HEAD
-     * @param {any[]|DataSource} dataset dataset to add.
-     * @returns {NewStylePlot} The calling NewStylePlot.
-=======
      * @param {any[]|Dataset} dataset dataset to add.
-     * @return {NewStylePlot} The calling NewStylePlot.
->>>>>>> api-breaking-changes
+     * @returns {NewStylePlot} The calling NewStylePlot.
      */
     public addDataset(key: string, dataset: Dataset): NewStylePlot;
     public addDataset(key: string, dataset: any[]): NewStylePlot;

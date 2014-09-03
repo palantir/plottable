@@ -27,16 +27,12 @@ export module Plot {
       this.project("fill", () => Core.Colors.INDIGO); // default
     }
 
-<<<<<<< HEAD
     /**
      * @param {string} attrToSet One of ["x", "y", "cx", "cy", "r",
      * "fill"]. "cx" and "cy" are aliases for "x" and "y". "r" is the datum's
      * radius, and "fill" is the CSS color of the datum.
      */
-    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
-=======
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
->>>>>>> api-breaking-changes
       attrToSet = attrToSet === "cx" ? "x" : attrToSet;
       attrToSet = attrToSet === "cy" ? "y" : attrToSet;
       super.project(attrToSet, accessor, scale);
@@ -52,11 +48,7 @@ export module Plot {
       delete attrToProjector["x"];
       delete attrToProjector["y"];
 
-<<<<<<< HEAD
-      var circles = this._renderArea.selectAll("circle").data(this._dataSource.data());
-=======
-      var circles = this.renderArea.selectAll("circle").data(this._dataset.data());
->>>>>>> api-breaking-changes
+      var circles = this._renderArea.selectAll("circle").data(this._dataset.data());
       circles.enter().append("circle");
 
       if (this._dataChanged) {

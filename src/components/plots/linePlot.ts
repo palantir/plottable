@@ -16,15 +16,9 @@ export module Plot {
      * Constructs a LinePlot.
      *
      * @constructor
-<<<<<<< HEAD
-     * @param {IDataset | any} dataset The dataset to render.
-     * @param {Scale} xScale The x scale to use.
-     * @param {Scale} yScale The y scale to use.
-=======
-     * @param {IDataset} dataset The dataset to render.
+     * @param {any | IDataset} dataset The dataset to render.
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
->>>>>>> api-breaking-changes
      */
     constructor(dataset: any, xScale: Abstract.QuantitativeScale<any>, yScale: Abstract.QuantitativeScale<any>) {
       super(dataset, xScale, yScale);

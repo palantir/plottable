@@ -1,13 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-<<<<<<< HEAD
 export module _Util {
-  export class ScaleDomainCoordinator {
-=======
-export module Util {
   export class ScaleDomainCoordinator<D> {
->>>>>>> api-breaking-changes
     /* This class is responsible for maintaining coordination between linked scales.
     It registers event listeners for when one of its scales changes its domain. When the scale
     does change its domain, it re-propogates the change to every linked scale.

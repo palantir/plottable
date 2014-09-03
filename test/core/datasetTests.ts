@@ -40,15 +40,9 @@ describe("Dataset", () => {
   it("_getExtent works as expected", () => {
     var data = [1,2,3,4,1];
     var metadata = {foo: 11};
-<<<<<<< HEAD:test/core/dataSourceTests.ts
-    var dataSource = new Plottable.DataSource(data, metadata);
-    var plot = new Plottable.Abstract.Plot(dataSource);
-    var apply = (a: any) => Plottable._Util.Methods.applyAccessor(a, plot);
-=======
     var dataset = new Plottable.Dataset(data, metadata);
     var plot = new Plottable.Abstract.Plot(dataset);
-    var apply = (a: any) => Plottable.Util.Methods._applyAccessor(a, plot);
->>>>>>> api-breaking-changes:test/core/datasetTests.ts
+    var apply = (a: any) => Plottable._Util.Methods._applyAccessor(a, plot);
     var a1 = (d: number, i: number, m: any) => d + i - 2;
     assert.deepEqual(dataset._getExtent(apply(a1)), [-1, 5], "extent for numerical data works properly");
     var a2 = (d: number, i: number, m: any) => d + m.foo;

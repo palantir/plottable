@@ -31,7 +31,6 @@ export module Abstract {
     }
 
     /**
-<<<<<<< HEAD
      * Modifies the domain on the scale so that it includes the extent of all
      * perspectives it depends on. This will normally happen automatically, but
      * if you set domain explicitly with `plot.domain(x)`, you will need to
@@ -41,13 +40,7 @@ export module Abstract {
      * Extent: The [min, max] pair for a Scale.Quantitative, all covered
      * strings for a Scale.Ordinal.
      *
-     * Perspective: A combination of a DataSource and an Accessor that
-=======
-     * Modify the domain on the scale so that it includes the extent of all
-     * perspectives it depends on. Extent: The (min, max) pair for a
-     * QuantitiativeScale, all covered strings for an OrdinalScale.
      * Perspective: A combination of a Dataset and an Accessor that
->>>>>>> api-breaking-changes
      * represents a view in to the data.
      *
      * @returns {Scale} The calling Scale.
@@ -84,19 +77,11 @@ export module Abstract {
     /**
      * Sets the domain.
      *
-<<<<<<< HEAD
-     * @param {any[]} values If provided, the new value for the domain. On
+     * @param {D[]} values If provided, the new value for the domain. On
      * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
      * make the function decreasing. On Scale.Ordinal, this is an array of all
      * input values.
-     * @returs {Scale} The calling Scale.
-=======
-     * @param {D[]} values The new value for the domain. This array may
-     *     contain more than 2 values if the scale type allows it (e.g.
-     *     ordinal scales). Other scales such as quantitative scales accept
-     *     only a 2-value extent array.
      * @returns {Scale} The calling Scale.
->>>>>>> api-breaking-changes
      */
     public domain(values: D[]): Scale<D,R>;
     public domain(values?: D[]): any {
@@ -121,15 +106,11 @@ export module Abstract {
     /**
      * Gets the range.
      *
-<<<<<<< HEAD
      * In the case of having a numeric range, it will be a [min, max] pair. In
      * the case of string range (e.g. Scale.InterpolatedColor), it will be a
      * list of all possible outputs.
      *
-     * @returns {any[]} The current range.
-=======
      * @returns {R[]} The current range.
->>>>>>> api-breaking-changes
      */
     public range(): R[];
     /**
@@ -139,11 +120,7 @@ export module Abstract {
      * the case of string range (e.g. Scale.InterpolatedColor), it will be a
      * list of all possible outputs.
      *
-<<<<<<< HEAD
-     * @param {any[]} values If provided, the new values for the range.
-=======
-     * @param {R[]} values The new values for the range.
->>>>>>> api-breaking-changes
+     * @param {R[]} values If provided, the new values for the range.
      * @returns {Scale} The calling Scale.
      */
     public range(values: R[]): Scale<D,R>;
@@ -176,11 +153,7 @@ export module Abstract {
      * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
      * @param {D[]} extent The new extent to be included in the scale.
      */
-<<<<<<< HEAD
-    public _updateExtent(plotProvidedKey: string, attr: string, extent: any[]) {
-=======
-    public updateExtent(plotProvidedKey: string, attr: string, extent: D[]) {
->>>>>>> api-breaking-changes
+    public _updateExtent(plotProvidedKey: string, attr: string, extent: D[]) {
       this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
       this._autoDomainIfAutomaticMode();
       return this;

@@ -143,7 +143,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = renderer.renderArea.selectAll("rect");
+      var bars = renderer._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);

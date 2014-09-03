@@ -3,8 +3,7 @@
 module Plottable {
 export module Plot {
   export class ClusteredBar extends Abstract.NewStyleBarPlot {
-<<<<<<< HEAD
-    public _isVertical = true;
+
     private innerScale: Scale.Ordinal;
 
     /**
@@ -18,13 +17,7 @@ export module Plot {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale) {
-=======
-    public static DEFAULT_WIDTH = 10;
-    private innerScale: Scale.Ordinal;
-
     constructor(xScale: Abstract.Scale<any, number>, yScale: Abstract.Scale<any, number>, isVertical = true) {
->>>>>>> api-breaking-changes
       super(xScale, yScale);
       this.innerScale = new Scale.Ordinal();
       this._isVertical = isVertical;
@@ -60,12 +53,8 @@ export module Plot {
 
         clusters[key] = data.map((d, i) => {
           var val = accessor(d, i);
-<<<<<<< HEAD
-          d["_PLOTTABLE_PROTECTED_FIELD_X"] = this._xScale.scale(val) + this.innerScale.scale(key);
-=======
-          var primaryScale = this._isVertical ? this.xScale : this.yScale;
+          var primaryScale = this._isVertical ? this._xScale : this._yScale;
           d["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + this.innerScale.scale(key);
->>>>>>> api-breaking-changes
           return d;
         });
       });

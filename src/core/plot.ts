@@ -22,12 +22,7 @@ export module Abstract {
      * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
      *
      * @constructor
-<<<<<<< HEAD
-     * @param {any[]|DataSource} [dataset] The data or DataSource to be
-     * associated with this Plot.
-=======
-     * @param {any[]|Dataset} [dataOrDataset] The data or Dataset to be associated with this Plot.
->>>>>>> api-breaking-changes
+     * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
      */
     constructor();
     constructor(data: any[]);
@@ -73,23 +68,14 @@ export module Abstract {
     /**
      * Gets the Plot's Dataset.
      *
-<<<<<<< HEAD
-     * @returns {DataSource} The current DataSource.
-=======
-     * @return {Dataset} The current Dataset.
->>>>>>> api-breaking-changes
+     * @returns {Dataset} The current Dataset.
      */
     public dataset(): Dataset;
     /**
      * Sets the Plot's Dataset.
      *
-<<<<<<< HEAD
-     * @param {DataSource} source If provided, The DataSource the Plot should use.
-     * @returnss {Plot} The calling Plot.
-=======
-     * @param {Dataset} dataset The Dataset the Plot should use.
-     * @return {Plot} The calling Plot.
->>>>>>> api-breaking-changes
+     * @param {Dataset} dataset If provided, the Dataset the Plot should use.
+     * @returns {Plot} The calling Plot.
      */
     public dataset(dataset: Dataset): Plot;
     public dataset(dataset?: Dataset): any {
@@ -112,7 +98,6 @@ export module Abstract {
       this._render();
     }
 
-<<<<<<< HEAD
     /**
      * Sets an attribute of every data point.
      *
@@ -136,10 +121,7 @@ export module Abstract {
      *
      * @returns {Plot} The calling Plot.
      */
-    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
-=======
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
->>>>>>> api-breaking-changes
       attrToSet = attrToSet.toLowerCase();
       var currentProjection = this._projectors[attrToSet];
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
@@ -152,7 +134,7 @@ export module Abstract {
       if (scale != null) {
         scale.broadcaster.registerListener(this, () => this._render());
       }
-      var activatedAccessor = _Util.Methods.applyAccessor(accessor, this);
+      var activatedAccessor = _Util.Methods._applyAccessor(accessor, this);
       this._projectors[attrToSet] = {accessor: activatedAccessor, scale: scale, attribute: attrToSet};
       this._updateProjector(attrToSet);
       this._render(); // queue a re-render upon changing projector

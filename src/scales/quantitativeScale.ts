@@ -62,9 +62,6 @@ export module Abstract {
     }
 
     /**
-<<<<<<< HEAD
-     * Returns the locations in the range where ticks will show up.
-=======
      * Sets or gets the QuantitativeScale's output interpolator
      *
      * @param {D3.Transition.Interpolate} [factory] The output interpolator to use.
@@ -112,8 +109,7 @@ export module Abstract {
     }
 
     /**
-     * Generates tick values.
->>>>>>> api-breaking-changes
+     * Returns the locations in the range where ticks will show up.
      *
      * @param {number} count The suggested number of ticks to generate.
      * @returns {any[]} The generated ticks.

@@ -12,14 +12,10 @@ module Plottable {
     public broadcaster = new Core.Broadcaster(this);
 
     /**
-<<<<<<< HEAD:src/core/dataSource.ts
-     * Constructs a new DataSource.
+     * Constructs a new set.
      *
-     * A DataSource is mostly just a wrapper around an any[], DataSource is the
+     * A Dataset is mostly just a wrapper around an any[], Dataset is the
      * data you're going to plot.
-=======
-     * Creates a new Dataset.
->>>>>>> api-breaking-changes:src/core/dataset.ts
      *
      * @constructor
      * @param {any[]} data The data for this DataSource (default = []).
