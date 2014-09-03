@@ -70,17 +70,7 @@ var Plottable;
             Methods.populateMap = populateMap;
             function _applyAccessor(accessor, plot) {
                 var activatedAccessor = _accessorize(accessor);
-<<<<<<< HEAD
-<<<<<<< HEAD
                 return function (d, i) { return activatedAccessor(d, i, plot.dataset().metadata()); };
-=======
-                return function (d, i) {
-                    return activatedAccessor(d, i, plot.dataSource().metadata());
-                };
->>>>>>> Release version 0.27.0
-=======
-                return function (d, i) { return activatedAccessor(d, i, plot.dataSource().metadata()); };
->>>>>>> Remove comments from built files.
             }
             Methods._applyAccessor = _applyAccessor;
             function uniq(arr) {
@@ -1049,24 +1039,11 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-<<<<<<< HEAD
     var Dataset = (function (_super) {
         __extends(Dataset, _super);
         function Dataset(data, metadata) {
             if (data === void 0) { data = []; }
             if (metadata === void 0) { metadata = {}; }
-=======
-    var DataSource = (function (_super) {
-        __extends(DataSource, _super);
-        function DataSource(data, metadata) {
-<<<<<<< HEAD
-            if (typeof data === "undefined") { data = []; }
-            if (typeof metadata === "undefined") { metadata = {}; }
->>>>>>> Release version 0.27.0
-=======
-            if (data === void 0) { data = []; }
-            if (metadata === void 0) { metadata = {}; }
->>>>>>> Remove comments from built files.
             _super.call(this);
             this.broadcaster = new Plottable.Core.Broadcaster(this);
             this._data = data;
@@ -1084,15 +1061,7 @@ var Plottable;
                 return this;
             }
         };
-<<<<<<< HEAD
-<<<<<<< HEAD
         Dataset.prototype.metadata = function (metadata) {
-=======
-
-=======
->>>>>>> Remove comments from built files.
-        DataSource.prototype.metadata = function (metadata) {
->>>>>>> Release version 0.27.0
             if (metadata == null) {
                 return this._metadata;
             }
@@ -1103,15 +1072,7 @@ var Plottable;
                 return this;
             }
         };
-<<<<<<< HEAD
-<<<<<<< HEAD
         Dataset.prototype._getExtent = function (accessor) {
-=======
-
-=======
->>>>>>> Remove comments from built files.
-        DataSource.prototype._getExtent = function (accessor) {
->>>>>>> Release version 0.27.0
             var cachedExtent = this.accessor2cachedExtent.get(accessor);
             if (cachedExtent === undefined) {
                 cachedExtent = this.computeExtent(accessor);
@@ -1119,15 +1080,7 @@ var Plottable;
             }
             return cachedExtent;
         };
-<<<<<<< HEAD
-<<<<<<< HEAD
         Dataset.prototype.computeExtent = function (accessor) {
-=======
-
-=======
->>>>>>> Remove comments from built files.
-        DataSource.prototype.computeExtent = function (accessor) {
->>>>>>> Release version 0.27.0
             var mappedData = this._data.map(accessor);
             if (mappedData.length === 0) {
                 return [];
@@ -1886,19 +1839,9 @@ var Plottable;
             Scale.prototype.domain = function (values) {
                 if (values == null) {
                     return this._getDomain();
-<<<<<<< HEAD
-<<<<<<< HEAD
                 }
                 else {
                     this._autoDomainAutomatically = false;
-=======
-                } else {
-=======
-                }
-                else {
->>>>>>> Remove comments from built files.
-                    this.autoDomainAutomatically = false;
->>>>>>> Release version 0.27.0
                     this._setDomain(values);
                     return this;
                 }
@@ -1960,8 +1903,6 @@ var Plottable;
                 this.animateOnNextRender = true;
                 this.clipPathEnabled = true;
                 this.classed("plot", true);
-<<<<<<< HEAD
-<<<<<<< HEAD
                 var dataset;
                 if (dataOrDataset != null) {
                     if (typeof dataOrDataset.data === "function") {
@@ -1973,22 +1914,6 @@ var Plottable;
                 }
                 else {
                     dataset = new Plottable.Dataset();
-=======
-
-=======
->>>>>>> Remove comments from built files.
-                var dataSource;
-                if (dataset != null) {
-                    if (typeof dataset.data === "function") {
-                        dataSource = dataset;
-                    }
-                    else {
-                        dataSource = dataSource = new Plottable.DataSource(dataset);
-                    }
-                }
-                else {
-                    dataSource = new Plottable.DataSource();
->>>>>>> Release version 0.27.0
                 }
                 this.dataset(dataset);
             }
@@ -2001,16 +1926,7 @@ var Plottable;
             Plot.prototype.remove = function () {
                 var _this = this;
                 _super.prototype.remove.call(this);
-<<<<<<< HEAD
                 this._dataset.broadcaster.deregisterListener(this);
-=======
-                this._dataSource.broadcaster.deregisterListener(this);
-<<<<<<< HEAD
-
-                // deregister from all scales
->>>>>>> Release version 0.27.0
-=======
->>>>>>> Remove comments from built files.
                 var properties = Object.keys(this._projectors);
                 properties.forEach(function (property) {
                     var projector = _this._projectors[property];
@@ -2019,15 +1935,7 @@ var Plottable;
                     }
                 });
             };
-<<<<<<< HEAD
-<<<<<<< HEAD
             Plot.prototype.dataset = function (dataset) {
-=======
-
-=======
->>>>>>> Remove comments from built files.
-            Plot.prototype.dataSource = function (source) {
->>>>>>> Release version 0.27.0
                 var _this = this;
                 if (dataset == null) {
                     return this._dataset;
@@ -2035,21 +1943,12 @@ var Plottable;
                 if (this._dataset != null) {
                     this._dataset.broadcaster.deregisterListener(this);
                 }
-<<<<<<< HEAD
                 this._dataset = dataset;
                 this._dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
                 this._onDatasetUpdate();
                 return this;
             };
             Plot.prototype._onDatasetUpdate = function () {
-=======
-                this._dataSource = source;
-                this._dataSource.broadcaster.registerListener(this, function () { return _this._onDataSourceUpdate(); });
-                this._onDataSourceUpdate();
-                return this;
-            };
-            Plot.prototype._onDataSourceUpdate = function () {
->>>>>>> Release version 0.27.0
                 this._updateAllProjectors();
                 this.animateOnNextRender = true;
                 this._dataChanged = true;
@@ -2243,15 +2142,7 @@ var Plottable;
                 }
                 var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
                 var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
-<<<<<<< HEAD
                 var dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
-=======
-                var dataset = (data instanceof Plottable.DataSource) ? data : new Plottable.DataSource(data);
-<<<<<<< HEAD
-
->>>>>>> Release version 0.27.0
-=======
->>>>>>> Remove comments from built files.
                 this._addDataset(key, dataset);
                 return this;
             };
@@ -2268,19 +2159,8 @@ var Plottable;
                 if (this._isSetup) {
                     drawer.renderArea = this.renderArea.append("g");
                 }
-<<<<<<< HEAD
-<<<<<<< HEAD
                 dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
                 this._onDatasetUpdate();
-=======
-                dataset.broadcaster.registerListener(this, function () {
-                    return _this._onDataSourceUpdate();
-                });
-=======
-                dataset.broadcaster.registerListener(this, function () { return _this._onDataSourceUpdate(); });
->>>>>>> Remove comments from built files.
-                this._onDataSourceUpdate();
->>>>>>> Release version 0.27.0
             };
             NewStylePlot.prototype._getDrawer = function (key) {
                 throw new Error("Abstract Method Not Implemented");
@@ -2312,19 +2192,9 @@ var Plottable;
                 }
                 if (isPermutation(order, this._datasetKeysInOrder)) {
                     this._datasetKeysInOrder = order;
-<<<<<<< HEAD
                     this._onDatasetUpdate();
                 }
                 else {
-=======
-                    this._onDataSourceUpdate();
-<<<<<<< HEAD
-                } else {
->>>>>>> Release version 0.27.0
-=======
-                }
-                else {
->>>>>>> Remove comments from built files.
                     Plottable.Util.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
                 }
                 return this;
@@ -3329,15 +3199,7 @@ var Plottable;
             Area.prototype.draw = function (data, attrToProjector) {
                 var pathData = [data];
                 var svgElement = "path";
-<<<<<<< HEAD
                 var dataElements = this.renderArea.selectAll(svgElement).data(pathData);
-=======
-                var dataElements = this.renderArea.selectAll(svgElement).data(data);
-<<<<<<< HEAD
-
->>>>>>> Release version 0.27.0
-=======
->>>>>>> Remove comments from built files.
                 dataElements.enter().append(svgElement);
                 dataElements.attr(attrToProjector).classed("area", true);
                 dataElements.exit().remove();
@@ -4216,8 +4078,6 @@ var Plottable;
             Category.prototype._getTickValues = function () {
                 return this._scale.domain();
             };
-<<<<<<< HEAD
-<<<<<<< HEAD
             Category.prototype.drawTicks = function (axisWidth, axisHeight, scale, ticks) {
                 return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, true);
             };
@@ -4225,13 +4085,6 @@ var Plottable;
                 return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, false);
             };
             Category.prototype.drawOrMeasureTicks = function (axisWidth, axisHeight, scale, dataOrTicks, draw) {
-=======
-
-=======
->>>>>>> Remove comments from built files.
-            Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
-                var draw = typeof dataOrTicks[0] !== "string";
->>>>>>> Release version 0.27.0
                 var self = this;
                 var textWriteResults = [];
                 var tm = function (s) { return self.measurer.measure(s); };
@@ -4856,15 +4709,7 @@ var Plottable;
                 attrToProjector["cy"] = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
-<<<<<<< HEAD
-<<<<<<< HEAD
                 var circles = this.renderArea.selectAll("circle").data(this._dataset.data());
-=======
-
-=======
->>>>>>> Remove comments from built files.
-                var circles = this.renderArea.selectAll("circle").data(this._dataSource.data());
->>>>>>> Release version 0.27.0
                 circles.enter().append("circle");
                 if (this._dataChanged) {
                     var rFunction = attrToProjector["r"];
@@ -4913,15 +4758,7 @@ var Plottable;
             };
             Grid.prototype._paint = function () {
                 _super.prototype._paint.call(this);
-<<<<<<< HEAD
-<<<<<<< HEAD
                 var cells = this.renderArea.selectAll("rect").data(this._dataset.data());
-=======
-
-=======
->>>>>>> Remove comments from built files.
-                var cells = this.renderArea.selectAll("rect").data(this._dataSource.data());
->>>>>>> Release version 0.27.0
                 cells.enter().append("rect");
                 var xStep = this.xScale.rangeBand();
                 var yStep = this.yScale.rangeBand();
@@ -5253,17 +5090,7 @@ var Plottable;
                 var yFunction = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
-<<<<<<< HEAD
-<<<<<<< HEAD
                 this.linePath.datum(this._dataset.data());
-=======
-
-                this.linePath.datum(this._dataSource.data());
-
->>>>>>> Release version 0.27.0
-=======
-                this.linePath.datum(this._dataSource.data());
->>>>>>> Remove comments from built files.
                 if (this._dataChanged) {
                     attrToProjector["d"] = d3.svg.line().x(xFunction).y(this._getResetYFunction());
                     this._applyAnimatedAttributes(this.linePath, "line-reset", attrToProjector);
@@ -5306,17 +5133,8 @@ var Plottable;
                 this.areaPath = this.renderArea.append("path").classed("area", true);
                 _super.prototype._appendPath.call(this);
             };
-<<<<<<< HEAD
-<<<<<<< HEAD
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-=======
-
-=======
->>>>>>> Remove comments from built files.
-            Area.prototype._onDataSourceUpdate = function () {
-                _super.prototype._onDataSourceUpdate.call(this);
->>>>>>> Release version 0.27.0
                 if (this.yScale != null) {
                     this._updateYDomainer();
                 }
@@ -5357,17 +5175,7 @@ var Plottable;
                 delete attrToProjector["x"];
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
-<<<<<<< HEAD
-<<<<<<< HEAD
                 this.areaPath.datum(this._dataset.data());
-=======
-
-                this.areaPath.datum(this._dataSource.data());
-
->>>>>>> Release version 0.27.0
-=======
-                this.areaPath.datum(this._dataSource.data());
->>>>>>> Remove comments from built files.
                 if (this._dataChanged) {
                     attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(this._getResetYFunction());
                     this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
@@ -5534,27 +5342,16 @@ var Plottable;
                 _super.apply(this, arguments);
                 this.stackedExtent = [0, 0];
             }
-<<<<<<< HEAD
             Stacked.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-=======
-            Stacked.prototype._onDataSourceUpdate = function () {
-                _super.prototype._onDataSourceUpdate.call(this);
-<<<<<<< HEAD
-
-                // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
->>>>>>> Release version 0.27.0
-=======
->>>>>>> Remove comments from built files.
                 if (this._datasetKeysInOrder != null && this._projectors["x"] != null && this._projectors["y"] != null) {
                     this.stack();
                 }
             };
-<<<<<<< HEAD
-<<<<<<< HEAD
             Stacked.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
-                if (this._datasetKeysInOrder.length > 0 && attrToSet === "y") {
+                var primaryAttr = this._isVertical ? "y" : "x";
+                if (this._datasetKeysInOrder.length > 0 && attrToSet === primaryAttr) {
                     this.stack();
                 }
                 return this;
@@ -5570,23 +5367,6 @@ var Plottable;
                 this.stackedExtent[1] = Math.max(0, maxY);
                 var minY = Plottable.Util.Methods.min(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
                 this.stackedExtent[0] = Math.min(minY, 0);
-=======
-
-=======
->>>>>>> Remove comments from built files.
-            Stacked.prototype.stack = function () {
-                var datasets = this._getDatasetsInOrder();
-                d3.layout.stack().x(this._projectors["x"].accessor).y(this._projectors["y"].accessor).values(function (d) { return d.data(); })(datasets);
-                this.stackedExtent = [0, 0];
-                var maxY = Plottable.Util.Methods.max(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum.y0; });
-                if (maxY > 0) {
-                    this.stackedExtent[1] = maxY;
-                }
-                var minY = Plottable.Util.Methods.min(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum.y0; });
-                if (minY < 0) {
-                    this.stackedExtent[0] = minY;
-                }
->>>>>>> Release version 0.27.0
             };
             Stacked.prototype._updateAllProjectors = function () {
                 _super.prototype._updateAllProjectors.call(this);
@@ -5595,17 +5375,10 @@ var Plottable;
                     return;
                 }
                 if (this._isAnchored && this.stackedExtent.length > 0) {
-<<<<<<< HEAD
                     primaryScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
                 }
                 else {
                     primaryScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
-=======
-                    this.yScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
-                }
-                else {
-                    this.yScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
->>>>>>> Release version 0.27.0
                 }
             };
             return Stacked;
@@ -5630,18 +5403,8 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
                 this.classed("area-plot", true);
-<<<<<<< HEAD
-<<<<<<< HEAD
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
                 this._isVertical = true;
-=======
-                this.project("fill", function () {
-                    return Plottable.Core.Colors.INDIGO;
-                });
->>>>>>> Release version 0.27.0
-=======
-                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
->>>>>>> Remove comments from built files.
             }
             StackedArea.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Area(key);
@@ -5651,14 +5414,6 @@ var Plottable;
                 this._baseline = this.renderArea.append("line").classed("baseline", true);
             };
             StackedArea.prototype._paint = function () {
-<<<<<<< HEAD
-=======
-                _super.prototype._paint.call(this);
-<<<<<<< HEAD
-
->>>>>>> Release version 0.27.0
-=======
->>>>>>> Remove comments from built files.
                 var scaledBaseline = this.yScale.scale(this._baselineValue);
                 var baselineAttr = {
                     "x1": 0,
@@ -5676,23 +5431,8 @@ var Plottable;
                 delete attrToProjector["y"];
                 attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
                 var fillProjector = attrToProjector["fill"];
-<<<<<<< HEAD
-<<<<<<< HEAD
                 attrToProjector["fill"] = function (d, i) { return fillProjector(d[0], i); };
                 this._draw(attrToProjector);
-=======
-                attrToProjector["fill"] = function (d, i) {
-                    return fillProjector(d[0], i);
-                };
-
-=======
-                attrToProjector["fill"] = function (d, i) { return fillProjector(d[0], i); };
->>>>>>> Remove comments from built files.
-                var datasets = this._getDatasetsInOrder();
-                this._getDrawersInOrder().forEach(function (drawer, i) {
-                    drawer.draw([datasets[i].data()], attrToProjector);
-                });
->>>>>>> Release version 0.27.0
             };
             StackedArea.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
@@ -5702,39 +5442,16 @@ var Plottable;
                     scale._autoDomainIfAutomaticMode();
                 }
             };
-<<<<<<< HEAD
-<<<<<<< HEAD
             StackedArea.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
                 Plot.Area.prototype._onDatasetUpdate.apply(this);
-=======
-
-=======
->>>>>>> Remove comments from built files.
-            StackedArea.prototype._onDataSourceUpdate = function () {
-                _super.prototype._onDataSourceUpdate.call(this);
-                Plot.Area.prototype._onDataSourceUpdate.apply(this);
->>>>>>> Release version 0.27.0
             };
             StackedArea.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-<<<<<<< HEAD
-<<<<<<< HEAD
-                attrToProjector["y"] = function (d) { return _this.yScale.scale(d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                var yAccessor = this._projectors["y"].accessor;
+                attrToProjector["y"] = function (d) { return _this.yScale.scale(yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 attrToProjector["y0"] = function (d) { return _this.yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-=======
-                attrToProjector["y"] = function (d) {
-                    return _this.yScale.scale(d.y + d.y0);
-                };
-                attrToProjector["y0"] = function (d) {
-                    return _this.yScale.scale(d.y0);
-                };
->>>>>>> Release version 0.27.0
-=======
-                attrToProjector["y"] = function (d) { return _this.yScale.scale(d.y + d.y0); };
-                attrToProjector["y0"] = function (d) { return _this.yScale.scale(d.y0); };
->>>>>>> Remove comments from built files.
                 return attrToProjector;
             };
             return StackedArea;
@@ -5764,36 +5481,16 @@ var Plottable;
                 this.baseline(this._baselineValue);
                 this._isVertical = isVertical;
             }
-<<<<<<< HEAD
             StackedBar.prototype._getDrawer = function (key) {
                 return Plottable.Abstract.NewStyleBarPlot.prototype._getDrawer.apply(this, [key]);
-=======
-            StackedBar.prototype._addDataset = function (key, dataset) {
-                _super.prototype._addDataset.call(this, key, dataset);
-                var accessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-                this.stackedData = this.stack(accessor);
-            };
-            StackedBar.prototype._updateAllProjectors = function () {
-                _super.prototype._updateAllProjectors.call(this);
-                if (this.yScale == null) {
-                    return;
-                }
-                var primaryScale = this._isVertical ? this.yScale : this.xScale;
-                if (this._isAnchored && this.stackedExtent.length > 0) {
-                    primaryScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
-                }
-                else {
-                    primaryScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
-                }
->>>>>>> Release version 0.27.0
             };
             StackedBar.prototype._generateAttrToProjector = function () {
-<<<<<<< HEAD
                 var attrToProjector = Plottable.Abstract.NewStyleBarPlot.prototype._generateAttrToProjector.apply(this);
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var primaryScale = this._isVertical ? this.yScale : this.xScale;
+                var primaryAccessor = this._projectors[primaryAttr].accessor;
                 var getStart = function (d) { return primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                var getEnd = function (d) { return primaryScale.scale(d[primaryAttr] + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                var getEnd = function (d) { return primaryScale.scale(primaryAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 var heightF = function (d) { return Math.abs(getEnd(d) - getStart(d)); };
                 var widthF = attrToProjector["width"];
                 attrToProjector["height"] = this._isVertical ? heightF : widthF;
@@ -5812,56 +5509,6 @@ var Plottable;
             };
             StackedBar.prototype._updateYDomainer = function () {
                 return Plottable.Abstract.NewStyleBarPlot.prototype._updateYDomainer.apply(this);
-=======
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var primaryScale = this._isVertical ? this.yScale : this.xScale;
-                var getStart = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_START); };
-                var getEnd = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_END); };
-                var heightF = function (d) { return Math.abs(getEnd(d) - getStart(d)); };
-                var widthF = attrToProjector["width"];
-                attrToProjector["height"] = this._isVertical ? heightF : widthF;
-                attrToProjector["width"] = this._isVertical ? widthF : heightF;
-                var primaryAttr = this._isVertical ? "y" : "x";
-                attrToProjector[primaryAttr] = this._isVertical ? getEnd : function (d, i) { return getEnd(d) - heightF(d); };
-                return attrToProjector;
-            };
-            StackedBar.prototype.stack = function (accessor) {
-                var datasets = d3.values(this._key2DatasetDrawerKey);
-                var lengths = datasets.map(function (d) { return d.dataset.data().length; });
-                if (Plottable.Util.Methods.uniq(lengths).length > 1) {
-                    Plottable.Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
-                }
-                var currentBase = Plottable.Util.Methods.createFilledArray(0, lengths[0]);
-                var stacks = this._getDatasetsInOrder().map(function (dataset) {
-                    var data = dataset.data();
-                    var base = currentBase.slice();
-                    var vals = data.map(accessor);
-                    if (vals.some(function (x) { return x < 0; })) {
-                        Plottable.Util.Methods.warn("Warning: Behavior for stacked bars undefined when data includes negative values");
-                    }
-                    currentBase = Plottable.Util.Methods.addArrays(base, vals);
-                    return data.map(function (d, i) {
-                        d["_PLOTTABLE_PROTECTED_FIELD_START"] = base[i];
-                        d["_PLOTTABLE_PROTECTED_FIELD_END"] = currentBase[i];
-                        return d;
-                    });
-                });
-                this.stackedExtent = [0, Plottable.Util.Methods.max(currentBase)];
-                this._onDataSourceUpdate();
-                return stacks;
-            };
-            StackedBar.prototype._paint = function () {
-                var _this = this;
-                var attrHash = this._generateAttrToProjector();
-                this._getDrawersInOrder().forEach(function (d, i) {
-                    var animator;
-                    if (_this._animate) {
-                        animator = new Plottable.Animator.Rect();
-                        animator.delay(animator.duration() * i);
-                    }
-                    d.draw(_this.stackedData[i], attrHash, animator);
-                });
->>>>>>> Release version 0.27.0
             };
             return StackedBar;
         })(Plottable.Abstract.Stacked);
