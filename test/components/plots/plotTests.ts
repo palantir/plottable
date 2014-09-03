@@ -24,7 +24,7 @@ describe("Plots", () => {
 
     it("Base Plot functionality works", () => {
       var svg = generateSVG(400, 300);
-      var d1 = new Plottable.DataSource(["foo"], {cssClass: "bar"});
+      var d1 = new Plottable.Dataset(["foo"], {cssClass: "bar"});
       var r = new Plottable.Abstract.Plot(d1);
       r._anchor(svg);
       r._computeLayout();
@@ -33,18 +33,18 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("Allows the DataSource to be changed", () => {
-      var d1 = new Plottable.DataSource(["foo"], {cssClass: "bar"});
+    it("Allows the Dataset to be changed", () => {
+      var d1 = new Plottable.Dataset(["foo"], {cssClass: "bar"});
       var r = new Plottable.Abstract.Plot(d1);
-      assert.equal(d1, r.dataSource(), "returns the original");
+      assert.equal(d1, r.dataset(), "returns the original");
 
-      var d2 = new Plottable.DataSource(["bar"], {cssClass: "boo"});
-      r.dataSource(d2);
-      assert.equal(d2, r.dataSource(), "returns new datasource");
+      var d2 = new Plottable.Dataset(["bar"], {cssClass: "boo"});
+      r.dataset(d2);
+      assert.equal(d2, r.dataset(), "returns new datasource");
     });
 
-    it("Changes DataSource listeners when the DataSource is changed", () => {
-      var d1 = new Plottable.DataSource(["foo"], {cssClass: "bar"});
+    it("Changes Dataset listeners when the Dataset is changed", () => {
+      var d1 = new Plottable.Dataset(["foo"], {cssClass: "bar"});
       var r = new CountingPlot(d1);
 
       assert.equal(0, r.renders, "initially hasn't rendered anything");
@@ -52,11 +52,11 @@ describe("Plots", () => {
       d1.broadcaster.broadcast();
       assert.equal(1, r.renders, "we re-render when our datasource changes");
 
-      r.dataSource();
+      r.dataset();
       assert.equal(1, r.renders, "we shouldn't redraw when querying the datasource");
 
-      var d2 = new Plottable.DataSource(["bar"], {cssClass: "boo"});
-      r.dataSource(d2);
+      var d2 = new Plottable.Dataset(["bar"], {cssClass: "boo"});
+      r.dataset(d2);
       assert.equal(2, r.renders, "we should redraw when we change datasource");
 
       d1.broadcaster.broadcast();
@@ -66,8 +66,8 @@ describe("Plots", () => {
       assert.equal(3, r.renders, "we should listen to the new datasource");
     });
 
-    it("Updates its projectors when the DataSource is changed", () => {
-      var d1 = new Plottable.DataSource([{x: 5, y: 6}], {cssClass: "bar"});
+    it("Updates its projectors when the Dataset is changed", () => {
+      var d1 = new Plottable.Dataset([{x: 5, y: 6}], {cssClass: "bar"});
       var r = new Plottable.Abstract.Plot(d1);
 
       var xScaleCalls: number = 0;
@@ -97,8 +97,8 @@ describe("Plots", () => {
       var metaProjector = r._generateAttrToProjector()["meta"];
       assert.equal(metaProjector(null, 0), "bar", "plot projector used the right metadata");
 
-      var d2 = new Plottable.DataSource([{x: 7, y: 8}], {cssClass: "boo"});
-      r.dataSource(d2);
+      var d2 = new Plottable.Dataset([{x: 7, y: 8}], {cssClass: "boo"});
+      r.dataset(d2);
       assert.equal(2, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
       assert.equal(2, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
 
@@ -115,12 +115,12 @@ describe("Plots", () => {
 
     });
 
-    it("Plot automatically generates a DataSource if only data is provided", () => {
+    it("Plot automatically generates a Dataset if only data is provided", () => {
       var data = ["foo", "bar"];
       var r = new Plottable.Abstract.Plot(data);
-      var dataSource = r.dataSource();
-      assert.isNotNull(dataSource, "A DataSource was automatically generated");
-      assert.deepEqual(dataSource.data(), data, "The generated DataSource has the correct data");
+      var dataset = r.dataset();
+      assert.isNotNull(dataset, "A Dataset was automatically generated");
+      assert.deepEqual(dataset.data(), data, "The generated Dataset has the correct data");
     });
 
     it("Plot.project works as intended", () => {
@@ -132,18 +132,18 @@ describe("Plots", () => {
       assert.equal(projector({"a": 0.5}, 0), 5, "projector works as intended");
     });
 
-    it("Changing Plot.dataSource().data to [] causes scale to contract", () => {
-      var ds1 = new Plottable.DataSource([0, 1, 2]);
-      var ds2 = new Plottable.DataSource([1, 2, 3]);
+    it("Changing Plot.dataset().data to [] causes scale to contract", () => {
+      var ds1 = new Plottable.Dataset([0, 1, 2]);
+      var ds2 = new Plottable.Dataset([1, 2, 3]);
       var s = new Plottable.Scale.Linear();
       var svg1 = generateSVG(100, 100);
       var svg2 = generateSVG(100, 100);
       var r1 = new Plottable.Abstract.Plot()
-                    .dataSource(ds1)
+                    .dataset(ds1)
                     .project("x", (x: number) => x, s)
                     .renderTo(svg1);
       var r2 = new Plottable.Abstract.Plot()
-                    .dataSource(ds2)
+                    .dataset(ds2)
                     .project("x", (x: number) => x, s)
                     .renderTo(svg2);
       assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");

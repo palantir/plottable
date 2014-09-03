@@ -6,8 +6,8 @@ export module Abstract {
 
     private stackedExtent = [0, 0];
 
-    public _onDataSourceUpdate() {
-      super._onDataSourceUpdate();
+    public _onDatasetUpdate() {
+      super._onDatasetUpdate();
       // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
       if (this._datasetKeysInOrder != null &&
           this._projectors["x"] != null &&

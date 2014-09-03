@@ -29,8 +29,13 @@ module Plottable {
   }
 
   export interface _IProjector {
+<<<<<<< HEAD
     accessor: _IAccessor;
     scale?: Abstract.Scale;
+=======
+    accessor: IAccessor;
+    scale?: Abstract.Scale<any, any>;
+>>>>>>> api-breaking-changes
     attribute: string;
   }
 

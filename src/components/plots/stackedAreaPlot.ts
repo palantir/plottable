@@ -14,7 +14,7 @@ export module Plot {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.QuantitativeScale, yScale: Abstract.QuantitativeScale) {
+    constructor(xScale: Abstract.QuantitativeScale<any>, yScale: Abstract.QuantitativeScale<any>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
@@ -32,8 +32,13 @@ export module Plot {
     public _paint() {
       super._paint();
 
+<<<<<<< HEAD
       var scaledBaseline = this._yScale.scale(this._baselineValue);
       var baselineAttr: IAttributeToProjector = {
+=======
+      var scaledBaseline = this.yScale.scale(this._baselineValue);
+      var baselineAttr: any = {
+>>>>>>> api-breaking-changes
         "x1": 0,
         "y1": scaledBaseline,
         "x2": this.width(),
@@ -66,7 +71,11 @@ export module Plot {
 
     public _updateYDomainer() {
       super._updateYDomainer();
+<<<<<<< HEAD
       var scale = <Abstract.QuantitativeScale> this._yScale;
+=======
+      var scale = <Abstract.QuantitativeScale<any>> this.yScale;
+>>>>>>> api-breaking-changes
       if (!scale._userSetDomainer) {
         scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
@@ -74,9 +83,9 @@ export module Plot {
       }
     }
 
-    public _onDataSourceUpdate() {
-      super._onDataSourceUpdate();
-      Plot.Area.prototype._onDataSourceUpdate.apply(this);
+    public _onDatasetUpdate() {
+      super._onDatasetUpdate();
+      Plot.Area.prototype._onDatasetUpdate.apply(this);
     }
 
     public _generateAttrToProjector() {

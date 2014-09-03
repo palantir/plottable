@@ -193,7 +193,7 @@ describe("Domainer", () => {
     assert.deepEqual(getExceptions(), [5], "projecting a different constant y0 removed the old exception and added a new one");
     r.project("y0", "y0", yScale);
     assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
-    r.dataSource().data([{x: 0, y: 0, y0: 0}, {x: 5, y: 5, y0: 0}]);
+    r.dataset().data([{x: 0, y: 0, y0: 0}, {x: 5, y: 5, y0: 0}]);
     assert.deepEqual(getExceptions(), [0], "changing to constant values via change in datasource adds exception");
     svg.remove();
   });

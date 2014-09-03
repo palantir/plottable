@@ -6,7 +6,18 @@ export module Scale {
     [key: string]: string[];
   };
 
+<<<<<<< HEAD
   export class InterpolatedColor extends Abstract.QuantitativeScale {
+=======
+  /**
+   * This class implements a color scale that takes quantitive input and
+   * interpolates between a list of color values. It returns a hex string
+   * representing the interpolated color.
+   *
+   * By default it generates a linear scale internally.
+   */
+  export class InterpolatedColor extends Abstract.Scale<number, string> {
+>>>>>>> api-breaking-changes
     private static COLOR_SCALES: ColorGroups = {
       reds : [
         "#FFFFFF", // white

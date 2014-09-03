@@ -12,11 +12,17 @@ export module Plot {
      * Constructs an AreaPlot.
      *
      * @constructor
+<<<<<<< HEAD
      * @param {IDataset | any} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
+=======
+     * @param {IDataset} dataset The dataset to render.
+     * @param {QuantitativeScale} xScale The x scale to use.
+     * @param {QuantitativeScale} yScale The y scale to use.
+>>>>>>> api-breaking-changes
      */
-    constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
+    constructor(dataset: any, xScale: Abstract.QuantitativeScale<any>, yScale: Abstract.QuantitativeScale<any>) {
       super(dataset, xScale, yScale);
       this.classed("area-plot", true);
       this.project("y0", 0, yScale); // default
@@ -34,20 +40,30 @@ export module Plot {
       super._appendPath();
     }
 
+<<<<<<< HEAD
     public _onDataSourceUpdate() {
       super._onDataSourceUpdate();
       if (this._yScale != null) {
+=======
+    public _onDatasetUpdate() {
+      super._onDatasetUpdate();
+      if (this.yScale != null) {
+>>>>>>> api-breaking-changes
         this._updateYDomainer();
       }
     }
 
     public _updateYDomainer() {
       super._updateYDomainer();
+<<<<<<< HEAD
       var scale = <Abstract.QuantitativeScale> this._yScale;
+=======
+      var scale = <Abstract.QuantitativeScale<any>> <any> this.yScale;
+>>>>>>> api-breaking-changes
 
       var y0Projector = this._projectors["y0"];
       var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
-      var extent:  number[] = y0Accessor != null ? this.dataSource()._getExtent(y0Accessor) : [];
+      var extent:  number[] = y0Accessor != null ? this.dataset()._getExtent(y0Accessor) : [];
       var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
 
       if (!scale._userSetDomainer) {
@@ -61,7 +77,7 @@ export module Plot {
       }
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
+    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "y0") {
         this._updateYDomainer();
@@ -83,7 +99,7 @@ export module Plot {
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
 
-      this.areaPath.datum(this._dataSource.data());
+      this.areaPath.datum(this._dataset.data());
 
       if (this._dataChanged) {
         attrToProjector["d"] = d3.svg.area()

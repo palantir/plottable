@@ -67,8 +67,13 @@ describe("Plots", () => {
       var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(null, xScale, yScale, colorScale)
                                                           .project("fill", "magnitude", colorScale);
       renderer.renderTo(svg);
+<<<<<<< HEAD
       renderer.dataSource().data(DATA);
       VERIFY_CELLS(renderer._renderArea.selectAll("rect")[0]);
+=======
+      renderer.dataset().data(DATA);
+      VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
+>>>>>>> api-breaking-changes
       svg.remove();
     });
 
@@ -82,7 +87,7 @@ describe("Plots", () => {
       renderer.renderTo(svg);
 
       yScale.domain(["U", "V"]);
-      renderer.dataSource().data(DATA);
+      renderer.dataset().data(DATA);
 
       var cells = renderer._renderArea.selectAll("rect")[0];
       var cellAU = d3.select(cells[0]);

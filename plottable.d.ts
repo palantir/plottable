@@ -217,13 +217,13 @@ declare module Plottable {
 
 
 declare module Plottable {
-    class DataSource extends Plottable.Abstract.PlottableObject implements Plottable.Core.IListenable {
+    class Dataset extends Plottable.Abstract.PlottableObject implements Plottable.Core.IListenable {
         broadcaster: any;
         constructor(data?: any[], metadata?: any);
         data(): any[];
-        data(data: any[]): DataSource;
+        data(data: any[]): Dataset;
         metadata(): any;
-        metadata(metadata: any): DataSource;
+        metadata(metadata: any): Dataset;
     }
 }
 
@@ -299,9 +299,10 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Scale extends PlottableObject implements Plottable.Core.IListenable {
+        class Scale<D, R> extends PlottableObject implements Plottable.Core.IListenable {
             broadcaster: any;
             constructor(scale: D3.Scale.Scale);
+<<<<<<< HEAD
             autoDomain(): Scale;
             scale(value: any): any;
             domain(): any[];
@@ -309,6 +310,17 @@ declare module Plottable {
             range(): any[];
             range(values: any[]): Scale;
             copy(): Scale;
+=======
+            autoDomain(): Scale<D, R>;
+            scale(value: D): R;
+            domain(): D[];
+            domain(values: D[]): Scale<D, R>;
+            range(): R[];
+            range(values: R[]): Scale<D, R>;
+            copy(): Scale<D, R>;
+            updateExtent(plotProvidedKey: string, attr: string, extent: D[]): Scale<D, R>;
+            removeExtent(plotProvidedKey: string, attr: string): Scale<D, R>;
+>>>>>>> api-breaking-changes
         }
     }
 }
@@ -318,12 +330,12 @@ declare module Plottable {
     module Abstract {
         class Plot extends Component {
             constructor();
-            constructor(dataset: any[]);
-            constructor(dataset: DataSource);
+            constructor(data: any[]);
+            constructor(dataset: Dataset);
             remove(): void;
-            dataSource(): DataSource;
-            dataSource(source: DataSource): Plot;
-            project(attrToSet: string, accessor: any, scale?: Scale): Plot;
+            dataset(): Dataset;
+            dataset(dataset: Dataset): Plot;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
             animate(enabled: boolean): Plot;
             detach(): Plot;
             animator(animatorKey: string): IPlotAnimator;
@@ -336,21 +348,36 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class XYPlot extends Plot {
+<<<<<<< HEAD
             constructor(dataset: any, xScale: Scale, yScale: Scale);
             project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
+=======
+            xScale: Scale<any, number>;
+            yScale: Scale<any, number>;
+            constructor(dataset: any, xScale: Scale<any, number>, yScale: Scale<any, number>);
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot;
+>>>>>>> api-breaking-changes
         }
     }
 }
 
 
 declare module Plottable {
+<<<<<<< HEAD
+=======
+    interface DatasetDrawerKey {
+        dataset: Dataset;
+        drawer: Plottable.Abstract._Drawer;
+        key: string;
+    }
+>>>>>>> api-breaking-changes
     module Abstract {
         class NewStylePlot extends XYPlot {
-            constructor(xScale?: Scale, yScale?: Scale);
+            constructor(xScale?: Scale<any, number>, yScale?: Scale<any, number>);
             remove(): void;
-            addDataset(key: string, dataset: DataSource): NewStylePlot;
+            addDataset(key: string, dataset: Dataset): NewStylePlot;
             addDataset(key: string, dataset: any[]): NewStylePlot;
-            addDataset(dataset: DataSource): NewStylePlot;
+            addDataset(dataset: Dataset): NewStylePlot;
             addDataset(dataset: any[]): NewStylePlot;
             datasetOrder(): string[];
             datasetOrder(order: string[]): NewStylePlot;
@@ -421,8 +448,13 @@ declare module Plottable {
         (datum: any, index: number): any;
     }
     interface _IProjector {
+<<<<<<< HEAD
         accessor: _IAccessor;
         scale?: Plottable.Abstract.Scale;
+=======
+        accessor: IAccessor;
+        scale?: Plottable.Abstract.Scale<any, any>;
+>>>>>>> api-breaking-changes
         attribute: string;
     }
     interface IAttributeToProjector {
@@ -471,7 +503,7 @@ declare module Plottable {
 declare module Plottable {
     class Domainer {
         constructor(combineExtents?: (extents: any[][]) => any[]);
-        computeDomain(extents: any[][], scale: Plottable.Abstract.QuantitativeScale): any[];
+        computeDomain(extents: any[][], scale: Plottable.Abstract.QuantitativeScale<any>): any[];
         pad(padProportion?: number): Domainer;
         addPaddingException(exception: any, key?: string): Domainer;
         removePaddingException(keyOrException: any): Domainer;
@@ -484,15 +516,27 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class QuantitativeScale extends Scale {
+        class QuantitativeScale<D> extends Scale<D, number> {
             constructor(scale: D3.Scale.QuantitativeScale);
+<<<<<<< HEAD
             invert(value: number): number;
             copy(): QuantitativeScale;
             domain(): any[];
             domain(values: any[]): QuantitativeScale;
+=======
+            invert(value: number): D;
+            copy(): QuantitativeScale<D>;
+            domain(): D[];
+            domain(values: D[]): QuantitativeScale<D>;
+            interpolate(): D3.Transition.Interpolate;
+            interpolate(factory: D3.Transition.Interpolate): QuantitativeScale<D>;
+            rangeRound(values: number[]): QuantitativeScale<D>;
+            clamp(): boolean;
+            clamp(clamp: boolean): QuantitativeScale<D>;
+>>>>>>> api-breaking-changes
             ticks(count?: number): any[];
             domainer(): Domainer;
-            domainer(domainer: Domainer): QuantitativeScale;
+            domainer(domainer: Domainer): QuantitativeScale<D>;
         }
     }
 }
@@ -500,7 +544,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Linear extends Plottable.Abstract.QuantitativeScale {
+        class Linear extends Plottable.Abstract.QuantitativeScale<number> {
             constructor();
             constructor(scale: D3.Scale.LinearScale);
             copy(): Linear;
@@ -511,7 +555,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Log extends Plottable.Abstract.QuantitativeScale {
+        class Log extends Plottable.Abstract.QuantitativeScale<number> {
             constructor();
             constructor(scale: D3.Scale.LogScale);
             copy(): Log;
@@ -522,7 +566,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class ModifiedLog extends Plottable.Abstract.QuantitativeScale {
+        class ModifiedLog extends Plottable.Abstract.QuantitativeScale<number> {
             constructor(base?: number);
             scale(x: number): number;
             invert(x: number): number;
@@ -537,7 +581,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Ordinal extends Plottable.Abstract.Scale {
+        class Ordinal extends Plottable.Abstract.Scale<string, number> {
             constructor(scale?: D3.Scale.OrdinalScale);
             domain(): any[];
             domain(values: any[]): Ordinal;
@@ -556,7 +600,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Color extends Plottable.Abstract.Scale {
+        class Color extends Plottable.Abstract.Scale<string, string> {
             constructor(scaleType?: string);
         }
     }
@@ -565,7 +609,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Time extends Plottable.Abstract.QuantitativeScale {
+        class Time extends Plottable.Abstract.QuantitativeScale<any> {
             constructor();
             constructor(scale: D3.Scale.LinearScale);
             domain(): any[];
@@ -578,7 +622,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class InterpolatedColor extends Plottable.Abstract.QuantitativeScale {
+        class InterpolatedColor extends Plottable.Abstract.Scale<number, string> {
             constructor(colorRange?: any, scaleType?: string);
             colorRange(): string[];
             colorRange(colorRange: any): InterpolatedColor;
@@ -591,10 +635,17 @@ declare module Plottable {
 
 
 declare module Plottable {
+<<<<<<< HEAD
     module _Util {
         class ScaleDomainCoordinator {
             constructor(scales: Plottable.Abstract.Scale[]);
             rescale(scale: Plottable.Abstract.Scale): void;
+=======
+    module Util {
+        class ScaleDomainCoordinator<D> {
+            constructor(scales: Plottable.Abstract.Scale<D, any>[]);
+            rescale(scale: Plottable.Abstract.Scale<D, any>): void;
+>>>>>>> api-breaking-changes
         }
     }
 }
@@ -636,7 +687,7 @@ declare module Plottable {
             static END_TICK_MARK_CLASS: string;
             static TICK_MARK_CLASS: string;
             static TICK_LABEL_CLASS: string;
-            constructor(scale: Scale, orientation: string, formatter?: (d: any) => string);
+            constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
             remove(): void;
             width(): number;
             width(w: any): Axis;
@@ -678,7 +729,7 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Numeric extends Plottable.Abstract.Axis {
-            constructor(scale: Plottable.Abstract.QuantitativeScale, orientation: string, formatter?: (d: any) => string);
+            constructor(scale: Plottable.Abstract.QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
             tickLabelPosition(): string;
             tickLabelPosition(position: string): Numeric;
             showEndTickLabel(orientation: string): boolean;
@@ -754,7 +805,7 @@ declare module Plottable {
 declare module Plottable {
     module Component {
         class Gridlines extends Plottable.Abstract.Component {
-            constructor(xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.QuantitativeScale);
+            constructor(xScale: Plottable.Abstract.QuantitativeScale<any>, yScale: Plottable.Abstract.QuantitativeScale<any>);
             remove(): Gridlines;
         }
     }
@@ -764,8 +815,8 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Scatter extends Plottable.Abstract.XYPlot {
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.Scale);
-            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale): Scatter;
+            constructor(dataset: any, xScale: Plottable.Abstract.Scale<any, number>, yScale: Plottable.Abstract.Scale<any, number>);
+            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Scatter;
         }
     }
 }
@@ -774,8 +825,16 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Grid extends Plottable.Abstract.XYPlot {
+<<<<<<< HEAD
             constructor(dataset: any, xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale): Grid;
+=======
+            colorScale: Plottable.Abstract.Scale<any, string>;
+            xScale: Plottable.Scale.Ordinal;
+            yScale: Plottable.Scale.Ordinal;
+            constructor(dataset: any, xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale<any, string>);
+            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Grid;
+>>>>>>> api-breaking-changes
         }
     }
 }
@@ -784,7 +843,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class BarPlot extends XYPlot {
-            constructor(dataset: any, xScale: Scale, yScale: Scale);
+            constructor(dataset: any, xScale: Scale<any, number>, yScale: Scale<any, number>);
             baseline(value: number): BarPlot;
             barAlignment(alignment: string): BarPlot;
             selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
@@ -800,7 +859,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class VerticalBar extends Plottable.Abstract.BarPlot {
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
+            constructor(dataset: any, xScale: Plottable.Abstract.Scale<any, number>, yScale: Plottable.Abstract.QuantitativeScale<number>);
         }
     }
 }
@@ -809,7 +868,12 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class HorizontalBar extends Plottable.Abstract.BarPlot {
+<<<<<<< HEAD
             constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.Scale);
+=======
+            isVertical: boolean;
+            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<number>, yScale: Plottable.Abstract.Scale<any, number>);
+>>>>>>> api-breaking-changes
         }
     }
 }
@@ -818,7 +882,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Line extends Plottable.Abstract.XYPlot {
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.Scale);
+            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<any>, yScale: Plottable.Abstract.QuantitativeScale<any>);
         }
     }
 }
@@ -827,8 +891,8 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Area extends Line {
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.Scale);
-            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale): Area;
+            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<any>, yScale: Plottable.Abstract.QuantitativeScale<any>);
+            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Area;
         }
     }
 }
@@ -837,7 +901,12 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class NewStyleBarPlot extends NewStylePlot {
+<<<<<<< HEAD
             constructor(xScale: Scale, yScale: Scale);
+=======
+            static DEFAULT_WIDTH: number;
+            constructor(xScale: Scale<any, number>, yScale: Scale<any, number>);
+>>>>>>> api-breaking-changes
             baseline(value: number): any;
         }
     }
@@ -847,7 +916,12 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
+<<<<<<< HEAD
             constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
+=======
+            static DEFAULT_WIDTH: number;
+            constructor(xScale: Plottable.Abstract.Scale<any, number>, yScale: Plottable.Abstract.Scale<any, number>, isVertical?: boolean);
+>>>>>>> api-breaking-changes
         }
     }
 }
@@ -864,7 +938,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class StackedArea extends Plottable.Abstract.Stacked {
-            constructor(xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.QuantitativeScale);
+            constructor(xScale: Plottable.Abstract.QuantitativeScale<any>, yScale: Plottable.Abstract.QuantitativeScale<any>);
         }
     }
 }
@@ -873,7 +947,12 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
+<<<<<<< HEAD
             constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
+=======
+            stackedData: any[][];
+            constructor(xScale?: Plottable.Abstract.Scale<any, number>, yScale?: Plottable.Abstract.Scale<any, number>, isVertical?: boolean);
+>>>>>>> api-breaking-changes
         }
     }
 }
@@ -985,7 +1064,13 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class PanZoom extends Plottable.Abstract.Interaction {
+<<<<<<< HEAD
             constructor(componentToListenTo: Plottable.Abstract.Component, xScale?: Plottable.Abstract.QuantitativeScale, yScale?: Plottable.Abstract.QuantitativeScale);
+=======
+            xScale: Plottable.Abstract.QuantitativeScale<any>;
+            yScale: Plottable.Abstract.QuantitativeScale<any>;
+            constructor(componentToListenTo: Plottable.Abstract.Component, xScale?: Plottable.Abstract.QuantitativeScale<any>, yScale?: Plottable.Abstract.QuantitativeScale<any>);
+>>>>>>> api-breaking-changes
             resetZoom(): void;
         }
     }
@@ -1016,7 +1101,7 @@ declare module Plottable {
             drag(cb: (startLocation: Point, endLocation: Point) => any): Drag;
             dragend(): (startLocation: Point, endLocation: Point) => void;
             dragend(cb: (startLocation: Point, endLocation: Point) => any): Drag;
-            setupZoomCallback(xScale?: Plottable.Abstract.QuantitativeScale, yScale?: Plottable.Abstract.QuantitativeScale): Drag;
+            setupZoomCallback(xScale?: Plottable.Abstract.QuantitativeScale<any>, yScale?: Plottable.Abstract.QuantitativeScale<any>): Drag;
         }
     }
 }

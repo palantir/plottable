@@ -2,11 +2,11 @@
 
 module Plottable {
 export module Abstract {
-  export class Scale extends PlottableObject implements Core.IListenable {
+  export class Scale<D,R> extends PlottableObject implements Core.IListenable {
     public _d3Scale: D3.Scale.Scale;
-    private autoDomainAutomatically = true;
+    public _autoDomainAutomatically = true;
     public broadcaster = new Plottable.Core.Broadcaster(this);
-    public _rendererAttrID2Extent: {[rendererAttrID: string]: any[]} = {};
+    public _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     /**
      * Constructs a new Scale.
      *
@@ -22,15 +22,16 @@ export module Abstract {
       this._d3Scale = scale;
     }
 
-    public _getAllExtents(): any[][] {
+    public _getAllExtents(): D[][] {
       return d3.values(this._rendererAttrID2Extent);
     }
 
-    public _getExtent(): any[] {
+    public _getExtent(): D[] {
       return []; // this should be overwritten
     }
 
     /**
+<<<<<<< HEAD
      * Modifies the domain on the scale so that it includes the extent of all
      * perspectives it depends on. This will normally happen automatically, but
      * if you set domain explicitly with `plot.domain(x)`, you will need to
@@ -41,18 +42,24 @@ export module Abstract {
      * strings for a Scale.Ordinal.
      *
      * Perspective: A combination of a DataSource and an Accessor that
+=======
+     * Modify the domain on the scale so that it includes the extent of all
+     * perspectives it depends on. Extent: The (min, max) pair for a
+     * QuantitiativeScale, all covered strings for an OrdinalScale.
+     * Perspective: A combination of a Dataset and an Accessor that
+>>>>>>> api-breaking-changes
      * represents a view in to the data.
      *
      * @returns {Scale} The calling Scale.
      */
     public autoDomain() {
-      this.autoDomainAutomatically = true;
+      this._autoDomainAutomatically = true;
       this._setDomain(this._getExtent());
       return this;
     }
 
     public _autoDomainIfAutomaticMode() {
-      if (this.autoDomainAutomatically) {
+      if (this._autoDomainAutomatically) {
         this.autoDomain();
       }
     }
@@ -61,34 +68,42 @@ export module Abstract {
      * Computes the range value corresponding to a given domain value. In other
      * words, apply the function to value.
      *
-     * @param value {any} A domain value to be scaled.
-     * @returns {any} The range value corresponding to the supplied domain value.
+     * @param {R} value A domain value to be scaled.
+     * @returns {R} The range value corresponding to the supplied domain value.
      */
-    public scale(value: any) {
+    public scale(value: D): R {
       return this._d3Scale(value);
     }
 
     /**
      * Gets the domain.
      *
-     * @returns {any[]} The current domain.
+     * @returns {D[]} The current domain.
      */
-    public domain(): any[];
+    public domain(): D[];
     /**
      * Sets the domain.
      *
+<<<<<<< HEAD
      * @param {any[]} values If provided, the new value for the domain. On
      * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
      * make the function decreasing. On Scale.Ordinal, this is an array of all
      * input values.
      * @returs {Scale} The calling Scale.
+=======
+     * @param {D[]} values The new value for the domain. This array may
+     *     contain more than 2 values if the scale type allows it (e.g.
+     *     ordinal scales). Other scales such as quantitative scales accept
+     *     only a 2-value extent array.
+     * @returns {Scale} The calling Scale.
+>>>>>>> api-breaking-changes
      */
-    public domain(values: any[]): Scale;
-    public domain(values?: any[]): any {
+    public domain(values: D[]): Scale<D,R>;
+    public domain(values?: D[]): any {
       if (values == null) {
         return this._getDomain();
       } else {
-        this.autoDomainAutomatically = false;
+        this._autoDomainAutomatically = false;
         this._setDomain(values);
         return this;
       }
@@ -98,7 +113,7 @@ export module Abstract {
       return this._d3Scale.domain();
     }
 
-    public _setDomain(values: any[]) {
+    public _setDomain(values: D[]) {
       this._d3Scale.domain(values);
       this.broadcaster.broadcast();
     }
@@ -106,13 +121,17 @@ export module Abstract {
     /**
      * Gets the range.
      *
+<<<<<<< HEAD
      * In the case of having a numeric range, it will be a [min, max] pair. In
      * the case of string range (e.g. Scale.InterpolatedColor), it will be a
      * list of all possible outputs.
      *
      * @returns {any[]} The current range.
+=======
+     * @returns {R[]} The current range.
+>>>>>>> api-breaking-changes
      */
-    public range(): any[];
+    public range(): R[];
     /**
      * Sets the range.
      *
@@ -120,11 +139,15 @@ export module Abstract {
      * the case of string range (e.g. Scale.InterpolatedColor), it will be a
      * list of all possible outputs.
      *
+<<<<<<< HEAD
      * @param {any[]} values If provided, the new values for the range.
+=======
+     * @param {R[]} values The new values for the range.
+>>>>>>> api-breaking-changes
      * @returns {Scale} The calling Scale.
      */
-    public range(values: any[]): Scale;
-    public range(values?: any[]): any {
+    public range(values: R[]): Scale<D,R>;
+    public range(values?: R[]): any {
       if (values == null) {
         return this._d3Scale.range();
       } else {
@@ -139,8 +162,8 @@ export module Abstract {
      *
      * @returns {Scale} A copy of the calling Scale.
      */
-    public copy(): Scale {
-      return new Scale(this._d3Scale.copy());
+    public copy(): Scale<D,R> {
+      return new Scale<D,R>(this._d3Scale.copy());
     }
 
     /**
@@ -151,9 +174,13 @@ export module Abstract {
      * @param {number} rendererID A unique indentifier of the renderer sending
      *                 the new extent.
      * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
-     * @param {any[]} extent The new extent to be included in the scale.
+     * @param {D[]} extent The new extent to be included in the scale.
      */
+<<<<<<< HEAD
     public _updateExtent(plotProvidedKey: string, attr: string, extent: any[]) {
+=======
+    public updateExtent(plotProvidedKey: string, attr: string, extent: D[]) {
+>>>>>>> api-breaking-changes
       this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
       this._autoDomainIfAutomaticMode();
       return this;

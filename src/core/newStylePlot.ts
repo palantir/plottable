@@ -1,6 +1,15 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+<<<<<<< HEAD
+=======
+  export interface DatasetDrawerKey {
+    dataset: Dataset;
+    drawer: Abstract._Drawer;
+    key: string;
+  }
+
+>>>>>>> api-breaking-changes
 export module Abstract {
   export class NewStylePlot extends XYPlot {
     private nextSeriesIndex: number;
@@ -19,12 +28,12 @@ export module Abstract {
      * @param [Scale] xScale The x scale to use
      * @param [Scale] yScale The y scale to use
      */
-    constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
-      // make a dummy dataSource to satisfy the base Plot (HACKHACK)
+    constructor(xScale?: Abstract.Scale<any, number>, yScale?: Abstract.Scale<any, number>) {
+      // make a dummy dataset to satisfy the base Plot (HACKHACK)
       this._key2DatasetDrawerKey = d3.map();
       this._datasetKeysInOrder = [];
       this.nextSeriesIndex = 0;
-      super(new Plottable.DataSource(), xScale, yScale);
+      super(new Plottable.Dataset(), xScale, yScale);
     }
 
     public _setup() {
@@ -43,12 +52,17 @@ export module Abstract {
      * A key is automatically generated if not supplied.
      *
      * @param {string} [key] The key of the dataset.
+<<<<<<< HEAD
      * @param {any[]|DataSource} dataset dataset to add.
      * @returns {NewStylePlot} The calling NewStylePlot.
+=======
+     * @param {any[]|Dataset} dataset dataset to add.
+     * @return {NewStylePlot} The calling NewStylePlot.
+>>>>>>> api-breaking-changes
      */
-    public addDataset(key: string, dataset: DataSource): NewStylePlot;
+    public addDataset(key: string, dataset: Dataset): NewStylePlot;
     public addDataset(key: string, dataset: any[]): NewStylePlot;
-    public addDataset(dataset: DataSource): NewStylePlot;
+    public addDataset(dataset: Dataset): NewStylePlot;
     public addDataset(dataset: any[]): NewStylePlot;
     public addDataset(keyOrDataset: any, dataset?: any): NewStylePlot {
       if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
@@ -59,13 +73,13 @@ export module Abstract {
       }
       var key  = typeof(keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
       var data = typeof(keyOrDataset) !== "string" ? keyOrDataset : dataset;
-      var dataset = (data instanceof DataSource) ? data : new DataSource(data);
+      var dataset = (data instanceof Dataset) ? data : new Dataset(data);
 
       this._addDataset(key, dataset);
       return this;
     }
 
-    public _addDataset(key: string, dataset: DataSource) {
+    public _addDataset(key: string, dataset: Dataset) {
       if (this._key2DatasetDrawerKey.has(key)) {
         this.removeDataset(key);
       };
@@ -77,8 +91,8 @@ export module Abstract {
       if (this._isSetup) {
         drawer._renderArea = this._renderArea.append("g");
       }
-      dataset.broadcaster.registerListener(this, () => this._onDataSourceUpdate());
-      this._onDataSourceUpdate();
+      dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
+      this._onDatasetUpdate();
     }
 
     public _getDrawer(key: string): Abstract._Drawer {
@@ -126,7 +140,7 @@ export module Abstract {
       }
       if (isPermutation(order, this._datasetKeysInOrder)) {
         this._datasetKeysInOrder = order;
-        this._onDataSourceUpdate();
+        this._onDatasetUpdate();
       } else {
         _Util.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
       }
@@ -155,12 +169,12 @@ export module Abstract {
         ddk.dataset.broadcaster.deregisterListener(this);
         this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
         this._key2DatasetDrawerKey.remove(key);
-        this._onDataSourceUpdate();
+        this._onDatasetUpdate();
       }
       return this;
     }
 
-    public _getDatasetsInOrder(): DataSource[] {
+    public _getDatasetsInOrder(): Dataset[] {
       return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).dataset);
     }
 

@@ -7,7 +7,7 @@ describe("Plots", () => {
     describe("Vertical Bar Plot in points mode", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
-      var dataset: Plottable.DataSource;
+      var dataset: Plottable.Dataset;
       var xScale: Plottable.Scale.Ordinal;
       var yScale: Plottable.Scale.Linear;
       var renderer: Plottable.Plot.VerticalBar;
@@ -23,7 +23,7 @@ describe("Plots", () => {
           {x: "B", y: -1.5},
           {x: "B", y: 1} // duplicate X-value
         ];
-        dataset = new Plottable.DataSource(data);
+        dataset = new Plottable.Dataset(data);
 
         renderer = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
         renderer.animate(false);
@@ -172,7 +172,7 @@ describe("Plots", () => {
     describe("Horizontal Bar Plot in Points Mode", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
-      var dataset: Plottable.DataSource;
+      var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
       var xScale: Plottable.Scale.Linear;
       var renderer: Plottable.Plot.HorizontalBar;
@@ -188,7 +188,7 @@ describe("Plots", () => {
           {y: "B", x: -1.5},
           {y: "B", x: 1} // duplicate Y-value
         ];
-        dataset = new Plottable.DataSource(data);
+        dataset = new Plottable.Dataset(data);
 
         renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
         renderer.animate(false);
@@ -278,7 +278,7 @@ describe("Plots", () => {
     describe("Horizontal Bar Plot in Bands mode", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
-      var dataset: Plottable.DataSource;
+      var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
       var xScale: Plottable.Scale.Linear;
       var renderer: Plottable.Plot.HorizontalBar;
@@ -298,7 +298,7 @@ describe("Plots", () => {
           {y: "A", x: 1},
           {y: "B", x: 2},
         ];
-        dataset = new Plottable.DataSource(data);
+        dataset = new Plottable.Dataset(data);
 
         renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
         renderer.baseline(0);

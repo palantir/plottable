@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scale {
-  export class Ordinal extends Abstract.Scale {
+  export class Ordinal extends Abstract.Scale<string, number> {
     public _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
     private _rangeType: string = "bands";

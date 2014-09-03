@@ -3,8 +3,14 @@
 module Plottable {
 export module Abstract {
   export class XYPlot extends Plot {
+<<<<<<< HEAD
     public _xScale: Abstract.Scale;
     public _yScale: Abstract.Scale;
+=======
+    public xScale: Abstract.Scale<any, number>;
+    public yScale: Abstract.Scale<any, number>;
+    // TODO - replace any typing
+>>>>>>> api-breaking-changes
     /**
      * Constructs an XYPlot.
      *
@@ -12,11 +18,11 @@ export module Abstract {
      * include Scale.Line and Scale.Bar.
      *
      * @constructor
-     * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.
+     * @param {any[]|Dataset} [dataset] The data or Dataset to be associated with this Renderer.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
+    constructor(dataset: any, xScale: Abstract.Scale<any, number>, yScale: Abstract.Scale<any, number>) {
       super(dataset);
       if (xScale == null || yScale == null) {throw new Error("XYPlots require an xScale and yScale");}
       this.classed("xy-plot", true);
@@ -25,11 +31,15 @@ export module Abstract {
       this.project("y", "y", yScale); // default accessor
     }
 
+<<<<<<< HEAD
     /**
      * @param {string} attrToSet One of ["x", "y"] which determines the point's
      * x and y position in the Plot.
      */
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
+=======
+    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
+>>>>>>> api-breaking-changes
       // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale != null) {
@@ -54,8 +64,13 @@ export module Abstract {
     }
 
     public _updateXDomainer() {
+<<<<<<< HEAD
       if (this._xScale instanceof QuantitativeScale) {
         var scale = <QuantitativeScale> this._xScale;
+=======
+      if (this.xScale instanceof QuantitativeScale) {
+        var scale = <QuantitativeScale<any>> this.xScale;
+>>>>>>> api-breaking-changes
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
@@ -63,8 +78,13 @@ export module Abstract {
     }
 
     public _updateYDomainer() {
+<<<<<<< HEAD
       if (this._yScale instanceof QuantitativeScale) {
         var scale = <QuantitativeScale> this._yScale;
+=======
+      if (this.yScale instanceof QuantitativeScale) {
+        var scale = <QuantitativeScale<any>> this.yScale;
+>>>>>>> api-breaking-changes
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }

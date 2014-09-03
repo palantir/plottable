@@ -149,6 +149,7 @@ export module Interaction {
       return this;
     }
 
+<<<<<<< HEAD
     /**
      * Sets up so that the xScale and yScale that are passed have their
      * domains automatically changed as you zoom.
@@ -158,6 +159,9 @@ export module Interaction {
      * @returns {Drag} The calling Drag.
      */
     public setupZoomCallback(xScale?: Abstract.QuantitativeScale, yScale?: Abstract.QuantitativeScale) {
+=======
+    public setupZoomCallback(xScale?: Abstract.QuantitativeScale<any>, yScale?: Abstract.QuantitativeScale<any>) {
+>>>>>>> api-breaking-changes
       var xDomainOriginal = xScale != null ? xScale.domain() : null;
       var yDomainOriginal = yScale != null ? yScale.domain() : null;
       var resetOnNextClick = false;

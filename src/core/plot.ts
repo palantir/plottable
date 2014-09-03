@@ -3,7 +3,7 @@
 module Plottable {
 export module Abstract {
   export class Plot extends Component {
-    public _dataSource: DataSource;
+    public _dataset: Dataset;
     public _dataChanged = false;
 
     public _renderArea: D3.Selection;
@@ -22,28 +22,32 @@ export module Abstract {
      * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
      *
      * @constructor
+<<<<<<< HEAD
      * @param {any[]|DataSource} [dataset] The data or DataSource to be
      * associated with this Plot.
+=======
+     * @param {any[]|Dataset} [dataOrDataset] The data or Dataset to be associated with this Plot.
+>>>>>>> api-breaking-changes
      */
     constructor();
-    constructor(dataset: any[]);
-    constructor(dataset: DataSource);
-    constructor(dataset?: any) {
+    constructor(data: any[]);
+    constructor(dataset: Dataset);
+    constructor(dataOrDataset?: any) {
       super();
       this.clipPathEnabled = true;
       this.classed("plot", true);
 
-      var dataSource: DataSource;
-      if (dataset != null) {
-        if (typeof dataset.data === "function") {
-          dataSource = <DataSource> dataset;
+      var dataset: Dataset;
+      if (dataOrDataset != null) {
+        if (typeof dataOrDataset.data === "function") {
+          dataset = <Dataset> dataOrDataset;
         } else {
-          dataSource = dataSource = new DataSource(dataset);
+          dataset = new Dataset(dataOrDataset);
         }
       } else {
-        dataSource = new DataSource();
+        dataset = new Dataset();
       }
-      this.dataSource(dataSource);
+      this.dataset(dataset);
     }
 
     public _anchor(element: D3.Selection) {
@@ -55,7 +59,7 @@ export module Abstract {
 
     public remove() {
       super.remove();
-      this._dataSource.broadcaster.deregisterListener(this);
+      this._dataset.broadcaster.deregisterListener(this);
       // deregister from all scales
       var properties = Object.keys(this._projectors);
       properties.forEach((property) => {
@@ -67,39 +71,48 @@ export module Abstract {
     }
 
     /**
-     * Gets the Plot's DataSource.
+     * Gets the Plot's Dataset.
      *
+<<<<<<< HEAD
      * @returns {DataSource} The current DataSource.
+=======
+     * @return {Dataset} The current Dataset.
+>>>>>>> api-breaking-changes
      */
-    public dataSource(): DataSource;
+    public dataset(): Dataset;
     /**
-     * Sets the Plot's DataSource.
+     * Sets the Plot's Dataset.
      *
+<<<<<<< HEAD
      * @param {DataSource} source If provided, The DataSource the Plot should use.
      * @returnss {Plot} The calling Plot.
+=======
+     * @param {Dataset} dataset The Dataset the Plot should use.
+     * @return {Plot} The calling Plot.
+>>>>>>> api-breaking-changes
      */
-    public dataSource(source: DataSource): Plot;
-    public dataSource(source?: DataSource): any {
-      if (source == null) {
-        return this._dataSource;
+    public dataset(dataset: Dataset): Plot;
+    public dataset(dataset?: Dataset): any {
+      if (dataset == null) {
+        return this._dataset;
       }
-      var oldSource = this._dataSource;
-      if (oldSource != null) {
-        this._dataSource.broadcaster.deregisterListener(this);
+      if (this._dataset != null) {
+        this._dataset.broadcaster.deregisterListener(this);
       }
-      this._dataSource = source;
-      this._dataSource.broadcaster.registerListener(this, () => this._onDataSourceUpdate());
-      this._onDataSourceUpdate();
+      this._dataset = dataset;
+      this._dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
+      this._onDatasetUpdate();
       return this;
     }
 
-    public _onDataSourceUpdate() {
+    public _onDatasetUpdate() {
       this._updateAllProjectors();
       this.animateOnNextRender = true;
       this._dataChanged = true;
       this._render();
     }
 
+<<<<<<< HEAD
     /**
      * Sets an attribute of every data point.
      *
@@ -124,6 +137,9 @@ export module Abstract {
      * @returns {Plot} The calling Plot.
      */
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
+=======
+    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
+>>>>>>> api-breaking-changes
       attrToSet = attrToSet.toLowerCase();
       var currentProjection = this._projectors[attrToSet];
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
@@ -200,7 +216,7 @@ export module Abstract {
     public _updateProjector(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
-        var extent = this.dataSource()._getExtent(projector.accessor);
+        var extent = this.dataset()._getExtent(projector.accessor);
         if (extent.length === 0 || !this._isAnchored) {
           projector.scale._removeExtent(this._plottableID.toString(), attr);
         } else {
