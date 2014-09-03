@@ -1140,6 +1140,7 @@ declare module Plottable {
         class StackedBar extends Plottable.Abstract.Stacked {
             _baselineValue: number;
             _baseline: D3.Selection;
+            _barAlignmentFactor: number;
             constructor(xScale?: Plottable.Abstract.Scale<any, number>, yScale?: Plottable.Abstract.Scale<any, number>, isVertical?: boolean);
             _getDrawer(key: string): any;
             _generateAttrToProjector(): any;
