@@ -5,7 +5,6 @@ export module Abstract {
   export class XYPlot<X,Y> extends Plot {
     public xScale: Abstract.Scale<X, number>;
     public yScale: Abstract.Scale<Y, number>;
-    // TODO - replace any typing
     /**
      * Creates an XYPlot.
      *
