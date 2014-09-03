@@ -77,7 +77,8 @@ export module Plot {
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      attrToProjector["y"] = (d: any) => this.yScale.scale(d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var yAccessor = this._projectors["y"].accessor;
+      attrToProjector["y"] = (d: any) => this.yScale.scale(yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
       attrToProjector["y0"] = (d: any) => this.yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
       return attrToProjector;
     }

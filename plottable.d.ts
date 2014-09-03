@@ -204,57 +204,16 @@ declare module Plottable {
         class Broadcaster extends Plottable.Abstract.PlottableObject {
             listenable: IListenable;
             constructor(listenable: IListenable);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Remove comments from built files.
             registerListener(key: any, callback: IBroadcasterCallback): Broadcaster;
             broadcast(...args: any[]): Broadcaster;
             deregisterListener(key: any): Broadcaster;
             deregisterAllListeners(): void;
-<<<<<<< HEAD
-=======
-            /**
-            * Registers a callback to be called when the broadcast method is called. Also takes a key which
-            * is used to support deregistering the same callback later, by passing in the same key.
-            * If there is already a callback associated with that key, then the callback will be replaced.
-            *
-            * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-            * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
-            * @returns {Broadcaster} this object
-            */
-            public registerListener(key: any, callback: IBroadcasterCallback): Broadcaster;
-            /**
-            * Call all listening callbacks, optionally with arguments passed through.
-            *
-            * @param ...args A variable number of optional arguments
-            * @returns {Broadcaster} this object
-            */
-            public broadcast(...args: any[]): Broadcaster;
-            /**
-            * Deregisters the callback associated with a key.
-            *
-            * @param key The key to deregister.
-            * @returns {Broadcaster} this object
-            */
-            public deregisterListener(key: any): Broadcaster;
-            /**
-            * Deregisters all listeners and callbacks associated with the broadcaster.
-            *
-            * @returns {Broadcaster} this object
-            */
-            public deregisterAllListeners(): void;
->>>>>>> Release version 0.27.0
-=======
->>>>>>> Remove comments from built files.
         }
     }
 }
 
 
 declare module Plottable {
-<<<<<<< HEAD
-<<<<<<< HEAD
     class Dataset extends Plottable.Abstract.PlottableObject implements Plottable.Core.IListenable {
         broadcaster: any;
         constructor(data?: any[], metadata?: any);
@@ -262,53 +221,6 @@ declare module Plottable {
         data(data: any[]): Dataset;
         metadata(): any;
         metadata(metadata: any): Dataset;
-=======
-    class DataSource extends Abstract.PlottableObject implements Core.IListenable {
-        public broadcaster: Core.Broadcaster;
-        /**
-        * Creates a new DataSource.
-        *
-        * @constructor
-        * @param {any[]} data
-        * @param {any} metadata An object containing additional information.
-        */
-        constructor(data?: any[], metadata?: any);
-        /**
-        * Gets the data.
-        *
-        * @returns {any[]} The current data.
-        */
-        public data(): any[];
-        /**
-        * Sets new data.
-        *
-        * @param {any[]} data The new data.
-        * @returns {DataSource} The calling DataSource.
-        */
-        public data(data: any[]): DataSource;
-        /**
-        * Gets the metadata.
-        *
-        * @returns {any} The current metadata.
-        */
-        public metadata(): any;
-        /**
-        * Sets the metadata.
-        *
-        * @param {any} metadata The new metadata.
-        * @returns {DataSource} The calling DataSource.
-        */
-        public metadata(metadata: any): DataSource;
->>>>>>> Release version 0.27.0
-=======
-    class DataSource extends Plottable.Abstract.PlottableObject implements Plottable.Core.IListenable {
-        broadcaster: any;
-        constructor(data?: any[], metadata?: any);
-        data(): any[];
-        data(data: any[]): DataSource;
-        metadata(): any;
-        metadata(metadata: any): DataSource;
->>>>>>> Remove comments from built files.
     }
 }
 
@@ -389,8 +301,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class Scale<D, R> extends PlottableObject implements Plottable.Core.IListenable {
             broadcaster: any;
             constructor(scale: D3.Scale.Scale);
@@ -403,93 +313,6 @@ declare module Plottable {
             copy(): Scale<D, R>;
             updateExtent(plotProvidedKey: string, attr: string, extent: D[]): Scale<D, R>;
             removeExtent(plotProvidedKey: string, attr: string): Scale<D, R>;
-=======
-        class Scale extends PlottableObject implements Core.IListenable {
-            public broadcaster: Core.Broadcaster;
-            /**
-            * Creates a new Scale.
-            *
-            * @constructor
-            * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
-            */
-            constructor(scale: D3.Scale.Scale);
-            /**
-            * Modify the domain on the scale so that it includes the extent of all
-            * perspectives it depends on. Extent: The (min, max) pair for a
-            * QuantitiativeScale, all covered strings for an OrdinalScale.
-            * Perspective: A combination of a DataSource and an Accessor that
-            * represents a view in to the data.
-            */
-            public autoDomain(): Scale;
-            /**
-            * Returns the range value corresponding to a given domain value.
-            *
-            * @param value {any} A domain value to be scaled.
-            * @returns {any} The range value corresponding to the supplied domain value.
-            */
-            public scale(value: any): any;
-            /**
-            * Gets the domain.
-            *
-            * @returns {any[]} The current domain.
-            */
-            public domain(): any[];
-            /**
-            * Sets the Scale's domain to the specified values.
-            *
-            * @param {any[]} values The new value for the domain. This array may
-            *     contain more than 2 values if the scale type allows it (e.g.
-            *     ordinal scales). Other scales such as quantitative scales accept
-            *     only a 2-value extent array.
-            * @returns {Scale} The calling Scale.
-            */
-            public domain(values: any[]): Scale;
-            /**
-            * Gets the range.
-            *
-            * @returns {any[]} The current range.
-            */
-            public range(): any[];
-            /**
-            * Sets the Scale's range to the specified values.
-            *
-            * @param {any[]} values The new values for the range.
-            * @returns {Scale} The calling Scale.
-            */
-            public range(values: any[]): Scale;
-            /**
-            * Creates a copy of the Scale with the same domain and range but without any registered listeners.
-            *
-            * @returns {Scale} A copy of the calling Scale.
-            */
-            public copy(): Scale;
-            /**
-            * When a renderer determines that the extent of a projector has changed,
-            * it will call this function. This function should ensure that
-            * the scale has a domain at least large enough to include extent.
-            *
-            * @param {number} rendererID A unique indentifier of the renderer sending
-            *                 the new extent.
-            * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
-            * @param {any[]} extent The new extent to be included in the scale.
-            */
-            public updateExtent(plotProvidedKey: string, attr: string, extent: any[]): Scale;
-            public removeExtent(plotProvidedKey: string, attr: string): Scale;
->>>>>>> Release version 0.27.0
-=======
-        class Scale extends PlottableObject implements Plottable.Core.IListenable {
-            broadcaster: any;
-            constructor(scale: D3.Scale.Scale);
-            autoDomain(): Scale;
-            scale(value: any): any;
-            domain(): any[];
-            domain(values: any[]): Scale;
-            range(): any[];
-            range(values: any[]): Scale;
-            copy(): Scale;
-            updateExtent(plotProvidedKey: string, attr: string, extent: any[]): Scale;
-            removeExtent(plotProvidedKey: string, attr: string): Scale;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -501,7 +324,6 @@ declare module Plottable {
             renderArea: D3.Selection;
             element: D3.Selection;
             constructor();
-<<<<<<< HEAD
             constructor(data: any[]);
             constructor(dataset: Dataset);
             remove(): void;
@@ -512,59 +334,6 @@ declare module Plottable {
             detach(): Plot;
             animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
             animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
-=======
-            constructor(dataset: any[]);
-            constructor(dataset: DataSource);
-<<<<<<< HEAD
-            public remove(): void;
-            /**
-            * Gets the Plot's DataSource.
-            *
-            * @return {DataSource} The current DataSource.
-            */
-            public dataSource(): DataSource;
-            /**
-            * Sets the Plot's DataSource.
-            *
-            * @param {DataSource} source The DataSource the Plot should use.
-            * @return {Plot} The calling Plot.
-            */
-            public dataSource(source: DataSource): Plot;
-            public project(attrToSet: string, accessor: any, scale?: Scale): Plot;
-            /**
-            * Enables or disables animation.
-            *
-            * @param {boolean} enabled Whether or not to animate.
-            */
-            public animate(enabled: boolean): Plot;
-            public detach(): Plot;
-            /**
-            * Gets the animator associated with the specified Animator key.
-            *
-            * @param {string} animatorKey The key for the Animator.
-            * @return {Animator.IPlotAnimator} The Animator for the specified key.
-            */
-            public animator(animatorKey: string): Animator.IPlotAnimator;
-            /**
-            * Sets the animator associated with the specified Animator key.
-            *
-            * @param {string} animatorKey The key for the Animator.
-            * @param {Animator.IPlotAnimator} animator An Animator to be assigned to
-            *                                          the specified key.
-            * @return {Plot} The calling Plot.
-            */
-            public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
->>>>>>> Release version 0.27.0
-=======
-            remove(): void;
-            dataSource(): DataSource;
-            dataSource(source: DataSource): Plot;
-            project(attrToSet: string, accessor: any, scale?: Scale): Plot;
-            animate(enabled: boolean): Plot;
-            detach(): Plot;
-            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
-            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -573,32 +342,10 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class XYPlot extends Plot {
-<<<<<<< HEAD
-<<<<<<< HEAD
             xScale: Scale<any, number>;
             yScale: Scale<any, number>;
             constructor(dataset: any, xScale: Scale<any, number>, yScale: Scale<any, number>);
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot;
-=======
-            public xScale: Scale;
-            public yScale: Scale;
-            /**
-            * Creates an XYPlot.
-            *
-            * @constructor
-            * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.
-            * @param {Scale} xScale The x scale to use.
-            * @param {Scale} yScale The y scale to use.
-            */
-            constructor(dataset: any, xScale: Scale, yScale: Scale);
-            public project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
->>>>>>> Release version 0.27.0
-=======
-            xScale: Scale;
-            yScale: Scale;
-            constructor(dataset: any, xScale: Scale, yScale: Scale);
-            project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -606,23 +353,12 @@ declare module Plottable {
 
 declare module Plottable {
     interface DatasetDrawerKey {
-<<<<<<< HEAD
         dataset: Dataset;
         drawer: Plottable.Abstract._Drawer;
-=======
-        dataset: DataSource;
-<<<<<<< HEAD
-        drawer: Abstract._Drawer;
->>>>>>> Release version 0.27.0
-=======
-        drawer: Plottable.Abstract._Drawer;
->>>>>>> Remove comments from built files.
         key: string;
     }
     module Abstract {
         class NewStylePlot extends XYPlot {
-<<<<<<< HEAD
-<<<<<<< HEAD
             constructor(xScale?: Scale<any, number>, yScale?: Scale<any, number>);
             remove(): void;
             addDataset(key: string, dataset: Dataset): NewStylePlot;
@@ -632,60 +368,6 @@ declare module Plottable {
             datasetOrder(): string[];
             datasetOrder(order: string[]): NewStylePlot;
             removeDataset(key: string): NewStylePlot;
-=======
-            /**
-            * Creates a NewStylePlot.
-            *
-            * @constructor
-            * @param [Scale] xScale The x scale to use
-            * @param [Scale] yScale The y scale to use
-            */
-            constructor(xScale?: Scale, yScale?: Scale);
-            public remove(): void;
-            /**
-            * Adds a dataset to this plot. Identify this dataset with a key.
-            *
-            * A key is automatically generated if not supplied.
-            *
-            * @param {string} [key] The key of the dataset.
-            * @param {any[]|DataSource} dataset dataset to add.
-            * @return {NewStylePlot} The calling NewStylePlot.
-            */
-            public addDataset(key: string, dataset: DataSource): NewStylePlot;
-            public addDataset(key: string, dataset: any[]): NewStylePlot;
-            public addDataset(dataset: DataSource): NewStylePlot;
-            public addDataset(dataset: any[]): NewStylePlot;
-            /**
-            * Gets the dataset order by key
-            *
-            * @return {string[]} a string array of the keys in order
-            */
-            public datasetOrder(): string[];
-            /**
-            * Sets the dataset order by key
-            *
-            * @param {string[]} order A string array which represents the order of the keys. This must be a permutation of existing keys.
-            */
-            public datasetOrder(order: string[]): NewStylePlot;
-            /**
-            * Removes a dataset
-            *
-            * @param {string} key The key of the dataset
-            * @return {NewStylePlot} The calling NewStylePlot.
-            */
-            public removeDataset(key: string): NewStylePlot;
->>>>>>> Release version 0.27.0
-=======
-            constructor(xScale?: Scale, yScale?: Scale);
-            remove(): void;
-            addDataset(key: string, dataset: DataSource): NewStylePlot;
-            addDataset(key: string, dataset: any[]): NewStylePlot;
-            addDataset(dataset: DataSource): NewStylePlot;
-            addDataset(dataset: any[]): NewStylePlot;
-            datasetOrder(): string[];
-            datasetOrder(order: string[]): NewStylePlot;
-            removeDataset(key: string): NewStylePlot;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -765,15 +447,7 @@ declare module Plottable {
     }
     interface _IProjector {
         accessor: IAccessor;
-<<<<<<< HEAD
-<<<<<<< HEAD
         scale?: Plottable.Abstract.Scale<any, any>;
-=======
-        scale?: Abstract.Scale;
->>>>>>> Release version 0.27.0
-=======
-        scale?: Plottable.Abstract.Scale;
->>>>>>> Remove comments from built files.
         attribute: string;
     }
     interface IAttributeToProjector {
@@ -809,106 +483,19 @@ declare module Plottable {
 declare module Plottable {
     class Domainer {
         constructor(combineExtents?: (extents: any[][]) => any[]);
-<<<<<<< HEAD
-<<<<<<< HEAD
         computeDomain(extents: any[][], scale: Plottable.Abstract.QuantitativeScale<any>): any[];
-=======
-        computeDomain(extents: any[][], scale: Plottable.Abstract.QuantitativeScale): any[];
->>>>>>> Remove comments from built files.
         pad(padProportion?: number): Domainer;
         addPaddingException(exception: any, key?: string): Domainer;
         removePaddingException(keyOrException: any): Domainer;
         addIncludedValue(value: any, key?: string): Domainer;
         removeIncludedValue(valueOrKey: any): Domainer;
         nice(count?: number): Domainer;
-<<<<<<< HEAD
-=======
-        /**
-        * @param {any[][]} extents The list of extents to be reduced to a single
-        *        extent.
-        * @param {Abstract.QuantitativeScale} scale
-        *        Since nice() must do different things depending on Linear, Log,
-        *        or Time scale, the scale must be passed in for nice() to work.
-        * @return {any[]} The domain, as a merging of all exents, as a [min, max]
-        *                 pair.
-        */
-        public computeDomain(extents: any[][], scale: Abstract.QuantitativeScale): any[];
-        /**
-        * Sets the Domainer to pad by a given ratio.
-        *
-        * @param {number} [padProportion] Proportionally how much bigger the
-        *         new domain should be (0.05 = 5% larger).
-        *
-        *         A domainer will pad equal visual amounts on each side.
-        *         On a linear scale, this means both sides are padded the same
-        *         amount: [10, 20] will be padded to [5, 25].
-        *         On a log scale, the top will be padded more than the bottom, so
-        *         [10, 100] will be padded to [1, 1000].
-        *
-        * @return {Domainer} The calling Domainer.
-        */
-        public pad(padProportion?: number): Domainer;
-        /**
-        * Add a padding exception, a value that will not be padded at either end of the domain.
-        *
-        * Eg, if a padding exception is added at x=0, then [0, 100] will pad to [0, 105] instead of [-2.5, 102.5].
-        * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
-        * If a key is not provided, it will be added with set semantics (Can be removed by value)
-        *
-        * @param {any} exception The padding exception to add.
-        * @param string [key] The key to register the exception under.
-        * @return Domainer The calling domainer
-        */
-        public addPaddingException(exception: any, key?: string): Domainer;
-        /**
-        * Remove a padding exception, allowing the domain to pad out that value again.
-        *
-        * If a string is provided, it is assumed to be a key and the exception associated with that key is removed.
-        * If a non-string is provdied, it is assumed to be an unkeyed exception and that exception is removed.
-        *
-        * @param {any} keyOrException The key for the value to remove, or the value to remove
-        * @return Domainer The calling domainer
-        */
-        public removePaddingException(keyOrException: any): Domainer;
-        /**
-        * Add an included value, a value that must be included inside the domain.
-        *
-        * Eg, if a value exception is added at x=0, then [50, 100] will expand to [0, 100] rather than [50, 100].
-        * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
-        * If a key is not provided, it will be added with set semantics (Can be removed by value)
-        *
-        * @param {any} value The included value to add.
-        * @param string [key] The key to register the value under.
-        * @return Domainer The calling domainer
-        */
-        public addIncludedValue(value: any, key?: string): Domainer;
-        /**
-        * Remove an included value, allowing the domain to not include that value gain again.
-        *
-        * If a string is provided, it is assumed to be a key and the value associated with that key is removed.
-        * If a non-string is provdied, it is assumed to be an unkeyed value and that value is removed.
-        *
-        * @param {any} keyOrException The key for the value to remove, or the value to remove
-        * @return Domainer The calling domainer
-        */
-        public removeIncludedValue(valueOrKey: any): Domainer;
-        /**
-        * Extends the scale's domain so it starts and ends with "nice" values.
-        *
-        * @param {number} [count] The number of ticks that should fit inside the new domain.
-        * @return {Domainer} The calling Domainer.
-        */
-        public nice(count?: number): Domainer;
->>>>>>> Release version 0.27.0
-=======
->>>>>>> Remove comments from built files.
     }
 }
 
 
 declare module Plottable {
     module Abstract {
-<<<<<<< HEAD
         class QuantitativeScale<D> extends Scale<D, number> {
             constructor(scale: D3.Scale.QuantitativeScale);
             invert(value: number): D;
@@ -924,102 +511,6 @@ declare module Plottable {
             tickFormat(count: number, format?: string): (n: number) => string;
             domainer(): Domainer;
             domainer(domainer: Domainer): QuantitativeScale<D>;
-=======
-        class QuantitativeScale extends Scale {
-            constructor(scale: D3.Scale.QuantitativeScale);
-<<<<<<< HEAD
-            /**
-            * Retrieves the domain value corresponding to a supplied range value.
-            *
-            * @param {number} value: A value from the Scale's range.
-            * @returns {number} The domain value corresponding to the supplied range value.
-            */
-            public invert(value: number): number;
-            /**
-            * Creates a copy of the QuantitativeScale with the same domain and range but without any registered listeners.
-            *
-            * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
-            */
-            public copy(): QuantitativeScale;
-            public domain(): any[];
-            public domain(values: any[]): QuantitativeScale;
-            /**
-            * Sets or gets the QuantitativeScale's output interpolator
-            *
-            * @param {D3.Transition.Interpolate} [factory] The output interpolator to use.
-            * @returns {D3.Transition.Interpolate|QuantitativeScale} The current output interpolator, or the calling QuantitativeScale.
-            */
-            public interpolate(): D3.Transition.Interpolate;
-            public interpolate(factory: D3.Transition.Interpolate): QuantitativeScale;
-            /**
-            * Sets the range of the QuantitativeScale and sets the interpolator to d3.interpolateRound.
-            *
-            * @param {number[]} values The new range value for the range.
-            */
-            public rangeRound(values: number[]): QuantitativeScale;
-            /**
-            * Gets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
-            *
-            * @returns {boolean} The current clamp status.
-            */
-            public clamp(): boolean;
-            /**
-            * Sets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
-            *
-            * @param {boolean} clamp Whether or not to clamp the QuantitativeScale.
-            * @returns {QuantitativeScale} The calling QuantitativeScale.
-            */
-            public clamp(clamp: boolean): QuantitativeScale;
-            /**
-            * Generates tick values.
-            *
-            * @param {number} [count] The number of ticks to generate.
-            * @returns {any[]} The generated ticks.
-            */
-            public ticks(count?: number): any[];
-            /**
-            * Gets a tick formatting function for displaying tick values.
-            *
-            * @param {number} count The number of ticks to be displayed
-            * @param {string} [format] A format specifier string.
-            * @returns {(n: number) => string} A formatting function.
-            */
-            public tickFormat(count: number, format?: string): (n: number) => string;
-            /**
-            * Retrieve a Domainer of a scale. A Domainer is responsible for combining
-            * multiple extents into a single domain.
-            *
-            * @return {QuantitativeScale} The scale's current domainer.
-            */
-            public domainer(): Domainer;
-            /**
-            * Sets a Domainer of a scale. A Domainer is responsible for combining
-            * multiple extents into a single domain.
-            *
-            * When you set domainer, we assume that you know what you want the domain
-            * to look like better that we do. Ensuring that the domain is padded,
-            * includes 0, etc., will be the responsability of the new domainer.
-            *
-            * @param {Domainer} domainer The domainer to be set.
-            * @return {QuantitativeScale} The calling scale.
-            */
-            public domainer(domainer: Domainer): QuantitativeScale;
->>>>>>> Release version 0.27.0
-=======
-            invert(value: number): number;
-            copy(): QuantitativeScale;
-            domain(): any[];
-            domain(values: any[]): QuantitativeScale;
-            interpolate(): D3.Transition.Interpolate;
-            interpolate(factory: D3.Transition.Interpolate): QuantitativeScale;
-            rangeRound(values: number[]): QuantitativeScale;
-            clamp(): boolean;
-            clamp(clamp: boolean): QuantitativeScale;
-            ticks(count?: number): any[];
-            tickFormat(count: number, format?: string): (n: number) => string;
-            domainer(): Domainer;
-            domainer(domainer: Domainer): QuantitativeScale;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1027,21 +518,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class Linear extends Plottable.Abstract.QuantitativeScale<number> {
-=======
-        class Linear extends Abstract.QuantitativeScale {
-            /**
-            * Creates a new LinearScale.
-            *
-            * @constructor
-            * @param {D3.Scale.LinearScale} [scale] The D3 LinearScale backing the LinearScale. If not supplied, uses a default scale.
-            */
->>>>>>> Release version 0.27.0
-=======
-        class Linear extends Plottable.Abstract.QuantitativeScale {
->>>>>>> Remove comments from built files.
             constructor();
             constructor(scale: D3.Scale.LinearScale);
             copy(): Linear;
@@ -1052,27 +529,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class Log extends Plottable.Abstract.QuantitativeScale<number> {
-=======
-        class Log extends Abstract.QuantitativeScale {
-            /**
-            * Creates a new Scale.Log.
-            *
-            * Warning: Log is deprecated; if possible, use ModifiedLog. Log scales are
-            * very unstable due to the fact that they can't handle 0 or negative
-            * numbers. The only time when you would want to use a Log scale over a
-            * ModifiedLog scale is if you're plotting very small data, such as all
-            * data < 1.
-            *
-            * @constructor
-            * @param {D3.Scale.LogScale} [scale] The D3 Scale.Log backing the Scale.Log. If not supplied, uses a default scale.
-            */
->>>>>>> Release version 0.27.0
-=======
-        class Log extends Plottable.Abstract.QuantitativeScale {
->>>>>>> Remove comments from built files.
             constructor();
             constructor(scale: D3.Scale.LogScale);
             copy(): Log;
@@ -1083,40 +540,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class ModifiedLog extends Plottable.Abstract.QuantitativeScale<number> {
-=======
-        class ModifiedLog extends Abstract.QuantitativeScale {
-            /**
-            * Creates a new Scale.ModifiedLog.
-            *
-            * A ModifiedLog scale acts as a regular log scale for large numbers.
-            * As it approaches 0, it gradually becomes linear. This means that the
-            * scale won't freak out if you give it 0 or a negative number, where an
-            * ordinary Log scale would.
-            *
-            * However, it does mean that scale will be effectively linear as values
-            * approach 0. If you want very small values on a log scale, you should use
-            * an ordinary Scale.Log instead.
-            *
-            * @constructor
-            * @param {number} [base]
-            *        The base of the log. Defaults to 10, and must be > 1.
-            *
-            *        For base <= x, scale(x) = log(x).
-            *
-            *        For 0 < x < base, scale(x) will become more and more
-            *        linear as it approaches 0.
-            *
-            *        At x == 0, scale(x) == 0.
-            *
-            *        For negative values, scale(-x) = -scale(x).
-            */
->>>>>>> Release version 0.27.0
-=======
-        class ModifiedLog extends Plottable.Abstract.QuantitativeScale {
->>>>>>> Remove comments from built files.
             constructor(base?: number);
             scale(x: number): number;
             invert(x: number): number;
@@ -1131,20 +555,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class Ordinal extends Plottable.Abstract.Scale<string, number> {
-=======
-        class Ordinal extends Abstract.Scale {
-            /**
-            * Creates a new OrdinalScale. Domain and Range are set later.
-            *
-            * @constructor
-            */
->>>>>>> Release version 0.27.0
-=======
-        class Ordinal extends Plottable.Abstract.Scale {
->>>>>>> Remove comments from built files.
             constructor(scale?: D3.Scale.OrdinalScale);
             domain(): any[];
             domain(values: any[]): Ordinal;
@@ -1163,23 +574,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class Color extends Plottable.Abstract.Scale<string, string> {
-=======
-        class Color extends Abstract.Scale {
-            /**
-            * Creates a ColorScale.
-            *
-            * @constructor
-            * @param {string} [scaleType] the type of color scale to create
-            *     (Category10/Category20/Category20b/Category20c).
-            * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
-            */
->>>>>>> Release version 0.27.0
-=======
-        class Color extends Plottable.Abstract.Scale {
->>>>>>> Remove comments from built files.
             constructor(scaleType?: string);
         }
     }
@@ -1188,21 +583,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class Time extends Plottable.Abstract.QuantitativeScale<any> {
-=======
-        class Time extends Abstract.QuantitativeScale {
-            /**
-            * Creates a new Time Scale.
-            *
-            * @constructor
-            * @param {D3.Scale.Time} [scale] The D3 LinearScale backing the TimeScale. If not supplied, uses a default scale.
-            */
->>>>>>> Release version 0.27.0
-=======
-        class Time extends Plottable.Abstract.QuantitativeScale {
->>>>>>> Remove comments from built files.
             constructor();
             constructor(scale: D3.Scale.LinearScale);
             tickInterval(interval: D3.Time.Interval, step?: number): any[];
@@ -1216,33 +597,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class InterpolatedColor extends Plottable.Abstract.Scale<number, string> {
-=======
-        /**
-        * This class implements a color scale that takes quantitive input and
-        * interpolates between a list of color values. It returns a hex string
-        * representing the interpolated color.
-        *
-        * By default it generates a linear scale internally.
-        */
-        class InterpolatedColor extends Abstract.QuantitativeScale {
-            /**
-            * Creates a InterpolatedColorScale.
-            *
-            * @constructor
-            * @param {string|string[]} [colorRange] the type of color scale to
-            *     create. Default is "reds". @see {@link colorRange} for further
-            *     options.
-            * @param {string} [scaleType] the type of underlying scale to use
-            *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
-            *     for further options.
-            */
->>>>>>> Release version 0.27.0
-=======
-        class InterpolatedColor extends Plottable.Abstract.QuantitativeScale {
->>>>>>> Remove comments from built files.
             constructor(colorRange?: any, scaleType?: string);
             colorRange(): string[];
             colorRange(colorRange: any): InterpolatedColor;
@@ -1256,26 +611,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Util {
-<<<<<<< HEAD
         class ScaleDomainCoordinator<D> {
             constructor(scales: Plottable.Abstract.Scale<D, any>[]);
             rescale(scale: Plottable.Abstract.Scale<D, any>): void;
-=======
-        class ScaleDomainCoordinator {
-<<<<<<< HEAD
-            /**
-            * Creates a ScaleDomainCoordinator.
-            *
-            * @constructor
-            * @param {Scale[]} scales A list of scales whose domains should be linked.
-            */
-            constructor(scales: Abstract.Scale[]);
-            public rescale(scale: Abstract.Scale): void;
->>>>>>> Release version 0.27.0
-=======
-            constructor(scales: Plottable.Abstract.Scale[]);
-            rescale(scale: Plottable.Abstract.Scale): void;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1287,27 +625,8 @@ declare module Plottable {
             renderArea: D3.Selection;
             key: string;
             constructor(key: string);
-<<<<<<< HEAD
-<<<<<<< HEAD
             remove(): void;
             draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
-=======
-            /**
-            * Removes the Drawer and its renderArea
-            */
-            public remove(): void;
-            /**
-            * Draws the data into the renderArea using the attrHash for attributes
-            *
-            * @param{any[][]} data The data to be drawn
-            * @param{attrHash} IAttributeToProjector The list of attributes to set on the data
-            */
-            public draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Animator.Null): void;
->>>>>>> Release version 0.27.0
-=======
-            remove(): void;
-            draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1315,18 +634,8 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class Area extends Plottable.Abstract._Drawer {
             draw(data: any[], attrToProjector: IAttributeToProjector): void;
-=======
-        class Area extends Abstract._Drawer {
-            public draw(data: any[][], attrToProjector: IAttributeToProjector): void;
->>>>>>> Release version 0.27.0
-=======
-        class Area extends Plottable.Abstract._Drawer {
-            draw(data: any[][], attrToProjector: IAttributeToProjector): void;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1334,18 +643,8 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class Rect extends Plottable.Abstract._Drawer {
             draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
-=======
-        class Rect extends Abstract._Drawer {
-            public draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Animator.Null): void;
->>>>>>> Release version 0.27.0
-=======
-        class Rect extends Plottable.Abstract._Drawer {
-            draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1357,7 +656,6 @@ declare module Plottable {
             static END_TICK_MARK_CLASS: string;
             static TICK_MARK_CLASS: string;
             static TICK_LABEL_CLASS: string;
-<<<<<<< HEAD
             constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
             remove(): void;
             width(): number;
@@ -1378,150 +676,6 @@ declare module Plottable {
             orient(newOrientation: string): Axis;
             showEndTickLabels(): boolean;
             showEndTickLabels(show: boolean): Axis;
-=======
-            constructor(scale: Scale, orientation: string, formatter?: (d: any) => string);
-<<<<<<< HEAD
-            public remove(): void;
-            /**
-            * Gets the current width.
-            *
-            * @returns {number} The current width.
-            */
-            public width(): number;
-            /**
-            * Sets a user-specified width.
-            *
-            * @param {number|String} w A fixed width for the Axis, or "auto" for automatic mode.
-            * @returns {Axis} The calling Axis.
-            */
-            public width(w: any): Axis;
-            /**
-            * Gets the current height.
-            *
-            * @returns {number} The current height.
-            */
-            public height(): number;
-            /**
-            * Sets a user-specified height.
-            *
-            * @param {number|String} h A fixed height for the Axis, or "auto" for automatic mode.
-            * @returns {Axis} The calling Axis.
-            */
-            public height(h: any): Axis;
-            /**
-            * Get the current formatter on the axis.
-            *
-            * @returns {Formatter} the axis formatter
-            */
-            public formatter(): Formatter;
-            /**
-            * Sets a new tick formatter.
-            *
-            * @param {Formatter} formatter
-            * @returns {Abstract.Axis} The calling Axis.
-            */
-            public formatter(formatter: Formatter): Axis;
-            /**
-            * Gets the current tick mark length.
-            *
-            * @returns {number} The current tick mark length.
-            */
-            public tickLength(): number;
-            /**
-            * Sets the tick mark length.
-            *
-            * @param {number} length The length of each tick.
-            * @returns {BaseAxis} The calling Axis.
-            */
-            public tickLength(length: number): Axis;
-            /**
-            * Gets the current end tick mark length.
-            *
-            * @returns {number} The current end tick mark length.
-            */
-            public endTickLength(): number;
-            /**
-            * Sets the end tick mark length.
-            *
-            * @param {number} length The length of the end ticks.
-            * @returns {BaseAxis} The calling Axis.
-            */
-            public endTickLength(length: number): Axis;
-            /**
-            * Gets the padding between each tick mark and its associated label.
-            *
-            * @returns {number} The current padding, in pixels.
-            */
-            public tickLabelPadding(): number;
-            /**
-            * Sets the padding between each tick mark and its associated label.
-            *
-            * @param {number} padding The desired padding, in pixels.
-            * @returns {Axis} The calling Axis.
-            */
-            public tickLabelPadding(padding: number): Axis;
-            /**
-            * Gets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
-            *
-            * @returns {number} The current size of the gutter, in pixels.
-            */
-            public gutter(): number;
-            /**
-            * Sets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
-            *
-            * @param {number} size The desired size of the gutter, in pixels.
-            * @returns {Axis} The calling Axis.
-            */
-            public gutter(size: number): Axis;
-            /**
-            * Gets the orientation of the Axis.
-            *
-            * @returns {string} The current orientation.
-            */
-            public orient(): string;
-            /**
-            * Sets the orientation of the Axis.
-            *
-            * @param {string} newOrientation The desired orientation (top/bottom/left/right).
-            * @returns {Axis} The calling Axis.
-            */
-            public orient(newOrientation: string): Axis;
-            /**
-            * Checks whether the Axis is currently set to show the first and last
-            * tick labels.
-            *
-            * @returns {boolean}
-            */
-            public showEndTickLabels(): boolean;
-            /**
-            * Set whether or not to show the first and last tick labels.
-            *
-            * @param {boolean} show Whether or not to show the first and last labels.
-            * @returns {Axis} The calling Axis.
-            */
-            public showEndTickLabels(show: boolean): Axis;
->>>>>>> Release version 0.27.0
-=======
-            remove(): void;
-            width(): number;
-            width(w: any): Axis;
-            height(): number;
-            height(h: any): Axis;
-            formatter(): Formatter;
-            formatter(formatter: Formatter): Axis;
-            tickLength(): number;
-            tickLength(length: number): Axis;
-            endTickLength(): number;
-            endTickLength(length: number): Axis;
-            tickLabelPadding(): number;
-            tickLabelPadding(padding: number): Axis;
-            gutter(): number;
-            gutter(size: number): Axis;
-            orient(): string;
-            orient(newOrientation: string): Axis;
-            showEndTickLabels(): boolean;
-            showEndTickLabels(show: boolean): Axis;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1545,71 +699,12 @@ declare module Plottable {
 
 declare module Plottable {
     module Axis {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class Numeric extends Plottable.Abstract.Axis {
             constructor(scale: Plottable.Abstract.QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
-=======
-        class Numeric extends Plottable.Abstract.Axis {
-            constructor(scale: Plottable.Abstract.QuantitativeScale, orientation: string, formatter?: (d: any) => string);
->>>>>>> Remove comments from built files.
             tickLabelPosition(): string;
             tickLabelPosition(position: string): Numeric;
             showEndTickLabel(orientation: string): boolean;
             showEndTickLabel(orientation: string, show: boolean): Numeric;
-<<<<<<< HEAD
-=======
-        class Numeric extends Abstract.Axis {
-            /**
-            * Creates a NumericAxis.
-            *
-            * @constructor
-            * @param {QuantitativeScale} scale The QuantitativeScale to base the NumericAxis on.
-            * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-            * @param {Formatter} [formatter] A function to format tick labels (default Formatters.general(3, false)).
-            */
-            constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter?: (d: any) => string);
-            /**
-            * Gets the tick label position relative to the tick marks.
-            *
-            * @returns {string} The current tick label position.
-            */
-            public tickLabelPosition(): string;
-            /**
-            * Sets the tick label position relative to the tick marks.
-            *
-            * @param {string} position The relative position of the tick label.
-            *                          [top/center/bottom] for a vertical NumericAxis,
-            *                          [left/center/right] for a horizontal NumericAxis.
-            * @returns {NumericAxis} The calling NumericAxis.
-            */
-            public tickLabelPosition(position: string): Numeric;
-            /**
-            * Return whether or not the tick labels at the end of the graph are
-            * displayed when partially cut off.
-            *
-            * @param {string} orientation Where on the scale to change tick labels.
-            *                 On a "top" or "bottom" axis, this can be "left" or
-            *                 "right". On a "left" or "right" axis, this can be "top"
-            *                 or "bottom".
-            * @returns {boolean} The current setting.
-            */
-            public showEndTickLabel(orientation: string): boolean;
-            /**
-            * Control whether or not the tick labels at the end of the graph are
-            * displayed when partially cut off.
-            *
-            * @param {string} orientation Where on the scale to change tick labels.
-            *                 On a "top" or "bottom" axis, this can be "left" or
-            *                 "right". On a "left" or "right" axis, this can be "top"
-            *                 or "bottom".
-            * @param {boolean} show Whether or not the given tick should be displayed.
-            * @returns {Numeric} The calling Numeric.
-            */
-            public showEndTickLabel(orientation: string, show: boolean): Numeric;
->>>>>>> Release version 0.27.0
-=======
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1680,28 +775,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class Gridlines extends Plottable.Abstract.Component {
             constructor(xScale: Plottable.Abstract.QuantitativeScale<any>, yScale: Plottable.Abstract.QuantitativeScale<any>);
             remove(): Gridlines;
-=======
-        class Gridlines extends Abstract.Component {
-            /**
-            * Creates a set of Gridlines.
-            * @constructor
-            *
-            * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-            * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
-            */
-            constructor(xScale: Abstract.QuantitativeScale, yScale: Abstract.QuantitativeScale);
-            public remove(): Gridlines;
->>>>>>> Release version 0.27.0
-=======
-        class Gridlines extends Plottable.Abstract.Component {
-            constructor(xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.QuantitativeScale);
-            remove(): Gridlines;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1709,29 +785,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class Scatter extends Plottable.Abstract.XYPlot {
             constructor(dataset: any, xScale: Plottable.Abstract.Scale<any, number>, yScale: Plottable.Abstract.Scale<any, number>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Scatter;
-=======
-        class Scatter extends Abstract.XYPlot {
-            /**
-            * Creates a ScatterPlot.
-            *
-            * @constructor
-            * @param {IDataset} dataset The dataset to render.
-            * @param {Scale} xScale The x scale to use.
-            * @param {Scale} yScale The y scale to use.
-            */
-            constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale);
-            public project(attrToSet: string, accessor: any, scale?: Abstract.Scale): Scatter;
->>>>>>> Release version 0.27.0
-=======
-        class Scatter extends Plottable.Abstract.XYPlot {
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.Scale);
-            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale): Scatter;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1739,40 +795,12 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class Grid extends Plottable.Abstract.XYPlot {
             colorScale: Plottable.Abstract.Scale<any, string>;
             xScale: Plottable.Scale.Ordinal;
             yScale: Plottable.Scale.Ordinal;
             constructor(dataset: any, xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale<any, string>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Grid;
-=======
-        class Grid extends Abstract.XYPlot {
-            public colorScale: Abstract.Scale;
-            public xScale: Scale.Ordinal;
-            public yScale: Scale.Ordinal;
-            /**
-            * Creates a GridPlot.
-            *
-            * @constructor
-            * @param {IDataset} dataset The dataset to render.
-            * @param {OrdinalScale} xScale The x scale to use.
-            * @param {OrdinalScale} yScale The y scale to use.
-            * @param {ColorScale|InterpolatedColorScale} colorScale The color scale to use for each grid
-            *     cell.
-            */
-            constructor(dataset: any, xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale);
-            public project(attrToSet: string, accessor: any, scale?: Abstract.Scale): Grid;
->>>>>>> Release version 0.27.0
-=======
-        class Grid extends Plottable.Abstract.XYPlot {
-            colorScale: Plottable.Abstract.Scale;
-            xScale: Plottable.Scale.Ordinal;
-            yScale: Plottable.Scale.Ordinal;
-            constructor(dataset: any, xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale);
-            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale): Grid;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1781,8 +809,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class BarPlot extends XYPlot {
-<<<<<<< HEAD
-<<<<<<< HEAD
             constructor(dataset: any, xScale: Scale<any, number>, yScale: Scale<any, number>);
             baseline(value: number): BarPlot;
             barAlignment(alignment: string): BarPlot;
@@ -1791,63 +817,6 @@ declare module Plottable {
             selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
             selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
             deselectAll(): BarPlot;
-=======
-            /**
-            * Creates an AbstractBarPlot.
-            *
-            * @constructor
-            * @param {IDataset} dataset The dataset to render.
-            * @param {Scale} xScale The x scale to use.
-            * @param {Scale} yScale The y scale to use.
-            */
-            constructor(dataset: any, xScale: Scale, yScale: Scale);
-            /**
-            * Sets the baseline for the bars to the specified value.
-            *
-            * @param {number} value The value to position the baseline at.
-            * @return {AbstractBarPlot} The calling AbstractBarPlot.
-            */
-            public baseline(value: number): BarPlot;
-            /**
-            * Sets the bar alignment relative to the independent axis.
-            * VerticalBarPlot supports "left", "center", "right"
-            * HorizontalBarPlot supports "top", "center", "bottom"
-            *
-            * @param {string} alignment The desired alignment.
-            * @return {AbstractBarPlot} The calling AbstractBarPlot.
-            */
-            public barAlignment(alignment: string): BarPlot;
-            /**
-            * Selects the bar under the given pixel position (if [xValOrExtent]
-            * and [yValOrExtent] are {number}s), under a given line (if only one
-            * of [xValOrExtent] or [yValOrExtent] are {IExtent}s) or are under a
-            * 2D area (if [xValOrExtent] and [yValOrExtent] are both {IExtent}s).
-            *
-            * @param {any} xValOrExtent The pixel x position, or range of x values.
-            * @param {any} yValOrExtent The pixel y position, or range of y values.
-            * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
-            * @return {D3.Selection} The selected bar, or null if no bar was selected.
-            */
-            public selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
-            public selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
-            public selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
-            public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
-            /**
-            * Deselects all bars.
-            * @return {AbstractBarPlot} The calling AbstractBarPlot.
-            */
-            public deselectAll(): BarPlot;
->>>>>>> Release version 0.27.0
-=======
-            constructor(dataset: any, xScale: Scale, yScale: Scale);
-            baseline(value: number): BarPlot;
-            barAlignment(alignment: string): BarPlot;
-            selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
-            selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
-            selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
-            selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
-            deselectAll(): BarPlot;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1855,35 +824,8 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class VerticalBar extends Plottable.Abstract.BarPlot {
             constructor(dataset: any, xScale: Plottable.Abstract.Scale<any, number>, yScale: Plottable.Abstract.QuantitativeScale<number>);
-=======
-        /**
-        * A VerticalBarPlot draws bars vertically.
-        * Key projected attributes:
-        *  - "width" - the horizontal width of a bar.
-        *      - if an ordinal scale is attached, this defaults to ordinalScale.rangeBand()
-        *      - if a quantitative scale is attached, this defaults to 10
-        *  - "x" - the horizontal position of a bar
-        *  - "y" - the vertical height of a bar
-        */
-        class VerticalBar extends Abstract.BarPlot {
-            /**
-            * Creates a VerticalBarPlot.
-            *
-            * @constructor
-            * @param {IDataset} dataset The dataset to render.
-            * @param {Scale} xScale The x scale to use.
-            * @param {QuantitativeScale} yScale The y scale to use.
-            */
-            constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale);
->>>>>>> Release version 0.27.0
-=======
-        class VerticalBar extends Plottable.Abstract.BarPlot {
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1891,38 +833,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class HorizontalBar extends Plottable.Abstract.BarPlot {
             isVertical: boolean;
             constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<number>, yScale: Plottable.Abstract.Scale<any, number>);
-=======
-        /**
-        * A HorizontalBarPlot draws bars horizontally.
-        * Key projected attributes:
-        *  - "width" - the vertical height of a bar (since the bar is rotated horizontally)
-        *      - if an ordinal scale is attached, this defaults to ordinalScale.rangeBand()
-        *      - if a quantitative scale is attached, this defaults to 10
-        *  - "x" - the horizontal length of a bar
-        *  - "y" - the vertical position of a bar
-        */
-        class HorizontalBar extends Abstract.BarPlot {
-            public isVertical: boolean;
-            /**
-            * Creates a HorizontalBarPlot.
-            *
-            * @constructor
-            * @param {IDataset} dataset The dataset to render.
-            * @param {QuantitativeScale} xScale The x scale to use.
-            * @param {Scale} yScale The y scale to use.
-            */
-            constructor(dataset: any, xScale: Abstract.QuantitativeScale, yScale: Abstract.Scale);
->>>>>>> Release version 0.27.0
-=======
-        class HorizontalBar extends Plottable.Abstract.BarPlot {
-            isVertical: boolean;
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.Scale);
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1930,26 +843,8 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class Line extends Plottable.Abstract.XYPlot {
             constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<any>, yScale: Plottable.Abstract.QuantitativeScale<any>);
-=======
-        class Line extends Abstract.XYPlot {
-            /**
-            * Creates a LinePlot.
-            *
-            * @constructor
-            * @param {IDataset} dataset The dataset to render.
-            * @param {Scale} xScale The x scale to use.
-            * @param {Scale} yScale The y scale to use.
-            */
-            constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale);
->>>>>>> Release version 0.27.0
-=======
-        class Line extends Plottable.Abstract.XYPlot {
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.Scale);
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1958,26 +853,8 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Area extends Line {
-<<<<<<< HEAD
-<<<<<<< HEAD
             constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<any>, yScale: Plottable.Abstract.QuantitativeScale<any>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Area;
-=======
-            /**
-            * Creates an AreaPlot.
-            *
-            * @constructor
-            * @param {IDataset} dataset The dataset to render.
-            * @param {Scale} xScale The x scale to use.
-            * @param {Scale} yScale The y scale to use.
-            */
-            constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale);
-            public project(attrToSet: string, accessor: any, scale?: Abstract.Scale): Area;
->>>>>>> Release version 0.27.0
-=======
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.Scale);
-            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale): Area;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -1987,31 +864,8 @@ declare module Plottable {
     module Abstract {
         class NewStyleBarPlot extends NewStylePlot {
             static DEFAULT_WIDTH: number;
-<<<<<<< HEAD
-<<<<<<< HEAD
             constructor(xScale: Scale<any, number>, yScale: Scale<any, number>);
             baseline(value: number): any;
-=======
-            /**
-            * Creates an NewStyleBarPlot.
-            *
-            * @constructor
-            * @param {Scale} xScale The x scale to use.
-            * @param {Scale} yScale The y scale to use.
-            */
-            constructor(xScale: Scale, yScale: Scale);
-            /**
-            * Sets the baseline for the bars to the specified value.
-            *
-            * @param {number} value The value to position the baseline at.
-            * @return {NewStyleBarPlot} The calling NewStyleBarPlot.
-            */
-            public baseline(value: number): any;
->>>>>>> Release version 0.27.0
-=======
-            constructor(xScale: Scale, yScale: Scale);
-            baseline(value: number): any;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -2021,15 +875,7 @@ declare module Plottable {
     module Plot {
         class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
             static DEFAULT_WIDTH: number;
-<<<<<<< HEAD
-<<<<<<< HEAD
             constructor(xScale: Plottable.Abstract.Scale<any, number>, yScale: Plottable.Abstract.Scale<any, number>, isVertical?: boolean);
-=======
-            constructor(xScale: Abstract.Scale, yScale: Abstract.Scale, isVertical?: boolean);
->>>>>>> Release version 0.27.0
-=======
-            constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.Scale, isVertical?: boolean);
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -2046,25 +892,8 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class StackedArea extends Plottable.Abstract.Stacked {
             constructor(xScale: Plottable.Abstract.QuantitativeScale<any>, yScale: Plottable.Abstract.QuantitativeScale<any>);
-=======
-        class StackedArea extends Abstract.Stacked {
-            /**
-            * Constructs a StackedArea plot.
-            *
-            * @constructor
-            * @param {QuantitativeScale} xScale The x scale to use.
-            * @param {QuantitativeScale} yScale The y scale to use.
-            */
-            constructor(xScale: Abstract.QuantitativeScale, yScale: Abstract.QuantitativeScale);
->>>>>>> Release version 0.27.0
-=======
-        class StackedArea extends Plottable.Abstract.Stacked {
-            constructor(xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.QuantitativeScale);
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -2072,29 +901,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class StackedBar extends Plottable.Abstract.Stacked {
             constructor(xScale?: Plottable.Abstract.Scale<any, number>, yScale?: Plottable.Abstract.Scale<any, number>, isVertical?: boolean);
             baseline(value: number): any;
-=======
-        class StackedBar extends Abstract.NewStyleBarPlot {
-            public stackedData: any[][];
-            /**
-            * Constructs a StackedBar plot.
-            *
-            * @constructor
-            * @param {Scale} xScale the x scale of the plot
-            * @param {Scale} yScale the y scale of the plot
-            * @param {boolean} isVertical if the plot if vertical
-            */
-            constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale, isVertical?: boolean);
->>>>>>> Release version 0.27.0
-=======
-        class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
-            stackedData: any[][];
-            constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale, isVertical?: boolean);
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -2206,35 +1015,11 @@ declare module Plottable {
 
 declare module Plottable {
     module Interaction {
-<<<<<<< HEAD
-<<<<<<< HEAD
         class PanZoom extends Plottable.Abstract.Interaction {
             xScale: Plottable.Abstract.QuantitativeScale<any>;
             yScale: Plottable.Abstract.QuantitativeScale<any>;
             constructor(componentToListenTo: Plottable.Abstract.Component, xScale?: Plottable.Abstract.QuantitativeScale<any>, yScale?: Plottable.Abstract.QuantitativeScale<any>);
             resetZoom(): void;
-=======
-        class PanZoom extends Abstract.Interaction {
-            public xScale: Abstract.QuantitativeScale;
-            public yScale: Abstract.QuantitativeScale;
-            /**
-            * Creates a PanZoomInteraction.
-            *
-            * @constructor
-            * @param {Component} componentToListenTo The component to listen for interactions on.
-            * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
-            * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
-            */
-            constructor(componentToListenTo: Abstract.Component, xScale?: Abstract.QuantitativeScale, yScale?: Abstract.QuantitativeScale);
-            public resetZoom(): void;
->>>>>>> Release version 0.27.0
-=======
-        class PanZoom extends Plottable.Abstract.Interaction {
-            xScale: Plottable.Abstract.QuantitativeScale;
-            yScale: Plottable.Abstract.QuantitativeScale;
-            constructor(componentToListenTo: Plottable.Abstract.Component, xScale?: Plottable.Abstract.QuantitativeScale, yScale?: Plottable.Abstract.QuantitativeScale);
-            resetZoom(): void;
->>>>>>> Remove comments from built files.
         }
     }
 }
@@ -2256,10 +1041,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Interaction {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Remove comments from built files.
         class Drag extends Plottable.Abstract.Interaction {
             origin: number[];
             location: number[];
@@ -2270,62 +1051,7 @@ declare module Plottable {
             drag(cb: (startLocation: Point, endLocation: Point) => any): Drag;
             dragend(): (startLocation: Point, endLocation: Point) => void;
             dragend(cb: (startLocation: Point, endLocation: Point) => any): Drag;
-<<<<<<< HEAD
             setupZoomCallback(xScale?: Plottable.Abstract.QuantitativeScale<any>, yScale?: Plottable.Abstract.QuantitativeScale<any>): Drag;
-=======
-        class Drag extends Abstract.Interaction {
-            public origin: number[];
-            public location: number[];
-            /**
-            * Creates a Drag.
-            *
-            * @param {Component} componentToListenTo The component to listen for interactions on.
-            */
-            constructor(componentToListenTo: Abstract.Component);
-            /**
-            * Gets the callback that is called when dragging starts.
-            *
-            * @returns {(startLocation: Point) => void}
-            */
-            public dragstart(): (startLocation: Point) => void;
-            /**
-            * Sets the callback to be called when dragging starts.
-            *
-            * @param {(startLocation: Point) => any} cb The function to be called.
-            * @returns {Drag}
-            */
-            public dragstart(cb: (startLocation: Point) => any): Drag;
-            /**
-            * Gets the callback that is called during dragging.
-            *
-            * @returns {(startLocation: Point, endLocation: Point) => void}
-            */
-            public drag(): (startLocation: Point, endLocation: Point) => void;
-            /**
-            * Adds a callback to be called during dragging.
-            *
-            * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called.
-            * @returns {Drag}
-            */
-            public drag(cb: (startLocation: Point, endLocation: Point) => any): Drag;
-            /**
-            * Gets the callback that is called when dragging ends.
-            *
-            * @returns {(startLocation: Point, endLocation: Point) => void}
-            */
-            public dragend(): (startLocation: Point, endLocation: Point) => void;
-            /**
-            * Adds a callback to be called when the dragging ends.
-            *
-            * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called. Takes in a SelectionArea in pixels.
-            * @returns {Drag} The calling Drag.
-            */
-            public dragend(cb: (startLocation: Point, endLocation: Point) => any): Drag;
-            public setupZoomCallback(xScale?: Abstract.QuantitativeScale, yScale?: Abstract.QuantitativeScale): Drag;
->>>>>>> Release version 0.27.0
-=======
-            setupZoomCallback(xScale?: Plottable.Abstract.QuantitativeScale, yScale?: Plottable.Abstract.QuantitativeScale): Drag;
->>>>>>> Remove comments from built files.
         }
     }
 }
