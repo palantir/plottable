@@ -6,7 +6,7 @@ export module Plot {
   export class StackedBar extends Abstract.Stacked {
     public _baselineValue = 0;
     public _baseline: D3.Selection;
-    public _barAlignmentFactor = 0.5;
+    public _barAlignmentFactor = 0;
 
     /**
      * Constructs a StackedBar plot.
