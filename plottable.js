@@ -5604,7 +5604,7 @@ var Plottable;
             }
             IterativeDelay.prototype.animate = function (selection, attrToProjector) {
                 var _this = this;
-                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS * i; }).attr(attrToProjector);
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + _this.iterativeDelay() * i; }).attr(attrToProjector);
             };
             IterativeDelay.prototype.iterativeDelay = function (iterDelay) {
                 if (iterDelay === undefined) {
