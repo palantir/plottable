@@ -3190,9 +3190,8 @@ var Plottable;
                 _super.apply(this, arguments);
             }
             Area.prototype.draw = function (data, attrToProjector) {
-                var pathData = [data];
                 var svgElement = "path";
-                var dataElements = this.renderArea.selectAll(svgElement).data(pathData);
+                var dataElements = this.renderArea.selectAll(svgElement).data([data]);
                 dataElements.enter().append(svgElement);
                 dataElements.attr(attrToProjector).classed("area", true);
                 dataElements.exit().remove();
