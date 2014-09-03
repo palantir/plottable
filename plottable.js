@@ -4961,8 +4961,8 @@ var Plottable;
         var VerticalBar = (function (_super) {
             __extends(VerticalBar, _super);
             function VerticalBar(dataset, xScale, yScale) {
-                _super.call(this, dataset, xScale, yScale);
                 this._isVertical = true;
+                _super.call(this, dataset, xScale, yScale);
             }
             VerticalBar.prototype._updateYDomainer = function () {
                 this._updateDomainer(this.yScale);
@@ -4987,8 +4987,8 @@ var Plottable;
         var HorizontalBar = (function (_super) {
             __extends(HorizontalBar, _super);
             function HorizontalBar(dataset, xScale, yScale) {
+                this._isVertical = false;
                 _super.call(this, dataset, xScale, yScale);
-                this.isVertical = false;
             }
             HorizontalBar.prototype._updateXDomainer = function () {
                 this._updateDomainer(this.xScale);

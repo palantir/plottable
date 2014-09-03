@@ -1010,7 +1010,6 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
-            _isVertical: boolean;
             constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
             _updateYDomainer(): void;
         }
@@ -1024,7 +1023,6 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
-            isVertical: boolean;
             constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.Scale);
             _updateXDomainer(): void;
             _generateAttrToProjector(): IAttributeToProjector;
