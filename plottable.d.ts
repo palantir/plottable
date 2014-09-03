@@ -2248,7 +2248,6 @@ declare module Plottable {
         *  - "y" - the vertical position of a bar
         */
         class HorizontalBar extends Abstract.BarPlot {
-            public isVertical: boolean;
             /**
             * Creates a HorizontalBarPlot.
             *

@@ -1,5 +1,5 @@
 /*!
-Plottable 0.27.0 (https://github.com/palantir/plottable)
+Plottable 0.27.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1413,7 +1413,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.27.0";
+    Plottable.version = "0.27.1";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4771,7 +4771,7 @@ var Plottable;
     var _Drawer = Plottable._Drawer;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
+///<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -5172,7 +5172,7 @@ var Plottable;
     var Abstract = Plottable.Abstract;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
+///<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -5454,7 +5454,7 @@ var Plottable;
     var Axis = Plottable.Axis;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
+///<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -5684,7 +5684,7 @@ var Plottable;
     var Axis = Plottable.Axis;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
+///<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -5753,8 +5753,25 @@ var Plottable;
                 return this._scale.domain();
             };
 
-            Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
-                var draw = typeof dataOrTicks[0] !== "string";
+            /**
+            * Measures the size of the ticks while also writing them to the DOM.
+            * @param {D3.Selection} ticks The tick elements to be written to.
+            */
+            Category.prototype.drawTicks = function (axisWidth, axisHeight, scale, ticks) {
+                return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, true);
+            };
+
+            /**
+            * Measures the size of the ticks without making any (permanent) DOM
+            * changes.
+            *
+            * @param {string[]} data The strings that will be printed on the ticks.
+            */
+            Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, ticks) {
+                return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, false);
+            };
+
+            Category.prototype.drawOrMeasureTicks = function (axisWidth, axisHeight, scale, dataOrTicks, draw) {
                 var self = this;
                 var textWriteResults = [];
                 var tm = function (s) {
@@ -5824,7 +5841,7 @@ var Plottable;
 
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this.measureTicks(this.width(), this.height(), this._scale, tickLabels);
+                this.drawTicks(this.width(), this.height(), this._scale, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
                 var xTranslate = this._orientation === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
@@ -6934,8 +6951,8 @@ var Plottable;
             * @param {QuantitativeScale} yScale The y scale to use.
             */
             function VerticalBar(dataset, xScale, yScale) {
+                this._isVertical = true; // Has to be set before super()
                 _super.call(this, dataset, xScale, yScale);
-                this._isVertical = true;
             }
             VerticalBar.prototype._updateYDomainer = function () {
                 this._updateDomainer(this.yScale);
@@ -6978,8 +6995,8 @@ var Plottable;
             * @param {Scale} yScale The y scale to use.
             */
             function HorizontalBar(dataset, xScale, yScale) {
+                this._isVertical = false;
                 _super.call(this, dataset, xScale, yScale);
-                this.isVertical = false;
             }
             HorizontalBar.prototype._updateXDomainer = function () {
                 this._updateDomainer(this.xScale);
@@ -7338,9 +7355,9 @@ var Plottable;
             __extends(ClusteredBar, _super);
             function ClusteredBar(xScale, yScale, isVertical) {
                 if (typeof isVertical === "undefined") { isVertical = true; }
+                this._isVertical = isVertical; // Has to be set before super()
                 _super.call(this, xScale, yScale);
                 this.innerScale = new Plottable.Scale.Ordinal();
-                this._isVertical = isVertical;
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -7597,11 +7614,10 @@ var Plottable;
             */
             function StackedBar(xScale, yScale, isVertical) {
                 if (typeof isVertical === "undefined") { isVertical = true; }
-                _super.call(this, xScale, yScale);
                 this.stackedData = [];
-                this._baselineValue = 0;
                 this.stackedExtent = [];
-                this._isVertical = isVertical;
+                this._isVertical = isVertical; // Has to be set before super()
+                _super.call(this, xScale, yScale);
             }
             StackedBar.prototype._addDataset = function (key, dataset) {
                 _super.prototype._addDataset.call(this, key, dataset);

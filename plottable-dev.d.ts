@@ -2475,7 +2475,6 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [alignment: string]: number;
             };
-            public _isVertical: boolean;
             /**
             * Creates a VerticalBarPlot.
             *
@@ -2506,7 +2505,6 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [alignment: string]: number;
             };
-            public isVertical: boolean;
             /**
             * Creates a HorizontalBarPlot.
             *
@@ -2664,8 +2662,6 @@ declare module Plottable {
         class StackedBar extends Abstract.NewStyleBarPlot {
             public stackedData: any[][];
             public _yAccessor: IAccessor;
-            public _baselineValue: number;
-            public _baseline: D3.Selection;
             /**
             * Constructs a StackedBar plot.
             *
