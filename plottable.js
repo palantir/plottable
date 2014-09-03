@@ -5267,9 +5267,9 @@ var Plottable;
             __extends(ClusteredBar, _super);
             function ClusteredBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
+                this._isVertical = isVertical;
                 _super.call(this, xScale, yScale);
                 this.innerScale = new Plottable.Scale.Ordinal();
-                this._isVertical = isVertical;
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -5460,11 +5460,10 @@ var Plottable;
             __extends(StackedBar, _super);
             function StackedBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
-                _super.call(this, xScale, yScale);
                 this.stackedData = [];
-                this._baselineValue = 0;
                 this.stackedExtent = [];
                 this._isVertical = isVertical;
+                _super.call(this, xScale, yScale);
             }
             StackedBar.prototype._addDataset = function (key, dataset) {
                 _super.prototype._addDataset.call(this, key, dataset);

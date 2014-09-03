@@ -7,9 +7,9 @@ export module Plot {
     private innerScale: Scale.Ordinal;
 
     constructor(xScale: Abstract.Scale, yScale: Abstract.Scale, isVertical = true) {
+      this._isVertical = isVertical; // Has to be set before super()
       super(xScale, yScale);
       this.innerScale = new Scale.Ordinal();
-      this._isVertical = isVertical;
     }
 
     public _generateAttrToProjector() {
