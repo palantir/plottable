@@ -5361,11 +5361,13 @@ var Plottable;
                 var outFunction = function (d, y0, y) {
                     d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = y0;
                 };
-                d3.layout.stack().x(this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor).y(this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor).values(function (d) { return d.data(); }).out(outFunction)(datasets);
+                var primaryAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+                var secondaryAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                d3.layout.stack().x(secondaryAccessor).y(primaryAccessor).values(function (d) { return d.data(); }).out(outFunction)(datasets);
                 this.stackedExtent = [0, 0];
-                var maxY = Plottable.Util.Methods.max(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
+                var maxY = Plottable.Util.Methods.max(datasets[datasets.length - 1].data(), function (datum) { return primaryAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
                 this.stackedExtent[1] = Math.max(0, maxY);
-                var minY = Plottable.Util.Methods.min(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
+                var minY = Plottable.Util.Methods.min(datasets[datasets.length - 1].data(), function (datum) { return primaryAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
                 this.stackedExtent[0] = Math.min(minY, 0);
             };
             Stacked.prototype._updateAllProjectors = function () {
