@@ -955,6 +955,16 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Animator {
+        class MovingRect extends Rect {
+            baseline: number;
+            constructor(baseline: number, isVertical?: boolean);
+        }
+    }
+}
+
+
+declare module Plottable {
     module Core {
         interface IKeyEventListenerCallback {
             (e: D3.D3Event): any;

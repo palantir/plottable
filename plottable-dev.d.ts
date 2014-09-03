@@ -1199,6 +1199,17 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Animator {
+        class MovingRect extends Rect {
+            baseline: number;
+            constructor(baseline: number, isVertical?: boolean);
+            _startMovingAttrProjector(attrToProjector: IAttributeToProjector): (p: any) => number;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Core {
         interface IKeyEventListenerCallback {
             (e: D3.D3Event): any;
