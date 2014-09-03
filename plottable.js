@@ -5478,7 +5478,7 @@ var Plottable;
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
-                this._barAlignmentFactor = 0.5;
+                this._barAlignmentFactor = 0;
                 this.classed("bar-plot", true);
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
                 this.baseline(this._baselineValue);
