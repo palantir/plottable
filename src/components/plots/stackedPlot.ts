@@ -34,19 +34,21 @@ export module Abstract {
         d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = y0;
       };
 
+      var primaryAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+      var secondaryAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       d3.layout.stack()
-        .x(this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor)
-        .y(this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor)
+        .x(secondaryAccessor)
+        .y(primaryAccessor)
         .values((d) => d.data())
         .out(outFunction)(datasets);
 
       this.stackedExtent = [0, 0];
       var maxY = Util.Methods.max(datasets[datasets.length - 1].data(),
-                                  (datum: any) => datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+                                  (datum: any) => primaryAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
       this.stackedExtent[1] = Math.max(0, maxY);
 
       var minY = Util.Methods.min(datasets[datasets.length - 1].data(),
-                                  (datum: any) => datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+                                  (datum: any) => primaryAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
       this.stackedExtent[0] = Math.min(minY, 0);
     }
 
