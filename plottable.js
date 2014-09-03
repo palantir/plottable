@@ -5340,6 +5340,13 @@ var Plottable;
                     this.stack();
                 }
             };
+            Stacked.prototype.project = function (attrToSet, accessor, scale) {
+                _super.prototype.project.call(this, attrToSet, accessor, scale);
+                if (this._datasetKeysInOrder.length > 0 && attrToSet === "y") {
+                    this.stack();
+                }
+                return this;
+            };
             Stacked.prototype.stack = function () {
                 var datasets = this._getDatasetsInOrder();
                 d3.layout.stack().x(this._projectors["x"].accessor).y(this._projectors["y"].accessor).values(function (d) { return d.data(); })(datasets);
