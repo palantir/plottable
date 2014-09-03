@@ -4,7 +4,7 @@ var assert = chai.assert;
 describe("Plots", () => {
   describe("New Style Plots", () => {
     var p: Plottable.Abstract.NewStylePlot;
-    var oldWarn = Plottable.Util.Methods.warn;
+    var oldWarn = Plottable._Util.Methods.warn;
 
     beforeEach(() => {
       var xScale = new Plottable.Scale.Linear();
@@ -14,7 +14,7 @@ describe("Plots", () => {
     });
 
     afterEach(() => {
-      Plottable.Util.Methods.warn = oldWarn;
+      Plottable._Util.Methods.warn = oldWarn;
     });
 
     it("Datasets can be added and removed as expected", () => {
@@ -60,7 +60,7 @@ describe("Plots", () => {
       p.datasetOrder(["bar", "baz", "foo"]);
       assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
       var warned = 0;
-      Plottable.Util.Methods.warn = () => warned++; // suppress expected warnings
+      Plottable._Util.Methods.warn = () => warned++; // suppress expected warnings
       p.datasetOrder(["blah", "blee", "bar", "baz", "foo"]);
       assert.equal(warned, 1);
       assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
@@ -68,7 +68,7 @@ describe("Plots", () => {
 
     it("Has proper warnings", () => {
       var warned = 0;
-      Plottable.Util.Methods.warn = () => warned++;
+      Plottable._Util.Methods.warn = () => warned++;
       p.addDataset("_foo", []);
       assert.equal(warned, 1);
       p.addDataset("2", []);

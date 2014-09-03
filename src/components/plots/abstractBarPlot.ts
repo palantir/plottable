@@ -15,17 +15,17 @@ export module Abstract {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public _isVertical: boolean;
 
-    public _animators: Animator.IPlotAnimatorMap = {
+    public _animators: IPlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
       "bars"       : new Animator.IterativeDelay(),
       "baseline"   : new Animator.Null()
     };
 
     /**
-     * Creates an AbstractBarPlot.
+     * Constructs an AbstractBarPlot.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
+     * @param {IDataset | any} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
@@ -41,16 +41,16 @@ export module Abstract {
 
     public _setup() {
       super._setup();
-      this._baseline = this.renderArea.append("line").classed("baseline", true);
-      this._bars = this.renderArea.selectAll("rect").data([]);
+      this._baseline = this._renderArea.append("line").classed("baseline", true);
+      this._bars = this._renderArea.selectAll("rect").data([]);
     }
 
     public _paint() {
       super._paint();
-      this._bars = this.renderArea.selectAll("rect").data(this._dataset.data());
+      this._bars = this._renderArea.selectAll("rect").data(this._dataset.data());
       this._bars.enter().append("rect");
 
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       var positionAttr = this._isVertical ? "y" : "x";
       var dimensionAttr = this._isVertical ? "height" : "width";
@@ -84,8 +84,10 @@ export module Abstract {
     /**
      * Sets the baseline for the bars to the specified value.
      *
+     * The baseline is the line that the bars are drawn from, defaulting to 0.
+     *
      * @param {number} value The value to position the baseline at.
-     * @return {AbstractBarPlot} The calling AbstractBarPlot.
+     * @returns {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public baseline(value: number) {
       this._baselineValue = value;
@@ -101,7 +103,7 @@ export module Abstract {
      * HorizontalBarPlot supports "top", "center", "bottom"
      *
      * @param {string} alignment The desired alignment.
-     * @return {AbstractBarPlot} The calling AbstractBarPlot.
+     * @returns {AbstractBarPlot} The calling AbstractBarPlot.
      */
      public barAlignment(alignment: string) {
        var alignmentLC = alignment.toLowerCase();
@@ -135,7 +137,7 @@ export module Abstract {
      * @param {any} xValOrExtent The pixel x position, or range of x values.
      * @param {any} yValOrExtent The pixel y position, or range of y values.
      * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
-     * @return {D3.Selection} The selected bar, or null if no bar was selected.
+     * @returns {D3.Selection} The selected bar, or null if no bar was selected.
      */
     public selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
     public selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
@@ -177,7 +179,7 @@ export module Abstract {
 
     /**
      * Deselects all bars.
-     * @return {AbstractBarPlot} The calling AbstractBarPlot.
+     * @returns {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public deselectAll() {
       if (this._isSetup) {
@@ -208,7 +210,7 @@ export module Abstract {
 
     public _updateYDomainer() {
       if (this._isVertical) {
-        this._updateDomainer(this.yScale);
+        this._updateDomainer(this._yScale);
       } else {
         super._updateYDomainer();
       }
@@ -216,7 +218,7 @@ export module Abstract {
 
     public _updateXDomainer() {
       if (!this._isVertical) {
-        this._updateDomainer(this.xScale);
+        this._updateDomainer(this._xScale);
       } else {
         super._updateXDomainer();
       }
@@ -226,8 +228,8 @@ export module Abstract {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale    = this._isVertical ? this.yScale : this.xScale;
-      var secondaryScale  = this._isVertical ? this.xScale : this.yScale;
+      var primaryScale    = this._isVertical ? this._yScale : this._xScale;
+      var secondaryScale  = this._isVertical ? this._xScale : this._yScale;
       var primaryAttr     = this._isVertical ? "y" : "x";
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
@@ -266,4 +268,3 @@ export module Abstract {
   }
 }
 }
-

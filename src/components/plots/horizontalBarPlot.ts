@@ -13,13 +13,13 @@ export module Plot {
    */
   export class HorizontalBar extends Abstract.BarPlot {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {"top": 0, "center": 0.5, "bottom": 1};
-    public isVertical = false;
+    private isVertical = false;
 
     /**
-     * Creates a HorizontalBarPlot.
+     * Constructs a HorizontalBarPlot.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
+     * @param {IDataset | any} dataset The dataset to render.
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
@@ -28,7 +28,7 @@ export module Plot {
     }
 
     public _updateXDomainer() {
-      this._updateDomainer(this.xScale);
+      this._updateDomainer(this._xScale);
     }
 
     public _generateAttrToProjector() {

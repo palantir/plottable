@@ -8,7 +8,11 @@ export module Abstract {
     public broadcaster = new Plottable.Core.Broadcaster(this);
     public _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     /**
-     * Creates a new Scale.
+     * Constructs a new Scale.
+     *
+     * A Scale is a wrapper around a D3.Scale.Scale. A Scale is really just a
+     * function. Scales have a domain (input), a range (output), and a function
+     * from domain to range.
      *
      * @constructor
      * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
@@ -27,11 +31,19 @@ export module Abstract {
     }
 
     /**
-     * Modify the domain on the scale so that it includes the extent of all
-     * perspectives it depends on. Extent: The (min, max) pair for a
-     * QuantitiativeScale, all covered strings for an OrdinalScale.
+     * Modifies the domain on the scale so that it includes the extent of all
+     * perspectives it depends on. This will normally happen automatically, but
+     * if you set domain explicitly with `plot.domain(x)`, you will need to
+     * call this function if you want the domain to neccessarily include all
+     * the data.
+     *
+     * Extent: The [min, max] pair for a Scale.Quantitative, all covered
+     * strings for a Scale.Ordinal.
+     *
      * Perspective: A combination of a Dataset and an Accessor that
      * represents a view in to the data.
+     *
+     * @returns {Scale} The calling Scale.
      */
     public autoDomain() {
       this._autoDomainAutomatically = true;
@@ -46,7 +58,8 @@ export module Abstract {
     }
 
     /**
-     * Returns the range value corresponding to a given domain value.
+     * Computes the range value corresponding to a given domain value. In other
+     * words, apply the function to value.
      *
      * @param {R} value A domain value to be scaled.
      * @returns {R} The range value corresponding to the supplied domain value.
@@ -62,12 +75,12 @@ export module Abstract {
      */
     public domain(): D[];
     /**
-     * Sets the Scale's domain to the specified values.
+     * Sets the domain.
      *
-     * @param {D[]} values The new value for the domain. This array may
-     *     contain more than 2 values if the scale type allows it (e.g.
-     *     ordinal scales). Other scales such as quantitative scales accept
-     *     only a 2-value extent array.
+     * @param {D[]} values If provided, the new value for the domain. On
+     * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
+     * make the function decreasing. On Scale.Ordinal, this is an array of all
+     * input values.
      * @returns {Scale} The calling Scale.
      */
     public domain(values: D[]): Scale<D,R>;
@@ -93,13 +106,21 @@ export module Abstract {
     /**
      * Gets the range.
      *
+     * In the case of having a numeric range, it will be a [min, max] pair. In
+     * the case of string range (e.g. Scale.InterpolatedColor), it will be a
+     * list of all possible outputs.
+     *
      * @returns {R[]} The current range.
      */
     public range(): R[];
     /**
-     * Sets the Scale's range to the specified values.
+     * Sets the range.
      *
-     * @param {R[]} values The new values for the range.
+     * In the case of having a numeric range, it will be a [min, max] pair. In
+     * the case of string range (e.g. Scale.InterpolatedColor), it will be a
+     * list of all possible outputs.
+     *
+     * @param {R[]} values If provided, the new values for the range.
      * @returns {Scale} The calling Scale.
      */
     public range(values: R[]): Scale<D,R>;
@@ -113,7 +134,8 @@ export module Abstract {
     }
 
     /**
-     * Creates a copy of the Scale with the same domain and range but without any registered listeners.
+     * Constructs a copy of the Scale with the same domain and range but without
+     * any registered listeners.
      *
      * @returns {Scale} A copy of the calling Scale.
      */
@@ -131,13 +153,13 @@ export module Abstract {
      * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
      * @param {D[]} extent The new extent to be included in the scale.
      */
-    public updateExtent(plotProvidedKey: string, attr: string, extent: D[]) {
+    public _updateExtent(plotProvidedKey: string, attr: string, extent: D[]) {
       this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
       this._autoDomainIfAutomaticMode();
       return this;
     }
 
-    public removeExtent(plotProvidedKey: string, attr: string) {
+    public _removeExtent(plotProvidedKey: string, attr: string) {
       delete this._rendererAttrID2Extent[plotProvidedKey + attr];
       this._autoDomainIfAutomaticMode();
       return this;

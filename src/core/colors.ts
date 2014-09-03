@@ -2,6 +2,9 @@
 
 module Plottable {
 export module Core {
+  /**
+   * Colors we use as defaults on a number of graphs.
+   */
   export class Colors {
     public static CORAL_RED = "#fd373e";
     public static INDIGO = "#5177c4";

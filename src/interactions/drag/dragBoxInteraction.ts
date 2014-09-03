@@ -2,9 +2,20 @@
 
 module Plottable {
 export module Interaction {
+  /**
+   * A DragBox is an interaction that automatically draws a box across the
+   * element you attach it to when you drag.
+   */
   export class DragBox extends Drag {
     private static CLASS_DRAG_BOX = "drag-box";
+    /**
+     * The DOM element of the box that is drawn. When no box is drawn, it is
+     * null.
+     */
     public dragBox: D3.Selection;
+    /**
+     * Whether or not dragBox has been rendered in a visible area.
+     */
     public boxIsDrawn = false;
 
     public _dragstart() {
@@ -13,9 +24,9 @@ export module Interaction {
     }
 
     /**
-     * Clears the highlighted drag-selection box drawn by the AreaInteraction.
+     * Clears the highlighted drag-selection box drawn by the DragBox.
      *
-     * @returns {AreaInteraction} The calling AreaInteraction.
+     * @returns {DragBox} The calling DragBox.
      */
     public clearBox() {
       if (this.dragBox == null) {return;} // HACKHACK #593
@@ -24,6 +35,16 @@ export module Interaction {
       return this;
     }
 
+    /**
+     * Set where the box is draw explicitly.
+     *
+     * @param {number} x0 Left.
+     * @param {number} x1 Right.
+     * @param {number} y0 Top.
+     * @param {number} y1 Bottom.
+     *
+     * @returns {DragBox} The calling DragBox.
+     */
     public setBox(x0: number, x1: number, y0: number, y1: number) {
       if (this.dragBox == null) {return;} // HACKHACK #593
       var w = Math.abs(x0 - x1);
@@ -38,7 +59,7 @@ export module Interaction {
     public _anchor(hitBox: D3.Selection) {
       super._anchor(hitBox);
       var cname = DragBox.CLASS_DRAG_BOX;
-      var background = this.componentToListenTo.backgroundContainer;
+      var background = this.componentToListenTo._backgroundContainer;
       this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
       return this;
     }

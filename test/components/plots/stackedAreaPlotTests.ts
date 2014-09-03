@@ -55,7 +55,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var areas = renderer.renderArea.selectAll(".area");
+      var areas = renderer._renderArea.selectAll(".area");
       var area0 = d3.select(areas[0][0]);
       var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
       var d0Ys = d0.slice(1, d0.length - 1).map((s) => parseFloat(s.split(",")[1]));

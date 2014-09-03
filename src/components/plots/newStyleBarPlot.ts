@@ -4,20 +4,20 @@ module Plottable {
 export module Abstract {
   export class NewStyleBarPlot extends NewStylePlot {
     public static _barAlignmentToFactor: {[alignment: string]: number} = {};
-    public static DEFAULT_WIDTH = 10;
+    private static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignmentFactor = 0;
     public _isVertical: boolean;
 
-    public _animators: Animator.IPlotAnimatorMap = {
+    public _animators: IPlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
       "bars"       : new Animator.IterativeDelay(),
       "baseline"   : new Animator.Null()
     };
 
     /**
-     * Creates an NewStyleBarPlot.
+     * Constructs a NewStyleBarPlot.
      *
      * @constructor
      * @param {Scale} xScale The x scale to use.
@@ -37,13 +37,13 @@ export module Abstract {
 
     public _setup() {
       super._setup();
-      this._baseline = this.renderArea.append("line").classed("baseline", true);
+      this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
     public _paint() {
       super._paint();
 
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       var baselineAttr: any = {
         "x1": this._isVertical ? 0 : scaledBaseline,
@@ -57,8 +57,10 @@ export module Abstract {
     /**
      * Sets the baseline for the bars to the specified value.
      *
+     * The baseline is the line that the bars are drawn from, defaulting to 0.
+     *
      * @param {number} value The value to position the baseline at.
-     * @return {NewStyleBarPlot} The calling NewStyleBarPlot.
+     * @returns {NewStyleBarPlot} The calling NewStyleBarPlot.
      */
     public baseline(value: number) {
       return Abstract.BarPlot.prototype.baseline.apply(this, [value]);

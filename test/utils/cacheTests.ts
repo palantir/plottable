@@ -8,11 +8,11 @@ describe("Cache", () => {
     callbackCalled = true;
     return s + s;
   };
-  var cache: Plottable.Util.Cache<string>;
+  var cache: Plottable._Util.Cache<string>;
 
   beforeEach(() => {
     callbackCalled = false;
-    cache = new Plottable.Util.Cache(f);
+    cache = new Plottable._Util.Cache(f);
   });
 
   it("Doesn't call its function if it already called", () => {
@@ -25,7 +25,7 @@ describe("Cache", () => {
 
   it("Clears its cache when .clear() is called", () => {
     var prefix = "hello";
-    cache = new Plottable.Util.Cache((s: string) => {
+    cache = new Plottable._Util.Cache((s: string) => {
       callbackCalled = true;
       return prefix + s;
     });
@@ -41,7 +41,7 @@ describe("Cache", () => {
   });
 
   it("Doesn't clear the cache when canonicalKey doesn't change", () => {
-    cache = new Plottable.Util.Cache(f, "x");
+    cache = new Plottable._Util.Cache(f, "x");
     assert.equal(cache.get("hello"), "hellohello");
     assert.isTrue(callbackCalled);
     cache.clear();
@@ -52,7 +52,7 @@ describe("Cache", () => {
 
   it("Clears the cache when canonicalKey changes", () => {
     var prefix = "hello";
-    cache = new Plottable.Util.Cache((s: string) => {
+    cache = new Plottable._Util.Cache((s: string) => {
       callbackCalled = true;
       return prefix + s;
     });
@@ -67,7 +67,7 @@ describe("Cache", () => {
 
   it("uses valueEq to check if it should clear", () => {
     var decider = true;
-    cache = new Plottable.Util.Cache(f, "x", (a, b) => decider);
+    cache = new Plottable._Util.Cache(f, "x", (a, b) => decider);
     cache.get("hello");
     assert.isTrue(callbackCalled);
     cache.clear();

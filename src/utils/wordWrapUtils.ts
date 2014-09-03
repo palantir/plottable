@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Util {
+export module _Util {
   export module WordWrap {
 
     var LINE_BREAKS_BEFORE = /[{\[]/;
@@ -27,7 +27,7 @@ export module Util {
         lines = lines.splice(0, nLinesThatFit);
         if (nLinesThatFit > 0) {
           // Overwrite the last line to one that has had a ... appended to the end
-          lines[nLinesThatFit-1] = Text._addEllipsesToLine(lines[nLinesThatFit-1], width, measureText);
+          lines[nLinesThatFit-1] = Text.addEllipsesToLine(lines[nLinesThatFit-1], width, measureText);
         }
       }
       return {originalText: text, lines: lines, textFits: textFit};
@@ -60,7 +60,7 @@ export module Util {
     export function canWrapWithoutBreakingWords(text: string, width: number, widthMeasure: (s: string) => number): boolean {
       var tokens = tokenize(text);
       var widths = tokens.map(widthMeasure);
-      var maxWidth = Util.Methods.max(widths);
+      var maxWidth = _Util.Methods.max(widths);
       return maxWidth <= width;
     }
 
