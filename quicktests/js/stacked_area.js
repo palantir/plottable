@@ -16,7 +16,7 @@ function run(div, data, Plottable) {
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  xScale.rangeBand("points");
+  xScale.rangeType("points");
 
   if (!Plottable.Plot.StackedArea) {
     return;
