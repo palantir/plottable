@@ -1,6 +1,31 @@
+
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="../../plottable.css">  
+    <title>Multiple Clusteredbar</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <style>
+      svg {
+        margin: 2px;
+      }
+
+      #testdiv {
+        border: 2px solid black;
+        padding: 20px;
+      }
+
+      #outer {
+      }
+
+      .plottable .axis-label text {
+        font-size: 15;
+      }
+
+      .plottable .legend-row text {
+        font-size: 14px;
+      }
+
+
+    </style>
     <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
     <script src="../../plottable.js"></script>
     <script src="../exampleUtil.js"></script>
@@ -8,15 +33,16 @@
 
     <script>
       window.onload = function() {
-        var div = d3.select("#chart");
+        var div = d3.select("#testdiv");
         run(div, makeData(), Plottable);
       }
-    </script>
+  </script>
+  </head>
 
   <body>
-    <br>
-  	<div id="chart" height="500"></div>
+  <div id="outer">
+    <div id="testdiv"></div>
+    </div>
   </body>
 
-  </head>
 </html>
