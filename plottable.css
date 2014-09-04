@@ -4,81 +4,96 @@ svg.plottable {
 }
 
 .plottable .bounding-box {
-  fill: none;
+  /* Invisible pink bounding-box to allow for collision testing */
+  fill: pink;
+  visibility: hidden;
 }
 
 .plottable .label text {
-  font-family: sans-serif;
-  fill: #656565;
+  font-family: "Helvetica Neue", sans-serif;
+  fill: #32313F;
 }
 
 .plottable .axis-label text {
-  font-size: 14pt;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  line-height: normal;
+  text-transform: uppercase;
 }
 
 .plottable .title-label text {
-  font-size: 30pt;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 .plottable .text-label-vertical {
   writing-mode: tb;
 }
 
-.plottable .axis line {
-  stroke: #979797;
-  stroke-width: 2px;
+.plottable .axis line.baseline {
+  stroke: #CCC;
+  stroke-width: 1px;
 }
 
-.plottable .axis path {
-  fill: none;
-  stroke-width: 2px;
-  stroke: #979797;
-}
-
-.plottable .y-axis path {
-  stroke: none;
+.plottable .axis line.tick-mark {
+  stroke: #CCC;
+  stroke-width: 1px;
 }
 
 .plottable .axis text {
-  font-size: 10pt;
-  fill: #979797;
-  font-family: sans-serif;
+  fill: #32313F;
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 12px;
+  font-weight: 200;
+  line-height: normal;
 }
 
-.plottable .bar-renderer .baseline {
+.plottable .bar-plot .baseline {
   stroke: #999;
+}
+
+.bar-plot .render-area rect.not-hovered {
+  opacity: 0.5;
 }
 
 .plottable .gridlines line {
-  stroke: #999;
-  stroke-dasharray: 2, 2;
-  opacity: 0.4;
+  stroke: #3C3C3C; /* hackhack: gridlines should be solid; see #820 */
+  opacity: 0.25;
+  stroke-width: 1px;
 }
 
 .plottable .drag-box {
   fill: aliceblue;
-  opacity: 1;
+  opacity: .7;
   stroke: #C0C8FF;
 
 }
 
 .plottable .legend text {
-  font-family: sans-serif;
-  fill: #979797;
-  font-size: 14pt;
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: normal;
 }
 
-.plottable .area-renderer path.area {
-  stroke: none;
-  fill-opacity: 0.5;
-}
-
-.plottable .area-renderer path.line {
+.plottable .line-plot path.line {
   fill: none;
-  stroke-width: 2px;
   vector-effect: non-scaling-stroke;
+}
+
+.plottable .area-plot path.area {
+  stroke: none;
 }
 
 .plottable .legend .toggled-off circle {
   fill: #d3d3d3;
+}
+
+.plottable .plot.toggled-on {
+  visibility:visible;
+}
+
+.plottable .plot.toggled-off {
+  visibility:hidden;
 }

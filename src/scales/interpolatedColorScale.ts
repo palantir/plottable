@@ -6,7 +6,14 @@ export module Scale {
     [key: string]: string[];
   };
 
-  export class InterpolatedColor extends Abstract.QuantitiveScale {
+  /**
+   * This class implements a color scale that takes quantitive input and
+   * interpolates between a list of color values. It returns a hex string
+   * representing the interpolated color.
+   *
+   * By default it generates a linear scale internally.
+   */
+  export class InterpolatedColor extends Abstract.QuantitativeScale {
     private static COLOR_SCALES: ColorGroups = {
       reds : [
         "#FFFFFF", // white
@@ -57,11 +64,11 @@ export module Scale {
      * @param {string[]} colors an array of strings representing color
      *     values in hex ("#FFFFFF") or keywords ("white").
      * @param {string} scaleType a string representing the underlying scale
-     *     type (linear/log/sqrt/pow)
-     * @returns a quantitive d3 scale.
+     *     type ("linear"/"log"/"sqrt"/"pow")
+     * @returns a Quantitative d3 scale.
      */
-    private static getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitiveScale {
-      var scale: D3.Scale.QuantitiveScale;
+    private static getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitativeScale {
+      var scale: D3.Scale.QuantitativeScale;
       switch(scaleType){
         case "linear":
           scale = d3.scale.linear();
@@ -77,7 +84,7 @@ export module Scale {
           break;
       }
       if (scale == null){
-        throw new Error("unknown quantitive scale type " + scaleType);
+        throw new Error("unknown Quantitative scale type " + scaleType);
       }
       return scale
                   .range([0, 1])
@@ -137,19 +144,21 @@ export module Scale {
     }
 
     /**
-     * Gets or sets the color range.
+     * Gets the color range.
      *
-     * @param {string|string[]} [colorRange]. If no argument is passed,
-     *     returns the current range of colors. If the param is one of
-     *     (reds/blues/posneg) we lookup the scale from the built-in color
-     *     groups. Finally, if params is an array of strings with at least 2
-     *     values (e.g. ["#FF00FF", "red", "dodgerblue"], the resulting scale
-     *     will interpolate between the color values across the domain.
-     *
-     * @returns the current color values for the range as strings or this
-     *     InterpolatedColorScale object.
+     * @returns {string[]} the current color values for the range as strings.
      */
     public colorRange(): string[];
+    /**
+     * Sets the color range.
+     *
+     * @param {string|string[]} colorRange. If colorRange is one of
+     *     (reds/blues/posneg), uses the built-in color groups. If colorRange
+     *     is an array of strings with at least 2 values
+     *     (e.g. ["#FF00FF", "red", "dodgerblue"], the resulting scale
+     *     will interpolate between the color values across the domain.
+     * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
+     */
     public colorRange(colorRange: any): InterpolatedColor;
     public colorRange(colorRange?: any): any {
       if (colorRange == null) {
@@ -157,19 +166,22 @@ export module Scale {
       }
       this._colorRange = this._resolveColorValues(colorRange);
       this._resetScale();
+      return this;
     }
 
     /**
-     * Gets or sets the internal scale type.
+     * Gets the internal scale type.
      *
-     * @param {string} [scaleType]. If no argument is passed, returns the
-     *     current scale type string. Otherwise, we set the internal scale
-     *     using the d3 scale name. These scales must be quantitative scales,
-     *     so the valid values are (linear/log/sqrt/pow).
-     *
-     * @returns the current scale type or this InterpolatedColorScale object.
+     * @returns {string} The current scale type.
      */
     public scaleType(): string;
+    /**
+     * Sets the internal scale type.
+     *
+     * @param {string} scaleType. The type of d3 scale to use internally.
+     *                            (linear/log/sqrt/pow).
+     * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
+     */
     public scaleType(scaleType: string): InterpolatedColor;
     public scaleType(scaleType?: string): any {
       if (scaleType == null){
@@ -177,14 +189,13 @@ export module Scale {
       }
       this._scaleType = scaleType;
       this._resetScale();
+      return this;
     }
 
     private _resetScale(): any {
       this._d3Scale = InterpolatedColor.getD3InterpolatedScale(this._colorRange, this._scaleType);
-      if (this._autoDomain) {
-        this.autoDomain();
-      }
-      this._broadcast();
+      this._autoDomainIfAutomaticMode();
+      this.broadcaster.broadcast();
     }
 
     private _resolveColorValues(colorRange: any): string[] {
@@ -195,6 +206,15 @@ export module Scale {
       } else {
         return InterpolatedColor.COLOR_SCALES["reds"];
       }
+    }
+
+    public autoDomain() {
+      // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
+      var extents = this._getAllExtents();
+      if (extents.length > 0) {
+        this._setDomain([Util.Methods.min(extents, (x) => x[0]), Util.Methods.max(extents, (x) => x[1])]);
+      }
+      return this;
     }
   }
 }

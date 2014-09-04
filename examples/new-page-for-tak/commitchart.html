@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable.js"></script>
+    <script src="commiterchart.js"></script>
+    <script>
+
+    window.onload = function() {
+        d3.json("../data/gitstats2.json", function(data) {
+            data.forEach(function(d) {
+                d.parsedDate = new Date(d.date);
+                d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
+            });
+            data.sort(function(a, b) {return a.parsedDate - b.parsedDate})
+            var nCommits = 0;
+            commitData = data.map(function(d) {
+                return {parsedDate: d.parsedDate, nCommits: ++nCommits};
+            });
+            var contribSet = d3.set();
+            contribData = [];
+            data.forEach(function(d) {
+                var c = d.name;
+                contribData.push({parsedDate: d.parsedDate, nContrib: contribSet.size()});
+                contribSet.add(c);
+                contribData.push({parsedDate: d.parsedDate, nContrib: contribSet.size()});
+            });
+            var svg = d3.select("body").append("svg").attr("width", "100%").attr("height", 600);
+            makeCommiterChart(svg, commitData, contribData);
+        });
+    }
+
+    </script>
+
+    <style type="text/css">
+     .open path {
+        fill: #ff3030;
+     }
+     .closed path {
+        fill: #4Cbb17;
+     }
+
+    </style>
+    </head>
+
+<body>
+
+</body>
+</html>

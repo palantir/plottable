@@ -1,26 +1,46 @@
 {
   "name": "plottable",
   "description": "A library for creating charts out of D3",
-  "version": "0.15.0",
+  "version": "0.27.1",
   "main": ["plottable.js", "plottable.css"],
   "license": "MIT",
   "ignore": [
     "**/*",
+    "!bower.json",
     "!plottable.js",
     "!plottable.css",
-    "!plottable.d.ts"
+    "!plottable.min.js",
+    "!plottable.d.ts",
+    "!plottable-dev.d.ts"
   ],
-  "keywords": ["plottable", "plottablejs", "plottable.js", "d3", "data viz", "chart", "plot"],
+  "keywords": [
+    "plottable",
+    "plottablejs",
+    "plottable.js",
+    "d3",
+    "data viz",
+    "chart",
+    "charts",
+    "reusable charts",
+    "visualization",
+    "scatterplot",
+    "bar chart",
+    "plot",
+    "plots"
+  ],
   "dependencies": {
-    "d3": "3.4.5"
+    "d3": "3.4.11"
   },
   "homepage": "palantir.github.io/plottable",
-  "repository": {"type": "git", "url": "git://github.com/palantir/plottable.git"},
-
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/palantir/plottable.git"
+  },
   "devDependencies": {
     "chai": "1.9.0",
     "mocha": "1.17.1",
     "jQuery": "2.1.0",
-    "jquery.simulate": "1.2.0"
+    "jquery.simulate": "1.2.0",
+    "lodash": "~2.4.1"
   }
 }

@@ -2,106 +2,43 @@
 
 module Plottable {
 export module Plot {
+  /**
+   * A HorizontalBarPlot draws bars horizontally.
+   * Key projected attributes:
+   *  - "width" - the vertical height of a bar (since the bar is rotated horizontally)
+   *      - if an ordinal scale is attached, this defaults to ordinalScale.rangeBand()
+   *      - if a quantitative scale is attached, this defaults to 10
+   *  - "x" - the horizontal length of a bar
+   *  - "y" - the vertical position of a bar
+   */
   export class HorizontalBar extends Abstract.BarPlot {
-    public _barAlignment = "top";
-    public _ANIMATION_DURATION = 300; //milliseconds
-    public _ANIMATION_DELAY = 15; //milliseconds
+    public static _BarAlignmentToFactor: {[alignment: string]: number} = {"top": 0, "center": 0.5, "bottom": 1};
 
     /**
      * Creates a HorizontalBarPlot.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
-     * @param {QuantitiveScale} xScale The x scale to use.
+     * @param {QuantitativeScale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.QuantitiveScale, yScale: Abstract.Scale) {
+    constructor(dataset: any, xScale: Abstract.QuantitativeScale, yScale: Abstract.Scale) {
+      this._isVertical = false;
       super(dataset, xScale, yScale);
     }
 
-    public _paint() {
-      super._paint();
-      this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
-      this._bars.enter().append("rect");
-
-      var attrToProjector = this._generateAttrToProjector();
-
-      var yFunction = attrToProjector["y"];
-
-      attrToProjector["height"] = attrToProjector["width"]; // remapping due to naming conventions
-      var heightFunction = attrToProjector["height"];
-
-      var castYScale = (<Scale.Ordinal> this.yScale);
-      var rangeType = (castYScale.rangeType == null) ? "points" : castYScale.rangeType();
-      if (rangeType === "points") {
-        if (this._barAlignment === "middle") {
-          attrToProjector["y"] = (d: any, i: number) => yFunction(d, i) - heightFunction(d, i) / 2;
-        } else if (this._barAlignment === "bottom") {
-          attrToProjector["y"] = (d: any, i: number) => yFunction(d, i) - heightFunction(d, i);
-        }
-      } else {
-        attrToProjector["height"] = (d: any, i: number) => castYScale.rangeBand();
-      }
-
-      var scaledBaseline = this.xScale.scale(this._baselineValue);
-
-      var xFunction = attrToProjector["x"];
-
-      if (this._animate && this._dataChanged) {
-        attrToProjector["x"] = () => scaledBaseline;
-        attrToProjector["width"] = () => 0;
-        this._bars.attr(attrToProjector);
-      }
-
-      attrToProjector["x"] = (d: any, i: number) => {
-        var originalX = xFunction(d, i);
-        return (originalX > scaledBaseline) ? scaledBaseline : originalX;
-      };
-
-      var widthFunction = (d: any, i: number) => {
-        return Math.abs(scaledBaseline - xFunction(d, i));
-      };
-      attrToProjector["width"] = widthFunction; // actual SVG rect width
-
-      if (attrToProjector["fill"] != null) {
-        this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
-      }
-
-      var updateSelection: any = this._bars;
-      if (this._animate) {
-        var n = this.dataSource().data().length;
-        updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION)
-                                            .delay((d: any, i: number) => i * this._ANIMATION_DELAY);
-      }
-
-      updateSelection.attr(attrToProjector);
-      this._bars.exit().remove();
-
-      this._baseline.attr({
-        "x1": scaledBaseline,
-        "y1": 0,
-        "x2": scaledBaseline,
-        "y2": this.availableHeight
-      });
+    public _updateXDomainer() {
+      this._updateDomainer(this.xScale);
     }
 
-    /**
-     * Sets the vertical alignment of the bars.
-     *
-     * @param {string} alignment Which part of the bar should align with the bar's x-value (top/middle/bottom).
-     * @return {HorizontalBarPlot} The calling HorizontalBarPlot.
-     */
-    public barAlignment(alignment: string) {
-      var alignmentLC = alignment.toLowerCase();
-      if (alignmentLC !== "top" && alignmentLC !== "middle" && alignmentLC !== "bottom") {
-        throw new Error("unsupported bar alignment");
-      }
-
-      this._barAlignment = alignmentLC;
-      if (this.element != null) {
-        this._render();
-      }
-      return this;
+    public _generateAttrToProjector() {
+      var attrToProjector = super._generateAttrToProjector();
+      // by convention, for API users the 2ndary dimension of a bar is always called its "width", so
+      // the "width" of a horziontal bar plot is actually its "height" from the perspective of a svg rect
+      var widthF = attrToProjector["width"];
+      attrToProjector["width"] = attrToProjector["height"];
+      attrToProjector["height"] = widthF;
+      return attrToProjector;
     }
   }
 }

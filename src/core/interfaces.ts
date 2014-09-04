@@ -17,6 +17,16 @@ module Plottable {
     (datum: any, index: number) : any;
   }
 
+  export interface _IProjector {
+    accessor: IAccessor;
+    scale?: Abstract.Scale;
+    attribute: string;
+  }
+
+  export interface IAttributeToProjector {
+    [attrToSet: string]: IAppliedAccessor;
+  }
+
   export interface SelectionArea {
     xMin: number;
     xMax: number;
@@ -29,10 +39,6 @@ module Plottable {
     data: SelectionArea;
   }
 
-  export interface IBroadcasterCallback {
-    (broadcaster: Abstract.Broadcaster, ...args: any[]): any;
-  }
-
   export interface ISpaceRequest {
     width: number;
     height: number;
@@ -40,10 +46,14 @@ module Plottable {
     wantsHeight: boolean;
   }
 
-  export interface IPixelArea {
-    xMin: number;
-    xMax: number;
-    yMin: number;
-    yMax: number;
+  export interface IExtent {
+    min: number;
+    max: number;
+  }
+
+  export interface Point {
+    x: number;
+    y: number;
   }
 }
+

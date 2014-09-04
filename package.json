@@ -1,6 +1,6 @@
 {
   "name": "plottable.js",
-  "version": "0.15.0",
+  "version": "0.27.1",
   "description": "Build flexible, performant, interactive charts using D3",
   "repository": {
     "type": "git",
@@ -8,28 +8,29 @@
   },
   "author": "Palantir Technologies",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test-travis"
   },
   "devDependencies": {
     "grunt": "~0.4.2",
     "grunt-cli": "0.1.6",
     "grunt-contrib-watch": "~0.5.3",
     "load-grunt-tasks": "~0.2.0",
-    "grunt-ts": "~1.7.5",
+    "grunt-ts": "~1.11.6",
     "grunt-tslint": "~0.4.0",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-mocha-phantomjs": "~0.4.0",
     "grunt-contrib-connect": "~0.6.0",
     "grunt-blanket-mocha": "~0.4.0",
-    "typescript": "~0.9.7",
+    "grunt-saucelabs": "8.1.1",
+    "typescript": "1.0.1",
     "grunt-sed": "~0.1.1",
     "grunt-git": "~0.2.6",
-    "grunt-contrib-copy": "~0.5.0",
     "grunt-contrib-clean": "~0.4.0",
     "grunt-bump": "0.0.13",
     "grunt-contrib-compress": "~0.9.1",
     "grunt-contrib-uglify": "~0.4.0",
     "grunt-shell": "0.7.0",
+    "grunt-contrib-jshint": "^0.10.0",
     "typedoc": "0.0.4"
   }
 }

@@ -18,16 +18,16 @@ export module Util {
      * Wraps words and fits as much of the text as possible into the given width and height.
      */
     export function breakTextToFitRect(text: string, width: number, height: number, measureText: Text.TextMeasurer): IWrappedText {
-      var widthMeasure = (s: string) => measureText(s)[0];
+      var widthMeasure = (s: string) => measureText(s).width;
       var lines = breakTextToFitWidth(text, width, widthMeasure);
-      var textHeight = measureText("hello world")[1];
+      var textHeight = measureText("hello world").height;
       var nLinesThatFit = Math.floor(height / textHeight);
       var textFit = nLinesThatFit >= lines.length;
       if (!textFit) {
         lines = lines.splice(0, nLinesThatFit);
         if (nLinesThatFit > 0) {
           // Overwrite the last line to one that has had a ... appended to the end
-          lines[nLinesThatFit-1] = Text.addEllipsesToLine(lines[nLinesThatFit-1], width, measureText);
+          lines[nLinesThatFit-1] = Text._addEllipsesToLine(lines[nLinesThatFit-1], width, measureText);
         }
       }
       return {originalText: text, lines: lines, textFits: textFit};
@@ -38,7 +38,7 @@ export module Util {
      * to fit in width). Tries to avoid breaking words on non-linebreak-or-space characters, and will only break a word if
      * the word is too big to fit within width on its own.
      */
-    export function breakTextToFitWidth(text: string, width: number, widthMeasure: (s: string) => number): string[] {
+    function breakTextToFitWidth(text: string, width: number, widthMeasure: (s: string) => number): string[] {
       var ret: string[] = [];
       var paragraphs = text.split("\n");
       for (var i = 0, len = paragraphs.length; i < len; i++) {
@@ -60,7 +60,7 @@ export module Util {
     export function canWrapWithoutBreakingWords(text: string, width: number, widthMeasure: (s: string) => number): boolean {
       var tokens = tokenize(text);
       var widths = tokens.map(widthMeasure);
-      var maxWidth = d3.max(widths);
+      var maxWidth = Util.Methods.max(widths);
       return maxWidth <= width;
     }
 

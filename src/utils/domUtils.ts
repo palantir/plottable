@@ -11,18 +11,28 @@ export module Util {
       return (<any> element.node()).getBBox();
     }
 
-    function _getParsedStyleValue(style: CSSStyleDeclaration, prop: string): number {
-      var value: any = style.getPropertyValue(prop);
-      if (value == null){
-        return 0;
+    export var POLYFILL_TIMEOUT_MSEC = 1000 / 60; // 60 fps
+    export function requestAnimationFramePolyfill(fn: () => any): void {
+      if (window.requestAnimationFrame != null) {
+        window.requestAnimationFrame(fn);
+      } else {
+        setTimeout(fn, POLYFILL_TIMEOUT_MSEC);
       }
-      return parseFloat(value);
     }
 
-    export function isSelectionRemoved(selection: D3.Selection) {
-      var e = selection.node();
-      var n = e.parentNode;
-      while (n !== null && n.nodeName !== "#document") {
+    function _getParsedStyleValue(style: CSSStyleDeclaration, prop: string): number {
+      var value: any = style.getPropertyValue(prop);
+      var parsedValue = parseFloat(value);
+      if (parsedValue !== parsedValue) {
+          return 0;
+      }
+      return parsedValue;
+    }
+
+    //
+    export function isSelectionRemovedFromSVG(selection: D3.Selection) {
+      var n = (<Node> selection.node());
+      while (n !== null && n.nodeName !== "svg") {
         n = n.parentNode;
       }
       return (n == null);
@@ -80,6 +90,14 @@ export module Util {
         s.attr("transform", xform.toString());
         return s;
       }
+    }
+
+    export function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
+      if (boxA.right < boxB.left) { return false; }
+      if (boxA.left > boxB.right) { return false; }
+      if (boxA.bottom < boxB.top) { return false; }
+      if (boxA.top > boxB.bottom) { return false; }
+      return true;
     }
   }
 }

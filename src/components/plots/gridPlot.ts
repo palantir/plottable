@@ -7,6 +7,11 @@ export module Plot {
     public xScale: Scale.Ordinal;
     public yScale: Scale.Ordinal;
 
+
+    public _animators: Animator.IPlotAnimatorMap = {
+      "cells" : new Animator.Null()
+    };
+
     /**
      * Creates a GridPlot.
      *
@@ -19,7 +24,7 @@ export module Plot {
      */
     constructor(dataset: any, xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
-      this.classed("grid-renderer", true);
+      this.classed("grid-plot", true);
 
       // The x and y scales should render in bands with no padding
       this.xScale.rangeType("bands", 0, 0);
@@ -50,7 +55,7 @@ export module Plot {
       attrToProjector["width"]  = () => xStep;
       attrToProjector["height"] = () => yStep;
 
-      cells.attr(attrToProjector);
+      this._applyAnimatedAttributes(cells, "cells", attrToProjector);
       cells.exit().remove();
     }
   }

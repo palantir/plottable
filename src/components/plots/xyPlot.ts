@@ -5,9 +5,6 @@ export module Abstract {
   export class XYPlot extends Plot {
     public xScale: Abstract.Scale;
     public yScale: Abstract.Scale;
-    public _xAccessor: any;
-    public _yAccessor: any;
-
     /**
      * Creates an XYPlot.
      *
@@ -18,7 +15,8 @@ export module Abstract {
      */
     constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(dataset);
-      this.classed("xy-renderer", true);
+      if (xScale == null || yScale == null) {throw new Error("XYPlots require an xScale and yScale");}
+      this.classed("xy-plot", true);
 
       this.project("x", "x", xScale); // default accessor
       this.project("y", "y", yScale); // default accessor
@@ -27,18 +25,16 @@ export module Abstract {
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
       // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
-      if (attrToSet === "x") {
-        this.xScale = scale != null ? scale : this.xScale;
-        this._xAccessor = accessor;
-        this.xScale._autoNice = true;
-        this.xScale._autoPad = true;
+      if (attrToSet === "x" && scale != null) {
+        this.xScale = scale;
+        this._updateXDomainer();
       }
-      if (attrToSet === "y") {
-        this.yScale = scale != null ? scale : this.yScale;
-        this._yAccessor = accessor;
-        this.yScale._autoNice = true;
-        this.yScale._autoPad = true;
+
+      if (attrToSet === "y" && scale != null) {
+        this.yScale = scale;
+        this._updateYDomainer();
       }
+
       super.project(attrToSet, accessor, scale);
 
       return this;
@@ -46,14 +42,25 @@ export module Abstract {
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-      this.xScale.range([0, this.availableWidth]);
-      this.yScale.range([this.availableHeight, 0]);
-      return this;
+      this.xScale.range([0, this.width()]);
+      this.yScale.range([this.height(), 0]);
     }
 
-    private rescale() {
-      if (this.element != null) {
-        this._render();
+    public _updateXDomainer() {
+      if (this.xScale instanceof QuantitativeScale) {
+        var scale = <QuantitativeScale> this.xScale;
+        if (!scale._userSetDomainer) {
+          scale.domainer().pad().nice();
+        }
+      }
+    }
+
+    public _updateYDomainer() {
+      if (this.yScale instanceof QuantitativeScale) {
+        var scale = <QuantitativeScale> this.yScale;
+        if (!scale._userSetDomainer) {
+          scale.domainer().pad().nice();
+        }
       }
     }
   }
