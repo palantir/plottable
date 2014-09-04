@@ -10,13 +10,15 @@ function run(div, data, Plottable) {
   var xScale = new Plottable.Scale.Linear();
   var yScale = new Plottable.Scale.ModifiedLog();
   var rScale = new Plottable.Scale.Linear();
+  var colorScale = new Plottable.Scale.Color();
 
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
   var scatterRenderer = new Plottable.Plot.Scatter(d, xScale, yScale)
     .project("x", "Distance", xScale)
     .project("y", function(d) {return Math.abs(d.Mag)}, yScale)
-    .project("r", function(d) {return Math.abs(d.AbsMag)});
+    .project("r", function(d) {return Math.abs(d.AbsMag)})
+    .project("stroke", "ColorIndex", colorScale);
 
   var titleLabel = new Plottable.Component.TitleLabel("Absolute Value of Absolute Visual Magnitudes of Stars");
   var subtitleLabel = new Plottable.Component.Label("Data from The HYG Database at The Astronomy Nexus");
