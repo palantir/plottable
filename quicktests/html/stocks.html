@@ -70,11 +70,11 @@
         var xAxisTop = new Plottable.Axis.Time(xScale, "top");
 
         var yScale_aapl = new Plottable.Scale.Linear();
-        var yAxis_aapl = new Plottable.Axis.Numeric(yScale_aapl, "right");
+        var yAxis_aapl = new Plottable.Axis.Numeric(yScale_aapl, "right").showEndTickLabels(true);
         var label_aapl = new Plottable.Component.AxisLabel("AAPL", "right");
 
         var yScale_goog = new Plottable.Scale.Linear();
-        var yAxis_goog = new Plottable.Axis.Numeric(yScale_goog, "left").xAlign("right");
+        var yAxis_goog = new Plottable.Axis.Numeric(yScale_goog, "left").xAlign("right").showEndTickLabels(true);
         var label_goog = new Plottable.Component.AxisLabel("GOOG", "left");
 
         colorScale = new Plottable.Scale.Color();
