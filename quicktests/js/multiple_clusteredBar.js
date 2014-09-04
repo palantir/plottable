@@ -19,7 +19,7 @@ function run(div, data, Plottable){
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var renderer = new Plottable.Plot.ClusteredBar(xScale, yScale, true)
+  var clusteredPlot = new Plottable.Plot.ClusteredBar(xScale, yScale, true)
     .addDataset(data[0])
     .addDataset(data[1])
     .addDataset(data[2])
