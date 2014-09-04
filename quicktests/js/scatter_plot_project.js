@@ -19,8 +19,10 @@ function run(div, data, Plottable) {
     .project("r", function(d) {return Math.abs(d.Mag)});
 
   var titleLabel = new Plottable.Component.TitleLabel("Absolute Value of Visual Magnitudes of Stars");
+  var subtitleLabel = new Plottable.Component.Label("Data from The HYG Database at The Astronomy Nexus");
   var titleTable = new Plottable.Component.Table([
-                                                  [titleLabel]
+                                                  [titleLabel],
+                                                  [subtitleLabel]
                                                   ]).xAlign("center");
 
   var yAxisLabel = new Plottable.Component.AxisLabel("Absolute Value of Y Coordinate of the Star", "vertical-left");
