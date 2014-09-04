@@ -231,222 +231,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Abstract {
-        class Component extends PlottableObject {
-            static AUTORESIZE_BY_DEFAULT: boolean;
-            element: D3.Selection;
-            content: D3.Selection;
-            backgroundContainer: D3.Selection;
-            foregroundContainer: D3.Selection;
-            clipPathEnabled: boolean;
-            xOrigin: number;
-            yOrigin: number;
-            _parent: ComponentContainer;
-            _xAlignProportion: number;
-            _yAlignProportion: number;
-            _fixedHeightFlag: boolean;
-            _fixedWidthFlag: boolean;
-            _isSetup: boolean;
-            _isAnchored: boolean;
-            _anchor(element: D3.Selection): void;
-            _setup(): void;
-            _requestedSpace(availableWidth: number, availableHeight: number): ISpaceRequest;
-            _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-            _render(): void;
-            _scheduleComputeLayout(): void;
-            _doRender(): void;
-            _invalidateLayout(): void;
-            renderTo(element: any): Component;
-            resize(width?: number, height?: number): Component;
-            autoResize(flag: boolean): Component;
-            xAlign(alignment: string): Component;
-            yAlign(alignment: string): Component;
-            xOffset(offset: number): Component;
-            yOffset(offset: number): Component;
-            registerInteraction(interaction: Interaction): Component;
-            classed(cssClass: string): boolean;
-            classed(cssClass: string, addClass: boolean): Component;
-            _isFixedWidth(): boolean;
-            _isFixedHeight(): boolean;
-            merge(c: Component): Plottable.Component.Group;
-            detach(): Component;
-            remove(): void;
-            width(): number;
-            height(): number;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
-        class ComponentContainer extends Component {
-            _components: Component[];
-            _anchor(element: D3.Selection): void;
-            _render(): void;
-            _removeComponent(c: Component): void;
-            _addComponent(c: Component, prepend?: boolean): boolean;
-            components(): Component[];
-            empty(): boolean;
-            detachAll(): ComponentContainer;
-            remove(): void;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Component {
-        class Group extends Plottable.Abstract.ComponentContainer {
-            constructor(components?: Plottable.Abstract.Component[]);
-            _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
-            merge(c: Plottable.Abstract.Component): Group;
-            _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
-            _isFixedWidth(): boolean;
-            _isFixedHeight(): boolean;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Component {
-        interface IterateLayoutResult {
-            colProportionalSpace: number[];
-            rowProportionalSpace: number[];
-            guaranteedWidths: number[];
-            guaranteedHeights: number[];
-            wantsWidth: boolean;
-            wantsHeight: boolean;
-        }
-        class Table extends Plottable.Abstract.ComponentContainer {
-            constructor(rows?: Plottable.Abstract.Component[][]);
-            addComponent(row: number, col: number, component: Plottable.Abstract.Component): Table;
-            _removeComponent(component: Plottable.Abstract.Component): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
-            padding(rowPadding: number, colPadding: number): Table;
-            rowWeight(index: number, weight: number): Table;
-            colWeight(index: number, weight: number): Table;
-            _isFixedWidth(): boolean;
-            _isFixedHeight(): boolean;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
-        class Scale extends PlottableObject implements Plottable.Core.IListenable {
-            _d3Scale: D3.Scale.Scale;
-            broadcaster: any;
-            _rendererAttrID2Extent: {
-                [x: string]: any[];
-            };
-            constructor(scale: D3.Scale.Scale);
-            _getAllExtents(): any[][];
-            _getExtent(): any[];
-            autoDomain(): Scale;
-            _autoDomainIfAutomaticMode(): void;
-            scale(value: any): any;
-            domain(): any[];
-            domain(values: any[]): Scale;
-            _getDomain(): any[];
-            _setDomain(values: any[]): void;
-            range(): any[];
-            range(values: any[]): Scale;
-            copy(): Scale;
-            updateExtent(plotProvidedKey: string, attr: string, extent: any[]): Scale;
-            removeExtent(plotProvidedKey: string, attr: string): Scale;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
-        class Plot extends Component {
-            _dataSource: DataSource;
-            _dataChanged: boolean;
-            renderArea: D3.Selection;
-            element: D3.Selection;
-            _animate: boolean;
-            _animators: Plottable.Animator.IPlotAnimatorMap;
-            _ANIMATION_DURATION: number;
-            _projectors: {
-                [x: string]: _IProjector;
-            };
-            constructor();
-            constructor(dataset: any[]);
-            constructor(dataset: DataSource);
-            _anchor(element: D3.Selection): void;
-            remove(): void;
-            dataSource(): DataSource;
-            dataSource(source: DataSource): Plot;
-            _onDataSourceUpdate(): void;
-            project(attrToSet: string, accessor: any, scale?: Scale): Plot;
-            _generateAttrToProjector(): IAttributeToProjector;
-            _doRender(): void;
-            _paint(): void;
-            _setup(): void;
-            animate(enabled: boolean): Plot;
-            detach(): Plot;
-            _updateAllProjectors(): void;
-            _updateProjector(attr: string): void;
-            _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any;
-            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
-            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
-        class XYPlot extends Plot {
-            xScale: Scale;
-            yScale: Scale;
-            constructor(dataset: any, xScale: Scale, yScale: Scale);
-            project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
-            _updateXDomainer(): void;
-            _updateYDomainer(): void;
-        }
-    }
-}
-
-
-declare module Plottable {
-    interface DatasetDrawerKey {
-        dataset: DataSource;
-        drawer: Plottable.Abstract._Drawer;
-        key: string;
-    }
-    module Abstract {
-        class NewStylePlot extends XYPlot {
-            _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
-            _datasetKeysInOrder: string[];
-            constructor(xScale?: Scale, yScale?: Scale);
-            _setup(): void;
-            remove(): void;
-            addDataset(key: string, dataset: DataSource): NewStylePlot;
-            addDataset(key: string, dataset: any[]): NewStylePlot;
-            addDataset(dataset: DataSource): NewStylePlot;
-            addDataset(dataset: any[]): NewStylePlot;
-            _addDataset(key: string, dataset: DataSource): void;
-            _getDrawer(key: string): _Drawer;
-            _updateProjector(attr: string): void;
-            datasetOrder(): string[];
-            datasetOrder(order: string[]): NewStylePlot;
-            removeDataset(key: string): NewStylePlot;
-            _getDatasetsInOrder(): DataSource[];
-            _getDrawersInOrder(): _Drawer[];
-        }
-    }
-}
-
-
-declare module Plottable {
     module Core {
         module RenderController {
             module RenderPolicy {
@@ -565,6 +349,34 @@ declare module Plottable {
         addIncludedValue(value: any, key?: string): Domainer;
         removeIncludedValue(valueOrKey: any): Domainer;
         nice(count?: number): Domainer;
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class Scale extends PlottableObject implements Plottable.Core.IListenable {
+            _d3Scale: D3.Scale.Scale;
+            broadcaster: any;
+            _rendererAttrID2Extent: {
+                [x: string]: any[];
+            };
+            constructor(scale: D3.Scale.Scale);
+            _getAllExtents(): any[][];
+            _getExtent(): any[];
+            autoDomain(): Scale;
+            _autoDomainIfAutomaticMode(): void;
+            scale(value: any): any;
+            domain(): any[];
+            domain(values: any[]): Scale;
+            _getDomain(): any[];
+            _setDomain(values: any[]): void;
+            range(): any[];
+            range(values: any[]): Scale;
+            copy(): Scale;
+            updateExtent(plotProvidedKey: string, attr: string, extent: any[]): Scale;
+            removeExtent(plotProvidedKey: string, attr: string): Scale;
+        }
     }
 }
 
@@ -737,6 +549,85 @@ declare module Plottable {
     module _Drawer {
         class Rect extends Plottable.Abstract._Drawer {
             draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class Component extends PlottableObject {
+            static AUTORESIZE_BY_DEFAULT: boolean;
+            element: D3.Selection;
+            content: D3.Selection;
+            backgroundContainer: D3.Selection;
+            foregroundContainer: D3.Selection;
+            clipPathEnabled: boolean;
+            xOrigin: number;
+            yOrigin: number;
+            _parent: ComponentContainer;
+            _xAlignProportion: number;
+            _yAlignProportion: number;
+            _fixedHeightFlag: boolean;
+            _fixedWidthFlag: boolean;
+            _isSetup: boolean;
+            _isAnchored: boolean;
+            _anchor(element: D3.Selection): void;
+            _setup(): void;
+            _requestedSpace(availableWidth: number, availableHeight: number): ISpaceRequest;
+            _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            _render(): void;
+            _scheduleComputeLayout(): void;
+            _doRender(): void;
+            _invalidateLayout(): void;
+            renderTo(element: any): Component;
+            resize(width?: number, height?: number): Component;
+            autoResize(flag: boolean): Component;
+            xAlign(alignment: string): Component;
+            yAlign(alignment: string): Component;
+            xOffset(offset: number): Component;
+            yOffset(offset: number): Component;
+            registerInteraction(interaction: Interaction): Component;
+            classed(cssClass: string): boolean;
+            classed(cssClass: string, addClass: boolean): Component;
+            _isFixedWidth(): boolean;
+            _isFixedHeight(): boolean;
+            merge(c: Component): Plottable.Component.Group;
+            detach(): Component;
+            remove(): void;
+            width(): number;
+            height(): number;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class ComponentContainer extends Component {
+            _components: Component[];
+            _anchor(element: D3.Selection): void;
+            _render(): void;
+            _removeComponent(c: Component): void;
+            _addComponent(c: Component, prepend?: boolean): boolean;
+            components(): Component[];
+            empty(): boolean;
+            detachAll(): ComponentContainer;
+            remove(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        class Group extends Plottable.Abstract.ComponentContainer {
+            constructor(components?: Plottable.Abstract.Component[]);
+            _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
+            merge(c: Plottable.Abstract.Component): Group;
+            _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
+            _isFixedWidth(): boolean;
+            _isFixedHeight(): boolean;
         }
     }
 }
@@ -941,6 +832,115 @@ declare module Plottable {
             remove(): Gridlines;
             _setup(): void;
             _doRender(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        interface IterateLayoutResult {
+            colProportionalSpace: number[];
+            rowProportionalSpace: number[];
+            guaranteedWidths: number[];
+            guaranteedHeights: number[];
+            wantsWidth: boolean;
+            wantsHeight: boolean;
+        }
+        class Table extends Plottable.Abstract.ComponentContainer {
+            constructor(rows?: Plottable.Abstract.Component[][]);
+            addComponent(row: number, col: number, component: Plottable.Abstract.Component): Table;
+            _removeComponent(component: Plottable.Abstract.Component): void;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
+            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
+            padding(rowPadding: number, colPadding: number): Table;
+            rowWeight(index: number, weight: number): Table;
+            colWeight(index: number, weight: number): Table;
+            _isFixedWidth(): boolean;
+            _isFixedHeight(): boolean;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class Plot extends Component {
+            _dataSource: DataSource;
+            _dataChanged: boolean;
+            renderArea: D3.Selection;
+            element: D3.Selection;
+            _animate: boolean;
+            _animators: Plottable.Animator.IPlotAnimatorMap;
+            _ANIMATION_DURATION: number;
+            _projectors: {
+                [x: string]: _IProjector;
+            };
+            constructor();
+            constructor(dataset: any[]);
+            constructor(dataset: DataSource);
+            _anchor(element: D3.Selection): void;
+            remove(): void;
+            dataSource(): DataSource;
+            dataSource(source: DataSource): Plot;
+            _onDataSourceUpdate(): void;
+            project(attrToSet: string, accessor: any, scale?: Scale): Plot;
+            _generateAttrToProjector(): IAttributeToProjector;
+            _doRender(): void;
+            _paint(): void;
+            _setup(): void;
+            animate(enabled: boolean): Plot;
+            detach(): Plot;
+            _updateAllProjectors(): void;
+            _updateProjector(attr: string): void;
+            _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any;
+            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
+            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class XYPlot extends Plot {
+            xScale: Scale;
+            yScale: Scale;
+            constructor(dataset: any, xScale: Scale, yScale: Scale);
+            project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
+            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
+            _updateXDomainer(): void;
+            _updateYDomainer(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    interface DatasetDrawerKey {
+        dataset: DataSource;
+        drawer: Plottable.Abstract._Drawer;
+        key: string;
+    }
+    module Abstract {
+        class NewStylePlot extends XYPlot {
+            _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
+            _datasetKeysInOrder: string[];
+            constructor(xScale?: Scale, yScale?: Scale);
+            _setup(): void;
+            remove(): void;
+            addDataset(key: string, dataset: DataSource): NewStylePlot;
+            addDataset(key: string, dataset: any[]): NewStylePlot;
+            addDataset(dataset: DataSource): NewStylePlot;
+            addDataset(dataset: any[]): NewStylePlot;
+            _addDataset(key: string, dataset: DataSource): void;
+            _getDrawer(key: string): _Drawer;
+            _updateProjector(attr: string): void;
+            datasetOrder(): string[];
+            datasetOrder(order: string[]): NewStylePlot;
+            removeDataset(key: string): NewStylePlot;
+            _getDatasetsInOrder(): DataSource[];
+            _getDrawersInOrder(): _Drawer[];
         }
     }
 }
