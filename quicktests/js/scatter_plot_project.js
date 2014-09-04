@@ -1,24 +1,11 @@
 function makeData() {
   "use strict";
-  var minX = 10;
-  var maxX = 50;
-  var minY = 5;
-  var maxY = 500;
-  var minR = 1;
-  var maxR = 10;
-  var dataPointCount = 200;
-  var data = [];
-  for (var i = 0; i < dataPointCount; i++) {
-	  var xCoordinate = (Math.random() * (maxX - minX)) + minX;
-	  var yCoordinate = (Math.random() * (maxY - minY)) + minY;
-	  var rCoordinate = (Math.random() * (maxR - minR)) + minR;
-	  data.push({distance: xCoordinate, lifetime_years: yCoordinate, star_radius: rCoordinate});
-  }
-  return data;
+  return d3.csv("../../examples/data/hygxyzTruncated.csv");
 }
 
 function run(div, data, Plottable) {
   "use strict";
+  d3.csv("../../examples/data/hygxyzTruncated.csv", function(d) {
   var svg = div.append("svg").attr("height", 500);
   var xScale = new Plottable.Scale.Linear();
   var yScale = new Plottable.Scale.Linear();
@@ -26,20 +13,18 @@ function run(div, data, Plottable) {
 
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  var scatterRenderer = new Plottable.Plot.Scatter(data, xScale, yScale)
-    .project("x", "distance", xScale)
-    .project("y", "lifetime_years", yScale)
-    .project("r", "star_radius");
+  var scatterRenderer = new Plottable.Plot.Scatter(d, xScale, yScale)
+    .project("x", "X", xScale)
+    .project("y", function(d) {return Math.abs(d.Y)}, yScale)
+    .project("r", function(d) {return Math.abs(d.Mag)});
 
-  var titleLabel = new Plottable.Component.TitleLabel("Fake star distances, lifetimes, and radii");
-  var subtitleLabel = new Plottable.Component.Label("Lots of fake random data below");
+  var titleLabel = new Plottable.Component.TitleLabel("Absolute Value of Visual Magnitudes of Stars");
   var titleTable = new Plottable.Component.Table([
-                                                  [titleLabel],
-                                                  [subtitleLabel]
+                                                  [titleLabel]
                                                   ]).xAlign("center");
 
-  var yAxisLabel = new Plottable.Component.AxisLabel("Lifetime (in some arbitrary units)", "vertical-left");
-  var xAxisLabel = new Plottable.Component.AxisLabel("Distance from Earth (in some arbitrary units)");
+  var yAxisLabel = new Plottable.Component.AxisLabel("Absolute Value of Y Coordinate of the Star", "vertical-left");
+  var xAxisLabel = new Plottable.Component.AxisLabel("X Coordinate of the Star");
   var plotTable = new Plottable.Component.Table([
                                                  [yAxisLabel, yAxis, scatterRenderer],
                                                  [null, null, xAxis],
@@ -50,4 +35,5 @@ function run(div, data, Plottable) {
                                  [titleTable],
                                  [plotTable]
                                  ]).renderTo(svg);
+  });
 }
