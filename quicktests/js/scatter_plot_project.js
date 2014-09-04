@@ -18,7 +18,7 @@ function run(div, data, Plottable) {
     .project("x", "Distance", xScale)
     .project("y", function(d) {return Math.abs(d.Mag)}, yScale)
     .project("r", function(d) {return Math.abs(d.AbsMag)})
-    .project("stroke", "ColorIndex", colorScale);
+    .project("fill", "ColorIndex", colorScale);
 
   var titleLabel = new Plottable.Component.TitleLabel("Absolute Value of Absolute Visual Magnitudes of Stars");
   var subtitleLabel = new Plottable.Component.Label("Data from The HYG Database at The Astronomy Nexus");
