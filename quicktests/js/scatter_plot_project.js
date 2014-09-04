@@ -8,25 +8,25 @@ function run(div, data, Plottable) {
   d3.csv("../../examples/data/hygxyzTruncated.csv", function(d) {
   var svg = div.append("svg").attr("height", 500);
   var xScale = new Plottable.Scale.Linear();
-  var yScale = new Plottable.Scale.Linear();
+  var yScale = new Plottable.Scale.ModifiedLog();
   var rScale = new Plottable.Scale.Linear();
 
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
   var scatterRenderer = new Plottable.Plot.Scatter(d, xScale, yScale)
-    .project("x", "X", xScale)
-    .project("y", function(d) {return Math.abs(d.Y)}, yScale)
-    .project("r", function(d) {return Math.abs(d.Mag)});
+    .project("x", "Distance", xScale)
+    .project("y", function(d) {return Math.abs(d.Mag)}, yScale)
+    .project("r", function(d) {return Math.abs(d.AbsMag)});
 
-  var titleLabel = new Plottable.Component.TitleLabel("Absolute Value of Visual Magnitudes of Stars");
+  var titleLabel = new Plottable.Component.TitleLabel("Absolute Value of Absolute Visual Magnitudes of Stars");
   var subtitleLabel = new Plottable.Component.Label("Data from The HYG Database at The Astronomy Nexus");
   var titleTable = new Plottable.Component.Table([
                                                   [titleLabel],
                                                   [subtitleLabel]
                                                   ]).xAlign("center");
 
-  var yAxisLabel = new Plottable.Component.AxisLabel("Absolute Value of Y Coordinate of the Star", "vertical-left");
-  var xAxisLabel = new Plottable.Component.AxisLabel("X Coordinate of the Star");
+  var yAxisLabel = new Plottable.Component.AxisLabel("Absolute Value of Apparent Visual Magnitude", "vertical-left");
+  var xAxisLabel = new Plottable.Component.AxisLabel("Distance in parsecs");
   var plotTable = new Plottable.Component.Table([
                                                  [yAxisLabel, yAxis, scatterRenderer],
                                                  [null, null, xAxis],
