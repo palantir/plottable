@@ -6,10 +6,19 @@
     <script src="../exampleUtil.js"></script>
     <script src="../js/multiple_verticalBar.js"></script>
 
+    <script>
+      window.onload = function() {
+        var div = d3.select("#chart");
+        run(div, makeData(), Plottable);
+      }
+    </script>
+
+  </head>
+
 
   <body>
     <br>
-  	<svg id="chart" height="500"></svg>
+  	<div id="chart" height="500"></div>
   </body>
 
   </head>
