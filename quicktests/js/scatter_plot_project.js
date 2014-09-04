@@ -10,7 +10,7 @@ function run(div, data, Plottable) {
   var xScale = new Plottable.Scale.Linear();
   var yScale = new Plottable.Scale.ModifiedLog();
   var rScale = new Plottable.Scale.Linear();
-  var colorScale = new Plottable.Scale.Color();
+  var colorScale = new Plottable.Scale.InterpolatedColor(["blue", "red"]).domain([-0.33, 1.4]);
 
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
