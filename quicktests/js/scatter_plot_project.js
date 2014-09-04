@@ -16,8 +16,8 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
   var scatterRenderer = new Plottable.Plot.Scatter(d, xScale, yScale)
     .project("x", "Distance", xScale)
-    .project("y", function(d) {return Math.abs(d.Mag)}, yScale)
-    .project("r", function(d) {return Math.abs(d.AbsMag)})
+    .project("y", function(d) {return Math.abs(d.Mag);}, yScale)
+    .project("r", function(d) {return Math.abs(d.AbsMag);})
     .project("fill", "ColorIndex", colorScale);
 
   var titleLabel = new Plottable.Component.TitleLabel("Absolute Value of Absolute Visual Magnitudes of Stars");
