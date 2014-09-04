@@ -36,10 +36,5 @@ function run(div, data, Plottable){
                                             [yAxis  ,  clusteredPlot],
                                             [null   ,  xAxis        ]]);
 
-  plot.renderTo(svg);
-
-  var chart = new Plottable.Component.Table([
-                  [plot]]);
-
-  chart.renderTo("svg");
+  chart.renderTo(svg);
 }
