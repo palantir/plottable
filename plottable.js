@@ -2140,7 +2140,7 @@ var Plottable;
             }
             Area.prototype.draw = function (data, attrToProjector) {
                 var svgElement = "path";
-                var dataElements = this._renderArea.selectAll(svgElement).data(data);
+                var dataElements = this._renderArea.selectAll(svgElement).data([data]);
                 dataElements.enter().append(svgElement);
                 dataElements.attr(attrToProjector).classed("area", true);
                 dataElements.exit().remove();
@@ -5412,7 +5412,7 @@ var Plottable;
                 attrToProjector["fill"] = function (d, i) { return fillProjector(d[0], i); };
                 var datasets = this._getDatasetsInOrder();
                 this._getDrawersInOrder().forEach(function (drawer, i) {
-                    drawer.draw([datasets[i].data()], attrToProjector);
+                    drawer.draw(datasets[i].data(), attrToProjector);
                 });
             };
             StackedArea.prototype._updateYDomainer = function () {

@@ -489,7 +489,7 @@ declare module Plottable {
             key: string;
             constructor(key: string);
             remove(): void;
-            draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
+            draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
         }
     }
 }
@@ -498,7 +498,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Area extends Plottable.Abstract._Drawer {
-            draw(data: any[][], attrToProjector: IAttributeToProjector): void;
+            draw(data: any[], attrToProjector: IAttributeToProjector): void;
         }
     }
 }
@@ -507,7 +507,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Rect extends Plottable.Abstract._Drawer {
-            draw(data: any[][], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
+            draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
         }
     }
 }
