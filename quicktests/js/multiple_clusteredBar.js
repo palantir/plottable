@@ -29,18 +29,25 @@ function run(div, data, Plottable){
 
   var legend = new Plottable.Component.HorizontalLegend(colorScale);
   var title = new Plottable.Component.TitleLabel("Average Rainfall in Different Cities between 2013-2014", "horizontal" );
-  var yunit = new Plottable.Component.AxisLabel("Inches", "vertical-left" );
+  var yUnitLabel = new Plottable.Component.AxisLabel("Inches", "vertical-left" );
 
 
-  var chart = new Plottable.Component.Table([
+/*  var chart = new Plottable.Component.Table([
                                             [null   ,  title        ],
                                             [null   ,  legend       ],
                                             [yAxis  ,  clusteredPlot],
                                             [null   ,  xAxis        ]]);
+*/
+
+    var chart = new Plottable.Component.Table([
+                                            [null  ,  null   ,  title        ],
+                                            [null  ,  null   ,  legend       ],
+                                            [yUnitLabel  ,  yAxis  ,  clusteredPlot],
+                                            [null  ,  null   ,  xAxis        ]]);
 
 
   var finalchart = new Plottable.Component.Table([
-                    [yunit, chart]]);
+                    [yUnitLabel, chart]]);
 
   finalchart.renderTo(svg);
 }

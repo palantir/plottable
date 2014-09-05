@@ -24,19 +24,19 @@ function run(div, data, Plottable){
   var yAxis3 = new Plottable.Axis.Numeric(yScale, "left");
 
 
-  var palo_alto_bar = new Plottable.Plot.VerticalBar(data[0], xScale, yScale)
+  var paloAltoBar = new Plottable.Plot.VerticalBar(data[0], xScale, yScale)
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
     .project("fill", "city", colorScale);
 
-  var san_francisco_bar = new Plottable.Plot.VerticalBar(data[1], xScale, yScale)
+  var sanFranciscoBar = new Plottable.Plot.VerticalBar(data[1], xScale, yScale)
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
     .project("fill", "city", colorScale);
 
-  var san_jose_bar = new Plottable.Plot.VerticalBar(data[2], xScale, yScale)
+  var sanJoseBar = new Plottable.Plot.VerticalBar(data[2], xScale, yScale)
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
@@ -44,7 +44,7 @@ function run(div, data, Plottable){
 
   var legend = new Plottable.Component.HorizontalLegend(colorScale);
   var title = new Plottable.Component.TitleLabel("Average Rainfall in Different Cities between 2013-2014", "horizontal" );
-  var yunit = new Plottable.Component.AxisLabel("Inches", "vertical-left" );
+  var yUnitLabel = new Plottable.Component.AxisLabel("Inches", "vertical-left" );
 
 
   legend.xAlign("right");
@@ -52,20 +52,20 @@ function run(div, data, Plottable){
   var g1 = new Plottable.Component.Gridlines(null, yScale);
   var g2 = new Plottable.Component.Gridlines(null, yScale);
   var g3 = new Plottable.Component.Gridlines(null, yScale);
-  palo_alto_bar     = g1.merge(palo_alto_bar);
-  san_francisco_bar = g2.merge(san_francisco_bar);
-  san_jose_bar      = g3.merge(san_jose_bar);
+  var bar1 = g1.merge(paloAltoBar);
+  var bar2 = g2.merge(sanFranciscoBar);
+  var bar3 = g3.merge(sanJoseBar);
 
   var chart = new Plottable.Component.Table([
                   [null    ,   title            ],
                   [null    ,   legend           ],
-                  [yAxis1  ,   palo_alto_bar    ],
-                  [yAxis2  ,   san_francisco_bar],
-                  [yAxis3  ,   san_jose_bar     ],
+                  [yAxis1  ,   bar1    ],
+                  [yAxis2  ,   bar2],
+                  [yAxis3  ,   bar3     ],
                   [null    ,   xAxis            ]]);
 
   var finalchart = new Plottable.Component.Table([
-                    [yunit, chart]]);
+                    [yUnitLabel, chart]]);
 
   finalchart.renderTo(svg);
 }
