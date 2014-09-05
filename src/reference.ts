@@ -14,14 +14,6 @@
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
 /// <reference path="core/dataSource.ts" />
-/// <reference path="components/component.ts" />
-/// <reference path="components/componentContainer.ts" />
-/// <reference path="components/componentGroup.ts" />
-/// <reference path="components/table.ts" />
-/// <reference path="scales/scale.ts" />
-/// <reference path="components/plots/plot.ts" />
-/// <reference path="components/plots/xyPlot.ts" />
-/// <reference path="components/plots/newStylePlot.ts" />
 /// <reference path="core/renderPolicy.ts" />
 /// <reference path="core/renderController.ts" />
 /// <reference path="core/resizeBroadcaster.ts" />
@@ -29,6 +21,7 @@
 /// <reference path="core/interfaces.ts" />
 /// <reference path="core/domainer.ts" />
 
+/// <reference path="scales/scale.ts" />
 /// <reference path="scales/quantitativeScale.ts" />
 /// <reference path="scales/linearScale.ts" />
 /// <reference path="scales/logScale.ts" />
@@ -43,6 +36,10 @@
 /// <reference path="drawers/areaDrawer.ts" />
 /// <reference path="drawers/rectDrawer.ts" />
 
+/// <reference path="components/component.ts" />
+/// <reference path="components/componentContainer.ts" />
+/// <reference path="components/componentGroup.ts" />
+
 /// <reference path="components/axes/baseAxis.ts" />
 /// <reference path="components/axes/timeAxis.ts" />
 /// <reference path="components/axes/numericAxis.ts" />
@@ -52,7 +49,11 @@
 /// <reference path="components/legend.ts" />
 /// <reference path="components/horizontalLegend.ts" />
 /// <reference path="components/gridlines.ts" />
+/// <reference path="components/table.ts" />
 
+/// <reference path="components/plots/plot.ts" />
+/// <reference path="components/plots/xyPlot.ts" />
+/// <reference path="components/plots/newStylePlot.ts" />
 /// <reference path="components/plots/scatterPlot.ts" />
 /// <reference path="components/plots/gridPlot.ts" />
 /// <reference path="components/plots/abstractBarPlot.ts" />

@@ -1103,1136 +1103,6 @@ var Plottable;
     Plottable.DataSource = DataSource;
 })(Plottable || (Plottable = {}));
 
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Abstract) {
-        var Component = (function (_super) {
-            __extends(Component, _super);
-            function Component() {
-                _super.apply(this, arguments);
-                this.clipPathEnabled = false;
-                this._xAlignProportion = 0;
-                this._yAlignProportion = 0;
-                this._fixedHeightFlag = false;
-                this._fixedWidthFlag = false;
-                this._isSetup = false;
-                this._isAnchored = false;
-                this.interactionsToRegister = [];
-                this.boxes = [];
-                this.isTopLevelComponent = false;
-                this._xOffset = 0;
-                this._yOffset = 0;
-                this.cssClasses = ["component"];
-                this.removed = false;
-            }
-            Component.prototype._anchor = function (element) {
-                if (this.removed) {
-                    throw new Error("Can't reuse remove()-ed components!");
-                }
-                if (element.node().nodeName === "svg") {
-                    this.rootSVG = element;
-                    this.rootSVG.classed("plottable", true);
-                    this.rootSVG.style("overflow", "visible");
-                    this.isTopLevelComponent = true;
-                }
-                if (this.element != null) {
-                    element.node().appendChild(this.element.node());
-                }
-                else {
-                    this.element = element.append("g");
-                    this._setup();
-                }
-                this._isAnchored = true;
-            };
-            Component.prototype._setup = function () {
-                var _this = this;
-                if (this._isSetup) {
-                    return;
-                }
-                this.cssClasses.forEach(function (cssClass) {
-                    _this.element.classed(cssClass, true);
-                });
-                this.cssClasses = null;
-                this.backgroundContainer = this.element.append("g").classed("background-container", true);
-                this.content = this.element.append("g").classed("content", true);
-                this.foregroundContainer = this.element.append("g").classed("foreground-container", true);
-                this.boxContainer = this.element.append("g").classed("box-container", true);
-                if (this.clipPathEnabled) {
-                    this.generateClipPath();
-                }
-                ;
-                this.addBox("bounding-box");
-                this.interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
-                this.interactionsToRegister = null;
-                if (this.isTopLevelComponent) {
-                    this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
-                }
-                this._isSetup = true;
-            };
-            Component.prototype._requestedSpace = function (availableWidth, availableHeight) {
-                return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
-            };
-            Component.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
-                var _this = this;
-                if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
-                    if (this.element == null) {
-                        throw new Error("anchor must be called before computeLayout");
-                    }
-                    else if (this.isTopLevelComponent) {
-                        xOrigin = 0;
-                        yOrigin = 0;
-                        if (this.rootSVG.attr("width") == null) {
-                            this.rootSVG.attr("width", "100%");
-                        }
-                        if (this.rootSVG.attr("height") == null) {
-                            this.rootSVG.attr("height", "100%");
-                        }
-                        var elem = this.rootSVG.node();
-                        availableWidth = Plottable.Util.DOM.getElementWidth(elem);
-                        availableHeight = Plottable.Util.DOM.getElementHeight(elem);
-                    }
-                    else {
-                        throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
-                    }
-                }
-                this.xOrigin = xOrigin;
-                this.yOrigin = yOrigin;
-                var xPosition = this.xOrigin;
-                var yPosition = this.yOrigin;
-                var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
-                xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
-                xPosition += this._xOffset;
-                if (this._isFixedWidth()) {
-                    availableWidth = Math.min(availableWidth, requestedSpace.width);
-                }
-                yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
-                yPosition += this._yOffset;
-                if (this._isFixedHeight()) {
-                    availableHeight = Math.min(availableHeight, requestedSpace.height);
-                }
-                this._width = availableWidth;
-                this._height = availableHeight;
-                this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-                this.boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
-            };
-            Component.prototype._render = function () {
-                if (this._isAnchored && this._isSetup) {
-                    Plottable.Core.RenderController.registerToRender(this);
-                }
-            };
-            Component.prototype._scheduleComputeLayout = function () {
-                if (this._isAnchored && this._isSetup) {
-                    Plottable.Core.RenderController.registerToComputeLayout(this);
-                }
-            };
-            Component.prototype._doRender = function () {
-            };
-            Component.prototype._invalidateLayout = function () {
-                if (this._isAnchored && this._isSetup) {
-                    if (this.isTopLevelComponent) {
-                        this._scheduleComputeLayout();
-                    }
-                    else {
-                        this._parent._invalidateLayout();
-                    }
-                }
-            };
-            Component.prototype.renderTo = function (element) {
-                if (element != null) {
-                    var selection;
-                    if (typeof (element.node) === "function") {
-                        selection = element;
-                    }
-                    else {
-                        selection = d3.select(element);
-                    }
-                    this._anchor(selection);
-                }
-                this._computeLayout();
-                this._render();
-                return this;
-            };
-            Component.prototype.resize = function (width, height) {
-                if (!this.isTopLevelComponent) {
-                    throw new Error("Cannot resize on non top-level component");
-                }
-                if (width != null && height != null && this._isAnchored) {
-                    this.rootSVG.attr({ width: width, height: height });
-                }
-                this._invalidateLayout();
-                return this;
-            };
-            Component.prototype.autoResize = function (flag) {
-                if (flag) {
-                    Plottable.Core.ResizeBroadcaster.register(this);
-                }
-                else {
-                    Plottable.Core.ResizeBroadcaster.deregister(this);
-                }
-                return this;
-            };
-            Component.prototype.xAlign = function (alignment) {
-                alignment = alignment.toLowerCase();
-                if (alignment === "left") {
-                    this._xAlignProportion = 0;
-                }
-                else if (alignment === "center") {
-                    this._xAlignProportion = 0.5;
-                }
-                else if (alignment === "right") {
-                    this._xAlignProportion = 1;
-                }
-                else {
-                    throw new Error("Unsupported alignment");
-                }
-                this._invalidateLayout();
-                return this;
-            };
-            Component.prototype.yAlign = function (alignment) {
-                alignment = alignment.toLowerCase();
-                if (alignment === "top") {
-                    this._yAlignProportion = 0;
-                }
-                else if (alignment === "center") {
-                    this._yAlignProportion = 0.5;
-                }
-                else if (alignment === "bottom") {
-                    this._yAlignProportion = 1;
-                }
-                else {
-                    throw new Error("Unsupported alignment");
-                }
-                this._invalidateLayout();
-                return this;
-            };
-            Component.prototype.xOffset = function (offset) {
-                this._xOffset = offset;
-                this._invalidateLayout();
-                return this;
-            };
-            Component.prototype.yOffset = function (offset) {
-                this._yOffset = offset;
-                this._invalidateLayout();
-                return this;
-            };
-            Component.prototype.addBox = function (className, parentElement) {
-                if (this.element == null) {
-                    throw new Error("Adding boxes before anchoring is currently disallowed");
-                }
-                var parentElement = parentElement == null ? this.boxContainer : parentElement;
-                var box = parentElement.append("rect");
-                if (className != null) {
-                    box.classed(className, true);
-                }
-                ;
-                this.boxes.push(box);
-                if (this.width() != null && this.height() != null) {
-                    box.attr("width", this.width()).attr("height", this.height());
-                }
-                return box;
-            };
-            Component.prototype.generateClipPath = function () {
-                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-                this.element.attr("clip-path", "url(" + prefix + "#clipPath" + this._plottableID + ")");
-                var clipPathParent = this.boxContainer.append("clipPath").attr("id", "clipPath" + this._plottableID);
-                this.addBox("clip-rect", clipPathParent);
-            };
-            Component.prototype.registerInteraction = function (interaction) {
-                if (this.element != null) {
-                    if (this.hitBox == null) {
-                        this.hitBox = this.addBox("hit-box");
-                        this.hitBox.style("fill", "#ffffff").style("opacity", 0);
-                    }
-                    interaction._anchor(this.hitBox);
-                }
-                else {
-                    this.interactionsToRegister.push(interaction);
-                }
-                return this;
-            };
-            Component.prototype.classed = function (cssClass, addClass) {
-                if (addClass == null) {
-                    if (cssClass == null) {
-                        return false;
-                    }
-                    else if (this.element == null) {
-                        return (this.cssClasses.indexOf(cssClass) !== -1);
-                    }
-                    else {
-                        return this.element.classed(cssClass);
-                    }
-                }
-                else {
-                    if (cssClass == null) {
-                        return this;
-                    }
-                    if (this.element == null) {
-                        var classIndex = this.cssClasses.indexOf(cssClass);
-                        if (addClass && classIndex === -1) {
-                            this.cssClasses.push(cssClass);
-                        }
-                        else if (!addClass && classIndex !== -1) {
-                            this.cssClasses.splice(classIndex, 1);
-                        }
-                    }
-                    else {
-                        this.element.classed(cssClass, addClass);
-                    }
-                    return this;
-                }
-            };
-            Component.prototype._isFixedWidth = function () {
-                return this._fixedWidthFlag;
-            };
-            Component.prototype._isFixedHeight = function () {
-                return this._fixedHeightFlag;
-            };
-            Component.prototype.merge = function (c) {
-                var cg;
-                if (this._isSetup || this._isAnchored) {
-                    throw new Error("Can't presently merge a component that's already been anchored");
-                }
-                if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
-                    cg = c;
-                    cg._addComponent(this, true);
-                    return cg;
-                }
-                else {
-                    cg = new Plottable.Component.Group([this, c]);
-                    return cg;
-                }
-            };
-            Component.prototype.detach = function () {
-                if (this._isAnchored) {
-                    this.element.remove();
-                }
-                if (this._parent != null) {
-                    this._parent._removeComponent(this);
-                }
-                this._isAnchored = false;
-                this._parent = null;
-                return this;
-            };
-            Component.prototype.remove = function () {
-                this.removed = true;
-                this.detach();
-                Plottable.Core.ResizeBroadcaster.deregister(this);
-            };
-            Component.prototype.width = function () {
-                return this._width;
-            };
-            Component.prototype.height = function () {
-                return this._height;
-            };
-            Component.AUTORESIZE_BY_DEFAULT = true;
-            return Component;
-        })(Abstract.PlottableObject);
-        Abstract.Component = Component;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Abstract) {
-        var ComponentContainer = (function (_super) {
-            __extends(ComponentContainer, _super);
-            function ComponentContainer() {
-                _super.apply(this, arguments);
-                this._components = [];
-            }
-            ComponentContainer.prototype._anchor = function (element) {
-                var _this = this;
-                _super.prototype._anchor.call(this, element);
-                this._components.forEach(function (c) { return c._anchor(_this.content); });
-            };
-            ComponentContainer.prototype._render = function () {
-                this._components.forEach(function (c) { return c._render(); });
-            };
-            ComponentContainer.prototype._removeComponent = function (c) {
-                var removeIndex = this._components.indexOf(c);
-                if (removeIndex >= 0) {
-                    this._components.splice(removeIndex, 1);
-                    this._invalidateLayout();
-                }
-            };
-            ComponentContainer.prototype._addComponent = function (c, prepend) {
-                if (prepend === void 0) { prepend = false; }
-                if (c == null || this._components.indexOf(c) >= 0) {
-                    return false;
-                }
-                if (prepend) {
-                    this._components.unshift(c);
-                }
-                else {
-                    this._components.push(c);
-                }
-                c._parent = this;
-                if (this._isAnchored) {
-                    c._anchor(this.content);
-                }
-                this._invalidateLayout();
-                return true;
-            };
-            ComponentContainer.prototype.components = function () {
-                return this._components.slice();
-            };
-            ComponentContainer.prototype.empty = function () {
-                return this._components.length === 0;
-            };
-            ComponentContainer.prototype.detachAll = function () {
-                this._components.slice().forEach(function (c) { return c.detach(); });
-                return this;
-            };
-            ComponentContainer.prototype.remove = function () {
-                _super.prototype.remove.call(this);
-                this._components.slice().forEach(function (c) { return c.remove(); });
-            };
-            return ComponentContainer;
-        })(Abstract.Component);
-        Abstract.ComponentContainer = ComponentContainer;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Component) {
-        var Group = (function (_super) {
-            __extends(Group, _super);
-            function Group(components) {
-                if (components === void 0) { components = []; }
-                _super.call(this);
-                var _this = this;
-                this.classed("component-group", true);
-                components.forEach(function (c) { return _this._addComponent(c); });
-            }
-            Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var requests = this._components.map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
-                return {
-                    width: Plottable.Util.Methods.max(requests, function (request) { return request.width; }),
-                    height: Plottable.Util.Methods.max(requests, function (request) { return request.height; }),
-                    wantsWidth: requests.map(function (r) { return r.wantsWidth; }).some(function (x) { return x; }),
-                    wantsHeight: requests.map(function (r) { return r.wantsHeight; }).some(function (x) { return x; })
-                };
-            };
-            Group.prototype.merge = function (c) {
-                this._addComponent(c);
-                return this;
-            };
-            Group.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
-                var _this = this;
-                _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
-                this._components.forEach(function (c) {
-                    c._computeLayout(0, 0, _this.width(), _this.height());
-                });
-                return this;
-            };
-            Group.prototype._isFixedWidth = function () {
-                return this._components.every(function (c) { return c._isFixedWidth(); });
-            };
-            Group.prototype._isFixedHeight = function () {
-                return this._components.every(function (c) { return c._isFixedHeight(); });
-            };
-            return Group;
-        })(Plottable.Abstract.ComponentContainer);
-        Component.Group = Group;
-    })(Plottable.Component || (Plottable.Component = {}));
-    var Component = Plottable.Component;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Component) {
-        ;
-        var Table = (function (_super) {
-            __extends(Table, _super);
-            function Table(rows) {
-                if (rows === void 0) { rows = []; }
-                _super.call(this);
-                var _this = this;
-                this.rowPadding = 0;
-                this.colPadding = 0;
-                this.rows = [];
-                this.rowWeights = [];
-                this.colWeights = [];
-                this.nRows = 0;
-                this.nCols = 0;
-                this.classed("table", true);
-                rows.forEach(function (row, rowIndex) {
-                    row.forEach(function (component, colIndex) {
-                        _this.addComponent(rowIndex, colIndex, component);
-                    });
-                });
-            }
-            Table.prototype.addComponent = function (row, col, component) {
-                if (this._addComponent(component)) {
-                    this.nRows = Math.max(row + 1, this.nRows);
-                    this.nCols = Math.max(col + 1, this.nCols);
-                    this.padTableToSize(this.nRows, this.nCols);
-                    var currentComponent = this.rows[row][col];
-                    if (currentComponent != null) {
-                        throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
-                    }
-                    this.rows[row][col] = component;
-                }
-                return this;
-            };
-            Table.prototype._removeComponent = function (component) {
-                _super.prototype._removeComponent.call(this, component);
-                var rowpos;
-                var colpos;
-                outer: for (var i = 0; i < this.nRows; i++) {
-                    for (var j = 0; j < this.nCols; j++) {
-                        if (this.rows[i][j] === component) {
-                            rowpos = i;
-                            colpos = j;
-                            break outer;
-                        }
-                    }
-                }
-                if (rowpos !== undefined) {
-                    this.rows[rowpos][colpos] = null;
-                }
-            };
-            Table.prototype.iterateLayout = function (availableWidth, availableHeight) {
-                var cols = d3.transpose(this.rows);
-                var availableWidthAfterPadding = availableWidth - this.colPadding * (this.nCols - 1);
-                var availableHeightAfterPadding = availableHeight - this.rowPadding * (this.nRows - 1);
-                var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, function (c) { return (c == null) || c._isFixedHeight(); });
-                var colWeights = Table.calcComponentWeights(this.colWeights, cols, function (c) { return (c == null) || c._isFixedWidth(); });
-                var heuristicColWeights = colWeights.map(function (c) { return c === 0 ? 0.5 : c; });
-                var heuristicRowWeights = rowWeights.map(function (c) { return c === 0 ? 0.5 : c; });
-                var colProportionalSpace = Table.calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding);
-                var rowProportionalSpace = Table.calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
-                var guaranteedWidths = Plottable.Util.Methods.createFilledArray(0, this.nCols);
-                var guaranteedHeights = Plottable.Util.Methods.createFilledArray(0, this.nRows);
-                var freeWidth;
-                var freeHeight;
-                var nIterations = 0;
-                while (true) {
-                    var offeredHeights = Plottable.Util.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
-                    var offeredWidths = Plottable.Util.Methods.addArrays(guaranteedWidths, colProportionalSpace);
-                    var guarantees = this.determineGuarantees(offeredWidths, offeredHeights);
-                    guaranteedWidths = guarantees.guaranteedWidths;
-                    guaranteedHeights = guarantees.guaranteedHeights;
-                    var wantsWidth = guarantees.wantsWidthArr.some(function (x) { return x; });
-                    var wantsHeight = guarantees.wantsHeightArr.some(function (x) { return x; });
-                    var lastFreeWidth = freeWidth;
-                    var lastFreeHeight = freeHeight;
-                    freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
-                    freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
-                    var xWeights;
-                    if (wantsWidth) {
-                        xWeights = guarantees.wantsWidthArr.map(function (x) { return x ? 0.1 : 0; });
-                        xWeights = Plottable.Util.Methods.addArrays(xWeights, colWeights);
-                    }
-                    else {
-                        xWeights = colWeights;
-                    }
-                    var yWeights;
-                    if (wantsHeight) {
-                        yWeights = guarantees.wantsHeightArr.map(function (x) { return x ? 0.1 : 0; });
-                        yWeights = Plottable.Util.Methods.addArrays(yWeights, rowWeights);
-                    }
-                    else {
-                        yWeights = rowWeights;
-                    }
-                    colProportionalSpace = Table.calcProportionalSpace(xWeights, freeWidth);
-                    rowProportionalSpace = Table.calcProportionalSpace(yWeights, freeHeight);
-                    nIterations++;
-                    var canImproveWidthAllocation = freeWidth > 0 && wantsWidth && freeWidth !== lastFreeWidth;
-                    var canImproveHeightAllocation = freeHeight > 0 && wantsHeight && freeHeight !== lastFreeHeight;
-                    if (!(canImproveWidthAllocation || canImproveHeightAllocation)) {
-                        break;
-                    }
-                    if (nIterations > 5) {
-                        break;
-                    }
-                }
-                freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
-                freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
-                colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
-                rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
-                return { colProportionalSpace: colProportionalSpace, rowProportionalSpace: rowProportionalSpace, guaranteedWidths: guarantees.guaranteedWidths, guaranteedHeights: guarantees.guaranteedHeights, wantsWidth: wantsWidth, wantsHeight: wantsHeight };
-            };
-            Table.prototype.determineGuarantees = function (offeredWidths, offeredHeights) {
-                var requestedWidths = Plottable.Util.Methods.createFilledArray(0, this.nCols);
-                var requestedHeights = Plottable.Util.Methods.createFilledArray(0, this.nRows);
-                var layoutWantsWidth = Plottable.Util.Methods.createFilledArray(false, this.nCols);
-                var layoutWantsHeight = Plottable.Util.Methods.createFilledArray(false, this.nRows);
-                this.rows.forEach(function (row, rowIndex) {
-                    row.forEach(function (component, colIndex) {
-                        var spaceRequest;
-                        if (component != null) {
-                            spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
-                        }
-                        else {
-                            spaceRequest = { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
-                        }
-                        var allocatedWidth = Math.min(spaceRequest.width, offeredWidths[colIndex]);
-                        var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
-                        requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], allocatedWidth);
-                        requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
-                        layoutWantsWidth[colIndex] = layoutWantsWidth[colIndex] || spaceRequest.wantsWidth;
-                        layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
-                    });
-                });
-                return { guaranteedWidths: requestedWidths, guaranteedHeights: requestedHeights, wantsWidthArr: layoutWantsWidth, wantsHeightArr: layoutWantsHeight };
-            };
-            Table.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var layout = this.iterateLayout(offeredWidth, offeredHeight);
-                return { width: d3.sum(layout.guaranteedWidths), height: d3.sum(layout.guaranteedHeights), wantsWidth: layout.wantsWidth, wantsHeight: layout.wantsHeight };
-            };
-            Table.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                var _this = this;
-                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                var layout = this.iterateLayout(this.width(), this.height());
-                var sumPair = function (p) { return p[0] + p[1]; };
-                var rowHeights = Plottable.Util.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
-                var colWidths = Plottable.Util.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);
-                var childYOffset = 0;
-                this.rows.forEach(function (row, rowIndex) {
-                    var childXOffset = 0;
-                    row.forEach(function (component, colIndex) {
-                        if (component != null) {
-                            component._computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
-                        }
-                        childXOffset += colWidths[colIndex] + _this.colPadding;
-                    });
-                    childYOffset += rowHeights[rowIndex] + _this.rowPadding;
-                });
-            };
-            Table.prototype.padding = function (rowPadding, colPadding) {
-                this.rowPadding = rowPadding;
-                this.colPadding = colPadding;
-                this._invalidateLayout();
-                return this;
-            };
-            Table.prototype.rowWeight = function (index, weight) {
-                this.rowWeights[index] = weight;
-                this._invalidateLayout();
-                return this;
-            };
-            Table.prototype.colWeight = function (index, weight) {
-                this.colWeights[index] = weight;
-                this._invalidateLayout();
-                return this;
-            };
-            Table.prototype._isFixedWidth = function () {
-                var cols = d3.transpose(this.rows);
-                return Table.fixedSpace(cols, function (c) { return (c == null) || c._isFixedWidth(); });
-            };
-            Table.prototype._isFixedHeight = function () {
-                return Table.fixedSpace(this.rows, function (c) { return (c == null) || c._isFixedHeight(); });
-            };
-            Table.prototype.padTableToSize = function (nRows, nCols) {
-                for (var i = 0; i < nRows; i++) {
-                    if (this.rows[i] === undefined) {
-                        this.rows[i] = [];
-                        this.rowWeights[i] = null;
-                    }
-                    for (var j = 0; j < nCols; j++) {
-                        if (this.rows[i][j] === undefined) {
-                            this.rows[i][j] = null;
-                        }
-                    }
-                }
-                for (j = 0; j < nCols; j++) {
-                    if (this.colWeights[j] === undefined) {
-                        this.colWeights[j] = null;
-                    }
-                }
-            };
-            Table.calcComponentWeights = function (setWeights, componentGroups, fixityAccessor) {
-                return setWeights.map(function (w, i) {
-                    if (w != null) {
-                        return w;
-                    }
-                    var fixities = componentGroups[i].map(fixityAccessor);
-                    var allFixed = fixities.reduce(function (a, b) { return a && b; }, true);
-                    return allFixed ? 0 : 1;
-                });
-            };
-            Table.calcProportionalSpace = function (weights, freeSpace) {
-                var weightSum = d3.sum(weights);
-                if (weightSum === 0) {
-                    return Plottable.Util.Methods.createFilledArray(0, weights.length);
-                }
-                else {
-                    return weights.map(function (w) { return freeSpace * w / weightSum; });
-                }
-            };
-            Table.fixedSpace = function (componentGroup, fixityAccessor) {
-                var all = function (bools) { return bools.reduce(function (a, b) { return a && b; }, true); };
-                var group_isFixed = function (components) { return all(components.map(fixityAccessor)); };
-                return all(componentGroup.map(group_isFixed));
-            };
-            return Table;
-        })(Plottable.Abstract.ComponentContainer);
-        Component.Table = Table;
-    })(Plottable.Component || (Plottable.Component = {}));
-    var Component = Plottable.Component;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Abstract) {
-        var Scale = (function (_super) {
-            __extends(Scale, _super);
-            function Scale(scale) {
-                _super.call(this);
-                this.autoDomainAutomatically = true;
-                this.broadcaster = new Plottable.Core.Broadcaster(this);
-                this._rendererAttrID2Extent = {};
-                this._d3Scale = scale;
-            }
-            Scale.prototype._getAllExtents = function () {
-                return d3.values(this._rendererAttrID2Extent);
-            };
-            Scale.prototype._getExtent = function () {
-                return [];
-            };
-            Scale.prototype.autoDomain = function () {
-                this.autoDomainAutomatically = true;
-                this._setDomain(this._getExtent());
-                return this;
-            };
-            Scale.prototype._autoDomainIfAutomaticMode = function () {
-                if (this.autoDomainAutomatically) {
-                    this.autoDomain();
-                }
-            };
-            Scale.prototype.scale = function (value) {
-                return this._d3Scale(value);
-            };
-            Scale.prototype.domain = function (values) {
-                if (values == null) {
-                    return this._getDomain();
-                }
-                else {
-                    this.autoDomainAutomatically = false;
-                    this._setDomain(values);
-                    return this;
-                }
-            };
-            Scale.prototype._getDomain = function () {
-                return this._d3Scale.domain();
-            };
-            Scale.prototype._setDomain = function (values) {
-                this._d3Scale.domain(values);
-                this.broadcaster.broadcast();
-            };
-            Scale.prototype.range = function (values) {
-                if (values == null) {
-                    return this._d3Scale.range();
-                }
-                else {
-                    this._d3Scale.range(values);
-                    return this;
-                }
-            };
-            Scale.prototype.copy = function () {
-                return new Scale(this._d3Scale.copy());
-            };
-            Scale.prototype.updateExtent = function (plotProvidedKey, attr, extent) {
-                this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
-                this._autoDomainIfAutomaticMode();
-                return this;
-            };
-            Scale.prototype.removeExtent = function (plotProvidedKey, attr) {
-                delete this._rendererAttrID2Extent[plotProvidedKey + attr];
-                this._autoDomainIfAutomaticMode();
-                return this;
-            };
-            return Scale;
-        })(Abstract.PlottableObject);
-        Abstract.Scale = Scale;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Abstract) {
-        var Plot = (function (_super) {
-            __extends(Plot, _super);
-            function Plot(dataset) {
-                _super.call(this);
-                this._dataChanged = false;
-                this._animate = false;
-                this._animators = {};
-                this._ANIMATION_DURATION = 250;
-                this._projectors = {};
-                this.animateOnNextRender = true;
-                this.clipPathEnabled = true;
-                this.classed("plot", true);
-                var dataSource;
-                if (dataset != null) {
-                    if (typeof dataset.data === "function") {
-                        dataSource = dataset;
-                    }
-                    else {
-                        dataSource = dataSource = new Plottable.DataSource(dataset);
-                    }
-                }
-                else {
-                    dataSource = new Plottable.DataSource();
-                }
-                this.dataSource(dataSource);
-            }
-            Plot.prototype._anchor = function (element) {
-                _super.prototype._anchor.call(this, element);
-                this.animateOnNextRender = true;
-                this._dataChanged = true;
-                this._updateAllProjectors();
-            };
-            Plot.prototype.remove = function () {
-                var _this = this;
-                _super.prototype.remove.call(this);
-                this._dataSource.broadcaster.deregisterListener(this);
-                var properties = Object.keys(this._projectors);
-                properties.forEach(function (property) {
-                    var projector = _this._projectors[property];
-                    if (projector.scale != null) {
-                        projector.scale.broadcaster.deregisterListener(_this);
-                    }
-                });
-            };
-            Plot.prototype.dataSource = function (source) {
-                var _this = this;
-                if (source == null) {
-                    return this._dataSource;
-                }
-                var oldSource = this._dataSource;
-                if (oldSource != null) {
-                    this._dataSource.broadcaster.deregisterListener(this);
-                }
-                this._dataSource = source;
-                this._dataSource.broadcaster.registerListener(this, function () { return _this._onDataSourceUpdate(); });
-                this._onDataSourceUpdate();
-                return this;
-            };
-            Plot.prototype._onDataSourceUpdate = function () {
-                this._updateAllProjectors();
-                this.animateOnNextRender = true;
-                this._dataChanged = true;
-                this._render();
-            };
-            Plot.prototype.project = function (attrToSet, accessor, scale) {
-                var _this = this;
-                attrToSet = attrToSet.toLowerCase();
-                var currentProjection = this._projectors[attrToSet];
-                var existingScale = (currentProjection != null) ? currentProjection.scale : null;
-                if (existingScale != null) {
-                    existingScale.removeExtent(this._plottableID.toString(), attrToSet);
-                    existingScale.broadcaster.deregisterListener(this);
-                }
-                if (scale != null) {
-                    scale.broadcaster.registerListener(this, function () { return _this._render(); });
-                }
-                var activatedAccessor = Plottable.Util.Methods._applyAccessor(accessor, this);
-                this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
-                this._updateProjector(attrToSet);
-                this._render();
-                return this;
-            };
-            Plot.prototype._generateAttrToProjector = function () {
-                var _this = this;
-                var h = {};
-                d3.keys(this._projectors).forEach(function (a) {
-                    var projector = _this._projectors[a];
-                    var accessor = projector.accessor;
-                    var scale = projector.scale;
-                    var fn = scale == null ? accessor : function (d, i) { return scale.scale(accessor(d, i)); };
-                    h[a] = fn;
-                });
-                return h;
-            };
-            Plot.prototype._doRender = function () {
-                if (this._isAnchored) {
-                    this._paint();
-                    this._dataChanged = false;
-                    this.animateOnNextRender = false;
-                }
-            };
-            Plot.prototype._paint = function () {
-            };
-            Plot.prototype._setup = function () {
-                _super.prototype._setup.call(this);
-                this.renderArea = this.content.append("g").classed("render-area", true);
-            };
-            Plot.prototype.animate = function (enabled) {
-                this._animate = enabled;
-                return this;
-            };
-            Plot.prototype.detach = function () {
-                _super.prototype.detach.call(this);
-                this._updateAllProjectors();
-                return this;
-            };
-            Plot.prototype._updateAllProjectors = function () {
-                var _this = this;
-                d3.keys(this._projectors).forEach(function (attr) { return _this._updateProjector(attr); });
-            };
-            Plot.prototype._updateProjector = function (attr) {
-                var projector = this._projectors[attr];
-                if (projector.scale != null) {
-                    var extent = this.dataSource()._getExtent(projector.accessor);
-                    if (extent.length === 0 || !this._isAnchored) {
-                        projector.scale.removeExtent(this._plottableID.toString(), attr);
-                    }
-                    else {
-                        projector.scale.updateExtent(this._plottableID.toString(), attr, extent);
-                    }
-                }
-            };
-            Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
-                if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
-                    return this._animators[animatorKey].animate(selection, attrToProjector);
-                }
-                else {
-                    return selection.attr(attrToProjector);
-                }
-            };
-            Plot.prototype.animator = function (animatorKey, animator) {
-                if (animator === undefined) {
-                    return this._animators[animatorKey];
-                }
-                else {
-                    this._animators[animatorKey] = animator;
-                    return this;
-                }
-            };
-            return Plot;
-        })(Abstract.Component);
-        Abstract.Plot = Plot;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Abstract) {
-        var XYPlot = (function (_super) {
-            __extends(XYPlot, _super);
-            function XYPlot(dataset, xScale, yScale) {
-                _super.call(this, dataset);
-                if (xScale == null || yScale == null) {
-                    throw new Error("XYPlots require an xScale and yScale");
-                }
-                this.classed("xy-plot", true);
-                this.project("x", "x", xScale);
-                this.project("y", "y", yScale);
-            }
-            XYPlot.prototype.project = function (attrToSet, accessor, scale) {
-                if (attrToSet === "x" && scale != null) {
-                    this.xScale = scale;
-                    this._updateXDomainer();
-                }
-                if (attrToSet === "y" && scale != null) {
-                    this.yScale = scale;
-                    this._updateYDomainer();
-                }
-                _super.prototype.project.call(this, attrToSet, accessor, scale);
-                return this;
-            };
-            XYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                this.xScale.range([0, this.width()]);
-                this.yScale.range([this.height(), 0]);
-            };
-            XYPlot.prototype._updateXDomainer = function () {
-                if (this.xScale instanceof Abstract.QuantitativeScale) {
-                    var scale = this.xScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().pad().nice();
-                    }
-                }
-            };
-            XYPlot.prototype._updateYDomainer = function () {
-                if (this.yScale instanceof Abstract.QuantitativeScale) {
-                    var scale = this.yScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().pad().nice();
-                    }
-                }
-            };
-            return XYPlot;
-        })(Abstract.Plot);
-        Abstract.XYPlot = XYPlot;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Abstract) {
-        var NewStylePlot = (function (_super) {
-            __extends(NewStylePlot, _super);
-            function NewStylePlot(xScale, yScale) {
-                this._key2DatasetDrawerKey = d3.map();
-                this._datasetKeysInOrder = [];
-                this.nextSeriesIndex = 0;
-                _super.call(this, new Plottable.DataSource(), xScale, yScale);
-            }
-            NewStylePlot.prototype._setup = function () {
-                var _this = this;
-                _super.prototype._setup.call(this);
-                this._getDrawersInOrder().forEach(function (d) { return d.renderArea = _this.renderArea.append("g"); });
-            };
-            NewStylePlot.prototype.remove = function () {
-                var _this = this;
-                _super.prototype.remove.call(this);
-                this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
-            };
-            NewStylePlot.prototype.addDataset = function (keyOrDataset, dataset) {
-                if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
-                    throw new Error("invalid input to addDataset");
-                }
-                if (typeof (keyOrDataset) === "string" && keyOrDataset[0] === "_") {
-                    Plottable.Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
-                }
-                var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
-                var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
-                var dataset = (data instanceof Plottable.DataSource) ? data : new Plottable.DataSource(data);
-                this._addDataset(key, dataset);
-                return this;
-            };
-            NewStylePlot.prototype._addDataset = function (key, dataset) {
-                var _this = this;
-                if (this._key2DatasetDrawerKey.has(key)) {
-                    this.removeDataset(key);
-                }
-                ;
-                var drawer = this._getDrawer(key);
-                var ddk = { drawer: drawer, dataset: dataset, key: key };
-                this._datasetKeysInOrder.push(key);
-                this._key2DatasetDrawerKey.set(key, ddk);
-                if (this._isSetup) {
-                    drawer.renderArea = this.renderArea.append("g");
-                }
-                dataset.broadcaster.registerListener(this, function () { return _this._onDataSourceUpdate(); });
-                this._onDataSourceUpdate();
-            };
-            NewStylePlot.prototype._getDrawer = function (key) {
-                throw new Error("Abstract Method Not Implemented");
-            };
-            NewStylePlot.prototype._updateProjector = function (attr) {
-                var _this = this;
-                var projector = this._projectors[attr];
-                if (projector.scale != null) {
-                    this._key2DatasetDrawerKey.forEach(function (key, ddk) {
-                        var extent = ddk.dataset._getExtent(projector.accessor);
-                        var scaleKey = _this._plottableID.toString() + "_" + key;
-                        if (extent.length === 0 || !_this._isAnchored) {
-                            projector.scale.removeExtent(scaleKey, attr);
-                        }
-                        else {
-                            projector.scale.updateExtent(scaleKey, attr, extent);
-                        }
-                    });
-                }
-            };
-            NewStylePlot.prototype.datasetOrder = function (order) {
-                if (order === undefined) {
-                    return this._datasetKeysInOrder;
-                }
-                function isPermutation(l1, l2) {
-                    var intersection = Plottable.Util.Methods.intersection(d3.set(l1), d3.set(l2));
-                    var size = intersection.size();
-                    return size === l1.length && size === l2.length;
-                }
-                if (isPermutation(order, this._datasetKeysInOrder)) {
-                    this._datasetKeysInOrder = order;
-                    this._onDataSourceUpdate();
-                }
-                else {
-                    Plottable.Util.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
-                }
-                return this;
-            };
-            NewStylePlot.prototype.removeDataset = function (key) {
-                if (this._key2DatasetDrawerKey.has(key)) {
-                    var ddk = this._key2DatasetDrawerKey.get(key);
-                    ddk.drawer.remove();
-                    var projectors = d3.values(this._projectors);
-                    var scaleKey = this._plottableID.toString() + "_" + key;
-                    projectors.forEach(function (p) {
-                        if (p.scale != null) {
-                            p.scale.removeExtent(scaleKey, p.attribute);
-                        }
-                    });
-                    ddk.dataset.broadcaster.deregisterListener(this);
-                    this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-                    this._key2DatasetDrawerKey.remove(key);
-                    this._onDataSourceUpdate();
-                }
-                return this;
-            };
-            NewStylePlot.prototype._getDatasetsInOrder = function () {
-                var _this = this;
-                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).dataset; });
-            };
-            NewStylePlot.prototype._getDrawersInOrder = function () {
-                var _this = this;
-                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).drawer; });
-            };
-            return NewStylePlot;
-        })(Abstract.XYPlot);
-        Abstract.NewStylePlot = NewStylePlot;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
-})(Plottable || (Plottable = {}));
-
 var Plottable;
 (function (Plottable) {
     (function (Core) {
@@ -2509,6 +1379,89 @@ var Plottable;
         return Domainer;
     })();
     Plottable.Domainer = Domainer;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var Scale = (function (_super) {
+            __extends(Scale, _super);
+            function Scale(scale) {
+                _super.call(this);
+                this.autoDomainAutomatically = true;
+                this.broadcaster = new Plottable.Core.Broadcaster(this);
+                this._rendererAttrID2Extent = {};
+                this._d3Scale = scale;
+            }
+            Scale.prototype._getAllExtents = function () {
+                return d3.values(this._rendererAttrID2Extent);
+            };
+            Scale.prototype._getExtent = function () {
+                return [];
+            };
+            Scale.prototype.autoDomain = function () {
+                this.autoDomainAutomatically = true;
+                this._setDomain(this._getExtent());
+                return this;
+            };
+            Scale.prototype._autoDomainIfAutomaticMode = function () {
+                if (this.autoDomainAutomatically) {
+                    this.autoDomain();
+                }
+            };
+            Scale.prototype.scale = function (value) {
+                return this._d3Scale(value);
+            };
+            Scale.prototype.domain = function (values) {
+                if (values == null) {
+                    return this._getDomain();
+                }
+                else {
+                    this.autoDomainAutomatically = false;
+                    this._setDomain(values);
+                    return this;
+                }
+            };
+            Scale.prototype._getDomain = function () {
+                return this._d3Scale.domain();
+            };
+            Scale.prototype._setDomain = function (values) {
+                this._d3Scale.domain(values);
+                this.broadcaster.broadcast();
+            };
+            Scale.prototype.range = function (values) {
+                if (values == null) {
+                    return this._d3Scale.range();
+                }
+                else {
+                    this._d3Scale.range(values);
+                    return this;
+                }
+            };
+            Scale.prototype.copy = function () {
+                return new Scale(this._d3Scale.copy());
+            };
+            Scale.prototype.updateExtent = function (plotProvidedKey, attr, extent) {
+                this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
+                this._autoDomainIfAutomaticMode();
+                return this;
+            };
+            Scale.prototype.removeExtent = function (plotProvidedKey, attr) {
+                delete this._rendererAttrID2Extent[plotProvidedKey + attr];
+                this._autoDomainIfAutomaticMode();
+                return this;
+            };
+            return Scale;
+        })(Abstract.PlottableObject);
+        Abstract.Scale = Scale;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
 })(Plottable || (Plottable = {}));
 
 var __extends = this.__extends || function (d, b) {
@@ -3230,6 +2183,462 @@ var Plottable;
         _Drawer.Rect = Rect;
     })(Plottable._Drawer || (Plottable._Drawer = {}));
     var _Drawer = Plottable._Drawer;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var Component = (function (_super) {
+            __extends(Component, _super);
+            function Component() {
+                _super.apply(this, arguments);
+                this.clipPathEnabled = false;
+                this._xAlignProportion = 0;
+                this._yAlignProportion = 0;
+                this._fixedHeightFlag = false;
+                this._fixedWidthFlag = false;
+                this._isSetup = false;
+                this._isAnchored = false;
+                this.interactionsToRegister = [];
+                this.boxes = [];
+                this.isTopLevelComponent = false;
+                this._xOffset = 0;
+                this._yOffset = 0;
+                this.cssClasses = ["component"];
+                this.removed = false;
+            }
+            Component.prototype._anchor = function (element) {
+                if (this.removed) {
+                    throw new Error("Can't reuse remove()-ed components!");
+                }
+                if (element.node().nodeName === "svg") {
+                    this.rootSVG = element;
+                    this.rootSVG.classed("plottable", true);
+                    this.rootSVG.style("overflow", "visible");
+                    this.isTopLevelComponent = true;
+                }
+                if (this.element != null) {
+                    element.node().appendChild(this.element.node());
+                }
+                else {
+                    this.element = element.append("g");
+                    this._setup();
+                }
+                this._isAnchored = true;
+            };
+            Component.prototype._setup = function () {
+                var _this = this;
+                if (this._isSetup) {
+                    return;
+                }
+                this.cssClasses.forEach(function (cssClass) {
+                    _this.element.classed(cssClass, true);
+                });
+                this.cssClasses = null;
+                this.backgroundContainer = this.element.append("g").classed("background-container", true);
+                this.content = this.element.append("g").classed("content", true);
+                this.foregroundContainer = this.element.append("g").classed("foreground-container", true);
+                this.boxContainer = this.element.append("g").classed("box-container", true);
+                if (this.clipPathEnabled) {
+                    this.generateClipPath();
+                }
+                ;
+                this.addBox("bounding-box");
+                this.interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
+                this.interactionsToRegister = null;
+                if (this.isTopLevelComponent) {
+                    this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
+                }
+                this._isSetup = true;
+            };
+            Component.prototype._requestedSpace = function (availableWidth, availableHeight) {
+                return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
+            };
+            Component.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
+                var _this = this;
+                if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
+                    if (this.element == null) {
+                        throw new Error("anchor must be called before computeLayout");
+                    }
+                    else if (this.isTopLevelComponent) {
+                        xOrigin = 0;
+                        yOrigin = 0;
+                        if (this.rootSVG.attr("width") == null) {
+                            this.rootSVG.attr("width", "100%");
+                        }
+                        if (this.rootSVG.attr("height") == null) {
+                            this.rootSVG.attr("height", "100%");
+                        }
+                        var elem = this.rootSVG.node();
+                        availableWidth = Plottable.Util.DOM.getElementWidth(elem);
+                        availableHeight = Plottable.Util.DOM.getElementHeight(elem);
+                    }
+                    else {
+                        throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
+                    }
+                }
+                this.xOrigin = xOrigin;
+                this.yOrigin = yOrigin;
+                var xPosition = this.xOrigin;
+                var yPosition = this.yOrigin;
+                var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
+                xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
+                xPosition += this._xOffset;
+                if (this._isFixedWidth()) {
+                    availableWidth = Math.min(availableWidth, requestedSpace.width);
+                }
+                yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
+                yPosition += this._yOffset;
+                if (this._isFixedHeight()) {
+                    availableHeight = Math.min(availableHeight, requestedSpace.height);
+                }
+                this._width = availableWidth;
+                this._height = availableHeight;
+                this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
+                this.boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
+            };
+            Component.prototype._render = function () {
+                if (this._isAnchored && this._isSetup) {
+                    Plottable.Core.RenderController.registerToRender(this);
+                }
+            };
+            Component.prototype._scheduleComputeLayout = function () {
+                if (this._isAnchored && this._isSetup) {
+                    Plottable.Core.RenderController.registerToComputeLayout(this);
+                }
+            };
+            Component.prototype._doRender = function () {
+            };
+            Component.prototype._invalidateLayout = function () {
+                if (this._isAnchored && this._isSetup) {
+                    if (this.isTopLevelComponent) {
+                        this._scheduleComputeLayout();
+                    }
+                    else {
+                        this._parent._invalidateLayout();
+                    }
+                }
+            };
+            Component.prototype.renderTo = function (element) {
+                if (element != null) {
+                    var selection;
+                    if (typeof (element.node) === "function") {
+                        selection = element;
+                    }
+                    else {
+                        selection = d3.select(element);
+                    }
+                    this._anchor(selection);
+                }
+                this._computeLayout();
+                this._render();
+                return this;
+            };
+            Component.prototype.resize = function (width, height) {
+                if (!this.isTopLevelComponent) {
+                    throw new Error("Cannot resize on non top-level component");
+                }
+                if (width != null && height != null && this._isAnchored) {
+                    this.rootSVG.attr({ width: width, height: height });
+                }
+                this._invalidateLayout();
+                return this;
+            };
+            Component.prototype.autoResize = function (flag) {
+                if (flag) {
+                    Plottable.Core.ResizeBroadcaster.register(this);
+                }
+                else {
+                    Plottable.Core.ResizeBroadcaster.deregister(this);
+                }
+                return this;
+            };
+            Component.prototype.xAlign = function (alignment) {
+                alignment = alignment.toLowerCase();
+                if (alignment === "left") {
+                    this._xAlignProportion = 0;
+                }
+                else if (alignment === "center") {
+                    this._xAlignProportion = 0.5;
+                }
+                else if (alignment === "right") {
+                    this._xAlignProportion = 1;
+                }
+                else {
+                    throw new Error("Unsupported alignment");
+                }
+                this._invalidateLayout();
+                return this;
+            };
+            Component.prototype.yAlign = function (alignment) {
+                alignment = alignment.toLowerCase();
+                if (alignment === "top") {
+                    this._yAlignProportion = 0;
+                }
+                else if (alignment === "center") {
+                    this._yAlignProportion = 0.5;
+                }
+                else if (alignment === "bottom") {
+                    this._yAlignProportion = 1;
+                }
+                else {
+                    throw new Error("Unsupported alignment");
+                }
+                this._invalidateLayout();
+                return this;
+            };
+            Component.prototype.xOffset = function (offset) {
+                this._xOffset = offset;
+                this._invalidateLayout();
+                return this;
+            };
+            Component.prototype.yOffset = function (offset) {
+                this._yOffset = offset;
+                this._invalidateLayout();
+                return this;
+            };
+            Component.prototype.addBox = function (className, parentElement) {
+                if (this.element == null) {
+                    throw new Error("Adding boxes before anchoring is currently disallowed");
+                }
+                var parentElement = parentElement == null ? this.boxContainer : parentElement;
+                var box = parentElement.append("rect");
+                if (className != null) {
+                    box.classed(className, true);
+                }
+                ;
+                this.boxes.push(box);
+                if (this.width() != null && this.height() != null) {
+                    box.attr("width", this.width()).attr("height", this.height());
+                }
+                return box;
+            };
+            Component.prototype.generateClipPath = function () {
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                this.element.attr("clip-path", "url(" + prefix + "#clipPath" + this._plottableID + ")");
+                var clipPathParent = this.boxContainer.append("clipPath").attr("id", "clipPath" + this._plottableID);
+                this.addBox("clip-rect", clipPathParent);
+            };
+            Component.prototype.registerInteraction = function (interaction) {
+                if (this.element != null) {
+                    if (this.hitBox == null) {
+                        this.hitBox = this.addBox("hit-box");
+                        this.hitBox.style("fill", "#ffffff").style("opacity", 0);
+                    }
+                    interaction._anchor(this.hitBox);
+                }
+                else {
+                    this.interactionsToRegister.push(interaction);
+                }
+                return this;
+            };
+            Component.prototype.classed = function (cssClass, addClass) {
+                if (addClass == null) {
+                    if (cssClass == null) {
+                        return false;
+                    }
+                    else if (this.element == null) {
+                        return (this.cssClasses.indexOf(cssClass) !== -1);
+                    }
+                    else {
+                        return this.element.classed(cssClass);
+                    }
+                }
+                else {
+                    if (cssClass == null) {
+                        return this;
+                    }
+                    if (this.element == null) {
+                        var classIndex = this.cssClasses.indexOf(cssClass);
+                        if (addClass && classIndex === -1) {
+                            this.cssClasses.push(cssClass);
+                        }
+                        else if (!addClass && classIndex !== -1) {
+                            this.cssClasses.splice(classIndex, 1);
+                        }
+                    }
+                    else {
+                        this.element.classed(cssClass, addClass);
+                    }
+                    return this;
+                }
+            };
+            Component.prototype._isFixedWidth = function () {
+                return this._fixedWidthFlag;
+            };
+            Component.prototype._isFixedHeight = function () {
+                return this._fixedHeightFlag;
+            };
+            Component.prototype.merge = function (c) {
+                var cg;
+                if (this._isSetup || this._isAnchored) {
+                    throw new Error("Can't presently merge a component that's already been anchored");
+                }
+                if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
+                    cg = c;
+                    cg._addComponent(this, true);
+                    return cg;
+                }
+                else {
+                    cg = new Plottable.Component.Group([this, c]);
+                    return cg;
+                }
+            };
+            Component.prototype.detach = function () {
+                if (this._isAnchored) {
+                    this.element.remove();
+                }
+                if (this._parent != null) {
+                    this._parent._removeComponent(this);
+                }
+                this._isAnchored = false;
+                this._parent = null;
+                return this;
+            };
+            Component.prototype.remove = function () {
+                this.removed = true;
+                this.detach();
+                Plottable.Core.ResizeBroadcaster.deregister(this);
+            };
+            Component.prototype.width = function () {
+                return this._width;
+            };
+            Component.prototype.height = function () {
+                return this._height;
+            };
+            Component.AUTORESIZE_BY_DEFAULT = true;
+            return Component;
+        })(Abstract.PlottableObject);
+        Abstract.Component = Component;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var ComponentContainer = (function (_super) {
+            __extends(ComponentContainer, _super);
+            function ComponentContainer() {
+                _super.apply(this, arguments);
+                this._components = [];
+            }
+            ComponentContainer.prototype._anchor = function (element) {
+                var _this = this;
+                _super.prototype._anchor.call(this, element);
+                this._components.forEach(function (c) { return c._anchor(_this.content); });
+            };
+            ComponentContainer.prototype._render = function () {
+                this._components.forEach(function (c) { return c._render(); });
+            };
+            ComponentContainer.prototype._removeComponent = function (c) {
+                var removeIndex = this._components.indexOf(c);
+                if (removeIndex >= 0) {
+                    this._components.splice(removeIndex, 1);
+                    this._invalidateLayout();
+                }
+            };
+            ComponentContainer.prototype._addComponent = function (c, prepend) {
+                if (prepend === void 0) { prepend = false; }
+                if (c == null || this._components.indexOf(c) >= 0) {
+                    return false;
+                }
+                if (prepend) {
+                    this._components.unshift(c);
+                }
+                else {
+                    this._components.push(c);
+                }
+                c._parent = this;
+                if (this._isAnchored) {
+                    c._anchor(this.content);
+                }
+                this._invalidateLayout();
+                return true;
+            };
+            ComponentContainer.prototype.components = function () {
+                return this._components.slice();
+            };
+            ComponentContainer.prototype.empty = function () {
+                return this._components.length === 0;
+            };
+            ComponentContainer.prototype.detachAll = function () {
+                this._components.slice().forEach(function (c) { return c.detach(); });
+                return this;
+            };
+            ComponentContainer.prototype.remove = function () {
+                _super.prototype.remove.call(this);
+                this._components.slice().forEach(function (c) { return c.remove(); });
+            };
+            return ComponentContainer;
+        })(Abstract.Component);
+        Abstract.ComponentContainer = ComponentContainer;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Component) {
+        var Group = (function (_super) {
+            __extends(Group, _super);
+            function Group(components) {
+                if (components === void 0) { components = []; }
+                _super.call(this);
+                var _this = this;
+                this.classed("component-group", true);
+                components.forEach(function (c) { return _this._addComponent(c); });
+            }
+            Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+                var requests = this._components.map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
+                return {
+                    width: Plottable.Util.Methods.max(requests, function (request) { return request.width; }),
+                    height: Plottable.Util.Methods.max(requests, function (request) { return request.height; }),
+                    wantsWidth: requests.map(function (r) { return r.wantsWidth; }).some(function (x) { return x; }),
+                    wantsHeight: requests.map(function (r) { return r.wantsHeight; }).some(function (x) { return x; })
+                };
+            };
+            Group.prototype.merge = function (c) {
+                this._addComponent(c);
+                return this;
+            };
+            Group.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
+                var _this = this;
+                _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
+                this._components.forEach(function (c) {
+                    c._computeLayout(0, 0, _this.width(), _this.height());
+                });
+                return this;
+            };
+            Group.prototype._isFixedWidth = function () {
+                return this._components.every(function (c) { return c._isFixedWidth(); });
+            };
+            Group.prototype._isFixedHeight = function () {
+                return this._components.every(function (c) { return c._isFixedHeight(); });
+            };
+            return Group;
+        })(Plottable.Abstract.ComponentContainer);
+        Component.Group = Group;
+    })(Plottable.Component || (Plottable.Component = {}));
+    var Component = Plottable.Component;
 })(Plottable || (Plottable = {}));
 
 var __extends = this.__extends || function (d, b) {
@@ -4664,6 +4073,597 @@ var Plottable;
         Component.Gridlines = Gridlines;
     })(Plottable.Component || (Plottable.Component = {}));
     var Component = Plottable.Component;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Component) {
+        ;
+        var Table = (function (_super) {
+            __extends(Table, _super);
+            function Table(rows) {
+                if (rows === void 0) { rows = []; }
+                _super.call(this);
+                var _this = this;
+                this.rowPadding = 0;
+                this.colPadding = 0;
+                this.rows = [];
+                this.rowWeights = [];
+                this.colWeights = [];
+                this.nRows = 0;
+                this.nCols = 0;
+                this.classed("table", true);
+                rows.forEach(function (row, rowIndex) {
+                    row.forEach(function (component, colIndex) {
+                        _this.addComponent(rowIndex, colIndex, component);
+                    });
+                });
+            }
+            Table.prototype.addComponent = function (row, col, component) {
+                if (this._addComponent(component)) {
+                    this.nRows = Math.max(row + 1, this.nRows);
+                    this.nCols = Math.max(col + 1, this.nCols);
+                    this.padTableToSize(this.nRows, this.nCols);
+                    var currentComponent = this.rows[row][col];
+                    if (currentComponent != null) {
+                        throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
+                    }
+                    this.rows[row][col] = component;
+                }
+                return this;
+            };
+            Table.prototype._removeComponent = function (component) {
+                _super.prototype._removeComponent.call(this, component);
+                var rowpos;
+                var colpos;
+                outer: for (var i = 0; i < this.nRows; i++) {
+                    for (var j = 0; j < this.nCols; j++) {
+                        if (this.rows[i][j] === component) {
+                            rowpos = i;
+                            colpos = j;
+                            break outer;
+                        }
+                    }
+                }
+                if (rowpos !== undefined) {
+                    this.rows[rowpos][colpos] = null;
+                }
+            };
+            Table.prototype.iterateLayout = function (availableWidth, availableHeight) {
+                var cols = d3.transpose(this.rows);
+                var availableWidthAfterPadding = availableWidth - this.colPadding * (this.nCols - 1);
+                var availableHeightAfterPadding = availableHeight - this.rowPadding * (this.nRows - 1);
+                var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, function (c) { return (c == null) || c._isFixedHeight(); });
+                var colWeights = Table.calcComponentWeights(this.colWeights, cols, function (c) { return (c == null) || c._isFixedWidth(); });
+                var heuristicColWeights = colWeights.map(function (c) { return c === 0 ? 0.5 : c; });
+                var heuristicRowWeights = rowWeights.map(function (c) { return c === 0 ? 0.5 : c; });
+                var colProportionalSpace = Table.calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding);
+                var rowProportionalSpace = Table.calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
+                var guaranteedWidths = Plottable.Util.Methods.createFilledArray(0, this.nCols);
+                var guaranteedHeights = Plottable.Util.Methods.createFilledArray(0, this.nRows);
+                var freeWidth;
+                var freeHeight;
+                var nIterations = 0;
+                while (true) {
+                    var offeredHeights = Plottable.Util.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
+                    var offeredWidths = Plottable.Util.Methods.addArrays(guaranteedWidths, colProportionalSpace);
+                    var guarantees = this.determineGuarantees(offeredWidths, offeredHeights);
+                    guaranteedWidths = guarantees.guaranteedWidths;
+                    guaranteedHeights = guarantees.guaranteedHeights;
+                    var wantsWidth = guarantees.wantsWidthArr.some(function (x) { return x; });
+                    var wantsHeight = guarantees.wantsHeightArr.some(function (x) { return x; });
+                    var lastFreeWidth = freeWidth;
+                    var lastFreeHeight = freeHeight;
+                    freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
+                    freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
+                    var xWeights;
+                    if (wantsWidth) {
+                        xWeights = guarantees.wantsWidthArr.map(function (x) { return x ? 0.1 : 0; });
+                        xWeights = Plottable.Util.Methods.addArrays(xWeights, colWeights);
+                    }
+                    else {
+                        xWeights = colWeights;
+                    }
+                    var yWeights;
+                    if (wantsHeight) {
+                        yWeights = guarantees.wantsHeightArr.map(function (x) { return x ? 0.1 : 0; });
+                        yWeights = Plottable.Util.Methods.addArrays(yWeights, rowWeights);
+                    }
+                    else {
+                        yWeights = rowWeights;
+                    }
+                    colProportionalSpace = Table.calcProportionalSpace(xWeights, freeWidth);
+                    rowProportionalSpace = Table.calcProportionalSpace(yWeights, freeHeight);
+                    nIterations++;
+                    var canImproveWidthAllocation = freeWidth > 0 && wantsWidth && freeWidth !== lastFreeWidth;
+                    var canImproveHeightAllocation = freeHeight > 0 && wantsHeight && freeHeight !== lastFreeHeight;
+                    if (!(canImproveWidthAllocation || canImproveHeightAllocation)) {
+                        break;
+                    }
+                    if (nIterations > 5) {
+                        break;
+                    }
+                }
+                freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
+                freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
+                colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
+                rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
+                return { colProportionalSpace: colProportionalSpace, rowProportionalSpace: rowProportionalSpace, guaranteedWidths: guarantees.guaranteedWidths, guaranteedHeights: guarantees.guaranteedHeights, wantsWidth: wantsWidth, wantsHeight: wantsHeight };
+            };
+            Table.prototype.determineGuarantees = function (offeredWidths, offeredHeights) {
+                var requestedWidths = Plottable.Util.Methods.createFilledArray(0, this.nCols);
+                var requestedHeights = Plottable.Util.Methods.createFilledArray(0, this.nRows);
+                var layoutWantsWidth = Plottable.Util.Methods.createFilledArray(false, this.nCols);
+                var layoutWantsHeight = Plottable.Util.Methods.createFilledArray(false, this.nRows);
+                this.rows.forEach(function (row, rowIndex) {
+                    row.forEach(function (component, colIndex) {
+                        var spaceRequest;
+                        if (component != null) {
+                            spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
+                        }
+                        else {
+                            spaceRequest = { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
+                        }
+                        var allocatedWidth = Math.min(spaceRequest.width, offeredWidths[colIndex]);
+                        var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
+                        requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], allocatedWidth);
+                        requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
+                        layoutWantsWidth[colIndex] = layoutWantsWidth[colIndex] || spaceRequest.wantsWidth;
+                        layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
+                    });
+                });
+                return { guaranteedWidths: requestedWidths, guaranteedHeights: requestedHeights, wantsWidthArr: layoutWantsWidth, wantsHeightArr: layoutWantsHeight };
+            };
+            Table.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+                var layout = this.iterateLayout(offeredWidth, offeredHeight);
+                return { width: d3.sum(layout.guaranteedWidths), height: d3.sum(layout.guaranteedHeights), wantsWidth: layout.wantsWidth, wantsHeight: layout.wantsHeight };
+            };
+            Table.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                var _this = this;
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                var layout = this.iterateLayout(this.width(), this.height());
+                var sumPair = function (p) { return p[0] + p[1]; };
+                var rowHeights = Plottable.Util.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
+                var colWidths = Plottable.Util.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);
+                var childYOffset = 0;
+                this.rows.forEach(function (row, rowIndex) {
+                    var childXOffset = 0;
+                    row.forEach(function (component, colIndex) {
+                        if (component != null) {
+                            component._computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
+                        }
+                        childXOffset += colWidths[colIndex] + _this.colPadding;
+                    });
+                    childYOffset += rowHeights[rowIndex] + _this.rowPadding;
+                });
+            };
+            Table.prototype.padding = function (rowPadding, colPadding) {
+                this.rowPadding = rowPadding;
+                this.colPadding = colPadding;
+                this._invalidateLayout();
+                return this;
+            };
+            Table.prototype.rowWeight = function (index, weight) {
+                this.rowWeights[index] = weight;
+                this._invalidateLayout();
+                return this;
+            };
+            Table.prototype.colWeight = function (index, weight) {
+                this.colWeights[index] = weight;
+                this._invalidateLayout();
+                return this;
+            };
+            Table.prototype._isFixedWidth = function () {
+                var cols = d3.transpose(this.rows);
+                return Table.fixedSpace(cols, function (c) { return (c == null) || c._isFixedWidth(); });
+            };
+            Table.prototype._isFixedHeight = function () {
+                return Table.fixedSpace(this.rows, function (c) { return (c == null) || c._isFixedHeight(); });
+            };
+            Table.prototype.padTableToSize = function (nRows, nCols) {
+                for (var i = 0; i < nRows; i++) {
+                    if (this.rows[i] === undefined) {
+                        this.rows[i] = [];
+                        this.rowWeights[i] = null;
+                    }
+                    for (var j = 0; j < nCols; j++) {
+                        if (this.rows[i][j] === undefined) {
+                            this.rows[i][j] = null;
+                        }
+                    }
+                }
+                for (j = 0; j < nCols; j++) {
+                    if (this.colWeights[j] === undefined) {
+                        this.colWeights[j] = null;
+                    }
+                }
+            };
+            Table.calcComponentWeights = function (setWeights, componentGroups, fixityAccessor) {
+                return setWeights.map(function (w, i) {
+                    if (w != null) {
+                        return w;
+                    }
+                    var fixities = componentGroups[i].map(fixityAccessor);
+                    var allFixed = fixities.reduce(function (a, b) { return a && b; }, true);
+                    return allFixed ? 0 : 1;
+                });
+            };
+            Table.calcProportionalSpace = function (weights, freeSpace) {
+                var weightSum = d3.sum(weights);
+                if (weightSum === 0) {
+                    return Plottable.Util.Methods.createFilledArray(0, weights.length);
+                }
+                else {
+                    return weights.map(function (w) { return freeSpace * w / weightSum; });
+                }
+            };
+            Table.fixedSpace = function (componentGroup, fixityAccessor) {
+                var all = function (bools) { return bools.reduce(function (a, b) { return a && b; }, true); };
+                var group_isFixed = function (components) { return all(components.map(fixityAccessor)); };
+                return all(componentGroup.map(group_isFixed));
+            };
+            return Table;
+        })(Plottable.Abstract.ComponentContainer);
+        Component.Table = Table;
+    })(Plottable.Component || (Plottable.Component = {}));
+    var Component = Plottable.Component;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var Plot = (function (_super) {
+            __extends(Plot, _super);
+            function Plot(dataset) {
+                _super.call(this);
+                this._dataChanged = false;
+                this._animate = false;
+                this._animators = {};
+                this._ANIMATION_DURATION = 250;
+                this._projectors = {};
+                this.animateOnNextRender = true;
+                this.clipPathEnabled = true;
+                this.classed("plot", true);
+                var dataSource;
+                if (dataset != null) {
+                    if (typeof dataset.data === "function") {
+                        dataSource = dataset;
+                    }
+                    else {
+                        dataSource = dataSource = new Plottable.DataSource(dataset);
+                    }
+                }
+                else {
+                    dataSource = new Plottable.DataSource();
+                }
+                this.dataSource(dataSource);
+            }
+            Plot.prototype._anchor = function (element) {
+                _super.prototype._anchor.call(this, element);
+                this.animateOnNextRender = true;
+                this._dataChanged = true;
+                this._updateAllProjectors();
+            };
+            Plot.prototype.remove = function () {
+                var _this = this;
+                _super.prototype.remove.call(this);
+                this._dataSource.broadcaster.deregisterListener(this);
+                var properties = Object.keys(this._projectors);
+                properties.forEach(function (property) {
+                    var projector = _this._projectors[property];
+                    if (projector.scale != null) {
+                        projector.scale.broadcaster.deregisterListener(_this);
+                    }
+                });
+            };
+            Plot.prototype.dataSource = function (source) {
+                var _this = this;
+                if (source == null) {
+                    return this._dataSource;
+                }
+                var oldSource = this._dataSource;
+                if (oldSource != null) {
+                    this._dataSource.broadcaster.deregisterListener(this);
+                }
+                this._dataSource = source;
+                this._dataSource.broadcaster.registerListener(this, function () { return _this._onDataSourceUpdate(); });
+                this._onDataSourceUpdate();
+                return this;
+            };
+            Plot.prototype._onDataSourceUpdate = function () {
+                this._updateAllProjectors();
+                this.animateOnNextRender = true;
+                this._dataChanged = true;
+                this._render();
+            };
+            Plot.prototype.project = function (attrToSet, accessor, scale) {
+                var _this = this;
+                attrToSet = attrToSet.toLowerCase();
+                var currentProjection = this._projectors[attrToSet];
+                var existingScale = (currentProjection != null) ? currentProjection.scale : null;
+                if (existingScale != null) {
+                    existingScale.removeExtent(this._plottableID.toString(), attrToSet);
+                    existingScale.broadcaster.deregisterListener(this);
+                }
+                if (scale != null) {
+                    scale.broadcaster.registerListener(this, function () { return _this._render(); });
+                }
+                var activatedAccessor = Plottable.Util.Methods._applyAccessor(accessor, this);
+                this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
+                this._updateProjector(attrToSet);
+                this._render();
+                return this;
+            };
+            Plot.prototype._generateAttrToProjector = function () {
+                var _this = this;
+                var h = {};
+                d3.keys(this._projectors).forEach(function (a) {
+                    var projector = _this._projectors[a];
+                    var accessor = projector.accessor;
+                    var scale = projector.scale;
+                    var fn = scale == null ? accessor : function (d, i) { return scale.scale(accessor(d, i)); };
+                    h[a] = fn;
+                });
+                return h;
+            };
+            Plot.prototype._doRender = function () {
+                if (this._isAnchored) {
+                    this._paint();
+                    this._dataChanged = false;
+                    this.animateOnNextRender = false;
+                }
+            };
+            Plot.prototype._paint = function () {
+            };
+            Plot.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this.renderArea = this.content.append("g").classed("render-area", true);
+            };
+            Plot.prototype.animate = function (enabled) {
+                this._animate = enabled;
+                return this;
+            };
+            Plot.prototype.detach = function () {
+                _super.prototype.detach.call(this);
+                this._updateAllProjectors();
+                return this;
+            };
+            Plot.prototype._updateAllProjectors = function () {
+                var _this = this;
+                d3.keys(this._projectors).forEach(function (attr) { return _this._updateProjector(attr); });
+            };
+            Plot.prototype._updateProjector = function (attr) {
+                var projector = this._projectors[attr];
+                if (projector.scale != null) {
+                    var extent = this.dataSource()._getExtent(projector.accessor);
+                    if (extent.length === 0 || !this._isAnchored) {
+                        projector.scale.removeExtent(this._plottableID.toString(), attr);
+                    }
+                    else {
+                        projector.scale.updateExtent(this._plottableID.toString(), attr, extent);
+                    }
+                }
+            };
+            Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
+                if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
+                    return this._animators[animatorKey].animate(selection, attrToProjector);
+                }
+                else {
+                    return selection.attr(attrToProjector);
+                }
+            };
+            Plot.prototype.animator = function (animatorKey, animator) {
+                if (animator === undefined) {
+                    return this._animators[animatorKey];
+                }
+                else {
+                    this._animators[animatorKey] = animator;
+                    return this;
+                }
+            };
+            return Plot;
+        })(Abstract.Component);
+        Abstract.Plot = Plot;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var XYPlot = (function (_super) {
+            __extends(XYPlot, _super);
+            function XYPlot(dataset, xScale, yScale) {
+                _super.call(this, dataset);
+                if (xScale == null || yScale == null) {
+                    throw new Error("XYPlots require an xScale and yScale");
+                }
+                this.classed("xy-plot", true);
+                this.project("x", "x", xScale);
+                this.project("y", "y", yScale);
+            }
+            XYPlot.prototype.project = function (attrToSet, accessor, scale) {
+                if (attrToSet === "x" && scale != null) {
+                    this.xScale = scale;
+                    this._updateXDomainer();
+                }
+                if (attrToSet === "y" && scale != null) {
+                    this.yScale = scale;
+                    this._updateYDomainer();
+                }
+                _super.prototype.project.call(this, attrToSet, accessor, scale);
+                return this;
+            };
+            XYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                this.xScale.range([0, this.width()]);
+                this.yScale.range([this.height(), 0]);
+            };
+            XYPlot.prototype._updateXDomainer = function () {
+                if (this.xScale instanceof Abstract.QuantitativeScale) {
+                    var scale = this.xScale;
+                    if (!scale._userSetDomainer) {
+                        scale.domainer().pad().nice();
+                    }
+                }
+            };
+            XYPlot.prototype._updateYDomainer = function () {
+                if (this.yScale instanceof Abstract.QuantitativeScale) {
+                    var scale = this.yScale;
+                    if (!scale._userSetDomainer) {
+                        scale.domainer().pad().nice();
+                    }
+                }
+            };
+            return XYPlot;
+        })(Abstract.Plot);
+        Abstract.XYPlot = XYPlot;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var NewStylePlot = (function (_super) {
+            __extends(NewStylePlot, _super);
+            function NewStylePlot(xScale, yScale) {
+                this._key2DatasetDrawerKey = d3.map();
+                this._datasetKeysInOrder = [];
+                this.nextSeriesIndex = 0;
+                _super.call(this, new Plottable.DataSource(), xScale, yScale);
+            }
+            NewStylePlot.prototype._setup = function () {
+                var _this = this;
+                _super.prototype._setup.call(this);
+                this._getDrawersInOrder().forEach(function (d) { return d.renderArea = _this.renderArea.append("g"); });
+            };
+            NewStylePlot.prototype.remove = function () {
+                var _this = this;
+                _super.prototype.remove.call(this);
+                this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
+            };
+            NewStylePlot.prototype.addDataset = function (keyOrDataset, dataset) {
+                if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
+                    throw new Error("invalid input to addDataset");
+                }
+                if (typeof (keyOrDataset) === "string" && keyOrDataset[0] === "_") {
+                    Plottable.Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
+                }
+                var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
+                var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
+                var dataset = (data instanceof Plottable.DataSource) ? data : new Plottable.DataSource(data);
+                this._addDataset(key, dataset);
+                return this;
+            };
+            NewStylePlot.prototype._addDataset = function (key, dataset) {
+                var _this = this;
+                if (this._key2DatasetDrawerKey.has(key)) {
+                    this.removeDataset(key);
+                }
+                ;
+                var drawer = this._getDrawer(key);
+                var ddk = { drawer: drawer, dataset: dataset, key: key };
+                this._datasetKeysInOrder.push(key);
+                this._key2DatasetDrawerKey.set(key, ddk);
+                if (this._isSetup) {
+                    drawer.renderArea = this.renderArea.append("g");
+                }
+                dataset.broadcaster.registerListener(this, function () { return _this._onDataSourceUpdate(); });
+                this._onDataSourceUpdate();
+            };
+            NewStylePlot.prototype._getDrawer = function (key) {
+                throw new Error("Abstract Method Not Implemented");
+            };
+            NewStylePlot.prototype._updateProjector = function (attr) {
+                var _this = this;
+                var projector = this._projectors[attr];
+                if (projector.scale != null) {
+                    this._key2DatasetDrawerKey.forEach(function (key, ddk) {
+                        var extent = ddk.dataset._getExtent(projector.accessor);
+                        var scaleKey = _this._plottableID.toString() + "_" + key;
+                        if (extent.length === 0 || !_this._isAnchored) {
+                            projector.scale.removeExtent(scaleKey, attr);
+                        }
+                        else {
+                            projector.scale.updateExtent(scaleKey, attr, extent);
+                        }
+                    });
+                }
+            };
+            NewStylePlot.prototype.datasetOrder = function (order) {
+                if (order === undefined) {
+                    return this._datasetKeysInOrder;
+                }
+                function isPermutation(l1, l2) {
+                    var intersection = Plottable.Util.Methods.intersection(d3.set(l1), d3.set(l2));
+                    var size = intersection.size();
+                    return size === l1.length && size === l2.length;
+                }
+                if (isPermutation(order, this._datasetKeysInOrder)) {
+                    this._datasetKeysInOrder = order;
+                    this._onDataSourceUpdate();
+                }
+                else {
+                    Plottable.Util.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
+                }
+                return this;
+            };
+            NewStylePlot.prototype.removeDataset = function (key) {
+                if (this._key2DatasetDrawerKey.has(key)) {
+                    var ddk = this._key2DatasetDrawerKey.get(key);
+                    ddk.drawer.remove();
+                    var projectors = d3.values(this._projectors);
+                    var scaleKey = this._plottableID.toString() + "_" + key;
+                    projectors.forEach(function (p) {
+                        if (p.scale != null) {
+                            p.scale.removeExtent(scaleKey, p.attribute);
+                        }
+                    });
+                    ddk.dataset.broadcaster.deregisterListener(this);
+                    this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
+                    this._key2DatasetDrawerKey.remove(key);
+                    this._onDataSourceUpdate();
+                }
+                return this;
+            };
+            NewStylePlot.prototype._getDatasetsInOrder = function () {
+                var _this = this;
+                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).dataset; });
+            };
+            NewStylePlot.prototype._getDrawersInOrder = function () {
+                var _this = this;
+                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).drawer; });
+            };
+            return NewStylePlot;
+        })(Abstract.XYPlot);
+        Abstract.NewStylePlot = NewStylePlot;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
 })(Plottable || (Plottable = {}));
 
 var __extends = this.__extends || function (d, b) {

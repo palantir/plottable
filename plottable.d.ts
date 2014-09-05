@@ -226,154 +226,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Abstract {
-        class Component extends PlottableObject {
-            static AUTORESIZE_BY_DEFAULT: boolean;
-            element: D3.Selection;
-            content: D3.Selection;
-            backgroundContainer: D3.Selection;
-            foregroundContainer: D3.Selection;
-            clipPathEnabled: boolean;
-            xOrigin: number;
-            yOrigin: number;
-            renderTo(element: any): Component;
-            resize(width?: number, height?: number): Component;
-            autoResize(flag: boolean): Component;
-            xAlign(alignment: string): Component;
-            yAlign(alignment: string): Component;
-            xOffset(offset: number): Component;
-            yOffset(offset: number): Component;
-            registerInteraction(interaction: Interaction): Component;
-            classed(cssClass: string): boolean;
-            classed(cssClass: string, addClass: boolean): Component;
-            merge(c: Component): Plottable.Component.Group;
-            detach(): Component;
-            remove(): void;
-            width(): number;
-            height(): number;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
-        class ComponentContainer extends Component {
-            components(): Component[];
-            empty(): boolean;
-            detachAll(): ComponentContainer;
-            remove(): void;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Component {
-        class Group extends Plottable.Abstract.ComponentContainer {
-            constructor(components?: Plottable.Abstract.Component[]);
-            merge(c: Plottable.Abstract.Component): Group;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Component {
-        interface IterateLayoutResult {
-            colProportionalSpace: number[];
-            rowProportionalSpace: number[];
-            guaranteedWidths: number[];
-            guaranteedHeights: number[];
-            wantsWidth: boolean;
-            wantsHeight: boolean;
-        }
-        class Table extends Plottable.Abstract.ComponentContainer {
-            constructor(rows?: Plottable.Abstract.Component[][]);
-            addComponent(row: number, col: number, component: Plottable.Abstract.Component): Table;
-            padding(rowPadding: number, colPadding: number): Table;
-            rowWeight(index: number, weight: number): Table;
-            colWeight(index: number, weight: number): Table;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
-        class Scale extends PlottableObject implements Plottable.Core.IListenable {
-            broadcaster: any;
-            constructor(scale: D3.Scale.Scale);
-            autoDomain(): Scale;
-            scale(value: any): any;
-            domain(): any[];
-            domain(values: any[]): Scale;
-            range(): any[];
-            range(values: any[]): Scale;
-            copy(): Scale;
-            updateExtent(plotProvidedKey: string, attr: string, extent: any[]): Scale;
-            removeExtent(plotProvidedKey: string, attr: string): Scale;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
-        class Plot extends Component {
-            renderArea: D3.Selection;
-            element: D3.Selection;
-            constructor();
-            constructor(dataset: any[]);
-            constructor(dataset: DataSource);
-            remove(): void;
-            dataSource(): DataSource;
-            dataSource(source: DataSource): Plot;
-            project(attrToSet: string, accessor: any, scale?: Scale): Plot;
-            animate(enabled: boolean): Plot;
-            detach(): Plot;
-            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
-            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
-        class XYPlot extends Plot {
-            xScale: Scale;
-            yScale: Scale;
-            constructor(dataset: any, xScale: Scale, yScale: Scale);
-            project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
-        }
-    }
-}
-
-
-declare module Plottable {
-    interface DatasetDrawerKey {
-        dataset: DataSource;
-        drawer: Plottable.Abstract._Drawer;
-        key: string;
-    }
-    module Abstract {
-        class NewStylePlot extends XYPlot {
-            constructor(xScale?: Scale, yScale?: Scale);
-            remove(): void;
-            addDataset(key: string, dataset: DataSource): NewStylePlot;
-            addDataset(key: string, dataset: any[]): NewStylePlot;
-            addDataset(dataset: DataSource): NewStylePlot;
-            addDataset(dataset: any[]): NewStylePlot;
-            datasetOrder(): string[];
-            datasetOrder(order: string[]): NewStylePlot;
-            removeDataset(key: string): NewStylePlot;
-        }
-    }
-}
-
-
-declare module Plottable {
     module Core {
         module RenderController {
             module RenderPolicy {
@@ -490,6 +342,25 @@ declare module Plottable {
         addIncludedValue(value: any, key?: string): Domainer;
         removeIncludedValue(valueOrKey: any): Domainer;
         nice(count?: number): Domainer;
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class Scale extends PlottableObject implements Plottable.Core.IListenable {
+            broadcaster: any;
+            constructor(scale: D3.Scale.Scale);
+            autoDomain(): Scale;
+            scale(value: any): any;
+            domain(): any[];
+            domain(values: any[]): Scale;
+            range(): any[];
+            range(values: any[]): Scale;
+            copy(): Scale;
+            updateExtent(plotProvidedKey: string, attr: string, extent: any[]): Scale;
+            removeExtent(plotProvidedKey: string, attr: string): Scale;
+        }
     }
 }
 
@@ -652,6 +523,59 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
+        class Component extends PlottableObject {
+            static AUTORESIZE_BY_DEFAULT: boolean;
+            element: D3.Selection;
+            content: D3.Selection;
+            backgroundContainer: D3.Selection;
+            foregroundContainer: D3.Selection;
+            clipPathEnabled: boolean;
+            xOrigin: number;
+            yOrigin: number;
+            renderTo(element: any): Component;
+            resize(width?: number, height?: number): Component;
+            autoResize(flag: boolean): Component;
+            xAlign(alignment: string): Component;
+            yAlign(alignment: string): Component;
+            xOffset(offset: number): Component;
+            yOffset(offset: number): Component;
+            registerInteraction(interaction: Interaction): Component;
+            classed(cssClass: string): boolean;
+            classed(cssClass: string, addClass: boolean): Component;
+            merge(c: Component): Plottable.Component.Group;
+            detach(): Component;
+            remove(): void;
+            width(): number;
+            height(): number;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class ComponentContainer extends Component {
+            components(): Component[];
+            empty(): boolean;
+            detachAll(): ComponentContainer;
+            remove(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        class Group extends Plottable.Abstract.ComponentContainer {
+            constructor(components?: Plottable.Abstract.Component[]);
+            merge(c: Plottable.Abstract.Component): Group;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
         class Axis extends Component {
             static END_TICK_MARK_CLASS: string;
             static TICK_MARK_CLASS: string;
@@ -778,6 +702,82 @@ declare module Plottable {
         class Gridlines extends Plottable.Abstract.Component {
             constructor(xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.QuantitativeScale);
             remove(): Gridlines;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        interface IterateLayoutResult {
+            colProportionalSpace: number[];
+            rowProportionalSpace: number[];
+            guaranteedWidths: number[];
+            guaranteedHeights: number[];
+            wantsWidth: boolean;
+            wantsHeight: boolean;
+        }
+        class Table extends Plottable.Abstract.ComponentContainer {
+            constructor(rows?: Plottable.Abstract.Component[][]);
+            addComponent(row: number, col: number, component: Plottable.Abstract.Component): Table;
+            padding(rowPadding: number, colPadding: number): Table;
+            rowWeight(index: number, weight: number): Table;
+            colWeight(index: number, weight: number): Table;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class Plot extends Component {
+            renderArea: D3.Selection;
+            element: D3.Selection;
+            constructor();
+            constructor(dataset: any[]);
+            constructor(dataset: DataSource);
+            remove(): void;
+            dataSource(): DataSource;
+            dataSource(source: DataSource): Plot;
+            project(attrToSet: string, accessor: any, scale?: Scale): Plot;
+            animate(enabled: boolean): Plot;
+            detach(): Plot;
+            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
+            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class XYPlot extends Plot {
+            xScale: Scale;
+            yScale: Scale;
+            constructor(dataset: any, xScale: Scale, yScale: Scale);
+            project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
+        }
+    }
+}
+
+
+declare module Plottable {
+    interface DatasetDrawerKey {
+        dataset: DataSource;
+        drawer: Plottable.Abstract._Drawer;
+        key: string;
+    }
+    module Abstract {
+        class NewStylePlot extends XYPlot {
+            constructor(xScale?: Scale, yScale?: Scale);
+            remove(): void;
+            addDataset(key: string, dataset: DataSource): NewStylePlot;
+            addDataset(key: string, dataset: any[]): NewStylePlot;
+            addDataset(dataset: DataSource): NewStylePlot;
+            addDataset(dataset: any[]): NewStylePlot;
+            datasetOrder(): string[];
+            datasetOrder(order: string[]): NewStylePlot;
+            removeDataset(key: string): NewStylePlot;
         }
     }
 }
