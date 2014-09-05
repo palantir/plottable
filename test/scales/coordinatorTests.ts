@@ -8,7 +8,7 @@ describe("Coordinators", () => {
       var s1 = new Plottable.Scale.Linear();
       var s2 = new Plottable.Scale.Linear();
       var s3 = new Plottable.Scale.Linear();
-      var dc = new Plottable.Util.ScaleDomainCoordinator([s1, s2, s3]);
+      var dc = new Plottable._Util.ScaleDomainCoordinator([s1, s2, s3]);
       s1.domain([0, 100]);
       assert.deepEqual(s1.domain(), [0, 100]);
       assert.deepEqual(s1.domain(), s2.domain());

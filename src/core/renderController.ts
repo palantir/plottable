@@ -12,6 +12,14 @@ export module Core {
    *
    * If you require immediate rendering, call RenderController.flush() to
    * perform enqueued layout and rendering serially.
+   *
+   * If you want to always have immediate rendering (useful for debugging),
+   * call
+   * ```typescript
+   * Plottable.Core.RenderController.setRenderPolicy(
+   *   new Plottable.Core.RenderController.RenderPolicy.Immediate()
+   * );
+   * ```
    */
   export module RenderController {
     var _componentsNeedingRender: {[key: string]: Abstract.Component} = {};
@@ -32,7 +40,7 @@ export module Core {
      */
     export function registerToRender(c: Abstract.Component) {
       if (_isCurrentlyFlushing) {
-        Util.Methods.warn("Registered to render while other components are flushing: request may be ignored");
+        _Util.Methods.warn("Registered to render while other components are flushing: request may be ignored");
       }
       _componentsNeedingRender[c._plottableID] = c;
       requestRender();
@@ -58,6 +66,12 @@ export module Core {
       }
     }
 
+    /**
+     * Render everything that is waiting to be rendered right now, instead of
+     * waiting until the next frame.
+     *
+     * Useful to call when debugging.
+     */
     export function flush() {
       if (_animationRequested) {
         // Layout

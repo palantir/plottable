@@ -30,9 +30,9 @@ export module Interaction {
     }
 
     /**
-     * Sets an callback to be called when a click is received.
+     * Sets a callback to be called when a click is received.
      *
-     * @param {(x: number, y: number) => any} cb: Callback to be called. Takes click x and y in pixels.
+     * @param {(x: number, y: number) => any} cb Callback to be called. Takes click x and y in pixels.
      */
     public callback(cb: (x: number, y: number) => any): Click {
       this._callback = cb;

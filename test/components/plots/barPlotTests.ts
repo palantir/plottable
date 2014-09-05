@@ -10,7 +10,7 @@ describe("Plots", () => {
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scale.Ordinal;
       var yScale: Plottable.Scale.Linear;
-      var renderer: Plottable.Plot.VerticalBar;
+      var renderer: Plottable.Plot.VerticalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
@@ -37,7 +37,7 @@ describe("Plots", () => {
       });
 
       it("renders correctly", () => {
-        var renderArea = renderer.renderArea;
+        var renderArea = renderer._renderArea;
         var bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
         var bar0 = d3.select(bars[0][0]);
@@ -62,7 +62,7 @@ describe("Plots", () => {
       it("baseline value can be changed; renderer updates appropriately", () => {
         renderer.baseline(-1);
 
-        var renderArea = renderer.renderArea;
+        var renderArea = renderer._renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
@@ -81,7 +81,7 @@ describe("Plots", () => {
 
       it("bar alignment can be changed; renderer updates appropriately", () => {
         renderer.barAlignment("center");
-        var renderArea = renderer.renderArea;
+        var renderArea = renderer._renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
@@ -91,7 +91,7 @@ describe("Plots", () => {
         assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
 
         renderer.barAlignment("right");
-        renderArea = renderer.renderArea;
+        renderArea = renderer._renderArea;
         bars = renderArea.selectAll("rect");
         bar0 = d3.select(bars[0][0]);
         bar1 = d3.select(bars[0][1]);
@@ -175,7 +175,7 @@ describe("Plots", () => {
       var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
       var xScale: Plottable.Scale.Linear;
-      var renderer: Plottable.Plot.HorizontalBar;
+      var renderer: Plottable.Plot.HorizontalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       before(() => {
@@ -202,7 +202,7 @@ describe("Plots", () => {
       });
 
       it("renders correctly", () => {
-        var renderArea = renderer.renderArea;
+        var renderArea = renderer._renderArea;
         var bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
         var bar0 = d3.select(bars[0][0]);
@@ -227,7 +227,7 @@ describe("Plots", () => {
       it("baseline value can be changed; renderer updates appropriately", () => {
         renderer.baseline(-1);
 
-        var renderArea = renderer.renderArea;
+        var renderArea = renderer._renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
@@ -246,7 +246,7 @@ describe("Plots", () => {
 
       it("bar alignment can be changed; renderer updates appropriately", () => {
         renderer.barAlignment("center");
-        var renderArea = renderer.renderArea;
+        var renderArea = renderer._renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
@@ -256,7 +256,7 @@ describe("Plots", () => {
         assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
 
         renderer.barAlignment("bottom");
-        renderArea = renderer.renderArea;
+        renderArea = renderer._renderArea;
         bars = renderArea.selectAll("rect");
         bar0 = d3.select(bars[0][0]);
         bar1 = d3.select(bars[0][1]);
@@ -281,7 +281,7 @@ describe("Plots", () => {
       var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
       var xScale: Plottable.Scale.Linear;
-      var renderer: Plottable.Plot.HorizontalBar;
+      var renderer: Plottable.Plot.HorizontalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       var axisWidth = 0;
@@ -317,7 +317,7 @@ describe("Plots", () => {
       });
 
       it("renders correctly", () => {
-        var bars = renderer.renderArea.selectAll("rect");
+        var bars = renderer._renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
         var bar0y = bar0.data()[0].y;
@@ -333,7 +333,7 @@ describe("Plots", () => {
       });
 
       it("width projector may be overwritten, and calling project queues rerender", () => {
-        var bars = renderer.renderArea.selectAll("rect");
+        var bars = renderer._renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
         var bar0y = bar0.data()[0].y;

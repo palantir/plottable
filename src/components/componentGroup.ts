@@ -5,10 +5,14 @@ export module Component {
   export class Group extends Abstract.ComponentContainer {
 
     /**
-     * Creates a ComponentGroup.
+     * Constructs a GroupComponent.
+     *
+     * A GroupComponent is a set of Components that will be rendered on top of
+     * each other. When you call Component.merge(Component), it creates and
+     * returns a GroupComponent.
      *
      * @constructor
-     * @param {Component[]} [components] The Components in the Group.
+     * @param {Component[]} components The Components in the Group (default = []).
      */
     constructor(components: Abstract.Component[] = []){
       super();
@@ -16,13 +20,13 @@ export module Component {
       components.forEach((c: Abstract.Component) => this._addComponent(c));
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
       var requests = this._components.map((c: Abstract.Component) => c._requestedSpace(offeredWidth, offeredHeight));
       return {
-        width : Util.Methods.max(requests, (request: ISpaceRequest) => request.width ),
-        height: Util.Methods.max(requests, (request: ISpaceRequest) => request.height),
-        wantsWidth : requests.map((r: ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
-        wantsHeight: requests.map((r: ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
+        width : _Util.Methods.max(requests, (request: _ISpaceRequest) => request.width ),
+        height: _Util.Methods.max(requests, (request: _ISpaceRequest) => request.height),
+        wantsWidth : requests.map((r: _ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
+        wantsHeight: requests.map((r: _ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
       };
     }
 

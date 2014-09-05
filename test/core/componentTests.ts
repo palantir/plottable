@@ -5,7 +5,7 @@ var assert = chai.assert;
 
 function assertComponentXY(component: Plottable.Abstract.Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables
-  var translate = d3.transform(component.element.attr("transform")).translate;
+  var translate = d3.transform(component._element.attr("transform")).translate;
   var xActual = translate[0];
   var yActual = translate[1];
   assert.equal(xActual, x, "X: " + message);
@@ -25,7 +25,7 @@ describe("Component behavior", () => {
   describe("anchor", () => {
     it("anchoring works as expected", () => {
       c._anchor(svg);
-      assert.equal(c.element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
+      assert.equal(c._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
       assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
       svg.remove();
     });
@@ -35,7 +35,7 @@ describe("Component behavior", () => {
 
       var svg2 = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c._anchor(svg2);
-      assert.equal(c.element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
+      assert.equal(c._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
       assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
 
       svg.remove();
@@ -121,7 +121,7 @@ describe("Component behavior", () => {
       var height = 200;
       c._anchor(svg);
       c._computeLayout(xOff, yOff, width, height);
-      var translate = getTranslate(c.element);
+      var translate = getTranslate(c._element);
       assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
       assert.equal(c.width() , width, "the width set properly");
       assert.equal(c.height(), height, "the height set propery");
@@ -131,7 +131,7 @@ describe("Component behavior", () => {
 
   it("subelement containers are ordered properly", () => {
     c.renderTo(svg);
-    var gs = c.element.selectAll("g");
+    var gs = c._element.selectAll("g");
     var g0 = d3.select(gs[0][0]);
     var g1 = d3.select(gs[0][1]);
     var g2 = d3.select(gs[0][2]);
@@ -209,7 +209,7 @@ it("components can be offset relative to their alignment, and throw errors if th
     var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID+ ")";
     // IE 9 has clipPath like 'url("#clipPath")', must accomodate
     var normalizeClipPath = (s: string) => s.replace(/"/g, "");
-    assert.isTrue(normalizeClipPath(c.element.attr("clip-path")) === expectedClipPathURL,
+    assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL,
                   "the element has clip-path url attached");
     var clipRect = (<any> c).boxContainer.select(".clip-rect");
     assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
@@ -230,14 +230,14 @@ it("components can be offset relative to their alignment, and throw errors if th
     assert.throws(() => (<any> c).addBox("pre-anchor"), Error, "Adding boxes before anchoring is currently disallowed");
     c.renderTo(svg);
     (<any> c).addBox("post-anchor");
-    var e = c.element;
+    var e = c._element;
     var boxContainer = e.select(".box-container");
     var boxStrings = [".bounding-box", ".post-anchor"];
 
     boxStrings.forEach((s) => {
       var box = boxContainer.select(s);
       assert.isNotNull(box.node(), s + " box was created and placed inside boxContainer");
-      var bb = Plottable.Util.DOM.getBBox(box);
+      var bb = Plottable._Util.DOM.getBBox(box);
       assert.equal(bb.width, SVG_WIDTH, s + " width as expected");
       assert.equal(bb.height, SVG_HEIGHT, s + " height as expected");
     });

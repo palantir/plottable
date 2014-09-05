@@ -10,7 +10,7 @@ describe("Plots", () => {
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Ordinal;
     var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.StackedBar;
+    var renderer: Plottable.Plot.StackedBar<string, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var axisHeight = 0;
@@ -57,7 +57,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = renderer.renderArea.selectAll("rect");
+      var bars = renderer._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -96,7 +96,7 @@ describe("Plots", () => {
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Linear;
     var yScale: Plottable.Scale.Ordinal;
-    var renderer: Plottable.Plot.StackedBar;
+    var renderer: Plottable.Plot.StackedBar<number, string>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var rendererWidth: number;
@@ -143,7 +143,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = renderer.renderArea.selectAll("rect");
+      var bars = renderer._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);

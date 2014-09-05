@@ -2,14 +2,24 @@
 
 module Plottable {
 export module Plot {
-  export class ClusteredBar extends Abstract.NewStyleBarPlot {
-    public static DEFAULT_WIDTH = 10;
+  export class ClusteredBar<X,Y> extends Abstract.NewStyleBarPlot<X,Y> {
     private innerScale: Scale.Ordinal;
 
-    constructor(xScale: Abstract.Scale<any, number>, yScale: Abstract.Scale<any, number>, isVertical = true) {
+    /**
+     * Creates a ClusteredBarPlot.
+     *
+     * A ClusteredBarPlot is a plot that plots several bar plots next to each
+     * other. For example, when plotting life expectancy across each country,
+     * you would want each country to have a "male" and "female" bar.
+     *
+     * @constructor
+     * @param {Scale} xScale The x scale to use.
+     * @param {Scale} yScale The y scale to use.
+     */
+    constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>, isVertical = true) {
+      this._isVertical = isVertical; // Has to be set before super()
       super(xScale, yScale);
       this.innerScale = new Scale.Ordinal();
-      this._isVertical = isVertical;
     }
 
     public _generateAttrToProjector() {
@@ -30,11 +40,11 @@ export module Plot {
       return attrToProjector;
     }
 
-    private cluster(accessor: IAccessor) {
+    private cluster(accessor: _IAccessor) {
       this.innerScale.domain(this._datasetKeysInOrder);
       var lengths = this._getDatasetsInOrder().map((d) => d.data().length);
-      if (Util.Methods.uniq(lengths).length > 1) {
-        Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
+      if (_Util.Methods.uniq(lengths).length > 1) {
+        _Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
       }
       var clusters: {[key: string]: any[]} = {};
       this._datasetKeysInOrder.forEach((key: string) => {
@@ -42,7 +52,7 @@ export module Plot {
 
         clusters[key] = data.map((d, i) => {
           var val = accessor(d, i);
-          var primaryScale = this._isVertical ? this.xScale : this.yScale;
+          var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._xScale : this._yScale;
           d["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + this.innerScale.scale(key);
           return d;
         });

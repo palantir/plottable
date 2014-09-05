@@ -48,7 +48,7 @@ describe("Interactions", () => {
       var interaction = new Plottable.Interaction.PanZoom(renderer, xScale, yScale);
       interaction.registerWithComponent();
 
-      var hb = renderer.element.select(".hit-box").node();
+      var hb = renderer._element.select(".hit-box").node();
       var dragDistancePixelX = 10;
       var dragDistancePixelY = 20;
       $(hb).simulate("drag", {
@@ -85,7 +85,7 @@ describe("Interactions", () => {
     var dataset: Plottable.Dataset;
     var xScale: Plottable.Abstract.QuantitativeScale<number>;
     var yScale: Plottable.Abstract.QuantitativeScale<number>;
-    var renderer: Plottable.Abstract.XYPlot;
+    var renderer: Plottable.Abstract.XYPlot<number,number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
     var dragstartX = 20;
@@ -141,7 +141,7 @@ describe("Interactions", () => {
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox).CLASS_DRAG_BOX;
-      var dragBox = renderer.backgroundContainer.select(dragBoxClass);
+      var dragBox = renderer._backgroundContainer.select(dragBoxClass);
       assert.isNotNull(dragBox, "the dragbox was created");
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};
       var expectedStartPosition = {x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY)};
@@ -166,7 +166,7 @@ describe("Interactions", () => {
     var dataset: Plottable.Dataset;
     var xScale: Plottable.Abstract.QuantitativeScale<number>;
     var yScale: Plottable.Abstract.QuantitativeScale<number>;
-    var renderer: Plottable.Abstract.XYPlot;
+    var renderer: Plottable.Abstract.XYPlot<number,number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
     var dragstartX = 20;
@@ -216,7 +216,7 @@ describe("Interactions", () => {
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox).CLASS_DRAG_BOX;
-      var dragBox = renderer.backgroundContainer.select(dragBoxClass);
+      var dragBox = renderer._backgroundContainer.select(dragBoxClass);
       assert.isNotNull(dragBox, "the dragbox was created");
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};
       var expectedStartPosition = {x: 0, y: Math.min(dragstartY, dragendY)};
@@ -319,7 +319,7 @@ describe("Interactions", () => {
       barPlot.renderTo(svg);
       bhi.registerWithComponent();
 
-      var hitbox = barPlot.element.select(".hit-box");
+      var hitbox = barPlot._element.select(".hit-box");
 
       triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
       assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
@@ -373,7 +373,7 @@ describe("Interactions", () => {
       barPlot.renderTo(svg);
       bhi.registerWithComponent();
 
-      var hitbox = barPlot.element.select(".hit-box");
+      var hitbox = barPlot._element.select(".hit-box");
 
       triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
       assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
