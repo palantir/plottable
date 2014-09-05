@@ -2,7 +2,8 @@
 
 module Plottable {
 export module Abstract {
-  export class Stacked extends Abstract.NewStylePlot {
+  export class Stacked<X> extends Abstract.NewStylePlot<X, number> {
+    public yScale: Abstract.QuantitativeScale<number>;
 
     private stackedExtent = [0, 0];
 

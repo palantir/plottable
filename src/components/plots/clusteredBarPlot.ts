@@ -2,8 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class ClusteredBar extends Abstract.NewStyleBarPlot {
-
+  export class ClusteredBar<X,Y> extends Abstract.NewStyleBarPlot<X,Y> {
     private innerScale: Scale.Ordinal;
 
     /**
@@ -53,7 +52,7 @@ export module Plot {
 
         clusters[key] = data.map((d, i) => {
           var val = accessor(d, i);
-          var primaryScale = this._isVertical ? this._xScale : this._yScale;
+          var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._xScale : this._yScale;
           d["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + this.innerScale.scale(key);
           return d;
         });

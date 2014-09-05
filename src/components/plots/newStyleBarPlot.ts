@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Abstract {
-  export class NewStyleBarPlot extends NewStylePlot {
+  export class NewStyleBarPlot<X,Y> extends NewStylePlot<X,Y> {
     public static _barAlignmentToFactor: {[alignment: string]: number} = {};
     private static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
@@ -10,7 +10,7 @@ export module Abstract {
     public _barAlignmentFactor = 0;
     public _isVertical: boolean;
 
-    public _animators: IPlotAnimatorMap = {
+    public _animators: Animator.IPlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
       "bars"       : new Animator.IterativeDelay(),
       "baseline"   : new Animator.Null()
@@ -23,7 +23,7 @@ export module Abstract {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.Scale<any, number>, yScale: Abstract.Scale<any, number>) {
+    constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
@@ -43,7 +43,7 @@ export module Abstract {
     public _paint() {
       super._paint();
 
-      var primaryScale = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       var baselineAttr: any = {
         "x1": this._isVertical ? 0 : scaledBaseline,

@@ -11,7 +11,7 @@ describe("Plots", () => {
     var yAccessor: any;
     var colorAccessor: any;
     var simpleDataset: Plottable.Dataset;
-    var linePlot: Plottable.Plot.Line;
+    var linePlot: Plottable.Plot.Line<number>;
     var renderArea: D3.Selection;
     var verifier: MultiTestVerifier;
     // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"

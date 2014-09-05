@@ -2,13 +2,12 @@
 
 module Plottable {
 export module Plot {
-  export class Grid extends Abstract.XYPlot {
+  export class Grid extends Abstract.XYPlot<string,string> {
     public _colorScale: Abstract.Scale<any, string>;
     public _xScale: Scale.Ordinal;
     public _yScale: Scale.Ordinal;
 
-
-    public _animators: IPlotAnimatorMap = {
+    public _animators: Animator.IPlotAnimatorMap = {
       "cells" : new Animator.Null()
     };
 

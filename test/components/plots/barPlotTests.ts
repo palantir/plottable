@@ -10,7 +10,7 @@ describe("Plots", () => {
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scale.Ordinal;
       var yScale: Plottable.Scale.Linear;
-      var renderer: Plottable.Plot.VerticalBar;
+      var renderer: Plottable.Plot.VerticalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
@@ -175,7 +175,7 @@ describe("Plots", () => {
       var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
       var xScale: Plottable.Scale.Linear;
-      var renderer: Plottable.Plot.HorizontalBar;
+      var renderer: Plottable.Plot.HorizontalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       before(() => {
@@ -281,7 +281,7 @@ describe("Plots", () => {
       var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
       var xScale: Plottable.Scale.Linear;
-      var renderer: Plottable.Plot.HorizontalBar;
+      var renderer: Plottable.Plot.HorizontalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       var axisWidth = 0;

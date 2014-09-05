@@ -3,7 +3,7 @@
 var assert = chai.assert;
 describe("Plots", () => {
   describe("New Style Plots", () => {
-    var p: Plottable.Abstract.NewStylePlot;
+    var p: Plottable.Abstract.NewStylePlot<number,number>;
     var oldWarn = Plottable._Util.Methods.warn;
 
     beforeEach(() => {

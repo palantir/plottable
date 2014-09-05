@@ -3,7 +3,7 @@
 module Plottable {
 export module Interaction {
   export class BarHover extends Abstract.Interaction {
-    public componentToListenTo: Abstract.BarPlot;
+    public componentToListenTo: Abstract.BarPlot<any, any>;
     private dispatcher: Dispatcher.Mouse;
     private plotIsVertical = true;
     private hoverCallback: (datum: any, bar: D3.Selection) => any;
@@ -16,7 +16,7 @@ export module Interaction {
      *
      * @param {BarPlot} barPlot The Bar Plot to listen for hover events on.
      */
-    constructor(barPlot: Abstract.BarPlot) {
+    constructor(barPlot: Abstract.BarPlot<any, any>) {
       super(barPlot);
       this.plotIsVertical = Plottable.Plot.VerticalBar.prototype.isPrototypeOf(this.componentToListenTo);
     }

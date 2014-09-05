@@ -2,9 +2,9 @@
 
 module Plottable {
 export module Abstract {
-  export class XYPlot extends Plot {
-    public _xScale: Abstract.Scale<any, number>;
-    public _yScale: Abstract.Scale<any, number>;
+  export class XYPlot<X,Y> extends Plot {
+    public _xScale: Abstract.Scale<X, number>;
+    public _yScale: Abstract.Scale<Y, number>;
     /**
      * Constructs an XYPlot.
      *
@@ -16,7 +16,7 @@ export module Abstract {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale<any, number>, yScale: Abstract.Scale<any, number>) {
+    constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
       super(dataset);
       if (xScale == null || yScale == null) {throw new Error("XYPlots require an xScale and yScale");}
       this.classed("xy-plot", true);

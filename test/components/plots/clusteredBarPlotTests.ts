@@ -10,7 +10,7 @@ describe("Plots", () => {
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Ordinal;
     var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.ClusteredBar;
+    var renderer: Plottable.Plot.ClusteredBar<string, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var axisHeight = 0;
@@ -34,7 +34,7 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plot.ClusteredBar(xScale, yScale);
+      renderer = new Plottable.Plot.ClusteredBar<string,number>(xScale, yScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.baseline(0);
@@ -96,7 +96,7 @@ describe("Plots", () => {
     var dataset2: Plottable.Dataset;
     var yScale: Plottable.Scale.Ordinal;
     var xScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.ClusteredBar;
+    var renderer: Plottable.Plot.ClusteredBar<number, string>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var rendererWidth: number;
@@ -120,7 +120,7 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plot.ClusteredBar(xScale, yScale, false);
+      renderer = new Plottable.Plot.ClusteredBar<number,string>(xScale, yScale, false);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.baseline(0);
