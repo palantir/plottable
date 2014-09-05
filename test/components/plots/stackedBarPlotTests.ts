@@ -89,7 +89,7 @@ describe("Plots", () => {
     });
   });
 
-  describe("Horizontal Bar Plot", () => {
+  describe("Horizontal Stacked Bar Plot", () => {
     var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;

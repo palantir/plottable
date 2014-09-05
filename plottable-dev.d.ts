@@ -930,6 +930,7 @@ declare module Plottable {
             removeDataset(key: string): NewStylePlot<X, Y>;
             _getDatasetsInOrder(): Dataset[];
             _getDrawersInOrder(): _Drawer[];
+            _paint(): void;
         }
     }
 }
@@ -1091,8 +1092,8 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Stacked<X> extends NewStylePlot<X, number> {
-            yScale: QuantitativeScale<number>;
+        class Stacked<X, Y> extends NewStylePlot<X, Y> {
+            _isVertical: boolean;
             _onDatasetUpdate(): void;
             _updateAllProjectors(): void;
         }
@@ -1102,7 +1103,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class StackedArea<X> extends Plottable.Abstract.Stacked<X> {
+        class StackedArea<X> extends Plottable.Abstract.Stacked<X, number> {
             _baseline: D3.Selection;
             _baselineValue: number;
             constructor(xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
@@ -1119,14 +1120,17 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class StackedBar<X, Y> extends Plottable.Abstract.NewStyleBarPlot<X, Y> {
-            stackedData: any[][];
-            _yAccessor: _IAccessor;
+        class StackedBar<X, Y> extends Plottable.Abstract.Stacked<X, Y> {
+            _baselineValue: number;
+            _baseline: D3.Selection;
+            _barAlignmentFactor: number;
             constructor(xScale?: Plottable.Abstract.Scale<X, number>, yScale?: Plottable.Abstract.Scale<Y, number>, isVertical?: boolean);
-            _addDataset(key: string, dataset: any): void;
-            _updateAllProjectors(): void;
-            _generateAttrToProjector(): IAttributeToProjector;
-            _paint(): void;
+            _getDrawer(key: string): any;
+            _generateAttrToProjector(): any;
+            baseline(value: number): any;
+            _updateDomainer(scale: Plottable.Abstract.Scale<any, number>): any;
+            _updateXDomainer(): any;
+            _updateYDomainer(): any;
         }
     }
 }
