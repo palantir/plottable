@@ -2,42 +2,61 @@
 
 module Plottable {
 export module Plot {
+<<<<<<< HEAD
   export class Grid extends Abstract.XYPlot<string,string> {
     public colorScale: Abstract.Scale<any, string>;
     public xScale: Scale.Ordinal;
     public yScale: Scale.Ordinal;
+||||||| merged common ancestors
+  export class Grid extends Abstract.XYPlot {
+    public colorScale: Abstract.Scale<any, string>;
+    public xScale: Scale.Ordinal;
+    public yScale: Scale.Ordinal;
+=======
+  export class Grid extends Abstract.XYPlot {
+    public _colorScale: Abstract.Scale<any, string>;
+    public _xScale: Scale.Ordinal;
+    public _yScale: Scale.Ordinal;
+>>>>>>> api-breaking-changes
 
 
-    public _animators: Animator.IPlotAnimatorMap = {
+    public _animators: IPlotAnimatorMap = {
       "cells" : new Animator.Null()
     };
 
     /**
-     * Creates a GridPlot.
+     * Constructs a GridPlot.
+     *
+     * A GridPlot is used to shade a grid of data. Each datum is a cell on the
+     * grid, and the datum can control what color it is.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
-     * @param {OrdinalScale} xScale The x scale to use.
-     * @param {OrdinalScale} yScale The y scale to use.
-     * @param {ColorScale|InterpolatedColorScale} colorScale The color scale to use for each grid
-     *     cell.
+     * @param {IDataset | any} dataset The dataset to render.
+     * @param {Scale.Ordinal} xScale The x scale to use.
+     * @param {Scale.Ordinal} yScale The y scale to use.
+     * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
+     * to use for each grid cell.
      */
     constructor(dataset: any, xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale<any, string>) {
       super(dataset, xScale, yScale);
       this.classed("grid-plot", true);
 
       // The x and y scales should render in bands with no padding
-      this.xScale.rangeType("bands", 0, 0);
-      this.yScale.rangeType("bands", 0, 0);
+      this._xScale.rangeType("bands", 0, 0);
+      this._yScale.rangeType("bands", 0, 0);
 
-      this.colorScale = colorScale;
+      this._colorScale = colorScale;
       this.project("fill", "value", colorScale); // default
     }
 
+    /**
+     * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
+     * the data should return a valid CSS color.
+     */
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "fill") {
-        this.colorScale = this._projectors["fill"].scale;
+        this._colorScale = this._projectors["fill"].scale;
       }
       return this;
     }
@@ -45,11 +64,11 @@ export module Plot {
     public _paint() {
       super._paint();
 
-      var cells = this.renderArea.selectAll("rect").data(this._dataset.data());
+      var cells = this._renderArea.selectAll("rect").data(this._dataset.data());
       cells.enter().append("rect");
 
-      var xStep = this.xScale.rangeBand();
-      var yStep = this.yScale.rangeBand();
+      var xStep = this._xScale.rangeBand();
+      var yStep = this._yScale.rangeBand();
 
       var attrToProjector = this._generateAttrToProjector();
       attrToProjector["width"]  = () => xStep;

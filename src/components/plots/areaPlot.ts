@@ -9,10 +9,10 @@ export module Plot {
     private areaPath: D3.Selection;
 
     /**
-     * Creates an AreaPlot.
+     * Constructs an AreaPlot.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
+     * @param {IDataset | any} dataset The dataset to render.
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
@@ -24,19 +24,20 @@ export module Plot {
       this.project("fill-opacity", () => 0.25); // default
       this.project("stroke", () => Core.Colors.INDIGO); // default
       this._animators["area-reset"] = new Animator.Null();
-      this._animators["area"]       = new Animator.Default()
+      this._animators["area"]       = new Animator.Base()
                                         .duration(600)
                                         .easing("exp-in-out");
     }
 
     public _appendPath() {
-      this.areaPath = this.renderArea.append("path").classed("area", true);
+      this.areaPath = this._renderArea.append("path").classed("area", true);
       super._appendPath();
     }
 
+
     public _onDatasetUpdate() {
       super._onDatasetUpdate();
-      if (this.yScale != null) {
+      if (this._yScale != null) {
         this._updateYDomainer();
       }
     }
@@ -49,14 +50,14 @@ export module Plot {
       var extent:  number[] = y0Accessor != null ? this.dataset()._getExtent(y0Accessor) : [];
       var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
 
-      if (!this.yScale._userSetDomainer) {
+      if (!this._yScale._userSetDomainer) {
         if (constantBaseline != null) {
-          this.yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+          this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
         } else {
-          this.yScale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
+          this._yScale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
         }
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-        this.yScale._autoDomainIfAutomaticMode();
+        this._yScale._autoDomainIfAutomaticMode();
       }
     }
 

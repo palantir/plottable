@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Util {
+export module _Util {
   export class ScaleDomainCoordinator<D> {
     /* This class is responsible for maintaining coordination between linked scales.
     It registers event listeners for when one of its scales changes its domain. When the scale
@@ -11,7 +11,7 @@ export module Util {
     private scales: Abstract.Scale<D,any>[];
 
     /**
-     * Creates a ScaleDomainCoordinator.
+     * Constructs a ScaleDomainCoordinator.
      *
      * @constructor
      * @param {Scale[]} scales A list of scales whose domains should be linked.

@@ -2,11 +2,25 @@
 
 module Plottable {
 export module Abstract {
+<<<<<<< HEAD
   export class XYPlot<X,Y> extends Plot {
     public xScale: Abstract.Scale<X, number>;
     public yScale: Abstract.Scale<Y, number>;
+||||||| merged common ancestors
+  export class XYPlot extends Plot {
+    public xScale: Abstract.Scale<any, number>;
+    public yScale: Abstract.Scale<any, number>;
+    // TODO - replace any typing
+=======
+  export class XYPlot extends Plot {
+    public _xScale: Abstract.Scale<any, number>;
+    public _yScale: Abstract.Scale<any, number>;
+>>>>>>> api-breaking-changes
     /**
-     * Creates an XYPlot.
+     * Constructs an XYPlot.
+     *
+     * An XYPlot is a plot from drawing 2-dimensional data. Common examples
+     * include Scale.Line and Scale.Bar.
      *
      * @constructor
      * @param {any[]|Dataset} [dataset] The data or Dataset to be associated with this Renderer.
@@ -22,16 +36,20 @@ export module Abstract {
       this.project("y", "y", yScale); // default accessor
     }
 
+    /**
+     * @param {string} attrToSet One of ["x", "y"] which determines the point's
+     * x and y position in the Plot.
+     */
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
       // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale != null) {
-        this.xScale = scale;
+        this._xScale = scale;
         this._updateXDomainer();
       }
 
       if (attrToSet === "y" && scale != null) {
-        this.yScale = scale;
+        this._yScale = scale;
         this._updateYDomainer();
       }
 
@@ -42,13 +60,13 @@ export module Abstract {
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-      this.xScale.range([0, this.width()]);
-      this.yScale.range([this.height(), 0]);
+      this._xScale.range([0, this.width()]);
+      this._yScale.range([this.height(), 0]);
     }
 
     public _updateXDomainer() {
-      if (this.xScale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale<any>> this.xScale;
+      if (this._xScale instanceof QuantitativeScale) {
+        var scale = <QuantitativeScale<any>> this._xScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
@@ -56,8 +74,8 @@ export module Abstract {
     }
 
     public _updateYDomainer() {
-      if (this.yScale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale<any>> this.yScale;
+      if (this._yScale instanceof QuantitativeScale) {
+        var scale = <QuantitativeScale<any>> this._yScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Axis {
-  export interface ITimeInterval {
+  export interface _ITimeInterval {
       timeUnit: D3.Time.Interval;
       step: number;
       formatString: string;
@@ -16,7 +16,7 @@ export module Axis {
 
     // default intervals
     // these are for minor tick labels
-    public static minorIntervals: ITimeInterval[] = [
+    public static _minorIntervals: _ITimeInterval[] = [
       {timeUnit: d3.time.second, step: 1,      formatString: "%I:%M:%S %p"},
       {timeUnit: d3.time.second, step: 5,      formatString: "%I:%M:%S %p"},
       {timeUnit: d3.time.second, step: 10,     formatString: "%I:%M:%S %p"},
@@ -49,7 +49,7 @@ export module Axis {
     ];
 
     // these are for major tick labels
-    public static majorIntervals: ITimeInterval[] = [
+    public static _majorIntervals: _ITimeInterval[] = [
       {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
       {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
       {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
@@ -81,10 +81,12 @@ export module Axis {
       {timeUnit: d3.time.year,   step: 100000, formatString: ""}
     ];
 
-    private measurer: Util.Text.TextMeasurer;
+    private measurer: _Util.Text.TextMeasurer;
 
     /**
-     * Creates a TimeAxis
+     * Constructs a TimeAxis.
+     *
+     * A TimeAxis is used for rendering a TimeScale.
      *
      * @constructor
      * @param {TimeScale} scale The scale to base the Axis on.
@@ -118,7 +120,7 @@ export module Axis {
       return this.measurer(d3.time.format(format)(longDate)).width;
     }
 
-    private getIntervalLength(interval: ITimeInterval) {
+    private getIntervalLength(interval: _ITimeInterval) {
       var startDate = this._scale.domain()[0];
       var endDate = interval.timeUnit.offset(startDate, interval.step);
       if (endDate > this._scale.domain()[1]) {
@@ -130,7 +132,7 @@ export module Axis {
       return stepLength;
     }
 
-    private isEnoughSpace(container: D3.Selection, interval: ITimeInterval) {
+    private isEnoughSpace(container: D3.Selection, interval: _ITimeInterval) {
       // compute number of ticks
       // if less than a certain threshold
       var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
@@ -140,47 +142,47 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this._majorTickLabels = this.content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      this._minorTickLabels = this.content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      this.measurer = Util.Text.getTextMeasurer(this._majorTickLabels.append("text"));
+      this._majorTickLabels = this._content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      this._minorTickLabels = this._content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      this.measurer = _Util.Text.getTextMeasurer(this._majorTickLabels.append("text"));
     }
 
     // returns a number to index into the major/minor intervals
     private getTickLevel(): number {
-      for (var i = 0; i < Time.minorIntervals.length; i++) {
-        if (this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i])
-            && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i])) {
+      for (var i = 0; i < Time._minorIntervals.length; i++) {
+        if (this.isEnoughSpace(this._minorTickLabels, Time._minorIntervals[i])
+            && this.isEnoughSpace(this._majorTickLabels, Time._majorIntervals[i])) {
           break;
         }
       }
-      if (i >= Time.minorIntervals.length) {
-        Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
-        i = Time.minorIntervals.length - 1;
+      if (i >= Time._minorIntervals.length) {
+        _Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
+        i = Time._minorIntervals.length - 1;
       }
       return i;
     }
 
-    public _getTickIntervalValues(interval: ITimeInterval): any[] {
-      return this._scale.tickInterval(interval.timeUnit, interval.step);
+    public _getTickIntervalValues(interval: _ITimeInterval): any[] {
+      return this._scale._tickInterval(interval.timeUnit, interval.step);
     }
 
     public _getTickValues(): any[] {
       var index = this.getTickLevel();
-      var minorTicks = this._getTickIntervalValues(Time.minorIntervals[index]);
-      var majorTicks = this._getTickIntervalValues(Time.majorIntervals[index]);
+      var minorTicks = this._getTickIntervalValues(Time._minorIntervals[index]);
+      var majorTicks = this._getTickIntervalValues(Time._majorIntervals[index]);
       return minorTicks.concat(majorTicks);
     }
 
     public _measureTextHeight(container: D3.Selection): number {
       var fakeTickLabel = container.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      var textHeight = this.measurer(Util.Text.HEIGHT_TEXT).height;
+      var textHeight = this.measurer(_Util.Text.HEIGHT_TEXT).height;
       fakeTickLabel.remove();
       return textHeight;
     }
 
-    private renderTickLabels(container: D3.Selection, interval: ITimeInterval, height: number) {
+    private renderTickLabels(container: D3.Selection, interval: _ITimeInterval, height: number) {
       container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).remove();
-      var tickPos = this._scale.tickInterval(interval.timeUnit,
+      var tickPos = this._scale._tickInterval(interval.timeUnit,
                                               interval.step);
       tickPos.splice(0, 0, this._scale.domain()[0]);
       tickPos.push(this._scale.domain()[1]);
@@ -207,7 +209,7 @@ export module Axis {
           (this.height() - this._maxLabelTickLength() / 2 * height + 2 * this.tickLabelPadding()));
       var textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
-        Util.DOM.translate(textSelection, xTranslate, yTranslate);
+        _Util.DOM.translate(textSelection, xTranslate, yTranslate);
       }
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
@@ -231,7 +233,7 @@ export module Axis {
       return endPosition < this.width() && startPosition > 0;
     }
 
-    private adjustTickLength(height: number, interval: ITimeInterval) {
+    private adjustTickLength(height: number, interval: _ITimeInterval) {
       var tickValues = this._getTickIntervalValues(interval);
       var selection = this._tickMarkContainer.selectAll("." + Abstract.Axis.TICK_MARK_CLASS).filter((d: Date) =>
         // we want to check if d is in tickValues
@@ -250,30 +252,31 @@ export module Axis {
         return;
       }
 
-      var smallTicks = this._getTickIntervalValues(Time.minorIntervals[index]);
+      var smallTicks = this._getTickIntervalValues(Time._minorIntervals[index]);
       var allTicks = this._getTickValues().concat(smallTicks);
 
       var tickMarks = this._tickMarkContainer.selectAll("." + Abstract.Axis.TICK_MARK_CLASS).data(allTicks);
       tickMarks.enter().append("line").classed(Abstract.Axis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
       tickMarks.exit().remove();
-      this.adjustTickLength(this.tickLabelPadding(), Time.minorIntervals[index]);
+      this.adjustTickLength(this.tickLabelPadding(), Time._minorIntervals[index]);
     }
 
     public _doRender() {
       super._doRender();
       var index = this.getTickLevel();
-      this.renderTickLabels(this._minorTickLabels, Time.minorIntervals[index], 1);
-      this.renderTickLabels(this._majorTickLabels, Time.majorIntervals[index], 2);
+      this.renderTickLabels(this._minorTickLabels, Time._minorIntervals[index], 1);
+      this.renderTickLabels(this._majorTickLabels, Time._majorIntervals[index], 2);
       var domain = this._scale.domain();
       var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
-      if (this.getIntervalLength(Time.minorIntervals[index]) * 1.5 >= totalLength) {
+      if (this.getIntervalLength(Time._minorIntervals[index]) * 1.5 >= totalLength) {
         this.generateLabellessTicks(index - 1);
       }
       // make minor ticks shorter
-      this.adjustTickLength(this._maxLabelTickLength() / 2, Time.minorIntervals[index]);
+      this.adjustTickLength(this._maxLabelTickLength() / 2, Time._minorIntervals[index]);
       // however, we need to make major ticks longer, since they may have overlapped with some minor ticks
-      this.adjustTickLength(this._maxLabelTickLength(), Time.majorIntervals[index]);
+      this.adjustTickLength(this._maxLabelTickLength(), Time._majorIntervals[index]);
+      return this;
     }
   }
 }

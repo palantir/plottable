@@ -31,7 +31,7 @@ describe("Plots", () => {
               .project("y", yAccessor, yScale)
               .project("stroke", colorAccessor)
               .renderTo(svg);
-      renderArea = linePlot.renderArea;
+      renderArea = linePlot._renderArea;
     });
 
     beforeEach(() => {
