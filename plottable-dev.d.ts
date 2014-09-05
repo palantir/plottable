@@ -364,18 +364,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Animator {
-        interface IPlotAnimator {
-            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
-        }
-        interface IPlotAnimatorMap {
-            [animatorKey: string]: IPlotAnimator;
-        }
-    }
-}
-
-
-declare module Plottable {
     module Abstract {
         class Plot extends Component {
             _dataset: Dataset;
@@ -1149,6 +1137,18 @@ declare module Plottable {
 
 declare module Plottable {
     module Animator {
+        interface IPlotAnimator {
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
+        }
+        interface IPlotAnimatorMap {
+            [animatorKey: string]: IPlotAnimator;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Animator {
         class Null implements IPlotAnimator {
             animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
         }
@@ -1191,10 +1191,12 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         class Rect extends Base {
+            static ANIMATED_ATTRIBUTES: string[];
             isVertical: boolean;
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
             animate(selection: any, attrToProjector: IAttributeToProjector): any;
+            _startMovingProjector(attrToProjector: IAttributeToProjector): IAppliedAccessor;
         }
     }
 }
