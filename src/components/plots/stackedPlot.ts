@@ -21,7 +21,6 @@ export module Abstract {
       var outFunction = (d: any, y0: number, y: number) => {
         d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = y0;
       };
-
       d3.layout.stack()
         .x(this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor)
         .y(this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor)
