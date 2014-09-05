@@ -170,12 +170,8 @@ export module Abstract {
 
     public _paint() {
       var attrHash = this._generateAttrToProjector();
-      this._draw(attrHash);
-    }
-
-    public _draw(attrToProjector: IAttributeToProjector) {
       var datasets = this._getDatasetsInOrder();
-      this._getDrawersInOrder().forEach((d, i) => d.draw(datasets[i].data(), attrToProjector));
+      this._getDrawersInOrder().forEach((d, i) => d.draw(datasets[i].data(), attrHash));
     }
   }
 }

@@ -4658,11 +4658,8 @@ var Plottable;
             };
             NewStylePlot.prototype._paint = function () {
                 var attrHash = this._generateAttrToProjector();
-                this._draw(attrHash);
-            };
-            NewStylePlot.prototype._draw = function (attrToProjector) {
                 var datasets = this._getDatasetsInOrder();
-                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(datasets[i].data(), attrToProjector); });
+                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(datasets[i].data(), attrHash); });
             };
             return NewStylePlot;
         })(Abstract.XYPlot);
