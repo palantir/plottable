@@ -61,7 +61,7 @@ function commitDashboard(dataManager, svg) {
   var tscYAxis = new Plottable.Axis.YAxis(tscYScale, "left");
   var tscDateAxis = new Plottable.Axis.XAxis(timeScale, "bottom");
   var baseValue = d3.min(timeScale.domain());
-  var formatter = Plottable.Util.Axis.generateRelativeDateFormatter(baseValue, Plottable.Util.ONE_DAY, "d");
+  var formatter = Plottable._Util.Axis.generateRelativeDateFormatter(baseValue, Plottable._Util.ONE_DAY, "d");
   tscDateAxis.tickFormat(formatter);
 
   var tscRenderArea = new Plottable.Component.Gridlines(timeScale, tscYScale);
@@ -184,17 +184,17 @@ function commitDashboard(dataManager, svg) {
   function updateData(filter) {
     var newData = dataManager(filter);
 
-    scatterPlot.dataSource().data(newData.commits);
+    scatterPlot.dataset().data(newData.commits);
 
     tscYScale.domain([0, 0]);
     dataManager.directories.forEach(function(dir) {
-      tscPlots[dir].dataSource().data(newData.directoryTimeSeries[dir]);
+      tscPlots[dir].dataset().data(newData.directoryTimeSeries[dir]);
     });
 
-    contributorBarPlot.dataSource().data(newData.linesByContributor);
+    contributorBarPlot.dataset().data(newData.linesByContributor);
     contributorBarYScale.domain([0, 0]);
 
-    directoryBarPlot.dataSource().data(newData.linesByDirectory);
+    directoryBarPlot.dataset().data(newData.linesByDirectory);
     directoryBarYScale.domain([0, 0]);
 
     timeScale.domain([startDate, endDate]).nice();

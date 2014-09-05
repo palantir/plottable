@@ -2,12 +2,14 @@
 
 module Plottable {
 export module Scale {
-  export class Time extends Abstract.QuantitativeScale {
+  export class Time extends Abstract.QuantitativeScale<any> {
     /**
-     * Creates a new Time Scale.
+     * Constructs a TimeScale.
+     *
+     * A TimeScale maps Date objects to numbers.
      *
      * @constructor
-     * @param {D3.Scale.Time} [scale] The D3 LinearScale backing the TimeScale. If not supplied, uses a default scale.
+     * @param {D3.Scale.Time} scale The D3 LinearScale backing the Scale.Time. If not supplied, uses a default scale.
      */
     constructor();
     constructor(scale: D3.Scale.LinearScale);
@@ -16,7 +18,7 @@ export module Scale {
       super(scale == null ? (<any>d3.time.scale()) : scale);
     }
 
-    public tickInterval(interval: D3.Time.Interval, step?: number): any[] {
+    public _tickInterval(interval: D3.Time.Interval, step?: number): any[] {
       // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
       var tempScale = d3.time.scale();
       tempScale.domain(this.domain());
@@ -38,12 +40,6 @@ export module Scale {
       }
     }
 
-
-    /**
-     * Creates a copy of the TimeScale with the same domain and range but without any registered listeners.
-     *
-     * @returns {TimeScale} A copy of the calling TimeScale.
-     */
     public copy(): Time {
       return new Time(this._d3Scale.copy());
     }

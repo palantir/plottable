@@ -14,7 +14,7 @@ function run(div, data, Plottable) {
   "j", "k", "l", "m", "n", "o", "p", "q", "r", "s",
   "t", "u", "v", "w", "x", "y", "z"];
 
-  var ds = new Plottable.DataSource();
+  var ds = new Plottable.Dataset();
   var xScale = new Plottable.Scale.Ordinal();
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
 

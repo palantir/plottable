@@ -8,7 +8,7 @@ export module Dispatcher {
     private _mouseout: (location: Point) => any;
 
     /**
-     * Creates a Mouse Dispatcher with the specified target.
+     * Constructs a Mouse Dispatcher with the specified target.
      *
      * @param {D3.Selection} target The selection to listen for events on.
      */

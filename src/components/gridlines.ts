@@ -3,8 +3,8 @@
 module Plottable {
 export module Component {
   export class Gridlines extends Abstract.Component {
-    private xScale: Abstract.QuantitativeScale;
-    private yScale: Abstract.QuantitativeScale;
+    private xScale: Abstract.QuantitativeScale<any>;
+    private yScale: Abstract.QuantitativeScale<any>;
     private xLinesContainer: D3.Selection;
     private yLinesContainer: D3.Selection;
 
@@ -15,7 +15,7 @@ export module Component {
      * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
      * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
      */
-    constructor(xScale: Abstract.QuantitativeScale, yScale: Abstract.QuantitativeScale) {
+    constructor(xScale: Abstract.QuantitativeScale<any>, yScale: Abstract.QuantitativeScale<any>) {
       super();
       if (xScale == null && yScale == null) {throw new Error("Gridlines must have at least one scale");}
       this.classed("gridlines", true);
@@ -42,8 +42,8 @@ export module Component {
 
     public _setup() {
       super._setup();
-      this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);
-      this.yLinesContainer = this.content.append("g").classed("y-gridlines", true);
+      this.xLinesContainer = this._content.append("g").classed("x-gridlines", true);
+      this.yLinesContainer = this._content.append("g").classed("y-gridlines", true);
     }
 
     public _doRender() {

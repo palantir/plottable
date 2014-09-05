@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class Scatter extends Abstract.XYPlot {
+  export class Scatter<X,Y> extends Abstract.XYPlot<X,Y> {
 
     public _animators: Animator.IPlotAnimatorMap = {
       "circles-reset" : new Animator.Null(),
@@ -12,14 +12,14 @@ export module Plot {
     };
 
     /**
-     * Creates a ScatterPlot.
+     * Constructs a ScatterPlot.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
+     * @param {IDataset | any} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
+    constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
       super(dataset, xScale, yScale);
       this.classed("scatter-plot", true);
       this.project("r", 3); // default
@@ -27,7 +27,12 @@ export module Plot {
       this.project("fill", () => Core.Colors.INDIGO); // default
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
+    /**
+     * @param {string} attrToSet One of ["x", "y", "cx", "cy", "r",
+     * "fill"]. "cx" and "cy" are aliases for "x" and "y". "r" is the datum's
+     * radius, and "fill" is the CSS color of the datum.
+     */
+    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
       attrToSet = attrToSet === "cx" ? "x" : attrToSet;
       attrToSet = attrToSet === "cy" ? "y" : attrToSet;
       super.project(attrToSet, accessor, scale);
@@ -43,7 +48,7 @@ export module Plot {
       delete attrToProjector["x"];
       delete attrToProjector["y"];
 
-      var circles = this.renderArea.selectAll("circle").data(this._dataSource.data());
+      var circles = this._renderArea.selectAll("circle").data(this._dataset.data());
       circles.enter().append("circle");
 
       if (this._dataChanged) {

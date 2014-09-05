@@ -3,7 +3,7 @@
 module Plottable {
 export module Interaction {
   export class BarHover extends Abstract.Interaction {
-    public componentToListenTo: Abstract.BarPlot;
+    public componentToListenTo: Abstract.BarPlot<any, any>;
     private dispatcher: Dispatcher.Mouse;
     private plotIsVertical = true;
     private hoverCallback: (datum: any, bar: D3.Selection) => any;
@@ -14,9 +14,9 @@ export module Interaction {
     /**
      * Creates a new BarHover Interaction.
      *
-     * @param {Abstract.BarPlot} barPlot The Bar Plot to listen for hover events on.
+     * @param {BarPlot} barPlot The Bar Plot to listen for hover events on.
      */
-    constructor(barPlot: Abstract.BarPlot) {
+    constructor(barPlot: Abstract.BarPlot<any, any>) {
       super(barPlot);
       this.plotIsVertical = Plottable.Plot.VerticalBar.prototype.isPrototypeOf(this.componentToListenTo);
     }
@@ -87,8 +87,8 @@ export module Interaction {
      *                in the same direction as the bar and passing through
      *                the cursor.
      *
-     * @param {string} mode The desired hover mode.
-     * @return {BarHover} The calling Interaction.BarHover.
+     * @param {string} mode If provided, the desired hover mode.
+     * @return {BarHover} The calling BarHover.
      */
     public hoverMode(mode: string): BarHover;
     public hoverMode(mode?: string): any {
@@ -108,9 +108,9 @@ export module Interaction {
     /**
      * Attaches an callback to be called when the user mouses over a bar.
      *
-     * @param {(datum: any, bar: D3.Selection) => any} The callback to be called.
+     * @param {(datum: any, bar: D3.Selection) => any} callback The callback to be called.
      *      The callback will be passed the data from the hovered-over bar.
-     * @return {BarHover} The calling Interaction.BarHover.
+     * @return {BarHover} The calling BarHover.
      */
     public onHover(callback: (datum: any, bar: D3.Selection) => any) {
       this.hoverCallback = callback;
@@ -120,9 +120,9 @@ export module Interaction {
     /**
      * Attaches a callback to be called when the user mouses off of a bar.
      *
-     * @param {(datum: any, bar: D3.Selection) => any} The callback to be called.
+     * @param {(datum: any, bar: D3.Selection) => any} callback The callback to be called.
      *      The callback will be passed the data from the last-hovered bar.
-     * @return {BarHover} The calling Interaction.BarHover.
+     * @return {BarHover} The calling BarHover.
      */
     public onUnhover(callback: (datum: any, bar: D3.Selection) => any) {
       this.unhoverCallback = callback;

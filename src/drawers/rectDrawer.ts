@@ -6,7 +6,7 @@ export module _Drawer {
 
     public draw(data: any[], attrToProjector: IAttributeToProjector, animator = new Animator.Null()) {
       var svgElement = "rect";
-      var dataElements = this.renderArea.selectAll(svgElement).data(data);
+      var dataElements = this._renderArea.selectAll(svgElement).data(data);
 
       dataElements.enter().append(svgElement);
       animator.animate(dataElements, attrToProjector);
