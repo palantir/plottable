@@ -1,5 +1,5 @@
 /*!
-Plottable 0.27.0 (https://github.com/palantir/plottable)
+Plottable 0.27.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -935,7 +935,7 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.27.0";
+    Plottable.version = "0.27.1";
 })(Plottable || (Plottable = {}));
 
 var Plottable;
@@ -945,26 +945,26 @@ var Plottable;
             function Colors() {
             }
             Colors.CORAL_RED = "#fd373e";
-            Colors.INDIGO = "#5177c4";
-            Colors.ROBINS_EGG_BLUE = "#06bdbd";
-            Colors.FERN = "#62bb60";
+            Colors.INDIGO = "#5279c7";
+            Colors.ROBINS_EGG_BLUE = "#06cccc";
+            Colors.FERN = "#63c261";
             Colors.BURNING_ORANGE = "#ff7939";
             Colors.ROYAL_HEATH = "#962565";
             Colors.CONIFER = "#99ce50";
             Colors.CERISE_RED = "#db2e65";
-            Colors.BRIGHT_SUN = "#ffe43d";
+            Colors.BRIGHT_SUN = "#fad419";
             Colors.JACARTA = "#2c2b6f";
             Colors.PLOTTABLE_COLORS = [
-                Colors.CORAL_RED,
                 Colors.INDIGO,
-                Colors.ROBINS_EGG_BLUE,
+                Colors.CORAL_RED,
                 Colors.FERN,
-                Colors.BURNING_ORANGE,
-                Colors.ROYAL_HEATH,
-                Colors.CONIFER,
-                Colors.CERISE_RED,
                 Colors.BRIGHT_SUN,
-                Colors.JACARTA
+                Colors.JACARTA,
+                Colors.BURNING_ORANGE,
+                Colors.CERISE_RED,
+                Colors.CONIFER,
+                Colors.ROYAL_HEATH,
+                Colors.ROBINS_EGG_BLUE,
             ];
             return Colors;
         })();
@@ -4966,8 +4966,8 @@ var Plottable;
         var VerticalBar = (function (_super) {
             __extends(VerticalBar, _super);
             function VerticalBar(dataset, xScale, yScale) {
-                _super.call(this, dataset, xScale, yScale);
                 this._isVertical = true;
+                _super.call(this, dataset, xScale, yScale);
             }
             VerticalBar.prototype._updateYDomainer = function () {
                 this._updateDomainer(this.yScale);
@@ -4992,8 +4992,8 @@ var Plottable;
         var HorizontalBar = (function (_super) {
             __extends(HorizontalBar, _super);
             function HorizontalBar(dataset, xScale, yScale) {
+                this._isVertical = false;
                 _super.call(this, dataset, xScale, yScale);
-                this.isVertical = false;
             }
             HorizontalBar.prototype._updateXDomainer = function () {
                 this._updateDomainer(this.xScale);
@@ -5267,9 +5267,9 @@ var Plottable;
             __extends(ClusteredBar, _super);
             function ClusteredBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
+                this._isVertical = isVertical;
                 _super.call(this, xScale, yScale);
                 this.innerScale = new Plottable.Scale.Ordinal();
-                this._isVertical = isVertical;
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -5460,11 +5460,10 @@ var Plottable;
             __extends(StackedBar, _super);
             function StackedBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
-                _super.call(this, xScale, yScale);
                 this.stackedData = [];
-                this._baselineValue = 0;
                 this.stackedExtent = [];
                 this._isVertical = isVertical;
+                _super.call(this, xScale, yScale);
             }
             StackedBar.prototype._addDataset = function (key, dataset) {
                 _super.prototype._addDataset.call(this, key, dataset);
