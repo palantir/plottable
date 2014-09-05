@@ -2,12 +2,13 @@
 
 module Plottable {
 export module Abstract {
-  export class Stacked extends Abstract.NewStylePlot {
+  export class Stacked<X> extends Abstract.NewStylePlot<X, number> {
+    public yScale: Abstract.QuantitativeScale<number>;
 
     private stackedExtent = [0, 0];
 
-    public _onDataSourceUpdate() {
-      super._onDataSourceUpdate();
+    public _onDatasetUpdate() {
+      super._onDatasetUpdate();
       // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
       if (this._datasetKeysInOrder != null &&
           this._projectors["x"] != null &&
@@ -24,12 +25,12 @@ export module Abstract {
         .values((d) => d.data())(datasets);
 
       this.stackedExtent = [0, 0];
-      var maxY = Util.Methods.max(datasets[datasets.length - 1].data(), (datum: any) => datum.y + datum.y0);
+      var maxY = _Util.Methods.max(datasets[datasets.length - 1].data(), (datum: any) => datum.y + datum.y0);
       if (maxY > 0) {
         this.stackedExtent[1] = maxY;
       }
 
-      var minY = Util.Methods.min(datasets[datasets.length - 1].data(), (datum: any) => datum.y + datum.y0);
+      var minY = _Util.Methods.min(datasets[datasets.length - 1].data(), (datum: any) => datum.y + datum.y0);
       if (minY < 0) {
         this.stackedExtent[0] = minY;
       }
@@ -37,13 +38,13 @@ export module Abstract {
 
     public _updateAllProjectors() {
       super._updateAllProjectors();
-      if (this.yScale == null) {
+      if (this._yScale == null) {
         return;
       }
       if (this._isAnchored && this.stackedExtent.length > 0) {
-        this.yScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+        this._yScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
       } else {
-        this.yScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+        this._yScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
       }
     }
   }

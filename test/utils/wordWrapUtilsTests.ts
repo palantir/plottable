@@ -2,12 +2,12 @@
 
 var assert = chai.assert;
 
-describe("Word Wrap Util.ities", () => {
+describe("Word Wrap _Util.ities", () => {
     it("properly wraps a short sentence", () => {
         var text = "All work and no play makes Jack a dull boy.";
         var width = 200;
         var height = 100;
-        var wrappedText = Plottable.Util.WordWrap.breakTextToFitRect(text, width, height, (text) => text.length * 10);
+        var wrappedText = Plottable._Util.WordWrap.breakTextToFitRect(text, width, height, (text) => text.length * 10);
 
         assert.lengthOf(wrappedText, 3);
         assert.equal(wrappedText[0], "All work and no play ");
@@ -19,7 +19,7 @@ describe("Word Wrap Util.ities", () => {
         var text = "Supercalifragilisticexpialidocious";
         var width = 100;
         var height = 100;
-        var wrappedText = Plottable.Util.WordWrap.breakTextToFitRect(text, width, height, (text) => text.length * 10);
+        var wrappedText = Plottable._Util.WordWrap.breakTextToFitRect(text, width, height, (text) => text.length * 10);
 
         assert.lengthOf(wrappedText, 4);
         assert.equal(wrappedText[0], "Supercali-");
@@ -32,7 +32,7 @@ describe("Word Wrap Util.ities", () => {
         var text = "Hello:World";
         var width = 70;
         var height = 100;
-        var wrappedText = Plottable.Util.WordWrap.breakTextToFitRect(text, width, height, (text) => text.length * 10);
+        var wrappedText = Plottable._Util.WordWrap.breakTextToFitRect(text, width, height, (text) => text.length * 10);
 
         assert.lengthOf(wrappedText, 2);
         assert.equal(wrappedText[0], "Hello:");
@@ -45,7 +45,7 @@ describe("Word Wrap Util.ities", () => {
 
         // should line break after these characters: ! " % ) , - . : ; ? ] }
         var text = "||||| d!d";
-        var wrappedText = Plottable.Util.WordWrap.breakTextToFitRect(text, width, height, (text) => text.length * 10);
+        var wrappedText = Plottable._Util.WordWrap.breakTextToFitRect(text, width, height, (text) => text.length * 10);
 
         assert.lengthOf(wrappedText, 2);
         assert.equal(wrappedText[0], "||||| d!");
@@ -53,7 +53,7 @@ describe("Word Wrap Util.ities", () => {
 
         // should line break before these characters: { [
         text = "||||| d[d";
-        wrappedText = Plottable.Util.WordWrap.breakTextToFitRect(text, width, height, (text) => text.length * 10);
+        wrappedText = Plottable._Util.WordWrap.breakTextToFitRect(text, width, height, (text) => text.length * 10);
 
         assert.lengthOf(wrappedText, 2);
         assert.equal(wrappedText[0], "||||| d");
@@ -65,7 +65,7 @@ describe("Word Wrap Util.ities", () => {
         var text2 = "Hello World";
         var text3 = "HelloYWorld";
         var measureText = (text: string) => text.length * 10;
-        var canBreak = (text: string) => Plottable.Util.WordWrap.canWrapWithoutBreakingWords(text, 70, measureText);
+        var canBreak = (text: string) => Plottable._Util.WordWrap.canWrapWithoutBreakingWords(text, 70, measureText);
 
         assert.isTrue( canBreak(text1), "It can break \"Hello:World\"");
         assert.isTrue( canBreak(text2), "It can break \"Hello World\"");

@@ -9,9 +9,9 @@ function run(div, data, Plottable) {
 
   var svg = div.append("svg").attr("height", 500);
 
-  var dataseries1 = new Plottable.DataSource(data[0].slice(0, 20));
+  var dataseries1 = new Plottable.Dataset(data[0].slice(0, 20));
   dataseries1.metadata({name: "series1"});
-  var dataseries2 = new Plottable.DataSource(data[1].slice(0, 20));
+  var dataseries2 = new Plottable.Dataset(data[1].slice(0, 20));
   dataseries2.metadata({name: "series2"});
   var colorScale1 = new Plottable.Scale.Color("10");
   colorScale1.domain(["series1", "series2"]);

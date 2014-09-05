@@ -13,11 +13,11 @@
 /// <reference path="core/colors.ts" />
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
-/// <reference path="core/dataSource.ts" />
+
+/// <reference path="core/dataset.ts" />
 /// <reference path="core/renderPolicy.ts" />
 /// <reference path="core/renderController.ts" />
 /// <reference path="core/resizeBroadcaster.ts" />
-/// <reference path="core/animator.ts" />
 /// <reference path="core/interfaces.ts" />
 /// <reference path="core/domainer.ts" />
 
@@ -67,8 +67,9 @@
 /// <reference path="components/plots/stackedAreaPlot.ts" />
 /// <reference path="components/plots/stackedBarPlot.ts" />
 
+/// <reference path="core/animator.ts" />
 /// <reference path="animators/nullAnimator.ts" />
-/// <reference path="animators/defaultAnimator.ts" />
+/// <reference path="animators/baseAnimator.ts" />
 /// <reference path="animators/iterativeDelayAnimator.ts" />
 /// <reference path="animators/rectAnimator.ts" />
 

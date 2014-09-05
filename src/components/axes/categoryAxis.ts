@@ -4,18 +4,19 @@ module Plottable {
 export module Axis {
   export class Category extends Abstract.Axis {
     public _scale: Scale.Ordinal;
-    private measurer: Util.Text.CachingCharacterMeasurer;
+    private measurer: _Util.Text.CachingCharacterMeasurer;
 
     /**
-     * Creates a CategoryAxis.
+     * Constructs a CategoryAxis.
      *
-     * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to try to
-     * display the scale as efficiently as possible.
+     * A CategoryAxis takes an OrdinalScale and includes word-wrapping
+     * algorithms and advanced layout logic to try to display the scale as
+     * efficiently as possible.
      *
      * @constructor
      * @param {OrdinalScale} scale The scale to base the Axis on.
-     * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-     * @param {Formatter} [formatter] The Formatter for the Axis (default Formatters.identity())
+     * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
+     * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
      */
     constructor(scale: Scale.Ordinal, orientation = "bottom", formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
@@ -27,14 +28,14 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this.measurer = new Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
+      this.measurer = new _Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
     }
 
     public _rescale() {
       return this._invalidateLayout();
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
       var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
       var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
 
@@ -75,7 +76,7 @@ export module Axis {
      * Measures the size of the ticks without making any (permanent) DOM
      * changes.
      *
-     * @param {string[]} data The strings that will be printed on the ticks.
+     * @param {string[]} ticks The strings that will be printed on the ticks.
      */
     private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: string[]) {
       return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, false);
@@ -83,9 +84,9 @@ export module Axis {
 
 
     private drawOrMeasureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal,
-                                  dataOrTicks: any, draw: boolean): Util.Text.IWriteTextResult {
+                                  dataOrTicks: any, draw: boolean): _Util.Text.IWriteTextResult {
       var self = this;
-      var textWriteResults: Util.Text.IWriteTextResult[] = [];
+      var textWriteResults: _Util.Text.IWriteTextResult[] = [];
       var tm = (s: string) => self.measurer.measure(s);
       var iterator = draw ? (f: Function) => dataOrTicks.each(f) : (f: Function) => dataOrTicks.forEach(f);
 
@@ -94,30 +95,30 @@ export module Axis {
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
         var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
 
-        var textWriteResult: Util.Text.IWriteTextResult;
+        var textWriteResult: _Util.Text.IWriteTextResult;
         var formatter = self._formatter;
         if (draw) {
           var d3this = d3.select(this);
           var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
           var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
-          textWriteResult = Util.Text.writeText(formatter(d), width, height, tm, true, {
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, true, {
                                                     g: d3this,
                                                     xAlign: xAlign[self._orientation],
                                                     yAlign: yAlign[self._orientation]
           });
         } else {
-          textWriteResult = Util.Text.writeText(formatter(d), width, height, tm, true);
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, true);
         }
 
         textWriteResults.push(textWriteResult);
       });
 
-      var widthFn  = this._isHorizontal() ? d3.sum : Util.Methods.max;
-      var heightFn = this._isHorizontal() ? Util.Methods.max : d3.sum;
+      var widthFn  = this._isHorizontal() ? d3.sum : _Util.Methods.max;
+      var heightFn = this._isHorizontal() ? _Util.Methods.max : d3.sum;
       return {
-        textFits: textWriteResults.every((t: Util.Text.IWriteTextResult) => t.textFits),
-        usedWidth : widthFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedWidth),
-        usedHeight: heightFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedHeight)
+        textFits: textWriteResults.every((t: _Util.Text.IWriteTextResult) => t.textFits),
+        usedWidth : widthFn(textWriteResults, (t: _Util.Text.IWriteTextResult) => t.usedWidth),
+        usedHeight: heightFn(textWriteResults, (t: _Util.Text.IWriteTextResult) => t.usedHeight)
       };
     }
 
@@ -142,8 +143,9 @@ export module Axis {
 
       var xTranslate = this._orientation === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this._orientation === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
-      Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
+      _Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
+      _Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
+      return this;
     }
 
 

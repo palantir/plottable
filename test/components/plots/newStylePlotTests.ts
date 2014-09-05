@@ -3,8 +3,8 @@
 var assert = chai.assert;
 describe("Plots", () => {
   describe("New Style Plots", () => {
-    var p: Plottable.Abstract.NewStylePlot;
-    var oldWarn = Plottable.Util.Methods.warn;
+    var p: Plottable.Abstract.NewStylePlot<number,number>;
+    var oldWarn = Plottable._Util.Methods.warn;
 
     beforeEach(() => {
       var xScale = new Plottable.Scale.Linear();
@@ -14,15 +14,15 @@ describe("Plots", () => {
     });
 
     afterEach(() => {
-      Plottable.Util.Methods.warn = oldWarn;
+      Plottable._Util.Methods.warn = oldWarn;
     });
 
     it("Datasets can be added and removed as expected", () => {
       p.addDataset("foo", [1,2,3]);
-      var d2 = new Plottable.DataSource([4,5,6]);
+      var d2 = new Plottable.Dataset([4,5,6]);
       p.addDataset("bar", d2);
       p.addDataset([7,8,9]);
-      var d4 = new Plottable.DataSource([10,11,12]);
+      var d4 = new Plottable.Dataset([10,11,12]);
       p.addDataset(d4);
 
       assert.deepEqual(p._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
@@ -42,8 +42,8 @@ describe("Plots", () => {
     it("Datasets are listened to appropriately", () => {
       var callbackCounter = 0;
       var callback = () => callbackCounter++;
-      p._onDataSourceUpdate = callback;
-      var d = new Plottable.DataSource([1,2,3]);
+      p._onDatasetUpdate = callback;
+      var d = new Plottable.Dataset([1,2,3]);
       p.addDataset("foo", d);
       assert.equal(callbackCounter, 1, "adding dataset triggers listener");
       d.data([1,2,3,4]);
@@ -60,7 +60,7 @@ describe("Plots", () => {
       p.datasetOrder(["bar", "baz", "foo"]);
       assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
       var warned = 0;
-      Plottable.Util.Methods.warn = () => warned++; // suppress expected warnings
+      Plottable._Util.Methods.warn = () => warned++; // suppress expected warnings
       p.datasetOrder(["blah", "blee", "bar", "baz", "foo"]);
       assert.equal(warned, 1);
       assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
@@ -68,7 +68,7 @@ describe("Plots", () => {
 
     it("Has proper warnings", () => {
       var warned = 0;
-      Plottable.Util.Methods.warn = () => warned++;
+      Plottable._Util.Methods.warn = () => warned++;
       p.addDataset("_foo", []);
       assert.equal(warned, 1);
       p.addDataset("2", []);

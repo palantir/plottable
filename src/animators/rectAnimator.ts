@@ -6,7 +6,7 @@ export module Animator {
   /**
    * The default animator implementation with easing, duration, and delay.
    */
-  export class Rect extends Default {
+  export class Rect extends Base {
 
     public static ANIMATED_ATTRIBUTES = ["height", "width", "x", "y", "fill"];
 

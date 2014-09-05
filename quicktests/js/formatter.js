@@ -17,7 +17,7 @@ function run(div, data, Plottable) {
 
   var big_numbers = data[0].slice(0, 5);
   big_numbers.forEach(large_x);
-  var dataseries1 = new Plottable.DataSource(big_numbers);
+  var dataseries1 = new Plottable.Dataset(big_numbers);
 
 
   //Axis
