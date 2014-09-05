@@ -4,7 +4,7 @@ module Plottable {
 export module Plot {
   export class Scatter<X,Y> extends Abstract.XYPlot<X,Y> {
 
-    public _animators: IPlotAnimatorMap = {
+    public _animators: Animator.IPlotAnimatorMap = {
       "circles-reset" : new Animator.Null(),
       "circles"       : new Animator.IterativeDelay()
         .duration(250)

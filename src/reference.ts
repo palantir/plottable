@@ -19,6 +19,7 @@
 /// <reference path="core/componentGroup.ts" />
 /// <reference path="core/table.ts" />
 /// <reference path="core/scale.ts" />
+/// <reference path="core/animator.ts" />
 /// <reference path="core/plot.ts" />
 /// <reference path="components/plots/xyPlot.ts" />
 /// <reference path="core/newStylePlot.ts" />

@@ -35,13 +35,7 @@ export module Plot {
       if (this._yScale == null) {
         return;
       }
-<<<<<<< HEAD
       var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
-||||||| merged common ancestors
-      var primaryScale = this._isVertical ? this._yScale : this._xScale;
-=======
-      var primaryScale = this._isVertical ? this._yScale : this._xScale;
->>>>>>> api-breaking-changes
       if (this._isAnchored && this.stackedExtent.length > 0) {
         primaryScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
       } else {
@@ -52,13 +46,7 @@ export module Plot {
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
 
-<<<<<<< HEAD
       var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
-||||||| merged common ancestors
-      var primaryScale = this._isVertical ? this._yScale : this._xScale;
-=======
-      var primaryScale = this._isVertical ? this._yScale : this._xScale;
->>>>>>> api-breaking-changes
       var getStart = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_START);
       var getEnd = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_END);
 

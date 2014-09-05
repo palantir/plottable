@@ -2,20 +2,9 @@
 
 module Plottable {
 export module Abstract {
-<<<<<<< HEAD
   export class XYPlot<X,Y> extends Plot {
-    public xScale: Abstract.Scale<X, number>;
-    public yScale: Abstract.Scale<Y, number>;
-||||||| merged common ancestors
-  export class XYPlot extends Plot {
-    public xScale: Abstract.Scale<any, number>;
-    public yScale: Abstract.Scale<any, number>;
-    // TODO - replace any typing
-=======
-  export class XYPlot extends Plot {
-    public _xScale: Abstract.Scale<any, number>;
-    public _yScale: Abstract.Scale<any, number>;
->>>>>>> api-breaking-changes
+    public _xScale: Abstract.Scale<X, number>;
+    public _yScale: Abstract.Scale<Y, number>;
     /**
      * Constructs an XYPlot.
      *

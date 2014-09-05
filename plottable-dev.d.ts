@@ -364,13 +364,25 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Animator {
+        interface IPlotAnimator {
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
+        }
+        interface IPlotAnimatorMap {
+            [animatorKey: string]: IPlotAnimator;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Abstract {
         class Plot extends Component {
             _dataset: Dataset;
             _dataChanged: boolean;
             _renderArea: D3.Selection;
             _animate: boolean;
-            _animators: IPlotAnimatorMap;
+            _animators: Plottable.Animator.IPlotAnimatorMap;
             _ANIMATION_DURATION: number;
             _projectors: {
                 [x: string]: _IProjector;
@@ -393,8 +405,8 @@ declare module Plottable {
             _updateAllProjectors(): void;
             _updateProjector(attr: string): void;
             _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any;
-            animator(animatorKey: string): IPlotAnimator;
-            animator(animatorKey: string, animator: IPlotAnimator): Plot;
+            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
+            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
         }
     }
 }
@@ -402,25 +414,11 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-<<<<<<< HEAD
         class XYPlot<X, Y> extends Plot {
-            xScale: Scale<X, number>;
-            yScale: Scale<Y, number>;
+            _xScale: Scale<X, number>;
+            _yScale: Scale<Y, number>;
             constructor(dataset: any, xScale: Scale<X, number>, yScale: Scale<Y, number>);
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
-||||||| merged common ancestors
-        class XYPlot extends Plot {
-            xScale: Scale<any, number>;
-            yScale: Scale<any, number>;
-            constructor(dataset: any, xScale: Scale<any, number>, yScale: Scale<any, number>);
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot;
-=======
-        class XYPlot extends Plot {
-            _xScale: Scale<any, number>;
-            _yScale: Scale<any, number>;
-            constructor(dataset: any, xScale: Scale<any, number>, yScale: Scale<any, number>);
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot;
->>>>>>> api-breaking-changes
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _updateXDomainer(): void;
             _updateYDomainer(): void;
@@ -549,12 +547,6 @@ declare module Plottable {
     interface Point {
         x: number;
         y: number;
-    }
-    interface IPlotAnimator {
-        animate(selection: any, attrToProjector: IAttributeToProjector): any;
-    }
-    interface IPlotAnimatorMap {
-        [animatorKey: string]: IPlotAnimator;
     }
     interface DatasetDrawerKey {
         dataset: Dataset;
@@ -957,22 +949,10 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-<<<<<<< HEAD
         class Scatter<X, Y> extends Plottable.Abstract.XYPlot<X, Y> {
             _animators: Plottable.Animator.IPlotAnimatorMap;
             constructor(dataset: any, xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.Scale<Y, number>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Scatter<X, Y>;
-||||||| merged common ancestors
-        class Scatter extends Plottable.Abstract.XYPlot {
-            _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale<any, number>, yScale: Plottable.Abstract.Scale<any, number>);
-            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Scatter;
-=======
-        class Scatter extends Plottable.Abstract.XYPlot {
-            _animators: IPlotAnimatorMap;
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale<any, number>, yScale: Plottable.Abstract.Scale<any, number>);
-            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Scatter;
->>>>>>> api-breaking-changes
             _paint(): void;
         }
     }
@@ -981,25 +961,11 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-<<<<<<< HEAD
         class Grid extends Plottable.Abstract.XYPlot<string, string> {
-            colorScale: Plottable.Abstract.Scale<any, string>;
-            xScale: Plottable.Scale.Ordinal;
-            yScale: Plottable.Scale.Ordinal;
-            _animators: Plottable.Animator.IPlotAnimatorMap;
-||||||| merged common ancestors
-        class Grid extends Plottable.Abstract.XYPlot {
-            colorScale: Plottable.Abstract.Scale<any, string>;
-            xScale: Plottable.Scale.Ordinal;
-            yScale: Plottable.Scale.Ordinal;
-            _animators: Plottable.Animator.IPlotAnimatorMap;
-=======
-        class Grid extends Plottable.Abstract.XYPlot {
             _colorScale: Plottable.Abstract.Scale<any, string>;
             _xScale: Plottable.Scale.Ordinal;
             _yScale: Plottable.Scale.Ordinal;
-            _animators: IPlotAnimatorMap;
->>>>>>> api-breaking-changes
+            _animators: Plottable.Animator.IPlotAnimatorMap;
             constructor(dataset: any, xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale<any, string>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Grid;
             _paint(): void;
@@ -1019,16 +985,8 @@ declare module Plottable {
                 [x: string]: number;
             };
             _isVertical: boolean;
-<<<<<<< HEAD
             _animators: Plottable.Animator.IPlotAnimatorMap;
             constructor(dataset: any, xScale: Scale<X, number>, yScale: Scale<Y, number>);
-||||||| merged common ancestors
-            _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(dataset: any, xScale: Scale<any, number>, yScale: Scale<any, number>);
-=======
-            _animators: IPlotAnimatorMap;
-            constructor(dataset: any, xScale: Scale<any, number>, yScale: Scale<any, number>);
->>>>>>> api-breaking-changes
             _setup(): void;
             _paint(): void;
             baseline(value: number): BarPlot<X, Y>;
@@ -1067,15 +1025,7 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
-<<<<<<< HEAD
-            isVertical: boolean;
             constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<number>, yScale: Plottable.Abstract.Scale<Y, number>);
-||||||| merged common ancestors
-            isVertical: boolean;
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<number>, yScale: Plottable.Abstract.Scale<any, number>);
-=======
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<number>, yScale: Plottable.Abstract.Scale<any, number>);
->>>>>>> api-breaking-changes
             _updateXDomainer(): void;
             _generateAttrToProjector(): IAttributeToProjector;
         }
@@ -1085,20 +1035,10 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-<<<<<<< HEAD
         class Line<X> extends Plottable.Abstract.XYPlot<X, number> {
-            yScale: Plottable.Abstract.QuantitativeScale<number>;
+            _yScale: Plottable.Abstract.QuantitativeScale<number>;
             _animators: Plottable.Animator.IPlotAnimatorMap;
             constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
-||||||| merged common ancestors
-        class Line extends Plottable.Abstract.XYPlot {
-            _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<any>, yScale: Plottable.Abstract.QuantitativeScale<any>);
-=======
-        class Line extends Plottable.Abstract.XYPlot {
-            _animators: IPlotAnimatorMap;
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<any>, yScale: Plottable.Abstract.QuantitativeScale<any>);
->>>>>>> api-breaking-changes
             _setup(): void;
             _appendPath(): void;
             _getResetYFunction(): (d: any, i: number) => number;
@@ -1136,16 +1076,8 @@ declare module Plottable {
             _baselineValue: number;
             _barAlignmentFactor: number;
             _isVertical: boolean;
-<<<<<<< HEAD
             _animators: Plottable.Animator.IPlotAnimatorMap;
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
-||||||| merged common ancestors
-            _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(xScale: Scale<any, number>, yScale: Scale<any, number>);
-=======
-            _animators: IPlotAnimatorMap;
-            constructor(xScale: Scale<any, number>, yScale: Scale<any, number>);
->>>>>>> api-breaking-changes
             _getDrawer(key: string): Plottable._Drawer.Rect;
             _setup(): void;
             _paint(): void;
@@ -1161,15 +1093,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-<<<<<<< HEAD
         class ClusteredBar<X, Y> extends Plottable.Abstract.NewStyleBarPlot<X, Y> {
-            static DEFAULT_WIDTH: number;
-||||||| merged common ancestors
-        class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
-            static DEFAULT_WIDTH: number;
-=======
-        class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
->>>>>>> api-breaking-changes
             constructor(xScale: Plottable.Abstract.Scale<any, number>, yScale: Plottable.Abstract.Scale<any, number>, isVertical?: boolean);
             _generateAttrToProjector(): IAttributeToProjector;
             _paint(): void;

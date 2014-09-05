@@ -10,7 +10,7 @@ export module Abstract {
     public _barAlignmentFactor = 0;
     public _isVertical: boolean;
 
-    public _animators: IPlotAnimatorMap = {
+    public _animators: Animator.IPlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
       "bars"       : new Animator.IterativeDelay(),
       "baseline"   : new Animator.Null()
@@ -43,13 +43,7 @@ export module Abstract {
     public _paint() {
       super._paint();
 
-<<<<<<< HEAD
       var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
-||||||| merged common ancestors
-      var primaryScale = this._isVertical ? this._yScale : this._xScale;
-=======
-      var primaryScale = this._isVertical ? this._yScale : this._xScale;
->>>>>>> api-breaking-changes
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       var baselineAttr: any = {
         "x1": this._isVertical ? 0 : scaledBaseline,

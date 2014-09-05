@@ -1882,6 +1882,7 @@ var Plottable;
     var Abstract = Plottable.Abstract;
 })(Plottable || (Plottable = {}));
 
+
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -5125,24 +5126,18 @@ var Plottable;
             };
             Area.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
-<<<<<<< HEAD
-||||||| merged common ancestors
-                var scale = this.yScale;
-=======
-                var scale = this._yScale;
->>>>>>> api-breaking-changes
                 var y0Projector = this._projectors["y0"];
                 var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
                 var extent = y0Accessor != null ? this.dataset()._getExtent(y0Accessor) : [];
                 var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
-                if (!this.yScale._userSetDomainer) {
+                if (!this._yScale._userSetDomainer) {
                     if (constantBaseline != null) {
-                        this.yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+                        this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
                     }
                     else {
-                        this.yScale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
+                        this._yScale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
                     }
-                    this.yScale._autoDomainIfAutomaticMode();
+                    this._yScale._autoDomainIfAutomaticMode();
                 }
             };
             Area.prototype.project = function (attrToSet, accessor, scale) {

@@ -8,7 +8,7 @@ export module Abstract {
 
     public _renderArea: D3.Selection;
     public _animate: boolean = false;
-    public _animators: IPlotAnimatorMap = {};
+    public _animators: Animator.IPlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
     private animateOnNextRender = true;
@@ -234,7 +234,7 @@ export module Abstract {
      *
      * @return {IPlotAnimator} The Animator for the specified key.
      */
-    public animator(animatorKey: string): IPlotAnimator;
+    public animator(animatorKey: string): Animator.IPlotAnimator;
     /**
      * Set the animator associated with the specified Animator key.
      *
@@ -243,8 +243,8 @@ export module Abstract {
      * the specified key.
      * @returns {Plot} The calling Plot.
      */
-    public animator(animatorKey: string, animator: IPlotAnimator): Plot;
-    public animator(animatorKey: string, animator?: IPlotAnimator): any {
+    public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
+    public animator(animatorKey: string, animator?: Animator.IPlotAnimator): any {
       if (animator === undefined){
         return this._animators[animatorKey];
       } else {

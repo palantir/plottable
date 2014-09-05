@@ -3,16 +3,8 @@
 var assert = chai.assert;
 describe("Plots", () => {
   describe("New Style Plots", () => {
-<<<<<<< HEAD
     var p: Plottable.Abstract.NewStylePlot<number,number>;
-    var oldWarn = Plottable.Util.Methods.warn;
-||||||| merged common ancestors
-    var p: Plottable.Abstract.NewStylePlot;
-    var oldWarn = Plottable.Util.Methods.warn;
-=======
-    var p: Plottable.Abstract.NewStylePlot;
     var oldWarn = Plottable._Util.Methods.warn;
->>>>>>> api-breaking-changes
 
     beforeEach(() => {
       var xScale = new Plottable.Scale.Linear();

@@ -5,14 +5,8 @@ export module Plot {
   export class Line<X> extends Abstract.XYPlot<X,number> {
     private linePath: D3.Selection;
 
-<<<<<<< HEAD
-    public yScale: Abstract.QuantitativeScale<number>;
+    public _yScale: Abstract.QuantitativeScale<number>;
     public _animators: Animator.IPlotAnimatorMap = {
-||||||| merged common ancestors
-    public _animators: Animator.IPlotAnimatorMap = {
-=======
-    public _animators: IPlotAnimatorMap = {
->>>>>>> api-breaking-changes
       "line-reset" : new Animator.Null(),
       "line"       : new Animator.Base()
         .duration(600)
