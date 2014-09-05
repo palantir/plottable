@@ -1150,17 +1150,18 @@ declare module Plottable {
 
 declare module Plottable {
     module Animator {
-        class Default implements IPlotAnimator {
-            _durationMsec: number;
-            _delayMsec: number;
-            _easing: string;
+        class Base implements IPlotAnimator {
+            static DEFAULT_DURATION_MILLISECONDS: number;
+            static DEFAULT_DELAY_MILLISECONDS: number;
+            static DEFAULT_EASING: string;
+            constructor();
             animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
             duration(): number;
-            duration(duration: number): Default;
+            duration(duration: number): Base;
             delay(): number;
-            delay(delay: number): Default;
+            delay(delay: number): Base;
             easing(): string;
-            easing(easing: string): Default;
+            easing(easing: string): Base;
         }
     }
 }
@@ -1168,9 +1169,12 @@ declare module Plottable {
 
 declare module Plottable {
     module Animator {
-        class IterativeDelay extends Default {
-            _delayMsec: number;
+        class IterativeDelay extends Base {
+            static DEFAULT_ITERATIVE_DELAY_MILLISECONDS: number;
+            constructor();
             animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
+            iterativeDelay(): number;
+            iterativeDelay(iterDelay: number): IterativeDelay;
         }
     }
 }
@@ -1178,7 +1182,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Animator {
-        class Rect extends Default {
+        class Rect extends Base {
             isVertical: boolean;
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
