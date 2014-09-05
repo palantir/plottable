@@ -28,7 +28,6 @@ export module Abstract {
         .values((d) => d.data())
         .out(outFunction)(datasets);
 
-      this.stackedExtent = [0, 0];
       var maxY = _Util.Methods.max(datasets[datasets.length - 1].data(),
                                   (datum: any) => datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
       this.stackedExtent[1] = Math.max(0, maxY);
