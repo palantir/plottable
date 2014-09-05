@@ -1010,7 +1010,6 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
-            _isVertical: boolean;
             constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
             _updateYDomainer(): void;
         }
@@ -1024,7 +1023,6 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
-            isVertical: boolean;
             constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale, yScale: Plottable.Abstract.Scale);
             _updateXDomainer(): void;
             _generateAttrToProjector(): IAttributeToProjector;
@@ -1135,8 +1133,6 @@ declare module Plottable {
         class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
             stackedData: any[][];
             _yAccessor: IAccessor;
-            _baselineValue: number;
-            _baseline: D3.Selection;
             constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale, isVertical?: boolean);
             _addDataset(key: string, dataset: any): void;
             _updateAllProjectors(): void;
