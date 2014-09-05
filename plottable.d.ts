@@ -508,8 +508,6 @@ declare module Plottable {
     module _Drawer {
         class Rect extends Plottable.Abstract._Drawer {
             draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
-<<<<<<< HEAD
-=======
         }
     }
 }
@@ -558,7 +556,6 @@ declare module Plottable {
         class Group extends Plottable.Abstract.ComponentContainer {
             constructor(components?: Plottable.Abstract.Component[]);
             merge(c: Plottable.Abstract.Component): Group;
->>>>>>> develop
         }
     }
 }
@@ -856,8 +853,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Stacked<X> extends NewStylePlot<X, number> {
-            yScale: QuantitativeScale<number>;
+        class Stacked<X, Y> extends NewStylePlot<X, Y> {
         }
     }
 }
@@ -865,7 +861,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class StackedArea<X> extends Plottable.Abstract.Stacked<X> {
+        class StackedArea<X> extends Plottable.Abstract.Stacked<X, number> {
             constructor(xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
         }
     }
@@ -874,14 +870,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-<<<<<<< HEAD
-        class StackedBar extends Plottable.Abstract.Stacked {
-            constructor(xScale?: Plottable.Abstract.Scale<any, number>, yScale?: Plottable.Abstract.Scale<any, number>, isVertical?: boolean);
-            baseline(value: number): any;
-=======
-        class StackedBar<X, Y> extends Plottable.Abstract.NewStyleBarPlot<X, Y> {
-            stackedData: any[][];
+        class StackedBar<X, Y> extends Plottable.Abstract.Stacked<X, Y> {
             constructor(xScale?: Plottable.Abstract.Scale<X, number>, yScale?: Plottable.Abstract.Scale<Y, number>, isVertical?: boolean);
+            baseline(value: number): any;
         }
     }
 }
@@ -894,7 +885,6 @@ declare module Plottable {
         }
         interface IPlotAnimatorMap {
             [animatorKey: string]: IPlotAnimator;
->>>>>>> develop
         }
     }
 }

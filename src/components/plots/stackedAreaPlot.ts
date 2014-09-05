@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class StackedArea<X> extends Abstract.Stacked<X> {
+  export class StackedArea<X> extends Abstract.Stacked<X, number> {
 
     public _baseline: D3.Selection;
     public _baselineValue = 0;
@@ -32,11 +32,8 @@ export module Plot {
 
     public _paint() {
       super._paint();
-<<<<<<< HEAD
-      var scaledBaseline = this.yScale.scale(this._baselineValue);
-=======
       var scaledBaseline = this._yScale.scale(this._baselineValue);
->>>>>>> develop
+
       var baselineAttr: any = {
         "x1": 0,
         "y1": scaledBaseline,
@@ -44,31 +41,7 @@ export module Plot {
         "y2": scaledBaseline
       };
       this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
-<<<<<<< HEAD
-=======
 
-      var attrToProjector = this._generateAttrToProjector();
-      var xFunction       = attrToProjector["x"];
-      var y0Function      = attrToProjector["y0"];
-      var yFunction       = attrToProjector["y"];
-      delete attrToProjector["x"];
-      delete attrToProjector["y0"];
-      delete attrToProjector["y"];
-
-      attrToProjector["d"] = d3.svg.area()
-                                    .x(xFunction)
-                                    .y0(y0Function)
-                                    .y1(yFunction);
-
-      // Align fill with first index
-      var fillProjector = attrToProjector["fill"];
-      attrToProjector["fill"] = (d, i) => fillProjector(d[0], i);
-
-      var datasets = this._getDatasetsInOrder();
-      this._getDrawersInOrder().forEach((drawer, i) => {
-        drawer.draw(datasets[i].data(), attrToProjector);
-      });
->>>>>>> develop
     }
 
     public _updateYDomainer() {
@@ -88,10 +61,9 @@ export module Plot {
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-<<<<<<< HEAD
       var xFunction = attrToProjector["x"];
-      var yFunction = (d: any) => this.yScale.scale(d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      var y0Function = (d: any) => this.yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var yFunction = (d: any) => this._yScale.scale(d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var y0Function = (d: any) => this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
       delete attrToProjector["x"];
       delete attrToProjector["y0"];
@@ -106,10 +78,6 @@ export module Plot {
       var fillProjector = attrToProjector["fill"];
       attrToProjector["fill"] = (d, i) => fillProjector(d[0], i);
 
-=======
-      attrToProjector["y"] = (d: any) => this._yScale.scale(d.y + d.y0);
-      attrToProjector["y0"] = (d: any) => this._yScale.scale(d.y0);
->>>>>>> develop
       return attrToProjector;
     }
   }

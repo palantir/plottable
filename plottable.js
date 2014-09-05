@@ -2094,19 +2094,6 @@ var Plottable;
                 this.scales.forEach(function (s) { return s.domain(newDomain); });
                 this.rescaleInProgress = false;
             };
-<<<<<<< HEAD
-            NewStylePlot.prototype._paint = function () {
-                var attrHash = this._generateAttrToProjector();
-                this._draw(attrHash);
-            };
-            NewStylePlot.prototype._draw = function (attrToProjector) {
-                var datasets = this._getDatasetsInOrder();
-                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(datasets[i].data(), attrToProjector); });
-            };
-            return NewStylePlot;
-        })(Abstract.XYPlot);
-        Abstract.NewStylePlot = NewStylePlot;
-=======
             return ScaleDomainCoordinator;
         })();
         _Util.ScaleDomainCoordinator = ScaleDomainCoordinator;
@@ -2133,7 +2120,6 @@ var Plottable;
             return _Drawer;
         })();
         Abstract._Drawer = _Drawer;
->>>>>>> develop
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
 })(Plottable || (Plottable = {}));
@@ -3026,15 +3012,6 @@ var Plottable;
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
             }
-<<<<<<< HEAD
-            Area.prototype.draw = function (data, attrToProjector) {
-                var pathData = [data];
-                var svgElement = "path";
-                var dataElements = this.renderArea.selectAll(svgElement).data(pathData);
-                dataElements.enter().append(svgElement);
-                dataElements.attr(attrToProjector).classed("area", true);
-                dataElements.exit().remove();
-=======
             Time.prototype._computeHeight = function () {
                 if (this._computedHeight !== null) {
                     return this._computedHeight;
@@ -3044,7 +3021,6 @@ var Plottable;
                 this.endTickLength(textHeight);
                 this._computedHeight = this._maxLabelTickLength() + 2 * this.tickLabelPadding();
                 return this._computedHeight;
->>>>>>> develop
             };
             Time.prototype.calculateWorstWidth = function (container, format) {
                 var longDate = new Date(9999, 8, 29, 12, 59, 9999);
@@ -4680,6 +4656,14 @@ var Plottable;
                 var _this = this;
                 return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).drawer; });
             };
+            NewStylePlot.prototype._paint = function () {
+                var attrHash = this._generateAttrToProjector();
+                this._draw(attrHash);
+            };
+            NewStylePlot.prototype._draw = function (attrToProjector) {
+                var datasets = this._getDatasetsInOrder();
+                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(datasets[i].data(), attrToProjector); });
+            };
             return NewStylePlot;
         })(Abstract.XYPlot);
         Abstract.NewStylePlot = NewStylePlot;
@@ -5365,44 +5349,22 @@ var Plottable;
                 };
                 d3.layout.stack().x(this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor).y(this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor).values(function (d) { return d.data(); }).out(outFunction)(datasets);
                 this.stackedExtent = [0, 0];
-<<<<<<< HEAD
-                var maxY = Plottable.Util.Methods.max(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
+                var maxY = Plottable._Util.Methods.max(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
                 this.stackedExtent[1] = Math.max(0, maxY);
-                var minY = Plottable.Util.Methods.min(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
+                var minY = Plottable._Util.Methods.min(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
                 this.stackedExtent[0] = Math.min(minY, 0);
             };
             Stacked.prototype._updateAllProjectors = function () {
                 _super.prototype._updateAllProjectors.call(this);
-                var primaryScale = this._isVertical ? this.yScale : this.xScale;
+                var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 if (primaryScale == null) {
                     return;
                 }
                 if (this._isAnchored && this.stackedExtent.length > 0) {
-                    primaryScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+                    primaryScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
                 }
                 else {
-                    primaryScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
-=======
-                var maxY = Plottable._Util.Methods.max(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum.y0; });
-                if (maxY > 0) {
-                    this.stackedExtent[1] = maxY;
-                }
-                var minY = Plottable._Util.Methods.min(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum.y0; });
-                if (minY < 0) {
-                    this.stackedExtent[0] = minY;
-                }
-            };
-            Stacked.prototype._updateAllProjectors = function () {
-                _super.prototype._updateAllProjectors.call(this);
-                if (this._yScale == null) {
-                    return;
-                }
-                if (this._isAnchored && this.stackedExtent.length > 0) {
-                    this._yScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
-                }
-                else {
-                    this._yScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
->>>>>>> develop
+                    primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
             };
             return Stacked;
@@ -5447,23 +5409,6 @@ var Plottable;
                     "y2": scaledBaseline
                 };
                 this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
-<<<<<<< HEAD
-=======
-                var attrToProjector = this._generateAttrToProjector();
-                var xFunction = attrToProjector["x"];
-                var y0Function = attrToProjector["y0"];
-                var yFunction = attrToProjector["y"];
-                delete attrToProjector["x"];
-                delete attrToProjector["y0"];
-                delete attrToProjector["y"];
-                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
-                var fillProjector = attrToProjector["fill"];
-                attrToProjector["fill"] = function (d, i) { return fillProjector(d[0], i); };
-                var datasets = this._getDatasetsInOrder();
-                this._getDrawersInOrder().forEach(function (drawer, i) {
-                    drawer.draw(datasets[i].data(), attrToProjector);
-                });
->>>>>>> develop
             };
             StackedArea.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
@@ -5480,20 +5425,15 @@ var Plottable;
             StackedArea.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-<<<<<<< HEAD
                 var xFunction = attrToProjector["x"];
-                var yFunction = function (d) { return _this.yScale.scale(d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                var y0Function = function (d) { return _this.yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                var yFunction = function (d) { return _this._yScale.scale(d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                var y0Function = function (d) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 delete attrToProjector["x"];
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
                 attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
                 var fillProjector = attrToProjector["fill"];
                 attrToProjector["fill"] = function (d, i) { return fillProjector(d[0], i); };
-=======
-                attrToProjector["y"] = function (d) { return _this._yScale.scale(d.y + d.y0); };
-                attrToProjector["y0"] = function (d) { return _this._yScale.scale(d.y0); };
->>>>>>> develop
                 return attrToProjector;
             };
             return StackedArea;
@@ -5516,55 +5456,24 @@ var Plottable;
             __extends(StackedBar, _super);
             function StackedBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
-<<<<<<< HEAD
-                _super.call(this, xScale, yScale);
+                this._isVertical = isVertical;
                 this._baselineValue = 0;
                 this._barAlignmentFactor = 0.5;
+                _super.call(this, xScale, yScale);
                 this.classed("bar-plot", true);
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
                 this.baseline(this._baselineValue);
-=======
-                this.stackedData = [];
-                this.stackedExtent = [];
->>>>>>> develop
                 this._isVertical = isVertical;
-                _super.call(this, xScale, yScale);
             }
-<<<<<<< HEAD
             StackedBar.prototype._getDrawer = function (key) {
                 return Plottable.Abstract.NewStyleBarPlot.prototype._getDrawer.apply(this, [key]);
             };
             StackedBar.prototype._generateAttrToProjector = function () {
                 var attrToProjector = Plottable.Abstract.NewStyleBarPlot.prototype._generateAttrToProjector.apply(this);
                 var primaryAttr = this._isVertical ? "y" : "x";
-                var primaryScale = this._isVertical ? this.yScale : this.xScale;
+                var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 var getStart = function (d) { return primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 var getEnd = function (d) { return primaryScale.scale(d[primaryAttr] + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-=======
-            StackedBar.prototype._addDataset = function (key, dataset) {
-                _super.prototype._addDataset.call(this, key, dataset);
-                var accessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-                this.stackedData = this.stack(accessor);
-            };
-            StackedBar.prototype._updateAllProjectors = function () {
-                _super.prototype._updateAllProjectors.call(this);
-                if (this._yScale == null) {
-                    return;
-                }
-                var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                if (this._isAnchored && this.stackedExtent.length > 0) {
-                    primaryScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
-                }
-                else {
-                    primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
-                }
-            };
-            StackedBar.prototype._generateAttrToProjector = function () {
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                var getStart = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_START); };
-                var getEnd = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_END); };
->>>>>>> develop
                 var heightF = function (d) { return Math.abs(getEnd(d) - getStart(d)); };
                 var widthF = attrToProjector["width"];
                 attrToProjector["height"] = this._isVertical ? heightF : widthF;
@@ -5572,35 +5481,8 @@ var Plottable;
                 attrToProjector[primaryAttr] = this._isVertical ? getEnd : function (d) { return getEnd(d) - heightF(d); };
                 return attrToProjector;
             };
-<<<<<<< HEAD
             StackedBar.prototype.baseline = function (value) {
                 return Plottable.Abstract.NewStyleBarPlot.prototype.baseline.apply(this, [value]);
-=======
-            StackedBar.prototype.stack = function (accessor) {
-                var datasets = d3.values(this._key2DatasetDrawerKey);
-                var lengths = datasets.map(function (d) { return d.dataset.data().length; });
-                if (Plottable._Util.Methods.uniq(lengths).length > 1) {
-                    Plottable._Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
-                }
-                var currentBase = Plottable._Util.Methods.createFilledArray(0, lengths[0]);
-                var stacks = this._getDatasetsInOrder().map(function (dataset) {
-                    var data = dataset.data();
-                    var base = currentBase.slice();
-                    var vals = data.map(accessor);
-                    if (vals.some(function (x) { return x < 0; })) {
-                        Plottable._Util.Methods.warn("Warning: Behavior for stacked bars undefined when data includes negative values");
-                    }
-                    currentBase = Plottable._Util.Methods.addArrays(base, vals);
-                    return data.map(function (d, i) {
-                        d["_PLOTTABLE_PROTECTED_FIELD_START"] = base[i];
-                        d["_PLOTTABLE_PROTECTED_FIELD_END"] = currentBase[i];
-                        return d;
-                    });
-                });
-                this.stackedExtent = [0, Plottable._Util.Methods.max(currentBase)];
-                this._onDatasetUpdate();
-                return stacks;
->>>>>>> develop
             };
             StackedBar.prototype._updateDomainer = function (scale) {
                 return Plottable.Abstract.NewStyleBarPlot.prototype._updateDomainer.apply(this, [scale]);
