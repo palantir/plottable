@@ -44,6 +44,7 @@ function run(div, data, Plottable){
 
   var legend = new Plottable.Component.HorizontalLegend(colorScale);
   var title = new Plottable.Component.TitleLabel("Average Rainfall in Different Cities between 2013-2014", "horizontal" );
+  var yunit = new Plottable.Component.AxisLabel("Inches", "vertical-left" );
 
 
   legend.xAlign("right");
@@ -63,5 +64,8 @@ function run(div, data, Plottable){
                   [yAxis3  ,   san_jose_bar     ],
                   [null    ,   xAxis            ]]);
 
-  chart.renderTo(svg);
+  var finalchart = new Plottable.Component.Table([
+                    [yunit, chart]]);
+
+  finalchart.renderTo(svg);
 }
