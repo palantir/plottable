@@ -31,6 +31,7 @@ export module Plot {
     }
 
     public _paint() {
+      super._paint();
       var scaledBaseline = this.yScale.scale(this._baselineValue);
       var baselineAttr: any = {
         "x1": 0,
@@ -39,25 +40,6 @@ export module Plot {
         "y2": scaledBaseline
       };
       this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
-
-      var attrToProjector = this._generateAttrToProjector();
-      var xFunction       = attrToProjector["x"];
-      var y0Function      = attrToProjector["y0"];
-      var yFunction       = attrToProjector["y"];
-      delete attrToProjector["x"];
-      delete attrToProjector["y0"];
-      delete attrToProjector["y"];
-
-      attrToProjector["d"] = d3.svg.area()
-                                    .x(xFunction)
-                                    .y0(y0Function)
-                                    .y1(yFunction);
-
-      // Align fill with first index
-      var fillProjector = attrToProjector["fill"];
-      attrToProjector["fill"] = (d, i) => fillProjector(d[0], i);
-
-      this._draw(attrToProjector);
     }
 
     public _updateYDomainer() {
@@ -77,8 +59,23 @@ export module Plot {
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      attrToProjector["y"] = (d: any) => this.yScale.scale(d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      attrToProjector["y0"] = (d: any) => this.yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var xFunction = attrToProjector["x"];
+      var yFunction = (d: any) => this.yScale.scale(d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var y0Function = (d: any) => this.yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+
+      delete attrToProjector["x"];
+      delete attrToProjector["y0"];
+      delete attrToProjector["y"];
+
+      attrToProjector["d"] = d3.svg.area()
+                                    .x(xFunction)
+                                    .y0(y0Function)
+                                    .y1(yFunction);
+
+      // Align fill with first index
+      var fillProjector = attrToProjector["fill"];
+      attrToProjector["fill"] = (d, i) => fillProjector(d[0], i);
+
       return attrToProjector;
     }
   }

@@ -5401,6 +5401,7 @@ var Plottable;
                 this._baseline = this.renderArea.append("line").classed("baseline", true);
             };
             StackedArea.prototype._paint = function () {
+                _super.prototype._paint.call(this);
                 var scaledBaseline = this.yScale.scale(this._baselineValue);
                 var baselineAttr = {
                     "x1": 0,
@@ -5409,17 +5410,6 @@ var Plottable;
                     "y2": scaledBaseline
                 };
                 this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
-                var attrToProjector = this._generateAttrToProjector();
-                var xFunction = attrToProjector["x"];
-                var y0Function = attrToProjector["y0"];
-                var yFunction = attrToProjector["y"];
-                delete attrToProjector["x"];
-                delete attrToProjector["y0"];
-                delete attrToProjector["y"];
-                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
-                var fillProjector = attrToProjector["fill"];
-                attrToProjector["fill"] = function (d, i) { return fillProjector(d[0], i); };
-                this._draw(attrToProjector);
             };
             StackedArea.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
@@ -5436,8 +5426,15 @@ var Plottable;
             StackedArea.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["y"] = function (d) { return _this.yScale.scale(d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                attrToProjector["y0"] = function (d) { return _this.yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                var xFunction = attrToProjector["x"];
+                var yFunction = function (d) { return _this.yScale.scale(d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                var y0Function = function (d) { return _this.yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                delete attrToProjector["x"];
+                delete attrToProjector["y0"];
+                delete attrToProjector["y"];
+                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+                var fillProjector = attrToProjector["fill"];
+                attrToProjector["fill"] = function (d, i) { return fillProjector(d[0], i); };
                 return attrToProjector;
             };
             return StackedArea;
