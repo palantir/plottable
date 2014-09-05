@@ -13,7 +13,6 @@ export module Plot {
    */
   export class VerticalBar<X> extends Abstract.BarPlot<X,number> {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
-    public _isVertical = true;
 
     /**
      * Constructs a VerticalBarPlot.
@@ -24,6 +23,7 @@ export module Plot {
      * @param {QuantitativeScale} yScale The y scale to use.
      */
     constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.QuantitativeScale<number>) {
+      this._isVertical = true; // Has to be set before super()
       super(dataset, xScale, yScale);
     }
 

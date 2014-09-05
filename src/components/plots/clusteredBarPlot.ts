@@ -16,10 +16,10 @@ export module Plot {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.Scale<any, number>, yScale: Abstract.Scale<any, number>, isVertical = true) {
+    constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>, isVertical = true) {
+      this._isVertical = isVertical; // Has to be set before super()
       super(xScale, yScale);
       this.innerScale = new Scale.Ordinal();
-      this._isVertical = isVertical;
     }
 
     public _generateAttrToProjector() {

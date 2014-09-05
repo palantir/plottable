@@ -4,11 +4,9 @@ module Plottable {
 export module Plot {
 
   export class StackedBar<X,Y> extends Abstract.NewStyleBarPlot<X,Y> {
-    public stackedData: any[][] = [];
+    public stackedData: any[][];
     public _yAccessor: _IAccessor;
-    public _baselineValue = 0;
-    public _baseline: D3.Selection;
-    private stackedExtent: number[] = [];
+    private stackedExtent: number[];
 
     /**
      * Constructs a StackedBar plot.
@@ -20,8 +18,10 @@ export module Plot {
      * @param {boolean} isVertical if the plot if vertical.
      */
     constructor(xScale?: Abstract.Scale<X,number>, yScale?: Abstract.Scale<Y,number>, isVertical = true) {
+      this.stackedData = [];
+      this.stackedExtent = [];
+      this._isVertical = isVertical; // Has to be set before super()
       super(xScale, yScale);
-      this._isVertical = isVertical;
     }
 
     public _addDataset(key: string, dataset: any) {
