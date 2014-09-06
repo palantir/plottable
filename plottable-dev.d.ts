@@ -1085,6 +1085,7 @@ declare module Plottable {
         class ClusteredBar<X, Y> extends Plottable.Abstract.NewStyleBarPlot<X, Y> {
             constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.Scale<Y, number>, isVertical?: boolean);
             _generateAttrToProjector(): IAttributeToProjector;
+            _getAnimator(drawer: Plottable.Abstract._Drawer, index: number): Plottable.Animator.IPlotAnimator;
             _paint(): void;
         }
     }

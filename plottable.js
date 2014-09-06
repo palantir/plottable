@@ -5311,6 +5311,9 @@ var Plottable;
                 });
                 return clusters;
             };
+            ClusteredBar.prototype._getAnimator = function (drawer, index) {
+                return new Plottable.Animator.Null();
+            };
             ClusteredBar.prototype._paint = function () {
                 _super.prototype._paint.call(this);
                 var attrHash = this._generateAttrToProjector();
