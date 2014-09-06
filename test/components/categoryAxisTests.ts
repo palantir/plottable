@@ -28,7 +28,8 @@ describe("Category Axes", () => {
 
   it("doesnt blow up for non-string data", () => {
     var svg = generateSVG(1000, 400);
-    var scale = new Plottable.Scale.Ordinal().domain([null, undefined, true, 2, "foo"]);
+    var domain: any[] = [null, undefined, true, 2, "foo"];
+    var scale = new Plottable.Scale.Ordinal().domain(domain);
     var axis = new Plottable.Axis.Category(scale);
     var table = new Plottable.Component.Table([[axis]]);
     table.renderTo(svg);

@@ -453,15 +453,15 @@ declare module Plottable {
         class Ordinal extends Plottable.Abstract.Scale<string, number> {
             _d3Scale: D3.Scale.OrdinalScale;
             constructor(scale?: D3.Scale.OrdinalScale);
-            _getExtent(): any[];
-            domain(): any[];
-            domain(values: any[]): Ordinal;
-            _setDomain(values: any[]): void;
+            _getExtent(): string[];
+            domain(): string[];
+            domain(values: string[]): Ordinal;
+            _setDomain(values: string[]): void;
             range(): number[];
             range(values: number[]): Ordinal;
             rangeBand(): number;
             innerPadding(): number;
-            fullBandStartAndWidth(v: any): number[];
+            fullBandStartAndWidth(v: string): number[];
             rangeType(): string;
             rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): Ordinal;
             copy(): Ordinal;

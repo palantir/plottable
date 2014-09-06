@@ -26,18 +26,18 @@ export module Scale {
       }
     }
 
-    public _getExtent(): any[] {
+    public _getExtent(): string[] {
       var extents: string[][] = this._getAllExtents();
       return _Util.Methods.uniq(_Util.Methods.flatten(extents));
     }
 
-    public domain(): any[];
-    public domain(values: any[]): Ordinal;
-    public domain(values?: any[]): any {
+    public domain(): string[];
+    public domain(values: string[]): Ordinal;
+    public domain(values?: string[]): any {
       return super.domain(values);
     }
 
-    public _setDomain(values: any[]) {
+    public _setDomain(values: string[]) {
       super._setDomain(values);
       this.range(this.range()); // update range
     }
@@ -76,7 +76,7 @@ export module Scale {
       return step - this.rangeBand();
     }
 
-    public fullBandStartAndWidth(v: any) {
+    public fullBandStartAndWidth(v: string) {
       var start = this.scale(v) - this.innerPadding() / 2;
       var width = this.rangeBand() + this.innerPadding();
       return [start, width];

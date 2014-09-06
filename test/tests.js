@@ -654,7 +654,8 @@ describe("Category Axes", function () {
     });
     it("doesnt blow up for non-string data", function () {
         var svg = generateSVG(1000, 400);
-        var scale = new Plottable.Scale.Ordinal().domain([null, undefined, true, 2, "foo"]);
+        var domain = [null, undefined, true, 2, "foo"];
+        var scale = new Plottable.Scale.Ordinal().domain(domain);
         var axis = new Plottable.Axis.Category(scale);
         var table = new Plottable.Component.Table([[axis]]);
         table.renderTo(svg);
@@ -4023,9 +4024,9 @@ describe("Scales", function () {
             scale.rangeType("bands");
             assert.deepEqual(scale.rangeType(), "bands");
             scale.range([0, 2679]);
-            scale.domain([1, 2, 3, 4]);
+            scale.domain(["1", "2", "3", "4"]);
             assert.deepEqual(scale.rangeBand(), 399);
-            scale.domain([1, 2, 3, 4, 5]);
+            scale.domain(["1", "2", "3", "4", "5"]);
             assert.deepEqual(scale.rangeBand(), 329);
         });
         it("rangeType triggers broadcast", function () {
