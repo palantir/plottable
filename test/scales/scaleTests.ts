@@ -179,10 +179,10 @@ describe("Scales", () => {
       assert.deepEqual(scale.rangeType(), "bands");
       scale.range([0, 2679]);
 
-      scale.domain([1,2,3,4]);
+      scale.domain(["1","2","3","4"]);
       assert.deepEqual(scale.rangeBand(), 399);
 
-      scale.domain([1,2,3,4,5]);
+      scale.domain(["1","2","3","4","5"]);
       assert.deepEqual(scale.rangeBand(), 329);
     });
 

@@ -422,13 +422,13 @@ declare module Plottable {
     module Scale {
         class Ordinal extends Plottable.Abstract.Scale<string, number> {
             constructor(scale?: D3.Scale.OrdinalScale);
-            domain(): any[];
-            domain(values: any[]): Ordinal;
+            domain(): string[];
+            domain(values: string[]): Ordinal;
             range(): number[];
             range(values: number[]): Ordinal;
             rangeBand(): number;
             innerPadding(): number;
-            fullBandStartAndWidth(v: any): number[];
+            fullBandStartAndWidth(v: string): number[];
             rangeType(): string;
             rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): Ordinal;
             copy(): Ordinal;
