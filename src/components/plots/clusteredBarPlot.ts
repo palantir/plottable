@@ -60,10 +60,6 @@ export module Plot {
       return clusters;
     }
 
-    public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
-      return new Animator.Null();
-    }
-
     public _paint() {
       super._paint();
       var attrHash = this._generateAttrToProjector();
