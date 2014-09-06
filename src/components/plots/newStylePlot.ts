@@ -86,7 +86,7 @@ export module Abstract {
     }
 
     public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
-      throw new Error("Abstract Method Not Implemented");
+      return new Animator.Null();
     }
 
     public _updateProjector(attr: string) {

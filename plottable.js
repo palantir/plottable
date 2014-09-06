@@ -4597,7 +4597,7 @@ var Plottable;
                 throw new Error("Abstract Method Not Implemented");
             };
             NewStylePlot.prototype._getAnimator = function (drawer, index) {
-                throw new Error("Abstract Method Not Implemented");
+                return new Plottable.Animator.Null();
             };
             NewStylePlot.prototype._updateProjector = function (attr) {
                 var _this = this;
