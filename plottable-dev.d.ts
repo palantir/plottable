@@ -924,6 +924,7 @@ declare module Plottable {
             addDataset(dataset: any[]): NewStylePlot<X, Y>;
             _addDataset(key: string, dataset: Dataset): void;
             _getDrawer(key: string): _Drawer;
+            _getAnimator(drawer: _Drawer, index: number): Plottable.Animator.IPlotAnimator;
             _updateProjector(attr: string): void;
             datasetOrder(): string[];
             datasetOrder(order: string[]): NewStylePlot<X, Y>;
@@ -1125,6 +1126,7 @@ declare module Plottable {
             _baseline: D3.Selection;
             _barAlignmentFactor: number;
             constructor(xScale?: Plottable.Abstract.Scale<X, number>, yScale?: Plottable.Abstract.Scale<Y, number>, isVertical?: boolean);
+            _getAnimator(drawer: Plottable.Abstract._Drawer, index: number): Plottable.Animator.Rect;
             _getDrawer(key: string): any;
             _generateAttrToProjector(): any;
             baseline(value: number): any;

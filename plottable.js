@@ -1,5 +1,5 @@
 /*!
-Plottable 0.27.1 (https://github.com/palantir/plottable)
+Plottable 0.28.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -935,7 +935,7 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.27.1";
+    Plottable.version = "0.28.0";
 })(Plottable || (Plottable = {}));
 
 var Plottable;
@@ -4596,6 +4596,9 @@ var Plottable;
             NewStylePlot.prototype._getDrawer = function (key) {
                 throw new Error("Abstract Method Not Implemented");
             };
+            NewStylePlot.prototype._getAnimator = function (drawer, index) {
+                return new Plottable.Animator.Null();
+            };
             NewStylePlot.prototype._updateProjector = function (attr) {
                 var _this = this;
                 var projector = this._projectors[attr];
@@ -4657,9 +4660,13 @@ var Plottable;
                 return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).drawer; });
             };
             NewStylePlot.prototype._paint = function () {
+                var _this = this;
                 var attrHash = this._generateAttrToProjector();
                 var datasets = this._getDatasetsInOrder();
-                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(datasets[i].data(), attrHash); });
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
+                    d.draw(datasets[i].data(), attrHash, animator);
+                });
             };
             return NewStylePlot;
         })(Abstract.XYPlot);
@@ -5461,6 +5468,11 @@ var Plottable;
                 this.baseline(this._baselineValue);
                 this._isVertical = isVertical;
             }
+            StackedBar.prototype._getAnimator = function (drawer, index) {
+                var animator = new Plottable.Animator.Rect();
+                animator.delay(animator.duration() * index);
+                return animator;
+            };
             StackedBar.prototype._getDrawer = function (key) {
                 return Plottable.Abstract.NewStyleBarPlot.prototype._getDrawer.apply(this, [key]);
             };
@@ -5468,8 +5480,9 @@ var Plottable;
                 var attrToProjector = Plottable.Abstract.NewStyleBarPlot.prototype._generateAttrToProjector.apply(this);
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
+                var primaryAccessor = this._projectors[primaryAttr].accessor;
                 var getStart = function (d) { return primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                var getEnd = function (d) { return primaryScale.scale(d[primaryAttr] + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                var getEnd = function (d) { return primaryScale.scale(primaryAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 var heightF = function (d) { return Math.abs(getEnd(d) - getStart(d)); };
                 var widthF = attrToProjector["width"];
                 attrToProjector["height"] = this._isVertical ? heightF : widthF;
