@@ -10,7 +10,7 @@ function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
 
   var d = data[0].slice(10, 15);
-  var dataseries = new Plottable.DataSource(d);
+  var dataseries = new Plottable.Dataset(d);
   var i = 0;
 
   //Axis
@@ -21,7 +21,7 @@ function run(div, data, Plottable) {
 
   var barPlot = new Plottable.Plot.Area(dataseries, xScale, yScale).animate("true");
 
-  var label1  = new Plottable.Component.Label("dataSource.data()", "horizontal");
+  var label1  = new Plottable.Component.Label("dataset.data()", "horizontal");
   var label2  = new Plottable.Component.Label("change width + resize", "horizontal");
   var label3  = new Plottable.Component.Label("remove + renderTo", "horizontal");
   var label4  = new Plottable.Component.Label("_render()", "horizontal");

@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Util {
+export module _Util {
   export class IDCounter {
     private counter: {[id: string]: number} = {};
 

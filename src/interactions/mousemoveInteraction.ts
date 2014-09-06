@@ -3,6 +3,11 @@
 module Plottable {
 export module Interaction {
   export class Mousemove extends Abstract.Interaction {
+    /**
+     * Deprecated.
+     *
+     * @constructor
+     */
     constructor(componentToListenTo: Abstract.Component) {
       super(componentToListenTo);
     }

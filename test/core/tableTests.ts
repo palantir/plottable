@@ -96,13 +96,13 @@ describe("Tables", () => {
     var svg = generateSVG();
     table.renderTo(svg);
 
-    var elements = components.map((r) => r.element);
+    var elements = components.map((r) => r._element);
     var translates = elements.map((e) => getTranslate(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered at origin");
     assert.deepEqual(translates[1], [200, 0], "second element is located properly");
     assert.deepEqual(translates[2], [0, 200], "third element is located properly");
     assert.deepEqual(translates[3], [200, 200], "fourth element is located properly");
-    var bboxes = elements.map((e) => Plottable.Util.DOM.getBBox(e));
+    var bboxes = elements.map((e) => Plottable._Util.DOM.getBBox(e));
     bboxes.forEach((b) => {
       assert.equal(b.width, 200, "bbox is 200 pixels wide");
       assert.equal(b.height, 200, "bbox is 200 pixels tall");
@@ -119,9 +119,9 @@ describe("Tables", () => {
     var svg = generateSVG(415, 415);
     table.renderTo(svg);
 
-    var elements = components.map((r) => r.element);
+    var elements = components.map((r) => r._element);
     var translates = elements.map((e) => getTranslate(e));
-    var bboxes = elements.map((e) => Plottable.Util.DOM.getBBox(e));
+    var bboxes = elements.map((e) => Plottable._Util.DOM.getBBox(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
     assert.deepEqual(translates[1], [210, 0], "second element is located properly");
     assert.deepEqual(translates[2], [0, 210], "third element is located properly");
@@ -152,9 +152,9 @@ describe("Tables", () => {
 
     table.renderTo(svg);
 
-    var elements = components.map((r) => r.element);
+    var elements = components.map((r) => r._element);
     var translates = elements.map((e) => getTranslate(e));
-    var bboxes = elements.map((e) => Plottable.Util.DOM.getBBox(e));
+    var bboxes = elements.map((e) => Plottable._Util.DOM.getBBox(e));
     // test the translates
     assert.deepEqual(translates[0], [50, 0]  , "top axis translate");
     assert.deepEqual(translates[4], [50, 370], "bottom axis translate");
@@ -211,7 +211,7 @@ describe("Tables", () => {
 
   describe("table.iterateLayout works properly", () => {
     // This test battery would have caught #405
-    function verifyLayoutResult(result: Plottable.Component.IterateLayoutResult,
+    function verifyLayoutResult(result: Plottable.Component._IterateLayoutResult,
                                 cPS: number[], rPS: number[], gW: number[], gH: number[],
                                 wW: boolean, wH: boolean, id: string) {
       assert.deepEqual(result.colProportionalSpace, cPS, "colProportionalSpace:" + id);

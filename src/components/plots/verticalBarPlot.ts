@@ -11,24 +11,24 @@ export module Plot {
    *  - "x" - the horizontal position of a bar
    *  - "y" - the vertical height of a bar
    */
-  export class VerticalBar extends Abstract.BarPlot {
+  export class VerticalBar<X> extends Abstract.BarPlot<X,number> {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
 
     /**
-     * Creates a VerticalBarPlot.
+     * Constructs a VerticalBarPlot.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
+     * @param {IDataset | any} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale) {
+    constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.QuantitativeScale<number>) {
       this._isVertical = true; // Has to be set before super()
       super(dataset, xScale, yScale);
     }
 
     public _updateYDomainer() {
-      this._updateDomainer(this.yScale);
+      this._updateDomainer(this._yScale);
     }
   }
 }

@@ -12,7 +12,7 @@ function run(div, data, Plottable) {
 
     //data
 
-    var dataseries1 = new Plottable.DataSource(data[0]);
+    var dataseries1 = new Plottable.Dataset(data[0]);
 
     //Axis
     var xScale = new Plottable.Scale.Linear();
