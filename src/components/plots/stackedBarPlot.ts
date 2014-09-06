@@ -28,6 +28,12 @@ export module Plot {
       this._isVertical = isVertical;
     }
 
+    public _getAnimator(drawer: Abstract._Drawer, index: number) {
+      var animator = new Animator.Rect();
+      animator.delay(animator.duration() * index);
+      return animator;
+    }
+
     public _getDrawer(key: string) {
       return Abstract.NewStyleBarPlot.prototype._getDrawer.apply(this, [key]);
     }
