@@ -37,8 +37,9 @@ export module Plot {
 
       var primaryAttr = this._isVertical ? "y" : "x";
       var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryAccessor = this._projectors[primaryAttr].accessor;
       var getStart = (d: any) => primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      var getEnd = (d: any) => primaryScale.scale(d[primaryAttr] + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var getEnd = (d: any) => primaryScale.scale(primaryAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
       var heightF = (d: any) => Math.abs(getEnd(d) - getStart(d));
       var widthF = attrToProjector["width"];
