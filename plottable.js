@@ -4596,6 +4596,9 @@ var Plottable;
             NewStylePlot.prototype._getDrawer = function (key) {
                 throw new Error("Abstract Method Not Implemented");
             };
+            NewStylePlot.prototype._getAnimator = function (drawer, index) {
+                throw new Error("Abstract Method Not Implemented");
+            };
             NewStylePlot.prototype._updateProjector = function (attr) {
                 var _this = this;
                 var projector = this._projectors[attr];
@@ -4657,9 +4660,13 @@ var Plottable;
                 return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).drawer; });
             };
             NewStylePlot.prototype._paint = function () {
+                var _this = this;
                 var attrHash = this._generateAttrToProjector();
                 var datasets = this._getDatasetsInOrder();
-                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(datasets[i].data(), attrHash); });
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
+                    d.draw(datasets[i].data(), attrHash, animator);
+                });
             };
             return NewStylePlot;
         })(Abstract.XYPlot);
@@ -5461,6 +5468,11 @@ var Plottable;
                 this.baseline(this._baselineValue);
                 this._isVertical = isVertical;
             }
+            StackedBar.prototype._getAnimator = function (drawer, index) {
+                var animator = new Plottable.Animator.Rect();
+                animator.delay(animator.duration() * index);
+                return animator;
+            };
             StackedBar.prototype._getDrawer = function (key) {
                 return Plottable.Abstract.NewStyleBarPlot.prototype._getDrawer.apply(this, [key]);
             };

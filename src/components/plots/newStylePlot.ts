@@ -85,6 +85,10 @@ export module Abstract {
       throw new Error("Abstract Method Not Implemented");
     }
 
+    public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
+      throw new Error("Abstract Method Not Implemented");
+    }
+
     public _updateProjector(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
@@ -171,7 +175,10 @@ export module Abstract {
     public _paint() {
       var attrHash = this._generateAttrToProjector();
       var datasets = this._getDatasetsInOrder();
-      this._getDrawersInOrder().forEach((d, i) => d.draw(datasets[i].data(), attrHash));
+      this._getDrawersInOrder().forEach((d, i) => {
+        var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
+        d.draw(datasets[i].data(), attrHash, animator);
+      });
     }
   }
 }
