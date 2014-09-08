@@ -4508,7 +4508,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Abstract) {
+    (function (Plot) {
         var Pie = (function (_super) {
             __extends(Pie, _super);
             function Pie() {
@@ -4531,10 +4531,10 @@ var Plottable;
                 throw new Error("MUST IMPLEMENT");
             };
             return Pie;
-        })(Abstract.Plot);
-        Abstract.Pie = Pie;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
+        })(Plottable.Abstract.Plot);
+        Plot.Pie = Pie;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
 
 var __extends = this.__extends || function (d, b) {

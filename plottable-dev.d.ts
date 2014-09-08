@@ -905,8 +905,8 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Abstract {
-        class Pie extends Plot {
+    module Plot {
+        class Pie extends Plottable.Abstract.Plot {
             constructor();
             addDataset(key: string, dataset: Dataset): Pie;
             addDataset(key: string, dataset: any[]): Pie;
@@ -914,7 +914,7 @@ declare module Plottable {
             addDataset(dataset: any[]): Pie;
             removeDataset(key: string): Pie;
             _generateAttrToProjector(): IAttributeToProjector;
-            _getDrawer(key: string): _Drawer;
+            _getDrawer(key: string): Plottable.Abstract._Drawer;
             _paint(): void;
         }
     }

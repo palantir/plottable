@@ -742,8 +742,8 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Abstract {
-        class Pie extends Plot {
+    module Plot {
+        class Pie extends Plottable.Abstract.Plot {
             constructor();
             addDataset(key: string, dataset: Dataset): Pie;
             addDataset(key: string, dataset: any[]): Pie;
