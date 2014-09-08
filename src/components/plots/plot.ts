@@ -33,7 +33,7 @@ export module Abstract {
       this.classed("plot", true);
 
       var dataset: Dataset;
-      if (dataOrDataset != null) {
+      if (dataOrDataset) {
         if (typeof dataOrDataset.data === "function") {
           dataset = <Dataset> dataOrDataset;
         } else {
@@ -59,7 +59,7 @@ export module Abstract {
       var properties = Object.keys(this._projectors);
       properties.forEach((property) => {
         var projector = this._projectors[property];
-        if (projector.scale != null) {
+        if (projector.scale) {
           projector.scale.broadcaster.deregisterListener(this);
         }
       });
@@ -79,10 +79,10 @@ export module Abstract {
      */
     public dataset(dataset: Dataset): Plot;
     public dataset(dataset?: Dataset): any {
-      if (dataset == null) {
+      if (!dataset) {
         return this._dataset;
       }
-      if (this._dataset != null) {
+      if (this._dataset) {
         this._dataset.broadcaster.deregisterListener(this);
       }
       this._dataset = dataset;
@@ -124,14 +124,14 @@ export module Abstract {
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
       var currentProjection = this._projectors[attrToSet];
-      var existingScale = (currentProjection != null) ? currentProjection.scale : null;
+      var existingScale = currentProjection && currentProjection.scale;
 
-      if (existingScale != null) {
+      if (existingScale) {
         existingScale._removeExtent(this._plottableID.toString(), attrToSet);
         existingScale.broadcaster.deregisterListener(this);
       }
 
-      if (scale != null) {
+      if (scale) {
         scale.broadcaster.registerListener(this, () => this._render());
       }
       var activatedAccessor = _Util.Methods._applyAccessor(accessor, this);
@@ -147,7 +147,7 @@ export module Abstract {
         var projector = this._projectors[a];
         var accessor = projector.accessor;
         var scale = projector.scale;
-        var fn = scale == null ? accessor : (d: any, i: number) => scale.scale(accessor(d, i));
+        var fn = scale ? (d: any, i: number) => scale.scale(accessor(d, i)) : accessor;
         h[a] = fn;
       });
       return h;
@@ -197,7 +197,7 @@ export module Abstract {
 
     public _updateProjector(attr: string) {
       var projector = this._projectors[attr];
-      if (projector.scale != null) {
+      if (projector.scale) {
         var extent = this.dataset()._getExtent(projector.accessor);
         if (extent.length === 0 || !this._isAnchored) {
           projector.scale._removeExtent(this._plottableID.toString(), attr);
@@ -222,7 +222,7 @@ export module Abstract {
      * @returns {D3.Selection} The resulting selection (potentially after the transition)
      */
     public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any {
-      if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
+      if (this._animate && this.animateOnNextRender && this._animators[animatorKey]) {
         return this._animators[animatorKey].animate(selection, attrToProjector);
       } else {
         return selection.attr(attrToProjector);
