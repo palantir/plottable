@@ -734,8 +734,12 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class PiePlot<X, Y> extends Plot {
+        class Pie extends Plot {
             constructor();
+            addDataset(key: string, dataset: Dataset): Pie;
+            addDataset(key: string, dataset: any[]): Pie;
+            addDataset(dataset: Dataset): Pie;
+            addDataset(dataset: any[]): Pie;
         }
     }
 }
