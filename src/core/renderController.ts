@@ -28,9 +28,29 @@ export module Core {
     var _isCurrentlyFlushing: boolean = false;
     export var _renderPolicy: RenderPolicy.IRenderPolicy = new RenderPolicy.AnimationFrame();
 
-    export function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): any {
+
+    export function setRenderPolicy(policy: string): void;
+    export function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): void;
+    export function setRenderPolicy(policy: any): void {
+      if (typeof(policy) === "string") {
+        switch (policy.toLowerCase()) {
+          case "immediate":
+          policy = new RenderPolicy.Immediate();
+          break;
+          case "animationframe":
+          policy = new RenderPolicy.AnimationFrame();
+          break;
+          case "timeout":
+          policy = new RenderPolicy.Timeout();
+          break;
+          default:
+          _Util.Methods.warn("Unrecognized renderPolicy: " + policy);
+          return;
+        }
+      }
       _renderPolicy = policy;
     }
+
 
     /**
      * If the RenderController is enabled, we enqueue the component for
