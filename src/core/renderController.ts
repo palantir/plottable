@@ -28,7 +28,6 @@ export module Core {
     var _isCurrentlyFlushing: boolean = false;
     export var _renderPolicy: RenderPolicy.IRenderPolicy = new RenderPolicy.AnimationFrame();
 
-
     export function setRenderPolicy(policy: string): void;
     export function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): void;
     export function setRenderPolicy(policy: any): void {
@@ -50,7 +49,6 @@ export module Core {
       }
       _renderPolicy = policy;
     }
-
 
     /**
      * If the RenderController is enabled, we enqueue the component for
