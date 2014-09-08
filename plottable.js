@@ -2133,6 +2133,29 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (_Drawer) {
+        var Arc = (function (_super) {
+            __extends(Arc, _super);
+            function Arc() {
+                _super.apply(this, arguments);
+            }
+            Arc.prototype.draw = function (data, attrToProjector) {
+            };
+            return Arc;
+        })(Plottable.Abstract._Drawer);
+        _Drawer.Arc = Arc;
+    })(Plottable._Drawer || (Plottable._Drawer = {}));
+    var _Drawer = Plottable._Drawer;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (_Drawer) {
         var Area = (function (_super) {
             __extends(Area, _super);
             function Area() {
@@ -4475,6 +4498,43 @@ var Plottable;
         Abstract.Plot = Plot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Plot) {
+        var Pie = (function (_super) {
+            __extends(Pie, _super);
+            function Pie() {
+                _super.call(this, new Plottable.Dataset());
+                this.classed("pie-plot", true);
+            }
+            Pie.prototype.addDataset = function (keyOrDataset, dataset) {
+                throw new Error("MUST IMPLEMENT");
+            };
+            Pie.prototype.removeDataset = function (key) {
+                throw new Error("WILL IMPLEMENT");
+            };
+            Pie.prototype._generateAttrToProjector = function () {
+                throw new Error("MUST IMPLEMENT");
+            };
+            Pie.prototype._getDrawer = function (key) {
+                throw new Error("MUST IMPLEMENT");
+            };
+            Pie.prototype._paint = function () {
+                throw new Error("MUST IMPLEMENT");
+            };
+            return Pie;
+        })(Plottable.Abstract.Plot);
+        Plot.Pie = Pie;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
 
 var __extends = this.__extends || function (d, b) {
