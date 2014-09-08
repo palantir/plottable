@@ -24,11 +24,10 @@ function run(div, data, Plottable) {
   var renderGroup = gridlines.merge(barPlot);
   var title = new Plottable.Component.TitleLabel("reset");
 
-  new Plottable.Template.StandardChart()
-                .titleLabel(title)
-                .xAxis(xAxis).yAxis(yAxis)
-                .center(renderGroup)
-                .renderTo(svg);
+  var chart = new Plottable.Component.Table([
+                                            [null, title],
+                                            [yAxis, renderGroup],
+                                            [null,  xAxis]]).renderTo(svg);
 
 //callbacks
   var cb_drag = function(xy) {

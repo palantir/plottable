@@ -26,7 +26,7 @@ function run(div, data, Plottable) {
   hBarChart.renderTo(svg);
 
   var cb = function(x, y){
-    d = hBarRenderer.dataset().data();
+    var d = hBarRenderer.dataset().data();
     hBarRenderer.dataset().data(d);
   };
 

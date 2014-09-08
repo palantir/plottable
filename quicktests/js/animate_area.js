@@ -27,7 +27,7 @@ function run(div, data, Plottable) {
   areaChart.renderTo(svg);
 
   var cb = function(x, y){
-    d = areaRenderer.dataset().data();
+    var d = areaRenderer.dataset().data();
     areaRenderer.dataset().data(d);
   };
 

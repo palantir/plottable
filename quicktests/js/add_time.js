@@ -36,7 +36,7 @@ function run(div, data, Plottable) {
     date = date + ((Math.floor(data[0][pts].y*91)%28) + 1);
     date = date + "/";
     date = date + Math.floor(data[0][pts].x*3000);
-    var obj = {x: date, y: data[1][pts] * 500 - 250};
+    var obj = {x: date, y: data[1][pts].y * 500 - 250};
 
     d.push(obj);
     ds.data(d);

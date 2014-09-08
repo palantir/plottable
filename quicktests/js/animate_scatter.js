@@ -26,7 +26,7 @@ function run(div, data, Plottable) {
   circleChart.renderTo(svg);
 
   var cb = function(x, y){
-    d = circleRenderer.dataset().data();
+    var d = circleRenderer.dataset().data();
     circleRenderer.dataset().data(d);
   };
 
