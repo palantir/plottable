@@ -39,6 +39,20 @@ export module Abstract {
       throw new Error("MUST IMPLEMENT");
     }
 
+    /**
+     * Removes a dataset.
+     *
+     * @param {string} key The key of the dataset
+     * @returns {PiePlot} The calling PiePlot.
+     */
+    public removeDataset(key: string): Pie {
+      /**
+       * Implementation will be very similar to newStylePlot's implementation if not identical.
+       * Removal of a dataset will allow a new one to be added.
+       */
+      throw new Error("WILL IMPLEMENT");
+    }
+
     public _generateAttrToProjector(): IAttributeToProjector {
       /**
        * Under the assumption that the data is now nicely formatted,
@@ -47,13 +61,17 @@ export module Abstract {
       throw new Error("MUST IMPLEMENT");
     }
 
+    public _getDrawer(key: string): Abstract._Drawer {
+      /**
+       * Probably will need an arc drawer here
+       */
+      throw new Error("MUST IMPLEMENT");
+    }
+
     public _paint() {
       /**
        * Grab the attributes from _generateAttrToProjector and then use
        * an arcDrawer or so to draw the arc
-       * If animate is true, then animate appropirately through the drawer
-       * Also, if labels are to be shown, then write the labels here as well
-       * Maybe use textDrawer?  not sure in this case.
        */
       throw new Error("MUST IMPLEMENT");
     }

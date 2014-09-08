@@ -497,6 +497,15 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
+        class Arc extends Plottable.Abstract._Drawer {
+            draw(data: any[], attrToProjector: IAttributeToProjector): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
         class Area extends Plottable.Abstract._Drawer {
             draw(data: any[], attrToProjector: IAttributeToProjector): void;
         }
@@ -740,6 +749,7 @@ declare module Plottable {
             addDataset(key: string, dataset: any[]): Pie;
             addDataset(dataset: Dataset): Pie;
             addDataset(dataset: any[]): Pie;
+            removeDataset(key: string): Pie;
         }
     }
 }

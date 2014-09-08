@@ -2133,6 +2133,29 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (_Drawer) {
+        var Arc = (function (_super) {
+            __extends(Arc, _super);
+            function Arc() {
+                _super.apply(this, arguments);
+            }
+            Arc.prototype.draw = function (data, attrToProjector) {
+            };
+            return Arc;
+        })(Plottable.Abstract._Drawer);
+        _Drawer.Arc = Arc;
+    })(Plottable._Drawer || (Plottable._Drawer = {}));
+    var _Drawer = Plottable._Drawer;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (_Drawer) {
         var Area = (function (_super) {
             __extends(Area, _super);
             function Area() {
@@ -4495,7 +4518,13 @@ var Plottable;
             Pie.prototype.addDataset = function (keyOrDataset, dataset) {
                 throw new Error("MUST IMPLEMENT");
             };
+            Pie.prototype.removeDataset = function (key) {
+                throw new Error("WILL IMPLEMENT");
+            };
             Pie.prototype._generateAttrToProjector = function () {
+                throw new Error("MUST IMPLEMENT");
+            };
+            Pie.prototype._getDrawer = function (key) {
                 throw new Error("MUST IMPLEMENT");
             };
             Pie.prototype._paint = function () {
