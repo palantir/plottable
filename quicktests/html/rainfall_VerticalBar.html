@@ -1,7 +1,7 @@
 
 <html>
   <head>
-    <title>Multiple Clusteredbar</title>
+    <title>Rainfall Verticalbar</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
     <style>
       svg {
@@ -20,8 +20,17 @@
         font-size: 15;
       }
 
-      .plottable .legend-row text {
-        font-size: 14px;
+      .plottable .legend text {
+        font-size: 17px;
+        font-weight: normal;
+      }
+
+      .plottable .title-label text {
+        font-size: 25px;
+      }
+
+      .plottable .x-axis text {
+        font-size: 16px;
       }
 
 
@@ -29,7 +38,7 @@
     <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
     <script src="../../plottable.js"></script>
     <script src="../exampleUtil.js"></script>
-    <script src="../js/multiple_ClusteredBar.js"></script>
+    <script src="../js/rainfall_VerticalBar.js"></script>
 
     <script>
       window.onload = function() {
@@ -40,9 +49,7 @@
   </head>
 
   <body>
-  <div id="outer">
     <div id="testdiv"></div>
-    </div>
   </body>
 
 </html>

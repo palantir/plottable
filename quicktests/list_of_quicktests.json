@@ -72,10 +72,10 @@
     "name":"modifiedLog",
     "categories":["Datasource", "Metadata", "Modified Log Scale", "Color Scale", "Line Plot", "Numeric Axis", "Accessor", "Project", "Toggle Legend"]
   },  {
-    "name":"multiple_clusteredBar",
+    "name":"rainfall_ClusteredBar",
     "categories":[ "Color Scale", "Vertical Bar Plot", "Numeric Axis", "Accessor", "Legend", "Project", "Table"]
   },  {
-    "name":"multiple_verticalBar",
+    "name":"rainfall_VerticalBar",
     "categories":[ "Color Scale", "Vertical Bar Plot", "Numeric Axis", "Accessor", "Legend", "Project", "Table"]
   },  {
     "name":"no_data",

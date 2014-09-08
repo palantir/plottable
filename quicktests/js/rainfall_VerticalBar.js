@@ -57,12 +57,12 @@ function run(div, data, Plottable){
   var bar3 = g3.merge(sanJoseBar);
 
   var chart = new Plottable.Component.Table([
-    [null, title],
-    [null, legend],
-    [yAxis1, bar1],
-    [yAxis2, bar2],
-    [yAxis3, bar3],
-    [null, xAxis]]);
+                                            [null     ,   title ],
+                                            [null     ,   legend],
+                                            [yAxis1   ,   bar1  ],
+                                            [yAxis2   ,   bar2  ],
+                                            [yAxis3   ,   bar3  ],
+                                            [null     ,   xAxis ]]);
 
   var finalchart = new Plottable.Component.Table([
     [yUnitLabel, chart]]);

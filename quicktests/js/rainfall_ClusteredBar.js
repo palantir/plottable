@@ -32,10 +32,10 @@ function run(div, data, Plottable){
   var yUnitLabel = new Plottable.Component.AxisLabel("Inches", "vertical-left" );
 
   var chart = new Plottable.Component.Table([
-    [null, null, title],
-    [null, null, legend],
-    [yUnitLabel, yAxis, clusteredPlot],
-    [null, null , xAxis]]);
+                                            [null         ,   null    ,   title        ],
+                                            [null         ,   null    ,   legend       ],
+                                            [yUnitLabel   ,   yAxis   ,   clusteredPlot],
+                                            [null         ,   null    ,   xAxis        ]]);
 
   chart.renderTo(svg);
 }
