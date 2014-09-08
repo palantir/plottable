@@ -7,6 +7,11 @@ export module Plot {
    * One usecase is to show how much funding departments are given out of a total budget.
    */
   export class Pie extends Abstract.Plot {
+
+    public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
+    public _datasetKeysInOrder: string[];
+    private nextSeriesIndex: number;
+
     /**
      * Constructs a PiePlot.
      *
@@ -32,25 +37,61 @@ export module Plot {
     public addDataset(dataset: Dataset): Pie;
     public addDataset(dataset: any[]): Pie;
     public addDataset(keyOrDataset: any, dataset?: any): Pie {
-      /**
-       * Implementation will be very similar to newStylePlot's implementation if not identical.
-       * A dataset will be added for the PiePlot to plot.  Any additional ones will be ignored.
-       */
-      throw new Error("MUST IMPLEMENT");
+      if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
+        throw new Error("invalid input to addDataset");
+      }
+      if (typeof(keyOrDataset) === "string" && keyOrDataset[0] === "_") {
+        _Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
+      }
+      var key  = typeof(keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
+      var data = typeof(keyOrDataset) !== "string" ? keyOrDataset : dataset;
+      var dataset = (data instanceof Dataset) ? data : new Dataset(data);
+
+      this._addDataset(key, dataset);
+      return this;
+    }
+
+    public _addDataset(key: string, dataset: Dataset) {
+      if (this._key2DatasetDrawerKey.has(key)) {
+        this.removeDataset(key);
+      };
+      var drawer = this._getDrawer(key);
+      var ddk = {drawer: drawer, dataset: dataset, key: key};
+      this._datasetKeysInOrder.push(key);
+      this._key2DatasetDrawerKey.set(key, ddk);
+
+      if (this._isSetup) {
+        drawer._renderArea = this._renderArea.append("g");
+      }
+      dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
+      this._onDatasetUpdate();
     }
 
     /**
-     * Removes a dataset.
+     * Removes a dataset
      *
      * @param {string} key The key of the dataset
-     * @returns {PiePlot} The calling PiePlot.
+     * @return {NewStylePlot} The calling PiePlot.
      */
     public removeDataset(key: string): Pie {
-      /**
-       * Implementation will be very similar to newStylePlot's implementation if not identical.
-       * Removal of a dataset will allow a new one to be added.
-       */
-      throw new Error("WILL IMPLEMENT");
+      if (this._key2DatasetDrawerKey.has(key)) {
+        var ddk = this._key2DatasetDrawerKey.get(key);
+        ddk.drawer.remove();
+
+        var projectors = d3.values(this._projectors);
+        var scaleKey = this._plottableID.toString() + "_" + key;
+        projectors.forEach((p) => {
+          if (p.scale != null) {
+            p.scale._removeExtent(scaleKey, p.attribute);
+          }
+        });
+
+        ddk.dataset.broadcaster.deregisterListener(this);
+        this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
+        this._key2DatasetDrawerKey.remove(key);
+        this._onDatasetUpdate();
+      }
+      return this;
     }
 
     public _generateAttrToProjector(): IAttributeToProjector {

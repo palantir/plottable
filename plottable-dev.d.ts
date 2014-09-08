@@ -907,11 +907,14 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Pie extends Plottable.Abstract.Plot {
+            _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
+            _datasetKeysInOrder: string[];
             constructor();
             addDataset(key: string, dataset: Dataset): Pie;
             addDataset(key: string, dataset: any[]): Pie;
             addDataset(dataset: Dataset): Pie;
             addDataset(dataset: any[]): Pie;
+            _addDataset(key: string, dataset: Dataset): void;
             removeDataset(key: string): Pie;
             _generateAttrToProjector(): IAttributeToProjector;
             _getDrawer(key: string): Plottable.Abstract._Drawer;
