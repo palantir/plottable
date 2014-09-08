@@ -4486,6 +4486,28 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Abstract) {
+        var PiePlot = (function (_super) {
+            __extends(PiePlot, _super);
+            function PiePlot() {
+                _super.call(this, new Plottable.Dataset());
+                this.classed("pie-plot", true);
+            }
+            return PiePlot;
+        })(Abstract.Plot);
+        Abstract.PiePlot = PiePlot;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
         var XYPlot = (function (_super) {
             __extends(XYPlot, _super);
             function XYPlot(dataset, xScale, yScale) {

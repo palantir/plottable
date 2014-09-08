@@ -734,6 +734,15 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
+        class PiePlot<X, Y> extends Plot {
+            constructor();
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
         class XYPlot<X, Y> extends Plot {
             constructor(dataset: any, xScale: Scale<X, number>, yScale: Scale<Y, number>);
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
