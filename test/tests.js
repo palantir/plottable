@@ -1497,7 +1497,7 @@ describe("Plots", function () {
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
-            simpleDataset = new Plottable.Dataset([{ value: 5 }, { value: 10 }]);
+            simpleDataset = new Plottable.Dataset([{ value: 5 }, { value: 15 }]);
             piePlot = new Plottable.Plot.Pie();
             piePlot.addDataset(simpleDataset);
             piePlot.renderTo(svg);
@@ -1506,7 +1506,32 @@ describe("Plots", function () {
         beforeEach(function () {
             verifier.start();
         });
-        it("draws a line correctly", function () {
+        it("sectors divided evenly", function () {
+            var arcPaths = renderArea.selectAll(".arc");
+            assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+            var arcPath0 = d3.select(arcPaths[0][0]);
+            var pathPoints0 = arcPath0.attr("d").split(/[A-Z]/).slice(1, 4);
+            var firstPathPoints0 = pathPoints0[0].split(",");
+            assert.closeTo(parseFloat(firstPathPoints0[0]), 0, 1, "draws line vertically at beginning");
+            assert.operator(parseFloat(firstPathPoints0[1]), "<", 0, "draws line upwards");
+            var arcDestPoint0 = pathPoints0[1].split(" ")[3].split(",");
+            assert.operator(parseFloat(arcDestPoint0[0]), ">", 0, "arcs line to the right");
+            assert.closeTo(parseFloat(arcDestPoint0[1]), 0, 1, "ends on same level of svg");
+            var secondPathPoints0 = pathPoints0[2].split(",");
+            assert.closeTo(parseFloat(secondPathPoints0[0]), 0, 1, "draws line to origin");
+            assert.closeTo(parseFloat(secondPathPoints0[1]), 0, 1, "draws line to origin");
+            var arcPath1 = d3.select(arcPaths[0][1]);
+            var pathPoints1 = arcPath1.attr("d").split(/[A-Z]/).slice(1, 4);
+            var firstPathPoints1 = pathPoints1[0].split(",");
+            assert.operator(parseFloat(firstPathPoints1[0]), ">", 0, "draws line to the right");
+            assert.closeTo(parseFloat(firstPathPoints1[1]), 0, 1, "draws line horizontally");
+            var arcDestPoint1 = pathPoints1[1].split(" ")[3].split(",");
+            assert.closeTo(parseFloat(arcDestPoint1[0]), 0, 1, "ends at x origin");
+            assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above 0");
+            var secondPathPoints1 = pathPoints1[2].split(",");
+            assert.closeTo(parseFloat(secondPathPoints1[0]), 0, 1, "draws line to origin");
+            assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin");
+            verifier.end();
         });
         after(function () {
             if (verifier.passed) {
