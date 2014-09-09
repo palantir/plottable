@@ -1154,6 +1154,22 @@ var Plottable;
             var _isCurrentlyFlushing = false;
             RenderController._renderPolicy = new RenderController.RenderPolicy.AnimationFrame();
             function setRenderPolicy(policy) {
+                if (typeof (policy) === "string") {
+                    switch (policy.toLowerCase()) {
+                        case "immediate":
+                            policy = new RenderController.RenderPolicy.Immediate();
+                            break;
+                        case "animationframe":
+                            policy = new RenderController.RenderPolicy.AnimationFrame();
+                            break;
+                        case "timeout":
+                            policy = new RenderController.RenderPolicy.Timeout();
+                            break;
+                        default:
+                            Plottable._Util.Methods.warn("Unrecognized renderPolicy: " + policy);
+                            return;
+                    }
+                }
                 RenderController._renderPolicy = policy;
             }
             RenderController.setRenderPolicy = setRenderPolicy;

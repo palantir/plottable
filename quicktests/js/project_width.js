@@ -44,13 +44,11 @@ function run(div, data, Plottable) {
 
 
   function addBar() {
-    var data2 = ds.data();
-    if(data2.length < alphabet.length) {
-      var newBar = { name: alphabet[data2.length], age: data[0][data2.length].y };
-      data2.push(newBar);
-      console.log(newBar);
-    }
-    ds.data(data2);
+    var d = ds.data();
+    if(d.length < alphabet.length) {
+      d.push({ name: alphabet[d.length], age: data[0][d.length].y });
+    }  
+    ds.data(d);
     barRenderer.project("width", widthPicker);
   }
 

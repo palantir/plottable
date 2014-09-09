@@ -252,7 +252,8 @@ declare module Plottable {
 declare module Plottable {
     module Core {
         module RenderController {
-            function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): any;
+            function setRenderPolicy(policy: string): void;
+            function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): void;
             function registerToRender(c: Plottable.Abstract.Component): void;
             function registerToComputeLayout(c: Plottable.Abstract.Component): void;
             function flush(): void;

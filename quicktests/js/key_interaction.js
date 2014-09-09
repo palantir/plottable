@@ -35,6 +35,7 @@ function run(div, data, Plottable) {
   ki.callback(function() {
     xScale.domain(initialDomains.x);
     yScale.domain(initialDomains.y);
+    pzi.resetZoom();
   });
   scatterPlot.registerInteraction(ki);
 
