@@ -27,13 +27,15 @@ function run(div, data, Plottable) {
 
   basicTable.renderTo(svg);
 
-  var pzi = new Plottable.Interaction.PanZoom(scatterPlot, xScale, yScale).registerWithComponent();
+  scatterPlot.registerInteraction(
+    new Plottable.Interaction.PanZoom(xScale, yScale)
+  );
 
-  var ki = new Plottable.Interaction.Key(scatterPlot, 65);
+  var ki = new Plottable.Interaction.Key(65);
   ki.callback(function() {
     xScale.domain(initialDomains.x);
     yScale.domain(initialDomains.y);
   });
-  ki.registerWithComponent();
+  scatterPlot.registerInteraction(ki);
 
 }

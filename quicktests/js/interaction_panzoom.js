@@ -23,7 +23,7 @@ function run(div, data, Plottable) {
 
   chart.renderTo(svg);
 
-  var pzi = new Plottable.Interaction.PanZoom(renderAreaD1, xScale, yScale);
-  pzi.registerWithComponent();
-
+  renderAreaD1.registerInteraction(
+    new Plottable.Interaction.PanZoom(xScale, yScale)
+  );
 }

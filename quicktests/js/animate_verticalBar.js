@@ -28,11 +28,11 @@ function run(div, data, Plottable) {
   vBarChart.renderTo(svg);
 
   var cb = function(x, y){
-    d = vBarRenderer.dataset().data();
+    var d = vBarRenderer.dataset().data();
     vBarRenderer.dataset().data(d);
   };
 
-  new Plottable.Interaction.Click(vBarRenderer)
-        .callback(cb)
-        .registerWithComponent();
+  vBarRenderer.registerInteraction(
+    new Plottable.Interaction.Click(vBarRenderer).callback(cb)
+  );
 }

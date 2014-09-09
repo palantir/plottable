@@ -106,6 +106,6 @@
     "categories":["Linear Scale", "Numeric Axis", "Animate", "Legend", "Category Axis", "Linear Scale", "Vertical Bar Plot", "Stacked Plot"]
   }, {
     "name":"titleLegend_change",
-    "categories":["Datasource", "Metadata", "Color Scale", "Scatter Plot", "Line Plot", "Area Plot", "Domain", "Linear Scale", "Numeric Axis", "Project", "Accessor", "Title", "Label", "Layout", "Click Interaction"]
+    "categories":["Datasource", "Metadata", "Color Scale", "Scatter Plot", "Line Plot", "Area Plot", "Domain", "Linear Scale", "Numeric Axis", "Project", "Accessor", "Title", "Label", "Layout", "Legend", "Click Interaction"]
   }
 ]

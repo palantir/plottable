@@ -26,7 +26,7 @@ function run(div, data, Plottable) {
   var removeLabel = new Plottable.Component.Label("remove bar");
 
   var widthPicker = function(){
-    var availableSpace = xAxis.availableWidth;
+    var availableSpace = xAxis.width();
     var numBars = ds.data().length;
     var w = availableSpace * 0.7 / numBars;
     return w;
@@ -61,10 +61,10 @@ function run(div, data, Plottable) {
     barRenderer.project("width", widthPicker);
   }
 
-  var addClick = new Plottable.Interaction.Click(addLabel)
-                              .callback(addBar)
-                              .registerWithComponent();
-  var removeClick = new Plottable.Interaction.Click(removeLabel)
-                              .callback(removeBar)
-                              .registerWithComponent();
+  addLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(addBar)
+  );
+  removeLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(removeBar)
+  );
 }

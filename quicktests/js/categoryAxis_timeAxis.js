@@ -29,6 +29,6 @@ function run(div, data, Plottable) {
 
   new Plottable.Template.StandardChart().center(renderGroup).xAxis(xAxis).yAxis(yAxis).renderTo(svg);
 
-  new Plottable.Interaction.PanZoom(hBarPlot, xScale, yScale).registerWithComponent();
+  hBarPlot.registerInteraction(new Plottable.Interaction.PanZoom(xScale, yScale));
 
 }

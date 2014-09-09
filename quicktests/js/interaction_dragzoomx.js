@@ -28,6 +28,8 @@ function run(div, data, Plottable) {
   .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
   .renderTo(svg);
 
-  var dragBoxInteraction = new Plottable.Interaction.XDragBox(renderGroup).setupZoomCallback(xScale, null).registerWithComponent();
+  renderGroup.registerInteraction(
+    new Plottable.Interaction.XDragBox().setupZoomCallback(xScale, null)
+  );
 
 }

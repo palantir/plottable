@@ -35,10 +35,16 @@ function run(div, data, Plottable) {
   var autoYLabel = new Plottable.Component.Label("autodomain Y");
   var focusYLabel = new Plottable.Component.Label("focus Y");
 
+  var labelTable = new Plottable.Component.Table([
+    [autoXLabel, focusXLabel],
+    [autoYLabel, focusYLabel]
+  ]);
+
   var basicTable = new Plottable.Component.Table([
     [yAxis, yAxis2, linePlot.merge(scatterPlot)],
     [null, null, xAxis],
-    [null, null, xAxis2]
+    [null, null, xAxis2],
+    [null, null, labelTable]
     ]);
   basicTable.renderTo(svg);
 
@@ -55,21 +61,17 @@ function run(div, data, Plottable) {
     yScale.domain([0, 8]);
   }
 
-  var xAutoInteraction = new
-      Plottable.Interaction.Click(autoXLabel)
-      .callback(xAuto)
-      .registerWithComponent();
-  var yAutoInteraction = new
-      Plottable.Interaction.Click(autoYLabel)
-      .callback(yAuto)
-      .registerWithComponent();
-  var xFocusInteraction = new
-      Plottable.Interaction.Click(focusXLabel)
-      .callback(xFocus)
-      .registerWithComponent();
-  var yFocusInteraction = new
-      Plottable.Interaction.Click(focusYLabel)
-      .callback(yFocus)
-      .registerWithComponent();
+  autoXLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(xAuto)
+  );
+  autoYLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(yAuto)
+  );
+  focusXLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(xFocus)
+  );
+  focusYLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(yFocus)
+  );
 
 }
