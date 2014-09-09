@@ -4526,7 +4526,7 @@ var Plottable;
                 this.classed("pie-plot", true);
             }
             Pie.prototype._setup = function () {
-                Plottable.Abstract.NewStylePlot.prototype._setup.apply(this, []);
+                Plottable.Abstract.NewStylePlot.prototype._setup.call(this);
             };
             Pie.prototype.addDataset = function (keyOrDataset, dataset) {
                 return Plottable.Abstract.NewStylePlot.prototype.addDataset.apply(this, [keyOrDataset, dataset]);
@@ -4555,10 +4555,10 @@ var Plottable;
                 return new Plottable._Drawer.Arc(key);
             };
             Pie.prototype._getDatasetsInOrder = function () {
-                return Plottable.Abstract.NewStylePlot.prototype._getDatasetsInOrder.apply(this);
+                return Plottable.Abstract.NewStylePlot.prototype._getDatasetsInOrder.call(this);
             };
             Pie.prototype._getDrawersInOrder = function () {
-                return Plottable.Abstract.NewStylePlot.prototype._getDrawersInOrder.apply(this);
+                return Plottable.Abstract.NewStylePlot.prototype._getDrawersInOrder.call(this);
             };
             Pie.prototype._paint = function () {
                 var _this = this;

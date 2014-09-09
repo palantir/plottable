@@ -27,7 +27,7 @@ export module Plot {
     }
 
     public _setup() {
-      Abstract.NewStylePlot.prototype._setup.apply(this, []);
+      Abstract.NewStylePlot.prototype._setup.call(this);
     }
 
     /**
@@ -83,11 +83,11 @@ export module Plot {
     }
 
     public _getDatasetsInOrder(): Dataset[] {
-      return Abstract.NewStylePlot.prototype._getDatasetsInOrder.apply(this);
+      return Abstract.NewStylePlot.prototype._getDatasetsInOrder.call(this);
     }
 
     public _getDrawersInOrder(): Abstract._Drawer[] {
-      return Abstract.NewStylePlot.prototype._getDrawersInOrder.apply(this);
+      return Abstract.NewStylePlot.prototype._getDrawersInOrder.call(this);
     }
 
     public _paint() {
@@ -100,7 +100,7 @@ export module Plot {
       });
     }
 
-    private pie(d: any[]) {
+    private pie(d: any[]): D3.Layout.ArcDescriptor[] {
       return d3.layout.pie()
                       .sort(null)
                       .value((d) => d.value)(d);
