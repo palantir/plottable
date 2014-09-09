@@ -2184,7 +2184,11 @@ var Plottable;
             }
             Polygon.prototype.draw = function (data, attrToProjector, animator) {
                 if (animator === void 0) { animator = new Plottable.Animator.Null(); }
-                throw new Error("MUST IMPLEMENT");
+                var svgElement = "polygon";
+                var dataElements = this._renderArea.selectAll(svgElement).data(data);
+                dataElements.enter().append(svgElement);
+                dataElements.exit().remove();
+                animator.animate(dataElements, attrToProjector);
             };
             return Polygon;
         })(Plottable.Abstract._Drawer);
@@ -4527,56 +4531,93 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Plot) {
-        var RadarPlot = (function (_super) {
-            __extends(RadarPlot, _super);
-            function RadarPlot(rScale) {
+        var Radar = (function (_super) {
+            __extends(Radar, _super);
+            function Radar(rScale) {
                 this._key2DatasetDrawerKey = d3.map();
                 this._datasetKeysInOrder = [];
                 this.nextSeriesIndex = 0;
+                this.metrics = [];
+                this._rScale = rScale;
                 _super.call(this, new Plottable.Dataset());
                 this.classed("radar-plot", true);
             }
-            RadarPlot.prototype._setup = function () {
+            Radar.prototype._setup = function () {
                 Plottable.Abstract.NewStylePlot.prototype._setup.call(this);
             };
-            RadarPlot.prototype.addDataset = function (keyOrDataset, dataset) {
+            Radar.prototype.addMetrics = function () {
+                var _this = this;
+                var metrics = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    metrics[_i - 0] = arguments[_i];
+                }
+                metrics.forEach(function (metric) { return _this.metrics.push(metric); });
+                return this;
+            };
+            Radar.prototype.addDataset = function (keyOrDataset, dataset) {
                 return Plottable.Abstract.NewStylePlot.prototype.addDataset.call(this, keyOrDataset, dataset);
             };
-            RadarPlot.prototype._addDataset = function (key, dataset) {
+            Radar.prototype._addDataset = function (key, dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
                     Plottable._Util.Methods.warn("Only one dataset is supported in pie plots");
                     return;
                 }
                 Plottable.Abstract.NewStylePlot.prototype._addDataset.call(this, key, dataset);
             };
-            RadarPlot.prototype.removeDataset = function (key) {
+            Radar.prototype.removeDataset = function (key) {
                 return Plottable.Abstract.NewStylePlot.prototype.removeDataset.call(this, key);
             };
-            RadarPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+            Radar.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                this._rScale.range([0, Math.min(this.width(), this.height())]);
+                this._rScale.range([0, Math.min(this.width(), this.height()) / 2 - 100]);
             };
-            RadarPlot.prototype._getAnimator = function (drawer, index) {
+            Radar.prototype._getAnimator = function (drawer, index) {
                 return Plottable.Abstract.NewStylePlot.prototype._getAnimator.call(this, drawer, index);
             };
-            RadarPlot.prototype._getDrawer = function (key) {
+            Radar.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Polygon(key);
             };
-            RadarPlot.prototype._getDatasetsInOrder = function () {
+            Radar.prototype._getDatasetsInOrder = function () {
                 return Plottable.Abstract.NewStylePlot.prototype._getDatasetsInOrder.call(this);
             };
-            RadarPlot.prototype._getDrawersInOrder = function () {
+            Radar.prototype._getDrawersInOrder = function () {
                 return Plottable.Abstract.NewStylePlot.prototype._getDrawersInOrder.call(this);
             };
-            RadarPlot.prototype._generateAttrToProjector = function () {
-                var _this = this;
+            Radar.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["d"] = d3.svg.arc().outerRadius(Math.min(this.width(), this.height()) / 2).innerRadius(0);
-                attrToProjector["transform"] = function () { return "translate(" + _this.width() / 2 + "," + _this.height() / 2 + ")"; };
+                var self = this;
+                function pointMapper(d) {
+                    return self.metrics.map(function (metric, i) {
+                        var translateX = self.width() / 2;
+                        var translateY = self.height() / 2;
+                        var value = d[metric];
+                        var scaledValue = self._rScale.scale(value);
+                        var angle = i * 2 * Math.PI / self.metrics.length;
+                        var rotateX = scaledValue * Math.cos(angle);
+                        var rotateY = -scaledValue * Math.sin(angle);
+                        return [rotateX + translateX, rotateY + translateY];
+                    });
+                }
+                attrToProjector["points"] = function (d, i) { return pointMapper(d); };
+                attrToProjector["fill"] = function () { return "steelblue"; };
+                attrToProjector["opacity"] = function () { return "0.7"; };
                 return attrToProjector;
             };
-            RadarPlot.prototype._paint = function () {
+            Radar.prototype._paint = function () {
                 var _this = this;
+                var lineLength = Math.min(this.width(), this.height()) / 2 - 100;
+                var metricAxes = this._renderArea.selectAll(".metric-axis").data(this.metrics);
+                metricAxes.enter().append("line");
+                metricAxes.exit().remove();
+                var axesAttrToProjector = {};
+                var translateString = "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
+                axesAttrToProjector["transform"] = function (d, i) { return translateString + " rotate(" + i * 360 / _this.metrics.length + ")"; };
+                axesAttrToProjector["x1"] = function () { return lineLength; };
+                axesAttrToProjector["y1"] = function () { return 0; };
+                axesAttrToProjector["x2"] = function () { return 0; };
+                axesAttrToProjector["y1"] = function () { return 0; };
+                axesAttrToProjector["stroke"] = function () { return "black"; };
+                metricAxes.attr(axesAttrToProjector);
                 var attrHash = this._generateAttrToProjector();
                 var datasets = this._getDatasetsInOrder();
                 this._getDrawersInOrder().forEach(function (d, i) {
@@ -4584,9 +4625,9 @@ var Plottable;
                     d.draw(datasets[i].data(), attrHash, animator);
                 });
             };
-            return RadarPlot;
+            return Radar;
         })(Plottable.Abstract.Plot);
-        Plot.RadarPlot = RadarPlot;
+        Plot.Radar = Radar;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));

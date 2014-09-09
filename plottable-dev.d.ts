@@ -907,18 +907,19 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class RadarPlot<R> extends Plottable.Abstract.Plot {
+        class Radar<R> extends Plottable.Abstract.Plot {
             _datasetKeysInOrder: string[];
             _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
             _rScale: Plottable.Abstract.Scale<R, number>;
             constructor(rScale: Plottable.Abstract.Scale<R, number>);
             _setup(): void;
-            addDataset(key: string, dataset: Dataset): RadarPlot<R>;
-            addDataset(key: string, dataset: any[]): RadarPlot<R>;
-            addDataset(dataset: Dataset): RadarPlot<R>;
-            addDataset(dataset: any[]): RadarPlot<R>;
+            addMetrics(...metrics: string[]): Radar<R>;
+            addDataset(key: string, dataset: Dataset): Radar<R>;
+            addDataset(key: string, dataset: any[]): Radar<R>;
+            addDataset(dataset: Dataset): Radar<R>;
+            addDataset(dataset: any[]): Radar<R>;
             _addDataset(key: string, dataset: Dataset): void;
-            removeDataset(key: string): RadarPlot<R>;
+            removeDataset(key: string): Radar<R>;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _getAnimator(drawer: Plottable.Abstract._Drawer, index: number): Plottable.Animator.IPlotAnimator;
             _getDrawer(key: string): Plottable.Abstract._Drawer;

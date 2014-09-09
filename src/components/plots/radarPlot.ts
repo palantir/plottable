@@ -6,12 +6,13 @@ export module Plot {
    * A RadarPlot is a plot made for showing the values of multivariate data
    * as lengths starting from a singular center point.
    */
-  export class RadarPlot<R> extends Abstract.Plot {
+  export class Radar<R> extends Abstract.Plot {
 
     public _datasetKeysInOrder: string[];
     public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
     public _rScale: Abstract.Scale<R, number>;
     private nextSeriesIndex: number;
+    private metrics: string[];
 
     /**
      * Constructs a RadarPlot.
@@ -23,6 +24,8 @@ export module Plot {
       this._key2DatasetDrawerKey = d3.map();
       this._datasetKeysInOrder = [];
       this.nextSeriesIndex = 0;
+      this.metrics = [];
+      this._rScale = rScale;
       // make a dummy dataset to satisfy the base Plot (HACKHACK)
       super(new Dataset());
       this.classed("radar-plot", true);
@@ -32,11 +35,16 @@ export module Plot {
       Abstract.NewStylePlot.prototype._setup.call(this);
     }
 
-    public addDataset(key: string, dataset: Dataset): RadarPlot<R>;
-    public addDataset(key: string, dataset: any[]): RadarPlot<R>;
-    public addDataset(dataset: Dataset): RadarPlot<R>;
-    public addDataset(dataset: any[]): RadarPlot<R>;
-    public addDataset(keyOrDataset: any, dataset?: any): RadarPlot<R> {
+    public addMetrics(...metrics: string[]): Radar<R> {
+      metrics.forEach((metric) => this.metrics.push(metric));
+      return this;
+    }
+
+    public addDataset(key: string, dataset: Dataset): Radar<R>;
+    public addDataset(key: string, dataset: any[]): Radar<R>;
+    public addDataset(dataset: Dataset): Radar<R>;
+    public addDataset(dataset: any[]): Radar<R>;
+    public addDataset(keyOrDataset: any, dataset?: any): Radar<R> {
       return Abstract.NewStylePlot.prototype.addDataset.call(this, keyOrDataset, dataset);
     }
 
@@ -48,13 +56,13 @@ export module Plot {
       Abstract.NewStylePlot.prototype._addDataset.call(this, key, dataset);
     }
 
-    public removeDataset(key: string): RadarPlot<R> {
+    public removeDataset(key: string): Radar<R> {
       return Abstract.NewStylePlot.prototype.removeDataset.call(this, key);
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-      this._rScale.range([0, Math.min(this.width(), this.height())]);
+      this._rScale.range([0, Math.min(this.width(), this.height()) / 2 - 100]);
     }
 
     public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
@@ -74,17 +82,42 @@ export module Plot {
     }
 
     public _generateAttrToProjector(): IAttributeToProjector {
-      //TODO: Below is incorrect
       var attrToProjector = super._generateAttrToProjector();
-      attrToProjector["d"] = d3.svg.arc()
-        .outerRadius(Math.min(this.width(), this.height()) / 2)
-        .innerRadius(0);
-      attrToProjector["transform"] = () => "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
+      var self = this;
+      function pointMapper(d: any) {
+         return self.metrics.map((metric, i) => {
+           var translateX = self.width() / 2;
+           var translateY = self.height() / 2;
+           var value = d[metric];
+           var scaledValue = self._rScale.scale(value);
+           var angle = i * 2 * Math.PI / self.metrics.length;
+           var rotateX = scaledValue * Math.cos(angle);
+           var rotateY = -scaledValue * Math.sin(angle);
+           return [rotateX + translateX, rotateY + translateY];
+         });
+      }
+      attrToProjector["points"] = (d: any, i: number) => pointMapper(d);
+      attrToProjector["fill"] = () => "steelblue";
+      attrToProjector["opacity"] = () => "0.7";
       return attrToProjector;
     }
 
     public _paint() {
       //TODO: Below is incorrect
+      var lineLength = Math.min(this.width(), this.height()) / 2 - 100;
+      var metricAxes = this._renderArea.selectAll(".metric-axis").data(this.metrics);
+      metricAxes.enter().append("line");
+      metricAxes.exit().remove();
+      var axesAttrToProjector: IAttributeToProjector = {};
+      var translateString = "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
+      axesAttrToProjector["transform"] = (d: any, i: number) => translateString + " rotate(" + i * 360 / this.metrics.length + ")";
+      axesAttrToProjector["x1"] = () => lineLength;
+      axesAttrToProjector["y1"] = () => 0;
+      axesAttrToProjector["x2"] = () => 0;
+      axesAttrToProjector["y1"] = () => 0;
+      axesAttrToProjector["stroke"] = () => "black";
+      metricAxes.attr(axesAttrToProjector);
+
       var attrHash = this._generateAttrToProjector();
       var datasets = this._getDatasetsInOrder();
       this._getDrawersInOrder().forEach((d, i) => {

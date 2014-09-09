@@ -1487,6 +1487,39 @@ describe("Plots", function () {
 
 var assert = chai.assert;
 describe("Plots", function () {
+    describe("RadarPlot", function () {
+        var svg;
+        var rScale;
+        var simpleDataset;
+        var radarPlot;
+        var renderArea;
+        var verifier;
+        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
+        before(function () {
+            svg = generateSVG(500, 500);
+            verifier = new MultiTestVerifier();
+            rScale = new Plottable.Scale.Linear().domain([0, 10]);
+            simpleDataset = new Plottable.Dataset([{ attr0: 5, attr1: 10, attr2: 7 }]);
+            radarPlot = new Plottable.Plot.Radar(rScale).addDataset(simpleDataset).addMetrics("attr0", "attr1", "attr2");
+            radarPlot.renderTo(svg);
+            renderArea = radarPlot._renderArea;
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        it("draws area and line correctly", function () {
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+    });
+});
+
+var assert = chai.assert;
+describe("Plots", function () {
     describe("New Style Plots", function () {
         var p;
         var oldWarn = Plottable._Util.Methods.warn;

@@ -744,13 +744,14 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class RadarPlot<R> extends Plottable.Abstract.Plot {
+        class Radar<R> extends Plottable.Abstract.Plot {
             constructor(rScale: Plottable.Abstract.Scale<R, number>);
-            addDataset(key: string, dataset: Dataset): RadarPlot<R>;
-            addDataset(key: string, dataset: any[]): RadarPlot<R>;
-            addDataset(dataset: Dataset): RadarPlot<R>;
-            addDataset(dataset: any[]): RadarPlot<R>;
-            removeDataset(key: string): RadarPlot<R>;
+            addMetrics(...metrics: string[]): Radar<R>;
+            addDataset(key: string, dataset: Dataset): Radar<R>;
+            addDataset(key: string, dataset: any[]): Radar<R>;
+            addDataset(dataset: Dataset): Radar<R>;
+            addDataset(dataset: any[]): Radar<R>;
+            removeDataset(key: string): Radar<R>;
         }
     }
 }
