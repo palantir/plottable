@@ -8,8 +8,8 @@ function run(div, data, Plottable) {
   "use strict";
 
   var svg = div.append("svg").attr("height", 500);
-  var newdata = JSON.parse(JSON.stringify(data));
-  var dataseries = newdata[0].slice(0, 20);
+  var newData = JSON.parse(JSON.stringify(data));
+  var dataSeries = newData[0].slice(0, 20);
 
   var xScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
@@ -17,7 +17,7 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var renderAreaD1 = new Plottable.Plot.Area(dataseries, xScale, yScale);
+  var renderAreaD1 = new Plottable.Plot.Area(dataSeries, xScale, yScale);
   var fillAccessor = function() { return "steelblue"; };
   renderAreaD1.project("fill", fillAccessor);
 
@@ -31,14 +31,8 @@ function run(div, data, Plottable) {
   chart.renderTo(svg);
 
 
-  var dragBoxInteraction = new Plottable.Interaction.XDragBox(renderGroup).setupZoomCallback(xScale, null);
-  dragBoxInteraction.registerWithComponent();
-
-/*
-  var dragBoxInteraction = new Plottable.Interaction.XDragBox(renderGroup, xScale, yScale);
-  dragBoxInteraction.registerWithComponent()
-                    .resize(true);
-
-*/
+  var dragBoxInteraction = new Plottable.Interaction.XDragBox(renderGroup).setupZoomCallback(xScale, null)
+                                                                          .registerWithComponent()
+                                                                          .resize(true);
 
 }
