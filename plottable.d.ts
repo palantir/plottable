@@ -746,7 +746,8 @@ declare module Plottable {
     module Plot {
         class Radar<R> extends Plottable.Abstract.Plot {
             constructor(rScale: Plottable.Abstract.Scale<R, number>);
-            addMetrics(...metrics: string[]): Radar<R>;
+            metrics(): string[];
+            metrics(metrics: string[]): Radar<R>;
             addDataset(key: string, dataset: Dataset): Radar<R>;
             addDataset(key: string, dataset: any[]): Radar<R>;
             addDataset(dataset: Dataset): Radar<R>;

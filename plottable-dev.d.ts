@@ -913,7 +913,8 @@ declare module Plottable {
             _rScale: Plottable.Abstract.Scale<R, number>;
             constructor(rScale: Plottable.Abstract.Scale<R, number>);
             _setup(): void;
-            addMetrics(...metrics: string[]): Radar<R>;
+            metrics(): string[];
+            metrics(metrics: string[]): Radar<R>;
             addDataset(key: string, dataset: Dataset): Radar<R>;
             addDataset(key: string, dataset: any[]): Radar<R>;
             addDataset(dataset: Dataset): Radar<R>;

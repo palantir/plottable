@@ -12,7 +12,7 @@ export module Plot {
     public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
     public _rScale: Abstract.Scale<R, number>;
     private nextSeriesIndex: number;
-    private metrics: string[];
+    private _metrics: string[];
 
     /**
      * Constructs a RadarPlot.
@@ -24,8 +24,8 @@ export module Plot {
       this._key2DatasetDrawerKey = d3.map();
       this._datasetKeysInOrder = [];
       this.nextSeriesIndex = 0;
-      this.metrics = [];
       this._rScale = rScale;
+      this._metrics = [];
       // make a dummy dataset to satisfy the base Plot (HACKHACK)
       super(new Dataset());
       this.classed("radar-plot", true);
@@ -35,11 +35,37 @@ export module Plot {
       Abstract.NewStylePlot.prototype._setup.call(this);
     }
 
-    public addMetrics(...metrics: string[]): Radar<R> {
-      metrics.forEach((metric) => this.metrics.push(metric));
+    /**
+     * Gets a copy of the metrics associated with this RadarPlot
+     *
+     * @returns {string[]} The metrics measured in this RadarPlot
+     */
+    public metrics(): string[];
+    /**
+     * Sets the metrics to associated with this RadarPlot
+     *
+     * @param {string[]} The metrics to associated this RadarPlot to
+     * @returns {RadarPlot} The calling RadarPlot.
+     */
+    public metrics(metrics: string[]): Radar<R>;
+    public metrics(metrics?: string[]): any {
+      if (metrics == null) {
+        return this._metrics.slice(0);
+      }
+      this._metrics = metrics;
       return this;
     }
 
+    /**
+     * Adds a dataset to this plot.
+     * More than one dataset is not supported.
+     *
+     * A key is automatically generated if not supplied.
+     *
+     * @param {string} [key] The key of the dataset.
+     * @param {any[]|Dataset} dataset dataset to add.
+     * @returns {RadarPlot} The calling RadarPlot.
+     */
     public addDataset(key: string, dataset: Dataset): Radar<R>;
     public addDataset(key: string, dataset: any[]): Radar<R>;
     public addDataset(dataset: Dataset): Radar<R>;
@@ -59,6 +85,12 @@ export module Plot {
       Abstract.NewStylePlot.prototype._addDataset.call(this, key, dataset);
     }
 
+    /**
+     * Removes a dataset
+     *
+     * @param {string} key The key of the dataset
+     * @return {RadarPlot} The calling RadarPlot.
+     */
     public removeDataset(key: string): Radar<R> {
       return Abstract.NewStylePlot.prototype.removeDataset.call(this, key);
     }
@@ -88,10 +120,10 @@ export module Plot {
       var attrToProjector = super._generateAttrToProjector();
       var self = this;
       function pointMapper(d: any) {
-         return self.metrics.map((metric, i) => {
+         return self.metrics().map((metric, i) => {
            var scaledValue = self._rScale.scale(d[metric]);
 
-           var angle = i * 2 * Math.PI / self.metrics.length;
+           var angle = i * 2 * Math.PI / self.metrics().length;
            var rotateX = scaledValue * Math.cos(angle);
            var rotateY = -scaledValue * Math.sin(angle);
 
@@ -111,7 +143,7 @@ export module Plot {
       var attrHash: IAttributeToProjector = {};
 
       var translateString = "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
-      attrHash["transform"] = (d: any, i: number) => translateString + " rotate(" + i * 360 / this.metrics.length + ")";
+      attrHash["transform"] = (d: any, i: number) => translateString + " rotate(" + i * 360 / this.metrics().length + ")";
 
       attrHash["x1"] = () => this.maxRadius();
       attrHash["y1"] = () => 0;
@@ -124,7 +156,7 @@ export module Plot {
     public _paint() {
       // HACKHACK Can't place the axis lines before the polygon drawer g
       var renderArea = this._getDrawersInOrder()[0]._renderArea;
-      var metricAxes = renderArea.selectAll(".metric-axis").data(this.metrics);
+      var metricAxes = renderArea.selectAll(".metric-axis").data(this.metrics());
       metricAxes.enter().append("line");
       metricAxes.exit().remove();
       var axesAttrToProjector = this.generateAxesAttrToProjector();

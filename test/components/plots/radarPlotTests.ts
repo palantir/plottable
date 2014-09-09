@@ -20,7 +20,7 @@ describe("Plots", () => {
       simpleDataset = new Plottable.Dataset([{attr0: 5, attr1: 10, attr2: 7}]);
       radarPlot = new Plottable.Plot.Radar(rScale)
                                    .addDataset(simpleDataset)
-                                   .addMetrics("attr0", "attr1", "attr2");
+                                   .metrics(["attr0", "attr1", "attr2"]);
       radarPlot.renderTo(svg);
       renderArea = radarPlot._renderArea;
     });

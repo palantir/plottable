@@ -4537,21 +4537,19 @@ var Plottable;
                 this._key2DatasetDrawerKey = d3.map();
                 this._datasetKeysInOrder = [];
                 this.nextSeriesIndex = 0;
-                this.metrics = [];
                 this._rScale = rScale;
+                this._metrics = [];
                 _super.call(this, new Plottable.Dataset());
                 this.classed("radar-plot", true);
             }
             Radar.prototype._setup = function () {
                 Plottable.Abstract.NewStylePlot.prototype._setup.call(this);
             };
-            Radar.prototype.addMetrics = function () {
-                var _this = this;
-                var metrics = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    metrics[_i - 0] = arguments[_i];
+            Radar.prototype.metrics = function (metrics) {
+                if (metrics == null) {
+                    return this._metrics.slice(0);
                 }
-                metrics.forEach(function (metric) { return _this.metrics.push(metric); });
+                this._metrics = metrics;
                 return this;
             };
             Radar.prototype.addDataset = function (keyOrDataset, dataset) {
@@ -4590,9 +4588,9 @@ var Plottable;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var self = this;
                 function pointMapper(d) {
-                    return self.metrics.map(function (metric, i) {
+                    return self.metrics().map(function (metric, i) {
                         var scaledValue = self._rScale.scale(d[metric]);
-                        var angle = i * 2 * Math.PI / self.metrics.length;
+                        var angle = i * 2 * Math.PI / self.metrics().length;
                         var rotateX = scaledValue * Math.cos(angle);
                         var rotateY = -scaledValue * Math.sin(angle);
                         var translateX = self.width() / 2;
@@ -4609,7 +4607,7 @@ var Plottable;
                 var _this = this;
                 var attrHash = {};
                 var translateString = "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
-                attrHash["transform"] = function (d, i) { return translateString + " rotate(" + i * 360 / _this.metrics.length + ")"; };
+                attrHash["transform"] = function (d, i) { return translateString + " rotate(" + i * 360 / _this.metrics().length + ")"; };
                 attrHash["x1"] = function () { return _this.maxRadius(); };
                 attrHash["y1"] = function () { return 0; };
                 attrHash["x2"] = function () { return 0; };
@@ -4620,7 +4618,7 @@ var Plottable;
             Radar.prototype._paint = function () {
                 var _this = this;
                 var renderArea = this._getDrawersInOrder()[0]._renderArea;
-                var metricAxes = renderArea.selectAll(".metric-axis").data(this.metrics);
+                var metricAxes = renderArea.selectAll(".metric-axis").data(this.metrics());
                 metricAxes.enter().append("line");
                 metricAxes.exit().remove();
                 var axesAttrToProjector = this.generateAxesAttrToProjector();
