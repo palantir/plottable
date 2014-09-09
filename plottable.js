@@ -4596,7 +4596,7 @@ var Plottable;
                         var rotateX = scaledValue * Math.cos(angle);
                         var rotateY = -scaledValue * Math.sin(angle);
                         return [rotateX + translateX, rotateY + translateY];
-                    });
+                    }).join(" ");
                 }
                 attrToProjector["points"] = function (d, i) { return pointMapper(d); };
                 attrToProjector["fill"] = function () { return "steelblue"; };

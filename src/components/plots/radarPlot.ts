@@ -94,7 +94,7 @@ export module Plot {
            var rotateX = scaledValue * Math.cos(angle);
            var rotateY = -scaledValue * Math.sin(angle);
            return [rotateX + translateX, rotateY + translateY];
-         });
+         }).join(" ");
       }
       attrToProjector["points"] = (d: any, i: number) => pointMapper(d);
       attrToProjector["fill"] = () => "steelblue";

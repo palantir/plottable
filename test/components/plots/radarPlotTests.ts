@@ -30,18 +30,21 @@ describe("Plots", () => {
     });
 
     it("draws area and line correctly", () => {
-//      var areaPath = renderArea.select(".area");
-//      assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
-//      assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
-//      var areaComputedStyle = window.getComputedStyle(areaPath.node());
-//      assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
-//
-//      var linePath = renderArea.select(".line");
-//      assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
-//      assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
-//      var lineComputedStyle = window.getComputedStyle(linePath.node());
-//      assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
-//      verifier.end();
+      var polygon = renderArea.select("polygon");
+      var points = polygon.attr("points").split(" ");
+
+      var point0 = points[0].split(",");
+      assert.closeTo(parseFloat(point0[0]), 325, 1, "Starts halfway between center and end of axis");
+      assert.closeTo(parseFloat(point0[1]), 250, 1, "Starts at the same point vertically");
+
+      var point1 = points[1].split(",");
+      assert.closeTo(parseFloat(point1[0]), 175, 1, "Goes left to the second point");
+      assert.closeTo(parseFloat(point1[1]), 120, 1, "Goes up to the second point");
+
+      var point2 = points[2].split(",");
+      assert.closeTo(parseFloat(point2[0]), 197.5, 1, "Goes right to the third point");
+      assert.closeTo(parseFloat(point2[1]), 341, 1, "Goes down to the third point");
+      verifier.end();
     });
 
     after(() => {
