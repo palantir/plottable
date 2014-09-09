@@ -498,7 +498,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Arc extends Plottable.Abstract._Drawer {
-            draw(data: any[], attrToProjector: IAttributeToProjector): void;
+            draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
         }
     }
 }

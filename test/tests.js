@@ -1487,6 +1487,38 @@ describe("Plots", function () {
 
 var assert = chai.assert;
 describe("Plots", function () {
+    describe("PiePlot", function () {
+        var svg;
+        var simpleDataset;
+        var piePlot;
+        var renderArea;
+        var verifier;
+        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
+        before(function () {
+            svg = generateSVG(500, 500);
+            verifier = new MultiTestVerifier();
+            simpleDataset = new Plottable.Dataset([{ value: 5 }, { value: 10 }]);
+            piePlot = new Plottable.Plot.Pie();
+            piePlot.addDataset(simpleDataset);
+            piePlot.renderTo(svg);
+            renderArea = piePlot._renderArea;
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        it("draws a line correctly", function () {
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+    });
+});
+
+var assert = chai.assert;
+describe("Plots", function () {
     describe("New Style Plots", function () {
         var p;
         var oldWarn = Plottable._Util.Methods.warn;

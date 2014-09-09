@@ -535,7 +535,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Arc extends Plottable.Abstract._Drawer {
-            draw(data: any[], attrToProjector: IAttributeToProjector): void;
+            draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
         }
     }
 }
@@ -910,6 +910,7 @@ declare module Plottable {
             _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
             _datasetKeysInOrder: string[];
             constructor();
+            _setup(): void;
             addDataset(key: string, dataset: Dataset): Pie;
             addDataset(key: string, dataset: any[]): Pie;
             addDataset(dataset: Dataset): Pie;
@@ -917,7 +918,10 @@ declare module Plottable {
             _addDataset(key: string, dataset: Dataset): void;
             removeDataset(key: string): Pie;
             _generateAttrToProjector(): IAttributeToProjector;
+            _getAnimator(drawer: Plottable.Abstract._Drawer, index: number): Plottable.Animator.IPlotAnimator;
             _getDrawer(key: string): Plottable.Abstract._Drawer;
+            _getDatasetsInOrder(): Dataset[];
+            _getDrawersInOrder(): Plottable.Abstract._Drawer[];
             _paint(): void;
         }
     }

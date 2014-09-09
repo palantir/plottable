@@ -2138,7 +2138,13 @@ var Plottable;
             function Arc() {
                 _super.apply(this, arguments);
             }
-            Arc.prototype.draw = function (data, attrToProjector) {
+            Arc.prototype.draw = function (data, attrToProjector, animator) {
+                if (animator === void 0) { animator = new Plottable.Animator.Null(); }
+                var svgElement = "path";
+                var dataElements = this._renderArea.selectAll(svgElement).data(data);
+                dataElements.enter().append(svgElement);
+                animator.animate(dataElements, attrToProjector);
+                dataElements.exit().remove();
             };
             return Arc;
         })(Plottable.Abstract._Drawer);
@@ -4512,64 +4518,59 @@ var Plottable;
         var Pie = (function (_super) {
             __extends(Pie, _super);
             function Pie() {
+                this._key2DatasetDrawerKey = d3.map();
+                this._datasetKeysInOrder = [];
+                this.nextSeriesIndex = 0;
                 _super.call(this, new Plottable.Dataset());
                 this.classed("pie-plot", true);
             }
+            Pie.prototype._setup = function () {
+                Plottable.Abstract.NewStylePlot.prototype._setup.apply(this, []);
+            };
             Pie.prototype.addDataset = function (keyOrDataset, dataset) {
-                if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
-                    throw new Error("invalid input to addDataset");
-                }
-                if (typeof (keyOrDataset) === "string" && keyOrDataset[0] === "_") {
-                    Plottable._Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
-                }
-                var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
-                var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
-                var dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
-                this._addDataset(key, dataset);
-                return this;
+                return Plottable.Abstract.NewStylePlot.prototype.addDataset.apply(this, [keyOrDataset, dataset]);
             };
             Pie.prototype._addDataset = function (key, dataset) {
-                var _this = this;
-                if (this._key2DatasetDrawerKey.has(key)) {
-                    this.removeDataset(key);
+                if (this._datasetKeysInOrder.length === 1) {
+                    Plottable._Util.Methods.warn("Only one dataset is supported in pie plots");
+                    return;
                 }
-                ;
-                var drawer = this._getDrawer(key);
-                var ddk = { drawer: drawer, dataset: dataset, key: key };
-                this._datasetKeysInOrder.push(key);
-                this._key2DatasetDrawerKey.set(key, ddk);
-                if (this._isSetup) {
-                    drawer._renderArea = this._renderArea.append("g");
-                }
-                dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
-                this._onDatasetUpdate();
+                Plottable.Abstract.NewStylePlot.prototype._addDataset.apply(this, [key, dataset]);
             };
             Pie.prototype.removeDataset = function (key) {
-                if (this._key2DatasetDrawerKey.has(key)) {
-                    var ddk = this._key2DatasetDrawerKey.get(key);
-                    ddk.drawer.remove();
-                    var projectors = d3.values(this._projectors);
-                    var scaleKey = this._plottableID.toString() + "_" + key;
-                    projectors.forEach(function (p) {
-                        if (p.scale != null) {
-                            p.scale._removeExtent(scaleKey, p.attribute);
-                        }
-                    });
-                    ddk.dataset.broadcaster.deregisterListener(this);
-                    this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-                    this._key2DatasetDrawerKey.remove(key);
-                    this._onDatasetUpdate();
-                }
-                return this;
+                return Plottable.Abstract.NewStylePlot.prototype.removeDataset.apply(this, [key]);
             };
             Pie.prototype._generateAttrToProjector = function () {
-                throw new Error("MUST IMPLEMENT");
+                var _this = this;
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                attrToProjector["d"] = d3.svg.arc().outerRadius(Math.min(this.width(), this.height()) / 2).innerRadius(0);
+                attrToProjector["transform"] = function () { return "translate(" + _this.width() / 2 + "," + _this.height() / 2 + ")"; };
+                return attrToProjector;
+            };
+            Pie.prototype._getAnimator = function (drawer, index) {
+                return Plottable.Abstract.NewStylePlot.prototype._getAnimator.apply(this, [drawer, index]);
             };
             Pie.prototype._getDrawer = function (key) {
-                throw new Error("MUST IMPLEMENT");
+                return new Plottable._Drawer.Arc(key);
+            };
+            Pie.prototype._getDatasetsInOrder = function () {
+                return Plottable.Abstract.NewStylePlot.prototype._getDatasetsInOrder.apply(this);
+            };
+            Pie.prototype._getDrawersInOrder = function () {
+                return Plottable.Abstract.NewStylePlot.prototype._getDrawersInOrder.apply(this);
             };
             Pie.prototype._paint = function () {
-                throw new Error("MUST IMPLEMENT");
+                var _this = this;
+                var attrHash = this._generateAttrToProjector();
+                var datasets = this._getDatasetsInOrder();
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
+                    var pieData = _this.pie(datasets[i].data());
+                    d.draw(pieData, attrHash, animator);
+                });
+            };
+            Pie.prototype.pie = function (d) {
+                return d3.layout.pie().sort(null).value(function (d) { return d.value; })(d);
             };
             return Pie;
         })(Plottable.Abstract.Plot);

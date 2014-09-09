@@ -19,8 +19,15 @@ export module Plot {
      */
     constructor() {
       // make a dummy dataset to satisfy the base Plot (HACKHACK)
+      this._key2DatasetDrawerKey = d3.map();
+      this._datasetKeysInOrder = [];
+      this.nextSeriesIndex = 0;
       super(new Plottable.Dataset());
       this.classed("pie-plot", true);
+    }
+
+    public _setup() {
+      Abstract.NewStylePlot.prototype._setup.apply(this, []);
     }
 
     /**
@@ -37,34 +44,15 @@ export module Plot {
     public addDataset(dataset: Dataset): Pie;
     public addDataset(dataset: any[]): Pie;
     public addDataset(keyOrDataset: any, dataset?: any): Pie {
-      if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
-        throw new Error("invalid input to addDataset");
-      }
-      if (typeof(keyOrDataset) === "string" && keyOrDataset[0] === "_") {
-        _Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
-      }
-      var key  = typeof(keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
-      var data = typeof(keyOrDataset) !== "string" ? keyOrDataset : dataset;
-      var dataset = (data instanceof Dataset) ? data : new Dataset(data);
-
-      this._addDataset(key, dataset);
-      return this;
+      return Abstract.NewStylePlot.prototype.addDataset.apply(this, [keyOrDataset, dataset]);
     }
 
     public _addDataset(key: string, dataset: Dataset) {
-      if (this._key2DatasetDrawerKey.has(key)) {
-        this.removeDataset(key);
-      };
-      var drawer = this._getDrawer(key);
-      var ddk = {drawer: drawer, dataset: dataset, key: key};
-      this._datasetKeysInOrder.push(key);
-      this._key2DatasetDrawerKey.set(key, ddk);
-
-      if (this._isSetup) {
-        drawer._renderArea = this._renderArea.append("g");
+      if (this._datasetKeysInOrder.length === 1) {
+        _Util.Methods.warn("Only one dataset is supported in pie plots");
+        return;
       }
-      dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
-      this._onDatasetUpdate();
+      Abstract.NewStylePlot.prototype._addDataset.apply(this, [key, dataset]);
     }
 
     /**
@@ -74,47 +62,48 @@ export module Plot {
      * @return {NewStylePlot} The calling PiePlot.
      */
     public removeDataset(key: string): Pie {
-      if (this._key2DatasetDrawerKey.has(key)) {
-        var ddk = this._key2DatasetDrawerKey.get(key);
-        ddk.drawer.remove();
-
-        var projectors = d3.values(this._projectors);
-        var scaleKey = this._plottableID.toString() + "_" + key;
-        projectors.forEach((p) => {
-          if (p.scale != null) {
-            p.scale._removeExtent(scaleKey, p.attribute);
-          }
-        });
-
-        ddk.dataset.broadcaster.deregisterListener(this);
-        this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-        this._key2DatasetDrawerKey.remove(key);
-        this._onDatasetUpdate();
-      }
-      return this;
+      return Abstract.NewStylePlot.prototype.removeDataset.apply(this, [key]);
     }
 
     public _generateAttrToProjector(): IAttributeToProjector {
-      /**
-       * Under the assumption that the data is now nicely formatted,
-       * d3.arc should be able to be set on the "d" attribute to paint
-       */
-      throw new Error("MUST IMPLEMENT");
+      var attrToProjector = super._generateAttrToProjector();
+      attrToProjector["d"] = d3.svg.arc()
+                      .outerRadius(Math.min(this.width(), this.height()) / 2)
+                      .innerRadius(0);
+      attrToProjector["transform"] = () => "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
+      return attrToProjector;
+    }
+
+    public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
+      return Abstract.NewStylePlot.prototype._getAnimator.apply(this, [drawer, index]);
     }
 
     public _getDrawer(key: string): Abstract._Drawer {
-      /**
-       * Probably will need an arc drawer here
-       */
-      throw new Error("MUST IMPLEMENT");
+      return new Plottable._Drawer.Arc(key);
+    }
+
+    public _getDatasetsInOrder(): Dataset[] {
+      return Abstract.NewStylePlot.prototype._getDatasetsInOrder.apply(this);
+    }
+
+    public _getDrawersInOrder(): Abstract._Drawer[] {
+      return Abstract.NewStylePlot.prototype._getDrawersInOrder.apply(this);
     }
 
     public _paint() {
-      /**
-       * Grab the attributes from _generateAttrToProjector and then use
-       * an arcDrawer or so to draw the arc
-       */
-      throw new Error("MUST IMPLEMENT");
+      var attrHash = this._generateAttrToProjector();
+      var datasets = this._getDatasetsInOrder();
+      this._getDrawersInOrder().forEach((d, i) => {
+        var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
+        var pieData = this.pie(datasets[i].data());
+        d.draw(pieData, attrHash, animator);
+      });
+    }
+
+    private pie(d: any[]) {
+      return d3.layout.pie()
+                      .sort(null)
+                      .value((d) => d.value)(d);
     }
 
   }
