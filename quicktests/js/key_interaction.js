@@ -15,10 +15,6 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   var scatterPlot = new Plottable.Plot.Scatter(data[0].slice(0, 20), xScale, yScale);
-  var initialDomains = {
-    x: xScale.domain(),
-    y: yScale.domain(),
-  };
   var explanation = new Plottable.Component.TitleLabel("Press 'a' to reset domain");
 
   var basicTable = new Plottable.Component.Table([[null, explanation],
@@ -27,14 +23,15 @@ function run(div, data, Plottable) {
 
   basicTable.renderTo(svg);
 
-  var pzi = new Plottable.Interaction.PanZoom(scatterPlot, xScale, yScale).registerWithComponent();
+  var pzi = new Plottable.Interaction.PanZoom(xScale, yScale);
+  scatterPlot.registerInteraction(pzi);
 
-  var ki = new Plottable.Interaction.Key(scatterPlot, 65);
+  var ki = new Plottable.Interaction.Key(65);
   ki.callback(function() {
-    xScale.domain(initialDomains.x);
-    yScale.domain(initialDomains.y);
+    xScale.autoDomain();
+    yScale.autoDomain();
     pzi.resetZoom();
   });
-  ki.registerWithComponent();
+  scatterPlot.registerInteraction(ki);
 
 }

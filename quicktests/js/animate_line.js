@@ -29,7 +29,7 @@ function run(div, data, Plottable) {
     lineRenderer.dataset().data(d);
   };
 
-  var xy = new Plottable.Interaction.Click(lineRenderer)
-    .callback(cb)
-    .registerWithComponent();
+  lineRenderer.registerInteraction(
+    new Plottable.Interaction.Click(lineRenderer).callback(cb)
+  );
 }

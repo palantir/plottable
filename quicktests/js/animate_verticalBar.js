@@ -32,7 +32,7 @@ function run(div, data, Plottable) {
     vBarRenderer.dataset().data(d);
   };
 
-  new Plottable.Interaction.Click(vBarRenderer)
-        .callback(cb)
-        .registerWithComponent();
+  vBarRenderer.registerInteraction(
+    new Plottable.Interaction.Click(vBarRenderer).callback(cb)
+  );
 }

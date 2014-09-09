@@ -2443,7 +2443,7 @@ var Plottable;
                         this.hitBox = this.addBox("hit-box");
                         this.hitBox.style("fill", "#ffffff").style("opacity", 0);
                     }
-                    interaction._anchor(this.hitBox);
+                    interaction._anchor(this, this.hitBox);
                 }
                 else {
                     this.interactionsToRegister.push(interaction);
@@ -5717,18 +5717,11 @@ var Plottable;
 (function (Plottable) {
     (function (Abstract) {
         var Interaction = (function () {
-            function Interaction(componentToListenTo) {
-                if (componentToListenTo == null) {
-                    throw new Error("Interactions require a component to listen to");
-                }
-                this.componentToListenTo = componentToListenTo;
+            function Interaction() {
             }
-            Interaction.prototype._anchor = function (hitBox) {
-                this.hitBox = hitBox;
-            };
-            Interaction.prototype.registerWithComponent = function () {
-                this.componentToListenTo.registerInteraction(this);
-                return this;
+            Interaction.prototype._anchor = function (component, hitBox) {
+                this._componentToListenTo = component;
+                this._hitBox = hitBox;
             };
             return Interaction;
         })();
@@ -5748,12 +5741,12 @@ var Plottable;
     (function (Interaction) {
         var Click = (function (_super) {
             __extends(Click, _super);
-            function Click(componentToListenTo) {
-                _super.call(this, componentToListenTo);
+            function Click() {
+                _super.apply(this, arguments);
             }
-            Click.prototype._anchor = function (hitBox) {
+            Click.prototype._anchor = function (component, hitBox) {
                 var _this = this;
-                _super.prototype._anchor.call(this, hitBox);
+                _super.prototype._anchor.call(this, component, hitBox);
                 hitBox.on(this._listenTo(), function () {
                     var xy = d3.mouse(hitBox.node());
                     var x = xy[0];
@@ -5773,8 +5766,8 @@ var Plottable;
         Interaction.Click = Click;
         var DoubleClick = (function (_super) {
             __extends(DoubleClick, _super);
-            function DoubleClick(componentToListenTo) {
-                _super.call(this, componentToListenTo);
+            function DoubleClick() {
+                _super.apply(this, arguments);
             }
             DoubleClick.prototype._listenTo = function () {
                 return "dblclick";
@@ -5795,50 +5788,16 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Interaction) {
-        var Mousemove = (function (_super) {
-            __extends(Mousemove, _super);
-            function Mousemove(componentToListenTo) {
-                _super.call(this, componentToListenTo);
-            }
-            Mousemove.prototype._anchor = function (hitBox) {
-                var _this = this;
-                _super.prototype._anchor.call(this, hitBox);
-                hitBox.on("mousemove", function () {
-                    var xy = d3.mouse(hitBox.node());
-                    var x = xy[0];
-                    var y = xy[1];
-                    _this.mousemove(x, y);
-                });
-            };
-            Mousemove.prototype.mousemove = function (x, y) {
-                return;
-            };
-            return Mousemove;
-        })(Plottable.Abstract.Interaction);
-        Interaction.Mousemove = Mousemove;
-    })(Plottable.Interaction || (Plottable.Interaction = {}));
-    var Interaction = Plottable.Interaction;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Interaction) {
         var Key = (function (_super) {
             __extends(Key, _super);
-            function Key(componentToListenTo, keyCode) {
-                _super.call(this, componentToListenTo);
+            function Key(keyCode) {
+                _super.call(this);
                 this.activated = false;
                 this.keyCode = keyCode;
             }
-            Key.prototype._anchor = function (hitBox) {
+            Key.prototype._anchor = function (component, hitBox) {
                 var _this = this;
-                _super.prototype._anchor.call(this, hitBox);
+                _super.prototype._anchor.call(this, component, hitBox);
                 hitBox.on("mouseover", function () {
                     _this.activated = true;
                 });
@@ -5873,8 +5832,8 @@ var Plottable;
     (function (Interaction) {
         var PanZoom = (function (_super) {
             __extends(PanZoom, _super);
-            function PanZoom(componentToListenTo, xScale, yScale) {
-                _super.call(this, componentToListenTo);
+            function PanZoom(xScale, yScale) {
+                _super.call(this);
                 var _this = this;
                 if (xScale == null) {
                     xScale = new Plottable.Scale.Linear();
@@ -5895,10 +5854,10 @@ var Plottable;
                 this.zoom.x(this._xScale._d3Scale);
                 this.zoom.y(this._yScale._d3Scale);
                 this.zoom.on("zoom", function () { return _this.rerenderZoomed(); });
-                this.zoom(this.hitBox);
+                this.zoom(this._hitBox);
             };
-            PanZoom.prototype._anchor = function (hitBox) {
-                _super.prototype._anchor.call(this, hitBox);
+            PanZoom.prototype._anchor = function (component, hitBox) {
+                _super.prototype._anchor.call(this, component, hitBox);
                 this.zoom(hitBox);
             };
             PanZoom.prototype.rerenderZoomed = function () {
@@ -5925,16 +5884,16 @@ var Plottable;
     (function (Interaction) {
         var BarHover = (function (_super) {
             __extends(BarHover, _super);
-            function BarHover(barPlot) {
-                _super.call(this, barPlot);
-                this.plotIsVertical = true;
+            function BarHover() {
+                _super.apply(this, arguments);
                 this.currentBar = null;
                 this._hoverMode = "point";
-                this.plotIsVertical = Plottable.Plot.VerticalBar.prototype.isPrototypeOf(this.componentToListenTo);
             }
-            BarHover.prototype._anchor = function (hitBox) {
+            BarHover.prototype._anchor = function (barPlot, hitBox) {
                 var _this = this;
-                this.dispatcher = new Plottable.Dispatcher.Mouse(hitBox);
+                _super.prototype._anchor.call(this, barPlot, hitBox);
+                this.plotIsVertical = this._componentToListenTo._isVertical;
+                this.dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
                 this.dispatcher.mousemove(function (p) {
                     var selectedBar = _this.getHoveredBar(p);
                     if (selectedBar == null) {
@@ -5949,7 +5908,7 @@ var Plottable;
                                 _this._hoverOut();
                             }
                         }
-                        _this.componentToListenTo._bars.classed("not-hovered", true).classed("hovered", false);
+                        _this._componentToListenTo._bars.classed("not-hovered", true).classed("hovered", false);
                         selectedBar.classed("not-hovered", false).classed("hovered", true);
                         if (_this.hoverCallback != null) {
                             _this.hoverCallback(selectedBar.data()[0], selectedBar);
@@ -5961,7 +5920,7 @@ var Plottable;
                 this.dispatcher.connect();
             };
             BarHover.prototype._hoverOut = function () {
-                this.componentToListenTo._bars.classed("not-hovered hovered", false);
+                this._componentToListenTo._bars.classed("not-hovered hovered", false);
                 if (this.unhoverCallback != null && this.currentBar != null) {
                     this.unhoverCallback(this.currentBar.data()[0], this.currentBar);
                 }
@@ -5969,14 +5928,14 @@ var Plottable;
             };
             BarHover.prototype.getHoveredBar = function (p) {
                 if (this._hoverMode === "point") {
-                    return this.componentToListenTo.selectBar(p.x, p.y, false);
+                    return this._componentToListenTo.selectBar(p.x, p.y, false);
                 }
                 var maxExtent = { min: -Infinity, max: Infinity };
                 if (this.plotIsVertical) {
-                    return this.componentToListenTo.selectBar(p.x, maxExtent, false);
+                    return this._componentToListenTo.selectBar(p.x, maxExtent, false);
                 }
                 else {
-                    return this.componentToListenTo.selectBar(maxExtent, p.y, false);
+                    return this._componentToListenTo.selectBar(maxExtent, p.y, false);
                 }
             };
             BarHover.prototype.hoverMode = function (mode) {
@@ -6016,8 +5975,8 @@ var Plottable;
     (function (Interaction) {
         var Drag = (function (_super) {
             __extends(Drag, _super);
-            function Drag(componentToListenTo) {
-                _super.call(this, componentToListenTo);
+            function Drag() {
+                _super.call(this);
                 var _this = this;
                 this.dragInitialized = false;
                 this._origin = [0, 0];
@@ -6055,8 +6014,8 @@ var Plottable;
                 }
             };
             Drag.prototype._dragstart = function () {
-                var width = this.componentToListenTo.width();
-                var height = this.componentToListenTo.height();
+                var width = this._componentToListenTo.width();
+                var height = this._componentToListenTo.height();
                 var constraintFunction = function (min, max) { return function (x) { return Math.min(Math.max(x, min), max); }; };
                 this.constrainX = constraintFunction(0, width);
                 this.constrainY = constraintFunction(0, height);
@@ -6096,8 +6055,8 @@ var Plottable;
                     this.ondragend(startLocation, endLocation);
                 }
             };
-            Drag.prototype._anchor = function (hitBox) {
-                _super.prototype._anchor.call(this, hitBox);
+            Drag.prototype._anchor = function (component, hitBox) {
+                _super.prototype._anchor.call(this, component, hitBox);
                 hitBox.call(this.dragBehavior);
                 return this;
             };
@@ -6178,10 +6137,10 @@ var Plottable;
                 this.boxIsDrawn = (w > 0 && h > 0);
                 return this;
             };
-            DragBox.prototype._anchor = function (hitBox) {
-                _super.prototype._anchor.call(this, hitBox);
+            DragBox.prototype._anchor = function (component, hitBox) {
+                _super.prototype._anchor.call(this, component, hitBox);
                 var cname = DragBox.CLASS_DRAG_BOX;
-                var background = this.componentToListenTo._backgroundContainer;
+                var background = this._componentToListenTo._backgroundContainer;
                 this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
                 return this;
             };
@@ -6212,7 +6171,7 @@ var Plottable;
                 this.setBox(this._origin[0], this._location[0]);
             };
             XDragBox.prototype.setBox = function (x0, x1) {
-                _super.prototype.setBox.call(this, x0, x1, 0, this.componentToListenTo.height());
+                _super.prototype.setBox.call(this, x0, x1, 0, this._componentToListenTo.height());
                 return this;
             };
             return XDragBox;
@@ -6266,7 +6225,7 @@ var Plottable;
                 this.setBox(this._origin[1], this._location[1]);
             };
             YDragBox.prototype.setBox = function (y0, y1) {
-                _super.prototype.setBox.call(this, 0, this.componentToListenTo.width(), y0, y1);
+                _super.prototype.setBox.call(this, 0, this._componentToListenTo.width(), y0, y1);
                 return this;
             };
             return YDragBox;

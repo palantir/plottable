@@ -76,7 +76,6 @@
 /// <reference path="interactions/keyEventListener.ts" />
 /// <reference path="interactions/interaction.ts" />
 /// <reference path="interactions/clickInteraction.ts" />
-/// <reference path="interactions/mousemoveInteraction.ts" />
 /// <reference path="interactions/keyInteraction.ts" />
 /// <reference path="interactions/panZoomInteraction.ts" />
 /// <reference path="interactions/barHoverInteraction.ts" />

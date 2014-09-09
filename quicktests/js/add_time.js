@@ -42,7 +42,6 @@ function run(div, data, Plottable) {
     ds.data(d);
 
   }
-  var clickInteraction = new Plottable.Interaction.Click(title)
-    .callback(addData)
-    .registerWithComponent();
+  var clickInteraction = new Plottable.Interaction.Click().callback(addData);
+  title.registerInteraction(clickInteraction);
 }

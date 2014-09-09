@@ -45,8 +45,8 @@ describe("Interactions", () => {
       var xDomainBefore = xScale.domain();
       var yDomainBefore = yScale.domain();
 
-      var interaction = new Plottable.Interaction.PanZoom(renderer, xScale, yScale);
-      interaction.registerWithComponent();
+      var interaction = new Plottable.Interaction.PanZoom(xScale, yScale);
+      renderer.registerInteraction(interaction);
 
       var hb = renderer._element.select(".hit-box").node();
       var dragDistancePixelX = 10;
@@ -100,8 +100,8 @@ describe("Interactions", () => {
       yScale = new Plottable.Scale.Linear();
       renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
       renderer.renderTo(svg);
-      interaction = new Plottable.Interaction.XYDragBox(renderer);
-      interaction.registerWithComponent();
+      interaction = new Plottable.Interaction.XYDragBox();
+      renderer.registerInteraction(interaction);
     });
 
     afterEach(() => {
@@ -181,8 +181,8 @@ describe("Interactions", () => {
       yScale = new Plottable.Scale.Linear();
       renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
       renderer.renderTo(svg);
-      interaction = new Plottable.Interaction.YDragBox(renderer);
-      interaction.registerWithComponent();
+      interaction = new Plottable.Interaction.YDragBox();
+      renderer.registerInteraction(interaction);
     });
 
     afterEach(() => {
@@ -242,7 +242,7 @@ describe("Interactions", () => {
       component.renderTo(svg);
 
       var code = 65; // "a" key
-      var ki = new Plottable.Interaction.Key(component, code);
+      var ki = new Plottable.Interaction.Key(code);
 
       var callbackCalled = false;
       var callback = () => {
@@ -250,7 +250,7 @@ describe("Interactions", () => {
       };
 
       ki.callback(callback);
-      ki.registerWithComponent();
+      component.registerInteraction(ki);
 
       var $hitbox = $((<any> component).hitBox.node());
 
@@ -291,7 +291,7 @@ describe("Interactions", () => {
 
     it("hoverMode()", () => {
       var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
-      var bhi = new Plottable.Interaction.BarHover(barPlot);
+      var bhi = new Plottable.Interaction.BarHover();
 
       bhi.hoverMode("line");
       bhi.hoverMode("POINT");
@@ -303,7 +303,7 @@ describe("Interactions", () => {
       var svg = generateSVG(400, 400);
       var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
       barPlot.project("x", "name", ordinalScale).project("y", "value", linearScale);
-      var bhi = new Plottable.Interaction.BarHover(barPlot);
+      var bhi = new Plottable.Interaction.BarHover();
 
       var barDatum: any = null;
       bhi.onHover((datum: any, bar: D3.Selection) => {
@@ -317,7 +317,7 @@ describe("Interactions", () => {
       });
 
       barPlot.renderTo(svg);
-      bhi.registerWithComponent();
+      barPlot.registerInteraction(bhi);
 
       var hitbox = barPlot._element.select(".hit-box");
 
@@ -358,7 +358,7 @@ describe("Interactions", () => {
       var svg = generateSVG(400, 400);
       var barPlot = new Plottable.Plot.HorizontalBar(dataset, linearScale, ordinalScale);
       barPlot.project("y", "name", ordinalScale).project("x", "value", linearScale);
-      var bhi = new Plottable.Interaction.BarHover(barPlot);
+      var bhi = new Plottable.Interaction.BarHover();
 
       var barDatum: any = null;
       bhi.onHover((datum: any, bar: D3.Selection) => {
@@ -371,7 +371,7 @@ describe("Interactions", () => {
       });
 
       barPlot.renderTo(svg);
-      bhi.registerWithComponent();
+      barPlot.registerInteraction(bhi);
 
       var hitbox = barPlot._element.select(".hit-box");
 

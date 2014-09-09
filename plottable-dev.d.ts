@@ -1222,11 +1222,9 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Interaction {
-            hitBox: D3.Selection;
-            componentToListenTo: Component;
-            constructor(componentToListenTo: Component);
-            _anchor(hitBox: D3.Selection): void;
-            registerWithComponent(): Interaction;
+            _hitBox: D3.Selection;
+            _componentToListenTo: Component;
+            _anchor(component: Component, hitBox: D3.Selection): void;
         }
     }
 }
@@ -1235,25 +1233,12 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Click extends Plottable.Abstract.Interaction {
-            constructor(componentToListenTo: Plottable.Abstract.Component);
-            _anchor(hitBox: D3.Selection): void;
+            _anchor(component: Plottable.Abstract.Component, hitBox: D3.Selection): void;
             _listenTo(): string;
             callback(cb: (x: number, y: number) => any): Click;
         }
         class DoubleClick extends Click {
-            constructor(componentToListenTo: Plottable.Abstract.Component);
             _listenTo(): string;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
-        class Mousemove extends Plottable.Abstract.Interaction {
-            constructor(componentToListenTo: Plottable.Abstract.Component);
-            _anchor(hitBox: D3.Selection): void;
-            mousemove(x: number, y: number): void;
         }
     }
 }
@@ -1262,8 +1247,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Key extends Plottable.Abstract.Interaction {
-            constructor(componentToListenTo: Plottable.Abstract.Component, keyCode: number);
-            _anchor(hitBox: D3.Selection): void;
+            constructor(keyCode: number);
+            _anchor(component: Plottable.Abstract.Component, hitBox: D3.Selection): void;
             callback(cb: () => any): Key;
         }
     }
@@ -1275,9 +1260,9 @@ declare module Plottable {
         class PanZoom extends Plottable.Abstract.Interaction {
             _xScale: Plottable.Abstract.QuantitativeScale<any>;
             _yScale: Plottable.Abstract.QuantitativeScale<any>;
-            constructor(componentToListenTo: Plottable.Abstract.Component, xScale?: Plottable.Abstract.QuantitativeScale<any>, yScale?: Plottable.Abstract.QuantitativeScale<any>);
+            constructor(xScale?: Plottable.Abstract.QuantitativeScale<any>, yScale?: Plottable.Abstract.QuantitativeScale<any>);
             resetZoom(): void;
-            _anchor(hitBox: D3.Selection): void;
+            _anchor(component: Plottable.Abstract.Component, hitBox: D3.Selection): void;
         }
     }
 }
@@ -1286,9 +1271,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class BarHover extends Plottable.Abstract.Interaction {
-            componentToListenTo: Plottable.Abstract.BarPlot<any, any>;
-            constructor(barPlot: Plottable.Abstract.BarPlot<any, any>);
-            _anchor(hitBox: D3.Selection): void;
+            _componentToListenTo: Plottable.Abstract.BarPlot<any, any>;
+            _anchor(barPlot: Plottable.Abstract.BarPlot<any, any>, hitBox: D3.Selection): void;
             hoverMode(): string;
             hoverMode(mode: string): BarHover;
             onHover(callback: (datum: any, bar: D3.Selection) => any): BarHover;
@@ -1303,7 +1287,7 @@ declare module Plottable {
         class Drag extends Plottable.Abstract.Interaction {
             _origin: number[];
             _location: number[];
-            constructor(componentToListenTo: Plottable.Abstract.Component);
+            constructor();
             dragstart(): (startLocation: Point) => void;
             dragstart(cb: (startLocation: Point) => any): Drag;
             drag(): (startLocation: Point, endLocation: Point) => void;
@@ -1316,7 +1300,7 @@ declare module Plottable {
             _doDrag(): void;
             _dragend(): void;
             _doDragend(): void;
-            _anchor(hitBox: D3.Selection): Drag;
+            _anchor(component: Plottable.Abstract.Component, hitBox: D3.Selection): Drag;
             setupZoomCallback(xScale?: Plottable.Abstract.QuantitativeScale<any>, yScale?: Plottable.Abstract.QuantitativeScale<any>): Drag;
         }
     }
@@ -1331,7 +1315,7 @@ declare module Plottable {
             _dragstart(): void;
             clearBox(): DragBox;
             setBox(x0: number, x1: number, y0: number, y1: number): DragBox;
-            _anchor(hitBox: D3.Selection): DragBox;
+            _anchor(component: Plottable.Abstract.Component, hitBox: D3.Selection): DragBox;
         }
     }
 }

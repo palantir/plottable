@@ -14,13 +14,11 @@ export module Interaction {
      * does so by changing the xScale and yScales' domains repeatedly.
      *
      * @constructor
-     * @param {Component} componentToListenTo The component to listen for interactions on.
      * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
      * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
      */
-    constructor(componentToListenTo: Abstract.Component,
-                xScale?: Abstract.QuantitativeScale<any>, yScale?: Abstract.QuantitativeScale<any>) {
-      super(componentToListenTo);
+    constructor(xScale?: Abstract.QuantitativeScale<any>, yScale?: Abstract.QuantitativeScale<any>) {
+      super();
       if (xScale == null) {
         xScale = new Plottable.Scale.Linear();
       }
@@ -44,11 +42,11 @@ export module Interaction {
       this.zoom.x(this._xScale._d3Scale);
       this.zoom.y(this._yScale._d3Scale);
       this.zoom.on("zoom", () => this.rerenderZoomed());
-      this.zoom(this.hitBox);
+      this.zoom(this._hitBox);
     }
 
-    public _anchor(hitBox: D3.Selection) {
-      super._anchor(hitBox);
+    public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
+      super._anchor(component, hitBox);
       this.zoom(hitBox);
     }
 

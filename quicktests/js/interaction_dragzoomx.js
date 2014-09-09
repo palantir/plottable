@@ -30,9 +30,21 @@ function run(div, data, Plottable) {
 
   chart.renderTo(svg);
 
+  var xDrag = new Plottable.Interaction.XDragBox();
+  xDrag.dragend(function(start, end) {
+    xDrag.clearBox();
+    var scaledStartX = xScale.invert(start.x);
+    var scaledEndX = xScale.invert(end.x);
 
-  var dragBoxInteraction = new Plottable.Interaction.XDragBox(renderGroup).setupZoomCallback(xScale, null)
-                                                                          .registerWithComponent()
-                                                                          .resize(true);
+    var minX = Math.min(scaledStartX, scaledEndX);
+    var maxX = Math.max(scaledStartX, scaledEndX);
 
+    xScale.domain([minX, maxX]);
+  });
+
+  renderGroup.registerInteraction(xDrag);
+
+  var reset = new Plottable.Interaction.DoubleClick();
+  reset.callback(function() { xScale.autoDomain(); });
+  renderGroup.registerInteraction(reset);
 }

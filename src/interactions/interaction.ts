@@ -10,39 +10,12 @@ export module Abstract {
      * "foreground" and "background" elements where it can draw things,
      * e.g. crosshairs.
      */
-    public hitBox: D3.Selection;
-    public componentToListenTo: Abstract.Component;
+    public _hitBox: D3.Selection;
+    public _componentToListenTo: Abstract.Component;
 
-    /**
-     * Creates an Interaction.
-     *
-     * Some Interactions include Interaction.PanZoom and
-     * Interaction.DragBox. Interactions listen on events and do something that
-     * would be annoying to write by hand, such as pan/zoom. Many Interactions
-     * can have event listeners, such as a DragBox having listeners trigger
-     * each time the box changes size.
-     *
-     * @constructor
-     * @param {Component} componentToListenTo The component to listen for
-     * interactions on.
-     */
-    constructor(componentToListenTo: Abstract.Component) {
-      if (componentToListenTo == null) {throw new Error("Interactions require a component to listen to");}
-      this.componentToListenTo = componentToListenTo;
-    }
-
-    public _anchor(hitBox: D3.Selection) {
-      this.hitBox = hitBox;
-    }
-
-    /**
-     * Registers the Interaction on the Component it's listening to.
-     * This needs to be called to activate the interaction.
-     * @returns {Interaction} The calling Interaction.
-     */
-    public registerWithComponent(): Interaction {
-      this.componentToListenTo.registerInteraction(this);
-      return this;
+    public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
+      this._componentToListenTo = component;
+      this._hitBox = hitBox;
     }
   }
 }

@@ -376,7 +376,7 @@ export module Abstract {
             this.hitBox = this.addBox("hit-box");
             this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
         }
-        interaction._anchor(this.hitBox);
+        interaction._anchor(this, this.hitBox);
       } else {
         this.interactionsToRegister.push(interaction);
       }

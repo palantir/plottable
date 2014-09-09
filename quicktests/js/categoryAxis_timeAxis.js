@@ -31,7 +31,5 @@ function run(div, data, Plottable) {
 
   chart.renderTo(svg);
 
-  var pzi = new Plottable.Interaction.PanZoom(hBarPlot, xScale, yScale);
-  pzi.registerWithComponent();
-
+  hBarPlot.registerInteraction(new Plottable.Interaction.PanZoom(xScale, yScale));
 }

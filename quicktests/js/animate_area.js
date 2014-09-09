@@ -31,7 +31,7 @@ function run(div, data, Plottable) {
     areaRenderer.dataset().data(d);
   };
 
-  new Plottable.Interaction.Click(areaRenderer)
-    .callback(cb)
-    .registerWithComponent();
+  areaRenderer.registerInteraction(
+    new Plottable.Interaction.Click(areaRenderer).callback(cb)
+  );
 }

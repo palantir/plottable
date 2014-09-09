@@ -55,7 +55,7 @@
     "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Accessor", "Project"]
   },  {
     "name":"interaction_dragzoomx",
-    "categories":["Data", "Linear Scale", "Numeric Axis", "Accessor", "Project", "Area Plot", "Gridlines", "Merge", "Group"]
+    "categories":["Data", "Linear Scale", "Numeric Axis", "Accessor", "Project", "Area Plot", "Gridlines", "Merge", "Group", "DragBox Interaction"]
   },  {
     "name":"interaction_panzoom",
     "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Gridlines", "Merge", "PanZoom Interaction"]
@@ -94,10 +94,10 @@
     "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Gridlines", "Merge", "Table", "Layout", "PanZoom Interaction"]
   },  {
     "name":"select_bars",
-    "categories":["Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Gridlines", "Merge", "Click Interaction", "XYDragBox Interaction", "Title"]
+    "categories":["Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Gridlines", "Merge", "Click Interaction", "DragBox Interaction", "Title"]
   },  {
     "name":"select_zoom",
-    "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Merge", "Title", "Legend", "XYDragBox Interaction", "Double Click Interaction"]
+    "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Merge", "Title", "Legend", "DragBox Interaction", "Double Click Interaction"]
   },  {
     "name":"stacked_area",
     "categories":["Datasource", "Category Axis", "Area Plot", "Ordinal Scale", "Quantitative Scale"]
@@ -106,6 +106,6 @@
     "categories":["Linear Scale", "Numeric Axis", "Animate", "Legend", "Category Axis", "Linear Scale", "Vertical Bar Plot", "Stacked Plot"]
   }, {
     "name":"titleLegend_change",
-    "categories":["Datasource", "Metadata", "Color Scale", "Scatter Plot", "Line Plot", "Area Plot", "Domain", "Linear Scale", "Numeric Axis", "Project", "Accessor", "Title", "Label", "Layout", "Click Interaction"]
+    "categories":["Datasource", "Metadata", "Color Scale", "Scatter Plot", "Line Plot", "Area Plot", "Domain", "Linear Scale", "Numeric Axis", "Project", "Accessor", "Title", "Label", "Layout", "Legend", "Click Interaction"]
   }
 ]

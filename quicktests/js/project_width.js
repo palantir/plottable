@@ -59,10 +59,10 @@ function run(div, data, Plottable) {
     barRenderer.project("width", widthPicker);
   }
 
-  var addClick = new Plottable.Interaction.Click(addLabel)
-                              .callback(addBar)
-                              .registerWithComponent();
-  var removeClick = new Plottable.Interaction.Click(removeLabel)
-                              .callback(removeBar)
-                              .registerWithComponent();
+  addLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(addBar)
+  );
+  removeLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(removeBar)
+  );
 }

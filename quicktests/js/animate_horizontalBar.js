@@ -30,8 +30,7 @@ function run(div, data, Plottable) {
     hBarRenderer.dataset().data(d);
   };
 
-  var click = new Plottable.Interaction.Click(hBarRenderer)
-    .callback(cb)
-    .registerWithComponent();
-
+  hBarRenderer.registerInteraction(
+    new Plottable.Interaction.Click(hBarRenderer).callback(cb)
+  );
 }

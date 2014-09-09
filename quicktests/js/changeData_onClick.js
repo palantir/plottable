@@ -48,8 +48,8 @@ function run(div, data, Plottable) {
         }
     };
 
-    window.xy = new Plottable.Interaction.Click(renderGroup)
-        .callback(cb)
-        .registerWithComponent();
+    renderGroup.registerInteraction(
+        new Plottable.Interaction.Click().callback(cb)
+    );
 
 }
