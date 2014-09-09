@@ -4529,17 +4529,17 @@ var Plottable;
                 Plottable.Abstract.NewStylePlot.prototype._setup.call(this);
             };
             Pie.prototype.addDataset = function (keyOrDataset, dataset) {
-                return Plottable.Abstract.NewStylePlot.prototype.addDataset.apply(this, [keyOrDataset, dataset]);
+                return Plottable.Abstract.NewStylePlot.prototype.addDataset.call(this, keyOrDataset, dataset);
             };
             Pie.prototype._addDataset = function (key, dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
                     Plottable._Util.Methods.warn("Only one dataset is supported in pie plots");
                     return;
                 }
-                Plottable.Abstract.NewStylePlot.prototype._addDataset.apply(this, [key, dataset]);
+                Plottable.Abstract.NewStylePlot.prototype._addDataset.call(this, key, dataset);
             };
             Pie.prototype.removeDataset = function (key) {
-                return Plottable.Abstract.NewStylePlot.prototype.removeDataset.apply(this, [key]);
+                return Plottable.Abstract.NewStylePlot.prototype.removeDataset.call(this, key);
             };
             Pie.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -4549,7 +4549,7 @@ var Plottable;
                 return attrToProjector;
             };
             Pie.prototype._getAnimator = function (drawer, index) {
-                return Plottable.Abstract.NewStylePlot.prototype._getAnimator.apply(this, [drawer, index]);
+                return Plottable.Abstract.NewStylePlot.prototype._getAnimator.call(this, drawer, index);
             };
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Arc(key);

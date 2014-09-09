@@ -44,7 +44,7 @@ export module Plot {
     public addDataset(dataset: Dataset): Pie;
     public addDataset(dataset: any[]): Pie;
     public addDataset(keyOrDataset: any, dataset?: any): Pie {
-      return Abstract.NewStylePlot.prototype.addDataset.apply(this, [keyOrDataset, dataset]);
+      return Abstract.NewStylePlot.prototype.addDataset.call(this, keyOrDataset, dataset);
     }
 
     public _addDataset(key: string, dataset: Dataset) {
@@ -52,7 +52,7 @@ export module Plot {
         _Util.Methods.warn("Only one dataset is supported in pie plots");
         return;
       }
-      Abstract.NewStylePlot.prototype._addDataset.apply(this, [key, dataset]);
+      Abstract.NewStylePlot.prototype._addDataset.call(this, key, dataset);
     }
 
     /**
@@ -62,7 +62,7 @@ export module Plot {
      * @return {NewStylePlot} The calling PiePlot.
      */
     public removeDataset(key: string): Pie {
-      return Abstract.NewStylePlot.prototype.removeDataset.apply(this, [key]);
+      return Abstract.NewStylePlot.prototype.removeDataset.call(this, key);
     }
 
     public _generateAttrToProjector(): IAttributeToProjector {
@@ -75,7 +75,7 @@ export module Plot {
     }
 
     public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
-      return Abstract.NewStylePlot.prototype._getAnimator.apply(this, [drawer, index]);
+      return Abstract.NewStylePlot.prototype._getAnimator.call(this, drawer, index);
     }
 
     public _getDrawer(key: string): Abstract._Drawer {
