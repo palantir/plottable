@@ -106,7 +106,7 @@ function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
 }
 
 before(function () {
-    Plottable.Core.RenderController.setRenderPolicy(new Plottable.Core.RenderController.RenderPolicy.Immediate());
+    Plottable.Core.RenderController.setRenderPolicy("immediate");
     window.Pixel_CloseTo_Requirement = window.PHANTOMJS ? 2 : 0.5;
 });
 after(function () {
