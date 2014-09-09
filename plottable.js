@@ -4558,6 +4558,9 @@ var Plottable;
                 return Plottable.Abstract.NewStylePlot.prototype.addDataset.call(this, keyOrDataset, dataset);
             };
             Radar.prototype._addDataset = function (key, dataset) {
+                if (dataset.data().length > 1) {
+                    Plottable._Util.Methods.warn("Functionality is undefined for more than 1 item in the dataset");
+                }
                 if (this._datasetKeysInOrder.length === 1) {
                     Plottable._Util.Methods.warn("Only one dataset is supported in pie plots");
                     return;
@@ -4569,7 +4572,7 @@ var Plottable;
             };
             Radar.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                this._rScale.range([0, Math.min(this.width(), this.height()) / 2 - 100]);
+                this._rScale.range([0, this.maxRadius()]);
             };
             Radar.prototype._getAnimator = function (drawer, index) {
                 return Plottable.Abstract.NewStylePlot.prototype._getAnimator.call(this, drawer, index);
@@ -4588,13 +4591,12 @@ var Plottable;
                 var self = this;
                 function pointMapper(d) {
                     return self.metrics.map(function (metric, i) {
-                        var translateX = self.width() / 2;
-                        var translateY = self.height() / 2;
-                        var value = d[metric];
-                        var scaledValue = self._rScale.scale(value);
+                        var scaledValue = self._rScale.scale(d[metric]);
                         var angle = i * 2 * Math.PI / self.metrics.length;
                         var rotateX = scaledValue * Math.cos(angle);
                         var rotateY = -scaledValue * Math.sin(angle);
+                        var translateX = self.width() / 2;
+                        var translateY = self.height() / 2;
                         return [rotateX + translateX, rotateY + translateY];
                     }).join(" ");
                 }
@@ -4603,20 +4605,25 @@ var Plottable;
                 attrToProjector["opacity"] = function () { return "0.7"; };
                 return attrToProjector;
             };
+            Radar.prototype.generateAxesAttrToProjector = function () {
+                var _this = this;
+                var attrHash = {};
+                var translateString = "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
+                attrHash["transform"] = function (d, i) { return translateString + " rotate(" + i * 360 / _this.metrics.length + ")"; };
+                attrHash["x1"] = function () { return _this.maxRadius(); };
+                attrHash["y1"] = function () { return 0; };
+                attrHash["x2"] = function () { return 0; };
+                attrHash["y1"] = function () { return 0; };
+                attrHash["stroke"] = function () { return "black"; };
+                return attrHash;
+            };
             Radar.prototype._paint = function () {
                 var _this = this;
-                var lineLength = Math.min(this.width(), this.height()) / 2 - 100;
-                var metricAxes = this._renderArea.selectAll(".metric-axis").data(this.metrics);
+                var renderArea = this._getDrawersInOrder()[0]._renderArea;
+                var metricAxes = renderArea.selectAll(".metric-axis").data(this.metrics);
                 metricAxes.enter().append("line");
                 metricAxes.exit().remove();
-                var axesAttrToProjector = {};
-                var translateString = "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
-                axesAttrToProjector["transform"] = function (d, i) { return translateString + " rotate(" + i * 360 / _this.metrics.length + ")"; };
-                axesAttrToProjector["x1"] = function () { return lineLength; };
-                axesAttrToProjector["y1"] = function () { return 0; };
-                axesAttrToProjector["x2"] = function () { return 0; };
-                axesAttrToProjector["y1"] = function () { return 0; };
-                axesAttrToProjector["stroke"] = function () { return "black"; };
+                var axesAttrToProjector = this.generateAxesAttrToProjector();
                 metricAxes.attr(axesAttrToProjector);
                 var attrHash = this._generateAttrToProjector();
                 var datasets = this._getDatasetsInOrder();
@@ -4624,6 +4631,9 @@ var Plottable;
                     var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
                     d.draw(datasets[i].data(), attrHash, animator);
                 });
+            };
+            Radar.prototype.maxRadius = function () {
+                return Math.min(this.width(), this.height()) / 2 - 100;
             };
             return Radar;
         })(Plottable.Abstract.Plot);

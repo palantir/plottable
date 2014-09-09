@@ -49,6 +49,9 @@ export module Plot {
     }
 
     public _addDataset(key: string, dataset: Dataset) {
+      if (dataset.data().length > 1) {
+        _Util.Methods.warn("Functionality is undefined for more than 1 item in the dataset");
+      }
       if (this._datasetKeysInOrder.length === 1) {
         _Util.Methods.warn("Only one dataset is supported in pie plots");
         return;
@@ -62,7 +65,7 @@ export module Plot {
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-      this._rScale.range([0, Math.min(this.width(), this.height()) / 2 - 100]);
+      this._rScale.range([0, this.maxRadius()]);
     }
 
     public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
@@ -86,13 +89,15 @@ export module Plot {
       var self = this;
       function pointMapper(d: any) {
          return self.metrics.map((metric, i) => {
-           var translateX = self.width() / 2;
-           var translateY = self.height() / 2;
-           var value = d[metric];
-           var scaledValue = self._rScale.scale(value);
+           var scaledValue = self._rScale.scale(d[metric]);
+
            var angle = i * 2 * Math.PI / self.metrics.length;
            var rotateX = scaledValue * Math.cos(angle);
            var rotateY = -scaledValue * Math.sin(angle);
+
+           var translateX = self.width() / 2;
+           var translateY = self.height() / 2;
+
            return [rotateX + translateX, rotateY + translateY];
          }).join(" ");
       }
@@ -102,20 +107,27 @@ export module Plot {
       return attrToProjector;
     }
 
+    private generateAxesAttrToProjector(): IAttributeToProjector {
+      var attrHash: IAttributeToProjector = {};
+
+      var translateString = "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
+      attrHash["transform"] = (d: any, i: number) => translateString + " rotate(" + i * 360 / this.metrics.length + ")";
+
+      attrHash["x1"] = () => this.maxRadius();
+      attrHash["y1"] = () => 0;
+      attrHash["x2"] = () => 0;
+      attrHash["y1"] = () => 0;
+      attrHash["stroke"] = () => "black";
+      return attrHash;
+    }
+
     public _paint() {
-      //TODO: Below is incorrect
-      var lineLength = Math.min(this.width(), this.height()) / 2 - 100;
-      var metricAxes = this._renderArea.selectAll(".metric-axis").data(this.metrics);
+      // HACKHACK Can't place the axis lines before the polygon drawer g
+      var renderArea = this._getDrawersInOrder()[0]._renderArea;
+      var metricAxes = renderArea.selectAll(".metric-axis").data(this.metrics);
       metricAxes.enter().append("line");
       metricAxes.exit().remove();
-      var axesAttrToProjector: IAttributeToProjector = {};
-      var translateString = "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
-      axesAttrToProjector["transform"] = (d: any, i: number) => translateString + " rotate(" + i * 360 / this.metrics.length + ")";
-      axesAttrToProjector["x1"] = () => lineLength;
-      axesAttrToProjector["y1"] = () => 0;
-      axesAttrToProjector["x2"] = () => 0;
-      axesAttrToProjector["y1"] = () => 0;
-      axesAttrToProjector["stroke"] = () => "black";
+      var axesAttrToProjector = this.generateAxesAttrToProjector();
       metricAxes.attr(axesAttrToProjector);
 
       var attrHash = this._generateAttrToProjector();
@@ -124,6 +136,10 @@ export module Plot {
         var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
         d.draw(datasets[i].data(), attrHash, animator);
       });
+    }
+
+    private maxRadius() {
+      return Math.min(this.width(), this.height()) / 2 - 100;
     }
   }
 }
