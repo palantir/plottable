@@ -2177,6 +2177,31 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (_Drawer) {
+        var Polygon = (function (_super) {
+            __extends(Polygon, _super);
+            function Polygon() {
+                _super.apply(this, arguments);
+            }
+            Polygon.prototype.draw = function (data, attrToProjector, animator) {
+                if (animator === void 0) { animator = new Plottable.Animator.Null(); }
+                throw new Error("MUST IMPLEMENT");
+            };
+            return Polygon;
+        })(Plottable.Abstract._Drawer);
+        _Drawer.Polygon = Polygon;
+    })(Plottable._Drawer || (Plottable._Drawer = {}));
+    var _Drawer = Plottable._Drawer;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (_Drawer) {
         var Rect = (function (_super) {
             __extends(Rect, _super);
             function Rect() {
@@ -4491,6 +4516,79 @@ var Plottable;
         Abstract.Plot = Plot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Plot) {
+        var RadarPlot = (function (_super) {
+            __extends(RadarPlot, _super);
+            function RadarPlot(rScale) {
+                this._key2DatasetDrawerKey = d3.map();
+                this._datasetKeysInOrder = [];
+                this.nextSeriesIndex = 0;
+                _super.call(this, new Plottable.Dataset());
+                this.classed("radar-plot", true);
+            }
+            RadarPlot.prototype._setup = function () {
+                Plottable.Abstract.NewStylePlot.prototype._setup.call(this);
+            };
+            RadarPlot.prototype.addDataset = function (keyOrDataset, dataset) {
+                return Plottable.Abstract.NewStylePlot.prototype.addDataset.call(this, keyOrDataset, dataset);
+            };
+            RadarPlot.prototype._addDataset = function (key, dataset) {
+                if (this._datasetKeysInOrder.length === 1) {
+                    Plottable._Util.Methods.warn("Only one dataset is supported in pie plots");
+                    return;
+                }
+                Plottable.Abstract.NewStylePlot.prototype._addDataset.call(this, key, dataset);
+            };
+            RadarPlot.prototype.removeDataset = function (key) {
+                return Plottable.Abstract.NewStylePlot.prototype.removeDataset.call(this, key);
+            };
+            RadarPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                this._rScale.range([0, Math.min(this.width(), this.height())]);
+            };
+            RadarPlot.prototype._getAnimator = function (drawer, index) {
+                return Plottable.Abstract.NewStylePlot.prototype._getAnimator.call(this, drawer, index);
+            };
+            RadarPlot.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Polygon(key);
+            };
+            RadarPlot.prototype._getDatasetsInOrder = function () {
+                return Plottable.Abstract.NewStylePlot.prototype._getDatasetsInOrder.call(this);
+            };
+            RadarPlot.prototype._getDrawersInOrder = function () {
+                return Plottable.Abstract.NewStylePlot.prototype._getDrawersInOrder.call(this);
+            };
+            RadarPlot.prototype._generateAttrToProjector = function () {
+                var _this = this;
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                attrToProjector["d"] = d3.svg.arc().outerRadius(Math.min(this.width(), this.height()) / 2).innerRadius(0);
+                attrToProjector["transform"] = function () { return "translate(" + _this.width() / 2 + "," + _this.height() / 2 + ")"; };
+                return attrToProjector;
+            };
+            RadarPlot.prototype._paint = function () {
+                var _this = this;
+                var attrHash = this._generateAttrToProjector();
+                var datasets = this._getDatasetsInOrder();
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
+                    d.draw(datasets[i].data(), attrHash, animator);
+                });
+            };
+            return RadarPlot;
+        })(Plottable.Abstract.Plot);
+        Plot.RadarPlot = RadarPlot;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
 
 var __extends = this.__extends || function (d, b) {

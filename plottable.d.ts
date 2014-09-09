@@ -507,6 +507,15 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
+        class Polygon extends Plottable.Abstract._Drawer {
+            draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
         class Rect extends Plottable.Abstract._Drawer {
             draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
         }
@@ -728,6 +737,20 @@ declare module Plottable {
             detach(): Plot;
             animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
             animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
+        class RadarPlot<R> extends Plottable.Abstract.Plot {
+            constructor(rScale: Plottable.Abstract.Scale<R, number>);
+            addDataset(key: string, dataset: Dataset): RadarPlot<R>;
+            addDataset(key: string, dataset: any[]): RadarPlot<R>;
+            addDataset(dataset: Dataset): RadarPlot<R>;
+            addDataset(dataset: any[]): RadarPlot<R>;
+            removeDataset(key: string): RadarPlot<R>;
         }
     }
 }

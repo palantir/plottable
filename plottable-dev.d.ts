@@ -544,6 +544,15 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
+        class Polygon extends Plottable.Abstract._Drawer {
+            draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
         class Rect extends Plottable.Abstract._Drawer {
             draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
         }
@@ -891,6 +900,32 @@ declare module Plottable {
             _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any;
             animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
             animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
+        class RadarPlot<R> extends Plottable.Abstract.Plot {
+            _datasetKeysInOrder: string[];
+            _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
+            _rScale: Plottable.Abstract.Scale<R, number>;
+            constructor(rScale: Plottable.Abstract.Scale<R, number>);
+            _setup(): void;
+            addDataset(key: string, dataset: Dataset): RadarPlot<R>;
+            addDataset(key: string, dataset: any[]): RadarPlot<R>;
+            addDataset(dataset: Dataset): RadarPlot<R>;
+            addDataset(dataset: any[]): RadarPlot<R>;
+            _addDataset(key: string, dataset: Dataset): void;
+            removeDataset(key: string): RadarPlot<R>;
+            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
+            _getAnimator(drawer: Plottable.Abstract._Drawer, index: number): Plottable.Animator.IPlotAnimator;
+            _getDrawer(key: string): Plottable.Abstract._Drawer;
+            _getDatasetsInOrder(): Dataset[];
+            _getDrawersInOrder(): Plottable.Abstract._Drawer[];
+            _generateAttrToProjector(): IAttributeToProjector;
+            _paint(): void;
         }
     }
 }
