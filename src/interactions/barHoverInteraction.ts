@@ -3,7 +3,7 @@
 module Plottable {
 export module Interaction {
   export class BarHover extends Abstract.Interaction {
-    public componentToListenTo: Abstract.BarPlot<any, any>;
+    public _componentToListenTo: Abstract.BarPlot<any, any>;
     private dispatcher: Dispatcher.Mouse;
     private plotIsVertical = true;
     private hoverCallback: (datum: any, bar: D3.Selection) => any;
@@ -11,18 +11,10 @@ export module Interaction {
     private currentBar: D3.Selection = null;
     private _hoverMode = "point";
 
-    /**
-     * Creates a new BarHover Interaction.
-     *
-     * @param {BarPlot} barPlot The Bar Plot to listen for hover events on.
-     */
-    constructor(barPlot: Abstract.BarPlot<any, any>) {
-      super(barPlot);
-      this.plotIsVertical = Plottable.Plot.VerticalBar.prototype.isPrototypeOf(this.componentToListenTo);
-    }
-
-    public _anchor(hitBox: D3.Selection) {
-      this.dispatcher = new Dispatcher.Mouse(hitBox);
+    public _anchor(barPlot: Abstract.BarPlot<any, any>, hitBox: D3.Selection) {
+      super._anchor(barPlot, hitBox);
+      this.plotIsVertical = Plottable.Plot.VerticalBar.prototype.isPrototypeOf(this._componentToListenTo);
+      this.dispatcher = new Dispatcher.Mouse(this._hitBox);
 
       this.dispatcher.mousemove((p: Point) => {
         var selectedBar = this.getHoveredBar(p);
@@ -38,7 +30,7 @@ export module Interaction {
             }
           }
 
-          this.componentToListenTo._bars.classed("not-hovered", true).classed("hovered", false);
+          this._componentToListenTo._bars.classed("not-hovered", true).classed("hovered", false);
           selectedBar.classed("not-hovered", false).classed("hovered", true);
           if (this.hoverCallback != null) {
             this.hoverCallback(selectedBar.data()[0], selectedBar);
@@ -54,7 +46,7 @@ export module Interaction {
     }
 
     private _hoverOut() {
-      this.componentToListenTo._bars.classed("not-hovered hovered", false);
+      this._componentToListenTo._bars.classed("not-hovered hovered", false);
       if (this.unhoverCallback != null && this.currentBar != null) {
         this.unhoverCallback(this.currentBar.data()[0], this.currentBar); // last known information
       }
@@ -63,14 +55,14 @@ export module Interaction {
 
     private getHoveredBar(p: Point) {
       if (this._hoverMode === "point") {
-        return this.componentToListenTo.selectBar(p.x, p.y, false);
+        return this._componentToListenTo.selectBar(p.x, p.y, false);
       }
 
       var maxExtent: IExtent = { min: -Infinity, max: Infinity };
       if (this.plotIsVertical) {
-        return this.componentToListenTo.selectBar(p.x, maxExtent, false);
+        return this._componentToListenTo.selectBar(p.x, maxExtent, false);
       } else {
-        return this.componentToListenTo.selectBar(maxExtent, p.y, false);
+        return this._componentToListenTo.selectBar(maxExtent, p.y, false);
       }
     }
 

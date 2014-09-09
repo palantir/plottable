@@ -960,10 +960,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Interaction {
-            hitBox: D3.Selection;
-            componentToListenTo: Component;
-            constructor(componentToListenTo: Component);
-            registerWithComponent(): Interaction;
         }
     }
 }
@@ -972,21 +968,9 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Click extends Plottable.Abstract.Interaction {
-            constructor(componentToListenTo: Plottable.Abstract.Component);
             callback(cb: (x: number, y: number) => any): Click;
         }
         class DoubleClick extends Click {
-            constructor(componentToListenTo: Plottable.Abstract.Component);
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
-        class Mousemove extends Plottable.Abstract.Interaction {
-            constructor(componentToListenTo: Plottable.Abstract.Component);
-            mousemove(x: number, y: number): void;
         }
     }
 }
@@ -995,7 +979,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Key extends Plottable.Abstract.Interaction {
-            constructor(componentToListenTo: Plottable.Abstract.Component, keyCode: number);
+            constructor(keyCode: number);
             callback(cb: () => any): Key;
         }
     }
@@ -1005,7 +989,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class PanZoom extends Plottable.Abstract.Interaction {
-            constructor(componentToListenTo: Plottable.Abstract.Component, xScale?: Plottable.Abstract.QuantitativeScale<any>, yScale?: Plottable.Abstract.QuantitativeScale<any>);
+            constructor(xScale?: Plottable.Abstract.QuantitativeScale<any>, yScale?: Plottable.Abstract.QuantitativeScale<any>);
             resetZoom(): void;
         }
     }
@@ -1015,8 +999,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class BarHover extends Plottable.Abstract.Interaction {
-            componentToListenTo: Plottable.Abstract.BarPlot<any, any>;
-            constructor(barPlot: Plottable.Abstract.BarPlot<any, any>);
             hoverMode(): string;
             hoverMode(mode: string): BarHover;
             onHover(callback: (datum: any, bar: D3.Selection) => any): BarHover;
@@ -1029,7 +1011,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Drag extends Plottable.Abstract.Interaction {
-            constructor(componentToListenTo: Plottable.Abstract.Component);
+            constructor();
             dragstart(): (startLocation: Point) => void;
             dragstart(cb: (startLocation: Point) => any): Drag;
             drag(): (startLocation: Point, endLocation: Point) => void;
