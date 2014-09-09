@@ -5,7 +5,7 @@ export module Interaction {
   export class BarHover extends Abstract.Interaction {
     public _componentToListenTo: Abstract.BarPlot<any, any>;
     private dispatcher: Dispatcher.Mouse;
-    private plotIsVertical = true;
+    private plotIsVertical: boolean;
     private hoverCallback: (datum: any, bar: D3.Selection) => any;
     private unhoverCallback: (datum: any, bar: D3.Selection) => any;
     private currentBar: D3.Selection = null;
@@ -13,7 +13,7 @@ export module Interaction {
 
     public _anchor(barPlot: Abstract.BarPlot<any, any>, hitBox: D3.Selection) {
       super._anchor(barPlot, hitBox);
-      this.plotIsVertical = Plottable.Plot.VerticalBar.prototype.isPrototypeOf(this._componentToListenTo);
+      this.plotIsVertical = this._componentToListenTo._isVertical;
       this.dispatcher = new Dispatcher.Mouse(this._hitBox);
 
       this.dispatcher.mousemove((p: Point) => {

@@ -23,7 +23,7 @@ function run(div, data, Plottable) {
 
   basicTable.renderTo(svg);
 
-  var pzi = new Plottable.Interaction.PanZoom(xScale, yScale)
+  var pzi = new Plottable.Interaction.PanZoom(xScale, yScale);
   scatterPlot.registerInteraction(pzi);
 
   var ki = new Plottable.Interaction.Key(65);

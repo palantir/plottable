@@ -52,16 +52,15 @@ function run(div, data, Plottable) {
   var dragboxInteraction = new Plottable.Interaction.XYDragBox();
 
   var cb = function(start, end) {
-    console.log(start, end);
     var startX = xScale.invert(start.x);
     var endX = xScale.invert(end.x);
     var startY = yScale.invert(start.y);
     var endY = yScale.invert(end.y);
 
-    var minX = Math.min(start.x, end.x);
-    var maxX = Math.max(start.x, end.x);
-    var minY = Math.min(start.y, end.y);
-    var maxY = Math.max(start.y, end.y);
+    var minX = Math.min(startX, endX);
+    var maxX = Math.max(startX, endX);
+    var minY = Math.min(startY, endY);
+    var maxY = Math.max(startY, endY);
 
     xScale.domain([minX, maxX]);
     yScale.domain([minY, maxY]);

@@ -5886,14 +5886,13 @@ var Plottable;
             __extends(BarHover, _super);
             function BarHover() {
                 _super.apply(this, arguments);
-                this.plotIsVertical = true;
                 this.currentBar = null;
                 this._hoverMode = "point";
             }
             BarHover.prototype._anchor = function (barPlot, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, barPlot, hitBox);
-                this.plotIsVertical = Plottable.Plot.VerticalBar.prototype.isPrototypeOf(this._componentToListenTo);
+                this.plotIsVertical = this._componentToListenTo._isVertical;
                 this.dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
                 this.dispatcher.mousemove(function (p) {
                     var selectedBar = _this.getHoveredBar(p);

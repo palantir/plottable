@@ -14,13 +14,9 @@ export module Interaction {
      * does so by changing the xScale and yScales' domains repeatedly.
      *
      * @constructor
-     * @param {Component} componentToListenTo The component to listen for interactions on.
      * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
      * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
      */
-    // constructor(componentToListenTo: Abstract.Component,
-    //             xScale?: Abstract.QuantitativeScale<any>, yScale?: Abstract.QuantitativeScale<any>) {
-    //   super(componentToListenTo);
     constructor(xScale?: Abstract.QuantitativeScale<any>, yScale?: Abstract.QuantitativeScale<any>) {
       super();
       if (xScale == null) {
