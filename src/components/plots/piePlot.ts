@@ -37,7 +37,7 @@ export module Plot {
      *
      * @param {string} [key] The key of the dataset.
      * @param {any[]|Dataset} dataset dataset to add.
-     * @returns {PiePlot} The calling PiePlot.
+     * @returns {Pie} The calling PiePlot.
      */
     public addDataset(key: string, dataset: Dataset): Pie;
     public addDataset(key: string, dataset: any[]): Pie;
@@ -59,7 +59,7 @@ export module Plot {
      * Removes a dataset
      *
      * @param {string} key The key of the dataset
-     * @return {NewStylePlot} The calling PiePlot.
+     * @returns {Pie} The calling PiePlot.
      */
     public removeDataset(key: string): Pie {
       return Abstract.NewStylePlot.prototype.removeDataset.call(this, key);
