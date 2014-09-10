@@ -4587,7 +4587,7 @@ var Plottable;
                     var centroid = _this.arc().centroid(d);
                     var translatedCentroid = [centroid[0] + _this.width() / 2, centroid[1] + _this.height() / 2];
                     return "translate(" + translatedCentroid + ")";
-                }).attr("dy", ".35em").style("text-anchor", "middle").classed("pie-label", true).text(function (d) { return d.data["label"]; });
+                }).attr("dy", ".35em").style("text-anchor", "middle").classed("pie-label", true).text(function (d) { return (((d.endAngle - d.startAngle) / (2 * Math.PI)) * 100) + "%"; });
             };
             return Pie;
         })(Plottable.Abstract.Plot);

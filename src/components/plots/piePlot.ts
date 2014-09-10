@@ -125,7 +125,7 @@ export module Plot {
             .attr("dy", ".35em")
             .style("text-anchor", "middle")
             .classed("pie-label", true)
-            .text((d: any) => d.data["label"]);
+            .text((d: any) => (((d.endAngle - d.startAngle) / (2 * Math.PI)) * 100) + "%");
     }
 
   }
