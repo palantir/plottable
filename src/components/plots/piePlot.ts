@@ -71,6 +71,8 @@ export module Plot {
                       .outerRadius(Math.min(this.width(), this.height()) / 2)
                       .innerRadius(0);
       attrToProjector["transform"] = () => "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
+      attrToProjector["fill"] = () => "steelblue";
+      attrToProjector["stroke"] = () => "black";
       return attrToProjector;
     }
 
