@@ -969,7 +969,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Click extends Plottable.Abstract.Interaction {
-            callback(cb: (x: number, y: number) => any): Click;
+            callback(cb: (p: Point) => any): Click;
         }
         class DoubleClick extends Click {
         }

@@ -5759,7 +5759,7 @@ var Plottable;
                     var xy = d3.mouse(hitBox.node());
                     var x = xy[0];
                     var y = xy[1];
-                    _this._callback(x, y);
+                    _this._callback({ x: x, y: y });
                 });
             };
             Click.prototype._listenTo = function () {
