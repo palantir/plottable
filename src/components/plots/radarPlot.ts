@@ -40,19 +40,38 @@ export module Plot {
      *
      * @returns {string[]} The metrics measured in this RadarPlot
      */
-    public metrics(): string[];
+    public metrics(): string[] {
+      return this._metrics.slice(0);
+    }
+
     /**
-     * Sets the metrics to associated with this RadarPlot
+     * Adds metrics to associate with this RadarPlot
      *
-     * @param {string[]} The metrics to associated this RadarPlot to
-     * @returns {RadarPlot} The calling RadarPlot.
+     * @param {string[]} metrics The metrics to associate this RadarPlot to
+     * @returns {Radar} The calling RadarPlot.
      */
-    public metrics(metrics: string[]): Radar<R>;
-    public metrics(metrics?: string[]): any {
-      if (metrics == null) {
-        return this._metrics.slice(0);
-      }
-      this._metrics = metrics;
+    public addMetrics(...metrics: string[]): Radar<R> {
+      metrics.forEach((metric) => this._metrics.push(metric));
+      this._render();
+      return this;
+    }
+
+    /**
+     * Removes metrics associated with this RadarPlot
+     *
+     * @param {string[]} metrics The metrics to associate this RadarPlot to
+     * @returns {Radar} The calling RadarPlot.
+     */
+    public removeMetrics(...metrics: string[]): Radar<R> {
+      metrics.forEach((metric) => {
+        for (var i = 0; i < this._metrics.length; i++) {
+          if (metric === metrics[i]) {
+            this._metrics = metrics.splice(i, 1);
+            break;
+          }
+        }
+      });
+      this._render();
       return this;
     }
 
@@ -64,7 +83,7 @@ export module Plot {
      *
      * @param {string} [key] The key of the dataset.
      * @param {any[]|Dataset} dataset dataset to add.
-     * @returns {RadarPlot} The calling RadarPlot.
+     * @returns {Radar} The calling RadarPlot.
      */
     public addDataset(key: string, dataset: Dataset): Radar<R>;
     public addDataset(key: string, dataset: any[]): Radar<R>;

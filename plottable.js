@@ -4545,11 +4545,34 @@ var Plottable;
             Radar.prototype._setup = function () {
                 Plottable.Abstract.NewStylePlot.prototype._setup.call(this);
             };
-            Radar.prototype.metrics = function (metrics) {
-                if (metrics == null) {
-                    return this._metrics.slice(0);
+            Radar.prototype.metrics = function () {
+                return this._metrics.slice(0);
+            };
+            Radar.prototype.addMetrics = function () {
+                var _this = this;
+                var metrics = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    metrics[_i - 0] = arguments[_i];
                 }
-                this._metrics = metrics;
+                metrics.forEach(function (metric) { return _this._metrics.push(metric); });
+                this._render();
+                return this;
+            };
+            Radar.prototype.removeMetrics = function () {
+                var _this = this;
+                var metrics = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    metrics[_i - 0] = arguments[_i];
+                }
+                metrics.forEach(function (metric) {
+                    for (var i = 0; i < _this._metrics.length; i++) {
+                        if (metric === metrics[i]) {
+                            _this._metrics = metrics.splice(i, 1);
+                            break;
+                        }
+                    }
+                });
+                this._render();
                 return this;
             };
             Radar.prototype.addDataset = function (keyOrDataset, dataset) {

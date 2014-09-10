@@ -19,8 +19,8 @@ describe("Plots", () => {
       rScale = new Plottable.Scale.Linear().domain([0, 10]);
       simpleDataset = new Plottable.Dataset([{attr0: 5, attr1: 10, attr2: 7}]);
       radarPlot = new Plottable.Plot.Radar(rScale)
-                                   .addDataset(simpleDataset)
-                                   .metrics(["attr0", "attr1", "attr2"]);
+                                    .addDataset(simpleDataset)
+                                    .addMetrics("attr0", "attr1", "attr2");
       radarPlot.renderTo(svg);
       renderArea = radarPlot._renderArea;
     });
@@ -29,7 +29,7 @@ describe("Plots", () => {
       verifier.start();
     });
 
-    it("draws area and line correctly", () => {
+    it("polygon is drawn correctly", () => {
       var polygon = renderArea.select("polygon");
       var points = polygon.attr("points").split(" ");
 
