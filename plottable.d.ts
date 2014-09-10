@@ -960,7 +960,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Interaction {
+        class Interaction extends PlottableObject {
         }
     }
 }

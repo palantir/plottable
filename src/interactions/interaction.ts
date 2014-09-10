@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Abstract {
-  export class Interaction {
+  export class Interaction extends PlottableObject {
     /**
      * It maintains a 'hitBox' which is where all event listeners are
      * attached. Due to cross- browser weirdness, the hitbox needs to be an
