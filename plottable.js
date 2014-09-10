@@ -5713,18 +5713,26 @@ var Plottable;
     var Core = Plottable.Core;
 })(Plottable || (Plottable = {}));
 
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var Plottable;
 (function (Plottable) {
     (function (Abstract) {
-        var Interaction = (function () {
+        var Interaction = (function (_super) {
+            __extends(Interaction, _super);
             function Interaction() {
+                _super.apply(this, arguments);
             }
             Interaction.prototype._anchor = function (component, hitBox) {
                 this._componentToListenTo = component;
                 this._hitBox = hitBox;
             };
             return Interaction;
-        })();
+        })(Abstract.PlottableObject);
         Abstract.Interaction = Interaction;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;

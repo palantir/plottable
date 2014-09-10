@@ -1221,7 +1221,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Interaction {
+        class Interaction extends PlottableObject {
             _hitBox: D3.Selection;
             _componentToListenTo: Component;
             _anchor(component: Component, hitBox: D3.Selection): void;
