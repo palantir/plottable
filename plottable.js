@@ -4560,7 +4560,7 @@ var Plottable;
                     Plottable._Util.Methods.warn("Functionality is undefined for more than 1 item in the dataset");
                 }
                 if (this._datasetKeysInOrder.length === 1) {
-                    Plottable._Util.Methods.warn("Only one dataset is supported in pie plots");
+                    Plottable._Util.Methods.warn("Only one dataset is supported in radar plots");
                     return;
                 }
                 Plottable.Abstract.NewStylePlot.prototype._addDataset.call(this, key, dataset);

@@ -79,7 +79,7 @@ export module Plot {
         _Util.Methods.warn("Functionality is undefined for more than 1 item in the dataset");
       }
       if (this._datasetKeysInOrder.length === 1) {
-        _Util.Methods.warn("Only one dataset is supported in pie plots");
+        _Util.Methods.warn("Only one dataset is supported in radar plots");
         return;
       }
       Abstract.NewStylePlot.prototype._addDataset.call(this, key, dataset);
