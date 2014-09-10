@@ -62,7 +62,7 @@ describe("Plots", () => {
     });
 
     after(() => {
-//      if (verifier.passed) {svg.remove();};
+      if (verifier.passed) {svg.remove();};
     });
   });
 });

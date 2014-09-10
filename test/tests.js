@@ -1534,6 +1534,10 @@ describe("Plots", function () {
             verifier.end();
         });
         after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
         });
     });
 });
