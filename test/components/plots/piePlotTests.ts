@@ -61,6 +61,16 @@ describe("Plots", () => {
       verifier.end();
     });
 
+    it("labels show the percentage of the value out of the whole", () => {
+      var labels = renderArea.selectAll(".pie-label");
+      var label0 = d3.select(labels[0][0]);
+      assert.strictEqual(label0.text(), "25%", "Label is the value percentage");
+      var label1 = d3.select(labels[0][1]);
+      assert.strictEqual(label1.text(), "75%", "Label is the value percentage");
+      assert.closeTo(parseFloat(label0.text()) + parseFloat(label1.text()), 100, 1, "Labels add to 100%");
+      verifier.end();
+    });
+
     after(() => {
       if (verifier.passed) {svg.remove();};
     });
