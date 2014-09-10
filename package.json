@@ -1,6 +1,6 @@
 {
   "name": "plottable.js",
-  "version": "0.28.0",
+  "version": "0.28.1",
   "description": "Modular chart components, built with D3",
   "repository": {
     "type": "git",
