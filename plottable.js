@@ -4522,6 +4522,7 @@ var Plottable;
                 this._key2DatasetDrawerKey = d3.map();
                 this._datasetKeysInOrder = [];
                 this.nextSeriesIndex = 0;
+                this._formatter = Plottable.Formatters.percentage(2, false);
                 this._sectorLabelsEnabled = true;
                 _super.call(this, new Plottable.Dataset());
                 this.classed("pie-plot", true);
@@ -4590,7 +4591,7 @@ var Plottable;
                     var centroid = _this.arc().centroid(d);
                     var translatedCentroid = [centroid[0] + _this.width() / 2, centroid[1] + _this.height() / 2];
                     return "translate(" + translatedCentroid + ")";
-                }).attr("dy", ".35em").style("text-anchor", "middle").classed("pie-label", true).text(function (d) { return (((d.endAngle - d.startAngle) / (2 * Math.PI)) * 100) + "%"; });
+                }).attr("dy", ".35em").style("text-anchor", "middle").classed("pie-label", true).text(function (d) { return _this._formatter((d.endAngle - d.startAngle) / (2 * Math.PI)); });
             };
             Pie.prototype.sectorLabelsEnabled = function (isEnabled) {
                 if (isEnabled == null) {

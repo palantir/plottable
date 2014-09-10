@@ -11,6 +11,7 @@ export module Plot {
     public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
     public _datasetKeysInOrder: string[];
     private nextSeriesIndex: number;
+    private _formatter: Formatter;
     private _sectorLabelsEnabled: boolean;
 
     /**
@@ -23,6 +24,7 @@ export module Plot {
       this._key2DatasetDrawerKey = d3.map();
       this._datasetKeysInOrder = [];
       this.nextSeriesIndex = 0;
+      this._formatter = Formatters.percentage(2, false);
       this._sectorLabelsEnabled = true;
       super(new Plottable.Dataset());
       this.classed("pie-plot", true);
@@ -129,7 +131,7 @@ export module Plot {
             .attr("dy", ".35em")
             .style("text-anchor", "middle")
             .classed("pie-label", true)
-            .text((d: any) => (((d.endAngle - d.startAngle) / (2 * Math.PI)) * 100) + "%");
+            .text((d: any) => this._formatter((d.endAngle - d.startAngle) / (2 * Math.PI)));
     }
 
     /**

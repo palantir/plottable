@@ -1536,9 +1536,9 @@ describe("Plots", function () {
         it("labels show the percentage of the value out of the whole", function () {
             var labels = renderArea.selectAll(".pie-label");
             var label0 = d3.select(labels[0][0]);
-            assert.strictEqual(label0.text(), "25%", "Label is the value percentage");
+            assert.strictEqual(label0.text(), "25.00%", "Label is the value percentage");
             var label1 = d3.select(labels[0][1]);
-            assert.strictEqual(label1.text(), "75%", "Label is the value percentage");
+            assert.strictEqual(label1.text(), "75.00%", "Label is the value percentage");
             assert.closeTo(parseFloat(label0.text()) + parseFloat(label1.text()), 100, 1, "Labels add to 100%");
             verifier.end();
         });
