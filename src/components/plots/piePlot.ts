@@ -11,6 +11,7 @@ export module Plot {
     public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
     public _datasetKeysInOrder: string[];
     private nextSeriesIndex: number;
+    private _sectorLabelsEnabled: boolean;
 
     /**
      * Constructs a PiePlot.
@@ -22,6 +23,7 @@ export module Plot {
       this._key2DatasetDrawerKey = d3.map();
       this._datasetKeysInOrder = [];
       this.nextSeriesIndex = 0;
+      this._sectorLabelsEnabled = true;
       super(new Plottable.Dataset());
       this.classed("pie-plot", true);
     }
@@ -97,7 +99,9 @@ export module Plot {
         var pieData = this.pie(datasets[i].data());
         d.draw(pieData, attrHash, animator);
 
-        this.drawSectorLabels(pieData);
+        if (this.sectorLabelsEnabled()) {
+          this.drawSectorLabels(pieData);
+        }
       });
     }
 
@@ -126,6 +130,34 @@ export module Plot {
             .style("text-anchor", "middle")
             .classed("pie-label", true)
             .text((d: any) => (((d.endAngle - d.startAngle) / (2 * Math.PI)) * 100) + "%");
+    }
+
+    /**
+     * Checks if sector labels are enabled on the pie plot
+     *
+     * @returns {boolean} If sector labels are enabled
+     */
+    public sectorLabelsEnabled(): boolean;
+    /**
+     * Sets if sector labels are enabled on the pie plot, then re-renders if changed
+     *
+     * @returns {Pie} The calling PiePlot
+     */
+    public sectorLabelsEnabled(isEnabled: boolean): Pie;
+    public sectorLabelsEnabled(isEnabled?: boolean): any {
+      if (isEnabled == null) {
+        return this._sectorLabelsEnabled;
+      }
+      var oldSectorLabelsEnabled = this._sectorLabelsEnabled;
+      this._sectorLabelsEnabled = isEnabled;
+      if (oldSectorLabelsEnabled !== isEnabled) {
+        if (isEnabled) {
+          this._paint();
+        } else {
+          this._renderArea.selectAll(".pie-label").remove();
+        }
+      }
+      return this;
     }
 
   }

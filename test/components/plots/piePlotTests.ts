@@ -71,6 +71,13 @@ describe("Plots", () => {
       verifier.end();
     });
 
+    it("labels disabled when set to disabled", () => {
+      piePlot.sectorLabelsEnabled(false);
+      var labels = renderArea.selectAll(".pie-label");
+      assert.lengthOf(labels[0], 0, "No labels should appear");
+      verifier.end();
+    });
+
     after(() => {
       if (verifier.passed) {svg.remove();};
     });

@@ -4522,6 +4522,7 @@ var Plottable;
                 this._key2DatasetDrawerKey = d3.map();
                 this._datasetKeysInOrder = [];
                 this.nextSeriesIndex = 0;
+                this._sectorLabelsEnabled = true;
                 _super.call(this, new Plottable.Dataset());
                 this.classed("pie-plot", true);
             }
@@ -4569,7 +4570,9 @@ var Plottable;
                     var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
                     var pieData = _this.pie(datasets[i].data());
                     d.draw(pieData, attrHash, animator);
-                    _this.drawSectorLabels(pieData);
+                    if (_this.sectorLabelsEnabled()) {
+                        _this.drawSectorLabels(pieData);
+                    }
                 });
             };
             Pie.prototype.pie = function (d) {
@@ -4588,6 +4591,22 @@ var Plottable;
                     var translatedCentroid = [centroid[0] + _this.width() / 2, centroid[1] + _this.height() / 2];
                     return "translate(" + translatedCentroid + ")";
                 }).attr("dy", ".35em").style("text-anchor", "middle").classed("pie-label", true).text(function (d) { return (((d.endAngle - d.startAngle) / (2 * Math.PI)) * 100) + "%"; });
+            };
+            Pie.prototype.sectorLabelsEnabled = function (isEnabled) {
+                if (isEnabled == null) {
+                    return this._sectorLabelsEnabled;
+                }
+                var oldSectorLabelsEnabled = this._sectorLabelsEnabled;
+                this._sectorLabelsEnabled = isEnabled;
+                if (oldSectorLabelsEnabled !== isEnabled) {
+                    if (isEnabled) {
+                        this._paint();
+                    }
+                    else {
+                        this._renderArea.selectAll(".pie-label").remove();
+                    }
+                }
+                return this;
             };
             return Pie;
         })(Plottable.Abstract.Plot);

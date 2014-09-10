@@ -1542,6 +1542,12 @@ describe("Plots", function () {
             assert.closeTo(parseFloat(label0.text()) + parseFloat(label1.text()), 100, 1, "Labels add to 100%");
             verifier.end();
         });
+        it("labels disabled when set to disabled", function () {
+            piePlot.sectorLabelsEnabled(false);
+            var labels = renderArea.selectAll(".pie-label");
+            assert.lengthOf(labels[0], 0, "No labels should appear");
+            verifier.end();
+        });
         after(function () {
             if (verifier.passed) {
                 svg.remove();
