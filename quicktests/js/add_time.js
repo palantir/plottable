@@ -30,7 +30,8 @@ function run(div, data, Plottable) {
                                                     [null, xAxis]]);
   new Plottable.Component.Table([
                                  [titleTable],
-                                 [contentTable]]).renderTo(svg);
+                                 [contentTable]
+                                 ]).renderTo(svg);
 
 
   function addData(){
