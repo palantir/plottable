@@ -4566,8 +4566,8 @@ var Plottable;
                 }
                 metrics.forEach(function (metric) {
                     for (var i = 0; i < _this._metrics.length; i++) {
-                        if (metric === metrics[i]) {
-                            _this._metrics = metrics.splice(i, 1);
+                        if (metric === _this._metrics[i]) {
+                            _this._metrics.splice(i, 1);
                             break;
                         }
                     }

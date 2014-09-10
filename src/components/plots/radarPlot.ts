@@ -65,8 +65,8 @@ export module Plot {
     public removeMetrics(...metrics: string[]): Radar<R> {
       metrics.forEach((metric) => {
         for (var i = 0; i < this._metrics.length; i++) {
-          if (metric === metrics[i]) {
-            this._metrics = metrics.splice(i, 1);
+          if (metric === this._metrics[i]) {
+            this._metrics.splice(i, 1);
             break;
           }
         }

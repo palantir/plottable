@@ -1528,6 +1528,31 @@ describe("Plots", function () {
             ;
         });
     });
+    describe("RadarPlot Metrics", function () {
+        var radarPlot;
+        beforeEach(function () {
+            var rScale = new Plottable.Scale.Linear();
+            radarPlot = new Plottable.Plot.Radar(rScale).addMetrics("attr0", "attr1", "attr2");
+        });
+        it("initial metrics are correct", function () {
+            assert.deepEqual(radarPlot.metrics(), ["attr0", "attr1", "attr2"], "metrics is the same as ones initially added in same order");
+        });
+        it("adding metrics gives correct behavior", function () {
+            radarPlot.addMetrics("attr3", "attr4");
+            assert.deepEqual(radarPlot.metrics(), ["attr0", "attr1", "attr2", "attr3", "attr4"], "adding metrics appends them in the same order");
+            radarPlot.addMetrics("attr0");
+            assert.deepEqual(radarPlot.metrics(), ["attr0", "attr1", "attr2", "attr3", "attr4", "attr0"], "adding a duplicate metrics acts normally");
+        });
+        it("removing metrics gives correct behavior", function () {
+            radarPlot.removeMetrics("attr0");
+            assert.deepEqual(radarPlot.metrics(), ["attr1", "attr2"], "removing a metric acts normally");
+            radarPlot.addMetrics("attr1");
+            radarPlot.removeMetrics("attr1");
+            assert.deepEqual(radarPlot.metrics(), ["attr2", "attr1"], "removing a metric removes the first if duplicates exist");
+            assert.doesNotThrow(function () { return radarPlot.removeMetrics("attr0", "foo", "bar"); }, Error, "does not error if removing metrics that don't exist");
+            assert.deepEqual(radarPlot.metrics(), ["attr2", "attr1"], "metrics aren't changed after calling remove on nonexistent metrics");
+        });
+    });
 });
 
 var assert = chai.assert;
