@@ -24,7 +24,13 @@ function run(div, data, Plottable) {
 
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var renderGroup = plot.merge(gridlines);
-  new Plottable.Template.StandardChart().center(renderGroup).xAxis(xAxis).yAxis(yAxis).titleLabel(title).renderTo(svg);
+  var titleTable = new Plottable.Component.Table([[title]]);
+  var contentTable = new Plottable.Component.Table([
+                                                    [yAxis, renderGroup],
+                                                    [null, xAxis]]);
+  new Plottable.Component.Table([
+                                 [titleTable],
+                                 [contentTable]]).renderTo(svg);
 
 
   function addData(){
