@@ -59,17 +59,18 @@ function run(div, data, Plottable) {
 
 
   function cb() {
-    if(backPlot === 0){plot = scatterPlot; title1.text("front: scatterPlot");}
-    if(backPlot === 1){plot = linePlot; title1.text("front: linePlot");}
-    if(backPlot === 2){plot = areaPlot; title1.text("front: areaPlot");}
+    var plot;
+    if(backPlot === 0){ plot = scatterPlot; title1.text("front: scatterPlot");}
+    if(backPlot === 1){ plot = linePlot; title1.text("front: linePlot");}
+    if(backPlot === 2){ plot = areaPlot; title1.text("front: areaPlot");}
     plot.detach();
     plotGroup.merge(plot);
     backPlot++;
     if(backPlot === 3){ backPlot = 0; }
   }
 
-  var clickInteraction = new Plottable.Interaction.Click(plotGroup)
-  .callback(cb)
-  .registerWithComponent();
+  plotGroup.registerInteraction(
+    new Plottable.Interaction.Click(plotGroup).callback(cb)
+  );
 
 }

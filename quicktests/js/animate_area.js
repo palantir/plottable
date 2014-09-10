@@ -23,15 +23,15 @@ function run(div, data, Plottable) {
 
   var areaChart = new Plottable.Component.Table([[yAxis, areaRenderer],
    [null,  xAxis]]);
-  
+
   areaChart.renderTo(svg);
 
   var cb = function(x, y){
-    d = areaRenderer.dataSource().data();
-    areaRenderer.dataSource().data(d);
+    var d = areaRenderer.dataset().data();
+    areaRenderer.dataset().data(d);
   };
 
-  new Plottable.Interaction.Click(areaRenderer)
-    .callback(cb)
-    .registerWithComponent();
+  areaRenderer.registerInteraction(
+    new Plottable.Interaction.Click(areaRenderer).callback(cb)
+  );
 }

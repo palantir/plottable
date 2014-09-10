@@ -6,11 +6,11 @@ describe("Plots", () => {
   describe("Stacked Bar Plot", () => {
     var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
-    var dataset1: Plottable.DataSource;
-    var dataset2: Plottable.DataSource;
+    var dataset1: Plottable.Dataset;
+    var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Ordinal;
     var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.StackedBar;
+    var renderer: Plottable.Plot.StackedBar<string, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var axisHeight = 0;
@@ -31,8 +31,8 @@ describe("Plots", () => {
         {x: "A", y: 2},
         {x: "B", y: 1}
       ];
-      dataset1 = new Plottable.DataSource(data1);
-      dataset2 = new Plottable.DataSource(data2);
+      dataset1 = new Plottable.Dataset(data1);
+      dataset2 = new Plottable.Dataset(data2);
 
       renderer = new Plottable.Plot.StackedBar(xScale, yScale);
       renderer.addDataset(data1);
@@ -57,7 +57,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = renderer.renderArea.selectAll("rect");
+      var bars = renderer._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -89,14 +89,14 @@ describe("Plots", () => {
     });
   });
 
-  describe("Horizontal Bar Plot", () => {
+  describe("Horizontal Stacked Bar Plot", () => {
     var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
-    var dataset1: Plottable.DataSource;
-    var dataset2: Plottable.DataSource;
+    var dataset1: Plottable.Dataset;
+    var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Linear;
     var yScale: Plottable.Scale.Ordinal;
-    var renderer: Plottable.Plot.StackedBar;
+    var renderer: Plottable.Plot.StackedBar<number, string>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var rendererWidth: number;
@@ -106,21 +106,23 @@ describe("Plots", () => {
 
     before(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Linear().domain([0, 3]);
+      xScale = new Plottable.Scale.Linear().domain([0, 6]);
       yScale = new Plottable.Scale.Ordinal();
 
       var data1 = [
-        {y: "A", x: 1},
-        {y: "B", x: 2}
+        {name: "jon", y: 0, type: "q1"},
+        {name: "dan", y: 2, type: "q1"}
       ];
       var data2 = [
-        {y: "A", x: 2},
-        {y: "B", x: 1}
+        {name: "jon", y: 2, type: "q2"},
+        {name: "dan", y: 4, type: "q2"}
       ];
-      dataset1 = new Plottable.DataSource(data1);
-      dataset2 = new Plottable.DataSource(data2);
+      dataset1 = new Plottable.Dataset(data1);
+      dataset2 = new Plottable.Dataset(data2);
 
       renderer = new Plottable.Plot.StackedBar(xScale, yScale, false);
+      renderer.project("y", "name", yScale);
+      renderer.project("x", "y", xScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.baseline(0);
@@ -143,7 +145,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = renderer.renderArea.selectAll("rect");
+      var bars = renderer._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -154,15 +156,15 @@ describe("Plots", () => {
       assert.closeTo(numAttr(bar2, "height"), bandWidth, 2);
       assert.closeTo(numAttr(bar3, "height"), bandWidth, 2);
       // check widths
-      assert.closeTo(numAttr(bar0, "width"), rendererWidth / 3, 0.01, "width is correct for bar0");
-      assert.closeTo(numAttr(bar1, "width"), rendererWidth / 3 * 2, 0.01, "width is correct for bar1");
-      assert.closeTo(numAttr(bar2, "width"), rendererWidth / 3 * 2, 0.01, "width is correct for bar2");
-      assert.closeTo(numAttr(bar3, "width"), rendererWidth / 3, 0.01, "width is correct for bar3");
+      assert.closeTo(numAttr(bar0, "width"), 0, 0.01, "width is correct for bar0");
+      assert.closeTo(numAttr(bar1, "width"), rendererWidth / 3, 0.01, "width is correct for bar1");
+      assert.closeTo(numAttr(bar2, "width"), rendererWidth / 3, 0.01, "width is correct for bar2");
+      assert.closeTo(numAttr(bar3, "width"), rendererWidth / 3 * 2, 0.01, "width is correct for bar3");
 
-      var bar0Y = bar0.data()[0].y;
-      var bar1Y = bar1.data()[0].y;
-      var bar2Y = bar2.data()[0].y;
-      var bar3Y = bar3.data()[0].y;
+      var bar0Y = bar0.data()[0].name;
+      var bar1Y = bar1.data()[0].name;
+      var bar2Y = bar2.data()[0].name;
+      var bar3Y = bar3.data()[0].name;
 
       // check that bar is aligned on the center of the scale
       assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2, 0.01, "y pos correct for bar0");
@@ -172,8 +174,8 @@ describe("Plots", () => {
       // now check x values to ensure they do indeed stack
       assert.closeTo(numAttr(bar0, "x"), 0, 0.01, "x is correct for bar0");
       assert.closeTo(numAttr(bar1, "x"), 0, 0.01, "x is correct for bar1");
-      assert.closeTo(numAttr(bar2, "x"), rendererWidth / 3, 0.01, "x is correct for bar2");
-      assert.closeTo(numAttr(bar3, "x"), rendererWidth / 3 * 2, 0.01, "x is correct for bar3");
+      assert.closeTo(numAttr(bar2, "x"), 0, 0.01, "x is correct for bar2");
+      assert.closeTo(numAttr(bar3, "x"), rendererWidth / 3, 0.01, "x is correct for bar3");
     });
   });
 });

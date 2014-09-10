@@ -27,8 +27,9 @@ describe("Scales", () => {
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
 
-    (<any> scale).autoDomainAutomatically = true;
-    scale.updateExtent("1", "x", [0.08, 9.92]);
+
+    (<any> scale)._autoDomainAutomatically = true;
+    scale._updateExtent("1", "x", [0.08, 9.92]);
     callbackWasCalled = false;
     scale.domainer(new Plottable.Domainer().nice());
     assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
@@ -40,32 +41,32 @@ describe("Scales", () => {
 
   describe("autoranging behavior", () => {
     var data: any[];
-    var dataSource: Plottable.DataSource;
+    var dataset: Plottable.Dataset;
     var scale: Plottable.Scale.Linear;
     beforeEach(() => {
       data = [{foo: 2, bar: 1}, {foo: 5, bar: -20}, {foo: 0, bar: 0}];
-      dataSource = new Plottable.DataSource(data);
+      dataset = new Plottable.Dataset(data);
       scale = new Plottable.Scale.Linear();
     });
 
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
-      scale.updateExtent("1", "x", d3.extent(data, (e) => e.foo));
+      scale._updateExtent("1", "x", d3.extent(data, (e) => e.foo));
       scale.domainer(new Plottable.Domainer().pad().nice());
-      assert.isTrue((<any> scale).autoDomainAutomatically,
+      assert.isTrue((<any> scale)._autoDomainAutomatically,
                           "the autoDomain flag is still set after autoranginging and padding and nice-ing");
       scale.domain([0, 5]);
-      assert.isFalse((<any> scale).autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
+      assert.isFalse((<any> scale)._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
     });
 
-    it("scale autorange works as expected with single dataSource", () => {
+    it("scale autorange works as expected with single dataset", () => {
       var svg = generateSVG(100, 100);
       var renderer = new Plottable.Abstract.Plot()
-                        .dataSource(dataSource)
+                        .dataset(dataset)
                         .project("x", "foo", scale)
                         .renderTo(svg);
       assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
       data.push({foo: 100, bar: 200});
-      dataSource.data(data);
+      dataset.data(data);
       assert.deepEqual(scale.domain(), [0, 100], "scale domain was autoranged properly");
       svg.remove();
     });
@@ -74,37 +75,37 @@ describe("Scales", () => {
       var svg1 = generateSVG(100, 100);
       var svg2 = generateSVG(100, 100);
       var renderer1 = new Plottable.Abstract.Plot()
-                          .dataSource(dataSource)
+                          .dataset(dataset)
                           .project("x", "foo", scale);
       renderer1.renderTo(svg1);
       var renderer2 = new Plottable.Abstract.Plot()
-                          .dataSource(dataSource)
+                          .dataset(dataset)
                           .project("x", "foo", scale);
       renderer2.renderTo(svg2);
       var otherScale = new Plottable.Scale.Linear();
       renderer1.project("x", "foo", otherScale);
-      dataSource.data([{foo: 10}, {foo: 11}]);
-      assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataSource after one perspective deregistered");
+      dataset.data([{foo: 10}, {foo: 11}]);
+      assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataset after one perspective deregistered");
       renderer2.project("x", "foo", otherScale);
-      // "scale not listening to the dataSource after all perspectives removed"
-      dataSource.data([{foo: 99}, {foo: 100}]);
+      // "scale not listening to the dataset after all perspectives removed"
+      dataset.data([{foo: 99}, {foo: 100}]);
       assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
       svg1.remove();
       svg2.remove();
     });
 
     it("scale perspectives can be removed appropriately", () => {
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled1");
-      scale.updateExtent("1", "x", d3.extent(data, (e) => e.foo));
-      scale.updateExtent("2", "x", d3.extent(data, (e) => e.bar));
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled2");
+      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled1");
+      scale._updateExtent("1", "x", d3.extent(data, (e) => e.foo));
+      scale._updateExtent("2", "x", d3.extent(data, (e) => e.bar));
+      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled2");
       assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled3");
-      scale.removeExtent("1", "x");
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled4");
+      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled3");
+      scale._removeExtent("1", "x");
+      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled4");
       assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
-      scale.updateExtent("2", "x", d3.extent(data, (e) => e.foo));
-      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled5");
+      scale._updateExtent("2", "x", d3.extent(data, (e) => e.foo));
+      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled5");
       assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
     });
 
@@ -178,10 +179,10 @@ describe("Scales", () => {
       assert.deepEqual(scale.rangeType(), "bands");
       scale.range([0, 2679]);
 
-      scale.domain([1,2,3,4]);
+      scale.domain(["1","2","3","4"]);
       assert.deepEqual(scale.rangeBand(), 399);
 
-      scale.domain([1,2,3,4,5]);
+      scale.domain(["1","2","3","4","5"]);
       assert.deepEqual(scale.rangeBand(), 329);
     });
 
@@ -213,7 +214,7 @@ describe("Scales", () => {
 
     function iterateDataChanges(...dataChanges: any[]) {
       dataChanges.forEach((dataChange) => {
-        barPlot.dataSource().data(dataChange);
+        barPlot.dataset().data(dataChange);
       });
     }
 
@@ -299,14 +300,6 @@ describe("Scales", () => {
       assert.equal("#ffffff", scale.scale(16));
       assert.equal("#e3e3e3", scale.scale(8));
     });
-
-    it("doesn't use a domainer", () => {
-      var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-      var startDomain = scale.domain();
-      scale.domainer().pad(1.0);
-      scale.autoDomain();
-      assert.equal(scale.domain(), startDomain);
-    });
   });
   describe("Modified Log Scale", () => {
     var scale: Plottable.Scale.ModifiedLog;
@@ -347,7 +340,7 @@ describe("Scales", () => {
     });
 
     it("works with a domainer", () => {
-      scale.updateExtent("1", "x", [0, base * 2]);
+      scale._updateExtent("1", "x", [0, base * 2]);
       var domain = scale.domain();
       scale.domainer(new Plottable.Domainer().pad(0.1));
       assert.operator(scale.domain()[0], "<", domain[0]);
@@ -363,11 +356,11 @@ describe("Scales", () => {
     });
 
     it("gives reasonable values for ticks()", () => {
-      scale.updateExtent("1", "x", [0, base / 2]);
+      scale._updateExtent("1", "x", [0, base / 2]);
       var ticks = scale.ticks();
       assert.operator(ticks.length, ">", 0);
 
-      scale.updateExtent("1", "x", [-base * 2, base * 2]);
+      scale._updateExtent("1", "x", [-base * 2, base * 2]);
       ticks = scale.ticks();
       var beforePivot = ticks.filter((x) => x <= -base);
       var afterPivot = ticks.filter((x) => base <= x);
@@ -378,7 +371,7 @@ describe("Scales", () => {
     });
 
     it("works on inverted domain", () => {
-      scale.updateExtent("1", "x", [200, -100]);
+      scale._updateExtent("1", "x", [200, -100]);
       var range = scale.range();
       assert.closeTo(scale.scale(-100), range[1], epsilon);
       assert.closeTo(scale.scale(200), range[0], epsilon);
@@ -389,7 +382,7 @@ describe("Scales", () => {
 
       var ticks = scale.ticks();
       assert.deepEqual(ticks, ticks.slice().sort((x, y) => x - y), "ticks should be sorted");
-      assert.deepEqual(ticks, Plottable.Util.Methods.uniq(ticks), "ticks should not be repeated");
+      assert.deepEqual(ticks, Plottable._Util.Methods.uniq(ticks), "ticks should not be repeated");
       var beforePivot = ticks.filter((x) => x <= -base);
       var afterPivot = ticks.filter((x) => base <= x);
       var betweenPivots = ticks.filter((x) => -base < x && x < base);
@@ -400,7 +393,7 @@ describe("Scales", () => {
 
     it("ticks() is always non-empty", () => {
       [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach((domain) => {
-        scale.updateExtent("1", "x", domain);
+        scale._updateExtent("1", "x", domain);
         var ticks = scale.ticks();
         assert.operator(ticks.length, ">", 0);
       });

@@ -37,11 +37,11 @@ function run(div, data, Plottable) {
   circleChart.renderTo(svg);
 
   var cb = function(x, y){
-    d = circleRenderer.dataSource().data();
-    circleRenderer.dataSource().data(d);
+    d = circleRenderer.dataset().data();
+    circleRenderer.dataset().data(d);
   };
 
-  window.xy = new Plottable.Interaction.Click(circleRenderer)
-    .callback(cb)
-    .registerWithComponent();
+  circleRenderer.registerInteraction(
+    new Plottable.Interaction.Click().callback(cb)
+  );
 }

@@ -10,7 +10,7 @@ function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
 
   var d = data[0].slice(10, 15);
-  var dataseries = new Plottable.DataSource(d);
+  var dataseries = new Plottable.Dataset(d);
   var i = 0;
 
   //Axis
@@ -21,7 +21,7 @@ function run(div, data, Plottable) {
 
   var barPlot = new Plottable.Plot.Area(dataseries, xScale, yScale).animate("true");
 
-  var label1  = new Plottable.Component.Label("dataSource.data()", "horizontal");
+  var label1  = new Plottable.Component.Label("dataset.data()", "horizontal");
   var label2  = new Plottable.Component.Label("change width + resize", "horizontal");
   var label3  = new Plottable.Component.Label("remove + renderTo", "horizontal");
   var label4  = new Plottable.Component.Label("_render()", "horizontal");
@@ -51,19 +51,19 @@ function run(div, data, Plottable) {
     basicTable.renderTo(svg);
   }
 
-  new Plottable.Interaction.Click(label1)
-              .callback(newData)
-              .registerWithComponent();
+  label1.registerInteraction(
+    new Plottable.Interaction.Click().callback(newData)
+  );
 
-  new Plottable.Interaction.Click(label2)
-              .callback(changeWidth)
-              .registerWithComponent();
+  label2.registerInteraction(
+    new Plottable.Interaction.Click().callback(changeWidth)
+  );
 
-  new Plottable.Interaction.Click(label3)
-              .callback(removeAndRenderTo)
-              .registerWithComponent();
+  label3.registerInteraction(
+    new Plottable.Interaction.Click().callback(removeAndRenderTo)
+  );
 
-  new Plottable.Interaction.Click(label4)
-              .callback(function(){basicTable._render();})
-              .registerWithComponent();
+  label4.registerInteraction(
+    new Plottable.Interaction.Click().callback(function(){basicTable._render();})
+  );
 }

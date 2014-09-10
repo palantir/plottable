@@ -2,16 +2,16 @@
 
 module Plottable {
 export module Abstract {
+  /*
+   * An abstract ComponentContainer class to encapsulate Table and ComponentGroup's shared functionality.
+   * It will not do anything if instantiated directly.
+   */
   export class ComponentContainer extends Component {
-    /*
-     * An abstract ComponentContainer class to encapsulate Table and ComponentGroup's shared functionality.
-     * It will not do anything if instantiated directly.
-     */
     public _components: Abstract.Component[] = [];
 
     public _anchor(element: D3.Selection) {
       super._anchor(element);
-      this._components.forEach((c) => c._anchor(this.content));
+      this._components.forEach((c) => c._anchor(this._content));
     }
 
     public _render() {
@@ -38,16 +38,16 @@ export module Abstract {
       }
       c._parent = this;
       if (this._isAnchored) {
-        c._anchor(this.content);
+        c._anchor(this._content);
       }
       this._invalidateLayout();
       return true;
     }
 
     /**
-     * Returns a list of components in the ComponentContainer
+     * Returns a list of components in the ComponentContainer.
      *
-     * @returns{Component[]} the contained Components
+     * @returns {Component[]} the contained Components
      */
     public components(): Abstract.Component[] {
       return this._components.slice(); // return a shallow copy

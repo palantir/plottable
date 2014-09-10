@@ -7,17 +7,17 @@ function run(div, data, Plottable) {
   "use strict";
   var svg = div.append("svg").attr("height", 500);
     //data
-  var dataseries1 = new Plottable.DataSource(data[0].slice(0, 10));
+  var dataseries1 = new Plottable.Dataset(data[0].slice(0, 10));
   dataseries1.metadata({name: "series1"});
-  var dataseries2 = new Plottable.DataSource(data[0].slice(10, 20));
+  var dataseries2 = new Plottable.Dataset(data[0].slice(10, 20));
   dataseries2.metadata({name: "series2"});
-  var dataseries3 = new Plottable.DataSource(data[0].slice(20, 30));
+  var dataseries3 = new Plottable.Dataset(data[0].slice(20, 30));
   dataseries3.metadata({name: "apples"});
-  var dataseries4 = new Plottable.DataSource(data[1].slice(0, 10));
+  var dataseries4 = new Plottable.Dataset(data[1].slice(0, 10));
   dataseries4.metadata({name: "oranges"});
-  var dataseries5 = new Plottable.DataSource(data[1].slice(10, 20));
+  var dataseries5 = new Plottable.Dataset(data[1].slice(10, 20));
   dataseries5.metadata({name: "bananas"});
-  var dataseries6 = new Plottable.DataSource(data[1].slice(20, 30));
+  var dataseries6 = new Plottable.Dataset(data[1].slice(20, 30));
   dataseries6.metadata({name: "grapes"});
 
   var colorScale1 = new Plottable.Scale.Color();
@@ -107,11 +107,11 @@ function run(div, data, Plottable) {
   var noTitleLabel  = new Plottable.Component.Label("no title", "horizontal");
   var shortTitleLabel  = new Plottable.Component.Label("tiny title", "horizontal");
   var longTitleLabel  = new Plottable.Component.Label("long title", "horizontal");
-  var noLegendLabel  = new Plottable.Component.Label("no plots", "horizontal");
+  var noPlotsLabel  = new Plottable.Component.Label("no plots", "horizontal");
   var shortLegendLabel  = new Plottable.Component.Label("two plots", "horizontal");
   var tallLegendLabel  = new Plottable.Component.Label("six plots", "horizontal");
 
-  var labelTable = new Plottable.Component.Table([[noTitleLabel, noLegendLabel],
+  var labelTable = new Plottable.Component.Table([[noTitleLabel, noPlotsLabel],
     [shortTitleLabel, shortLegendLabel],
     [longTitleLabel, tallLegendLabel]]);
 
@@ -123,18 +123,24 @@ function run(div, data, Plottable) {
   basicTable.renderTo(svg);
 
 
-  new Plottable.Interaction.Click(noTitleLabel)
-    .callback(emptyTitle).registerWithComponent();
-  new Plottable.Interaction.Click(shortTitleLabel)
-    .callback(smallTitle).registerWithComponent();
-  new Plottable.Interaction.Click(longTitleLabel)
-    .callback(longTitle).registerWithComponent();
-  new Plottable.Interaction.Click(noLegendLabel)
-    .callback(noPlots).registerWithComponent();
-  new Plottable.Interaction.Click(shortLegendLabel)
-    .callback(twoPlots).registerWithComponent();
-  new Plottable.Interaction.Click(tallLegendLabel)
-    .callback(sixPlots).registerWithComponent();
+  noTitleLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(emptyTitle)
+  );
+  shortTitleLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(smallTitle)
+  );
+  longTitleLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(longTitle)
+  );
+  noPlotsLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(noPlots)
+  );
+  shortLegendLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(twoPlots)
+  );
+  tallLegendLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(sixPlots)
+  );
 
 
 }

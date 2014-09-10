@@ -17,7 +17,7 @@ function run(div, data, Plottable) {
 
   var big_numbers = data[0].slice(0, 5);
   big_numbers.forEach(large_x);
-  var dataseries1 = new Plottable.DataSource(big_numbers);
+  var dataseries1 = new Plottable.Dataset(big_numbers);
 
 
   //Axis
@@ -33,6 +33,8 @@ function run(div, data, Plottable) {
   var PerTitle = new Plottable.Component.Label("Percentage");
   var SITitle = new Plottable.Component.Label("SI");
   var CustTitle = new Plottable.Component.Label("Custom");
+
+  var custFormatter = function(d) { return "= ' w ' ="; };
 
   var plot = new Plottable.Plot.Line(dataseries1, xScale, yScale);
   var basicTable = new Plottable.Component.Table([[yAxis, plot], [null, xAxis]]);
@@ -71,27 +73,13 @@ function run(div, data, Plottable) {
      xAxis.formatter(custFormatter);
      yAxis.formatter(custFormatter);
   }
-  new Plottable.Interaction.Click(IdTitle)
-    .callback(identity_frmt)
-    .registerWithComponent();
-  new Plottable.Interaction.Click(GenTitle)
-    .callback(general_frmt)
-    .registerWithComponent();
-  new Plottable.Interaction.Click(FixTitle)
-    .callback(fixed_frmt)
-    .registerWithComponent();
-  new Plottable.Interaction.Click(CurrTitle)
-    .callback(currency_frmt)
-    .registerWithComponent();
-  new Plottable.Interaction.Click(PerTitle)
-    .callback(percentage_frmt)
-    .registerWithComponent();
-  new Plottable.Interaction.Click(SITitle)
-    .callback(SI_frmt)
-    .registerWithComponent();
-  new Plottable.Interaction.Click(CustTitle)
-    .callback(custom_frmt)
-    .registerWithComponent();
 
+  IdTitle.registerInteraction(new Plottable.Interaction.Click().callback(identity_frmt));
+  GenTitle.registerInteraction(new Plottable.Interaction.Click().callback(general_frmt));
+  FixTitle.registerInteraction(new Plottable.Interaction.Click().callback(fixed_frmt));
+  CurrTitle.registerInteraction(new Plottable.Interaction.Click().callback(currency_frmt));
+  PerTitle.registerInteraction(new Plottable.Interaction.Click().callback(percentage_frmt));
+  SITitle.registerInteraction(new Plottable.Interaction.Click().callback(SI_frmt));
+  CustTitle.registerInteraction(new Plottable.Interaction.Click().callback(custom_frmt));
 
 }

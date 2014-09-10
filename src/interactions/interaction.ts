@@ -3,37 +3,19 @@
 module Plottable {
 export module Abstract {
   export class Interaction {
-    /* A general base class for interactions.
-    It maintains a 'hitBox' which is where all event listeners are attached. Due to cross-
-    browser weirdness, the hitbox needs to be an opaque but invisible rectangle.
-    TODO: We should give the interaction "foreground" and "background" elements where it can
-    draw things, e.g. crosshairs.
-    */
-    public hitBox: D3.Selection;
-    public componentToListenTo: Abstract.Component;
-
     /**
-     * Creates an Interaction.
-     *
-     * @constructor
-     * @param {Component} componentToListenTo The component to listen for interactions on.
+     * It maintains a 'hitBox' which is where all event listeners are
+     * attached. Due to cross- browser weirdness, the hitbox needs to be an
+     * opaque but invisible rectangle.  TODO: We should give the interaction
+     * "foreground" and "background" elements where it can draw things,
+     * e.g. crosshairs.
      */
-    constructor(componentToListenTo: Abstract.Component) {
-      if (componentToListenTo == null) {throw new Error("Interactions require a component to listen to");}
-      this.componentToListenTo = componentToListenTo;
-    }
+    public _hitBox: D3.Selection;
+    public _componentToListenTo: Abstract.Component;
 
-    public _anchor(hitBox: D3.Selection) {
-      this.hitBox = hitBox;
-    }
-
-    /**
-     * Registers the Interaction on the Component it's listening to.
-     * This needs to be called to activate the interaction.
-     */
-    public registerWithComponent(): Interaction {
-      this.componentToListenTo.registerInteraction(this);
-      return this;
+    public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
+      this._componentToListenTo = component;
+      this._hitBox = hitBox;
     }
   }
 }
