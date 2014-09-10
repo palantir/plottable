@@ -4591,7 +4591,15 @@ var Plottable;
                     var centroid = _this.arc().centroid(d);
                     var translatedCentroid = [centroid[0] + _this.width() / 2, centroid[1] + _this.height() / 2];
                     return "translate(" + translatedCentroid + ")";
-                }).attr("dy", ".35em").style("text-anchor", "middle").classed("pie-label", true).text(function (d) { return _this._formatter((d.endAngle - d.startAngle) / (2 * Math.PI)); });
+                }).attr("dy", ".35em").style("text-anchor", "middle").classed("pie-label", true).text(function (d) {
+                    var percentage = (d.endAngle - d.startAngle) / (2 * Math.PI);
+                    if (percentage === 0) {
+                        return "";
+                    }
+                    else {
+                        return _this._formatter(percentage);
+                    }
+                });
             };
             Pie.prototype.sectorLabelsEnabled = function (isEnabled) {
                 if (isEnabled == null) {

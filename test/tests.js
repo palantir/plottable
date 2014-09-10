@@ -1497,7 +1497,7 @@ describe("Plots", function () {
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
-            simpleDataset = new Plottable.Dataset([{ value: 5, label: "A" }, { value: 15, label: "B" }]);
+            simpleDataset = new Plottable.Dataset([{ value: 5, label: "A" }, { value: 15, label: "B" }, { value: 0, label: "C" }]);
             piePlot = new Plottable.Plot.Pie();
             piePlot.addDataset(simpleDataset);
             piePlot.renderTo(svg);
@@ -1508,7 +1508,7 @@ describe("Plots", function () {
         });
         it("sectors divided evenly", function () {
             var arcPaths = renderArea.selectAll(".arc");
-            assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+            assert.lengthOf(arcPaths[0], 3, "only has three sectors");
             var arcPath0 = d3.select(arcPaths[0][0]);
             var pathPoints0 = normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
             var firstPathPoints0 = pathPoints0[0].split(",");

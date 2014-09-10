@@ -131,7 +131,14 @@ export module Plot {
             .attr("dy", ".35em")
             .style("text-anchor", "middle")
             .classed("pie-label", true)
-            .text((d: any) => this._formatter((d.endAngle - d.startAngle) / (2 * Math.PI)));
+            .text((d: any) => {
+                    var percentage = (d.endAngle - d.startAngle) / (2 * Math.PI);
+                    if (percentage === 0) {
+                      return "";
+                    } else {
+                      return this._formatter(percentage);
+                    }
+                  });
     }
 
     /**
