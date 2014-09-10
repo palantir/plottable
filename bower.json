@@ -10,8 +10,7 @@
     "!plottable.js",
     "!plottable.css",
     "!plottable.min.js",
-    "!plottable.d.ts",
-    "!plottable-dev.d.ts"
+    "!plottable.d.ts"
   ],
   "keywords": [
     "plottable",
