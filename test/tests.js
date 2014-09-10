@@ -1497,7 +1497,7 @@ describe("Plots", function () {
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
-            simpleDataset = new Plottable.Dataset([{ value: 5 }, { value: 15 }]);
+            simpleDataset = new Plottable.Dataset([{ value: 5, label: "A" }, { value: 15, label: "B" }]);
             piePlot = new Plottable.Plot.Pie();
             piePlot.addDataset(simpleDataset);
             piePlot.renderTo(svg);

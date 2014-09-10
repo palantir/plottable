@@ -67,10 +67,9 @@ export module Plot {
 
     public _generateAttrToProjector(): IAttributeToProjector {
       var attrToProjector = super._generateAttrToProjector();
-      attrToProjector["d"] = d3.svg.arc()
-                      .outerRadius(Math.min(this.width(), this.height()) / 2)
-                      .innerRadius(0);
+      attrToProjector["d"] = this.arc();
       attrToProjector["transform"] = () => "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
+      attrToProjector["fill"] = () => "steelblue";
       return attrToProjector;
     }
 
@@ -97,6 +96,8 @@ export module Plot {
         var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
         var pieData = this.pie(datasets[i].data());
         d.draw(pieData, attrHash, animator);
+
+        this.drawSectorLabels(pieData);
       });
     }
 
@@ -104,6 +105,27 @@ export module Plot {
       return d3.layout.pie()
                       .sort(null)
                       .value((d) => d.value)(d);
+    }
+
+    private arc(): D3.Svg.Arc {
+      return d3.svg.arc()
+                   .outerRadius(Math.min(this.width(), this.height()) / 2)
+                   .innerRadius(0);
+    }
+
+    private drawSectorLabels(arcData: D3.Layout.ArcDescriptor[]) {
+      var labels = this._renderArea.selectAll("text").data(arcData);
+      labels.enter().append("text");
+      labels.exit().remove();
+
+      labels.attr("transform", (d: any) => {
+                                 var centroid = this.arc().centroid(d);
+                                 var translatedCentroid = [centroid[0] + this.width() / 2, centroid[1] + this.height() / 2];
+                                 return "translate(" + translatedCentroid+ ")"; })
+            .attr("dy", ".35em")
+            .style("text-anchor", "middle")
+            .classed("pie-label", true)
+            .text((d: any) => d.data["label"]);
     }
 
   }

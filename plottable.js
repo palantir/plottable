@@ -4544,8 +4544,9 @@ var Plottable;
             Pie.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["d"] = d3.svg.arc().outerRadius(Math.min(this.width(), this.height()) / 2).innerRadius(0);
+                attrToProjector["d"] = this.arc();
                 attrToProjector["transform"] = function () { return "translate(" + _this.width() / 2 + "," + _this.height() / 2 + ")"; };
+                attrToProjector["fill"] = function () { return "steelblue"; };
                 return attrToProjector;
             };
             Pie.prototype._getAnimator = function (drawer, index) {
@@ -4568,10 +4569,25 @@ var Plottable;
                     var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
                     var pieData = _this.pie(datasets[i].data());
                     d.draw(pieData, attrHash, animator);
+                    _this.drawSectorLabels(pieData);
                 });
             };
             Pie.prototype.pie = function (d) {
                 return d3.layout.pie().sort(null).value(function (d) { return d.value; })(d);
+            };
+            Pie.prototype.arc = function () {
+                return d3.svg.arc().outerRadius(Math.min(this.width(), this.height()) / 2).innerRadius(0);
+            };
+            Pie.prototype.drawSectorLabels = function (arcData) {
+                var _this = this;
+                var labels = this._renderArea.selectAll("text").data(arcData);
+                labels.enter().append("text");
+                labels.exit().remove();
+                labels.attr("transform", function (d) {
+                    var centroid = _this.arc().centroid(d);
+                    var translatedCentroid = [centroid[0] + _this.width() / 2, centroid[1] + _this.height() / 2];
+                    return "translate(" + translatedCentroid + ")";
+                }).attr("dy", ".35em").style("text-anchor", "middle").classed("pie-label", true).text(function (d) { return d.data["label"]; });
             };
             return Pie;
         })(Plottable.Abstract.Plot);
