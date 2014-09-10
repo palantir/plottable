@@ -21,7 +21,7 @@
       var aapl;
 
       function processDatum(d) {
-        d.Date = new Date(d.Date);
+        d["Date"] = new Date(d["Date"]);
         d["Adj Close"] = parseFloat(d["Adj Close"]);
       }
 
@@ -30,25 +30,25 @@
           .get(function(error, rows) {
             goog = flip(rows);
             goog.forEach(processDatum);
-            drawChart();
+            run();
           });
 
         d3.csv("../data/AAPL_20140401_20140901.csv")
           .get(function(error, rows) {
             aapl = flip(rows);
             aapl.forEach(processDatum);
-            drawChart();
+            run();
           });
       }
 
-      function drawChart() {
+      function run() {
         if (goog == null || aapl == null) {
           return;
         }
 
-        var num_goog = 3, num_aapl = 23
-        d3.select("title").text(num_goog + " shares of GOOG, " + num_aapl + " shares of AAPL");
-        function getValue(i) { return num_aapl * aapl[i]["Adj Close"] + num_goog * goog[i]["Adj Close"]; };
+        var numGOOG = 3, numAAPL = 23
+        d3.select("title").text(numGOOG + " shares of GOOG, " + numAAPL + " shares of AAPL");
+        function getValue(i) { return numAAPL * aapl[i]["Adj Close"] + numGOOG * goog[i]["Adj Close"]; };
         var diffData = [
           {
             "Date": aapl[0].Date,
@@ -79,8 +79,8 @@
 
         colorScale = new Plottable.Scale.Color();
 
-        var aaplSource = new Plottable.DataSource(aapl, {name: "AAPL"} );
-        var googSource = new Plottable.DataSource(goog, {name: "GOOG"} );
+        var aaplSource = new Plottable.Dataset(aapl, {name: "AAPL"} );
+        var googSource = new Plottable.Dataset(goog, {name: "GOOG"} );
 
         var line_aapl = new Plottable.Plot.Line(aaplSource, xScale, yScale_aapl).animate(true)
                                 .project("x", "Date", xScale)
@@ -94,8 +94,6 @@
         var legend = new Plottable.Component.Legend(colorScale);
         legend.yAlign("top").xOffset(-5);
         var plotArea = new Plottable.Component.Group([line_aapl, line_goog, legend]);
-
-
 
         var yScale_diff = new Plottable.Scale.Linear();
         var yAxis_diff = new Plottable.Axis.Numeric(yScale_diff, "left");
@@ -121,9 +119,10 @@
         var svg = d3.select("#chart");
         table.renderTo(svg);
 
-        var pzi = new Plottable.Interaction.PanZoom(plotArea, xScale);
-        pzi.registerWithComponent();
-
+        plotArea.registerInteraction(new Plottable.Interaction.PanZoom(xScale, null));
+        plotArea.registerInteraction(
+          new Plottable.Interaction.Key(65).callback(function() { xScale.autoDomain(); })
+        );
       }
     </script>
   </head>
