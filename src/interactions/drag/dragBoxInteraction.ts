@@ -7,15 +7,29 @@ export module Interaction {
     public dragBox: D3.Selection;
     public boxIsDrawn = false;
     public resizePadding = 10;
+    /**
+     * The currently selected area, which can be different from the are the user has dragged.
+     */
     public selection: SelectionArea;
+    /**
+     * True if box is resizing on the X dimension.
+     */
     public isResizingX = false;
+    /**
+     * True if box is resizing on the Y dimension.
+     */
     public isResizingY = false;
+    /**
+     * True if box is resizing.
+     */
     public isResizing = false;
     public _selectionOrigin: number[];
     private resizeEnabled = false;
     private resizeStartDiff: number[] = [];
     private lastCursorStyle = "";
 
+    // Returns true if `val` is "close enough" to `position`.
+    // Determined by the wiggle room that left and right paddings represent.
     public _isCloseEnough(val: number, position: number, leftPadding: number, rightPadding: number): boolean {
       return position - leftPadding <= val && val <= position + rightPadding;
     }
