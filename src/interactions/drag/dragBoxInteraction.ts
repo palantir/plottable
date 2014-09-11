@@ -65,8 +65,7 @@ export module Interaction {
       }
     }
 
-    public _enableResize() {
-    }
+    public _enableResize() {}
 
     private isResizeStartAttr(isX: boolean): boolean {
       var i1: number, i2: number, positionAttr1: string, positionAttr2: string, lengthAttr1: string, lengthAttr2: string;
