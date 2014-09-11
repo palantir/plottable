@@ -176,7 +176,7 @@ export module Plot {
       // HACKHACK Can't place the axis lines before the polygon drawer g
       var renderArea = this._getDrawersInOrder()[0]._renderArea;
       var metricAxes = renderArea.selectAll(".metric-axis").data(this.metrics());
-      metricAxes.enter().append("line");
+      metricAxes.enter().append("line").classed("metric-axis", true);
       metricAxes.exit().remove();
       var axesAttrToProjector = this.generateAxesAttrToProjector();
       metricAxes.attr(axesAttrToProjector);
