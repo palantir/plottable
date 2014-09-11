@@ -6,14 +6,14 @@ export module Interaction {
     private static CLASS_DRAG_BOX = "drag-box";
     public dragBox: D3.Selection;
     public boxIsDrawn = false;
-    private resizeEnabled = false;
     public resizePadding = 10;
     public selection: SelectionArea;
     public isResizingX = false;
     public isResizingY = false;
     public isResizing = false;
     public _selectionOrigin: number[];
-    private _resizeStartDiff: number[] = [];
+    private resizeEnabled = false;
+    private resizeStartDiff: number[] = [];
     private lastCursorStyle = "";
 
     public _isCloseEnough(val: number, position: number, leftPadding: number, rightPadding: number): boolean {
@@ -72,12 +72,12 @@ export module Interaction {
       var result1 = this._isCloseEnough(origin, c1, this.resizePadding, otherPadding);
       if (result1) {
         this._selectionOrigin[i] = c2;
-        this._resizeStartDiff[i] = c1 - origin;
+        this.resizeStartDiff[i] = c1 - origin;
       }
       var result2 = this._isCloseEnough(origin, c2, otherPadding, this.resizePadding);
       if (result2) {
         this._selectionOrigin[i] = c1;
-        this._resizeStartDiff[i] = c2 - origin;
+        this.resizeStartDiff[i] = c2 - origin;
       }
       return result1 || result2;
     }
@@ -99,15 +99,15 @@ export module Interaction {
     public _drag() {
       var x = d3.event.x;
       var y = d3.event.y;
-      var diffX = this._resizeStartDiff[0];
-      var diffY = this._resizeStartDiff[1];
+      var diffX = this.resizeStartDiff[0];
+      var diffY = this.resizeStartDiff[1];
       if (this.isResizingX && diffX !== 0) {
         x += diffX;
-        this._resizeStartDiff[0] += diffX > 0 ? -1 : 1;
+        this.resizeStartDiff[0] += diffX > 0 ? -1 : 1;
       }
       if (this.isResizingY && diffY !== 0) {
         y += diffY;
-        this._resizeStartDiff[1] += diffY > 0 ? -1 : 1;
+        this.resizeStartDiff[1] += diffY > 0 ? -1 : 1;
       }
       this.location = [this._constrainX(x), this._constrainY(y)];
       this._doDrag();
