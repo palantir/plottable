@@ -845,7 +845,7 @@ var Plottable;
         Formatters.percentage = function (precision, onlyShowUnchanged) {
             if (precision === void 0) { precision = 0; }
             if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
-            var fixedFormatter = Formatters.fixed(precision);
+            var fixedFormatter = Formatters.fixed(precision, onlyShowUnchanged);
             return function (d) {
                 var valToFormat = d * 100;
                 var valString = d.toString();

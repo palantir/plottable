@@ -4508,6 +4508,11 @@ describe("Formatters", function () {
             var result2 = percentFormatter(0.0035);
             assert.strictEqual(result2, "0.35%", "works even if multiplying by 100 does not make it an integer");
         });
+        it("onlyShowUnchanged set to false", function () {
+            var percentFormatter = Plottable.Formatters.percentage(0, false);
+            var result = percentFormatter(0.075);
+            assert.strictEqual(result, "8%", "shows formatter changed value");
+        });
     });
     describe("time", function () {
         it("uses reasonable defaults", function () {
