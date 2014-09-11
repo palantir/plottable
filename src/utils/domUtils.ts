@@ -8,7 +8,16 @@ export module _Util {
      * @returns {SVGRed} The bounding box.
      */
     export function getBBox(element: D3.Selection): SVGRect {
-      return (<any> element.node()).getBBox();
+      var bbox: SVGRect;
+      // Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
+      try {
+        bbox = (<any> element.node()).getBBox();
+      } catch (err) {
+        bbox = {
+          x: 0, y: 0, width: 0, height: 0
+        };
+      }
+      return bbox;
     }
 
     export var POLYFILL_TIMEOUT_MSEC = 1000 / 60; // 60 fps
@@ -29,7 +38,6 @@ export module _Util {
       return parsedValue;
     }
 
-    //
     export function isSelectionRemovedFromSVG(selection: D3.Selection) {
       var n = (<Node> selection.node());
       while (n !== null && n.nodeName !== "svg") {
