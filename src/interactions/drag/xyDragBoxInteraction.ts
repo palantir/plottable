@@ -37,10 +37,9 @@ export module Interaction {
       this.boxIsDrawn = drawnX && drawnY;
     }
 
-    public _isResizeStart(): boolean {
-      this.isResizingX = this._isResizeStartAttr(true);
-      this.isResizingY = this._isResizeStartAttr(false);
-      return this.isResizingX || this.isResizingY;
+    public _enableResize() {
+      this._resizeXEnabled = true;
+      this._resizeYEnabled = true;
     }
 
     public _cursorStyle(x: number, y: number): string {

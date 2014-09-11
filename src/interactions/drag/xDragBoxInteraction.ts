@@ -13,9 +13,8 @@ export module Interaction {
       return this;
     }
 
-    public _isResizeStart(): boolean {
-      this.isResizingX = this._isResizeStartAttr(true);
-      return this.isResizingX;
+    public _enableResize() {
+      this._resizeXEnabled = true;
     }
 
     public _cursorStyle(x: number, y: number): string {

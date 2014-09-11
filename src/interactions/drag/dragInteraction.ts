@@ -14,7 +14,7 @@ export module Interaction {
     public location = [0,0];
     public  _constrainX: (n: number) => number;
     public  _constrainY: (n: number) => number;
-    public _isDragging = false;
+    public  _isDragging = false;
     private ondragstart: (start: Point) => void;
     private      ondrag: (start: Point, end: Point) => void;
     private   ondragend: (start: Point, end: Point) => void;

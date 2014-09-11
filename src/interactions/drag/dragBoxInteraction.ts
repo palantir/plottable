@@ -24,6 +24,8 @@ export module Interaction {
      */
     public isResizing = false;
     public _selectionOrigin: number[];
+    public _resizeXEnabled = false;
+    public _resizeYEnabled = false;
     private resizeEnabled = false;
     private resizeStartDiff: number[] = [];
     private lastCursorStyle = "";
@@ -58,11 +60,15 @@ export module Interaction {
         return this.resizeEnabled;
       } else {
         this.resizeEnabled = enabled;
+        this._enableResize();
         return this;
       }
     }
 
-    public _isResizeStartAttr(isX: boolean): boolean {
+    public _enableResize() {
+    }
+
+    private isResizeStartAttr(isX: boolean): boolean {
       var i1: number, i2: number, positionAttr1: string, positionAttr2: string, lengthAttr1: string, lengthAttr2: string;
       if (isX) {
         i1 = 0;
@@ -102,17 +108,15 @@ export module Interaction {
       return leftResult || rightResult;
     }
 
-    public _isResizeStart(): boolean {
-      return false;
-    }
-
     public _doDragstart() {
       this._selectionOrigin = this.origin.slice();
       if (this.boxIsDrawn) {
         if (!this.resizeEnabled) {
           this.clearBox();
         } else {
-          this.isResizing = this._isResizeStart();
+          this.isResizingX = this._resizeXEnabled && this.isResizeStartAttr(true);
+          this.isResizingY = this._resizeYEnabled && this.isResizeStartAttr(false);
+          this.isResizing = this.isResizingX || this.isResizingY;
           if (!this.isResizing) {
             this.clearBox();
           }
