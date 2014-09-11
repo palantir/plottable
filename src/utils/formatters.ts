@@ -25,7 +25,7 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for currency values.
      */
-    export function currency(precision = 2, symbol = "$", prefix = true, onlyShowUnchanged = true) {
+    export function currency(precision = 2, symbol = "$", prefix = true, onlyShowUnchanged = true): Formatter {
       var fixedFormatter = Formatters.fixed(precision);
       return function(d: any) {
         var formattedValue = fixedFormatter(Math.abs(d));
@@ -55,7 +55,7 @@ module Plottable {
      *
      * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
      */
-    export function fixed(precision = 3, onlyShowUnchanged = true) {
+    export function fixed(precision = 3, onlyShowUnchanged = true): Formatter {
       verifyPrecision(precision);
       return function(d: any) {
         var formattedValue = (<number> d).toFixed(precision);
@@ -75,7 +75,7 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for general values.
      */
-    export function general(precision = 3, onlyShowUnchanged = true) {
+    export function general(precision = 3, onlyShowUnchanged = true): Formatter {
       verifyPrecision(precision);
       return function(d: any) {
         if (typeof d === "number") {
@@ -96,7 +96,7 @@ module Plottable {
      *
      * @returns {Formatter} A formatter that stringifies its input.
      */
-    export function identity() {
+    export function identity(): Formatter{
       return function(d: any) {
         return String(d);
       };
@@ -111,7 +111,7 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for percentage values.
      */
-    export function percentage(precision = 0, onlyShowUnchanged = true) {
+    export function percentage(precision = 0, onlyShowUnchanged = true): Formatter {
       var fixedFormatter = Formatters.fixed(precision);
       return function(d: any) {
         var valToFormat = d * 100;
@@ -140,7 +140,7 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for SI values.
      */
-    export function siSuffix(precision = 3) {
+    export function siSuffix(precision = 3): Formatter {
       verifyPrecision(precision);
       return function(d: any) {
         return d3.format("." + precision + "s")(d);
@@ -152,7 +152,7 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for time/date values.
      */
-    export function time() {
+    export function time(): Formatter {
 
       var numFormats = 8;
 
@@ -211,7 +211,7 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for time/date values.
      */
-    export function relativeDate(baseValue: number = 0, increment: number = MILLISECONDS_IN_ONE_DAY, label: string = "") {
+    export function relativeDate(baseValue: number = 0, increment: number = MILLISECONDS_IN_ONE_DAY, label: string = ""): Formatter {
       return function (d: any) {
         var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
         return relativeDate.toString() + label;
