@@ -29,8 +29,15 @@ export module Interaction {
     private lastCursorStyle = "";
 
     // Returns true if `val` is "close enough" to `position`.
-    // Determined by the wiggle room that left and right paddings represent.
-    public _isCloseEnough(val: number, position: number, leftPadding: number, rightPadding: number): boolean {
+    public _isCloseEnoughLeft(val: number, position: number, len: number): boolean {
+      var leftPadding: number = this.resizePadding;
+      var rightPadding: number = Math.min(this.resizePadding, len / 2);
+      return position - leftPadding <= val && val <= position + rightPadding;
+    }
+
+    public _isCloseEnoughRight(val: number, position: number, len: number): boolean {
+      var leftPadding = Math.min(this.resizePadding, len / 2);
+      var rightPadding = this.resizePadding;
       return position - leftPadding <= val && val <= position + rightPadding;
     }
 
@@ -82,13 +89,12 @@ export module Interaction {
       var leftPosition = parseInt(this.dragBox.attr(positionAttr1), 10);
       var len = parseInt(this.dragBox.attr(lengthAttr1), 10);
       var rightPosition = len + leftPosition;
-      var otherPadding = Math.min(this.resizePadding, len / 2);
-      var leftResult = this._isCloseEnough(origin1, leftPosition, this.resizePadding, otherPadding);
+      var leftResult = this._isCloseEnoughLeft(origin1, leftPosition, len);
       if (leftResult) {
         this._selectionOrigin[i1] = rightPosition;
         this.resizeStartDiff[i1] = leftPosition - origin1;
       }
-      var rightResult = this._isCloseEnough(origin1, rightPosition, otherPadding, this.resizePadding);
+      var rightResult = this._isCloseEnoughRight(origin1, rightPosition, len);
       if (rightResult) {
         this._selectionOrigin[i1] = leftPosition;
         this.resizeStartDiff[i1] = rightPosition - origin1;

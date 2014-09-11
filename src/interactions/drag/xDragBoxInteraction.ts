@@ -20,12 +20,11 @@ export module Interaction {
     }
 
     public _cursorStyle(x: number, y: number): string {
-      var c1 = parseInt(this.dragBox.attr("x"), 10);
+      var leftPosition = parseInt(this.dragBox.attr("x"), 10);
       var width = parseInt(this.dragBox.attr("width"), 10);
-      var c2 = width + c1;
-      var otherPadding = Math.min(this.resizePadding, width / 2);
-      if (this._isCloseEnough(x, c1, this.resizePadding, otherPadding) ||
-          this._isCloseEnough(x, c2, otherPadding, this.resizePadding)) {
+      var rightPosition = width + leftPosition;
+      if (this._isCloseEnoughLeft(x, leftPosition, width) ||
+          this._isCloseEnoughRight(x, rightPosition, width)) {
         return "ew-resize";
       } else {
         return "";

@@ -52,10 +52,10 @@ export module Interaction {
       var y2 = height + y1;
       var otherWidthPadding = Math.min(this.resizePadding, width / 2);
       var otherHeightPadding = Math.min(this.resizePadding, height / 2);
-      var left = this._isCloseEnough(x, x1, this.resizePadding, otherWidthPadding);
-      var top = this._isCloseEnough(y, y1, otherWidthPadding, this.resizePadding);
-      var right = this._isCloseEnough(x, x2, this.resizePadding, otherHeightPadding);
-      var bottom = this._isCloseEnough(y, y2, otherHeightPadding, this.resizePadding);
+      var left = this._isCloseEnoughLeft(x, x1, width);
+      var top = this._isCloseEnoughLeft(y, y1, height);
+      var right = this._isCloseEnoughRight(x, x2, width);
+      var bottom = this._isCloseEnoughRight(y, y2, height);
 
       if (this.isResizingX && this.isResizingY) {
         if (left && top || bottom && right) {
