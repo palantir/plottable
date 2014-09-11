@@ -33,7 +33,7 @@ export module Interaction {
     }
 
     /**
-     * Gets wether resizing is enabled or not.
+     * Gets whether resizing is enabled or not.
      *
      * @returns {boolean}
      */
