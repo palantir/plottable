@@ -24,6 +24,8 @@ export module Plot {
       this.nextSeriesIndex = 0;
       super(new Plottable.Dataset());
       this.classed("pie-plot", true);
+      this.project("fill", () => "steelblue");
+      this.project("stroke", () => "black");
     }
 
     public _setup() {
@@ -71,8 +73,6 @@ export module Plot {
                       .outerRadius(Math.min(this.width(), this.height()) / 2)
                       .innerRadius(0);
       attrToProjector["transform"] = () => "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
-      attrToProjector["fill"] = () => "steelblue";
-      attrToProjector["stroke"] = () => "black";
       return attrToProjector;
     }
 
