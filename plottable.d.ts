@@ -969,7 +969,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Click extends Plottable.Abstract.Interaction {
-            callback(cb: (x: number, y: number) => any): Click;
+            callback(cb: (p: Point) => any): Click;
         }
         class DoubleClick extends Click {
         }
@@ -1086,29 +1086,6 @@ declare module Plottable {
             mousemove(callback: (location: Point) => any): Mouse;
             mouseout(): (location: Point) => any;
             mouseout(callback: (location: Point) => any): Mouse;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Template {
-        class StandardChart extends Plottable.Component.Table {
-            constructor();
-            yAxis(): Plottable.Abstract.Axis;
-            yAxis(y: Plottable.Abstract.Axis): StandardChart;
-            xAxis(): Plottable.Abstract.Axis;
-            xAxis(x: Plottable.Abstract.Axis): StandardChart;
-            yLabel(): Plottable.Component.AxisLabel;
-            yLabel(y: Plottable.Component.AxisLabel): StandardChart;
-            yLabel(y: string): StandardChart;
-            xLabel(): Plottable.Component.AxisLabel;
-            xLabel(x: Plottable.Component.AxisLabel): StandardChart;
-            xLabel(x: string): StandardChart;
-            titleLabel(): Plottable.Component.TitleLabel;
-            titleLabel(x: Plottable.Component.TitleLabel): StandardChart;
-            titleLabel(x: string): StandardChart;
-            center(c: Plottable.Abstract.Component): StandardChart;
         }
     }
 }

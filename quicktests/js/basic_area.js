@@ -41,9 +41,10 @@ function run(div, data, Plottable) {
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var renderGroup = new Plottable.Component.Group([gridlines, areaPlot1, areaPlot2]);
 
-  var chart = new Plottable.Template.StandardChart()
-    .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
-    .renderTo(svg);
+  new Plottable.Component.Table([
+                                 [yAxis, renderGroup],
+                                 [null, xAxis]
+                                 ]).renderTo(svg);
 }
 
 //this test projects a new 'y0' onto areaPlot2,
