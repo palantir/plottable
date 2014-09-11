@@ -7,7 +7,7 @@ export module Interaction {
     public _drag(){
       super._drag();
       if (this.dragBox == null) {return;}
-      var attrs: any = {};
+      var attrs: BoxArea = {};
       var drawnX: boolean = true;
       var drawnY: boolean = true;
       var x0 = this._selectionOrigin[0];

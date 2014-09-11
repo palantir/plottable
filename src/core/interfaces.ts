@@ -34,6 +34,13 @@ module Plottable {
     yMax: number;
   }
 
+  export interface BoxArea {
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+  }
+
   export interface FullSelectionArea {
     pixel: SelectionArea;
     data: SelectionArea;
