@@ -34,5 +34,4 @@ function run(div, data, Plottable) {
   chart.renderTo(svg);
 
   hBarPlot.registerInteraction(new Plottable.Interaction.PanZoom(xScale, yScale));
-
 }

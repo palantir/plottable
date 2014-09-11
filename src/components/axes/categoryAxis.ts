@@ -71,15 +71,17 @@ export module Axis {
     public textOrientation(): string;
     public textOrientation(newOrientation: string): Category;
     public textOrientation(newOrientation?: string): any {
-      if (newOrientation == null) { return this._textOrientation; }
+      if (newOrientation == null) {
+        return this._textOrientation;
+       }
       newOrientation = newOrientation.toLowerCase();
       if (["auto", "horizontal", "vertical"].indexOf(newOrientation) === -1) {
         throw new Error("Text orientation " + newOrientation + "is not a valid orientation");
       }
       this._textOrientation = newOrientation;
+      this._invalidateLayout();
       return this;
     }
-
 
     /**
      * Measures the size of the ticks while also writing them to the DOM.
