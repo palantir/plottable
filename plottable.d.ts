@@ -1159,6 +1159,12 @@ declare module Plottable {
         yMin: number;
         yMax: number;
     }
+    interface BoxArea {
+        x?: number;
+        y?: number;
+        width?: number;
+        height?: number;
+    }
     interface FullSelectionArea {
         pixel: SelectionArea;
         data: SelectionArea;
@@ -2524,7 +2530,13 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Drag extends Abstract.Interaction {
+            /**
+            * Where dragging originated for the current dragging event.
+            */
             public origin: number[];
+            /**
+            * The current location of the mouse for the current dragging event.
+            */
             public location: number[];
             /**
             * Creates a Drag.
@@ -2583,12 +2595,24 @@ declare module Plottable {
             public dragBox: D3.Selection;
             public boxIsDrawn: boolean;
             public resizePadding: number;
+            /**
+            * The currently selected area, which can be different from the are the user has dragged.
+            */
             public selection: SelectionArea;
+            /**
+            * True if box is resizing on the X dimension.
+            */
             public isResizingX: boolean;
+            /**
+            * True if box is resizing on the Y dimension.
+            */
             public isResizingY: boolean;
+            /**
+            * True if box is resizing.
+            */
             public isResizing: boolean;
             /**
-            * Gets wether resizing is enabled or not.
+            * Gets whether resizing is enabled or not.
             *
             * @returns {boolean}
             */
