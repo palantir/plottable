@@ -31,5 +31,4 @@ function run(div, data, Plottable) {
        [null,  xAxis]]);
 
     chart.renderTo(svg);
-
 }

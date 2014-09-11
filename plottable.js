@@ -3461,6 +3461,7 @@ var Plottable;
                 if (orientation === void 0) { orientation = "bottom"; }
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
+                this._textOrientation = "auto";
                 this.classed("category-axis", true);
                 if (scale.rangeType() !== "bands") {
                     throw new Error("Only rangeBands category axes are implemented");
@@ -3497,6 +3498,17 @@ var Plottable;
             Category.prototype._getTickValues = function () {
                 return this._scale.domain();
             };
+            Category.prototype.textOrientation = function (newOrientation) {
+                if (newOrientation == null) {
+                    return this._textOrientation;
+                }
+                newOrientation = newOrientation.toLowerCase();
+                if (["auto", "horizontal", "vertical"].indexOf(newOrientation) === -1) {
+                    throw new Error("Text orientation " + newOrientation + "is not a valid orientation");
+                }
+                this._textOrientation = newOrientation;
+                return this;
+            };
             Category.prototype.drawTicks = function (axisWidth, axisHeight, scale, ticks) {
                 return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, true);
             };
@@ -3508,6 +3520,7 @@ var Plottable;
                 var textWriteResults = [];
                 var tm = function (s) { return self.measurer.measure(s); };
                 var iterator = draw ? function (f) { return dataOrTicks.each(f); } : function (f) { return dataOrTicks.forEach(f); };
+                var orientation = this._textOrientation === "auto" || this._textOrientation === "horizontal";
                 iterator(function (d) {
                     var bandWidth = scale.fullBandStartAndWidth(d)[1];
                     var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
@@ -3518,14 +3531,14 @@ var Plottable;
                         var d3this = d3.select(this);
                         var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                         var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, true, {
+                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, orientation, {
                             g: d3this,
                             xAlign: xAlign[self._orientation],
                             yAlign: yAlign[self._orientation]
                         });
                     }
                     else {
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, true);
+                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, orientation);
                     }
                     textWriteResults.push(textWriteResult);
                 });
