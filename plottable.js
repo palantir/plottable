@@ -779,10 +779,8 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
-    var Formatters = (function () {
-        function Formatters() {
-        }
-        Formatters.currency = function (precision, symbol, prefix, onlyShowUnchanged) {
+    (function (Formatters) {
+        function currency(precision, symbol, prefix, onlyShowUnchanged) {
             if (precision === void 0) { precision = 2; }
             if (symbol === void 0) { symbol = "$"; }
             if (prefix === void 0) { prefix = true; }
@@ -790,7 +788,7 @@ var Plottable;
             var fixedFormatter = Formatters.fixed(precision);
             return function (d) {
                 var formattedValue = fixedFormatter(Math.abs(d));
-                if (onlyShowUnchanged && Formatters._valueChanged(Math.abs(d), formattedValue)) {
+                if (onlyShowUnchanged && valueChanged(Math.abs(d), formattedValue)) {
                     return "";
                 }
                 if (formattedValue !== "") {
@@ -806,28 +804,30 @@ var Plottable;
                 }
                 return formattedValue;
             };
-        };
-        Formatters.fixed = function (precision, onlyShowUnchanged) {
+        }
+        Formatters.currency = currency;
+        function fixed(precision, onlyShowUnchanged) {
             if (precision === void 0) { precision = 3; }
             if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
-            Formatters.verifyPrecision(precision);
+            verifyPrecision(precision);
             return function (d) {
                 var formattedValue = d.toFixed(precision);
-                if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+                if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
                     return "";
                 }
                 return formattedValue;
             };
-        };
-        Formatters.general = function (precision, onlyShowUnchanged) {
+        }
+        Formatters.fixed = fixed;
+        function general(precision, onlyShowUnchanged) {
             if (precision === void 0) { precision = 3; }
             if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
-            Formatters.verifyPrecision(precision);
+            verifyPrecision(precision);
             return function (d) {
                 if (typeof d === "number") {
                     var multiplier = Math.pow(10, precision);
                     var formattedValue = String(Math.round(d * multiplier) / multiplier);
-                    if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+                    if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
                         return "";
                     }
                     return formattedValue;
@@ -836,13 +836,15 @@ var Plottable;
                     return String(d);
                 }
             };
-        };
-        Formatters.identity = function () {
+        }
+        Formatters.general = general;
+        function identity() {
             return function (d) {
                 return String(d);
             };
-        };
-        Formatters.percentage = function (precision, onlyShowUnchanged) {
+        }
+        Formatters.identity = identity;
+        function percentage(precision, onlyShowUnchanged) {
             if (precision === void 0) { precision = 0; }
             if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
             var fixedFormatter = Formatters.fixed(precision);
@@ -852,7 +854,7 @@ var Plottable;
                 var integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
                 valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
                 var formattedValue = fixedFormatter(valToFormat);
-                if (onlyShowUnchanged && Formatters._valueChanged(valToFormat, formattedValue)) {
+                if (onlyShowUnchanged && valueChanged(valToFormat, formattedValue)) {
                     return "";
                 }
                 if (formattedValue !== "") {
@@ -860,15 +862,17 @@ var Plottable;
                 }
                 return formattedValue;
             };
-        };
-        Formatters.siSuffix = function (precision) {
+        }
+        Formatters.percentage = percentage;
+        function siSuffix(precision) {
             if (precision === void 0) { precision = 3; }
-            Formatters.verifyPrecision(precision);
+            verifyPrecision(precision);
             return function (d) {
                 return d3.format("." + precision + "s")(d);
             };
-        };
-        Formatters.time = function () {
+        }
+        Formatters.siSuffix = siSuffix;
+        function time() {
             var numFormats = 8;
             var timeFormat = {};
             timeFormat[0] = {
@@ -910,8 +914,9 @@ var Plottable;
                     }
                 }
             };
-        };
-        Formatters.relativeDate = function (baseValue, increment, label) {
+        }
+        Formatters.time = time;
+        function relativeDate(baseValue, increment, label) {
             if (baseValue === void 0) { baseValue = 0; }
             if (increment === void 0) { increment = Plottable.MILLISECONDS_IN_ONE_DAY; }
             if (label === void 0) { label = ""; }
@@ -919,18 +924,18 @@ var Plottable;
                 var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
                 return relativeDate.toString() + label;
             };
-        };
-        Formatters.verifyPrecision = function (precision) {
+        }
+        Formatters.relativeDate = relativeDate;
+        function verifyPrecision(precision) {
             if (precision < 0 || precision > 20) {
                 throw new RangeError("Formatter precision must be between 0 and 20");
             }
-        };
-        Formatters._valueChanged = function (d, formattedValue) {
+        }
+        function valueChanged(d, formattedValue) {
             return d !== parseFloat(formattedValue);
-        };
-        return Formatters;
-    })();
-    Plottable.Formatters = Formatters;
+        }
+    })(Plottable.Formatters || (Plottable.Formatters = {}));
+    var Formatters = Plottable.Formatters;
 })(Plottable || (Plottable = {}));
 
 var Plottable;

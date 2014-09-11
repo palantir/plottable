@@ -150,15 +150,15 @@ declare module Plottable {
         (d: any): string;
     }
     var MILLISECONDS_IN_ONE_DAY: number;
-    class Formatters {
-        static currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
-        static fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
-        static general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
-        static identity(): (d: any) => string;
-        static percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
-        static siSuffix(precision?: number): (d: any) => string;
-        static time(): (d: any) => string;
-        static relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
+    module Formatters {
+        function currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
+        function fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function identity(): (d: any) => string;
+        function percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function siSuffix(precision?: number): (d: any) => string;
+        function time(): (d: any) => string;
+        function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
     }
 }
 
