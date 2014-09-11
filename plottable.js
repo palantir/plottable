@@ -4548,7 +4548,6 @@ var Plottable;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 attrToProjector["d"] = this.arc();
                 attrToProjector["transform"] = function () { return "translate(" + _this.width() / 2 + "," + _this.height() / 2 + ")"; };
-                attrToProjector["fill"] = function () { return "steelblue"; };
                 return attrToProjector;
             };
             Pie.prototype._getAnimator = function (drawer, index) {

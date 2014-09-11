@@ -73,7 +73,6 @@ export module Plot {
       var attrToProjector = super._generateAttrToProjector();
       attrToProjector["d"] = this.arc();
       attrToProjector["transform"] = () => "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
-      attrToProjector["fill"] = () => "steelblue";
       return attrToProjector;
     }
 
