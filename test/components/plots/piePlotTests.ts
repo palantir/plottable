@@ -15,7 +15,11 @@ describe("Plots", () => {
     before(() => {
       svg = generateSVG(500, 500);
       verifier = new MultiTestVerifier();
-      simpleDataset = new Plottable.Dataset([{value: 5, label: "A"}, {value: 15, label: "B"}, {value: 0, label: "C" }]);
+      simpleDataset = new Plottable.Dataset([{value: 2},
+                                             {value: 3},
+                                             {value: 1},
+                                             {value: 1},
+                                             {value: 0}]);
       piePlot = new Plottable.Plot.Pie();
       piePlot.addDataset(simpleDataset);
       piePlot.renderTo(svg);
@@ -75,6 +79,7 @@ describe("Plots", () => {
       piePlot.sectorLabelsEnabled(false);
       var labels = renderArea.selectAll(".pie-label");
       assert.lengthOf(labels[0], 0, "No labels should appear");
+      piePlot.sectorLabelsEnabled(true);
       verifier.end();
     });
 
