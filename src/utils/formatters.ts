@@ -8,11 +8,6 @@ module Plottable {
 
   export var MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
 
-  interface TimeFilterFormat {
-    format: string;
-    filter: (d: any) => any;
-  }
-
   export module Formatters {
 
     /**
@@ -145,6 +140,11 @@ module Plottable {
       return function(d: any) {
         return d3.format("." + precision + "s")(d);
       };
+    }
+
+    interface TimeFilterFormat {
+      format: string;
+      filter: (d: any) => any;
     }
 
     /**
