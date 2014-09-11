@@ -225,7 +225,7 @@ declare module Plottable {
         data(data: any[]): Dataset;
         metadata(): any;
         metadata(metadata: any): Dataset;
-        _getExtent(accessor: _IAccessor): any[];
+        _getExtent(accessor: _IAccessor, typeCoercer: (d: any) => any): any[];
     }
 }
 
@@ -358,6 +358,7 @@ declare module Plottable {
             _rendererAttrID2Extent: {
                 [x: string]: D[];
             };
+            _typeCoercer: (d: any) => any;
             constructor(scale: D3.Scale.Scale);
             _getAllExtents(): D[][];
             _getExtent(): D[];
@@ -386,6 +387,7 @@ declare module Plottable {
             _PADDING_FOR_IDENTICAL_DOMAIN: number;
             _userSetDomainer: boolean;
             _domainer: Domainer;
+            _typeCoercer: (d: any) => number;
             constructor(scale: D3.Scale.QuantitativeScale);
             _getExtent(): D[];
             invert(value: number): D;
@@ -484,11 +486,11 @@ declare module Plottable {
 declare module Plottable {
     module Scale {
         class Time extends Plottable.Abstract.QuantitativeScale<any> {
+            _typeCoercer: (d: any) => any;
             constructor();
             constructor(scale: D3.Scale.LinearScale);
             _tickInterval(interval: D3.Time.Interval, step?: number): any[];
-            domain(): any[];
-            domain(values: any[]): Time;
+            _setDomain(values: any[]): void;
             copy(): Time;
             _defaultExtent(): any[];
         }

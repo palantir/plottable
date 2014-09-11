@@ -198,7 +198,7 @@ export module Abstract {
     public _updateProjector(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
-        var extent = this.dataset()._getExtent(projector.accessor);
+        var extent = this.dataset()._getExtent(projector.accessor, projector.scale._typeCoercer);
         if (extent.length === 0 || !this._isAnchored) {
           projector.scale._removeExtent(this._plottableID.toString(), attr);
         } else {

@@ -93,7 +93,7 @@ export module Abstract {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
         this._key2DatasetDrawerKey.forEach((key, ddk) => {
-          var extent = ddk.dataset._getExtent(projector.accessor);
+          var extent = ddk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer);
           var scaleKey = this._plottableID.toString() + "_" + key;
           if (extent.length === 0 || !this._isAnchored) {
             projector.scale._removeExtent(scaleKey, attr);

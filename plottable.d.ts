@@ -223,6 +223,7 @@ declare module Plottable {
         data(data: any[]): Dataset;
         metadata(): any;
         metadata(metadata: any): Dataset;
+        _getExtent(accessor: _IAccessor, typeCoercer: (d: any) => any): any[];
     }
 }
 
@@ -452,8 +453,6 @@ declare module Plottable {
         class Time extends Plottable.Abstract.QuantitativeScale<any> {
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            domain(): any[];
-            domain(values: any[]): Time;
             copy(): Time;
         }
     }
