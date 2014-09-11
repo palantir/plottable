@@ -109,8 +109,13 @@ export module Interaction {
     public _doDragstart() {
       this._selectionOrigin = this.origin.slice();
       if (this.boxIsDrawn) {
-        if (!this.resizeEnabled || !(this.isResizing = this._isResizeStart())) {
+        if (!this.resizeEnabled) {
           this.clearBox();
+        } else {
+          this.isResizing = this._isResizeStart();
+          if (!this.isResizing) {
+            this.clearBox();
+          }
         }
       }
       super._doDragstart();
