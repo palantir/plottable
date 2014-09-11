@@ -79,25 +79,25 @@ export module Interaction {
         lengthAttr1 = "height";
         lengthAttr2 = "width";
       }
-      var origin2 = this.origin[i2];
+      var otherOrigin = this.origin[i2];
       var from = parseInt(this.dragBox.attr(positionAttr2), 10);
       var to = parseInt(this.dragBox.attr(lengthAttr2), 10) + to;
-      if (origin2 < from || origin2 > to) {
+      if (otherOrigin < from || otherOrigin > to) {
         return false;
       }
-      var origin1 = this.origin[i1];
+      var attrOrigin = this.origin[i1];
       var leftPosition = parseInt(this.dragBox.attr(positionAttr1), 10);
       var len = parseInt(this.dragBox.attr(lengthAttr1), 10);
       var rightPosition = len + leftPosition;
-      var leftResult = this._isCloseEnoughLeft(origin1, leftPosition, len);
+      var leftResult = this._isCloseEnoughLeft(attrOrigin, leftPosition, len);
       if (leftResult) {
         this._selectionOrigin[i1] = rightPosition;
-        this.resizeStartDiff[i1] = leftPosition - origin1;
+        this.resizeStartDiff[i1] = leftPosition - attrOrigin;
       }
-      var rightResult = this._isCloseEnoughRight(origin1, rightPosition, len);
+      var rightResult = this._isCloseEnoughRight(attrOrigin, rightPosition, len);
       if (rightResult) {
         this._selectionOrigin[i1] = leftPosition;
-        this.resizeStartDiff[i1] = rightPosition - origin1;
+        this.resizeStartDiff[i1] = rightPosition - attrOrigin;
       }
       return leftResult || rightResult;
     }
