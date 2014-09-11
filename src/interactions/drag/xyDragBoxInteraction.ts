@@ -64,26 +64,19 @@ export module Interaction {
         } else {
           return "";
         }
-
       } else if (this.isResizingX) {
         return left || right ? "ew-resize" : "";
-
       } else if (this.isResizingY) {
         return top || bottom ? "ns-resize": "";
       }
 
-      var hovering = y1 - this.resizePadding <= y && y <= y2 + this.resizePadding &&
-        x1 - this.resizePadding <= x && x <= x2 + this.resizePadding;
-      if (!hovering) {
-        return "";
-      }
       if (left && top || bottom && right) {
         return "nwse-resize";
       } else if (top && right || bottom && left) {
         return "nesw-resize";
-      } else if (left || right) {
+      } else if ((left || right) && y1 - this.resizePadding <= y && y <= y2 + this.resizePadding) {
         return "ew-resize";
-      } else if (top || bottom) {
+      } else if ((top || bottom) && x1 - this.resizePadding <= x && x <= x2 + this.resizePadding) {
         return "ns-resize";
       } else {
         return "";
