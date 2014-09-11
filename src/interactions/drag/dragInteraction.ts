@@ -8,6 +8,7 @@ export module Interaction {
     public location = [0,0];
     public  _constrainX: (n: number) => number;
     public  _constrainY: (n: number) => number;
+    public _isDragging = false;
     private ondragstart: (start: Point) => void;
     private      ondrag: (start: Point, end: Point) => void;
     private   ondragend: (start: Point, end: Point) => void;
@@ -92,6 +93,7 @@ export module Interaction {
     }
 
     public _dragstart(){
+      this._isDragging = true;
       var availableWidth  = this.componentToListenTo.availableWidth;
       var availableHeight = this.componentToListenTo.availableHeight;
       // the constraint functions ensure that the selection rectangle will not exceed the hit box
@@ -122,6 +124,7 @@ export module Interaction {
     }
 
     public _dragend(){
+      this._isDragging = false;
       this._doDragend();
     }
 

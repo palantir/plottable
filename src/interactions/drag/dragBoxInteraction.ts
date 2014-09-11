@@ -178,7 +178,7 @@ export module Interaction {
         if (this.boxIsDrawn) {
           var position = d3.mouse(this.hitBox[0][0].parentNode);
           cursorStyle = this._cursorStyle(position[0], position[1]);
-          if (!cursorStyle && this.isResizing) {
+          if (!cursorStyle && this._isDragging) {
             cursorStyle = this.lastCursorStyle;
           }
           this.lastCursorStyle = cursorStyle;
