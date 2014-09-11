@@ -208,6 +208,9 @@ export module Abstract {
         } else {
           selection = d3.select(element);
         }
+        if (!element.node()) {
+          throw new Error("Plottable requires a valid selection to renderTo");
+        }
         this._anchor(selection);
       }
       this._computeLayout();
