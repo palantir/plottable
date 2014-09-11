@@ -4571,10 +4571,10 @@ var Plottable;
                     var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
                     var pieData = _this.pie(datasets[i].data());
                     d.draw(pieData, attrHash, animator);
-                    if (_this.sectorLabelsEnabled()) {
-                        _this.drawSectorLabels(pieData);
-                    }
                 });
+                if (this.sectorLabelsEnabled()) {
+                    this.drawSectorLabels();
+                }
             };
             Pie.prototype.pie = function (d) {
                 return d3.layout.pie().sort(null).value(function (d) { return d.value; })(d);
@@ -4582,23 +4582,26 @@ var Plottable;
             Pie.prototype.arc = function () {
                 return d3.svg.arc().outerRadius(Math.min(this.width(), this.height()) / 2).innerRadius(0);
             };
-            Pie.prototype.drawSectorLabels = function (arcData) {
+            Pie.prototype.drawSectorLabels = function () {
                 var _this = this;
-                var labels = this._renderArea.selectAll("text").data(arcData);
-                labels.enter().append("text");
-                labels.exit().remove();
-                labels.attr("transform", function (d) {
-                    var centroid = _this.arc().centroid(d);
-                    var translatedCentroid = [centroid[0] + _this.width() / 2, centroid[1] + _this.height() / 2];
-                    return "translate(" + translatedCentroid + ")";
-                }).attr("dy", ".35em").style("text-anchor", "middle").classed("pie-label", true).text(function (d) {
-                    var percentage = (d.endAngle - d.startAngle) / (2 * Math.PI);
-                    if (percentage === 0) {
-                        return "";
-                    }
-                    else {
-                        return _this._formatter(percentage);
-                    }
+                this._getDatasetsInOrder().forEach(function (dataset) {
+                    var arcData = _this.pie(dataset.data());
+                    var labels = _this._renderArea.selectAll("text").data(arcData);
+                    labels.enter().append("text");
+                    labels.exit().remove();
+                    labels.attr("dy", ".35em").attr("transform", function (d) {
+                        var centroid = _this.arc().centroid(d);
+                        var translatedCentroid = [centroid[0] + _this.width() / 2, centroid[1] + _this.height() / 2];
+                        return "translate(" + translatedCentroid + ")";
+                    }).classed("pie-label", true).style("text-anchor", "middle").text(function (d) {
+                        var percentage = (d.endAngle - d.startAngle) / (2 * Math.PI);
+                        if (percentage === 0) {
+                            return "";
+                        }
+                        else {
+                            return _this._formatter(percentage);
+                        }
+                    });
                 });
             };
             Pie.prototype.sectorLabelsEnabled = function (isEnabled) {
@@ -4609,7 +4612,7 @@ var Plottable;
                 this._sectorLabelsEnabled = isEnabled;
                 if (oldSectorLabelsEnabled !== isEnabled) {
                     if (isEnabled) {
-                        this._paint();
+                        this.drawSectorLabels();
                     }
                     else {
                         this._renderArea.selectAll(".pie-label").remove();

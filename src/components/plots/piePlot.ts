@@ -100,11 +100,11 @@ export module Plot {
         var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
         var pieData = this.pie(datasets[i].data());
         d.draw(pieData, attrHash, animator);
-
-        if (this.sectorLabelsEnabled()) {
-          this.drawSectorLabels(pieData);
-        }
       });
+
+      if (this.sectorLabelsEnabled()) {
+          this.drawSectorLabels();
+      }
     }
 
     private pie(d: any[]): D3.Layout.ArcDescriptor[] {
@@ -119,26 +119,29 @@ export module Plot {
                    .innerRadius(0);
     }
 
-    private drawSectorLabels(arcData: D3.Layout.ArcDescriptor[]) {
-      var labels = this._renderArea.selectAll("text").data(arcData);
-      labels.enter().append("text");
-      labels.exit().remove();
+    private drawSectorLabels() {
+      this._getDatasetsInOrder().forEach((dataset) => {
+        var arcData = this.pie(dataset.data());
+        var labels = this._renderArea.selectAll("text").data(arcData);
+        labels.enter().append("text");
+        labels.exit().remove();
 
-      labels.attr("transform", (d: any) => {
-                                 var centroid = this.arc().centroid(d);
-                                 var translatedCentroid = [centroid[0] + this.width() / 2, centroid[1] + this.height() / 2];
-                                 return "translate(" + translatedCentroid+ ")"; })
-            .attr("dy", ".35em")
-            .style("text-anchor", "middle")
-            .classed("pie-label", true)
-            .text((d: any) => {
-                    var percentage = (d.endAngle - d.startAngle) / (2 * Math.PI);
-                    if (percentage === 0) {
-                      return "";
-                    } else {
-                      return this._formatter(percentage);
-                    }
-                  });
+        labels.attr("dy", ".35em")
+              .attr("transform", (d: any) => {
+                var centroid = this.arc().centroid(d);
+                var translatedCentroid = [centroid[0] + this.width() / 2, centroid[1] + this.height() / 2];
+                return "translate(" + translatedCentroid + ")";})
+              .classed("pie-label", true)
+              .style("text-anchor", "middle")
+              .text((d: any) => {
+                var percentage = (d.endAngle - d.startAngle) / (2 * Math.PI);
+                if (percentage === 0) {
+                  return "";
+                } else {
+                  return this._formatter(percentage);
+                }
+              });
+      });
     }
 
     /**
@@ -161,7 +164,7 @@ export module Plot {
       this._sectorLabelsEnabled = isEnabled;
       if (oldSectorLabelsEnabled !== isEnabled) {
         if (isEnabled) {
-          this._paint();
+          this.drawSectorLabels();
         } else {
           this._renderArea.selectAll(".pie-label").remove();
         }
