@@ -107,5 +107,8 @@
   }, {
     "name":"titleLegend_change",
     "categories":["Datasource", "Metadata", "Color Scale", "Scatter Plot", "Line Plot", "Area Plot", "Domain", "Linear Scale", "Numeric Axis", "Project", "Accessor", "Title", "Label", "Layout", "Legend", "Click Interaction"]
+  }, {
+    "name":"vertical_cat_axis",
+    "categories":["Time Scale", "Ordinal Scale", "Horizontal Bar Plot", "Project", "Time Axis", "Category Axis", "Gridlines", "Group", "Standard Chart", "PanZoom Interaction"]
   }
 ]

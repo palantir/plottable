@@ -746,11 +746,14 @@ declare module Plottable {
     module Axis {
         class Category extends Plottable.Abstract.Axis {
             _scale: Plottable.Scale.Ordinal;
+            _textOrientation: string;
             constructor(scale: Plottable.Scale.Ordinal, orientation?: string, formatter?: (d: any) => string);
             _setup(): void;
             _rescale(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest;
             _getTickValues(): string[];
+            textOrientation(): string;
+            textOrientation(newOrientation: string): Category;
             _doRender(): Category;
             _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
         }

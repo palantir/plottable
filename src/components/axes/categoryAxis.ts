@@ -4,6 +4,7 @@ module Plottable {
 export module Axis {
   export class Category extends Abstract.Axis {
     public _scale: Scale.Ordinal;
+    public _textOrientation = "auto";
     private measurer: _Util.Text.CachingCharacterMeasurer;
 
     /**
@@ -63,6 +64,18 @@ export module Axis {
       return this._scale.domain();
     }
 
+    public textOrientation(): string;
+    public textOrientation(newOrientation: string): Category;
+    public textOrientation(newOrientation?: string): any {
+      if (newOrientation == null) { return this._textOrientation; }
+      newOrientation = newOrientation.toLowerCase();
+      if (["auto", "horizontal", "vertical"].indexOf(newOrientation) === -1) {
+        throw new Error("Text orientation " + newOrientation + "is not a valid orientation");
+      }
+      this._textOrientation = newOrientation;
+      return this;
+    }
+
 
     /**
      * Measures the size of the ticks while also writing them to the DOM.
@@ -90,6 +103,7 @@ export module Axis {
       var tm = (s: string) => self.measurer.measure(s);
       var iterator = draw ? (f: Function) => dataOrTicks.each(f) : (f: Function) => dataOrTicks.forEach(f);
 
+      var orientation = this._textOrientation === "auto" || this._textOrientation === "horizontal";
       iterator(function (d: string) {
         var bandWidth = scale.fullBandStartAndWidth(d)[1];
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
@@ -101,13 +115,13 @@ export module Axis {
           var d3this = d3.select(this);
           var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
           var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
-          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, true, {
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, orientation, {
                                                     g: d3this,
                                                     xAlign: xAlign[self._orientation],
                                                     yAlign: yAlign[self._orientation]
           });
         } else {
-          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, true);
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, orientation);
         }
 
         textWriteResults.push(textWriteResult);
