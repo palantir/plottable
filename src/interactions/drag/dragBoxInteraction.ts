@@ -56,32 +56,44 @@ export module Interaction {
     }
 
     public _isResizeStartAttr(isX: boolean): boolean {
-      var i: number, positionAttr: string, lengthAttr: string;
+      var i1: number, i2: number, positionAttr1: string, positionAttr2: string, lengthAttr1: string, lengthAttr2: string;
       if (isX) {
-        i = 0;
-        positionAttr = "x";
-        lengthAttr = "width";
+        i1 = 0;
+        i2 = 1;
+        positionAttr1 = "x";
+        positionAttr2 = "y";
+        lengthAttr1 = "width";
+        lengthAttr2 = "height";
       } else {
-        i = 1;
-        positionAttr = "y";
-        lengthAttr = "height";
+        i1 = 1;
+        i2 = 0;
+        positionAttr1 = "y";
+        positionAttr2 = "x";
+        lengthAttr1 = "height";
+        lengthAttr2 = "width";
       }
-      var origin = this.origin[i];
-      var c1 = parseInt(this.dragBox.attr(positionAttr), 10);
-      var len = parseInt(this.dragBox.attr(lengthAttr), 10);
-      var c2 = len + c1;
+      var origin2 = this.origin[i2];
+      var from = parseInt(this.dragBox.attr(positionAttr2), 10);
+      var to = parseInt(this.dragBox.attr(lengthAttr2), 10) + to;
+      if (origin2 < from || origin2 > to) {
+        return false;
+      }
+      var origin1 = this.origin[i1];
+      var leftPosition = parseInt(this.dragBox.attr(positionAttr1), 10);
+      var len = parseInt(this.dragBox.attr(lengthAttr1), 10);
+      var rightPosition = len + leftPosition;
       var otherPadding = Math.min(this.resizePadding, len / 2);
-      var result1 = this._isCloseEnough(origin, c1, this.resizePadding, otherPadding);
-      if (result1) {
-        this._selectionOrigin[i] = c2;
-        this.resizeStartDiff[i] = c1 - origin;
+      var leftResult = this._isCloseEnough(origin1, leftPosition, this.resizePadding, otherPadding);
+      if (leftResult) {
+        this._selectionOrigin[i1] = rightPosition;
+        this.resizeStartDiff[i1] = leftPosition - origin1;
       }
-      var result2 = this._isCloseEnough(origin, c2, otherPadding, this.resizePadding);
-      if (result2) {
-        this._selectionOrigin[i] = c1;
-        this.resizeStartDiff[i] = c2 - origin;
+      var rightResult = this._isCloseEnough(origin1, rightPosition, otherPadding, this.resizePadding);
+      if (rightResult) {
+        this._selectionOrigin[i1] = leftPosition;
+        this.resizeStartDiff[i1] = rightPosition - origin1;
       }
-      return result1 || result2;
+      return leftResult || rightResult;
     }
 
     public _isResizeStart(): boolean {
