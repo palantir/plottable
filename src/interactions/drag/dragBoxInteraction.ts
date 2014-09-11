@@ -82,7 +82,7 @@ export module Interaction {
       var otherOrigin = this.origin[i2];
       var from = parseInt(this.dragBox.attr(positionAttr2), 10);
       var to = parseInt(this.dragBox.attr(lengthAttr2), 10) + to;
-      if (otherOrigin < from || otherOrigin > to) {
+      if (otherOrigin + this.resizePadding < from || otherOrigin - this.resizePadding > to) {
         return false;
       }
       var attrOrigin = this.origin[i1];
