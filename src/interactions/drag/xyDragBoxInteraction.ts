@@ -50,12 +50,12 @@ export module Interaction {
       var y1 = parseInt(this.dragBox.attr("y"), 10);
       var height = parseInt(this.dragBox.attr("height"), 10);
       var y2 = height + y1;
-      var halfwidth = width / 2;
-      var halfheight = height / 2;
-      var left = this._isCloseEnoughXY(x, x1, this.resizePadding, halfwidth, true);
-      var top = this._isCloseEnoughXY(y, y1, this.resizePadding, halfheight, true);
-      var right = this._isCloseEnoughXY(x, x2, this.resizePadding, halfwidth, false);
-      var bottom = this._isCloseEnoughXY(y, y2, this.resizePadding, halfheight, false);
+      var otherWidthPadding = Math.min(this.resizePadding, width / 2);
+      var otherHeightPadding = Math.min(this.resizePadding, height / 2);
+      var left = this._isCloseEnough(x, x1, this.resizePadding, otherWidthPadding);
+      var top = this._isCloseEnough(y, y1, otherWidthPadding, this.resizePadding);
+      var right = this._isCloseEnough(x, x2, this.resizePadding, otherHeightPadding);
+      var bottom = this._isCloseEnough(y, y2, otherHeightPadding, this.resizePadding);
 
       if (this.isResizingX && this.isResizingY) {
         if (left && top || bottom && right) {

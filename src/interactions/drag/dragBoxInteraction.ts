@@ -34,18 +34,6 @@ export module Interaction {
       return position - leftPadding <= val && val <= position + rightPadding;
     }
 
-    public _isCloseEnoughXY(val: number, position: number, padding: number, halfLength: number, isLeft: boolean): boolean {
-      var leftValue: number, rightValue: number;
-      if (isLeft) {
-        leftValue = position - padding;
-        rightValue = position + Math.min(halfLength, padding);
-      } else {
-        leftValue = position - Math.min(halfLength, padding);
-        rightValue = position + padding;
-      }
-      return leftValue <= val && val <= rightValue;
-    }
-
     /**
      * Gets whether resizing is enabled or not.
      *
