@@ -152,14 +152,14 @@ declare module Plottable {
     }
     var MILLISECONDS_IN_ONE_DAY: number;
     module Formatters {
-        function currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
-        function fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
-        function general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
-        function identity(): (d: any) => string;
-        function percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
-        function siSuffix(precision?: number): (d: any) => string;
-        function time(): (d: any) => string;
-        function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
+        function currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): Formatter;
+        function fixed(precision?: number, onlyShowUnchanged?: boolean): Formatter;
+        function general(precision?: number, onlyShowUnchanged?: boolean): Formatter;
+        function identity(): Formatter;
+        function percentage(precision?: number, onlyShowUnchanged?: boolean): Formatter;
+        function siSuffix(precision?: number): Formatter;
+        function time(): Formatter;
+        function relativeDate(baseValue?: number, increment?: number, label?: string): Formatter;
     }
 }
 
@@ -645,7 +645,7 @@ declare module Plottable {
             _userRequestedHeight: any;
             _computedWidth: number;
             _computedHeight: number;
-            constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
+            constructor(scale: Scale<any, number>, orientation: string, formatter?: Formatter);
             remove(): void;
             _isHorizontal(): boolean;
             _computeWidth(): number;
@@ -726,7 +726,7 @@ declare module Plottable {
     module Axis {
         class Numeric extends Plottable.Abstract.Axis {
             _scale: Plottable.Abstract.QuantitativeScale<number>;
-            constructor(scale: Plottable.Abstract.QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
+            constructor(scale: Plottable.Abstract.QuantitativeScale<number>, orientation: string, formatter?: Formatter);
             _setup(): void;
             _computeWidth(): number;
             _computeHeight(): number;
@@ -746,7 +746,7 @@ declare module Plottable {
     module Axis {
         class Category extends Plottable.Abstract.Axis {
             _scale: Plottable.Scale.Ordinal;
-            constructor(scale: Plottable.Scale.Ordinal, orientation?: string, formatter?: (d: any) => string);
+            constructor(scale: Plottable.Scale.Ordinal, orientation?: string, formatter?: Formatter);
             _setup(): void;
             _rescale(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest;
