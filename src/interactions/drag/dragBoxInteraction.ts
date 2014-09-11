@@ -126,6 +126,8 @@ export module Interaction {
       var y = d3.event.y;
       var diffX = this.resizeStartDiff[0];
       var diffY = this.resizeStartDiff[1];
+      // Eases the mouse into the center of the dragging line, in case dragging started with the mouse
+      // away from the center due to `resizePadding`.
       if (this.isResizingX && diffX !== 0) {
         x += diffX;
         this.resizeStartDiff[0] += diffX > 0 ? -1 : 1;
