@@ -4,7 +4,13 @@ module Plottable {
 export module Interaction {
   export class Drag extends Abstract.Interaction {
     private dragBehavior: D3.Behavior.Drag;
+    /**
+     * Where dragging originated for the current dragging event.
+     */
     public origin = [0,0];
+    /**
+     * The current location of the mouse for the current dragging event.
+     */
     public location = [0,0];
     public  _constrainX: (n: number) => number;
     public  _constrainY: (n: number) => number;
