@@ -112,7 +112,7 @@ module Plottable {
      * @returns {Formatter} A formatter for percentage values.
      */
     public static percentage(precision = 0, onlyShowUnchanged = true) {
-      var fixedFormatter = Formatters.fixed(precision);
+      var fixedFormatter = Formatters.fixed(precision, onlyShowUnchanged);
       return function(d: any) {
         var valToFormat = d * 100;
 
