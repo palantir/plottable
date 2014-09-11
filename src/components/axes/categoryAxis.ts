@@ -64,6 +64,10 @@ export module Axis {
       return this._scale.domain();
     }
 
+    /**
+     * Set the textOrientation for the axis labels, or retrieve the current orientation.
+     * Valid values are "auto", "horizontal", and "vertical"
+     */
     public textOrientation(): string;
     public textOrientation(newOrientation: string): Category;
     public textOrientation(newOrientation?: string): any {
