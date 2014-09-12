@@ -7,6 +7,7 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 var Plottable;
 (function (Plottable) {
     (function (_Util) {
+        _Util.commonColors = ["aqua", "black", "blue", "fuchsia", "gray", "green", "lime", "maroon", "navy", "olive", "orange", "purple", "red", "silver", "teal", "white", "yellow"];
         (function (Methods) {
             function inRange(x, a, b) {
                 return (Math.min(a, b) <= x && x <= Math.max(a, b));
@@ -4409,6 +4410,10 @@ var Plottable;
                 attrToSet = attrToSet.toLowerCase();
                 var currentProjection = this._projectors[attrToSet];
                 var existingScale = (currentProjection != null) ? currentProjection.scale : null;
+                if ((attrToSet === "fill" || attrToSet === "stroke") && Plottable._Util.commonColors.indexOf(accessor) !== -1) {
+                    Plottable._Util.Methods.warn("You are attempting to project the common color name " + accessor + " as an accessor, but it will be \
+          interperted as a key function. If this is not intended, wrap your color in an anonymous function.");
+                }
                 if (existingScale != null) {
                     existingScale._removeExtent(this._plottableID.toString(), attrToSet);
                     existingScale.broadcaster.deregisterListener(this);

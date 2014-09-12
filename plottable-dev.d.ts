@@ -1,6 +1,7 @@
 
 declare module Plottable {
     module _Util {
+        var commonColors: string[];
         module Methods {
             function inRange(x: number, a: number, b: number): boolean;
             function warn(warning: string): void;
