@@ -6,16 +6,19 @@ module Plottable {
     private doNice = false;
     private niceCount: number;
     private padProportion = 0.0;
-    private paddingExceptions: D3.Map = d3.map();
-    private unregisteredPaddingExceptions: D3.Set = d3.set();
-    private includedValues: D3.Map = d3.map();
+    private paddingExceptions: D3.Map<any> = d3.map();
+    private unregisteredPaddingExceptions: D3.Set<any> = d3.set();
+    private includedValues: D3.Map<any> = d3.map();
     // includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
-    private unregisteredIncludedValues: D3.Map = d3.map();
+    private unregisteredIncludedValues: D3.Map<any> = d3.map();
     private combineExtents: (extents: any[][]) => any[];
     private static PADDING_FOR_IDENTICAL_DOMAIN = 1;
     private static ONE_DAY = 1000 * 60 * 60 * 24;
 
     /**
+     * Constructs a new Domainer.
+     *
+     * @constructor
      * @param {(extents: any[][]) => any[]} combineExtents
      *        If present, this function will be used by the Domainer to merge
      *        all the extents that are present on a scale.
@@ -33,20 +36,20 @@ module Plottable {
     /**
      * @param {any[][]} extents The list of extents to be reduced to a single
      *        extent.
-     * @param {Abstract.QuantitativeScale} scale
+     * @param {QuantitativeScale} scale
      *        Since nice() must do different things depending on Linear, Log,
      *        or Time scale, the scale must be passed in for nice() to work.
-     * @return {any[]} The domain, as a merging of all exents, as a [min, max]
+     * @returns {any[]} The domain, as a merging of all exents, as a [min, max]
      *                 pair.
      */
-    public computeDomain(extents: any[][], scale: Abstract.QuantitativeScale): any[] {
+    public computeDomain(extents: any[][], scale: Abstract.QuantitativeScale<any>): any[] {
       var domain: any[];
       if (this.combineExtents != null) {
         domain = this.combineExtents(extents);
       } else if (extents.length === 0) {
         domain = scale._defaultExtent();
       } else {
-        domain = [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
+        domain = [_Util.Methods.min(extents, (e) => e[0]), _Util.Methods.max(extents, (e) => e[1])];
       }
       domain = this.includeDomain(domain);
       domain = this.padDomain(scale, domain);
@@ -57,7 +60,7 @@ module Plottable {
     /**
      * Sets the Domainer to pad by a given ratio.
      *
-     * @param {number} [padProportion] Proportionally how much bigger the
+     * @param {number} padProportion Proportionally how much bigger the
      *         new domain should be (0.05 = 5% larger).
      *
      *         A domainer will pad equal visual amounts on each side.
@@ -66,7 +69,7 @@ module Plottable {
      *         On a log scale, the top will be padded more than the bottom, so
      *         [10, 100] will be padded to [1, 1000].
      *
-     * @return {Domainer} The calling Domainer.
+     * @returns {Domainer} The calling Domainer.
      */
     public pad(padProportion = 0.05): Domainer {
       this.padProportion = padProportion;
@@ -74,15 +77,15 @@ module Plottable {
     }
 
     /**
-     * Add a padding exception, a value that will not be padded at either end of the domain.
+     * Adds a padding exception, a value that will not be padded at either end of the domain.
      *
      * Eg, if a padding exception is added at x=0, then [0, 100] will pad to [0, 105] instead of [-2.5, 102.5].
      * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
      * If a key is not provided, it will be added with set semantics (Can be removed by value)
      *
      * @param {any} exception The padding exception to add.
-     * @param string [key] The key to register the exception under.
-     * @return Domainer The calling domainer
+     * @param {string} key The key to register the exception under.
+     * @returns {Domainer} The calling domainer
      */
     public addPaddingException(exception: any, key?: string): Domainer {
       if (key != null) {
@@ -95,13 +98,13 @@ module Plottable {
 
 
     /**
-     * Remove a padding exception, allowing the domain to pad out that value again.
+     * Removes a padding exception, allowing the domain to pad out that value again.
      *
      * If a string is provided, it is assumed to be a key and the exception associated with that key is removed.
      * If a non-string is provdied, it is assumed to be an unkeyed exception and that exception is removed.
      *
      * @param {any} keyOrException The key for the value to remove, or the value to remove
-     * @return Domainer The calling domainer
+     * @return {Domainer} The calling domainer
      */
     public removePaddingException(keyOrException: any): Domainer {
       if (typeof(keyOrException) === "string") {
@@ -113,15 +116,15 @@ module Plottable {
     }
 
     /**
-     * Add an included value, a value that must be included inside the domain.
+     * Adds an included value, a value that must be included inside the domain.
      *
      * Eg, if a value exception is added at x=0, then [50, 100] will expand to [0, 100] rather than [50, 100].
      * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
      * If a key is not provided, it will be added with set semantics (Can be removed by value)
      *
      * @param {any} value The included value to add.
-     * @param string [key] The key to register the value under.
-     * @return Domainer The calling domainer
+     * @param {string} key The key to register the value under.
+     * @returns {Domainer} The calling domainer
      */
     public addIncludedValue(value: any, key?: string): Domainer {
       if (key != null) {
@@ -139,7 +142,7 @@ module Plottable {
      * If a non-string is provdied, it is assumed to be an unkeyed value and that value is removed.
      *
      * @param {any} keyOrException The key for the value to remove, or the value to remove
-     * @return Domainer The calling domainer
+     * @return {Domainer} The calling domainer
      */
     public removeIncludedValue(valueOrKey: any) {
       if (typeof(valueOrKey) === "string") {
@@ -153,7 +156,7 @@ module Plottable {
     /**
      * Extends the scale's domain so it starts and ends with "nice" values.
      *
-     * @param {number} [count] The number of ticks that should fit inside the new domain.
+     * @param {number} count The number of ticks that should fit inside the new domain.
      * @return {Domainer} The calling Domainer.
      */
     public nice(count?: number): Domainer {
@@ -163,14 +166,10 @@ module Plottable {
     }
 
     private static defaultCombineExtents(extents: any[][]): any[] {
-      if (extents.length === 0) {
-        return [0, 1];
-      } else {
-        return [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
-      }
+      return [_Util.Methods.min(extents, (e) => e[0], 0), _Util.Methods.max(extents, (e) => e[1], 1)];
     }
 
-    private padDomain(scale: Abstract.QuantitativeScale, domain: any[]): any[] {
+    private padDomain(scale: Abstract.QuantitativeScale<any>, domain: any[]): any[] {
       var min = domain[0];
       var max = domain[1];
       if (min === max && this.padProportion > 0.0) {
@@ -204,7 +203,7 @@ module Plottable {
       return [newMin, newMax];
     }
 
-    private niceDomain(scale: Abstract.QuantitativeScale, domain: any[]): any[] {
+    private niceDomain(scale: Abstract.QuantitativeScale<any>, domain: any[]): any[] {
       if (this.doNice) {
         return scale._niceDomain(domain, this.niceCount);
       } else {

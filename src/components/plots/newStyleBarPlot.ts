@@ -2,9 +2,9 @@
 
 module Plottable {
 export module Abstract {
-  export class NewStyleBarPlot extends NewStylePlot {
+  export class NewStyleBarPlot<X,Y> extends NewStylePlot<X,Y> {
     public static _barAlignmentToFactor: {[alignment: string]: number} = {};
-    public static DEFAULT_WIDTH = 10;
+    private static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignmentFactor = 0;
@@ -17,13 +17,13 @@ export module Abstract {
     };
 
     /**
-     * Creates an NewStyleBarPlot.
+     * Constructs a NewStyleBarPlot.
      *
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.Scale, yScale: Abstract.Scale) {
+    constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
@@ -37,19 +37,19 @@ export module Abstract {
 
     public _setup() {
       super._setup();
-      this._baseline = this.renderArea.append("line").classed("baseline", true);
+      this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
     public _paint() {
       super._paint();
 
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
-      var baselineAttr: IAttributeToProjector = {
+      var baselineAttr: any = {
         "x1": this._isVertical ? 0 : scaledBaseline,
         "y1": this._isVertical ? scaledBaseline : 0,
-        "x2": this._isVertical ? this.availableWidth : scaledBaseline,
-        "y2": this._isVertical ? scaledBaseline : this.availableHeight
+        "x2": this._isVertical ? this.width() : scaledBaseline,
+        "y2": this._isVertical ? scaledBaseline : this.height()
       };
       this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
     }
@@ -57,14 +57,16 @@ export module Abstract {
     /**
      * Sets the baseline for the bars to the specified value.
      *
+     * The baseline is the line that the bars are drawn from, defaulting to 0.
+     *
      * @param {number} value The value to position the baseline at.
-     * @return {NewStyleBarPlot} The calling NewStyleBarPlot.
+     * @returns {NewStyleBarPlot} The calling NewStyleBarPlot.
      */
     public baseline(value: number) {
       return Abstract.BarPlot.prototype.baseline.apply(this, [value]);
     }
 
-    public _updateDomainer(scale: Scale) {
+    public _updateDomainer(scale: Scale<any, number>) {
       return Abstract.BarPlot.prototype._updateDomainer.apply(this, [scale]);
     }
 

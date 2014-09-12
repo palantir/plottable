@@ -50,10 +50,10 @@ describe("Interactions", () => {
       var xDomainBefore = xScale.domain();
       var yDomainBefore = yScale.domain();
 
-      var interaction = new Plottable.Interaction.PanZoom(renderer, xScale, yScale);
-      interaction.registerWithComponent();
+      var interaction = new Plottable.Interaction.PanZoom(xScale, yScale);
+      renderer.registerInteraction(interaction);
 
-      var hb = renderer.element.select(".hit-box").node();
+      var hb = renderer._element.select(".hit-box").node();
       var dragDistancePixelX = 10;
       var dragDistancePixelY = 20;
       $(hb).simulate("drag", {
@@ -87,10 +87,10 @@ describe("Interactions", () => {
     var svgWidth = 400;
     var svgHeight = 400;
     var svg: D3.Selection;
-    var dataset: Plottable.DataSource;
-    var xScale: Plottable.Abstract.QuantitativeScale;
-    var yScale: Plottable.Abstract.QuantitativeScale;
-    var renderer: Plottable.Abstract.XYPlot;
+    var dataset: Plottable.Dataset;
+    var xScale: Plottable.Abstract.QuantitativeScale<number>;
+    var yScale: Plottable.Abstract.QuantitativeScale<number>;
+    var renderer: Plottable.Abstract.XYPlot<number,number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
     var dragstartX = 20;
@@ -102,13 +102,13 @@ describe("Interactions", () => {
 
     before(() => {
       svg = generateSVG(svgWidth, svgHeight);
-      dataset = new Plottable.DataSource(makeLinearSeries(10));
+      dataset = new Plottable.Dataset(makeLinearSeries(10));
       xScale = new Plottable.Scale.Linear();
       yScale = new Plottable.Scale.Linear();
       renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
       renderer.renderTo(svg);
-      interaction = new Plottable.Interaction.XYDragBox(renderer);
-      interaction.registerWithComponent();
+      interaction = new Plottable.Interaction.XYDragBox();
+      renderer.registerInteraction(interaction);
     });
 
     afterEach(() => {
@@ -149,7 +149,7 @@ describe("Interactions", () => {
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox).CLASS_DRAG_BOX;
-      var dragBox = renderer.backgroundContainer.select(dragBoxClass);
+      var dragBox = renderer._backgroundContainer.select(dragBoxClass);
       assert.isNotNull(dragBox, "the dragbox was created");
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};
       var expectedStartPosition = {x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY)};
@@ -266,10 +266,10 @@ describe("Interactions", () => {
     var svgWidth = 400;
     var svgHeight = 400;
     var svg: D3.Selection;
-    var dataset: Plottable.DataSource;
-    var xScale: Plottable.Abstract.QuantitativeScale;
-    var yScale: Plottable.Abstract.QuantitativeScale;
-    var renderer: Plottable.Abstract.XYPlot;
+    var dataset: Plottable.Dataset;
+    var xScale: Plottable.Abstract.QuantitativeScale<number>;
+    var yScale: Plottable.Abstract.QuantitativeScale<number>;
+    var renderer: Plottable.Abstract.XYPlot<number,number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
     var dragstartX = 20;
@@ -281,13 +281,13 @@ describe("Interactions", () => {
 
     before(() => {
       svg = generateSVG(svgWidth, svgHeight);
-      dataset = new Plottable.DataSource(makeLinearSeries(10));
+      dataset = new Plottable.Dataset(makeLinearSeries(10));
       xScale = new Plottable.Scale.Linear();
       yScale = new Plottable.Scale.Linear();
       renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
       renderer.renderTo(svg);
-      interaction = new Plottable.Interaction.YDragBox(renderer);
-      interaction.registerWithComponent();
+      interaction = new Plottable.Interaction.YDragBox();
+      renderer.registerInteraction(interaction);
     });
 
     afterEach(() => {
@@ -322,7 +322,7 @@ describe("Interactions", () => {
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox).CLASS_DRAG_BOX;
-      var dragBox = renderer.backgroundContainer.select(dragBoxClass);
+      var dragBox = renderer._backgroundContainer.select(dragBoxClass);
       assert.isNotNull(dragBox, "the dragbox was created");
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};
       var expectedStartPosition = {x: 0, y: Math.min(dragstartY, dragendY)};
@@ -408,7 +408,7 @@ describe("Interactions", () => {
       component.renderTo(svg);
 
       var code = 65; // "a" key
-      var ki = new Plottable.Interaction.Key(component, code);
+      var ki = new Plottable.Interaction.Key(code);
 
       var callbackCalled = false;
       var callback = () => {
@@ -416,7 +416,7 @@ describe("Interactions", () => {
       };
 
       ki.callback(callback);
-      ki.registerWithComponent();
+      component.registerInteraction(ki);
 
       var $hitbox = $((<any> component).hitBox.node());
 
@@ -457,7 +457,7 @@ describe("Interactions", () => {
 
     it("hoverMode()", () => {
       var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
-      var bhi = new Plottable.Interaction.BarHover(barPlot);
+      var bhi = new Plottable.Interaction.BarHover();
 
       bhi.hoverMode("line");
       bhi.hoverMode("POINT");
@@ -469,7 +469,7 @@ describe("Interactions", () => {
       var svg = generateSVG(400, 400);
       var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
       barPlot.project("x", "name", ordinalScale).project("y", "value", linearScale);
-      var bhi = new Plottable.Interaction.BarHover(barPlot);
+      var bhi = new Plottable.Interaction.BarHover();
 
       var barDatum: any = null;
       bhi.onHover((datum: any, bar: D3.Selection) => {
@@ -483,9 +483,9 @@ describe("Interactions", () => {
       });
 
       barPlot.renderTo(svg);
-      bhi.registerWithComponent();
+      barPlot.registerInteraction(bhi);
 
-      var hitbox = barPlot.element.select(".hit-box");
+      var hitbox = barPlot._element.select(".hit-box");
 
       triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
       assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
@@ -524,7 +524,7 @@ describe("Interactions", () => {
       var svg = generateSVG(400, 400);
       var barPlot = new Plottable.Plot.HorizontalBar(dataset, linearScale, ordinalScale);
       barPlot.project("y", "name", ordinalScale).project("x", "value", linearScale);
-      var bhi = new Plottable.Interaction.BarHover(barPlot);
+      var bhi = new Plottable.Interaction.BarHover();
 
       var barDatum: any = null;
       bhi.onHover((datum: any, bar: D3.Selection) => {
@@ -537,9 +537,9 @@ describe("Interactions", () => {
       });
 
       barPlot.renderTo(svg);
-      bhi.registerWithComponent();
+      barPlot.registerInteraction(bhi);
 
-      var hitbox = barPlot.element.select(".hit-box");
+      var hitbox = barPlot._element.select(".hit-box");
 
       triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
       assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");

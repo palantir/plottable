@@ -20,12 +20,10 @@ export module Interaction {
     private   ondragend: (start: Point, end: Point) => void;
 
     /**
-     * Creates a Drag.
-     *
-     * @param {Component} componentToListenTo The component to listen for interactions on.
+     * Constructs a Drag. A Drag will signal its callbacks on mouse drag.
      */
-    constructor(componentToListenTo: Abstract.Component) {
-      super(componentToListenTo);
+    constructor() {
+      super();
       this.dragBehavior = d3.behavior.drag();
       this.dragBehavior.on("dragstart", () => this._dragstart());
       this.dragBehavior.on("drag",      () => this._drag     ());
@@ -35,14 +33,14 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging starts.
      *
-     * @returns {(start: Point) => void}
+     * @returns {(start: Point) => void} The callback called when dragging starts.
      */
     public dragstart(): (start: Point) => void;
     /**
      * Sets the callback to be called when dragging starts.
      *
-     * @param {(start: Point) => any} cb The function to be called.
-     * @returns {Drag}
+     * @param {(start: Point) => any} cb If provided, the function to be called. Takes in a Point in pixels.
+     * @returns {Drag} The calling Drag.
      */
     public dragstart(cb: (start: Point) => any): Drag;
     public dragstart(cb?: (start: Point) => any): any {
@@ -57,14 +55,14 @@ export module Interaction {
     /**
      * Gets the callback that is called during dragging.
      *
-     * @returns {(start: Point, end: Point) => void}
+     * @returns {(start: Point, end: Point) => void} The callback called during dragging.
      */
     public drag(): (start: Point, end: Point) => void;
     /**
      * Adds a callback to be called during dragging.
      *
-     * @param {(start: Point, end: Point) => any} cb The function to be called.
-     * @returns {Drag}
+     * @param {(start: Point, end: Point) => any} cb If provided, the function to be called. Takes in Points in pixels.
+     * @returns {Drag} The calling Drag.
      */
     public drag(cb: (start: Point, end: Point) => any): Drag;
     public drag(cb?: (start: Point, end: Point) => any): any {
@@ -79,13 +77,13 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging ends.
      *
-     * @returns {(start: Point, end: Point) => void}
+     * @returns {(start: Point, end: Point) => void} The callback called when dragging ends.
      */
     public dragend(): (start: Point, end: Point) => void;
     /**
      * Adds a callback to be called when the dragging ends.
      *
-     * @param {(start: Point, end: Point) => any} cb The function to be called. Takes in a SelectionArea in pixels.
+     * @param {(start: Point, end: Point) => any} cb If provided, the function to be called. Takes in a SelectionArea in pixels.
      * @returns {Drag} The calling Drag.
      */
     public dragend(cb: (start: Point, end: Point) => any): Drag;
@@ -100,13 +98,13 @@ export module Interaction {
 
     public _dragstart(){
       this._isDragging = true;
-      var availableWidth  = this.componentToListenTo.availableWidth;
-      var availableHeight = this.componentToListenTo.availableHeight;
+      var width  = this._componentToListenTo.width();
+      var height = this._componentToListenTo.height();
       // the constraint functions ensure that the selection rectangle will not exceed the hit box
       var constraintFunction = (min: number, max: number) => (x: number) => Math.min(Math.max(x, min), max);
-      this._constrainX = constraintFunction(0, availableWidth );
-      this._constrainY = constraintFunction(0, availableHeight);
-      this.origin = d3.mouse(this.hitBox[0][0].parentNode);
+      this._constrainX = constraintFunction(0, width );
+      this._constrainY = constraintFunction(0, height);
+      this.origin = d3.mouse(this._hitBox[0][0].parentNode);
       this._doDragstart();
     }
 
@@ -142,16 +140,25 @@ export module Interaction {
       }
     }
 
-    public _anchor(hitBox: D3.Selection) {
-      super._anchor(hitBox);
+    public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
+      super._anchor(component, hitBox);
       hitBox.call(this.dragBehavior);
       return this;
     }
 
-    public setupZoomCallback(xScale?: Abstract.QuantitativeScale, yScale?: Abstract.QuantitativeScale) {
+    /**
+     * Sets up so that the xScale and yScale that are passed have their
+     * domains automatically changed as you zoom.
+     *
+     * @param {QuantitativeScale} xScale The scale along the x-axis.
+     * @param {QuantitativeScale} yScale The scale along the y-axis.
+     * @returns {Drag} The calling Drag.
+     */
+    public setupZoomCallback(xScale?: Abstract.QuantitativeScale<any>, yScale?: Abstract.QuantitativeScale<any>) {
       var xDomainOriginal = xScale != null ? xScale.domain() : null;
       var yDomainOriginal = yScale != null ? yScale.domain() : null;
       var resetOnNextClick = false;
+
       function callback(upperLeft: Point, lowerRight: Point) {
         if (upperLeft == null || lowerRight == null) {
           if (resetOnNextClick) {

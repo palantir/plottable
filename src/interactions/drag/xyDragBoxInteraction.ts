@@ -38,6 +38,7 @@ export module Interaction {
     }
 
     public _enableResize() {
+      super._enableResize();
       this._resizeXEnabled = true;
       this._resizeYEnabled = true;
     }

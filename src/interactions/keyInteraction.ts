@@ -10,17 +10,19 @@ export module Interaction {
     /**
      * Creates a KeyInteraction.
      *
+     * KeyInteraction listens to key events that occur while the component is
+     * moused over.
+     *
      * @constructor
-     * @param {Component} componentToListenTo The component to listen for keypresses on.
      * @param {number} keyCode The key code to listen for.
      */
-    constructor(componentToListenTo: Abstract.Component, keyCode: number) {
-      super(componentToListenTo);
+    constructor(keyCode: number) {
+      super();
       this.keyCode = keyCode;
     }
 
-    public _anchor(hitBox: D3.Selection) {
-      super._anchor(hitBox);
+    public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
+      super._anchor(component, hitBox);
       hitBox.on("mouseover", () => {
         this.activated = true;
       });
@@ -36,9 +38,11 @@ export module Interaction {
     }
 
     /**
-     * Sets an callback to be called when the designated key is pressed.
+     * Sets a callback to be called when the designated key is pressed and the
+     * user is moused over the component.
      *
-     * @param {() => any} cb: Callback to be called.
+     * @param {() => any} cb Callback to be called.
+     * @returns The calling Key.
      */
     public callback(cb: () => any): Key {
       this._callback = cb;

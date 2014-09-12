@@ -2,9 +2,20 @@
 
 module Plottable {
 export module Interaction {
+  /**
+   * A DragBox is an interaction that automatically draws a box across the
+   * element you attach it to when you drag.
+   */
   export class DragBox extends Drag {
     private static CLASS_DRAG_BOX = "drag-box";
+    /**
+     * The DOM element of the box that is drawn. When no box is drawn, it is
+     * null.
+     */
     public dragBox: D3.Selection;
+    /**
+     * Whether or not dragBox has been rendered in a visible area.
+     */
     public boxIsDrawn = false;
     public resizePadding = 10;
     /**
@@ -59,13 +70,14 @@ export module Interaction {
       if (enabled == null) {
         return this.resizeEnabled;
       } else {
-        this.resizeEnabled = enabled;
         this._enableResize();
         return this;
       }
     }
 
-    public _enableResize() {}
+    public _enableResize() {
+      this.resizeEnabled = true;
+    }
 
     private isResizeStartAttr(isX: boolean): boolean {
       var i1: number, i2: number, positionAttr1: string, positionAttr2: string, lengthAttr1: string, lengthAttr2: string;
@@ -151,9 +163,9 @@ export module Interaction {
     }
 
     /**
-     * Clears the highlighted drag-selection box drawn by the AreaInteraction.
+     * Clears the highlighted drag-selection box drawn by the DragBox.
      *
-     * @returns {AreaInteraction} The calling AreaInteraction.
+     * @returns {DragBox} The calling DragBox.
      */
     public clearBox() {
       if (this.dragBox == null) {return;} // HACKHACK #593
@@ -162,6 +174,16 @@ export module Interaction {
       return this;
     }
 
+    /**
+     * Set where the box is draw explicitly.
+     *
+     * @param {number} x0 Left.
+     * @param {number} x1 Right.
+     * @param {number} y0 Top.
+     * @param {number} y1 Bottom.
+     *
+     * @returns {DragBox} The calling DragBox.
+     */
     public setBox(x0: number, x1: number, y0: number, y1: number) {
       if (this.dragBox == null) {return;} // HACKHACK #593
       var w = Math.abs(x0 - x1);
@@ -179,10 +201,10 @@ export module Interaction {
       return this;
     }
 
-    public _anchor(hitBox: D3.Selection) {
-      super._anchor(hitBox);
+    public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
+      super._anchor(component, hitBox);
       var cname = DragBox.CLASS_DRAG_BOX;
-      var background = this.componentToListenTo.backgroundContainer;
+      var background = this._componentToListenTo._backgroundContainer;
       this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
       hitBox.on("mousemove", () => this._hover());
       return this;
@@ -192,7 +214,7 @@ export module Interaction {
       if (this.resizeEnabled) {
         var cursorStyle: string;
         if (this.boxIsDrawn) {
-          var position = d3.mouse(this.hitBox[0][0].parentNode);
+          var position = d3.mouse(this._hitBox[0][0].parentNode);
           cursorStyle = this._cursorStyle(position[0], position[1]);
           if (!cursorStyle && this._isDragging) {
             cursorStyle = this.lastCursorStyle;
@@ -203,7 +225,7 @@ export module Interaction {
         } else {
           cursorStyle = "";
         }
-        this.hitBox.style("cursor", cursorStyle);
+        this._hitBox.style("cursor", cursorStyle);
       }
     }
 

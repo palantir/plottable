@@ -25,11 +25,11 @@ export module Component {
 
     private datumCurrentlyFocusedOn: string;
 
-    // this is the set of all elements that are currently toggled off
-    private isOff: D3.Set;
+    // this is the set of all legend domain strings that are currently toggled off
+    private isOff: D3.Set<string>;
 
     /**
-     * Creates a Legend.
+     * Constructs a Legend.
      *
      * A legend consists of a series of legend rows, each with a color and label taken from the `colorScale`.
      * The rows will be displayed in the order of the `colorScale` domain.
@@ -37,7 +37,7 @@ export module Component {
      * Setting a callback will also put classes on the individual rows.
      *
      * @constructor
-     * @param {Scale.Color} colorScale
+     * @param {ColorScale} colorScale
      */
     constructor(colorScale?: Scale.Color) {
       super();
@@ -57,17 +57,28 @@ export module Component {
     }
 
     /**
-     * Assigns or gets the callback to the Legend
+     * Gets the toggle callback from the Legend.
      *
      * This callback is associated with toggle events, which trigger when a legend row is clicked.
      * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
      * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
      * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
      *
-     * @param {ToggleCallback} callback The new callback function
+     * @returns {ToggleCallback} The current toggle callback.
+     */
+    public toggleCallback(): ToggleCallback;
+    /**
+     * Assigns a toggle callback to the Legend.
+     *
+     * This callback is associated with toggle events, which trigger when a legend row is clicked.
+     * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
+     * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
+     * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
+     *
+     * @param {ToggleCallback} callback The new callback function.
+     * @returns {Legend} The calling Legend.
      */
     public toggleCallback(callback: ToggleCallback): Legend;
-    public toggleCallback(): ToggleCallback;
     public toggleCallback(callback?: ToggleCallback): any {
       if (callback !== undefined) {
         this._toggleCallback = callback;
@@ -81,16 +92,28 @@ export module Component {
     }
 
     /**
-     * Assigns or gets the callback to the Legend
+     * Gets the hover callback from the Legend.
+     *
      * This callback is associated with hover events, which trigger when the mouse enters or leaves a legend row
      * Setting a callback will also set the class "hover" to all legend row,
      * as well as the class "focus" to the legend row being hovered over.
      * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
      *
-     * @param{HoverCallback} callback The new callback function
+     * @returns {HoverCallback} The new current hover callback.
+     */
+    public hoverCallback(): HoverCallback;
+    /**
+     * Assigns a hover callback to the Legend.
+     *
+     * This callback is associated with hover events, which trigger when the mouse enters or leaves a legend row
+     * Setting a callback will also set the class "hover" to all legend row,
+     * as well as the class "focus" to the legend row being hovered over.
+     * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
+     *
+     * @param {HoverCallback} callback If provided, the new callback function.
+     * @returns {Legend} The calling Legend.
      */
     public hoverCallback(callback: HoverCallback): Legend;
-    public hoverCallback(): HoverCallback;
     public hoverCallback(callback?: HoverCallback): any {
       if (callback !== undefined) {
         this._hoverCallback = callback;
@@ -103,15 +126,19 @@ export module Component {
       }
     }
 
-
     /**
-     * Assigns a new ColorScale to the Legend.
+     * Gets the current color scale from the Legend.
      *
-     * @param {ColorScale} scale
+     * @returns {ColorScale} The current color scale.
+     */
+    public scale(): Scale.Color;
+    /**
+     * Assigns a new color scale to the Legend.
+     *
+     * @param {Scale.Color} scale If provided, the new scale.
      * @returns {Legend} The calling Legend.
      */
     public scale(scale: Scale.Color): Legend;
-    public scale(): Scale.Color;
     public scale(scale?: Scale.Color): any {
       if (scale != null) {
         if (this.colorScale != null) {
@@ -128,7 +155,7 @@ export module Component {
 
     private updateDomain() {
       if (this._toggleCallback != null) {
-        this.isOff = Util.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
+        this.isOff = _Util.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
       }
       if (this._hoverCallback != null) {
         this.datumCurrentlyFocusedOn = this.scale().domain().indexOf(this.datumCurrentlyFocusedOn) >= 0 ?
@@ -141,16 +168,16 @@ export module Component {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
-      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.availableHeight / textHeight));
+      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.height() / textHeight));
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
       var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend.MARGIN) / textHeight));
-      var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-      var measure = Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
-      var maxWidth = d3.max(this.colorScale.domain(), (d: string) => measure(d).width);
+      var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+      var measure = _Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
+      var maxWidth = _Util.Methods.max(this.colorScale.domain(), (d: string) => measure(d).width);
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
       var desiredWidth  = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;
@@ -165,8 +192,8 @@ export module Component {
 
     private measureTextHeight(): number {
       // note: can't be called before anchoring atm
-      var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-      var textHeight = Util.Text.getTextMeasurer(fakeLegendEl.append("text"))(Util.Text.HEIGHT_TEXT).height;
+      var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+      var textHeight = _Util.Text.getTextMeasurer(fakeLegendEl.append("text"))(_Util.Text.HEIGHT_TEXT).height;
       // HACKHACK
       if (textHeight === 0) {
         textHeight = 1;
@@ -179,9 +206,9 @@ export module Component {
       super._doRender();
       var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
       var textHeight = this.measureTextHeight();
-      var availableWidth  = this.availableWidth  - textHeight - Legend.MARGIN;
+      var availableWidth  = this.width()  - textHeight - Legend.MARGIN;
       var r = textHeight * 0.3;
-      var legend: D3.UpdateSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, (d) => d);
+      var legend: D3.UpdateSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, (d) => d);
       var legendEnter = legend.enter()
           .append("g").classed(Legend.SUBELEMENT_CLASS, true);
 
@@ -200,10 +227,10 @@ export module Component {
         .attr("transform", "translate(" + textHeight + ", 0)")
         .each(function(d: string) {
           var d3this = d3.select(this);
-          var measure = Util.Text.getTextMeasurer(d3this.append("text"));
-          var writeLine = Util.Text.getTruncatedText(d, availableWidth, measure);
+          var measure = _Util.Text.getTextMeasurer(d3this.append("text"));
+          var writeLine = _Util.Text.getTruncatedText(d, availableWidth, measure);
           var writeLineMeasure = measure(writeLine);
-          Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
+          _Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
         });
 
       legend.attr("transform", (d: string) => {
@@ -218,7 +245,7 @@ export module Component {
       if (!this._isSetup) {
         return;
       }
-      var dataSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS);
+      var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
       if (this._hoverCallback != null) {
         // tag the element that is being hovered over with the class "focus"
         // this callback will trigger with the specific element being hovered over.
@@ -256,7 +283,7 @@ export module Component {
       if (!this._isSetup) {
         return;
       }
-      var dataSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS);
+      var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
       if (this._hoverCallback != null) {
         dataSelection.classed("focus", (d: string) => this.datumCurrentlyFocusedOn === d);
         dataSelection.classed("hover", this.datumCurrentlyFocusedOn !== undefined);

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scale {
-  export class ModifiedLog extends Abstract.QuantitativeScale {
+  export class ModifiedLog extends Abstract.QuantitativeScale<number> {
     private base: number;
     private pivot: number;
     private untransformedDomain: number[];
@@ -108,8 +108,8 @@ export module Scale {
       // then we're going to draw negative log ticks from -100 to -10,
       // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
       var middle = (x: number, y: number, z: number) => [x, y, z].sort((a, b) => a - b)[1];
-      var min = d3.min(this.untransformedDomain);
-      var max = d3.max(this.untransformedDomain);
+      var min = _Util.Methods.min(this.untransformedDomain);
+      var max = _Util.Methods.max(this.untransformedDomain);
       var negativeLower = min;
       var negativeUpper = middle(min, max, -this.pivot);
       var positiveLower = middle(min, max, this.pivot);
@@ -153,9 +153,9 @@ export module Scale {
       var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
       var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
       var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
-      var uniqMultiples = Util.Methods.uniqNumbers(multiples);
+      var uniqMultiples = _Util.Methods.uniq(multiples);
       var clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this.base, b - 1) * x));
-      var flattened = Util.Methods.flatten(clusters);
+      var flattened = _Util.Methods.flatten(clusters);
       var filtered = flattened.filter((x) => lower <= x && x <= upper);
       var sorted = filtered.sort((x, y) => x - y);
       return sorted;
@@ -169,8 +169,8 @@ export module Scale {
      * distance when plotted.
      */
     private howManyTicks(lower: number, upper: number): number {
-      var adjustedMin = this.adjustedLog(d3.min(this.untransformedDomain));
-      var adjustedMax = this.adjustedLog(d3.max(this.untransformedDomain));
+      var adjustedMin = this.adjustedLog(_Util.Methods.min(this.untransformedDomain));
+      var adjustedMax = this.adjustedLog(_Util.Methods.max(this.untransformedDomain));
       var adjustedLower = this.adjustedLog(lower);
       var adjustedUpper = this.adjustedLog(upper);
       var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
@@ -187,17 +187,19 @@ export module Scale {
     }
 
     /**
-     * @returns {boolean}
-     * Whether or not to return tick values other than powers of base.
+     * Gets whether or not to return tick values other than powers of base.
      *
      * This defaults to false, so you'll normally only see ticks like
      * [10, 100, 1000]. If you turn it on, you might see ticks values
      * like [10, 50, 100, 500, 1000].
+     * @returns {boolean} the current setting.
      */
     public showIntermediateTicks(): boolean;
     /**
-     * @param {boolean} show
-     * Whether or not to return ticks values other than powers of the base.
+     * Sets whether or not to return ticks values other than powers or base.
+     *
+     * @param {boolean} show If provided, the desired setting.
+     * @returns {ModifiedLog} The calling ModifiedLog.
      */
     public showIntermediateTicks(show: boolean): ModifiedLog;
     public showIntermediateTicks(show?: boolean): any {

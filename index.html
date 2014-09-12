@@ -33,7 +33,7 @@
     <script>
       function sizeSVG(selection) {
         var svg = d3.select(selection);
-        var width = Plottable.Util.DOM.getSVGPixelWidth(svg);
+        var width = Plottable._Util.DOM.getSVGPixelWidth(svg);
         svg.attr("width", width);
         var height = Math.min(width*.6, 500);
         svg.attr("height", height);
@@ -249,11 +249,11 @@
   var yAxisCommits  = new Plottable.Axis.YAxis(yScaleCommits, "left");
   var yAxisLOC      = new Plottable.Axis.YAxis(yScaleLOC, "right");
 
-  // A DataSource is a Plottable object that maintains data and metadata, and updates dependents when it changes
-  // In the previous example, we implicitly created a DataSource by putting the data directly into the Renderer constructor
-  var gitDataSource   = new Plottable.DataSource(data);
-  var commitsPlot = new Plottable.Plot.Line(gitDataSource, xScale, yScaleCommits);
-  var locPlot     = new Plottable.Plot.Area(gitDataSource, xScale, yScaleLOC);
+  // A Dataset is a Plottable object that maintains data and metadata, and updates dependents when it changes
+  // In the previous example, we implicitly created a Dataset by putting the data directly into the Renderer constructor
+  var gitDataset   = new Plottable.Dataset(data);
+  var commitsPlot = new Plottable.Plot.Line(gitDataset, xScale, yScaleCommits);
+  var locPlot     = new Plottable.Plot.Area(gitDataset, xScale, yScaleLOC);
 
   commitsPlot.project("x", "day_delta", xScale);
   locPlot    .project("x", "day_delta", xScale);
