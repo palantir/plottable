@@ -7,7 +7,7 @@ export module Abstract {
     public _autoDomainAutomatically = true;
     public broadcaster = new Plottable.Core.Broadcaster(this);
     public _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
-    public _typeCoercer: (d: any) => any;
+    public _typeCoercer: (d: any) => any = (d: any) => d;
     /**
      * Constructs a new Scale.
      *
