@@ -4349,6 +4349,7 @@ var Plottable;
                 this._animate = false;
                 this._animators = {};
                 this._ANIMATION_DURATION = 250;
+                this._colorVar = "fill";
                 this._projectors = {};
                 this.animateOnNextRender = true;
                 this.clipPathEnabled = true;
@@ -4407,6 +4408,9 @@ var Plottable;
             Plot.prototype.project = function (attrToSet, accessor, scale) {
                 var _this = this;
                 attrToSet = attrToSet.toLowerCase();
+                if (attrToSet === "color") {
+                    attrToSet = this._colorVar;
+                }
                 var currentProjection = this._projectors[attrToSet];
                 var existingScale = (currentProjection != null) ? currentProjection.scale : null;
                 if (existingScale != null) {
@@ -5057,6 +5061,7 @@ var Plottable;
                     "line-reset": new Plottable.Animator.Null(),
                     "line": new Plottable.Animator.Base().duration(600).easing("exp-in-out")
                 };
+                this._colorVar = "stroke";
                 this.classed("line-plot", true);
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; });
                 this.project("stroke-width", function () { return "2px"; });

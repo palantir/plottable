@@ -10,6 +10,7 @@ export module Abstract {
     public _animate: boolean = false;
     public _animators: Animator.IPlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
+    public _colorVar = "fill";
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
     private animateOnNextRender = true;
 
@@ -123,6 +124,9 @@ export module Abstract {
      */
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
+      if (attrToSet === "color") {
+        attrToSet = this._colorVar;
+      }
       var currentProjection = this._projectors[attrToSet];
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
 
