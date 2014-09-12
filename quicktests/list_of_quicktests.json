@@ -60,6 +60,9 @@
     "name":"interaction_panzoom",
     "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Gridlines", "Merge", "PanZoom Interaction"]
   },  {
+    "name":"interaction_BarHover",
+    "categories":["Linear Scale", "Numeric Axis", "Ordinal Scale", "Category Axis", "Vertical Bar Plot", "Hover Interaction"]
+  },  {
     "name":"key_interaction",
     "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "PanZoom Interaction", "Key Interaction"]
   },  {
