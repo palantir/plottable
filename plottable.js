@@ -4373,7 +4373,7 @@ var Plottable;
                 _super.prototype._anchor.call(this, element);
                 this.animateOnNextRender = true;
                 this._dataChanged = true;
-                this._updateAllProjectors();
+                this._updateScaleExtents();
             };
             Plot.prototype.remove = function () {
                 var _this = this;
@@ -4401,7 +4401,7 @@ var Plottable;
                 return this;
             };
             Plot.prototype._onDatasetUpdate = function () {
-                this._updateAllProjectors();
+                this._updateScaleExtents();
                 this.animateOnNextRender = true;
                 this._dataChanged = true;
                 this._render();
@@ -4420,7 +4420,7 @@ var Plottable;
                 }
                 var activatedAccessor = Plottable._Util.Methods._applyAccessor(accessor, this);
                 this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
-                this._updateProjector(attrToSet);
+                this._updateScaleExtent(attrToSet);
                 this._render();
                 return this;
             };
@@ -4455,14 +4455,14 @@ var Plottable;
             };
             Plot.prototype.detach = function () {
                 _super.prototype.detach.call(this);
-                this._updateAllProjectors();
+                this._updateScaleExtents();
                 return this;
             };
-            Plot.prototype._updateAllProjectors = function () {
+            Plot.prototype._updateScaleExtents = function () {
                 var _this = this;
-                d3.keys(this._projectors).forEach(function (attr) { return _this._updateProjector(attr); });
+                d3.keys(this._projectors).forEach(function (attr) { return _this._updateScaleExtent(attr); });
             };
-            Plot.prototype._updateProjector = function (attr) {
+            Plot.prototype._updateScaleExtent = function (attr) {
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
                     var extent = this.dataset()._getExtent(projector.accessor);
@@ -4620,7 +4620,7 @@ var Plottable;
             NewStylePlot.prototype._getAnimator = function (drawer, index) {
                 return new Plottable.Animator.Null();
             };
-            NewStylePlot.prototype._updateProjector = function (attr) {
+            NewStylePlot.prototype._updateScaleExtent = function (attr) {
                 var _this = this;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
@@ -5378,8 +5378,8 @@ var Plottable;
                 var minY = Plottable._Util.Methods.min(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
                 this.stackedExtent[0] = Math.min(minY, 0);
             };
-            Stacked.prototype._updateAllProjectors = function () {
-                _super.prototype._updateAllProjectors.call(this);
+            Stacked.prototype._updateScaleExtents = function () {
+                _super.prototype._updateScaleExtents.call(this);
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 if (primaryScale == null) {
                     return;
