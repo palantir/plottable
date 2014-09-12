@@ -8,6 +8,7 @@ export module Abstract {
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     public _userSetDomainer: boolean = false;
     public _domainer: Domainer = new Domainer();
+    public _typeCoercer = (d: any) => +d;
 
     /**
      * Constructs a new QuantitativeScale.

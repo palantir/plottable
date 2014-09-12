@@ -3410,13 +3410,16 @@ describe("Dataset", function () {
         var plot = new Plottable.Abstract.Plot(dataset);
         var apply = function (a) { return Plottable._Util.Methods._applyAccessor(a, plot); };
         var a1 = function (d, i, m) { return d + i - 2; };
-        assert.deepEqual(dataset._getExtent(apply(a1)), [-1, 5], "extent for numerical data works properly");
+        assert.deepEqual(dataset._getExtent(apply(a1), null), [-1, 5], "extent for numerical data works properly");
         var a2 = function (d, i, m) { return d + m.foo; };
-        assert.deepEqual(dataset._getExtent(apply(a2)), [12, 15], "extent uses metadata appropriately");
+        assert.deepEqual(dataset._getExtent(apply(a2), null), [12, 15], "extent uses metadata appropriately");
         dataset.metadata({ foo: -1 });
-        assert.deepEqual(dataset._getExtent(apply(a2)), [0, 3], "metadata change is reflected in extent results");
+        assert.deepEqual(dataset._getExtent(apply(a2), null), [0, 3], "metadata change is reflected in extent results");
         var a3 = function (d, i, m) { return "_" + d; };
-        assert.deepEqual(dataset._getExtent(apply(a3)), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
+        assert.deepEqual(dataset._getExtent(apply(a3), null), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
+        var a_toString = function (d) { return (d + 2).toString(); };
+        var coerce = function (d) { return +d; };
+        assert.deepEqual(dataset._getExtent(apply(a_toString), coerce), [3, 6], "type coercion works as expected");
     });
 });
 
@@ -4009,6 +4012,20 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
             scale.domain([-1, 5]);
             assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
+        });
+        it("autoranges appropriately even if stringy numbers are projected", function () {
+            var sadTimesData = ["999", "10", "100", "1000", "2", "999"];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Scatter(sadTimesData, xScale, yScale);
+            var id = function (d) { return d; };
+            xScale.domainer(new Plottable.Domainer());
+            plot.project("x", id, xScale);
+            plot.project("y", id, yScale);
+            var svg = generateSVG();
+            plot.renderTo(svg);
+            assert.deepEqual(xScale.domain(), [2, 1000], "the domain was calculated appropriately");
+            svg.remove();
         });
     });
     describe("Ordinal Scales", function () {

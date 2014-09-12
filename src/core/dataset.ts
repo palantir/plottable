@@ -77,17 +77,20 @@ module Plottable {
       }
     }
 
-    public _getExtent(accessor: _IAccessor): any[] {
+    public _getExtent(accessor: _IAccessor, typeCoercer: (d: any) => any): any[] {
       var cachedExtent = this.accessor2cachedExtent.get(accessor);
       if (cachedExtent === undefined) {
-        cachedExtent = this.computeExtent(accessor);
+        cachedExtent = this.computeExtent(accessor, typeCoercer);
         this.accessor2cachedExtent.set(accessor, cachedExtent);
       }
       return cachedExtent;
     }
 
-    private computeExtent(accessor: _IAccessor): any[] {
+    private computeExtent(accessor: _IAccessor, typeCoercer: (d: any) => any): any[] {
       var mappedData = this._data.map(accessor);
+      if (typeCoercer) {
+        mappedData = mappedData.map(typeCoercer);
+      }
       if (mappedData.length === 0){
         return [];
       } else if (typeof(mappedData[0]) === "string") {

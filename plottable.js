@@ -1077,16 +1077,19 @@ var Plottable;
                 return this;
             }
         };
-        Dataset.prototype._getExtent = function (accessor) {
+        Dataset.prototype._getExtent = function (accessor, typeCoercer) {
             var cachedExtent = this.accessor2cachedExtent.get(accessor);
             if (cachedExtent === undefined) {
-                cachedExtent = this.computeExtent(accessor);
+                cachedExtent = this.computeExtent(accessor, typeCoercer);
                 this.accessor2cachedExtent.set(accessor, cachedExtent);
             }
             return cachedExtent;
         };
-        Dataset.prototype.computeExtent = function (accessor) {
+        Dataset.prototype.computeExtent = function (accessor, typeCoercer) {
             var mappedData = this._data.map(accessor);
+            if (typeCoercer) {
+                mappedData = mappedData.map(typeCoercer);
+            }
             if (mappedData.length === 0) {
                 return [];
             }
@@ -1501,6 +1504,7 @@ var Plottable;
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
                 this._userSetDomainer = false;
                 this._domainer = new Plottable.Domainer();
+                this._typeCoercer = function (d) { return +d; };
             }
             QuantitativeScale.prototype._getExtent = function () {
                 return this._domainer.computeDomain(this._getAllExtents(), this);
@@ -1915,6 +1919,7 @@ var Plottable;
             __extends(Time, _super);
             function Time(scale) {
                 _super.call(this, scale == null ? d3.time.scale() : scale);
+                this._typeCoercer = function (d) { return d._isAMomentObject || d instanceof Date ? d : new Date(d); };
             }
             Time.prototype._tickInterval = function (interval, step) {
                 var tempScale = d3.time.scale();
@@ -1922,16 +1927,9 @@ var Plottable;
                 tempScale.range(this.range());
                 return tempScale.ticks(interval.range, step);
             };
-            Time.prototype.domain = function (values) {
-                if (values == null) {
-                    return _super.prototype.domain.call(this);
-                }
-                else {
-                    if (typeof (values[0]) === "string") {
-                        values = values.map(function (d) { return new Date(d); });
-                    }
-                    return _super.prototype.domain.call(this, values);
-                }
+            Time.prototype._setDomain = function (values) {
+                values = values.map(this._typeCoercer);
+                return _super.prototype._setDomain.call(this, values);
             };
             Time.prototype.copy = function () {
                 return new Time(this._d3Scale.copy());
@@ -4465,7 +4463,7 @@ var Plottable;
             Plot.prototype._updateProjector = function (attr) {
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
-                    var extent = this.dataset()._getExtent(projector.accessor);
+                    var extent = this.dataset()._getExtent(projector.accessor, projector.scale._typeCoercer);
                     if (extent.length === 0 || !this._isAnchored) {
                         projector.scale._removeExtent(this._plottableID.toString(), attr);
                     }
@@ -4625,7 +4623,7 @@ var Plottable;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
                     this._key2DatasetDrawerKey.forEach(function (key, ddk) {
-                        var extent = ddk.dataset._getExtent(projector.accessor);
+                        var extent = ddk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer);
                         var scaleKey = _this._plottableID.toString() + "_" + key;
                         if (extent.length === 0 || !_this._isAnchored) {
                             projector.scale._removeExtent(scaleKey, attr);
@@ -5164,7 +5162,7 @@ var Plottable;
                 _super.prototype._updateYDomainer.call(this);
                 var y0Projector = this._projectors["y0"];
                 var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
-                var extent = y0Accessor != null ? this.dataset()._getExtent(y0Accessor) : [];
+                var extent = y0Accessor != null ? this.dataset()._getExtent(y0Accessor, this._yScale._typeCoercer) : [];
                 var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
                 if (!this._yScale._userSetDomainer) {
                     if (constantBaseline != null) {

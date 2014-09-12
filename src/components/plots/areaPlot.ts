@@ -47,7 +47,7 @@ export module Plot {
 
       var y0Projector = this._projectors["y0"];
       var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
-      var extent:  number[] = y0Accessor != null ? this.dataset()._getExtent(y0Accessor) : [];
+      var extent:  number[] = y0Accessor != null ? this.dataset()._getExtent(y0Accessor, this._yScale._typeCoercer) : [];
       var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
 
       if (!this._yScale._userSetDomainer) {
