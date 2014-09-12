@@ -28,11 +28,11 @@ describe("_Util.DOM", () => {
 
     var removedSVG = generateSVG().remove();
     var rect = removedSVG.append("rect").attr(expectedBox);
-    Plottable._Util.DOM.getBBox(rect); // could throw errors
+    Plottable._Util.DOM.getBBox(rect); // could throw NS_ERROR on FF
 
     var noneSVG = generateSVG().style("display", "none");
     rect = noneSVG.append("rect").attr(expectedBox);
-    Plottable._Util.DOM.getBBox(rect); // could throw errors
+    Plottable._Util.DOM.getBBox(rect); // could throw NS_ERROR on FF
 
     noneSVG.remove();
   });

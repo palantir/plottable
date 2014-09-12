@@ -9,7 +9,7 @@ export module _Util {
      */
     export function getBBox(element: D3.Selection): SVGRect {
       var bbox: SVGRect;
-      // Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
+      // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
       try {
         bbox = (<any> element.node()).getBBox();
       } catch (err) {
