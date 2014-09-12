@@ -208,7 +208,7 @@ export module Abstract {
         } else {
           selection = d3.select(element);
         }
-        if (!element.node() || element.node().nodeName !== "svg") {
+        if (!selection.node() || selection.node().nodeName !== "svg") {
           throw new Error("Plottable requires a valid SVG to renderTo");
         }
         this._anchor(selection);
