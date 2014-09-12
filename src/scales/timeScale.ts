@@ -3,6 +3,8 @@
 module Plottable {
 export module Scale {
   export class Time extends Abstract.QuantitativeScale<any> {
+    public _typeCoercer = (d: any) => d._isAMomentObject || d instanceof Date ? d : new Date(d);
+
     /**
      * Constructs a TimeScale.
      *
@@ -26,18 +28,10 @@ export module Scale {
       return tempScale.ticks(interval.range, step);
     }
 
-    public domain(): any[];
-    public domain(values: any[]): Time;
-    public domain(values?: any[]): any {
-      if (values == null) {
-        return super.domain();
-      } else {
-        // attempt to parse dates
-        if (typeof(values[0]) === "string") {
-          values = values.map((d: any) => new Date(d));
-        }
-        return super.domain(values);
-      }
+    public _setDomain(values: any[]) {
+      // attempt to parse dates
+      values = values.map(this._typeCoercer);
+      return super._setDomain(values);
     }
 
     public copy(): Time {

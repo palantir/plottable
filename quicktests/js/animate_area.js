@@ -18,7 +18,7 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   var areaRenderer = new Plottable.Plot.Area(data[0].slice(0, 20), xScale, yScale);
-  areaRenderer.project("opacity", 0.75);
+  areaRenderer.attr("opacity", 0.75);
   areaRenderer.animate(doAnimate);
 
   var areaChart = new Plottable.Component.Table([[yAxis, areaRenderer],
@@ -27,11 +27,11 @@ function run(div, data, Plottable) {
   areaChart.renderTo(svg);
 
   var cb = function(x, y){
-    d = areaRenderer.dataset().data();
+    var d = areaRenderer.dataset().data();
     areaRenderer.dataset().data(d);
   };
 
-  new Plottable.Interaction.Click(areaRenderer)
-    .callback(cb)
-    .registerWithComponent();
+  areaRenderer.registerInteraction(
+    new Plottable.Interaction.Click(areaRenderer).callback(cb)
+  );
 }

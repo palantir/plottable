@@ -24,47 +24,43 @@ function run(div, data, Plottable) {
   var renderGroup = gridlines.merge(barPlot);
   var title = new Plottable.Component.TitleLabel("reset");
 
-  new Plottable.Template.StandardChart()
-                .titleLabel(title)
-                .xAxis(xAxis).yAxis(yAxis)
-                .center(renderGroup)
-                .renderTo(svg);
+  var chart = new Plottable.Component.Table([
+                                            [null, title],
+                                            [yAxis, renderGroup],
+                                            [null,  xAxis]]).renderTo(svg);
 
-//callbacks
-  var cb_drag = function(xy) {
-      if (xy == null) {return;}
-      var invertedXMin = xScale.invert(xy.xMin);
-      var invertedXMax = xScale.invert(xy.xMax);
-      var invertedYMin = yScale.invert(xy.yMax);
-      var invertedYMax = yScale.invert(xy.yMin);
-      barPlot.selectBar({min: xy.xMin, max: xy.xMax},
-                             {min: xy.yMin, max: xy.yMax},
-                             true);
-      drag_interaction.clearBox();
+  //callbacks
+  var dragBox = new Plottable.Interaction.XYDragBox();
+  var cb_drag = function(start, end) {
+    var minX = Math.min(start.x, end.x);
+    var maxX = Math.max(start.x, end.x);
+    var minY = Math.min(start.y, end.y);
+    var maxY = Math.max(start.y, end.y);
+
+    barPlot.selectBar({min: minX, max: maxX},
+                      {min: minY, max: maxY},
+                      true);
   };
+  dragBox.dragend(cb_drag);
 
-  var cb_click = function(x, y) {
-      barPlot.selectBar(x, y, true);
+  var cb_click = function(p) {
+      barPlot.selectBar(p.x, p.y, true);
   };
 
   var cb_reset = function() {
-      barPlot.deselectAll();
+    barPlot.deselectAll();
+    dragBox.clearBox();
   };
 
     //register interactions
-  var drag_interaction = new
-  Plottable.Interaction.XYDragBox(renderGroup)
-            .dragend(cb_drag)
-            .registerWithComponent();
+  renderGroup.registerInteraction(dragBox);
 
-  var click_interaction = new
-  Plottable.Interaction.Click(renderGroup)
-            .callback(cb_click)
-            .registerWithComponent();
+  renderGroup.registerInteraction(
+    new Plottable.Interaction.Click().callback(cb_click)
+  );
 
-  var reset_interaction = new
-  Plottable.Interaction.Click(title)
-            .callback(cb_reset)
-            .registerWithComponent();
+  title.registerInteraction(
+    new Plottable.Interaction.Click(title).callback(cb_reset)
+  );
 
 }

@@ -30,7 +30,7 @@
   "dependencies": {
     "d3": "3.4.11"
   },
-  "homepage": "palantir.github.io/plottable",
+  "homepage": "plottablejs.org",
   "repository": {
     "type": "git",
     "url": "git://github.com/palantir/plottable.git"

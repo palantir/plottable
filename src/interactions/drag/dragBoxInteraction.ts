@@ -56,10 +56,10 @@ export module Interaction {
       return this;
     }
 
-    public _anchor(hitBox: D3.Selection) {
-      super._anchor(hitBox);
+    public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
+      super._anchor(component, hitBox);
       var cname = DragBox.CLASS_DRAG_BOX;
-      var background = this.componentToListenTo._backgroundContainer;
+      var background = this._componentToListenTo._backgroundContainer;
       this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
       return this;
     }

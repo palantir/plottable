@@ -17,7 +17,7 @@ function run(div, data, Plottable) {
   var xScale = new Plottable.Scale.Time();
   var yScale = new Plottable.Scale.Linear();
   var linePlot = new Plottable.Plot.Line(dataPts, xScale, yScale)
-                              .project("x", function (d) { return d3.time.format("%x").parse(d.x);}, xScale);
+                              .attr("x", function (d) { return d3.time.format("%x").parse(d.x);}, xScale);
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 

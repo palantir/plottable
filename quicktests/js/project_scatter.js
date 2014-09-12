@@ -39,9 +39,9 @@ function run(div, data, Plottable) {
 
     //rendering
     var renderAreaD1 = new Plottable.Plot.Scatter(dataseries1, xScale, yScale)
-                                    .project("r", widthProjector)
-                                    .project("fill", colorProjector)
-                                    .project("opacity", opacityProjector)
+                                    .attr("r", widthProjector)
+                                    .attr("fill", colorProjector)
+                                    .attr("opacity", opacityProjector)
                                     .animate(true);
 
     //title + legend

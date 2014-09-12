@@ -159,6 +159,21 @@ describe("Scales", () => {
       scale.domain([-1, 5]);
       assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
     });
+
+    it("autoranges appropriately even if stringy numbers are projected", () => {
+      var sadTimesData = ["999", "10", "100", "1000", "2", "999"];
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      var plot = new Plottable.Plot.Scatter(sadTimesData, xScale, yScale);
+      var id = (d: any) => d;
+      xScale.domainer(new Plottable.Domainer()); // to disable padding, etc
+      plot.project("x", id, xScale);
+      plot.project("y", id, yScale);
+      var svg = generateSVG();
+      plot.renderTo(svg);
+      assert.deepEqual(xScale.domain(), [2, 1000], "the domain was calculated appropriately");
+      svg.remove();
+    });
   });
 
   describe("Ordinal Scales", () => {
