@@ -208,12 +208,8 @@ export module Abstract {
         } else {
           selection = d3.select(element);
         }
-        if (!element.node()) {
-          throw new Error("Plottable requires a valid selection to renderTo");
-        }
-        if (element.node().nodeName !== "svg") {
-          _Util.Methods.warn("Plottable expects to be placed in a SVG. Auto-generating one for you...");
-          selection = selection.append("svg");
+        if (!element.node() || element.node().nodeName !== "svg") {
+          throw new Error("Plottable requires a valid SVG to renderTo");
         }
         this._anchor(selection);
       }
