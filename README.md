@@ -5,7 +5,7 @@ Overview
 ---
 
 Plottable.js is a library of chart components for creating flexible, custom charts for websites. It is built on top of [D3.js](http://d3js.org/) and provides higher-level pieces, like plots, gridlines, and axes. As such, it's easier to quickly build charts than with D3, and the charts are much
-more flexible than standard-template charts provided by charting libraries. You can think of Plottable as a "D3 for Charts" - it is not a charting library so much as a set of tools that can be flexibly used to create charts. Check out examples of Plottable on our website's [examples page](http://plottablejs.org/examples/).
+more flexible than standard-template charts provided by charting libraries. You can think of Plottable as a "D3 for Charts" - it is not a charting library but a library of chart components. Check out examples of Plottable on our website's [examples page](http://plottablejs.org/examples/).
 
 Philosophy
 ---
@@ -38,7 +38,6 @@ Development
 - Install global dependencies `sudo npm install grunt grunt-cli typescript -g`
 - Install local dependencies `npm install`
 - Run `grunt` and it will spin up a server (pointed at localhost:9999) and begin compiling the typescript code
-- For local experimentation, the source files are individually compiled to their own javascript files, with `plottable_multifile.js` responsible for loading them together when ready
 
 Contributing
 ---
