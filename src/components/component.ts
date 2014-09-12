@@ -211,6 +211,10 @@ export module Abstract {
         if (!element.node()) {
           throw new Error("Plottable requires a valid selection to renderTo");
         }
+        if (element.node().nodeName !== "svg") {
+          _Util.Methods.warn("Plottable expects to be placed in a SVG. Auto-generating one for you...");
+          selection = selection.append("svg");
+        }
         this._anchor(selection);
       }
       this._computeLayout();
