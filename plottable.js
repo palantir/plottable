@@ -680,7 +680,19 @@ var Plottable;
     (function (_Util) {
         (function (DOM) {
             function getBBox(element) {
-                return element.node().getBBox();
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
             }
             DOM.getBBox = getBBox;
             DOM.POLYFILL_TIMEOUT_MSEC = 1000 / 60;

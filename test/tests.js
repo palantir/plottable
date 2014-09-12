@@ -4287,11 +4287,31 @@ var assert = chai.assert;
 describe("_Util.DOM", function () {
     it("getBBox works properly", function () {
         var svg = generateSVG();
-        var rect = svg.append("rect").attr("x", 0).attr("y", 0).attr("width", 5).attr("height", 5);
-        var bb1 = Plottable._Util.DOM.getBBox(rect);
-        var bb2 = rect.node().getBBox();
-        assert.deepEqual(bb1, bb2);
+        var expectedBox = {
+            x: 0,
+            y: 0,
+            width: 40,
+            height: 20
+        };
+        var rect = svg.append("rect").attr(expectedBox);
+        var measuredBox = Plottable._Util.DOM.getBBox(rect);
+        assert.deepEqual(measuredBox, expectedBox, "getBBox measures correctly");
         svg.remove();
+    });
+    it("getBBox does not fail on disconnected and display:none nodes", function () {
+        var expectedBox = {
+            x: 0,
+            y: 0,
+            width: 40,
+            height: 20
+        };
+        var removedSVG = generateSVG().remove();
+        var rect = removedSVG.append("rect").attr(expectedBox);
+        Plottable._Util.DOM.getBBox(rect);
+        var noneSVG = generateSVG().style("display", "none");
+        rect = noneSVG.append("rect").attr(expectedBox);
+        Plottable._Util.DOM.getBBox(rect);
+        noneSVG.remove();
     });
     describe("getElementWidth, getElementHeight", function () {
         it("can get a plain element's size", function () {
