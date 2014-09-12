@@ -5,7 +5,7 @@ Overview
 ---
 
 Plottable.js is a library of chart components for creating flexible, custom charts for websites. It is built on top of [D3.js](http://d3js.org/) and provides higher-level pieces, like plots, gridlines, and axes. As such, it's easier to quickly build charts than with D3, and the charts are much
-more flexible than standard-template charts provided by charting libraries. You can think of Plottable as like a "D3 for Charts" - it is not a charting library so much as a set of tools that can be flexibly used to create charts. Check out examples of Plottable on our website's [examples page](http://plottablejs.org/examples/).
+more flexible than standard-template charts provided by charting libraries. You can think of Plottable as a "D3 for Charts" - it is not a charting library so much as a set of tools that can be flexibly used to create charts. Check out examples of Plottable on our website's [examples page](http://plottablejs.org/examples/).
 
 Philosophy
 ---
@@ -25,7 +25,11 @@ If you just want to create a simple LineChart, ScatterPlot, or BarChart without 
 
 We Want To Help!
 ---
-If you run into any problems using Plottable, please let us know. We want Plottable to be easy-to-use, so if you are getting confused, it is our fault, not yours. [Create an issue](https://github.com/palantir/plottable/issues) and we'll help you fix things, and fix the bug, or add a more helpful error message, or improve our documentation.
+If you run into any problems using Plottable, please let us know. We want Plottable to be easy-to-use, so if you are getting confused, it is our fault, not yours. [Create an issue](https://github.com/palantir/plottable/issues) and we'll be happy to help you out.
+
+API Changes in Progress
+---
+Please be aware: as of 9/12/2014, there is currently an API change underway. In the near future, plots like `Plot.Scatter` and `Plot.Line` will receive data differently, so that they can maintain multiple datasets instead of being stuck with only one. For more details, [see the API change proposal](https://github.com/palantir/plottable/wiki/Proposed-API-Change:-Multi-dataset-Plots).
 
 Development
 ---
