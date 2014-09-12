@@ -17,7 +17,7 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   var lineRenderer = new Plottable.Plot.Line(data[0].slice(0, 20), xScale, yScale);
-  lineRenderer.project("opacity", 0.75);
+  lineRenderer.attr("opacity", 0.75);
   lineRenderer.animate(doAnimate);
 
   var lineChart = new Plottable.Component.Table([[yAxis, lineRenderer],
@@ -29,7 +29,7 @@ function run(div, data, Plottable) {
     lineRenderer.dataset().data(d);
   };
 
-  var xy = new Plottable.Interaction.Click(lineRenderer)
-    .callback(cb)
-    .registerWithComponent();
+  lineRenderer.registerInteraction(
+    new Plottable.Interaction.Click(lineRenderer).callback(cb)
+  );
 }

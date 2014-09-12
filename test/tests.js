@@ -106,7 +106,7 @@ function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
 }
 
 before(function () {
-    Plottable.Core.RenderController.setRenderPolicy(new Plottable.Core.RenderController.RenderPolicy.Immediate());
+    Plottable.Core.RenderController.setRenderPolicy("immediate");
     window.Pixel_CloseTo_Requirement = window.PHANTOMJS ? 2 : 0.5;
 });
 after(function () {
@@ -3281,22 +3281,24 @@ describe("Component behavior", function () {
         svg.remove();
         svg = generateSVG();
         c = new Plottable.Abstract.Component();
-        var i = new Plottable.Abstract.Interaction(c).registerWithComponent();
+        var i = new Plottable.Abstract.Interaction();
+        c.registerInteraction(i);
         c._anchor(svg);
         verifyHitbox(c);
         svg.remove();
         svg = generateSVG();
         c = new Plottable.Abstract.Component();
         c._anchor(svg);
-        i = new Plottable.Abstract.Interaction(c).registerWithComponent();
+        i = new Plottable.Abstract.Interaction();
+        c.registerInteraction(i);
         verifyHitbox(c);
         svg.remove();
     });
     it("interaction registration works properly", function () {
         var hitBox1 = null;
         var hitBox2 = null;
-        var interaction1 = { _anchor: function (hb) { return hitBox1 = hb.node(); } };
-        var interaction2 = { _anchor: function (hb) { return hitBox2 = hb.node(); } };
+        var interaction1 = { _anchor: function (comp, hb) { return hitBox1 = hb.node(); } };
+        var interaction2 = { _anchor: function (comp, hb) { return hitBox2 = hb.node(); } };
         c.registerInteraction(interaction1);
         c.renderTo(svg);
         c.registerInteraction(interaction2);
@@ -3404,17 +3406,21 @@ describe("Dataset", function () {
     it("_getExtent works as expected", function () {
         var data = [1, 2, 3, 4, 1];
         var metadata = { foo: 11 };
+        var id = function (d) { return d; };
         var dataset = new Plottable.Dataset(data, metadata);
         var plot = new Plottable.Abstract.Plot(dataset);
         var apply = function (a) { return Plottable._Util.Methods._applyAccessor(a, plot); };
         var a1 = function (d, i, m) { return d + i - 2; };
-        assert.deepEqual(dataset._getExtent(apply(a1)), [-1, 5], "extent for numerical data works properly");
+        assert.deepEqual(dataset._getExtent(apply(a1), id), [-1, 5], "extent for numerical data works properly");
         var a2 = function (d, i, m) { return d + m.foo; };
-        assert.deepEqual(dataset._getExtent(apply(a2)), [12, 15], "extent uses metadata appropriately");
+        assert.deepEqual(dataset._getExtent(apply(a2), id), [12, 15], "extent uses metadata appropriately");
         dataset.metadata({ foo: -1 });
-        assert.deepEqual(dataset._getExtent(apply(a2)), [0, 3], "metadata change is reflected in extent results");
+        assert.deepEqual(dataset._getExtent(apply(a2), id), [0, 3], "metadata change is reflected in extent results");
         var a3 = function (d, i, m) { return "_" + d; };
-        assert.deepEqual(dataset._getExtent(apply(a3)), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
+        assert.deepEqual(dataset._getExtent(apply(a3), id), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
+        var a_toString = function (d) { return (d + 2).toString(); };
+        var coerce = function (d) { return +d; };
+        assert.deepEqual(dataset._getExtent(apply(a_toString), coerce), [3, 6], "type coercion works as expected");
     });
 });
 
@@ -4008,6 +4014,20 @@ describe("Scales", function () {
             scale.domain([-1, 5]);
             assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
         });
+        it("autoranges appropriately even if stringy numbers are projected", function () {
+            var sadTimesData = ["999", "10", "100", "1000", "2", "999"];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Scatter(sadTimesData, xScale, yScale);
+            var id = function (d) { return d; };
+            xScale.domainer(new Plottable.Domainer());
+            plot.project("x", id, xScale);
+            plot.project("y", id, yScale);
+            var svg = generateSVG();
+            plot.renderTo(svg);
+            assert.deepEqual(xScale.domain(), [2, 1000], "the domain was calculated appropriately");
+            svg.remove();
+        });
     });
     describe("Ordinal Scales", function () {
         it("defaults to \"bands\" range type", function () {
@@ -4434,6 +4454,11 @@ describe("Formatters", function () {
             percentFormatter = Plottable.Formatters.percentage(2);
             var result2 = percentFormatter(0.0035);
             assert.strictEqual(result2, "0.35%", "works even if multiplying by 100 does not make it an integer");
+        });
+        it("onlyShowUnchanged set to false", function () {
+            var percentFormatter = Plottable.Formatters.percentage(0, false);
+            var result = percentFormatter(0.075);
+            assert.strictEqual(result, "8%", "shows formatter changed value");
         });
     });
     describe("time", function () {
@@ -4999,8 +5024,8 @@ describe("Interactions", function () {
             renderer.renderTo(svg);
             var xDomainBefore = xScale.domain();
             var yDomainBefore = yScale.domain();
-            var interaction = new Plottable.Interaction.PanZoom(renderer, xScale, yScale);
-            interaction.registerWithComponent();
+            var interaction = new Plottable.Interaction.PanZoom(xScale, yScale);
+            renderer.registerInteraction(interaction);
             var hb = renderer._element.select(".hit-box").node();
             var dragDistancePixelX = 10;
             var dragDistancePixelY = 20;
@@ -5045,8 +5070,8 @@ describe("Interactions", function () {
             yScale = new Plottable.Scale.Linear();
             renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
             renderer.renderTo(svg);
-            interaction = new Plottable.Interaction.XYDragBox(renderer);
-            interaction.registerWithComponent();
+            interaction = new Plottable.Interaction.XYDragBox();
+            renderer.registerInteraction(interaction);
         });
         afterEach(function () {
             interaction.dragstart(null);
@@ -5115,8 +5140,8 @@ describe("Interactions", function () {
             yScale = new Plottable.Scale.Linear();
             renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
             renderer.renderTo(svg);
-            interaction = new Plottable.Interaction.YDragBox(renderer);
-            interaction.registerWithComponent();
+            interaction = new Plottable.Interaction.YDragBox();
+            renderer.registerInteraction(interaction);
         });
         afterEach(function () {
             interaction.dragstart(null);
@@ -5165,13 +5190,13 @@ describe("Interactions", function () {
             var component = new Plottable.Abstract.Component();
             component.renderTo(svg);
             var code = 65;
-            var ki = new Plottable.Interaction.Key(component, code);
+            var ki = new Plottable.Interaction.Key(code);
             var callbackCalled = false;
             var callback = function () {
                 callbackCalled = true;
             };
             ki.callback(callback);
-            ki.registerWithComponent();
+            component.registerInteraction(ki);
             var $hitbox = $(component.hitBox.node());
             $hitbox.simulate("keydown", { keyCode: code });
             assert.isFalse(callbackCalled, "callback is not called if component does not have mouse focus (before mouseover)");
@@ -5201,7 +5226,7 @@ describe("Interactions", function () {
         });
         it("hoverMode()", function () {
             var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
-            var bhi = new Plottable.Interaction.BarHover(barPlot);
+            var bhi = new Plottable.Interaction.BarHover();
             bhi.hoverMode("line");
             bhi.hoverMode("POINT");
             assert.throws(function () { return bhi.hoverMode("derp"); }, "not a valid");
@@ -5210,7 +5235,7 @@ describe("Interactions", function () {
             var svg = generateSVG(400, 400);
             var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
             barPlot.project("x", "name", ordinalScale).project("y", "value", linearScale);
-            var bhi = new Plottable.Interaction.BarHover(barPlot);
+            var bhi = new Plottable.Interaction.BarHover();
             var barDatum = null;
             bhi.onHover(function (datum, bar) {
                 barDatum = datum;
@@ -5221,7 +5246,7 @@ describe("Interactions", function () {
                 unhoverCalled = true;
             });
             barPlot.renderTo(svg);
-            bhi.registerWithComponent();
+            barPlot.registerInteraction(bhi);
             var hitbox = barPlot._element.select(".hit-box");
             triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
@@ -5252,7 +5277,7 @@ describe("Interactions", function () {
             var svg = generateSVG(400, 400);
             var barPlot = new Plottable.Plot.HorizontalBar(dataset, linearScale, ordinalScale);
             barPlot.project("y", "name", ordinalScale).project("x", "value", linearScale);
-            var bhi = new Plottable.Interaction.BarHover(barPlot);
+            var bhi = new Plottable.Interaction.BarHover();
             var barDatum = null;
             bhi.onHover(function (datum, bar) {
                 barDatum = datum;
@@ -5262,7 +5287,7 @@ describe("Interactions", function () {
                 unhoverCalled = true;
             });
             barPlot.renderTo(svg);
-            bhi.registerWithComponent();
+            barPlot.registerInteraction(bhi);
             var hitbox = barPlot._element.select(".hit-box");
             triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");

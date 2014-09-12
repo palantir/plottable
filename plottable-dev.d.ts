@@ -400,7 +400,7 @@ declare module Plottable {
         (d: any): string;
     }
     var MILLISECONDS_IN_ONE_DAY: number;
-    class Formatters {
+    module Formatters {
         /**
         * Creates a formatter for currency values.
         *
@@ -411,7 +411,7 @@ declare module Plottable {
         *
         * @returns {Formatter} A formatter for currency values.
         */
-        static currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
+        function currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
         /**
         * Creates a formatter that displays exactly [precision] decimal places.
         *
@@ -420,7 +420,7 @@ declare module Plottable {
         *
         * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
         */
-        static fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
         /**
         * Creates a formatter that formats numbers to show no more than
         * [precision] decimal places. All other values are stringified.
@@ -430,13 +430,13 @@ declare module Plottable {
         *
         * @returns {Formatter} A formatter for general values.
         */
-        static general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
         /**
         * Creates a formatter that stringifies its input.
         *
         * @returns {Formatter} A formatter that stringifies its input.
         */
-        static identity(): (d: any) => string;
+        function identity(): (d: any) => string;
         /**
         * Creates a formatter for percentage values.
         * Multiplies the input by 100 and appends "%".
@@ -446,7 +446,7 @@ declare module Plottable {
         *
         * @returns {Formatter} A formatter for percentage values.
         */
-        static percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
         /**
         * Creates a formatter for values that displays [precision] significant figures
         * and puts SI notation.
@@ -455,13 +455,13 @@ declare module Plottable {
         *
         * @returns {Formatter} A formatter for SI values.
         */
-        static siSuffix(precision?: number): (d: any) => string;
+        function siSuffix(precision?: number): (d: any) => string;
         /**
         * Creates a formatter that displays dates.
         *
         * @returns {Formatter} A formatter for time/date values.
         */
-        static time(): (d: any) => string;
+        function time(): (d: any) => string;
         /**
         * Creates a formatter for relative dates.
         *
@@ -471,7 +471,7 @@ declare module Plottable {
         *
         * @returns {Formatter} A formatter for time/date values.
         */
-        static relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
+        function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
     }
 }
 
@@ -635,7 +635,7 @@ declare module Plottable {
         * @returns {Dataset} The calling Dataset.
         */
         public metadata(metadata: any): Dataset;
-        public _getExtent(accessor: _IAccessor): any[];
+        public _getExtent(accessor: _IAccessor, typeCoercer: (d: any) => any): any[];
     }
 }
 
@@ -701,7 +701,8 @@ declare module Plottable {
         */
         module RenderController {
             var _renderPolicy: RenderPolicy.IRenderPolicy;
-            function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): any;
+            function setRenderPolicy(policy: string): void;
+            function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): void;
             /**
             * If the RenderController is enabled, we enqueue the component for
             * render. Otherwise, it is rendered immediately.
@@ -971,6 +972,7 @@ declare module Plottable {
             public _rendererAttrID2Extent: {
                 [rendererAttrID: string]: D[];
             };
+            public _typeCoercer: (d: any) => any;
             /**
             * Constructs a new Scale.
             *
@@ -1080,6 +1082,7 @@ declare module Plottable {
             public _PADDING_FOR_IDENTICAL_DOMAIN: number;
             public _userSetDomainer: boolean;
             public _domainer: Domainer;
+            public _typeCoercer: (d: any) => number;
             /**
             * Constructs a new QuantitativeScale.
             *
@@ -1288,6 +1291,7 @@ declare module Plottable {
     module Scale {
         class Ordinal extends Abstract.Scale<string, number> {
             public _d3Scale: D3.Scale.OrdinalScale;
+            public _typeCoercer: (d: any) => any;
             /**
             * Creates an OrdinalScale.
             *
@@ -1357,6 +1361,7 @@ declare module Plottable {
 declare module Plottable {
     module Scale {
         class Time extends Abstract.QuantitativeScale<any> {
+            public _typeCoercer: (d: any) => any;
             /**
             * Constructs a TimeScale.
             *
@@ -1368,8 +1373,7 @@ declare module Plottable {
             constructor();
             constructor(scale: D3.Scale.LinearScale);
             public _tickInterval(interval: D3.Time.Interval, step?: number): any[];
-            public domain(): any[];
-            public domain(values: any[]): Time;
+            public _setDomain(values: any[]): void;
             public copy(): Time;
             public _defaultExtent(): any[];
         }
@@ -2422,7 +2426,7 @@ declare module Plottable {
             *
             * Here's a common use case:
             * ```typescript
-            * plot.project("r", function(d) { return d.foo; });
+            * plot.attr("r", function(d) { return d.foo; });
             * ```
             * This will set the radius of each datum `d` to be `d.foo`.
             *
@@ -2439,6 +2443,10 @@ declare module Plottable {
             * is passed through the scale, such as `scale.scale(accessor(d, i))`.
             *
             * @returns {Plot} The calling Plot.
+            */
+            public attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
+            /**
+            * Identical to plot.attr
             */
             public project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
             public _generateAttrToProjector(): IAttributeToProjector;
@@ -3146,7 +3154,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Interaction {
+        class Interaction extends PlottableObject {
             /**
             * It maintains a 'hitBox' which is where all event listeners are
             * attached. Due to cross- browser weirdness, the hitbox needs to be an
@@ -3154,29 +3162,9 @@ declare module Plottable {
             * "foreground" and "background" elements where it can draw things,
             * e.g. crosshairs.
             */
-            public hitBox: D3.Selection;
-            public componentToListenTo: Component;
-            /**
-            * Creates an Interaction.
-            *
-            * Some Interactions include Interaction.PanZoom and
-            * Interaction.DragBox. Interactions listen on events and do something that
-            * would be annoying to write by hand, such as pan/zoom. Many Interactions
-            * can have event listeners, such as a DragBox having listeners trigger
-            * each time the box changes size.
-            *
-            * @constructor
-            * @param {Component} componentToListenTo The component to listen for
-            * interactions on.
-            */
-            constructor(componentToListenTo: Component);
-            public _anchor(hitBox: D3.Selection): void;
-            /**
-            * Registers the Interaction on the Component it's listening to.
-            * This needs to be called to activate the interaction.
-            * @returns {Interaction} The calling Interaction.
-            */
-            public registerWithComponent(): Interaction;
+            public _hitBox: D3.Selection;
+            public _componentToListenTo: Component;
+            public _anchor(component: Component, hitBox: D3.Selection): void;
         }
     }
 }
@@ -3185,47 +3173,17 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Click extends Abstract.Interaction {
-            /**
-            * Creates a ClickInteraction.
-            *
-            * @constructor
-            * @param {Component} componentToListenTo The component to listen for clicks on.
-            */
-            constructor(componentToListenTo: Abstract.Component);
-            public _anchor(hitBox: D3.Selection): void;
+            public _anchor(component: Abstract.Component, hitBox: D3.Selection): void;
             public _listenTo(): string;
             /**
             * Sets a callback to be called when a click is received.
             *
-            * @param {(x: number, y: number) => any} cb Callback to be called. Takes click x and y in pixels.
+            * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
             */
-            public callback(cb: (x: number, y: number) => any): Click;
+            public callback(cb: (p: Point) => any): Click;
         }
         class DoubleClick extends Click {
-            /**
-            * Creates a DoubleClickInteraction.
-            *
-            * @constructor
-            * @param {Component} componentToListenTo The component to listen for clicks on.
-            */
-            constructor(componentToListenTo: Abstract.Component);
             public _listenTo(): string;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
-        class Mousemove extends Abstract.Interaction {
-            /**
-            * Deprecated.
-            *
-            * @constructor
-            */
-            constructor(componentToListenTo: Abstract.Component);
-            public _anchor(hitBox: D3.Selection): void;
-            public mousemove(x: number, y: number): void;
         }
     }
 }
@@ -3241,11 +3199,10 @@ declare module Plottable {
             * moused over.
             *
             * @constructor
-            * @param {Component} componentToListenTo The component to listen for keypresses on.
             * @param {number} keyCode The key code to listen for.
             */
-            constructor(componentToListenTo: Abstract.Component, keyCode: number);
-            public _anchor(hitBox: D3.Selection): void;
+            constructor(keyCode: number);
+            public _anchor(component: Abstract.Component, hitBox: D3.Selection): void;
             /**
             * Sets a callback to be called when the designated key is pressed and the
             * user is moused over the component.
@@ -3271,16 +3228,15 @@ declare module Plottable {
             * does so by changing the xScale and yScales' domains repeatedly.
             *
             * @constructor
-            * @param {Component} componentToListenTo The component to listen for interactions on.
             * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
             * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
             */
-            constructor(componentToListenTo: Abstract.Component, xScale?: Abstract.QuantitativeScale<any>, yScale?: Abstract.QuantitativeScale<any>);
+            constructor(xScale?: Abstract.QuantitativeScale<any>, yScale?: Abstract.QuantitativeScale<any>);
             /**
             * Sets the scales back to their original domains.
             */
             public resetZoom(): void;
-            public _anchor(hitBox: D3.Selection): void;
+            public _anchor(component: Abstract.Component, hitBox: D3.Selection): void;
         }
     }
 }
@@ -3289,14 +3245,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class BarHover extends Abstract.Interaction {
-            public componentToListenTo: Abstract.BarPlot<any, any>;
-            /**
-            * Creates a new BarHover Interaction.
-            *
-            * @param {BarPlot} barPlot The Bar Plot to listen for hover events on.
-            */
-            constructor(barPlot: Abstract.BarPlot<any, any>);
-            public _anchor(hitBox: D3.Selection): void;
+            public _componentToListenTo: Abstract.BarPlot<any, any>;
+            public _anchor(barPlot: Abstract.BarPlot<any, any>, hitBox: D3.Selection): void;
             /**
             * Gets the current hover mode.
             *
@@ -3342,11 +3292,8 @@ declare module Plottable {
             public _location: number[];
             /**
             * Constructs a Drag. A Drag will signal its callbacks on mouse drag.
-            *
-            * @param {Component} componentToListenTo The component to listen for
-            * interactions on.
             */
-            constructor(componentToListenTo: Abstract.Component);
+            constructor();
             /**
             * Gets the callback that is called when dragging starts.
             *
@@ -3392,7 +3339,7 @@ declare module Plottable {
             public _doDrag(): void;
             public _dragend(): void;
             public _doDragend(): void;
-            public _anchor(hitBox: D3.Selection): Drag;
+            public _anchor(component: Abstract.Component, hitBox: D3.Selection): Drag;
             /**
             * Sets up so that the xScale and yScale that are passed have their
             * domains automatically changed as you zoom.
@@ -3441,7 +3388,7 @@ declare module Plottable {
             * @returns {DragBox} The calling DragBox.
             */
             public setBox(x0: number, x1: number, y0: number, y1: number): DragBox;
-            public _anchor(hitBox: D3.Selection): DragBox;
+            public _anchor(component: Abstract.Component, hitBox: D3.Selection): DragBox;
         }
     }
 }
@@ -3570,93 +3517,6 @@ declare module Plottable {
             * @return {Mouse} The calling Mouse Handler.
             */
             public mouseout(callback: (location: Point) => any): Mouse;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Template {
-        class StandardChart extends Component.Table {
-            /**
-            * Creates a StandartChart.
-            *
-            * A StandardChart is a Component.Table with presets set to what users
-            * generally want.
-            *
-            * If you want to do this:
-            * ```typescript
-            * var table = new Table([[xAxis.merge(xLabel), plot.merge(title)],
-            *                        [null,                yAxis.merge(yLabel)]]);
-            * ```
-            * and laboriously create xLabel, xAxis, etc., you can do this:
-            * ```typescript
-            * var table = new StandardChart();
-            * table.xLabel("foo");
-            * table.xAxis(xAxis);
-            * ...
-            * ```
-            *
-            * StandardChart is what you should use if you just want a freakin'
-            * chart.
-            */
-            constructor();
-            public yAxis(): Abstract.Axis;
-            public yAxis(y: Abstract.Axis): StandardChart;
-            public xAxis(): Abstract.Axis;
-            public xAxis(x: Abstract.Axis): StandardChart;
-            /**
-            * @return {Component.AxisLabel} The label along the y-axis, such as
-            * "profit".
-            */
-            public yLabel(): Component.AxisLabel;
-            /**
-            * @param {Component.AxisLabel} y The desired label along the y-axis.
-            * @return {StandardChart} The calling StandardChart.
-            */
-            public yLabel(y: Component.AxisLabel): StandardChart;
-            /**
-            * @param {string} y The desired label along the y-axis. A
-            * Component.AxisLabel will be generated out of this string.
-            */
-            public yLabel(y: string): StandardChart;
-            /**
-            * @return {Component.AxisLabel} The label along the x-axis, such as
-            * "profit".
-            */
-            public xLabel(): Component.AxisLabel;
-            /**
-            * @param {Component.AxisLabel} x The desired label along the x-axis.
-            * @return {StandardChart} The calling StandardChart.
-            */
-            public xLabel(x: Component.AxisLabel): StandardChart;
-            /**
-            * @param {string} x The desired label along the x-axis. A
-            * Component.AxisLabel will be generated out of this string.
-            */
-            public xLabel(x: string): StandardChart;
-            /**
-            * @return {Component.TitleLabel} The label for the title, such as
-            * "profit".
-            */
-            public titleLabel(): Component.TitleLabel;
-            /**
-            * @param {Component.TitleLabel} x The desired label for the title.
-            * @return {StandardChart} The calling StandardChart.
-            */
-            public titleLabel(x: Component.TitleLabel): StandardChart;
-            /**
-            * @param {string} x The desired label for the title. A
-            * Component.TitleLabel will be generated out of this string.
-            */
-            public titleLabel(x: string): StandardChart;
-            /**
-            * Sets the component in the center, typically a plot.
-            *
-            * @param {Abstract.Component} c The component to place in the center.
-            * @return {StandardChart} The calling StandardChart.
-            */
-            public center(c: Abstract.Component): StandardChart;
         }
     }
 }

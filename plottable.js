@@ -1,5 +1,5 @@
 /*!
-Plottable 0.28.1 (https://github.com/palantir/plottable)
+Plottable 0.29.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1161,9 +1161,7 @@ var Plottable;
 (function (Plottable) {
     Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
 
-    var Formatters = (function () {
-        function Formatters() {
-        }
+    (function (Formatters) {
         /**
         * Creates a formatter for currency values.
         *
@@ -1174,7 +1172,7 @@ var Plottable;
         *
         * @returns {Formatter} A formatter for currency values.
         */
-        Formatters.currency = function (precision, symbol, prefix, onlyShowUnchanged) {
+        function currency(precision, symbol, prefix, onlyShowUnchanged) {
             if (typeof precision === "undefined") { precision = 2; }
             if (typeof symbol === "undefined") { symbol = "$"; }
             if (typeof prefix === "undefined") { prefix = true; }
@@ -1182,7 +1180,7 @@ var Plottable;
             var fixedFormatter = Formatters.fixed(precision);
             return function (d) {
                 var formattedValue = fixedFormatter(Math.abs(d));
-                if (onlyShowUnchanged && Formatters._valueChanged(Math.abs(d), formattedValue)) {
+                if (onlyShowUnchanged && valueChanged(Math.abs(d), formattedValue)) {
                     return "";
                 }
                 if (formattedValue !== "") {
@@ -1198,7 +1196,8 @@ var Plottable;
                 }
                 return formattedValue;
             };
-        };
+        }
+        Formatters.currency = currency;
 
         /**
         * Creates a formatter that displays exactly [precision] decimal places.
@@ -1208,18 +1207,19 @@ var Plottable;
         *
         * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
         */
-        Formatters.fixed = function (precision, onlyShowUnchanged) {
+        function fixed(precision, onlyShowUnchanged) {
             if (typeof precision === "undefined") { precision = 3; }
             if (typeof onlyShowUnchanged === "undefined") { onlyShowUnchanged = true; }
-            Formatters.verifyPrecision(precision);
+            verifyPrecision(precision);
             return function (d) {
                 var formattedValue = d.toFixed(precision);
-                if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+                if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
                     return "";
                 }
                 return formattedValue;
             };
-        };
+        }
+        Formatters.fixed = fixed;
 
         /**
         * Creates a formatter that formats numbers to show no more than
@@ -1230,15 +1230,15 @@ var Plottable;
         *
         * @returns {Formatter} A formatter for general values.
         */
-        Formatters.general = function (precision, onlyShowUnchanged) {
+        function general(precision, onlyShowUnchanged) {
             if (typeof precision === "undefined") { precision = 3; }
             if (typeof onlyShowUnchanged === "undefined") { onlyShowUnchanged = true; }
-            Formatters.verifyPrecision(precision);
+            verifyPrecision(precision);
             return function (d) {
                 if (typeof d === "number") {
                     var multiplier = Math.pow(10, precision);
                     var formattedValue = String(Math.round(d * multiplier) / multiplier);
-                    if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+                    if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
                         return "";
                     }
                     return formattedValue;
@@ -1246,18 +1246,20 @@ var Plottable;
                     return String(d);
                 }
             };
-        };
+        }
+        Formatters.general = general;
 
         /**
         * Creates a formatter that stringifies its input.
         *
         * @returns {Formatter} A formatter that stringifies its input.
         */
-        Formatters.identity = function () {
+        function identity() {
             return function (d) {
                 return String(d);
             };
-        };
+        }
+        Formatters.identity = identity;
 
         /**
         * Creates a formatter for percentage values.
@@ -1268,10 +1270,10 @@ var Plottable;
         *
         * @returns {Formatter} A formatter for percentage values.
         */
-        Formatters.percentage = function (precision, onlyShowUnchanged) {
+        function percentage(precision, onlyShowUnchanged) {
             if (typeof precision === "undefined") { precision = 0; }
             if (typeof onlyShowUnchanged === "undefined") { onlyShowUnchanged = true; }
-            var fixedFormatter = Formatters.fixed(precision);
+            var fixedFormatter = Formatters.fixed(precision, onlyShowUnchanged);
             return function (d) {
                 var valToFormat = d * 100;
 
@@ -1281,7 +1283,7 @@ var Plottable;
                 valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
 
                 var formattedValue = fixedFormatter(valToFormat);
-                if (onlyShowUnchanged && Formatters._valueChanged(valToFormat, formattedValue)) {
+                if (onlyShowUnchanged && valueChanged(valToFormat, formattedValue)) {
                     return "";
                 }
                 if (formattedValue !== "") {
@@ -1289,7 +1291,8 @@ var Plottable;
                 }
                 return formattedValue;
             };
-        };
+        }
+        Formatters.percentage = percentage;
 
         /**
         * Creates a formatter for values that displays [precision] significant figures
@@ -1299,20 +1302,21 @@ var Plottable;
         *
         * @returns {Formatter} A formatter for SI values.
         */
-        Formatters.siSuffix = function (precision) {
+        function siSuffix(precision) {
             if (typeof precision === "undefined") { precision = 3; }
-            Formatters.verifyPrecision(precision);
+            verifyPrecision(precision);
             return function (d) {
                 return d3.format("." + precision + "s")(d);
             };
-        };
+        }
+        Formatters.siSuffix = siSuffix;
 
         /**
         * Creates a formatter that displays dates.
         *
         * @returns {Formatter} A formatter for time/date values.
         */
-        Formatters.time = function () {
+        function time() {
             var numFormats = 8;
 
             // these defaults were taken from d3
@@ -1375,7 +1379,8 @@ var Plottable;
                     }
                 }
             };
-        };
+        }
+        Formatters.time = time;
 
         /**
         * Creates a formatter for relative dates.
@@ -1386,7 +1391,7 @@ var Plottable;
         *
         * @returns {Formatter} A formatter for time/date values.
         */
-        Formatters.relativeDate = function (baseValue, increment, label) {
+        function relativeDate(baseValue, increment, label) {
             if (typeof baseValue === "undefined") { baseValue = 0; }
             if (typeof increment === "undefined") { increment = Plottable.MILLISECONDS_IN_ONE_DAY; }
             if (typeof label === "undefined") { label = ""; }
@@ -1394,26 +1399,26 @@ var Plottable;
                 var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
                 return relativeDate.toString() + label;
             };
-        };
+        }
+        Formatters.relativeDate = relativeDate;
 
-        Formatters.verifyPrecision = function (precision) {
+        function verifyPrecision(precision) {
             if (precision < 0 || precision > 20) {
                 throw new RangeError("Formatter precision must be between 0 and 20");
             }
-        };
+        }
 
-        Formatters._valueChanged = function (d, formattedValue) {
+        function valueChanged(d, formattedValue) {
             return d !== parseFloat(formattedValue);
-        };
-        return Formatters;
-    })();
-    Plottable.Formatters = Formatters;
+        }
+    })(Plottable.Formatters || (Plottable.Formatters = {}));
+    var Formatters = Plottable.Formatters;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.28.1";
+    Plottable.version = "0.29.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1621,17 +1626,17 @@ var Plottable;
             }
         };
 
-        Dataset.prototype._getExtent = function (accessor) {
+        Dataset.prototype._getExtent = function (accessor, typeCoercer) {
             var cachedExtent = this.accessor2cachedExtent.get(accessor);
             if (cachedExtent === undefined) {
-                cachedExtent = this.computeExtent(accessor);
+                cachedExtent = this.computeExtent(accessor, typeCoercer);
                 this.accessor2cachedExtent.set(accessor, cachedExtent);
             }
             return cachedExtent;
         };
 
-        Dataset.prototype.computeExtent = function (accessor) {
-            var mappedData = this._data.map(accessor);
+        Dataset.prototype.computeExtent = function (accessor, typeCoercer) {
+            var mappedData = this._data.map(accessor).map(typeCoercer);
             if (mappedData.length === 0) {
                 return [];
             } else if (typeof (mappedData[0]) === "string") {
@@ -1739,6 +1744,22 @@ var Plottable;
             RenderController._renderPolicy = new RenderController.RenderPolicy.AnimationFrame();
 
             function setRenderPolicy(policy) {
+                if (typeof (policy) === "string") {
+                    switch (policy.toLowerCase()) {
+                        case "immediate":
+                            policy = new RenderController.RenderPolicy.Immediate();
+                            break;
+                        case "animationframe":
+                            policy = new RenderController.RenderPolicy.AnimationFrame();
+                            break;
+                        case "timeout":
+                            policy = new RenderController.RenderPolicy.Timeout();
+                            break;
+                        default:
+                            Plottable._Util.Methods.warn("Unrecognized renderPolicy: " + policy);
+                            return;
+                    }
+                }
                 RenderController._renderPolicy = policy;
             }
             RenderController.setRenderPolicy = setRenderPolicy;
@@ -2198,6 +2219,9 @@ var Plottable;
                 this._autoDomainAutomatically = true;
                 this.broadcaster = new Plottable.Core.Broadcaster(this);
                 this._rendererAttrID2Extent = {};
+                this._typeCoercer = function (d) {
+                    return d;
+                };
                 this._d3Scale = scale;
             }
             Scale.prototype._getAllExtents = function () {
@@ -2340,6 +2364,9 @@ var Plottable;
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
                 this._userSetDomainer = false;
                 this._domainer = new Plottable.Domainer();
+                this._typeCoercer = function (d) {
+                    return +d;
+                };
             }
             QuantitativeScale.prototype._getExtent = function () {
                 return this._domainer.computeDomain(this._getAllExtents(), this);
@@ -2764,6 +2791,9 @@ var Plottable;
                 // Padding as a proportion of the spacing between domain values
                 this._innerPadding = 0.3;
                 this._outerPadding = 0.5;
+                this._typeCoercer = function (d) {
+                    return d != null && d.toString ? d.toString() : d;
+                };
                 if (this._innerPadding > this._outerPadding) {
                     throw new Error("outerPadding must be >= innerPadding so cat axis bands work out reasonably");
                 }
@@ -2932,6 +2962,9 @@ var Plottable;
             function Time(scale) {
                 // need to cast since d3 time scales do not descend from Quantitative scales
                 _super.call(this, scale == null ? d3.time.scale() : scale);
+                this._typeCoercer = function (d) {
+                    return d._isAMomentObject || d instanceof Date ? d : new Date(d);
+                };
             }
             Time.prototype._tickInterval = function (interval, step) {
                 // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
@@ -2941,18 +2974,10 @@ var Plottable;
                 return tempScale.ticks(interval.range, step);
             };
 
-            Time.prototype.domain = function (values) {
-                if (values == null) {
-                    return _super.prototype.domain.call(this);
-                } else {
-                    // attempt to parse dates
-                    if (typeof (values[0]) === "string") {
-                        values = values.map(function (d) {
-                            return new Date(d);
-                        });
-                    }
-                    return _super.prototype.domain.call(this, values);
-                }
+            Time.prototype._setDomain = function (values) {
+                // attempt to parse dates
+                values = values.map(this._typeCoercer);
+                return _super.prototype._setDomain.call(this, values);
             };
 
             Time.prototype.copy = function () {
@@ -3519,7 +3544,14 @@ var Plottable;
                     } else {
                         selection = d3.select(element);
                     }
+                    if (!element.node() || element.node().nodeName !== "svg") {
+                        throw new Error("Plottable requires a valid SVG to renderTo");
+                    }
                     this._anchor(selection);
+                }
+                if (this._element == null) {
+                    throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
+          or a D3.Selection, or a selector string");
                 }
                 this._computeLayout();
                 this._render();
@@ -3689,7 +3721,7 @@ var Plottable;
                         this.hitBox = this.addBox("hit-box");
                         this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
                     }
-                    interaction._anchor(this.hitBox);
+                    interaction._anchor(this, this.hitBox);
                 } else {
                     this.interactionsToRegister.push(interaction);
                 }
@@ -6301,7 +6333,7 @@ var Plottable;
             *
             * Here's a common use case:
             * ```typescript
-            * plot.project("r", function(d) { return d.foo; });
+            * plot.attr("r", function(d) { return d.foo; });
             * ```
             * This will set the radius of each datum `d` to be `d.foo`.
             *
@@ -6318,6 +6350,13 @@ var Plottable;
             * is passed through the scale, such as `scale.scale(accessor(d, i))`.
             *
             * @returns {Plot} The calling Plot.
+            */
+            Plot.prototype.attr = function (attrToSet, accessor, scale) {
+                return this.project(attrToSet, accessor, scale);
+            };
+
+            /**
+            * Identical to plot.attr
             */
             Plot.prototype.project = function (attrToSet, accessor, scale) {
                 var _this = this;
@@ -6406,7 +6445,7 @@ var Plottable;
             Plot.prototype._updateProjector = function (attr) {
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
-                    var extent = this.dataset()._getExtent(projector.accessor);
+                    var extent = this.dataset()._getExtent(projector.accessor, projector.scale._typeCoercer);
                     if (extent.length === 0 || !this._isAnchored) {
                         projector.scale._removeExtent(this._plottableID.toString(), attr);
                     } else {
@@ -6632,7 +6671,7 @@ var Plottable;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
                     this._key2DatasetDrawerKey.forEach(function (key, ddk) {
-                        var extent = ddk.dataset._getExtent(projector.accessor);
+                        var extent = ddk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer);
                         var scaleKey = _this._plottableID.toString() + "_" + key;
                         if (extent.length === 0 || !_this._isAnchored) {
                             projector.scale._removeExtent(scaleKey, attr);
@@ -7407,7 +7446,7 @@ var Plottable;
 
                 var y0Projector = this._projectors["y0"];
                 var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
-                var extent = y0Accessor != null ? this.dataset()._getExtent(y0Accessor) : [];
+                var extent = y0Accessor != null ? this.dataset()._getExtent(y0Accessor, this._yScale._typeCoercer) : [];
                 var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
 
                 if (!this._yScale._userSetDomainer) {
@@ -8163,44 +8202,26 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var Plottable;
 (function (Plottable) {
     (function (Abstract) {
-        var Interaction = (function () {
-            /**
-            * Creates an Interaction.
-            *
-            * Some Interactions include Interaction.PanZoom and
-            * Interaction.DragBox. Interactions listen on events and do something that
-            * would be annoying to write by hand, such as pan/zoom. Many Interactions
-            * can have event listeners, such as a DragBox having listeners trigger
-            * each time the box changes size.
-            *
-            * @constructor
-            * @param {Component} componentToListenTo The component to listen for
-            * interactions on.
-            */
-            function Interaction(componentToListenTo) {
-                if (componentToListenTo == null) {
-                    throw new Error("Interactions require a component to listen to");
-                }
-                this.componentToListenTo = componentToListenTo;
+        var Interaction = (function (_super) {
+            __extends(Interaction, _super);
+            function Interaction() {
+                _super.apply(this, arguments);
             }
-            Interaction.prototype._anchor = function (hitBox) {
-                this.hitBox = hitBox;
-            };
-
-            /**
-            * Registers the Interaction on the Component it's listening to.
-            * This needs to be called to activate the interaction.
-            * @returns {Interaction} The calling Interaction.
-            */
-            Interaction.prototype.registerWithComponent = function () {
-                this.componentToListenTo.registerInteraction(this);
-                return this;
+            Interaction.prototype._anchor = function (component, hitBox) {
+                this._componentToListenTo = component;
+                this._hitBox = hitBox;
             };
             return Interaction;
-        })();
+        })(Abstract.PlottableObject);
         Abstract.Interaction = Interaction;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -8218,23 +8239,17 @@ var Plottable;
     (function (Interaction) {
         var Click = (function (_super) {
             __extends(Click, _super);
-            /**
-            * Creates a ClickInteraction.
-            *
-            * @constructor
-            * @param {Component} componentToListenTo The component to listen for clicks on.
-            */
-            function Click(componentToListenTo) {
-                _super.call(this, componentToListenTo);
+            function Click() {
+                _super.apply(this, arguments);
             }
-            Click.prototype._anchor = function (hitBox) {
+            Click.prototype._anchor = function (component, hitBox) {
                 var _this = this;
-                _super.prototype._anchor.call(this, hitBox);
+                _super.prototype._anchor.call(this, component, hitBox);
                 hitBox.on(this._listenTo(), function () {
                     var xy = d3.mouse(hitBox.node());
                     var x = xy[0];
                     var y = xy[1];
-                    _this._callback(x, y);
+                    _this._callback({ x: x, y: y });
                 });
             };
 
@@ -8245,7 +8260,7 @@ var Plottable;
             /**
             * Sets a callback to be called when a click is received.
             *
-            * @param {(x: number, y: number) => any} cb Callback to be called. Takes click x and y in pixels.
+            * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
             */
             Click.prototype.callback = function (cb) {
                 this._callback = cb;
@@ -8257,14 +8272,8 @@ var Plottable;
 
         var DoubleClick = (function (_super) {
             __extends(DoubleClick, _super);
-            /**
-            * Creates a DoubleClickInteraction.
-            *
-            * @constructor
-            * @param {Component} componentToListenTo The component to listen for clicks on.
-            */
-            function DoubleClick(componentToListenTo) {
-                _super.call(this, componentToListenTo);
+            function DoubleClick() {
+                _super.apply(this, arguments);
             }
             DoubleClick.prototype._listenTo = function () {
                 return "dblclick";
@@ -8272,47 +8281,6 @@ var Plottable;
             return DoubleClick;
         })(Click);
         Interaction.DoubleClick = DoubleClick;
-    })(Plottable.Interaction || (Plottable.Interaction = {}));
-    var Interaction = Plottable.Interaction;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Interaction) {
-        var Mousemove = (function (_super) {
-            __extends(Mousemove, _super);
-            /**
-            * Deprecated.
-            *
-            * @constructor
-            */
-            function Mousemove(componentToListenTo) {
-                _super.call(this, componentToListenTo);
-            }
-            Mousemove.prototype._anchor = function (hitBox) {
-                var _this = this;
-                _super.prototype._anchor.call(this, hitBox);
-                hitBox.on("mousemove", function () {
-                    var xy = d3.mouse(hitBox.node());
-                    var x = xy[0];
-                    var y = xy[1];
-                    _this.mousemove(x, y);
-                });
-            };
-
-            Mousemove.prototype.mousemove = function (x, y) {
-                return;
-            };
-            return Mousemove;
-        })(Plottable.Abstract.Interaction);
-        Interaction.Mousemove = Mousemove;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
@@ -8336,17 +8304,16 @@ var Plottable;
             * moused over.
             *
             * @constructor
-            * @param {Component} componentToListenTo The component to listen for keypresses on.
             * @param {number} keyCode The key code to listen for.
             */
-            function Key(componentToListenTo, keyCode) {
-                _super.call(this, componentToListenTo);
+            function Key(keyCode) {
+                _super.call(this);
                 this.activated = false;
                 this.keyCode = keyCode;
             }
-            Key.prototype._anchor = function (hitBox) {
+            Key.prototype._anchor = function (component, hitBox) {
                 var _this = this;
-                _super.prototype._anchor.call(this, hitBox);
+                _super.prototype._anchor.call(this, component, hitBox);
                 hitBox.on("mouseover", function () {
                     _this.activated = true;
                 });
@@ -8398,13 +8365,12 @@ var Plottable;
             * does so by changing the xScale and yScales' domains repeatedly.
             *
             * @constructor
-            * @param {Component} componentToListenTo The component to listen for interactions on.
             * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
             * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
             */
-            function PanZoom(componentToListenTo, xScale, yScale) {
+            function PanZoom(xScale, yScale) {
                 var _this = this;
-                _super.call(this, componentToListenTo);
+                _super.call(this);
                 if (xScale == null) {
                     xScale = new Plottable.Scale.Linear();
                 }
@@ -8432,11 +8398,11 @@ var Plottable;
                 this.zoom.on("zoom", function () {
                     return _this.rerenderZoomed();
                 });
-                this.zoom(this.hitBox);
+                this.zoom(this._hitBox);
             };
 
-            PanZoom.prototype._anchor = function (hitBox) {
-                _super.prototype._anchor.call(this, hitBox);
+            PanZoom.prototype._anchor = function (component, hitBox) {
+                _super.prototype._anchor.call(this, component, hitBox);
                 this.zoom(hitBox);
             };
 
@@ -8467,21 +8433,16 @@ var Plottable;
     (function (Interaction) {
         var BarHover = (function (_super) {
             __extends(BarHover, _super);
-            /**
-            * Creates a new BarHover Interaction.
-            *
-            * @param {BarPlot} barPlot The Bar Plot to listen for hover events on.
-            */
-            function BarHover(barPlot) {
-                _super.call(this, barPlot);
-                this.plotIsVertical = true;
+            function BarHover() {
+                _super.apply(this, arguments);
                 this.currentBar = null;
                 this._hoverMode = "point";
-                this.plotIsVertical = Plottable.Plot.VerticalBar.prototype.isPrototypeOf(this.componentToListenTo);
             }
-            BarHover.prototype._anchor = function (hitBox) {
+            BarHover.prototype._anchor = function (barPlot, hitBox) {
                 var _this = this;
-                this.dispatcher = new Plottable.Dispatcher.Mouse(hitBox);
+                _super.prototype._anchor.call(this, barPlot, hitBox);
+                this.plotIsVertical = this._componentToListenTo._isVertical;
+                this.dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
 
                 this.dispatcher.mousemove(function (p) {
                     var selectedBar = _this.getHoveredBar(p);
@@ -8497,7 +8458,7 @@ var Plottable;
                             }
                         }
 
-                        _this.componentToListenTo._bars.classed("not-hovered", true).classed("hovered", false);
+                        _this._componentToListenTo._bars.classed("not-hovered", true).classed("hovered", false);
                         selectedBar.classed("not-hovered", false).classed("hovered", true);
                         if (_this.hoverCallback != null) {
                             _this.hoverCallback(selectedBar.data()[0], selectedBar);
@@ -8515,7 +8476,7 @@ var Plottable;
             };
 
             BarHover.prototype._hoverOut = function () {
-                this.componentToListenTo._bars.classed("not-hovered hovered", false);
+                this._componentToListenTo._bars.classed("not-hovered hovered", false);
                 if (this.unhoverCallback != null && this.currentBar != null) {
                     this.unhoverCallback(this.currentBar.data()[0], this.currentBar); // last known information
                 }
@@ -8524,14 +8485,14 @@ var Plottable;
 
             BarHover.prototype.getHoveredBar = function (p) {
                 if (this._hoverMode === "point") {
-                    return this.componentToListenTo.selectBar(p.x, p.y, false);
+                    return this._componentToListenTo.selectBar(p.x, p.y, false);
                 }
 
                 var maxExtent = { min: -Infinity, max: Infinity };
                 if (this.plotIsVertical) {
-                    return this.componentToListenTo.selectBar(p.x, maxExtent, false);
+                    return this._componentToListenTo.selectBar(p.x, maxExtent, false);
                 } else {
-                    return this.componentToListenTo.selectBar(maxExtent, p.y, false);
+                    return this._componentToListenTo.selectBar(maxExtent, p.y, false);
                 }
             };
 
@@ -8593,13 +8554,10 @@ var Plottable;
             __extends(Drag, _super);
             /**
             * Constructs a Drag. A Drag will signal its callbacks on mouse drag.
-            *
-            * @param {Component} componentToListenTo The component to listen for
-            * interactions on.
             */
-            function Drag(componentToListenTo) {
+            function Drag() {
                 var _this = this;
-                _super.call(this, componentToListenTo);
+                _super.call(this);
                 this.dragInitialized = false;
                 this._origin = [0, 0];
                 this._location = [0, 0];
@@ -8642,8 +8600,8 @@ var Plottable;
             };
 
             Drag.prototype._dragstart = function () {
-                var width = this.componentToListenTo.width();
-                var height = this.componentToListenTo.height();
+                var width = this._componentToListenTo.width();
+                var height = this._componentToListenTo.height();
 
                 // the constraint functions ensure that the selection rectangle will not exceed the hit box
                 var constraintFunction = function (min, max) {
@@ -8696,8 +8654,8 @@ var Plottable;
                 }
             };
 
-            Drag.prototype._anchor = function (hitBox) {
-                _super.prototype._anchor.call(this, hitBox);
+            Drag.prototype._anchor = function (component, hitBox) {
+                _super.prototype._anchor.call(this, component, hitBox);
                 hitBox.call(this.dragBehavior);
                 return this;
             };
@@ -8814,10 +8772,10 @@ var Plottable;
                 return this;
             };
 
-            DragBox.prototype._anchor = function (hitBox) {
-                _super.prototype._anchor.call(this, hitBox);
+            DragBox.prototype._anchor = function (component, hitBox) {
+                _super.prototype._anchor.call(this, component, hitBox);
                 var cname = DragBox.CLASS_DRAG_BOX;
-                var background = this.componentToListenTo._backgroundContainer;
+                var background = this._componentToListenTo._backgroundContainer;
                 this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
                 return this;
             };
@@ -8850,7 +8808,7 @@ var Plottable;
             };
 
             XDragBox.prototype.setBox = function (x0, x1) {
-                _super.prototype.setBox.call(this, x0, x1, 0, this.componentToListenTo.height());
+                _super.prototype.setBox.call(this, x0, x1, 0, this._componentToListenTo.height());
                 return this;
             };
             return XDragBox;
@@ -8907,7 +8865,7 @@ var Plottable;
             };
 
             YDragBox.prototype.setBox = function (y0, y1) {
-                _super.prototype.setBox.call(this, 0, this.componentToListenTo.width(), y0, y1);
+                _super.prototype.setBox.call(this, 0, this._componentToListenTo.width(), y0, y1);
                 return this;
             };
             return YDragBox;
@@ -9075,152 +9033,4 @@ var Plottable;
         Dispatcher.Mouse = Mouse;
     })(Plottable.Dispatcher || (Plottable.Dispatcher = {}));
     var Dispatcher = Plottable.Dispatcher;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Template) {
-        var StandardChart = (function (_super) {
-            __extends(StandardChart, _super);
-            /**
-            * Creates a StandartChart.
-            *
-            * A StandardChart is a Component.Table with presets set to what users
-            * generally want.
-            *
-            * If you want to do this:
-            * ```typescript
-            * var table = new Table([[xAxis.merge(xLabel), plot.merge(title)],
-            *                        [null,                yAxis.merge(yLabel)]]);
-            * ```
-            * and laboriously create xLabel, xAxis, etc., you can do this:
-            * ```typescript
-            * var table = new StandardChart();
-            * table.xLabel("foo");
-            * table.xAxis(xAxis);
-            * ...
-            * ```
-            *
-            * StandardChart is what you should use if you just want a freakin'
-            * chart.
-            */
-            function StandardChart() {
-                _super.call(this);
-                this.xTable = new Plottable.Component.Table();
-                this.yTable = new Plottable.Component.Table();
-                this.centerComponent = new Plottable.Component.Group();
-                this.xyTable = new Plottable.Component.Table().addComponent(0, 0, this.yTable).addComponent(1, 1, this.xTable).addComponent(0, 1, this.centerComponent);
-                this.addComponent(1, 0, this.xyTable);
-            }
-            StandardChart.prototype.yAxis = function (y) {
-                if (y != null) {
-                    if (this._yAxis != null) {
-                        throw new Error("yAxis already assigned!");
-                    }
-                    this._yAxis = y;
-                    this.yTable.addComponent(0, 1, this._yAxis);
-                    return this;
-                } else {
-                    return this._yAxis;
-                }
-            };
-
-            StandardChart.prototype.xAxis = function (x) {
-                if (x != null) {
-                    if (this._xAxis != null) {
-                        throw new Error("xAxis already assigned!");
-                    }
-                    this._xAxis = x;
-                    this.xTable.addComponent(0, 0, this._xAxis);
-                    return this;
-                } else {
-                    return this._xAxis;
-                }
-            };
-
-            StandardChart.prototype.yLabel = function (y) {
-                if (y != null) {
-                    if (this._yLabel != null) {
-                        if (typeof (y) === "string") {
-                            this._yLabel.text(y);
-                            return this;
-                        } else {
-                            throw new Error("yLabel already assigned!");
-                        }
-                    }
-                    if (typeof (y) === "string") {
-                        y = new Plottable.Component.AxisLabel(y, "vertical-left");
-                    }
-                    this._yLabel = y;
-                    this.yTable.addComponent(0, 0, this._yLabel);
-                    return this;
-                } else {
-                    return this._yLabel;
-                }
-            };
-
-            StandardChart.prototype.xLabel = function (x) {
-                if (x != null) {
-                    if (this._xLabel != null) {
-                        if (typeof (x) === "string") {
-                            this._xLabel.text(x);
-                            return this;
-                        } else {
-                            throw new Error("xLabel already assigned!");
-                        }
-                    }
-                    if (typeof (x) === "string") {
-                        x = new Plottable.Component.AxisLabel(x, "horizontal");
-                    }
-                    this._xLabel = x;
-                    this.xTable.addComponent(1, 0, this._xLabel);
-                    return this;
-                } else {
-                    return this._xLabel;
-                }
-            };
-
-            StandardChart.prototype.titleLabel = function (x) {
-                if (x != null) {
-                    if (this._titleLabel != null) {
-                        if (typeof (x) === "string") {
-                            this._titleLabel.text(x);
-                            return this;
-                        } else {
-                            throw new Error("titleLabel already assigned!");
-                        }
-                    }
-                    if (typeof (x) === "string") {
-                        x = new Plottable.Component.TitleLabel(x, "horizontal");
-                    }
-                    this._titleLabel = x;
-                    this.addComponent(0, 0, this._titleLabel);
-                    return this;
-                } else {
-                    return this._titleLabel;
-                }
-            };
-
-            /**
-            * Sets the component in the center, typically a plot.
-            *
-            * @param {Abstract.Component} c The component to place in the center.
-            * @return {StandardChart} The calling StandardChart.
-            */
-            StandardChart.prototype.center = function (c) {
-                this.centerComponent.merge(c);
-                return this;
-            };
-            return StandardChart;
-        })(Plottable.Component.Table);
-        Template.StandardChart = StandardChart;
-    })(Plottable.Template || (Plottable.Template = {}));
-    var Template = Plottable.Template;
 })(Plottable || (Plottable = {}));

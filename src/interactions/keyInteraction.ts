@@ -14,16 +14,15 @@ export module Interaction {
      * moused over.
      *
      * @constructor
-     * @param {Component} componentToListenTo The component to listen for keypresses on.
      * @param {number} keyCode The key code to listen for.
      */
-    constructor(componentToListenTo: Abstract.Component, keyCode: number) {
-      super(componentToListenTo);
+    constructor(keyCode: number) {
+      super();
       this.keyCode = keyCode;
     }
 
-    public _anchor(hitBox: D3.Selection) {
-      super._anchor(hitBox);
+    public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
+      super._anchor(component, hitBox);
       hitBox.on("mouseover", () => {
         this.activated = true;
       });

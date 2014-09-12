@@ -15,12 +15,9 @@ export module Interaction {
 
     /**
      * Constructs a Drag. A Drag will signal its callbacks on mouse drag.
-     *
-     * @param {Component} componentToListenTo The component to listen for
-     * interactions on.
      */
-    constructor(componentToListenTo: Abstract.Component) {
-      super(componentToListenTo);
+    constructor() {
+      super();
       this.dragBehavior = d3.behavior.drag();
       this.dragBehavior.on("dragstart", () => this._dragstart());
       this.dragBehavior.on("drag",      () => this._drag     ());
@@ -94,8 +91,8 @@ export module Interaction {
     }
 
     public _dragstart(){
-      var width  = this.componentToListenTo.width();
-      var height = this.componentToListenTo.height();
+      var width  = this._componentToListenTo.width();
+      var height = this._componentToListenTo.height();
       // the constraint functions ensure that the selection rectangle will not exceed the hit box
       var constraintFunction = (min: number, max: number) => (x: number) => Math.min(Math.max(x, min), max);
       this.constrainX = constraintFunction(0, width );
@@ -143,8 +140,8 @@ export module Interaction {
       }
     }
 
-    public _anchor(hitBox: D3.Selection) {
-      super._anchor(hitBox);
+    public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
+      super._anchor(component, hitBox);
       hitBox.call(this.dragBehavior);
       return this;
     }

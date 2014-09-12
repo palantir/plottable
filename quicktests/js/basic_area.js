@@ -31,19 +31,20 @@ function run(div, data, Plottable) {
   var y0Accessor = function(d, i) { return dataseries[i].y; };
 
   var areaPlot1 = new Plottable.Plot.Area(dataseries, xScale, yScale);
-  var areaPlot2 = new Plottable.Plot.Area(dataseries_top, xScale, yScale).project("y0", y0Accessor, yScale);
+  var areaPlot2 = new Plottable.Plot.Area(dataseries_top, xScale, yScale).attr("y0", y0Accessor, yScale);
 
   var fillAccessor = function() { return "steelblue"; };
   var fillAccessorTop = function() { return "pink"; };
-  areaPlot1.project("fill", fillAccessor);
-  areaPlot2.project("fill", fillAccessorTop);
+  areaPlot1.attr("fill", fillAccessor);
+  areaPlot2.attr("fill", fillAccessorTop);
 
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var renderGroup = new Plottable.Component.Group([gridlines, areaPlot1, areaPlot2]);
 
-  var chart = new Plottable.Template.StandardChart()
-    .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
-    .renderTo(svg);
+  new Plottable.Component.Table([
+                                 [yAxis, renderGroup],
+                                 [null, xAxis]
+                                 ]).renderTo(svg);
 }
 
 //this test projects a new 'y0' onto areaPlot2,

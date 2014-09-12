@@ -44,12 +44,12 @@ function run(div, data, Plottable) {
   var renderOrange = new Plottable.Plot.Scatter(dataseries5, xScale, yScale);
   var renderGrape = new Plottable.Plot.Scatter(dataseries6, xScale, yScale);
 
-  renderAreaD1.project("fill", colorProjector);
-  renderAreaD2.project("stroke", colorProjector);
-  renderApple.project("fill", colorProjector);
-  renderBanana.project("stroke", colorProjector);
-  renderOrange.project("fill", colorProjector);
-  renderGrape.project("fill", colorProjector);
+  renderAreaD1.attr("fill", colorProjector);
+  renderAreaD2.attr("stroke", colorProjector);
+  renderApple.attr("fill", colorProjector);
+  renderBanana.attr("stroke", colorProjector);
+  renderOrange.attr("fill", colorProjector);
+  renderGrape.attr("fill", colorProjector);
 
   var renderArea = renderAreaD1.merge(renderAreaD2);
   function emptyTitle() {
@@ -107,11 +107,11 @@ function run(div, data, Plottable) {
   var noTitleLabel  = new Plottable.Component.Label("no title", "horizontal");
   var shortTitleLabel  = new Plottable.Component.Label("tiny title", "horizontal");
   var longTitleLabel  = new Plottable.Component.Label("long title", "horizontal");
-  var noLegendLabel  = new Plottable.Component.Label("no plots", "horizontal");
+  var noPlotsLabel  = new Plottable.Component.Label("no plots", "horizontal");
   var shortLegendLabel  = new Plottable.Component.Label("two plots", "horizontal");
   var tallLegendLabel  = new Plottable.Component.Label("six plots", "horizontal");
 
-  var labelTable = new Plottable.Component.Table([[noTitleLabel, noLegendLabel],
+  var labelTable = new Plottable.Component.Table([[noTitleLabel, noPlotsLabel],
     [shortTitleLabel, shortLegendLabel],
     [longTitleLabel, tallLegendLabel]]);
 
@@ -123,18 +123,24 @@ function run(div, data, Plottable) {
   basicTable.renderTo(svg);
 
 
-  new Plottable.Interaction.Click(noTitleLabel)
-    .callback(emptyTitle).registerWithComponent();
-  new Plottable.Interaction.Click(shortTitleLabel)
-    .callback(smallTitle).registerWithComponent();
-  new Plottable.Interaction.Click(longTitleLabel)
-    .callback(longTitle).registerWithComponent();
-  new Plottable.Interaction.Click(noLegendLabel)
-    .callback(noPlots).registerWithComponent();
-  new Plottable.Interaction.Click(shortLegendLabel)
-    .callback(twoPlots).registerWithComponent();
-  new Plottable.Interaction.Click(tallLegendLabel)
-    .callback(sixPlots).registerWithComponent();
+  noTitleLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(emptyTitle)
+  );
+  shortTitleLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(smallTitle)
+  );
+  longTitleLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(longTitle)
+  );
+  noPlotsLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(noPlots)
+  );
+  shortLegendLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(twoPlots)
+  );
+  tallLegendLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(sixPlots)
+  );
 
 
 }

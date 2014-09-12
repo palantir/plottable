@@ -30,8 +30,8 @@ function run(div, data, Plottable) {
         var cg = new Plottable.Component.Group();
         renderers.forEach(function(renderer, i) {
             renderer
-            .project("fill", function() { return colors[i]; })
-            .project("r", function(){ return 6;});
+            .attr("fill", function() { return colors[i]; })
+            .attr("r", function(){ return 6;});
             cg.merge(renderer);
         });
 
@@ -49,28 +49,33 @@ function run(div, data, Plottable) {
   var outerTable = new Plottable.Component.Table([[chart, legendTable]]);
   outerTable.renderTo(svg);
 
-  var dragboxInteraction = new Plottable.Interaction.XYDragBox(cg);
+  var dragboxInteraction = new Plottable.Interaction.XYDragBox();
 
-  var cb = function(xy) {
-      if (xy == null) {console.log("starting drag"); return;}
-      var invertedXMin = xScale.invert(xy.xMin);
-      var invertedXMax = xScale.invert(xy.xMax);
-      var invertedYMin = yScale.invert(xy.yMax);
-      var invertedYMax = yScale.invert(xy.yMin);
-      xScale.domain([invertedXMin, invertedXMax]);
-      yScale.domain([invertedYMin, invertedYMax]);
-      dragboxInteraction.clearBox();
+  var cb = function(start, end) {
+    var startX = xScale.invert(start.x);
+    var endX = xScale.invert(end.x);
+    var startY = yScale.invert(start.y);
+    var endY = yScale.invert(end.y);
+
+    var minX = Math.min(startX, endX);
+    var maxX = Math.max(startX, endX);
+    var minY = Math.min(startY, endY);
+    var maxY = Math.max(startY, endY);
+
+    xScale.domain([minX, maxX]);
+    yScale.domain([minY, maxY]);
+    dragboxInteraction.clearBox();
   };
 
-  dragboxInteraction.dragend(cb).registerWithComponent();
+  dragboxInteraction.dragend(cb);
+  cg.registerInteraction(dragboxInteraction);
 
   var cb2 = function(xy) {
       xScale.autoDomain();
       yScale.autoDomain();
   };
 
-  var doubleClickInteraction = new Plottable.Interaction.DoubleClick(cg)
-                                            .callback(cb2)
-                                            .registerWithComponent();
-
+  cg.registerInteraction(
+    new Plottable.Interaction.DoubleClick().callback(cb2)
+  );
 }

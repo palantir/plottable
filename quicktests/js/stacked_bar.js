@@ -21,11 +21,11 @@ function run(div, data, Plottable) {
                                     .addDataset("d1", data[0])
                                     .addDataset("d2", data[1])
                                     .addDataset("d3", data[2])
-                                    .project("x", "name", xScale)
-                                    .project("y", "y", yScale)
-                                    .project("fill", "type", colorScale)
-                                    .project("type", "type")
-                                    .project("yval", "y")
+                                    .attr("x", "name", xScale)
+                                    .attr("y", "y", yScale)
+                                    .attr("fill", "type", colorScale)
+                                    .attr("type", "type")
+                                    .attr("yval", "y")
                                     .animate(true);
 
   var center = stackedBarPlot.merge(new Plottable.Component.Legend(colorScale));
