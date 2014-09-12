@@ -2963,7 +2963,7 @@ var Plottable;
                 // need to cast since d3 time scales do not descend from Quantitative scales
                 _super.call(this, scale == null ? d3.time.scale() : scale);
                 this._typeCoercer = function (d) {
-                    return d._isAMomentObject || d instanceof Date ? d : new Date(d);
+                    return (d == null) || d._isAMomentObject || d instanceof Date ? d : new Date(d);
                 };
             }
             Time.prototype._tickInterval = function (interval, step) {
