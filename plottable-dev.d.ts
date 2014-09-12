@@ -455,6 +455,7 @@ declare module Plottable {
     module Scale {
         class Ordinal extends Plottable.Abstract.Scale<string, number> {
             _d3Scale: D3.Scale.OrdinalScale;
+            _typeCoercer: (d: any) => any;
             constructor(scale?: D3.Scale.OrdinalScale);
             _getExtent(): string[];
             domain(): string[];

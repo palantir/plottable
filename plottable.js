@@ -1086,10 +1086,7 @@ var Plottable;
             return cachedExtent;
         };
         Dataset.prototype.computeExtent = function (accessor, typeCoercer) {
-            var mappedData = this._data.map(accessor);
-            if (typeCoercer) {
-                mappedData = mappedData.map(typeCoercer);
-            }
+            var mappedData = this._data.map(accessor).map(typeCoercer);
             if (mappedData.length === 0) {
                 return [];
             }
@@ -1420,6 +1417,7 @@ var Plottable;
                 this._autoDomainAutomatically = true;
                 this.broadcaster = new Plottable.Core.Broadcaster(this);
                 this._rendererAttrID2Extent = {};
+                this._typeCoercer = function (d) { return d; };
                 this._d3Scale = scale;
             }
             Scale.prototype._getAllExtents = function () {
@@ -1773,6 +1771,7 @@ var Plottable;
                 this._rangeType = "bands";
                 this._innerPadding = 0.3;
                 this._outerPadding = 0.5;
+                this._typeCoercer = function (d) { return d != null && d.toString ? d.toString() : d; };
                 if (this._innerPadding > this._outerPadding) {
                     throw new Error("outerPadding must be >= innerPadding so cat axis bands work out reasonably");
                 }

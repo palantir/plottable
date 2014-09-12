@@ -87,10 +87,7 @@ module Plottable {
     }
 
     private computeExtent(accessor: _IAccessor, typeCoercer: (d: any) => any): any[] {
-      var mappedData = this._data.map(accessor);
-      if (typeCoercer) {
-        mappedData = mappedData.map(typeCoercer);
-      }
+      var mappedData = this._data.map(accessor).map(typeCoercer);
       if (mappedData.length === 0){
         return [];
       } else if (typeof(mappedData[0]) === "string") {
