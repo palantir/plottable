@@ -13,7 +13,7 @@ module Plottable {
     filter: (d: any) => any;
   }
 
-  export class Formatters {
+  export module Formatters {
 
     /**
      * Creates a formatter for currency values.
@@ -25,11 +25,11 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for currency values.
      */
-    public static currency(precision = 2, symbol = "$", prefix = true, onlyShowUnchanged = true) {
+    export function currency(precision = 2, symbol = "$", prefix = true, onlyShowUnchanged = true) {
       var fixedFormatter = Formatters.fixed(precision);
       return function(d: any) {
         var formattedValue = fixedFormatter(Math.abs(d));
-        if (onlyShowUnchanged && Formatters._valueChanged(Math.abs(d), formattedValue)) {
+        if (onlyShowUnchanged && valueChanged(Math.abs(d), formattedValue)) {
           return "";
         }
         if (formattedValue !== "") {
@@ -55,11 +55,11 @@ module Plottable {
      *
      * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
      */
-    public static fixed(precision = 3, onlyShowUnchanged = true) {
-      Formatters.verifyPrecision(precision);
+    export function fixed(precision = 3, onlyShowUnchanged = true) {
+      verifyPrecision(precision);
       return function(d: any) {
         var formattedValue = (<number> d).toFixed(precision);
-        if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+        if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
           return "";
         }
         return formattedValue;
@@ -75,13 +75,13 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for general values.
      */
-    public static general(precision = 3, onlyShowUnchanged = true) {
-      Formatters.verifyPrecision(precision);
+    export function general(precision = 3, onlyShowUnchanged = true) {
+      verifyPrecision(precision);
       return function(d: any) {
         if (typeof d === "number") {
           var multiplier = Math.pow(10, precision);
           var formattedValue = String(Math.round(d * multiplier) / multiplier);
-          if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+          if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
             return "";
           }
           return formattedValue;
@@ -96,7 +96,7 @@ module Plottable {
      *
      * @returns {Formatter} A formatter that stringifies its input.
      */
-    public static identity() {
+    export function identity() {
       return function(d: any) {
         return String(d);
       };
@@ -111,7 +111,7 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for percentage values.
      */
-    public static percentage(precision = 0, onlyShowUnchanged = true) {
+    export function percentage(precision = 0, onlyShowUnchanged = true) {
       var fixedFormatter = Formatters.fixed(precision, onlyShowUnchanged);
       return function(d: any) {
         var valToFormat = d * 100;
@@ -122,7 +122,7 @@ module Plottable {
         valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
 
         var formattedValue = fixedFormatter(valToFormat);
-        if (onlyShowUnchanged && Formatters._valueChanged(valToFormat, formattedValue)) {
+        if (onlyShowUnchanged && valueChanged(valToFormat, formattedValue)) {
           return "";
         }
         if (formattedValue !== "") {
@@ -140,8 +140,8 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for SI values.
      */
-    public static siSuffix(precision = 3) {
-      Formatters.verifyPrecision(precision);
+    export function siSuffix(precision = 3) {
+      verifyPrecision(precision);
       return function(d: any) {
         return d3.format("." + precision + "s")(d);
       };
@@ -152,7 +152,7 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for time/date values.
      */
-    public static time() {
+    export function time() {
 
       var numFormats = 8;
 
@@ -211,20 +211,20 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for time/date values.
      */
-    public static relativeDate(baseValue: number = 0, increment: number = MILLISECONDS_IN_ONE_DAY, label: string = "") {
+    export function relativeDate(baseValue: number = 0, increment: number = MILLISECONDS_IN_ONE_DAY, label: string = "") {
       return function (d: any) {
         var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
         return relativeDate.toString() + label;
       };
     }
 
-    private static verifyPrecision(precision: number) {
+    function verifyPrecision(precision: number) {
       if (precision < 0 || precision > 20) {
         throw new RangeError("Formatter precision must be between 0 and 20");
       }
     }
 
-    private static _valueChanged(d: any, formattedValue: string) {
+    function valueChanged(d: any, formattedValue: string) {
       return d !== parseFloat(formattedValue);
     }
 

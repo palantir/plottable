@@ -151,15 +151,15 @@ declare module Plottable {
         (d: any): string;
     }
     var MILLISECONDS_IN_ONE_DAY: number;
-    class Formatters {
-        static currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
-        static fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
-        static general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
-        static identity(): (d: any) => string;
-        static percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
-        static siSuffix(precision?: number): (d: any) => string;
-        static time(): (d: any) => string;
-        static relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
+    module Formatters {
+        function currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
+        function fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function identity(): (d: any) => string;
+        function percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function siSuffix(precision?: number): (d: any) => string;
+        function time(): (d: any) => string;
+        function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
     }
 }
 
@@ -1235,7 +1235,7 @@ declare module Plottable {
         class Click extends Plottable.Abstract.Interaction {
             _anchor(component: Plottable.Abstract.Component, hitBox: D3.Selection): void;
             _listenTo(): string;
-            callback(cb: (x: number, y: number) => any): Click;
+            callback(cb: (p: Point) => any): Click;
         }
         class DoubleClick extends Click {
             _listenTo(): string;
@@ -1377,29 +1377,6 @@ declare module Plottable {
             mousemove(callback: (location: Point) => any): Mouse;
             mouseout(): (location: Point) => any;
             mouseout(callback: (location: Point) => any): Mouse;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Template {
-        class StandardChart extends Plottable.Component.Table {
-            constructor();
-            yAxis(): Plottable.Abstract.Axis;
-            yAxis(y: Plottable.Abstract.Axis): StandardChart;
-            xAxis(): Plottable.Abstract.Axis;
-            xAxis(x: Plottable.Abstract.Axis): StandardChart;
-            yLabel(): Plottable.Component.AxisLabel;
-            yLabel(y: Plottable.Component.AxisLabel): StandardChart;
-            yLabel(y: string): StandardChart;
-            xLabel(): Plottable.Component.AxisLabel;
-            xLabel(x: Plottable.Component.AxisLabel): StandardChart;
-            xLabel(x: string): StandardChart;
-            titleLabel(): Plottable.Component.TitleLabel;
-            titleLabel(x: Plottable.Component.TitleLabel): StandardChart;
-            titleLabel(x: string): StandardChart;
-            center(c: Plottable.Abstract.Component): StandardChart;
         }
     }
 }

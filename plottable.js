@@ -1,5 +1,5 @@
 /*!
-Plottable 0.28.0 (https://github.com/palantir/plottable)
+Plottable 0.28.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -779,10 +779,8 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
-    var Formatters = (function () {
-        function Formatters() {
-        }
-        Formatters.currency = function (precision, symbol, prefix, onlyShowUnchanged) {
+    (function (Formatters) {
+        function currency(precision, symbol, prefix, onlyShowUnchanged) {
             if (precision === void 0) { precision = 2; }
             if (symbol === void 0) { symbol = "$"; }
             if (prefix === void 0) { prefix = true; }
@@ -790,7 +788,7 @@ var Plottable;
             var fixedFormatter = Formatters.fixed(precision);
             return function (d) {
                 var formattedValue = fixedFormatter(Math.abs(d));
-                if (onlyShowUnchanged && Formatters._valueChanged(Math.abs(d), formattedValue)) {
+                if (onlyShowUnchanged && valueChanged(Math.abs(d), formattedValue)) {
                     return "";
                 }
                 if (formattedValue !== "") {
@@ -806,28 +804,30 @@ var Plottable;
                 }
                 return formattedValue;
             };
-        };
-        Formatters.fixed = function (precision, onlyShowUnchanged) {
+        }
+        Formatters.currency = currency;
+        function fixed(precision, onlyShowUnchanged) {
             if (precision === void 0) { precision = 3; }
             if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
-            Formatters.verifyPrecision(precision);
+            verifyPrecision(precision);
             return function (d) {
                 var formattedValue = d.toFixed(precision);
-                if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+                if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
                     return "";
                 }
                 return formattedValue;
             };
-        };
-        Formatters.general = function (precision, onlyShowUnchanged) {
+        }
+        Formatters.fixed = fixed;
+        function general(precision, onlyShowUnchanged) {
             if (precision === void 0) { precision = 3; }
             if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
-            Formatters.verifyPrecision(precision);
+            verifyPrecision(precision);
             return function (d) {
                 if (typeof d === "number") {
                     var multiplier = Math.pow(10, precision);
                     var formattedValue = String(Math.round(d * multiplier) / multiplier);
-                    if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+                    if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
                         return "";
                     }
                     return formattedValue;
@@ -836,13 +836,15 @@ var Plottable;
                     return String(d);
                 }
             };
-        };
-        Formatters.identity = function () {
+        }
+        Formatters.general = general;
+        function identity() {
             return function (d) {
                 return String(d);
             };
-        };
-        Formatters.percentage = function (precision, onlyShowUnchanged) {
+        }
+        Formatters.identity = identity;
+        function percentage(precision, onlyShowUnchanged) {
             if (precision === void 0) { precision = 0; }
             if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
             var fixedFormatter = Formatters.fixed(precision, onlyShowUnchanged);
@@ -852,7 +854,7 @@ var Plottable;
                 var integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
                 valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
                 var formattedValue = fixedFormatter(valToFormat);
-                if (onlyShowUnchanged && Formatters._valueChanged(valToFormat, formattedValue)) {
+                if (onlyShowUnchanged && valueChanged(valToFormat, formattedValue)) {
                     return "";
                 }
                 if (formattedValue !== "") {
@@ -860,15 +862,17 @@ var Plottable;
                 }
                 return formattedValue;
             };
-        };
-        Formatters.siSuffix = function (precision) {
+        }
+        Formatters.percentage = percentage;
+        function siSuffix(precision) {
             if (precision === void 0) { precision = 3; }
-            Formatters.verifyPrecision(precision);
+            verifyPrecision(precision);
             return function (d) {
                 return d3.format("." + precision + "s")(d);
             };
-        };
-        Formatters.time = function () {
+        }
+        Formatters.siSuffix = siSuffix;
+        function time() {
             var numFormats = 8;
             var timeFormat = {};
             timeFormat[0] = {
@@ -910,8 +914,9 @@ var Plottable;
                     }
                 }
             };
-        };
-        Formatters.relativeDate = function (baseValue, increment, label) {
+        }
+        Formatters.time = time;
+        function relativeDate(baseValue, increment, label) {
             if (baseValue === void 0) { baseValue = 0; }
             if (increment === void 0) { increment = Plottable.MILLISECONDS_IN_ONE_DAY; }
             if (label === void 0) { label = ""; }
@@ -919,23 +924,23 @@ var Plottable;
                 var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
                 return relativeDate.toString() + label;
             };
-        };
-        Formatters.verifyPrecision = function (precision) {
+        }
+        Formatters.relativeDate = relativeDate;
+        function verifyPrecision(precision) {
             if (precision < 0 || precision > 20) {
                 throw new RangeError("Formatter precision must be between 0 and 20");
             }
-        };
-        Formatters._valueChanged = function (d, formattedValue) {
+        }
+        function valueChanged(d, formattedValue) {
             return d !== parseFloat(formattedValue);
-        };
-        return Formatters;
-    })();
-    Plottable.Formatters = Formatters;
+        }
+    })(Plottable.Formatters || (Plottable.Formatters = {}));
+    var Formatters = Plottable.Formatters;
 })(Plottable || (Plottable = {}));
 
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.28.0";
+    Plottable.version = "0.28.1";
 })(Plottable || (Plottable = {}));
 
 var Plottable;
@@ -5759,7 +5764,7 @@ var Plottable;
                     var xy = d3.mouse(hitBox.node());
                     var x = xy[0];
                     var y = xy[1];
-                    _this._callback(x, y);
+                    _this._callback({ x: x, y: y });
                 });
             };
             Click.prototype._listenTo = function () {
@@ -6365,126 +6370,4 @@ var Plottable;
         Dispatcher.Mouse = Mouse;
     })(Plottable.Dispatcher || (Plottable.Dispatcher = {}));
     var Dispatcher = Plottable.Dispatcher;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Template) {
-        var StandardChart = (function (_super) {
-            __extends(StandardChart, _super);
-            function StandardChart() {
-                _super.call(this);
-                this.xTable = new Plottable.Component.Table();
-                this.yTable = new Plottable.Component.Table();
-                this.centerComponent = new Plottable.Component.Group();
-                this.xyTable = new Plottable.Component.Table().addComponent(0, 0, this.yTable).addComponent(1, 1, this.xTable).addComponent(0, 1, this.centerComponent);
-                this.addComponent(1, 0, this.xyTable);
-            }
-            StandardChart.prototype.yAxis = function (y) {
-                if (y != null) {
-                    if (this._yAxis != null) {
-                        throw new Error("yAxis already assigned!");
-                    }
-                    this._yAxis = y;
-                    this.yTable.addComponent(0, 1, this._yAxis);
-                    return this;
-                }
-                else {
-                    return this._yAxis;
-                }
-            };
-            StandardChart.prototype.xAxis = function (x) {
-                if (x != null) {
-                    if (this._xAxis != null) {
-                        throw new Error("xAxis already assigned!");
-                    }
-                    this._xAxis = x;
-                    this.xTable.addComponent(0, 0, this._xAxis);
-                    return this;
-                }
-                else {
-                    return this._xAxis;
-                }
-            };
-            StandardChart.prototype.yLabel = function (y) {
-                if (y != null) {
-                    if (this._yLabel != null) {
-                        if (typeof (y) === "string") {
-                            this._yLabel.text(y);
-                            return this;
-                        }
-                        else {
-                            throw new Error("yLabel already assigned!");
-                        }
-                    }
-                    if (typeof (y) === "string") {
-                        y = new Plottable.Component.AxisLabel(y, "vertical-left");
-                    }
-                    this._yLabel = y;
-                    this.yTable.addComponent(0, 0, this._yLabel);
-                    return this;
-                }
-                else {
-                    return this._yLabel;
-                }
-            };
-            StandardChart.prototype.xLabel = function (x) {
-                if (x != null) {
-                    if (this._xLabel != null) {
-                        if (typeof (x) === "string") {
-                            this._xLabel.text(x);
-                            return this;
-                        }
-                        else {
-                            throw new Error("xLabel already assigned!");
-                        }
-                    }
-                    if (typeof (x) === "string") {
-                        x = new Plottable.Component.AxisLabel(x, "horizontal");
-                    }
-                    this._xLabel = x;
-                    this.xTable.addComponent(1, 0, this._xLabel);
-                    return this;
-                }
-                else {
-                    return this._xLabel;
-                }
-            };
-            StandardChart.prototype.titleLabel = function (x) {
-                if (x != null) {
-                    if (this._titleLabel != null) {
-                        if (typeof (x) === "string") {
-                            this._titleLabel.text(x);
-                            return this;
-                        }
-                        else {
-                            throw new Error("titleLabel already assigned!");
-                        }
-                    }
-                    if (typeof (x) === "string") {
-                        x = new Plottable.Component.TitleLabel(x, "horizontal");
-                    }
-                    this._titleLabel = x;
-                    this.addComponent(0, 0, this._titleLabel);
-                    return this;
-                }
-                else {
-                    return this._titleLabel;
-                }
-            };
-            StandardChart.prototype.center = function (c) {
-                this.centerComponent.merge(c);
-                return this;
-            };
-            return StandardChart;
-        })(Plottable.Component.Table);
-        Template.StandardChart = StandardChart;
-    })(Plottable.Template || (Plottable.Template = {}));
-    var Template = Plottable.Template;
 })(Plottable || (Plottable = {}));
