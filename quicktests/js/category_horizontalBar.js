@@ -22,8 +22,8 @@ function run(div, data, Plottable) {
     var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
     var barPlot = new Plottable.Plot.HorizontalBar(ds, xScale, yScale)
-    .project("y", "name", yScale)
-    .project("x", "age", xScale);
+    .attr("y", "name", yScale)
+    .attr("x", "age", xScale);
     barPlot.animate(true);
     var chart = new Plottable.Component.Table([[yAxis, barPlot],
        [null,  xAxis]]);

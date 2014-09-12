@@ -29,14 +29,14 @@ function run(div, data, Plottable) {
   //rendering
   var scatterPlot = new Plottable.Plot.Scatter(dataseries, xScale, yScale); //0
   scatterPlot
-    .project("fill", colorScale1.scale("scatter"))
-    .project("r", function(){return 10;});
+    .attr("fill", colorScale1.scale("scatter"))
+    .attr("r", function(){return 10;});
   var linePlot = new Plottable.Plot.Line(dataseries, xScale, yScale); //1
   linePlot
-    .project("stroke", colorScale1.scale("line"))
-    .project("stroke-width", function(){ return 5;});
+    .attr("stroke", colorScale1.scale("line"))
+    .attr("stroke-width", function(){ return 5;});
   var areaPlot = new Plottable.Plot.Area(dataseries, xScale, yScale); //2
-  areaPlot.project("fill", colorScale1.scale("area"));
+  areaPlot.attr("fill", colorScale1.scale("area"));
 
   //title + legend
   var title1 = new Plottable.Component.TitleLabel( "front: areaPlot", "horizontal");

@@ -882,6 +882,7 @@ declare module Plottable {
             dataset(): Dataset;
             dataset(dataset: Dataset): Plot;
             _onDatasetUpdate(): void;
+            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
             _generateAttrToProjector(): IAttributeToProjector;
             _doRender(): void;

@@ -4403,6 +4403,9 @@ var Plottable;
                 this._dataChanged = true;
                 this._render();
             };
+            Plot.prototype.attr = function (attrToSet, accessor, scale) {
+                return this.project(attrToSet, accessor, scale);
+            };
             Plot.prototype.project = function (attrToSet, accessor, scale) {
                 var _this = this;
                 attrToSet = attrToSet.toLowerCase();

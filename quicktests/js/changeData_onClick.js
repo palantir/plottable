@@ -25,7 +25,7 @@ function run(div, data, Plottable) {
     renderArea1.animate(true);
 
     var renderArea2 = new Plottable.Plot.Scatter(renderArea1.dataset(), xScale, yScale);
-    renderArea2.project("fill", function(){return "purple";});
+    renderArea2.attr("fill", function(){return "purple";});
     renderArea2.animate(true);
 
     var renderGroup = renderArea1.merge(renderArea2);

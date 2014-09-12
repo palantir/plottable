@@ -29,10 +29,10 @@ function run(div, data, Plottable) {
 
     var renderAreaD0 = new Plottable.Plot.Line(dataseries1, xScale, yScale);
     var renderAreaD1 = new Plottable.Plot.Line(dataseries2, xScale, yScale)
-                                      .project( "stroke", d3.functor("red"));
+                                      .attr( "stroke", d3.functor("red"));
     var renderAreaD2 = new Plottable.Plot.Area(dataseries1, xScale, yScale);
     var renderAreaD3 = new Plottable.Plot.Area(dataseries2, xScale, yScale)
-                                      .project( "fill", d3.functor("red"));
+                                      .attr( "fill", d3.functor("red"));
 
 
     //test merge:
