@@ -19,7 +19,7 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   var vBarRenderer = new Plottable.Plot.VerticalBar(data[0].slice(0, 6), xScale, yScale);
-  vBarRenderer.project("opacity", 0.75);
+  vBarRenderer.attr("opacity", 0.75);
   vBarRenderer.animate(doAnimate);
 
   var vBarChart = new Plottable.Component.Table([[yAxis, vBarRenderer],

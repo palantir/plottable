@@ -722,6 +722,7 @@ declare module Plottable {
             remove(): void;
             dataset(): Dataset;
             dataset(dataset: Dataset): Plot;
+            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
             animate(enabled: boolean): Plot;
             detach(): Plot;

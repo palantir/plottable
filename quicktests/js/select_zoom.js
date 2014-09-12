@@ -30,8 +30,8 @@ function run(div, data, Plottable) {
         var cg = new Plottable.Component.Group();
         renderers.forEach(function(renderer, i) {
             renderer
-            .project("fill", function() { return colors[i]; })
-            .project("r", function(){ return 6;});
+            .attr("fill", function() { return colors[i]; })
+            .attr("r", function(){ return 6;});
             cg.merge(renderer);
         });
 

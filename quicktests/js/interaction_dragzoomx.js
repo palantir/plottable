@@ -19,7 +19,7 @@ function run(div, data, Plottable) {
 
   var renderAreaD1 = new Plottable.Plot.Area(dataSeries, xScale, yScale);
   var fillAccessor = function() { return "steelblue"; };
-  renderAreaD1.project("fill", fillAccessor);
+  renderAreaD1.attr("fill", fillAccessor);
 
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var renderGroup = new Plottable.Component.Group([gridlines, renderAreaD1]);
