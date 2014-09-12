@@ -15,14 +15,14 @@ function run(div, data, Plottable) {
   var title = new Plottable.Component.TitleLabel("Hover over bars");
   var colorScale = new Plottable.Scale.Color();
 
-  var stackedBarRenderer = new Plottable.Plot.VerticalBar(data, xScale, yScale)
+  var plot = new Plottable.Plot.VerticalBar(data, xScale, yScale)
     .project("x", "name", xScale)
     .project("y", "y", yScale)
     .project("fill", "name", colorScale);
 
   var chart = new Plottable.Component.Table([
       [null, title],
-      [yAxis, stackedBarRenderer],
+      [yAxis, plot],
       [null, xAxis]]);
 
   chart.renderTo(svg);
@@ -39,5 +39,5 @@ function run(div, data, Plottable) {
   var bhi = new Plottable.Interaction.BarHover()
         .onHover(hoverHandler)
         .onUnhover(unhoverHandler);
-  stackedBarRenderer.registerInteraction(bhi);
+  plot.registerInteraction(bhi);
 }
