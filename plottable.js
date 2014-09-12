@@ -2351,7 +2351,18 @@ var Plottable;
                     else {
                         selection = d3.select(element);
                     }
+                    if (!element.node()) {
+                        throw new Error("Plottable requires a valid selection to renderTo");
+                    }
+                    if (element.node().nodeName !== "svg") {
+                        Plottable._Util.Methods.warn("Plottable expects to be placed in a SVG. Auto-generating one for you...");
+                        selection = selection.append("svg");
+                    }
                     this._anchor(selection);
+                }
+                if (this._element == null) {
+                    throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
+          or a D3.Selection, or a selector string");
                 }
                 this._computeLayout();
                 this._render();

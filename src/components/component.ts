@@ -217,6 +217,10 @@ export module Abstract {
         }
         this._anchor(selection);
       }
+      if (this._element == null) {
+        throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
+          or a D3.Selection, or a selector string");
+      }
       this._computeLayout();
       this._render();
       return this;
