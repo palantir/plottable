@@ -4519,11 +4519,14 @@ var Plottable;
         var Pie = (function (_super) {
             __extends(Pie, _super);
             function Pie() {
+                var _this = this;
                 this._key2DatasetDrawerKey = d3.map();
                 this._datasetKeysInOrder = [];
                 this.nextSeriesIndex = 0;
                 _super.call(this, new Plottable.Dataset());
                 this.classed("pie-plot", true);
+                this.project("innerRadius", function () { return 0; });
+                this.project("outerRadius", function () { return Math.min(_this.width(), _this.height()) / 2; });
             }
             Pie.prototype._setup = function () {
                 Plottable.Abstract.NewStylePlot.prototype._setup.call(this);
@@ -4544,7 +4547,11 @@ var Plottable;
             Pie.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["d"] = d3.svg.arc().outerRadius(Math.min(this.width(), this.height()) / 2).innerRadius(0);
+                var innerRadiusF = attrToProjector["innerradius"];
+                var outerRadiusF = attrToProjector["outerradius"];
+                attrToProjector["d"] = d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
+                delete attrToProjector["innerradius"];
+                delete attrToProjector["outerradius"];
                 attrToProjector["transform"] = function () { return "translate(" + _this.width() / 2 + "," + _this.height() / 2 + ")"; };
                 return attrToProjector;
             };

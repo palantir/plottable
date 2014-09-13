@@ -24,6 +24,9 @@ export module Plot {
       this.nextSeriesIndex = 0;
       super(new Plottable.Dataset());
       this.classed("pie-plot", true);
+
+      this.project("innerRadius", () => 0);
+      this.project("outerRadius", () => Math.min(this.width(), this.height()) / 2);
     }
 
     public _setup() {
@@ -67,9 +70,13 @@ export module Plot {
 
     public _generateAttrToProjector(): IAttributeToProjector {
       var attrToProjector = super._generateAttrToProjector();
+      var innerRadiusF = attrToProjector["innerradius"];
+      var outerRadiusF = attrToProjector["outerradius"];
       attrToProjector["d"] = d3.svg.arc()
-                      .outerRadius(Math.min(this.width(), this.height()) / 2)
-                      .innerRadius(0);
+                      .innerRadius(innerRadiusF)
+                      .outerRadius(outerRadiusF);
+      delete attrToProjector["innerradius"];
+      delete attrToProjector["outerradius"];
       attrToProjector["transform"] = () => "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
       return attrToProjector;
     }
