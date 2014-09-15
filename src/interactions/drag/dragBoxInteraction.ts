@@ -80,22 +80,12 @@ export module Interaction {
     }
 
     private isResizeStartAttr(isX: boolean): boolean {
-      var i1: number, i2: number, positionAttr1: string, positionAttr2: string, lengthAttr1: string, lengthAttr2: string;
-      if (isX) {
-        i1 = 0;
-        i2 = 1;
-        positionAttr1 = "x";
-        positionAttr2 = "y";
-        lengthAttr1 = "width";
-        lengthAttr2 = "height";
-      } else {
-        i1 = 1;
-        i2 = 0;
-        positionAttr1 = "y";
-        positionAttr2 = "x";
-        lengthAttr1 = "height";
-        lengthAttr2 = "width";
-      }
+      var i1 = isX ? 0 : 1;
+      var i2 = isX ? 1 : 0;
+      var positionAttr1 = isX ? "x" : "y";
+      var positionAttr2 = isX ? "y" : "x";
+      var lengthAttr1 = isX ? "width" : "height";
+      var lengthAttr2 = isX ? "height": "width";
       var otherOrigin = this.origin[i2];
       var from = parseInt(this.dragBox.attr(positionAttr2), 10);
       var to = parseInt(this.dragBox.attr(lengthAttr2), 10) + from;
