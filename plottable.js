@@ -2234,6 +2234,8 @@ var Plottable;
                 this.interactionsToRegister = [];
                 this.boxes = [];
                 this.isTopLevelComponent = false;
+                this._width = 0;
+                this._height = 0;
                 this._xOffset = 0;
                 this._yOffset = 0;
                 this.cssClasses = ["component"];
