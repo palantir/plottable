@@ -75,7 +75,6 @@ describe("Plots", () => {
       });
 
       it("project fill", () => {
-
         piePlot.project("fill", (d: any, i: number) => String(i), new Plottable.Scale.Color("10"));
 
         var arcPaths = renderArea.selectAll(".arc");
@@ -85,10 +84,8 @@ describe("Plots", () => {
 
         var arcPath1 = d3.select(arcPaths[0][1]);
         assert.strictEqual(arcPath1.attr("fill"), "#ff7f0e", "second sector filled appropriately");
-
         verifier.end();
       });
-
     });
 
     after(() => {
