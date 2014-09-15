@@ -17,7 +17,7 @@ describe("Plots", () => {
       verifier = new MultiTestVerifier();
       simpleDataset = new Plottable.Dataset([{value: 5}, {value: 15}]);
       piePlot = new Plottable.Plot.Pie();
-      piePlot.addDataset(simpleDataset);
+      piePlot.addDataset(simpleDataset)
       piePlot.renderTo(svg);
       renderArea = piePlot._renderArea;
     });
@@ -58,6 +58,28 @@ describe("Plots", () => {
       var secondPathPoints1 = pathPoints1[2].split(",");
       assert.closeTo(parseFloat(secondPathPoints1[0]), 0, 1, "draws line to origin");
       assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin");
+      verifier.end();
+    });
+
+    it("innerRadius project", () => {
+      piePlot.project("innerRadius", () => 5);
+      var arcPaths = renderArea.selectAll(".arc");
+      assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+      var normalizedPath0 = normalizePath(d3.select(arcPaths[0][0]).attr("d"));
+      assert.include(normalizedPath0, "L5,0", "stops line at innerRadius point");
+      assert.include(normalizedPath0, "A5,5,0,0,0,0,-5", "makes inner arc surrounding center point of radius 5");
+      piePlot.project("innerRadius", () => 0);
+      verifier.end();
+    });
+
+    it("outerRadius project", () => {
+      piePlot.project("outerRadius", () => 150);
+      var arcPaths = renderArea.selectAll(".arc");
+      assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+      var normalizedPath0 = normalizePath(d3.select(arcPaths[0][0]).attr("d"));
+      assert.include(normalizedPath0, "M0,-150", "goes to outerRadius point");
+      assert.include(normalizedPath0, "A150,150,0,0,1,150,0", "makes outer arc surrounding center point of radius 150");
+      piePlot.project("outerRadius", () => 250);
       verifier.end();
     });
 

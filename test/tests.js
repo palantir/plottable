@@ -1533,6 +1533,26 @@ describe("Plots", function () {
             assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin");
             verifier.end();
         });
+        it("innerRadius project", function () {
+            piePlot.project("innerRadius", function () { return 5; });
+            var arcPaths = renderArea.selectAll(".arc");
+            assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+            var normalizedPath0 = normalizePath(d3.select(arcPaths[0][0]).attr("d"));
+            assert.include(normalizedPath0, "L5,0", "stops line at innerRadius point");
+            assert.include(normalizedPath0, "A5,5,0,0,0,0,-5", "makes inner arc surrounding center point of radius 5");
+            piePlot.project("innerRadius", function () { return 0; });
+            verifier.end();
+        });
+        it("outerRadius project", function () {
+            piePlot.project("outerRadius", function () { return 150; });
+            var arcPaths = renderArea.selectAll(".arc");
+            assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+            var normalizedPath0 = normalizePath(d3.select(arcPaths[0][0]).attr("d"));
+            assert.include(normalizedPath0, "M0,-150", "goes to outerRadius point");
+            assert.include(normalizedPath0, "A150,150,0,0,1,150,0", "makes outer arc surrounding center point of radius 150");
+            piePlot.project("outerRadius", function () { return 250; });
+            verifier.end();
+        });
         after(function () {
             if (verifier.passed) {
                 svg.remove();
