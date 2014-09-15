@@ -1497,7 +1497,7 @@ describe("Plots", function () {
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
-            simpleDataset = new Plottable.Dataset([{ value: 5 }, { value: 15 }]);
+            simpleDataset = new Plottable.Dataset([{ value: 5, value2: 10 }, { value: 15, value2: 10 }]);
             piePlot = new Plottable.Plot.Pie();
             piePlot.addDataset(simpleDataset);
             piePlot.renderTo(svg);
@@ -1531,6 +1531,29 @@ describe("Plots", function () {
             var secondPathPoints1 = pathPoints1[2].split(",");
             assert.closeTo(parseFloat(secondPathPoints1[0]), 0, 1, "draws line to origin");
             assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin");
+            verifier.end();
+        });
+        it("project value onto different attribute", function () {
+            piePlot.project("value", "value2");
+            var arcPaths = renderArea.selectAll(".arc");
+            assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+            var arcPath0 = d3.select(arcPaths[0][0]);
+            var pathPoints0 = normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
+            var firstPathPoints0 = pathPoints0[0].split(",");
+            assert.closeTo(parseFloat(firstPathPoints0[0]), 0, 1, "draws line vertically at beginning");
+            assert.operator(parseFloat(firstPathPoints0[1]), "<", 0, "draws line upwards");
+            var arcDestPoint0 = pathPoints0[1].split(",").slice(5);
+            assert.closeTo(parseFloat(arcDestPoint0[0]), 0, 1, "ends on a line vertically from beginning");
+            assert.operator(parseFloat(arcDestPoint0[1]), ">", 0, "ends below the center");
+            var arcPath1 = d3.select(arcPaths[0][1]);
+            var pathPoints1 = normalizePath(arcPath1.attr("d")).split(/[A-Z]/).slice(1, 4);
+            var firstPathPoints1 = pathPoints1[0].split(",");
+            assert.closeTo(parseFloat(firstPathPoints1[0]), 0, 1, "draws line vertically at beginning");
+            assert.operator(parseFloat(firstPathPoints1[1]), ">", 0, "draws line downwards");
+            var arcDestPoint1 = pathPoints1[1].split(",").slice(5);
+            assert.closeTo(parseFloat(arcDestPoint1[0]), 0, 1, "ends on a line vertically from beginning");
+            assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above the center");
+            piePlot.project("value", "value");
             verifier.end();
         });
         after(function () {

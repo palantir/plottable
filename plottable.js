@@ -4524,6 +4524,7 @@ var Plottable;
                 this.nextSeriesIndex = 0;
                 _super.call(this, new Plottable.Dataset());
                 this.classed("pie-plot", true);
+                this.project("value", "value");
             }
             Pie.prototype._setup = function () {
                 Plottable.Abstract.NewStylePlot.prototype._setup.call(this);
@@ -4546,6 +4547,7 @@ var Plottable;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 attrToProjector["d"] = d3.svg.arc().outerRadius(Math.min(this.width(), this.height()) / 2).innerRadius(0);
                 attrToProjector["transform"] = function () { return "translate(" + _this.width() / 2 + "," + _this.height() / 2 + ")"; };
+                delete attrToProjector["value"];
                 return attrToProjector;
             };
             Pie.prototype._getAnimator = function (drawer, index) {
@@ -4571,7 +4573,7 @@ var Plottable;
                 });
             };
             Pie.prototype.pie = function (d) {
-                return d3.layout.pie().sort(null).value(function (d) { return d.value; })(d);
+                return d3.layout.pie().sort(null).value(this._projectors["value"].accessor)(d);
             };
             return Pie;
         })(Plottable.Abstract.Plot);

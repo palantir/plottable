@@ -24,6 +24,8 @@ export module Plot {
       this.nextSeriesIndex = 0;
       super(new Plottable.Dataset());
       this.classed("pie-plot", true);
+
+      this.project("value", "value");
     }
 
     public _setup() {
@@ -71,6 +73,7 @@ export module Plot {
                       .outerRadius(Math.min(this.width(), this.height()) / 2)
                       .innerRadius(0);
       attrToProjector["transform"] = () => "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
+      delete attrToProjector["value"];
       return attrToProjector;
     }
 
@@ -103,7 +106,7 @@ export module Plot {
     private pie(d: any[]): D3.Layout.ArcDescriptor[] {
       return d3.layout.pie()
                       .sort(null)
-                      .value((d) => d.value)(d);
+                      .value(this._projectors["value"].accessor)(d);
     }
 
   }
