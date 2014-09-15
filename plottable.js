@@ -845,7 +845,7 @@ var Plottable;
         Formatters.percentage = function (precision, onlyShowUnchanged) {
             if (precision === void 0) { precision = 0; }
             if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
-            var fixedFormatter = Formatters.fixed(precision);
+            var fixedFormatter = Formatters.fixed(precision, onlyShowUnchanged);
             return function (d) {
                 var valToFormat = d * 100;
                 var valString = d.toString();
@@ -4522,6 +4522,8 @@ var Plottable;
                 this._key2DatasetDrawerKey = d3.map();
                 this._datasetKeysInOrder = [];
                 this.nextSeriesIndex = 0;
+                this._formatter = Plottable.Formatters.percentage(2, false);
+                this._sectorLabelsEnabled = true;
                 _super.call(this, new Plottable.Dataset());
                 this.classed("pie-plot", true);
             }
@@ -4544,7 +4546,7 @@ var Plottable;
             Pie.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["d"] = d3.svg.arc().outerRadius(Math.min(this.width(), this.height()) / 2).innerRadius(0);
+                attrToProjector["d"] = this.arc();
                 attrToProjector["transform"] = function () { return "translate(" + _this.width() / 2 + "," + _this.height() / 2 + ")"; };
                 return attrToProjector;
             };
@@ -4569,9 +4571,53 @@ var Plottable;
                     var pieData = _this.pie(datasets[i].data());
                     d.draw(pieData, attrHash, animator);
                 });
+                if (this.sectorLabelsEnabled()) {
+                    this.drawSectorLabels();
+                }
             };
             Pie.prototype.pie = function (d) {
                 return d3.layout.pie().sort(null).value(function (d) { return d.value; })(d);
+            };
+            Pie.prototype.arc = function () {
+                return d3.svg.arc().outerRadius(Math.min(this.width(), this.height()) / 2).innerRadius(0);
+            };
+            Pie.prototype.drawSectorLabels = function () {
+                var _this = this;
+                this._getDatasetsInOrder().forEach(function (dataset) {
+                    var arcData = _this.pie(dataset.data());
+                    var labels = _this._renderArea.selectAll("text").data(arcData);
+                    labels.enter().append("text");
+                    labels.exit().remove();
+                    labels.attr("dy", ".35em").attr("transform", function (d) {
+                        var centroid = _this.arc().centroid(d);
+                        var translatedCentroid = [centroid[0] + _this.width() / 2, centroid[1] + _this.height() / 2];
+                        return "translate(" + translatedCentroid + ")";
+                    }).classed("pie-label", true).style("text-anchor", "middle").text(function (d) {
+                        var percentage = (d.endAngle - d.startAngle) / (2 * Math.PI);
+                        if (percentage === 0) {
+                            return "";
+                        }
+                        else {
+                            return _this._formatter(percentage);
+                        }
+                    });
+                });
+            };
+            Pie.prototype.sectorLabelsEnabled = function (isEnabled) {
+                if (isEnabled == null) {
+                    return this._sectorLabelsEnabled;
+                }
+                var oldSectorLabelsEnabled = this._sectorLabelsEnabled;
+                this._sectorLabelsEnabled = isEnabled;
+                if (oldSectorLabelsEnabled !== isEnabled) {
+                    if (isEnabled) {
+                        this.drawSectorLabels();
+                    }
+                    else {
+                        this._renderArea.selectAll(".pie-label").remove();
+                    }
+                }
+                return this;
             };
             return Pie;
         })(Plottable.Abstract.Plot);

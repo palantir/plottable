@@ -923,6 +923,8 @@ declare module Plottable {
             _getDatasetsInOrder(): Dataset[];
             _getDrawersInOrder(): Plottable.Abstract._Drawer[];
             _paint(): void;
+            sectorLabelsEnabled(): boolean;
+            sectorLabelsEnabled(isEnabled: boolean): Pie;
         }
     }
 }

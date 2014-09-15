@@ -15,7 +15,10 @@ describe("Plots", () => {
     before(() => {
       svg = generateSVG(500, 500);
       verifier = new MultiTestVerifier();
-      simpleDataset = new Plottable.Dataset([{value: 5}, {value: 15}]);
+      simpleDataset = new Plottable.Dataset([
+                                             {value: 1},
+                                             {value: 3},
+                                             {value: 0}]);
       piePlot = new Plottable.Plot.Pie();
       piePlot.addDataset(simpleDataset);
       piePlot.renderTo(svg);
@@ -28,7 +31,7 @@ describe("Plots", () => {
 
     it("sectors divided evenly", () => {
       var arcPaths = renderArea.selectAll(".arc");
-      assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+      assert.lengthOf(arcPaths[0], 3, "has three sectors");
       var arcPath0 = d3.select(arcPaths[0][0]);
       var pathPoints0 = normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
 
@@ -58,6 +61,24 @@ describe("Plots", () => {
       var secondPathPoints1 = pathPoints1[2].split(",");
       assert.closeTo(parseFloat(secondPathPoints1[0]), 0, 1, "draws line to origin");
       assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin");
+      verifier.end();
+    });
+
+    it("labels show the percentage of the value out of the whole", () => {
+      var labels = renderArea.selectAll(".pie-label");
+      var label0 = d3.select(labels[0][0]);
+      assert.strictEqual(label0.text(), "25.00%", "Label is the value percentage");
+      var label1 = d3.select(labels[0][1]);
+      assert.strictEqual(label1.text(), "75.00%", "Label is the value percentage");
+      assert.closeTo(parseFloat(label0.text()) + parseFloat(label1.text()), 100, 1, "Labels add to 100%");
+      verifier.end();
+    });
+
+    it("labels disabled when set to disabled", () => {
+      piePlot.sectorLabelsEnabled(false);
+      var labels = renderArea.selectAll(".pie-label");
+      assert.lengthOf(labels[0], 0, "No labels should appear");
+      piePlot.sectorLabelsEnabled(true);
       verifier.end();
     });
 

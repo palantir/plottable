@@ -750,6 +750,8 @@ declare module Plottable {
             addDataset(dataset: Dataset): Pie;
             addDataset(dataset: any[]): Pie;
             removeDataset(key: string): Pie;
+            sectorLabelsEnabled(): boolean;
+            sectorLabelsEnabled(isEnabled: boolean): Pie;
         }
     }
 }
