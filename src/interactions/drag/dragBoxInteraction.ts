@@ -8,6 +8,7 @@ export module Interaction {
    */
   export class DragBox extends Drag {
     private static CLASS_DRAG_BOX = "drag-box";
+    public static RESIZE_PADDING = 10;
     /**
      * The DOM element of the box that is drawn. When no box is drawn, it is
      * null.
@@ -17,7 +18,6 @@ export module Interaction {
      * Whether or not dragBox has been rendered in a visible area.
      */
     public boxIsDrawn = false;
-    public resizePadding = 10;
     /**
      * The currently selected area, which can be different from the are the user has dragged.
      */
@@ -43,14 +43,14 @@ export module Interaction {
 
     // Returns true if `val` is "close enough" to `position`.
     public _isCloseEnoughLeft(val: number, position: number, len: number): boolean {
-      var leftPadding: number = this.resizePadding;
-      var rightPadding: number = Math.min(this.resizePadding, len / 2);
+      var leftPadding: number = DragBox.RESIZE_PADDING;
+      var rightPadding: number = Math.min(DragBox.RESIZE_PADDING, len / 2);
       return position - leftPadding <= val && val <= position + rightPadding;
     }
 
     public _isCloseEnoughRight(val: number, position: number, len: number): boolean {
-      var leftPadding = Math.min(this.resizePadding, len / 2);
-      var rightPadding = this.resizePadding;
+      var leftPadding = Math.min(DragBox.RESIZE_PADDING, len / 2);
+      var rightPadding = DragBox.RESIZE_PADDING;
       return position - leftPadding <= val && val <= position + rightPadding;
     }
 
@@ -99,7 +99,7 @@ export module Interaction {
       var otherOrigin = this.origin[i2];
       var from = parseInt(this.dragBox.attr(positionAttr2), 10);
       var to = parseInt(this.dragBox.attr(lengthAttr2), 10) + from;
-      if (otherOrigin + this.resizePadding < from || otherOrigin - this.resizePadding > to) {
+      if (otherOrigin + DragBox.RESIZE_PADDING < from || otherOrigin - DragBox.RESIZE_PADDING > to) {
         return false;
       }
       var attrOrigin = this.origin[i1];
@@ -142,7 +142,7 @@ export module Interaction {
       var diffX = this.resizeStartDiff[0];
       var diffY = this.resizeStartDiff[1];
       // Eases the mouse into the center of the dragging line, in case dragging started with the mouse
-      // away from the center due to `resizePadding`.
+      // away from the center due to `DragBox.RESIZE_PADDING`.
       if (this.isResizingX && diffX !== 0) {
         x += diffX;
         this.resizeStartDiff[0] += diffX > 0 ? -1 : 1;

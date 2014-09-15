@@ -50,8 +50,8 @@ export module Interaction {
       var y1 = parseInt(this.dragBox.attr("y"), 10);
       var height = parseInt(this.dragBox.attr("height"), 10);
       var y2 = height + y1;
-      var otherWidthPadding = Math.min(this.resizePadding, width / 2);
-      var otherHeightPadding = Math.min(this.resizePadding, height / 2);
+      var otherWidthPadding = Math.min(DragBox.RESIZE_PADDING, width / 2);
+      var otherHeightPadding = Math.min(DragBox.RESIZE_PADDING, height / 2);
       var left = this._isCloseEnoughLeft(x, x1, width);
       var top = this._isCloseEnoughLeft(y, y1, height);
       var right = this._isCloseEnoughRight(x, x2, width);
@@ -75,9 +75,9 @@ export module Interaction {
         return "nwse-resize";
       } else if (top && right || bottom && left) {
         return "nesw-resize";
-      } else if ((left || right) && y1 - this.resizePadding <= y && y <= y2 + this.resizePadding) {
+      } else if ((left || right) && y1 - DragBox.RESIZE_PADDING <= y && y <= y2 + DragBox.RESIZE_PADDING) {
         return "ew-resize";
-      } else if ((top || bottom) && x1 - this.resizePadding <= x && x <= x2 + this.resizePadding) {
+      } else if ((top || bottom) && x1 - DragBox.RESIZE_PADDING <= x && x <= x2 + DragBox.RESIZE_PADDING) {
         return "ns-resize";
       } else {
         return "";
