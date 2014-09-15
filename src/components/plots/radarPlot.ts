@@ -158,35 +158,8 @@ export module Plot {
       return attrToProjector;
     }
 
-    private generateAxesAttrToProjector(): IAttributeToProjector {
-      var attrHash: IAttributeToProjector = {};
-
-      var translateString = "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
-      attrHash["transform"] = (d: any, i: number) => translateString + " rotate(" + i * 360 / this.metrics().length + ")";
-
-      attrHash["x1"] = () => this.maxRadius();
-      attrHash["y1"] = () => 0;
-      attrHash["x2"] = () => 0;
-      attrHash["y1"] = () => 0;
-      attrHash["stroke"] = () => "black";
-      return attrHash;
-    }
-
     public _paint() {
-      // HACKHACK Can't place the axis lines before the polygon drawer g
-      var renderArea = this._getDrawersInOrder()[0]._renderArea;
-      var metricAxes = renderArea.selectAll(".metric-axis").data(this.metrics());
-      metricAxes.enter().append("line").classed("metric-axis", true);
-      metricAxes.exit().remove();
-      var axesAttrToProjector = this.generateAxesAttrToProjector();
-      metricAxes.attr(axesAttrToProjector);
-
-      var attrHash = this._generateAttrToProjector();
-      var datasets = this._getDatasetsInOrder();
-      this._getDrawersInOrder().forEach((d, i) => {
-        var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
-        d.draw(datasets[i].data(), attrHash, animator);
-      });
+      Abstract.NewStylePlot.prototype._paint.call(this);
     }
 
     private maxRadius() {

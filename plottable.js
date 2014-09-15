@@ -4626,32 +4626,8 @@ var Plottable;
                 attrToProjector["opacity"] = function () { return "0.7"; };
                 return attrToProjector;
             };
-            Radar.prototype.generateAxesAttrToProjector = function () {
-                var _this = this;
-                var attrHash = {};
-                var translateString = "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
-                attrHash["transform"] = function (d, i) { return translateString + " rotate(" + i * 360 / _this.metrics().length + ")"; };
-                attrHash["x1"] = function () { return _this.maxRadius(); };
-                attrHash["y1"] = function () { return 0; };
-                attrHash["x2"] = function () { return 0; };
-                attrHash["y1"] = function () { return 0; };
-                attrHash["stroke"] = function () { return "black"; };
-                return attrHash;
-            };
             Radar.prototype._paint = function () {
-                var _this = this;
-                var renderArea = this._getDrawersInOrder()[0]._renderArea;
-                var metricAxes = renderArea.selectAll(".metric-axis").data(this.metrics());
-                metricAxes.enter().append("line").classed("metric-axis", true);
-                metricAxes.exit().remove();
-                var axesAttrToProjector = this.generateAxesAttrToProjector();
-                metricAxes.attr(axesAttrToProjector);
-                var attrHash = this._generateAttrToProjector();
-                var datasets = this._getDatasetsInOrder();
-                this._getDrawersInOrder().forEach(function (d, i) {
-                    var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
-                    d.draw(datasets[i].data(), attrHash, animator);
-                });
+                Plottable.Abstract.NewStylePlot.prototype._paint.call(this);
             };
             Radar.prototype.maxRadius = function () {
                 return Math.min(this.width(), this.height()) / 2 - 100;
