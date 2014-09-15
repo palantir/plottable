@@ -4526,6 +4526,7 @@ var Plottable;
                 this.nextSeriesIndex = 0;
                 _super.call(this, new Plottable.Dataset());
                 this.classed("pie-plot", true);
+                this.project("fill", function (d, i) { return String(i); }, new Plottable.Scale.Color());
             }
             Pie.prototype._setup = function () {
                 Plottable.Abstract.NewStylePlot.prototype._setup.call(this);

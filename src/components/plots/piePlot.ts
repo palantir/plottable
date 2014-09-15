@@ -24,6 +24,8 @@ export module Plot {
       this.nextSeriesIndex = 0;
       super(new Plottable.Dataset());
       this.classed("pie-plot", true);
+
+      this.project("fill", (d: any, i: number) => String(i), new Scale.Color());
     }
 
     public _setup() {
