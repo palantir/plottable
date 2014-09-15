@@ -25,8 +25,8 @@ export module Plot {
       super(new Plottable.Dataset());
       this.classed("pie-plot", true);
 
-      this.project("innerRadius", () => 0);
-      this.project("outerRadius", () => Math.min(this.width(), this.height()) / 2);
+      this.project("innerradius", () => 0);
+      this.project("outerradius", () => Math.min(this.width(), this.height()) / 2);
     }
 
     public _setup() {
