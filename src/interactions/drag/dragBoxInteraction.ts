@@ -59,14 +59,14 @@ export module Interaction {
      *
      * @returns {boolean}
      */
-    public resize(): boolean;
+    public isResizeEnabled(): boolean;
     /**
      * Enables or disables resizing.
      *
      * @param {boolean} enabled
      */
-    public resize(enabled: boolean): DragBox;
-    public resize(enabled?: boolean): any {
+    public isResizeEnabled(enabled: boolean): DragBox;
+    public isResizeEnabled(enabled?: boolean): any {
       if (enabled == null) {
         return this.resizeEnabled;
       } else {

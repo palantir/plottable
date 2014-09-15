@@ -15,12 +15,12 @@ export module Interaction {
       var y0 = this._selectionOrigin[1];
       var y1 = this.location[1];
 
-      if (!this.resize() || this.isResizingX || !this.isResizingY) {
+      if (!this.isResizeEnabled() || this.isResizingX || !this.isResizingY) {
         attrs.width = Math.abs(x0 - x1);
         attrs.x = Math.min(x0, x1);
         drawnX = attrs.width > 0;
       }
-      if (!this.resize() || this.isResizingY || !this.isResizingX) {
+      if (!this.isResizeEnabled() || this.isResizingY || !this.isResizingX) {
         attrs.height = Math.abs(y0 - y1);
         attrs.y = Math.min(y0, y1);
         drawnY = attrs.height > 0;
