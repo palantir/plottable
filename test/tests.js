@@ -1587,6 +1587,25 @@ describe("Plots", function () {
             piePlot.project("outerRadius", function () { return 250; });
             verifier.end();
         });
+        describe("Fill", function () {
+            it("sectors are filled in according to defaults", function () {
+                var arcPaths = renderArea.selectAll(".arc");
+                var arcPath0 = d3.select(arcPaths[0][0]);
+                assert.strictEqual(arcPath0.attr("fill"), Plottable.Core.Colors.PLOTTABLE_COLORS[0], "first sector filled appropriately");
+                var arcPath1 = d3.select(arcPaths[0][1]);
+                assert.strictEqual(arcPath1.attr("fill"), Plottable.Core.Colors.PLOTTABLE_COLORS[1], "second sector filled appropriately");
+                verifier.end();
+            });
+            it("project fill", function () {
+                piePlot.project("fill", function (d, i) { return String(i); }, new Plottable.Scale.Color("10"));
+                var arcPaths = renderArea.selectAll(".arc");
+                var arcPath0 = d3.select(arcPaths[0][0]);
+                assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
+                var arcPath1 = d3.select(arcPaths[0][1]);
+                assert.strictEqual(arcPath1.attr("fill"), "#ff7f0e", "second sector filled appropriately");
+                verifier.end();
+            });
+        });
         after(function () {
             if (verifier.passed) {
                 svg.remove();
