@@ -4544,7 +4544,11 @@ var Plottable;
             Pie.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["d"] = d3.svg.arc().outerRadius(Math.min(this.width(), this.height()) / 2).innerRadius(0);
+                var innerRadiusF = attrToProjector["innerradius"] || d3.functor(0);
+                var outerRadiusF = attrToProjector["outerradius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
+                attrToProjector["d"] = d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
+                delete attrToProjector["innerradius"];
+                delete attrToProjector["outerradius"];
                 attrToProjector["transform"] = function () { return "translate(" + _this.width() / 2 + "," + _this.height() / 2 + ")"; };
                 delete attrToProjector["value"];
                 return attrToProjector;
