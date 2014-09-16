@@ -71,7 +71,7 @@ export module Plot {
     }
 
     public _generateAttrToProjector(): IAttributeToProjector {
-      var attrToProjector = super._generateAttrToProjector();
+      var attrToProjector = this.retargetProjectors(super._generateAttrToProjector());
       var innerRadiusF = attrToProjector["innerradius"] || d3.functor(0);
       var outerRadiusF = attrToProjector["outerradius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
       attrToProjector["d"] = d3.svg.arc()
@@ -87,6 +87,14 @@ export module Plot {
       attrToProjector["transform"] = () => "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
       delete attrToProjector["value"];
       return attrToProjector;
+    }
+
+    private retargetProjectors(attrToProjector: IAttributeToProjector): IAttributeToProjector {
+      var retargetedAttrToProjector: IAttributeToProjector = {};
+      d3.entries(attrToProjector).forEach((entry) => {
+        retargetedAttrToProjector[entry.key] = (d: any, i: number) => entry.value(d.data, i);
+      });
+      return retargetedAttrToProjector;
     }
 
     public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {

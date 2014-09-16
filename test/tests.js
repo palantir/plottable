@@ -1497,7 +1497,7 @@ describe("Plots", function () {
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
-            simpleDataset = new Plottable.Dataset([{ value: 5, value2: 10 }, { value: 15, value2: 10 }]);
+            simpleDataset = new Plottable.Dataset([{ value: 5, value2: 10, type: "A" }, { value: 15, value2: 10, type: "B" }]);
             piePlot = new Plottable.Plot.Pie();
             piePlot.addDataset(simpleDataset);
             piePlot.renderTo(svg);
@@ -1604,6 +1604,12 @@ describe("Plots", function () {
                 assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
                 var arcPath1 = d3.select(arcPaths[0][1]);
                 assert.strictEqual(arcPath1.attr("fill"), "#ff7f0e", "second sector filled appropriately");
+                piePlot.project("fill", "type", new Plottable.Scale.Color("20"));
+                arcPaths = renderArea.selectAll(".arc");
+                arcPath0 = d3.select(arcPaths[0][0]);
+                assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
+                arcPath1 = d3.select(arcPaths[0][1]);
+                assert.strictEqual(arcPath1.attr("fill"), "#aec7e8", "second sector filled appropriately");
                 verifier.end();
             });
         });

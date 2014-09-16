@@ -4545,7 +4545,7 @@ var Plottable;
             };
             Pie.prototype._generateAttrToProjector = function () {
                 var _this = this;
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var attrToProjector = this.retargetProjectors(_super.prototype._generateAttrToProjector.call(this));
                 var innerRadiusF = attrToProjector["innerradius"] || d3.functor(0);
                 var outerRadiusF = attrToProjector["outerradius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
                 attrToProjector["d"] = d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
@@ -4557,6 +4557,13 @@ var Plottable;
                 attrToProjector["transform"] = function () { return "translate(" + _this.width() / 2 + "," + _this.height() / 2 + ")"; };
                 delete attrToProjector["value"];
                 return attrToProjector;
+            };
+            Pie.prototype.retargetProjectors = function (attrToProjector) {
+                var retargetedAttrToProjector = {};
+                d3.entries(attrToProjector).forEach(function (entry) {
+                    retargetedAttrToProjector[entry.key] = function (d, i) { return entry.value(d.data, i); };
+                });
+                return retargetedAttrToProjector;
             };
             Pie.prototype._getAnimator = function (drawer, index) {
                 return Plottable.Abstract.NewStylePlot.prototype._getAnimator.call(this, drawer, index);
