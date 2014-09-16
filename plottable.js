@@ -4524,7 +4524,6 @@ var Plottable;
                 this.nextSeriesIndex = 0;
                 _super.call(this, new Plottable.Dataset());
                 this.classed("pie-plot", true);
-                this.project("value", "value");
             }
             Pie.prototype._setup = function () {
                 Plottable.Abstract.NewStylePlot.prototype._setup.call(this);
@@ -4573,7 +4572,10 @@ var Plottable;
                 });
             };
             Pie.prototype.pie = function (d) {
-                return d3.layout.pie().sort(null).value(this._projectors["value"].accessor)(d);
+                var defaultAccessor = function (d) { return d.value; };
+                var valueProjector = this._projectors["value"];
+                var valueAccessor = valueProjector ? valueProjector.accessor : defaultAccessor;
+                return d3.layout.pie().sort(null).value(valueAccessor)(d);
             };
             return Pie;
         })(Plottable.Abstract.Plot);
