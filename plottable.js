@@ -1555,7 +1555,8 @@ var Plottable;
                 return this;
             };
             QuantitativeScale.prototype.ticks = function (count) {
-                return this._d3Scale.ticks((count == null) ? this._numTicks : count);
+                if (count === void 0) { count = this.numTicks(); }
+                return this._d3Scale.ticks(count);
             };
             QuantitativeScale.prototype.numTicks = function (count) {
                 if (count == null) {
@@ -1703,7 +1704,7 @@ var Plottable;
                 this.broadcaster.broadcast();
             };
             ModifiedLog.prototype.ticks = function (count) {
-                var numberOfTicks = (count == null) ? this._numTicks : count;
+                if (count === void 0) { count = this.numTicks(); }
                 var middle = function (x, y, z) { return [x, y, z].sort(function (a, b) { return a - b; })[1]; };
                 var min = Plottable._Util.Methods.min(this.untransformedDomain);
                 var max = Plottable._Util.Methods.max(this.untransformedDomain);
@@ -1716,7 +1717,7 @@ var Plottable;
                 var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this.howManyTicks(negativeUpper, positiveLower)) : [-this.pivot, 0, this.pivot].filter(function (x) { return min <= x && x <= max; });
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 if (ticks.length <= 1) {
-                    ticks = d3.scale.linear().domain([min, max]).ticks(numberOfTicks);
+                    ticks = d3.scale.linear().domain([min, max]).ticks(count);
                 }
                 return ticks;
             };

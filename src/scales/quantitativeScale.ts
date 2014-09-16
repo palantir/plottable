@@ -117,14 +117,14 @@ export module Abstract {
      *                         numTicks() is used instead.
      * @returns {any[]} The generated ticks.
      */
-    public ticks(count?: number): any[] {
-      return this._d3Scale.ticks( (count == null) ? this._numTicks : count);
+    public ticks(count = this.numTicks()): any[] {
+      return this._d3Scale.ticks(count);
     }
 
     /**
-     * Gets the current default number of ticks.
+     * Gets the default number of ticks.
      *
-     * @returns {number} The current default number of ticks.
+     * @returns {number} The default number of ticks.
      */
     public numTicks(): number;
     /**
