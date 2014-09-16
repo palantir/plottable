@@ -7,6 +7,9 @@ export module Plot {
    * One usecase is to show how much funding departments are given out of a total budget.
    *
    * Primary projection attributes:
+   *   "fill" - Accessor determining the color of each sector
+   *   "innerradius" - Accessor determining the distance from the center to the inner edge of the sector
+   *   "outerradius" - Accessor determining the distance from the center to the outer edge of the sector
    *   "value" - Accessor to extract the value determining the proportion of each slice to the total
    */
   export class Pie extends Abstract.Plot {
