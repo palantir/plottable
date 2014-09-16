@@ -4555,6 +4555,7 @@ var Plottable;
                     attrToProjector["fill"] = function (d, i) { return Pie.DEFAULT_COLOR_SCALE.scale(String(i)); };
                 }
                 attrToProjector["transform"] = function () { return "translate(" + _this.width() / 2 + "," + _this.height() / 2 + ")"; };
+                delete attrToProjector["value"];
                 return attrToProjector;
             };
             Pie.prototype._getAnimator = function (drawer, index) {
@@ -4580,7 +4581,10 @@ var Plottable;
                 });
             };
             Pie.prototype.pie = function (d) {
-                return d3.layout.pie().sort(null).value(function (d) { return d.value; })(d);
+                var defaultAccessor = function (d) { return d.value; };
+                var valueProjector = this._projectors["value"];
+                var valueAccessor = valueProjector ? valueProjector.accessor : defaultAccessor;
+                return d3.layout.pie().sort(null).value(valueAccessor)(d);
             };
             Pie.DEFAULT_COLOR_SCALE = new Plottable.Scale.Color();
             return Pie;

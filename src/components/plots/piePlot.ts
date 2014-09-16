@@ -5,6 +5,9 @@ export module Plot {
   /*
    * A PiePlot is a plot meant to show how much out of a total an attribute's value is.
    * One usecase is to show how much funding departments are given out of a total budget.
+   *
+   * Primary projection attributes:
+   *   "value" - Accessor to extract the value determining the proportion of each slice to the total
    */
   export class Pie extends Abstract.Plot {
 
@@ -82,6 +85,7 @@ export module Plot {
       }
 
       attrToProjector["transform"] = () => "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
+      delete attrToProjector["value"];
       return attrToProjector;
     }
 
@@ -112,9 +116,12 @@ export module Plot {
     }
 
     private pie(d: any[]): D3.Layout.ArcDescriptor[] {
+      var defaultAccessor = (d: any) => d.value;
+      var valueProjector = this._projectors["value"];
+      var valueAccessor = valueProjector ? valueProjector.accessor : defaultAccessor;
       return d3.layout.pie()
                       .sort(null)
-                      .value((d) => d.value)(d);
+                      .value(valueAccessor)(d);
     }
 
   }
