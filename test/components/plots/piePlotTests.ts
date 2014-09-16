@@ -61,6 +61,48 @@ describe("Plots", () => {
       verifier.end();
     });
 
+    it("innerRadius project", () => {
+      piePlot.project("innerRadius", () => 5);
+      var arcPaths = renderArea.selectAll(".arc");
+      assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+
+      var pathPoints0 = normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
+
+      var radiusPath0 = pathPoints0[2].split(",").map((coordinate: string) => parseFloat(coordinate));
+      assert.closeTo(radiusPath0[0], 5, 1, "stops line at innerRadius point");
+      assert.closeTo(radiusPath0[1], 0, 1, "stops line at innerRadius point");
+
+      var innerArcPath0 = pathPoints0[3].split(",").map((coordinate: string) => parseFloat(coordinate));
+      assert.closeTo(innerArcPath0[0], 5, 1, "makes inner arc of radius 5");
+      assert.closeTo(innerArcPath0[1], 5, 1, "makes inner arc of radius 5");
+      assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center");
+      assert.closeTo(innerArcPath0[6], -5, 1, "makes inner arc to top of inner circle");
+
+      piePlot.project("innerRadius", () => 0);
+      verifier.end();
+    });
+
+    it("outerRadius project", () => {
+      piePlot.project("outerRadius", () => 150);
+      var arcPaths = renderArea.selectAll(".arc");
+      assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+
+      var pathPoints0 = normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
+
+      var radiusPath0 = pathPoints0[0].split(",").map((coordinate: string) => parseFloat(coordinate));
+      assert.closeTo(radiusPath0[0], 0, 1, "starts at outerRadius point");
+      assert.closeTo(radiusPath0[1], -150, 1, "starts at outerRadius point");
+
+      var outerArcPath0 = pathPoints0[1].split(",").map((coordinate: string) => parseFloat(coordinate));
+      assert.closeTo(outerArcPath0[0], 150, 1, "makes outer arc of radius 150");
+      assert.closeTo(outerArcPath0[1], 150, 1, "makes outer arc of radius 150");
+      assert.closeTo(outerArcPath0[5], 150, 1, "makes outer arc to right edge");
+      assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
+
+      piePlot.project("outerRadius", () => 250);
+      verifier.end();
+    });
+
     after(() => {
       if (verifier.passed) {svg.remove();};
     });

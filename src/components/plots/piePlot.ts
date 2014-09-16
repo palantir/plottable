@@ -67,9 +67,13 @@ export module Plot {
 
     public _generateAttrToProjector(): IAttributeToProjector {
       var attrToProjector = super._generateAttrToProjector();
+      var innerRadiusF = attrToProjector["innerradius"] || d3.functor(0);
+      var outerRadiusF = attrToProjector["outerradius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
       attrToProjector["d"] = d3.svg.arc()
-                      .outerRadius(Math.min(this.width(), this.height()) / 2)
-                      .innerRadius(0);
+                      .innerRadius(innerRadiusF)
+                      .outerRadius(outerRadiusF);
+      delete attrToProjector["innerradius"];
+      delete attrToProjector["outerradius"];
       attrToProjector["transform"] = () => "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
       return attrToProjector;
     }
