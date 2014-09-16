@@ -69,9 +69,13 @@ export module Plot {
 
     public _generateAttrToProjector(): IAttributeToProjector {
       var attrToProjector = super._generateAttrToProjector();
+      var innerRadiusF = attrToProjector["innerradius"] || d3.functor(0);
+      var outerRadiusF = attrToProjector["outerradius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
       attrToProjector["d"] = d3.svg.arc()
-                      .outerRadius(Math.min(this.width(), this.height()) / 2)
-                      .innerRadius(0);
+                      .innerRadius(innerRadiusF)
+                      .outerRadius(outerRadiusF);
+      delete attrToProjector["innerradius"];
+      delete attrToProjector["outerradius"];
 
       if (attrToProjector["fill"] == null) {
         attrToProjector["fill"] = (d: any, i: number) => Pie.DEFAULT_COLOR_SCALE.scale(String(i));
