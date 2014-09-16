@@ -99,14 +99,8 @@ export module Scale {
       this.broadcaster.broadcast();
     }
 
-    public ticks(): any[];
-    public ticks(count: number): ModifiedLog;
-    public ticks(count?: number): any {
-      if (count != null) {
-        super.ticks(count);
-        return this;
-      }
-
+    public ticks(count?: number): number[] {
+      var numberOfTicks = (count == null) ? this._numTicks : count;
       // Say your domain is [-100, 100] and your pivot is 10.
       // then we're going to draw negative log ticks from -100 to -10,
       // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
@@ -128,7 +122,7 @@ export module Scale {
       var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
       // If you only have 1 tick, you can't tell how big the scale is.
       if (ticks.length <= 1) {
-        ticks = d3.scale.linear().domain([min, max]).ticks(this._numTicks);
+        ticks = d3.scale.linear().domain([min, max]).ticks(numberOfTicks);
       }
       return ticks;
     }

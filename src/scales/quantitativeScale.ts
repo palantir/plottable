@@ -110,21 +110,33 @@ export module Abstract {
     }
 
     /**
-     * Returns a set of tick values spanning the domain.
+     * Gets a set of tick values spanning the domain.
      *
+     * @param {number} [count] The approximate number of ticks to generate.
+     *                         If not supplied, the number specified by
+     *                         numTicks() is used instead.
      * @returns {any[]} The generated ticks.
      */
-    public ticks(): any[];
+    public ticks(count?: number): any[] {
+      return this._d3Scale.ticks( (count == null) ? this._numTicks : count);
+    }
+
     /**
-     * Sets the number of ticks to generate.
+     * Gets the current default number of ticks.
      *
-     * @param {number} count The number of ticks to generate.
-     * @returns {QuantitativeScale} The calling QuantitativeScale.
+     * @returns {number} The current default number of ticks.
      */
-    public ticks(count: number): QuantitativeScale<D>;
-    public ticks(count?: number): any {
+    public numTicks(): number;
+    /**
+     * Sets the default number of ticks to generate.
+     *
+     * @param {number} count The new default number of ticks.
+     * @returns {Scale} The calling Scale.
+     */
+    public numTicks(count: number): QuantitativeScale<D>;
+    public numTicks(count?: number): any {
       if (count == null) {
-        return this._d3Scale.ticks(this._numTicks);
+        return this._numTicks;
       }
       this._numTicks = count;
       return this;
