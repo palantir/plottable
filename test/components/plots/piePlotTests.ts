@@ -89,6 +89,7 @@ describe("Plots", () => {
       assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above the center");
 
       piePlot.project("value", "value");
+      verifier.end();
     });
 
     it("innerRadius project", () => {

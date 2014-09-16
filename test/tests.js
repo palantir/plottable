@@ -1554,6 +1554,7 @@ describe("Plots", function () {
             assert.closeTo(parseFloat(arcDestPoint1[0]), 0, 1, "ends on a line vertically from beginning");
             assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above the center");
             piePlot.project("value", "value");
+            verifier.end();
         });
         it("innerRadius project", function () {
             piePlot.project("innerRadius", function () { return 5; });
