@@ -8,6 +8,8 @@ export module Plot {
    */
   export class Pie extends Abstract.Plot {
 
+    private static DEFAULT_COLOR_SCALE = new Scale.Color();
+
     public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
     public _datasetKeysInOrder: string[];
     private nextSeriesIndex: number;
@@ -24,8 +26,6 @@ export module Plot {
       this.nextSeriesIndex = 0;
       super(new Plottable.Dataset());
       this.classed("pie-plot", true);
-
-      this.project("fill", (d: any, i: number) => String(i), new Scale.Color());
     }
 
     public _setup() {
@@ -72,6 +72,11 @@ export module Plot {
       attrToProjector["d"] = d3.svg.arc()
                       .outerRadius(Math.min(this.width(), this.height()) / 2)
                       .innerRadius(0);
+
+      if (attrToProjector["fill"] == null) {
+        attrToProjector["fill"] = (d: any, i: number) => Pie.DEFAULT_COLOR_SCALE.scale(String(i));
+      }
+
       attrToProjector["transform"] = () => "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
       return attrToProjector;
     }
