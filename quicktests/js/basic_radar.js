@@ -1,7 +1,7 @@
 function makeData() {
   "use strict";
 
-  var data = [{attr0: 5, attr1: 5, attr2: 5 }, {attr0: 8, attr1: 8, attr2: 8}, {attr0: 10, attr1: 10, attr2: 10}];
+  var data = [{metric: "attr0", value: 5}, {metric: "attr1", value: 6}, {metric: "attr2", value: 7}];
   return data;
 }
 
@@ -10,9 +10,9 @@ function run(div, data, Plottable) {
 
   var svg = div.append("svg").attr("height", 500);
   var rScale = new Plottable.Scale.Linear().domain([0, 10]);
+  var thetaScale = new Plottable.Scale.Ordinal().rangeType("points", 0, 0).domain(["attr0", "attr1", "attr2"]);
 
-  var radarPlot = new Plottable.Plot.Radar(rScale)
+  var radarPlot = new Plottable.Plot.Radar(rScale, thetaScale)
                                     .addDataset(data)
-                                    .addMetrics("attr0", "attr1", "attr2")
                                     .renderTo(svg);
 }
