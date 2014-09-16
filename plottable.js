@@ -1510,7 +1510,7 @@ var Plottable;
             __extends(QuantitativeScale, _super);
             function QuantitativeScale(scale) {
                 _super.call(this, scale);
-                this._lastRequestedTickCount = 10;
+                this._numTicks = 10;
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
                 this._userSetDomainer = false;
                 this._domainer = new Plottable.Domainer();
@@ -1555,10 +1555,11 @@ var Plottable;
                 return this;
             };
             QuantitativeScale.prototype.ticks = function (count) {
-                if (count != null) {
-                    this._lastRequestedTickCount = count;
+                if (count == null) {
+                    return this._d3Scale.ticks(this._numTicks);
                 }
-                return this._d3Scale.ticks(this._lastRequestedTickCount);
+                this._numTicks = count;
+                return this;
             };
             QuantitativeScale.prototype._niceDomain = function (domain, count) {
                 return this._d3Scale.copy().domain(domain).nice(count).domain();
@@ -1658,7 +1659,7 @@ var Plottable;
                 this.base = base;
                 this.pivot = this.base;
                 this.untransformedDomain = this._defaultExtent();
-                this._lastRequestedTickCount = 10;
+                this._numTicks = 10;
                 if (base <= 1) {
                     throw new Error("ModifiedLogScale: The base must be > 1");
                 }
@@ -1701,6 +1702,7 @@ var Plottable;
             ModifiedLog.prototype.ticks = function (count) {
                 if (count != null) {
                     _super.prototype.ticks.call(this, count);
+                    return this;
                 }
                 var middle = function (x, y, z) { return [x, y, z].sort(function (a, b) { return a - b; })[1]; };
                 var min = Plottable._Util.Methods.min(this.untransformedDomain);
@@ -1714,7 +1716,7 @@ var Plottable;
                 var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this.howManyTicks(negativeUpper, positiveLower)) : [-this.pivot, 0, this.pivot].filter(function (x) { return min <= x && x <= max; });
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 if (ticks.length <= 1) {
-                    ticks = d3.scale.linear().domain([min, max]).ticks(this._lastRequestedTickCount);
+                    ticks = d3.scale.linear().domain([min, max]).ticks(this._numTicks);
                 }
                 return ticks;
             };
@@ -1742,7 +1744,7 @@ var Plottable;
                 var adjustedLower = this.adjustedLog(lower);
                 var adjustedUpper = this.adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-                var ticks = Math.ceil(proportion * this._lastRequestedTickCount);
+                var ticks = Math.ceil(proportion * this._numTicks);
                 return ticks;
             };
             ModifiedLog.prototype.copy = function () {

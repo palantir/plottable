@@ -4,7 +4,7 @@ module Plottable {
 export module Abstract {
   export class QuantitativeScale<D> extends Scale<D, number> {
     public _d3Scale: D3.Scale.QuantitativeScale;
-    public _lastRequestedTickCount = 10;
+    public _numTicks = 10;
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     public _userSetDomainer: boolean = false;
     public _domainer: Domainer = new Domainer();
@@ -110,16 +110,24 @@ export module Abstract {
     }
 
     /**
-     * Returns the locations in the range where ticks will show up.
+     * Returns a set of tick values spanning the domain.
      *
-     * @param {number} count The suggested number of ticks to generate.
      * @returns {any[]} The generated ticks.
      */
-    public ticks(count?: number) {
-      if (count != null) {
-        this._lastRequestedTickCount = count;
+    public ticks(): any[];
+    /**
+     * Sets the number of ticks to generate.
+     *
+     * @param {number} count The number of ticks to generate.
+     * @returns {QuantitativeScale} The calling QuantitativeScale.
+     */
+    public ticks(count: number): QuantitativeScale<D>;
+    public ticks(count?: number): any {
+      if (count == null) {
+        return this._d3Scale.ticks(this._numTicks);
       }
-      return this._d3Scale.ticks(this._lastRequestedTickCount);
+      this._numTicks = count;
+      return this;
     }
 
     /**

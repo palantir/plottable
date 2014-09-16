@@ -375,7 +375,8 @@ declare module Plottable {
             rangeRound(values: number[]): QuantitativeScale<D>;
             clamp(): boolean;
             clamp(clamp: boolean): QuantitativeScale<D>;
-            ticks(count?: number): any[];
+            ticks(): any[];
+            ticks(count: number): QuantitativeScale<D>;
             domainer(): Domainer;
             domainer(domainer: Domainer): QuantitativeScale<D>;
         }
@@ -411,7 +412,8 @@ declare module Plottable {
             constructor(base?: number);
             scale(x: number): number;
             invert(x: number): number;
-            ticks(count?: number): number[];
+            ticks(): any[];
+            ticks(count: number): ModifiedLog;
             copy(): ModifiedLog;
             showIntermediateTicks(): boolean;
             showIntermediateTicks(show: boolean): ModifiedLog;

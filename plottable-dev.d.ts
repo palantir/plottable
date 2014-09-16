@@ -383,7 +383,7 @@ declare module Plottable {
     module Abstract {
         class QuantitativeScale<D> extends Scale<D, number> {
             _d3Scale: D3.Scale.QuantitativeScale;
-            _lastRequestedTickCount: number;
+            _numTicks: number;
             _PADDING_FOR_IDENTICAL_DOMAIN: number;
             _userSetDomainer: boolean;
             _domainer: Domainer;
@@ -400,7 +400,8 @@ declare module Plottable {
             rangeRound(values: number[]): QuantitativeScale<D>;
             clamp(): boolean;
             clamp(clamp: boolean): QuantitativeScale<D>;
-            ticks(count?: number): any[];
+            ticks(): any[];
+            ticks(count: number): QuantitativeScale<D>;
             _niceDomain(domain: any[], count?: number): any[];
             domainer(): Domainer;
             domainer(domainer: Domainer): QuantitativeScale<D>;
@@ -441,7 +442,8 @@ declare module Plottable {
             invert(x: number): number;
             _getDomain(): number[];
             _setDomain(values: number[]): void;
-            ticks(count?: number): number[];
+            ticks(): any[];
+            ticks(count: number): ModifiedLog;
             copy(): ModifiedLog;
             _niceDomain(domain: any[], count?: number): any[];
             showIntermediateTicks(): boolean;
