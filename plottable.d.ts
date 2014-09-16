@@ -376,6 +376,8 @@ declare module Plottable {
             clamp(): boolean;
             clamp(clamp: boolean): QuantitativeScale<D>;
             ticks(count?: number): any[];
+            numTicks(): number;
+            numTicks(count: number): QuantitativeScale<D>;
             domainer(): Domainer;
             domainer(domainer: Domainer): QuantitativeScale<D>;
         }
