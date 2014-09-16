@@ -6,7 +6,7 @@ export module Plot {
    * A PiePlot is a plot meant to show how much out of a total an attribute's value is.
    * One usecase is to show how much funding departments are given out of a total budget.
    *
-   * Supported projection attributes:
+   * Primary projection attributes:
    *   "value" - Accessor to extract the value determining the proportion of each slice to the total
    */
   export class Pie extends Abstract.Plot {
