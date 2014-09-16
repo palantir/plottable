@@ -17,7 +17,7 @@ describe("Plots", () => {
       verifier = new MultiTestVerifier();
       simpleDataset = new Plottable.Dataset([{value: 5}, {value: 15}]);
       piePlot = new Plottable.Plot.Pie();
-      piePlot.addDataset(simpleDataset)
+      piePlot.addDataset(simpleDataset);
       piePlot.renderTo(svg);
       renderArea = piePlot._renderArea;
     });

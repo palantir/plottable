@@ -4519,14 +4519,11 @@ var Plottable;
         var Pie = (function (_super) {
             __extends(Pie, _super);
             function Pie() {
-                var _this = this;
                 this._key2DatasetDrawerKey = d3.map();
                 this._datasetKeysInOrder = [];
                 this.nextSeriesIndex = 0;
                 _super.call(this, new Plottable.Dataset());
                 this.classed("pie-plot", true);
-                this.project("innerradius", function () { return 0; });
-                this.project("outerradius", function () { return Math.min(_this.width(), _this.height()) / 2; });
             }
             Pie.prototype._setup = function () {
                 Plottable.Abstract.NewStylePlot.prototype._setup.call(this);
@@ -4547,8 +4544,8 @@ var Plottable;
             Pie.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var innerRadiusF = attrToProjector["innerradius"];
-                var outerRadiusF = attrToProjector["outerradius"];
+                var innerRadiusF = attrToProjector["innerradius"] || d3.functor(0);
+                var outerRadiusF = attrToProjector["outerradius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
                 attrToProjector["d"] = d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
                 delete attrToProjector["innerradius"];
                 delete attrToProjector["outerradius"];
