@@ -4533,11 +4533,12 @@ var Plottable;
     (function (Plot) {
         var Radar = (function (_super) {
             __extends(Radar, _super);
-            function Radar(rScale) {
+            function Radar(rScale, thetaScale) {
                 this._key2DatasetDrawerKey = d3.map();
                 this._datasetKeysInOrder = [];
                 this.nextSeriesIndex = 0;
                 this._rScale = rScale;
+                this._thetaScale = thetaScale;
                 this._metrics = [];
                 _super.call(this, new Plottable.Dataset());
                 this.classed("radar-plot", true);
@@ -4548,40 +4549,32 @@ var Plottable;
             Radar.prototype.metrics = function () {
                 return this._metrics.slice(0);
             };
-            Radar.prototype.addMetrics = function () {
-                var _this = this;
-                var metrics = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    metrics[_i - 0] = arguments[_i];
-                }
-                metrics.forEach(function (metric) { return _this._metrics.push(metric); });
-                this._render();
-                return this;
+            Radar.prototype._onDatasetUpdate = function () {
+                _super.prototype._onDatasetUpdate.call(this);
+                this.radar();
             };
-            Radar.prototype.removeMetrics = function () {
+            Radar.prototype.radar = function () {
                 var _this = this;
-                var metrics = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    metrics[_i - 0] = arguments[_i];
-                }
-                metrics.forEach(function (metric) {
-                    for (var i = 0; i < _this._metrics.length; i++) {
-                        if (metric === _this._metrics[i]) {
-                            _this._metrics.splice(i, 1);
-                            break;
+                this.radarData = [];
+                this._metrics = [];
+                this._getDatasetsInOrder().forEach(function (dataset) {
+                    var data = dataset.data();
+                    var radarDatum = {};
+                    data.forEach(function (datum) {
+                        var metric = datum["metric"];
+                        var value = datum["value"];
+                        if (_this._metrics.indexOf(metric) === -1) {
+                            _this._metrics.push(metric);
                         }
-                    }
+                        radarDatum[metric] = value;
+                    });
+                    _this.radarData.push(radarDatum);
                 });
-                this._render();
-                return this;
             };
             Radar.prototype.addDataset = function (keyOrDataset, dataset) {
                 return Plottable.Abstract.NewStylePlot.prototype.addDataset.call(this, keyOrDataset, dataset);
             };
             Radar.prototype._addDataset = function (key, dataset) {
-                if (dataset.data().length > 1) {
-                    Plottable._Util.Methods.warn("Functionality is undefined for more than 1 item in the dataset");
-                }
                 if (this._datasetKeysInOrder.length === 1) {
                     Plottable._Util.Methods.warn("Only one dataset is supported in radar plots");
                     return;
@@ -4594,6 +4587,7 @@ var Plottable;
             Radar.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 this._rScale.range([0, this.maxRadius()]);
+                this._thetaScale.range([0, 2 * Math.PI * (this._metrics.length - 1) / this._metrics.length]);
             };
             Radar.prototype._getAnimator = function (drawer, index) {
                 return Plottable.Abstract.NewStylePlot.prototype._getAnimator.call(this, drawer, index);
@@ -4613,9 +4607,9 @@ var Plottable;
                 function pointMapper(d) {
                     return self.metrics().map(function (metric, i) {
                         var scaledValue = self._rScale.scale(d[metric]);
-                        var angle = i * 2 * Math.PI / self.metrics().length;
-                        var rotateX = scaledValue * Math.cos(angle);
-                        var rotateY = -scaledValue * Math.sin(angle);
+                        var angle = self._thetaScale.scale(metric);
+                        var rotateX = scaledValue * Math.sin(angle);
+                        var rotateY = -scaledValue * Math.cos(angle);
                         var translateX = self.width() / 2;
                         var translateY = self.height() / 2;
                         return [rotateX + translateX, rotateY + translateY];
@@ -4627,10 +4621,16 @@ var Plottable;
                 return attrToProjector;
             };
             Radar.prototype._paint = function () {
-                Plottable.Abstract.NewStylePlot.prototype._paint.call(this);
+                var _this = this;
+                var attrHash = this._generateAttrToProjector();
+                var datasets = this._getDatasetsInOrder();
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
+                    d.draw([_this.radarData[i]], attrHash, animator);
+                });
             };
             Radar.prototype.maxRadius = function () {
-                return Math.min(this.width(), this.height()) / 2 - 100;
+                return Math.min(this.width(), this.height()) / 2;
             };
             return Radar;
         })(Plottable.Abstract.Plot);

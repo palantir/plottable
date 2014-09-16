@@ -1490,6 +1490,7 @@ describe("Plots", function () {
     describe("RadarPlot", function () {
         var svg;
         var rScale;
+        var thetaScale;
         var simpleDataset;
         var radarPlot;
         var renderArea;
@@ -1499,8 +1500,9 @@ describe("Plots", function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
             rScale = new Plottable.Scale.Linear().domain([0, 10]);
-            simpleDataset = new Plottable.Dataset([{ attr0: 5, attr1: 10, attr2: 7 }]);
-            radarPlot = new Plottable.Plot.Radar(rScale).addDataset(simpleDataset).addMetrics("attr0", "attr1", "attr2");
+            thetaScale = new Plottable.Scale.Ordinal().rangeType("points", 0, 0).domain(["attr0", "attr1", "attr2"]);
+            simpleDataset = new Plottable.Dataset([{ metric: "attr0", value: 5 }, { metric: "attr1", value: 10 }, { metric: "attr2", value: 7 }]);
+            radarPlot = new Plottable.Plot.Radar(rScale, thetaScale).addDataset(simpleDataset);
             radarPlot.renderTo(svg);
             renderArea = radarPlot._renderArea;
         });
@@ -1510,15 +1512,15 @@ describe("Plots", function () {
         it("polygon is drawn correctly", function () {
             var polygon = renderArea.select("polygon");
             var points = polygon.attr("points").split(" ");
-            var point0 = points[0].split(",");
-            assert.closeTo(parseFloat(point0[0]), 325, 1, "Starts halfway between center and end of axis");
-            assert.closeTo(parseFloat(point0[1]), 250, 1, "Starts at the same point vertically");
-            var point1 = points[1].split(",");
-            assert.closeTo(parseFloat(point1[0]), 175, 1, "Goes left to the second point");
-            assert.closeTo(parseFloat(point1[1]), 120, 1, "Goes up to the second point");
-            var point2 = points[2].split(",");
-            assert.closeTo(parseFloat(point2[0]), 197.5, 1, "Goes right to the third point");
-            assert.closeTo(parseFloat(point2[1]), 341, 1, "Goes down to the third point");
+            var point0 = points[0].split(",").map(function (coordinate) { return parseFloat(coordinate); });
+            assert.closeTo(point0[0], 250, 1, "Starts above the center point");
+            assert.closeTo(point0[1], 125, 1, "Starts above the center point halfway to the top");
+            var point1 = points[1].split(",").map(function (coordinate) { return parseFloat(coordinate); });
+            assert.closeTo(point1[0], 466.5, 1, "Goes right to the second point");
+            assert.closeTo(point1[1], 375, 1, "Goes down to the second point");
+            var point2 = points[2].split(",").map(function (coordinate) { return parseFloat(coordinate); });
+            assert.closeTo(point2[0], 98.45, 1, "Goes left to the third point");
+            assert.closeTo(point2[1], 337.5, 1, "Goes up to the third point");
             verifier.end();
         });
         after(function () {
@@ -1532,25 +1534,12 @@ describe("Plots", function () {
         var radarPlot;
         beforeEach(function () {
             var rScale = new Plottable.Scale.Linear();
-            radarPlot = new Plottable.Plot.Radar(rScale).addMetrics("attr0", "attr1", "attr2");
+            var thetaScale = new Plottable.Scale.Ordinal().domain(["attr0", "attr1", "attr2"]);
+            var dataset = new Plottable.Dataset([{ metric: "attr0", value: 5 }, { metric: "attr1", value: 10 }, { metric: "attr2", value: 7 }]);
+            radarPlot = new Plottable.Plot.Radar(rScale, thetaScale).addDataset(dataset);
         });
         it("initial metrics are correct", function () {
             assert.deepEqual(radarPlot.metrics(), ["attr0", "attr1", "attr2"], "metrics is the same as ones initially added in same order");
-        });
-        it("adding metrics gives correct behavior", function () {
-            radarPlot.addMetrics("attr3", "attr4");
-            assert.deepEqual(radarPlot.metrics(), ["attr0", "attr1", "attr2", "attr3", "attr4"], "adding metrics appends them in the same order");
-            radarPlot.addMetrics("attr0");
-            assert.deepEqual(radarPlot.metrics(), ["attr0", "attr1", "attr2", "attr3", "attr4", "attr0"], "adding a duplicate metrics acts normally");
-        });
-        it("removing metrics gives correct behavior", function () {
-            radarPlot.removeMetrics("attr0");
-            assert.deepEqual(radarPlot.metrics(), ["attr1", "attr2"], "removing a metric acts normally");
-            radarPlot.addMetrics("attr1");
-            radarPlot.removeMetrics("attr1");
-            assert.deepEqual(radarPlot.metrics(), ["attr2", "attr1"], "removing a metric removes the first if duplicates exist");
-            assert.doesNotThrow(function () { return radarPlot.removeMetrics("attr0", "foo", "bar"); }, Error, "does not error if removing metrics that don't exist");
-            assert.deepEqual(radarPlot.metrics(), ["attr2", "attr1"], "metrics aren't changed after calling remove on nonexistent metrics");
         });
     });
 });

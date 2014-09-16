@@ -911,11 +911,11 @@ declare module Plottable {
             _datasetKeysInOrder: string[];
             _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
             _rScale: Plottable.Abstract.Scale<R, number>;
-            constructor(rScale: Plottable.Abstract.Scale<R, number>);
+            _thetaScale: Plottable.Scale.Ordinal;
+            constructor(rScale: Plottable.Abstract.Scale<R, number>, thetaScale: Plottable.Scale.Ordinal);
             _setup(): void;
             metrics(): string[];
-            addMetrics(...metrics: string[]): Radar<R>;
-            removeMetrics(...metrics: string[]): Radar<R>;
+            _onDatasetUpdate(): void;
             addDataset(key: string, dataset: Dataset): Radar<R>;
             addDataset(key: string, dataset: any[]): Radar<R>;
             addDataset(dataset: Dataset): Radar<R>;

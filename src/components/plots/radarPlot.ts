@@ -11,8 +11,10 @@ export module Plot {
     public _datasetKeysInOrder: string[];
     public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
     public _rScale: Abstract.Scale<R, number>;
+    public _thetaScale: Scale.Ordinal;
     private nextSeriesIndex: number;
     private _metrics: string[];
+    private radarData: any[];
 
     /**
      * Constructs a RadarPlot.
@@ -20,11 +22,12 @@ export module Plot {
      * @constructor
      * @param {Scale} rScale The r scale to use.
      */
-    constructor(rScale: Abstract.Scale<R, number>) {
+    constructor(rScale: Abstract.Scale<R, number>, thetaScale: Scale.Ordinal) {
       this._key2DatasetDrawerKey = d3.map();
       this._datasetKeysInOrder = [];
       this.nextSeriesIndex = 0;
       this._rScale = rScale;
+      this._thetaScale = thetaScale;
       this._metrics = [];
       // make a dummy dataset to satisfy the base Plot (HACKHACK)
       super(new Dataset());
@@ -44,35 +47,29 @@ export module Plot {
       return this._metrics.slice(0);
     }
 
-    /**
-     * Adds metrics to associate with this RadarPlot
-     *
-     * @param {string[]} metrics The metrics to associate this RadarPlot to
-     * @returns {Radar} The calling RadarPlot.
-     */
-    public addMetrics(...metrics: string[]): Radar<R> {
-      metrics.forEach((metric) => this._metrics.push(metric));
-      this._render();
-      return this;
+    public _onDatasetUpdate() {
+      super._onDatasetUpdate();
+      this.radar();
     }
 
-    /**
-     * Removes metrics associated with this RadarPlot
-     *
-     * @param {string[]} metrics The metrics to associate this RadarPlot to
-     * @returns {Radar} The calling RadarPlot.
-     */
-    public removeMetrics(...metrics: string[]): Radar<R> {
-      metrics.forEach((metric) => {
-        for (var i = 0; i < this._metrics.length; i++) {
-          if (metric === this._metrics[i]) {
-            this._metrics.splice(i, 1);
-            break;
+    private radar() {
+      this.radarData = [];
+      this._metrics = [];
+      this._getDatasetsInOrder().forEach((dataset) => {
+        var data = dataset.data();
+        var radarDatum: any = {};
+        data.forEach((datum: any) => {
+          var metric = datum["metric"];
+          var value = datum["value"];
+
+          if (this._metrics.indexOf(metric) === -1) {
+            this._metrics.push(metric);
           }
-        }
+
+          radarDatum[metric] = value;
+        });
+        this.radarData.push(radarDatum);
       });
-      this._render();
-      return this;
     }
 
     /**
@@ -94,9 +91,6 @@ export module Plot {
     }
 
     public _addDataset(key: string, dataset: Dataset) {
-      if (dataset.data().length > 1) {
-        _Util.Methods.warn("Functionality is undefined for more than 1 item in the dataset");
-      }
       if (this._datasetKeysInOrder.length === 1) {
         _Util.Methods.warn("Only one dataset is supported in radar plots");
         return;
@@ -117,6 +111,7 @@ export module Plot {
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this._rScale.range([0, this.maxRadius()]);
+      this._thetaScale.range([0, 2 * Math.PI * (this._metrics.length - 1) / this._metrics.length]);
     }
 
     public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
@@ -141,10 +136,9 @@ export module Plot {
       function pointMapper(d: any) {
          return self.metrics().map((metric, i) => {
            var scaledValue = self._rScale.scale(d[metric]);
-
-           var angle = i * 2 * Math.PI / self.metrics().length;
-           var rotateX = scaledValue * Math.cos(angle);
-           var rotateY = -scaledValue * Math.sin(angle);
+           var angle = self._thetaScale.scale(metric);
+           var rotateX = scaledValue * Math.sin(angle);
+           var rotateY = -scaledValue * Math.cos(angle);
 
            var translateX = self.width() / 2;
            var translateY = self.height() / 2;
@@ -159,11 +153,16 @@ export module Plot {
     }
 
     public _paint() {
-      Abstract.NewStylePlot.prototype._paint.call(this);
+      var attrHash = this._generateAttrToProjector();
+      var datasets = this._getDatasetsInOrder();
+      this._getDrawersInOrder().forEach((d, i) => {
+        var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
+        d.draw([this.radarData[i]], attrHash, animator);
+      });
     }
 
     private maxRadius() {
-      return Math.min(this.width(), this.height()) / 2 - 100;
+      return Math.min(this.width(), this.height()) / 2;
     }
   }
 }
