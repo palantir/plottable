@@ -2234,6 +2234,8 @@ var Plottable;
                 this.interactionsToRegister = [];
                 this.boxes = [];
                 this.isTopLevelComponent = false;
+                this._width = 0;
+                this._height = 0;
                 this._xOffset = 0;
                 this._yOffset = 0;
                 this.cssClasses = ["component"];
@@ -4549,6 +4551,9 @@ var Plottable;
                 attrToProjector["d"] = d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
                 delete attrToProjector["innerradius"];
                 delete attrToProjector["outerradius"];
+                if (attrToProjector["fill"] == null) {
+                    attrToProjector["fill"] = function (d, i) { return Pie.DEFAULT_COLOR_SCALE.scale(String(i)); };
+                }
                 attrToProjector["transform"] = function () { return "translate(" + _this.width() / 2 + "," + _this.height() / 2 + ")"; };
                 return attrToProjector;
             };
@@ -4577,6 +4582,7 @@ var Plottable;
             Pie.prototype.pie = function (d) {
                 return d3.layout.pie().sort(null).value(function (d) { return d.value; })(d);
             };
+            Pie.DEFAULT_COLOR_SCALE = new Plottable.Scale.Color();
             return Pie;
         })(Plottable.Abstract.Plot);
         Plot.Pie = Pie;
