@@ -7,7 +7,7 @@ export module Plot {
    * One usecase is to show how much funding departments are given out of a total budget.
    *
    * Supported projection attributes:
-   *   "value" - Accessor to extract the relevant value from the data to plot
+   *   "value" - Accessor to extract the value determining the proportion of each slice to the total
    */
   export class Pie extends Abstract.Plot {
 
