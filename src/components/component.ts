@@ -208,7 +208,14 @@ export module Abstract {
         } else {
           selection = d3.select(element);
         }
+        if (!selection.node() || selection.node().nodeName !== "svg") {
+          throw new Error("Plottable requires a valid SVG to renderTo");
+        }
         this._anchor(selection);
+      }
+      if (this._element == null) {
+        throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
+          or a D3.Selection, or a selector string");
       }
       this._computeLayout();
       this._render();
@@ -376,7 +383,7 @@ export module Abstract {
             this.hitBox = this.addBox("hit-box");
             this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
         }
-        interaction._anchor(this.hitBox);
+        interaction._anchor(this, this.hitBox);
       } else {
         this.interactionsToRegister.push(interaction);
       }

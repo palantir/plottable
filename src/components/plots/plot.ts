@@ -103,7 +103,7 @@ export module Abstract {
      *
      * Here's a common use case:
      * ```typescript
-     * plot.project("r", function(d) { return d.foo; });
+     * plot.attr("r", function(d) { return d.foo; });
      * ```
      * This will set the radius of each datum `d` to be `d.foo`.
      *
@@ -120,6 +120,13 @@ export module Abstract {
      * is passed through the scale, such as `scale.scale(accessor(d, i))`.
      *
      * @returns {Plot} The calling Plot.
+     */
+    public attr(attrToSet: string, accessor: any, scale?: Abstract.Scale<any,any>) {
+      return this.project(attrToSet, accessor, scale);
+    }
+
+    /**
+     * Identical to plot.attr
      */
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
@@ -198,7 +205,7 @@ export module Abstract {
     public _updateProjector(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
-        var extent = this.dataset()._getExtent(projector.accessor);
+        var extent = this.dataset()._getExtent(projector.accessor, projector.scale._typeCoercer);
         if (extent.length === 0 || !this._isAnchored) {
           projector.scale._removeExtent(this._plottableID.toString(), attr);
         } else {

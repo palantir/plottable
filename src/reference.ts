@@ -78,7 +78,6 @@
 /// <reference path="interactions/keyEventListener.ts" />
 /// <reference path="interactions/interaction.ts" />
 /// <reference path="interactions/clickInteraction.ts" />
-/// <reference path="interactions/mousemoveInteraction.ts" />
 /// <reference path="interactions/keyInteraction.ts" />
 /// <reference path="interactions/panZoomInteraction.ts" />
 /// <reference path="interactions/barHoverInteraction.ts" />
@@ -90,5 +89,3 @@
 
 /// <reference path="dispatchers/dispatcher.ts" />
 /// <reference path="dispatchers/mouseDispatcher.ts" />
-
-/// <reference path="templates/standardChart.ts" />

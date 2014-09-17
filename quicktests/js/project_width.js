@@ -26,16 +26,16 @@ function run(div, data, Plottable) {
   var removeLabel = new Plottable.Component.Label("remove bar");
 
   var widthPicker = function(){
-    var availableSpace = xAxis.availableWidth;
+    var availableSpace = xAxis.width();
     var numBars = ds.data().length;
     var w = availableSpace * 0.7 / numBars;
     return w;
   };
 
   var barRenderer = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
-                                 .project("x", "name", xScale)
-                                 .project("y", "age", yScale)
-                                 .project("width", widthPicker);
+                                 .attr("x", "name", xScale)
+                                 .attr("y", "age", yScale)
+                                 .attr("width", widthPicker);
   var chart = new Plottable.Component.Table([
                                             [yAxis, gridlines.merge(barRenderer)],
                                             [null,  xAxis],
@@ -44,27 +44,25 @@ function run(div, data, Plottable) {
 
 
   function addBar() {
-    var data2 = ds.data();
-    if(data2.length < alphabet.length) {
-      var newBar = { name: alphabet[data2.length], age: data[0][data2.length].y };
-      data2.push(newBar);
-      console.log(newBar);
+    var d = ds.data();
+    if(d.length < alphabet.length) {
+      d.push({ name: alphabet[d.length], age: data[0][d.length].y });
     }
-    ds.data(data2);
-    barRenderer.project("width", widthPicker);
+    ds.data(d);
+    barRenderer.attr("width", widthPicker);
   }
 
   function removeBar() {
     var data2 = ds.data();
     if(data2.length > 0){  data2.pop();   }
     ds.data(data2);
-    barRenderer.project("width", widthPicker);
+    barRenderer.attr("width", widthPicker);
   }
 
-  var addClick = new Plottable.Interaction.Click(addLabel)
-                              .callback(addBar)
-                              .registerWithComponent();
-  var removeClick = new Plottable.Interaction.Click(removeLabel)
-                              .callback(removeBar)
-                              .registerWithComponent();
+  addLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(addBar)
+  );
+  removeLabel.registerInteraction(
+    new Plottable.Interaction.Click().callback(removeBar)
+  );
 }

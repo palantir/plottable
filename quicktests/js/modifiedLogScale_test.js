@@ -26,8 +26,8 @@ function run(div, data, Plottable) {
   yAxis.showEndTickLabel("bottom", false);
 
   circleRenderer = new Plottable.Plot.Scatter(data, xScale, yScale);
-  circleRenderer.project("r", 8);
-  circleRenderer.project("opacity", 0.75);
+  circleRenderer.attr("r", 8);
+  circleRenderer.attr("opacity", 0.75);
   circleRenderer.animate(doAnimate);
 
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
@@ -41,7 +41,7 @@ function run(div, data, Plottable) {
     circleRenderer.dataset().data(d);
   };
 
-  window.xy = new Plottable.Interaction.Click(circleRenderer)
-    .callback(cb)
-    .registerWithComponent();
+  circleRenderer.registerInteraction(
+    new Plottable.Interaction.Click().callback(cb)
+  );
 }

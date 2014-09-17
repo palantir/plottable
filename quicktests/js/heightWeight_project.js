@@ -29,11 +29,11 @@ function run(div, data, Plottable) {
     };
 
     var renderer = new Plottable.Plot.Scatter(dataseries, xScale, yScale);
-    renderer.project("x", xAccessor, xScale)
-                .project("y", yAccessor, yScale)
-                .project("r", rAccessor)
-                .project("fill", colorAccessor)
-                .project("opacity", opacityAccessor);
+    renderer.attr("x", xAccessor, xScale)
+                .attr("y", yAccessor, yScale)
+                .attr("r", rAccessor)
+                .attr("fill", colorAccessor)
+                .attr("opacity", opacityAccessor);
     var chartTable = new Plottable.Component.Table([[yAxis, renderer],
                                           [null, xAxis]]);
     chartTable.renderTo(svg);

@@ -18,7 +18,7 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   var hBarRenderer = new Plottable.Plot.HorizontalBar(data[0].slice(0, 6), xScale, yScale);
-  hBarRenderer.project("opacity", 0.75);
+  hBarRenderer.attr("opacity", 0.75);
   hBarRenderer.animate(doAnimate);
 
   var hBarChart = new Plottable.Component.Table([[yAxis, hBarRenderer],
@@ -26,12 +26,11 @@ function run(div, data, Plottable) {
   hBarChart.renderTo(svg);
 
   var cb = function(x, y){
-    d = hBarRenderer.dataset().data();
+    var d = hBarRenderer.dataset().data();
     hBarRenderer.dataset().data(d);
   };
 
-  var click = new Plottable.Interaction.Click(hBarRenderer)
-    .callback(cb)
-    .registerWithComponent();
-
+  hBarRenderer.registerInteraction(
+    new Plottable.Interaction.Click(hBarRenderer).callback(cb)
+  );
 }
