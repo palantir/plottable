@@ -4,17 +4,11 @@ module Plottable {
 export module Interaction {
   export class Drag extends Abstract.Interaction {
     private dragBehavior: D3.Behavior.Drag;
-    /**
-     * Where dragging originated for the current dragging event.
-     */
-    public origin = [0,0];
-    /**
-     * The current location of the mouse for the current dragging event.
-     */
-    public location = [0,0];
+    public      _origin = [0,0];
+    public    _location = [0,0];
+    public  _isDragging = false;
     public  _constrainX: (n: number) => number;
     public  _constrainY: (n: number) => number;
-    public  _isDragging = false;
     private ondragstart: (start: Point) => void;
     private      ondrag: (start: Point, end: Point) => void;
     private   ondragend: (start: Point, end: Point) => void;
@@ -104,25 +98,25 @@ export module Interaction {
       var constraintFunction = (min: number, max: number) => (x: number) => Math.min(Math.max(x, min), max);
       this._constrainX = constraintFunction(0, width );
       this._constrainY = constraintFunction(0, height);
-      this.origin = d3.mouse(this._hitBox[0][0].parentNode);
+      this._origin = d3.mouse(this._hitBox[0][0].parentNode);
       this._doDragstart();
     }
 
     public _doDragstart() {
       if (this.ondragstart != null) {
-        this.ondragstart({x: this.origin[0], y: this.origin[1]});
+        this.ondragstart({x: this._origin[0], y: this._origin[1]});
       }
     }
 
     public _drag(){
-      this.location = [this._constrainX(d3.event.x), this._constrainY(d3.event.y)];
+      this._location = [this._constrainX(d3.event.x), this._constrainY(d3.event.y)];
       this._doDrag();
     }
 
     public _doDrag() {
       if (this.ondrag != null) {
-        var start = {x: this.origin[0], y: this.origin[1]};
-        var end = {x: this.location[0], y: this.location[1]};
+        var start = {x: this._origin[0], y: this._origin[1]};
+        var end = {x: this._location[0], y: this._location[1]};
         this.ondrag(start, end);
       }
     }
@@ -134,8 +128,8 @@ export module Interaction {
 
     public _doDragend() {
       if (this.ondragend != null) {
-        var start = {x: this.origin[0], y: this.origin[1]};
-        var end = {x: this.location[0], y: this.location[1]};
+        var start = {x: this._origin[0], y: this._origin[1]};
+        var end = {x: this._location[0], y: this._location[1]};
         this.ondragend(start, end);
       }
     }

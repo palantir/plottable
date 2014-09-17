@@ -11,9 +11,9 @@ export module Interaction {
       var drawnX = true;
       var drawnY = true;
       var x0 = this._selectionOrigin[0];
-      var x1 = this.location[0];
+      var x1 = this._location[0];
       var y0 = this._selectionOrigin[1];
-      var y1 = this.location[1];
+      var y1 = this._location[1];
 
       if (!this.isResizeEnabled() || this.isResizingX || !this.isResizingY) {
         attrs.width = Math.abs(x0 - x1);

@@ -80,7 +80,7 @@ export module Interaction {
     }
 
     private isInsideBox(isX: boolean): boolean {
-      var origin = this.origin[isX ? 1 : 0];
+      var origin = this._origin[isX ? 1 : 0];
       var positionAttr = isX ? "y" : "x";
       var lengthAttr = isX ? "height" : "width";
       var from = parseInt(this.dragBox.attr(positionAttr), 10);
@@ -92,7 +92,7 @@ export module Interaction {
       var i = isX ? 0 : 1;
       var positionAttr = isX ? "x" : "y";
       var lengthAttr = isX ? "width" : "height";
-      var attrOrigin = this.origin[i];
+      var attrOrigin = this._origin[i];
       var leftPosition = parseInt(this.dragBox.attr(positionAttr), 10);
       var len = parseInt(this.dragBox.attr(lengthAttr), 10);
       if (isLeft) {
@@ -120,7 +120,7 @@ export module Interaction {
     }
 
     public _doDragstart() {
-      this._selectionOrigin = this.origin.slice();
+      this._selectionOrigin = this._origin.slice();
       if (this.boxIsDrawn) {
         if (!this.resizeEnabled) {
           this.clearBox();
@@ -131,13 +131,13 @@ export module Interaction {
               leftPosition = parseInt(this.dragBox.attr("x"), 10);
               rightPosition = parseInt(this.dragBox.attr("width"), 10) + leftPosition;
               this._selectionOrigin[0] = rightPosition;
-              this.resizeStartDiff[0] = leftPosition - this.origin[0];
+              this.resizeStartDiff[0] = leftPosition - this._origin[0];
               this.isResizingX = true;
             } else if (this.isResizeStartRight()) {
               leftPosition = parseInt(this.dragBox.attr("x"), 10);
               rightPosition = parseInt(this.dragBox.attr("width"), 10) + leftPosition;
               this._selectionOrigin[0] = leftPosition;
-              this.resizeStartDiff[0] = rightPosition - this.origin[0];
+              this.resizeStartDiff[0] = rightPosition - this._origin[0];
               this.isResizingX = true;
             } else {
               this.isResizingX = false;
@@ -151,13 +151,13 @@ export module Interaction {
               topPosition = parseInt(this.dragBox.attr("y"), 10);
               bottomPosition = parseInt(this.dragBox.attr("height"), 10) + topPosition;
               this._selectionOrigin[1] = bottomPosition;
-              this.resizeStartDiff[1] = topPosition - this.origin[1];
+              this.resizeStartDiff[1] = topPosition - this._origin[1];
               this.isResizingY = true;
             } else if (this.isResizeStartBottom()) {
               topPosition = parseInt(this.dragBox.attr("y"), 10);
               bottomPosition = parseInt(this.dragBox.attr("height"), 10) + topPosition;
               this._selectionOrigin[1] = topPosition;
-              this.resizeStartDiff[1] = bottomPosition - this.origin[1];
+              this.resizeStartDiff[1] = bottomPosition - this._origin[1];
               this.isResizingY = true;
             } else {
               this.isResizingY = false;
@@ -189,7 +189,7 @@ export module Interaction {
         y += diffY;
         this.resizeStartDiff[1] += diffY > 0 ? -1 : 1;
       }
-      this.location = [this._constrainX(x), this._constrainY(y)];
+      this._location = [this._constrainX(x), this._constrainY(y)];
       this._doDrag();
     }
 
