@@ -1,6 +1,6 @@
 function makeData() {
   "use strict";
-  return d3.csv("../../examples/data/hygxyzTruncated.csv");
+  return null;
 }
 
 function run(div, data, Plottable) {
