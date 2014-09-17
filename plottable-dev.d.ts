@@ -759,6 +759,23 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Axis {
+        class RadialGroup extends Plottable.Abstract.Component {
+            _rScale: Plottable.Abstract.Scale<any, number>;
+            _thetaScale: Plottable.Abstract.Scale<any, number>;
+            constructor(rScale: Plottable.Abstract.Scale<any, number>, thetaScale: Plottable.Abstract.Scale<any, number>);
+            remove(): void;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest;
+            _rescale(): void;
+            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
+            _doRender(): void;
+            _generateBaselineAttrHash(): IAttributeToProjector;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Component {
         class Label extends Plottable.Abstract.Component {
             constructor(displayText?: string, orientation?: string);
