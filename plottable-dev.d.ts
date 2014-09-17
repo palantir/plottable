@@ -3413,7 +3413,7 @@ declare module Plottable {
              * @param {boolean} enabled
              */
             isResizeEnabled(enabled: boolean): DragBox;
-            _enableResize(): void;
+            _enableResize(enabled: boolean): void;
             _doDragstart(): void;
             _drag(): void;
             _doDragend(): void;
@@ -3447,7 +3447,7 @@ declare module Plottable {
         class XDragBox extends DragBox {
             _drag(): void;
             setBox(x0: number, x1: number): XDragBox;
-            _enableResize(): void;
+            _enableResize(enabled: boolean): void;
             _cursorStyle(x: number, y: number): string;
         }
     }
@@ -3458,7 +3458,7 @@ declare module Plottable {
     module Interaction {
         class XYDragBox extends DragBox {
             _drag(): void;
-            _enableResize(): void;
+            _enableResize(enabled: boolean): void;
             _cursorStyle(x: number, y: number): string;
         }
     }
@@ -3470,7 +3470,7 @@ declare module Plottable {
         class YDragBox extends DragBox {
             _drag(): void;
             setBox(y0: number, y1: number): YDragBox;
-            _enableResize(): void;
+            _enableResize(enabled: boolean): void;
             _cursorStyle(x: number, y: number): string;
         }
     }

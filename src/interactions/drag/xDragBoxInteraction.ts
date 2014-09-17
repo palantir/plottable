@@ -13,9 +13,9 @@ export module Interaction {
       return this;
     }
 
-    public _enableResize() {
-      super._enableResize();
-      this._resizeXEnabled = true;
+    public _enableResize(enabled: boolean) {
+      super._enableResize(enabled);
+      this._resizeXEnabled = enabled;
     }
 
     public _cursorStyle(x: number, y: number): string {

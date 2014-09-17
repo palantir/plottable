@@ -7881,12 +7881,12 @@ var Plottable;
                     return this.resizeEnabled;
                 }
                 else {
-                    this._enableResize();
+                    this._enableResize(enabled);
                     return this;
                 }
             };
-            DragBox.prototype._enableResize = function () {
-                this.resizeEnabled = true;
+            DragBox.prototype._enableResize = function (enabled) {
+                this.resizeEnabled = enabled;
             };
             DragBox.prototype.isInsideBox = function (isX) {
                 var origin = this._origin[isX ? 1 : 0];
@@ -8113,9 +8113,9 @@ var Plottable;
                 _super.prototype.setBox.call(this, x0, x1, 0, this._componentToListenTo.height());
                 return this;
             };
-            XDragBox.prototype._enableResize = function () {
-                _super.prototype._enableResize.call(this);
-                this._resizeXEnabled = true;
+            XDragBox.prototype._enableResize = function (enabled) {
+                _super.prototype._enableResize.call(this, enabled);
+                this._resizeXEnabled = enabled;
             };
             XDragBox.prototype._cursorStyle = function (x, y) {
                 var leftPosition = parseInt(this.dragBox.attr("x"), 10);
@@ -8183,10 +8183,10 @@ var Plottable;
                 };
                 this.boxIsDrawn = drawnX && drawnY;
             };
-            XYDragBox.prototype._enableResize = function () {
-                _super.prototype._enableResize.call(this);
-                this._resizeXEnabled = true;
-                this._resizeYEnabled = true;
+            XYDragBox.prototype._enableResize = function (enabled) {
+                _super.prototype._enableResize.call(this, enabled);
+                this._resizeXEnabled = enabled;
+                this._resizeYEnabled = enabled;
             };
             XYDragBox.prototype._cursorStyle = function (x, y) {
                 var x1 = parseInt(this.dragBox.attr("x"), 10);
@@ -8264,9 +8264,9 @@ var Plottable;
                 _super.prototype.setBox.call(this, 0, this._componentToListenTo.width(), y0, y1);
                 return this;
             };
-            YDragBox.prototype._enableResize = function () {
-                _super.prototype._enableResize.call(this);
-                this._resizeYEnabled = true;
+            YDragBox.prototype._enableResize = function (enabled) {
+                _super.prototype._enableResize.call(this, enabled);
+                this._resizeYEnabled = enabled;
             };
             YDragBox.prototype._cursorStyle = function (x, y) {
                 var topPosition = parseInt(this.dragBox.attr("y"), 10);

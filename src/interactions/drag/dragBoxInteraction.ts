@@ -70,13 +70,13 @@ export module Interaction {
       if (enabled == null) {
         return this.resizeEnabled;
       } else {
-        this._enableResize();
+        this._enableResize(enabled);
         return this;
       }
     }
 
-    public _enableResize() {
-      this.resizeEnabled = true;
+    public _enableResize(enabled: boolean) {
+      this.resizeEnabled = enabled;
     }
 
     private isInsideBox(isX: boolean): boolean {
