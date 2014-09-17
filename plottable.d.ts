@@ -2941,14 +2941,6 @@ declare module Plottable {
     module Interaction {
         class Drag extends Abstract.Interaction {
             /**
-             * Where dragging originated for the current dragging event.
-             */
-            origin: number[];
-            /**
-             * The current location of the mouse for the current dragging event.
-             */
-            location: number[];
-            /**
              * Constructs a Drag. A Drag will signal its callbacks on mouse drag.
              */
             constructor();
@@ -3012,6 +3004,7 @@ declare module Plottable {
          * element you attach it to when you drag.
          */
         class DragBox extends Drag {
+            static RESIZE_PADDING: number;
             /**
              * The DOM element of the box that is drawn. When no box is drawn, it is
              * null.
@@ -3021,7 +3014,6 @@ declare module Plottable {
              * Whether or not dragBox has been rendered in a visible area.
              */
             boxIsDrawn: boolean;
-            resizePadding: number;
             /**
              * The currently selected area, which can be different from the are the user has dragged.
              */
@@ -3043,13 +3035,13 @@ declare module Plottable {
              *
              * @returns {boolean}
              */
-            resize(): boolean;
+            isResizeEnabled(): boolean;
             /**
              * Enables or disables resizing.
              *
              * @param {boolean} enabled
              */
-            resize(enabled: boolean): DragBox;
+            isResizeEnabled(enabled: boolean): DragBox;
             /**
              * Clears the highlighted drag-selection box drawn by the DragBox.
              *
