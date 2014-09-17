@@ -79,34 +79,44 @@ export module Interaction {
       this.resizeEnabled = true;
     }
 
-    private isResizeStartAttr(isX: boolean): boolean {
-      var i1 = isX ? 0 : 1;
-      var i2 = isX ? 1 : 0;
-      var positionAttr1 = isX ? "x" : "y";
-      var positionAttr2 = isX ? "y" : "x";
-      var lengthAttr1 = isX ? "width" : "height";
-      var lengthAttr2 = isX ? "height": "width";
-      var otherOrigin = this.origin[i2];
-      var from = parseInt(this.dragBox.attr(positionAttr2), 10);
-      var to = parseInt(this.dragBox.attr(lengthAttr2), 10) + from;
-      if (otherOrigin + DragBox.RESIZE_PADDING < from || otherOrigin - DragBox.RESIZE_PADDING > to) {
-        return false;
+    private isInsideBox(isX: boolean): boolean {
+      var origin = this.origin[isX ? 1 : 0];
+      var positionAttr = isX ? "y" : "x";
+      var lengthAttr = isX ? "height" : "width";
+      var from = parseInt(this.dragBox.attr(positionAttr), 10);
+      var to = parseInt(this.dragBox.attr(lengthAttr), 10) + from;
+      return origin + DragBox.RESIZE_PADDING > from && origin - DragBox.RESIZE_PADDING < to;
+    }
+
+    private isResizeStartAttr(isX: boolean, isLeft: boolean): boolean {
+      var i = isX ? 0 : 1;
+      var positionAttr = isX ? "x" : "y";
+      var lengthAttr = isX ? "width" : "height";
+      var attrOrigin = this.origin[i];
+      var leftPosition = parseInt(this.dragBox.attr(positionAttr), 10);
+      var len = parseInt(this.dragBox.attr(lengthAttr), 10);
+      if (isLeft) {
+        return this._isCloseEnoughLeft(attrOrigin, leftPosition, len);
+      } else {
+        var rightPosition = len + leftPosition;
+        return this._isCloseEnoughRight(attrOrigin, rightPosition, len);
       }
-      var attrOrigin = this.origin[i1];
-      var leftPosition = parseInt(this.dragBox.attr(positionAttr1), 10);
-      var len = parseInt(this.dragBox.attr(lengthAttr1), 10);
-      var rightPosition = len + leftPosition;
-      var leftResult = this._isCloseEnoughLeft(attrOrigin, leftPosition, len);
-      if (leftResult) {
-        this._selectionOrigin[i1] = rightPosition;
-        this.resizeStartDiff[i1] = leftPosition - attrOrigin;
-      }
-      var rightResult = this._isCloseEnoughRight(attrOrigin, rightPosition, len);
-      if (rightResult) {
-        this._selectionOrigin[i1] = leftPosition;
-        this.resizeStartDiff[i1] = rightPosition - attrOrigin;
-      }
-      return leftResult || rightResult;
+    }
+
+    private isResizeStartLeft(): boolean {
+      return this.isResizeStartAttr(true, true);
+    }
+
+    private isResizeStartRight(): boolean {
+      return this.isResizeStartAttr(true, false);
+    }
+
+    private isResizeStartTop(): boolean {
+      return this.isResizeStartAttr(false, true);
+    }
+
+    private isResizeStartBottom(): boolean {
+      return this.isResizeStartAttr(false, false);
     }
 
     public _doDragstart() {
@@ -115,8 +125,46 @@ export module Interaction {
         if (!this.resizeEnabled) {
           this.clearBox();
         } else {
-          this.isResizingX = this._resizeXEnabled && this.isResizeStartAttr(true);
-          this.isResizingY = this._resizeYEnabled && this.isResizeStartAttr(false);
+          if (this._resizeXEnabled && this.isInsideBox(true)) {
+            var leftPosition: number, rightPosition: number;
+            if (this.isResizeStartLeft()) {
+              leftPosition = parseInt(this.dragBox.attr("x"), 10);
+              rightPosition = parseInt(this.dragBox.attr("width"), 10) + leftPosition;
+              this._selectionOrigin[0] = rightPosition;
+              this.resizeStartDiff[0] = leftPosition - this.origin[0];
+              this.isResizingX = true;
+            } else if (this.isResizeStartRight()) {
+              leftPosition = parseInt(this.dragBox.attr("x"), 10);
+              rightPosition = parseInt(this.dragBox.attr("width"), 10) + leftPosition;
+              this._selectionOrigin[0] = leftPosition;
+              this.resizeStartDiff[0] = rightPosition - this.origin[0];
+              this.isResizingX = true;
+            } else {
+              this.isResizingX = false;
+            }
+          } else {
+            this.isResizingX = false;
+          }
+          if (this._resizeYEnabled && this.isInsideBox(false)) {
+            var topPosition: number, bottomPosition: number;
+            if (this.isResizeStartTop()) {
+              topPosition = parseInt(this.dragBox.attr("y"), 10);
+              bottomPosition = parseInt(this.dragBox.attr("height"), 10) + topPosition;
+              this._selectionOrigin[1] = bottomPosition;
+              this.resizeStartDiff[1] = topPosition - this.origin[1];
+              this.isResizingY = true;
+            } else if (this.isResizeStartBottom()) {
+              topPosition = parseInt(this.dragBox.attr("y"), 10);
+              bottomPosition = parseInt(this.dragBox.attr("height"), 10) + topPosition;
+              this._selectionOrigin[1] = topPosition;
+              this.resizeStartDiff[1] = bottomPosition - this.origin[1];
+              this.isResizingY = true;
+            } else {
+              this.isResizingY = false;
+            }
+          } else {
+            this.isResizingY = false;
+          }
           this.isResizing = this.isResizingX || this.isResizingY;
           if (!this.isResizing) {
             this.clearBox();
