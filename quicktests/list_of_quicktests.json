@@ -102,6 +102,9 @@
     "name":"scale_interactive",
     "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Gridlines", "Merge", "Table", "Layout", "PanZoom Interaction"]
   },  {
+    "name":"scatter_plot_project",
+    "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Layout"]
+  },  {
     "name":"select_bars",
     "categories":["Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Gridlines", "Merge", "Click Interaction", "DragBox Interaction", "Title"]
   },  {
