@@ -10,6 +10,11 @@ module Plottable {
 
   export module Formatters {
 
+    interface TimeFilterFormat {
+      format: string;
+      filter: (d: any) => any;
+    }
+
     /**
      * Creates a formatter for currency values.
      *
@@ -140,11 +145,6 @@ module Plottable {
       return function(d: any) {
         return d3.format("." + precision + "s")(d);
       };
-    }
-
-    interface TimeFilterFormat {
-      format: string;
-      filter: (d: any) => any;
     }
 
     /**
