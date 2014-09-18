@@ -15,13 +15,10 @@ export module Interaction {
      */
     public dragBox: D3.Selection;
     /**
-     * Whether or not dragBox has been rendered in a visible area.
-     */
-    public boxIsDrawn = false;
-    /**
      * The currently selected area, which can be different from the are the user has dragged.
      */
     public selection: SelectionArea;
+    public _boxIsDrawn = false;
     public _selectionOrigin: number[];
     public _resizeXEnabled = false;
     public _resizeYEnabled = false;
@@ -85,6 +82,15 @@ export module Interaction {
     }
 
     /**
+     * Whether or not dragBox has been rendered in a visible area.
+     *
+     * @returns {boolean}
+     */
+    public boxIsDrawn(): boolean {
+      return this._boxIsDrawn;
+    }
+
+    /**
      * Return true if box is resizing.
      *
      * @returns {boolean}
@@ -139,7 +145,7 @@ export module Interaction {
 
     public _doDragstart() {
       this._selectionOrigin = this._origin.slice();
-      if (this.boxIsDrawn) {
+      if (this._boxIsDrawn) {
         if (!this.resizeEnabled) {
           this.clearBox();
         } else {
@@ -226,7 +232,7 @@ export module Interaction {
     public clearBox() {
       if (this.dragBox == null) {return;} // HACKHACK #593
       this.dragBox.attr("height", 0).attr("width", 0);
-      this.boxIsDrawn = false;
+      this._boxIsDrawn = false;
       return this;
     }
 
@@ -247,7 +253,7 @@ export module Interaction {
       var xo = Math.min(x0, x1);
       var yo = Math.min(y0, y1);
       this.dragBox.attr({x: xo, y: yo, width: w, height: h});
-      this.boxIsDrawn = (w > 0 && h > 0);
+      this._boxIsDrawn = (w > 0 && h > 0);
       this.selection = {
         xMin: xo,
         xMax: xo + w,
@@ -269,7 +275,7 @@ export module Interaction {
     public _hover() {
       if (this.resizeEnabled) {
         var cursorStyle: string;
-        if (this.boxIsDrawn) {
+        if (this._boxIsDrawn) {
           var position = d3.mouse(this._hitBox[0][0].parentNode);
           cursorStyle = this._cursorStyle(position[0], position[1]);
           if (!cursorStyle && this._isDragging) {

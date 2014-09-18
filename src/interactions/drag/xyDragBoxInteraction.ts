@@ -34,7 +34,7 @@ export module Interaction {
         yMin: yMin,
         yMax: (attrs.height || parseInt(this.dragBox.attr("height"), 10)) + yMin
       };
-      this.boxIsDrawn = drawnX && drawnY;
+      this._boxIsDrawn = drawnX && drawnY;
     }
 
     public _enableResize(enabled: boolean) {

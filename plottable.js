@@ -7843,10 +7843,7 @@ var Plottable;
             __extends(DragBox, _super);
             function DragBox() {
                 _super.apply(this, arguments);
-                /**
-                 * Whether or not dragBox has been rendered in a visible area.
-                 */
-                this.boxIsDrawn = false;
+                this._boxIsDrawn = false;
                 this._resizeXEnabled = false;
                 this._resizeYEnabled = false;
                 this._isResizingX = false;
@@ -7891,6 +7888,14 @@ var Plottable;
              */
             DragBox.prototype.isResizingY = function () {
                 return this._isResizingY;
+            };
+            /**
+             * Whether or not dragBox has been rendered in a visible area.
+             *
+             * @returns {boolean}
+             */
+            DragBox.prototype.boxIsDrawn = function () {
+                return this._boxIsDrawn;
             };
             /**
              * Return true if box is resizing.
@@ -7940,7 +7945,7 @@ var Plottable;
             };
             DragBox.prototype._doDragstart = function () {
                 this._selectionOrigin = this._origin.slice();
-                if (this.boxIsDrawn) {
+                if (this._boxIsDrawn) {
                     if (!this.resizeEnabled) {
                         this.clearBox();
                     }
@@ -8033,7 +8038,7 @@ var Plottable;
                     return;
                 } // HACKHACK #593
                 this.dragBox.attr("height", 0).attr("width", 0);
-                this.boxIsDrawn = false;
+                this._boxIsDrawn = false;
                 return this;
             };
             /**
@@ -8055,7 +8060,7 @@ var Plottable;
                 var xo = Math.min(x0, x1);
                 var yo = Math.min(y0, y1);
                 this.dragBox.attr({ x: xo, y: yo, width: w, height: h });
-                this.boxIsDrawn = (w > 0 && h > 0);
+                this._boxIsDrawn = (w > 0 && h > 0);
                 this.selection = {
                     xMin: xo,
                     xMax: xo + w,
@@ -8076,7 +8081,7 @@ var Plottable;
             DragBox.prototype._hover = function () {
                 if (this.resizeEnabled) {
                     var cursorStyle;
-                    if (this.boxIsDrawn) {
+                    if (this._boxIsDrawn) {
                         var position = d3.mouse(this._hitBox[0][0].parentNode);
                         cursorStyle = this._cursorStyle(position[0], position[1]);
                         if (!cursorStyle && this._isDragging) {
@@ -8196,7 +8201,7 @@ var Plottable;
                     yMin: yMin,
                     yMax: (attrs.height || parseInt(this.dragBox.attr("height"), 10)) + yMin
                 };
-                this.boxIsDrawn = drawnX && drawnY;
+                this._boxIsDrawn = drawnX && drawnY;
             };
             XYDragBox.prototype._enableResize = function (enabled) {
                 _super.prototype._enableResize.call(this, enabled);

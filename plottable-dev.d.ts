@@ -3377,13 +3377,10 @@ declare module Plottable {
              */
             dragBox: D3.Selection;
             /**
-             * Whether or not dragBox has been rendered in a visible area.
-             */
-            boxIsDrawn: boolean;
-            /**
              * The currently selected area, which can be different from the are the user has dragged.
              */
             selection: SelectionArea;
+            _boxIsDrawn: boolean;
             _selectionOrigin: number[];
             _resizeXEnabled: boolean;
             _resizeYEnabled: boolean;
@@ -3413,6 +3410,12 @@ declare module Plottable {
              * @returns {boolean}
              */
             isResizingY(): boolean;
+            /**
+             * Whether or not dragBox has been rendered in a visible area.
+             *
+             * @returns {boolean}
+             */
+            boxIsDrawn(): boolean;
             /**
              * Return true if box is resizing.
              *
