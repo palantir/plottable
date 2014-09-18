@@ -22,21 +22,12 @@ export module Interaction {
      * The currently selected area, which can be different from the are the user has dragged.
      */
     public selection: SelectionArea;
-    /**
-     * True if box is resizing on the X dimension.
-     */
-    public isResizingX = false;
-    /**
-     * True if box is resizing on the Y dimension.
-     */
-    public isResizingY = false;
-    /**
-     * True if box is resizing.
-     */
-    public isResizing = false;
     public _selectionOrigin: number[];
     public _resizeXEnabled = false;
     public _resizeYEnabled = false;
+    private _isResizingX = false;
+    private _isResizingY = false;
+    private _isResizing = false;
     private resizeEnabled = false;
     private resizeStartDiff: number[] = [];
     private lastCursorStyle = "";
@@ -73,6 +64,33 @@ export module Interaction {
         this._enableResize(enabled);
         return this;
       }
+    }
+
+    /**
+     * Return true if box is resizing on the X dimension.
+     *
+     * @returns {boolean}
+     */
+    public isResizingX(): boolean {
+      return this._isResizingX;
+    }
+
+    /**
+     * Return true if box is resizing on the Y dimension.
+     *
+     * @returns {boolean}
+     */
+    public isResizingY(): boolean {
+      return this._isResizingY;
+    }
+
+    /**
+     * Return true if box is resizing.
+     *
+     * @returns {boolean}
+     */
+    public isResizing(): boolean {
+      return this._isResizing;
     }
 
     public _enableResize(enabled: boolean) {
@@ -132,18 +150,18 @@ export module Interaction {
               rightPosition = parseInt(this.dragBox.attr("width"), 10) + leftPosition;
               this._selectionOrigin[0] = rightPosition;
               this.resizeStartDiff[0] = leftPosition - this._origin[0];
-              this.isResizingX = true;
+              this._isResizingX = true;
             } else if (this.isResizeStartRight()) {
               leftPosition = parseInt(this.dragBox.attr("x"), 10);
               rightPosition = parseInt(this.dragBox.attr("width"), 10) + leftPosition;
               this._selectionOrigin[0] = leftPosition;
               this.resizeStartDiff[0] = rightPosition - this._origin[0];
-              this.isResizingX = true;
+              this._isResizingX = true;
             } else {
-              this.isResizingX = false;
+              this._isResizingX = false;
             }
           } else {
-            this.isResizingX = false;
+            this._isResizingX = false;
           }
           if (this._resizeYEnabled && this.isInsideBox(false)) {
             var topPosition: number, bottomPosition: number;
@@ -152,21 +170,21 @@ export module Interaction {
               bottomPosition = parseInt(this.dragBox.attr("height"), 10) + topPosition;
               this._selectionOrigin[1] = bottomPosition;
               this.resizeStartDiff[1] = topPosition - this._origin[1];
-              this.isResizingY = true;
+              this._isResizingY = true;
             } else if (this.isResizeStartBottom()) {
               topPosition = parseInt(this.dragBox.attr("y"), 10);
               bottomPosition = parseInt(this.dragBox.attr("height"), 10) + topPosition;
               this._selectionOrigin[1] = topPosition;
               this.resizeStartDiff[1] = bottomPosition - this._origin[1];
-              this.isResizingY = true;
+              this._isResizingY = true;
             } else {
-              this.isResizingY = false;
+              this._isResizingY = false;
             }
           } else {
-            this.isResizingY = false;
+            this._isResizingY = false;
           }
-          this.isResizing = this.isResizingX || this.isResizingY;
-          if (!this.isResizing) {
+          this._isResizing = this._isResizingX || this._isResizingY;
+          if (!this._isResizing) {
             this.clearBox();
           }
         }
@@ -181,11 +199,11 @@ export module Interaction {
       var diffY = this.resizeStartDiff[1];
       // Eases the mouse into the center of the dragging line, in case dragging started with the mouse
       // away from the center due to `DragBox.RESIZE_PADDING`.
-      if (this.isResizingX && diffX !== 0) {
+      if (this._isResizingX && diffX !== 0) {
         x += diffX;
         this.resizeStartDiff[0] += diffX > 0 ? -1 : 1;
       }
-      if (this.isResizingY && diffY !== 0) {
+      if (this._isResizingY && diffY !== 0) {
         y += diffY;
         this.resizeStartDiff[1] += diffY > 0 ? -1 : 1;
       }
@@ -194,9 +212,9 @@ export module Interaction {
     }
 
     public _doDragend() {
-      this.isResizingX = false;
-      this.isResizingY = false;
-      this.isResizing = false;
+      this._isResizingX = false;
+      this._isResizingY = false;
+      this._isResizing = false;
       super._doDragend();
     }
 
@@ -258,7 +276,7 @@ export module Interaction {
             cursorStyle = this.lastCursorStyle;
           }
           this.lastCursorStyle = cursorStyle;
-        } else if (this.isResizing) {
+        } else if (this._isResizing) {
           cursorStyle = this.lastCursorStyle;
         } else {
           cursorStyle = "";

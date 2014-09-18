@@ -15,12 +15,12 @@ export module Interaction {
       var y0 = this._selectionOrigin[1];
       var y1 = this._location[1];
 
-      if (!this.isResizeEnabled() || this.isResizingX || !this.isResizingY) {
+      if (!this.isResizeEnabled() || this.isResizingX() || !this.isResizingY()) {
         attrs.width = Math.abs(x0 - x1);
         attrs.x = Math.min(x0, x1);
         drawnX = attrs.width > 0;
       }
-      if (!this.isResizeEnabled() || this.isResizingY || !this.isResizingX) {
+      if (!this.isResizeEnabled() || this.isResizingY() || !this.isResizingX()) {
         attrs.height = Math.abs(y0 - y1);
         attrs.y = Math.min(y0, y1);
         drawnY = attrs.height > 0;
@@ -57,7 +57,7 @@ export module Interaction {
       var right = this._isCloseEnoughRight(x, x2, width);
       var bottom = this._isCloseEnoughRight(y, y2, height);
 
-      if (this.isResizingX && this.isResizingY) {
+      if (this.isResizingX() && this.isResizingY()) {
         if (left && top || bottom && right) {
           return "nwse-resize";
         } else if (top && right || bottom && left) {
@@ -65,9 +65,9 @@ export module Interaction {
         } else {
           return "";
         }
-      } else if (this.isResizingX) {
+      } else if (this.isResizingX()) {
         return left || right ? "ew-resize" : "";
-      } else if (this.isResizingY) {
+      } else if (this.isResizingY()) {
         return top || bottom ? "ns-resize": "";
       }
 

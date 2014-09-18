@@ -3019,18 +3019,6 @@ declare module Plottable {
              */
             selection: SelectionArea;
             /**
-             * True if box is resizing on the X dimension.
-             */
-            isResizingX: boolean;
-            /**
-             * True if box is resizing on the Y dimension.
-             */
-            isResizingY: boolean;
-            /**
-             * True if box is resizing.
-             */
-            isResizing: boolean;
-            /**
              * Gets whether resizing is enabled or not.
              *
              * @returns {boolean}
@@ -3042,6 +3030,24 @@ declare module Plottable {
              * @param {boolean} enabled
              */
             isResizeEnabled(enabled: boolean): DragBox;
+            /**
+             * Return true if box is resizing on the X dimension.
+             *
+             * @returns {boolean}
+             */
+            isResizingX(): boolean;
+            /**
+             * Return true if box is resizing on the Y dimension.
+             *
+             * @returns {boolean}
+             */
+            isResizingY(): boolean;
+            /**
+             * Return true if box is resizing.
+             *
+             * @returns {boolean}
+             */
+            isResizing(): boolean;
             /**
              * Clears the highlighted drag-selection box drawn by the DragBox.
              *
