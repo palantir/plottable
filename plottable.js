@@ -2166,6 +2166,36 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (_Drawer) {
+        var Arc = (function (_super) {
+            __extends(Arc, _super);
+            function Arc() {
+                _super.apply(this, arguments);
+            }
+            Arc.prototype.draw = function (data, attrToProjector, animator) {
+                if (animator === void 0) { animator = new Plottable.Animator.Null(); }
+                var svgElement = "path";
+                var dataElements = this._renderArea.selectAll(svgElement).data(data);
+                dataElements.enter().append(svgElement);
+                dataElements.classed("arc", true);
+                animator.animate(dataElements, attrToProjector);
+                dataElements.exit().remove();
+            };
+            return Arc;
+        })(Plottable.Abstract._Drawer);
+        _Drawer.Arc = Arc;
+    })(Plottable._Drawer || (Plottable._Drawer = {}));
+    var _Drawer = Plottable._Drawer;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (_Drawer) {
         var Area = (function (_super) {
             __extends(Area, _super);
             function Area() {
@@ -4520,6 +4550,103 @@ var Plottable;
         Abstract.Plot = Plot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Plot) {
+        var Pie = (function (_super) {
+            __extends(Pie, _super);
+            function Pie() {
+                this._key2DatasetDrawerKey = d3.map();
+                this._datasetKeysInOrder = [];
+                this.nextSeriesIndex = 0;
+                _super.call(this, new Plottable.Dataset());
+                this.classed("pie-plot", true);
+            }
+            Pie.prototype._setup = function () {
+                Plottable.Abstract.NewStylePlot.prototype._setup.call(this);
+            };
+            Pie.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+            };
+            Pie.prototype.addDataset = function (keyOrDataset, dataset) {
+                return Plottable.Abstract.NewStylePlot.prototype.addDataset.call(this, keyOrDataset, dataset);
+            };
+            Pie.prototype._addDataset = function (key, dataset) {
+                if (this._datasetKeysInOrder.length === 1) {
+                    Plottable._Util.Methods.warn("Only one dataset is supported in pie plots");
+                    return;
+                }
+                Plottable.Abstract.NewStylePlot.prototype._addDataset.call(this, key, dataset);
+            };
+            Pie.prototype.removeDataset = function (key) {
+                return Plottable.Abstract.NewStylePlot.prototype.removeDataset.call(this, key);
+            };
+            Pie.prototype._generateAttrToProjector = function () {
+                var attrToProjector = this.retargetProjectors(_super.prototype._generateAttrToProjector.call(this));
+                var innerRadiusF = attrToProjector["inner-radius"] || d3.functor(0);
+                var outerRadiusF = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
+                attrToProjector["d"] = d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
+                delete attrToProjector["inner-radius"];
+                delete attrToProjector["outer-radius"];
+                if (attrToProjector["fill"] == null) {
+                    attrToProjector["fill"] = function (d, i) { return Pie.DEFAULT_COLOR_SCALE.scale(String(i)); };
+                }
+                delete attrToProjector["value"];
+                return attrToProjector;
+            };
+            Pie.prototype.retargetProjectors = function (attrToProjector) {
+                var retargetedAttrToProjector = {};
+                d3.entries(attrToProjector).forEach(function (entry) {
+                    retargetedAttrToProjector[entry.key] = function (d, i) { return entry.value(d.data, i); };
+                });
+                return retargetedAttrToProjector;
+            };
+            Pie.prototype._getAnimator = function (drawer, index) {
+                return Plottable.Abstract.NewStylePlot.prototype._getAnimator.call(this, drawer, index);
+            };
+            Pie.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Arc(key);
+            };
+            Pie.prototype._getDatasetsInOrder = function () {
+                return Plottable.Abstract.NewStylePlot.prototype._getDatasetsInOrder.call(this);
+            };
+            Pie.prototype._getDrawersInOrder = function () {
+                return Plottable.Abstract.NewStylePlot.prototype._getDrawersInOrder.call(this);
+            };
+            Pie.prototype._updateProjector = function (attr) {
+                Plottable.Abstract.NewStylePlot.prototype._updateProjector.call(this, attr);
+            };
+            Pie.prototype._paint = function () {
+                var _this = this;
+                var attrHash = this._generateAttrToProjector();
+                var datasets = this._getDatasetsInOrder();
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
+                    var pieData = _this.pie(datasets[i].data());
+                    d.draw(pieData, attrHash, animator);
+                });
+            };
+            Pie.prototype.pie = function (d) {
+                var defaultAccessor = function (d) { return d.value; };
+                var valueProjector = this._projectors["value"];
+                var valueAccessor = valueProjector ? valueProjector.accessor : defaultAccessor;
+                return d3.layout.pie().sort(null).value(valueAccessor)(d);
+            };
+            Pie.DEFAULT_COLOR_SCALE = new Plottable.Scale.Color();
+            return Pie;
+        })(Plottable.Abstract.Plot);
+        Plot.Pie = Pie;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
 
 var __extends = this.__extends || function (d, b) {
