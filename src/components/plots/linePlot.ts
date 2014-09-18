@@ -3,7 +3,7 @@
 module Plottable {
 export module Plot {
   export class Line<X> extends Abstract.XYPlot<X,number> {
-    private linePath: D3.Selection;
+    public static _colorVar = "stroke";
 
     public _animators: Animator.IPlotAnimatorMap = {
       "line-reset" : new Animator.Null(),
@@ -11,8 +11,9 @@ export module Plot {
         .duration(600)
         .easing("exp-in-out")
     };
-    public _colorVar = "stroke";
     public _yScale: Abstract.QuantitativeScale<number>;
+
+    private linePath: D3.Selection;
 
     /**
      * Constructs a LinePlot.

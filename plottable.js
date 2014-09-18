@@ -4349,7 +4349,6 @@ var Plottable;
                 this._animate = false;
                 this._animators = {};
                 this._ANIMATION_DURATION = 250;
-                this._colorVar = "fill";
                 this._projectors = {};
                 this.animateOnNextRender = true;
                 this.clipPathEnabled = true;
@@ -4409,7 +4408,7 @@ var Plottable;
                 var _this = this;
                 attrToSet = attrToSet.toLowerCase();
                 if (attrToSet === "color") {
-                    attrToSet = this._colorVar;
+                    attrToSet = this.constructor._colorVar;
                 }
                 var currentProjection = this._projectors[attrToSet];
                 var existingScale = (currentProjection != null) ? currentProjection.scale : null;
@@ -4493,6 +4492,7 @@ var Plottable;
                     return this;
                 }
             };
+            Plot._colorVar = "fill";
             return Plot;
         })(Abstract.Component);
         Abstract.Plot = Plot;
@@ -5061,7 +5061,6 @@ var Plottable;
                     "line-reset": new Plottable.Animator.Null(),
                     "line": new Plottable.Animator.Base().duration(600).easing("exp-in-out")
                 };
-                this._colorVar = "stroke";
                 this.classed("line-plot", true);
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; });
                 this.project("stroke-width", function () { return "2px"; });
@@ -5125,6 +5124,7 @@ var Plottable;
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
             };
+            Line._colorVar = "stroke";
             return Line;
         })(Plottable.Abstract.XYPlot);
         Plot.Line = Line;

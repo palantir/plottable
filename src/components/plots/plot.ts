@@ -3,15 +3,16 @@
 module Plottable {
 export module Abstract {
   export class Plot extends Component {
+    public static _colorVar = "fill";
+
     public _dataset: Dataset;
     public _dataChanged = false;
-
     public _renderArea: D3.Selection;
     public _animate: boolean = false;
     public _animators: Animator.IPlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
-    public _colorVar = "fill";
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
+
     private animateOnNextRender = true;
 
     /**
@@ -125,7 +126,7 @@ export module Abstract {
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
       if (attrToSet === "color") {
-        attrToSet = this._colorVar;
+        attrToSet = (<any> this.constructor)._colorVar;
       }
       var currentProjection = this._projectors[attrToSet];
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;

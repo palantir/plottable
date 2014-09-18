@@ -1371,6 +1371,10 @@ describe("Plots", function () {
         it("Plots default correctly", function () {
             var r = new Plottable.Abstract.Plot();
             assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
+            r.project("color", function () { return "testColor"; });
+            var a2p = r._generateAttrToProjector();
+            assert.isNotNull(a2p["fill"], "fill inserted in a2p");
+            assert.equal(a2p["fill"](null, 0), "testColor", "color projector assigned to fill");
         });
         it("Base Plot functionality works", function () {
             var svg = generateSVG(400, 300);
@@ -1619,6 +1623,14 @@ describe("Plots", function () {
             data[0].stroke = "green";
             simpleDataset.data(data);
             assert.equal(areaPath.attr("stroke"), "green", "stroke set to first datum stroke color");
+            verifier.end();
+        });
+        it("color projector maps onto stroke", function () {
+            var lp = new Plottable.Plot.Line([], xScale, yScale);
+            lp.project("color", function () { return "testColor"; });
+            var a2p = lp._generateAttrToProjector();
+            assert.isNotNull(a2p["stroke"], "stroke inserted in a2p");
+            assert.equal(a2p["stroke"]([1, 2, 3], 0), "testColor", "color projector assigned to stroke");
             verifier.end();
         });
         after(function () {
