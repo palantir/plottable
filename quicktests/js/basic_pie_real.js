@@ -36,24 +36,24 @@ function run(div, data, Plottable) {
     Aplot.addDataset("d1", data[0]);
     Aplot.project("value", "percent");
     Aplot.project("fill", "region", colorScale);
-    Aplot.project("innerradius", 40);
-    Aplot.project("outerradius", 80);
+    Aplot.project("inner-radius", 40);
+    Aplot.project("outer-radius", 80);
     Aplot = Alabel.merge(Aplot);
 
   var Bplot = new Plottable.Plot.Pie();
     Bplot.addDataset("d2", data[1]);
     Bplot.project("value", "percent");
     Bplot.project("fill", "region", colorScale);
-    Bplot.project("innerradius", 40);
-    Bplot.project("outerradius", 80);
+    Bplot.project("inner-radius", 40);
+    Bplot.project("outer-radius", 80);
     Bplot = Blabel.merge(Bplot);
 
   var ABplot = new Plottable.Plot.Pie();
     ABplot.addDataset("d3", data[2]);
     ABplot.project("value", "percent");
     ABplot.project("fill", "region", colorScale);
-    ABplot.project("innerradius", 50);
-    ABplot.project("outerradius", 100);
+    ABplot.project("inner-radius", 50);
+    ABplot.project("outer-radius", 100);
     ABplot = ABlabel.merge(ABplot);
 
   var productPlots = new Plottable.Component.Table([

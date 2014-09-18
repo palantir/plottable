@@ -8,8 +8,8 @@ export module Plot {
    *
    * Primary projection attributes:
    *   "fill" - Accessor determining the color of each sector
-   *   "innerradius" - Accessor determining the distance from the center to the inner edge of the sector
-   *   "outerradius" - Accessor determining the distance from the center to the outer edge of the sector
+   *   "inner-radius" - Accessor determining the distance from the center to the inner edge of the sector
+   *   "outer-radius" - Accessor determining the distance from the center to the outer edge of the sector
    *   "value" - Accessor to extract the value determining the proportion of each slice to the total
    */
   export class Pie extends Abstract.Plot {
@@ -36,6 +36,11 @@ export module Plot {
 
     public _setup() {
       Abstract.NewStylePlot.prototype._setup.call(this);
+    }
+
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
+      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+      this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
     }
 
     /**
@@ -75,27 +80,30 @@ export module Plot {
 
     public _generateAttrToProjector(): IAttributeToProjector {
       var attrToProjector = this.retargetProjectors(super._generateAttrToProjector());
-      var innerRadiusF = attrToProjector["innerradius"] || d3.functor(0);
-      var outerRadiusF = attrToProjector["outerradius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
+      var innerRadiusF = attrToProjector["inner-radius"] || d3.functor(0);
+      var outerRadiusF = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
       attrToProjector["d"] = d3.svg.arc()
                       .innerRadius(innerRadiusF)
                       .outerRadius(outerRadiusF);
-      delete attrToProjector["innerradius"];
-      delete attrToProjector["outerradius"];
+      delete attrToProjector["inner-radius"];
+      delete attrToProjector["outer-radius"];
 
       if (attrToProjector["fill"] == null) {
         attrToProjector["fill"] = (d: any, i: number) => Pie.DEFAULT_COLOR_SCALE.scale(String(i));
       }
 
-      attrToProjector["transform"] = () => "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
       delete attrToProjector["value"];
       return attrToProjector;
     }
 
+    /**
+     * Since the data goes through a pie function, which returns an array of ArcDescriptors,
+     * projectors will need to be retargeted so they point to the data portion of each arc descriptor.
+     */
     private retargetProjectors(attrToProjector: IAttributeToProjector): IAttributeToProjector {
       var retargetedAttrToProjector: IAttributeToProjector = {};
       d3.entries(attrToProjector).forEach((entry) => {
-        retargetedAttrToProjector[entry.key] = (d: any, i: number) => entry.value(d.data, i);
+        retargetedAttrToProjector[entry.key] = (d: D3.Layout.ArcDescriptor, i: number) => entry.value(d.data, i);
       });
       return retargetedAttrToProjector;
     }

@@ -4570,6 +4570,10 @@ var Plottable;
             Pie.prototype._setup = function () {
                 Plottable.Abstract.NewStylePlot.prototype._setup.call(this);
             };
+            Pie.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+            };
             Pie.prototype.addDataset = function (keyOrDataset, dataset) {
                 return Plottable.Abstract.NewStylePlot.prototype.addDataset.call(this, keyOrDataset, dataset);
             };
@@ -4584,17 +4588,15 @@ var Plottable;
                 return Plottable.Abstract.NewStylePlot.prototype.removeDataset.call(this, key);
             };
             Pie.prototype._generateAttrToProjector = function () {
-                var _this = this;
                 var attrToProjector = this.retargetProjectors(_super.prototype._generateAttrToProjector.call(this));
-                var innerRadiusF = attrToProjector["innerradius"] || d3.functor(0);
-                var outerRadiusF = attrToProjector["outerradius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
+                var innerRadiusF = attrToProjector["inner-radius"] || d3.functor(0);
+                var outerRadiusF = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
                 attrToProjector["d"] = d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
-                delete attrToProjector["innerradius"];
-                delete attrToProjector["outerradius"];
+                delete attrToProjector["inner-radius"];
+                delete attrToProjector["outer-radius"];
                 if (attrToProjector["fill"] == null) {
                     attrToProjector["fill"] = function (d, i) { return Pie.DEFAULT_COLOR_SCALE.scale(String(i)); };
                 }
-                attrToProjector["transform"] = function () { return "translate(" + _this.width() / 2 + "," + _this.height() / 2 + ")"; };
                 delete attrToProjector["value"];
                 return attrToProjector;
             };

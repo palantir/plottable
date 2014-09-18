@@ -1557,7 +1557,7 @@ describe("Plots", function () {
             verifier.end();
         });
         it("innerRadius project", function () {
-            piePlot.project("innerRadius", function () { return 5; });
+            piePlot.project("inner-radius", function () { return 5; });
             var arcPaths = renderArea.selectAll(".arc");
             assert.lengthOf(arcPaths[0], 2, "only has two sectors");
             var pathPoints0 = normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
@@ -1569,11 +1569,11 @@ describe("Plots", function () {
             assert.closeTo(innerArcPath0[1], 5, 1, "makes inner arc of radius 5");
             assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center");
             assert.closeTo(innerArcPath0[6], -5, 1, "makes inner arc to top of inner circle");
-            piePlot.project("innerRadius", function () { return 0; });
+            piePlot.project("inner-radius", function () { return 0; });
             verifier.end();
         });
         it("outerRadius project", function () {
-            piePlot.project("outerRadius", function () { return 150; });
+            piePlot.project("outer-radius", function () { return 150; });
             var arcPaths = renderArea.selectAll(".arc");
             assert.lengthOf(arcPaths[0], 2, "only has two sectors");
             var pathPoints0 = normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
@@ -1585,7 +1585,7 @@ describe("Plots", function () {
             assert.closeTo(outerArcPath0[1], 150, 1, "makes outer arc of radius 150");
             assert.closeTo(outerArcPath0[5], 150, 1, "makes outer arc to right edge");
             assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
-            piePlot.project("outerRadius", function () { return 250; });
+            piePlot.project("outer-radius", function () { return 250; });
             verifier.end();
         });
         describe("Fill", function () {
