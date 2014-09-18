@@ -30,6 +30,9 @@
     "name":"basic_pie",
     "categories":["Datasource", "Pie Plot"]
   },{
+    "name":"basic_pie_real",
+    "categories":["Datasource", "Pie Plot"]
+  },{
     "name": "category_axis_non_string",
     "categories": ["Category Axis", "Ordinal Scale"]
   }, {
