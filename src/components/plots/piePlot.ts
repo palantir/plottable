@@ -38,6 +38,11 @@ export module Plot {
       Abstract.NewStylePlot.prototype._setup.call(this);
     }
 
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
+      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+      this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+    }
+
     /**
      * Adds a dataset to this plot. Only one dataset can be added to a PiePlot.
      *
@@ -87,7 +92,6 @@ export module Plot {
         attrToProjector["fill"] = (d: any, i: number) => Pie.DEFAULT_COLOR_SCALE.scale(String(i));
       }
 
-      attrToProjector["transform"] = () => "translate(" + this.width() / 2 + "," + this.height() / 2 + ")";
       delete attrToProjector["value"];
       return attrToProjector;
     }

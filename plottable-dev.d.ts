@@ -916,6 +916,7 @@ declare module Plottable {
             _datasetKeysInOrder: string[];
             constructor();
             _setup(): void;
+            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             addDataset(key: string, dataset: Dataset): Pie;
             addDataset(key: string, dataset: any[]): Pie;
             addDataset(dataset: Dataset): Pie;
