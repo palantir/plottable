@@ -8,8 +8,8 @@ export module Plot {
    *
    * Primary projection attributes:
    *   "fill" - Accessor determining the color of each sector
-   *   "innerradius" - Accessor determining the distance from the center to the inner edge of the sector
-   *   "outerradius" - Accessor determining the distance from the center to the outer edge of the sector
+   *   "inner-radius" - Accessor determining the distance from the center to the inner edge of the sector
+   *   "outer-radius" - Accessor determining the distance from the center to the outer edge of the sector
    *   "value" - Accessor to extract the value determining the proportion of each slice to the total
    */
   export class Pie extends Abstract.Plot {
@@ -75,13 +75,13 @@ export module Plot {
 
     public _generateAttrToProjector(): IAttributeToProjector {
       var attrToProjector = this.retargetProjectors(super._generateAttrToProjector());
-      var innerRadiusF = attrToProjector["innerradius"] || d3.functor(0);
-      var outerRadiusF = attrToProjector["outerradius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
+      var innerRadiusF = attrToProjector["inner-radius"] || d3.functor(0);
+      var outerRadiusF = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
       attrToProjector["d"] = d3.svg.arc()
                       .innerRadius(innerRadiusF)
                       .outerRadius(outerRadiusF);
-      delete attrToProjector["innerradius"];
-      delete attrToProjector["outerradius"];
+      delete attrToProjector["inner-radius"];
+      delete attrToProjector["outer-radius"];
 
       if (attrToProjector["fill"] == null) {
         attrToProjector["fill"] = (d: any, i: number) => Pie.DEFAULT_COLOR_SCALE.scale(String(i));

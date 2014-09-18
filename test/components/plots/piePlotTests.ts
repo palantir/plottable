@@ -93,7 +93,7 @@ describe("Plots", () => {
     });
 
     it("innerRadius project", () => {
-      piePlot.project("innerRadius", () => 5);
+      piePlot.project("inner-radius", () => 5);
       var arcPaths = renderArea.selectAll(".arc");
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
 
@@ -109,12 +109,12 @@ describe("Plots", () => {
       assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center");
       assert.closeTo(innerArcPath0[6], -5, 1, "makes inner arc to top of inner circle");
 
-      piePlot.project("innerRadius", () => 0);
+      piePlot.project("inner-radius", () => 0);
       verifier.end();
     });
 
     it("outerRadius project", () => {
-      piePlot.project("outerRadius", () => 150);
+      piePlot.project("outer-radius", () => 150);
       var arcPaths = renderArea.selectAll(".arc");
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
 
@@ -130,7 +130,7 @@ describe("Plots", () => {
       assert.closeTo(outerArcPath0[5], 150, 1, "makes outer arc to right edge");
       assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
 
-      piePlot.project("outerRadius", () => 250);
+      piePlot.project("outer-radius", () => 250);
       verifier.end();
     });
 

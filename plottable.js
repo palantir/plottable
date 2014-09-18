@@ -4586,11 +4586,11 @@ var Plottable;
             Pie.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = this.retargetProjectors(_super.prototype._generateAttrToProjector.call(this));
-                var innerRadiusF = attrToProjector["innerradius"] || d3.functor(0);
-                var outerRadiusF = attrToProjector["outerradius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
+                var innerRadiusF = attrToProjector["inner-radius"] || d3.functor(0);
+                var outerRadiusF = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
                 attrToProjector["d"] = d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
-                delete attrToProjector["innerradius"];
-                delete attrToProjector["outerradius"];
+                delete attrToProjector["inner-radius"];
+                delete attrToProjector["outer-radius"];
                 if (attrToProjector["fill"] == null) {
                     attrToProjector["fill"] = function (d, i) { return Pie.DEFAULT_COLOR_SCALE.scale(String(i)); };
                 }
