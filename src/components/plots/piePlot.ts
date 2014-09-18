@@ -92,10 +92,14 @@ export module Plot {
       return attrToProjector;
     }
 
+    /**
+     * Since the data goes through a pie function, which returns an array of ArcDescriptors,
+     * projectors will need to be retargeted so they point to the data portion of each arc descriptor.
+     */
     private retargetProjectors(attrToProjector: IAttributeToProjector): IAttributeToProjector {
       var retargetedAttrToProjector: IAttributeToProjector = {};
       d3.entries(attrToProjector).forEach((entry) => {
-        retargetedAttrToProjector[entry.key] = (d: any, i: number) => entry.value(d.data, i);
+        retargetedAttrToProjector[entry.key] = (d: D3.Layout.ArcDescriptor, i: number) => entry.value(d.data, i);
       });
       return retargetedAttrToProjector;
     }
