@@ -779,8 +779,6 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class RadialGroup extends Plottable.Component.Group {
-            _rScale: Plottable.Abstract.Scale<any, number>;
-            _thetaScale: Plottable.Abstract.Scale<any, number>;
             constructor(rScale: Plottable.Abstract.Scale<any, number>, thetaScale: Plottable.Abstract.Scale<any, number>);
         }
     }

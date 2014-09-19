@@ -3,9 +3,6 @@
 module Plottable {
 export module Axis {
   export class RadialGroup extends Component.Group {
-    public _rScale: Abstract.Scale<any, number>;
-    public _thetaScale: Abstract.Scale<any, number>;
-
 
     /**
      * Constructs an axis. An axis is a wrapper around a scale for rendering.
@@ -20,14 +17,18 @@ export module Axis {
      */
     constructor(rScale: Abstract.Scale<any, number>, thetaScale: Abstract.Scale<any, number>) {
       super();
-      if (rScale == null || thetaScale == null) {throw new Error("Axis requires a scale");}
-      this._rScale = rScale;
-      this._thetaScale = thetaScale;
+      if (rScale == null || thetaScale == null) {throw new Error("Axis group requires a scale");}
 
-      var thetaDomainLength = this._thetaScale.domain().length;
-      this._thetaScale.range([0, 2 * Math.PI * (thetaDomainLength - 1) / thetaDomainLength]);
+      thetaScale.broadcaster.registerListener(this, () => this.resetRadialAxes(rScale, thetaScale));
+      this.resetRadialAxes(rScale, thetaScale);
+    }
 
-      this._thetaScale.domain().forEach((domainEntry) => this.merge(new Radial(rScale, thetaScale.scale(domainEntry))));
+    private resetRadialAxes(rScale: Abstract.Scale<any, number>, thetaScale: Abstract.Scale<any, number>) {
+      var thetaDomainLength = thetaScale.domain().length;
+      thetaScale.range([0, 2 * Math.PI * (thetaDomainLength - 1) / thetaDomainLength]);
+
+      this.components().forEach((component) => component.remove());
+      thetaScale.domain().forEach((domainEntry) => this.merge(new Radial(rScale, thetaScale.scale(domainEntry))));
     }
   }
 }

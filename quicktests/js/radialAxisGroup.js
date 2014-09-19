@@ -11,4 +11,6 @@ function run(div, data, Plottable) {
   var rScale = new Plottable.Scale.Linear();
   var thetaScale = new Plottable.Scale.Ordinal().rangeType("points", 0, 0).domain(["one", "two", "three"]);
   new Plottable.Axis.RadialGroup(rScale, thetaScale).renderTo(svg);
+  thetaScale.domain(["one", "two", "three", "four"]);
+  thetaScale.domain(["one", "two", "three", "four", "five"]);
 }

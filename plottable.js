@@ -3654,14 +3654,18 @@ var Plottable;
                 _super.call(this);
                 var _this = this;
                 if (rScale == null || thetaScale == null) {
-                    throw new Error("Axis requires a scale");
+                    throw new Error("Axis group requires a scale");
                 }
-                this._rScale = rScale;
-                this._thetaScale = thetaScale;
-                var thetaDomainLength = this._thetaScale.domain().length;
-                this._thetaScale.range([0, 2 * Math.PI * (thetaDomainLength - 1) / thetaDomainLength]);
-                this._thetaScale.domain().forEach(function (domainEntry) { return _this.merge(new Axis.Radial(rScale, thetaScale.scale(domainEntry))); });
+                thetaScale.broadcaster.registerListener(this, function () { return _this.resetRadialAxes(rScale, thetaScale); });
+                this.resetRadialAxes(rScale, thetaScale);
             }
+            RadialGroup.prototype.resetRadialAxes = function (rScale, thetaScale) {
+                var _this = this;
+                var thetaDomainLength = thetaScale.domain().length;
+                thetaScale.range([0, 2 * Math.PI * (thetaDomainLength - 1) / thetaDomainLength]);
+                this.components().forEach(function (component) { return component.remove(); });
+                thetaScale.domain().forEach(function (domainEntry) { return _this.merge(new Axis.Radial(rScale, thetaScale.scale(domainEntry))); });
+            };
             return RadialGroup;
         })(Plottable.Component.Group);
         Axis.RadialGroup = RadialGroup;
