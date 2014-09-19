@@ -4587,7 +4587,6 @@ var Plottable;
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 this._rScale.range([0, this.maxRadius()]);
                 this._thetaScale.range([0, 2 * Math.PI * (this._metrics.length - 1) / this._metrics.length]);
-                this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
             };
             Radar.prototype._getAnimator = function (drawer, index) {
                 return Plottable.Abstract.NewStylePlot.prototype._getAnimator.call(this, drawer, index);
@@ -4602,15 +4601,20 @@ var Plottable;
                 return Plottable.Abstract.NewStylePlot.prototype._getDrawersInOrder.call(this);
             };
             Radar.prototype._generateAttrToProjector = function () {
-                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["points"] = function (d) {
-                    return _this.metrics().map(function (metric, i) {
-                        var scaledValue = _this._rScale.scale(d[metric]);
-                        var angle = _this._thetaScale.scale(metric);
-                        return [scaledValue * Math.sin(angle), -scaledValue * Math.cos(angle)];
+                var self = this;
+                function pointMapper(d) {
+                    return self.metrics().map(function (metric, i) {
+                        var scaledValue = self._rScale.scale(d[metric]);
+                        var angle = self._thetaScale.scale(metric);
+                        var rotateX = scaledValue * Math.sin(angle);
+                        var rotateY = -scaledValue * Math.cos(angle);
+                        var translateX = self.width() / 2;
+                        var translateY = self.height() / 2;
+                        return [rotateX + translateX, rotateY + translateY];
                     }).join(" ");
-                };
+                }
+                attrToProjector["points"] = function (d, i) { return pointMapper(d); };
                 attrToProjector["fill"] = function () { return "steelblue"; };
                 attrToProjector["opacity"] = function () { return "0.7"; };
                 return attrToProjector;
