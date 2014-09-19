@@ -4558,9 +4558,8 @@ var Plottable;
                 this.radarData = [];
                 this._metrics = [];
                 this._getDatasetsInOrder().forEach(function (dataset) {
-                    var data = dataset.data();
                     var radarDatum = {};
-                    data.forEach(function (datum) {
+                    dataset.data().forEach(function (datum) {
                         var metric = datum["metric"];
                         var value = datum["value"];
                         if (_this._metrics.indexOf(metric) === -1) {

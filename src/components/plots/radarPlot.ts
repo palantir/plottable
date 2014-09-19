@@ -56,9 +56,8 @@ export module Plot {
       this.radarData = [];
       this._metrics = [];
       this._getDatasetsInOrder().forEach((dataset) => {
-        var data = dataset.data();
         var radarDatum: any = {};
-        data.forEach((datum: any) => {
+        dataset.data().forEach((datum: any) => {
           var metric = datum["metric"];
           var value = datum["value"];
 
