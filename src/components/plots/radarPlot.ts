@@ -111,6 +111,7 @@ export module Plot {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this._rScale.range([0, this.maxRadius()]);
       this._thetaScale.range([0, 2 * Math.PI * (this._metrics.length - 1) / this._metrics.length]);
+      this._renderArea.attr("transform", "translate(" + this.width() / 2 + ", " + this.height() / 2 + ")");
     }
 
     public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
@@ -131,21 +132,13 @@ export module Plot {
 
     public _generateAttrToProjector(): IAttributeToProjector {
       var attrToProjector = super._generateAttrToProjector();
-      var self = this;
-      function pointMapper(d: any) {
-         return self.metrics().map((metric, i) => {
-           var scaledValue = self._rScale.scale(d[metric]);
-           var angle = self._thetaScale.scale(metric);
-           var rotateX = scaledValue * Math.sin(angle);
-           var rotateY = -scaledValue * Math.cos(angle);
-
-           var translateX = self.width() / 2;
-           var translateY = self.height() / 2;
-
-           return [rotateX + translateX, rotateY + translateY];
+      attrToProjector["points"] = (d: any) => {
+         return this.metrics().map((metric, i) => {
+           var scaledValue = this._rScale.scale(d[metric]);
+           var angle = this._thetaScale.scale(metric);
+           return [scaledValue * Math.sin(angle), -scaledValue * Math.cos(angle)];
          }).join(" ");
-      }
-      attrToProjector["points"] = (d: any, i: number) => pointMapper(d);
+      };
       attrToProjector["fill"] = () => "steelblue";
       attrToProjector["opacity"] = () => "0.7";
       return attrToProjector;

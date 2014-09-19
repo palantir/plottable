@@ -1513,14 +1513,14 @@ describe("Plots", function () {
             var polygon = renderArea.select("polygon");
             var points = polygon.attr("points").split(" ");
             var point0 = points[0].split(",").map(function (coordinate) { return parseFloat(coordinate); });
-            assert.closeTo(point0[0], 250, 1, "Starts above the center point");
-            assert.closeTo(point0[1], 125, 1, "Starts above the center point halfway to the top");
+            assert.closeTo(point0[0], 0, 1, "Starts above the center point");
+            assert.closeTo(point0[1], -125, 1, "Starts above the center point halfway to the top");
             var point1 = points[1].split(",").map(function (coordinate) { return parseFloat(coordinate); });
-            assert.closeTo(point1[0], 466.5, 1, "Goes right to the second point");
-            assert.closeTo(point1[1], 375, 1, "Goes down to the second point");
+            assert.closeTo(point1[0], 216.5, 1, "Goes right to the second point");
+            assert.closeTo(point1[1], 125, 1, "Goes down to the second point");
             var point2 = points[2].split(",").map(function (coordinate) { return parseFloat(coordinate); });
-            assert.closeTo(point2[0], 98.45, 1, "Goes left to the third point");
-            assert.closeTo(point2[1], 337.5, 1, "Goes up to the third point");
+            assert.closeTo(point2[0], -151.55, 1, "Goes left to the third point");
+            assert.closeTo(point2[1], 87.5, 1, "Goes up to the third point");
             verifier.end();
         });
         after(function () {
