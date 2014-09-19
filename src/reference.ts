@@ -44,6 +44,7 @@
 /// <reference path="components/axes/timeAxis.ts" />
 /// <reference path="components/axes/numericAxis.ts" />
 /// <reference path="components/axes/categoryAxis.ts" />
+/// <reference path="components/axes/radialAxis.ts" />
 /// <reference path="components/axes/radialAxisGroup.ts" />
 
 /// <reference path="components/label.ts" />

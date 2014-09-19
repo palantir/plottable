@@ -760,16 +760,28 @@ declare module Plottable {
 
 declare module Plottable {
     module Axis {
-        class RadialGroup extends Plottable.Abstract.Component {
-            _rScale: Plottable.Abstract.Scale<any, number>;
-            _thetaScale: Plottable.Abstract.Scale<any, number>;
-            constructor(rScale: Plottable.Abstract.Scale<any, number>, thetaScale: Plottable.Abstract.Scale<any, number>);
+        class Radial extends Plottable.Abstract.Component {
+            constructor(rScale: Plottable.Abstract.Scale<any, number>, angle: number);
+            _setup(): void;
             remove(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest;
             _rescale(): void;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _doRender(): void;
             _generateBaselineAttrHash(): IAttributeToProjector;
+            angleOrientation(): number;
+            angleOrientation(angle: number): Radial;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Axis {
+        class RadialGroup extends Plottable.Component.Group {
+            _rScale: Plottable.Abstract.Scale<any, number>;
+            _thetaScale: Plottable.Abstract.Scale<any, number>;
+            constructor(rScale: Plottable.Abstract.Scale<any, number>, thetaScale: Plottable.Abstract.Scale<any, number>);
         }
     }
 }
