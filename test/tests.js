@@ -91,6 +91,9 @@ var MultiTestVerifier = (function () {
     };
     return MultiTestVerifier;
 })();
+function normalizePath(pathString) {
+    return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
+}
 function triggerFakeUIEvent(type, target) {
     var e = document.createEvent("UIEvents");
     e.initUIEvent(type, true, true, window, 1);
@@ -1493,7 +1496,6 @@ describe("Plots", function () {
         var piePlot;
         var renderArea;
         var verifier;
-        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
@@ -1707,7 +1709,6 @@ describe("Plots", function () {
         var linePlot;
         var renderArea;
         var verifier;
-        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
@@ -1782,7 +1783,6 @@ describe("Plots", function () {
         var areaPlot;
         var renderArea;
         var verifier;
-        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
@@ -2372,7 +2372,6 @@ describe("Plots", function () {
         var SVG_WIDTH = 600;
         var SVG_HEIGHT = 400;
         var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
-        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
         before(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Linear().domain([1, 3]);
@@ -2431,7 +2430,6 @@ describe("Plots", function () {
         var SVG_WIDTH = 600;
         var SVG_HEIGHT = 400;
         var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
-        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
         before(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Linear().domain([1, 3]);
