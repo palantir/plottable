@@ -56,7 +56,7 @@ export module Axis {
 
     public _doRender() {
       var thetaDomainLength = this._thetaScale.domain().length;
-      this._thetaScale.range([0, 2*Math.PI * (thetaDomainLength - 1) / thetaDomainLength]);
+      this._thetaScale.range([0, 2 * Math.PI * (thetaDomainLength - 1) / thetaDomainLength]);
 
       var baselines = this._content.selectAll(".baseline").data(this._thetaScale.domain());
       baselines.enter().append("line").classed("baseline", true);
