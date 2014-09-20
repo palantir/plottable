@@ -51,3 +51,5 @@
 ///<reference path="interactions/interactionTests.ts" />
 
 ///<reference path="dispatchers/dispatcherTests.ts" />
+
+///<reference path="regressionTests.ts" />

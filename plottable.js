@@ -1933,7 +1933,7 @@ var Plottable;
             __extends(Time, _super);
             function Time(scale) {
                 _super.call(this, scale == null ? d3.time.scale() : scale);
-                this._typeCoercer = function (d) { return d._isAMomentObject || d instanceof Date ? d : new Date(d); };
+                this._typeCoercer = function (d) { return d && d._isAMomentObject || d instanceof Date ? d : new Date(d); };
             }
             Time.prototype._tickInterval = function (interval, step) {
                 var tempScale = d3.time.scale();
