@@ -36,8 +36,8 @@ export module Abstract {
       this.stackedExtent[0] = Math.min(minY, 0);
     }
 
-    public _updateAllProjectors() {
-      super._updateAllProjectors();
+    public _updateScaleExtents() {
+      super._updateScaleExtents();
       var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
       if (primaryScale == null) {
         return;

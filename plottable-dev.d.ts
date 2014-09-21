@@ -901,8 +901,8 @@ declare module Plottable {
             _setup(): void;
             animate(enabled: boolean): Plot;
             detach(): Plot;
-            _updateAllProjectors(): void;
-            _updateProjector(attr: string): void;
+            _updateScaleExtents(): void;
+            _updateScaleExtent(attr: string): void;
             _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any;
             animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
             animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
@@ -967,7 +967,7 @@ declare module Plottable {
             _addDataset(key: string, dataset: Dataset): void;
             _getDrawer(key: string): _Drawer;
             _getAnimator(drawer: _Drawer, index: number): Plottable.Animator.IPlotAnimator;
-            _updateProjector(attr: string): void;
+            _updateScaleExtent(attr: string): void;
             datasetOrder(): string[];
             datasetOrder(order: string[]): NewStylePlot<X, Y>;
             removeDataset(key: string): NewStylePlot<X, Y>;
@@ -1138,7 +1138,7 @@ declare module Plottable {
         class Stacked<X, Y> extends NewStylePlot<X, Y> {
             _isVertical: boolean;
             _onDatasetUpdate(): void;
-            _updateAllProjectors(): void;
+            _updateScaleExtents(): void;
         }
     }
 }
