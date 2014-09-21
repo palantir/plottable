@@ -4622,8 +4622,8 @@ var Plottable;
             Pie.prototype._getDrawersInOrder = function () {
                 return Plottable.Abstract.NewStylePlot.prototype._getDrawersInOrder.call(this);
             };
-            Pie.prototype._updateProjector = function (attr) {
-                Plottable.Abstract.NewStylePlot.prototype._updateProjector.call(this, attr);
+            Pie.prototype._updateScaleExtent = function (attr) {
+                Plottable.Abstract.NewStylePlot.prototype._updateScaleExtent.call(this, attr);
             };
             Pie.prototype._paint = function () {
                 var _this = this;

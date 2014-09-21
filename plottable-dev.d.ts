@@ -930,7 +930,7 @@ declare module Plottable {
             _getDrawer(key: string): Plottable.Abstract._Drawer;
             _getDatasetsInOrder(): Dataset[];
             _getDrawersInOrder(): Plottable.Abstract._Drawer[];
-            _updateProjector(attr: string): void;
+            _updateScaleExtent(attr: string): void;
             _paint(): void;
         }
     }
