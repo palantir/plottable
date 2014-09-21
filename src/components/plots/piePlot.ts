@@ -124,8 +124,8 @@ export module Plot {
       return Abstract.NewStylePlot.prototype._getDrawersInOrder.call(this);
     }
 
-    public _updateProjector(attr: string) {
-      Abstract.NewStylePlot.prototype._updateProjector.call(this, attr);
+    public _updateScaleExtent(attr: string) {
+      Abstract.NewStylePlot.prototype._updateScaleExtent.call(this, attr);
     }
 
     public _paint() {
