@@ -2406,6 +2406,7 @@ var Plottable;
                 }
                 this._computeLayout();
                 this._render();
+                Plottable.Core.RenderController.flush();
                 return this;
             };
             Component.prototype.resize = function (width, height) {
