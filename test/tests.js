@@ -960,7 +960,7 @@ describe("Legends", function () {
         });
         svg.remove();
     });
-    it("icon radius is not too small or too big", function () {
+    it("iconHeight / 2 < circleHeight < iconHeight", function () {
         color.domain(["foo"]);
         legend.renderTo(svg);
         var style = legend._element.append("style");
@@ -970,8 +970,8 @@ describe("Legends", function () {
             var circle = legend._content.select("circle");
             var textHeight = Plottable._Util.DOM.getBBox(text).height;
             var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
-            assert.operator(circleHeight, "<", textHeight, "icons are too big. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
-            assert.operator(circleHeight, ">", textHeight / 2, "icons are too small. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
+            assert.operator(circleHeight, "<", textHeight, "icons too small: iconHeight < circleHeight");
+            assert.operator(circleHeight, ">", textHeight / 2, "icons too big: iconHeight / 2 > circleHeight");
         }
         verifyCircleHeight();
         style.text(".plottable .legend text { font-size: 60px; }");
@@ -4666,7 +4666,7 @@ describe("Formatters", function () {
             var relativeDateFormatter = Plottable.Formatters.relativeDate(5 * Plottable.MILLISECONDS_IN_ONE_DAY);
             var result = relativeDateFormatter(9 * Plottable.MILLISECONDS_IN_ONE_DAY);
             assert.strictEqual(result, "4", "4 days greater from base value");
-            var result = relativeDateFormatter(Plottable.MILLISECONDS_IN_ONE_DAY);
+            result = relativeDateFormatter(Plottable.MILLISECONDS_IN_ONE_DAY);
             assert.strictEqual(result, "-4", "4 days less from base value");
         });
         it("can increment by different time types (hours, minutes)", function () {
@@ -4674,7 +4674,7 @@ describe("Formatters", function () {
             var result = hoursRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
             assert.strictEqual(result, "72", "72 hour difference from epoch");
             var minutesRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / (24 * 60));
-            var result = minutesRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            result = minutesRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
             assert.strictEqual(result, "4320", "4320 minute difference from epoch");
         });
         it("can append a suffix", function () {
@@ -5255,7 +5255,7 @@ describe("Interactions", function () {
                 timesCalled++;
                 var expectedStart = {
                     x: dragstartX,
-                    y: dragstartY,
+                    y: dragstartY
                 };
                 var expectedEnd = {
                     x: dragendX,

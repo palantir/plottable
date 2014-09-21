@@ -181,7 +181,7 @@ describe("Formatters", () => {
       var relativeDateFormatter = Plottable.Formatters.relativeDate(5 * Plottable.MILLISECONDS_IN_ONE_DAY);
       var result = relativeDateFormatter(9 * Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "4", "4 days greater from base value");
-      var result = relativeDateFormatter(Plottable.MILLISECONDS_IN_ONE_DAY);
+      result = relativeDateFormatter(Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "-4", "4 days less from base value");
     });
 
@@ -191,7 +191,7 @@ describe("Formatters", () => {
       assert.strictEqual(result, "72", "72 hour difference from epoch");
 
       var minutesRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / (24 * 60));
-      var result = minutesRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      result = minutesRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "4320", "4320 minute difference from epoch");
     });
 
