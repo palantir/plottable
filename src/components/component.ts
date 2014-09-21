@@ -219,6 +219,8 @@ export module Abstract {
       }
       this._computeLayout();
       this._render();
+      // flush so that consumers can immediately attach to stuff we create in the DOM
+      Core.RenderController.flush();
       return this;
     }
 
