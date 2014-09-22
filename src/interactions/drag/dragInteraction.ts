@@ -141,7 +141,7 @@ export module Interaction {
     }
 
     /**
-     * Sets up so that the xScale and yScale that are passed have their
+     * Sets up so that the xScale and yScale that area passed have their
      * domains automatically changed as you zoom.
      *
      * @param {QuantitativeScale} xScale The scale along the x-axis.
