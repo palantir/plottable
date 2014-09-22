@@ -24,7 +24,6 @@ export module Interaction {
     public _resizeYEnabled = false;
     private _isResizingX = false;
     private _isResizingY = false;
-    private _isResizing = false;
     private resizeEnabled = false;
     private resizeStartDiff: number[] = [];
     private lastCursorStyle = "";
@@ -96,7 +95,7 @@ export module Interaction {
      * @returns {boolean}
      */
     public isResizing(): boolean {
-      return this._isResizing;
+      return this._isResizingX || this._isResizingY;
     }
 
     public _enableResize(enabled: boolean) {
@@ -189,8 +188,7 @@ export module Interaction {
           } else {
             this._isResizingY = false;
           }
-          this._isResizing = this._isResizingX || this._isResizingY;
-          if (!this._isResizing) {
+          if (!this._isResizingX && !this._isResizingY) {
             this.clearBox();
           }
         }
@@ -220,7 +218,6 @@ export module Interaction {
     public _doDragend() {
       this._isResizingX = false;
       this._isResizingY = false;
-      this._isResizing = false;
       super._doDragend();
     }
 
@@ -282,7 +279,7 @@ export module Interaction {
             cursorStyle = this.lastCursorStyle;
           }
           this.lastCursorStyle = cursorStyle;
-        } else if (this._isResizing) {
+        } else if (this._isResizingX || this._isResizingY) {
           cursorStyle = this.lastCursorStyle;
         } else {
           cursorStyle = "";

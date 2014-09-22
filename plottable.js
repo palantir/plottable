@@ -7848,7 +7848,6 @@ var Plottable;
                 this._resizeYEnabled = false;
                 this._isResizingX = false;
                 this._isResizingY = false;
-                this._isResizing = false;
                 this.resizeEnabled = false;
                 this.resizeStartDiff = [];
                 this.lastCursorStyle = "";
@@ -7903,7 +7902,7 @@ var Plottable;
              * @returns {boolean}
              */
             DragBox.prototype.isResizing = function () {
-                return this._isResizing;
+                return this._isResizingX || this._isResizingY;
             };
             DragBox.prototype._enableResize = function (enabled) {
                 this.resizeEnabled = enabled;
@@ -7996,8 +7995,7 @@ var Plottable;
                         else {
                             this._isResizingY = false;
                         }
-                        this._isResizing = this._isResizingX || this._isResizingY;
-                        if (!this._isResizing) {
+                        if (!this._isResizingX && !this._isResizingY) {
                             this.clearBox();
                         }
                     }
@@ -8025,7 +8023,6 @@ var Plottable;
             DragBox.prototype._doDragend = function () {
                 this._isResizingX = false;
                 this._isResizingY = false;
-                this._isResizing = false;
                 _super.prototype._doDragend.call(this);
             };
             /**
@@ -8089,7 +8086,7 @@ var Plottable;
                         }
                         this.lastCursorStyle = cursorStyle;
                     }
-                    else if (this._isResizing) {
+                    else if (this._isResizingX || this._isResizingY) {
                         cursorStyle = this.lastCursorStyle;
                     }
                     else {
