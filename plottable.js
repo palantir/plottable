@@ -3664,7 +3664,7 @@ var Plottable;
                 var thetaDomainLength = thetaScale.domain().length;
                 thetaScale.range([0, 2 * Math.PI * (thetaDomainLength - 1) / thetaDomainLength]);
                 this.components().forEach(function (component) { return component.remove(); });
-                thetaScale.domain().forEach(function (domainEntry) { return _this.merge(new Axis.Radial(rScale, thetaScale.scale(domainEntry))); });
+                thetaScale.domain().forEach(function (domainEntry) { return _this._addComponent(new Axis.Radial(rScale, thetaScale.scale(domainEntry))); });
             };
             return RadialGroup;
         })(Plottable.Component.Group);

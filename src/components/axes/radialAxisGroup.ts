@@ -28,7 +28,7 @@ export module Axis {
       thetaScale.range([0, 2 * Math.PI * (thetaDomainLength - 1) / thetaDomainLength]);
 
       this.components().forEach((component) => component.remove());
-      thetaScale.domain().forEach((domainEntry) => this.merge(new Radial(rScale, thetaScale.scale(domainEntry))));
+      thetaScale.domain().forEach((domainEntry) => this._addComponent(new Radial(rScale, thetaScale.scale(domainEntry))));
     }
   }
 }
