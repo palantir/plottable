@@ -24,7 +24,7 @@ export module Interaction {
     public _resizeYEnabled = false;
     private _isResizingX = false;
     private _isResizingY = false;
-    private resizeEnabled = false;
+    private _resizeEnabled = false;
     private resizeStartDiff: number[] = [];
     private lastCursorStyle = "";
 
@@ -46,16 +46,16 @@ export module Interaction {
      *
      * @returns {boolean}
      */
-    public isResizeEnabled(): boolean;
+    public resizeEnabled(): boolean;
     /**
      * Enables or disables resizing.
      *
      * @param {boolean} enabled
      */
-    public isResizeEnabled(enabled: boolean): DragBox;
-    public isResizeEnabled(enabled?: boolean): any {
+    public resizeEnabled(enabled: boolean): DragBox;
+    public resizeEnabled(enabled?: boolean): any {
       if (enabled == null) {
-        return this.resizeEnabled;
+        return this._resizeEnabled;
       } else {
         this._enableResize(enabled);
         return this;
@@ -99,7 +99,7 @@ export module Interaction {
     }
 
     public _enableResize(enabled: boolean) {
-      this.resizeEnabled = enabled;
+      this._resizeEnabled = enabled;
     }
 
     /**
@@ -148,7 +148,7 @@ export module Interaction {
     public _doDragstart() {
       this._selectionOrigin = this._origin.slice();
       if (this._boxIsDrawn) {
-        if (!this.resizeEnabled) {
+        if (!this._resizeEnabled) {
           this.clearBox();
         } else {
           if (this._resizeXEnabled && this.isInsideBox(true)) {
@@ -273,7 +273,7 @@ export module Interaction {
     }
 
     public _hover() {
-      if (this.resizeEnabled) {
+      if (this._resizeEnabled) {
         var cursorStyle: string;
         if (this._boxIsDrawn) {
           var position = d3.mouse(this._hitBox[0][0].parentNode);

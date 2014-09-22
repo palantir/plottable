@@ -179,7 +179,7 @@ describe("Interactions", () => {
         });
 
         // fake another drag event to resize the box.
-        interaction.isResizeEnabled(true);
+        interaction.resizeEnabled(true);
         fakeDragSequence((<any> interaction), dragstartX2, dragstartY2, dragmidX, dragmidY)
         assert.equal(timesCalled, 1, "drag callback not called once");
       }
@@ -360,7 +360,7 @@ describe("Interactions", () => {
         });
 
         // fake another drag event to resize the box.
-        interaction.isResizeEnabled(true);
+        interaction.resizeEnabled(true);
         fakeDragSequence((<any> interaction), dragstartX2, dragstartY2, dragendX2, dragendY2)
         assert.equal(timesCalled, 1, "drag callback called");
       });
@@ -389,7 +389,7 @@ describe("Interactions", () => {
         });
 
         // fake another drag event to resize the box.
-        interaction.isResizeEnabled(true);
+        interaction.resizeEnabled(true);
         fakeDragSequence((<any> interaction), dragstartX2, dragstartY2, dragendX2, dragendY2)
         assert.equal(timesCalled, 1, "drag callback called");
       });

@@ -7848,7 +7848,7 @@ var Plottable;
                 this._resizeYEnabled = false;
                 this._isResizingX = false;
                 this._isResizingY = false;
-                this.resizeEnabled = false;
+                this._resizeEnabled = false;
                 this.resizeStartDiff = [];
                 this.lastCursorStyle = "";
             }
@@ -7863,9 +7863,9 @@ var Plottable;
                 var rightPadding = DragBox.RESIZE_PADDING;
                 return position - leftPadding <= val && val <= position + rightPadding;
             };
-            DragBox.prototype.isResizeEnabled = function (enabled) {
+            DragBox.prototype.resizeEnabled = function (enabled) {
                 if (enabled == null) {
-                    return this.resizeEnabled;
+                    return this._resizeEnabled;
                 }
                 else {
                     this._enableResize(enabled);
@@ -7905,7 +7905,7 @@ var Plottable;
                 return this._isResizingX || this._isResizingY;
             };
             DragBox.prototype._enableResize = function (enabled) {
-                this.resizeEnabled = enabled;
+                this._resizeEnabled = enabled;
             };
             /**
              * Checks if the cursor is inside the dragBox for the given dimension.
@@ -7948,7 +7948,7 @@ var Plottable;
             DragBox.prototype._doDragstart = function () {
                 this._selectionOrigin = this._origin.slice();
                 if (this._boxIsDrawn) {
-                    if (!this.resizeEnabled) {
+                    if (!this._resizeEnabled) {
                         this.clearBox();
                     }
                     else {
@@ -8079,7 +8079,7 @@ var Plottable;
                 return this;
             };
             DragBox.prototype._hover = function () {
-                if (this.resizeEnabled) {
+                if (this._resizeEnabled) {
                     var cursorStyle;
                     if (this._boxIsDrawn) {
                         var position = d3.mouse(this._hitBox[0][0].parentNode);
@@ -8182,12 +8182,12 @@ var Plottable;
                 var x1 = this._location[0];
                 var y0 = this._selectionOrigin[1];
                 var y1 = this._location[1];
-                if (!this.isResizeEnabled() || this.isResizingX() || !this.isResizingY()) {
+                if (!this.resizeEnabled() || this.isResizingX() || !this.isResizingY()) {
                     attrs.width = Math.abs(x0 - x1);
                     attrs.x = Math.min(x0, x1);
                     drawnX = attrs.width > 0;
                 }
-                if (!this.isResizeEnabled() || this.isResizingY() || !this.isResizingX()) {
+                if (!this.resizeEnabled() || this.isResizingY() || !this.isResizingX()) {
                     attrs.height = Math.abs(y0 - y1);
                     attrs.y = Math.min(y0, y1);
                     drawnY = attrs.height > 0;

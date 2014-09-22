@@ -3019,13 +3019,13 @@ declare module Plottable {
              *
              * @returns {boolean}
              */
-            isResizeEnabled(): boolean;
+            resizeEnabled(): boolean;
             /**
              * Enables or disables resizing.
              *
              * @param {boolean} enabled
              */
-            isResizeEnabled(enabled: boolean): DragBox;
+            resizeEnabled(enabled: boolean): DragBox;
             /**
              * Return true if box is resizing on the X dimension.
              *
