@@ -35,7 +35,7 @@ export module Animator {
       this._easing = Base.DEFAULT_EASING;
     }
 
-    public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection {
+    public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Transition.Transition {
       return selection.transition()
         .ease(this.easing())
         .duration(this.duration())
