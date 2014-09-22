@@ -102,6 +102,9 @@ export module Interaction {
       this.resizeEnabled = enabled;
     }
 
+    /**
+     * Checks if the cursor is inside the dragBox for the given dimension.
+     */
     private isInsideBox(isX: boolean): boolean {
       var origin = this._origin[isX ? 1 : 0];
       var positionAttr = isX ? "y" : "x";
