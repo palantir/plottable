@@ -3574,6 +3574,113 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    (function (Axis) {
+        var Radial = (function (_super) {
+            __extends(Radial, _super);
+            function Radial(rScale, angle) {
+                _super.call(this);
+                var _this = this;
+                if (rScale == null) {
+                    throw new Error("Axis requires a scale");
+                }
+                this._rScale = rScale;
+                this._angleOrientation = angle;
+                this.classed("radial-axis", true);
+                this._rScale.broadcaster.registerListener(this, function () { return _this._rescale(); });
+            }
+            Radial.prototype._setup = function () {
+                Plottable.Abstract.Axis.prototype._setup.call(this);
+            };
+            Radial.prototype.remove = function () {
+                _super.prototype.remove.call(this);
+                this._rScale.broadcaster.deregisterListener(this);
+            };
+            Radial.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+                return {
+                    width: offeredWidth,
+                    height: offeredHeight,
+                    wantsWidth: false,
+                    wantsHeight: false
+                };
+            };
+            Radial.prototype._rescale = function () {
+                this._render();
+            };
+            Radial.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                this._rScale.range([0, Math.min(this.width(), this.height()) / 2]);
+            };
+            Radial.prototype._doRender = function () {
+                this._baseline.attr(this._generateBaselineAttrHash());
+            };
+            Radial.prototype._generateBaselineAttrHash = function () {
+                var _this = this;
+                var baselineAttrHash = {};
+                baselineAttrHash["x1"] = function () { return 0; };
+                baselineAttrHash["y1"] = function () { return 0; };
+                var radius = Math.min(this.width(), this.height()) / 2;
+                baselineAttrHash["x2"] = function (d) { return radius * Math.sin(_this._angleOrientation); };
+                baselineAttrHash["y2"] = function (d) { return -radius * Math.cos(_this._angleOrientation); };
+                baselineAttrHash["stroke"] = function () { return "black"; };
+                baselineAttrHash["transform"] = function () { return "translate(" + _this.width() / 2 + "," + _this.height() / 2 + ")"; };
+                return baselineAttrHash;
+            };
+            Radial.prototype.angleOrientation = function (angle) {
+                if (angle == null) {
+                    return this._angleOrientation;
+                }
+                this._angleOrientation = angle;
+                return this;
+            };
+            return Radial;
+        })(Plottable.Abstract.Component);
+        Axis.Radial = Radial;
+    })(Plottable.Axis || (Plottable.Axis = {}));
+    var Axis = Plottable.Axis;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Axis) {
+        var RadialGroup = (function (_super) {
+            __extends(RadialGroup, _super);
+            function RadialGroup(rScale, thetaScale) {
+                _super.call(this);
+                var _this = this;
+                if (rScale == null || thetaScale == null) {
+                    throw new Error("Axis group requires a scale");
+                }
+                thetaScale.broadcaster.registerListener(this, function () { return _this.resetRadialAxes(rScale, thetaScale); });
+                this.resetRadialAxes(rScale, thetaScale);
+            }
+            RadialGroup.prototype.resetRadialAxes = function (rScale, thetaScale) {
+                var _this = this;
+                var thetaDomainLength = thetaScale.domain().length;
+                thetaScale.range([0, 2 * Math.PI * (thetaDomainLength - 1) / thetaDomainLength]);
+                this.components().forEach(function (component) { return component.remove(); });
+                thetaScale.domain().forEach(function (domainEntry) { return _this._addComponent(new Axis.Radial(rScale, thetaScale.scale(domainEntry))); });
+            };
+            return RadialGroup;
+        })(Plottable.Component.Group);
+        Axis.RadialGroup = RadialGroup;
+    })(Plottable.Axis || (Plottable.Axis = {}));
+    var Axis = Plottable.Axis;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
     (function (Component) {
         var Label = (function (_super) {
             __extends(Label, _super);

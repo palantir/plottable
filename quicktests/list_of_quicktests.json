@@ -84,6 +84,9 @@
     "name":"project_width",
     "categories":["Linear Scale", "Numeric Axis", "Ordinal Scale", "Category Axis", "Vertical Bar Plot", "Gridlines", "Accessor", "Project", "Click Interaction"]
   },  {
+    "name":"radialAxisGroup",
+    "categories":["Radial Axis"]
+  },  {
     "name":"render_behavior",
     "categories":["Data", "Area Plot", "Datasource", "Label", "Linear Scale", "Numeric Axis", "Click Interaction"]
   },  {
