@@ -20,6 +20,10 @@ describe("Plots", () => {
     it("Plots default correctly", () => {
       var r = new Plottable.Abstract.Plot();
       assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
+      r.project("color", () => "testColor");
+      var a2p = r._generateAttrToProjector();
+      assert.isNotNull(a2p["fill"], "fill inserted in a2p");
+      assert.equal(a2p["fill"](null, 0), "testColor", "color projector assigned to fill");
     });
 
     it("Base Plot functionality works", () => {

@@ -876,6 +876,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Plot extends Component {
+            static _colorVar: string;
             _dataset: Dataset;
             _dataChanged: boolean;
             _renderArea: D3.Selection;
@@ -1067,8 +1068,9 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Line<X> extends Plottable.Abstract.XYPlot<X, number> {
-            _yScale: Plottable.Abstract.QuantitativeScale<number>;
+            static _colorVar: string;
             _animators: Plottable.Animator.IPlotAnimatorMap;
+            _yScale: Plottable.Abstract.QuantitativeScale<number>;
             constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
             _setup(): void;
             _appendPath(): void;

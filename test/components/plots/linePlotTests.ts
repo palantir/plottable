@@ -73,6 +73,15 @@ describe("Plots", () => {
       verifier.end();
     });
 
+    it("color projector maps onto stroke", () => {
+      var lp = new Plottable.Plot.Line([], xScale, yScale);
+      lp.project("color", () => "testColor");
+      var a2p = lp._generateAttrToProjector();
+      assert.isNotNull(a2p["stroke"], "stroke inserted in a2p");
+      assert.equal(a2p["stroke"]([1,2,3], 0), "testColor", "color projector assigned to stroke");
+      verifier.end();
+    });
+
     after(() => {
       if (verifier.passed) {svg.remove();};
     });

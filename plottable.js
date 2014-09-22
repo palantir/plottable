@@ -4463,6 +4463,9 @@ var Plottable;
             Plot.prototype.project = function (attrToSet, accessor, scale) {
                 var _this = this;
                 attrToSet = attrToSet.toLowerCase();
+                if (attrToSet === "color") {
+                    attrToSet = this.constructor._colorVar;
+                }
                 var currentProjection = this._projectors[attrToSet];
                 var existingScale = (currentProjection != null) ? currentProjection.scale : null;
                 if (existingScale != null) {
@@ -4545,6 +4548,7 @@ var Plottable;
                     return this;
                 }
             };
+            Plot._colorVar = "fill";
             return Plot;
         })(Abstract.Component);
         Abstract.Plot = Plot;
@@ -5273,6 +5277,7 @@ var Plottable;
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
             };
+            Line._colorVar = "stroke";
             return Line;
         })(Plottable.Abstract.XYPlot);
         Plot.Line = Line;
