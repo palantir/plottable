@@ -4619,7 +4619,7 @@ var Plottable;
                 if (scale != null) {
                     scale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
-                var activatedAccessor = Plottable._Util.Methods._applyAccessor(accessor, this);
+                var activatedAccessor = Plottable._Util.Methods.accessorize(accessor);
                 this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
                 this._updateScaleExtent(attrToSet);
                 this._render();
@@ -4799,31 +4799,19 @@ var Plottable;
         var Pie = (function (_super) {
             __extends(Pie, _super);
             function Pie() {
-                this._key2DatasetDrawerKey = d3.map();
-                this._datasetKeysInOrder = [];
-                this.nextSeriesIndex = 0;
-                _super.call(this, new Plottable.Dataset());
+                _super.call(this);
                 this.classed("pie-plot", true);
             }
-            Pie.prototype._setup = function () {
-                Plottable.Abstract.NewStylePlot.prototype._setup.call(this);
-            };
             Pie.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
-            };
-            Pie.prototype.addDataset = function (keyOrDataset, dataset) {
-                return Plottable.Abstract.NewStylePlot.prototype.addDataset.call(this, keyOrDataset, dataset);
             };
             Pie.prototype._addDataset = function (key, dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
                     Plottable._Util.Methods.warn("Only one dataset is supported in pie plots");
                     return;
                 }
-                Plottable.Abstract.NewStylePlot.prototype._addDataset.call(this, key, dataset);
-            };
-            Pie.prototype.removeDataset = function (key) {
-                return Plottable.Abstract.NewStylePlot.prototype.removeDataset.call(this, key);
+                _super.prototype._addDataset.call(this, key, dataset);
             };
             Pie.prototype._generateAttrToProjector = function () {
                 var attrToProjector = this.retargetProjectors(_super.prototype._generateAttrToProjector.call(this));
@@ -4845,20 +4833,8 @@ var Plottable;
                 });
                 return retargetedAttrToProjector;
             };
-            Pie.prototype._getAnimator = function (drawer, index) {
-                return Plottable.Abstract.NewStylePlot.prototype._getAnimator.call(this, drawer, index);
-            };
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Arc(key);
-            };
-            Pie.prototype._getDatasetsInOrder = function () {
-                return Plottable.Abstract.NewStylePlot.prototype._getDatasetsInOrder.call(this);
-            };
-            Pie.prototype._getDrawersInOrder = function () {
-                return Plottable.Abstract.NewStylePlot.prototype._getDrawersInOrder.call(this);
-            };
-            Pie.prototype._updateScaleExtent = function (attr) {
-                Plottable.Abstract.NewStylePlot.prototype._updateScaleExtent.call(this, attr);
             };
             Pie.prototype._paint = function () {
                 var _this = this;
@@ -4878,7 +4854,7 @@ var Plottable;
             };
             Pie.DEFAULT_COLOR_SCALE = new Plottable.Scale.Color();
             return Pie;
-        })(Plottable.Abstract.Plot);
+        })(Plottable.Abstract.NSPlot);
         Plot.Pie = Pie;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;

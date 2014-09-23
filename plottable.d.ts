@@ -769,13 +769,8 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Pie extends Plottable.Abstract.Plot {
+        class Pie extends Plottable.Abstract.NSPlot {
             constructor();
-            addDataset(key: string, dataset: Dataset): Pie;
-            addDataset(key: string, dataset: any[]): Pie;
-            addDataset(dataset: Dataset): Pie;
-            addDataset(dataset: any[]): Pie;
-            removeDataset(key: string): Pie;
         }
     }
 }

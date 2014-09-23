@@ -9,7 +9,7 @@ declare module Plottable {
             function accessorize(accessor: any): _IAccessor;
             function union<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
             function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T>;
-            function _applyAccessor(accessor: _IAccessor, plot: any): (d: any, i: number) => any;
+            function _applyAccessor(accessor: _IAccessor, plot: Plottable.Abstract.Plot): (d: any, i: number) => any;
             function uniq<T>(arr: T[]): T[];
             function createFilledArray<T>(value: T, count: number): T[];
             function createFilledArray<T>(func: (index?: number) => T, count: number): T[];
@@ -960,24 +960,12 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Pie extends Plottable.Abstract.Plot {
-            _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
-            _datasetKeysInOrder: string[];
+        class Pie extends Plottable.Abstract.NSPlot {
             constructor();
-            _setup(): void;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
-            addDataset(key: string, dataset: Dataset): Pie;
-            addDataset(key: string, dataset: any[]): Pie;
-            addDataset(dataset: Dataset): Pie;
-            addDataset(dataset: any[]): Pie;
             _addDataset(key: string, dataset: Dataset): void;
-            removeDataset(key: string): Pie;
             _generateAttrToProjector(): IAttributeToProjector;
-            _getAnimator(drawer: Plottable.Abstract._Drawer, index: number): Plottable.Animator.IPlotAnimator;
             _getDrawer(key: string): Plottable.Abstract._Drawer;
-            _getDatasetsInOrder(): Dataset[];
-            _getDrawersInOrder(): Plottable.Abstract._Drawer[];
-            _updateScaleExtent(attr: string): void;
             _paint(): void;
         }
     }
