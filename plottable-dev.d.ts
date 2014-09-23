@@ -3439,7 +3439,6 @@ declare module Plottable {
             setBox(x0: number, x1: number, y0: number, y1: number): DragBox;
             _anchor(component: Abstract.Component, hitBox: D3.Selection): DragBox;
             _hover(): void;
-            _cursorStyle(x: number, y: number): string;
         }
     }
 }
@@ -3450,7 +3449,6 @@ declare module Plottable {
         class XDragBox extends DragBox {
             _drag(): void;
             setBox(x0: number, x1: number): XDragBox;
-            _cursorStyle(x: number, y: number): string;
         }
     }
 }
@@ -3460,7 +3458,6 @@ declare module Plottable {
     module Interaction {
         class XYDragBox extends DragBox {
             _drag(): void;
-            _cursorStyle(xOrigin: number, yOrigin: number): string;
         }
     }
 }
@@ -3471,7 +3468,6 @@ declare module Plottable {
         class YDragBox extends DragBox {
             _drag(): void;
             setBox(y0: number, y1: number): YDragBox;
-            _cursorStyle(x: number, y: number): string;
         }
     }
 }

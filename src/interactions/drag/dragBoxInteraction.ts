@@ -251,7 +251,7 @@ export module Interaction {
         var cursorStyle: string;
         if (this._boxIsDrawn) {
           var position = d3.mouse(this._hitBox[0][0].parentNode);
-          cursorStyle = this._cursorStyle(position[0], position[1]);
+          cursorStyle = this.cursorStyle(position[0], position[1]);
           if (!cursorStyle && this._isDragging) {
             cursorStyle = this.lastCursorStyle;
           }
@@ -265,8 +265,48 @@ export module Interaction {
       }
     }
 
-    public _cursorStyle(x: number, y: number): string {
-      return "";
+    private cursorStyle(xOrigin: number, yOrigin: number): string {
+      var xStart = this._dragBoxAttr.x;
+      var width = this._dragBoxAttr.width;
+      var xEnd = width + xStart;
+      var yStart = this._dragBoxAttr.y;
+      var height = this._dragBoxAttr.height;
+      var yEnd = height + yStart;
+      var left = false, top = false, right = false, bottom = false;
+      if (this._resizeXEnabled) {
+        left = this._isCloseEnoughLeft(xOrigin, xStart, width);
+        right = this._isCloseEnoughRight(xOrigin, xEnd, width);
+      }
+      if (this._resizeYEnabled) {
+        top = this._isCloseEnoughLeft(yOrigin, yStart, height);
+        bottom = this._isCloseEnoughRight(yOrigin, yEnd, height);
+      }
+
+      if (this._isResizingX && this._isResizingY) {
+        if (left && top || bottom && right) {
+          return "nwse-resize";
+        } else if (top && right || bottom && left) {
+          return "nesw-resize";
+        } else {
+          return "";
+        }
+      } else if (this._isResizingX) {
+        return left || right ? "ew-resize" : "";
+      } else if (this._isResizingY) {
+        return top || bottom ? "ns-resize": "";
+      }
+
+      if (left && top || bottom && right) {
+        return "nwse-resize";
+      } else if (top && right || bottom && left) {
+        return "nesw-resize";
+      } else if ((left || right) && this.isInsideBox(yOrigin, yStart, yEnd)) {
+        return "ew-resize";
+      } else if ((top || bottom) && this.isInsideBox(xOrigin, xStart, xEnd)) {
+        return "ns-resize";
+      } else {
+        return "";
+      }
     }
   }
 }

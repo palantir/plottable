@@ -12,18 +12,6 @@ export module Interaction {
       super.setBox(x0, x1, 0, this._componentToListenTo.height());
       return this;
     }
-
-    public _cursorStyle(x: number, y: number): string {
-      var leftPosition = this._dragBoxAttr.x;
-      var width = this._dragBoxAttr.width;
-      var rightPosition = width + leftPosition;
-      if (this._isCloseEnoughLeft(x, leftPosition, width) ||
-          this._isCloseEnoughRight(x, rightPosition, width)) {
-        return "ew-resize";
-      } else {
-        return "";
-      }
-    }
   }
 }
 }
