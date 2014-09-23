@@ -788,23 +788,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class NewStylePlot<X, Y> extends XYPlot<X, Y> {
-            constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>);
-            remove(): void;
-            addDataset(key: string, dataset: Dataset): NewStylePlot<X, Y>;
-            addDataset(key: string, dataset: any[]): NewStylePlot<X, Y>;
-            addDataset(dataset: Dataset): NewStylePlot<X, Y>;
-            addDataset(dataset: any[]): NewStylePlot<X, Y>;
-            datasetOrder(): string[];
-            datasetOrder(order: string[]): NewStylePlot<X, Y>;
-            removeDataset(key: string): NewStylePlot<X, Y>;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
         class NSXYPlot<X, Y> extends NSPlot {
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSXYPlot<X, Y>;

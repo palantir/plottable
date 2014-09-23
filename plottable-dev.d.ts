@@ -989,33 +989,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class NewStylePlot<X, Y> extends XYPlot<X, Y> {
-            _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
-            _datasetKeysInOrder: string[];
-            constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>);
-            _setup(): void;
-            remove(): void;
-            addDataset(key: string, dataset: Dataset): NewStylePlot<X, Y>;
-            addDataset(key: string, dataset: any[]): NewStylePlot<X, Y>;
-            addDataset(dataset: Dataset): NewStylePlot<X, Y>;
-            addDataset(dataset: any[]): NewStylePlot<X, Y>;
-            _addDataset(key: string, dataset: Dataset): void;
-            _getDrawer(key: string): _Drawer;
-            _getAnimator(drawer: _Drawer, index: number): Plottable.Animator.IPlotAnimator;
-            _updateScaleExtent(attr: string): void;
-            datasetOrder(): string[];
-            datasetOrder(order: string[]): NewStylePlot<X, Y>;
-            removeDataset(key: string): NewStylePlot<X, Y>;
-            _getDatasetsInOrder(): Dataset[];
-            _getDrawersInOrder(): _Drawer[];
-            _paint(): void;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
         class NSXYPlot<X, Y> extends NSPlot {
             _xScale: Scale<X, number>;
             _yScale: Scale<Y, number>;
