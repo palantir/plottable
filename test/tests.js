@@ -1632,7 +1632,7 @@ describe("Plots", function () {
         beforeEach(function () {
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
-            p = new Plottable.Abstract.NewStylePlot(xScale, yScale);
+            p = new Plottable.Abstract.NSXYPlot(xScale, yScale);
             p._getDrawer = function (k) { return new Plottable._Drawer.Rect(k); };
         });
         afterEach(function () {
