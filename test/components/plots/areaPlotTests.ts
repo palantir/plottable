@@ -16,8 +16,6 @@ describe("Plots", () => {
     var areaPlot: Plottable.Plot.Area<number>;
     var renderArea: D3.Selection;
     var verifier: MultiTestVerifier;
-    // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
-    var normalizePath = (s: string) => s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
 
     before(() => {
       svg = generateSVG(500, 500);

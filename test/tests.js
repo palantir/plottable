@@ -92,6 +92,10 @@ var MultiTestVerifier = (function () {
     };
     return MultiTestVerifier;
 })();
+// for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
+function normalizePath(pathString) {
+    return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
+}
 function triggerFakeUIEvent(type, target) {
     var e = document.createEvent("UIEvents");
     e.initUIEvent(type, true, true, window, 1);
@@ -983,7 +987,7 @@ describe("Legends", function () {
         });
         svg.remove();
     });
-    it("icon radius is not too small or too big", function () {
+    it("iconHeight / 2 < circleHeight < iconHeight", function () {
         color.domain(["foo"]);
         legend.renderTo(svg);
         var style = legend._element.append("style");
@@ -993,8 +997,8 @@ describe("Legends", function () {
             var circle = legend._content.select("circle");
             var textHeight = Plottable._Util.DOM.getBBox(text).height;
             var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
-            assert.operator(circleHeight, "<", textHeight, "icons are too big. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
-            assert.operator(circleHeight, ">", textHeight / 2, "icons are too small. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
+            assert.operator(circleHeight, "<", textHeight, "icons too small: iconHeight < circleHeight");
+            assert.operator(circleHeight, ">", textHeight / 2, "icons too big: iconHeight / 2 > circleHeight");
         }
         verifyCircleHeight();
         style.text(".plottable .legend text { font-size: 60px; }");
@@ -1516,6 +1520,143 @@ describe("Plots", function () {
 ///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
+    describe("PiePlot", function () {
+        var svg;
+        var simpleDataset;
+        var piePlot;
+        var renderArea;
+        var verifier;
+        before(function () {
+            svg = generateSVG(500, 500);
+            verifier = new MultiTestVerifier();
+            simpleDataset = new Plottable.Dataset([{ value: 5, value2: 10, type: "A" }, { value: 15, value2: 10, type: "B" }]);
+            piePlot = new Plottable.Plot.Pie();
+            piePlot.addDataset(simpleDataset);
+            piePlot.renderTo(svg);
+            renderArea = piePlot._renderArea;
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        it("sectors divided evenly", function () {
+            var arcPaths = renderArea.selectAll(".arc");
+            assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+            var arcPath0 = d3.select(arcPaths[0][0]);
+            var pathPoints0 = normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
+            var firstPathPoints0 = pathPoints0[0].split(",");
+            assert.closeTo(parseFloat(firstPathPoints0[0]), 0, 1, "draws line vertically at beginning");
+            assert.operator(parseFloat(firstPathPoints0[1]), "<", 0, "draws line upwards");
+            var arcDestPoint0 = pathPoints0[1].split(",").slice(5);
+            assert.operator(parseFloat(arcDestPoint0[0]), ">", 0, "arcs line to the right");
+            assert.closeTo(parseFloat(arcDestPoint0[1]), 0, 1, "ends on same level of svg");
+            var secondPathPoints0 = pathPoints0[2].split(",");
+            assert.closeTo(parseFloat(secondPathPoints0[0]), 0, 1, "draws line to origin");
+            assert.closeTo(parseFloat(secondPathPoints0[1]), 0, 1, "draws line to origin");
+            var arcPath1 = d3.select(arcPaths[0][1]);
+            var pathPoints1 = normalizePath(arcPath1.attr("d")).split(/[A-Z]/).slice(1, 4);
+            var firstPathPoints1 = pathPoints1[0].split(",");
+            assert.operator(parseFloat(firstPathPoints1[0]), ">", 0, "draws line to the right");
+            assert.closeTo(parseFloat(firstPathPoints1[1]), 0, 1, "draws line horizontally");
+            var arcDestPoint1 = pathPoints1[1].split(",").slice(5);
+            assert.closeTo(parseFloat(arcDestPoint1[0]), 0, 1, "ends at x origin");
+            assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above 0");
+            var secondPathPoints1 = pathPoints1[2].split(",");
+            assert.closeTo(parseFloat(secondPathPoints1[0]), 0, 1, "draws line to origin");
+            assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin");
+            verifier.end();
+        });
+        it("project value onto different attribute", function () {
+            piePlot.project("value", "value2");
+            var arcPaths = renderArea.selectAll(".arc");
+            assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+            var arcPath0 = d3.select(arcPaths[0][0]);
+            var pathPoints0 = normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
+            var firstPathPoints0 = pathPoints0[0].split(",");
+            assert.closeTo(parseFloat(firstPathPoints0[0]), 0, 1, "draws line vertically at beginning");
+            assert.operator(parseFloat(firstPathPoints0[1]), "<", 0, "draws line upwards");
+            var arcDestPoint0 = pathPoints0[1].split(",").slice(5);
+            assert.closeTo(parseFloat(arcDestPoint0[0]), 0, 1, "ends on a line vertically from beginning");
+            assert.operator(parseFloat(arcDestPoint0[1]), ">", 0, "ends below the center");
+            var arcPath1 = d3.select(arcPaths[0][1]);
+            var pathPoints1 = normalizePath(arcPath1.attr("d")).split(/[A-Z]/).slice(1, 4);
+            var firstPathPoints1 = pathPoints1[0].split(",");
+            assert.closeTo(parseFloat(firstPathPoints1[0]), 0, 1, "draws line vertically at beginning");
+            assert.operator(parseFloat(firstPathPoints1[1]), ">", 0, "draws line downwards");
+            var arcDestPoint1 = pathPoints1[1].split(",").slice(5);
+            assert.closeTo(parseFloat(arcDestPoint1[0]), 0, 1, "ends on a line vertically from beginning");
+            assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above the center");
+            piePlot.project("value", "value");
+            verifier.end();
+        });
+        it("innerRadius project", function () {
+            piePlot.project("inner-radius", function () { return 5; });
+            var arcPaths = renderArea.selectAll(".arc");
+            assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+            var pathPoints0 = normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
+            var radiusPath0 = pathPoints0[2].split(",").map(function (coordinate) { return parseFloat(coordinate); });
+            assert.closeTo(radiusPath0[0], 5, 1, "stops line at innerRadius point");
+            assert.closeTo(radiusPath0[1], 0, 1, "stops line at innerRadius point");
+            var innerArcPath0 = pathPoints0[3].split(",").map(function (coordinate) { return parseFloat(coordinate); });
+            assert.closeTo(innerArcPath0[0], 5, 1, "makes inner arc of radius 5");
+            assert.closeTo(innerArcPath0[1], 5, 1, "makes inner arc of radius 5");
+            assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center");
+            assert.closeTo(innerArcPath0[6], -5, 1, "makes inner arc to top of inner circle");
+            piePlot.project("inner-radius", function () { return 0; });
+            verifier.end();
+        });
+        it("outerRadius project", function () {
+            piePlot.project("outer-radius", function () { return 150; });
+            var arcPaths = renderArea.selectAll(".arc");
+            assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+            var pathPoints0 = normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
+            var radiusPath0 = pathPoints0[0].split(",").map(function (coordinate) { return parseFloat(coordinate); });
+            assert.closeTo(radiusPath0[0], 0, 1, "starts at outerRadius point");
+            assert.closeTo(radiusPath0[1], -150, 1, "starts at outerRadius point");
+            var outerArcPath0 = pathPoints0[1].split(",").map(function (coordinate) { return parseFloat(coordinate); });
+            assert.closeTo(outerArcPath0[0], 150, 1, "makes outer arc of radius 150");
+            assert.closeTo(outerArcPath0[1], 150, 1, "makes outer arc of radius 150");
+            assert.closeTo(outerArcPath0[5], 150, 1, "makes outer arc to right edge");
+            assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
+            piePlot.project("outer-radius", function () { return 250; });
+            verifier.end();
+        });
+        describe("Fill", function () {
+            it("sectors are filled in according to defaults", function () {
+                var arcPaths = renderArea.selectAll(".arc");
+                var arcPath0 = d3.select(arcPaths[0][0]);
+                assert.strictEqual(arcPath0.attr("fill"), Plottable.Core.Colors.PLOTTABLE_COLORS[0], "first sector filled appropriately");
+                var arcPath1 = d3.select(arcPaths[0][1]);
+                assert.strictEqual(arcPath1.attr("fill"), Plottable.Core.Colors.PLOTTABLE_COLORS[1], "second sector filled appropriately");
+                verifier.end();
+            });
+            it("project fill", function () {
+                piePlot.project("fill", function (d, i) { return String(i); }, new Plottable.Scale.Color("10"));
+                var arcPaths = renderArea.selectAll(".arc");
+                var arcPath0 = d3.select(arcPaths[0][0]);
+                assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
+                var arcPath1 = d3.select(arcPaths[0][1]);
+                assert.strictEqual(arcPath1.attr("fill"), "#ff7f0e", "second sector filled appropriately");
+                piePlot.project("fill", "type", new Plottable.Scale.Color("20"));
+                arcPaths = renderArea.selectAll(".arc");
+                arcPath0 = d3.select(arcPaths[0][0]);
+                assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
+                arcPath1 = d3.select(arcPaths[0][1]);
+                assert.strictEqual(arcPath1.attr("fill"), "#aec7e8", "second sector filled appropriately");
+                verifier.end();
+            });
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+describe("Plots", function () {
     describe("New Style Plots", function () {
         var p;
         var oldWarn = Plottable._Util.Methods.warn;
@@ -1602,8 +1743,6 @@ describe("Plots", function () {
         var linePlot;
         var renderArea;
         var verifier;
-        // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
-        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
@@ -1679,8 +1818,6 @@ describe("Plots", function () {
         var areaPlot;
         var renderArea;
         var verifier;
-        // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
-        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
@@ -2283,7 +2420,6 @@ describe("Plots", function () {
         var SVG_WIDTH = 600;
         var SVG_HEIGHT = 400;
         var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
-        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
         before(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Linear().domain([1, 3]);
@@ -2342,7 +2478,6 @@ describe("Plots", function () {
         var SVG_WIDTH = 600;
         var SVG_HEIGHT = 400;
         var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
-        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
         before(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Linear().domain([1, 3]);
@@ -4093,6 +4228,16 @@ describe("Scales", function () {
             assert.equal(d[0], 0);
             assert.equal(d[1], 1);
         });
+        it("can change the number of ticks generated", function () {
+            var scale = new Plottable.Scale.Linear();
+            var ticks10 = scale.ticks();
+            assert.closeTo(ticks10.length, 10, 1, "defaults to (about) 10 ticks");
+            var ticks20 = scale.ticks(20);
+            assert.closeTo(ticks20.length, 20, 1, "can request a different number of ticks");
+            scale.numTicks(5);
+            var ticks5 = scale.ticks();
+            assert.closeTo(ticks5.length, 5, 1, "can change the default number of ticks");
+        });
         it("autorange defaults to [1, 10] on log scale", function () {
             var scale = new Plottable.Scale.Log();
             scale.autoDomain();
@@ -4357,6 +4502,15 @@ describe("TimeScale tests", function () {
         checkDomain(["October 1, 2014", "November 1, 2014"]);
         checkDomain(["Oct 1, 2014", "Nov 1, 2014"]);
     });
+    it("time coercer works as intended", function () {
+        var tc = new Plottable.Scale.Time()._typeCoercer;
+        assert.equal(tc(null).getMilliseconds(), 0, "null converted to Date(0)");
+        // converting null to Date(0) is the correct behavior as it mirror's d3's semantics
+        assert.equal(tc("Wed Dec 31 1969 16:00:00 GMT-0800 (PST)").getMilliseconds(), 0, "string parsed to date");
+        assert.equal(tc(0).getMilliseconds(), 0, "number parsed to date");
+        var d = new Date(0);
+        assert.equal(tc(d), d, "date passed thru unchanged");
+    });
     it("_tickInterval produces correct number of ticks", function () {
         var scale = new Plottable.Scale.Time();
         // 100 year span
@@ -4395,11 +4549,31 @@ var assert = chai.assert;
 describe("_Util.DOM", function () {
     it("getBBox works properly", function () {
         var svg = generateSVG();
-        var rect = svg.append("rect").attr("x", 0).attr("y", 0).attr("width", 5).attr("height", 5);
-        var bb1 = Plottable._Util.DOM.getBBox(rect);
-        var bb2 = rect.node().getBBox();
-        assert.deepEqual(bb1, bb2);
+        var expectedBox = {
+            x: 0,
+            y: 0,
+            width: 40,
+            height: 20
+        };
+        var rect = svg.append("rect").attr(expectedBox);
+        var measuredBox = Plottable._Util.DOM.getBBox(rect);
+        assert.deepEqual(measuredBox, expectedBox, "getBBox measures correctly");
         svg.remove();
+    });
+    it("getBBox does not fail on disconnected and display:none nodes", function () {
+        var expectedBox = {
+            x: 0,
+            y: 0,
+            width: 40,
+            height: 20
+        };
+        var removedSVG = generateSVG().remove();
+        var rect = removedSVG.append("rect").attr(expectedBox);
+        Plottable._Util.DOM.getBBox(rect); // could throw NS_ERROR on FF
+        var noneSVG = generateSVG().style("display", "none");
+        rect = noneSVG.append("rect").attr(expectedBox);
+        Plottable._Util.DOM.getBBox(rect); // could throw NS_ERROR on FF
+        noneSVG.remove();
     });
     describe("getElementWidth, getElementHeight", function () {
         it("can get a plain element's size", function () {
@@ -4613,7 +4787,7 @@ describe("Formatters", function () {
             var relativeDateFormatter = Plottable.Formatters.relativeDate(5 * Plottable.MILLISECONDS_IN_ONE_DAY);
             var result = relativeDateFormatter(9 * Plottable.MILLISECONDS_IN_ONE_DAY);
             assert.strictEqual(result, "4", "4 days greater from base value");
-            var result = relativeDateFormatter(Plottable.MILLISECONDS_IN_ONE_DAY);
+            result = relativeDateFormatter(Plottable.MILLISECONDS_IN_ONE_DAY);
             assert.strictEqual(result, "-4", "4 days less from base value");
         });
         it("can increment by different time types (hours, minutes)", function () {
@@ -4621,7 +4795,7 @@ describe("Formatters", function () {
             var result = hoursRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
             assert.strictEqual(result, "72", "72 hour difference from epoch");
             var minutesRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / (24 * 60));
-            var result = minutesRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
+            result = minutesRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
             assert.strictEqual(result, "4320", "4320 minute difference from epoch");
         });
         it("can append a suffix", function () {
@@ -5189,8 +5363,8 @@ describe("Interactions", function () {
         var dragstartY = svgHeight - 100;
         var dragendX = 100;
         var dragendY = svgHeight - 20;
-        var draghalfwidth = ~~((dragendX - dragstartX) / 2);
-        var draghalfheight = ~~((dragendY - dragstartY) / 2);
+        var draghalfwidth = Math.round((dragendX - dragstartX) / 2);
+        var draghalfheight = Math.round((dragendY - dragstartY) / 2);
         before(function () {
             svg = generateSVG(svgWidth, svgHeight);
             dataset = new Plottable.Dataset(makeLinearSeries(10));
@@ -5218,7 +5392,7 @@ describe("Interactions", function () {
                 dragEndCalled++;
                 var expectedStart = {
                     x: dragstartX,
-                    y: dragstartY,
+                    y: dragstartY
                 };
                 var expectedEnd = {
                     x: dragendX,
@@ -5402,10 +5576,10 @@ describe("Interactions", function () {
                 var timesCalled = 0;
                 // fake a drag event
                 fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-                var dragstartX2 = dragstartX + ~~(dragwidth / 2);
+                var dragstartX2 = dragstartX + Math.round(dragwidth / 2);
                 var dragstartY2 = dragstartY;
                 var dragendX2 = dragstartX2;
-                var dragendY2 = dragstartY + ~~(dragheight / 2);
+                var dragendY2 = dragstartY + Math.round(dragheight / 2);
                 interaction.dragend(function (start, end) {
                     timesCalled++;
                     assert.deepEqual(start, { x: dragstartX2, y: dragstartY2 });
@@ -5414,7 +5588,7 @@ describe("Interactions", function () {
                         xMin: 0,
                         xMax: svgWidth,
                         yMin: dragendY2,
-                        yMax: dragendY,
+                        yMax: dragendY
                     });
                 });
                 // fake another drag event to resize the box.
@@ -5426,10 +5600,10 @@ describe("Interactions", function () {
                 var timesCalled = 0;
                 // fake a drag event
                 fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-                var dragstartX2 = dragstartX + ~~(dragwidth / 2);
+                var dragstartX2 = dragstartX + Math.round(dragwidth / 2);
                 var dragstartY2 = dragendY;
                 var dragendX2 = dragstartX2;
-                var dragendY2 = dragstartY2 - ~~(dragheight / 2);
+                var dragendY2 = dragstartY2 - Math.round(dragheight / 2);
                 interaction.dragend(function (start, end) {
                     timesCalled++;
                     assert.deepEqual(start, { x: dragstartX2, y: dragstartY2 });
@@ -5438,7 +5612,7 @@ describe("Interactions", function () {
                         xMin: 0,
                         xMax: svgWidth,
                         yMin: dragstartY,
-                        yMax: dragendY2,
+                        yMax: dragendY2
                     });
                 });
                 // fake another drag event to resize the box.

@@ -27,6 +27,12 @@
     "name":"basic_moveToFront",
     "categories":["Accessor", "Datasource", "Linear Scale", "Numeric Axis", "Project", "Area Plot", "Scatter Plot", "Line Plot", "Group", "Merge", "Click Interaction"]
   },  {
+    "name":"basic_pie",
+    "categories":["Datasource", "Pie Plot"]
+  },{
+    "name":"basic_pie_real",
+    "categories":["Datasource", "Pie Plot"]
+  },{
     "name": "category_axis_non_string",
     "categories": ["Category Axis", "Ordinal Scale"]
   }, {
@@ -60,6 +66,9 @@
     "name":"interaction_panzoom",
     "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Gridlines", "Merge", "PanZoom Interaction"]
   },  {
+    "name":"interaction_BarHover",
+    "categories":["Linear Scale", "Numeric Axis", "Ordinal Scale", "Category Axis", "Vertical Bar Plot", "Hover Interaction"]
+  },  {
     "name":"key_interaction",
     "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "PanZoom Interaction", "Key Interaction"]
   },  {
@@ -92,6 +101,9 @@
   },  {
     "name":"scale_interactive",
     "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Gridlines", "Merge", "Table", "Layout", "PanZoom Interaction"]
+  },  {
+    "name":"scatter_plot_project",
+    "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Layout"]
   },  {
     "name":"select_bars",
     "categories":["Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Gridlines", "Merge", "Click Interaction", "DragBox Interaction", "Title"]

@@ -1078,7 +1078,7 @@ declare module Plottable {
     module Abstract {
         class QuantitativeScale<D> extends Scale<D, number> {
             _d3Scale: D3.Scale.QuantitativeScale;
-            _lastRequestedTickCount: number;
+            _numTicks: number;
             _PADDING_FOR_IDENTICAL_DOMAIN: number;
             _userSetDomainer: boolean;
             _domainer: Domainer;
@@ -1139,12 +1139,27 @@ declare module Plottable {
              */
             clamp(clamp: boolean): QuantitativeScale<D>;
             /**
-             * Returns the locations in the range where ticks will show up.
+             * Gets a set of tick values spanning the domain.
              *
-             * @param {number} count The suggested number of ticks to generate.
+             * @param {number} [count] The approximate number of ticks to generate.
+             *                         If not supplied, the number specified by
+             *                         numTicks() is used instead.
              * @returns {any[]} The generated ticks.
              */
             ticks(count?: number): any[];
+            /**
+             * Gets the default number of ticks.
+             *
+             * @returns {number} The default number of ticks.
+             */
+            numTicks(): number;
+            /**
+             * Sets the default number of ticks to generate.
+             *
+             * @param {number} count The new default number of ticks.
+             * @returns {Scale} The calling Scale.
+             */
+            numTicks(count: number): QuantitativeScale<D>;
             /**
              * Given a domain, expands its domain onto "nice" values, e.g. whole
              * numbers.
@@ -1479,6 +1494,15 @@ declare module Plottable {
              * @param{any[]} data The data to be drawn
              * @param{attrHash} IAttributeToProjector The list of attributes to set on the data
              */
+            draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Animator.Null): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Arc extends Abstract._Drawer {
             draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Animator.Null): void;
         }
     }
@@ -2464,8 +2488,8 @@ declare module Plottable {
              * This function makes sure that all of the scales in this._projectors
              * have an extent that includes all the data that is projected onto them.
              */
-            _updateAllProjectors(): void;
-            _updateProjector(attr: string): void;
+            _updateScaleExtents(): void;
+            _updateScaleExtent(attr: string): void;
             /**
              * Applies attributes to the selection.
              *
@@ -2496,6 +2520,52 @@ declare module Plottable {
              * @returns {Plot} The calling Plot.
              */
             animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
+        class Pie extends Abstract.Plot {
+            _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
+            _datasetKeysInOrder: string[];
+            /**
+             * Constructs a PiePlot.
+             *
+             * @constructor
+             */
+            constructor();
+            _setup(): void;
+            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
+            /**
+             * Adds a dataset to this plot. Only one dataset can be added to a PiePlot.
+             *
+             * A key is automatically generated if not supplied.
+             *
+             * @param {string} [key] The key of the dataset.
+             * @param {any[]|Dataset} dataset dataset to add.
+             * @returns {Pie} The calling PiePlot.
+             */
+            addDataset(key: string, dataset: Dataset): Pie;
+            addDataset(key: string, dataset: any[]): Pie;
+            addDataset(dataset: Dataset): Pie;
+            addDataset(dataset: any[]): Pie;
+            _addDataset(key: string, dataset: Dataset): void;
+            /**
+             * Removes a dataset
+             *
+             * @param {string} key The key of the dataset
+             * @returns {Pie} The calling PiePlot.
+             */
+            removeDataset(key: string): Pie;
+            _generateAttrToProjector(): IAttributeToProjector;
+            _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator;
+            _getDrawer(key: string): Abstract._Drawer;
+            _getDatasetsInOrder(): Dataset[];
+            _getDrawersInOrder(): Abstract._Drawer[];
+            _updateScaleExtent(attr: string): void;
+            _paint(): void;
         }
     }
 }
@@ -2567,7 +2637,7 @@ declare module Plottable {
             _addDataset(key: string, dataset: Dataset): void;
             _getDrawer(key: string): _Drawer;
             _getAnimator(drawer: _Drawer, index: number): Animator.IPlotAnimator;
-            _updateProjector(attr: string): void;
+            _updateScaleExtent(attr: string): void;
             /**
              * Gets the dataset order by key
              *
@@ -2905,7 +2975,7 @@ declare module Plottable {
         class Stacked<X, Y> extends NewStylePlot<X, Y> {
             _isVertical: boolean;
             _onDatasetUpdate(): void;
-            _updateAllProjectors(): void;
+            _updateScaleExtents(): void;
         }
     }
 }

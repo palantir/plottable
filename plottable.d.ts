@@ -1101,12 +1101,27 @@ declare module Plottable {
              */
             clamp(clamp: boolean): QuantitativeScale<D>;
             /**
-             * Returns the locations in the range where ticks will show up.
+             * Gets a set of tick values spanning the domain.
              *
-             * @param {number} count The suggested number of ticks to generate.
+             * @param {number} [count] The approximate number of ticks to generate.
+             *                         If not supplied, the number specified by
+             *                         numTicks() is used instead.
              * @returns {any[]} The generated ticks.
              */
             ticks(count?: number): any[];
+            /**
+             * Gets the default number of ticks.
+             *
+             * @returns {number} The default number of ticks.
+             */
+            numTicks(): number;
+            /**
+             * Sets the default number of ticks to generate.
+             *
+             * @param {number} count The new default number of ticks.
+             * @returns {Scale} The calling Scale.
+             */
+            numTicks(count: number): QuantitativeScale<D>;
             /**
              * Gets a Domainer of a scale. A Domainer is responsible for combining
              * multiple extents into a single domain.
@@ -1421,6 +1436,15 @@ declare module Plottable {
              * @param{any[]} data The data to be drawn
              * @param{attrHash} IAttributeToProjector The list of attributes to set on the data
              */
+            draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Animator.Null): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Arc extends Abstract._Drawer {
             draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Animator.Null): void;
         }
     }
@@ -2259,6 +2283,40 @@ declare module Plottable {
              * @returns {Plot} The calling Plot.
              */
             animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
+        class Pie extends Abstract.Plot {
+            /**
+             * Constructs a PiePlot.
+             *
+             * @constructor
+             */
+            constructor();
+            /**
+             * Adds a dataset to this plot. Only one dataset can be added to a PiePlot.
+             *
+             * A key is automatically generated if not supplied.
+             *
+             * @param {string} [key] The key of the dataset.
+             * @param {any[]|Dataset} dataset dataset to add.
+             * @returns {Pie} The calling PiePlot.
+             */
+            addDataset(key: string, dataset: Dataset): Pie;
+            addDataset(key: string, dataset: any[]): Pie;
+            addDataset(dataset: Dataset): Pie;
+            addDataset(dataset: any[]): Pie;
+            /**
+             * Removes a dataset
+             *
+             * @param {string} key The key of the dataset
+             * @returns {Pie} The calling PiePlot.
+             */
+            removeDataset(key: string): Pie;
         }
     }
 }
