@@ -41,10 +41,7 @@ export module Abstract {
         negativeValuedDatasets.push(negativeValuedDataset);
       });
 
-      this._stack(positiveValuedDatasets);
-      this._stack(negativeValuedDatasets);
-
-      this.setDatasetStackOffsets(positiveValuedDatasets, negativeValuedDatasets);
+      this.setDatasetStackOffsets(this._stack(positiveValuedDatasets), this._stack(negativeValuedDatasets));
 
       var maxY = _Util.Methods.max(datasets, (dataset: any) => {
         return _Util.Methods.max(dataset.data(), (datum: any) => {
@@ -61,7 +58,7 @@ export module Abstract {
       this.stackedExtent[0] = Math.min(minY, 0);
     }
 
-    private _stack(data: any[]) {
+    private _stack(data: any[]): any[] {
       var outFunction = (d: any, y0: number, y: number) => {
         d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = y0;
       };
@@ -71,6 +68,8 @@ export module Abstract {
                .y((d) => d.value)
                .values((d) => d)
                .out(outFunction)(data);
+
+      return data;
     }
 
     private setDatasetStackOffsets(positiveStackDatasets: any[], negativeStackDatasets: any[]) {
