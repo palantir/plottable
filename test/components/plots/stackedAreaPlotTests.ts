@@ -15,7 +15,6 @@ describe("Plots", () => {
     var SVG_HEIGHT = 400;
 
     var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
-    var normalizePath = (s: string) => s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
 
     before(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -83,7 +82,6 @@ describe("Plots", () => {
     var SVG_HEIGHT = 400;
 
     var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
-    var normalizePath = (s: string) => s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
 
     before(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);

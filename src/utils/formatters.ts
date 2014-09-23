@@ -8,12 +8,12 @@ module Plottable {
 
   export var MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
 
-  interface TimeFilterFormat {
-    format: string;
-    filter: (d: any) => any;
-  }
-
   export module Formatters {
+
+    interface TimeFilterFormat {
+      format: string;
+      filter: (d: any) => any;
+    }
 
     /**
      * Creates a formatter for currency values.

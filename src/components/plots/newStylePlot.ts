@@ -89,7 +89,7 @@ export module Abstract {
       return new Animator.Null();
     }
 
-    public _updateProjector(attr: string) {
+    public _updateScaleExtent(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
         this._key2DatasetDrawerKey.forEach((key, ddk) => {

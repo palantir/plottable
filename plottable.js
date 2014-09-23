@@ -1,5 +1,5 @@
 /*!
-Plottable 0.29.1 (https://github.com/palantir/plottable)
+Plottable 0.30.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1051,7 +1051,16 @@ var Plottable;
             * @returns {SVGRed} The bounding box.
             */
             function getBBox(element) {
-                return element.node().getBBox();
+                var bbox;
+
+                try  {
+                    bbox = element.node().getBBox();
+                } catch (err) {
+                    bbox = {
+                        x: 0, y: 0, width: 0, height: 0
+                    };
+                }
+                return bbox;
             }
             DOM.getBBox = getBBox;
 
@@ -1074,7 +1083,6 @@ var Plottable;
                 return parsedValue;
             }
 
-            //
             function isSelectionRemovedFromSVG(selection) {
                 var n = selection.node();
                 while (n !== null && n.nodeName !== "svg") {
@@ -1418,7 +1426,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.29.1";
+    Plottable.version = "0.30.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2360,7 +2368,7 @@ var Plottable;
             */
             function QuantitativeScale(scale) {
                 _super.call(this, scale);
-                this._lastRequestedTickCount = 10;
+                this._numTicks = 10;
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
                 this._userSetDomainer = false;
                 this._domainer = new Plottable.Domainer();
@@ -2433,16 +2441,24 @@ var Plottable;
             };
 
             /**
-            * Returns the locations in the range where ticks will show up.
+            * Gets a set of tick values spanning the domain.
             *
-            * @param {number} count The suggested number of ticks to generate.
+            * @param {number} [count] The approximate number of ticks to generate.
+            *                         If not supplied, the number specified by
+            *                         numTicks() is used instead.
             * @returns {any[]} The generated ticks.
             */
             QuantitativeScale.prototype.ticks = function (count) {
-                if (count != null) {
-                    this._lastRequestedTickCount = count;
+                if (typeof count === "undefined") { count = this.numTicks(); }
+                return this._d3Scale.ticks(count);
+            };
+
+            QuantitativeScale.prototype.numTicks = function (count) {
+                if (count == null) {
+                    return this._numTicks;
                 }
-                return this._d3Scale.ticks(this._lastRequestedTickCount);
+                this._numTicks = count;
+                return this;
             };
 
             /**
@@ -2588,7 +2604,7 @@ var Plottable;
                 this.base = base;
                 this.pivot = this.base;
                 this.untransformedDomain = this._defaultExtent();
-                this._lastRequestedTickCount = 10;
+                this._numTicks = 10;
                 if (base <= 1) {
                     throw new Error("ModifiedLogScale: The base must be > 1");
                 }
@@ -2649,10 +2665,7 @@ var Plottable;
             };
 
             ModifiedLog.prototype.ticks = function (count) {
-                if (count != null) {
-                    _super.prototype.ticks.call(this, count);
-                }
-
+                if (typeof count === "undefined") { count = this.numTicks(); }
                 // Say your domain is [-100, 100] and your pivot is 10.
                 // then we're going to draw negative log ticks from -100 to -10,
                 // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
@@ -2680,7 +2693,7 @@ var Plottable;
 
                 // If you only have 1 tick, you can't tell how big the scale is.
                 if (ticks.length <= 1) {
-                    ticks = d3.scale.linear().domain([min, max]).ticks(this._lastRequestedTickCount);
+                    ticks = d3.scale.linear().domain([min, max]).ticks(count);
                 }
                 return ticks;
             };
@@ -2738,7 +2751,7 @@ var Plottable;
                 var adjustedLower = this.adjustedLog(lower);
                 var adjustedUpper = this.adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-                var ticks = Math.ceil(proportion * this._lastRequestedTickCount);
+                var ticks = Math.ceil(proportion * this._numTicks);
                 return ticks;
             };
 
@@ -2963,7 +2976,7 @@ var Plottable;
                 // need to cast since d3 time scales do not descend from Quantitative scales
                 _super.call(this, scale == null ? d3.time.scale() : scale);
                 this._typeCoercer = function (d) {
-                    return d._isAMomentObject || d instanceof Date ? d : new Date(d);
+                    return d && d._isAMomentObject || d instanceof Date ? d : new Date(d);
                 };
             }
             Time.prototype._tickInterval = function (interval, step) {
@@ -3291,6 +3304,38 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (_Drawer) {
+        var Arc = (function (_super) {
+            __extends(Arc, _super);
+            function Arc() {
+                _super.apply(this, arguments);
+            }
+            Arc.prototype.draw = function (data, attrToProjector, animator) {
+                if (typeof animator === "undefined") { animator = new Plottable.Animator.Null(); }
+                var svgElement = "path";
+                var dataElements = this._renderArea.selectAll(svgElement).data(data);
+
+                dataElements.enter().append(svgElement);
+                dataElements.classed("arc", true);
+                animator.animate(dataElements, attrToProjector);
+                dataElements.exit().remove();
+            };
+            return Arc;
+        })(Plottable.Abstract._Drawer);
+        _Drawer.Arc = Arc;
+    })(Plottable._Drawer || (Plottable._Drawer = {}));
+    var _Drawer = Plottable._Drawer;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (_Drawer) {
         var Area = (function (_super) {
             __extends(Area, _super);
             function Area() {
@@ -3366,6 +3411,8 @@ var Plottable;
                 this.interactionsToRegister = [];
                 this.boxes = [];
                 this.isTopLevelComponent = false;
+                this._width = 0;
+                this._height = 0;
                 this._xOffset = 0;
                 this._yOffset = 0;
                 this.cssClasses = ["component"];
@@ -3555,6 +3602,9 @@ var Plottable;
                 }
                 this._computeLayout();
                 this._render();
+
+                // flush so that consumers can immediately attach to stuff we create in the DOM
+                Plottable.Core.RenderController.flush();
                 return this;
             };
 
@@ -6287,7 +6337,7 @@ var Plottable;
                 _super.prototype._anchor.call(this, element);
                 this.animateOnNextRender = true;
                 this._dataChanged = true;
-                this._updateAllProjectors();
+                this._updateScaleExtents();
             };
 
             Plot.prototype.remove = function () {
@@ -6322,7 +6372,7 @@ var Plottable;
             };
 
             Plot.prototype._onDatasetUpdate = function () {
-                this._updateAllProjectors();
+                this._updateScaleExtents();
                 this.animateOnNextRender = true;
                 this._dataChanged = true;
                 this._render();
@@ -6376,7 +6426,7 @@ var Plottable;
                 }
                 var activatedAccessor = Plottable._Util.Methods._applyAccessor(accessor, this);
                 this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
-                this._updateProjector(attrToSet);
+                this._updateScaleExtent(attrToSet);
                 this._render(); // queue a re-render upon changing projector
                 return this;
             };
@@ -6427,7 +6477,7 @@ var Plottable;
                 _super.prototype.detach.call(this);
 
                 // make the domain resize
-                this._updateAllProjectors();
+                this._updateScaleExtents();
                 return this;
             };
 
@@ -6435,14 +6485,14 @@ var Plottable;
             * This function makes sure that all of the scales in this._projectors
             * have an extent that includes all the data that is projected onto them.
             */
-            Plot.prototype._updateAllProjectors = function () {
+            Plot.prototype._updateScaleExtents = function () {
                 var _this = this;
                 d3.keys(this._projectors).forEach(function (attr) {
-                    return _this._updateProjector(attr);
+                    return _this._updateScaleExtent(attr);
                 });
             };
 
-            Plot.prototype._updateProjector = function (attr) {
+            Plot.prototype._updateScaleExtent = function (attr) {
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
                     var extent = this.dataset()._getExtent(projector.accessor, projector.scale._typeCoercer);
@@ -6489,6 +6539,151 @@ var Plottable;
         Abstract.Plot = Plot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Plot) {
+        /*
+        * A PiePlot is a plot meant to show how much out of a total an attribute's value is.
+        * One usecase is to show how much funding departments are given out of a total budget.
+        *
+        * Primary projection attributes:
+        *   "fill" - Accessor determining the color of each sector
+        *   "inner-radius" - Accessor determining the distance from the center to the inner edge of the sector
+        *   "outer-radius" - Accessor determining the distance from the center to the outer edge of the sector
+        *   "value" - Accessor to extract the value determining the proportion of each slice to the total
+        */
+        var Pie = (function (_super) {
+            __extends(Pie, _super);
+            /**
+            * Constructs a PiePlot.
+            *
+            * @constructor
+            */
+            function Pie() {
+                // make a dummy dataset to satisfy the base Plot (HACKHACK)
+                this._key2DatasetDrawerKey = d3.map();
+                this._datasetKeysInOrder = [];
+                this.nextSeriesIndex = 0;
+                _super.call(this, new Plottable.Dataset());
+                this.classed("pie-plot", true);
+            }
+            Pie.prototype._setup = function () {
+                Plottable.Abstract.NewStylePlot.prototype._setup.call(this);
+            };
+
+            Pie.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+            };
+
+            Pie.prototype.addDataset = function (keyOrDataset, dataset) {
+                return Plottable.Abstract.NewStylePlot.prototype.addDataset.call(this, keyOrDataset, dataset);
+            };
+
+            Pie.prototype._addDataset = function (key, dataset) {
+                if (this._datasetKeysInOrder.length === 1) {
+                    Plottable._Util.Methods.warn("Only one dataset is supported in pie plots");
+                    return;
+                }
+                Plottable.Abstract.NewStylePlot.prototype._addDataset.call(this, key, dataset);
+            };
+
+            /**
+            * Removes a dataset
+            *
+            * @param {string} key The key of the dataset
+            * @returns {Pie} The calling PiePlot.
+            */
+            Pie.prototype.removeDataset = function (key) {
+                return Plottable.Abstract.NewStylePlot.prototype.removeDataset.call(this, key);
+            };
+
+            Pie.prototype._generateAttrToProjector = function () {
+                var attrToProjector = this.retargetProjectors(_super.prototype._generateAttrToProjector.call(this));
+                var innerRadiusF = attrToProjector["inner-radius"] || d3.functor(0);
+                var outerRadiusF = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
+                attrToProjector["d"] = d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
+                delete attrToProjector["inner-radius"];
+                delete attrToProjector["outer-radius"];
+
+                if (attrToProjector["fill"] == null) {
+                    attrToProjector["fill"] = function (d, i) {
+                        return Pie.DEFAULT_COLOR_SCALE.scale(String(i));
+                    };
+                }
+
+                delete attrToProjector["value"];
+                return attrToProjector;
+            };
+
+            /**
+            * Since the data goes through a pie function, which returns an array of ArcDescriptors,
+            * projectors will need to be retargeted so they point to the data portion of each arc descriptor.
+            */
+            Pie.prototype.retargetProjectors = function (attrToProjector) {
+                var retargetedAttrToProjector = {};
+                d3.entries(attrToProjector).forEach(function (entry) {
+                    retargetedAttrToProjector[entry.key] = function (d, i) {
+                        return entry.value(d.data, i);
+                    };
+                });
+                return retargetedAttrToProjector;
+            };
+
+            Pie.prototype._getAnimator = function (drawer, index) {
+                return Plottable.Abstract.NewStylePlot.prototype._getAnimator.call(this, drawer, index);
+            };
+
+            Pie.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Arc(key);
+            };
+
+            Pie.prototype._getDatasetsInOrder = function () {
+                return Plottable.Abstract.NewStylePlot.prototype._getDatasetsInOrder.call(this);
+            };
+
+            Pie.prototype._getDrawersInOrder = function () {
+                return Plottable.Abstract.NewStylePlot.prototype._getDrawersInOrder.call(this);
+            };
+
+            Pie.prototype._updateScaleExtent = function (attr) {
+                Plottable.Abstract.NewStylePlot.prototype._updateScaleExtent.call(this, attr);
+            };
+
+            Pie.prototype._paint = function () {
+                var _this = this;
+                var attrHash = this._generateAttrToProjector();
+                var datasets = this._getDatasetsInOrder();
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
+                    var pieData = _this.pie(datasets[i].data());
+                    d.draw(pieData, attrHash, animator);
+                });
+            };
+
+            Pie.prototype.pie = function (d) {
+                var defaultAccessor = function (d) {
+                    return d.value;
+                };
+                var valueProjector = this._projectors["value"];
+                var valueAccessor = valueProjector ? valueProjector.accessor : defaultAccessor;
+                return d3.layout.pie().sort(null).value(valueAccessor)(d);
+            };
+            Pie.DEFAULT_COLOR_SCALE = new Plottable.Scale.Color();
+            return Pie;
+        })(Plottable.Abstract.Plot);
+        Plot.Pie = Pie;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -6666,7 +6861,7 @@ var Plottable;
                 return new Plottable.Animator.Null();
             };
 
-            NewStylePlot.prototype._updateProjector = function (attr) {
+            NewStylePlot.prototype._updateScaleExtent = function (attr) {
                 var _this = this;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
@@ -7737,8 +7932,8 @@ var Plottable;
                 this.stackedExtent[0] = Math.min(minY, 0);
             };
 
-            Stacked.prototype._updateAllProjectors = function () {
-                _super.prototype._updateAllProjectors.call(this);
+            Stacked.prototype._updateScaleExtents = function () {
+                _super.prototype._updateScaleExtents.call(this);
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 if (primaryScale == null) {
                     return;
