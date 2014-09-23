@@ -18,14 +18,30 @@ export module Abstract {
 
     private stack() {
       var datasets = this._getDatasetsInOrder();
-      var outFunction = (d: any, y0: number, y: number) => {
-        d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = y0;
-      };
-      d3.layout.stack()
-        .x(this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor)
-        .y(this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor)
-        .values((d) => d.data())
-        .out(outFunction)(datasets);
+      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+      var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+
+      var positiveValuedData: any[] = datasets.map((dataset) => {
+        return dataset.data().map((datum) => {
+          var key = keyAccessor(datum);
+          var value = valueAccessor(datum);
+          value = value >= 0 ? value : 0;
+          return {key: key, value: value};
+        })
+      });
+      this._stack(positiveValuedData);
+
+      var negativeValuedData: any[] = datasets.map((dataset) => {
+        return dataset.data().map((datum) => {
+          var key = keyAccessor(datum);
+          var value = valueAccessor(datum);
+          value = value <= 0 ? value : 0;
+          return {key: key, value: value};
+        })
+      });
+      this._stack(negativeValuedData);
+
+      this.setDatasetStackOffsets(datasets, positiveValuedData, negativeValuedData);
 
       var maxY = _Util.Methods.max(datasets[datasets.length - 1].data(),
                                   (datum: any) => datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
@@ -34,6 +50,35 @@ export module Abstract {
       var minY = _Util.Methods.min(datasets[datasets.length - 1].data(),
                                   (datum: any) => datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
       this.stackedExtent[0] = Math.min(minY, 0);
+    }
+
+    private _stack(data: any[]) {
+      var outFunction = (d: any, y0: number, y: number) => {
+        d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = y0;
+      };
+
+      d3.layout.stack()
+               .x((d) => d.key)
+               .y((d) => d.value)
+               .values((d) => d)
+               .out(outFunction)(data);
+    }
+
+    private setDatasetStackOffsets(datasets: Dataset[], positiveStackData: any[], negativeStackData: any[]) {
+      datasets.forEach((dataset, datasetIndex) => {
+        var data = dataset.data();
+        var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+        data.forEach((datum: any, datumIndex: number) => {
+          var positiveOffset: number = positiveStackData[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+          var negativeOffset: number = negativeStackData[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+          if (valueAccessor(datum) >= 0) {
+            datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = positiveOffset;
+          } else {
+            datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = negativeOffset;
+          }
+        });
+      });
+
     }
 
     public _updateScaleExtents() {

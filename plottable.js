@@ -5520,14 +5520,54 @@ var Plottable;
             };
             Stacked.prototype.stack = function () {
                 var datasets = this._getDatasetsInOrder();
-                var outFunction = function (d, y0, y) {
-                    d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = y0;
-                };
-                d3.layout.stack().x(this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor).y(this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor).values(function (d) { return d.data(); }).out(outFunction)(datasets);
+                var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+                var positiveValuedData = datasets.map(function (dataset) {
+                    return dataset.data().map(function (datum) {
+                        var key = keyAccessor(datum);
+                        var value = valueAccessor(datum);
+                        value = value >= 0 ? value : 0;
+                        return { key: key, value: value };
+                    });
+                });
+                this._stack(positiveValuedData);
+                var negativeValuedData = datasets.map(function (dataset) {
+                    return dataset.data().map(function (datum) {
+                        var key = keyAccessor(datum);
+                        var value = valueAccessor(datum);
+                        value = value <= 0 ? value : 0;
+                        return { key: key, value: value };
+                    });
+                });
+                this._stack(negativeValuedData);
+                this.setDatasetStackOffsets(datasets, positiveValuedData, negativeValuedData);
                 var maxY = Plottable._Util.Methods.max(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
                 this.stackedExtent[1] = Math.max(0, maxY);
                 var minY = Plottable._Util.Methods.min(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
                 this.stackedExtent[0] = Math.min(minY, 0);
+            };
+            Stacked.prototype._stack = function (data) {
+                var outFunction = function (d, y0, y) {
+                    d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = y0;
+                };
+                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return d; }).out(outFunction)(data);
+            };
+            Stacked.prototype.setDatasetStackOffsets = function (datasets, positiveStackData, negativeStackData) {
+                var _this = this;
+                datasets.forEach(function (dataset, datasetIndex) {
+                    var data = dataset.data();
+                    var valueAccessor = _this._isVertical ? _this._projectors["y"].accessor : _this._projectors["x"].accessor;
+                    data.forEach(function (datum, datumIndex) {
+                        var positiveOffset = positiveStackData[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                        var negativeOffset = negativeStackData[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                        if (valueAccessor(datum) >= 0) {
+                            datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = positiveOffset;
+                        }
+                        else {
+                            datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = negativeOffset;
+                        }
+                    });
+                });
             };
             Stacked.prototype._updateScaleExtents = function () {
                 _super.prototype._updateScaleExtents.call(this);
