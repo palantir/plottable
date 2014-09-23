@@ -2246,30 +2246,25 @@ describe("Plots", function () {
             yScale.domain([400, 0]);
             var data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
             var metadata = { foo: 10, bar: 20 };
-            var xAccessor = function (d, i, m) { return d.x + i * m.foo; };
-            var yAccessor = function (d, i, m) { return m.bar; };
+            var xAccessor = function (d, i, m) { return d.x + i; };
+            var yAccessor = function (d, i, m) { return 0; };
             var dataset = new Plottable.Dataset(data, metadata);
-            var renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor);
-            renderer.renderTo(svg);
-            var circles = renderer._renderArea.selectAll("circle");
+            var plot = new Plottable.Plot.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
+            plot.addDataset(dataset);
+            plot.renderTo(svg);
+            var circles = plot._renderArea.selectAll("circle");
             var c1 = d3.select(circles[0][0]);
             var c2 = d3.select(circles[0][1]);
             assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
-            assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct");
-            assert.closeTo(parseFloat(c2.attr("cx")), 11, 0.01, "second circle cx is correct");
-            assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct");
+            assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct");
+            assert.closeTo(parseFloat(c2.attr("cx")), 2, 0.01, "second circle cx is correct");
+            assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct");
             data = [{ x: 2, y: 2 }, { x: 4, y: 4 }];
             dataset.data(data);
             assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after data change");
-            assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct after data change");
-            assert.closeTo(parseFloat(c2.attr("cx")), 14, 0.01, "second circle cx is correct after data change");
-            assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct after data change");
-            metadata = { foo: 0, bar: 0 };
-            dataset.metadata(metadata);
-            assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after metadata change");
-            assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
-            assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");
-            assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
+            assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after data change");
+            assert.closeTo(parseFloat(c2.attr("cx")), 5, 0.01, "second circle cx is correct after data change");
+            assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after data change");
             svg.remove();
         });
         describe("Example ScatterPlot with quadratic series", function () {
@@ -2316,7 +2311,8 @@ describe("Plots", function () {
                 svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 xScale = new Plottable.Scale.Linear().domain([0, 9]);
                 yScale = new Plottable.Scale.Linear().domain([0, 81]);
-                circlePlot = new Plottable.Plot.Scatter(quadraticDataset, xScale, yScale);
+                circlePlot = new Plottable.Plot.Scatter(xScale, yScale);
+                circlePlot.addDataset(quadraticDataset);
                 circlePlot.project("fill", colorAccessor);
                 circlePlot.renderTo(svg);
             });
@@ -4163,7 +4159,8 @@ describe("Scales", function () {
             var sadTimesData = ["999", "10", "100", "1000", "2", "999"];
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
-            var plot = new Plottable.Plot.Scatter(sadTimesData, xScale, yScale);
+            var plot = new Plottable.Plot.Scatter(xScale, yScale);
+            plot.addDataset(sadTimesData);
             var id = function (d) { return d; };
             xScale.domainer(new Plottable.Domainer());
             plot.project("x", id, xScale);
@@ -5185,13 +5182,13 @@ describe("Interactions", function () {
             var yScale = new Plottable.Scale.Linear().domain([11, 0]);
             var svg = generateSVG();
             var dataset = makeLinearSeries(11);
-            var renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
-            renderer.renderTo(svg);
+            var plot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataset);
+            plot.renderTo(svg);
             var xDomainBefore = xScale.domain();
             var yDomainBefore = yScale.domain();
             var interaction = new Plottable.Interaction.PanZoom(xScale, yScale);
-            renderer.registerInteraction(interaction);
-            var hb = renderer._element.select(".hit-box").node();
+            plot.registerInteraction(interaction);
+            var hb = plot._element.select(".hit-box").node();
             var dragDistancePixelX = 10;
             var dragDistancePixelY = 20;
             $(hb).simulate("drag", {
@@ -5222,7 +5219,7 @@ describe("Interactions", function () {
         var dataset;
         var xScale;
         var yScale;
-        var renderer;
+        var plot;
         var interaction;
         var dragstartX = 20;
         var dragstartY = svgHeight - 100;
@@ -5233,10 +5230,11 @@ describe("Interactions", function () {
             dataset = new Plottable.Dataset(makeLinearSeries(10));
             xScale = new Plottable.Scale.Linear();
             yScale = new Plottable.Scale.Linear();
-            renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
-            renderer.renderTo(svg);
+            plot = new Plottable.Plot.Scatter(xScale, yScale);
+            plot.addDataset(dataset);
+            plot.renderTo(svg);
             interaction = new Plottable.Interaction.XYDragBox();
-            renderer.registerInteraction(interaction);
+            plot.registerInteraction(interaction);
         });
         afterEach(function () {
             interaction.dragstart(null);
@@ -5270,7 +5268,7 @@ describe("Interactions", function () {
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
             var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
-            var dragBox = renderer._backgroundContainer.select(dragBoxClass);
+            var dragBox = plot._backgroundContainer.select(dragBoxClass);
             assert.isNotNull(dragBox, "the dragbox was created");
             var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
             var expectedStartPosition = { x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY) };
@@ -5292,7 +5290,7 @@ describe("Interactions", function () {
         var dataset;
         var xScale;
         var yScale;
-        var renderer;
+        var plot;
         var interaction;
         var dragstartX = 20;
         var dragstartY = svgHeight - 100;
@@ -5303,10 +5301,11 @@ describe("Interactions", function () {
             dataset = new Plottable.Dataset(makeLinearSeries(10));
             xScale = new Plottable.Scale.Linear();
             yScale = new Plottable.Scale.Linear();
-            renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
-            renderer.renderTo(svg);
+            plot = new Plottable.Plot.Scatter(xScale, yScale);
+            plot.addDataset(dataset);
+            plot.renderTo(svg);
             interaction = new Plottable.Interaction.YDragBox();
-            renderer.registerInteraction(interaction);
+            plot.registerInteraction(interaction);
         });
         afterEach(function () {
             interaction.dragstart(null);
@@ -5334,7 +5333,7 @@ describe("Interactions", function () {
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
             var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
-            var dragBox = renderer._backgroundContainer.select(dragBoxClass);
+            var dragBox = plot._backgroundContainer.select(dragBoxClass);
             assert.isNotNull(dragBox, "the dragbox was created");
             var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
             var expectedStartPosition = { x: 0, y: Math.min(dragstartY, dragendY) };

@@ -24,7 +24,8 @@ function run(div, data, Plottable) {
     var renderArea1 = new Plottable.Plot.VerticalBar(dataseries1, xScale, yScale);
     renderArea1.animate(true);
 
-    var renderArea2 = new Plottable.Plot.Scatter(renderArea1.dataset(), xScale, yScale);
+    var renderArea2 = new Plottable.Plot.Scatter(xScale, yScale);
+    renderArea2.addDataset(renderArea1.dataset());
     renderArea2.attr("fill", function(){return "purple";});
     renderArea2.animate(true);
 

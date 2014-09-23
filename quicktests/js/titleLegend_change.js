@@ -37,12 +37,12 @@ function run(div, data, Plottable) {
   };
 
   //rendering
-  var renderAreaD1 = new Plottable.Plot.Scatter(dataseries1, xScale, yScale);
+  var renderAreaD1 = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries1);
   var renderAreaD2 = new Plottable.Plot.Line(dataseries2, xScale, yScale);
   var renderApple = new Plottable.Plot.Area(dataseries3, xScale, yScale);
   var renderBanana = new Plottable.Plot.Line(dataseries4, xScale, yScale);
-  var renderOrange = new Plottable.Plot.Scatter(dataseries5, xScale, yScale);
-  var renderGrape = new Plottable.Plot.Scatter(dataseries6, xScale, yScale);
+  var renderOrange = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries5);
+  var renderGrape = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries6);
 
   renderAreaD1.attr("fill", colorProjector);
   renderAreaD2.attr("stroke", colorProjector);

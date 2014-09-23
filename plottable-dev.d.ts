@@ -1004,10 +1004,11 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Scatter<X, Y> extends Plottable.Abstract.XYPlot<X, Y> {
+        class Scatter<X, Y> extends Plottable.Abstract.NSXYPlot<X, Y> {
             _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.Scale<Y, number>);
+            constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.Scale<Y, number>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Scatter<X, Y>;
+            _generateAttrToProjector(): IAttributeToProjector;
             _paint(): void;
         }
     }

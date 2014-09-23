@@ -4685,7 +4685,7 @@ var Plottable;
                 this._onDatasetUpdate();
             };
             NSPlot.prototype._getDrawer = function (key) {
-                throw new Error("Abstract Method Not Implemented");
+                return new Abstract._Drawer(key);
             };
             NSPlot.prototype._getAnimator = function (drawer, index) {
                 return new Plottable.Animator.Null();
@@ -4991,8 +4991,8 @@ var Plottable;
     (function (Plot) {
         var Scatter = (function (_super) {
             __extends(Scatter, _super);
-            function Scatter(dataset, xScale, yScale) {
-                _super.call(this, dataset, xScale, yScale);
+            function Scatter(xScale, yScale) {
+                _super.call(this, xScale, yScale);
                 this._animators = {
                     "circles-reset": new Plottable.Animator.Null(),
                     "circles": new Plottable.Animator.IterativeDelay().duration(250).delay(5)
@@ -5008,26 +5008,34 @@ var Plottable;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
             };
+            Scatter.prototype._generateAttrToProjector = function () {
+                var a2p = _super.prototype._generateAttrToProjector.call(this);
+                a2p["cx"] = a2p["x"];
+                delete a2p["x"];
+                a2p["cy"] = a2p["y"];
+                delete a2p["y"];
+                return a2p;
+            };
             Scatter.prototype._paint = function () {
-                _super.prototype._paint.call(this);
+                var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
-                attrToProjector["cx"] = attrToProjector["x"];
-                attrToProjector["cy"] = attrToProjector["y"];
-                delete attrToProjector["x"];
-                delete attrToProjector["y"];
-                var circles = this._renderArea.selectAll("circle").data(this._dataset.data());
-                circles.enter().append("circle");
-                if (this._dataChanged) {
-                    var rFunction = attrToProjector["r"];
-                    attrToProjector["r"] = function () { return 0; };
-                    this._applyAnimatedAttributes(circles, "circles-reset", attrToProjector);
-                    attrToProjector["r"] = rFunction;
-                }
-                this._applyAnimatedAttributes(circles, "circles", attrToProjector);
-                circles.exit().remove();
+                var datasets = this._getDatasetsInOrder();
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    var dataset = datasets[i];
+                    var circles = d._renderArea.selectAll("circle").data(dataset.data());
+                    circles.enter().append("circle");
+                    if (_this._dataChanged) {
+                        var rFunction = attrToProjector["r"];
+                        attrToProjector["r"] = function () { return 0; };
+                        _this._applyAnimatedAttributes(circles, "circles-reset", attrToProjector);
+                        attrToProjector["r"] = rFunction;
+                    }
+                    _this._applyAnimatedAttributes(circles, "circles", attrToProjector);
+                    circles.exit().remove();
+                });
             };
             return Scatter;
-        })(Plottable.Abstract.XYPlot);
+        })(Plottable.Abstract.NSXYPlot);
         Plot.Scatter = Scatter;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;

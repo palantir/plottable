@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class Scatter<X,Y> extends Abstract.XYPlot<X,Y> {
+  export class Scatter<X,Y> extends Abstract.NSXYPlot<X,Y> {
 
     public _animators: Animator.IPlotAnimatorMap = {
       "circles-reset" : new Animator.Null(),
@@ -19,8 +19,8 @@ export module Plot {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
-      super(dataset, xScale, yScale);
+    constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
+      super(xScale, yScale);
       this.classed("scatter-plot", true);
       this.project("r", 3); // default
       this.project("opacity", 0.6); // default
@@ -39,27 +39,34 @@ export module Plot {
       return this;
     }
 
+    public _generateAttrToProjector() {
+      var a2p = super._generateAttrToProjector();
+      a2p["cx"] = a2p["x"];
+      delete a2p["x"];
+      a2p["cy"] = a2p["y"];
+      delete a2p["y"];
+      return a2p;
+    }
+
     public _paint() {
-      super._paint();
+      var attrToProjector = this._generateAttrToProjector();
+      var datasets = this._getDatasetsInOrder();
 
-      var attrToProjector   = this._generateAttrToProjector();
-      attrToProjector["cx"] = attrToProjector["x"];
-      attrToProjector["cy"] = attrToProjector["y"];
-      delete attrToProjector["x"];
-      delete attrToProjector["y"];
+      this._getDrawersInOrder().forEach((d, i) => {
+        var dataset = datasets[i];
+        var circles = d._renderArea.selectAll("circle").data(dataset.data());
+        circles.enter().append("circle");
 
-      var circles = this._renderArea.selectAll("circle").data(this._dataset.data());
-      circles.enter().append("circle");
+        if (this._dataChanged) {
+          var rFunction = attrToProjector["r"];
+          attrToProjector["r"] = () => 0;
+          this._applyAnimatedAttributes(circles, "circles-reset", attrToProjector);
+          attrToProjector["r"] = rFunction;
+        }
 
-      if (this._dataChanged) {
-        var rFunction = attrToProjector["r"];
-        attrToProjector["r"] = () => 0;
-        this._applyAnimatedAttributes(circles, "circles-reset", attrToProjector);
-        attrToProjector["r"] = rFunction;
-      }
-
-      this._applyAnimatedAttributes(circles, "circles", attrToProjector);
-      circles.exit().remove();
+        this._applyAnimatedAttributes(circles, "circles", attrToProjector);
+        circles.exit().remove();
+      });
     }
   }
 }

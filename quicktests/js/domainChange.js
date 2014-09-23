@@ -28,7 +28,7 @@ function run(div, data, Plottable) {
 
   //rendering
   var linePlot = new Plottable.Plot.Line(dataseries, xScale, yScale);
-  var scatterPlot = new Plottable.Plot.Scatter(dataseries, xScale, yScale);
+  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries);
 
   var autoXLabel = new Plottable.Component.Label("autodomain X");
   var focusXLabel = new Plottable.Component.Label("focus X");

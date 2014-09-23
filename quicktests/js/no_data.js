@@ -23,7 +23,7 @@ function run(div, data, Plottable) {
     }
 
     //rendering
-    var scatterPlot = new Plottable.Plot.Scatter([], xScale, yScale);
+    var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset([]);
     var linePlot = new Plottable.Plot.Line([], xScale, yScale);
     var areaPlot = new Plottable.Plot.Area([], xScale, yScale);
     var vbarPlot = new Plottable.Plot.VerticalBar([], xScale, yScale);

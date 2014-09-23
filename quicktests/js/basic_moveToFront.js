@@ -27,8 +27,9 @@ function run(div, data, Plottable) {
   };
 
   //rendering
-  var scatterPlot = new Plottable.Plot.Scatter(dataseries, xScale, yScale); //0
+  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale); //0
   scatterPlot
+    .addDataset(dataseries)
     .attr("fill", colorScale1.scale("scatter"))
     .attr("r", function(){return 10;});
   var linePlot = new Plottable.Plot.Line(dataseries, xScale, yScale); //1

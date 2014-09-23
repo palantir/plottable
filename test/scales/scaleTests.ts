@@ -176,7 +176,8 @@ describe("Scales", () => {
       var sadTimesData = ["999", "10", "100", "1000", "2", "999"];
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
-      var plot = new Plottable.Plot.Scatter(sadTimesData, xScale, yScale);
+      var plot = new Plottable.Plot.Scatter(xScale, yScale);
+      plot.addDataset(sadTimesData);
       var id = (d: any) => d;
       xScale.domainer(new Plottable.Domainer()); // to disable padding, etc
       plot.project("x", id, xScale);
