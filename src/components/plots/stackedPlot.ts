@@ -27,7 +27,7 @@ export module Abstract {
           var value = valueAccessor(datum);
           value = value >= 0 ? value : 0;
           return {key: key, value: value};
-        })
+        });
       });
       this._stack(positiveValuedData);
 
@@ -37,7 +37,7 @@ export module Abstract {
           var value = valueAccessor(datum);
           value = value <= 0 ? value : 0;
           return {key: key, value: value};
-        })
+        });
       });
       this._stack(negativeValuedData);
 
@@ -45,14 +45,14 @@ export module Abstract {
 
       var maxY = _Util.Methods.max(datasets, (dataset: any) => {
         return _Util.Methods.max(dataset.data(), (datum: any) => {
-          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]
+          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
         });
       });
       this.stackedExtent[1] = Math.max(0, maxY);
 
       var minY = _Util.Methods.min(datasets, (dataset: any) => {
         return _Util.Methods.min(dataset.data(), (datum: any) => {
-          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]
+          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
         });
       });
       this.stackedExtent[0] = Math.min(minY, 0);
