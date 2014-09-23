@@ -1,6 +1,7 @@
 
 declare module Plottable {
     module _Util {
+        var commonColors: string[];
         module Methods {
             /**
              * Checks if x is between a and b.

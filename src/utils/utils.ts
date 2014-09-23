@@ -2,6 +2,8 @@
 
 module Plottable {
 export module _Util {
+  export var commonColors = ["aqua", "black", "blue", "fuchsia", "gray", "green", "lime", "maroon", "navy",
+                              "olive", "orange", "purple", "red", "silver", "teal", "white", "yellow"];
   export module Methods {
 
     /**
