@@ -5554,7 +5554,7 @@ var Plottable;
             };
             Stacked.prototype._stack = function (data) {
                 var outFunction = function (d, y0, y) {
-                    d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = y0;
+                    d.stackOffset = y0;
                 };
                 d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return d; }).out(outFunction)(data);
                 return data;
@@ -5564,8 +5564,8 @@ var Plottable;
                 this._getDatasetsInOrder().forEach(function (dataset, datasetIndex) {
                     var valueAccessor = _this._isVertical ? _this._projectors["y"].accessor : _this._projectors["x"].accessor;
                     dataset.data().forEach(function (datum, datumIndex) {
-                        var positiveOffset = positiveDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-                        var negativeOffset = negativeDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                        var positiveOffset = positiveDatasets[datasetIndex][datumIndex]["stackOffset"];
+                        var negativeOffset = negativeDatasets[datasetIndex][datumIndex]["stackOffset"];
                         datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) >= 0 ? positiveOffset : negativeOffset;
                     });
                 });
