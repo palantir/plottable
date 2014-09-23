@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Abstract {
-  export class NewStyleBarPlot<X,Y> extends NewStylePlot<X,Y> {
+  export class NewStyleBarPlot<X,Y> extends NSXYPlot<X,Y> {
     public static _barAlignmentToFactor: {[alignment: string]: number} = {};
     private static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;

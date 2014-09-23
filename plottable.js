@@ -5698,7 +5698,7 @@ var Plottable;
             NewStyleBarPlot._barAlignmentToFactor = {};
             NewStyleBarPlot.DEFAULT_WIDTH = 10;
             return NewStyleBarPlot;
-        })(Abstract.NewStylePlot);
+        })(Abstract.NSXYPlot);
         Abstract.NewStyleBarPlot = NewStyleBarPlot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;

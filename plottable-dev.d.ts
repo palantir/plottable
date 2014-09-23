@@ -1149,7 +1149,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class NewStyleBarPlot<X, Y> extends NewStylePlot<X, Y> {
+        class NewStyleBarPlot<X, Y> extends NSXYPlot<X, Y> {
             static _barAlignmentToFactor: {
                 [x: string]: number;
             };

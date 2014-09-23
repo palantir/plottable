@@ -888,7 +888,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class NewStyleBarPlot<X, Y> extends NewStylePlot<X, Y> {
+        class NewStyleBarPlot<X, Y> extends NSXYPlot<X, Y> {
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             baseline(value: number): any;
         }
