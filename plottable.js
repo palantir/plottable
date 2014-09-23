@@ -5522,23 +5522,23 @@ var Plottable;
                 var datasets = this._getDatasetsInOrder();
                 var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-                var positiveValuedDatasets = datasets.map(function (dataset) {
-                    return dataset.data().map(function (datum) {
+                var positiveValuedDatasets = [];
+                var negativeValuedDatasets = [];
+                datasets.forEach(function (dataset) {
+                    var positiveValuedDataset = [];
+                    var negativeValuedDataset = [];
+                    dataset.data().forEach(function (datum) {
                         var key = keyAccessor(datum);
                         var value = valueAccessor(datum);
-                        value = value >= 0 ? value : 0;
-                        return { key: key, value: value };
+                        var positiveValue = value >= 0 ? value : 0;
+                        var negativeValue = value <= 0 ? value : 0;
+                        positiveValuedDataset.push({ key: key, value: positiveValue });
+                        negativeValuedDataset.push({ key: key, value: negativeValue });
                     });
+                    positiveValuedDatasets.push(positiveValuedDataset);
+                    negativeValuedDatasets.push(negativeValuedDataset);
                 });
                 this._stack(positiveValuedDatasets);
-                var negativeValuedDatasets = datasets.map(function (dataset) {
-                    return dataset.data().map(function (datum) {
-                        var key = keyAccessor(datum);
-                        var value = valueAccessor(datum);
-                        value = value <= 0 ? value : 0;
-                        return { key: key, value: value };
-                    });
-                });
                 this._stack(negativeValuedDatasets);
                 this.setDatasetStackOffsets(datasets, positiveValuedDatasets, negativeValuedDatasets);
                 var maxY = Plottable._Util.Methods.max(datasets, function (dataset) {
