@@ -113,7 +113,8 @@ export module _Util {
     /**
      * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
      */
-    export function _applyAccessor(accessor: _IAccessor, plot: Abstract.Plot) {
+     // ## HACK HACK HACK HACK HACK HACK - any typed##
+    export function _applyAccessor(accessor: _IAccessor, plot: any) {
       var activatedAccessor = accessorize(accessor);
       return (d: any, i: number) => activatedAccessor(d, i, plot.dataset().metadata());
     }

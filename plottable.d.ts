@@ -745,6 +745,29 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Abstract {
+        class NSPlot extends Component {
+            constructor();
+            animate(enabled: boolean): NSPlot;
+            detach(): NSPlot;
+            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSPlot;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSPlot;
+            remove(): void;
+            addDataset(key: string, dataset: Dataset): NSPlot;
+            addDataset(key: string, dataset: any[]): NSPlot;
+            addDataset(dataset: Dataset): NSPlot;
+            addDataset(dataset: any[]): NSPlot;
+            datasetOrder(): string[];
+            datasetOrder(order: string[]): NSPlot;
+            removeDataset(key: string): NSPlot;
+            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
+            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Plot {
         class Pie extends Plottable.Abstract.Plot {
             constructor();
@@ -780,6 +803,16 @@ declare module Plottable {
             datasetOrder(): string[];
             datasetOrder(order: string[]): NewStylePlot<X, Y>;
             removeDataset(key: string): NewStylePlot<X, Y>;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class NSXYPlot<X, Y> extends NSPlot {
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSXYPlot<X, Y>;
         }
     }
 }
