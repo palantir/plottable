@@ -80,17 +80,13 @@ export module Abstract {
      * After the stack offsets have been determined on each separate dataset, the offsets need
      * to be determined correctly on the overall datasets
      */
-    private setDatasetStackOffsets(positiveStackDatasets: any[], negativeStackDatasets: any[]) {
+    private setDatasetStackOffsets(positiveDatasets: any[], negativeDatasets: any[]) {
       this._getDatasetsInOrder().forEach((dataset, datasetIndex) => {
         var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
         dataset.data().forEach((datum: any, datumIndex: number) => {
-          if (valueAccessor(datum) >= 0) {
-            var positiveOffset: number = positiveStackDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-            datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = positiveOffset;
-          } else {
-            var negativeOffset: number = negativeStackDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-            datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = negativeOffset;
-          }
+          var positiveOffset = positiveDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+          var negativeOffset = negativeDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+          datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) >= 0 ? positiveOffset : negativeOffset;
         });
       });
     }
