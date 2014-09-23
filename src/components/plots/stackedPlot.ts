@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Abstract {
-  export class Stacked<X, Y> extends Abstract.NewStylePlot<X, Y> {
+  export class Stacked<X, Y> extends Abstract.NSXYPlot<X, Y> {
     private stackedExtent = [0, 0];
     public _isVertical: boolean;
 

@@ -5814,7 +5814,7 @@ var Plottable;
                 }
             };
             return Stacked;
-        })(Abstract.NewStylePlot);
+        })(Abstract.NSXYPlot);
         Abstract.Stacked = Stacked;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;

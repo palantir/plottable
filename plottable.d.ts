@@ -907,7 +907,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Stacked<X, Y> extends NewStylePlot<X, Y> {
+        class Stacked<X, Y> extends NSXYPlot<X, Y> {
         }
     }
 }
