@@ -2608,6 +2608,10 @@ describe("Plots", function () {
             verifier.end();
         });
         after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
         });
         it("renders correctly", function () {
             var bars = renderer._renderArea.selectAll("rect");
