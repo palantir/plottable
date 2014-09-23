@@ -7918,32 +7918,28 @@ var Plottable;
                 var to = parseInt(this.dragBox.attr(lengthAttr), 10) + from;
                 return origin + DragBox.RESIZE_PADDING > from && origin - DragBox.RESIZE_PADDING < to;
             };
-            DragBox.prototype.isResizeStartAttr = function (isX, isLeft) {
-                var i = isX ? 0 : 1;
-                var positionAttr = isX ? "x" : "y";
-                var lengthAttr = isX ? "width" : "height";
-                var attrOrigin = this._origin[i];
-                var leftPosition = parseInt(this.dragBox.attr(positionAttr), 10);
-                var len = parseInt(this.dragBox.attr(lengthAttr), 10);
-                if (isLeft) {
-                    return this._isCloseEnoughLeft(attrOrigin, leftPosition, len);
+            DragBox.prototype.isResizeStart = function (direction) {
+                var leftPosition, rightPosition, len;
+                switch (direction) {
+                    case "top":
+                        leftPosition = parseInt(this.dragBox.attr("y"), 10);
+                        len = parseInt(this.dragBox.attr("height"), 10);
+                        return this._isCloseEnoughLeft(this._origin[1], leftPosition, len);
+                    case "right":
+                        leftPosition = parseInt(this.dragBox.attr("x"), 10);
+                        len = parseInt(this.dragBox.attr("width"), 10);
+                        rightPosition = len + leftPosition;
+                        return this._isCloseEnoughRight(this._origin[0], rightPosition, len);
+                    case "bottom":
+                        leftPosition = parseInt(this.dragBox.attr("y"), 10);
+                        len = parseInt(this.dragBox.attr("height"), 10);
+                        rightPosition = len + leftPosition;
+                        return this._isCloseEnoughRight(this._origin[1], rightPosition, len);
+                    case "left":
+                        leftPosition = parseInt(this.dragBox.attr("x"), 10);
+                        len = parseInt(this.dragBox.attr("width"), 10);
+                        return this._isCloseEnoughLeft(this._origin[0], leftPosition, len);
                 }
-                else {
-                    var rightPosition = len + leftPosition;
-                    return this._isCloseEnoughRight(attrOrigin, rightPosition, len);
-                }
-            };
-            DragBox.prototype.isResizeStartLeft = function () {
-                return this.isResizeStartAttr(true, true);
-            };
-            DragBox.prototype.isResizeStartRight = function () {
-                return this.isResizeStartAttr(true, false);
-            };
-            DragBox.prototype.isResizeStartTop = function () {
-                return this.isResizeStartAttr(false, true);
-            };
-            DragBox.prototype.isResizeStartBottom = function () {
-                return this.isResizeStartAttr(false, false);
             };
             DragBox.prototype._doDragstart = function () {
                 this._selectionOrigin = this._origin.slice();
@@ -7954,14 +7950,14 @@ var Plottable;
                     else {
                         if (this._resizeXEnabled && this.isInsideBox(true)) {
                             var leftPosition, rightPosition;
-                            if (this.isResizeStartLeft()) {
+                            if (this.isResizeStart("left")) {
                                 leftPosition = parseInt(this.dragBox.attr("x"), 10);
                                 rightPosition = parseInt(this.dragBox.attr("width"), 10) + leftPosition;
                                 this._selectionOrigin[0] = rightPosition;
                                 this.resizeStartDiff[0] = leftPosition - this._origin[0];
                                 this._isResizingX = true;
                             }
-                            else if (this.isResizeStartRight()) {
+                            else if (this.isResizeStart("right")) {
                                 leftPosition = parseInt(this.dragBox.attr("x"), 10);
                                 rightPosition = parseInt(this.dragBox.attr("width"), 10) + leftPosition;
                                 this._selectionOrigin[0] = leftPosition;
@@ -7977,14 +7973,14 @@ var Plottable;
                         }
                         if (this._resizeYEnabled && this.isInsideBox(false)) {
                             var topPosition, bottomPosition;
-                            if (this.isResizeStartTop()) {
+                            if (this.isResizeStart("top")) {
                                 topPosition = parseInt(this.dragBox.attr("y"), 10);
                                 bottomPosition = parseInt(this.dragBox.attr("height"), 10) + topPosition;
                                 this._selectionOrigin[1] = bottomPosition;
                                 this.resizeStartDiff[1] = topPosition - this._origin[1];
                                 this._isResizingY = true;
                             }
-                            else if (this.isResizeStartBottom()) {
+                            else if (this.isResizeStart("bottom")) {
                                 topPosition = parseInt(this.dragBox.attr("y"), 10);
                                 bottomPosition = parseInt(this.dragBox.attr("height"), 10) + topPosition;
                                 this._selectionOrigin[1] = topPosition;
