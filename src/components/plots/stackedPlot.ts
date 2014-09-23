@@ -84,7 +84,6 @@ export module Abstract {
           }
         });
       });
-
     }
 
     public _updateScaleExtents() {
