@@ -825,12 +825,6 @@ declare module Plottable {
         yMin: number;
         yMax: number;
     }
-    interface BoxArea {
-        x?: number;
-        y?: number;
-        width?: number;
-        height?: number;
-    }
     interface _ISpaceRequest {
         width: number;
         height: number;
@@ -3384,6 +3378,7 @@ declare module Plottable {
             _selectionOrigin: number[];
             _resizeXEnabled: boolean;
             _resizeYEnabled: boolean;
+            _dragBoxAttr: SVGRect;
             _isCloseEnoughLeft(val: number, position: number, len: number): boolean;
             _isCloseEnoughRight(val: number, position: number, len: number): boolean;
             /**
@@ -3468,7 +3463,7 @@ declare module Plottable {
         class XYDragBox extends DragBox {
             _drag(): void;
             _enableResize(enabled: boolean): void;
-            _cursorStyle(x: number, y: number): string;
+            _cursorStyle(xOrigin: number, yOrigin: number): string;
         }
     }
 }

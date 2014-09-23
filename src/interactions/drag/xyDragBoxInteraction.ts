@@ -7,32 +7,34 @@ export module Interaction {
     public _drag(){
       super._drag();
       if (this.dragBox == null) {return;}
-      var attrs: BoxArea = {};
       var drawnX = true;
       var drawnY = true;
       var x0 = this._selectionOrigin[0];
       var x1 = this._location[0];
       var y0 = this._selectionOrigin[1];
       var y1 = this._location[1];
+      if (this._dragBoxAttr == null) {
+        this._dragBoxAttr = {x: 0, width: 0, y: 0, height: 0};
+      }
 
       if (!this.resizeEnabled() || this.isResizingX() || !this.isResizingY()) {
-        attrs.width = Math.abs(x0 - x1);
-        attrs.x = Math.min(x0, x1);
-        drawnX = attrs.width > 0;
+        this._dragBoxAttr.width = Math.abs(x0 - x1);
+        this._dragBoxAttr.x = Math.min(x0, x1);
+        drawnX = this._dragBoxAttr.width > 0;
       }
       if (!this.resizeEnabled() || this.isResizingY() || !this.isResizingX()) {
-        attrs.height = Math.abs(y0 - y1);
-        attrs.y = Math.min(y0, y1);
-        drawnY = attrs.height > 0;
+        this._dragBoxAttr.height = Math.abs(y0 - y1);
+        this._dragBoxAttr.y = Math.min(y0, y1);
+        drawnY = this._dragBoxAttr.height > 0;
       }
-      this.dragBox.attr(attrs);
-      var xMin = attrs.x || parseInt(this.dragBox.attr("x"), 10);
-      var yMin = attrs.y || parseInt(this.dragBox.attr("y"), 10);
+      this.dragBox.attr(this._dragBoxAttr);
+      var xMin = this._dragBoxAttr.x;
+      var yMin = this._dragBoxAttr.y;
       this.selection = {
         xMin: xMin,
-        xMax: (attrs.width || parseInt(this.dragBox.attr("width"), 10)) + xMin,
+        xMax: this._dragBoxAttr.width + xMin,
         yMin: yMin,
-        yMax: (attrs.height || parseInt(this.dragBox.attr("height"), 10)) + yMin
+        yMax: this._dragBoxAttr.height + yMin
       };
       this._boxIsDrawn = drawnX && drawnY;
     }
@@ -43,19 +45,19 @@ export module Interaction {
       this._resizeYEnabled = enabled;
     }
 
-    public _cursorStyle(x: number, y: number): string {
-      var x1 = parseInt(this.dragBox.attr("x"), 10);
-      var width = parseInt(this.dragBox.attr("width"), 10);
-      var x2 = width + x1;
-      var y1 = parseInt(this.dragBox.attr("y"), 10);
-      var height = parseInt(this.dragBox.attr("height"), 10);
-      var y2 = height + y1;
+    public _cursorStyle(xOrigin: number, yOrigin: number): string {
+      var xStart = this._dragBoxAttr.x;
+      var width = this._dragBoxAttr.width;
+      var xEnd = width + xStart;
+      var yStart = this._dragBoxAttr.y;
+      var height = this._dragBoxAttr.height;
+      var yEnd = height + yStart;
       var otherWidthPadding = Math.min(DragBox.RESIZE_PADDING, width / 2);
       var otherHeightPadding = Math.min(DragBox.RESIZE_PADDING, height / 2);
-      var left = this._isCloseEnoughLeft(x, x1, width);
-      var top = this._isCloseEnoughLeft(y, y1, height);
-      var right = this._isCloseEnoughRight(x, x2, width);
-      var bottom = this._isCloseEnoughRight(y, y2, height);
+      var left = this._isCloseEnoughLeft(xOrigin, xStart, width);
+      var top = this._isCloseEnoughLeft(yOrigin, yStart, height);
+      var right = this._isCloseEnoughRight(xOrigin, xEnd, width);
+      var bottom = this._isCloseEnoughRight(yOrigin, yEnd, height);
 
       if (this.isResizingX() && this.isResizingY()) {
         if (left && top || bottom && right) {
@@ -75,9 +77,9 @@ export module Interaction {
         return "nwse-resize";
       } else if (top && right || bottom && left) {
         return "nesw-resize";
-      } else if ((left || right) && y1 - DragBox.RESIZE_PADDING <= y && y <= y2 + DragBox.RESIZE_PADDING) {
+      } else if ((left || right) && yStart - DragBox.RESIZE_PADDING <= yOrigin && yOrigin <= yEnd + DragBox.RESIZE_PADDING) {
         return "ew-resize";
-      } else if ((top || bottom) && x1 - DragBox.RESIZE_PADDING <= x && x <= x2 + DragBox.RESIZE_PADDING) {
+      } else if ((top || bottom) && xStart - DragBox.RESIZE_PADDING <= xOrigin && xOrigin <= xEnd + DragBox.RESIZE_PADDING) {
         return "ns-resize";
       } else {
         return "";

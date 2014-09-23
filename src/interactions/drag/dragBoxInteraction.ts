@@ -22,6 +22,7 @@ export module Interaction {
     public _selectionOrigin: number[];
     public _resizeXEnabled = false;
     public _resizeYEnabled = false;
+    public _dragBoxAttr: SVGRect;
     private _isResizingX = false;
     private _isResizingY = false;
     private _resizeEnabled = false;
@@ -105,10 +106,10 @@ export module Interaction {
     private checkResizeStart() {
       var xOrigin = this._origin[0];
       var yOrigin = this._origin[1];
-      var xStart = parseInt(this.dragBox.attr("x"), 10);
-      var yStart = parseInt(this.dragBox.attr("y"), 10);
-      var width = parseInt(this.dragBox.attr("width"), 10);
-      var height = parseInt(this.dragBox.attr("height"), 10);
+      var xStart = this._dragBoxAttr.x;
+      var yStart = this._dragBoxAttr.y;
+      var width = this._dragBoxAttr.width;
+      var height = this._dragBoxAttr.height;
       var xEnd = xStart + width;
       var yEnd = yStart + height;
 
@@ -219,7 +220,9 @@ export module Interaction {
       var h = Math.abs(y0 - y1);
       var xo = Math.min(x0, x1);
       var yo = Math.min(y0, y1);
-      this.dragBox.attr({x: xo, y: yo, width: w, height: h});
+      var newProps: SVGRect = {x: xo, y: yo, width: w, height: h};
+      this.dragBox.attr(newProps);
+      this._dragBoxAttr = newProps;
       this._boxIsDrawn = (w > 0 && h > 0);
       this.selection = {
         xMin: xo,

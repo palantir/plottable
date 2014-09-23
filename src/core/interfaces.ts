@@ -56,13 +56,6 @@ module Plottable {
     yMax: number;
   }
 
-  export interface BoxArea {
-    x?: number;
-    y?: number;
-    width?: number;
-    height?: number;
-  }
-
   export interface _ISpaceRequest {
     width: number;
     height: number;

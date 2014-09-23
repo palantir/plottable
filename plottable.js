@@ -7910,10 +7910,10 @@ var Plottable;
             DragBox.prototype.checkResizeStart = function () {
                 var xOrigin = this._origin[0];
                 var yOrigin = this._origin[1];
-                var xStart = parseInt(this.dragBox.attr("x"), 10);
-                var yStart = parseInt(this.dragBox.attr("y"), 10);
-                var width = parseInt(this.dragBox.attr("width"), 10);
-                var height = parseInt(this.dragBox.attr("height"), 10);
+                var xStart = this._dragBoxAttr.x;
+                var yStart = this._dragBoxAttr.y;
+                var width = this._dragBoxAttr.width;
+                var height = this._dragBoxAttr.height;
                 var xEnd = xStart + width;
                 var yEnd = yStart + height;
                 if (this._resizeXEnabled && this.isInsideBox(yOrigin, yStart, yEnd)) {
@@ -8028,7 +8028,9 @@ var Plottable;
                 var h = Math.abs(y0 - y1);
                 var xo = Math.min(x0, x1);
                 var yo = Math.min(y0, y1);
-                this.dragBox.attr({ x: xo, y: yo, width: w, height: h });
+                var newProps = { x: xo, y: yo, width: w, height: h };
+                this.dragBox.attr(newProps);
+                this._dragBoxAttr = newProps;
                 this._boxIsDrawn = (w > 0 && h > 0);
                 this.selection = {
                     xMin: xo,
@@ -8107,8 +8109,8 @@ var Plottable;
                 this._resizeXEnabled = enabled;
             };
             XDragBox.prototype._cursorStyle = function (x, y) {
-                var leftPosition = parseInt(this.dragBox.attr("x"), 10);
-                var width = parseInt(this.dragBox.attr("width"), 10);
+                var leftPosition = this._dragBoxAttr.x;
+                var width = this._dragBoxAttr.width;
                 var rightPosition = width + leftPosition;
                 if (this._isCloseEnoughLeft(x, leftPosition, width) || this._isCloseEnoughRight(x, rightPosition, width)) {
                     return "ew-resize";
@@ -8144,31 +8146,33 @@ var Plottable;
                 if (this.dragBox == null) {
                     return;
                 }
-                var attrs = {};
                 var drawnX = true;
                 var drawnY = true;
                 var x0 = this._selectionOrigin[0];
                 var x1 = this._location[0];
                 var y0 = this._selectionOrigin[1];
                 var y1 = this._location[1];
+                if (this._dragBoxAttr == null) {
+                    this._dragBoxAttr = { x: 0, width: 0, y: 0, height: 0 };
+                }
                 if (!this.resizeEnabled() || this.isResizingX() || !this.isResizingY()) {
-                    attrs.width = Math.abs(x0 - x1);
-                    attrs.x = Math.min(x0, x1);
-                    drawnX = attrs.width > 0;
+                    this._dragBoxAttr.width = Math.abs(x0 - x1);
+                    this._dragBoxAttr.x = Math.min(x0, x1);
+                    drawnX = this._dragBoxAttr.width > 0;
                 }
                 if (!this.resizeEnabled() || this.isResizingY() || !this.isResizingX()) {
-                    attrs.height = Math.abs(y0 - y1);
-                    attrs.y = Math.min(y0, y1);
-                    drawnY = attrs.height > 0;
+                    this._dragBoxAttr.height = Math.abs(y0 - y1);
+                    this._dragBoxAttr.y = Math.min(y0, y1);
+                    drawnY = this._dragBoxAttr.height > 0;
                 }
-                this.dragBox.attr(attrs);
-                var xMin = attrs.x || parseInt(this.dragBox.attr("x"), 10);
-                var yMin = attrs.y || parseInt(this.dragBox.attr("y"), 10);
+                this.dragBox.attr(this._dragBoxAttr);
+                var xMin = this._dragBoxAttr.x;
+                var yMin = this._dragBoxAttr.y;
                 this.selection = {
                     xMin: xMin,
-                    xMax: (attrs.width || parseInt(this.dragBox.attr("width"), 10)) + xMin,
+                    xMax: this._dragBoxAttr.width + xMin,
                     yMin: yMin,
-                    yMax: (attrs.height || parseInt(this.dragBox.attr("height"), 10)) + yMin
+                    yMax: this._dragBoxAttr.height + yMin
                 };
                 this._boxIsDrawn = drawnX && drawnY;
             };
@@ -8177,19 +8181,19 @@ var Plottable;
                 this._resizeXEnabled = enabled;
                 this._resizeYEnabled = enabled;
             };
-            XYDragBox.prototype._cursorStyle = function (x, y) {
-                var x1 = parseInt(this.dragBox.attr("x"), 10);
-                var width = parseInt(this.dragBox.attr("width"), 10);
-                var x2 = width + x1;
-                var y1 = parseInt(this.dragBox.attr("y"), 10);
-                var height = parseInt(this.dragBox.attr("height"), 10);
-                var y2 = height + y1;
+            XYDragBox.prototype._cursorStyle = function (xOrigin, yOrigin) {
+                var xStart = this._dragBoxAttr.x;
+                var width = this._dragBoxAttr.width;
+                var xEnd = width + xStart;
+                var yStart = this._dragBoxAttr.y;
+                var height = this._dragBoxAttr.height;
+                var yEnd = height + yStart;
                 var otherWidthPadding = Math.min(Interaction.DragBox.RESIZE_PADDING, width / 2);
                 var otherHeightPadding = Math.min(Interaction.DragBox.RESIZE_PADDING, height / 2);
-                var left = this._isCloseEnoughLeft(x, x1, width);
-                var top = this._isCloseEnoughLeft(y, y1, height);
-                var right = this._isCloseEnoughRight(x, x2, width);
-                var bottom = this._isCloseEnoughRight(y, y2, height);
+                var left = this._isCloseEnoughLeft(xOrigin, xStart, width);
+                var top = this._isCloseEnoughLeft(yOrigin, yStart, height);
+                var right = this._isCloseEnoughRight(xOrigin, xEnd, width);
+                var bottom = this._isCloseEnoughRight(yOrigin, yEnd, height);
                 if (this.isResizingX() && this.isResizingY()) {
                     if (left && top || bottom && right) {
                         return "nwse-resize";
@@ -8213,10 +8217,10 @@ var Plottable;
                 else if (top && right || bottom && left) {
                     return "nesw-resize";
                 }
-                else if ((left || right) && y1 - Interaction.DragBox.RESIZE_PADDING <= y && y <= y2 + Interaction.DragBox.RESIZE_PADDING) {
+                else if ((left || right) && yStart - Interaction.DragBox.RESIZE_PADDING <= yOrigin && yOrigin <= yEnd + Interaction.DragBox.RESIZE_PADDING) {
                     return "ew-resize";
                 }
-                else if ((top || bottom) && x1 - Interaction.DragBox.RESIZE_PADDING <= x && x <= x2 + Interaction.DragBox.RESIZE_PADDING) {
+                else if ((top || bottom) && xStart - Interaction.DragBox.RESIZE_PADDING <= xOrigin && xOrigin <= xEnd + Interaction.DragBox.RESIZE_PADDING) {
                     return "ns-resize";
                 }
                 else {
@@ -8258,8 +8262,8 @@ var Plottable;
                 this._resizeYEnabled = enabled;
             };
             YDragBox.prototype._cursorStyle = function (x, y) {
-                var topPosition = parseInt(this.dragBox.attr("y"), 10);
-                var height = parseInt(this.dragBox.attr("height"), 10);
+                var topPosition = this._dragBoxAttr.y;
+                var height = this._dragBoxAttr.height;
                 var bottomPosition = height + topPosition;
                 if (this._isCloseEnoughLeft(y, topPosition, height) || this._isCloseEnoughRight(y, bottomPosition, height)) {
                     return "ns-resize";

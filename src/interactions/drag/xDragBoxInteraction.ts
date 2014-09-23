@@ -19,8 +19,8 @@ export module Interaction {
     }
 
     public _cursorStyle(x: number, y: number): string {
-      var leftPosition = parseInt(this.dragBox.attr("x"), 10);
-      var width = parseInt(this.dragBox.attr("width"), 10);
+      var leftPosition = this._dragBoxAttr.x;
+      var width = this._dragBoxAttr.width;
       var rightPosition = width + leftPosition;
       if (this._isCloseEnoughLeft(x, leftPosition, width) ||
           this._isCloseEnoughRight(x, rightPosition, width)) {

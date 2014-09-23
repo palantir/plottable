@@ -818,12 +818,6 @@ declare module Plottable {
         yMin: number;
         yMax: number;
     }
-    interface BoxArea {
-        x?: number;
-        y?: number;
-        width?: number;
-        height?: number;
-    }
     interface _ISpaceRequest {
         width: number;
         height: number;
