@@ -19,24 +19,27 @@ export module Abstract {
       var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
 
-      var positiveValuedDatasets: any[] = datasets.map((dataset) => {
-        return dataset.data().map((datum) => {
-          var key = keyAccessor(datum);
-          var value = valueAccessor(datum);
-          value = value >= 0 ? value : 0;
-          return {key: key, value: value};
-        });
-      });
-      this._stack(positiveValuedDatasets);
+      var positiveValuedDatasets: any[][] = [];
+      var negativeValuedDatasets: any[][] = [];
 
-      var negativeValuedDatasets: any[] = datasets.map((dataset) => {
-        return dataset.data().map((datum) => {
+      datasets.forEach((dataset) => {
+        var positiveValuedDataset: any[] = [];
+        var negativeValuedDataset: any[] = [];
+
+        dataset.data().forEach((datum) => {
           var key = keyAccessor(datum);
           var value = valueAccessor(datum);
-          value = value <= 0 ? value : 0;
-          return {key: key, value: value};
+          var positiveValue = value >= 0 ? value : 0;
+          var negativeValue = value <= 0 ? value : 0;
+          positiveValuedDataset.push({key: key, value: positiveValue});
+          negativeValuedDataset.push({key: key, value: negativeValue});
         });
+
+        positiveValuedDatasets.push(positiveValuedDataset);
+        negativeValuedDatasets.push(negativeValuedDataset);
       });
+
+      this._stack(positiveValuedDatasets);
       this._stack(negativeValuedDatasets);
 
       this.setDatasetStackOffsets(datasets, positiveValuedDatasets, negativeValuedDatasets);
