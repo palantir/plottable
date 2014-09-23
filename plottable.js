@@ -5522,7 +5522,7 @@ var Plottable;
                 var datasets = this._getDatasetsInOrder();
                 var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-                var positiveValuedData = datasets.map(function (dataset) {
+                var positiveValuedDatasets = datasets.map(function (dataset) {
                     return dataset.data().map(function (datum) {
                         var key = keyAccessor(datum);
                         var value = valueAccessor(datum);
@@ -5530,8 +5530,8 @@ var Plottable;
                         return { key: key, value: value };
                     });
                 });
-                this._stack(positiveValuedData);
-                var negativeValuedData = datasets.map(function (dataset) {
+                this._stack(positiveValuedDatasets);
+                var negativeValuedDatasets = datasets.map(function (dataset) {
                     return dataset.data().map(function (datum) {
                         var key = keyAccessor(datum);
                         var value = valueAccessor(datum);
@@ -5539,8 +5539,8 @@ var Plottable;
                         return { key: key, value: value };
                     });
                 });
-                this._stack(negativeValuedData);
-                this.setDatasetStackOffsets(datasets, positiveValuedData, negativeValuedData);
+                this._stack(negativeValuedDatasets);
+                this.setDatasetStackOffsets(datasets, positiveValuedDatasets, negativeValuedDatasets);
                 var maxY = Plottable._Util.Methods.max(datasets, function (dataset) {
                     return Plottable._Util.Methods.max(dataset.data(), function (datum) {
                         return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
@@ -5560,14 +5560,14 @@ var Plottable;
                 };
                 d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return d; }).out(outFunction)(data);
             };
-            Stacked.prototype.setDatasetStackOffsets = function (datasets, positiveStackData, negativeStackData) {
+            Stacked.prototype.setDatasetStackOffsets = function (datasets, positiveStackDatasets, negativeStackDatasets) {
                 var _this = this;
                 datasets.forEach(function (dataset, datasetIndex) {
                     var data = dataset.data();
                     var valueAccessor = _this._isVertical ? _this._projectors["y"].accessor : _this._projectors["x"].accessor;
                     data.forEach(function (datum, datumIndex) {
-                        var positiveOffset = positiveStackData[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-                        var negativeOffset = negativeStackData[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                        var positiveOffset = positiveStackDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                        var negativeOffset = negativeStackDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                         if (valueAccessor(datum) >= 0) {
                             datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = positiveOffset;
                         }

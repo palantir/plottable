@@ -21,7 +21,7 @@ export module Abstract {
       var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
 
-      var positiveValuedData: any[] = datasets.map((dataset) => {
+      var positiveValuedDatasets: any[] = datasets.map((dataset) => {
         return dataset.data().map((datum) => {
           var key = keyAccessor(datum);
           var value = valueAccessor(datum);
@@ -29,9 +29,9 @@ export module Abstract {
           return {key: key, value: value};
         });
       });
-      this._stack(positiveValuedData);
+      this._stack(positiveValuedDatasets);
 
-      var negativeValuedData: any[] = datasets.map((dataset) => {
+      var negativeValuedDatasets: any[] = datasets.map((dataset) => {
         return dataset.data().map((datum) => {
           var key = keyAccessor(datum);
           var value = valueAccessor(datum);
@@ -39,9 +39,9 @@ export module Abstract {
           return {key: key, value: value};
         });
       });
-      this._stack(negativeValuedData);
+      this._stack(negativeValuedDatasets);
 
-      this.setDatasetStackOffsets(datasets, positiveValuedData, negativeValuedData);
+      this.setDatasetStackOffsets(datasets, positiveValuedDatasets, negativeValuedDatasets);
 
       var maxY = _Util.Methods.max(datasets, (dataset: any) => {
         return _Util.Methods.max(dataset.data(), (datum: any) => {
@@ -70,13 +70,13 @@ export module Abstract {
                .out(outFunction)(data);
     }
 
-    private setDatasetStackOffsets(datasets: Dataset[], positiveStackData: any[], negativeStackData: any[]) {
+    private setDatasetStackOffsets(datasets: Dataset[], positiveStackDatasets: any[], negativeStackDatasets: any[]) {
       datasets.forEach((dataset, datasetIndex) => {
         var data = dataset.data();
         var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
         data.forEach((datum: any, datumIndex: number) => {
-          var positiveOffset: number = positiveStackData[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-          var negativeOffset: number = negativeStackData[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+          var positiveOffset: number = positiveStackDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+          var negativeOffset: number = negativeStackDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
           if (valueAccessor(datum) >= 0) {
             datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = positiveOffset;
           } else {
