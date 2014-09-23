@@ -62,7 +62,7 @@ export module Abstract {
      */
     private _stack(data: any[]): any[] {
       var outFunction = (d: any, y0: number, y: number) => {
-        d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = y0;
+        d.stackOffset = y0;
       };
 
       d3.layout.stack()
@@ -82,8 +82,8 @@ export module Abstract {
       this._getDatasetsInOrder().forEach((dataset, datasetIndex) => {
         var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
         dataset.data().forEach((datum: any, datumIndex: number) => {
-          var positiveOffset = positiveDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-          var negativeOffset = negativeDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+          var positiveOffset = positiveDatasets[datasetIndex][datumIndex]["stackOffset"];
+          var negativeOffset = negativeDatasets[datasetIndex][datumIndex]["stackOffset"];
           datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) >= 0 ? positiveOffset : negativeOffset;
         });
       });
