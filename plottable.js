@@ -7907,39 +7907,57 @@ var Plottable;
             DragBox.prototype._enableResize = function (enabled) {
                 this._resizeEnabled = enabled;
             };
+            DragBox.prototype.checkResizeStart = function () {
+                var xOrigin = this._origin[0];
+                var yOrigin = this._origin[1];
+                var xStart = parseInt(this.dragBox.attr("x"), 10);
+                var yStart = parseInt(this.dragBox.attr("y"), 10);
+                var width = parseInt(this.dragBox.attr("width"), 10);
+                var height = parseInt(this.dragBox.attr("height"), 10);
+                var xEnd = xStart + width;
+                var yEnd = yStart + height;
+                if (this._resizeXEnabled && this.isInsideBox(yOrigin, yStart, yEnd)) {
+                    if (this._isCloseEnoughLeft(xOrigin, xStart, width)) {
+                        this._selectionOrigin[0] = xEnd;
+                        this.resizeStartDiff[0] = xStart - xOrigin;
+                        this._isResizingX = true;
+                    }
+                    else if (this._isCloseEnoughRight(xOrigin, xEnd, width)) {
+                        this._selectionOrigin[0] = xStart;
+                        this.resizeStartDiff[0] = xEnd - xOrigin;
+                        this._isResizingX = true;
+                    }
+                    else {
+                        this._isResizingX = false;
+                    }
+                }
+                else {
+                    this._isResizingX = false;
+                }
+                if (this._resizeYEnabled && this.isInsideBox(xOrigin, xStart, xEnd)) {
+                    if (this._isCloseEnoughLeft(yOrigin, yStart, height)) {
+                        this._selectionOrigin[1] = yEnd;
+                        this.resizeStartDiff[1] = yStart - yOrigin;
+                        this._isResizingY = true;
+                    }
+                    else if (this._isCloseEnoughRight(yOrigin, yEnd, height)) {
+                        this._selectionOrigin[1] = yStart;
+                        this.resizeStartDiff[1] = yEnd - yOrigin;
+                        this._isResizingY = true;
+                    }
+                    else {
+                        this._isResizingY = false;
+                    }
+                }
+                else {
+                    this._isResizingY = false;
+                }
+            };
             /**
              * Checks if the cursor is inside the dragBox for the given dimension.
              */
-            DragBox.prototype.isInsideBox = function (isX) {
-                var origin = this._origin[isX ? 1 : 0];
-                var positionAttr = isX ? "y" : "x";
-                var lengthAttr = isX ? "height" : "width";
-                var from = parseInt(this.dragBox.attr(positionAttr), 10);
-                var to = parseInt(this.dragBox.attr(lengthAttr), 10) + from;
+            DragBox.prototype.isInsideBox = function (origin, from, to) {
                 return origin + DragBox.RESIZE_PADDING > from && origin - DragBox.RESIZE_PADDING < to;
-            };
-            DragBox.prototype.isResizeStart = function (direction) {
-                var leftPosition, rightPosition, len;
-                switch (direction) {
-                    case "top":
-                        leftPosition = parseInt(this.dragBox.attr("y"), 10);
-                        len = parseInt(this.dragBox.attr("height"), 10);
-                        return this._isCloseEnoughLeft(this._origin[1], leftPosition, len);
-                    case "right":
-                        leftPosition = parseInt(this.dragBox.attr("x"), 10);
-                        len = parseInt(this.dragBox.attr("width"), 10);
-                        rightPosition = len + leftPosition;
-                        return this._isCloseEnoughRight(this._origin[0], rightPosition, len);
-                    case "bottom":
-                        leftPosition = parseInt(this.dragBox.attr("y"), 10);
-                        len = parseInt(this.dragBox.attr("height"), 10);
-                        rightPosition = len + leftPosition;
-                        return this._isCloseEnoughRight(this._origin[1], rightPosition, len);
-                    case "left":
-                        leftPosition = parseInt(this.dragBox.attr("x"), 10);
-                        len = parseInt(this.dragBox.attr("width"), 10);
-                        return this._isCloseEnoughLeft(this._origin[0], leftPosition, len);
-                }
             };
             DragBox.prototype._doDragstart = function () {
                 this._selectionOrigin = this._origin.slice();
@@ -7948,52 +7966,7 @@ var Plottable;
                         this.clearBox();
                     }
                     else {
-                        if (this._resizeXEnabled && this.isInsideBox(true)) {
-                            var leftPosition, rightPosition;
-                            if (this.isResizeStart("left")) {
-                                leftPosition = parseInt(this.dragBox.attr("x"), 10);
-                                rightPosition = parseInt(this.dragBox.attr("width"), 10) + leftPosition;
-                                this._selectionOrigin[0] = rightPosition;
-                                this.resizeStartDiff[0] = leftPosition - this._origin[0];
-                                this._isResizingX = true;
-                            }
-                            else if (this.isResizeStart("right")) {
-                                leftPosition = parseInt(this.dragBox.attr("x"), 10);
-                                rightPosition = parseInt(this.dragBox.attr("width"), 10) + leftPosition;
-                                this._selectionOrigin[0] = leftPosition;
-                                this.resizeStartDiff[0] = rightPosition - this._origin[0];
-                                this._isResizingX = true;
-                            }
-                            else {
-                                this._isResizingX = false;
-                            }
-                        }
-                        else {
-                            this._isResizingX = false;
-                        }
-                        if (this._resizeYEnabled && this.isInsideBox(false)) {
-                            var topPosition, bottomPosition;
-                            if (this.isResizeStart("top")) {
-                                topPosition = parseInt(this.dragBox.attr("y"), 10);
-                                bottomPosition = parseInt(this.dragBox.attr("height"), 10) + topPosition;
-                                this._selectionOrigin[1] = bottomPosition;
-                                this.resizeStartDiff[1] = topPosition - this._origin[1];
-                                this._isResizingY = true;
-                            }
-                            else if (this.isResizeStart("bottom")) {
-                                topPosition = parseInt(this.dragBox.attr("y"), 10);
-                                bottomPosition = parseInt(this.dragBox.attr("height"), 10) + topPosition;
-                                this._selectionOrigin[1] = topPosition;
-                                this.resizeStartDiff[1] = bottomPosition - this._origin[1];
-                                this._isResizingY = true;
-                            }
-                            else {
-                                this._isResizingY = false;
-                            }
-                        }
-                        else {
-                            this._isResizingY = false;
-                        }
+                        this.checkResizeStart();
                         if (!this._isResizingX && !this._isResizingY) {
                             this.clearBox();
                         }
