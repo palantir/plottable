@@ -5562,15 +5562,14 @@ var Plottable;
             Stacked.prototype.setDatasetStackOffsets = function (positiveStackDatasets, negativeStackDatasets) {
                 var _this = this;
                 this._getDatasetsInOrder().forEach(function (dataset, datasetIndex) {
-                    var data = dataset.data();
                     var valueAccessor = _this._isVertical ? _this._projectors["y"].accessor : _this._projectors["x"].accessor;
-                    data.forEach(function (datum, datumIndex) {
-                        var positiveOffset = positiveStackDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-                        var negativeOffset = negativeStackDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                    dataset.data().forEach(function (datum, datumIndex) {
                         if (valueAccessor(datum) >= 0) {
+                            var positiveOffset = positiveStackDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                             datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = positiveOffset;
                         }
                         else {
+                            var negativeOffset = negativeStackDatasets[datasetIndex][datumIndex]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                             datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = negativeOffset;
                         }
                     });
