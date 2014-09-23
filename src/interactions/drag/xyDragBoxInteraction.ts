@@ -39,12 +39,6 @@ export module Interaction {
       this._boxIsDrawn = drawnX && drawnY;
     }
 
-    public _enableResize(enabled: boolean) {
-      super._enableResize(enabled);
-      this._resizeXEnabled = enabled;
-      this._resizeYEnabled = enabled;
-    }
-
     public _cursorStyle(xOrigin: number, yOrigin: number): string {
       var xStart = this._dragBoxAttr.x;
       var width = this._dragBoxAttr.width;

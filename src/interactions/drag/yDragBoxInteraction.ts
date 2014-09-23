@@ -13,11 +13,6 @@ export module Interaction {
       return this;
     }
 
-    public _enableResize(enabled: boolean) {
-      super._enableResize(enabled);
-      this._resizeYEnabled = enabled;
-    }
-
     public _cursorStyle(x: number, y: number): string {
       var topPosition = this._dragBoxAttr.y;
       var height = this._dragBoxAttr.height;

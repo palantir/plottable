@@ -58,7 +58,15 @@ export module Interaction {
       if (enabled == null) {
         return this._resizeEnabled;
       } else {
-        this._enableResize(enabled);
+        this._resizeEnabled = enabled;
+        if (this instanceof XDragBox) {
+          this._resizeXEnabled = enabled;
+        } else if (this instanceof YDragBox) {
+          this._resizeYEnabled = enabled;
+        } else if (this instanceof XYDragBox) {
+          this._resizeXEnabled = enabled;
+          this._resizeYEnabled = enabled;
+        }
         return this;
       }
     }
@@ -97,10 +105,6 @@ export module Interaction {
      */
     public isResizing(): boolean {
       return this._isResizingX || this._isResizingY;
-    }
-
-    public _enableResize(enabled: boolean) {
-      this._resizeEnabled = enabled;
     }
 
     private checkResizeStart() {
