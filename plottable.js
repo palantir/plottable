@@ -5643,6 +5643,7 @@ var Plottable;
                 return Plottable.Abstract.NewStyleBarPlot.prototype._getDrawer.apply(this, [key]);
             };
             StackedBar.prototype._generateAttrToProjector = function () {
+                var _this = this;
                 var attrToProjector = Plottable.Abstract.NewStyleBarPlot.prototype._generateAttrToProjector.apply(this);
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
@@ -5653,7 +5654,9 @@ var Plottable;
                 var widthF = attrToProjector["width"];
                 attrToProjector["height"] = this._isVertical ? heightF : widthF;
                 attrToProjector["width"] = this._isVertical ? widthF : heightF;
-                attrToProjector[primaryAttr] = this._isVertical ? getEnd : function (d) { return getEnd(d) - heightF(d); };
+                var valueNegative = function (d) { return primaryAccessor(d) < 0; };
+                var attrFunction = function (d) { return valueNegative(d) ? getStart(d) : getEnd(d); };
+                attrToProjector[primaryAttr] = function (d) { return _this._isVertical ? attrFunction(d) : attrFunction(d) - heightF(d); };
                 return attrToProjector;
             };
             StackedBar.prototype._paint = function () {
