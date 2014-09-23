@@ -28,6 +28,10 @@ export module Plot {
       this._isVertical = isVertical;
     }
 
+    public _setup() {
+      Abstract.NewStyleBarPlot.prototype._setup.call(this);
+    }
+
     public _getAnimator(drawer: Abstract._Drawer, index: number) {
       var animator = new Animator.Rect();
       animator.delay(animator.duration() * index);
@@ -54,6 +58,19 @@ export module Plot {
 
       attrToProjector[primaryAttr] = this._isVertical ? getEnd : (d: any) => getEnd(d) - heightF(d);
       return attrToProjector;
+    }
+
+    public _paint() {
+      super._paint();
+      var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var scaledBaseline = primaryScale.scale(this._baselineValue);
+      var baselineAttr: any = {
+        "x1": this._isVertical ? 0 : scaledBaseline,
+        "y1": this._isVertical ? scaledBaseline : 0,
+        "x2": this._isVertical ? this.width() : scaledBaseline,
+        "y2": this._isVertical ? scaledBaseline : this.height()
+      };
+      this._baseline.attr(baselineAttr);
     }
 
     public baseline(value: number) {

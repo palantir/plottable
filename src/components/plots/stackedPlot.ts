@@ -41,12 +41,18 @@ export module Abstract {
 
       this.setDatasetStackOffsets(datasets, positiveValuedData, negativeValuedData);
 
-      var maxY = _Util.Methods.max(datasets[datasets.length - 1].data(),
-                                  (datum: any) => datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var maxY = _Util.Methods.max(datasets, (dataset: any) => {
+        return _Util.Methods.max(dataset.data(), (datum: any) => {
+          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]
+        });
+      });
       this.stackedExtent[1] = Math.max(0, maxY);
 
-      var minY = _Util.Methods.min(datasets[datasets.length - 1].data(),
-                                  (datum: any) => datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var minY = _Util.Methods.min(datasets, (dataset: any) => {
+        return _Util.Methods.min(dataset.data(), (datum: any) => {
+          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]
+        });
+      });
       this.stackedExtent[0] = Math.min(minY, 0);
     }
 
