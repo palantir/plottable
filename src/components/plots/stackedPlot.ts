@@ -56,6 +56,10 @@ export module Abstract {
       this.stackedExtent[0] = Math.min(minY, 0);
     }
 
+    /**
+     * Feeds the data through d3's stack layout function which will calculate
+     * the stack offsets and use the the function declared in .out to set the offsets on the data.
+     */
     private _stack(data: any[]): any[] {
       var outFunction = (d: any, y0: number, y: number) => {
         d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = y0;
@@ -70,6 +74,10 @@ export module Abstract {
       return data;
     }
 
+    /**
+     * After the stack offsets have been determined on each separate dataset, the offsets need
+     * to be determined correctly on the overall datasets
+     */
     private setDatasetStackOffsets(positiveStackDatasets: any[], negativeStackDatasets: any[]) {
       this._getDatasetsInOrder().forEach((dataset, datasetIndex) => {
         var data = dataset.data();
