@@ -3,10 +3,7 @@
 module Plottable {
 export module Interaction {
   export class YDragBox extends DragBox {
-    constructor() {
-      super();
-      this._canResizeY = true;
-    }
+    public static _canResizeY = true;
 
     public _drag(){
       super._drag();

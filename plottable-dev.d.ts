@@ -3449,8 +3449,6 @@ declare module Plottable {
             _resizeXEnabled: boolean;
             _resizeYEnabled: boolean;
             _dragBoxAttr: SVGRect;
-            _canResizeX: boolean;
-            _canResizeY: boolean;
             _isCloseEnoughLeft(val: number, position: number, len: number): boolean;
             _isCloseEnoughRight(val: number, position: number, len: number): boolean;
             /**
@@ -3519,7 +3517,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XDragBox extends DragBox {
-            constructor();
+            static _canResizeX: boolean;
             _drag(): void;
             setBox(x0: number, x1: number): XDragBox;
         }
@@ -3530,7 +3528,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XYDragBox extends DragBox {
-            constructor();
+            static _canResizeX: boolean;
+            static _canResizeY: boolean;
             _drag(): void;
         }
     }
@@ -3540,7 +3539,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class YDragBox extends DragBox {
-            constructor();
+            static _canResizeY: boolean;
             _drag(): void;
             setBox(y0: number, y1: number): YDragBox;
         }
