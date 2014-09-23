@@ -1168,9 +1168,11 @@ declare module Plottable {
             _baseline: D3.Selection;
             _barAlignmentFactor: number;
             constructor(xScale?: Plottable.Abstract.Scale<X, number>, yScale?: Plottable.Abstract.Scale<Y, number>, isVertical?: boolean);
+            _setup(): void;
             _getAnimator(drawer: Plottable.Abstract._Drawer, index: number): Plottable.Animator.Rect;
             _getDrawer(key: string): any;
             _generateAttrToProjector(): any;
+            _paint(): void;
             baseline(value: number): any;
             _updateDomainer(scale: Plottable.Abstract.Scale<any, number>): any;
             _updateXDomainer(): any;
