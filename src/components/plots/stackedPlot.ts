@@ -42,7 +42,7 @@ export module Abstract {
       this._stack(positiveValuedDatasets);
       this._stack(negativeValuedDatasets);
 
-      this.setDatasetStackOffsets(datasets, positiveValuedDatasets, negativeValuedDatasets);
+      this.setDatasetStackOffsets(positiveValuedDatasets, negativeValuedDatasets);
 
       var maxY = _Util.Methods.max(datasets, (dataset: any) => {
         return _Util.Methods.max(dataset.data(), (datum: any) => {
@@ -71,8 +71,8 @@ export module Abstract {
                .out(outFunction)(data);
     }
 
-    private setDatasetStackOffsets(datasets: Dataset[], positiveStackDatasets: any[], negativeStackDatasets: any[]) {
-      datasets.forEach((dataset, datasetIndex) => {
+    private setDatasetStackOffsets(positiveStackDatasets: any[], negativeStackDatasets: any[]) {
+      this._getDatasetsInOrder().forEach((dataset, datasetIndex) => {
         var data = dataset.data();
         var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
         data.forEach((datum: any, datumIndex: number) => {

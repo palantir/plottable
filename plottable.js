@@ -5483,7 +5483,7 @@ var Plottable;
                 });
                 this._stack(positiveValuedDatasets);
                 this._stack(negativeValuedDatasets);
-                this.setDatasetStackOffsets(datasets, positiveValuedDatasets, negativeValuedDatasets);
+                this.setDatasetStackOffsets(positiveValuedDatasets, negativeValuedDatasets);
                 var maxY = Plottable._Util.Methods.max(datasets, function (dataset) {
                     return Plottable._Util.Methods.max(dataset.data(), function (datum) {
                         return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
@@ -5503,9 +5503,9 @@ var Plottable;
                 };
                 d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return d; }).out(outFunction)(data);
             };
-            Stacked.prototype.setDatasetStackOffsets = function (datasets, positiveStackDatasets, negativeStackDatasets) {
+            Stacked.prototype.setDatasetStackOffsets = function (positiveStackDatasets, negativeStackDatasets) {
                 var _this = this;
-                datasets.forEach(function (dataset, datasetIndex) {
+                this._getDatasetsInOrder().forEach(function (dataset, datasetIndex) {
                     var data = dataset.data();
                     var valueAccessor = _this._isVertical ? _this._projectors["y"].accessor : _this._projectors["x"].accessor;
                     data.forEach(function (datum, datumIndex) {
