@@ -56,7 +56,9 @@ export module Plot {
       attrToProjector["height"] = this._isVertical ? heightF : widthF;
       attrToProjector["width"] = this._isVertical ? widthF : heightF;
 
-      attrToProjector[primaryAttr] = this._isVertical ? getEnd : (d: any) => getEnd(d) - heightF(d);
+      var valueNegative = (d: any) => primaryAccessor(d) < 0;
+      var attrFunction = (d: any) => valueNegative(d) ? getStart(d) : getEnd(d);
+      attrToProjector[primaryAttr] = (d: any) => this._isVertical ? attrFunction(d) : attrFunction(d) - heightF(d);
       return attrToProjector;
     }
 
