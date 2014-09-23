@@ -3127,6 +3127,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XDragBox extends DragBox {
+            constructor();
             setBox(x0: number, x1: number): XDragBox;
         }
     }
@@ -3136,6 +3137,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XYDragBox extends DragBox {
+            constructor();
         }
     }
 }
@@ -3144,6 +3146,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class YDragBox extends DragBox {
+            constructor();
             setBox(y0: number, y1: number): YDragBox;
         }
     }

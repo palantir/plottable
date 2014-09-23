@@ -8021,6 +8021,8 @@ var Plottable;
                 this._boxIsDrawn = false;
                 this._resizeXEnabled = false;
                 this._resizeYEnabled = false;
+                this._canResizeX = false;
+                this._canResizeY = false;
                 this._isResizingX = false;
                 this._isResizingY = false;
                 this._resizeEnabled = false;
@@ -8044,14 +8046,10 @@ var Plottable;
                 }
                 else {
                     this._resizeEnabled = enabled;
-                    if (this instanceof Interaction.XDragBox) {
+                    if (this._canResizeX) {
                         this._resizeXEnabled = enabled;
                     }
-                    else if (this instanceof Interaction.YDragBox) {
-                        this._resizeYEnabled = enabled;
-                    }
-                    else if (this instanceof Interaction.XYDragBox) {
-                        this._resizeXEnabled = enabled;
+                    if (this._canResizeY) {
                         this._resizeYEnabled = enabled;
                     }
                     return this;
@@ -8322,7 +8320,8 @@ var Plottable;
         var XDragBox = (function (_super) {
             __extends(XDragBox, _super);
             function XDragBox() {
-                _super.apply(this, arguments);
+                _super.call(this);
+                this._canResizeX = true;
             }
             XDragBox.prototype._drag = function () {
                 _super.prototype._drag.call(this);
@@ -8352,7 +8351,9 @@ var Plottable;
         var XYDragBox = (function (_super) {
             __extends(XYDragBox, _super);
             function XYDragBox() {
-                _super.apply(this, arguments);
+                _super.call(this);
+                this._canResizeX = true;
+                this._canResizeY = true;
             }
             XYDragBox.prototype._drag = function () {
                 _super.prototype._drag.call(this);
@@ -8409,7 +8410,8 @@ var Plottable;
         var YDragBox = (function (_super) {
             __extends(YDragBox, _super);
             function YDragBox() {
-                _super.apply(this, arguments);
+                _super.call(this);
+                this._canResizeY = true;
             }
             YDragBox.prototype._drag = function () {
                 _super.prototype._drag.call(this);

@@ -23,6 +23,8 @@ export module Interaction {
     public _resizeXEnabled = false;
     public _resizeYEnabled = false;
     public _dragBoxAttr: SVGRect;
+    public _canResizeX = false;
+    public _canResizeY = false;
     private _isResizingX = false;
     private _isResizingY = false;
     private _resizeEnabled = false;
@@ -59,12 +61,10 @@ export module Interaction {
         return this._resizeEnabled;
       } else {
         this._resizeEnabled = enabled;
-        if (this instanceof XDragBox) {
+        if (this._canResizeX) {
           this._resizeXEnabled = enabled;
-        } else if (this instanceof YDragBox) {
-          this._resizeYEnabled = enabled;
-        } else if (this instanceof XYDragBox) {
-          this._resizeXEnabled = enabled;
+        }
+        if (this._canResizeY) {
           this._resizeYEnabled = enabled;
         }
         return this;

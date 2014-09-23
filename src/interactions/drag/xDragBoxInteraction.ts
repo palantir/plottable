@@ -3,6 +3,11 @@
 module Plottable {
 export module Interaction {
   export class XDragBox extends DragBox {
+    constructor() {
+      super();
+      this._canResizeX = true;
+    }
+
     public _drag(){
       super._drag();
       this.setBox(this._selectionOrigin[0], this._location[0]);
