@@ -57,10 +57,10 @@ function run(div, data, Plottable) {
     var renderAreaD2 = new Plottable.Plot.Line(dataseries2, xScale, yScale);
     var renderAreaD3 = new Plottable.Plot.Line(dataseries3, xScale, yScale);
     var renderAreaD4 = new Plottable.Plot.Line(dataseries4, xScale, yScale);
-    renderAreaD1.project("stroke", colorProjector);
-    renderAreaD2.project("stroke", colorProjector);
-    renderAreaD3.project("stroke", colorProjector);
-    renderAreaD4.project("stroke", colorProjector);
+    renderAreaD1.attr("stroke", colorProjector);
+    renderAreaD2.attr("stroke", colorProjector);
+    renderAreaD3.attr("stroke", colorProjector);
+    renderAreaD4.attr("stroke", colorProjector);
     var renderAreas = renderAreaD1.merge(renderAreaD2)
                         .merge(renderAreaD3).merge(renderAreaD4);
 

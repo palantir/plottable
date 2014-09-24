@@ -31,7 +31,7 @@ function run(div, data, Plottable) {
 
   //rendering
   var renderAreaD1 = new Plottable.Plot.VerticalBar(dataseries1, xScale, yScale)
-                                  .project("width", widthProjector)
+                                  .attr("width", widthProjector)
                                   .animate(true);
 
   //title + legend

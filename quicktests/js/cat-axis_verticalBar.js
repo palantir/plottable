@@ -23,8 +23,8 @@ function run(div, data, Plottable) {
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
     var barPlot = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
-    .project("x", "name", xScale)
-    .project("y", "age", yScale)
+    .attr("x", "name", xScale)
+    .attr("y", "age", yScale)
     .animate(true);
 
     var chart = new Plottable.Component.Table([[yAxis, barPlot],

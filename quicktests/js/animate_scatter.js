@@ -17,8 +17,8 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   circleRenderer = new Plottable.Plot.Scatter(data[0].slice(0, 20), xScale, yScale);
-  circleRenderer.project("r", 8);
-  circleRenderer.project("opacity", 0.75);
+  circleRenderer.attr("r", 8);
+  circleRenderer.attr("opacity", 0.75);
   circleRenderer.animate(doAnimate);
 
   var circleChart = new Plottable.Component.Table([[yAxis, circleRenderer],
@@ -26,11 +26,11 @@ function run(div, data, Plottable) {
   circleChart.renderTo(svg);
 
   var cb = function(x, y){
-    d = circleRenderer.dataset().data();
+    var d = circleRenderer.dataset().data();
     circleRenderer.dataset().data(d);
   };
 
-  window.xy = new Plottable.Interaction.Click(circleRenderer)
-  .callback(cb)
-  .registerWithComponent();
+  circleRenderer.registerInteraction(
+    new Plottable.Interaction.Click(circleRenderer).callback(cb)
+  );
 }

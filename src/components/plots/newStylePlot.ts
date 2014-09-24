@@ -89,11 +89,11 @@ export module Abstract {
       return new Animator.Null();
     }
 
-    public _updateProjector(attr: string) {
+    public _updateScaleExtent(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale) {
         this._key2DatasetDrawerKey.forEach((key, ddk) => {
-          var extent = ddk.dataset._getExtent(projector.accessor);
+          var extent = ddk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer);
           var scaleKey = this._plottableID.toString() + "_" + key;
           if (extent.length === 0 || !this._isAnchored) {
             projector.scale._removeExtent(scaleKey, attr);

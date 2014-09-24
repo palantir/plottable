@@ -91,6 +91,9 @@ var MultiTestVerifier = (function () {
     };
     return MultiTestVerifier;
 })();
+function normalizePath(pathString) {
+    return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
+}
 function triggerFakeUIEvent(type, target) {
     var e = document.createEvent("UIEvents");
     e.initUIEvent(type, true, true, window, 1);
@@ -106,7 +109,7 @@ function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
 }
 
 before(function () {
-    Plottable.Core.RenderController.setRenderPolicy(new Plottable.Core.RenderController.RenderPolicy.Immediate());
+    Plottable.Core.RenderController.setRenderPolicy("immediate");
     window.Pixel_CloseTo_Requirement = window.PHANTOMJS ? 2 : 0.5;
 });
 after(function () {
@@ -1487,6 +1490,142 @@ describe("Plots", function () {
 
 var assert = chai.assert;
 describe("Plots", function () {
+    describe("PiePlot", function () {
+        var svg;
+        var simpleDataset;
+        var piePlot;
+        var renderArea;
+        var verifier;
+        before(function () {
+            svg = generateSVG(500, 500);
+            verifier = new MultiTestVerifier();
+            simpleDataset = new Plottable.Dataset([{ value: 5, value2: 10, type: "A" }, { value: 15, value2: 10, type: "B" }]);
+            piePlot = new Plottable.Plot.Pie();
+            piePlot.addDataset(simpleDataset);
+            piePlot.renderTo(svg);
+            renderArea = piePlot._renderArea;
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        it("sectors divided evenly", function () {
+            var arcPaths = renderArea.selectAll(".arc");
+            assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+            var arcPath0 = d3.select(arcPaths[0][0]);
+            var pathPoints0 = normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
+            var firstPathPoints0 = pathPoints0[0].split(",");
+            assert.closeTo(parseFloat(firstPathPoints0[0]), 0, 1, "draws line vertically at beginning");
+            assert.operator(parseFloat(firstPathPoints0[1]), "<", 0, "draws line upwards");
+            var arcDestPoint0 = pathPoints0[1].split(",").slice(5);
+            assert.operator(parseFloat(arcDestPoint0[0]), ">", 0, "arcs line to the right");
+            assert.closeTo(parseFloat(arcDestPoint0[1]), 0, 1, "ends on same level of svg");
+            var secondPathPoints0 = pathPoints0[2].split(",");
+            assert.closeTo(parseFloat(secondPathPoints0[0]), 0, 1, "draws line to origin");
+            assert.closeTo(parseFloat(secondPathPoints0[1]), 0, 1, "draws line to origin");
+            var arcPath1 = d3.select(arcPaths[0][1]);
+            var pathPoints1 = normalizePath(arcPath1.attr("d")).split(/[A-Z]/).slice(1, 4);
+            var firstPathPoints1 = pathPoints1[0].split(",");
+            assert.operator(parseFloat(firstPathPoints1[0]), ">", 0, "draws line to the right");
+            assert.closeTo(parseFloat(firstPathPoints1[1]), 0, 1, "draws line horizontally");
+            var arcDestPoint1 = pathPoints1[1].split(",").slice(5);
+            assert.closeTo(parseFloat(arcDestPoint1[0]), 0, 1, "ends at x origin");
+            assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above 0");
+            var secondPathPoints1 = pathPoints1[2].split(",");
+            assert.closeTo(parseFloat(secondPathPoints1[0]), 0, 1, "draws line to origin");
+            assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin");
+            verifier.end();
+        });
+        it("project value onto different attribute", function () {
+            piePlot.project("value", "value2");
+            var arcPaths = renderArea.selectAll(".arc");
+            assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+            var arcPath0 = d3.select(arcPaths[0][0]);
+            var pathPoints0 = normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
+            var firstPathPoints0 = pathPoints0[0].split(",");
+            assert.closeTo(parseFloat(firstPathPoints0[0]), 0, 1, "draws line vertically at beginning");
+            assert.operator(parseFloat(firstPathPoints0[1]), "<", 0, "draws line upwards");
+            var arcDestPoint0 = pathPoints0[1].split(",").slice(5);
+            assert.closeTo(parseFloat(arcDestPoint0[0]), 0, 1, "ends on a line vertically from beginning");
+            assert.operator(parseFloat(arcDestPoint0[1]), ">", 0, "ends below the center");
+            var arcPath1 = d3.select(arcPaths[0][1]);
+            var pathPoints1 = normalizePath(arcPath1.attr("d")).split(/[A-Z]/).slice(1, 4);
+            var firstPathPoints1 = pathPoints1[0].split(",");
+            assert.closeTo(parseFloat(firstPathPoints1[0]), 0, 1, "draws line vertically at beginning");
+            assert.operator(parseFloat(firstPathPoints1[1]), ">", 0, "draws line downwards");
+            var arcDestPoint1 = pathPoints1[1].split(",").slice(5);
+            assert.closeTo(parseFloat(arcDestPoint1[0]), 0, 1, "ends on a line vertically from beginning");
+            assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above the center");
+            piePlot.project("value", "value");
+            verifier.end();
+        });
+        it("innerRadius project", function () {
+            piePlot.project("inner-radius", function () { return 5; });
+            var arcPaths = renderArea.selectAll(".arc");
+            assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+            var pathPoints0 = normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
+            var radiusPath0 = pathPoints0[2].split(",").map(function (coordinate) { return parseFloat(coordinate); });
+            assert.closeTo(radiusPath0[0], 5, 1, "stops line at innerRadius point");
+            assert.closeTo(radiusPath0[1], 0, 1, "stops line at innerRadius point");
+            var innerArcPath0 = pathPoints0[3].split(",").map(function (coordinate) { return parseFloat(coordinate); });
+            assert.closeTo(innerArcPath0[0], 5, 1, "makes inner arc of radius 5");
+            assert.closeTo(innerArcPath0[1], 5, 1, "makes inner arc of radius 5");
+            assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center");
+            assert.closeTo(innerArcPath0[6], -5, 1, "makes inner arc to top of inner circle");
+            piePlot.project("inner-radius", function () { return 0; });
+            verifier.end();
+        });
+        it("outerRadius project", function () {
+            piePlot.project("outer-radius", function () { return 150; });
+            var arcPaths = renderArea.selectAll(".arc");
+            assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+            var pathPoints0 = normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
+            var radiusPath0 = pathPoints0[0].split(",").map(function (coordinate) { return parseFloat(coordinate); });
+            assert.closeTo(radiusPath0[0], 0, 1, "starts at outerRadius point");
+            assert.closeTo(radiusPath0[1], -150, 1, "starts at outerRadius point");
+            var outerArcPath0 = pathPoints0[1].split(",").map(function (coordinate) { return parseFloat(coordinate); });
+            assert.closeTo(outerArcPath0[0], 150, 1, "makes outer arc of radius 150");
+            assert.closeTo(outerArcPath0[1], 150, 1, "makes outer arc of radius 150");
+            assert.closeTo(outerArcPath0[5], 150, 1, "makes outer arc to right edge");
+            assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
+            piePlot.project("outer-radius", function () { return 250; });
+            verifier.end();
+        });
+        describe("Fill", function () {
+            it("sectors are filled in according to defaults", function () {
+                var arcPaths = renderArea.selectAll(".arc");
+                var arcPath0 = d3.select(arcPaths[0][0]);
+                assert.strictEqual(arcPath0.attr("fill"), Plottable.Core.Colors.PLOTTABLE_COLORS[0], "first sector filled appropriately");
+                var arcPath1 = d3.select(arcPaths[0][1]);
+                assert.strictEqual(arcPath1.attr("fill"), Plottable.Core.Colors.PLOTTABLE_COLORS[1], "second sector filled appropriately");
+                verifier.end();
+            });
+            it("project fill", function () {
+                piePlot.project("fill", function (d, i) { return String(i); }, new Plottable.Scale.Color("10"));
+                var arcPaths = renderArea.selectAll(".arc");
+                var arcPath0 = d3.select(arcPaths[0][0]);
+                assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
+                var arcPath1 = d3.select(arcPaths[0][1]);
+                assert.strictEqual(arcPath1.attr("fill"), "#ff7f0e", "second sector filled appropriately");
+                piePlot.project("fill", "type", new Plottable.Scale.Color("20"));
+                arcPaths = renderArea.selectAll(".arc");
+                arcPath0 = d3.select(arcPaths[0][0]);
+                assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
+                arcPath1 = d3.select(arcPaths[0][1]);
+                assert.strictEqual(arcPath1.attr("fill"), "#aec7e8", "second sector filled appropriately");
+                verifier.end();
+            });
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+    });
+});
+
+var assert = chai.assert;
+describe("Plots", function () {
     describe("New Style Plots", function () {
         var p;
         var oldWarn = Plottable._Util.Methods.warn;
@@ -1570,7 +1709,6 @@ describe("Plots", function () {
         var linePlot;
         var renderArea;
         var verifier;
-        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
@@ -1645,7 +1783,6 @@ describe("Plots", function () {
         var areaPlot;
         var renderArea;
         var verifier;
-        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
@@ -2235,7 +2372,6 @@ describe("Plots", function () {
         var SVG_WIDTH = 600;
         var SVG_HEIGHT = 400;
         var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
-        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
         before(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Linear().domain([1, 3]);
@@ -2294,7 +2430,6 @@ describe("Plots", function () {
         var SVG_WIDTH = 600;
         var SVG_HEIGHT = 400;
         var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
-        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
         before(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Linear().domain([1, 3]);
@@ -3281,22 +3416,24 @@ describe("Component behavior", function () {
         svg.remove();
         svg = generateSVG();
         c = new Plottable.Abstract.Component();
-        var i = new Plottable.Abstract.Interaction(c).registerWithComponent();
+        var i = new Plottable.Abstract.Interaction();
+        c.registerInteraction(i);
         c._anchor(svg);
         verifyHitbox(c);
         svg.remove();
         svg = generateSVG();
         c = new Plottable.Abstract.Component();
         c._anchor(svg);
-        i = new Plottable.Abstract.Interaction(c).registerWithComponent();
+        i = new Plottable.Abstract.Interaction();
+        c.registerInteraction(i);
         verifyHitbox(c);
         svg.remove();
     });
     it("interaction registration works properly", function () {
         var hitBox1 = null;
         var hitBox2 = null;
-        var interaction1 = { _anchor: function (hb) { return hitBox1 = hb.node(); } };
-        var interaction2 = { _anchor: function (hb) { return hitBox2 = hb.node(); } };
+        var interaction1 = { _anchor: function (comp, hb) { return hitBox1 = hb.node(); } };
+        var interaction2 = { _anchor: function (comp, hb) { return hitBox2 = hb.node(); } };
         c.registerInteraction(interaction1);
         c.renderTo(svg);
         c.registerInteraction(interaction2);
@@ -3404,17 +3541,21 @@ describe("Dataset", function () {
     it("_getExtent works as expected", function () {
         var data = [1, 2, 3, 4, 1];
         var metadata = { foo: 11 };
+        var id = function (d) { return d; };
         var dataset = new Plottable.Dataset(data, metadata);
         var plot = new Plottable.Abstract.Plot(dataset);
         var apply = function (a) { return Plottable._Util.Methods._applyAccessor(a, plot); };
         var a1 = function (d, i, m) { return d + i - 2; };
-        assert.deepEqual(dataset._getExtent(apply(a1)), [-1, 5], "extent for numerical data works properly");
+        assert.deepEqual(dataset._getExtent(apply(a1), id), [-1, 5], "extent for numerical data works properly");
         var a2 = function (d, i, m) { return d + m.foo; };
-        assert.deepEqual(dataset._getExtent(apply(a2)), [12, 15], "extent uses metadata appropriately");
+        assert.deepEqual(dataset._getExtent(apply(a2), id), [12, 15], "extent uses metadata appropriately");
         dataset.metadata({ foo: -1 });
-        assert.deepEqual(dataset._getExtent(apply(a2)), [0, 3], "metadata change is reflected in extent results");
+        assert.deepEqual(dataset._getExtent(apply(a2), id), [0, 3], "metadata change is reflected in extent results");
         var a3 = function (d, i, m) { return "_" + d; };
-        assert.deepEqual(dataset._getExtent(apply(a3)), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
+        assert.deepEqual(dataset._getExtent(apply(a3), id), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
+        var a_toString = function (d) { return (d + 2).toString(); };
+        var coerce = function (d) { return +d; };
+        assert.deepEqual(dataset._getExtent(apply(a_toString), coerce), [3, 6], "type coercion works as expected");
     });
 });
 
@@ -3991,6 +4132,16 @@ describe("Scales", function () {
             assert.equal(d[0], 0);
             assert.equal(d[1], 1);
         });
+        it("can change the number of ticks generated", function () {
+            var scale = new Plottable.Scale.Linear();
+            var ticks10 = scale.ticks();
+            assert.closeTo(ticks10.length, 10, 1, "defaults to (about) 10 ticks");
+            var ticks20 = scale.ticks(20);
+            assert.closeTo(ticks20.length, 20, 1, "can request a different number of ticks");
+            scale.numTicks(5);
+            var ticks5 = scale.ticks();
+            assert.closeTo(ticks5.length, 5, 1, "can change the default number of ticks");
+        });
         it("autorange defaults to [1, 10] on log scale", function () {
             var scale = new Plottable.Scale.Log();
             scale.autoDomain();
@@ -4007,6 +4158,20 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
             scale.domain([-1, 5]);
             assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
+        });
+        it("autoranges appropriately even if stringy numbers are projected", function () {
+            var sadTimesData = ["999", "10", "100", "1000", "2", "999"];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Scatter(sadTimesData, xScale, yScale);
+            var id = function (d) { return d; };
+            xScale.domainer(new Plottable.Domainer());
+            plot.project("x", id, xScale);
+            plot.project("y", id, yScale);
+            var svg = generateSVG();
+            plot.renderTo(svg);
+            assert.deepEqual(xScale.domain(), [2, 1000], "the domain was calculated appropriately");
+            svg.remove();
         });
     });
     describe("Ordinal Scales", function () {
@@ -4267,11 +4432,31 @@ var assert = chai.assert;
 describe("_Util.DOM", function () {
     it("getBBox works properly", function () {
         var svg = generateSVG();
-        var rect = svg.append("rect").attr("x", 0).attr("y", 0).attr("width", 5).attr("height", 5);
-        var bb1 = Plottable._Util.DOM.getBBox(rect);
-        var bb2 = rect.node().getBBox();
-        assert.deepEqual(bb1, bb2);
+        var expectedBox = {
+            x: 0,
+            y: 0,
+            width: 40,
+            height: 20
+        };
+        var rect = svg.append("rect").attr(expectedBox);
+        var measuredBox = Plottable._Util.DOM.getBBox(rect);
+        assert.deepEqual(measuredBox, expectedBox, "getBBox measures correctly");
         svg.remove();
+    });
+    it("getBBox does not fail on disconnected and display:none nodes", function () {
+        var expectedBox = {
+            x: 0,
+            y: 0,
+            width: 40,
+            height: 20
+        };
+        var removedSVG = generateSVG().remove();
+        var rect = removedSVG.append("rect").attr(expectedBox);
+        Plottable._Util.DOM.getBBox(rect);
+        var noneSVG = generateSVG().style("display", "none");
+        rect = noneSVG.append("rect").attr(expectedBox);
+        Plottable._Util.DOM.getBBox(rect);
+        noneSVG.remove();
     });
     describe("getElementWidth, getElementHeight", function () {
         it("can get a plain element's size", function () {
@@ -4434,6 +4619,11 @@ describe("Formatters", function () {
             percentFormatter = Plottable.Formatters.percentage(2);
             var result2 = percentFormatter(0.0035);
             assert.strictEqual(result2, "0.35%", "works even if multiplying by 100 does not make it an integer");
+        });
+        it("onlyShowUnchanged set to false", function () {
+            var percentFormatter = Plottable.Formatters.percentage(0, false);
+            var result = percentFormatter(0.075);
+            assert.strictEqual(result, "8%", "shows formatter changed value");
         });
     });
     describe("time", function () {
@@ -4999,8 +5189,8 @@ describe("Interactions", function () {
             renderer.renderTo(svg);
             var xDomainBefore = xScale.domain();
             var yDomainBefore = yScale.domain();
-            var interaction = new Plottable.Interaction.PanZoom(renderer, xScale, yScale);
-            interaction.registerWithComponent();
+            var interaction = new Plottable.Interaction.PanZoom(xScale, yScale);
+            renderer.registerInteraction(interaction);
             var hb = renderer._element.select(".hit-box").node();
             var dragDistancePixelX = 10;
             var dragDistancePixelY = 20;
@@ -5045,8 +5235,8 @@ describe("Interactions", function () {
             yScale = new Plottable.Scale.Linear();
             renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
             renderer.renderTo(svg);
-            interaction = new Plottable.Interaction.XYDragBox(renderer);
-            interaction.registerWithComponent();
+            interaction = new Plottable.Interaction.XYDragBox();
+            renderer.registerInteraction(interaction);
         });
         afterEach(function () {
             interaction.dragstart(null);
@@ -5115,8 +5305,8 @@ describe("Interactions", function () {
             yScale = new Plottable.Scale.Linear();
             renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
             renderer.renderTo(svg);
-            interaction = new Plottable.Interaction.YDragBox(renderer);
-            interaction.registerWithComponent();
+            interaction = new Plottable.Interaction.YDragBox();
+            renderer.registerInteraction(interaction);
         });
         afterEach(function () {
             interaction.dragstart(null);
@@ -5165,13 +5355,13 @@ describe("Interactions", function () {
             var component = new Plottable.Abstract.Component();
             component.renderTo(svg);
             var code = 65;
-            var ki = new Plottable.Interaction.Key(component, code);
+            var ki = new Plottable.Interaction.Key(code);
             var callbackCalled = false;
             var callback = function () {
                 callbackCalled = true;
             };
             ki.callback(callback);
-            ki.registerWithComponent();
+            component.registerInteraction(ki);
             var $hitbox = $(component.hitBox.node());
             $hitbox.simulate("keydown", { keyCode: code });
             assert.isFalse(callbackCalled, "callback is not called if component does not have mouse focus (before mouseover)");
@@ -5201,7 +5391,7 @@ describe("Interactions", function () {
         });
         it("hoverMode()", function () {
             var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
-            var bhi = new Plottable.Interaction.BarHover(barPlot);
+            var bhi = new Plottable.Interaction.BarHover();
             bhi.hoverMode("line");
             bhi.hoverMode("POINT");
             assert.throws(function () { return bhi.hoverMode("derp"); }, "not a valid");
@@ -5210,7 +5400,7 @@ describe("Interactions", function () {
             var svg = generateSVG(400, 400);
             var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
             barPlot.project("x", "name", ordinalScale).project("y", "value", linearScale);
-            var bhi = new Plottable.Interaction.BarHover(barPlot);
+            var bhi = new Plottable.Interaction.BarHover();
             var barDatum = null;
             bhi.onHover(function (datum, bar) {
                 barDatum = datum;
@@ -5221,7 +5411,7 @@ describe("Interactions", function () {
                 unhoverCalled = true;
             });
             barPlot.renderTo(svg);
-            bhi.registerWithComponent();
+            barPlot.registerInteraction(bhi);
             var hitbox = barPlot._element.select(".hit-box");
             triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
@@ -5252,7 +5442,7 @@ describe("Interactions", function () {
             var svg = generateSVG(400, 400);
             var barPlot = new Plottable.Plot.HorizontalBar(dataset, linearScale, ordinalScale);
             barPlot.project("y", "name", ordinalScale).project("x", "value", linearScale);
-            var bhi = new Plottable.Interaction.BarHover(barPlot);
+            var bhi = new Plottable.Interaction.BarHover();
             var barDatum = null;
             bhi.onHover(function (datum, bar) {
                 barDatum = datum;
@@ -5262,7 +5452,7 @@ describe("Interactions", function () {
                 unhoverCalled = true;
             });
             barPlot.renderTo(svg);
-            bhi.registerWithComponent();
+            barPlot.registerInteraction(bhi);
             var hitbox = barPlot._element.select(".hit-box");
             triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");

@@ -25,7 +25,7 @@ function run(div, data, Plottable) {
     renderArea1.animate(true);
 
     var renderArea2 = new Plottable.Plot.Scatter(renderArea1.dataset(), xScale, yScale);
-    renderArea2.project("fill", function(){return "purple";});
+    renderArea2.attr("fill", function(){return "purple";});
     renderArea2.animate(true);
 
     var renderGroup = renderArea1.merge(renderArea2);
@@ -48,8 +48,8 @@ function run(div, data, Plottable) {
         }
     };
 
-    window.xy = new Plottable.Interaction.Click(renderGroup)
-        .callback(cb)
-        .registerWithComponent();
+    renderGroup.registerInteraction(
+        new Plottable.Interaction.Click().callback(cb)
+    );
 
 }

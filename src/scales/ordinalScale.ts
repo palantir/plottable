@@ -10,6 +10,7 @@ export module Scale {
     // Padding as a proportion of the spacing between domain values
     private _innerPadding: number = 0.3;
     private _outerPadding: number = 0.5;
+    public _typeCoercer: (d: any) => any = (d: any) => d != null && d.toString ? d.toString() : d;
 
     /**
      * Creates an OrdinalScale.

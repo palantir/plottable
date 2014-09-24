@@ -150,15 +150,15 @@ declare module Plottable {
         (d: any): string;
     }
     var MILLISECONDS_IN_ONE_DAY: number;
-    class Formatters {
-        static currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
-        static fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
-        static general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
-        static identity(): (d: any) => string;
-        static percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
-        static siSuffix(precision?: number): (d: any) => string;
-        static time(): (d: any) => string;
-        static relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
+    module Formatters {
+        function currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
+        function fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function identity(): (d: any) => string;
+        function percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function siSuffix(precision?: number): (d: any) => string;
+        function time(): (d: any) => string;
+        function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
     }
 }
 
@@ -223,6 +223,7 @@ declare module Plottable {
         data(data: any[]): Dataset;
         metadata(): any;
         metadata(metadata: any): Dataset;
+        _getExtent(accessor: _IAccessor, typeCoercer: (d: any) => any): any[];
     }
 }
 
@@ -252,7 +253,8 @@ declare module Plottable {
 declare module Plottable {
     module Core {
         module RenderController {
-            function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): any;
+            function setRenderPolicy(policy: string): void;
+            function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): void;
             function registerToRender(c: Plottable.Abstract.Component): void;
             function registerToComputeLayout(c: Plottable.Abstract.Component): void;
             function flush(): void;
@@ -374,6 +376,8 @@ declare module Plottable {
             clamp(): boolean;
             clamp(clamp: boolean): QuantitativeScale<D>;
             ticks(count?: number): any[];
+            numTicks(): number;
+            numTicks(count: number): QuantitativeScale<D>;
             domainer(): Domainer;
             domainer(domainer: Domainer): QuantitativeScale<D>;
         }
@@ -451,8 +455,6 @@ declare module Plottable {
         class Time extends Plottable.Abstract.QuantitativeScale<any> {
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            domain(): any[];
-            domain(values: any[]): Time;
             copy(): Time;
         }
     }
@@ -489,6 +491,15 @@ declare module Plottable {
             key: string;
             constructor(key: string);
             remove(): void;
+            draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Arc extends Plottable.Abstract._Drawer {
             draw(data: any[], attrToProjector: IAttributeToProjector, animator?: Plottable.Animator.Null): void;
         }
     }
@@ -722,11 +733,26 @@ declare module Plottable {
             remove(): void;
             dataset(): Dataset;
             dataset(dataset: Dataset): Plot;
+            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
             animate(enabled: boolean): Plot;
             detach(): Plot;
             animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
             animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
+        class Pie extends Plottable.Abstract.Plot {
+            constructor();
+            addDataset(key: string, dataset: Dataset): Pie;
+            addDataset(key: string, dataset: any[]): Pie;
+            addDataset(dataset: Dataset): Pie;
+            addDataset(dataset: any[]): Pie;
+            removeDataset(key: string): Pie;
         }
     }
 }
@@ -959,11 +985,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Interaction {
-            hitBox: D3.Selection;
-            componentToListenTo: Component;
-            constructor(componentToListenTo: Component);
-            registerWithComponent(): Interaction;
+        class Interaction extends PlottableObject {
         }
     }
 }
@@ -972,21 +994,9 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Click extends Plottable.Abstract.Interaction {
-            constructor(componentToListenTo: Plottable.Abstract.Component);
-            callback(cb: (x: number, y: number) => any): Click;
+            callback(cb: (p: Point) => any): Click;
         }
         class DoubleClick extends Click {
-            constructor(componentToListenTo: Plottable.Abstract.Component);
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
-        class Mousemove extends Plottable.Abstract.Interaction {
-            constructor(componentToListenTo: Plottable.Abstract.Component);
-            mousemove(x: number, y: number): void;
         }
     }
 }
@@ -995,7 +1005,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Key extends Plottable.Abstract.Interaction {
-            constructor(componentToListenTo: Plottable.Abstract.Component, keyCode: number);
+            constructor(keyCode: number);
             callback(cb: () => any): Key;
         }
     }
@@ -1005,7 +1015,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class PanZoom extends Plottable.Abstract.Interaction {
-            constructor(componentToListenTo: Plottable.Abstract.Component, xScale?: Plottable.Abstract.QuantitativeScale<any>, yScale?: Plottable.Abstract.QuantitativeScale<any>);
+            constructor(xScale?: Plottable.Abstract.QuantitativeScale<any>, yScale?: Plottable.Abstract.QuantitativeScale<any>);
             resetZoom(): void;
         }
     }
@@ -1015,8 +1025,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class BarHover extends Plottable.Abstract.Interaction {
-            componentToListenTo: Plottable.Abstract.BarPlot<any, any>;
-            constructor(barPlot: Plottable.Abstract.BarPlot<any, any>);
             hoverMode(): string;
             hoverMode(mode: string): BarHover;
             onHover(callback: (datum: any, bar: D3.Selection) => any): BarHover;
@@ -1029,7 +1037,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Drag extends Plottable.Abstract.Interaction {
-            constructor(componentToListenTo: Plottable.Abstract.Component);
+            constructor();
             dragstart(): (startLocation: Point) => void;
             dragstart(cb: (startLocation: Point) => any): Drag;
             drag(): (startLocation: Point, endLocation: Point) => void;
@@ -1103,29 +1111,6 @@ declare module Plottable {
             mousemove(callback: (location: Point) => any): Mouse;
             mouseout(): (location: Point) => any;
             mouseout(callback: (location: Point) => any): Mouse;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Template {
-        class StandardChart extends Plottable.Component.Table {
-            constructor();
-            yAxis(): Plottable.Abstract.Axis;
-            yAxis(y: Plottable.Abstract.Axis): StandardChart;
-            xAxis(): Plottable.Abstract.Axis;
-            xAxis(x: Plottable.Abstract.Axis): StandardChart;
-            yLabel(): Plottable.Component.AxisLabel;
-            yLabel(y: Plottable.Component.AxisLabel): StandardChart;
-            yLabel(y: string): StandardChart;
-            xLabel(): Plottable.Component.AxisLabel;
-            xLabel(x: Plottable.Component.AxisLabel): StandardChart;
-            xLabel(x: string): StandardChart;
-            titleLabel(): Plottable.Component.TitleLabel;
-            titleLabel(x: Plottable.Component.TitleLabel): StandardChart;
-            titleLabel(x: string): StandardChart;
-            center(c: Plottable.Abstract.Component): StandardChart;
         }
     }
 }

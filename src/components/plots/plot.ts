@@ -49,7 +49,7 @@ export module Abstract {
       super._anchor(element);
       this.animateOnNextRender = true;
       this._dataChanged = true;
-      this._updateAllProjectors();
+      this._updateScaleExtents();
     }
 
     public remove() {
@@ -92,7 +92,7 @@ export module Abstract {
     }
 
     public _onDatasetUpdate() {
-      this._updateAllProjectors();
+      this._updateScaleExtents();
       this.animateOnNextRender = true;
       this._dataChanged = true;
       this._render();
@@ -103,7 +103,7 @@ export module Abstract {
      *
      * Here's a common use case:
      * ```typescript
-     * plot.project("r", function(d) { return d.foo; });
+     * plot.attr("r", function(d) { return d.foo; });
      * ```
      * This will set the radius of each datum `d` to be `d.foo`.
      *
@@ -121,6 +121,13 @@ export module Abstract {
      *
      * @returns {Plot} The calling Plot.
      */
+    public attr(attrToSet: string, accessor: any, scale?: Abstract.Scale<any,any>) {
+      return this.project(attrToSet, accessor, scale);
+    }
+
+    /**
+     * Identical to plot.attr
+     */
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
       var currentProjection = this._projectors[attrToSet];
@@ -136,7 +143,7 @@ export module Abstract {
       }
       var activatedAccessor = _Util.Methods._applyAccessor(accessor, this);
       this._projectors[attrToSet] = {accessor: activatedAccessor, scale: scale, attribute: attrToSet};
-      this._updateProjector(attrToSet);
+      this._updateScaleExtent(attrToSet);
       this._render(); // queue a re-render upon changing projector
       return this;
     }
@@ -183,7 +190,7 @@ export module Abstract {
     public detach() {
       super.detach();
       // make the domain resize
-      this._updateAllProjectors();
+      this._updateScaleExtents();
       return this;
     }
 
@@ -191,14 +198,14 @@ export module Abstract {
      * This function makes sure that all of the scales in this._projectors
      * have an extent that includes all the data that is projected onto them.
      */
-    public _updateAllProjectors() {
-      d3.keys(this._projectors).forEach((attr: string) => this._updateProjector(attr));
+    public _updateScaleExtents() {
+      d3.keys(this._projectors).forEach((attr: string) => this._updateScaleExtent(attr));
     }
 
-    public _updateProjector(attr: string) {
+    public _updateScaleExtent(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale) {
-        var extent = this.dataset()._getExtent(projector.accessor);
+        var extent = this.dataset()._getExtent(projector.accessor, projector.scale._typeCoercer);
         if (extent.length === 0 || !this._isAnchored) {
           projector.scale._removeExtent(this._plottableID.toString(), attr);
         } else {
