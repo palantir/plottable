@@ -1,7 +1,7 @@
 function makeData() {
   "use strict";
 
-  return [makeRandomData(50), makeRandomData(50)];
+  return makeRandomData(8);
 }
 
 function run(div, data, Plottable) {
@@ -9,7 +9,6 @@ function run(div, data, Plottable) {
 
   var svg = div.append("svg").attr("height", 500);
 
-  var d = data[0].slice(0, 8);
   //Axis
   var xScale = new Plottable.Scale.Linear();
   var yScale = new Plottable.Scale.Linear();
@@ -21,11 +20,16 @@ function run(div, data, Plottable) {
   }
 
   //rendering
-  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(d);
-  var linePlot = new Plottable.Plot.Line(xScale, yScale).addDataset(d);
-  var areaPlot = new Plottable.Plot.Area(xScale, yScale).addDataset(d);
-  var vbarPlot = new Plottable.Plot.VerticalBar(d, xScale, yScale);
-  var hbarPlot = new Plottable.Plot.HorizontalBar(d, xScale, yScale);
+  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale)
+                          .addDataset(data);
+  var linePlot = new Plottable.Plot.Line(xScale, yScale)
+                          .addDataset(data);
+  var areaPlot = new Plottable.Plot.Area(xScale, yScale)
+                          .addDataset(data);
+  var vbarPlot = new Plottable.Plot.VerticalBar(xScale, yScale)
+                          .addDataset(data);
+  var hbarPlot = new Plottable.Plot.HorizontalBar(xScale, yScale)
+                          .addDataset(data);
 
   //title + legend
 

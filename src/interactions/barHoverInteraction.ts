@@ -3,7 +3,7 @@
 module Plottable {
 export module Interaction {
   export class BarHover extends Abstract.Interaction {
-    public _componentToListenTo: Abstract.BarPlot<any, any>;
+    public _componentToListenTo: Abstract.NewStyleBarPlot<any, any>;
     private dispatcher: Dispatcher.Mouse;
     private plotIsVertical: boolean;
     private hoverCallback: (datum: any, bar: D3.Selection) => any;
@@ -11,7 +11,8 @@ export module Interaction {
     private currentBar: D3.Selection = null;
     private _hoverMode = "point";
 
-    public _anchor(barPlot: Abstract.BarPlot<any, any>, hitBox: D3.Selection) {
+
+    public _anchor(barPlot: Abstract.NewStyleBarPlot<any, any>, hitBox: D3.Selection) {
       super._anchor(barPlot, hitBox);
       this.plotIsVertical = this._componentToListenTo._isVertical;
       this.dispatcher = new Dispatcher.Mouse(this._hitBox);
@@ -30,7 +31,7 @@ export module Interaction {
             }
           }
 
-          this._componentToListenTo._bars.classed("not-hovered", true).classed("hovered", false);
+          this.getBars().classed("not-hovered", true).classed("hovered", false);
           selectedBar.classed("not-hovered", false).classed("hovered", true);
           if (this.hoverCallback != null) {
             this.hoverCallback(selectedBar.data()[0], selectedBar);
@@ -45,8 +46,12 @@ export module Interaction {
       this.dispatcher.connect();
     }
 
+    private getBars(): D3.Selection {
+      return this._componentToListenTo._renderArea.selectAll("rect");
+    }
+
     private _hoverOut() {
-      this._componentToListenTo._bars.classed("not-hovered hovered", false);
+      this.getBars().classed("not-hovered hovered", false);
       if (this.unhoverCallback != null && this.currentBar != null) {
         this.unhoverCallback(this.currentBar.data()[0], this.currentBar); // last known information
       }

@@ -22,10 +22,11 @@ function run(div, data, Plottable) {
     var yScale = new Plottable.Scale.Linear();
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-    var barPlot = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
-    .attr("x", "name", xScale)
-    .attr("y", "age", yScale);
-    barPlot.animate(true);
+    var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale)
+        .addDataset(ds)
+        .attr("x", "name", xScale)
+        .attr("y", "age", yScale)
+        .animate(true);
 
     var chart = new Plottable.Component.Table([[yAxis, barPlot],
        [null,  xAxis]]);

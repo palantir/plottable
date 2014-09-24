@@ -237,7 +237,8 @@ describe("Scales", () => {
     var dA = {x: "A", y: 2};
     var dB = {x: "B", y: 2};
     var dC = {x: "C", y: 2};
-    var barPlot = new Plottable.Plot.VerticalBar([dA, dB], xScale, yScale);
+    var dataset = new Plottable.Dataset([dA, dB]);
+    var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale).addDataset(dataset);
     var svg = generateSVG();
     assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
     barPlot.renderTo(svg);
@@ -245,7 +246,7 @@ describe("Scales", () => {
 
     function iterateDataChanges(...dataChanges: any[]) {
       dataChanges.forEach((dataChange) => {
-        barPlot.dataset().data(dataChange);
+        dataset.data(dataChange);
       });
     }
 

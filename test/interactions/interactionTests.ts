@@ -292,7 +292,7 @@ describe("Interactions", () => {
     });
 
     it("hoverMode()", () => {
-      var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
+      var barPlot = new Plottable.Plot.VerticalBar(ordinalScale, linearScale).addDataset(dataset);
       var bhi = new Plottable.Interaction.BarHover();
 
       bhi.hoverMode("line");
@@ -303,7 +303,7 @@ describe("Interactions", () => {
 
     it("correctly triggers callbacks (vertical)", () => {
       var svg = generateSVG(400, 400);
-      var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
+      var barPlot = new Plottable.Plot.VerticalBar(ordinalScale, linearScale).addDataset(dataset);
       barPlot.project("x", "name", ordinalScale).project("y", "value", linearScale);
       var bhi = new Plottable.Interaction.BarHover();
 
@@ -358,7 +358,7 @@ describe("Interactions", () => {
 
     it("correctly triggers callbacks (hoizontal)", () => {
       var svg = generateSVG(400, 400);
-      var barPlot = new Plottable.Plot.HorizontalBar(dataset, linearScale, ordinalScale);
+      var barPlot = new Plottable.Plot.HorizontalBar(linearScale, ordinalScale).addDataset(dataset);
       barPlot.project("y", "name", ordinalScale).project("x", "value", linearScale);
       var bhi = new Plottable.Interaction.BarHover();
 

@@ -5099,10 +5099,10 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Abstract) {
-        var BarPlot = (function (_super) {
-            __extends(BarPlot, _super);
-            function BarPlot(dataset, xScale, yScale) {
-                _super.call(this, dataset, xScale, yScale);
+        var NewStyleBarPlot = (function (_super) {
+            __extends(NewStyleBarPlot, _super);
+            function NewStyleBarPlot(xScale, yScale) {
+                _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
                 this._barAlignmentFactor = 0;
                 this._animators = {
@@ -5114,31 +5114,17 @@ var Plottable;
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
                 this.baseline(this._baselineValue);
             }
-            BarPlot.prototype._setup = function () {
+            NewStyleBarPlot.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Rect(key);
+            };
+            NewStyleBarPlot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
-                this._bars = this._renderArea.selectAll("rect").data([]);
             };
-            BarPlot.prototype._paint = function () {
+            NewStyleBarPlot.prototype._paint = function () {
                 _super.prototype._paint.call(this);
-                this._bars = this._renderArea.selectAll("rect").data(this._dataset.data());
-                this._bars.enter().append("rect");
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
-                var positionAttr = this._isVertical ? "y" : "x";
-                var dimensionAttr = this._isVertical ? "height" : "width";
-                if (this._dataChanged && this._animate) {
-                    var resetAttrToProjector = this._generateAttrToProjector();
-                    resetAttrToProjector[positionAttr] = function () { return scaledBaseline; };
-                    resetAttrToProjector[dimensionAttr] = function () { return 0; };
-                    this._applyAnimatedAttributes(this._bars, "bars-reset", resetAttrToProjector);
-                }
-                var attrToProjector = this._generateAttrToProjector();
-                if (attrToProjector["fill"] != null) {
-                    this._bars.attr("fill", attrToProjector["fill"]);
-                }
-                this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
-                this._bars.exit().remove();
                 var baselineAttr = {
                     "x1": this._isVertical ? 0 : scaledBaseline,
                     "y1": this._isVertical ? scaledBaseline : 0,
@@ -5147,14 +5133,14 @@ var Plottable;
                 };
                 this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
             };
-            BarPlot.prototype.baseline = function (value) {
+            NewStyleBarPlot.prototype.baseline = function (value) {
                 this._baselineValue = value;
                 this._updateXDomainer();
                 this._updateYDomainer();
                 this._render();
                 return this;
             };
-            BarPlot.prototype.barAlignment = function (alignment) {
+            NewStyleBarPlot.prototype.barAlignment = function (alignment) {
                 var alignmentLC = alignment.toLowerCase();
                 var align2factor = this.constructor._BarAlignmentToFactor;
                 if (align2factor[alignmentLC] === undefined) {
@@ -5164,7 +5150,7 @@ var Plottable;
                 this._render();
                 return this;
             };
-            BarPlot.prototype.parseExtent = function (input) {
+            NewStyleBarPlot.prototype.parseExtent = function (input) {
                 if (typeof (input) === "number") {
                     return { min: input, max: input };
                 }
@@ -5175,7 +5161,7 @@ var Plottable;
                     throw new Error("input '" + input + "' can't be parsed as an IExtent");
                 }
             };
-            BarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
+            NewStyleBarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
                 if (select === void 0) { select = true; }
                 if (!this._isSetup) {
                     return null;
@@ -5184,11 +5170,13 @@ var Plottable;
                 var xExtent = this.parseExtent(xValOrExtent);
                 var yExtent = this.parseExtent(yValOrExtent);
                 var tolerance = 0.5;
-                this._bars.each(function (d) {
-                    var bbox = this.getBBox();
-                    if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
-                        selectedBars.push(this);
-                    }
+                this._getDrawersInOrder().forEach(function (d) {
+                    d._renderArea.selectAll("rect").each(function (d) {
+                        var bbox = this.getBBox();
+                        if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
+                            selectedBars.push(this);
+                        }
+                    });
                 });
                 if (selectedBars.length > 0) {
                     var selection = d3.selectAll(selectedBars);
@@ -5199,13 +5187,13 @@ var Plottable;
                     return null;
                 }
             };
-            BarPlot.prototype.deselectAll = function () {
+            NewStyleBarPlot.prototype.deselectAll = function () {
                 if (this._isSetup) {
-                    this._bars.classed("selected", false);
+                    this._getDrawersInOrder().forEach(function (d) { return d._renderArea.selectAll("rect").classed("selected", false); });
                 }
                 return this;
             };
-            BarPlot.prototype._updateDomainer = function (scale) {
+            NewStyleBarPlot.prototype._updateDomainer = function (scale) {
                 if (scale instanceof Abstract.QuantitativeScale) {
                     var qscale = scale;
                     if (!qscale._userSetDomainer) {
@@ -5220,7 +5208,7 @@ var Plottable;
                     qscale._autoDomainIfAutomaticMode();
                 }
             };
-            BarPlot.prototype._updateYDomainer = function () {
+            NewStyleBarPlot.prototype._updateYDomainer = function () {
                 if (this._isVertical) {
                     this._updateDomainer(this._yScale);
                 }
@@ -5228,7 +5216,7 @@ var Plottable;
                     _super.prototype._updateYDomainer.call(this);
                 }
             };
-            BarPlot.prototype._updateXDomainer = function () {
+            NewStyleBarPlot.prototype._updateXDomainer = function () {
                 if (!this._isVertical) {
                     this._updateDomainer(this._xScale);
                 }
@@ -5236,7 +5224,7 @@ var Plottable;
                     _super.prototype._updateXDomainer.call(this);
                 }
             };
-            BarPlot.prototype._generateAttrToProjector = function () {
+            NewStyleBarPlot.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
@@ -5246,7 +5234,7 @@ var Plottable;
                 var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
                 if (attrToProjector["width"] == null) {
-                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : BarPlot.DEFAULT_WIDTH;
+                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : NewStyleBarPlot.DEFAULT_WIDTH;
                     attrToProjector["width"] = function (d, i) { return constantWidth; };
                 }
                 var positionF = attrToProjector[secondaryAttr];
@@ -5268,11 +5256,11 @@ var Plottable;
                 };
                 return attrToProjector;
             };
-            BarPlot.DEFAULT_WIDTH = 10;
-            BarPlot._BarAlignmentToFactor = {};
-            return BarPlot;
-        })(Abstract.XYPlot);
-        Abstract.BarPlot = BarPlot;
+            NewStyleBarPlot._BarAlignmentToFactor = {};
+            NewStyleBarPlot.DEFAULT_WIDTH = 10;
+            return NewStyleBarPlot;
+        })(Abstract.NSXYPlot);
+        Abstract.NewStyleBarPlot = NewStyleBarPlot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
 })(Plottable || (Plottable = {}));
@@ -5288,16 +5276,16 @@ var Plottable;
     (function (Plot) {
         var VerticalBar = (function (_super) {
             __extends(VerticalBar, _super);
-            function VerticalBar(dataset, xScale, yScale) {
+            function VerticalBar(xScale, yScale) {
                 this._isVertical = true;
-                _super.call(this, dataset, xScale, yScale);
+                _super.call(this, xScale, yScale);
             }
             VerticalBar.prototype._updateYDomainer = function () {
                 this._updateDomainer(this._yScale);
             };
             VerticalBar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             return VerticalBar;
-        })(Plottable.Abstract.BarPlot);
+        })(Plottable.Abstract.NewStyleBarPlot);
         Plot.VerticalBar = VerticalBar;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
@@ -5314,8 +5302,8 @@ var Plottable;
     (function (Plot) {
         var HorizontalBar = (function (_super) {
             __extends(HorizontalBar, _super);
-            function HorizontalBar(dataset, xScale, yScale) {
-                _super.call(this, dataset, xScale, yScale);
+            function HorizontalBar(xScale, yScale) {
+                _super.call(this, xScale, yScale);
             }
             HorizontalBar.prototype._updateXDomainer = function () {
                 this._updateDomainer(this._xScale);
@@ -5329,7 +5317,7 @@ var Plottable;
             };
             HorizontalBar._BarAlignmentToFactor = { "top": 0, "center": 0.5, "bottom": 1 };
             return HorizontalBar;
-        })(Plottable.Abstract.BarPlot);
+        })(Plottable.Abstract.NewStyleBarPlot);
         Plot.HorizontalBar = HorizontalBar;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
@@ -5526,73 +5514,6 @@ var Plottable;
         Plot.Area = Area;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Abstract) {
-        var NewStyleBarPlot = (function (_super) {
-            __extends(NewStyleBarPlot, _super);
-            function NewStyleBarPlot(xScale, yScale) {
-                _super.call(this, xScale, yScale);
-                this._baselineValue = 0;
-                this._barAlignmentFactor = 0;
-                this._animators = {
-                    "bars-reset": new Plottable.Animator.Null(),
-                    "bars": new Plottable.Animator.IterativeDelay(),
-                    "baseline": new Plottable.Animator.Null()
-                };
-                this.classed("bar-plot", true);
-                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
-                this.baseline(this._baselineValue);
-            }
-            NewStyleBarPlot.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Rect(key);
-            };
-            NewStyleBarPlot.prototype._setup = function () {
-                _super.prototype._setup.call(this);
-                this._baseline = this._renderArea.append("line").classed("baseline", true);
-            };
-            NewStyleBarPlot.prototype._paint = function () {
-                _super.prototype._paint.call(this);
-                var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                var scaledBaseline = primaryScale.scale(this._baselineValue);
-                var baselineAttr = {
-                    "x1": this._isVertical ? 0 : scaledBaseline,
-                    "y1": this._isVertical ? scaledBaseline : 0,
-                    "x2": this._isVertical ? this.width() : scaledBaseline,
-                    "y2": this._isVertical ? scaledBaseline : this.height()
-                };
-                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
-            };
-            NewStyleBarPlot.prototype.baseline = function (value) {
-                return Abstract.BarPlot.prototype.baseline.apply(this, [value]);
-            };
-            NewStyleBarPlot.prototype._updateDomainer = function (scale) {
-                return Abstract.BarPlot.prototype._updateDomainer.apply(this, [scale]);
-            };
-            NewStyleBarPlot.prototype._generateAttrToProjector = function () {
-                return Abstract.BarPlot.prototype._generateAttrToProjector.apply(this);
-            };
-            NewStyleBarPlot.prototype._updateXDomainer = function () {
-                return Abstract.BarPlot.prototype._updateXDomainer.apply(this);
-            };
-            NewStyleBarPlot.prototype._updateYDomainer = function () {
-                return Abstract.BarPlot.prototype._updateYDomainer.apply(this);
-            };
-            NewStyleBarPlot._barAlignmentToFactor = {};
-            NewStyleBarPlot.DEFAULT_WIDTH = 10;
-            return NewStyleBarPlot;
-        })(Abstract.NSXYPlot);
-        Abstract.NewStyleBarPlot = NewStyleBarPlot;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
 })(Plottable || (Plottable = {}));
 
 var __extends = this.__extends || function (d, b) {
@@ -6234,7 +6155,7 @@ var Plottable;
                                 _this._hoverOut();
                             }
                         }
-                        _this._componentToListenTo._bars.classed("not-hovered", true).classed("hovered", false);
+                        _this.getBars().classed("not-hovered", true).classed("hovered", false);
                         selectedBar.classed("not-hovered", false).classed("hovered", true);
                         if (_this.hoverCallback != null) {
                             _this.hoverCallback(selectedBar.data()[0], selectedBar);
@@ -6245,8 +6166,11 @@ var Plottable;
                 this.dispatcher.mouseout(function (p) { return _this._hoverOut(); });
                 this.dispatcher.connect();
             };
+            BarHover.prototype.getBars = function () {
+                return this._componentToListenTo._renderArea.selectAll("rect");
+            };
             BarHover.prototype._hoverOut = function () {
-                this._componentToListenTo._bars.classed("not-hovered hovered", false);
+                this.getBars().classed("not-hovered hovered", false);
                 if (this.unhoverCallback != null && this.currentBar != null) {
                     this.unhoverCallback(this.currentBar.data()[0], this.currentBar);
                 }

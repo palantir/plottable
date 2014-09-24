@@ -1032,26 +1032,26 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class BarPlot<X, Y> extends XYPlot<X, Y> {
-            _bars: D3.UpdateSelection;
-            _baseline: D3.Selection;
-            _baselineValue: number;
-            _barAlignmentFactor: number;
+        class NewStyleBarPlot<X, Y> extends NSXYPlot<X, Y> {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
+            _baseline: D3.Selection;
+            _baselineValue: number;
+            _barAlignmentFactor: number;
             _isVertical: boolean;
             _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(dataset: any, xScale: Scale<X, number>, yScale: Scale<Y, number>);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
+            _getDrawer(key: string): Plottable._Drawer.Rect;
             _setup(): void;
             _paint(): void;
-            baseline(value: number): BarPlot<X, Y>;
-            barAlignment(alignment: string): BarPlot<X, Y>;
+            baseline(value: number): NewStyleBarPlot<X, Y>;
+            barAlignment(alignment: string): NewStyleBarPlot<X, Y>;
             selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
             selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
             selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
             selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
-            deselectAll(): BarPlot<X, Y>;
+            deselectAll(): NewStyleBarPlot<X, Y>;
             _updateDomainer(scale: Scale<any, number>): void;
             _updateYDomainer(): void;
             _updateXDomainer(): void;
@@ -1063,11 +1063,11 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class VerticalBar<X> extends Plottable.Abstract.BarPlot<X, number> {
+        class VerticalBar<X> extends Plottable.Abstract.NewStyleBarPlot<X, number> {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.QuantitativeScale<number>);
+            constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.QuantitativeScale<number>);
             _updateYDomainer(): void;
         }
     }
@@ -1076,11 +1076,11 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class HorizontalBar<Y> extends Plottable.Abstract.BarPlot<number, Y> {
+        class HorizontalBar<Y> extends Plottable.Abstract.NewStyleBarPlot<number, Y> {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<number>, yScale: Plottable.Abstract.Scale<Y, number>);
+            constructor(xScale: Plottable.Abstract.QuantitativeScale<number>, yScale: Plottable.Abstract.Scale<Y, number>);
             _updateXDomainer(): void;
             _generateAttrToProjector(): IAttributeToProjector;
         }
@@ -1113,31 +1113,6 @@ declare module Plottable {
             _getResetYFunction(): IAppliedAccessor;
             _paint(): void;
             _wholeDatumAttributes(): string[];
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
-        class NewStyleBarPlot<X, Y> extends NSXYPlot<X, Y> {
-            static _barAlignmentToFactor: {
-                [x: string]: number;
-            };
-            _baseline: D3.Selection;
-            _baselineValue: number;
-            _barAlignmentFactor: number;
-            _isVertical: boolean;
-            _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
-            _getDrawer(key: string): Plottable._Drawer.Rect;
-            _setup(): void;
-            _paint(): void;
-            baseline(value: number): any;
-            _updateDomainer(scale: Scale<any, number>): any;
-            _generateAttrToProjector(): IAttributeToProjector;
-            _updateXDomainer(): any;
-            _updateYDomainer(): any;
         }
     }
 }
@@ -1333,8 +1308,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class BarHover extends Plottable.Abstract.Interaction {
-            _componentToListenTo: Plottable.Abstract.BarPlot<any, any>;
-            _anchor(barPlot: Plottable.Abstract.BarPlot<any, any>, hitBox: D3.Selection): void;
+            _componentToListenTo: Plottable.Abstract.NewStyleBarPlot<any, any>;
+            _anchor(barPlot: Plottable.Abstract.NewStyleBarPlot<any, any>, hitBox: D3.Selection): void;
             hoverMode(): string;
             hoverMode(mode: string): BarHover;
             onHover(callback: (datum: any, bar: D3.Selection) => any): BarHover;

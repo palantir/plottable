@@ -818,15 +818,15 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class BarPlot<X, Y> extends XYPlot<X, Y> {
-            constructor(dataset: any, xScale: Scale<X, number>, yScale: Scale<Y, number>);
-            baseline(value: number): BarPlot<X, Y>;
-            barAlignment(alignment: string): BarPlot<X, Y>;
+        class NewStyleBarPlot<X, Y> extends NSXYPlot<X, Y> {
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
+            baseline(value: number): NewStyleBarPlot<X, Y>;
+            barAlignment(alignment: string): NewStyleBarPlot<X, Y>;
             selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
             selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
             selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
             selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
-            deselectAll(): BarPlot<X, Y>;
+            deselectAll(): NewStyleBarPlot<X, Y>;
         }
     }
 }
@@ -834,8 +834,8 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class VerticalBar<X> extends Plottable.Abstract.BarPlot<X, number> {
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.QuantitativeScale<number>);
+        class VerticalBar<X> extends Plottable.Abstract.NewStyleBarPlot<X, number> {
+            constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.QuantitativeScale<number>);
         }
     }
 }
@@ -843,8 +843,8 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class HorizontalBar<Y> extends Plottable.Abstract.BarPlot<number, Y> {
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<number>, yScale: Plottable.Abstract.Scale<Y, number>);
+        class HorizontalBar<Y> extends Plottable.Abstract.NewStyleBarPlot<number, Y> {
+            constructor(xScale: Plottable.Abstract.QuantitativeScale<number>, yScale: Plottable.Abstract.Scale<Y, number>);
         }
     }
 }
@@ -864,16 +864,6 @@ declare module Plottable {
         class Area<X> extends Line<X> {
             constructor(xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Area<X>;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
-        class NewStyleBarPlot<X, Y> extends NSXYPlot<X, Y> {
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
-            baseline(value: number): any;
         }
     }
 }

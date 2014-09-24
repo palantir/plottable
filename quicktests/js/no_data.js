@@ -26,8 +26,8 @@ function run(div, data, Plottable) {
     var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset([]);
     var linePlot = new Plottable.Plot.Line(xScale, yScale).addDataset([]);
     var areaPlot = new Plottable.Plot.Area(xScale, yScale).addDataset([]);
-    var vbarPlot = new Plottable.Plot.VerticalBar([], xScale, yScale);
-    var hbarPlot = new Plottable.Plot.HorizontalBar([], xScale, yScale);
+    var vbarPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+    var hbarPlot = new Plottable.Plot.HorizontalBar(xScale, yScale);
 
     //title + legend
 
