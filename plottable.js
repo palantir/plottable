@@ -5522,23 +5522,23 @@ var Plottable;
                 var datasets = this._getDatasetsInOrder();
                 var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-                var positiveValuedDatasets = [];
-                var negativeValuedDatasets = [];
+                var positiveDatasets = [];
+                var negativeDatasets = [];
                 datasets.forEach(function (dataset) {
-                    var positiveValuedDataset = [];
-                    var negativeValuedDataset = [];
+                    var positiveDataset = [];
+                    var negativeDataset = [];
                     dataset.data().forEach(function (datum) {
                         var key = keyAccessor(datum);
                         var value = valueAccessor(datum);
                         var positiveValue = value >= 0 ? value : 0;
-                        positiveValuedDataset.push({ key: key, value: positiveValue });
+                        positiveDataset.push({ key: key, value: positiveValue });
                         var negativeValue = value <= 0 ? value : 0;
-                        negativeValuedDataset.push({ key: key, value: negativeValue });
+                        negativeDataset.push({ key: key, value: negativeValue });
                     });
-                    positiveValuedDatasets.push(positiveValuedDataset);
-                    negativeValuedDatasets.push(negativeValuedDataset);
+                    positiveDatasets.push(positiveDataset);
+                    negativeDatasets.push(negativeDataset);
                 });
-                this.setDatasetStackOffsets(this._stack(positiveValuedDatasets), this._stack(negativeValuedDatasets));
+                this.setDatasetStackOffsets(this._stack(positiveDatasets), this._stack(negativeDatasets));
                 var maxY = Plottable._Util.Methods.max(datasets, function (dataset) {
                     return Plottable._Util.Methods.max(dataset.data(), function (datum) {
                         return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
