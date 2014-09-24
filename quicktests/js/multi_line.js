@@ -33,12 +33,12 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   //rendering
-  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale)
+  var linePlot = new Plottable.Plot.Line(xScale, yScale)
       .addDataset(d1)
       .addDataset(d2)
       .addDataset(d3)
       .addDataset(d4)
-      .attr("fill", "color", colorScale)
+      .attr("stroke", "color", colorScale)
       .attr("r", function(d) {return d.x * 12});
 
   //title + legend
@@ -49,7 +49,7 @@ function run(div, data, Plottable) {
 
   var basicTable = new Plottable.Component.Table().addComponent(0,2, titleTable)
               .addComponent(1, 1, yAxis)
-              .addComponent(1, 2, scatterPlot)
+              .addComponent(1, 2, linePlot)
               .addComponent(2, 2, xAxis);
 
   basicTable.renderTo(svg);
