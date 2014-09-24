@@ -3947,22 +3947,6 @@ var Plottable;
                 this._computedHeight = null;
                 _super.prototype._invalidateLayout.call(this);
             };
-            /**
-             * Gets the current width.
-             *
-             * @returns {number} The current width.
-             */
-            Axis.prototype.width = function () {
-                return _super.prototype.width.call(this);
-            };
-            /**
-             * Gets the current height.
-             *
-             * @returns {Axis} The current height.
-             */
-            Axis.prototype.height = function () {
-                return _super.prototype.height.call(this);
-            };
             Axis.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
                     return this._formatter;

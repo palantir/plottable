@@ -1684,18 +1684,6 @@ declare module Plottable {
             constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
             remove(): void;
             /**
-             * Gets the current width.
-             *
-             * @returns {number} The current width.
-             */
-            width(): number;
-            /**
-             * Gets the current height.
-             *
-             * @returns {Axis} The current height.
-             */
-            height(): number;
-            /**
              * Gets the current formatter on the axis. Data is passed through the
              * formatter before being displayed.
              *

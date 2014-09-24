@@ -237,24 +237,6 @@ export module Abstract {
     }
 
     /**
-     * Gets the current width.
-     *
-     * @returns {number} The current width.
-     */
-    public width(): number {
-      return super.width();
-    }
-
-    /**
-     * Gets the current height.
-     *
-     * @returns {Axis} The current height.
-     */
-    public height(): number {
-      return super.height();
-    }
-
-    /**
      * Gets the current formatter on the axis. Data is passed through the
      * formatter before being displayed.
      *
