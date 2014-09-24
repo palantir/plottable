@@ -22,6 +22,7 @@ export module Abstract {
 
       var datasets = this._getDatasetsInOrder();
       var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+
       var maxY = _Util.Methods.max(datasets, (dataset: any) => {
         return _Util.Methods.max(dataset.data(), (datum: any) => {
           return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
