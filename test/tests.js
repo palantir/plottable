@@ -869,7 +869,6 @@ describe("Labels", function () {
         var bbox = Plottable._Util.DOM.getBBox(text);
         assert.closeTo(bbox.height, label.height(), 1, "text height === label.minimumHeight()");
         label.orient("vertical-right");
-        label.renderTo(svg);
         text = content.select("text");
         bbox = Plottable._Util.DOM.getBBox(text);
         assertBBoxInclusion(label._element.select(".bounding-box"), text);
