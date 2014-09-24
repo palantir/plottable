@@ -80,7 +80,7 @@ export module Component {
         this.padTableToSize(this.nRows, this.nCols);
 
         var currentComponent = this.rows[row][col];
-        if (currentComponent != null) {
+        if (currentComponent) {
           throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
         }
 
