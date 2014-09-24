@@ -29,9 +29,11 @@ export module Abstract {
         dataset.data().forEach((datum) => {
           var key = keyAccessor(datum);
           var value = valueAccessor(datum);
+
           var positiveValue = value >= 0 ? value : 0;
-          var negativeValue = value <= 0 ? value : 0;
           positiveValuedDataset.push({key: key, value: positiveValue});
+
+          var negativeValue = value <= 0 ? value : 0;
           negativeValuedDataset.push({key: key, value: negativeValue});
         });
 
