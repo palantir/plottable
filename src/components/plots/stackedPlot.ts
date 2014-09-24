@@ -38,6 +38,10 @@ export module Abstract {
       this.stackedExtent[0] = Math.min(minY, 0);
     }
 
+    /**
+     * Goes through the datasets so that only negative values / 0 are placed in negativeDatasets
+     * and positive values / 0 are placed in positiveDatasets
+     */
     private populatePositiveNegativeDatasets(positiveDatasets: any[], negativeDatasets: any[]) {
       var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
