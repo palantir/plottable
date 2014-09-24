@@ -27,19 +27,19 @@ export module Abstract {
       var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
 
-      var dataArray = datasets.map((dataset) => {
+      var dataArray: StackedDatum[][] = datasets.map((dataset) => {
         return dataset.data().map((datum) => {
           return {key: keyAccessor(datum), value: valueAccessor(datum)};
         });
       });
 
-      var positiveDataArray = dataArray.map((data) => {
+      var positiveDataArray: StackedDatum[][] = dataArray.map((data) => {
         return data.map((datum) => {
           return {key: keyAccessor(datum), value: datum.value < 0 ? 0 : datum.value};
         });
       });
 
-      var negativeDataArray = dataArray.map((data) => {
+      var negativeDataArray: StackedDatum[][] = dataArray.map((data) => {
         return data.map((datum) => {
           return {key: keyAccessor(datum), value: datum.value > 0 ? 0 : datum.value};
         });
