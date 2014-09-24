@@ -15,13 +15,12 @@ export module Abstract {
     }
 
     private stack() {
-      var datasets = this._getDatasetsInOrder();
-
       var positiveDatasets: any[][] = [];
       var negativeDatasets: any[][] = [];
       this.populatePositiveNegativeDatasets(positiveDatasets, negativeDatasets);
       this.setDatasetStackOffsets(this._stack(positiveDatasets), this._stack(negativeDatasets));
 
+      var datasets = this._getDatasetsInOrder();
       var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
       var maxY = _Util.Methods.max(datasets, (dataset: any) => {
         return _Util.Methods.max(dataset.data(), (datum: any) => {

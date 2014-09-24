@@ -5462,11 +5462,11 @@ var Plottable;
                 }
             };
             Stacked.prototype.stack = function () {
-                var datasets = this._getDatasetsInOrder();
                 var positiveDatasets = [];
                 var negativeDatasets = [];
                 this.populatePositiveNegativeDatasets(positiveDatasets, negativeDatasets);
                 this.setDatasetStackOffsets(this._stack(positiveDatasets), this._stack(negativeDatasets));
+                var datasets = this._getDatasetsInOrder();
                 var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
                 var maxY = Plottable._Util.Methods.max(datasets, function (dataset) {
                     return Plottable._Util.Methods.max(dataset.data(), function (datum) {
