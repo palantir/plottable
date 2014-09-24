@@ -3,7 +3,7 @@
 module Plottable {
 export module Interaction {
   export class Click extends Abstract.Interaction {
-    private _callback: (x: number, y: number) => any;
+    private _callback: (p: Point) => any;
 
     public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
@@ -11,7 +11,7 @@ export module Interaction {
         var xy = d3.mouse(hitBox.node());
         var x = xy[0];
         var y = xy[1];
-        this._callback(x, y);
+        this._callback({x: x, y: y});
       });
     }
 
@@ -22,9 +22,9 @@ export module Interaction {
     /**
      * Sets a callback to be called when a click is received.
      *
-     * @param {(x: number, y: number) => any} cb Callback to be called. Takes click x and y in pixels.
+     * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
      */
-    public callback(cb: (x: number, y: number) => any): Click {
+    public callback(cb: (p: Point) => any): Click {
       this._callback = cb;
       return this;
     }

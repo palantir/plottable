@@ -115,14 +115,14 @@ describe("Interactions", () => {
       var timesCalled = 0;
       interaction.dragstart(function(a: Plottable.Point) {
         timesCalled++;
-        var expectedStartLocation = { x: dragstartX, y: dragstartY };
+        var expectedStartLocation = {x: dragstartX, y: dragstartY};
         assert.deepEqual(a, expectedStartLocation, "areaCallback called with null arg on dragstart");
       });
       interaction.dragend(function(a: Plottable.Point, b: Plottable.Point) {
         timesCalled++;
         var expectedStart = {
           x: dragstartX,
-          y: dragstartY,
+          y: dragstartY
         };
         var expectedEnd = {
           x: dragendX,
@@ -198,7 +198,7 @@ describe("Interactions", () => {
         timesCalled++;
         var expectedY = dragstartY;
         assert.deepEqual(a.y, expectedY, "areaCallback called with null arg on dragstart");
-      })
+      });
       interaction.dragend(function(a: Plottable.Point, b: Plottable.Point) {
         timesCalled++;
         var expectedStartY = dragstartY;

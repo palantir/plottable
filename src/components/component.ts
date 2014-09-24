@@ -27,8 +27,8 @@ export module Abstract {
     private boxContainer: D3.Selection;
     private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
-    private _width : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
-    private _height: number;
+    private _width = 0; // Width and height of the component. Used to size the hitbox, bounding box, etc
+    private _height = 0;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
     private cssClasses: string[] = ["component"];
@@ -208,10 +208,19 @@ export module Abstract {
         } else {
           selection = d3.select(element);
         }
+        if (!selection.node() || selection.node().nodeName !== "svg") {
+          throw new Error("Plottable requires a valid SVG to renderTo");
+        }
         this._anchor(selection);
+      }
+      if (this._element == null) {
+        throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
+          or a D3.Selection, or a selector string");
       }
       this._computeLayout();
       this._render();
+      // flush so that consumers can immediately attach to stuff we create in the DOM
+      Core.RenderController.flush();
       return this;
     }
 

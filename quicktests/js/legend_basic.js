@@ -27,8 +27,8 @@ function run(div, data, Plottable) {
 
   var renderAreaD1 = new Plottable.Plot.Scatter(dataseries1, xScale, yScale);
   var renderAreaD2 = new Plottable.Plot.Line(dataseries2, xScale, yScale);
-  renderAreaD1.project("fill", colorProjector);
-  renderAreaD2.project("stroke", colorProjector);
+  renderAreaD1.attr("fill", colorProjector);
+  renderAreaD2.attr("stroke", colorProjector);
   var renderAreas = renderAreaD1.merge(renderAreaD2);
 
 

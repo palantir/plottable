@@ -15,7 +15,7 @@ function run(div, data, Plottable) {
   var ds = new Plottable.Dataset(dates);
   var parse = function(d) {return d3.time.format("%x").parse(d.x);};
   var plot = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
-                      .project("x", parse, xScale);
+                      .attr("x", parse, xScale);
 
   var xAxis = new Plottable.Axis.Time(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
@@ -24,7 +24,14 @@ function run(div, data, Plottable) {
 
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var renderGroup = plot.merge(gridlines);
-  new Plottable.Template.StandardChart().center(renderGroup).xAxis(xAxis).yAxis(yAxis).titleLabel(title).renderTo(svg);
+  var titleTable = new Plottable.Component.Table([[title]]);
+  var contentTable = new Plottable.Component.Table([
+                                                    [yAxis, renderGroup],
+                                                    [null, xAxis]]);
+  new Plottable.Component.Table([
+                                 [titleTable],
+                                 [contentTable]
+                                 ]).renderTo(svg);
 
 
   function addData(){

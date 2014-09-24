@@ -33,6 +33,7 @@
 /// <reference path="scales/scaleDomainCoordinator.ts" />
 
 /// <reference path="drawers/baseDrawer.ts" />
+/// <reference path="drawers/arcDrawer.ts" />
 /// <reference path="drawers/areaDrawer.ts" />
 /// <reference path="drawers/rectDrawer.ts" />
 
@@ -52,6 +53,7 @@
 /// <reference path="components/table.ts" />
 
 /// <reference path="components/plots/plot.ts" />
+/// <reference path="components/plots/piePlot.ts" />
 /// <reference path="components/plots/xyPlot.ts" />
 /// <reference path="components/plots/newStylePlot.ts" />
 /// <reference path="components/plots/scatterPlot.ts" />
@@ -87,5 +89,3 @@
 
 /// <reference path="dispatchers/dispatcher.ts" />
 /// <reference path="dispatchers/mouseDispatcher.ts" />
-
-/// <reference path="templates/standardChart.ts" />

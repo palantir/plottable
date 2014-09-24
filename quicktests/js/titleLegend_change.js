@@ -44,12 +44,12 @@ function run(div, data, Plottable) {
   var renderOrange = new Plottable.Plot.Scatter(dataseries5, xScale, yScale);
   var renderGrape = new Plottable.Plot.Scatter(dataseries6, xScale, yScale);
 
-  renderAreaD1.project("fill", colorProjector);
-  renderAreaD2.project("stroke", colorProjector);
-  renderApple.project("fill", colorProjector);
-  renderBanana.project("stroke", colorProjector);
-  renderOrange.project("fill", colorProjector);
-  renderGrape.project("fill", colorProjector);
+  renderAreaD1.attr("fill", colorProjector);
+  renderAreaD2.attr("stroke", colorProjector);
+  renderApple.attr("fill", colorProjector);
+  renderBanana.attr("stroke", colorProjector);
+  renderOrange.attr("fill", colorProjector);
+  renderGrape.attr("fill", colorProjector);
 
   var renderArea = renderAreaD1.merge(renderAreaD2);
   function emptyTitle() {

@@ -144,7 +144,7 @@ describe("Legends", () => {
     svg.remove();
   });
 
-  it("icon radius is not too small or too big", () => {
+  it("iconHeight / 2 < circleHeight < iconHeight", () => {
     color.domain(["foo"]);
     legend.renderTo(svg);
     var style = legend._element.append("style");
@@ -155,8 +155,8 @@ describe("Legends", () => {
       var circle = legend._content.select("circle");
       var textHeight = Plottable._Util.DOM.getBBox(text).height;
       var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
-      assert.operator(circleHeight, "<", textHeight, "icons are too big. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
-      assert.operator(circleHeight, ">", textHeight / 2, "icons are too small. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
+      assert.operator(circleHeight, "<", textHeight, "icons too small: iconHeight < circleHeight");
+      assert.operator(circleHeight, ">", textHeight / 2, "icons too big: iconHeight / 2 > circleHeight");
     }
 
     verifyCircleHeight();
@@ -520,7 +520,7 @@ describe("HorizontalLegend", () => {
   var colorScale: Plottable.Scale.Color;
   var horizLegend: Plottable.Component.HorizontalLegend;
 
-  var entrySelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ENTRY_CLASS
+  var entrySelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ENTRY_CLASS;
   var rowSelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ROW_CLASS;
 
   beforeEach(() => {

@@ -19,7 +19,7 @@ describe("NumericAxis", () => {
     return true;
   }
 
-  function assertBoxInside(inner: ClientRect, outer: ClientRect, epsilon = 0, message="") {
+  function assertBoxInside(inner: ClientRect, outer: ClientRect, epsilon = 0, message = "") {
     assert.operator(inner.left, ">", outer.left - epsilon, message + " (box inside (left))");
     assert.operator(inner.right, "<", outer.right + epsilon, message + " (box inside (right))");
     assert.operator(inner.top, ">", outer.top - epsilon, message + " (box inside (top))");

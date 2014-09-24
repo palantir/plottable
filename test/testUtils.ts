@@ -108,6 +108,11 @@ class MultiTestVerifier {
   }
 }
 
+// for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
+function normalizePath(pathString: string) {
+  return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
+}
+
 function triggerFakeUIEvent(type: string, target: D3.Selection) {
   var e = <UIEvent> document.createEvent("UIEvents");
   e.initUIEvent(type, true, true, window, 1);

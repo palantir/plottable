@@ -30,6 +30,7 @@ function run(div, data, Plottable) {
                                             [null,  xAxis]]).renderTo(svg);
 
   //callbacks
+  var dragBox = new Plottable.Interaction.XYDragBox();
   var cb_drag = function(start, end) {
     var minX = Math.min(start.x, end.x);
     var maxX = Math.max(start.x, end.x);
@@ -39,21 +40,20 @@ function run(div, data, Plottable) {
     barPlot.selectBar({min: minX, max: maxX},
                       {min: minY, max: maxY},
                       true);
-    drag_interaction.clearBox();
   };
+  dragBox.dragend(cb_drag);
 
-  var cb_click = function(x, y) {
-      barPlot.selectBar(x, y, true);
+  var cb_click = function(p) {
+      barPlot.selectBar(p.x, p.y, true);
   };
 
   var cb_reset = function() {
-      barPlot.deselectAll();
+    barPlot.deselectAll();
+    dragBox.clearBox();
   };
 
     //register interactions
-  renderGroup.registerInteraction(
-    new Plottable.Interaction.XYDragBox().dragend(cb_drag)
-  );
+  renderGroup.registerInteraction(dragBox);
 
   renderGroup.registerInteraction(
     new Plottable.Interaction.Click().callback(cb_click)

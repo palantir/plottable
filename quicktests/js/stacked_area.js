@@ -25,9 +25,9 @@ function run(div, data, Plottable) {
     .addDataset("d1", data[0])
     .addDataset("d2", data[1])
     .addDataset("d3", data[2])
-    .project("x", "name", xScale)
-    .project("y", "y", yScale)
-    .project("fill", "type", colorScale);
+    .attr("x", "name", xScale)
+    .attr("y", "y", yScale)
+    .attr("fill", "type", colorScale);
 
   var center = stackedAreaRenderer.merge(new Plottable.Component.Legend(colorScale));
 
