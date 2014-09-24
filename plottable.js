@@ -4571,11 +4571,11 @@ var Plottable;
                 this._ANIMATION_DURATION = 250;
                 this._projectors = {};
                 this.animateOnNextRender = true;
+                this.clipPathEnabled = true;
                 this.classed("plot", true);
                 this._key2DatasetDrawerKey = d3.map();
                 this._datasetKeysInOrder = [];
                 this.nextSeriesIndex = 0;
-                this.clipPathEnabled = true;
             }
             NSPlot.prototype._anchor = function (element) {
                 _super.prototype._anchor.call(this, element);
@@ -4589,20 +4589,58 @@ var Plottable;
                 this._renderArea = this._content.append("g").classed("render-area", true);
                 this._getDrawersInOrder().forEach(function (d) { return d._renderArea = _this._renderArea.append("g"); });
             };
+            NSPlot.prototype.remove = function () {
+                var _this = this;
+                _super.prototype.remove.call(this);
+                this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
+                var properties = Object.keys(this._projectors);
+                properties.forEach(function (property) {
+                    var projector = _this._projectors[property];
+                    if (projector.scale != null) {
+                        projector.scale.broadcaster.deregisterListener(_this);
+                    }
+                });
+            };
+            NSPlot.prototype.addDataset = function (keyOrDataset, dataset) {
+                if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
+                    throw new Error("invalid input to addDataset");
+                }
+                if (typeof (keyOrDataset) === "string" && keyOrDataset[0] === "_") {
+                    Plottable._Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
+                }
+                var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
+                var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
+                var dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
+                this._addDataset(key, dataset);
+                return this;
+            };
+            NSPlot.prototype._addDataset = function (key, dataset) {
+                var _this = this;
+                if (this._key2DatasetDrawerKey.has(key)) {
+                    this.removeDataset(key);
+                }
+                ;
+                var drawer = this._getDrawer(key);
+                var ddk = { drawer: drawer, dataset: dataset, key: key };
+                this._datasetKeysInOrder.push(key);
+                this._key2DatasetDrawerKey.set(key, ddk);
+                if (this._isSetup) {
+                    drawer._renderArea = this._renderArea.append("g");
+                }
+                dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
+                this._onDatasetUpdate();
+            };
+            NSPlot.prototype._getDrawer = function (key) {
+                return new Abstract._Drawer(key);
+            };
+            NSPlot.prototype._getAnimator = function (drawer, index) {
+                return new Plottable.Animator.Null();
+            };
             NSPlot.prototype._onDatasetUpdate = function () {
                 this._updateScaleExtents();
                 this.animateOnNextRender = true;
                 this._dataChanged = true;
                 this._render();
-            };
-            NSPlot.prototype.animate = function (enabled) {
-                this._animate = enabled;
-                return this;
-            };
-            NSPlot.prototype.detach = function () {
-                _super.prototype.detach.call(this);
-                this._updateScaleExtents();
-                return this;
             };
             NSPlot.prototype.attr = function (attrToSet, accessor, scale) {
                 return this.project(attrToSet, accessor, scale);
@@ -4644,51 +4682,18 @@ var Plottable;
                     this.animateOnNextRender = false;
                 }
             };
-            NSPlot.prototype.remove = function () {
-                var _this = this;
-                var properties = Object.keys(this._projectors);
-                properties.forEach(function (property) {
-                    var projector = _this._projectors[property];
-                    if (projector.scale != null) {
-                        projector.scale.broadcaster.deregisterListener(_this);
-                    }
-                });
-                this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
-            };
-            NSPlot.prototype.addDataset = function (keyOrDataset, dataset) {
-                if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
-                    throw new Error("invalid input to addDataset");
-                }
-                if (typeof (keyOrDataset) === "string" && keyOrDataset[0] === "_") {
-                    Plottable._Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
-                }
-                var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
-                var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
-                var dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
-                this._addDataset(key, dataset);
+            NSPlot.prototype.animate = function (enabled) {
+                this._animate = enabled;
                 return this;
             };
-            NSPlot.prototype._addDataset = function (key, dataset) {
+            NSPlot.prototype.detach = function () {
+                _super.prototype.detach.call(this);
+                this._updateScaleExtents();
+                return this;
+            };
+            NSPlot.prototype._updateScaleExtents = function () {
                 var _this = this;
-                if (this._key2DatasetDrawerKey.has(key)) {
-                    this.removeDataset(key);
-                }
-                ;
-                var drawer = this._getDrawer(key);
-                var ddk = { drawer: drawer, dataset: dataset, key: key };
-                this._datasetKeysInOrder.push(key);
-                this._key2DatasetDrawerKey.set(key, ddk);
-                if (this._isSetup) {
-                    drawer._renderArea = this._renderArea.append("g");
-                }
-                dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
-                this._onDatasetUpdate();
-            };
-            NSPlot.prototype._getDrawer = function (key) {
-                return new Abstract._Drawer(key);
-            };
-            NSPlot.prototype._getAnimator = function (drawer, index) {
-                return new Plottable.Animator.Null();
+                d3.keys(this._projectors).forEach(function (attr) { return _this._updateScaleExtent(attr); });
             };
             NSPlot.prototype._updateScaleExtent = function (attr) {
                 var _this = this;
@@ -4706,9 +4711,22 @@ var Plottable;
                     });
                 }
             };
-            NSPlot.prototype._updateScaleExtents = function () {
-                var _this = this;
-                d3.keys(this._projectors).forEach(function (attr) { return _this._updateScaleExtent(attr); });
+            NSPlot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
+                if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
+                    return this._animators[animatorKey].animate(selection, attrToProjector);
+                }
+                else {
+                    return selection.attr(attrToProjector);
+                }
+            };
+            NSPlot.prototype.animator = function (animatorKey, animator) {
+                if (animator === undefined) {
+                    return this._animators[animatorKey];
+                }
+                else {
+                    this._animators[animatorKey] = animator;
+                    return this;
+                }
             };
             NSPlot.prototype.datasetOrder = function (order) {
                 if (order === undefined) {
@@ -4762,23 +4780,6 @@ var Plottable;
                     var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
                     d.draw(datasets[i].data(), attrHash, animator);
                 });
-            };
-            NSPlot.prototype.animator = function (animatorKey, animator) {
-                if (animator === undefined) {
-                    return this._animators[animatorKey];
-                }
-                else {
-                    this._animators[animatorKey] = animator;
-                    return this;
-                }
-            };
-            NSPlot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
-                if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
-                    return this._animators[animatorKey].animate(selection, attrToProjector);
-                }
-                else {
-                    return selection.attr(attrToProjector);
-                }
             };
             return NSPlot;
         })(Abstract.Component);

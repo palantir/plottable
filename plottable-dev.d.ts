@@ -914,9 +914,9 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class NSPlot extends Component {
+            _dataChanged: boolean;
             _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
             _datasetKeysInOrder: string[];
-            _dataChanged: boolean;
             _renderArea: D3.Selection;
             _animate: boolean;
             _animators: Plottable.Animator.IPlotAnimatorMap;
@@ -927,13 +927,6 @@ declare module Plottable {
             constructor();
             _anchor(element: D3.Selection): void;
             _setup(): void;
-            _onDatasetUpdate(): void;
-            animate(enabled: boolean): NSPlot;
-            detach(): NSPlot;
-            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSPlot;
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSPlot;
-            _generateAttrToProjector(): IAttributeToProjector;
-            _doRender(): void;
             remove(): void;
             addDataset(key: string, dataset: Dataset): NSPlot;
             addDataset(key: string, dataset: any[]): NSPlot;
@@ -942,17 +935,24 @@ declare module Plottable {
             _addDataset(key: string, dataset: Dataset): void;
             _getDrawer(key: string): _Drawer;
             _getAnimator(drawer: _Drawer, index: number): Plottable.Animator.IPlotAnimator;
-            _updateScaleExtent(attr: string): void;
+            _onDatasetUpdate(): void;
+            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSPlot;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSPlot;
+            _generateAttrToProjector(): IAttributeToProjector;
+            _doRender(): void;
+            animate(enabled: boolean): NSPlot;
+            detach(): NSPlot;
             _updateScaleExtents(): void;
+            _updateScaleExtent(attr: string): void;
+            _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any;
+            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
+            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
             datasetOrder(): string[];
             datasetOrder(order: string[]): NSPlot;
             removeDataset(key: string): NSPlot;
             _getDatasetsInOrder(): Dataset[];
             _getDrawersInOrder(): _Drawer[];
             _paint(): void;
-            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
-            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
-            _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any;
         }
     }
 }

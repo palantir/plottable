@@ -748,20 +748,20 @@ declare module Plottable {
     module Abstract {
         class NSPlot extends Component {
             constructor();
-            animate(enabled: boolean): NSPlot;
-            detach(): NSPlot;
-            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSPlot;
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSPlot;
             remove(): void;
             addDataset(key: string, dataset: Dataset): NSPlot;
             addDataset(key: string, dataset: any[]): NSPlot;
             addDataset(dataset: Dataset): NSPlot;
             addDataset(dataset: any[]): NSPlot;
+            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSPlot;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSPlot;
+            animate(enabled: boolean): NSPlot;
+            detach(): NSPlot;
+            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
+            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
             datasetOrder(): string[];
             datasetOrder(order: string[]): NSPlot;
             removeDataset(key: string): NSPlot;
-            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
-            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
         }
     }
 }

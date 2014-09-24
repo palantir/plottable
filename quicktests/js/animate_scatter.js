@@ -17,7 +17,7 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   circleRenderer = new Plottable.Plot.Scatter(xScale, yScale);
-  circleRenderer.addDataset(data[0].slice(0, 10)).addDataset(data[1].slice(0, 10))
+  circleRenderer.addDataset(data[0].slice(0, 10)).addDataset(data[1].slice(0, 10));
   circleRenderer.attr("r", 8);
   circleRenderer.attr("opacity", 0.75);
   circleRenderer.animate(doAnimate);
