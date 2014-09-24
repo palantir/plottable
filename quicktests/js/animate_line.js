@@ -7,7 +7,6 @@ function makeData() {
 
 function run(div, data, Plottable) {
   "use strict";
-
   var svg = div.append("svg").attr("height", 500);
   var doAnimate = true;
   var xScale = new Plottable.Scale.Linear();
@@ -16,7 +15,7 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var lineRenderer = new Plottable.Plot.Line(data[0].slice(0, 20), xScale, yScale);
+  var lineRenderer = new Plottable.Plot.Line(xScale, yScale).addDataset(data[0].slice(0, 20));
   lineRenderer.attr("opacity", 0.75);
   lineRenderer.animate(doAnimate);
 

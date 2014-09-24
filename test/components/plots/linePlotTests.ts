@@ -24,10 +24,11 @@ describe("Plots", () => {
       yAccessor = (d: any) => d.bar;
       colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
       simpleDataset = new Plottable.Dataset([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
-      linePlot = new Plottable.Plot.Line(simpleDataset, xScale, yScale);
+      linePlot = new Plottable.Plot.Line(xScale, yScale);
       linePlot.project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)
               .project("stroke", colorAccessor)
+              .addDataset(simpleDataset)
               .renderTo(svg);
       renderArea = linePlot._renderArea;
     });

@@ -17,7 +17,7 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var renderAreaD1 = new Plottable.Plot.Area(dataSeries, xScale, yScale);
+  var renderAreaD1 = new Plottable.Plot.Area(xScale, yScale).addDataset(dataSeries);
   var fillAccessor = function() { return "steelblue"; };
   renderAreaD1.attr("fill", fillAccessor);
 

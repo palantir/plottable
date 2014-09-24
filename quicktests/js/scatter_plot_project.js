@@ -14,7 +14,8 @@ function run(div, data, Plottable) {
 
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  var scatterRenderer = new Plottable.Plot.Scatter(xScale, yScale).addDataset(d)
+  var scatterRenderer = new Plottable.Plot.Scatter(xScale, yScale)
+    .addDataset(d)
     .project("x", "Distance", xScale)
     .project("y", function(d) {return Math.abs(d.Mag);}, yScale)
     .project("r", function(d) {return Math.abs(d.AbsMag);})

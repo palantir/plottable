@@ -48,15 +48,16 @@ function run(div, data, Plottable) {
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
 
+    // Hackhack assoc with broken metadata / no way to color series efficiently
     var colorProjector = function(d, i, m) {
-       return colorScale1.scale(m.name);
+       return colorScale1.scale("series1");
     };
 
     //rendering
-    var renderAreaD1 = new Plottable.Plot.Line(dataseries1, xScale, yScale);
-    var renderAreaD2 = new Plottable.Plot.Line(dataseries2, xScale, yScale);
-    var renderAreaD3 = new Plottable.Plot.Line(dataseries3, xScale, yScale);
-    var renderAreaD4 = new Plottable.Plot.Line(dataseries4, xScale, yScale);
+    var renderAreaD1 = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries1);
+    var renderAreaD2 = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries2);
+    var renderAreaD3 = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries3);
+    var renderAreaD4 = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries4);
     renderAreaD1.attr("stroke", colorProjector);
     renderAreaD2.attr("stroke", colorProjector);
     renderAreaD3.attr("stroke", colorProjector);

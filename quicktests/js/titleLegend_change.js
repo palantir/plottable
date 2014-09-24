@@ -32,15 +32,16 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
 
+  // metadata is broken
   var colorProjector = function(d, i, m) {
-    return colorScale1.scale(m.name);
+    return colorScale1.scale("series1");
   };
 
   //rendering
   var renderAreaD1 = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries1);
-  var renderAreaD2 = new Plottable.Plot.Line(dataseries2, xScale, yScale);
-  var renderApple = new Plottable.Plot.Area(dataseries3, xScale, yScale);
-  var renderBanana = new Plottable.Plot.Line(dataseries4, xScale, yScale);
+  var renderAreaD2 = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries2);
+  var renderApple = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries3);
+  var renderBanana = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries4);
   var renderOrange = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries5);
   var renderGrape = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries6);
 

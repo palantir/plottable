@@ -1090,12 +1090,10 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Line<X> extends Plottable.Abstract.XYPlot<X, number> {
+        class Line<X> extends Plottable.Abstract.NSXYPlot<X, number> {
             _yScale: Plottable.Abstract.QuantitativeScale<number>;
             _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
-            _setup(): void;
-            _appendPath(): void;
+            constructor(xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
             _getResetYFunction(): (d: any, i: number) => number;
             _generateAttrToProjector(): IAttributeToProjector;
             _paint(): void;
@@ -1108,8 +1106,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Area<X> extends Line<X> {
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
-            _appendPath(): void;
+            constructor(xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
             _onDatasetUpdate(): void;
             _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Area<X>;

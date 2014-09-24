@@ -15,7 +15,7 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left").tickLabelPosition("bottom");
 
-  var renderAreaD1 = new Plottable.Plot.Scatter(data[0].slice(0, 21), xScale, yScale);
+  var renderAreaD1 = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data[0].slice(0, 21));
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var renderGroup = renderAreaD1.merge(gridlines);
   var chart = new Plottable.Component.Table([[yAxis, renderGroup],

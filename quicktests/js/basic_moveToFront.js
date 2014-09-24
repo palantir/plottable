@@ -32,11 +32,11 @@ function run(div, data, Plottable) {
     .addDataset(dataseries)
     .attr("fill", colorScale1.scale("scatter"))
     .attr("r", function(){return 10;});
-  var linePlot = new Plottable.Plot.Line(dataseries, xScale, yScale); //1
+  var linePlot = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries); //1
   linePlot
     .attr("stroke", colorScale1.scale("line"))
     .attr("stroke-width", function(){ return 5;});
-  var areaPlot = new Plottable.Plot.Area(dataseries, xScale, yScale); //2
+  var areaPlot = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries); //2
   areaPlot.attr("fill", colorScale1.scale("area"));
 
   //title + legend

@@ -27,7 +27,7 @@ function run(div, data, Plottable) {
   var yAxis2 = new Plottable.Axis.Numeric(yScale, "left");
 
   //rendering
-  var linePlot = new Plottable.Plot.Line(dataseries, xScale, yScale);
+  var linePlot = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries);
   var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries);
 
   var autoXLabel = new Plottable.Component.Label("autodomain X");

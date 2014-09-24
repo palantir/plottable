@@ -852,8 +852,8 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Line<X> extends Plottable.Abstract.XYPlot<X, number> {
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
+        class Line<X> extends Plottable.Abstract.NSXYPlot<X, number> {
+            constructor(xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
         }
     }
 }
@@ -862,7 +862,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Area<X> extends Line<X> {
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
+            constructor(xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Area<X>;
         }
     }

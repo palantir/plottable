@@ -118,8 +118,10 @@ describe("Scales", () => {
       xScale.domainer(new Plottable.Domainer());
       var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
       var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-      var renderAreaD1 = new Plottable.Plot.Line(ds1, xScale, yScale);
-      var renderAreaD2 = new Plottable.Plot.Line(ds2, xScale, yScale);
+      var renderAreaD1 = new Plottable.Plot.Line(xScale, yScale);
+      renderAreaD1.addDataset(ds1);
+      var renderAreaD2 = new Plottable.Plot.Line(xScale, yScale);
+      renderAreaD2.addDataset(ds2);
       var renderAreas = renderAreaD1.merge(renderAreaD2);
       renderAreas.renderTo(svg);
       assert.deepEqual(xScale.domain(), [0, 2]);

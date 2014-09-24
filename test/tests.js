@@ -1718,8 +1718,8 @@ describe("Plots", function () {
             yAccessor = function (d) { return d.bar; };
             colorAccessor = function (d, i, m) { return d3.rgb(d.foo, d.bar, i).toString(); };
             simpleDataset = new Plottable.Dataset([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
-            linePlot = new Plottable.Plot.Line(simpleDataset, xScale, yScale);
-            linePlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).renderTo(svg);
+            linePlot = new Plottable.Plot.Line(xScale, yScale);
+            linePlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).addDataset(simpleDataset).renderTo(svg);
             renderArea = linePlot._renderArea;
         });
         beforeEach(function () {
@@ -1794,8 +1794,8 @@ describe("Plots", function () {
             colorAccessor = function (d, i, m) { return d3.rgb(d.foo, d.bar, i).toString(); };
             fillAccessor = function () { return "steelblue"; };
             simpleDataset = new Plottable.Dataset([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
-            areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
-            areaPlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
+            areaPlot = new Plottable.Plot.Area(xScale, yScale);
+            areaPlot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
             renderArea = areaPlot._renderArea;
         });
         beforeEach(function () {
@@ -3959,7 +3959,9 @@ describe("Domainer", function () {
         var yScale = new Plottable.Scale.Linear();
         var domainer = yScale.domainer();
         var data = [{ x: 0, y: 0, y0: 0 }, { x: 5, y: 5, y0: 5 }];
-        var r = new Plottable.Plot.Area(data, xScale, yScale);
+        var dataset = new Plottable.Dataset(data);
+        var r = new Plottable.Plot.Area(xScale, yScale);
+        r.addDataset(dataset);
         var svg = generateSVG();
         r.project("x", "x", xScale);
         r.project("y", "y", yScale);
@@ -3985,7 +3987,7 @@ describe("Domainer", function () {
         assert.deepEqual(getExceptions(), [5], "projecting a different constant y0 removed the old exception and added a new one");
         r.project("y0", "y0", yScale);
         assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
-        r.dataset().data([{ x: 0, y: 0, y0: 0 }, { x: 5, y: 5, y0: 0 }]);
+        dataset.data([{ x: 0, y: 0, y0: 0 }, { x: 5, y: 5, y0: 0 }]);
         assert.deepEqual(getExceptions(), [0], "changing to constant values via change in datasource adds exception");
         svg.remove();
     });
@@ -4108,8 +4110,10 @@ describe("Scales", function () {
             xScale.domainer(new Plottable.Domainer());
             var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
             var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-            var renderAreaD1 = new Plottable.Plot.Line(ds1, xScale, yScale);
-            var renderAreaD2 = new Plottable.Plot.Line(ds2, xScale, yScale);
+            var renderAreaD1 = new Plottable.Plot.Line(xScale, yScale);
+            renderAreaD1.addDataset(ds1);
+            var renderAreaD2 = new Plottable.Plot.Line(xScale, yScale);
+            renderAreaD2.addDataset(ds2);
             var renderAreas = renderAreaD1.merge(renderAreaD2);
             renderAreas.renderTo(svg);
             assert.deepEqual(xScale.domain(), [0, 2]);

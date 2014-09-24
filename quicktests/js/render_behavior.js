@@ -19,7 +19,7 @@ function run(div, data, Plottable) {
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var barPlot = new Plottable.Plot.Area(dataseries, xScale, yScale).animate("true");
+  var barPlot = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries).animate("true");
 
   var label1  = new Plottable.Component.Label("dataset.data()", "horizontal");
   var label2  = new Plottable.Component.Label("change width + resize", "horizontal");
