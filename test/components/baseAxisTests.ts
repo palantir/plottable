@@ -66,7 +66,6 @@ describe("BaseAxis", () => {
     scale.domain([0, 10]);
     scale.range([0, SVG_WIDTH]);
     var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
-    baseAxis.gutter(SVG_HEIGHT);
     var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     (<any> baseAxis)._getTickValues = function() { return tickValues; };
     baseAxis.renderTo(svg);
@@ -85,8 +84,8 @@ describe("BaseAxis", () => {
     assert.isNotNull(baseline.node(), "baseline was drawn");
     assert.strictEqual(baseline.attr("x1"), "0");
     assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
-    assert.strictEqual(baseline.attr("y1"), String(SVG_HEIGHT));
-    assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
+    assert.strictEqual(baseline.attr("y1"), String(baseAxis.height()));
+    assert.strictEqual(baseline.attr("y2"), String(baseAxis.height()));
 
     svg.remove();
   });
@@ -99,7 +98,6 @@ describe("BaseAxis", () => {
     scale.domain([0, 10]);
     scale.range([0, SVG_HEIGHT]);
     var baseAxis = new Plottable.Abstract.Axis(scale, "left");
-    baseAxis.gutter(SVG_WIDTH);
     var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     (<any> baseAxis)._getTickValues = function() { return tickValues; };
     baseAxis.renderTo(svg);
@@ -109,8 +107,8 @@ describe("BaseAxis", () => {
     var baseline = svg.select(".baseline");
 
     assert.isNotNull(baseline.node(), "baseline was drawn");
-    assert.strictEqual(baseline.attr("x1"), String(SVG_WIDTH));
-    assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
+    assert.strictEqual(baseline.attr("x1"), String(baseAxis.width()));
+    assert.strictEqual(baseline.attr("x2"), String(baseAxis.width()));
     assert.strictEqual(baseline.attr("y1"), "0");
     assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
 

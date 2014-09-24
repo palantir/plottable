@@ -184,7 +184,6 @@ describe("BaseAxis", function () {
         scale.domain([0, 10]);
         scale.range([0, SVG_WIDTH]);
         var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
-        baseAxis.gutter(SVG_HEIGHT);
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
             return tickValues;
@@ -202,8 +201,8 @@ describe("BaseAxis", function () {
         assert.isNotNull(baseline.node(), "baseline was drawn");
         assert.strictEqual(baseline.attr("x1"), "0");
         assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
-        assert.strictEqual(baseline.attr("y1"), String(SVG_HEIGHT));
-        assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
+        assert.strictEqual(baseline.attr("y1"), String(baseAxis.height()));
+        assert.strictEqual(baseline.attr("y2"), String(baseAxis.height()));
         svg.remove();
     });
     it("draws ticks and baseline (vertical)", function () {
@@ -214,7 +213,6 @@ describe("BaseAxis", function () {
         scale.domain([0, 10]);
         scale.range([0, SVG_HEIGHT]);
         var baseAxis = new Plottable.Abstract.Axis(scale, "left");
-        baseAxis.gutter(SVG_WIDTH);
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
             return tickValues;
@@ -224,8 +222,8 @@ describe("BaseAxis", function () {
         assert.strictEqual(tickMarks[0].length, tickValues.length, "A tick mark was created for each value");
         var baseline = svg.select(".baseline");
         assert.isNotNull(baseline.node(), "baseline was drawn");
-        assert.strictEqual(baseline.attr("x1"), String(SVG_WIDTH));
-        assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
+        assert.strictEqual(baseline.attr("x1"), String(baseAxis.width()));
+        assert.strictEqual(baseline.attr("x2"), String(baseAxis.width()));
         assert.strictEqual(baseline.attr("y1"), "0");
         assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
         baseAxis.orient("right");
