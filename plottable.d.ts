@@ -1966,6 +1966,20 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             text(displayText: string): Label;
+            /**
+             * Gets the orientation of the Label.
+             *
+             * @returns {number} the current orientation.
+             */
+            orient(): string;
+            /**
+             * Sets the orientation of the Label.
+             *
+             * @param {number} newOrientation If provided, the desired orientation
+             * (horizontal/vertical-left/vertical-right).
+             * @returns {Label} The calling Label.
+             */
+            orient(newOrientation: string): Label;
         }
         class TitleLabel extends Label {
             /**

@@ -108,6 +108,37 @@ export module Component {
       }
     }
 
+    /**
+     * Gets the orientation of the Label.
+     *
+     * @returns {number} the current orientation.
+     */
+    public orient(): string;
+    /**
+     * Sets the orientation of the Label.
+     *
+     * @param {number} newOrientation If provided, the desired orientation
+     * (horizontal/vertical-left/vertical-right).
+     * @returns {Label} The calling Label.
+     */
+    public orient(newOrientation: string): Label;
+    public orient(newOrientation?: string): any {
+      if (newOrientation == null) {
+        return this.orientation;
+      } else {
+        newOrientation = newOrientation.toLowerCase();
+        if (newOrientation === "vertical-left")  { newOrientation = "left" ; }
+        if (newOrientation === "vertical-right") { newOrientation = "right"; }
+        if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
+          this.orientation = newOrientation;
+        } else {
+          throw new Error("unsupported orientation");
+        }
+        this._invalidateLayout();
+        return this;
+      }
+    }
+
     public _doRender() {
       super._doRender();
       this.textContainer.text("");

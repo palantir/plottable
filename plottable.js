@@ -4853,6 +4853,28 @@ var Plottable;
                     return this;
                 }
             };
+            Label.prototype.orient = function (newOrientation) {
+                if (newOrientation == null) {
+                    return this.orientation;
+                }
+                else {
+                    newOrientation = newOrientation.toLowerCase();
+                    if (newOrientation === "vertical-left") {
+                        newOrientation = "left";
+                    }
+                    if (newOrientation === "vertical-right") {
+                        newOrientation = "right";
+                    }
+                    if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
+                        this.orientation = newOrientation;
+                    }
+                    else {
+                        throw new Error("unsupported orientation");
+                    }
+                    this._invalidateLayout();
+                    return this;
+                }
+            };
             Label.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
                 this.textContainer.text("");

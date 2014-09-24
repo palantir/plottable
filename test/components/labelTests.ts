@@ -108,4 +108,24 @@ describe("Labels", () => {
   it("unsupported alignments and orientations are unsupported", () => {
     assert.throws(() => new Plottable.Component.Label("foo", "bar"), Error, "not a valid orientation");
   });
+
+  it("Label orientation can be changed after label is created", () => {
+    var svg = generateSVG(400, 400);
+    var label = new Plottable.Component.AxisLabel("CHANGING ORIENTATION");
+    label.renderTo(svg);
+
+    var content = label._content;
+    var text = content.select("text");
+    var bbox = Plottable._Util.DOM.getBBox(text);
+    assert.closeTo(bbox.height, label.height(), 1, "text height === label.minimumHeight()");
+    label.orient("vertical-right");
+    label.renderTo(svg);
+
+    text = content.select("text");
+    bbox = Plottable._Util.DOM.getBBox(text);
+    assertBBoxInclusion(label._element.select(".bounding-box"), text);
+    assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
+
+    svg.remove();
+  });
 });
