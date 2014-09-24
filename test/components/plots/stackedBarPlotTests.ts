@@ -101,10 +101,10 @@ describe("Plots", () => {
 
     var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
 
-    before(() => {
+    beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Ordinal();
-      yScale = new Plottable.Scale.Linear().domain([-4, 4]);
+      yScale = new Plottable.Scale.Linear();
 
       var data1 = [
         {x: "A", y: 1},
@@ -135,16 +135,21 @@ describe("Plots", () => {
       var bar2X = bar2.data()[0].x;
       var bar3X = bar3.data()[0].x;
       // check heights
-      assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 8, 0.01, "height is correct for bar0");
-      assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar1");
-      assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight) / 8, 0.01, "height is correct for bar2");
-      assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
+      assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 8, 10, "height is correct for bar0");
+      assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight) / 2, 10, "height is correct for bar1");
+      assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight) / 8, 10, "height is correct for bar2");
+      assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 10, "height is correct for bar3");
       // now check y values for stacking correctly
-      assert.closeTo(numAttr(bar0, "y"), (400 - axisHeight) / 8 * 3, 0.01, "y is correct for bar0");
-      assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 2, 0.01, "y is correct for bar1");
-      assert.closeTo(numAttr(bar2, "y"), (400 - axisHeight) / 2, 0.01, "y is correct for bar2");
-      assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
+      assert.closeTo(numAttr(bar0, "y"), (400 - axisHeight) / 8 * 3, 10, "y is correct for bar0");
+      assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 2, 0.1, "y is correct for bar1");
+      assert.closeTo(numAttr(bar2, "y"), (400 - axisHeight) / 2, 0.1, "y is correct for bar2");
+      assert.closeTo(numAttr(bar3, "y"), 0, 10, "y is correct for bar3");
 
+      svg.remove();
+    });
+
+    it("stacked extent is set correctly", () => {
+      assert.deepEqual((<any> plot).stackedExtent, [-4, 4], "stacked extent is updated accordingly");
       svg.remove();
     });
   });
