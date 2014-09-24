@@ -5503,13 +5503,14 @@ var Plottable;
                 return datasets;
             };
             Stacked.prototype.setDatasetStackOffsets = function (positiveDatasets, negativeDatasets) {
-                var _this = this;
+                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+                var positiveDatasetOffsets = positiveDatasets.map(function (dataset) { return dataset.data().map(function (datum) { return datum.stackOffset; }); });
+                var negativeDatasetOffsets = negativeDatasets.map(function (dataset) { return dataset.data().map(function (datum) { return datum.stackOffset; }); });
                 this._getDatasetsInOrder().forEach(function (dataset, datasetIndex) {
-                    var valueAccessor = _this._isVertical ? _this._projectors["y"].accessor : _this._projectors["x"].accessor;
-                    var positiveOffsets = positiveDatasets[datasetIndex].data().map(function (datum) { return datum.stackOffset; });
-                    var negativeOffsets = negativeDatasets[datasetIndex].data().map(function (datum) { return datum.stackOffset; });
                     dataset.data().forEach(function (datum, datumIndex) {
-                        datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) >= 0 ? positiveOffsets[datumIndex] : negativeOffsets[datumIndex];
+                        var positiveOffset = positiveDatasetOffsets[datasetIndex][datumIndex];
+                        var negativeOffset = negativeDatasetOffsets[datasetIndex][datumIndex];
+                        datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) > 0 ? positiveOffset : negativeOffset;
                     });
                 });
             };

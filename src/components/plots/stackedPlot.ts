@@ -59,7 +59,7 @@ export module Abstract {
      * Feeds the data through d3's stack layout function which will calculate
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
-    private _stack(datasets: Dataset[]): any[] {
+    private _stack(datasets: Dataset[]): Dataset[] {
       var outFunction = (d: any, y0: number, y: number) => {
         d.stackOffset = y0;
       };
@@ -78,12 +78,14 @@ export module Abstract {
      * to be determined correctly on the overall datasets
      */
     private setDatasetStackOffsets(positiveDatasets: Dataset[], negativeDatasets: Dataset[]) {
+      var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+      var positiveDatasetOffsets = positiveDatasets.map((dataset) => dataset.data().map((datum) => datum.stackOffset));
+      var negativeDatasetOffsets = negativeDatasets.map((dataset) => dataset.data().map((datum) => datum.stackOffset));
       this._getDatasetsInOrder().forEach((dataset, datasetIndex) => {
-        var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-        var positiveOffsets = positiveDatasets[datasetIndex].data().map((datum) => datum.stackOffset);
-        var negativeOffsets = negativeDatasets[datasetIndex].data().map((datum) => datum.stackOffset);
         dataset.data().forEach((datum: any, datumIndex: number) => {
-          datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) >= 0 ? positiveOffsets[datumIndex] : negativeOffsets[datumIndex];
+          var positiveOffset = positiveDatasetOffsets[datasetIndex][datumIndex];
+          var negativeOffset = negativeDatasetOffsets[datasetIndex][datumIndex];
+          datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) > 0 ? positiveOffset : negativeOffset;
         });
       });
     }
