@@ -90,7 +90,6 @@ describe("Plots", () => {
   });
 
   describe("Stacked Bar Plot Negative Values", () => {
-    var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
     var xScale: Plottable.Scale.Ordinal;
     var yScale: Plottable.Scale.Linear;
@@ -126,18 +125,6 @@ describe("Plots", () => {
       bandWidth = xScale.rangeBand();
     });
 
-    beforeEach(() => {
-      verifier.start();
-    });
-
-    afterEach(() => {
-      verifier.end();
-    });
-
-    after(() => {
-      if (verifier.passed) {svg.remove();};
-    });
-
     it("renders correctly", () => {
       var bars = renderer._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
@@ -168,6 +155,8 @@ describe("Plots", () => {
       assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 2, 0.01, "y is correct for bar1");
       assert.closeTo(numAttr(bar2, "y"), (400 - axisHeight) / 2, 0.01, "y is correct for bar2");
       assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
+
+      svg.remove();
     });
   });
 

@@ -2660,7 +2660,6 @@ describe("Plots", function () {
         });
     });
     describe("Stacked Bar Plot Negative Values", function () {
-        var verifier = new MultiTestVerifier();
         var svg;
         var xScale;
         var yScale;
@@ -2691,18 +2690,6 @@ describe("Plots", function () {
             axisHeight = xAxis.height();
             bandWidth = xScale.rangeBand();
         });
-        beforeEach(function () {
-            verifier.start();
-        });
-        afterEach(function () {
-            verifier.end();
-        });
-        after(function () {
-            if (verifier.passed) {
-                svg.remove();
-            }
-            ;
-        });
         it("renders correctly", function () {
             var bars = renderer._renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
@@ -2729,6 +2716,7 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 2, 0.01, "y is correct for bar1");
             assert.closeTo(numAttr(bar2, "y"), (400 - axisHeight) / 2, 0.01, "y is correct for bar2");
             assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
+            svg.remove();
         });
     });
     describe("Horizontal Stacked Bar Plot", function () {
