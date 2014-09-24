@@ -3,7 +3,7 @@
 module Plottable {
 export module Abstract {
 
-  interface Datum {
+  interface StackedDatum {
     key: any;
     value: number;
     offset?: number;
@@ -66,7 +66,7 @@ export module Abstract {
      * Feeds the data through d3's stack layout function which will calculate
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
-    private _stack(dataArray: Datum[][]): Datum[][] {
+    private _stack(dataArray: StackedDatum[][]): StackedDatum[][] {
       var outFunction = (d: any, y0: number, y: number) => {
         d.offset = y0;
       };
@@ -84,7 +84,7 @@ export module Abstract {
      * After the stack offsets have been determined on each separate dataset, the offsets need
      * to be determined correctly on the overall datasets
      */
-    private setDatasetStackOffsets(positiveDataArray: Datum[][], negativeDataArray: Datum[][]) {
+    private setDatasetStackOffsets(positiveDataArray: StackedDatum[][], negativeDataArray: StackedDatum[][]) {
       var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
       var positiveDataArrayOffsets = positiveDataArray.map((data) => data.map((datum) => datum.offset));
       var negativeDataArrayOffsets = negativeDataArray.map((data) => data.map((datum) => datum.offset));
