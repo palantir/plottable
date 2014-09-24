@@ -83,10 +83,12 @@ export module Abstract {
       var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
       var positiveDatasetOffsets = positiveDatasets.map((dataset) => dataset.data().map((datum) => datum.stackOffset));
       var negativeDatasetOffsets = negativeDatasets.map((dataset) => dataset.data().map((datum) => datum.stackOffset));
+
       this._getDatasetsInOrder().forEach((dataset, datasetIndex) => {
         dataset.data().forEach((datum: any, datumIndex: number) => {
           var positiveOffset = positiveDatasetOffsets[datasetIndex][datumIndex];
           var negativeOffset = negativeDatasetOffsets[datasetIndex][datumIndex];
+
           datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) > 0 ? positiveOffset : negativeOffset;
         });
       });
