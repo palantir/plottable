@@ -5522,23 +5522,22 @@ var Plottable;
                 var datasets = this._getDatasetsInOrder();
                 var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-                var positiveDatasets = datasets.map(function (dataset) {
-                    var positiveDataset = new Plottable.Dataset();
-                    var positiveData = dataset.data().map(function (datum) {
-                        var value = valueAccessor(datum);
-                        return { key: keyAccessor(datum), value: value < 0 ? 0 : value };
+                var dataArray = datasets.map(function (dataset) {
+                    return dataset.data().map(function (datum) {
+                        return { key: keyAccessor(datum), value: valueAccessor(datum) };
                     });
-                    return positiveDataset.data(positiveData);
                 });
-                var negativeDatasets = datasets.map(function (dataset) {
-                    var negativeDataset = new Plottable.Dataset();
-                    var negativeData = dataset.data().map(function (datum) {
-                        var value = valueAccessor(datum);
-                        return { key: keyAccessor(datum), value: value > 0 ? 0 : value };
+                var positiveDataArray = dataArray.map(function (data) {
+                    return data.map(function (datum) {
+                        return { key: keyAccessor(datum), value: datum.value < 0 ? 0 : datum.value };
                     });
-                    return negativeDataset.data(negativeData);
                 });
-                this.setDatasetStackOffsets(this._stack(positiveDatasets), this._stack(negativeDatasets));
+                var negativeDataArray = dataArray.map(function (data) {
+                    return data.map(function (datum) {
+                        return { key: keyAccessor(datum), value: datum.value > 0 ? 0 : datum.value };
+                    });
+                });
+                this.setDatasetStackOffsets(this._stack(positiveDataArray), this._stack(negativeDataArray));
                 var maxStack = Plottable._Util.Methods.max(datasets, function (dataset) {
                     return Plottable._Util.Methods.max(dataset.data(), function (datum) {
                         return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
@@ -5551,21 +5550,21 @@ var Plottable;
                 });
                 this.stackedExtent = [Math.min(minStack, 0), Math.max(0, maxStack)];
             };
-            Stacked.prototype._stack = function (datasets) {
+            Stacked.prototype._stack = function (dataArray) {
                 var outFunction = function (d, y0, y) {
-                    d[Stacked.STACK_OFFSET_ATTRIBUTE] = y0;
+                    d.offset = y0;
                 };
-                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return d.data(); }).out(outFunction)(datasets);
-                return datasets;
+                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return d; }).out(outFunction)(dataArray);
+                return dataArray;
             };
-            Stacked.prototype.setDatasetStackOffsets = function (positiveDatasets, negativeDatasets) {
+            Stacked.prototype.setDatasetStackOffsets = function (positiveDataArray, negativeDataArray) {
                 var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-                var positiveDatasetOffsets = positiveDatasets.map(function (dataset) { return dataset.data().map(function (datum) { return datum[Stacked.STACK_OFFSET_ATTRIBUTE]; }); });
-                var negativeDatasetOffsets = negativeDatasets.map(function (dataset) { return dataset.data().map(function (datum) { return datum[Stacked.STACK_OFFSET_ATTRIBUTE]; }); });
+                var positiveDataArrayOffsets = positiveDataArray.map(function (data) { return data.map(function (datum) { return datum.offset; }); });
+                var negativeDataArrayOffsets = negativeDataArray.map(function (data) { return data.map(function (datum) { return datum.offset; }); });
                 this._getDatasetsInOrder().forEach(function (dataset, datasetIndex) {
                     dataset.data().forEach(function (datum, datumIndex) {
-                        var positiveOffset = positiveDatasetOffsets[datasetIndex][datumIndex];
-                        var negativeOffset = negativeDatasetOffsets[datasetIndex][datumIndex];
+                        var positiveOffset = positiveDataArrayOffsets[datasetIndex][datumIndex];
+                        var negativeOffset = negativeDataArrayOffsets[datasetIndex][datumIndex];
                         datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) > 0 ? positiveOffset : negativeOffset;
                     });
                 });
@@ -5583,7 +5582,6 @@ var Plottable;
                     primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
             };
-            Stacked.STACK_OFFSET_ATTRIBUTE = "stackOffset";
             return Stacked;
         })(Abstract.NewStylePlot);
         Abstract.Stacked = Stacked;
