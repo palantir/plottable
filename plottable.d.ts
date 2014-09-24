@@ -808,9 +808,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Grid extends Plottable.Abstract.XYPlot<string, string> {
-            constructor(dataset: any, xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale<any, string>);
-            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Grid;
+        class Grid<C> extends Plottable.Abstract.NSXYPlot<string, string> {
+            constructor(xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale<C, string>);
+            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Grid<C>;
         }
     }
 }

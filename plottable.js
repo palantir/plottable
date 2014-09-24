@@ -4809,7 +4809,7 @@ var Plottable;
             };
             Pie.prototype._addDataset = function (key, dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
-                    Plottable._Util.Methods.warn("Only one dataset is supported in pie plots");
+                    Plottable._Util.Methods.warn("Only one dataset is supported in Pie plots");
                     return;
                 }
                 _super.prototype._addDataset.call(this, key, dataset);
@@ -5053,8 +5053,8 @@ var Plottable;
     (function (Plot) {
         var Grid = (function (_super) {
             __extends(Grid, _super);
-            function Grid(dataset, xScale, yScale, colorScale) {
-                _super.call(this, dataset, xScale, yScale);
+            function Grid(xScale, yScale, colorScale) {
+                _super.call(this, xScale, yScale);
                 this._animators = {
                     "cells": new Plottable.Animator.Null()
                 };
@@ -5064,6 +5064,13 @@ var Plottable;
                 this._colorScale = colorScale;
                 this.project("fill", "value", colorScale);
             }
+            Grid.prototype._addDataset = function (key, dataset) {
+                if (this._datasetKeysInOrder.length === 1) {
+                    Plottable._Util.Methods.warn("Only one dataset is supported in Grid plots");
+                    return;
+                }
+                _super.prototype._addDataset.call(this, key, dataset);
+            };
             Grid.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 if (attrToSet === "fill") {
@@ -5072,8 +5079,8 @@ var Plottable;
                 return this;
             };
             Grid.prototype._paint = function () {
-                _super.prototype._paint.call(this);
-                var cells = this._renderArea.selectAll("rect").data(this._dataset.data());
+                var dataset = this._getDatasetsInOrder()[0];
+                var cells = this._renderArea.selectAll("rect").data(dataset.data());
                 cells.enter().append("rect");
                 var xStep = this._xScale.rangeBand();
                 var yStep = this._yScale.rangeBand();
@@ -5084,7 +5091,7 @@ var Plottable;
                 cells.exit().remove();
             };
             return Grid;
-        })(Plottable.Abstract.XYPlot);
+        })(Plottable.Abstract.NSXYPlot);
         Plot.Grid = Grid;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;

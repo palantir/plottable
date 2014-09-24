@@ -1017,13 +1017,14 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Grid extends Plottable.Abstract.XYPlot<string, string> {
-            _colorScale: Plottable.Abstract.Scale<any, string>;
+        class Grid<C> extends Plottable.Abstract.NSXYPlot<string, string> {
+            _colorScale: Plottable.Abstract.Scale<C, string>;
             _xScale: Plottable.Scale.Ordinal;
             _yScale: Plottable.Scale.Ordinal;
             _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(dataset: any, xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale<any, string>);
-            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Grid;
+            constructor(xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale<C, string>);
+            _addDataset(key: string, dataset: Dataset): void;
+            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Grid<C>;
             _paint(): void;
         }
     }
