@@ -5539,18 +5539,17 @@ var Plottable;
                     return negativeDataset.data(negativeData);
                 });
                 this.setDatasetStackOffsets(this._stack(positiveDatasets), this._stack(negativeDatasets));
-                var maxY = Plottable._Util.Methods.max(datasets, function (dataset) {
+                var maxStack = Plottable._Util.Methods.max(datasets, function (dataset) {
                     return Plottable._Util.Methods.max(dataset.data(), function (datum) {
                         return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                     });
                 });
-                this.stackedExtent[1] = Math.max(0, maxY);
-                var minY = Plottable._Util.Methods.min(datasets, function (dataset) {
+                var minStack = Plottable._Util.Methods.min(datasets, function (dataset) {
                     return Plottable._Util.Methods.min(dataset.data(), function (datum) {
                         return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                     });
                 });
-                this.stackedExtent[0] = Math.min(minY, 0);
+                this.stackedExtent = [Math.min(minStack, 0), Math.max(0, maxStack)];
             };
             Stacked.prototype._stack = function (datasets) {
                 var outFunction = function (d, y0, y) {
