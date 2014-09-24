@@ -5463,11 +5463,28 @@ var Plottable;
             };
             Stacked.prototype.stack = function () {
                 var datasets = this._getDatasetsInOrder();
-                var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
                 var positiveDatasets = [];
                 var negativeDatasets = [];
-                datasets.forEach(function (dataset) {
+                this.populatePositiveNegativeDatasets(positiveDatasets, negativeDatasets);
+                this.setDatasetStackOffsets(this._stack(positiveDatasets), this._stack(negativeDatasets));
+                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+                var maxY = Plottable._Util.Methods.max(datasets, function (dataset) {
+                    return Plottable._Util.Methods.max(dataset.data(), function (datum) {
+                        return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                    });
+                });
+                this.stackedExtent[1] = Math.max(0, maxY);
+                var minY = Plottable._Util.Methods.min(datasets, function (dataset) {
+                    return Plottable._Util.Methods.min(dataset.data(), function (datum) {
+                        return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                    });
+                });
+                this.stackedExtent[0] = Math.min(minY, 0);
+            };
+            Stacked.prototype.populatePositiveNegativeDatasets = function (positiveDatasets, negativeDatasets) {
+                var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+                this._getDatasetsInOrder().forEach(function (dataset) {
                     var positiveDataset = [];
                     var negativeDataset = [];
                     dataset.data().forEach(function (datum) {
@@ -5481,19 +5498,6 @@ var Plottable;
                     positiveDatasets.push(positiveDataset);
                     negativeDatasets.push(negativeDataset);
                 });
-                this.setDatasetStackOffsets(this._stack(positiveDatasets), this._stack(negativeDatasets));
-                var maxY = Plottable._Util.Methods.max(datasets, function (dataset) {
-                    return Plottable._Util.Methods.max(dataset.data(), function (datum) {
-                        return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-                    });
-                });
-                this.stackedExtent[1] = Math.max(0, maxY);
-                var minY = Plottable._Util.Methods.min(datasets, function (dataset) {
-                    return Plottable._Util.Methods.min(dataset.data(), function (datum) {
-                        return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-                    });
-                });
-                this.stackedExtent[0] = Math.min(minY, 0);
             };
             Stacked.prototype._stack = function (data) {
                 var outFunction = function (d, y0, y) {
