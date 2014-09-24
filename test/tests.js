@@ -2645,7 +2645,7 @@ describe("Plots", function () {
         var svg;
         var xScale;
         var yScale;
-        var renderer;
+        var plot;
         var SVG_WIDTH = 600;
         var SVG_HEIGHT = 400;
         var axisHeight = 0;
@@ -2663,17 +2663,16 @@ describe("Plots", function () {
                 { x: "A", y: -1 },
                 { x: "B", y: 4 }
             ];
-            renderer = new Plottable.Plot.StackedBar(xScale, yScale);
-            renderer.addDataset(data1);
-            renderer.addDataset(data2);
-            renderer.baseline(0);
+            plot = new Plottable.Plot.StackedBar(xScale, yScale);
+            plot.addDataset(data1);
+            plot.addDataset(data2);
+            plot.baseline(0);
             var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+            var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
             axisHeight = xAxis.height();
-            bandWidth = xScale.rangeBand();
         });
         it("renders correctly", function () {
-            var bars = renderer._renderArea.selectAll("rect");
+            var bars = plot._renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -2682,18 +2681,10 @@ describe("Plots", function () {
             var bar1X = bar1.data()[0].x;
             var bar2X = bar2.data()[0].x;
             var bar3X = bar3.data()[0].x;
-            assert.closeTo(numAttr(bar0, "width"), bandWidth, 2);
-            assert.closeTo(numAttr(bar1, "width"), bandWidth, 2);
-            assert.closeTo(numAttr(bar2, "width"), bandWidth, 2);
-            assert.closeTo(numAttr(bar3, "width"), bandWidth, 2);
             assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 8, 0.01, "height is correct for bar0");
             assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar1");
             assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight) / 8, 0.01, "height is correct for bar2");
             assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
-            assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) + bandWidth / 2, 0.01, "x pos correct for bar0");
-            assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2, 0.01, "x pos correct for bar1");
-            assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2, 0.01, "x pos correct for bar2");
-            assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2, 0.01, "x pos correct for bar3");
             assert.closeTo(numAttr(bar0, "y"), (400 - axisHeight) / 8 * 3, 0.01, "y is correct for bar0");
             assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 2, 0.01, "y is correct for bar1");
             assert.closeTo(numAttr(bar2, "y"), (400 - axisHeight) / 2, 0.01, "y is correct for bar2");
