@@ -160,14 +160,6 @@ describe("BaseAxis", function () {
         verticalAxis.gutter(20);
         expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter();
         assert.strictEqual(verticalAxis.width(), expectedWidth, "changing the gutter size updates the width");
-        verticalAxis.width(20);
-        assert.strictEqual(verticalAxis.width(), 20, "width was set to user-specified value");
-        verticalAxis.width(10 * SVG_WIDTH); // way too big
-        assert.strictEqual(verticalAxis.width(), SVG_WIDTH, "returns actual used width if requested width is too large");
-        assert.doesNotThrow(function () { return verticalAxis.width("auto"); }, Error, "can be set to auto mode");
-        assert.throws(function () { return verticalAxis.width(-999); }, Error, "invalid");
-        var horizontalAxis = new Plottable.Abstract.Axis(scale, "bottom");
-        assert.throws(function () { return horizontalAxis.width(2014); }, Error, "horizontal");
         svg.remove();
     });
     it("height() + gutter()", function () {
@@ -182,14 +174,6 @@ describe("BaseAxis", function () {
         horizontalAxis.gutter(20);
         expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter();
         assert.strictEqual(horizontalAxis.height(), expectedHeight, "changing the gutter size updates the height");
-        horizontalAxis.height(20);
-        assert.strictEqual(horizontalAxis.height(), 20, "height was set to user-specified value");
-        horizontalAxis.height(10 * SVG_HEIGHT); // way too big
-        assert.strictEqual(horizontalAxis.height(), SVG_HEIGHT, "returns actual used height if requested height is too large");
-        assert.doesNotThrow(function () { return horizontalAxis.height("auto"); }, Error, "can be set to auto mode");
-        assert.throws(function () { return horizontalAxis.height(-999); }, Error, "invalid");
-        var verticalAxis = new Plottable.Abstract.Axis(scale, "right");
-        assert.throws(function () { return verticalAxis.height(2014); }, Error, "vertical");
         svg.remove();
     });
     it("draws ticks and baseline (horizontal)", function () {
@@ -200,7 +184,7 @@ describe("BaseAxis", function () {
         scale.domain([0, 10]);
         scale.range([0, SVG_WIDTH]);
         var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
-        baseAxis.height(SVG_HEIGHT);
+        baseAxis.gutter(SVG_HEIGHT);
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
             return tickValues;
@@ -230,7 +214,7 @@ describe("BaseAxis", function () {
         scale.domain([0, 10]);
         scale.range([0, SVG_HEIGHT]);
         var baseAxis = new Plottable.Abstract.Axis(scale, "left");
-        baseAxis.width(SVG_WIDTH);
+        baseAxis.gutter(SVG_WIDTH);
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
             return tickValues;

@@ -1799,8 +1799,6 @@ declare module Plottable {
             _scale: Scale<any, number>;
             _formatter: Formatter;
             _orientation: string;
-            _userRequestedWidth: any;
-            _userRequestedHeight: any;
             _computedWidth: number;
             _computedHeight: number;
             /**
@@ -1847,27 +1845,11 @@ declare module Plottable {
              */
             width(): number;
             /**
-             * Sets the current width.
-             *
-             * @param {number|String} w A fixed width for the Axis, or
-             * "auto" for automatic mode.
-             * @returns {Axis} The calling Axis.
-             */
-            width(w: any): Axis;
-            /**
              * Gets the current height.
              *
              * @returns {Axis} The current height.
              */
             height(): number;
-            /**
-             * Sets the current height.
-             *
-             * @param {number|String} h If provided, a fixed height for the Axis, or
-             * "auto" for automatic mode.
-             * @returns {Axis} The calling Axis.
-             */
-            height(h: any): Axis;
             /**
              * Gets the current formatter on the axis. Data is passed through the
              * formatter before being displayed.
