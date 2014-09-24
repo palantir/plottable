@@ -1,133 +1,33 @@
-<!DOCTYPE html>
+
 <html>
   <head>
-    <title>Stock Price Quicktest</title>
+    <title>Stocks</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <style>
+      svg {
+        background-color: #FFF;
+      }
+
+      div {
+        background-color: #AAA;
+        padding: 20px;
+      }
+    </style>
+    <script src="../../bower_components/d3/d3.js" charset="utf-8"></script>
     <script src="../../plottable.js"></script>
     <script src="../exampleUtil.js"></script>
+    <script src="../js/stocks.js"></script>
 
     <script>
-      function flip(arr) {
-        for (var l=0, r=arr.length-1; l<r; l++, r--) {
-          var t = arr[l];
-          arr[l] = arr[r];
-          arr[r] = t;
-        }
-        return arr;
-      }
-
-      var goog;
-      var aapl;
-
-      function processDatum(d) {
-        d["Date"] = new Date(d["Date"]);
-        d["Adj Close"] = parseFloat(d["Adj Close"]);
-      }
-
       window.onload = function() {
-        d3.csv("../data/GOOG_20140401_20140901.csv")
-          .get(function(error, rows) {
-            goog = flip(rows);
-            goog.forEach(processDatum);
-            run();
-          });
-
-        d3.csv("../data/AAPL_20140401_20140901.csv")
-          .get(function(error, rows) {
-            aapl = flip(rows);
-            aapl.forEach(processDatum);
-            run();
-          });
+        var div = d3.select("#testdiv");
+        run(div, makeData(), Plottable);
       }
-
-      function run() {
-        if (goog == null || aapl == null) {
-          return;
-        }
-
-        var numGOOG = 3, numAAPL = 23
-        d3.select("title").text(numGOOG + " shares of GOOG, " + numAAPL + " shares of AAPL");
-        function getValue(i) { return numAAPL * aapl[i]["Adj Close"] + numGOOG * goog[i]["Adj Close"]; };
-        var diffData = [
-          {
-            "Date": aapl[0].Date,
-            "net change": 0,
-            "total value": getValue(0)
-          }
-        ];
-        for (var i=1; i<aapl.length; i++) {
-          var totalVal = getValue(i);
-          diffData.push({
-            "Date": aapl[i].Date,
-            "net change": totalVal - diffData[i-1]["total value"],
-            "total value": totalVal
-          });
-        }
-
-        var xScale = new Plottable.Scale.Time();
-        var xAxis = new Plottable.Axis.Time(xScale, "bottom");
-        var xAxisTop = new Plottable.Axis.Time(xScale, "top");
-
-        var yScale_aapl = new Plottable.Scale.Linear();
-        var yAxis_aapl = new Plottable.Axis.Numeric(yScale_aapl, "right").showEndTickLabels(true);
-        var label_aapl = new Plottable.Component.AxisLabel("AAPL", "right");
-
-        var yScale_goog = new Plottable.Scale.Linear();
-        var yAxis_goog = new Plottable.Axis.Numeric(yScale_goog, "left").xAlign("right").showEndTickLabels(true);
-        var label_goog = new Plottable.Component.AxisLabel("GOOG", "left");
-
-        colorScale = new Plottable.Scale.Color();
-
-        var aaplSource = new Plottable.Dataset(aapl, {name: "AAPL"} );
-        var googSource = new Plottable.Dataset(goog, {name: "GOOG"} );
-
-        var line_aapl = new Plottable.Plot.Line(aaplSource, xScale, yScale_aapl).animate(true)
-                                .project("x", "Date", xScale)
-                                .project("y", "Adj Close", yScale_aapl)
-                                .project("stroke", function(d, i, m) { return m.name; }, colorScale);
-        var line_goog = new Plottable.Plot.Line(googSource, xScale, yScale_goog).animate(true)
-                                .project("x", "Date", xScale)
-                                .project("y", "Adj Close", yScale_goog)
-                                .project("stroke", function(d, i, m) { return m.name; }, colorScale);
-
-        var legend = new Plottable.Component.Legend(colorScale);
-        legend.yAlign("top").xOffset(-5);
-        var plotArea = new Plottable.Component.Group([line_aapl, line_goog, legend]);
-
-        var yScale_diff = new Plottable.Scale.Linear();
-        var yAxis_diff = new Plottable.Axis.Numeric(yScale_diff, "left");
-
-        var DAY_MILLIS = 24 * 60 * 60 * 1000;
-        var bar_diff = new Plottable.Plot.VerticalBar(diffData, xScale, yScale_diff).animate(true)
-                                .project("x", "Date", xScale)
-                                .project("y", "net change", yScale_diff)
-                                .project("width", function() { return xScale.scale(DAY_MILLIS) - xScale.scale(0); })
-                                .project("fill", function(d) {
-                                  return d["net change"] > 0 ? Plottable.Core.Colors.FERN : Plottable.Core.Colors.CERISE_RED;
-                                });
-
-        var table = new Plottable.Component.Table([
-                          [null, null,  xAxisTop, null, null],
-                          [label_goog, yAxis_goog, plotArea, yAxis_aapl, label_aapl],
-                          [null, null, bar_diff, null, null],
-                          [null, null,  xAxis, null, null],
-                        ]);
-
-        table.rowWeight(2, 0.3);
-
-        var svg = d3.select("#chart");
-        table.renderTo(svg);
-
-        plotArea.registerInteraction(new Plottable.Interaction.PanZoom(xScale, null));
-        plotArea.registerInteraction(
-          new Plottable.Interaction.Key(65).callback(function() { xScale.autoDomain(); })
-        );
-      }
-    </script>
+  </script>
   </head>
+
   <body>
-    <svg id="chart" width="640" height="480"></svg>
+    <div id="testdiv"></div>
   </body>
 
 </html>
