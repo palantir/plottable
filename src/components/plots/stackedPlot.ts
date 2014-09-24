@@ -71,7 +71,7 @@ export module Abstract {
      * Feeds the data through d3's stack layout function which will calculate
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
-    private _stack(data: any[]): any[] {
+    private _stack(datasets: any[][]): any[] {
       var outFunction = (d: any, y0: number, y: number) => {
         d.stackOffset = y0;
       };
@@ -80,9 +80,9 @@ export module Abstract {
                .x((d) => d.key)
                .y((d) => d.value)
                .values((d) => d)
-               .out(outFunction)(data);
+               .out(outFunction)(datasets);
 
-      return data;
+      return datasets;
     }
 
     /**

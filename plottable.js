@@ -5556,12 +5556,12 @@ var Plottable;
                     negativeDatasets.push(negativeDataset);
                 });
             };
-            Stacked.prototype._stack = function (data) {
+            Stacked.prototype._stack = function (datasets) {
                 var outFunction = function (d, y0, y) {
                     d.stackOffset = y0;
                 };
-                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return d; }).out(outFunction)(data);
-                return data;
+                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return d; }).out(outFunction)(datasets);
+                return datasets;
             };
             Stacked.prototype.setDatasetStackOffsets = function (positiveDatasets, negativeDatasets) {
                 var _this = this;
