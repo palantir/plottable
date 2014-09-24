@@ -63,7 +63,7 @@ export module Abstract {
       }
 
       var attrToProjector = this._generateAttrToProjector();
-      if (attrToProjector["fill"] != null) {
+      if (attrToProjector["fill"]) {
         this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
       this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
@@ -235,7 +235,7 @@ export module Abstract {
       var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
                       && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
-      if (attrToProjector["width"] == null) {
+      if (!attrToProjector["width"]) {
         var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : BarPlot.DEFAULT_WIDTH;
         attrToProjector["width"] = (d: any, i: number) => constantWidth;
       }
