@@ -18,13 +18,32 @@ export module Abstract {
 
     private stack() {
       var datasets = this._getDatasetsInOrder();
-      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-      var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
 
       var positiveDatasets: any[][] = [];
       var negativeDatasets: any[][] = [];
+      this.populatePositiveNegativeDatasets(positiveDatasets, negativeDatasets);
+      this.setDatasetStackOffsets(this._stack(positiveDatasets), this._stack(negativeDatasets));
 
-      datasets.forEach((dataset) => {
+      var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+      var maxY = _Util.Methods.max(datasets, (dataset: any) => {
+        return _Util.Methods.max(dataset.data(), (datum: any) => {
+          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+        });
+      });
+      this.stackedExtent[1] = Math.max(0, maxY);
+
+      var minY = _Util.Methods.min(datasets, (dataset: any) => {
+        return _Util.Methods.min(dataset.data(), (datum: any) => {
+          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+        });
+      });
+      this.stackedExtent[0] = Math.min(minY, 0);
+    }
+
+    private populatePositiveNegativeDatasets(positiveDatasets: any[], negativeDatasets: any[]) {
+      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+      var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+      this._getDatasetsInOrder().forEach((dataset) => {
         var positiveDataset: any[] = [];
         var negativeDataset: any[] = [];
 
@@ -42,22 +61,6 @@ export module Abstract {
         positiveDatasets.push(positiveDataset);
         negativeDatasets.push(negativeDataset);
       });
-
-      this.setDatasetStackOffsets(this._stack(positiveDatasets), this._stack(negativeDatasets));
-
-      var maxY = _Util.Methods.max(datasets, (dataset: any) => {
-        return _Util.Methods.max(dataset.data(), (datum: any) => {
-          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-        });
-      });
-      this.stackedExtent[1] = Math.max(0, maxY);
-
-      var minY = _Util.Methods.min(datasets, (dataset: any) => {
-        return _Util.Methods.min(dataset.data(), (datum: any) => {
-          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-        });
-      });
-      this.stackedExtent[0] = Math.min(minY, 0);
     }
 
     /**
