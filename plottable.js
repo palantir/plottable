@@ -5554,15 +5554,15 @@ var Plottable;
             };
             Stacked.prototype._stack = function (datasets) {
                 var outFunction = function (d, y0, y) {
-                    d.stackOffset = y0;
+                    d[Stacked.STACK_OFFSET_ATTRIBUTE] = y0;
                 };
                 d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return d.data(); }).out(outFunction)(datasets);
                 return datasets;
             };
             Stacked.prototype.setDatasetStackOffsets = function (positiveDatasets, negativeDatasets) {
                 var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-                var positiveDatasetOffsets = positiveDatasets.map(function (dataset) { return dataset.data().map(function (datum) { return datum.stackOffset; }); });
-                var negativeDatasetOffsets = negativeDatasets.map(function (dataset) { return dataset.data().map(function (datum) { return datum.stackOffset; }); });
+                var positiveDatasetOffsets = positiveDatasets.map(function (dataset) { return dataset.data().map(function (datum) { return datum[Stacked.STACK_OFFSET_ATTRIBUTE]; }); });
+                var negativeDatasetOffsets = negativeDatasets.map(function (dataset) { return dataset.data().map(function (datum) { return datum[Stacked.STACK_OFFSET_ATTRIBUTE]; }); });
                 this._getDatasetsInOrder().forEach(function (dataset, datasetIndex) {
                     dataset.data().forEach(function (datum, datumIndex) {
                         var positiveOffset = positiveDatasetOffsets[datasetIndex][datumIndex];
@@ -5584,6 +5584,7 @@ var Plottable;
                     primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
             };
+            Stacked.STACK_OFFSET_ATTRIBUTE = "stackOffset";
             return Stacked;
         })(Abstract.NewStylePlot);
         Abstract.Stacked = Stacked;

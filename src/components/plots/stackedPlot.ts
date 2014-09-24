@@ -4,6 +4,8 @@ module Plottable {
 export module Abstract {
 
   export class Stacked<X, Y> extends Abstract.NewStylePlot<X, Y> {
+    private static STACK_OFFSET_ATTRIBUTE = "stackOffset";
+
     private stackedExtent = [0, 0];
     public _isVertical: boolean;
 
@@ -63,7 +65,7 @@ export module Abstract {
      */
     private _stack(datasets: Dataset[]): Dataset[] {
       var outFunction = (d: any, y0: number, y: number) => {
-        d.stackOffset = y0;
+        d[Stacked.STACK_OFFSET_ATTRIBUTE] = y0;
       };
 
       d3.layout.stack()
@@ -81,8 +83,8 @@ export module Abstract {
      */
     private setDatasetStackOffsets(positiveDatasets: Dataset[], negativeDatasets: Dataset[]) {
       var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-      var positiveDatasetOffsets = positiveDatasets.map((dataset) => dataset.data().map((datum) => datum.stackOffset));
-      var negativeDatasetOffsets = negativeDatasets.map((dataset) => dataset.data().map((datum) => datum.stackOffset));
+      var positiveDatasetOffsets = positiveDatasets.map((dataset) => dataset.data().map((datum) => datum[Stacked.STACK_OFFSET_ATTRIBUTE]));
+      var negativeDatasetOffsets = negativeDatasets.map((dataset) => dataset.data().map((datum) => datum[Stacked.STACK_OFFSET_ATTRIBUTE]));
 
       this._getDatasetsInOrder().forEach((dataset, datasetIndex) => {
         dataset.data().forEach((datum: any, datumIndex: number) => {
