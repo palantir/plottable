@@ -151,7 +151,7 @@ describe("Scales", () => {
       scale.numTicks(5);
       var ticks5 = scale.ticks();
       assert.closeTo(ticks5.length, 5, 1, "can change the default number of ticks");
-    })
+    });
 
     it("autorange defaults to [1, 10] on log scale", () => {
       var scale = new Plottable.Scale.Log();

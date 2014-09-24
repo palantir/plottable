@@ -1,5 +1,5 @@
 /*!
-Plottable 0.29.1 (https://github.com/palantir/plottable)
+Plottable 0.30.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -952,7 +952,7 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.29.1";
+    Plottable.version = "0.30.0";
 })(Plottable || (Plottable = {}));
 
 var Plottable;
@@ -1933,7 +1933,7 @@ var Plottable;
             __extends(Time, _super);
             function Time(scale) {
                 _super.call(this, scale == null ? d3.time.scale() : scale);
-                this._typeCoercer = function (d) { return d._isAMomentObject || d instanceof Date ? d : new Date(d); };
+                this._typeCoercer = function (d) { return d && d._isAMomentObject || d instanceof Date ? d : new Date(d); };
             }
             Time.prototype._tickInterval = function (interval, step) {
                 var tempScale = d3.time.scale();
@@ -2406,6 +2406,7 @@ var Plottable;
                 }
                 this._computeLayout();
                 this._render();
+                Plottable.Core.RenderController.flush();
                 return this;
             };
             Component.prototype.resize = function (width, height) {
