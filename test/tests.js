@@ -2681,9 +2681,14 @@ describe("Plots", function () {
                 { x: "A", y: -1 },
                 { x: "B", y: 4 }
             ];
+            var data3 = [
+                { x: "A", y: -1 },
+                { x: "B", y: -4 }
+            ];
             plot = new Plottable.Plot.StackedBar(xScale, yScale);
             plot.addDataset(data1);
             plot.addDataset(data2);
+            plot.addDataset(data3);
             plot.baseline(0);
             var xAxis = new Plottable.Axis.Category(xScale, "bottom");
             var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
@@ -2695,22 +2700,20 @@ describe("Plots", function () {
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
             var bar3 = d3.select(bars[0][3]);
-            var bar0X = bar0.data()[0].x;
-            var bar1X = bar1.data()[0].x;
-            var bar2X = bar2.data()[0].x;
-            var bar3X = bar3.data()[0].x;
-            assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 8, 10, "height is correct for bar0");
-            assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight) / 2, 10, "height is correct for bar1");
-            assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight) / 8, 10, "height is correct for bar2");
-            assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 10, "height is correct for bar3");
-            assert.closeTo(numAttr(bar0, "y"), (400 - axisHeight) / 8 * 3, 10, "y is correct for bar0");
-            assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 2, 0.1, "y is correct for bar1");
-            assert.closeTo(numAttr(bar2, "y"), (400 - axisHeight) / 2, 0.1, "y is correct for bar2");
-            assert.closeTo(numAttr(bar3, "y"), 0, 10, "y is correct for bar3");
+            var bar4 = d3.select(bars[0][4]);
+            var bar5 = d3.select(bars[0][5]);
+            assert.closeTo(numAttr(bar0, "height"), numAttr(bar2, "height"), 1, "heights are the same");
+            assert.closeTo(numAttr(bar0, "height"), numAttr(bar4, "height"), 1, "heights are the same");
+            assert.closeTo(numAttr(bar1, "height"), numAttr(bar3, "height"), 1, "heights are the same");
+            assert.closeTo(numAttr(bar1, "height"), numAttr(bar5, "height"), 1, "heights are the same");
+            assert.operator(numAttr(bar0, "y"), "<", numAttr(bar2, "y"), "y is correct for bar0");
+            assert.operator(numAttr(bar2, "y"), "<", numAttr(bar4, "y"), "y is correct for bar0");
+            assert.operator(numAttr(bar3, "y"), "<", numAttr(bar1, "y"), "y is correct for bar0");
+            assert.operator(numAttr(bar1, "y"), "<", numAttr(bar5, "y"), "y is correct for bar0");
             svg.remove();
         });
         it("stacked extent is set correctly", function () {
-            assert.deepEqual(plot.stackedExtent, [-4, 4], "stacked extent is updated accordingly");
+            assert.deepEqual(plot.stackedExtent, [-8, 4], "stacked extent is updated accordingly");
             svg.remove();
         });
     });
