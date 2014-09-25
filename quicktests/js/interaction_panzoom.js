@@ -1,7 +1,7 @@
 function makeData() {
   "use strict";
 
-  return [makeRandomData(50), makeRandomData(50)];
+  return makeRandomData(20);
 }
 
 function run(div, data, Plottable) {
@@ -15,15 +15,15 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left").tickLabelPosition("bottom");
 
-  var renderAreaD1 = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data[0].slice(0, 21));
+  var plot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data);
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-  var renderGroup = renderAreaD1.merge(gridlines);
-  var chart = new Plottable.Component.Table([[yAxis, renderGroup],
-   [null,  xAxis]]);
+  var group = plot.merge(gridlines);
+  var chart = new Plottable.Component.Table([[yAxis, group],
+                                             [null,  xAxis]]);
 
   chart.renderTo(svg);
 
-  renderAreaD1.registerInteraction(
+  plot.registerInteraction(
     new Plottable.Interaction.PanZoom(xScale, yScale)
   );
 }

@@ -1,8 +1,7 @@
 
 function makeData() {
   "use strict";
-
-  return [makeRandomData(50), makeRandomData(50)];
+  return makeRandomData(20);
 }
 
 function run(div, data, Plottable) {
@@ -15,17 +14,19 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var lineRenderer = new Plottable.Plot.Line(xScale, yScale).addDataset(data[0].slice(0, 20));
-  lineRenderer.attr("opacity", 0.75);
-  lineRenderer.animate(doAnimate);
+  var dataset = new Plottable.Dataset(data);
+  var lineRenderer = new Plottable.Plot.Line(xScale, yScale)
+              .addDataset(dataset)
+              .attr("opacity", 0.75)
+              .animate(doAnimate);
 
   var lineChart = new Plottable.Component.Table([[yAxis, lineRenderer],
                                            [null,  xAxis]]);
   lineChart.renderTo(svg);
 
   var cb = function(x, y){
-    var d = lineRenderer.dataset().data();
-    lineRenderer.dataset().data(d);
+    var d = dataset.data();
+    dataset.data(d);
   };
 
   lineRenderer.registerInteraction(

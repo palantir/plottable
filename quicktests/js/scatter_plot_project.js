@@ -14,7 +14,7 @@ function run(div, data, Plottable) {
 
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  var scatterRenderer = new Plottable.Plot.Scatter(xScale, yScale)
+  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale)
     .addDataset(d)
     .project("x", "Distance", xScale)
     .project("y", function(d) {return Math.abs(d.Mag);}, yScale)
@@ -31,10 +31,9 @@ function run(div, data, Plottable) {
   var yAxisLabel = new Plottable.Component.AxisLabel("Absolute Value of Apparent Visual Magnitude", "vertical-left");
   var xAxisLabel = new Plottable.Component.AxisLabel("Distance in parsecs");
   var plotTable = new Plottable.Component.Table([
-                                                 [yAxisLabel, yAxis, scatterRenderer],
-                                                 [null, null, xAxis],
-                                                 [null, null, xAxisLabel]
-                                                 ]);
+                                                 [yAxisLabel, yAxis, scatterPlot],
+                                                 [null      , null , xAxis      ],
+                                                 [null      , null , xAxisLabel ]]);
 
   new Plottable.Component.Table([
                                  [titleTable],

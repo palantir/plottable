@@ -27,17 +27,19 @@ function run(div, data, Plottable) {
   };
 
   //rendering
-  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale); //0
-  scatterPlot
-    .addDataset(dataseries)
-    .attr("fill", colorScale1.scale("scatter"))
-    .attr("r", function(){return 10;});
-  var linePlot = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries); //1
-  linePlot
-    .attr("stroke", colorScale1.scale("line"))
-    .attr("stroke-width", function(){ return 5;});
-  var areaPlot = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries); //2
-  areaPlot.attr("fill", colorScale1.scale("area"));
+  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale) //0
+          .addDataset(dataseries)
+          .attr("fill", colorScale1.scale("scatter"))
+          .attr("r", function(){return 10;});
+
+  var linePlot = new Plottable.Plot.Line(xScale, yScale)
+          .addDataset(dataseries) //1
+          .attr("stroke", colorScale1.scale("line"))
+          .attr("stroke-width", function(){ return 5;});
+
+  var areaPlot = new Plottable.Plot.Area(xScale, yScale)
+          .addDataset(dataseries) //2
+          .attr("fill", colorScale1.scale("area"));
 
   //title + legend
   var title1 = new Plottable.Component.TitleLabel( "front: areaPlot", "horizontal");

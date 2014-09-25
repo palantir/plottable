@@ -21,7 +21,7 @@ function run(div, data, Plottable) {
   if (!Plottable.Plot.Area) {
     return;
   }
-  var AreaRenderer = new Plottable.Plot.Area(xScale, yScale)
+  var stackedAreaPlot = new Plottable.Plot.StackedArea(xScale, yScale)
     .addDataset("d1", data[0])
     .addDataset("d2", data[1])
     .addDataset("d3", data[2])
@@ -29,7 +29,7 @@ function run(div, data, Plottable) {
     .attr("y", "y", yScale)
     .attr("fill", "type", colorScale);
 
-  var center = AreaRenderer.merge(new Plottable.Component.Legend(colorScale));
+  var center = stackedAreaPlot.merge(new Plottable.Component.Legend(colorScale));
 
   new Plottable.Component.Table([
     [yAxis, center], [null, xAxis]
