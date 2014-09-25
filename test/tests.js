@@ -1,4 +1,3 @@
-///<reference path="testReference.ts" />
 function generateSVG(width, height) {
     if (width === void 0) { width = 400; }
     if (height === void 0) { height = 400; }
@@ -92,7 +91,6 @@ var MultiTestVerifier = (function () {
     };
     return MultiTestVerifier;
 })();
-// for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
 function normalizePath(pathString) {
     return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
 }
@@ -110,9 +108,7 @@ function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
     target.node().dispatchEvent(e);
 }
 
-///<reference path="testReference.ts" />
 before(function () {
-    // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
     Plottable.Core.RenderController.setRenderPolicy("immediate");
     window.Pixel_CloseTo_Requirement = window.PHANTOMJS ? 2 : 0.5;
 });
@@ -131,7 +127,6 @@ after(function () {
     }
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("BaseAxis", function () {
     it("orientation", function () {
@@ -155,7 +150,7 @@ describe("BaseAxis", function () {
         var scale = new Plottable.Scale.Linear();
         var verticalAxis = new Plottable.Abstract.Axis(scale, "right");
         verticalAxis.renderTo(svg);
-        var expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter(); // tick length and gutter by default
+        var expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter();
         assert.strictEqual(verticalAxis.width(), expectedWidth, "calling width() with no arguments returns currently used width");
         verticalAxis.gutter(20);
         expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter();
@@ -169,7 +164,7 @@ describe("BaseAxis", function () {
         var scale = new Plottable.Scale.Linear();
         var horizontalAxis = new Plottable.Abstract.Axis(scale, "bottom");
         horizontalAxis.renderTo(svg);
-        var expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter(); // tick length and gutter by default
+        var expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter();
         assert.strictEqual(horizontalAxis.height(), expectedHeight, "calling height() with no arguments returns currently used height");
         horizontalAxis.gutter(20);
         expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter();
@@ -298,7 +293,6 @@ describe("BaseAxis", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("TimeAxis", function () {
     it("can not initialize vertical time axis", function () {
@@ -314,10 +308,8 @@ describe("TimeAxis", function () {
         var scale = new Plottable.Scale.Time();
         var axis = new Plottable.Axis.Time(scale, "bottom");
         scale.range([0, 400]);
-        // very large time span
         assert.doesNotThrow(function () { return scale.domain([new Date(0, 0, 1, 0, 0, 0, 0), new Date(50000, 0, 1, 0, 0, 0, 0)]); });
         axis.renderTo(svg);
-        // very small time span
         assert.doesNotThrow(function () { return scale.domain([new Date(0, 0, 1, 0, 0, 0, 0), new Date(0, 0, 1, 0, 0, 0, 100)]); });
         axis.renderTo(svg);
         svg.remove();
@@ -348,25 +340,17 @@ describe("TimeAxis", function () {
             checkLabelsForContainer(axis._minorTickLabels);
             checkLabelsForContainer(axis._majorTickLabels);
         }
-        // 100 year span
         checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
-        // 1 year span
         checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 11, 31, 0, 0, 0, 0)]);
-        // 1 month span
         checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 1, 1, 0, 0, 0, 0)]);
-        // 1 day span
         checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 23, 0, 0, 0)]);
-        // 1 hour span
         checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 1, 0, 0, 0)]);
-        // 1 minute span
         checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
-        // 1 second span
         checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 0, 1, 0)]);
         svg.remove();
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("NumericAxis", function () {
     function boxesOverlap(boxA, boxB) {
@@ -439,7 +423,6 @@ describe("NumericAxis", function () {
             var labelCenter = (labelBB.left + labelBB.right) / 2;
             assert.closeTo(labelCenter, markCenter, 1, "tick label is centered on mark");
         }
-        // labels to left
         numericAxis.tickLabelPosition("left");
         tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
         tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
@@ -448,7 +431,6 @@ describe("NumericAxis", function () {
             labelBB = tickLabels[0][i].getBoundingClientRect();
             assert.operator(labelBB.left, "<=", markBB.right, "tick label is to left of mark");
         }
-        // labels to right
         numericAxis.tickLabelPosition("right");
         tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
         tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
@@ -481,7 +463,6 @@ describe("NumericAxis", function () {
             var labelCenter = (labelBB.top + labelBB.bottom) / 2;
             assert.closeTo(labelCenter, markCenter, 1, "tick label is centered on mark");
         }
-        // labels to top
         numericAxis.tickLabelPosition("top");
         tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
         tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
@@ -490,7 +471,6 @@ describe("NumericAxis", function () {
             labelBB = tickLabels[0][i].getBoundingClientRect();
             assert.operator(labelBB.bottom, "<=", markBB.top, "tick label is above mark");
         }
-        // labels to bottom
         numericAxis.tickLabelPosition("bottom");
         tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
         tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
@@ -633,7 +613,6 @@ describe("NumericAxis", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Category Axes", function () {
     it("re-renders appropriately when data is changed", function () {
@@ -703,13 +682,12 @@ describe("Category Axes", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Gridlines", function () {
     it("Gridlines and axis tick marks align", function () {
         var svg = generateSVG(640, 480);
         var xScale = new Plottable.Scale.Linear();
-        xScale.domain([0, 10]); // manually set domain since we won't have a renderer
+        xScale.domain([0, 10]);
         var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
         var yScale = new Plottable.Scale.Linear();
         yScale.domain([0, 10]);
@@ -718,7 +696,7 @@ describe("Gridlines", function () {
         var basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
         basicTable._anchor(svg);
         basicTable._computeLayout();
-        xScale.range([0, xAxis.width()]); // manually set range since we don't have a renderer
+        xScale.range([0, xAxis.width()]);
         yScale.range([yAxis.height(), 0]);
         basicTable._render();
         var xAxisTickMarks = xAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS)[0];
@@ -743,11 +721,9 @@ describe("Gridlines", function () {
         var xScale = new Plottable.Scale.Linear();
         var gridlines = new Plottable.Component.Gridlines(xScale, null);
         xScale.domain([0, 1]);
-        // test passes if error is not thrown.
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Labels", function () {
     it("Standard text title label generates properly", function () {
@@ -799,7 +775,6 @@ describe("Labels", function () {
         assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
         svg.remove();
     });
-    // skipping because Dan is rewriting labels and the height test fails
     it.skip("Superlong text is handled in a sane fashion", function () {
         var svgWidth = 400;
         var svg = generateSVG(svgWidth, 80);
@@ -844,7 +819,6 @@ describe("Labels", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Legends", function () {
     var svg;
@@ -923,7 +897,6 @@ describe("Legends", function () {
         legend.renderTo(svg);
         var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
         color.domain(newDomain);
-        // due to how joins work, this is how the elements should be arranged by d3
         var newDomainActualOrder = ["foo", "baz", "mushu", "persei", "eight"];
         legend._content.selectAll(".legend-row").each(function (d, i) {
             assert.equal(d, newDomainActualOrder[i], "the data is set correctly");
@@ -1117,15 +1090,14 @@ describe("Legends", function () {
             });
             toggleEntry("a", 0);
             assert.equal(state, false, "callback was successful");
-            toggleLegend.toggleCallback(); // this should not remove the callback
+            toggleLegend.toggleCallback();
             toggleEntry("a", 0);
             assert.equal(state, true, "callback was successful");
-            toggleLegend.toggleCallback(null); // this should remove the callback
+            toggleLegend.toggleCallback(null);
             assert.throws(function () {
                 toggleEntry("a", 0);
             });
             var selection = getSelection("a");
-            // should have no classes
             assert.equal(selection.classed("toggled-on"), false, "is not toggled-on");
             assert.equal(selection.classed("toggled-off"), false, "is not toggled-off");
             svg.remove();
@@ -1261,10 +1233,10 @@ describe("Legends", function () {
             });
             hoverEntry("a", 0);
             assert.equal(focused, "a", "callback was successful");
-            hoverLegend.hoverCallback(); // this should not remove the callback
+            hoverLegend.hoverCallback();
             leaveEntry("a", 0);
             assert.equal(focused, undefined, "callback was successful");
-            hoverLegend.hoverCallback(null); // this should remove the callback
+            hoverLegend.hoverCallback(null);
             assert.throws(function () {
                 hoverEntry("a", 0);
             });
@@ -1360,7 +1332,6 @@ describe("HorizontalLegend", function () {
     });
 });
 
-///<reference path="../../testReference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -1499,7 +1470,6 @@ describe("Plots", function () {
     });
 });
 
-///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
     describe("PiePlot", function () {
@@ -1636,7 +1606,6 @@ describe("Plots", function () {
     });
 });
 
-///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
     describe("New Style Plots", function () {
@@ -1689,7 +1658,7 @@ describe("Plots", function () {
             p.datasetOrder(["bar", "baz", "foo"]);
             assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
             var warned = 0;
-            Plottable._Util.Methods.warn = function () { return warned++; }; // suppress expected warnings
+            Plottable._Util.Methods.warn = function () { return warned++; };
             p.datasetOrder(["blah", "blee", "bar", "baz", "foo"]);
             assert.equal(warned, 1);
             assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
@@ -1701,17 +1670,14 @@ describe("Plots", function () {
             assert.equal(warned, 1);
             p.addDataset("2", []);
             p.addDataset("4", []);
-            // get warning for not a permutation
             p.datasetOrder(["_bar", "4", "2"]);
             assert.equal(warned, 2);
-            // do not get warning for a permutation
             p.datasetOrder(["2", "_foo", "4"]);
             assert.equal(warned, 2);
         });
     });
 });
 
-///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
     describe("LinePlot", function () {
@@ -1784,7 +1750,6 @@ describe("Plots", function () {
     });
 });
 
-///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
     describe("AreaPlot", function () {
@@ -1855,7 +1820,6 @@ describe("Plots", function () {
     });
 });
 
-///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
     describe("Bar Plot", function () {
@@ -1949,20 +1913,18 @@ describe("Plots", function () {
                 verifier.end();
             });
             it("can select and deselect bars", function () {
-                var selectedBar = renderer.selectBar(145, 150); // in the middle of bar 0
+                var selectedBar = renderer.selectBar(145, 150);
                 assert.isNotNull(selectedBar, "clicked on a bar");
                 assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
                 assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
                 renderer.deselectAll();
                 assert.isFalse(selectedBar.classed("selected"), "the bar is no longer selected");
-                selectedBar = renderer.selectBar(-1, -1); // no bars here
+                selectedBar = renderer.selectBar(-1, -1);
                 assert.isNull(selectedBar, "returns null if no bar was selected");
-                selectedBar = renderer.selectBar(200, 50); // between the two bars
+                selectedBar = renderer.selectBar(200, 50);
                 assert.isNull(selectedBar, "returns null if no bar was selected");
-                selectedBar = renderer.selectBar(145, 10); // above bar 0
+                selectedBar = renderer.selectBar(145, 10);
                 assert.isNull(selectedBar, "returns null if no bar was selected");
-                // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
-                // origin is at the top left!
                 selectedBar = renderer.selectBar({ min: 145, max: 445 }, { min: 150, max: 150 }, true);
                 assert.isNotNull(selectedBar, "line between middle of two bars");
                 assert.lengthOf(selectedBar.data(), 2, "selected 2 bars (not the negative one)");
@@ -1976,8 +1938,6 @@ describe("Plots", function () {
                 assert.equal(selectedBar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
                 assert.equal(selectedBar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
                 assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
-                // the runtime parameter validation should be strict, so no strings or
-                // mangled objects
                 assert.throws(function () { return renderer.selectBar("blargh", 150); }, Error);
                 assert.throws(function () { return renderer.selectBar({ min: 150 }, 150); }, Error);
                 verifier.end();
@@ -1986,7 +1946,7 @@ describe("Plots", function () {
                 var brandNew = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
                 assert.isNotNull(brandNew.deselectAll(), "deselects return self");
                 assert.isNull(brandNew.selectBar(0, 0), "selects return empty");
-                brandNew._anchor(d3.select(document.createElement("svg"))); // calls `_setup()`
+                brandNew._anchor(d3.select(document.createElement("svg")));
                 assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
                 assert.isNull(brandNew.selectBar(0, 0), "selects return empty after setup");
                 verifier.end();
@@ -2142,7 +2102,6 @@ describe("Plots", function () {
                 assert.closeTo(numAttr(bar1, "height"), 104, 2);
                 assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "width is correct for bar0");
                 assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "width is correct for bar1");
-                // check that bar is aligned on the center of the scale
                 assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "y pos correct for bar0");
                 assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "y pos correct for bar1");
                 verifier.end();
@@ -2166,7 +2125,6 @@ describe("Plots", function () {
     });
 });
 
-///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
     describe("GridPlot", function () {
@@ -2259,7 +2217,6 @@ describe("Plots", function () {
     });
 });
 
-///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
     describe("ScatterPlot", function () {
@@ -2313,16 +2270,12 @@ describe("Plots", function () {
             var circlesInArea;
             var quadraticDataset = makeQuadraticSeries(10);
             function getCirclePlotVerifier() {
-                // creates a function that verifies that circles are drawn properly after accounting for svg transform
-                // and then modifies circlesInArea to contain the number of circles that were discovered in the plot area
                 circlesInArea = 0;
                 var renderArea = circlePlot._renderArea;
                 var renderAreaTransform = d3.transform(renderArea.attr("transform"));
                 var translate = renderAreaTransform.translate;
                 var scale = renderAreaTransform.scale;
                 return function (datum, index) {
-                    // This function takes special care to compute the position of circles after taking svg transformation
-                    // into account.
                     var selection = d3.select(this);
                     var elementTransform = d3.transform(selection.attr("transform"));
                     var elementTranslate = elementTransform.translate;
@@ -2388,7 +2341,6 @@ describe("Plots", function () {
     });
 });
 
-///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
     describe("Stacked Area Plot", function () {
@@ -2611,7 +2563,6 @@ describe("Plots", function () {
     });
 });
 
-///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
     describe("Stacked Bar Plot", function () {
@@ -2672,26 +2623,84 @@ describe("Plots", function () {
             var bar1X = bar1.data()[0].x;
             var bar2X = bar2.data()[0].x;
             var bar3X = bar3.data()[0].x;
-            // check widths
             assert.closeTo(numAttr(bar0, "width"), bandWidth, 2);
             assert.closeTo(numAttr(bar1, "width"), bandWidth, 2);
             assert.closeTo(numAttr(bar2, "width"), bandWidth, 2);
             assert.closeTo(numAttr(bar3, "width"), bandWidth, 2);
-            // check heights
             assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 3, 0.01, "height is correct for bar0");
             assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight) / 3 * 2, 0.01, "height is correct for bar1");
             assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight) / 3 * 2, 0.01, "height is correct for bar2");
             assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 3, 0.01, "height is correct for bar3");
-            // check that bar is aligned on the center of the scale
             assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) + bandWidth / 2, 0.01, "x pos correct for bar0");
             assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2, 0.01, "x pos correct for bar1");
             assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2, 0.01, "x pos correct for bar2");
             assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2, 0.01, "x pos correct for bar3");
-            // now check y values to ensure they do indeed stack
             assert.closeTo(numAttr(bar0, "y"), (400 - axisHeight) / 3 * 2, 0.01, "y is correct for bar0");
             assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 3, 0.01, "y is correct for bar1");
             assert.closeTo(numAttr(bar2, "y"), 0, 0.01, "y is correct for bar2");
             assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
+        });
+    });
+    describe("Stacked Bar Plot Negative Values", function () {
+        var svg;
+        var xScale;
+        var yScale;
+        var plot;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var axisHeight = 0;
+        var bandWidth = 0;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        beforeEach(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Ordinal();
+            yScale = new Plottable.Scale.Linear();
+            var data1 = [
+                { x: "A", y: -1 },
+                { x: "B", y: -4 }
+            ];
+            var data2 = [
+                { x: "A", y: -1 },
+                { x: "B", y: 4 }
+            ];
+            var data3 = [
+                { x: "A", y: -2 },
+                { x: "B", y: -4 }
+            ];
+            var data4 = [
+                { x: "A", y: -3 },
+                { x: "B", y: 4 }
+            ];
+            plot = new Plottable.Plot.StackedBar(xScale, yScale);
+            plot.addDataset(data1);
+            plot.addDataset(data2);
+            plot.addDataset(data3);
+            plot.addDataset(data4);
+            plot.baseline(0);
+            var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+            var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
+            axisHeight = xAxis.height();
+        });
+        it("stacking done correctly for negative values", function () {
+            var bars = plot._renderArea.selectAll("rect");
+            var bar0 = d3.select(bars[0][0]);
+            var bar1 = d3.select(bars[0][1]);
+            var bar2 = d3.select(bars[0][2]);
+            var bar3 = d3.select(bars[0][3]);
+            var bar4 = d3.select(bars[0][4]);
+            var bar5 = d3.select(bars[0][5]);
+            var bar6 = d3.select(bars[0][6]);
+            var bar7 = d3.select(bars[0][7]);
+            assert.operator(numAttr(bar0, "y"), "<", numAttr(bar2, "y"), "'A' bars added below the baseline in dataset order");
+            assert.operator(numAttr(bar2, "y"), "<", numAttr(bar4, "y"), "'A' bars added below the baseline in dataset order");
+            assert.operator(numAttr(bar4, "y"), "<", numAttr(bar6, "y"), "'A' bars added below the baseline in dataset order");
+            assert.operator(numAttr(bar1, "y"), "<", numAttr(bar5, "y"), "'B' bars added below the baseline in dataset order");
+            assert.operator(numAttr(bar3, "y"), ">", numAttr(bar7, "y"), "'B' bars added above the baseline in dataset order");
+            svg.remove();
+        });
+        it("stacked extent is set correctly", function () {
+            assert.deepEqual(plot.stackedExtent, [-8, 8], "stacked extent is updated accordingly");
+            svg.remove();
         });
     });
     describe("Horizontal Stacked Bar Plot", function () {
@@ -2750,12 +2759,10 @@ describe("Plots", function () {
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
             var bar3 = d3.select(bars[0][3]);
-            // check heights
             assert.closeTo(numAttr(bar0, "height"), bandWidth, 2);
             assert.closeTo(numAttr(bar1, "height"), bandWidth, 2);
             assert.closeTo(numAttr(bar2, "height"), bandWidth, 2);
             assert.closeTo(numAttr(bar3, "height"), bandWidth, 2);
-            // check widths
             assert.closeTo(numAttr(bar0, "width"), 0, 0.01, "width is correct for bar0");
             assert.closeTo(numAttr(bar1, "width"), rendererWidth / 3, 0.01, "width is correct for bar1");
             assert.closeTo(numAttr(bar2, "width"), rendererWidth / 3, 0.01, "width is correct for bar2");
@@ -2764,12 +2771,10 @@ describe("Plots", function () {
             var bar1Y = bar1.data()[0].name;
             var bar2Y = bar2.data()[0].name;
             var bar3Y = bar3.data()[0].name;
-            // check that bar is aligned on the center of the scale
             assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2, 0.01, "y pos correct for bar0");
             assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2, 0.01, "y pos correct for bar1");
             assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + bandWidth / 2, 0.01, "y pos correct for bar2");
             assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + bandWidth / 2, 0.01, "y pos correct for bar3");
-            // now check x values to ensure they do indeed stack
             assert.closeTo(numAttr(bar0, "x"), 0, 0.01, "x is correct for bar0");
             assert.closeTo(numAttr(bar1, "x"), 0, 0.01, "x is correct for bar1");
             assert.closeTo(numAttr(bar2, "x"), 0, 0.01, "x is correct for bar2");
@@ -2778,7 +2783,6 @@ describe("Plots", function () {
     });
 });
 
-///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
     describe("Clustered Bar Plot", function () {
@@ -2839,18 +2843,15 @@ describe("Plots", function () {
             var bar1X = bar1.data()[0].x;
             var bar2X = bar2.data()[0].x;
             var bar3X = bar3.data()[0].x;
-            // check widths
             var width = bandWidth / 2 * .518;
             assert.closeTo(numAttr(bar0, "width"), width, 2);
             assert.closeTo(numAttr(bar1, "width"), width, 2);
             assert.closeTo(numAttr(bar2, "width"), width, 2);
             assert.closeTo(numAttr(bar3, "width"), width, 2);
-            // check heights
             assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar0");
             assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight), 0.01, "height is correct for bar1");
             assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight), 0.01, "height is correct for bar2");
             assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
-            // check that clustering is correct
             var off = renderer.innerScale.scale("_0");
             assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) + bandWidth / 2 - off, 0.01, "x pos correct for bar0");
             assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2 - off, 0.01, "x pos correct for bar1");
@@ -2912,13 +2913,11 @@ describe("Plots", function () {
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
             var bar3 = d3.select(bars[0][3]);
-            // check widths
             var width = bandWidth / 2 * .518;
             assert.closeTo(numAttr(bar0, "height"), width, 2, "height is correct for bar0");
             assert.closeTo(numAttr(bar1, "height"), width, 2, "height is correct for bar1");
             assert.closeTo(numAttr(bar2, "height"), width, 2, "height is correct for bar2");
             assert.closeTo(numAttr(bar3, "height"), width, 2, "height is correct for bar3");
-            // check heights
             assert.closeTo(numAttr(bar0, "width"), rendererWidth / 2, 0.01, "width is correct for bar0");
             assert.closeTo(numAttr(bar1, "width"), rendererWidth, 0.01, "width is correct for bar1");
             assert.closeTo(numAttr(bar2, "width"), rendererWidth, 0.01, "width is correct for bar2");
@@ -2927,7 +2926,6 @@ describe("Plots", function () {
             var bar1Y = bar1.data()[0].y;
             var bar2Y = bar2.data()[0].y;
             var bar3Y = bar3.data()[0].y;
-            // check that clustering is correct
             var off = renderer.innerScale.scale("_0");
             assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar0");
             assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar1");
@@ -2937,7 +2935,6 @@ describe("Plots", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Broadcasters", function () {
     var b;
@@ -3004,7 +3001,6 @@ describe("Broadcasters", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("ComponentContainer", function () {
     it("_addComponent()", function () {
@@ -3062,7 +3058,6 @@ describe("ComponentContainer", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("ComponentGroups", function () {
     it("components in componentGroups overlap", function () {
@@ -3251,10 +3246,8 @@ describe("ComponentGroups", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 function assertComponentXY(component, x, y, message) {
-    // use <any> to examine the private variables
     var translate = d3.transform(component._element.attr("transform")).translate;
     var xActual = translate[0];
     var yActual = translate[1];
@@ -3304,11 +3297,9 @@ describe("Component behavior", function () {
             svg.remove();
         });
         it("computeLayout works with CSS layouts", function () {
-            // Manually size parent
             var parent = d3.select(svg.node().parentNode);
             parent.style("width", "400px");
             parent.style("height", "200px");
-            // Remove width/height attributes and style with CSS
             svg.attr("width", null).attr("height", null);
             c._anchor(svg);
             c._computeLayout();
@@ -3328,7 +3319,6 @@ describe("Component behavior", function () {
             assert.equal(c.height(), 50, "computeLayout updated height to new svg height");
             assert.equal(c.xOrigin, 0, "xOrigin is still 0");
             assert.equal(c.yOrigin, 0, "yOrigin is still 0");
-            // reset test page DOM
             parent.style("width", "auto");
             parent.style("height", "auto");
             svg.remove();
@@ -3425,7 +3415,6 @@ describe("Component behavior", function () {
         c._render();
         var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
         var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
-        // IE 9 has clipPath like 'url("#clipPath")', must accomodate
         var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
         assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
         var clipRect = c.boxContainer.select(".clip-rect");
@@ -3560,12 +3549,11 @@ describe("Component behavior", function () {
     });
     it("components can be detached even if not anchored", function () {
         var c = new Plottable.Abstract.Component();
-        c.detach(); // no error thrown
+        c.detach();
         svg.remove();
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Dataset", function () {
     it("Updates listeners when the data is changed", function () {
@@ -3615,11 +3603,8 @@ describe("Dataset", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 function generateBasicTable(nRows, nCols) {
-    // makes a table with exactly nRows * nCols children in a regular grid, with each
-    // child being a basic component
     var table = new Plottable.Component.Table();
     var rows = [];
     var components = [];
@@ -3687,12 +3672,11 @@ describe("Tables", function () {
         assert.throws(function () { return t.addComponent(0, 2, c3); }, Error, "component already exists");
     });
     it("addComponent works even if a component is added with a high column and low row index", function () {
-        // Solves #180, a weird bug
         var t = new Plottable.Component.Table();
         var svg = generateSVG();
         t.addComponent(1, 0, new Plottable.Abstract.Component());
         t.addComponent(0, 2, new Plottable.Abstract.Component());
-        t.renderTo(svg); //would throw an error without the fix (tested);
+        t.renderTo(svg);
         svg.remove();
     });
     it("basic table with 2 rows 2 cols lays out properly", function () {
@@ -3737,10 +3721,6 @@ describe("Tables", function () {
     it("table with fixed-size objects on every side lays out properly", function () {
         var svg = generateSVG();
         var c4 = new Plottable.Abstract.Component();
-        // [0 1 2] \\
-        // [3 4 5] \\
-        // [6 7 8] \\
-        // give the axis-like objects a minimum
         var c1 = makeFixedSizeComponent(null, 30);
         var c7 = makeFixedSizeComponent(null, 30);
         var c3 = makeFixedSizeComponent(50, null);
@@ -3751,13 +3731,11 @@ describe("Tables", function () {
         var elements = components.map(function (r) { return r._element; });
         var translates = elements.map(function (e) { return getTranslate(e); });
         var bboxes = elements.map(function (e) { return Plottable._Util.DOM.getBBox(e); });
-        // test the translates
         assert.deepEqual(translates[0], [50, 0], "top axis translate");
         assert.deepEqual(translates[4], [50, 370], "bottom axis translate");
         assert.deepEqual(translates[1], [0, 30], "left axis translate");
         assert.deepEqual(translates[3], [350, 30], "right axis translate");
         assert.deepEqual(translates[2], [50, 30], "plot translate");
-        // test the bboxes
         assertBBoxEquivalence(bboxes[0], [300, 30], "top axis bbox");
         assertBBoxEquivalence(bboxes[4], [300, 30], "bottom axis bbox");
         assertBBoxEquivalence(bboxes[1], [50, 340], "left axis bbox");
@@ -3781,8 +3759,6 @@ describe("Tables", function () {
         assert.isFalse(table._isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
     });
     it.skip("table._requestedSpace works properly", function () {
-        // [0 1]
-        // [2 3]
         var c0 = new Plottable.Abstract.Component();
         var c1 = makeFixedSizeComponent(50, 50);
         var c2 = makeFixedSizeComponent(20, 50);
@@ -3798,7 +3774,6 @@ describe("Tables", function () {
         verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
     });
     describe("table.iterateLayout works properly", function () {
-        // This test battery would have caught #405
         function verifyLayoutResult(result, cPS, rPS, gW, gH, wW, wH, id) {
             assert.deepEqual(result.colProportionalSpace, cPS, "colProportionalSpace:" + id);
             assert.deepEqual(result.rowProportionalSpace, rPS, "rowProportionalSpace:" + id);
@@ -3836,7 +3811,6 @@ describe("Tables", function () {
             result = table.iterateLayout(80, 80);
             verifyLayoutResult(result, [0, 0], [0, 0], [40, 40], [40, 40], true, true, "..when there's not enough space");
             result = table.iterateLayout(120, 120);
-            // If there is extra space in a fixed-size table, the extra space should not be allocated to proportional space
             verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's extra space");
         });
         it.skip("iterateLayout works in the tricky case when components can be unsatisfied but request little space", function () {
@@ -3889,7 +3863,6 @@ describe("Tables", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Domainer", function () {
     var scale;
@@ -3945,9 +3918,6 @@ describe("Domainer", function () {
         var dayBefore = new Date(2000, 5, 4);
         var dayAfter = new Date(2000, 5, 6);
         var timeScale = new Plottable.Scale.Time();
-        // the result of computeDomain() will be number[], but when it
-        // gets fed back into timeScale, it will be adjusted back to a Date.
-        // That's why I'm using _updateExtent() instead of domainer.computeDomain()
         timeScale._updateExtent("1", "x", [d, d]);
         timeScale.domainer(new Plottable.Domainer().pad());
         assert.deepEqual(timeScale.domain(), [dayBefore, dayAfter]);
@@ -4055,7 +4025,6 @@ describe("Domainer", function () {
             return exceptions;
         }
         assert.deepEqual(getExceptions(), [0], "initializing the plot adds a padding exception at 0");
-        // assert.deepEqual(getExceptions(), [], "Initially there are no padding exceptions");
         r.project("y0", "y0", yScale);
         assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
         r.project("y0", 0, yScale);
@@ -4070,7 +4039,6 @@ describe("Domainer", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Coordinators", function () {
     describe("ScaleDomainCoordinator", function () {
@@ -4091,12 +4059,11 @@ describe("Coordinators", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Scales", function () {
     it("Scale's copy() works correctly", function () {
         var testCallback = function (broadcaster) {
-            return true; // doesn't do anything
+            return true;
         };
         var scale = new Plottable.Scale.Linear();
         scale.broadcaster.registerListener(null, testCallback);
@@ -4161,7 +4128,6 @@ describe("Scales", function () {
             dataset.data([{ foo: 10 }, { foo: 11 }]);
             assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataset after one perspective deregistered");
             renderer2.project("x", "foo", otherScale);
-            // "scale not listening to the dataset after all perspectives removed"
             dataset.data([{ foo: 99 }, { foo: 100 }]);
             assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
             svg1.remove();
@@ -4243,7 +4209,7 @@ describe("Scales", function () {
             var yScale = new Plottable.Scale.Linear();
             var plot = new Plottable.Plot.Scatter(sadTimesData, xScale, yScale);
             var id = function (d) { return d; };
-            xScale.domainer(new Plottable.Domainer()); // to disable padding, etc
+            xScale.domainer(new Plottable.Domainer());
             plot.project("x", id, xScale);
             plot.project("y", id, yScale);
             var svg = generateSVG();
@@ -4285,7 +4251,6 @@ describe("Scales", function () {
         });
     });
     it("OrdinalScale + BarPlot combo works as expected when the data is swapped", function () {
-        // This unit test taken from SLATE, see SLATE-163 a fix for SLATE-102
         var xScale = new Plottable.Scale.Ordinal();
         var yScale = new Plottable.Scale.Linear();
         var dA = { x: "A", y: 2 };
@@ -4387,10 +4352,8 @@ describe("Scales", function () {
         });
         it("is an increasing, continuous function that can go negative", function () {
             d3.range(-base * 2, base * 2, base / 20).forEach(function (x) {
-                // increasing
                 assert.operator(scale.scale(x - epsilon), "<", scale.scale(x));
                 assert.operator(scale.scale(x), "<", scale.scale(x + epsilon));
-                // continuous
                 assert.closeTo(scale.scale(x - epsilon), scale.scale(x), epsilon);
                 assert.closeTo(scale.scale(x), scale.scale(x + epsilon), epsilon);
             });
@@ -4444,7 +4407,6 @@ describe("Scales", function () {
             assert.closeTo(scale.scale(200), range[0], epsilon);
             var a = [-100, -10, -3, 0, 1, 3.64, 50, 60, 200];
             var b = a.map(function (x) { return scale.scale(x); });
-            // should be decreasing function; reverse is sorted
             assert.deepEqual(b.slice().reverse(), b.slice().sort(function (x, y) { return x - y; }));
             var ticks = scale.ticks();
             assert.deepEqual(ticks, ticks.slice().sort(function (x, y) { return x - y; }), "ticks should be sorted");
@@ -4466,7 +4428,6 @@ describe("Scales", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("TimeScale tests", function () {
     it("parses reasonable formats for dates", function () {
@@ -4487,7 +4448,6 @@ describe("TimeScale tests", function () {
     it("time coercer works as intended", function () {
         var tc = new Plottable.Scale.Time()._typeCoercer;
         assert.equal(tc(null).getMilliseconds(), 0, "null converted to Date(0)");
-        // converting null to Date(0) is the correct behavior as it mirror's d3's semantics
         assert.equal(tc("Wed Dec 31 1969 16:00:00 GMT-0800 (PST)").getMilliseconds(), 0, "string parsed to date");
         assert.equal(tc(0).getMilliseconds(), 0, "number parsed to date");
         var d = new Date(0);
@@ -4495,38 +4455,31 @@ describe("TimeScale tests", function () {
     });
     it("_tickInterval produces correct number of ticks", function () {
         var scale = new Plottable.Scale.Time();
-        // 100 year span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
         var ticks = scale._tickInterval(d3.time.year);
         assert.equal(ticks.length, 101, "generated correct number of ticks");
-        // 1 year span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 11, 31, 0, 0, 0, 0)]);
         ticks = scale._tickInterval(d3.time.month);
         assert.equal(ticks.length, 12, "generated correct number of ticks");
         ticks = scale._tickInterval(d3.time.month, 3);
         assert.equal(ticks.length, 4, "generated correct number of ticks");
-        // 1 month span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 1, 1, 0, 0, 0, 0)]);
         ticks = scale._tickInterval(d3.time.day);
         assert.equal(ticks.length, 32, "generated correct number of ticks");
-        // 1 day span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 23, 0, 0, 0)]);
         ticks = scale._tickInterval(d3.time.hour);
         assert.equal(ticks.length, 24, "generated correct number of ticks");
-        // 1 hour span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 1, 0, 0, 0)]);
         ticks = scale._tickInterval(d3.time.minute);
         assert.equal(ticks.length, 61, "generated correct number of ticks");
         ticks = scale._tickInterval(d3.time.minute, 10);
         assert.equal(ticks.length, 7, "generated correct number of ticks");
-        // 1 minute span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
         ticks = scale._tickInterval(d3.time.second);
         assert.equal(ticks.length, 61, "generated correct number of ticks");
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("_Util.DOM", function () {
     it("getBBox works properly", function () {
@@ -4551,10 +4504,10 @@ describe("_Util.DOM", function () {
         };
         var removedSVG = generateSVG().remove();
         var rect = removedSVG.append("rect").attr(expectedBox);
-        Plottable._Util.DOM.getBBox(rect); // could throw NS_ERROR on FF
+        Plottable._Util.DOM.getBBox(rect);
         var noneSVG = generateSVG().style("display", "none");
         rect = noneSVG.append("rect").attr(expectedBox);
-        Plottable._Util.DOM.getBBox(rect); // could throw NS_ERROR on FF
+        Plottable._Util.DOM.getBBox(rect);
         noneSVG.remove();
     });
     describe("getElementWidth, getElementHeight", function () {
@@ -4598,7 +4551,6 @@ describe("_Util.DOM", function () {
             child.style("height", "50%");
             assert.equal(Plottable._Util.DOM.getElementWidth(childElem), 100, "width is correct");
             assert.equal(Plottable._Util.DOM.getElementHeight(childElem), 25, "height is correct");
-            // reset test page DOM
             parent.style("width", "auto");
             parent.style("height", "auto");
             child.remove();
@@ -4606,7 +4558,6 @@ describe("_Util.DOM", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Formatters", function () {
     describe("fixed", function () {
@@ -4691,7 +4642,6 @@ describe("Formatters", function () {
     describe("time", function () {
         it("uses reasonable defaults", function () {
             var timeFormatter = Plottable.Formatters.time();
-            // year, month, day, hours, minutes, seconds, milliseconds
             var result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
             assert.strictEqual(result, "2000", "only the year was displayed");
             result = timeFormatter(new Date(2000, 2, 1, 0, 0, 0, 0));
@@ -4731,7 +4681,6 @@ describe("Formatters", function () {
     describe("time", function () {
         it("uses reasonable defaults", function () {
             var timeFormatter = Plottable.Formatters.time();
-            // year, month, day, hours, minutes, seconds, milliseconds
             var result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
             assert.strictEqual(result, "2000", "only the year was displayed");
             result = timeFormatter(new Date(2000, 2, 1, 0, 0, 0, 0));
@@ -4788,7 +4737,6 @@ describe("Formatters", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("IDCounter", function () {
     it("IDCounter works as expected", function () {
@@ -4804,7 +4752,6 @@ describe("IDCounter", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("StrictEqualityAssociativeArray", function () {
     it("StrictEqualityAssociativeArray works as expected", function () {
@@ -4841,7 +4788,6 @@ describe("StrictEqualityAssociativeArray", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("CachingCharacterMeasurer", function () {
     var g;
@@ -4876,7 +4822,6 @@ describe("CachingCharacterMeasurer", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Cache", function () {
     var callbackCalled = false;
@@ -4951,7 +4896,6 @@ describe("Cache", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("_Util.Text", function () {
     it("getTruncatedText works properly", function () {
@@ -5199,7 +5143,6 @@ describe("_Util.Text", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("_Util.Methods", function () {
     it("inRange works correct", function () {
@@ -5262,7 +5205,6 @@ describe("_Util.Methods", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 function makeFakeEvent(x, y) {
     return {
@@ -5291,8 +5233,6 @@ function fakeDragSequence(anyedInteraction, startX, startY, endX, endY) {
 describe("Interactions", function () {
     describe("PanZoomInteraction", function () {
         it("Pans properly", function () {
-            // The only difference between pan and zoom is internal to d3
-            // Simulating zoom events is painful, so panning will suffice here
             var xScale = new Plottable.Scale.Linear().domain([0, 11]);
             var yScale = new Plottable.Scale.Linear().domain([11, 0]);
             var svg = generateSVG();
@@ -5376,7 +5316,6 @@ describe("Interactions", function () {
                 assert.deepEqual(a, expectedStart, "areaCallback was passed the correct starting point");
                 assert.deepEqual(b, expectedEnd, "areaCallback was passed the correct ending point");
             });
-            // fake a drag event
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
             assert.equal(timesCalled, 2, "drag callbacks are called twice");
         });
@@ -5441,7 +5380,6 @@ describe("Interactions", function () {
                 assert.deepEqual(a.y, expectedStartY);
                 assert.deepEqual(b.y, expectedEndY);
             });
-            // fake a drag event
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
             assert.equal(timesCalled, 2, "drag callbacks area called twice");
         });
@@ -5466,10 +5404,9 @@ describe("Interactions", function () {
     describe("KeyInteraction", function () {
         it("Triggers the callback only when the Component is moused over and appropriate key is pressed", function () {
             var svg = generateSVG(400, 400);
-            // svg.attr("id", "key-interaction-test");
             var component = new Plottable.Abstract.Component();
             component.renderTo(svg);
-            var code = 65; // "a" key
+            var code = 65;
             var ki = new Plottable.Interaction.Key(code);
             var callbackCalled = false;
             var callback = function () {
@@ -5594,7 +5531,6 @@ describe("Interactions", function () {
     });
 });
 
-///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Dispatchers", function () {
     it("correctly registers for and deregisters from events", function () {
