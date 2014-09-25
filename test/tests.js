@@ -2688,10 +2688,10 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar0, "height"), numAttr(bar4, "height"), 1, "heights are the same");
             assert.closeTo(numAttr(bar1, "height"), numAttr(bar3, "height"), 1, "heights are the same");
             assert.closeTo(numAttr(bar1, "height"), numAttr(bar5, "height"), 1, "heights are the same");
-            assert.operator(numAttr(bar0, "y"), "<", numAttr(bar2, "y"), "y is correct for bar0");
-            assert.operator(numAttr(bar2, "y"), "<", numAttr(bar4, "y"), "y is correct for bar0");
-            assert.operator(numAttr(bar3, "y"), "<", numAttr(bar1, "y"), "y is correct for bar0");
-            assert.operator(numAttr(bar1, "y"), "<", numAttr(bar5, "y"), "y is correct for bar0");
+            assert.operator(numAttr(bar0, "y"), "<", numAttr(bar2, "y"), "bar0 above bar2");
+            assert.operator(numAttr(bar2, "y"), "<", numAttr(bar4, "y"), "bar2 above bar4");
+            assert.operator(numAttr(bar3, "y"), "<", numAttr(bar1, "y"), "bar3 above bar1");
+            assert.operator(numAttr(bar1, "y"), "<", numAttr(bar5, "y"), "bar1 above bar5");
             svg.remove();
         });
         it("stacked extent is set correctly", function () {
