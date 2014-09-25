@@ -655,8 +655,6 @@ declare module Plottable {
             _scale: Scale<any, number>;
             _formatter: Formatter;
             _orientation: string;
-            _userRequestedWidth: any;
-            _userRequestedHeight: any;
             _computedWidth: number;
             _computedHeight: number;
             constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
@@ -685,10 +683,6 @@ declare module Plottable {
                 y2: any;
             };
             _invalidateLayout(): void;
-            width(): number;
-            width(w: any): Axis;
-            height(): number;
-            height(h: any): Axis;
             formatter(): Formatter;
             formatter(formatter: Formatter): Axis;
             tickLength(): number;

@@ -1,5 +1,5 @@
 /*!
-Plottable 0.29.1 (https://github.com/palantir/plottable)
+Plottable 0.30.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -952,7 +952,7 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.29.1";
+    Plottable.version = "0.30.0";
 })(Plottable || (Plottable = {}));
 
 var Plottable;
@@ -1933,7 +1933,7 @@ var Plottable;
             __extends(Time, _super);
             function Time(scale) {
                 _super.call(this, scale == null ? d3.time.scale() : scale);
-                this._typeCoercer = function (d) { return d._isAMomentObject || d instanceof Date ? d : new Date(d); };
+                this._typeCoercer = function (d) { return d && d._isAMomentObject || d instanceof Date ? d : new Date(d); };
             }
             Time.prototype._tickInterval = function (interval, step) {
                 var tempScale = d3.time.scale();
@@ -2406,6 +2406,7 @@ var Plottable;
                 }
                 this._computeLayout();
                 this._render();
+                Plottable.Core.RenderController.flush();
                 return this;
             };
             Component.prototype.resize = function (width, height) {
@@ -2494,8 +2495,8 @@ var Plottable;
                 this.addBox("clip-rect", clipPathParent);
             };
             Component.prototype.registerInteraction = function (interaction) {
-                if (this._element != null) {
-                    if (this.hitBox == null) {
+                if (this._element) {
+                    if (!this.hitBox) {
                         this.hitBox = this.addBox("hit-box");
                         this.hitBox.style("fill", "#ffffff").style("opacity", 0);
                     }
@@ -2620,7 +2621,7 @@ var Plottable;
             };
             ComponentContainer.prototype._addComponent = function (c, prepend) {
                 if (prepend === void 0) { prepend = false; }
-                if (c == null || this._components.indexOf(c) >= 0) {
+                if (!c || this._components.indexOf(c) >= 0) {
                     return false;
                 }
                 if (prepend) {
@@ -2724,8 +2725,6 @@ var Plottable;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this);
                 var _this = this;
-                this._userRequestedWidth = "auto";
-                this._userRequestedHeight = "auto";
                 this._endTickLength = 5;
                 this._tickLength = 5;
                 this._tickLabelPadding = 10;
@@ -2762,25 +2761,19 @@ var Plottable;
                 return this._computedHeight;
             };
             Axis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var requestedWidth = this._userRequestedWidth;
-                var requestedHeight = this._userRequestedHeight;
+                var requestedWidth = 0;
+                var requestedHeight = 0;
                 if (this._isHorizontal()) {
-                    if (this._userRequestedHeight === "auto") {
-                        if (this._computedHeight == null) {
-                            this._computeHeight();
-                        }
-                        requestedHeight = this._computedHeight + this._gutter;
+                    if (this._computedHeight == null) {
+                        this._computeHeight();
                     }
-                    requestedWidth = 0;
+                    requestedHeight = this._computedHeight + this._gutter;
                 }
                 else {
-                    if (this._userRequestedWidth === "auto") {
-                        if (this._computedWidth == null) {
-                            this._computeWidth();
-                        }
-                        requestedWidth = this._computedWidth + this._gutter;
+                    if (this._computedWidth == null) {
+                        this._computeWidth();
                     }
-                    requestedHeight = 0;
+                    requestedWidth = this._computedWidth + this._gutter;
                 }
                 return {
                     width: requestedWidth,
@@ -2894,38 +2887,6 @@ var Plottable;
                 this._computedWidth = null;
                 this._computedHeight = null;
                 _super.prototype._invalidateLayout.call(this);
-            };
-            Axis.prototype.width = function (w) {
-                if (w == null) {
-                    return _super.prototype.width.call(this);
-                }
-                else {
-                    if (this._isHorizontal()) {
-                        throw new Error("width cannot be set on a horizontal Axis");
-                    }
-                    if (w !== "auto" && w < 0) {
-                        throw new Error("invalid value for width");
-                    }
-                    this._userRequestedWidth = w;
-                    this._invalidateLayout();
-                    return this;
-                }
-            };
-            Axis.prototype.height = function (h) {
-                if (h == null) {
-                    return _super.prototype.height.call(this);
-                }
-                else {
-                    if (!this._isHorizontal()) {
-                        throw new Error("height cannot be set on a vertical Axis");
-                    }
-                    if (h !== "auto" && h < 0) {
-                        throw new Error("invalid value for height");
-                    }
-                    this._userRequestedHeight = h;
-                    this._invalidateLayout();
-                    return this;
-                }
             };
             Axis.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
@@ -4083,25 +4044,22 @@ var Plottable;
             function Gridlines(xScale, yScale) {
                 _super.call(this);
                 var _this = this;
-                if (xScale == null && yScale == null) {
-                    throw new Error("Gridlines must have at least one scale");
-                }
                 this.classed("gridlines", true);
                 this.xScale = xScale;
                 this.yScale = yScale;
-                if (this.xScale != null) {
+                if (this.xScale) {
                     this.xScale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
-                if (this.yScale != null) {
+                if (this.yScale) {
                     this.yScale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
             }
             Gridlines.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                if (this.xScale != null) {
+                if (this.xScale) {
                     this.xScale.broadcaster.deregisterListener(this);
                 }
-                if (this.yScale != null) {
+                if (this.yScale) {
                     this.yScale.broadcaster.deregisterListener(this);
                 }
                 return this;
@@ -4118,7 +4076,7 @@ var Plottable;
             };
             Gridlines.prototype.redrawXLines = function () {
                 var _this = this;
-                if (this.xScale != null) {
+                if (this.xScale) {
                     var xTicks = this.xScale.ticks();
                     var getScaledXValue = function (tickVal) { return _this.xScale.scale(tickVal); };
                     var xLines = this.xLinesContainer.selectAll("line").data(xTicks);
@@ -4129,7 +4087,7 @@ var Plottable;
             };
             Gridlines.prototype.redrawYLines = function () {
                 var _this = this;
-                if (this.yScale != null) {
+                if (this.yScale) {
                     var yTicks = this.yScale.ticks();
                     var getScaledYValue = function (tickVal) { return _this.yScale.scale(tickVal); };
                     var yLines = this.yLinesContainer.selectAll("line").data(yTicks);
@@ -4181,7 +4139,7 @@ var Plottable;
                     this.nCols = Math.max(col + 1, this.nCols);
                     this.padTableToSize(this.nRows, this.nCols);
                     var currentComponent = this.rows[row][col];
-                    if (currentComponent != null) {
+                    if (currentComponent) {
                         throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
                     }
                     this.rows[row][col] = component;
@@ -4407,7 +4365,7 @@ var Plottable;
                 this.clipPathEnabled = true;
                 this.classed("plot", true);
                 var dataset;
-                if (dataOrDataset != null) {
+                if (dataOrDataset) {
                     if (typeof dataOrDataset.data === "function") {
                         dataset = dataOrDataset;
                     }
@@ -4433,17 +4391,17 @@ var Plottable;
                 var properties = Object.keys(this._projectors);
                 properties.forEach(function (property) {
                     var projector = _this._projectors[property];
-                    if (projector.scale != null) {
+                    if (projector.scale) {
                         projector.scale.broadcaster.deregisterListener(_this);
                     }
                 });
             };
             Plot.prototype.dataset = function (dataset) {
                 var _this = this;
-                if (dataset == null) {
+                if (!dataset) {
                     return this._dataset;
                 }
-                if (this._dataset != null) {
+                if (this._dataset) {
                     this._dataset.broadcaster.deregisterListener(this);
                 }
                 this._dataset = dataset;
@@ -4464,12 +4422,12 @@ var Plottable;
                 var _this = this;
                 attrToSet = attrToSet.toLowerCase();
                 var currentProjection = this._projectors[attrToSet];
-                var existingScale = (currentProjection != null) ? currentProjection.scale : null;
-                if (existingScale != null) {
+                var existingScale = currentProjection && currentProjection.scale;
+                if (existingScale) {
                     existingScale._removeExtent(this._plottableID.toString(), attrToSet);
                     existingScale.broadcaster.deregisterListener(this);
                 }
-                if (scale != null) {
+                if (scale) {
                     scale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
                 var activatedAccessor = Plottable._Util.Methods._applyAccessor(accessor, this);
@@ -4485,7 +4443,7 @@ var Plottable;
                     var projector = _this._projectors[a];
                     var accessor = projector.accessor;
                     var scale = projector.scale;
-                    var fn = scale == null ? accessor : function (d, i) { return scale.scale(accessor(d, i)); };
+                    var fn = scale ? function (d, i) { return scale.scale(accessor(d, i)); } : accessor;
                     h[a] = fn;
                 });
                 return h;
@@ -4518,7 +4476,7 @@ var Plottable;
             };
             Plot.prototype._updateScaleExtent = function (attr) {
                 var projector = this._projectors[attr];
-                if (projector.scale != null) {
+                if (projector.scale) {
                     var extent = this.dataset()._getExtent(projector.accessor, projector.scale._typeCoercer);
                     if (extent.length === 0 || !this._isAnchored) {
                         projector.scale._removeExtent(this._plottableID.toString(), attr);
@@ -4529,7 +4487,7 @@ var Plottable;
                 }
             };
             Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
-                if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
+                if (this._animate && this.animateOnNextRender && this._animators[animatorKey]) {
                     return this._animators[animatorKey].animate(selection, attrToProjector);
                 }
                 else {
@@ -4662,7 +4620,7 @@ var Plottable;
             __extends(XYPlot, _super);
             function XYPlot(dataset, xScale, yScale) {
                 _super.call(this, dataset);
-                if (xScale == null || yScale == null) {
+                if (!xScale || !yScale) {
                     throw new Error("XYPlots require an xScale and yScale");
                 }
                 this.classed("xy-plot", true);
@@ -4670,11 +4628,11 @@ var Plottable;
                 this.project("y", "y", yScale);
             }
             XYPlot.prototype.project = function (attrToSet, accessor, scale) {
-                if (attrToSet === "x" && scale != null) {
+                if (attrToSet === "x" && scale) {
                     this._xScale = scale;
                     this._updateXDomainer();
                 }
-                if (attrToSet === "y" && scale != null) {
+                if (attrToSet === "y" && scale) {
                     this._yScale = scale;
                     this._updateYDomainer();
                 }
@@ -4774,7 +4732,7 @@ var Plottable;
             NewStylePlot.prototype._updateScaleExtent = function (attr) {
                 var _this = this;
                 var projector = this._projectors[attr];
-                if (projector.scale != null) {
+                if (projector.scale) {
                     this._key2DatasetDrawerKey.forEach(function (key, ddk) {
                         var extent = ddk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer);
                         var scaleKey = _this._plottableID.toString() + "_" + key;
@@ -4812,7 +4770,7 @@ var Plottable;
                     var projectors = d3.values(this._projectors);
                     var scaleKey = this._plottableID.toString() + "_" + key;
                     projectors.forEach(function (p) {
-                        if (p.scale != null) {
+                        if (p.scale) {
                             p.scale._removeExtent(scaleKey, p.attribute);
                         }
                     });
@@ -4992,7 +4950,7 @@ var Plottable;
                     this._applyAnimatedAttributes(this._bars, "bars-reset", resetAttrToProjector);
                 }
                 var attrToProjector = this._generateAttrToProjector();
-                if (attrToProjector["fill"] != null) {
+                if (attrToProjector["fill"]) {
                     this._bars.attr("fill", attrToProjector["fill"]);
                 }
                 this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
@@ -5103,7 +5061,7 @@ var Plottable;
                 var secondaryAttr = this._isVertical ? "x" : "y";
                 var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
-                if (attrToProjector["width"] == null) {
+                if (!attrToProjector["width"]) {
                     var constantWidth = bandsMode ? secondaryScale.rangeBand() : BarPlot.DEFAULT_WIDTH;
                     attrToProjector["width"] = function (d, i) { return constantWidth; };
                 }
@@ -5225,33 +5183,18 @@ var Plottable;
                 var yDomain = this._yScale.domain();
                 var domainMax = Math.max(yDomain[0], yDomain[1]);
                 var domainMin = Math.min(yDomain[0], yDomain[1]);
-                var startValue = 0;
-                if (domainMax < 0) {
-                    startValue = domainMax;
-                }
-                else if (domainMin > 0) {
-                    startValue = domainMin;
-                }
+                var startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
                 var scaledStartValue = this._yScale.scale(startValue);
                 return function (d, i) { return scaledStartValue; };
             };
             Line.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var wholeDatumAttributes = this._wholeDatumAttributes();
-                function singleDatumAttributeFilter(attr) {
-                    return wholeDatumAttributes.indexOf(attr) === -1;
-                }
-                var singleDatumAttributes = d3.keys(attrToProjector).filter(singleDatumAttributeFilter);
+                var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
+                var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
                 singleDatumAttributes.forEach(function (attribute) {
                     var projector = attrToProjector[attribute];
-                    attrToProjector[attribute] = function (data, i) {
-                        if (data.length > 0) {
-                            return projector(data[0], i);
-                        }
-                        else {
-                            return null;
-                        }
-                    };
+                    attrToProjector[attribute] = function (data, i) { return data.length > 0 ? projector(data[0], i) : null; };
                 });
                 return attrToProjector;
             };
@@ -5314,8 +5257,8 @@ var Plottable;
             Area.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
                 var y0Projector = this._projectors["y0"];
-                var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
-                var extent = y0Accessor != null ? this.dataset()._getExtent(y0Accessor, this._yScale._typeCoercer) : [];
+                var y0Accessor = y0Projector && y0Projector.accessor;
+                var extent = y0Accessor ? this.dataset()._getExtent(y0Accessor, this._yScale._typeCoercer) : [];
                 var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
                 if (!this._yScale._userSetDomainer) {
                     if (constantBaseline != null) {
@@ -5514,7 +5457,7 @@ var Plottable;
             }
             Stacked.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-                if (this._datasetKeysInOrder != null && this._projectors["x"] != null && this._projectors["y"] != null) {
+                if (this._datasetKeysInOrder && this._projectors["x"] && this._projectors["y"]) {
                     this.stack();
                 }
             };
@@ -5572,7 +5515,7 @@ var Plottable;
             Stacked.prototype._updateScaleExtents = function () {
                 _super.prototype._updateScaleExtents.call(this);
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                if (primaryScale == null) {
+                if (!primaryScale) {
                     return;
                 }
                 if (this._isAnchored && this.stackedExtent.length > 0) {
