@@ -122,5 +122,6 @@ def get_template
     <div id="testdiv"></div>
   </body>
 
-</html>}
+</html>
+}
 end
