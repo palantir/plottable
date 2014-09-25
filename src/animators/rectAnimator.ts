@@ -19,7 +19,7 @@ export module Animator {
       this.isReverse = isReverse;
     }
 
-    public animate(selection: any, attrToProjector: IAttributeToProjector): any {
+    public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Transition.Transition {
       var startAttrToProjector: IAttributeToProjector = {};
       Rect.ANIMATED_ATTRIBUTES.forEach((attr: string) => startAttrToProjector[attr] = attrToProjector[attr]);
 
