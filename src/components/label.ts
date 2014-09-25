@@ -104,13 +104,13 @@ export module Component {
     /**
      * Gets the orientation of the Label.
      *
-     * @returns {number} the current orientation.
+     * @returns {string} the current orientation.
      */
     public orient(): string;
     /**
      * Sets the orientation of the Label.
      *
-     * @param {number} newOrientation If provided, the desired orientation
+     * @param {string} newOrientation If provided, the desired orientation
      * (horizontal/vertical-left/vertical-right).
      * @returns {Label} The calling Label.
      */
