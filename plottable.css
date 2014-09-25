@@ -14,12 +14,6 @@ svg.plottable {
   fill: #32313F;
 }
 
-.selected {
-  stroke: #333;
-  stroke-width: 2px;
-
-}
-
 .plottable .axis-label text {
   font-size: 10px;
   font-weight: bold;
