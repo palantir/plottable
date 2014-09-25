@@ -1,0 +1,55 @@
+
+<html>
+  <head>
+    <title>Rainfall Verticalbar</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <style>
+      svg {
+        margin: 2px;
+      }
+
+      #testdiv {
+        border: 2px solid black;
+        padding: 20px;
+      }
+
+      #outer {
+      }
+
+      .plottable .axis-label text {
+        font-size: 15;
+      }
+
+      .plottable .legend text {
+        font-size: 17px;
+        font-weight: normal;
+      }
+
+      .plottable .title-label text {
+        font-size: 25px;
+      }
+
+      .plottable .x-axis text {
+        font-size: 16px;
+      }
+
+
+    </style>
+    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="../../plottable.js"></script>
+    <script src="../exampleUtil.js"></script>
+    <script src="../js/rainfall_VerticalBar.js"></script>
+
+    <script>
+      window.onload = function() {
+        var div = d3.select("#testdiv");
+        run(div, makeData(), Plottable);
+      }
+  </script>
+  </head>
+
+  <body>
+    <div id="testdiv"></div>
+  </body>
+
+</html>

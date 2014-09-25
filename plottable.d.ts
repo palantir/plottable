@@ -580,10 +580,6 @@ declare module Plottable {
             static TICK_LABEL_CLASS: string;
             constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
             remove(): void;
-            width(): number;
-            width(w: any): Axis;
-            height(): number;
-            height(h: any): Axis;
             formatter(): Formatter;
             formatter(formatter: Formatter): Axis;
             tickLength(): number;
