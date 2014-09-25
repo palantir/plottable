@@ -30,37 +30,9 @@ export module Abstract {
       super();
       this.clipPathEnabled = true;
       this.classed("plot", true);
-<<<<<<< HEAD
       this._key2DatasetDrawerKey = d3.map();
       this._datasetKeysInOrder = [];
       this.nextSeriesIndex = 0;
-||||||| merged common ancestors
-
-      var dataset: Dataset;
-      if (dataOrDataset != null) {
-        if (typeof dataOrDataset.data === "function") {
-          dataset = <Dataset> dataOrDataset;
-        } else {
-          dataset = new Dataset(dataOrDataset);
-        }
-      } else {
-        dataset = new Dataset();
-      }
-      this.dataset(dataset);
-=======
-
-      var dataset: Dataset;
-      if (dataOrDataset) {
-        if (typeof dataOrDataset.data === "function") {
-          dataset = <Dataset> dataOrDataset;
-        } else {
-          dataset = new Dataset(dataOrDataset);
-        }
-      } else {
-        dataset = new Dataset();
-      }
-      this.dataset(dataset);
->>>>>>> develop
     }
 
     public _anchor(element: D3.Selection) {
@@ -98,7 +70,6 @@ export module Abstract {
      * @param {any[]|Dataset} dataset dataset to add.
      * @returns {NewStylePlot} The calling NewStylePlot.
      */
-<<<<<<< HEAD
     public addDataset(key: string, dataset: Dataset): Plot;
     public addDataset(key: string, dataset: any[]): Plot;
     public addDataset(dataset: Dataset): Plot;
@@ -106,28 +77,9 @@ export module Abstract {
     public addDataset(keyOrDataset: any, dataset?: any): Plot {
       if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
         throw new Error("invalid input to addDataset");
-||||||| merged common ancestors
-    public dataset(dataset: Dataset): Plot;
-    public dataset(dataset?: Dataset): any {
-      if (dataset == null) {
-        return this._dataset;
-=======
-    public dataset(dataset: Dataset): Plot;
-    public dataset(dataset?: Dataset): any {
-      if (!dataset) {
-        return this._dataset;
->>>>>>> develop
       }
-<<<<<<< HEAD
       if (typeof(keyOrDataset) === "string" && keyOrDataset[0] === "_") {
         _Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
-||||||| merged common ancestors
-      if (this._dataset != null) {
-        this._dataset.broadcaster.deregisterListener(this);
-=======
-      if (this._dataset) {
-        this._dataset.broadcaster.deregisterListener(this);
->>>>>>> develop
       }
       var key  = typeof(keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
       var data = typeof(keyOrDataset) !== "string" ? keyOrDataset : dataset;
@@ -203,21 +155,11 @@ export module Abstract {
       var currentProjection = this._projectors[attrToSet];
       var existingScale = currentProjection && currentProjection.scale;
 
-<<<<<<< HEAD
-      if (existingScale != null) {
+      if (existingScale) {
         this._datasetKeysInOrder.forEach((key) => {
           existingScale._removeExtent(this._plottableID.toString() + "_" + key, attrToSet);
           existingScale.broadcaster.deregisterListener(this);
         });
-||||||| merged common ancestors
-      if (existingScale != null) {
-        existingScale._removeExtent(this._plottableID.toString(), attrToSet);
-        existingScale.broadcaster.deregisterListener(this);
-=======
-      if (existingScale) {
-        existingScale._removeExtent(this._plottableID.toString(), attrToSet);
-        existingScale.broadcaster.deregisterListener(this);
->>>>>>> develop
       }
 
       if (scale) {
@@ -277,8 +219,7 @@ export module Abstract {
 
     public _updateScaleExtent(attr: string) {
       var projector = this._projectors[attr];
-<<<<<<< HEAD
-      if (projector.scale != null) {
+      if (projector.scale) {
         this._key2DatasetDrawerKey.forEach((key, ddk) => {
           var extent = ddk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer);
           var scaleKey = this._plottableID.toString() + "_" + key;
@@ -288,23 +229,6 @@ export module Abstract {
             projector.scale._updateExtent(scaleKey, attr, extent);
           }
         });
-||||||| merged common ancestors
-      if (projector.scale != null) {
-        var extent = this.dataset()._getExtent(projector.accessor, projector.scale._typeCoercer);
-        if (extent.length === 0 || !this._isAnchored) {
-          projector.scale._removeExtent(this._plottableID.toString(), attr);
-        } else {
-          projector.scale._updateExtent(this._plottableID.toString(), attr, extent);
-        }
-=======
-      if (projector.scale) {
-        var extent = this.dataset()._getExtent(projector.accessor, projector.scale._typeCoercer);
-        if (extent.length === 0 || !this._isAnchored) {
-          projector.scale._removeExtent(this._plottableID.toString(), attr);
-        } else {
-          projector.scale._updateExtent(this._plottableID.toString(), attr, extent);
-        }
->>>>>>> develop
       }
     }
 

@@ -26,7 +26,7 @@ describe("Plots", () => {
         dataset = new Plottable.Dataset(data);
 
         barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
-        barPlot.addDataset("1", dataset)
+        barPlot.addDataset("1", dataset);
         barPlot.animate(false);
         barPlot.renderTo(svg);
       });

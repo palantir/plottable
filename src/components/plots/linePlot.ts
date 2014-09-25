@@ -60,7 +60,6 @@ export module Plot {
 
       var datasets = this._getDatasetsInOrder();
 
-<<<<<<< HEAD
       this._getDrawersInOrder().forEach((d, i) => {
         var dataset = datasets[i];
         var linePath: D3.Selection;
@@ -78,12 +77,6 @@ export module Plot {
           this._applyAnimatedAttributes(linePath, "line-reset", attrToProjector);
         }
 
-||||||| merged common ancestors
-      if (this._dataChanged) {
-
-=======
-      if (this._dataChanged) {
->>>>>>> develop
         attrToProjector["d"] = d3.svg.line()
           .x(xFunction)
           .y(yFunction);

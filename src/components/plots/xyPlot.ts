@@ -16,21 +16,11 @@ export module Abstract {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-<<<<<<< HEAD
     constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
       super();
       if (!(xScale && xScale.scale && yScale && yScale.scale)) {
         throw new Error("XYPlots require an xScale and yScale");
       }
-||||||| merged common ancestors
-    constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
-      super(dataset);
-      if (xScale == null || yScale == null) {throw new Error("XYPlots require an xScale and yScale");}
-=======
-    constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
-      super(dataset);
-      if (!xScale || !yScale) {throw new Error("XYPlots require an xScale and yScale");}
->>>>>>> develop
       this.classed("xy-plot", true);
 
       this.project("x", "x", xScale); // default accessor

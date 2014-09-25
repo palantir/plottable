@@ -29,21 +29,6 @@ export module Plot {
                                         .easing("exp-in-out");
     }
 
-<<<<<<< HEAD
-||||||| merged common ancestors
-    public _appendPath() {
-      this.areaPath = this._renderArea.append("path").classed("area", true);
-      super._appendPath();
-    }
-
-
-=======
-    public _appendPath() {
-      this.areaPath = this._renderArea.append("path").classed("area", true);
-      super._appendPath();
-    }
-
->>>>>>> develop
     public _onDatasetUpdate() {
       super._onDatasetUpdate();
       if (this._yScale != null) {
@@ -56,8 +41,7 @@ export module Plot {
 
       var constantBaseline: number;
       var y0Projector = this._projectors["y0"];
-<<<<<<< HEAD
-      var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
+      var y0Accessor = y0Projector && y0Projector.accessor;
       if (y0Accessor != null) {
         var extents = this._getDatasetsInOrder().map((d) => d._getExtent(y0Accessor, this._yScale._typeCoercer));
         var extent = _Util.Methods.flatten(extents);
@@ -66,15 +50,6 @@ export module Plot {
           constantBaseline = uniqExtentVals[0];
         }
       }
-||||||| merged common ancestors
-      var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
-      var extent:  number[] = y0Accessor != null ? this.dataset()._getExtent(y0Accessor, this._yScale._typeCoercer) : [];
-      var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
-=======
-      var y0Accessor = y0Projector && y0Projector.accessor;
-      var extent:  number[] = y0Accessor ? this.dataset()._getExtent(y0Accessor, this._yScale._typeCoercer) : [];
-      var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
->>>>>>> develop
 
       if (!this._yScale._userSetDomainer) {
         if (constantBaseline != null) {
