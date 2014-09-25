@@ -28,7 +28,7 @@ function run(div, data, Plottable) {
   var yAxis2 = new Plottable.Axis.Category(yScale2, "left");
 
   var legend = new Plottable.Component.HorizontalLegend(colorScale);
-    legend.xAlign("center");
+  legend.xAlign("center");
 
   var title = new Plottable.Component.TitleLabel("Sample Net Earnings by Teams");
 
@@ -42,8 +42,6 @@ function run(div, data, Plottable) {
     .addDataset("d4", data[3])
     .addDataset("d5", data[4]);
 
-
-
   var horizontalPlot = new Plottable.Plot.StackedBar(xScale2, yScale2, false)
     .project("x", "earnings", xScale2)
     .project("y", "quarter", yScale2)
@@ -52,8 +50,7 @@ function run(div, data, Plottable) {
     .addDataset("d2", data[1])
     .addDataset("d3", data[2])
     .addDataset("d4", data[3])
-    .addDataset("d5", data[4]);                        
-
+    .addDataset("d5", data[4]);
 
   var chart1 = new Plottable.Component.Table([
     [yAxis1, verticalPlot], [null, xAxis1]
@@ -65,8 +62,8 @@ function run(div, data, Plottable) {
   
   var finalchart = new Plottable.Component.Table([
     [title],
-    [legend],  
-    [chart1], 
+    [legend],
+    [chart1],
     [chart2]
     ]);
 
