@@ -1359,8 +1359,8 @@ var __extends = this.__extends || function (d, b) {
 var assert = chai.assert;
 var CountingPlot = (function (_super) {
     __extends(CountingPlot, _super);
-    function CountingPlot(dataset) {
-        _super.call(this, dataset);
+    function CountingPlot() {
+        _super.apply(this, arguments);
         this.renders = 0;
     }
     CountingPlot.prototype._render = function () {
@@ -1368,58 +1368,51 @@ var CountingPlot = (function (_super) {
         return _super.prototype._render.call(this);
     };
     return CountingPlot;
-})(Plottable.Abstract.Plot);
+})(Plottable.Abstract.NSPlot);
 describe("Plots", function () {
     describe("Abstract Plot", function () {
         it("Plots default correctly", function () {
-            var r = new Plottable.Abstract.Plot();
+            var r = new Plottable.Abstract.NSPlot();
             assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
         });
         it("Base Plot functionality works", function () {
             var svg = generateSVG(400, 300);
-            var d1 = new Plottable.Dataset(["foo"], { cssClass: "bar" });
-            var r = new Plottable.Abstract.Plot(d1);
+            var r = new Plottable.Abstract.NSPlot();
             r._anchor(svg);
             r._computeLayout();
             var renderArea = r._content.select(".render-area");
             assert.isNotNull(renderArea.node(), "there is a render-area");
             svg.remove();
         });
-        it("Allows the Dataset to be changed", function () {
-            var d1 = new Plottable.Dataset(["foo"], { cssClass: "bar" });
-            var r = new Plottable.Abstract.Plot(d1);
-            assert.equal(d1, r.dataset(), "returns the original");
-            var d2 = new Plottable.Dataset(["bar"], { cssClass: "boo" });
-            r.dataset(d2);
-            assert.equal(d2, r.dataset(), "returns new datasource");
-        });
         it("Changes Dataset listeners when the Dataset is changed", function () {
-            var d1 = new Plottable.Dataset(["foo"], { cssClass: "bar" });
-            var r = new CountingPlot(d1);
-            assert.equal(0, r.renders, "initially hasn't rendered anything");
-            d1.broadcaster.broadcast();
-            assert.equal(1, r.renders, "we re-render when our datasource changes");
-            r.dataset();
-            assert.equal(1, r.renders, "we shouldn't redraw when querying the datasource");
-            var d2 = new Plottable.Dataset(["bar"], { cssClass: "boo" });
-            r.dataset(d2);
-            assert.equal(2, r.renders, "we should redraw when we change datasource");
-            d1.broadcaster.broadcast();
-            assert.equal(2, r.renders, "we shouldn't listen to the old datasource");
-            d2.broadcaster.broadcast();
-            assert.equal(3, r.renders, "we should listen to the new datasource");
+            var dFoo = new Plottable.Dataset(["foo"], { cssClass: "bar" });
+            var dBar = new Plottable.Dataset(["bar"], { cssClass: "boo" });
+            var r = new CountingPlot();
+            r.addDataset("foo", dFoo);
+            assert.equal(1, r.renders, "initial render due to addDataset");
+            dFoo.broadcaster.broadcast();
+            assert.equal(2, r.renders, "we re-render when our dataset changes");
+            r.addDataset("bar", dBar);
+            assert.equal(3, r.renders, "we should redraw when we add a dataset");
+            dFoo.broadcaster.broadcast();
+            assert.equal(4, r.renders, "we should still listen to the first dataset");
+            dBar.broadcaster.broadcast();
+            assert.equal(5, r.renders, "we should listen to the new dataset");
+            r.removeDataset("foo");
+            assert.equal(6, r.renders, "we re-render on dataset removal");
+            dFoo.broadcaster.broadcast();
+            assert.equal(6, r.renders, "we don't listen to removed datasets");
         });
         it("Updates its projectors when the Dataset is changed", function () {
             var d1 = new Plottable.Dataset([{ x: 5, y: 6 }], { cssClass: "bar" });
-            var r = new Plottable.Abstract.Plot(d1);
+            var r = new Plottable.Abstract.NSPlot();
+            r.addDataset("d1", d1);
             var xScaleCalls = 0;
             var yScaleCalls = 0;
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
-            var metadataProjector = function (d, i, m) { return m.cssClass; };
             r.project("x", "x", xScale);
             r.project("y", "y", yScale);
-            r.project("meta", metadataProjector);
             xScale.broadcaster.registerListener(null, function (listenable) {
                 assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
                 ++xScaleCalls;
@@ -1433,30 +1426,27 @@ describe("Plots", function () {
             d1.broadcaster.broadcast();
             assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
             assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
-            var metaProjector = r._generateAttrToProjector()["meta"];
-            assert.equal(metaProjector(null, 0), "bar", "plot projector used the right metadata");
             var d2 = new Plottable.Dataset([{ x: 7, y: 8 }], { cssClass: "boo" });
-            r.dataset(d2);
-            assert.equal(2, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
-            assert.equal(2, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
+            r.removeDataset("d1");
+            r.addDataset(d2);
+            assert.equal(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
+            assert.equal(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
             d1.broadcaster.broadcast();
-            assert.equal(2, xScaleCalls, "X scale was unhooked from old datasource");
-            assert.equal(2, yScaleCalls, "Y scale was unhooked from old datasource");
+            assert.equal(3, xScaleCalls, "X scale was unhooked from old datasource");
+            assert.equal(3, yScaleCalls, "Y scale was unhooked from old datasource");
             d2.broadcaster.broadcast();
-            assert.equal(3, xScaleCalls, "X scale was hooked into new datasource");
-            assert.equal(3, yScaleCalls, "Y scale was hooked into new datasource");
-            metaProjector = r._generateAttrToProjector()["meta"];
-            assert.equal(metaProjector(null, 0), "boo", "plot projector used the right metadata");
+            assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
+            assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
         });
         it("Plot automatically generates a Dataset if only data is provided", function () {
             var data = ["foo", "bar"];
-            var r = new Plottable.Abstract.Plot(data);
-            var dataset = r.dataset();
+            var r = new Plottable.Abstract.NSPlot().addDataset("foo", data);
+            var dataset = r._getDatasetsInOrder()[0];
             assert.isNotNull(dataset, "A Dataset was automatically generated");
             assert.deepEqual(dataset.data(), data, "The generated Dataset has the correct data");
         });
         it("Plot.project works as intended", function () {
-            var r = new Plottable.Abstract.Plot();
+            var r = new Plottable.Abstract.NSPlot();
             var s = new Plottable.Scale.Linear().domain([0, 1]).range([0, 10]);
             r.project("attr", "a", s);
             var attrToProjector = r._generateAttrToProjector();
@@ -1469,8 +1459,8 @@ describe("Plots", function () {
             var s = new Plottable.Scale.Linear();
             var svg1 = generateSVG(100, 100);
             var svg2 = generateSVG(100, 100);
-            var r1 = new Plottable.Abstract.Plot().dataset(ds1).project("x", function (x) { return x; }, s).renderTo(svg1);
-            var r2 = new Plottable.Abstract.Plot().dataset(ds2).project("x", function (x) { return x; }, s).renderTo(svg2);
+            var r1 = new Plottable.Abstract.NSPlot().addDataset(ds1).project("x", function (x) { return x; }, s).renderTo(svg1);
+            var r2 = new Plottable.Abstract.NSPlot().addDataset(ds2).project("x", function (x) { return x; }, s).renderTo(svg2);
             assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
             ds1.data([]);
             assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
@@ -1478,7 +1468,7 @@ describe("Plots", function () {
             svg2.remove();
         });
         it("remove() disconnects plots from its scales", function () {
-            var r = new Plottable.Abstract.Plot();
+            var r = new Plottable.Abstract.NSPlot();
             var s = new Plottable.Scale.Linear();
             r.project("attr", "a", s);
             r.remove();
@@ -1630,9 +1620,7 @@ describe("Plots", function () {
         var p;
         var oldWarn = Plottable._Util.Methods.warn;
         beforeEach(function () {
-            var xScale = new Plottable.Scale.Linear();
-            var yScale = new Plottable.Scale.Linear();
-            p = new Plottable.Abstract.NSXYPlot(xScale, yScale);
+            p = new Plottable.Abstract.NSPlot();
             p._getDrawer = function (k) { return new Plottable._Drawer.Rect(k); };
         });
         afterEach(function () {
@@ -3532,31 +3520,25 @@ describe("Dataset", function () {
         var callbackCalled = false;
         var callback = function (listenable) {
             assert.equal(listenable, ds, "Callback received the Dataset as the first argument");
-            assert.deepEqual(ds.metadata(), newMetadata, "Dataset arrives with correct metadata");
             callbackCalled = true;
         };
         ds.broadcaster.registerListener(null, callback);
         ds.metadata(newMetadata);
-        assert.isTrue(callbackCalled, "callback was called when the metadata was changed");
     });
     it("_getExtent works as expected", function () {
         var data = [1, 2, 3, 4, 1];
         var metadata = { foo: 11 };
         var id = function (d) { return d; };
         var dataset = new Plottable.Dataset(data, metadata);
-        var plot = new Plottable.Abstract.Plot(dataset);
-        var apply = function (a) { return Plottable._Util.Methods._applyAccessor(a, plot); };
+        var plot = new Plottable.Abstract.NSPlot().addDataset(dataset);
         var a1 = function (d, i, m) { return d + i - 2; };
-        assert.deepEqual(dataset._getExtent(apply(a1), id), [-1, 5], "extent for numerical data works properly");
-        var a2 = function (d, i, m) { return d + m.foo; };
-        assert.deepEqual(dataset._getExtent(apply(a2), id), [12, 15], "extent uses metadata appropriately");
+        assert.deepEqual(dataset._getExtent(a1, id), [-1, 5], "extent for numerical data works properly");
         dataset.metadata({ foo: -1 });
-        assert.deepEqual(dataset._getExtent(apply(a2), id), [0, 3], "metadata change is reflected in extent results");
         var a3 = function (d, i, m) { return "_" + d; };
-        assert.deepEqual(dataset._getExtent(apply(a3), id), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
+        assert.deepEqual(dataset._getExtent(a3, id), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
         var a_toString = function (d) { return (d + 2).toString(); };
         var coerce = function (d) { return +d; };
-        assert.deepEqual(dataset._getExtent(apply(a_toString), coerce), [3, 6], "type coercion works as expected");
+        assert.deepEqual(dataset._getExtent(a_toString, coerce), [3, 6], "type coercion works as expected");
     });
 });
 
@@ -4068,7 +4050,7 @@ describe("Scales", function () {
         });
         it("scale autorange works as expected with single dataset", function () {
             var svg = generateSVG(100, 100);
-            var renderer = new Plottable.Abstract.Plot().dataset(dataset).project("x", "foo", scale).renderTo(svg);
+            var renderer = new Plottable.Abstract.NSPlot().addDataset(dataset).project("x", "foo", scale).renderTo(svg);
             assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
             data.push({ foo: 100, bar: 200 });
             dataset.data(data);
@@ -4078,9 +4060,9 @@ describe("Scales", function () {
         it("scale reference counting works as expected", function () {
             var svg1 = generateSVG(100, 100);
             var svg2 = generateSVG(100, 100);
-            var renderer1 = new Plottable.Abstract.Plot().dataset(dataset).project("x", "foo", scale);
+            var renderer1 = new Plottable.Abstract.NSPlot().addDataset(dataset).project("x", "foo", scale);
             renderer1.renderTo(svg1);
-            var renderer2 = new Plottable.Abstract.Plot().dataset(dataset).project("x", "foo", scale);
+            var renderer2 = new Plottable.Abstract.NSPlot().addDataset(dataset).project("x", "foo", scale);
             renderer2.renderTo(svg2);
             var otherScale = new Plottable.Scale.Linear();
             renderer1.project("x", "foo", otherScale);

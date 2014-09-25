@@ -726,26 +726,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Plot extends Component {
-            constructor();
-            constructor(data: any[]);
-            constructor(dataset: Dataset);
-            remove(): void;
-            dataset(): Dataset;
-            dataset(dataset: Dataset): Plot;
-            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
-            animate(enabled: boolean): Plot;
-            detach(): Plot;
-            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
-            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
         class NSPlot extends Component {
             constructor();
             remove(): void;
@@ -758,7 +738,7 @@ declare module Plottable {
             animate(enabled: boolean): NSPlot;
             detach(): NSPlot;
             animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
-            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
+            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): NSPlot;
             datasetOrder(): string[];
             datasetOrder(order: string[]): NSPlot;
             removeDataset(key: string): NSPlot;
@@ -771,16 +751,6 @@ declare module Plottable {
     module Plot {
         class Pie extends Plottable.Abstract.NSPlot {
             constructor();
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
-        class XYPlot<X, Y> extends Plot {
-            constructor(dataset: any, xScale: Scale<X, number>, yScale: Scale<Y, number>);
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
         }
     }
 }

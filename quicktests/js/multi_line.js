@@ -8,10 +8,9 @@ function makePowerFunction(pow) {
   "use strict";
   return function(d) {
     var newY = Math.pow(10 * d.y, pow);
-    if (newY === Infinity) {newY = Math.pow(10, 10)};
     return {x: d.x, y: newY, color: pow.toString()};
-  }
-};
+  };
+}
 
 function run(div, data, Plottable) {
   "use strict";
@@ -39,7 +38,7 @@ function run(div, data, Plottable) {
       .addDataset(d3)
       .addDataset(d4)
       .attr("stroke", "color", colorScale)
-      .attr("r", function(d) {return d.x * 12});
+      .attr("r", function(d) {return d.x * 12;});
 
   //title + legend
   var title1 = new Plottable.Component.TitleLabel( "Two Data Series", "horizontal");

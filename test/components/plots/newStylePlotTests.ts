@@ -3,13 +3,11 @@
 var assert = chai.assert;
 describe("Plots", () => {
   describe("New Style Plots", () => {
-    var p: Plottable.Abstract.NSXYPlot<number,number>;
+    var p: Plottable.Abstract.NSPlot;
     var oldWarn = Plottable._Util.Methods.warn;
 
     beforeEach(() => {
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
-      p = new Plottable.Abstract.NSXYPlot(xScale, yScale);
+      p = new Plottable.Abstract.NSPlot();
       p._getDrawer = (k: string) => new Plottable._Drawer.Rect(k);
     });
 

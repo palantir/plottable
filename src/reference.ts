@@ -52,10 +52,8 @@
 /// <reference path="components/gridlines.ts" />
 /// <reference path="components/table.ts" />
 
-/// <reference path="components/plots/plot.ts" />
 /// <reference path="components/plots/nsPlot.ts" />
 /// <reference path="components/plots/piePlot.ts" />
-/// <reference path="components/plots/xyPlot.ts" />
 /// <reference path="components/plots/nsXYPlot.ts" />
 /// <reference path="components/plots/scatterPlot.ts" />
 /// <reference path="components/plots/gridPlot.ts" />

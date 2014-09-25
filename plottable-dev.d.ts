@@ -9,7 +9,6 @@ declare module Plottable {
             function accessorize(accessor: any): _IAccessor;
             function union<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
             function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T>;
-            function _applyAccessor(accessor: _IAccessor, plot: Plottable.Abstract.Plot): (d: any, i: number) => any;
             function uniq<T>(arr: T[]): T[];
             function createFilledArray<T>(value: T, count: number): T[];
             function createFilledArray<T>(func: (index?: number) => T, count: number): T[];
@@ -875,44 +874,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Plot extends Component {
-            _dataset: Dataset;
-            _dataChanged: boolean;
-            _renderArea: D3.Selection;
-            _animate: boolean;
-            _animators: Plottable.Animator.IPlotAnimatorMap;
-            _ANIMATION_DURATION: number;
-            _projectors: {
-                [x: string]: _IProjector;
-            };
-            constructor();
-            constructor(data: any[]);
-            constructor(dataset: Dataset);
-            _anchor(element: D3.Selection): void;
-            remove(): void;
-            dataset(): Dataset;
-            dataset(dataset: Dataset): Plot;
-            _onDatasetUpdate(): void;
-            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
-            _generateAttrToProjector(): IAttributeToProjector;
-            _doRender(): void;
-            _paint(): void;
-            _setup(): void;
-            animate(enabled: boolean): Plot;
-            detach(): Plot;
-            _updateScaleExtents(): void;
-            _updateScaleExtent(attr: string): void;
-            _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any;
-            animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
-            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
         class NSPlot extends Component {
             _dataChanged: boolean;
             _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
@@ -946,7 +907,7 @@ declare module Plottable {
             _updateScaleExtent(attr: string): void;
             _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any;
             animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
-            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
+            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): NSPlot;
             datasetOrder(): string[];
             datasetOrder(order: string[]): NSPlot;
             removeDataset(key: string): NSPlot;
@@ -967,21 +928,6 @@ declare module Plottable {
             _generateAttrToProjector(): IAttributeToProjector;
             _getDrawer(key: string): Plottable.Abstract._Drawer;
             _paint(): void;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
-        class XYPlot<X, Y> extends Plot {
-            _xScale: Scale<X, number>;
-            _yScale: Scale<Y, number>;
-            constructor(dataset: any, xScale: Scale<X, number>, yScale: Scale<Y, number>);
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
-            _updateXDomainer(): void;
-            _updateYDomainer(): void;
         }
     }
 }

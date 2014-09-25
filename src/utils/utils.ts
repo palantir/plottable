@@ -111,14 +111,6 @@ export module _Util {
     }
 
     /**
-     * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
-     */
-    export function _applyAccessor(accessor: _IAccessor, plot: Abstract.Plot) {
-      var activatedAccessor = accessorize(accessor);
-      return (d: any, i: number) => activatedAccessor(d, i, plot.dataset().metadata());
-    }
-
-    /**
      * Take an array of values, and return the unique values.
      * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
      *

@@ -68,11 +68,6 @@ var Plottable;
                 return map;
             }
             Methods.populateMap = populateMap;
-            function _applyAccessor(accessor, plot) {
-                var activatedAccessor = accessorize(accessor);
-                return function (d, i) { return activatedAccessor(d, i, plot.dataset().metadata()); };
-            }
-            Methods._applyAccessor = _applyAccessor;
             function uniq(arr) {
                 var seen = d3.set();
                 var result = [];
@@ -2148,7 +2143,6 @@ var Plottable;
             };
             _Drawer.prototype.draw = function (data, attrToProjector, animator) {
                 if (animator === void 0) { animator = new Plottable.Animator.Null(); }
-                throw new Error("Abstract Method Not Implemented");
             };
             return _Drawer;
         })();
@@ -4394,173 +4388,6 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Abstract) {
-        var Plot = (function (_super) {
-            __extends(Plot, _super);
-            function Plot(dataOrDataset) {
-                _super.call(this);
-                this._dataChanged = false;
-                this._animate = false;
-                this._animators = {};
-                this._ANIMATION_DURATION = 250;
-                this._projectors = {};
-                this.animateOnNextRender = true;
-                this.clipPathEnabled = true;
-                this.classed("plot", true);
-                var dataset;
-                if (dataOrDataset != null) {
-                    if (typeof dataOrDataset.data === "function") {
-                        dataset = dataOrDataset;
-                    }
-                    else {
-                        dataset = new Plottable.Dataset(dataOrDataset);
-                    }
-                }
-                else {
-                    dataset = new Plottable.Dataset();
-                }
-                this.dataset(dataset);
-            }
-            Plot.prototype._anchor = function (element) {
-                _super.prototype._anchor.call(this, element);
-                this.animateOnNextRender = true;
-                this._dataChanged = true;
-                this._updateScaleExtents();
-            };
-            Plot.prototype.remove = function () {
-                var _this = this;
-                _super.prototype.remove.call(this);
-                this._dataset.broadcaster.deregisterListener(this);
-                var properties = Object.keys(this._projectors);
-                properties.forEach(function (property) {
-                    var projector = _this._projectors[property];
-                    if (projector.scale != null) {
-                        projector.scale.broadcaster.deregisterListener(_this);
-                    }
-                });
-            };
-            Plot.prototype.dataset = function (dataset) {
-                var _this = this;
-                if (dataset == null) {
-                    return this._dataset;
-                }
-                if (this._dataset != null) {
-                    this._dataset.broadcaster.deregisterListener(this);
-                }
-                this._dataset = dataset;
-                this._dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
-                this._onDatasetUpdate();
-                return this;
-            };
-            Plot.prototype._onDatasetUpdate = function () {
-                this._updateScaleExtents();
-                this.animateOnNextRender = true;
-                this._dataChanged = true;
-                this._render();
-            };
-            Plot.prototype.attr = function (attrToSet, accessor, scale) {
-                return this.project(attrToSet, accessor, scale);
-            };
-            Plot.prototype.project = function (attrToSet, accessor, scale) {
-                var _this = this;
-                attrToSet = attrToSet.toLowerCase();
-                var currentProjection = this._projectors[attrToSet];
-                var existingScale = (currentProjection != null) ? currentProjection.scale : null;
-                if (existingScale != null) {
-                    existingScale._removeExtent(this._plottableID.toString(), attrToSet);
-                    existingScale.broadcaster.deregisterListener(this);
-                }
-                if (scale != null) {
-                    scale.broadcaster.registerListener(this, function () { return _this._render(); });
-                }
-                var activatedAccessor = Plottable._Util.Methods._applyAccessor(accessor, this);
-                this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
-                this._updateScaleExtent(attrToSet);
-                this._render();
-                return this;
-            };
-            Plot.prototype._generateAttrToProjector = function () {
-                var _this = this;
-                var h = {};
-                d3.keys(this._projectors).forEach(function (a) {
-                    var projector = _this._projectors[a];
-                    var accessor = projector.accessor;
-                    var scale = projector.scale;
-                    var fn = scale == null ? accessor : function (d, i) { return scale.scale(accessor(d, i)); };
-                    h[a] = fn;
-                });
-                return h;
-            };
-            Plot.prototype._doRender = function () {
-                if (this._isAnchored) {
-                    this._paint();
-                    this._dataChanged = false;
-                    this.animateOnNextRender = false;
-                }
-            };
-            Plot.prototype._paint = function () {
-            };
-            Plot.prototype._setup = function () {
-                _super.prototype._setup.call(this);
-                this._renderArea = this._content.append("g").classed("render-area", true);
-            };
-            Plot.prototype.animate = function (enabled) {
-                this._animate = enabled;
-                return this;
-            };
-            Plot.prototype.detach = function () {
-                _super.prototype.detach.call(this);
-                this._updateScaleExtents();
-                return this;
-            };
-            Plot.prototype._updateScaleExtents = function () {
-                var _this = this;
-                d3.keys(this._projectors).forEach(function (attr) { return _this._updateScaleExtent(attr); });
-            };
-            Plot.prototype._updateScaleExtent = function (attr) {
-                var projector = this._projectors[attr];
-                if (projector.scale != null) {
-                    var extent = this.dataset()._getExtent(projector.accessor, projector.scale._typeCoercer);
-                    if (extent.length === 0 || !this._isAnchored) {
-                        projector.scale._removeExtent(this._plottableID.toString(), attr);
-                    }
-                    else {
-                        projector.scale._updateExtent(this._plottableID.toString(), attr, extent);
-                    }
-                }
-            };
-            Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
-                if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
-                    return this._animators[animatorKey].animate(selection, attrToProjector);
-                }
-                else {
-                    return selection.attr(attrToProjector);
-                }
-            };
-            Plot.prototype.animator = function (animatorKey, animator) {
-                if (animator === undefined) {
-                    return this._animators[animatorKey];
-                }
-                else {
-                    this._animators[animatorKey] = animator;
-                    return this;
-                }
-            };
-            return Plot;
-        })(Abstract.Component);
-        Abstract.Plot = Plot;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Abstract) {
         var NSPlot = (function (_super) {
             __extends(NSPlot, _super);
             function NSPlot() {
@@ -4651,8 +4478,10 @@ var Plottable;
                 var currentProjection = this._projectors[attrToSet];
                 var existingScale = (currentProjection != null) ? currentProjection.scale : null;
                 if (existingScale != null) {
-                    existingScale._removeExtent(this._plottableID.toString(), attrToSet);
-                    existingScale.broadcaster.deregisterListener(this);
+                    this._datasetKeysInOrder.forEach(function (key) {
+                        existingScale._removeExtent(_this._plottableID.toString() + "_" + key, attrToSet);
+                        existingScale.broadcaster.deregisterListener(_this);
+                    });
                 }
                 if (scale != null) {
                     scale.broadcaster.registerListener(this, function () { return _this._render(); });
@@ -4859,66 +4688,6 @@ var Plottable;
         Plot.Pie = Pie;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Abstract) {
-        var XYPlot = (function (_super) {
-            __extends(XYPlot, _super);
-            function XYPlot(dataset, xScale, yScale) {
-                _super.call(this, dataset);
-                if (xScale == null || yScale == null) {
-                    throw new Error("XYPlots require an xScale and yScale");
-                }
-                this.classed("xy-plot", true);
-                this.project("x", "x", xScale);
-                this.project("y", "y", yScale);
-            }
-            XYPlot.prototype.project = function (attrToSet, accessor, scale) {
-                if (attrToSet === "x" && scale != null) {
-                    this._xScale = scale;
-                    this._updateXDomainer();
-                }
-                if (attrToSet === "y" && scale != null) {
-                    this._yScale = scale;
-                    this._updateYDomainer();
-                }
-                _super.prototype.project.call(this, attrToSet, accessor, scale);
-                return this;
-            };
-            XYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                this._xScale.range([0, this.width()]);
-                this._yScale.range([this.height(), 0]);
-            };
-            XYPlot.prototype._updateXDomainer = function () {
-                if (this._xScale instanceof Abstract.QuantitativeScale) {
-                    var scale = this._xScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().pad().nice();
-                    }
-                }
-            };
-            XYPlot.prototype._updateYDomainer = function () {
-                if (this._yScale instanceof Abstract.QuantitativeScale) {
-                    var scale = this._yScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().pad().nice();
-                    }
-                }
-            };
-            return XYPlot;
-        })(Abstract.Plot);
-        Abstract.XYPlot = XYPlot;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
 })(Plottable || (Plottable = {}));
 
 var __extends = this.__extends || function (d, b) {

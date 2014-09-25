@@ -156,8 +156,10 @@ export module Abstract {
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
 
       if (existingScale != null) {
-        existingScale._removeExtent(this._plottableID.toString(), attrToSet);
-        existingScale.broadcaster.deregisterListener(this);
+        this._datasetKeysInOrder.forEach((key) => {
+          existingScale._removeExtent(this._plottableID.toString() + "_" + key, attrToSet);
+          existingScale.broadcaster.deregisterListener(this);
+        });
       }
 
       if (scale != null) {
@@ -266,7 +268,7 @@ export module Abstract {
      * the specified key.
      * @returns {Plot} The calling Plot.
      */
-    public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
+    public animator(animatorKey: string, animator: Animator.IPlotAnimator): NSPlot;
     public animator(animatorKey: string, animator?: Animator.IPlotAnimator): any {
       if (animator === undefined){
         return this._animators[animatorKey];
@@ -275,8 +277,6 @@ export module Abstract {
         return this;
       }
     }
-
-
 
     /**
      * Gets the dataset order by key
