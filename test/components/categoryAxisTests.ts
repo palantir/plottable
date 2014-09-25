@@ -79,4 +79,23 @@ describe("Category Axes", () => {
 
     svg.remove();
   });
+
+  it("proper range values for different range types", () => {
+    var SVG_WIDTH = 400;
+    var svg = generateSVG(SVG_WIDTH, 400);
+    var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([0, 400]).rangeType("bands", 1, 0);
+    var ca = new Plottable.Axis.Category(xScale, "bottom");
+    ca.renderTo(svg);
+
+    // Outer padding is equal to step
+    var step = SVG_WIDTH / 5;
+    var rangeValues = xScale.domain().map((s: any) => xScale.scale(s) / step);
+    assert.deepEqual(rangeValues, [1, 2, 3]);
+
+    xScale.rangeType("points", 1, 0);
+    step = SVG_WIDTH / 4;
+    rangeValues = xScale.domain().map((s: any) => xScale.scale(s) / step);
+    assert.deepEqual(rangeValues, [1, 2, 3]);
+    svg.remove();
+  });
 });
