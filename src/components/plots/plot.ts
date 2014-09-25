@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Abstract {
-  export class NSPlot extends Component {
+  export class Plot extends Component {
     public _dataChanged = false;
     private nextSeriesIndex: number;
     public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
@@ -70,11 +70,11 @@ export module Abstract {
      * @param {any[]|Dataset} dataset dataset to add.
      * @returns {NewStylePlot} The calling NewStylePlot.
      */
-    public addDataset(key: string, dataset: Dataset): NSPlot;
-    public addDataset(key: string, dataset: any[]): NSPlot;
-    public addDataset(dataset: Dataset): NSPlot;
-    public addDataset(dataset: any[]): NSPlot;
-    public addDataset(keyOrDataset: any, dataset?: any): NSPlot {
+    public addDataset(key: string, dataset: Dataset): Plot;
+    public addDataset(key: string, dataset: any[]): Plot;
+    public addDataset(dataset: Dataset): Plot;
+    public addDataset(dataset: any[]): Plot;
+    public addDataset(keyOrDataset: any, dataset?: any): Plot {
       if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
         throw new Error("invalid input to addDataset");
       }
@@ -268,7 +268,7 @@ export module Abstract {
      * the specified key.
      * @returns {Plot} The calling Plot.
      */
-    public animator(animatorKey: string, animator: Animator.IPlotAnimator): NSPlot;
+    public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
     public animator(animatorKey: string, animator?: Animator.IPlotAnimator): any {
       if (animator === undefined){
         return this._animators[animatorKey];
@@ -292,7 +292,7 @@ export module Abstract {
      *
      * @returns {NewStylePlot} The calling NewStylePlot.
      */
-    public datasetOrder(order: string[]): NSPlot;
+    public datasetOrder(order: string[]): Plot;
     public datasetOrder(order?: string[]): any {
       if (order === undefined) {
         return this._datasetKeysInOrder;
@@ -317,7 +317,7 @@ export module Abstract {
      * @param {string} key The key of the dataset
      * @return {NewStylePlot} The calling NewStylePlot.
      */
-    public removeDataset(key: string): NSPlot {
+    public removeDataset(key: string): Plot {
       if (this._key2DatasetDrawerKey.has(key)) {
         var ddk = this._key2DatasetDrawerKey.get(key);
         ddk.drawer.remove();

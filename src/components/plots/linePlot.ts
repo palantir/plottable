@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class Line<X> extends Abstract.NSXYPlot<X,number> {
+  export class Line<X> extends Abstract.XYPlot<X,number> {
 
     public _yScale: Abstract.QuantitativeScale<number>;
     public _animators: Animator.IPlotAnimatorMap = {

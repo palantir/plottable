@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Abstract {
-  export class NSXYPlot<X,Y> extends NSPlot {
+  export class XYPlot<X,Y> extends Plot {
     public _xScale: Abstract.Scale<X, number>;
     public _yScale: Abstract.Scale<Y, number>;
     /**

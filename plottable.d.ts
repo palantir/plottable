@@ -726,22 +726,22 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class NSPlot extends Component {
+        class Plot extends Component {
             constructor();
             remove(): void;
-            addDataset(key: string, dataset: Dataset): NSPlot;
-            addDataset(key: string, dataset: any[]): NSPlot;
-            addDataset(dataset: Dataset): NSPlot;
-            addDataset(dataset: any[]): NSPlot;
-            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSPlot;
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSPlot;
-            animate(enabled: boolean): NSPlot;
-            detach(): NSPlot;
+            addDataset(key: string, dataset: Dataset): Plot;
+            addDataset(key: string, dataset: any[]): Plot;
+            addDataset(dataset: Dataset): Plot;
+            addDataset(dataset: any[]): Plot;
+            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
+            animate(enabled: boolean): Plot;
+            detach(): Plot;
             animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
-            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): NSPlot;
+            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
             datasetOrder(): string[];
-            datasetOrder(order: string[]): NSPlot;
-            removeDataset(key: string): NSPlot;
+            datasetOrder(order: string[]): Plot;
+            removeDataset(key: string): Plot;
         }
     }
 }
@@ -749,7 +749,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Pie extends Plottable.Abstract.NSPlot {
+        class Pie extends Plottable.Abstract.Plot {
             constructor();
         }
     }
@@ -758,9 +758,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class NSXYPlot<X, Y> extends NSPlot {
+        class XYPlot<X, Y> extends Plot {
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSXYPlot<X, Y>;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
         }
     }
 }
@@ -768,7 +768,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Scatter<X, Y> extends Plottable.Abstract.NSXYPlot<X, Y> {
+        class Scatter<X, Y> extends Plottable.Abstract.XYPlot<X, Y> {
             constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.Scale<Y, number>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Scatter<X, Y>;
         }
@@ -778,7 +778,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Grid<C> extends Plottable.Abstract.NSXYPlot<string, string> {
+        class Grid<C> extends Plottable.Abstract.XYPlot<string, string> {
             constructor(xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale<C, string>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Grid<C>;
         }
@@ -788,7 +788,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class NewStyleBarPlot<X, Y> extends NSXYPlot<X, Y> {
+        class NewStyleBarPlot<X, Y> extends XYPlot<X, Y> {
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             baseline(value: number): NewStyleBarPlot<X, Y>;
             barAlignment(alignment: string): NewStyleBarPlot<X, Y>;
@@ -822,7 +822,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Line<X> extends Plottable.Abstract.NSXYPlot<X, number> {
+        class Line<X> extends Plottable.Abstract.XYPlot<X, number> {
             constructor(xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
         }
     }
@@ -850,7 +850,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Stacked<X, Y> extends NSXYPlot<X, Y> {
+        class Stacked<X, Y> extends XYPlot<X, Y> {
         }
     }
 }

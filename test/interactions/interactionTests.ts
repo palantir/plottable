@@ -85,7 +85,7 @@ describe("Interactions", () => {
     var dataset: Plottable.Dataset;
     var xScale: Plottable.Abstract.QuantitativeScale<number>;
     var yScale: Plottable.Abstract.QuantitativeScale<number>;
-    var plot: Plottable.Abstract.NSXYPlot<number,number>;
+    var plot: Plottable.Abstract.XYPlot<number,number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
     var dragstartX = 20;
@@ -167,7 +167,7 @@ describe("Interactions", () => {
     var dataset: Plottable.Dataset;
     var xScale: Plottable.Abstract.QuantitativeScale<number>;
     var yScale: Plottable.Abstract.QuantitativeScale<number>;
-    var plot: Plottable.Abstract.NSXYPlot<number,number>;
+    var plot: Plottable.Abstract.XYPlot<number,number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
     var dragstartX = 20;

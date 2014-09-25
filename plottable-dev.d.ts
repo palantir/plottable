@@ -874,7 +874,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class NSPlot extends Component {
+        class Plot extends Component {
             _dataChanged: boolean;
             _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
             _datasetKeysInOrder: string[];
@@ -889,28 +889,28 @@ declare module Plottable {
             _anchor(element: D3.Selection): void;
             _setup(): void;
             remove(): void;
-            addDataset(key: string, dataset: Dataset): NSPlot;
-            addDataset(key: string, dataset: any[]): NSPlot;
-            addDataset(dataset: Dataset): NSPlot;
-            addDataset(dataset: any[]): NSPlot;
+            addDataset(key: string, dataset: Dataset): Plot;
+            addDataset(key: string, dataset: any[]): Plot;
+            addDataset(dataset: Dataset): Plot;
+            addDataset(dataset: any[]): Plot;
             _addDataset(key: string, dataset: Dataset): void;
             _getDrawer(key: string): _Drawer;
             _getAnimator(drawer: _Drawer, index: number): Plottable.Animator.IPlotAnimator;
             _onDatasetUpdate(): void;
-            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSPlot;
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSPlot;
+            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
             _generateAttrToProjector(): IAttributeToProjector;
             _doRender(): void;
-            animate(enabled: boolean): NSPlot;
-            detach(): NSPlot;
+            animate(enabled: boolean): Plot;
+            detach(): Plot;
             _updateScaleExtents(): void;
             _updateScaleExtent(attr: string): void;
             _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any;
             animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
-            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): NSPlot;
+            animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
             datasetOrder(): string[];
-            datasetOrder(order: string[]): NSPlot;
-            removeDataset(key: string): NSPlot;
+            datasetOrder(order: string[]): Plot;
+            removeDataset(key: string): Plot;
             _getDatasetsInOrder(): Dataset[];
             _getDrawersInOrder(): _Drawer[];
             _paint(): void;
@@ -921,7 +921,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Pie extends Plottable.Abstract.NSPlot {
+        class Pie extends Plottable.Abstract.Plot {
             constructor();
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _addDataset(key: string, dataset: Dataset): void;
@@ -935,11 +935,11 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class NSXYPlot<X, Y> extends NSPlot {
+        class XYPlot<X, Y> extends Plot {
             _xScale: Scale<X, number>;
             _yScale: Scale<Y, number>;
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): NSXYPlot<X, Y>;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _updateXDomainer(): void;
             _updateYDomainer(): void;
@@ -950,7 +950,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Scatter<X, Y> extends Plottable.Abstract.NSXYPlot<X, Y> {
+        class Scatter<X, Y> extends Plottable.Abstract.XYPlot<X, Y> {
             _animators: Plottable.Animator.IPlotAnimatorMap;
             constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.Scale<Y, number>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Scatter<X, Y>;
@@ -963,7 +963,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Grid<C> extends Plottable.Abstract.NSXYPlot<string, string> {
+        class Grid<C> extends Plottable.Abstract.XYPlot<string, string> {
             _colorScale: Plottable.Abstract.Scale<C, string>;
             _xScale: Plottable.Scale.Ordinal;
             _yScale: Plottable.Scale.Ordinal;
@@ -979,7 +979,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class NewStyleBarPlot<X, Y> extends NSXYPlot<X, Y> {
+        class NewStyleBarPlot<X, Y> extends XYPlot<X, Y> {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
@@ -1037,7 +1037,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Line<X> extends Plottable.Abstract.NSXYPlot<X, number> {
+        class Line<X> extends Plottable.Abstract.XYPlot<X, number> {
             _yScale: Plottable.Abstract.QuantitativeScale<number>;
             _animators: Plottable.Animator.IPlotAnimatorMap;
             constructor(xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
@@ -1078,7 +1078,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Stacked<X, Y> extends NSXYPlot<X, Y> {
+        class Stacked<X, Y> extends XYPlot<X, Y> {
             _isVertical: boolean;
             _onDatasetUpdate(): void;
             _updateScaleExtents(): void;

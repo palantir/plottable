@@ -4388,9 +4388,9 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Abstract) {
-        var NSPlot = (function (_super) {
-            __extends(NSPlot, _super);
-            function NSPlot() {
+        var Plot = (function (_super) {
+            __extends(Plot, _super);
+            function Plot() {
                 _super.call(this);
                 this._dataChanged = false;
                 this._animate = false;
@@ -4404,19 +4404,19 @@ var Plottable;
                 this._datasetKeysInOrder = [];
                 this.nextSeriesIndex = 0;
             }
-            NSPlot.prototype._anchor = function (element) {
+            Plot.prototype._anchor = function (element) {
                 _super.prototype._anchor.call(this, element);
                 this.animateOnNextRender = true;
                 this._dataChanged = true;
                 this._updateScaleExtents();
             };
-            NSPlot.prototype._setup = function () {
+            Plot.prototype._setup = function () {
                 var _this = this;
                 _super.prototype._setup.call(this);
                 this._renderArea = this._content.append("g").classed("render-area", true);
                 this._getDrawersInOrder().forEach(function (d) { return d._renderArea = _this._renderArea.append("g"); });
             };
-            NSPlot.prototype.remove = function () {
+            Plot.prototype.remove = function () {
                 var _this = this;
                 _super.prototype.remove.call(this);
                 this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
@@ -4428,7 +4428,7 @@ var Plottable;
                     }
                 });
             };
-            NSPlot.prototype.addDataset = function (keyOrDataset, dataset) {
+            Plot.prototype.addDataset = function (keyOrDataset, dataset) {
                 if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
                     throw new Error("invalid input to addDataset");
                 }
@@ -4441,7 +4441,7 @@ var Plottable;
                 this._addDataset(key, dataset);
                 return this;
             };
-            NSPlot.prototype._addDataset = function (key, dataset) {
+            Plot.prototype._addDataset = function (key, dataset) {
                 var _this = this;
                 if (this._key2DatasetDrawerKey.has(key)) {
                     this.removeDataset(key);
@@ -4457,22 +4457,22 @@ var Plottable;
                 dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
                 this._onDatasetUpdate();
             };
-            NSPlot.prototype._getDrawer = function (key) {
+            Plot.prototype._getDrawer = function (key) {
                 return new Abstract._Drawer(key);
             };
-            NSPlot.prototype._getAnimator = function (drawer, index) {
+            Plot.prototype._getAnimator = function (drawer, index) {
                 return new Plottable.Animator.Null();
             };
-            NSPlot.prototype._onDatasetUpdate = function () {
+            Plot.prototype._onDatasetUpdate = function () {
                 this._updateScaleExtents();
                 this.animateOnNextRender = true;
                 this._dataChanged = true;
                 this._render();
             };
-            NSPlot.prototype.attr = function (attrToSet, accessor, scale) {
+            Plot.prototype.attr = function (attrToSet, accessor, scale) {
                 return this.project(attrToSet, accessor, scale);
             };
-            NSPlot.prototype.project = function (attrToSet, accessor, scale) {
+            Plot.prototype.project = function (attrToSet, accessor, scale) {
                 var _this = this;
                 attrToSet = attrToSet.toLowerCase();
                 var currentProjection = this._projectors[attrToSet];
@@ -4492,7 +4492,7 @@ var Plottable;
                 this._render();
                 return this;
             };
-            NSPlot.prototype._generateAttrToProjector = function () {
+            Plot.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var h = {};
                 d3.keys(this._projectors).forEach(function (a) {
@@ -4504,27 +4504,27 @@ var Plottable;
                 });
                 return h;
             };
-            NSPlot.prototype._doRender = function () {
+            Plot.prototype._doRender = function () {
                 if (this._isAnchored) {
                     this._paint();
                     this._dataChanged = false;
                     this.animateOnNextRender = false;
                 }
             };
-            NSPlot.prototype.animate = function (enabled) {
+            Plot.prototype.animate = function (enabled) {
                 this._animate = enabled;
                 return this;
             };
-            NSPlot.prototype.detach = function () {
+            Plot.prototype.detach = function () {
                 _super.prototype.detach.call(this);
                 this._updateScaleExtents();
                 return this;
             };
-            NSPlot.prototype._updateScaleExtents = function () {
+            Plot.prototype._updateScaleExtents = function () {
                 var _this = this;
                 d3.keys(this._projectors).forEach(function (attr) { return _this._updateScaleExtent(attr); });
             };
-            NSPlot.prototype._updateScaleExtent = function (attr) {
+            Plot.prototype._updateScaleExtent = function (attr) {
                 var _this = this;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
@@ -4540,7 +4540,7 @@ var Plottable;
                     });
                 }
             };
-            NSPlot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
+            Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
                 if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
                     return this._animators[animatorKey].animate(selection, attrToProjector);
                 }
@@ -4548,7 +4548,7 @@ var Plottable;
                     return selection.attr(attrToProjector);
                 }
             };
-            NSPlot.prototype.animator = function (animatorKey, animator) {
+            Plot.prototype.animator = function (animatorKey, animator) {
                 if (animator === undefined) {
                     return this._animators[animatorKey];
                 }
@@ -4557,7 +4557,7 @@ var Plottable;
                     return this;
                 }
             };
-            NSPlot.prototype.datasetOrder = function (order) {
+            Plot.prototype.datasetOrder = function (order) {
                 if (order === undefined) {
                     return this._datasetKeysInOrder;
                 }
@@ -4575,7 +4575,7 @@ var Plottable;
                 }
                 return this;
             };
-            NSPlot.prototype.removeDataset = function (key) {
+            Plot.prototype.removeDataset = function (key) {
                 if (this._key2DatasetDrawerKey.has(key)) {
                     var ddk = this._key2DatasetDrawerKey.get(key);
                     ddk.drawer.remove();
@@ -4593,15 +4593,15 @@ var Plottable;
                 }
                 return this;
             };
-            NSPlot.prototype._getDatasetsInOrder = function () {
+            Plot.prototype._getDatasetsInOrder = function () {
                 var _this = this;
                 return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).dataset; });
             };
-            NSPlot.prototype._getDrawersInOrder = function () {
+            Plot.prototype._getDrawersInOrder = function () {
                 var _this = this;
                 return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).drawer; });
             };
-            NSPlot.prototype._paint = function () {
+            Plot.prototype._paint = function () {
                 var _this = this;
                 var attrHash = this._generateAttrToProjector();
                 var datasets = this._getDatasetsInOrder();
@@ -4610,9 +4610,9 @@ var Plottable;
                     d.draw(datasets[i].data(), attrHash, animator);
                 });
             };
-            return NSPlot;
+            return Plot;
         })(Abstract.Component);
-        Abstract.NSPlot = NSPlot;
+        Abstract.Plot = Plot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
 })(Plottable || (Plottable = {}));
@@ -4684,7 +4684,7 @@ var Plottable;
             };
             Pie.DEFAULT_COLOR_SCALE = new Plottable.Scale.Color();
             return Pie;
-        })(Plottable.Abstract.NSPlot);
+        })(Plottable.Abstract.Plot);
         Plot.Pie = Pie;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
@@ -4699,9 +4699,9 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Abstract) {
-        var NSXYPlot = (function (_super) {
-            __extends(NSXYPlot, _super);
-            function NSXYPlot(xScale, yScale) {
+        var XYPlot = (function (_super) {
+            __extends(XYPlot, _super);
+            function XYPlot(xScale, yScale) {
                 _super.call(this);
                 if (!(xScale && xScale.scale && yScale && yScale.scale)) {
                     throw new Error("XYPlots require an xScale and yScale");
@@ -4710,7 +4710,7 @@ var Plottable;
                 this.project("x", "x", xScale);
                 this.project("y", "y", yScale);
             }
-            NSXYPlot.prototype.project = function (attrToSet, accessor, scale) {
+            XYPlot.prototype.project = function (attrToSet, accessor, scale) {
                 if (attrToSet === "x" && scale != null) {
                     this._xScale = scale;
                     this._updateXDomainer();
@@ -4722,12 +4722,12 @@ var Plottable;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
             };
-            NSXYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+            XYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 this._xScale.range([0, this.width()]);
                 this._yScale.range([this.height(), 0]);
             };
-            NSXYPlot.prototype._updateXDomainer = function () {
+            XYPlot.prototype._updateXDomainer = function () {
                 if (this._xScale instanceof Abstract.QuantitativeScale) {
                     var scale = this._xScale;
                     if (!scale._userSetDomainer) {
@@ -4735,7 +4735,7 @@ var Plottable;
                     }
                 }
             };
-            NSXYPlot.prototype._updateYDomainer = function () {
+            XYPlot.prototype._updateYDomainer = function () {
                 if (this._yScale instanceof Abstract.QuantitativeScale) {
                     var scale = this._yScale;
                     if (!scale._userSetDomainer) {
@@ -4743,9 +4743,9 @@ var Plottable;
                     }
                 }
             };
-            return NSXYPlot;
-        })(Abstract.NSPlot);
-        Abstract.NSXYPlot = NSXYPlot;
+            return XYPlot;
+        })(Abstract.Plot);
+        Abstract.XYPlot = XYPlot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
 })(Plottable || (Plottable = {}));
@@ -4805,7 +4805,7 @@ var Plottable;
                 });
             };
             return Scatter;
-        })(Plottable.Abstract.NSXYPlot);
+        })(Plottable.Abstract.XYPlot);
         Plot.Scatter = Scatter;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
@@ -4860,7 +4860,7 @@ var Plottable;
                 cells.exit().remove();
             };
             return Grid;
-        })(Plottable.Abstract.NSXYPlot);
+        })(Plottable.Abstract.XYPlot);
         Plot.Grid = Grid;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
@@ -5035,7 +5035,7 @@ var Plottable;
             NewStyleBarPlot._BarAlignmentToFactor = {};
             NewStyleBarPlot.DEFAULT_WIDTH = 10;
             return NewStyleBarPlot;
-        })(Abstract.NSXYPlot);
+        })(Abstract.XYPlot);
         Abstract.NewStyleBarPlot = NewStyleBarPlot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -5184,7 +5184,7 @@ var Plottable;
                 return ["x", "y"];
             };
             return Line;
-        })(Plottable.Abstract.NSXYPlot);
+        })(Plottable.Abstract.XYPlot);
         Plot.Line = Line;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
@@ -5402,7 +5402,7 @@ var Plottable;
                 }
             };
             return Stacked;
-        })(Abstract.NSXYPlot);
+        })(Abstract.XYPlot);
         Abstract.Stacked = Stacked;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
