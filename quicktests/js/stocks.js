@@ -67,7 +67,7 @@ function run(div, data, Plottable) {
                                   .project("y", "Adj Close", yScale_aapl)
                                   .project("stroke", function(d, i, m) { return m.name; }, colorScale);
           var line_goog = new Plottable.Plot.Line(xScale, yScale_goog).animate(true)
-                                  .addDataset("goog", goodSource)
+                                  .addDataset("goog", googSource)
                                   .project("x", "Date", xScale)
                                   .project("y", "Adj Close", yScale_goog)
                                   .project("stroke", function(d, i, m) { return m.name; }, colorScale);
