@@ -11,7 +11,7 @@ export module Plot {
    *  - "x" - the horizontal position of a bar
    *  - "y" - the vertical height of a bar
    */
-  export class VerticalBar<X> extends Abstract.NewStyleBarPlot<X,number> {
+  export class VerticalBar<X> extends Abstract.BarPlot<X,number> {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
 
     /**

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Abstract {
-  export class NewStyleBarPlot<X,Y> extends XYPlot<X,Y> {
+  export class BarPlot<X,Y> extends XYPlot<X,Y> {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     private static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
@@ -17,7 +17,7 @@ export module Abstract {
     };
 
     /**
-     * Constructs a NewStyleBarPlot.
+     * Constructs a BarPlot.
      *
      * @constructor
      * @param {Scale} xScale The x scale to use.
@@ -80,7 +80,7 @@ export module Abstract {
      */
      public barAlignment(alignment: string) {
        var alignmentLC = alignment.toLowerCase();
-       var align2factor = (<typeof NewStyleBarPlot> this.constructor)._BarAlignmentToFactor;
+       var align2factor = (<typeof BarPlot> this.constructor)._BarAlignmentToFactor;
        if (align2factor[alignmentLC] === undefined) {
          throw new Error("unsupported bar alignment");
        }
@@ -212,7 +212,7 @@ export module Abstract {
                       && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       if (attrToProjector["width"] == null) {
-        var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : NewStyleBarPlot.DEFAULT_WIDTH;
+        var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : BarPlot.DEFAULT_WIDTH;
         attrToProjector["width"] = (d: any, i: number) => constantWidth;
       }
 

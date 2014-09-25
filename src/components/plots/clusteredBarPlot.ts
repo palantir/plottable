@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class ClusteredBar<X,Y> extends Abstract.NewStyleBarPlot<X,Y> {
+  export class ClusteredBar<X,Y> extends Abstract.BarPlot<X,Y> {
     private innerScale: Scale.Ordinal;
 
     /**

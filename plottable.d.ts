@@ -784,15 +784,15 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class NewStyleBarPlot<X, Y> extends XYPlot<X, Y> {
+        class BarPlot<X, Y> extends XYPlot<X, Y> {
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
-            baseline(value: number): NewStyleBarPlot<X, Y>;
-            barAlignment(alignment: string): NewStyleBarPlot<X, Y>;
+            baseline(value: number): BarPlot<X, Y>;
+            barAlignment(alignment: string): BarPlot<X, Y>;
             selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
             selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
             selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
             selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
-            deselectAll(): NewStyleBarPlot<X, Y>;
+            deselectAll(): BarPlot<X, Y>;
         }
     }
 }
@@ -800,7 +800,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class VerticalBar<X> extends Plottable.Abstract.NewStyleBarPlot<X, number> {
+        class VerticalBar<X> extends Plottable.Abstract.BarPlot<X, number> {
             constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.QuantitativeScale<number>);
         }
     }
@@ -809,7 +809,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class HorizontalBar<Y> extends Plottable.Abstract.NewStyleBarPlot<number, Y> {
+        class HorizontalBar<Y> extends Plottable.Abstract.BarPlot<number, Y> {
             constructor(xScale: Plottable.Abstract.QuantitativeScale<number>, yScale: Plottable.Abstract.Scale<Y, number>);
         }
     }
@@ -837,7 +837,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class ClusteredBar<X, Y> extends Plottable.Abstract.NewStyleBarPlot<X, Y> {
+        class ClusteredBar<X, Y> extends Plottable.Abstract.BarPlot<X, Y> {
             constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.Scale<Y, number>, isVertical?: boolean);
         }
     }

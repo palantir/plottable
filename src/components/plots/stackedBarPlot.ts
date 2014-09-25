@@ -35,11 +35,11 @@ export module Plot {
     }
 
     public _getDrawer(key: string) {
-      return Abstract.NewStyleBarPlot.prototype._getDrawer.apply(this, [key]);
+      return Abstract.BarPlot.prototype._getDrawer.apply(this, [key]);
     }
 
     public _generateAttrToProjector() {
-      var attrToProjector = Abstract.NewStyleBarPlot.prototype._generateAttrToProjector.apply(this);
+      var attrToProjector = Abstract.BarPlot.prototype._generateAttrToProjector.apply(this);
 
       var primaryAttr = this._isVertical ? "y" : "x";
       var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
@@ -57,19 +57,19 @@ export module Plot {
     }
 
     public baseline(value: number) {
-      return Abstract.NewStyleBarPlot.prototype.baseline.apply(this, [value]);
+      return Abstract.BarPlot.prototype.baseline.apply(this, [value]);
     }
 
     public _updateDomainer(scale: Abstract.Scale<any,number>) {
-      return Abstract.NewStyleBarPlot.prototype._updateDomainer.apply(this, [scale]);
+      return Abstract.BarPlot.prototype._updateDomainer.apply(this, [scale]);
     }
 
     public _updateXDomainer() {
-      return Abstract.NewStyleBarPlot.prototype._updateXDomainer.apply(this);
+      return Abstract.BarPlot.prototype._updateXDomainer.apply(this);
     }
 
     public _updateYDomainer() {
-      return Abstract.NewStyleBarPlot.prototype._updateYDomainer.apply(this);
+      return Abstract.BarPlot.prototype._updateYDomainer.apply(this);
     }
   }
 }

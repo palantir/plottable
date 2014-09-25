@@ -973,7 +973,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class NewStyleBarPlot<X, Y> extends XYPlot<X, Y> {
+        class BarPlot<X, Y> extends XYPlot<X, Y> {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
@@ -986,13 +986,13 @@ declare module Plottable {
             _getDrawer(key: string): Plottable._Drawer.Rect;
             _setup(): void;
             _paint(): void;
-            baseline(value: number): NewStyleBarPlot<X, Y>;
-            barAlignment(alignment: string): NewStyleBarPlot<X, Y>;
+            baseline(value: number): BarPlot<X, Y>;
+            barAlignment(alignment: string): BarPlot<X, Y>;
             selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
             selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
             selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
             selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
-            deselectAll(): NewStyleBarPlot<X, Y>;
+            deselectAll(): BarPlot<X, Y>;
             _updateDomainer(scale: Scale<any, number>): void;
             _updateYDomainer(): void;
             _updateXDomainer(): void;
@@ -1004,7 +1004,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class VerticalBar<X> extends Plottable.Abstract.NewStyleBarPlot<X, number> {
+        class VerticalBar<X> extends Plottable.Abstract.BarPlot<X, number> {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
@@ -1017,7 +1017,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class HorizontalBar<Y> extends Plottable.Abstract.NewStyleBarPlot<number, Y> {
+        class HorizontalBar<Y> extends Plottable.Abstract.BarPlot<number, Y> {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
@@ -1061,7 +1061,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class ClusteredBar<X, Y> extends Plottable.Abstract.NewStyleBarPlot<X, Y> {
+        class ClusteredBar<X, Y> extends Plottable.Abstract.BarPlot<X, Y> {
             constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.Scale<Y, number>, isVertical?: boolean);
             _generateAttrToProjector(): IAttributeToProjector;
             _paint(): void;
@@ -1249,8 +1249,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class BarHover extends Plottable.Abstract.Interaction {
-            _componentToListenTo: Plottable.Abstract.NewStyleBarPlot<any, any>;
-            _anchor(barPlot: Plottable.Abstract.NewStyleBarPlot<any, any>, hitBox: D3.Selection): void;
+            _componentToListenTo: Plottable.Abstract.BarPlot<any, any>;
+            _anchor(barPlot: Plottable.Abstract.BarPlot<any, any>, hitBox: D3.Selection): void;
             hoverMode(): string;
             hoverMode(mode: string): BarHover;
             onHover(callback: (datum: any, bar: D3.Selection) => any): BarHover;
