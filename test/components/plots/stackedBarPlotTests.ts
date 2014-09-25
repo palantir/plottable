@@ -129,7 +129,7 @@ describe("Plots", () => {
       axisHeight = xAxis.height();
     });
 
-    it("renders correctly", () => {
+    it("stacking done correctly for negative values", () => {
       var bars = plot._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
@@ -137,16 +137,11 @@ describe("Plots", () => {
       var bar3 = d3.select(bars[0][3]);
       var bar4 = d3.select(bars[0][4]);
       var bar5 = d3.select(bars[0][5]);
-      // check bar heights
-      assert.closeTo(numAttr(bar0, "height"), numAttr(bar2, "height"), 1, "heights are the same");
-      assert.closeTo(numAttr(bar0, "height"), numAttr(bar4, "height"), 1, "heights are the same");
-      assert.closeTo(numAttr(bar1, "height"), numAttr(bar3, "height"), 1, "heights are the same");
-      assert.closeTo(numAttr(bar1, "height"), numAttr(bar5, "height"), 1, "heights are the same");
       // check stacking order
-      assert.operator(numAttr(bar0, "y"), "<", numAttr(bar2, "y"), "bar0 above bar2");
-      assert.operator(numAttr(bar2, "y"), "<", numAttr(bar4, "y"), "bar2 above bar4");
-      assert.operator(numAttr(bar3, "y"), "<", numAttr(bar1, "y"), "bar3 above bar1");
-      assert.operator(numAttr(bar1, "y"), "<", numAttr(bar5, "y"), "bar1 above bar5");
+      assert.operator(numAttr(bar0, "y"), "<", numAttr(bar2, "y"), "'A' bar from first dataset on top");
+      assert.operator(numAttr(bar2, "y"), "<", numAttr(bar4, "y"), "'A' bar from second dataset in middle");
+      assert.operator(numAttr(bar3, "y"), "<", numAttr(bar1, "y"), "'B' bar from second dataset on top");
+      assert.operator(numAttr(bar1, "y"), "<", numAttr(bar5, "y"), "'B' bar from first dataset in middle");
 
       svg.remove();
     });
