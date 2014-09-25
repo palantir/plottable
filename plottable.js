@@ -4589,10 +4589,6 @@ var Plottable;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
                 this.classed("category-axis", true);
-                var rangeType = scale.rangeType();
-                if (!(rangeType === "points" || rangeType === "bands")) {
-                    throw new Error("Unsupported range type: " + rangeType);
-                }
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);

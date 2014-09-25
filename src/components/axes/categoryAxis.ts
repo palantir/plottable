@@ -21,10 +21,6 @@ export module Axis {
     constructor(scale: Scale.Ordinal, orientation = "bottom", formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
       this.classed("category-axis", true);
-      var rangeType = scale.rangeType();
-      if(!(rangeType === "points" || rangeType === "bands")) {
-          throw new Error("Unsupported range type: " + rangeType);
-        }
     }
 
     public _setup() {
