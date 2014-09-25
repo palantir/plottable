@@ -196,4 +196,25 @@ describe("BaseAxis", () => {
 
     svg.remove();
   });
+
+  it("axis remains in own cell", () => {
+    var svg = generateSVG(400, 400);
+    var scale = new Plottable.Scale.Linear();
+    var xAxis = new Plottable.Abstract.Axis(scale, "bottom");
+    var yAxis = new Plottable.Abstract.Axis(scale, "left");
+    var placeHolder = new Plottable.Abstract.Component();
+    var t = new Plottable.Component.Table().addComponent(0, 0, yAxis)
+                                 .addComponent(1, 0, new Plottable.Abstract.Component())
+                                 .addComponent(0, 1, placeHolder)
+                                 .addComponent(1, 1, xAxis);
+    t.renderTo(svg);
+
+    xAxis.xAlign("left");
+    yAxis.yAlign("bottom");
+
+    assertBBoxExclusion(yAxis._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
+    assertBBoxExclusion(xAxis._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
+
+    svg.remove();
+  });
 });

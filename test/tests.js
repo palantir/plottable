@@ -55,6 +55,15 @@ function assertBBoxInclusion(outerEl, innerEl) {
     assert.operator(Math.ceil(outerBox.right) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.right), "bounding rect right included");
     assert.operator(Math.ceil(outerBox.bottom) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.bottom), "bounding rect bottom included");
 }
+function assertBBoxExclusion(firstEl, secondEl) {
+    var firstBox = firstEl.node().getBoundingClientRect();
+    var secondBox = secondEl.node().getBoundingClientRect();
+    var leftSide = Math.max(Math.floor(firstBox.left), Math.ceil(secondBox.left));
+    var rightSide = Math.min(Math.floor(firstBox.right), Math.ceil(secondBox.right));
+    var topSide = Math.max(Math.floor(firstBox.top), Math.ceil(secondBox.top));
+    var bottomSide = Math.min(Math.floor(firstBox.bottom), Math.ceil(secondBox.bottom));
+    assert.isTrue((leftSide >= rightSide) || (topSide <= bottomSide), "bounding rects excluded");
+}
 function assertXY(el, xExpected, yExpected, message) {
     var x = el.attr("x");
     var y = el.attr("y");
@@ -294,6 +303,20 @@ describe("BaseAxis", function () {
         assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should increase to end tick length");
         baseAxis.tickLength(10);
         assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should not decrease");
+        svg.remove();
+    });
+    it("axis remains in own cell", function () {
+        var svg = generateSVG(400, 400);
+        var scale = new Plottable.Scale.Linear();
+        var xAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        var yAxis = new Plottable.Abstract.Axis(scale, "left");
+        var placeHolder = new Plottable.Abstract.Component();
+        var t = new Plottable.Component.Table().addComponent(0, 0, yAxis).addComponent(1, 0, new Plottable.Abstract.Component()).addComponent(0, 1, placeHolder).addComponent(1, 1, xAxis);
+        t.renderTo(svg);
+        xAxis.xAlign("left");
+        yAxis.yAlign("bottom");
+        assertBBoxExclusion(yAxis._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
+        assertBBoxExclusion(xAxis._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
         svg.remove();
     });
 });

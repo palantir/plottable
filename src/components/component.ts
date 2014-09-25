@@ -143,14 +143,14 @@ export module Abstract {
 
       var requestedSpace = this._requestedSpace(availableWidth , availableHeight);
 
-      xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
+      xPosition += (availableWidth - (this._isFixedWidth() ? requestedSpace.width : this.width())) * this._xAlignProportion;
       xPosition += this._xOffset;
       if (this._isFixedWidth()) {
         // Decrease size so hitbox / bounding box and children are sized correctly
         availableWidth  = Math.min(availableWidth, requestedSpace.width);
       }
 
-      yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
+      yPosition += (availableHeight - (this._isFixedHeight() ? requestedSpace.height : this.height())) * this._yAlignProportion;
       yPosition += this._yOffset;
       if (this._isFixedHeight()) {
         availableHeight = Math.min(availableHeight, requestedSpace.height);

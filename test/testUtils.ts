@@ -65,6 +65,16 @@ function assertBBoxInclusion(outerEl: D3.Selection, innerEl: D3.Selection) {
           "bounding rect bottom included");
 }
 
+function assertBBoxExclusion(firstEl: D3.Selection, secondEl: D3.Selection) {
+  var firstBox = firstEl.node().getBoundingClientRect();
+  var secondBox = secondEl.node().getBoundingClientRect();
+  var leftSide = Math.max(Math.floor(firstBox.left), Math.ceil(secondBox.left));
+  var rightSide = Math.min(Math.floor(firstBox.right), Math.ceil(secondBox.right));
+  var topSide = Math.max(Math.floor(firstBox.top), Math.ceil(secondBox.top));
+  var bottomSide = Math.min(Math.floor(firstBox.bottom), Math.ceil(secondBox.bottom));
+  assert.isTrue((leftSide >= rightSide) || (topSide <= bottomSide), "bounding rects excluded");
+}
+
 function assertXY(el: D3.Selection, xExpected: number, yExpected: number, message: string) {
   var x = el.attr("x");
   var y = el.attr("y");
