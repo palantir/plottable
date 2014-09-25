@@ -37,13 +37,13 @@ export module Abstract {
 
       var positiveDataArray: StackedDatum[][] = dataArray.map((data) => {
         return data.map((datum) => {
-          return {key: datum.key, value: datum.value < 0 ? 0 : datum.value};
+          return {key: datum.key, value: Math.max(0, datum.value)};
         });
       });
 
       var negativeDataArray: StackedDatum[][] = dataArray.map((data) => {
         return data.map((datum) => {
-          return {key: datum.key, value: datum.value > 0 ? 0 : datum.value};
+          return {key: datum.key, value: Math.min(datum.value, 0)};
         });
       });
 

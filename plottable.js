@@ -5529,12 +5529,12 @@ var Plottable;
                 });
                 var positiveDataArray = dataArray.map(function (data) {
                     return data.map(function (datum) {
-                        return { key: datum.key, value: datum.value < 0 ? 0 : datum.value };
+                        return { key: datum.key, value: Math.max(0, datum.value) };
                     });
                 });
                 var negativeDataArray = dataArray.map(function (data) {
                     return data.map(function (datum) {
-                        return { key: datum.key, value: datum.value > 0 ? 0 : datum.value };
+                        return { key: datum.key, value: Math.min(datum.value, 0) };
                     });
                 });
                 this.setDatasetStackOffsets(this._stack(positiveDataArray), this._stack(negativeDataArray));
