@@ -143,11 +143,11 @@ export module Abstract {
 
       var requestedSpace = this._requestedSpace(availableWidth , availableHeight);
 
-      xPosition += (availableWidth  - requestedSpace.width) * this._xAlignProportion;
+      xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
       xPosition += this._xOffset;
       if (this._isFixedWidth()) {
         // Decrease size so hitbox / bounding box and children are sized correctly
-        availableWidth  = Math.min(availableWidth , requestedSpace.width);
+        availableWidth  = Math.min(availableWidth, requestedSpace.width);
       }
 
       yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
@@ -162,9 +162,6 @@ export module Abstract {
       this.boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
     }
 
-    /**
-     * Renders the component.
-     */
     public _render() {
       if (this._isAnchored && this._isSetup) {
         Core.RenderController.registerToRender(this);
@@ -177,10 +174,7 @@ export module Abstract {
       }
     }
 
-    public _doRender() {
-      //no-op
-    }
-
+    public _doRender() {/* overwrite */}
 
     public _invalidateLayout() {
       if (this._isAnchored && this._isSetup) {
@@ -219,6 +213,8 @@ export module Abstract {
       }
       this._computeLayout();
       this._render();
+      // flush so that consumers can immediately attach to stuff we create in the DOM
+      Core.RenderController.flush();
       return this;
     }
 
@@ -378,8 +374,8 @@ export module Abstract {
       // Interactions can be registered before or after anchoring. If registered before, they are
       // pushed to this.interactionsToRegister and registered during anchoring. If after, they are
       // registered immediately
-      if (this._element != null) {
-        if (this.hitBox == null) {
+      if (this._element) {
+        if (!this.hitBox) {
             this.hitBox = this.addBox("hit-box");
             this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
         }
@@ -522,7 +518,6 @@ export module Abstract {
     public height(): number {
       return this._height;
     }
-
   }
 }
 }

@@ -34,12 +34,7 @@ export module Plot {
       var domainMin = Math.min(yDomain[0], yDomain[1]);
       // start from zero, or the closest domain value to zero
       // avoids lines zooming on from offscreen.
-      var startValue = 0;
-      if (domainMax < 0) {
-        startValue = domainMax;
-      } else if (domainMin > 0) {
-        startValue = domainMin;
-      }
+      var startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
       var scaledStartValue = this._yScale.scale(startValue);
       return (d: any, i: number) => scaledStartValue;
     }
@@ -47,19 +42,11 @@ export module Plot {
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       var wholeDatumAttributes = this._wholeDatumAttributes();
-      function singleDatumAttributeFilter(attr: string) {
-        return wholeDatumAttributes.indexOf(attr) === -1;
-      }
-      var singleDatumAttributes = d3.keys(attrToProjector).filter(singleDatumAttributeFilter);
+      var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
+      var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
       singleDatumAttributes.forEach((attribute: string) => {
         var projector = attrToProjector[attribute];
-        attrToProjector[attribute] = (data: any[], i: number) => {
-          if (data.length > 0) {
-            return projector(data[0], i);
-          } else {
-            return null;
-          }
-        };
+        attrToProjector[attribute] = (data: any[], i: number) => data.length > 0 ? projector(data[0], i) : null;
       });
       return attrToProjector;
     }
@@ -73,6 +60,7 @@ export module Plot {
 
       var datasets = this._getDatasetsInOrder();
 
+<<<<<<< HEAD
       this._getDrawersInOrder().forEach((d, i) => {
         var dataset = datasets[i];
         var linePath: D3.Selection;
@@ -90,6 +78,12 @@ export module Plot {
           this._applyAnimatedAttributes(linePath, "line-reset", attrToProjector);
         }
 
+||||||| merged common ancestors
+      if (this._dataChanged) {
+
+=======
+      if (this._dataChanged) {
+>>>>>>> develop
         attrToProjector["d"] = d3.svg.line()
           .x(xFunction)
           .y(yFunction);

@@ -16,11 +16,21 @@ export module Abstract {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
+<<<<<<< HEAD
     constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
       super();
       if (!(xScale && xScale.scale && yScale && yScale.scale)) {
         throw new Error("XYPlots require an xScale and yScale");
       }
+||||||| merged common ancestors
+    constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
+      super(dataset);
+      if (xScale == null || yScale == null) {throw new Error("XYPlots require an xScale and yScale");}
+=======
+    constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
+      super(dataset);
+      if (!xScale || !yScale) {throw new Error("XYPlots require an xScale and yScale");}
+>>>>>>> develop
       this.classed("xy-plot", true);
 
       this.project("x", "x", xScale); // default accessor
@@ -34,12 +44,12 @@ export module Abstract {
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
       // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
-      if (attrToSet === "x" && scale != null) {
+      if (attrToSet === "x" && scale) {
         this._xScale = scale;
         this._updateXDomainer();
       }
 
-      if (attrToSet === "y" && scale != null) {
+      if (attrToSet === "y" && scale) {
         this._yScale = scale;
         this._updateYDomainer();
       }

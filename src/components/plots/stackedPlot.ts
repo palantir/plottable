@@ -9,9 +9,7 @@ export module Abstract {
     public _onDatasetUpdate() {
       super._onDatasetUpdate();
       // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
-      if (this._datasetKeysInOrder != null &&
-          this._projectors["x"] != null &&
-          this._projectors["y"] != null) {
+      if (this._datasetKeysInOrder && this._projectors["x"]  && this._projectors["y"]) {
         this.stack();
       }
     }
@@ -39,7 +37,7 @@ export module Abstract {
     public _updateScaleExtents() {
       super._updateScaleExtents();
       var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
-      if (primaryScale == null) {
+      if (!primaryScale) {
         return;
       }
       if (this._isAnchored && this.stackedExtent.length > 0) {

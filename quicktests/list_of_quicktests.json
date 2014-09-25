@@ -145,6 +145,16 @@
   },
 
   {
+    "name":"rainfall_ClusteredBar",
+    "categories":[ "Color Scale", "Vertical Bar Plot", "Numeric Axis", "Accessor", "Legend", "Project", "Table"]
+  },
+
+  {
+    "name":"rainfall_VerticalBar",
+    "categories":[ "Color Scale", "Vertical Bar Plot", "Numeric Axis", "Accessor", "Legend", "Project", "Table"]
+  },
+
+  {
     "name":"no_data",
     "categories":[ "Linear Scale", "Numeric Axis", "Area Plot", "Scatter Plot", "Vertical Bar Plot", "Horizontal Bar Plot", "Line Plot", "Table", "Layout"]
   },
@@ -207,5 +217,8 @@
   {
     "name":"titleLegend_change",
     "categories":["Datasource", "Metadata", "Color Scale", "Scatter Plot", "Line Plot", "Area Plot", "Domain", "Linear Scale", "Numeric Axis", "Project", "Accessor", "Title", "Label", "Layout", "Legend", "Click Interaction"]
+  }, {
+    "name":"stocks",
+    "categories":["Integration", "Vertical Bar Plot", "Legend", "Layout", "PanZoom Interaction", "Key Interaction"]
   }
 ]
