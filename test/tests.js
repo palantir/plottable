@@ -155,14 +155,6 @@ describe("BaseAxis", function () {
         verticalAxis.gutter(20);
         expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter();
         assert.strictEqual(verticalAxis.width(), expectedWidth, "changing the gutter size updates the width");
-        verticalAxis.width(20);
-        assert.strictEqual(verticalAxis.width(), 20, "width was set to user-specified value");
-        verticalAxis.width(10 * SVG_WIDTH);
-        assert.strictEqual(verticalAxis.width(), SVG_WIDTH, "returns actual used width if requested width is too large");
-        assert.doesNotThrow(function () { return verticalAxis.width("auto"); }, Error, "can be set to auto mode");
-        assert.throws(function () { return verticalAxis.width(-999); }, Error, "invalid");
-        var horizontalAxis = new Plottable.Abstract.Axis(scale, "bottom");
-        assert.throws(function () { return horizontalAxis.width(2014); }, Error, "horizontal");
         svg.remove();
     });
     it("height() + gutter()", function () {
@@ -177,14 +169,6 @@ describe("BaseAxis", function () {
         horizontalAxis.gutter(20);
         expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter();
         assert.strictEqual(horizontalAxis.height(), expectedHeight, "changing the gutter size updates the height");
-        horizontalAxis.height(20);
-        assert.strictEqual(horizontalAxis.height(), 20, "height was set to user-specified value");
-        horizontalAxis.height(10 * SVG_HEIGHT);
-        assert.strictEqual(horizontalAxis.height(), SVG_HEIGHT, "returns actual used height if requested height is too large");
-        assert.doesNotThrow(function () { return horizontalAxis.height("auto"); }, Error, "can be set to auto mode");
-        assert.throws(function () { return horizontalAxis.height(-999); }, Error, "invalid");
-        var verticalAxis = new Plottable.Abstract.Axis(scale, "right");
-        assert.throws(function () { return verticalAxis.height(2014); }, Error, "vertical");
         svg.remove();
     });
     it("draws ticks and baseline (horizontal)", function () {
@@ -195,7 +179,6 @@ describe("BaseAxis", function () {
         scale.domain([0, 10]);
         scale.range([0, SVG_WIDTH]);
         var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
-        baseAxis.height(SVG_HEIGHT);
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
             return tickValues;
@@ -213,8 +196,8 @@ describe("BaseAxis", function () {
         assert.isNotNull(baseline.node(), "baseline was drawn");
         assert.strictEqual(baseline.attr("x1"), "0");
         assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
-        assert.strictEqual(baseline.attr("y1"), String(SVG_HEIGHT));
-        assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
+        assert.strictEqual(baseline.attr("y1"), String(baseAxis.height()));
+        assert.strictEqual(baseline.attr("y2"), String(baseAxis.height()));
         svg.remove();
     });
     it("draws ticks and baseline (vertical)", function () {
@@ -225,7 +208,6 @@ describe("BaseAxis", function () {
         scale.domain([0, 10]);
         scale.range([0, SVG_HEIGHT]);
         var baseAxis = new Plottable.Abstract.Axis(scale, "left");
-        baseAxis.width(SVG_WIDTH);
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
             return tickValues;
@@ -235,8 +217,8 @@ describe("BaseAxis", function () {
         assert.strictEqual(tickMarks[0].length, tickValues.length, "A tick mark was created for each value");
         var baseline = svg.select(".baseline");
         assert.isNotNull(baseline.node(), "baseline was drawn");
-        assert.strictEqual(baseline.attr("x1"), String(SVG_WIDTH));
-        assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
+        assert.strictEqual(baseline.attr("x1"), String(baseAxis.width()));
+        assert.strictEqual(baseline.attr("x2"), String(baseAxis.width()));
         assert.strictEqual(baseline.attr("y1"), "0");
         assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
         baseAxis.orient("right");
@@ -4462,6 +4444,14 @@ describe("TimeScale tests", function () {
         checkDomain(["10/1/2014", "11/1/2014"]);
         checkDomain(["October 1, 2014", "November 1, 2014"]);
         checkDomain(["Oct 1, 2014", "Nov 1, 2014"]);
+    });
+    it("time coercer works as intended", function () {
+        var tc = new Plottable.Scale.Time()._typeCoercer;
+        assert.equal(tc(null).getMilliseconds(), 0, "null converted to Date(0)");
+        assert.equal(tc("Wed Dec 31 1969 16:00:00 GMT-0800 (PST)").getMilliseconds(), 0, "string parsed to date");
+        assert.equal(tc(0).getMilliseconds(), 0, "number parsed to date");
+        var d = new Date(0);
+        assert.equal(tc(d), d, "date passed thru unchanged");
     });
     it("_tickInterval produces correct number of ticks", function () {
         var scale = new Plottable.Scale.Time();

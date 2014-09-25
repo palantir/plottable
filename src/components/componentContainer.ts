@@ -27,7 +27,7 @@ export module Abstract {
     }
 
     public _addComponent(c: Abstract.Component, prepend = false): boolean {
-      if (c == null || this._components.indexOf(c) >= 0) {
+      if (!c || this._components.indexOf(c) >= 0) {
         return false;
       }
 

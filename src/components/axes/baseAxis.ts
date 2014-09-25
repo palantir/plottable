@@ -21,8 +21,6 @@ export module Abstract {
     public _scale: Abstract.Scale<any, number>;
     public _formatter: Formatter;
     public _orientation: string;
-    public _userRequestedWidth: any = "auto";
-    public _userRequestedHeight: any = "auto";
     public _computedWidth: number;
     public _computedHeight: number;
     private _endTickLength = 5;
@@ -82,25 +80,19 @@ export module Abstract {
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
-      var requestedWidth = this._userRequestedWidth;
-      var requestedHeight = this._userRequestedHeight;
+      var requestedWidth = 0;
+      var requestedHeight = 0;
 
       if (this._isHorizontal()) {
-        if (this._userRequestedHeight === "auto") {
-          if (this._computedHeight == null) {
-            this._computeHeight();
-          }
-          requestedHeight = this._computedHeight + this._gutter;
+        if (this._computedHeight == null) {
+          this._computeHeight();
         }
-        requestedWidth = 0;
+        requestedHeight = this._computedHeight + this._gutter;
       } else { // vertical
-        if (this._userRequestedWidth === "auto") {
-          if (this._computedWidth == null) {
-            this._computeWidth();
-          }
-          requestedWidth = this._computedWidth + this._gutter;
+        if (this._computedWidth == null) {
+          this._computeWidth();
         }
-        requestedHeight = 0;
+        requestedWidth = this._computedWidth + this._gutter;
       }
 
       return {
@@ -242,66 +234,6 @@ export module Abstract {
       this._computedWidth = null;
       this._computedHeight = null;
       super._invalidateLayout();
-    }
-
-    /**
-     * Gets the current width.
-     *
-     * @returns {number} The current width.
-     */
-    public width(): number;
-    /**
-     * Sets the current width.
-     *
-     * @param {number|String} w A fixed width for the Axis, or
-     * "auto" for automatic mode.
-     * @returns {Axis} The calling Axis.
-     */
-    public width(w: any): Axis;
-    public width(w?: any): any {
-      if (w == null) {
-        return super.width();
-      } else {
-        if (this._isHorizontal()) {
-          throw new Error("width cannot be set on a horizontal Axis");
-        }
-        if (w !== "auto" && w < 0) {
-          throw new Error("invalid value for width");
-        }
-        this._userRequestedWidth = w;
-        this._invalidateLayout();
-        return this;
-      }
-    }
-
-    /**
-     * Gets the current height.
-     *
-     * @returns {Axis} The current height.
-     */
-    public height(): number;
-    /**
-     * Sets the current height.
-     *
-     * @param {number|String} h If provided, a fixed height for the Axis, or
-     * "auto" for automatic mode.
-     * @returns {Axis} The calling Axis.
-     */
-    public height(h: any): Axis;
-    public height(h?: any): any {
-      if (h == null) {
-        return super.height();
-      } else {
-        if (!this._isHorizontal()) {
-          throw new Error("height cannot be set on a vertical Axis");
-        }
-        if (h !== "auto" && h < 0) {
-          throw new Error("invalid value for height");
-        }
-        this._userRequestedHeight = h;
-        this._invalidateLayout();
-        return this;
-      }
     }
 
     /**
