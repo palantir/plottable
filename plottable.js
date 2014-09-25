@@ -3774,8 +3774,6 @@ var Plottable;
                 var _this = this;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this);
-                this._userRequestedWidth = "auto";
-                this._userRequestedHeight = "auto";
                 this._endTickLength = 5;
                 this._tickLength = 5;
                 this._tickLabelPadding = 10;
@@ -3814,25 +3812,19 @@ var Plottable;
                 return this._computedHeight;
             };
             Axis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var requestedWidth = this._userRequestedWidth;
-                var requestedHeight = this._userRequestedHeight;
+                var requestedWidth = 0;
+                var requestedHeight = 0;
                 if (this._isHorizontal()) {
-                    if (this._userRequestedHeight === "auto") {
-                        if (this._computedHeight == null) {
-                            this._computeHeight();
-                        }
-                        requestedHeight = this._computedHeight + this._gutter;
+                    if (this._computedHeight == null) {
+                        this._computeHeight();
                     }
-                    requestedWidth = 0;
+                    requestedHeight = this._computedHeight + this._gutter;
                 }
                 else {
-                    if (this._userRequestedWidth === "auto") {
-                        if (this._computedWidth == null) {
-                            this._computeWidth();
-                        }
-                        requestedWidth = this._computedWidth + this._gutter;
+                    if (this._computedWidth == null) {
+                        this._computeWidth();
                     }
-                    requestedHeight = 0;
+                    requestedWidth = this._computedWidth + this._gutter;
                 }
                 return {
                     width: requestedWidth,
@@ -3951,38 +3943,6 @@ var Plottable;
                 this._computedWidth = null;
                 this._computedHeight = null;
                 _super.prototype._invalidateLayout.call(this);
-            };
-            Axis.prototype.width = function (w) {
-                if (w == null) {
-                    return _super.prototype.width.call(this);
-                }
-                else {
-                    if (this._isHorizontal()) {
-                        throw new Error("width cannot be set on a horizontal Axis");
-                    }
-                    if (w !== "auto" && w < 0) {
-                        throw new Error("invalid value for width");
-                    }
-                    this._userRequestedWidth = w;
-                    this._invalidateLayout();
-                    return this;
-                }
-            };
-            Axis.prototype.height = function (h) {
-                if (h == null) {
-                    return _super.prototype.height.call(this);
-                }
-                else {
-                    if (!this._isHorizontal()) {
-                        throw new Error("height cannot be set on a vertical Axis");
-                    }
-                    if (h !== "auto" && h < 0) {
-                        throw new Error("invalid value for height");
-                    }
-                    this._userRequestedHeight = h;
-                    this._invalidateLayout();
-                    return this;
-                }
             };
             Axis.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
