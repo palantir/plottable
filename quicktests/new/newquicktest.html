@@ -1,0 +1,33 @@
+<html>
+<head>
+  <script src="/bower_components/jQuery/dist/jquery.js" charset="utf-8"></script>
+  <script src="/bower_components/d3/d3.js" charset="utf-8"></script>
+  <script src="/bower_components/lodash/dist/lodash.js"></script>
+  <script src="/quicktests/exampleUtil.js"></script>
+  <link rel="stylesheet" type="text/css" href="/plottable.css">
+  <link rel="stylesheet" type="text/css" href="/plottable_testing.css">
+  <link rel="stylesheet" type="text/css" href="newquicktest.css">
+  <script src="/quicktests/new/newquicktest.js" defer> </script>
+
+  <title>NEW QUICKTEST</title>
+</head>
+
+<body>
+
+<div>
+    <label>Category:</label>
+     <select type="text" id="category" name="category">
+      <option value="basic">Basic</option>
+      <option value="animations">Animations</option>
+      <option value="interactions">Interactions</option>
+      <option value="datatype">Data Types</option>
+      <option value="realistic">Realistic</option>
+    </select>
+    <input id="render" type="submit" value="Render" onclick="renderPlots();">
+</div>
+
+<div id="result">
+</div>
+
+</body>
+</html>

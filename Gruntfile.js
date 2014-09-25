@@ -392,4 +392,16 @@ module.exports = function(grunt) {
                                   "sed:sublime",
                                   ]);
 
+  var loadQuickTests = function() {
+    var qtJSON = [];
+    var rawtests = grunt.file.expand("quicktests/new/list/**/*.js");
+    rawtests.forEach(function(value, index, array){
+      qtJSON.push({path: value});
+    });
+    qtJSON = JSON.stringify(qtJSON);
+    grunt.file.write("quicktests/new/list_of_quicktests.json", qtJSON);
+  };
+
+  grunt.registerTask("lq", loadQuickTests);
+
 };
