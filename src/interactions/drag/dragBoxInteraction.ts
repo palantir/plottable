@@ -147,7 +147,7 @@ export module Interaction {
      * Checks if the cursor is inside the dragBox for the given dimension.
      */
     private isInsideBox(origin: number, from: number, to: number): boolean {
-      return origin + DragBox.RESIZE_PADDING > from && origin - DragBox.RESIZE_PADDING < to;
+      return Plottable._Util.Methods.inRange(origin, from - DragBox.RESIZE_PADDING, to + DragBox.RESIZE_PADDING);
     }
 
     public _doDragstart() {

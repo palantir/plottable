@@ -8131,7 +8131,7 @@ var Plottable;
              * Checks if the cursor is inside the dragBox for the given dimension.
              */
             DragBox.prototype.isInsideBox = function (origin, from, to) {
-                return origin + DragBox.RESIZE_PADDING > from && origin - DragBox.RESIZE_PADDING < to;
+                return Plottable._Util.Methods.inRange(origin, from - DragBox.RESIZE_PADDING, to + DragBox.RESIZE_PADDING);
             };
             DragBox.prototype._doDragstart = function () {
                 this._selectionOrigin = this._origin.slice();
