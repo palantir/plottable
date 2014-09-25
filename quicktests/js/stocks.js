@@ -61,14 +61,18 @@ function run(div, data, Plottable) {
           var aaplSource = new Plottable.Dataset(aapl, {name: "AAPL"} );
           var googSource = new Plottable.Dataset(goog, {name: "GOOG"} );
 
-          var line_aapl = new Plottable.Plot.Line(aaplSource, xScale, yScale_aapl).animate(true)
+          var line_aapl = new Plottable.Plot.Line(xScale, yScale_aapl).animate(true)
+                                  .addDataset("aapl", aaplSource)
                                   .project("x", "Date", xScale)
                                   .project("y", "Adj Close", yScale_aapl)
                                   .project("stroke", function(d, i, m) { return m.name; }, colorScale);
-          var line_goog = new Plottable.Plot.Line(googSource, xScale, yScale_goog).animate(true)
+          var line_goog = new Plottable.Plot.Line(xScale, yScale_goog).animate(true)
+                                  .addDataset("goog", goodSource)
                                   .project("x", "Date", xScale)
                                   .project("y", "Adj Close", yScale_goog)
                                   .project("stroke", function(d, i, m) { return m.name; }, colorScale);
+
+          // should be one line plot, pending #917
 
           var legend = new Plottable.Component.Legend(colorScale);
           legend.yAlign("top").xOffset(-5);
@@ -78,7 +82,8 @@ function run(div, data, Plottable) {
           var yAxis_diff = new Plottable.Axis.Numeric(yScale_diff, "left");
 
           var DAY_MILLIS = 24 * 60 * 60 * 1000;
-          var bar_diff = new Plottable.Plot.VerticalBar(diffData, xScale, yScale_diff).animate(true)
+          var bar_diff = new Plottable.Plot.VerticalBar(xScale, yScale_diff).animate(true)
+                                  .addDataset(diffData)
                                   .project("x", "Date", xScale)
                                   .project("y", "net change", yScale_diff)
                                   .project("width", function() { return xScale.scale(DAY_MILLIS) - xScale.scale(0); })
@@ -87,11 +92,10 @@ function run(div, data, Plottable) {
                                   });
 
           var table = new Plottable.Component.Table([
-                            [null, null,  xAxisTop, null, null],
+                            [null      , null      , xAxisTop, null      , null      ],
                             [label_goog, yAxis_goog, plotArea, yAxis_aapl, label_aapl],
-                            [null, null, bar_diff, null, null],
-                            [null, null,  xAxis, null, null],
-                          ]);
+                            [null      , null      , bar_diff, null      , null      ],
+                            [null      , null      , xAxis   , null      , null      ]]);
 
           table.rowWeight(2, 0.3);
 
