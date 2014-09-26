@@ -1848,6 +1848,7 @@ var Plottable;
                     if (innerPadding != null) {
                         this._innerPadding = innerPadding;
                     }
+                    this.range(this.range());
                     this.broadcaster.broadcast();
                     return this;
                 }
@@ -3474,9 +3475,6 @@ var Plottable;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
                 this.classed("category-axis", true);
-                if (scale.rangeType() !== "bands") {
-                    throw new Error("Only rangeBands category axes are implemented");
-                }
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);

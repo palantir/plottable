@@ -680,6 +680,23 @@ describe("Category Axes", function () {
         assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing ticklength increases height");
         svg.remove();
     });
+    it("proper range values for different range types", function () {
+        var SVG_WIDTH = 400;
+        var svg = generateSVG(SVG_WIDTH, 100);
+        var scale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([0, 400]).rangeType("bands", 1, 0);
+        var categoryAxis = new Plottable.Axis.Category(scale, "bottom");
+        categoryAxis.renderTo(svg);
+        // Outer padding is equal to step
+        var step = SVG_WIDTH / 5;
+        var tickMarks = categoryAxis._tickMarkContainer.selectAll(".tick-mark")[0];
+        var ticksNormalizedPosition = tickMarks.map(function (s) { return +d3.select(s).attr("x1") / step; });
+        assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
+        scale.rangeType("points", 1, 0);
+        step = SVG_WIDTH / 4;
+        ticksNormalizedPosition = tickMarks.map(function (s) { return +d3.select(s).attr("x1") / step; });
+        assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
+        svg.remove();
+    });
 });
 
 var assert = chai.assert;
@@ -4252,6 +4269,16 @@ describe("Scales", function () {
             assert.deepEqual(scale.rangeBand(), 399);
             scale.domain(["1", "2", "3", "4", "5"]);
             assert.deepEqual(scale.rangeBand(), 329);
+        });
+        it("rangeBand is updated when mode is changed", function () {
+            var scale = new Plottable.Scale.Ordinal();
+            scale.rangeType("bands");
+            assert.deepEqual(scale.rangeType(), "bands");
+            scale.range([0, 2679]);
+            scale.domain(["1", "2", "3", "4"]);
+            assert.deepEqual(scale.rangeBand(), 399);
+            scale.rangeType("points");
+            assert.deepEqual(scale.rangeBand(), 0, "Band width should be 0 in points mode");
         });
         it("rangeType triggers broadcast", function () {
             var scale = new Plottable.Scale.Ordinal();
