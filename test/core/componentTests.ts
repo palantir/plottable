@@ -367,4 +367,22 @@ it("components can be offset relative to their alignment, and throw errors if th
     c.detach(); // no error thrown
     svg.remove();
   });
+
+  it("component remains in own cell", () => {
+    var horizontalComponent = new Plottable.Abstract.Component();
+    var verticalComponent = new Plottable.Abstract.Component();
+    var placeHolder = new Plottable.Abstract.Component();
+    var t = new Plottable.Component.Table().addComponent(0, 0, verticalComponent)
+                                 .addComponent(0, 1, new Plottable.Abstract.Component())
+                                 .addComponent(1, 0, placeHolder)
+                                 .addComponent(1, 1, horizontalComponent);
+    t.renderTo(svg);
+    horizontalComponent.xAlign("center");
+    verticalComponent.yAlign("bottom");
+
+    assertBBoxNonIntersection(verticalComponent._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
+    assertBBoxInclusion((<any> t).boxContainer.select(".bounding-box"), horizontalComponent._element.select(".bounding-box"));
+
+    svg.remove();
+  });
 });

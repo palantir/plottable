@@ -65,14 +65,19 @@ function assertBBoxInclusion(outerEl: D3.Selection, innerEl: D3.Selection) {
           "bounding rect bottom included");
 }
 
-function assertBBoxExclusion(firstEl: D3.Selection, secondEl: D3.Selection) {
+function assertBBoxNonIntersection(firstEl: D3.Selection, secondEl: D3.Selection) {
   var firstBox = firstEl.node().getBoundingClientRect();
   var secondBox = secondEl.node().getBoundingClientRect();
-  var leftSide = Math.max(Math.floor(firstBox.left), Math.ceil(secondBox.left));
-  var rightSide = Math.min(Math.floor(firstBox.right), Math.ceil(secondBox.right));
-  var topSide = Math.max(Math.floor(firstBox.top), Math.ceil(secondBox.top));
-  var bottomSide = Math.min(Math.floor(firstBox.bottom), Math.ceil(secondBox.bottom));
-  assert.isTrue((leftSide >= rightSide) || (topSide <= bottomSide), "bounding rects excluded");
+
+  var x1 = Math.max(firstBox.left, secondBox.left);
+  var x2 = Math.min(firstBox.right, secondBox.right);
+  var y1 = Math.min(firstBox.bottom, secondBox.bottom);
+  var y2 = Math.max(firstBox.top, secondBox.top);
+
+  var width = Math.max(x2 - x1, 0);
+  var height = Math.max(y1 - y2, 0);
+
+  assert.equal(width * height, 0, "at least one dimension of intersecting rect is 0");
 }
 
 function assertXY(el: D3.Selection, xExpected: number, yExpected: number, message: string) {

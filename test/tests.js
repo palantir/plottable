@@ -55,14 +55,16 @@ function assertBBoxInclusion(outerEl, innerEl) {
     assert.operator(Math.ceil(outerBox.right) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.right), "bounding rect right included");
     assert.operator(Math.ceil(outerBox.bottom) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.bottom), "bounding rect bottom included");
 }
-function assertBBoxExclusion(firstEl, secondEl) {
+function assertBBoxNonIntersection(firstEl, secondEl) {
     var firstBox = firstEl.node().getBoundingClientRect();
     var secondBox = secondEl.node().getBoundingClientRect();
-    var leftSide = Math.max(Math.floor(firstBox.left), Math.ceil(secondBox.left));
-    var rightSide = Math.min(Math.floor(firstBox.right), Math.ceil(secondBox.right));
-    var topSide = Math.max(Math.floor(firstBox.top), Math.ceil(secondBox.top));
-    var bottomSide = Math.min(Math.floor(firstBox.bottom), Math.ceil(secondBox.bottom));
-    assert.isTrue((leftSide >= rightSide) || (topSide <= bottomSide), "bounding rects excluded");
+    var x1 = Math.max(firstBox.left, secondBox.left);
+    var x2 = Math.min(firstBox.right, secondBox.right);
+    var y1 = Math.min(firstBox.bottom, secondBox.bottom);
+    var y2 = Math.max(firstBox.top, secondBox.top);
+    var width = Math.max(x2 - x1, 0);
+    var height = Math.max(y1 - y2, 0);
+    assert.equal(width * height, 0, "at least one dimension of intersecting rect is 0");
 }
 function assertXY(el, xExpected, yExpected, message) {
     var x = el.attr("x");
@@ -303,20 +305,6 @@ describe("BaseAxis", function () {
         assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should increase to end tick length");
         baseAxis.tickLength(10);
         assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should not decrease");
-        svg.remove();
-    });
-    it("axis remains in own cell", function () {
-        var svg = generateSVG(400, 400);
-        var scale = new Plottable.Scale.Linear();
-        var xAxis = new Plottable.Abstract.Axis(scale, "bottom");
-        var yAxis = new Plottable.Abstract.Axis(scale, "left");
-        var placeHolder = new Plottable.Abstract.Component();
-        var t = new Plottable.Component.Table().addComponent(0, 0, yAxis).addComponent(1, 0, new Plottable.Abstract.Component()).addComponent(0, 1, placeHolder).addComponent(1, 1, xAxis);
-        t.renderTo(svg);
-        xAxis.xAlign("left");
-        yAxis.yAlign("bottom");
-        assertBBoxExclusion(yAxis._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
-        assertBBoxExclusion(xAxis._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
         svg.remove();
     });
 });
@@ -3584,6 +3572,18 @@ describe("Component behavior", function () {
     it("components can be detached even if not anchored", function () {
         var c = new Plottable.Abstract.Component();
         c.detach(); // no error thrown
+        svg.remove();
+    });
+    it("component remains in own cell", function () {
+        var horizontalComponent = new Plottable.Abstract.Component();
+        var verticalComponent = new Plottable.Abstract.Component();
+        var placeHolder = new Plottable.Abstract.Component();
+        var t = new Plottable.Component.Table().addComponent(0, 0, verticalComponent).addComponent(0, 1, new Plottable.Abstract.Component()).addComponent(1, 0, placeHolder).addComponent(1, 1, horizontalComponent);
+        t.renderTo(svg);
+        horizontalComponent.xAlign("center");
+        verticalComponent.yAlign("bottom");
+        assertBBoxNonIntersection(verticalComponent._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
+        assertBBoxInclusion(t.boxContainer.select(".bounding-box"), horizontalComponent._element.select(".bounding-box"));
         svg.remove();
     });
 });
