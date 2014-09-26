@@ -7,6 +7,7 @@ export module Abstract {
     value: number;
     offset?: number;
   }
+
   export class Stacked<X, Y> extends Abstract.XYPlot<X, Y> {
     private stackedExtent = [0, 0];
     public _isVertical: boolean;
