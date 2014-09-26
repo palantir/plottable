@@ -11,7 +11,6 @@ export module Interaction {
     private currentBar: D3.Selection = null;
     private _hoverMode = "point";
 
-
     public _anchor(barPlot: Abstract.BarPlot<any, any>, hitBox: D3.Selection) {
       super._anchor(barPlot, hitBox);
       this.plotIsVertical = this._componentToListenTo._isVertical;

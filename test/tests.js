@@ -1831,7 +1831,7 @@ describe("Plots", function () {
                 ];
                 dataset = new Plottable.Dataset(data);
                 barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
-                barPlot.addDataset("1", dataset);
+                barPlot.addDataset(dataset);
                 barPlot.animate(false);
                 barPlot.renderTo(svg);
             });
