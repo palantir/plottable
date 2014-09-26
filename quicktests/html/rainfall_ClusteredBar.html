@@ -5,14 +5,28 @@
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
     <style>
       svg {
-        background-color: #EEE;
+        margin: 2px;
       }
 
-      div {
+      #testdiv {
+        border: 2px solid black;
         padding: 20px;
       }
+
+      #outer {
+      }
+
+      .plottable .axis-label text {
+        font-size: 15;
+      }
+
+      .plottable .legend-row text {
+        font-size: 14px;
+      }
+
+
     </style>
-    <script src="../../bower_components/d3/d3.js" charset="utf-8"></script>
+    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
     <script src="../../plottable.js"></script>
     <script src="../exampleUtil.js"></script>
     <script src="../js/rainfall_ClusteredBar.js"></script>
@@ -26,7 +40,9 @@
   </head>
 
   <body>
+  <div id="outer">
     <div id="testdiv"></div>
+    </div>
   </body>
 
 </html>

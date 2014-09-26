@@ -1,11 +1,13 @@
 
 function makeData() {
   "use strict";
-  return makeRandomData(20);
+
+  return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
   "use strict";
+
   var svg = div.append("svg").attr("height", 500);
   var doAnimate = true;
   var xScale = new Plottable.Scale.Linear();
@@ -14,19 +16,17 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var dataset = new Plottable.Dataset(data);
-  var lineRenderer = new Plottable.Plot.Line(xScale, yScale)
-              .addDataset(dataset)
-              .attr("opacity", 0.75)
-              .animate(doAnimate);
+  var lineRenderer = new Plottable.Plot.Line(data[0].slice(0, 20), xScale, yScale);
+  lineRenderer.attr("opacity", 0.75);
+  lineRenderer.animate(doAnimate);
 
   var lineChart = new Plottable.Component.Table([[yAxis, lineRenderer],
                                            [null,  xAxis]]);
   lineChart.renderTo(svg);
 
   var cb = function(x, y){
-    var d = dataset.data();
-    dataset.data(d);
+    var d = lineRenderer.dataset().data();
+    lineRenderer.dataset().data(d);
   };
 
   lineRenderer.registerInteraction(

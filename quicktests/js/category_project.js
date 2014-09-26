@@ -1,18 +1,22 @@
 function makeData() {
   "use strict";
 
-  return makeRandomData(5);
+  return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
   "use strict";
 
   var svg = div.append("svg").attr("height", 500);
+  var rawData = data[0].slice(0, 5);
   var change_x = function(elt, i) {
-    elt.x = i.toString(); // wtf is this code
+    elt.x = i;
+    elt.x = elt.x.toString();
   };
-  data.forEach(change_x);
-  var dataseries1 = new Plottable.Dataset(data);
+  rawData.forEach(change_x);
+  var dataseries1 = new Plottable.Dataset(rawData);
+  dataseries1.metadata({name: "series1"});
+
 
   //Axis
   var xScale = new Plottable.Scale.Ordinal();
@@ -20,13 +24,13 @@ function run(div, data, Plottable) {
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
+
   var widthProjector = function(d, i, m) {
     return (d.x*3 + 3);
   };
 
   //rendering
-  var renderAreaD1 = new Plottable.Plot.VerticalBar(xScale, yScale)
-                                  .addDataset(dataseries1)
+  var renderAreaD1 = new Plottable.Plot.VerticalBar(dataseries1, xScale, yScale)
                                   .attr("width", widthProjector)
                                   .animate(true);
 

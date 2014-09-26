@@ -1,7 +1,7 @@
 function makeData() {
   "use strict";
 
-  return makeRandomData(6);
+  return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
@@ -18,23 +18,21 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var dataset = new Plottable.Dataset(data);
-  var verticalBarPlot = new Plottable.Plot.VerticalBar(xScale, yScale)
-                              .addDataset(dataset)
-                              .attr("opacity", 0.75)
-                              .animate(doAnimate);
+  var vBarRenderer = new Plottable.Plot.VerticalBar(data[0].slice(0, 6), xScale, yScale);
+  vBarRenderer.attr("opacity", 0.75);
+  vBarRenderer.animate(doAnimate);
 
-  var chart = new Plottable.Component.Table([[yAxis, verticalBarPlot],
+  var vBarChart = new Plottable.Component.Table([[yAxis, vBarRenderer],
    [null,  xAxis]]);
 
-  chart.renderTo(svg);
+  vBarChart.renderTo(svg);
 
   var cb = function(x, y){
-    var d = dataset.data();
-    dataset.data(d);
+    var d = vBarRenderer.dataset().data();
+    vBarRenderer.dataset().data(d);
   };
 
-  verticalBarPlot.registerInteraction(
-    new Plottable.Interaction.Click(verticalBarPlot).callback(cb)
+  vBarRenderer.registerInteraction(
+    new Plottable.Interaction.Click(vBarRenderer).callback(cb)
   );
 }

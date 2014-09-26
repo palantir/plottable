@@ -24,22 +24,19 @@ function run(div, data, Plottable){
   var yAxis3 = new Plottable.Axis.Numeric(yScale, "left");
 
 
-  var paloAltoBar = new Plottable.Plot.VerticalBar(xScale, yScale)
-    .addDataset(data[0])
+  var paloAltoBar = new Plottable.Plot.VerticalBar(data[0], xScale, yScale)
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
     .project("fill", "city", colorScale);
 
-  var sanFranciscoBar = new Plottable.Plot.VerticalBar(xScale, yScale)
-    .addDataset(data[1])
+  var sanFranciscoBar = new Plottable.Plot.VerticalBar(data[1], xScale, yScale)
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
     .project("fill", "city", colorScale);
 
-  var sanJoseBar = new Plottable.Plot.VerticalBar(xScale, yScale)
-    .addDataset(data[2])
+  var sanJoseBar = new Plottable.Plot.VerticalBar(data[2], xScale, yScale)
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)

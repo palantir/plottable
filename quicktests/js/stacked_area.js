@@ -18,10 +18,10 @@ function run(div, data, Plottable) {
 
   xScale.rangeType("points");
 
-  if (!Plottable.Plot.Area) {
+  if (!Plottable.Plot.StackedArea) {
     return;
   }
-  var stackedAreaPlot = new Plottable.Plot.StackedArea(xScale, yScale)
+  var stackedAreaRenderer = new Plottable.Plot.StackedArea(xScale, yScale)
     .addDataset("d1", data[0])
     .addDataset("d2", data[1])
     .addDataset("d3", data[2])
@@ -29,7 +29,7 @@ function run(div, data, Plottable) {
     .attr("y", "y", yScale)
     .attr("fill", "type", colorScale);
 
-  var center = stackedAreaPlot.merge(new Plottable.Component.Legend(colorScale));
+  var center = stackedAreaRenderer.merge(new Plottable.Component.Legend(colorScale));
 
   new Plottable.Component.Table([
     [yAxis, center], [null, xAxis]

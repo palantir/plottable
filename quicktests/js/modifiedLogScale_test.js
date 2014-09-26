@@ -25,7 +25,7 @@ function run(div, data, Plottable) {
   yAxis.showEndTickLabel("top", false);
   yAxis.showEndTickLabel("bottom", false);
 
-  circleRenderer = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data);
+  circleRenderer = new Plottable.Plot.Scatter(data, xScale, yScale);
   circleRenderer.attr("r", 8);
   circleRenderer.attr("opacity", 0.75);
   circleRenderer.animate(doAnimate);

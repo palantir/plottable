@@ -1,7 +1,7 @@
 function makeData() {
   "use strict";
 
-  return makeRandomData(20);
+  return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
@@ -17,11 +17,9 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var dataset = new Plottable.Dataset(data);
-  var areaRenderer = new Plottable.Plot.Area(xScale, yScale)
-            .addDataset(dataset)
-            .attr("opacity", 0.75)
-            .animate(doAnimate);
+  var areaRenderer = new Plottable.Plot.Area(data[0].slice(0, 20), xScale, yScale);
+  areaRenderer.attr("opacity", 0.75);
+  areaRenderer.animate(doAnimate);
 
   var areaChart = new Plottable.Component.Table([[yAxis, areaRenderer],
    [null,  xAxis]]);
@@ -29,8 +27,8 @@ function run(div, data, Plottable) {
   areaChart.renderTo(svg);
 
   var cb = function(x, y){
-    var d = dataset.data();
-    dataset.data(d);
+    var d = areaRenderer.dataset().data();
+    areaRenderer.dataset().data(d);
   };
 
   areaRenderer.registerInteraction(

@@ -1,7 +1,7 @@
 function makeData() {
   "use strict";
 
-  return makeRandomData(20);
+  return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
@@ -9,7 +9,7 @@ function run(div, data, Plottable) {
 
   var svg = div.append("svg").attr("height", 500);
   var newData = JSON.parse(JSON.stringify(data));
-  var dataSeries = newData;
+  var dataSeries = newData[0].slice(0, 20);
 
   var xScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
@@ -17,12 +17,12 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var plot = new Plottable.Plot.Area(xScale, yScale).addDataset(dataSeries);
+  var renderAreaD1 = new Plottable.Plot.Area(dataSeries, xScale, yScale);
   var fillAccessor = function() { return "steelblue"; };
-  plot.attr("fill", fillAccessor);
+  renderAreaD1.attr("fill", fillAccessor);
 
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-  var renderGroup = new Plottable.Component.Group([gridlines, plot]);
+  var renderGroup = new Plottable.Component.Group([gridlines, renderAreaD1]);
 
   var chart = new Plottable.Component.Table([
                                             [yAxis, renderGroup],

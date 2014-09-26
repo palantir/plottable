@@ -38,7 +38,7 @@ function run(div, data, Plottable) {
     };
 
     //rendering
-    var renderAreaD1 = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries1)
+    var renderAreaD1 = new Plottable.Plot.Scatter(dataseries1, xScale, yScale)
                                     .attr("r", widthProjector)
                                     .attr("fill", colorProjector)
                                     .attr("opacity", opacityProjector)

@@ -1,7 +1,7 @@
 function makeData() {
   "use strict";
 
-  return [makeRandomData(20), makeRandomData(20)];
+  return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(div, data, Plottable) {
@@ -16,24 +16,18 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var d1 = new Plottable.Dataset(data[0]);
-  var d2 = new Plottable.Dataset(data[1]);
-
-  circleRenderer = new Plottable.Plot.Scatter(xScale, yScale)
-                .addDataset(d1)
-                .addDataset(d2)
-                .attr("r", 8)
-                .attr("opacity", 0.75)
-                .animate(doAnimate);
+  circleRenderer = new Plottable.Plot.Scatter(data[0].slice(0, 20), xScale, yScale);
+  circleRenderer.attr("r", 8);
+  circleRenderer.attr("opacity", 0.75);
+  circleRenderer.animate(doAnimate);
 
   var circleChart = new Plottable.Component.Table([[yAxis, circleRenderer],
    [null,  xAxis]]);
   circleChart.renderTo(svg);
 
   var cb = function(x, y){
-    var tmp = d1.data();
-    d1.data(d2.data());
-    d2.data(tmp);
+    var d = circleRenderer.dataset().data();
+    circleRenderer.dataset().data(d);
   };
 
   circleRenderer.registerInteraction(

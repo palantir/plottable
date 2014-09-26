@@ -28,10 +28,8 @@ function run(div, data, Plottable) {
         return d.gender === "male" ? "#F35748" : "#2FA9E7";
     };
 
-    var renderer = new Plottable.Plot.Scatter(xScale, yScale);
-    renderer
-                .addDataset(dataseries)
-                .attr("x", xAccessor, xScale)
+    var renderer = new Plottable.Plot.Scatter(dataseries, xScale, yScale);
+    renderer.attr("x", xAccessor, xScale)
                 .attr("y", yAccessor, yScale)
                 .attr("r", rAccessor)
                 .attr("fill", colorAccessor)
