@@ -51,7 +51,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    // hackhack #1106 - should use drawers for paint logic
+    // HACKHACK #1106 - should use drawers for paint logic
     public _paint() {
       var attrToProjector = this._generateAttrToProjector();
       var xFunction       = attrToProjector["x"];

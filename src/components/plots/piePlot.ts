@@ -22,7 +22,6 @@ export module Plot {
      * @constructor
      */
     constructor() {
-      // make a dummy dataset to satisfy the base Plot (HACKHACK)
       super();
       this.classed("pie-plot", true);
     }

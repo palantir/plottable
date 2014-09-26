@@ -4,16 +4,18 @@ module Plottable {
 export module Abstract {
   export class Plot extends Component {
     public _dataChanged = false;
-    private nextSeriesIndex: number;
     public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
     public _datasetKeysInOrder: string[];
 
     public _renderArea: D3.Selection;
+    public _projectors: { [attrToSet: string]: _IProjector; } = {};
+
     public _animate: boolean = false;
     public _animators: Animator.IPlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
-    public _projectors: { [attrToSet: string]: _IProjector; } = {};
+
     private animateOnNextRender = true;
+    private nextSeriesIndex: number;
 
     /**
      * Constructs a Plot.
