@@ -4737,12 +4737,12 @@ var Plottable;
                 return this;
             };
             Scatter.prototype._generateAttrToProjector = function () {
-                var a2p = _super.prototype._generateAttrToProjector.call(this);
-                a2p["cx"] = a2p["x"];
-                delete a2p["x"];
-                a2p["cy"] = a2p["y"];
-                delete a2p["y"];
-                return a2p;
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                attrToProjector["cx"] = attrToProjector["x"];
+                delete attrToProjector["x"];
+                attrToProjector["cy"] = attrToProjector["y"];
+                delete attrToProjector["y"];
+                return attrToProjector;
             };
             Scatter.prototype._paint = function () {
                 var _this = this;

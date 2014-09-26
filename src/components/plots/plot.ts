@@ -68,7 +68,7 @@ export module Abstract {
      *
      * @param {string} [key] The key of the dataset.
      * @param {any[]|Dataset} dataset dataset to add.
-     * @returns {NewStylePlot} The calling NewStylePlot.
+     * @returns {Plot} The calling Plot.
      */
     public addDataset(key: string, dataset: Dataset): Plot;
     public addDataset(key: string, dataset: any[]): Plot;
@@ -290,7 +290,7 @@ export module Abstract {
      * @param {string[]} order If provided, a string array which represents the order of the keys.
      * This must be a permutation of existing keys.
      *
-     * @returns {NewStylePlot} The calling NewStylePlot.
+     * @returns {Plot} The calling Plot.
      */
     public datasetOrder(order: string[]): Plot;
     public datasetOrder(order?: string[]): any {
@@ -315,7 +315,7 @@ export module Abstract {
      * Removes a dataset
      *
      * @param {string} key The key of the dataset
-     * @return {NewStylePlot} The calling NewStylePlot.
+     * @return {Plot} The calling Plot.
      */
     public removeDataset(key: string): Plot {
       if (this._key2DatasetDrawerKey.has(key)) {

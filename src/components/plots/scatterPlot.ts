@@ -40,12 +40,12 @@ export module Plot {
     }
 
     public _generateAttrToProjector() {
-      var a2p = super._generateAttrToProjector();
-      a2p["cx"] = a2p["x"];
-      delete a2p["x"];
-      a2p["cy"] = a2p["y"];
-      delete a2p["y"];
-      return a2p;
+      var attrToProjector = super._generateAttrToProjector();
+      attrToProjector["cx"] = attrToProjector["x"];
+      delete attrToProjector["x"];
+      attrToProjector["cy"] = attrToProjector["y"];
+      delete attrToProjector["y"];
+      return attrToProjector;
     }
 
     // hackhack #1106 - should use drawers for paint logic
