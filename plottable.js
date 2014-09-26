@@ -4967,7 +4967,7 @@ var Plottable;
                 var secondaryAttr = this._isVertical ? "x" : "y";
                 var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
-                if (attrToProjector["width"] == null) {
+                if (!attrToProjector["width"]) {
                     var constantWidth = bandsMode ? secondaryScale.rangeBand() : BarPlot.DEFAULT_WIDTH;
                     attrToProjector["width"] = function (d, i) { return constantWidth; };
                 }
