@@ -150,6 +150,11 @@
   },
 
   {
+    "name":"negative_stacked_bar",
+    "categories":["Linear Scale", "Numeric Axis", "Legend", "Category Axis", "Linear Scale", "Vertical Bar Plot", "Stacked Plot"]
+  },
+
+  {
     "name":"no_data",
     "categories":[ "Linear Scale", "Numeric Axis", "Area Plot", "Scatter Plot", "Vertical Bar Plot", "Horizontal Bar Plot", "Line Plot", "Table", "Layout"]
   },

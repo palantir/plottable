@@ -874,7 +874,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         interface IPlotAnimator {
-            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
+            animate(selection: any, attrToProjector: IAttributeToProjector): any;
         }
         interface IPlotAnimatorMap {
             [animatorKey: string]: IPlotAnimator;
@@ -899,7 +899,7 @@ declare module Plottable {
             static DEFAULT_DELAY_MILLISECONDS: number;
             static DEFAULT_EASING: string;
             constructor();
-            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Transition.Transition;
             duration(): number;
             duration(duration: number): Base;
             delay(): number;
@@ -916,7 +916,7 @@ declare module Plottable {
         class IterativeDelay extends Base {
             static DEFAULT_ITERATIVE_DELAY_MILLISECONDS: number;
             constructor();
-            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Transition.Transition;
             iterativeDelay(): number;
             iterativeDelay(iterDelay: number): IterativeDelay;
         }
@@ -931,7 +931,7 @@ declare module Plottable {
             isVertical: boolean;
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
-            animate(selection: any, attrToProjector: IAttributeToProjector): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Transition.Transition;
         }
     }
 }

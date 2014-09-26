@@ -27,7 +27,7 @@ export module Animator {
       this._iterativeDelay = IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
     }
 
-    public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection {
+    public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Transition.Transition {
       return selection.transition()
         .ease(this.easing())
         .duration(this.duration())
