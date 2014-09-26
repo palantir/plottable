@@ -2,6 +2,11 @@
 
 module Plottable {
 export module Abstract {
+  interface StackedDatum {
+    key: any;
+    value: number;
+    offset?: number;
+  }
   export class Stacked<X, Y> extends Abstract.XYPlot<X, Y> {
     private stackedExtent = [0, 0];
     public _isVertical: boolean;
@@ -16,22 +21,79 @@ export module Abstract {
 
     private stack() {
       var datasets = this._getDatasetsInOrder();
+      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+      var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+
+      var dataArray: StackedDatum[][] = datasets.map((dataset) => {
+        return dataset.data().map((datum) => {
+          return {key: keyAccessor(datum), value: valueAccessor(datum)};
+        });
+      });
+
+      var positiveDataArray: StackedDatum[][] = dataArray.map((data) => {
+        return data.map((datum) => {
+          return {key: datum.key, value: Math.max(0, datum.value)};
+        });
+      });
+
+      var negativeDataArray: StackedDatum[][] = dataArray.map((data) => {
+        return data.map((datum) => {
+          return {key: datum.key, value: Math.min(datum.value, 0)};
+        });
+      });
+
+      this.setDatasetStackOffsets(this._stack(positiveDataArray), this._stack(negativeDataArray));
+
+      var maxStack = _Util.Methods.max(datasets, (dataset: Dataset) => {
+        return _Util.Methods.max(dataset.data(), (datum: any) => {
+          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+        });
+      });
+
+      var minStack = _Util.Methods.min(datasets, (dataset: Dataset) => {
+        return _Util.Methods.min(dataset.data(), (datum: any) => {
+          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+        });
+      });
+
+      this.stackedExtent = [Math.min(minStack, 0), Math.max(0, maxStack)];
+    }
+
+    /**
+     * Feeds the data through d3's stack layout function which will calculate
+     * the stack offsets and use the the function declared in .out to set the offsets on the data.
+     */
+    private _stack(dataArray: StackedDatum[][]): StackedDatum[][] {
       var outFunction = (d: any, y0: number, y: number) => {
-        d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = y0;
+        d.offset = y0;
       };
+
       d3.layout.stack()
-        .x(this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor)
-        .y(this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor)
-        .values((d) => d.data())
-        .out(outFunction)(datasets);
+               .x((d) => d.key)
+               .y((d) => d.value)
+               .values((d) => d)
+               .out(outFunction)(dataArray);
 
-      var maxY = _Util.Methods.max(datasets[datasets.length - 1].data(),
-                                  (datum: any) => datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      this.stackedExtent[1] = Math.max(0, maxY);
+      return dataArray;
+    }
 
-      var minY = _Util.Methods.min(datasets[datasets.length - 1].data(),
-                                  (datum: any) => datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      this.stackedExtent[0] = Math.min(minY, 0);
+    /**
+     * After the stack offsets have been determined on each separate dataset, the offsets need
+     * to be determined correctly on the overall datasets
+     */
+    private setDatasetStackOffsets(positiveDataArray: StackedDatum[][], negativeDataArray: StackedDatum[][]) {
+      var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+      var positiveDataArrayOffsets = positiveDataArray.map((data) => data.map((datum) => datum.offset));
+      var negativeDataArrayOffsets = negativeDataArray.map((data) => data.map((datum) => datum.offset));
+
+      this._getDatasetsInOrder().forEach((dataset, datasetIndex) => {
+        dataset.data().forEach((datum: any, datumIndex: number) => {
+          var positiveOffset = positiveDataArrayOffsets[datasetIndex][datumIndex];
+          var negativeOffset = negativeDataArrayOffsets[datasetIndex][datumIndex];
+
+          datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) > 0 ? positiveOffset : negativeOffset;
+        });
+      });
     }
 
     public _updateScaleExtents() {
