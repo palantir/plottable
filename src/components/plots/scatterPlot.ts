@@ -48,6 +48,7 @@ export module Plot {
       return a2p;
     }
 
+    // hackhack #1106 - should use drawers for paint logic
     public _paint() {
       var attrToProjector = this._generateAttrToProjector();
       var datasets = this._getDatasetsInOrder();

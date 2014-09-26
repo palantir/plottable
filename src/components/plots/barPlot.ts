@@ -199,7 +199,6 @@ export module Abstract {
       }
     }
 
-
     public _generateAttrToProjector() {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
