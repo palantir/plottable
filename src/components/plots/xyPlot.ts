@@ -18,7 +18,7 @@ export module Abstract {
      */
     constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
       super();
-      if (!(xScale && xScale.scale && yScale && yScale.scale)) {
+      if (xScale == null || yScale == null) {
         throw new Error("XYPlots require an xScale and yScale");
       }
       this.classed("xy-plot", true);
