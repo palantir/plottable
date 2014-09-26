@@ -116,6 +116,7 @@ export module Scale {
         if (innerPadding != null) {
           this._innerPadding = innerPadding;
         }
+        this.range(this.range());
         this.broadcaster.broadcast();
         return this;
       }

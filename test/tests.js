@@ -713,6 +713,23 @@ describe("Category Axes", function () {
         assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing ticklength increases height");
         svg.remove();
     });
+    it("proper range values for different range types", function () {
+        var SVG_WIDTH = 400;
+        var svg = generateSVG(SVG_WIDTH, 100);
+        var scale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([0, 400]).rangeType("bands", 1, 0);
+        var categoryAxis = new Plottable.Axis.Category(scale, "bottom");
+        categoryAxis.renderTo(svg);
+        // Outer padding is equal to step
+        var step = SVG_WIDTH / 5;
+        var tickMarks = categoryAxis._tickMarkContainer.selectAll(".tick-mark")[0];
+        var ticksNormalizedPosition = tickMarks.map(function (s) { return +d3.select(s).attr("x1") / step; });
+        assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
+        scale.rangeType("points", 1, 0);
+        step = SVG_WIDTH / 4;
+        ticksNormalizedPosition = tickMarks.map(function (s) { return +d3.select(s).attr("x1") / step; });
+        assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -853,6 +870,21 @@ describe("Labels", function () {
     });
     it("unsupported alignments and orientations are unsupported", function () {
         assert.throws(function () { return new Plottable.Component.Label("foo", "bar"); }, Error, "not a valid orientation");
+    });
+    it("Label orientation can be changed after label is created", function () {
+        var svg = generateSVG(400, 400);
+        var label = new Plottable.Component.AxisLabel("CHANGING ORIENTATION");
+        label.renderTo(svg);
+        var content = label._content;
+        var text = content.select("text");
+        var bbox = Plottable._Util.DOM.getBBox(text);
+        assert.closeTo(bbox.height, label.height(), 1, "label is in horizontal position");
+        label.orient("vertical-right");
+        text = content.select("text");
+        bbox = Plottable._Util.DOM.getBBox(text);
+        assertBBoxInclusion(label._element.select(".bounding-box"), text);
+        assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "label is in vertical position");
+        svg.remove();
     });
 });
 
@@ -2706,6 +2738,69 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
         });
     });
+    describe("Stacked Bar Plot Negative Values", function () {
+        var svg;
+        var xScale;
+        var yScale;
+        var plot;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var axisHeight = 0;
+        var bandWidth = 0;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        beforeEach(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Ordinal();
+            yScale = new Plottable.Scale.Linear();
+            var data1 = [
+                { x: "A", y: -1 },
+                { x: "B", y: -4 }
+            ];
+            var data2 = [
+                { x: "A", y: -1 },
+                { x: "B", y: 4 }
+            ];
+            var data3 = [
+                { x: "A", y: -2 },
+                { x: "B", y: -4 }
+            ];
+            var data4 = [
+                { x: "A", y: -3 },
+                { x: "B", y: 4 }
+            ];
+            plot = new Plottable.Plot.StackedBar(xScale, yScale);
+            plot.addDataset(data1);
+            plot.addDataset(data2);
+            plot.addDataset(data3);
+            plot.addDataset(data4);
+            plot.baseline(0);
+            var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+            var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
+            axisHeight = xAxis.height();
+        });
+        it("stacking done correctly for negative values", function () {
+            var bars = plot._renderArea.selectAll("rect");
+            var bar0 = d3.select(bars[0][0]);
+            var bar1 = d3.select(bars[0][1]);
+            var bar2 = d3.select(bars[0][2]);
+            var bar3 = d3.select(bars[0][3]);
+            var bar4 = d3.select(bars[0][4]);
+            var bar5 = d3.select(bars[0][5]);
+            var bar6 = d3.select(bars[0][6]);
+            var bar7 = d3.select(bars[0][7]);
+            // check stacking order
+            assert.operator(numAttr(bar0, "y"), "<", numAttr(bar2, "y"), "'A' bars added below the baseline in dataset order");
+            assert.operator(numAttr(bar2, "y"), "<", numAttr(bar4, "y"), "'A' bars added below the baseline in dataset order");
+            assert.operator(numAttr(bar4, "y"), "<", numAttr(bar6, "y"), "'A' bars added below the baseline in dataset order");
+            assert.operator(numAttr(bar1, "y"), "<", numAttr(bar5, "y"), "'B' bars added below the baseline in dataset order");
+            assert.operator(numAttr(bar3, "y"), ">", numAttr(bar7, "y"), "'B' bars added above the baseline in dataset order");
+            svg.remove();
+        });
+        it("stacked extent is set correctly", function () {
+            assert.deepEqual(plot.stackedExtent, [-8, 8], "stacked extent is updated accordingly");
+            svg.remove();
+        });
+    });
     describe("Horizontal Stacked Bar Plot", function () {
         var verifier = new MultiTestVerifier();
         var svg;
@@ -4295,6 +4390,16 @@ describe("Scales", function () {
             assert.deepEqual(scale.rangeBand(), 399);
             scale.domain(["1", "2", "3", "4", "5"]);
             assert.deepEqual(scale.rangeBand(), 329);
+        });
+        it("rangeBand is updated when mode is changed", function () {
+            var scale = new Plottable.Scale.Ordinal();
+            scale.rangeType("bands");
+            assert.deepEqual(scale.rangeType(), "bands");
+            scale.range([0, 2679]);
+            scale.domain(["1", "2", "3", "4"]);
+            assert.deepEqual(scale.rangeBand(), 399);
+            scale.rangeType("points");
+            assert.deepEqual(scale.rangeBand(), 0, "Band width should be 0 in points mode");
         });
         it("rangeType triggers broadcast", function () {
             var scale = new Plottable.Scale.Ordinal();

@@ -2120,6 +2120,20 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             text(displayText: string): Label;
+            /**
+             * Gets the orientation of the Label.
+             *
+             * @returns {string} the current orientation.
+             */
+            orient(): string;
+            /**
+             * Sets the orientation of the Label.
+             *
+             * @param {string} newOrientation If provided, the desired orientation
+             * (horizontal/vertical-left/vertical-right).
+             * @returns {Label} The calling Label.
+             */
+            orient(newOrientation: string): Label;
             _doRender(): void;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
         }
@@ -2988,9 +3002,11 @@ declare module Plottable {
              * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale?: Abstract.Scale<X, number>, yScale?: Abstract.Scale<Y, number>, isVertical?: boolean);
+            _setup(): void;
             _getAnimator(drawer: Abstract._Drawer, index: number): Animator.Rect;
             _getDrawer(key: string): any;
             _generateAttrToProjector(): any;
+            _paint(): void;
             baseline(value: number): any;
             _updateDomainer(scale: Abstract.Scale<any, number>): any;
             _updateXDomainer(): any;

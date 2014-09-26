@@ -2616,6 +2616,7 @@ var Plottable;
                     if (innerPadding != null) {
                         this._innerPadding = innerPadding;
                     }
+                    this.range(this.range());
                     this.broadcaster.broadcast();
                     return this;
                 }
@@ -4588,9 +4589,6 @@ var Plottable;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
                 this.classed("category-axis", true);
-                if (scale.rangeType() !== "bands") {
-                    throw new Error("Only rangeBands category axes are implemented");
-                }
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -4739,19 +4737,7 @@ var Plottable;
                 _super.call(this);
                 this.classed("label", true);
                 this.text(displayText);
-                orientation = orientation.toLowerCase();
-                if (orientation === "vertical-left") {
-                    orientation = "left";
-                }
-                if (orientation === "vertical-right") {
-                    orientation = "right";
-                }
-                if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
-                    this.orientation = orientation;
-                }
-                else {
-                    throw new Error(orientation + " is not a valid orientation for LabelComponent");
-                }
+                this.orient(orientation);
                 this.xAlign("center").yAlign("center");
                 this._fixedHeightFlag = true;
                 this._fixedWidthFlag = true;
@@ -4805,6 +4791,28 @@ var Plottable;
                 }
                 else {
                     this._text = displayText;
+                    this._invalidateLayout();
+                    return this;
+                }
+            };
+            Label.prototype.orient = function (newOrientation) {
+                if (newOrientation == null) {
+                    return this.orientation;
+                }
+                else {
+                    newOrientation = newOrientation.toLowerCase();
+                    if (newOrientation === "vertical-left") {
+                        newOrientation = "left";
+                    }
+                    if (newOrientation === "vertical-right") {
+                        newOrientation = "right";
+                    }
+                    if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
+                        this.orientation = newOrientation;
+                    }
+                    else {
+                        throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
+                    }
                     this._invalidateLayout();
                     return this;
                 }
@@ -7055,14 +7063,62 @@ var Plottable;
             };
             Stacked.prototype.stack = function () {
                 var datasets = this._getDatasetsInOrder();
+                var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+                var dataArray = datasets.map(function (dataset) {
+                    return dataset.data().map(function (datum) {
+                        return { key: keyAccessor(datum), value: valueAccessor(datum) };
+                    });
+                });
+                var positiveDataArray = dataArray.map(function (data) {
+                    return data.map(function (datum) {
+                        return { key: datum.key, value: Math.max(0, datum.value) };
+                    });
+                });
+                var negativeDataArray = dataArray.map(function (data) {
+                    return data.map(function (datum) {
+                        return { key: datum.key, value: Math.min(datum.value, 0) };
+                    });
+                });
+                this.setDatasetStackOffsets(this._stack(positiveDataArray), this._stack(negativeDataArray));
+                var maxStack = Plottable._Util.Methods.max(datasets, function (dataset) {
+                    return Plottable._Util.Methods.max(dataset.data(), function (datum) {
+                        return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                    });
+                });
+                var minStack = Plottable._Util.Methods.min(datasets, function (dataset) {
+                    return Plottable._Util.Methods.min(dataset.data(), function (datum) {
+                        return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                    });
+                });
+                this.stackedExtent = [Math.min(minStack, 0), Math.max(0, maxStack)];
+            };
+            /**
+             * Feeds the data through d3's stack layout function which will calculate
+             * the stack offsets and use the the function declared in .out to set the offsets on the data.
+             */
+            Stacked.prototype._stack = function (dataArray) {
                 var outFunction = function (d, y0, y) {
-                    d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = y0;
+                    d.offset = y0;
                 };
-                d3.layout.stack().x(this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor).y(this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor).values(function (d) { return d.data(); }).out(outFunction)(datasets);
-                var maxY = Plottable._Util.Methods.max(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
-                this.stackedExtent[1] = Math.max(0, maxY);
-                var minY = Plottable._Util.Methods.min(datasets[datasets.length - 1].data(), function (datum) { return datum.y + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]; });
-                this.stackedExtent[0] = Math.min(minY, 0);
+                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return d; }).out(outFunction)(dataArray);
+                return dataArray;
+            };
+            /**
+             * After the stack offsets have been determined on each separate dataset, the offsets need
+             * to be determined correctly on the overall datasets
+             */
+            Stacked.prototype.setDatasetStackOffsets = function (positiveDataArray, negativeDataArray) {
+                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+                var positiveDataArrayOffsets = positiveDataArray.map(function (data) { return data.map(function (datum) { return datum.offset; }); });
+                var negativeDataArrayOffsets = negativeDataArray.map(function (data) { return data.map(function (datum) { return datum.offset; }); });
+                this._getDatasetsInOrder().forEach(function (dataset, datasetIndex) {
+                    dataset.data().forEach(function (datum, datumIndex) {
+                        var positiveOffset = positiveDataArrayOffsets[datasetIndex][datumIndex];
+                        var negativeOffset = negativeDataArrayOffsets[datasetIndex][datumIndex];
+                        datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) > 0 ? positiveOffset : negativeOffset;
+                    });
+                });
             };
             Stacked.prototype._updateScaleExtents = function () {
                 _super.prototype._updateScaleExtents.call(this);
@@ -7195,6 +7251,9 @@ var Plottable;
                 this.baseline(this._baselineValue);
                 this._isVertical = isVertical;
             }
+            StackedBar.prototype._setup = function () {
+                Plottable.Abstract.NewStyleBarPlot.prototype._setup.call(this);
+            };
             StackedBar.prototype._getAnimator = function (drawer, index) {
                 var animator = new Plottable.Animator.Rect();
                 animator.delay(animator.duration() * index);
@@ -7204,6 +7263,7 @@ var Plottable;
                 return Plottable.Abstract.NewStyleBarPlot.prototype._getDrawer.apply(this, [key]);
             };
             StackedBar.prototype._generateAttrToProjector = function () {
+                var _this = this;
                 var attrToProjector = Plottable.Abstract.NewStyleBarPlot.prototype._generateAttrToProjector.apply(this);
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
@@ -7214,8 +7274,21 @@ var Plottable;
                 var widthF = attrToProjector["width"];
                 attrToProjector["height"] = this._isVertical ? heightF : widthF;
                 attrToProjector["width"] = this._isVertical ? widthF : heightF;
-                attrToProjector[primaryAttr] = this._isVertical ? getEnd : function (d) { return getEnd(d) - heightF(d); };
+                var attrFunction = function (d) { return primaryAccessor(d) < 0 ? getStart(d) : getEnd(d); };
+                attrToProjector[primaryAttr] = function (d) { return _this._isVertical ? attrFunction(d) : attrFunction(d) - heightF(d); };
                 return attrToProjector;
+            };
+            StackedBar.prototype._paint = function () {
+                _super.prototype._paint.call(this);
+                var primaryScale = this._isVertical ? this._yScale : this._xScale;
+                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var baselineAttr = {
+                    "x1": this._isVertical ? 0 : scaledBaseline,
+                    "y1": this._isVertical ? scaledBaseline : 0,
+                    "x2": this._isVertical ? this.width() : scaledBaseline,
+                    "y2": this._isVertical ? scaledBaseline : this.height()
+                };
+                this._baseline.attr(baselineAttr);
             };
             StackedBar.prototype.baseline = function (value) {
                 return Plottable.Abstract.NewStyleBarPlot.prototype.baseline.apply(this, [value]);
