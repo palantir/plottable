@@ -76,6 +76,7 @@ function assertBBoxNonIntersection(firstEl: D3.Selection, secondEl: D3.Selection
     top: Math.max(firstBox.top, secondBox.top)
   };
 
+  // +1 for inaccuracy in IE
   assert.isTrue(intersectionBox.left + 1 >= intersectionBox.right || intersectionBox.bottom + 1 >= intersectionBox.top,
           "bounding rects are not intersecting");
 }

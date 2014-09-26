@@ -3232,15 +3232,15 @@ var Plottable;
                 var xPosition = this.xOrigin;
                 var yPosition = this.yOrigin;
                 var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
-                xPosition += (availableWidth - (this._isFixedWidth() ? requestedSpace.width : this.width())) * this._xAlignProportion;
                 xPosition += this._xOffset;
                 if (this._isFixedWidth()) {
+                    xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
                     // Decrease size so hitbox / bounding box and children are sized correctly
                     availableWidth = Math.min(availableWidth, requestedSpace.width);
                 }
-                yPosition += (availableHeight - (this._isFixedHeight() ? requestedSpace.height : this.height())) * this._yAlignProportion;
                 yPosition += this._yOffset;
                 if (this._isFixedHeight()) {
+                    yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
                     availableHeight = Math.min(availableHeight, requestedSpace.height);
                 }
                 this._width = availableWidth;

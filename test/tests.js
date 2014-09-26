@@ -64,6 +64,7 @@ function assertBBoxNonIntersection(firstEl, secondEl) {
         bottom: Math.min(firstBox.bottom, secondBox.bottom),
         top: Math.max(firstBox.top, secondBox.top)
     };
+    // +1 for inaccuracy in IE
     assert.isTrue(intersectionBox.left + 1 >= intersectionBox.right || intersectionBox.bottom + 1 >= intersectionBox.top, "bounding rects are not intersecting");
 }
 function assertXY(el, xExpected, yExpected, message) {
