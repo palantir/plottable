@@ -1684,34 +1684,6 @@ declare module Plottable {
             constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
             public remove(): void;
             /**
-            * Gets the current width.
-            *
-            * @returns {number} The current width.
-            */
-            public width(): number;
-            /**
-            * Sets the current width.
-            *
-            * @param {number|String} w A fixed width for the Axis, or
-            * "auto" for automatic mode.
-            * @returns {Axis} The calling Axis.
-            */
-            public width(w: any): Axis;
-            /**
-            * Gets the current height.
-            *
-            * @returns {Axis} The current height.
-            */
-            public height(): number;
-            /**
-            * Sets the current height.
-            *
-            * @param {number|String} h If provided, a fixed height for the Axis, or
-            * "auto" for automatic mode.
-            * @returns {Axis} The calling Axis.
-            */
-            public height(h: any): Axis;
-            /**
             * Gets the current formatter on the axis. Data is passed through the
             * formatter before being displayed.
             *
@@ -1966,6 +1938,20 @@ declare module Plottable {
             * @returns {Label} The calling Label.
             */
             public text(displayText: string): Label;
+            /**
+            * Gets the orientation of the Label.
+            *
+            * @returns {string} the current orientation.
+            */
+            public orient(): string;
+            /**
+            * Sets the orientation of the Label.
+            *
+            * @param {string} newOrientation If provided, the desired orientation
+            * (horizontal/vertical-left/vertical-right).
+            * @returns {Label} The calling Label.
+            */
+            public orient(newOrientation: string): Label;
         }
         class TitleLabel extends Label {
             /**

@@ -91,7 +91,7 @@ export module Abstract {
 
     public _updateScaleExtent(attr: string) {
       var projector = this._projectors[attr];
-      if (projector.scale != null) {
+      if (projector.scale) {
         this._key2DatasetDrawerKey.forEach((key, ddk) => {
           var extent = ddk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer);
           var scaleKey = this._plottableID.toString() + "_" + key;
@@ -151,7 +151,7 @@ export module Abstract {
         var projectors = d3.values(this._projectors);
         var scaleKey = this._plottableID.toString() + "_" + key;
         projectors.forEach((p) => {
-          if (p.scale != null) {
+          if (p.scale) {
             p.scale._removeExtent(scaleKey, p.attribute);
           }
         });

@@ -1567,9 +1567,6 @@ declare module Plottable {
             * @param {number} availableHeight available height for the component to render in
             */
             public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-            /**
-            * Renders the component.
-            */
             public _render(): void;
             public _scheduleComputeLayout(): void;
             public _doRender(): void;
@@ -1799,8 +1796,6 @@ declare module Plottable {
             public _scale: Scale<any, number>;
             public _formatter: Formatter;
             public _orientation: string;
-            public _userRequestedWidth: any;
-            public _userRequestedHeight: any;
             public _computedWidth: number;
             public _computedHeight: number;
             /**
@@ -1840,34 +1835,6 @@ declare module Plottable {
                 y2: any;
             };
             public _invalidateLayout(): void;
-            /**
-            * Gets the current width.
-            *
-            * @returns {number} The current width.
-            */
-            public width(): number;
-            /**
-            * Sets the current width.
-            *
-            * @param {number|String} w A fixed width for the Axis, or
-            * "auto" for automatic mode.
-            * @returns {Axis} The calling Axis.
-            */
-            public width(w: any): Axis;
-            /**
-            * Gets the current height.
-            *
-            * @returns {Axis} The current height.
-            */
-            public height(): number;
-            /**
-            * Sets the current height.
-            *
-            * @param {number|String} h If provided, a fixed height for the Axis, or
-            * "auto" for automatic mode.
-            * @returns {Axis} The calling Axis.
-            */
-            public height(h: any): Axis;
             /**
             * Gets the current formatter on the axis. Data is passed through the
             * formatter before being displayed.
@@ -2153,6 +2120,20 @@ declare module Plottable {
             * @returns {Label} The calling Label.
             */
             public text(displayText: string): Label;
+            /**
+            * Gets the orientation of the Label.
+            *
+            * @returns {string} the current orientation.
+            */
+            public orient(): string;
+            /**
+            * Sets the orientation of the Label.
+            *
+            * @param {string} newOrientation If provided, the desired orientation
+            * (horizontal/vertical-left/vertical-right).
+            * @returns {Label} The calling Label.
+            */
+            public orient(newOrientation: string): Label;
             public _doRender(): void;
             public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
         }
@@ -3021,9 +3002,11 @@ declare module Plottable {
             * @param {boolean} isVertical if the plot if vertical.
             */
             constructor(xScale?: Abstract.Scale<X, number>, yScale?: Abstract.Scale<Y, number>, isVertical?: boolean);
+            public _setup(): void;
             public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.Rect;
             public _getDrawer(key: string): any;
             public _generateAttrToProjector(): any;
+            public _paint(): void;
             public baseline(value: number): any;
             public _updateDomainer(scale: Abstract.Scale<any, number>): any;
             public _updateXDomainer(): any;

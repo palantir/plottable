@@ -17,24 +17,23 @@ export module Component {
      */
     constructor(xScale: Abstract.QuantitativeScale<any>, yScale: Abstract.QuantitativeScale<any>) {
       super();
-      if (xScale == null && yScale == null) {throw new Error("Gridlines must have at least one scale");}
       this.classed("gridlines", true);
       this.xScale = xScale;
       this.yScale = yScale;
-      if (this.xScale != null) {
+      if (this.xScale) {
         this.xScale.broadcaster.registerListener(this, () => this._render());
       }
-      if (this.yScale != null) {
+      if (this.yScale) {
         this.yScale.broadcaster.registerListener(this, () => this._render());
       }
     }
 
     public remove() {
       super.remove();
-      if (this.xScale != null) {
+      if (this.xScale) {
         this.xScale.broadcaster.deregisterListener(this);
       }
-      if (this.yScale != null) {
+      if (this.yScale) {
         this.yScale.broadcaster.deregisterListener(this);
       }
       return this;
@@ -53,7 +52,7 @@ export module Component {
     }
 
     private redrawXLines() {
-      if (this.xScale != null) {
+      if (this.xScale) {
         var xTicks = this.xScale.ticks();
         var getScaledXValue = (tickVal: number) => this.xScale.scale(tickVal);
         var xLines = this.xLinesContainer.selectAll("line").data(xTicks);
@@ -68,7 +67,7 @@ export module Component {
     }
 
     private redrawYLines() {
-      if (this.yScale != null) {
+      if (this.yScale) {
         var yTicks = this.yScale.ticks();
         var getScaledYValue = (tickVal: number) => this.yScale.scale(tickVal);
         var yLines = this.yLinesContainer.selectAll("line").data(yTicks);

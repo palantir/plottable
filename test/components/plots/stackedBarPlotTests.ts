@@ -89,6 +89,78 @@ describe("Plots", () => {
     });
   });
 
+  describe("Stacked Bar Plot Negative Values", () => {
+    var svg: D3.Selection;
+    var xScale: Plottable.Scale.Ordinal;
+    var yScale: Plottable.Scale.Linear;
+    var plot: Plottable.Plot.StackedBar<string, number>;
+    var SVG_WIDTH = 600;
+    var SVG_HEIGHT = 400;
+    var axisHeight = 0;
+    var bandWidth = 0;
+
+    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
+
+    beforeEach(() => {
+      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      xScale = new Plottable.Scale.Ordinal();
+      yScale = new Plottable.Scale.Linear();
+
+      var data1 = [
+        {x: "A", y: -1},
+        {x: "B", y: -4}
+      ];
+      var data2 = [
+        {x: "A", y: -1},
+        {x: "B", y: 4}
+      ];
+      var data3 = [
+        {x: "A", y: -2},
+        {x: "B", y: -4}
+      ];
+      var data4 = [
+        {x: "A", y: -3},
+        {x: "B", y: 4}
+      ];
+
+      plot = new Plottable.Plot.StackedBar(xScale, yScale);
+      plot.addDataset(data1);
+      plot.addDataset(data2);
+      plot.addDataset(data3);
+      plot.addDataset(data4);
+      plot.baseline(0);
+      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+      var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
+      axisHeight = xAxis.height();
+    });
+
+    it("stacking done correctly for negative values", () => {
+      var bars = plot._renderArea.selectAll("rect");
+      var bar0 = d3.select(bars[0][0]);
+      var bar1 = d3.select(bars[0][1]);
+      var bar2 = d3.select(bars[0][2]);
+      var bar3 = d3.select(bars[0][3]);
+      var bar4 = d3.select(bars[0][4]);
+      var bar5 = d3.select(bars[0][5]);
+      var bar6 = d3.select(bars[0][6]);
+      var bar7 = d3.select(bars[0][7]);
+      // check stacking order
+      assert.operator(numAttr(bar0, "y"), "<", numAttr(bar2, "y"), "'A' bars added below the baseline in dataset order");
+      assert.operator(numAttr(bar2, "y"), "<", numAttr(bar4, "y"), "'A' bars added below the baseline in dataset order");
+      assert.operator(numAttr(bar4, "y"), "<", numAttr(bar6, "y"), "'A' bars added below the baseline in dataset order");
+
+      assert.operator(numAttr(bar1, "y"), "<", numAttr(bar5, "y"), "'B' bars added below the baseline in dataset order");
+      assert.operator(numAttr(bar3, "y"), ">", numAttr(bar7, "y"), "'B' bars added above the baseline in dataset order");
+
+      svg.remove();
+    });
+
+    it("stacked extent is set correctly", () => {
+      assert.deepEqual((<any> plot).stackedExtent, [-8, 8], "stacked extent is updated accordingly");
+      svg.remove();
+    });
+  });
+
   describe("Horizontal Stacked Bar Plot", () => {
     var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
