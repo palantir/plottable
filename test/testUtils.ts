@@ -69,15 +69,15 @@ function assertBBoxNonIntersection(firstEl: D3.Selection, secondEl: D3.Selection
   var firstBox = firstEl.node().getBoundingClientRect();
   var secondBox = secondEl.node().getBoundingClientRect();
 
-  var x1 = Math.max(firstBox.left, secondBox.left);
-  var x2 = Math.min(firstBox.right, secondBox.right);
-  var y1 = Math.min(firstBox.bottom, secondBox.bottom);
-  var y2 = Math.max(firstBox.top, secondBox.top);
+  var intersectionBox = {
+    left: Math.max(firstBox.left, secondBox.left),
+    right: Math.min(firstBox.right, secondBox.right),
+    bottom: Math.min(firstBox.bottom, secondBox.bottom),
+    top: Math.max(firstBox.top, secondBox.top)
+  };
 
-  var width = Math.max(x2 - x1, 0);
-  var height = Math.max(y1 - y2, 0);
-
-  assert.equal(width * height, 0, "at least one dimension of intersecting rect is 0");
+  assert.isTrue(intersectionBox.left + 1 >= intersectionBox.right || intersectionBox.bottom + 1 >= intersectionBox.top,
+          "bounding rects are not intersecting");
 }
 
 function assertXY(el: D3.Selection, xExpected: number, yExpected: number, message: string) {
