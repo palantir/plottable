@@ -3600,19 +3600,7 @@ var Plottable;
                 _super.call(this);
                 this.classed("label", true);
                 this.text(displayText);
-                orientation = orientation.toLowerCase();
-                if (orientation === "vertical-left") {
-                    orientation = "left";
-                }
-                if (orientation === "vertical-right") {
-                    orientation = "right";
-                }
-                if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
-                    this.orientation = orientation;
-                }
-                else {
-                    throw new Error(orientation + " is not a valid orientation for LabelComponent");
-                }
+                this.orient(orientation);
                 this.xAlign("center").yAlign("center");
                 this._fixedHeightFlag = true;
                 this._fixedWidthFlag = true;
@@ -3652,6 +3640,28 @@ var Plottable;
                 }
                 else {
                     this._text = displayText;
+                    this._invalidateLayout();
+                    return this;
+                }
+            };
+            Label.prototype.orient = function (newOrientation) {
+                if (newOrientation == null) {
+                    return this.orientation;
+                }
+                else {
+                    newOrientation = newOrientation.toLowerCase();
+                    if (newOrientation === "vertical-left") {
+                        newOrientation = "left";
+                    }
+                    if (newOrientation === "vertical-right") {
+                        newOrientation = "right";
+                    }
+                    if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
+                        this.orientation = newOrientation;
+                    }
+                    else {
+                        throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
+                    }
                     this._invalidateLayout();
                     return this;
                 }

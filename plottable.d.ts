@@ -643,6 +643,20 @@ declare module Plottable {
             yAlign(alignment: string): Label;
             text(): string;
             text(displayText: string): Label;
+            /**
+             * Gets the orientation of the Label.
+             *
+             * @returns {string} the current orientation.
+             */
+            orient(): string;
+            /**
+             * Sets the orientation of the Label.
+             *
+             * @param {string} newOrientation If provided, the desired orientation
+             * (horizontal/vertical-left/vertical-right).
+             * @returns {Label} The calling Label.
+             */
+            orient(newOrientation: string): Label;
         }
         class TitleLabel extends Label {
             constructor(text?: string, orientation?: string);

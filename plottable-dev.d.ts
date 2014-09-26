@@ -776,6 +776,20 @@ declare module Plottable {
             _setup(): void;
             text(): string;
             text(displayText: string): Label;
+            /**
+             * Gets the orientation of the Label.
+             *
+             * @returns {string} the current orientation.
+             */
+            orient(): string;
+            /**
+             * Sets the orientation of the Label.
+             *
+             * @param {string} newOrientation If provided, the desired orientation
+             * (horizontal/vertical-left/vertical-right).
+             * @returns {Label} The calling Label.
+             */
+            orient(newOrientation: string): Label;
             _doRender(): void;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
         }
