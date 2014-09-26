@@ -2,8 +2,8 @@
 
 module Plottable {
 export module Plot {
-  export class Grid<C> extends Abstract.XYPlot<string,string> {
-    public _colorScale: Abstract.Scale<C, string>;
+  export class Grid extends Abstract.XYPlot<string,string> {
+    public _colorScale: Abstract.Scale<any, string>;
     public _xScale: Scale.Ordinal;
     public _yScale: Scale.Ordinal;
 
@@ -23,7 +23,7 @@ export module Plot {
      * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
      * to use for each grid cell.
      */
-    constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale<C, string>) {
+    constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale<any, string>) {
       super(xScale, yScale);
       this.classed("grid-plot", true);
 

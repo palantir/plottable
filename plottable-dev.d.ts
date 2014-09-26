@@ -957,14 +957,14 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Grid<C> extends Plottable.Abstract.XYPlot<string, string> {
-            _colorScale: Plottable.Abstract.Scale<C, string>;
+        class Grid extends Plottable.Abstract.XYPlot<string, string> {
+            _colorScale: Plottable.Abstract.Scale<any, string>;
             _xScale: Plottable.Scale.Ordinal;
             _yScale: Plottable.Scale.Ordinal;
             _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale<C, string>);
+            constructor(xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale<any, string>);
             _addDataset(key: string, dataset: Dataset): void;
-            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Grid<C>;
+            project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Grid;
             _paint(): void;
         }
     }

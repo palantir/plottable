@@ -51,7 +51,7 @@ describe("Plots", () => {
       var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
       var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
       var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var gridPlot: Plottable.Plot.Grid<number> = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+      var gridPlot: Plottable.Plot.Grid = new Plottable.Plot.Grid(xScale, yScale, colorScale);
       gridPlot.addDataset(DATA)
               .project("fill", "magnitude", colorScale);
       gridPlot.renderTo(svg);
@@ -66,7 +66,7 @@ describe("Plots", () => {
       var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
       var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dataset = new Plottable.Dataset();
-      var gridPlot: Plottable.Plot.Grid<number> = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+      var gridPlot: Plottable.Plot.Grid = new Plottable.Plot.Grid(xScale, yScale, colorScale);
       gridPlot.addDataset(dataset)
               .project("fill", "magnitude", colorScale)
               .renderTo(svg);
@@ -80,7 +80,7 @@ describe("Plots", () => {
       var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
       var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
       var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var gridPlot: Plottable.Plot.Grid<number> = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+      var gridPlot: Plottable.Plot.Grid = new Plottable.Plot.Grid(xScale, yScale, colorScale);
       gridPlot.addDataset(DATA)
               .project("fill", "magnitude")
               .renderTo(svg);
