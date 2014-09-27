@@ -22,9 +22,9 @@ export module Plot {
      * @param {Scale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.QuantitativeScale<number>) {
+    constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.QuantitativeScale<number>) {
       this._isVertical = true; // Has to be set before super()
-      super(dataset, xScale, yScale);
+      super(xScale, yScale);
     }
 
     public _updateYDomainer() {

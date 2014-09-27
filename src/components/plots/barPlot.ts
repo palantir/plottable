@@ -2,17 +2,12 @@
 
 module Plottable {
 export module Abstract {
-  /*
-   * An Abstract.BarPlot is the base implementation for HorizontalBarPlot and
-   * VerticalBarPlot. It should not be used on its own.
-   */
   export class BarPlot<X,Y> extends XYPlot<X,Y> {
+    public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     private static DEFAULT_WIDTH = 10;
-    public _bars: D3.UpdateSelection;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignmentFactor = 0;
-    public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public _isVertical: boolean;
 
     public _animators: Animator.IPlotAnimatorMap = {
@@ -22,63 +17,41 @@ export module Abstract {
     };
 
     /**
-     * Constructs an AbstractBarPlot.
+     * Constructs a BarPlot.
      *
      * @constructor
-     * @param {IDataset | any} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
-      super(dataset, xScale, yScale);
+    constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
+      super(xScale, yScale);
       this.classed("bar-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
-      // because this._baselineValue was not initialized during the super()
-      // call, we must call this in order to get this._baselineValue
-      // to be used by the Domainer.
+      // super() doesn't set baseline
       this.baseline(this._baselineValue);
+    }
+
+    public _getDrawer(key: string) {
+      return new Plottable._Drawer.Rect(key);
     }
 
     public _setup() {
       super._setup();
       this._baseline = this._renderArea.append("line").classed("baseline", true);
-      this._bars = this._renderArea.selectAll("rect").data([]);
     }
 
     public _paint() {
       super._paint();
-      this._bars = this._renderArea.selectAll("rect").data(this._dataset.data());
-      this._bars.enter().append("rect");
 
       var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
-      var positionAttr = this._isVertical ? "y" : "x";
-      var dimensionAttr = this._isVertical ? "height" : "width";
-
-      if (this._dataChanged && this._animate) {
-        var resetAttrToProjector = this._generateAttrToProjector();
-        resetAttrToProjector[positionAttr] = () => scaledBaseline;
-        resetAttrToProjector[dimensionAttr] = () => 0;
-        this._applyAnimatedAttributes(this._bars, "bars-reset", resetAttrToProjector);
-      }
-
-      var attrToProjector = this._generateAttrToProjector();
-      if (attrToProjector["fill"]) {
-        this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
-      }
-      this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
-
-      this._bars.exit().remove();
-
       var baselineAttr: any = {
         "x1": this._isVertical ? 0 : scaledBaseline,
         "y1": this._isVertical ? scaledBaseline : 0,
         "x2": this._isVertical ? this.width() : scaledBaseline,
         "y2": this._isVertical ? scaledBaseline : this.height()
       };
-
       this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
-
     }
 
     /**
@@ -160,12 +133,14 @@ export module Abstract {
       var tolerance: number = 0.5;
 
       // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-      this._bars.each(function(d: any) {
-        var bbox = this.getBBox();
-        if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
-            bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
-          selectedBars.push(this);
-        }
+      this._getDrawersInOrder().forEach((d) => {
+        d._renderArea.selectAll("rect").each(function(d: any) {
+          var bbox = this.getBBox();
+          if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
+              bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
+            selectedBars.push(this);
+          }
+        });
       });
 
       if (selectedBars.length > 0) {
@@ -183,7 +158,7 @@ export module Abstract {
      */
     public deselectAll() {
       if (this._isSetup) {
-        this._bars.classed("selected", false);
+        this._getDrawersInOrder().forEach((d) => d._renderArea.selectAll("rect").classed("selected", false));
       }
       return this;
     }
@@ -264,7 +239,6 @@ export module Abstract {
 
       return attrToProjector;
     }
-
   }
 }
 }

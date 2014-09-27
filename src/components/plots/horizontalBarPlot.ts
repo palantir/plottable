@@ -18,12 +18,11 @@ export module Plot {
      * Constructs a HorizontalBarPlot.
      *
      * @constructor
-     * @param {IDataset | any} dataset The dataset to render.
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.QuantitativeScale<number>, yScale: Abstract.Scale<Y,number>) {
-      super(dataset, xScale, yScale);
+    constructor(xScale: Abstract.QuantitativeScale<number>, yScale: Abstract.Scale<Y,number>) {
+      super(xScale, yScale);
     }
 
     public _updateXDomainer() {

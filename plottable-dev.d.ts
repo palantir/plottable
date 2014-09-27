@@ -9,7 +9,6 @@ declare module Plottable {
             function accessorize(accessor: any): _IAccessor;
             function union<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
             function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T>;
-            function _applyAccessor(accessor: _IAccessor, plot: Plottable.Abstract.Plot): (d: any, i: number) => any;
             function uniq<T>(arr: T[]): T[];
             function createFilledArray<T>(value: T, count: number): T[];
             function createFilledArray<T>(func: (index?: number) => T, count: number): T[];
@@ -870,8 +869,9 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Plot extends Component {
-            _dataset: Dataset;
             _dataChanged: boolean;
+            _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
+            _datasetKeysInOrder: string[];
             _renderArea: D3.Selection;
             _animate: boolean;
             _animators: Plottable.Animator.IPlotAnimatorMap;
@@ -880,19 +880,21 @@ declare module Plottable {
                 [x: string]: _IProjector;
             };
             constructor();
-            constructor(data: any[]);
-            constructor(dataset: Dataset);
             _anchor(element: D3.Selection): void;
+            _setup(): void;
             remove(): void;
-            dataset(): Dataset;
-            dataset(dataset: Dataset): Plot;
+            addDataset(key: string, dataset: Dataset): Plot;
+            addDataset(key: string, dataset: any[]): Plot;
+            addDataset(dataset: Dataset): Plot;
+            addDataset(dataset: any[]): Plot;
+            _addDataset(key: string, dataset: Dataset): void;
+            _getDrawer(key: string): _Drawer;
+            _getAnimator(drawer: _Drawer, index: number): Plottable.Animator.IPlotAnimator;
             _onDatasetUpdate(): void;
             attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
             _generateAttrToProjector(): IAttributeToProjector;
             _doRender(): void;
-            _paint(): void;
-            _setup(): void;
             animate(enabled: boolean): Plot;
             detach(): Plot;
             _updateScaleExtents(): void;
@@ -900,6 +902,12 @@ declare module Plottable {
             _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any;
             animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
             animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
+            datasetOrder(): string[];
+            datasetOrder(order: string[]): Plot;
+            removeDataset(key: string): Plot;
+            _getDatasetsInOrder(): Dataset[];
+            _getDrawersInOrder(): _Drawer[];
+            _paint(): void;
         }
     }
 }
@@ -908,23 +916,11 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Pie extends Plottable.Abstract.Plot {
-            _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
-            _datasetKeysInOrder: string[];
             constructor();
-            _setup(): void;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
-            addDataset(key: string, dataset: Dataset): Pie;
-            addDataset(key: string, dataset: any[]): Pie;
-            addDataset(dataset: Dataset): Pie;
-            addDataset(dataset: any[]): Pie;
             _addDataset(key: string, dataset: Dataset): void;
-            removeDataset(key: string): Pie;
             _generateAttrToProjector(): IAttributeToProjector;
-            _getAnimator(drawer: Plottable.Abstract._Drawer, index: number): Plottable.Animator.IPlotAnimator;
             _getDrawer(key: string): Plottable.Abstract._Drawer;
-            _getDatasetsInOrder(): Dataset[];
-            _getDrawersInOrder(): Plottable.Abstract._Drawer[];
-            _updateScaleExtent(attr: string): void;
             _paint(): void;
         }
     }
@@ -936,7 +932,7 @@ declare module Plottable {
         class XYPlot<X, Y> extends Plot {
             _xScale: Scale<X, number>;
             _yScale: Scale<Y, number>;
-            constructor(dataset: any, xScale: Scale<X, number>, yScale: Scale<Y, number>);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _updateXDomainer(): void;
@@ -947,38 +943,12 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Abstract {
-        class NewStylePlot<X, Y> extends XYPlot<X, Y> {
-            _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
-            _datasetKeysInOrder: string[];
-            constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>);
-            _setup(): void;
-            remove(): void;
-            addDataset(key: string, dataset: Dataset): NewStylePlot<X, Y>;
-            addDataset(key: string, dataset: any[]): NewStylePlot<X, Y>;
-            addDataset(dataset: Dataset): NewStylePlot<X, Y>;
-            addDataset(dataset: any[]): NewStylePlot<X, Y>;
-            _addDataset(key: string, dataset: Dataset): void;
-            _getDrawer(key: string): _Drawer;
-            _getAnimator(drawer: _Drawer, index: number): Plottable.Animator.IPlotAnimator;
-            _updateScaleExtent(attr: string): void;
-            datasetOrder(): string[];
-            datasetOrder(order: string[]): NewStylePlot<X, Y>;
-            removeDataset(key: string): NewStylePlot<X, Y>;
-            _getDatasetsInOrder(): Dataset[];
-            _getDrawersInOrder(): _Drawer[];
-            _paint(): void;
-        }
-    }
-}
-
-
-declare module Plottable {
     module Plot {
         class Scatter<X, Y> extends Plottable.Abstract.XYPlot<X, Y> {
             _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.Scale<Y, number>);
+            constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.Scale<Y, number>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Scatter<X, Y>;
+            _generateAttrToProjector(): IAttributeToProjector;
             _paint(): void;
         }
     }
@@ -992,7 +962,8 @@ declare module Plottable {
             _xScale: Plottable.Scale.Ordinal;
             _yScale: Plottable.Scale.Ordinal;
             _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(dataset: any, xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale<any, string>);
+            constructor(xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale<any, string>);
+            _addDataset(key: string, dataset: Dataset): void;
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Grid;
             _paint(): void;
         }
@@ -1003,16 +974,16 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class BarPlot<X, Y> extends XYPlot<X, Y> {
-            _bars: D3.UpdateSelection;
-            _baseline: D3.Selection;
-            _baselineValue: number;
-            _barAlignmentFactor: number;
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
+            _baseline: D3.Selection;
+            _baselineValue: number;
+            _barAlignmentFactor: number;
             _isVertical: boolean;
             _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(dataset: any, xScale: Scale<X, number>, yScale: Scale<Y, number>);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
+            _getDrawer(key: string): Plottable._Drawer.Rect;
             _setup(): void;
             _paint(): void;
             baseline(value: number): BarPlot<X, Y>;
@@ -1037,7 +1008,7 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.QuantitativeScale<number>);
+            constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.QuantitativeScale<number>);
             _updateYDomainer(): void;
         }
     }
@@ -1050,7 +1021,7 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<number>, yScale: Plottable.Abstract.Scale<Y, number>);
+            constructor(xScale: Plottable.Abstract.QuantitativeScale<number>, yScale: Plottable.Abstract.Scale<Y, number>);
             _updateXDomainer(): void;
             _generateAttrToProjector(): IAttributeToProjector;
         }
@@ -1063,9 +1034,7 @@ declare module Plottable {
         class Line<X> extends Plottable.Abstract.XYPlot<X, number> {
             _yScale: Plottable.Abstract.QuantitativeScale<number>;
             _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
-            _setup(): void;
-            _appendPath(): void;
+            constructor(xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
             _getResetYFunction(): (d: any, i: number) => number;
             _generateAttrToProjector(): IAttributeToProjector;
             _paint(): void;
@@ -1078,8 +1047,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Area<X> extends Line<X> {
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
-            _appendPath(): void;
+            constructor(xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
             _onDatasetUpdate(): void;
             _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Area<X>;
@@ -1092,33 +1060,8 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Abstract {
-        class NewStyleBarPlot<X, Y> extends NewStylePlot<X, Y> {
-            static _barAlignmentToFactor: {
-                [x: string]: number;
-            };
-            _baseline: D3.Selection;
-            _baselineValue: number;
-            _barAlignmentFactor: number;
-            _isVertical: boolean;
-            _animators: Plottable.Animator.IPlotAnimatorMap;
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
-            _getDrawer(key: string): Plottable._Drawer.Rect;
-            _setup(): void;
-            _paint(): void;
-            baseline(value: number): any;
-            _updateDomainer(scale: Scale<any, number>): any;
-            _generateAttrToProjector(): IAttributeToProjector;
-            _updateXDomainer(): any;
-            _updateYDomainer(): any;
-        }
-    }
-}
-
-
-declare module Plottable {
     module Plot {
-        class ClusteredBar<X, Y> extends Plottable.Abstract.NewStyleBarPlot<X, Y> {
+        class ClusteredBar<X, Y> extends Plottable.Abstract.BarPlot<X, Y> {
             constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.Scale<Y, number>, isVertical?: boolean);
             _generateAttrToProjector(): IAttributeToProjector;
             _paint(): void;
@@ -1129,7 +1072,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Stacked<X, Y> extends NewStylePlot<X, Y> {
+        class Stacked<X, Y> extends XYPlot<X, Y> {
             _isVertical: boolean;
             _onDatasetUpdate(): void;
             _updateScaleExtents(): void;

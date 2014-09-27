@@ -724,17 +724,20 @@ declare module Plottable {
     module Abstract {
         class Plot extends Component {
             constructor();
-            constructor(data: any[]);
-            constructor(dataset: Dataset);
             remove(): void;
-            dataset(): Dataset;
-            dataset(dataset: Dataset): Plot;
+            addDataset(key: string, dataset: Dataset): Plot;
+            addDataset(key: string, dataset: any[]): Plot;
+            addDataset(dataset: Dataset): Plot;
+            addDataset(dataset: any[]): Plot;
             attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
             animate(enabled: boolean): Plot;
             detach(): Plot;
             animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
             animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
+            datasetOrder(): string[];
+            datasetOrder(order: string[]): Plot;
+            removeDataset(key: string): Plot;
         }
     }
 }
@@ -744,11 +747,6 @@ declare module Plottable {
     module Plot {
         class Pie extends Plottable.Abstract.Plot {
             constructor();
-            addDataset(key: string, dataset: Dataset): Pie;
-            addDataset(key: string, dataset: any[]): Pie;
-            addDataset(dataset: Dataset): Pie;
-            addDataset(dataset: any[]): Pie;
-            removeDataset(key: string): Pie;
         }
     }
 }
@@ -757,25 +755,8 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class XYPlot<X, Y> extends Plot {
-            constructor(dataset: any, xScale: Scale<X, number>, yScale: Scale<Y, number>);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Abstract {
-        class NewStylePlot<X, Y> extends XYPlot<X, Y> {
-            constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>);
-            remove(): void;
-            addDataset(key: string, dataset: Dataset): NewStylePlot<X, Y>;
-            addDataset(key: string, dataset: any[]): NewStylePlot<X, Y>;
-            addDataset(dataset: Dataset): NewStylePlot<X, Y>;
-            addDataset(dataset: any[]): NewStylePlot<X, Y>;
-            datasetOrder(): string[];
-            datasetOrder(order: string[]): NewStylePlot<X, Y>;
-            removeDataset(key: string): NewStylePlot<X, Y>;
         }
     }
 }
@@ -784,7 +765,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Scatter<X, Y> extends Plottable.Abstract.XYPlot<X, Y> {
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.Scale<Y, number>);
+            constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.Scale<Y, number>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Scatter<X, Y>;
         }
     }
@@ -794,7 +775,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Grid extends Plottable.Abstract.XYPlot<string, string> {
-            constructor(dataset: any, xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale<any, string>);
+            constructor(xScale: Plottable.Scale.Ordinal, yScale: Plottable.Scale.Ordinal, colorScale: Plottable.Abstract.Scale<any, string>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Grid;
         }
     }
@@ -804,7 +785,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class BarPlot<X, Y> extends XYPlot<X, Y> {
-            constructor(dataset: any, xScale: Scale<X, number>, yScale: Scale<Y, number>);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             baseline(value: number): BarPlot<X, Y>;
             barAlignment(alignment: string): BarPlot<X, Y>;
             selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
@@ -820,7 +801,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class VerticalBar<X> extends Plottable.Abstract.BarPlot<X, number> {
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.QuantitativeScale<number>);
+            constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.QuantitativeScale<number>);
         }
     }
 }
@@ -829,7 +810,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class HorizontalBar<Y> extends Plottable.Abstract.BarPlot<number, Y> {
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<number>, yScale: Plottable.Abstract.Scale<Y, number>);
+            constructor(xScale: Plottable.Abstract.QuantitativeScale<number>, yScale: Plottable.Abstract.Scale<Y, number>);
         }
     }
 }
@@ -838,7 +819,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Line<X> extends Plottable.Abstract.XYPlot<X, number> {
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
+            constructor(xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
         }
     }
 }
@@ -847,7 +828,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Area<X> extends Line<X> {
-            constructor(dataset: any, xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
+            constructor(xScale: Plottable.Abstract.QuantitativeScale<X>, yScale: Plottable.Abstract.QuantitativeScale<number>);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale<any, any>): Area<X>;
         }
     }
@@ -855,18 +836,8 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Abstract {
-        class NewStyleBarPlot<X, Y> extends NewStylePlot<X, Y> {
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
-            baseline(value: number): any;
-        }
-    }
-}
-
-
-declare module Plottable {
     module Plot {
-        class ClusteredBar<X, Y> extends Plottable.Abstract.NewStyleBarPlot<X, Y> {
+        class ClusteredBar<X, Y> extends Plottable.Abstract.BarPlot<X, Y> {
             constructor(xScale: Plottable.Abstract.Scale<X, number>, yScale: Plottable.Abstract.Scale<Y, number>, isVertical?: boolean);
         }
     }
@@ -875,7 +846,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Stacked<X, Y> extends NewStylePlot<X, Y> {
+        class Stacked<X, Y> extends XYPlot<X, Y> {
         }
     }
 }

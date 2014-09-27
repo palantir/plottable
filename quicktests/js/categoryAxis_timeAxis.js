@@ -16,8 +16,9 @@ function run(div, data, Plottable) {
   var xScale = new Plottable.Scale.Time();
   var yScale = new Plottable.Scale.Ordinal();
 
-  var hBarPlot = new Plottable.Plot.HorizontalBar(data, xScale, yScale)
-  .attr("x", function (d) { return d3.time.format("%x").parse(d.x); }, xScale);
+  var hBarPlot = new Plottable.Plot.HorizontalBar(xScale, yScale)
+    .addDataset(data)
+    .attr("x", function (d) { return d3.time.format("%x").parse(d.x); }, xScale);
 
   var xAxis = new Plottable.Axis.Time(xScale, "bottom", Plottable.Formatters.time());
   var yAxis = new Plottable.Axis.Category(yScale, "left");

@@ -28,8 +28,9 @@ describe("Plots", () => {
       colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
       fillAccessor = () => "steelblue";
       simpleDataset = new Plottable.Dataset([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
-      areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
-      areaPlot.project("x", xAccessor, xScale)
+      areaPlot = new Plottable.Plot.Area(xScale, yScale);
+      areaPlot.addDataset(simpleDataset)
+              .project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)
               .project("y0", y0Accessor, yScale)
               .project("fill", fillAccessor)

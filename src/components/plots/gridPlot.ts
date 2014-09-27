@@ -18,14 +18,13 @@ export module Plot {
      * grid, and the datum can control what color it is.
      *
      * @constructor
-     * @param {IDataset | any} dataset The dataset to render.
      * @param {Scale.Ordinal} xScale The x scale to use.
      * @param {Scale.Ordinal} yScale The y scale to use.
      * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
      * to use for each grid cell.
      */
-    constructor(dataset: any, xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale<any, string>) {
-      super(dataset, xScale, yScale);
+    constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale<any, string>) {
+      super(xScale, yScale);
       this.classed("grid-plot", true);
 
       // The x and y scales should render in bands with no padding
@@ -34,6 +33,14 @@ export module Plot {
 
       this._colorScale = colorScale;
       this.project("fill", "value", colorScale); // default
+    }
+
+    public _addDataset(key: string, dataset: Dataset) {
+      if (this._datasetKeysInOrder.length === 1) {
+        _Util.Methods.warn("Only one dataset is supported in Grid plots");
+        return;
+      }
+      super._addDataset(key, dataset);
     }
 
     /**
@@ -49,9 +56,8 @@ export module Plot {
     }
 
     public _paint() {
-      super._paint();
-
-      var cells = this._renderArea.selectAll("rect").data(this._dataset.data());
+      var dataset = this._getDatasetsInOrder()[0];
+      var cells = this._renderArea.selectAll("rect").data(dataset.data());
       cells.enter().append("rect");
 
       var xStep = this._xScale.rangeBand();

@@ -3,15 +3,19 @@
 module Plottable {
 export module Abstract {
   export class Plot extends Component {
-    public _dataset: Dataset;
     public _dataChanged = false;
+    public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
+    public _datasetKeysInOrder: string[];
 
     public _renderArea: D3.Selection;
+    public _projectors: { [attrToSet: string]: _IProjector; } = {};
+
     public _animate: boolean = false;
     public _animators: Animator.IPlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
-    public _projectors: { [attrToSet: string]: _IProjector; } = {};
+
     private animateOnNextRender = true;
+    private nextSeriesIndex: number;
 
     /**
      * Constructs a Plot.
@@ -24,25 +28,13 @@ export module Abstract {
      * @constructor
      * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
      */
-    constructor();
-    constructor(data: any[]);
-    constructor(dataset: Dataset);
-    constructor(dataOrDataset?: any) {
+    constructor() {
       super();
       this.clipPathEnabled = true;
       this.classed("plot", true);
-
-      var dataset: Dataset;
-      if (dataOrDataset) {
-        if (typeof dataOrDataset.data === "function") {
-          dataset = <Dataset> dataOrDataset;
-        } else {
-          dataset = new Dataset(dataOrDataset);
-        }
-      } else {
-        dataset = new Dataset();
-      }
-      this.dataset(dataset);
+      this._key2DatasetDrawerKey = d3.map();
+      this._datasetKeysInOrder = [];
+      this.nextSeriesIndex = 0;
     }
 
     public _anchor(element: D3.Selection) {
@@ -52,9 +44,15 @@ export module Abstract {
       this._updateScaleExtents();
     }
 
+    public _setup() {
+      super._setup();
+      this._renderArea = this._content.append("g").classed("render-area", true);
+      this._getDrawersInOrder().forEach((d) => d._renderArea = this._renderArea.append("g"));
+    }
+
     public remove() {
       super.remove();
-      this._dataset.broadcaster.deregisterListener(this);
+      this._datasetKeysInOrder.forEach((k) => this.removeDataset(k));
       // deregister from all scales
       var properties = Object.keys(this._projectors);
       properties.forEach((property) => {
@@ -66,29 +64,55 @@ export module Abstract {
     }
 
     /**
-     * Gets the Plot's Dataset.
+     * Adds a dataset to this plot. Identify this dataset with a key.
      *
-     * @returns {Dataset} The current Dataset.
-     */
-    public dataset(): Dataset;
-    /**
-     * Sets the Plot's Dataset.
+     * A key is automatically generated if not supplied.
      *
-     * @param {Dataset} dataset If provided, the Dataset the Plot should use.
+     * @param {string} [key] The key of the dataset.
+     * @param {any[]|Dataset} dataset dataset to add.
      * @returns {Plot} The calling Plot.
      */
-    public dataset(dataset: Dataset): Plot;
-    public dataset(dataset?: Dataset): any {
-      if (!dataset) {
-        return this._dataset;
+    public addDataset(key: string, dataset: Dataset): Plot;
+    public addDataset(key: string, dataset: any[]): Plot;
+    public addDataset(dataset: Dataset): Plot;
+    public addDataset(dataset: any[]): Plot;
+    public addDataset(keyOrDataset: any, dataset?: any): Plot {
+      if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
+        throw new Error("invalid input to addDataset");
       }
-      if (this._dataset) {
-        this._dataset.broadcaster.deregisterListener(this);
+      if (typeof(keyOrDataset) === "string" && keyOrDataset[0] === "_") {
+        _Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
       }
-      this._dataset = dataset;
-      this._dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
-      this._onDatasetUpdate();
+      var key  = typeof(keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
+      var data = typeof(keyOrDataset) !== "string" ? keyOrDataset : dataset;
+      var dataset = (data instanceof Dataset) ? data : new Dataset(data);
+
+      this._addDataset(key, dataset);
       return this;
+    }
+
+    public _addDataset(key: string, dataset: Dataset) {
+      if (this._key2DatasetDrawerKey.has(key)) {
+        this.removeDataset(key);
+      };
+      var drawer = this._getDrawer(key);
+      var ddk = {drawer: drawer, dataset: dataset, key: key};
+      this._datasetKeysInOrder.push(key);
+      this._key2DatasetDrawerKey.set(key, ddk);
+
+      if (this._isSetup) {
+        drawer._renderArea = this._renderArea.append("g");
+      }
+      dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
+      this._onDatasetUpdate();
+    }
+
+    public _getDrawer(key: string): Abstract._Drawer {
+      return new Abstract._Drawer(key);
+    }
+
+    public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
+      return new Animator.Null();
     }
 
     public _onDatasetUpdate() {
@@ -134,14 +158,16 @@ export module Abstract {
       var existingScale = currentProjection && currentProjection.scale;
 
       if (existingScale) {
-        existingScale._removeExtent(this._plottableID.toString(), attrToSet);
-        existingScale.broadcaster.deregisterListener(this);
+        this._datasetKeysInOrder.forEach((key) => {
+          existingScale._removeExtent(this._plottableID.toString() + "_" + key, attrToSet);
+          existingScale.broadcaster.deregisterListener(this);
+        });
       }
 
       if (scale) {
         scale.broadcaster.registerListener(this, () => this._render());
       }
-      var activatedAccessor = _Util.Methods._applyAccessor(accessor, this);
+      var activatedAccessor = _Util.Methods.accessorize(accessor);
       this._projectors[attrToSet] = {accessor: activatedAccessor, scale: scale, attribute: attrToSet};
       this._updateScaleExtent(attrToSet);
       this._render(); // queue a re-render upon changing projector
@@ -166,15 +192,6 @@ export module Abstract {
         this._dataChanged = false;
         this.animateOnNextRender = false;
       }
-    }
-
-    public _paint() {
-      // no-op
-    }
-
-    public _setup() {
-      super._setup();
-      this._renderArea = this._content.append("g").classed("render-area", true);
     }
 
     /**
@@ -205,12 +222,15 @@ export module Abstract {
     public _updateScaleExtent(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale) {
-        var extent = this.dataset()._getExtent(projector.accessor, projector.scale._typeCoercer);
-        if (extent.length === 0 || !this._isAnchored) {
-          projector.scale._removeExtent(this._plottableID.toString(), attr);
-        } else {
-          projector.scale._updateExtent(this._plottableID.toString(), attr, extent);
-        }
+        this._key2DatasetDrawerKey.forEach((key, ddk) => {
+          var extent = ddk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer);
+          var scaleKey = this._plottableID.toString() + "_" + key;
+          if (extent.length === 0 || !this._isAnchored) {
+            projector.scale._removeExtent(scaleKey, attr);
+          } else {
+            projector.scale._updateExtent(scaleKey, attr, extent);
+          }
+        });
       }
     }
 
@@ -258,6 +278,83 @@ export module Abstract {
         this._animators[animatorKey] = animator;
         return this;
       }
+    }
+
+    /**
+     * Gets the dataset order by key
+     *
+     * @returns {string[]} A string array of the keys in order
+     */
+    public datasetOrder(): string[];
+    /**
+     * Sets the dataset order by key
+     *
+     * @param {string[]} order If provided, a string array which represents the order of the keys.
+     * This must be a permutation of existing keys.
+     *
+     * @returns {Plot} The calling Plot.
+     */
+    public datasetOrder(order: string[]): Plot;
+    public datasetOrder(order?: string[]): any {
+      if (order === undefined) {
+        return this._datasetKeysInOrder;
+      }
+      function isPermutation(l1: string[], l2: string[]) {
+        var intersection = _Util.Methods.intersection(d3.set(l1), d3.set(l2));
+        var size = (<any> intersection).size(); // HACKHACK pending on borisyankov/definitelytyped/ pr #2653
+        return size === l1.length && size === l2.length;
+      }
+      if (isPermutation(order, this._datasetKeysInOrder)) {
+        this._datasetKeysInOrder = order;
+        this._onDatasetUpdate();
+      } else {
+        _Util.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
+      }
+      return this;
+    }
+
+    /**
+     * Removes a dataset
+     *
+     * @param {string} key The key of the dataset
+     * @return {Plot} The calling Plot.
+     */
+    public removeDataset(key: string): Plot {
+      if (this._key2DatasetDrawerKey.has(key)) {
+        var ddk = this._key2DatasetDrawerKey.get(key);
+        ddk.drawer.remove();
+
+        var projectors = d3.values(this._projectors);
+        var scaleKey = this._plottableID.toString() + "_" + key;
+        projectors.forEach((p) => {
+          if (p.scale != null) {
+            p.scale._removeExtent(scaleKey, p.attribute);
+          }
+        });
+
+        ddk.dataset.broadcaster.deregisterListener(this);
+        this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
+        this._key2DatasetDrawerKey.remove(key);
+        this._onDatasetUpdate();
+      }
+      return this;
+    }
+
+    public _getDatasetsInOrder(): Dataset[] {
+      return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).dataset);
+    }
+
+    public _getDrawersInOrder(): Abstract._Drawer[] {
+      return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).drawer);
+    }
+
+    public _paint() {
+      var attrHash = this._generateAttrToProjector();
+      var datasets = this._getDatasetsInOrder();
+      this._getDrawersInOrder().forEach((d, i) => {
+        var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
+        d.draw(datasets[i].data(), attrHash, animator);
+      });
     }
   }
 }

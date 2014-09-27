@@ -30,7 +30,7 @@ export module Interaction {
             }
           }
 
-          this._componentToListenTo._bars.classed("not-hovered", true).classed("hovered", false);
+          this.getBars().classed("not-hovered", true).classed("hovered", false);
           selectedBar.classed("not-hovered", false).classed("hovered", true);
           if (this.hoverCallback != null) {
             this.hoverCallback(selectedBar.data()[0], selectedBar);
@@ -45,8 +45,12 @@ export module Interaction {
       this.dispatcher.connect();
     }
 
+    private getBars(): D3.Selection {
+      return this._componentToListenTo._renderArea.selectAll("rect");
+    }
+
     private _hoverOut() {
-      this._componentToListenTo._bars.classed("not-hovered hovered", false);
+      this.getBars().classed("not-hovered hovered", false);
       if (this.unhoverCallback != null && this.currentBar != null) {
         this.unhoverCallback(this.currentBar.data()[0], this.currentBar); // last known information
       }

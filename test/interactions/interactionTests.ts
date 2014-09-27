@@ -39,16 +39,16 @@ describe("Interactions", () => {
 
       var svg = generateSVG();
       var dataset = makeLinearSeries(11);
-      var renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
-      renderer.renderTo(svg);
+      var plot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataset);
+      plot.renderTo(svg);
 
       var xDomainBefore = xScale.domain();
       var yDomainBefore = yScale.domain();
 
       var interaction = new Plottable.Interaction.PanZoom(xScale, yScale);
-      renderer.registerInteraction(interaction);
+      plot.registerInteraction(interaction);
 
-      var hb = renderer._element.select(".hit-box").node();
+      var hb = plot._element.select(".hit-box").node();
       var dragDistancePixelX = 10;
       var dragDistancePixelY = 20;
       $(hb).simulate("drag", {
@@ -85,7 +85,7 @@ describe("Interactions", () => {
     var dataset: Plottable.Dataset;
     var xScale: Plottable.Abstract.QuantitativeScale<number>;
     var yScale: Plottable.Abstract.QuantitativeScale<number>;
-    var renderer: Plottable.Abstract.XYPlot<number,number>;
+    var plot: Plottable.Abstract.XYPlot<number,number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
     var dragstartX = 20;
@@ -98,10 +98,11 @@ describe("Interactions", () => {
       dataset = new Plottable.Dataset(makeLinearSeries(10));
       xScale = new Plottable.Scale.Linear();
       yScale = new Plottable.Scale.Linear();
-      renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
-      renderer.renderTo(svg);
+      plot = new Plottable.Plot.Scatter(xScale, yScale);
+      plot.addDataset(dataset);
+      plot.renderTo(svg);
       interaction = new Plottable.Interaction.XYDragBox();
-      renderer.registerInteraction(interaction);
+      plot.registerInteraction(interaction);
     });
 
     afterEach(() => {
@@ -141,7 +142,7 @@ describe("Interactions", () => {
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox).CLASS_DRAG_BOX;
-      var dragBox = renderer._backgroundContainer.select(dragBoxClass);
+      var dragBox = plot._backgroundContainer.select(dragBoxClass);
       assert.isNotNull(dragBox, "the dragbox was created");
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};
       var expectedStartPosition = {x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY)};
@@ -166,7 +167,7 @@ describe("Interactions", () => {
     var dataset: Plottable.Dataset;
     var xScale: Plottable.Abstract.QuantitativeScale<number>;
     var yScale: Plottable.Abstract.QuantitativeScale<number>;
-    var renderer: Plottable.Abstract.XYPlot<number,number>;
+    var plot: Plottable.Abstract.XYPlot<number,number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
     var dragstartX = 20;
@@ -179,10 +180,11 @@ describe("Interactions", () => {
       dataset = new Plottable.Dataset(makeLinearSeries(10));
       xScale = new Plottable.Scale.Linear();
       yScale = new Plottable.Scale.Linear();
-      renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
-      renderer.renderTo(svg);
+      plot = new Plottable.Plot.Scatter(xScale, yScale);
+      plot.addDataset(dataset);
+      plot.renderTo(svg);
       interaction = new Plottable.Interaction.YDragBox();
-      renderer.registerInteraction(interaction);
+      plot.registerInteraction(interaction);
     });
 
     afterEach(() => {
@@ -216,7 +218,7 @@ describe("Interactions", () => {
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox).CLASS_DRAG_BOX;
-      var dragBox = renderer._backgroundContainer.select(dragBoxClass);
+      var dragBox = plot._backgroundContainer.select(dragBoxClass);
       assert.isNotNull(dragBox, "the dragbox was created");
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};
       var expectedStartPosition = {x: 0, y: Math.min(dragstartY, dragendY)};
@@ -290,7 +292,7 @@ describe("Interactions", () => {
     });
 
     it("hoverMode()", () => {
-      var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
+      var barPlot = new Plottable.Plot.VerticalBar(ordinalScale, linearScale).addDataset(dataset);
       var bhi = new Plottable.Interaction.BarHover();
 
       bhi.hoverMode("line");
@@ -301,7 +303,7 @@ describe("Interactions", () => {
 
     it("correctly triggers callbacks (vertical)", () => {
       var svg = generateSVG(400, 400);
-      var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
+      var barPlot = new Plottable.Plot.VerticalBar(ordinalScale, linearScale).addDataset(dataset);
       barPlot.project("x", "name", ordinalScale).project("y", "value", linearScale);
       var bhi = new Plottable.Interaction.BarHover();
 
@@ -356,7 +358,7 @@ describe("Interactions", () => {
 
     it("correctly triggers callbacks (hoizontal)", () => {
       var svg = generateSVG(400, 400);
-      var barPlot = new Plottable.Plot.HorizontalBar(dataset, linearScale, ordinalScale);
+      var barPlot = new Plottable.Plot.HorizontalBar(linearScale, ordinalScale).addDataset(dataset);
       barPlot.project("y", "name", ordinalScale).project("x", "value", linearScale);
       var bhi = new Plottable.Interaction.BarHover();
 

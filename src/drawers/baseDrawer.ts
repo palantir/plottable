@@ -32,7 +32,7 @@ export module Abstract {
      * @param{attrHash} IAttributeToProjector The list of attributes to set on the data
      */
     public draw(data: any[], attrToProjector: IAttributeToProjector, animator = new Animator.Null()) {
-      throw new Error("Abstract Method Not Implemented");
+        // no-op
     }
   }
 }
