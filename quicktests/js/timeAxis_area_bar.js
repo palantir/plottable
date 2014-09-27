@@ -61,7 +61,7 @@ function run(div, data, Plottable) {
   var yAxis3 = new Plottable.Axis.Numeric(yScale2, "left");
   var yAxis4 = new Plottable.Axis.Numeric(yScale2, "left");
 
-  var timeFormat = function (data) { return d3.time.format("%m/%d/%Y").parse(data.date)};
+  var timeFormat = function (data) { return d3.time.format("%m/%d/%Y").parse(data.date);};
   var colorScale = new Plottable.Scale.Color();
   var legend = new Plottable.Component.HorizontalLegend(colorScale).xAlign("center");
   var title = new Plottable.Component.TitleLabel("Area & Bar on Time Axes");
@@ -70,7 +70,7 @@ function run(div, data, Plottable) {
       .project("x", timeFormat, xScale);
 
   var barPlot = new Plottable.Plot.VerticalBar(data[0], xScale, yScale1)
-      .project("x", timeFormat, xScale)
+      .project("x", timeFormat, xScale);
 
   var stackedArea = new Plottable.Plot.StackedArea(xScale, yScale2)
       .project("x", timeFormat, xScale)
