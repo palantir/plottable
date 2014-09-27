@@ -21,14 +21,16 @@ function run(div, data, Plottable) {
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
 
-    var renderArea1 = new Plottable.Plot.VerticalBar(dataseries1, xScale, yScale);
-    renderArea1.animate(true);
+    var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale)
+        .addDataset(dataseries1)
+        .animate(true);
 
-    var renderArea2 = new Plottable.Plot.Scatter(renderArea1.dataset(), xScale, yScale);
-    renderArea2.attr("fill", function(){return "purple";});
-    renderArea2.animate(true);
+    var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale)
+        .addDataset(dataseries1)
+        .attr("fill", function() { return "purple"; })
+        .animate(true);
 
-    var renderGroup = renderArea1.merge(renderArea2);
+    var renderGroup = barPlot.merge(scatterPlot);
 
     var basicTable = new Plottable.Component.Table()
                 .addComponent(2, 0, yAxis)
