@@ -46,15 +46,15 @@ function run(div, data, Plottable) {
   "use strict";
 
   var svg = div.append("svg").attr("height", 500);
-
-  var xScale = new Plottable.Scale.Time();
+  var formatter = d3.time.format("%Y");
+  var xScale = new Plottable.Scale.Time().numTicks(5);
   var yScale1 = new Plottable.Scale.Linear();
   var yScale2 = new Plottable.Scale.Linear();
 
-  var xAxis1 = new Plottable.Axis.Time(xScale, "bottom");
-  var xAxis2 = new Plottable.Axis.Time(xScale, "bottom");
-  var xAxis3 = new Plottable.Axis.Time(xScale, "bottom");
-  var xAxis4 = new Plottable.Axis.Time(xScale, "bottom");
+  var xAxis1 = new Plottable.Axis.Numeric(xScale, "bottom", formatter);
+  var xAxis2 = new Plottable.Axis.Numeric(xScale, "bottom", formatter);
+  var xAxis3 = new Plottable.Axis.Numeric(xScale, "bottom", formatter);
+  var xAxis4 = new Plottable.Axis.Numeric(xScale, "bottom", formatter);
 
   var yAxis1 = new Plottable.Axis.Numeric(yScale1, "left");
   var yAxis2 = new Plottable.Axis.Numeric(yScale1, "left");
@@ -70,7 +70,9 @@ function run(div, data, Plottable) {
       .project("x", timeFormat, xScale);
 
   var barPlot = new Plottable.Plot.VerticalBar(data[0], xScale, yScale1)
-      .project("x", timeFormat, xScale);
+      .project("x", timeFormat, xScale)
+      .project("width", 40)
+      .barAlignment("center")
 
   var stackedArea = new Plottable.Plot.StackedArea(xScale, yScale2)
       .project("x", timeFormat, xScale)
@@ -84,6 +86,7 @@ function run(div, data, Plottable) {
   var stackedBar = new Plottable.Plot.StackedBar(xScale, yScale2)
       .project("x", timeFormat, xScale)
       .project("fill", "type", colorScale)
+      .project("width", 40)
       .addDataset(data[0])
       .addDataset(data[1])
       .addDataset(data[2])
