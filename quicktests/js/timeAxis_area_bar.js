@@ -72,7 +72,7 @@ function run(div, data, Plottable) {
   var barPlot = new Plottable.Plot.VerticalBar(data[0], xScale, yScale1)
       .project("x", timeFormat, xScale)
       .project("width", 40)
-      .barAlignment("center")
+      .barAlignment("center");
 
   var stackedArea = new Plottable.Plot.StackedArea(xScale, yScale2)
       .project("x", timeFormat, xScale)
