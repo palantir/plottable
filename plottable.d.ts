@@ -856,12 +856,6 @@ declare module Plottable {
         drawer: Abstract._Drawer;
         key: string;
     }
-    /**
-     * A tick generator for quantitative scale.
-     */
-    interface TickGenerator {
-        (s: Abstract.QuantitativeScale<any>): number[];
-    }
 }
 
 
@@ -1052,6 +1046,12 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
+        /**
+         * A tick generator for quantitative scale.
+         */
+        interface TickGenerator {
+            (s: QuantitativeScale<any>, defaultTicks: number[]): any[];
+        }
         class QuantitativeScale<D> extends Scale<D, number> {
             /**
              * Constructs a new QuantitativeScale.
@@ -1109,12 +1109,9 @@ declare module Plottable {
             /**
              * Gets a set of tick values spanning the domain.
              *
-             * @param {number} [count] The approximate number of ticks to generate.
-             *                         If not supplied, the number specified by
-             *                         numTicks() is used instead.
              * @returns {any[]} The generated ticks.
              */
-            ticks(count?: number): any[];
+            ticks(): any[];
             /**
              * Gets the default number of ticks.
              *

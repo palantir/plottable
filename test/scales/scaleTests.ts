@@ -189,7 +189,7 @@ describe("Scales", () => {
       scale.domain([0, 10]);
       var ticks = scale.ticks();
       assert.closeTo(ticks.length, 10, 1, "ticks were generated correctly with default generator");
-      scale.tickGenerator((s) => s._d3Scale.ticks(scale.numTicks()).filter(i => i % 3 === 0));
+      scale.tickGenerator((s, d) => d.filter(i => i % 3 === 0));
       ticks = scale.ticks();
       assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
     });

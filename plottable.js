@@ -2163,14 +2163,13 @@ var Plottable;
              * backing the QuantitativeScale.
              */
             function QuantitativeScale(scale) {
-                var _this = this;
                 _super.call(this, scale);
                 this._numTicks = 10;
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
                 this._userSetDomainer = false;
                 this._domainer = new Plottable.Domainer();
                 this._typeCoercer = function (d) { return +d; };
-                this._tickGenerator = function (s) { return s._d3Scale.ticks(_this.numTicks()); };
+                this._tickGenerator = function (s, defaultTicks) { return defaultTicks; };
             }
             QuantitativeScale.prototype._getExtent = function () {
                 return this._domainer.computeDomain(this._getAllExtents(), this);
@@ -2229,14 +2228,10 @@ var Plottable;
             /**
              * Gets a set of tick values spanning the domain.
              *
-             * @param {number} [count] The approximate number of ticks to generate.
-             *                         If not supplied, the number specified by
-             *                         numTicks() is used instead.
              * @returns {any[]} The generated ticks.
              */
-            QuantitativeScale.prototype.ticks = function (count) {
-                if (count === void 0) { count = this.numTicks(); }
-                return this._tickGenerator(this);
+            QuantitativeScale.prototype.ticks = function () {
+                return this._tickGenerator(this, this._d3Scale.ticks(this.numTicks()));
             };
             QuantitativeScale.prototype.numTicks = function (count) {
                 if (count == null) {
