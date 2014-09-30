@@ -55,6 +55,18 @@ function assertBBoxInclusion(outerEl, innerEl) {
     assert.operator(Math.ceil(outerBox.right) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.right), "bounding rect right included");
     assert.operator(Math.ceil(outerBox.bottom) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.bottom), "bounding rect bottom included");
 }
+function assertBBoxNonIntersection(firstEl, secondEl) {
+    var firstBox = firstEl.node().getBoundingClientRect();
+    var secondBox = secondEl.node().getBoundingClientRect();
+    var intersectionBox = {
+        left: Math.max(firstBox.left, secondBox.left),
+        right: Math.min(firstBox.right, secondBox.right),
+        bottom: Math.min(firstBox.bottom, secondBox.bottom),
+        top: Math.max(firstBox.top, secondBox.top)
+    };
+    // +1 for inaccuracy in IE
+    assert.isTrue(intersectionBox.left + 1 >= intersectionBox.right || intersectionBox.bottom + 1 >= intersectionBox.top, "bounding rects are not intersecting");
+}
 function assertXY(el, xExpected, yExpected, message) {
     var x = el.attr("x");
     var y = el.attr("y");
@@ -3667,6 +3679,18 @@ describe("Component behavior", function () {
     it("components can be detached even if not anchored", function () {
         var c = new Plottable.Abstract.Component();
         c.detach(); // no error thrown
+        svg.remove();
+    });
+    it("component remains in own cell", function () {
+        var horizontalComponent = new Plottable.Abstract.Component();
+        var verticalComponent = new Plottable.Abstract.Component();
+        var placeHolder = new Plottable.Abstract.Component();
+        var t = new Plottable.Component.Table().addComponent(0, 0, verticalComponent).addComponent(0, 1, new Plottable.Abstract.Component()).addComponent(1, 0, placeHolder).addComponent(1, 1, horizontalComponent);
+        t.renderTo(svg);
+        horizontalComponent.xAlign("center");
+        verticalComponent.yAlign("bottom");
+        assertBBoxNonIntersection(verticalComponent._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
+        assertBBoxInclusion(t.boxContainer.select(".bounding-box"), horizontalComponent._element.select(".bounding-box"));
         svg.remove();
     });
 });
