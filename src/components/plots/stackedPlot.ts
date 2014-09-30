@@ -27,44 +27,21 @@ export module Abstract {
       var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
 
-      var dataArray: StackedDatum[][] = datasets.map((dataset) => {
-        return dataset.data().map((datum) => {
-          return {key: keyAccessor(datum), value: valueAccessor(datum)};
+      var dataMapArray = this.generateDefaultMapArray();
+
+      var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap: D3.Map<StackedDatum>) => {
+        return _Util.Methods.populateMap(dataMap.keys(), (key: string) => {
+          return {key: key, value: Math.max(0, dataMap.get(key).value)};
         });
       });
 
-      var keysArray: D3.Set<any>[] = dataArray.map((data) => d3.set(data.map((datum) => datum.key)));
-
-      var domainKeys = d3.set();
-      keysArray.forEach((keys) => domainKeys = _Util.Methods.union(domainKeys, keys));
-
-      keysArray.forEach((keys, i) => {
-        domainKeys.forEach((domainKey) => {
-          if (!keys.has(domainKey)) {
-            dataArray[i].push({key: domainKey, value: this._missingValue()});
-          }
+      var negativeDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
+        return _Util.Methods.populateMap(dataMap.keys(), (key) => {
+          return {key: key, value: Math.min(dataMap.get(key).value, 0)};
         });
       });
 
-      var sortedDataArray = dataArray.map((data) => {
-        return domainKeys.values().map((domainKey) => {
-          return data.filter((datum) => String(datum.key) === domainKey)[0];
-        });
-      });
-
-      var positiveDataArray: StackedDatum[][] = sortedDataArray.map((data) => {
-        return data.map((datum) => {
-          return {key: datum.key, value: Math.max(0, datum.value)};
-        });
-      });
-
-      var negativeDataArray: StackedDatum[][] = sortedDataArray.map((data) => {
-        return data.map((datum) => {
-          return {key: datum.key, value: Math.min(datum.value, 0)};
-        });
-      });
-
-      this.setDatasetStackOffsets(this._stack(positiveDataArray), this._stack(negativeDataArray));
+      this.setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
 
       var maxStack = _Util.Methods.max(datasets, (dataset: Dataset) => {
         return _Util.Methods.max(dataset.data(), (datum: any) => {
@@ -85,39 +62,69 @@ export module Abstract {
      * Feeds the data through d3's stack layout function which will calculate
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
-    private _stack(dataArray: StackedDatum[][]): StackedDatum[][] {
-      var outFunction = (d: any, y0: number, y: number) => {
+    private _stack(dataArrayMap: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
+      var outFunction = (d: StackedDatum, y0: number, y: number) => {
         d.offset = y0;
       };
 
       d3.layout.stack()
                .x((d) => d.key)
                .y((d) => d.value)
-               .values((d) => d)
-               .out(outFunction)(dataArray);
+               .values((d) => d.values())
+               .out(outFunction)(dataArrayMap);
 
-      return dataArray;
+      return dataArrayMap;
     }
 
     /**
      * After the stack offsets have been determined on each separate dataset, the offsets need
      * to be determined correctly on the overall datasets
      */
-    private setDatasetStackOffsets(positiveDataArray: StackedDatum[][], negativeDataArray: StackedDatum[][]) {
+    private setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
       var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
 
       this._getDatasetsInOrder().forEach((dataset, datasetIndex) => {
-        var positiveData = positiveDataArray[datasetIndex];
-        var negativeData = negativeDataArray[datasetIndex];
+        var positiveDataMap = positiveDataMapArray[datasetIndex];
+        var negativeDataMap = negativeDataMapArray[datasetIndex];
 
         dataset.data().forEach((datum: any, datumIndex: number) => {
-          var positiveOffset = positiveData.filter((posDatum) => keyAccessor(datum) === posDatum.key)[0].offset;
-          var negativeOffset = negativeData.filter((negDatum) => keyAccessor(datum) === negDatum.key)[0].offset;
+          var positiveOffset = positiveDataMap.get(keyAccessor(datum)).offset;
+          var negativeOffset = negativeDataMap.get(keyAccessor(datum)).offset;
 
           datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) > 0 ? positiveOffset : negativeOffset;
         });
       });
+    }
+
+    private generateDefaultMapArray(): D3.Map<StackedDatum>[] {
+      var domainKeys = d3.set();
+
+      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+      var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+
+      var datasets = this._getDatasetsInOrder();
+      datasets.forEach((dataset) => {
+        dataset.data().forEach((datum) => {
+          domainKeys.add(keyAccessor(datum));
+        });
+      });
+
+      var dataMapArray = datasets.map(() => {
+        return _Util.Methods.populateMap(domainKeys.values(), (domainKey) => {
+          return {key: domainKey, value: this._missingValue()};
+        });
+      });
+
+      datasets.forEach((dataset, datasetIndex) => {
+        dataset.data().forEach((datum) => {
+          var key = keyAccessor(datum);
+          var value = valueAccessor(datum);
+          dataMapArray[datasetIndex].set(key, {key: key, value: value});
+        });
+      });
+
+      return dataMapArray;
     }
 
     public _updateScaleExtents() {

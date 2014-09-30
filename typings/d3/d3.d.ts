@@ -848,7 +848,7 @@ declare module D3 {
         remove(key: string): boolean;
         keys(): string[];
         values(): T[];
-        entries(): any[][]; // Actually of form [key: string, val: T][], but this is inexpressible in Typescript
+        entries(): any[]; // Actually of form [key: string, val: T][], but this is inexpressible in Typescript
         forEach(func: (key: string, value: T) => void ): void;
         empty(): boolean;
         size(): number;
