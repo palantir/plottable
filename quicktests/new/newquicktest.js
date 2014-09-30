@@ -8,16 +8,29 @@ function renderPlots(){
 
 function loadQuickTestDir(category){
   //d3.text("/quicktests/new/" + category + "");
-  readQuickTests();
+  var listofTestNames = getQuicktestNames(category);
 }
 
-function readQuickTests(){
-  var temp = d3.json("list_of_quicktests.json");
-  console.log(temp);
-  
+function getQuicktestNames(category){
+  var qtestnames = []; //array of quicktest names
+  d3.json("list_of_quicktests.json", function (data){
+    var x = [];
+    data.forEach(function(quicktestobj){
+      var path = quicktestobj.path;
+
+      if (-1 !== path.indexOf(category)){
+        var name = path.replace(/.*\/|\.js/g, '');
+        x.push(name);
+      }
+
+    });
+    doShit(x);
+  });
 }
 
-
+function doShit(x){
+  console.log(x);
+}
 
 function loadTheQuicktests(quicktestsJSONArray) {
   window.quicktests = [];
