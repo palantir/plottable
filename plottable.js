@@ -7063,8 +7063,6 @@ var Plottable;
             };
             Stacked.prototype.stack = function () {
                 var datasets = this._getDatasetsInOrder();
-                var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
                 var dataMapArray = this.generateDefaultMapArray();
                 var positiveDataMapArray = dataMapArray.map(function (dataMap) {
                     return Plottable._Util.Methods.populateMap(dataMap.keys(), function (key) {
@@ -7077,6 +7075,7 @@ var Plottable;
                     });
                 });
                 this.setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
+                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
                 var maxStack = Plottable._Util.Methods.max(datasets, function (dataset) {
                     return Plottable._Util.Methods.max(dataset.data(), function (datum) {
                         return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];

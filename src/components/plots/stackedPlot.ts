@@ -24,8 +24,6 @@ export module Abstract {
 
     private stack() {
       var datasets = this._getDatasetsInOrder();
-      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-      var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
 
       var dataMapArray = this.generateDefaultMapArray();
 
@@ -43,6 +41,7 @@ export module Abstract {
 
       this.setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
 
+      var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
       var maxStack = _Util.Methods.max(datasets, (dataset: Dataset) => {
         return _Util.Methods.max(dataset.data(), (datum: any) => {
           return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
