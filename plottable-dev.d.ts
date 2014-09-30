@@ -864,7 +864,7 @@ declare module Plottable {
         key: string;
     }
     /**
-     * A tick generator for quantitive scale.
+     * A tick generator for quantitative scale.
      */
     interface TickGenerator {
         (s: Abstract.QuantitativeScale<any>): number[];
@@ -1201,7 +1201,7 @@ declare module Plottable {
             /**
              * Sets a tick generator
              *
-             * @param {TickGenerator} tick generation policy If provided, the new tick generation policy.
+             * @param {TickGenerator} tick generator If provided, the new tick generator.
              * @return {QuanitativeScale} The calling QuantitativeScale.
              */
             tickGenerator(generator: TickGenerator): QuantitativeScale<D>;

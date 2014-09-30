@@ -195,7 +195,7 @@ export module Abstract {
     /**
      * Sets a tick generator
      *
-     * @param {TickGenerator} tick generation policy If provided, the new tick generation policy.
+     * @param {TickGenerator} tick generator If provided, the new tick generator.
      * @return {QuanitativeScale} The calling QuantitativeScale.
      */
     public tickGenerator(generator: TickGenerator): QuantitativeScale<D>;

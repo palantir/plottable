@@ -100,7 +100,7 @@ module Plottable {
   }
 
   /**
-   * A tick generator for quantitive scale.
+   * A tick generator for quantitative scale.
    */
   export interface TickGenerator {
     (s: Plottable.Abstract.QuantitativeScale<any>): number[]
