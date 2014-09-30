@@ -7025,10 +7025,6 @@ var Plottable;
             ClusteredBar.prototype.cluster = function (accessor) {
                 var _this = this;
                 this.innerScale.domain(this._datasetKeysInOrder);
-                var lengths = this._getDatasetsInOrder().map(function (d) { return d.data().length; });
-                if (Plottable._Util.Methods.uniq(lengths).length > 1) {
-                    Plottable._Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
-                }
                 var clusters = {};
                 this._datasetKeysInOrder.forEach(function (key) {
                     var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
