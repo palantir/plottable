@@ -9,6 +9,8 @@ export module Abstract {
     public _userSetDomainer: boolean = false;
     public _domainer: Domainer = new Domainer();
     public _typeCoercer = (d: any) => +d;
+    public _tickGenerator: TickGenerator = (s: Plottable.Abstract.QuantitativeScale<D>) => s._d3Scale.ticks(this.numTicks());
+
 
     /**
      * Constructs a new QuantitativeScale.
@@ -118,7 +120,7 @@ export module Abstract {
      * @returns {any[]} The generated ticks.
      */
     public ticks(count = this.numTicks()): any[] {
-      return this._d3Scale.ticks(count);
+      return this._tickGenerator(this);
     }
 
     /**
@@ -182,6 +184,28 @@ export module Abstract {
 
     public _defaultExtent(): any[] {
       return [0, 1];
+    }
+
+    /**
+     * Gets the tick generator of the QuantitativeScale.
+     *
+     * @returns {TickGenerator} The current tick generator.
+     */
+    public tickGenerator() : TickGenerator;
+    /**
+     * Sets a tick generator
+     *
+     * @param {TickGenerator} tick generation policy If provided, the new tick generation policy.
+     * @return {QuanitativeScale} The calling QuantitativeScale.
+     */
+    public tickGenerator(generator: TickGenerator): QuantitativeScale<D>;
+    public tickGenerator(generator?: TickGenerator): any {
+      if(generator == null) {
+        return this._tickGenerator;
+      } else {
+        this._tickGenerator = generator;
+        return this;
+      }
     }
   }
 }

@@ -98,4 +98,11 @@ module Plottable {
     drawer: Abstract._Drawer;
     key: string;
   }
+
+  /**
+   * A tick generator for quantitive scale.
+   */
+  export interface TickGenerator {
+    (s: Plottable.Abstract.QuantitativeScale<any>): number[]
+  }
 }

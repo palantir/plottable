@@ -2163,12 +2163,14 @@ var Plottable;
              * backing the QuantitativeScale.
              */
             function QuantitativeScale(scale) {
+                var _this = this;
                 _super.call(this, scale);
                 this._numTicks = 10;
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
                 this._userSetDomainer = false;
                 this._domainer = new Plottable.Domainer();
                 this._typeCoercer = function (d) { return +d; };
+                this._tickGenerator = function (s) { return s._d3Scale.ticks(_this.numTicks()); };
             }
             QuantitativeScale.prototype._getExtent = function () {
                 return this._domainer.computeDomain(this._getAllExtents(), this);
@@ -2234,7 +2236,7 @@ var Plottable;
              */
             QuantitativeScale.prototype.ticks = function (count) {
                 if (count === void 0) { count = this.numTicks(); }
-                return this._d3Scale.ticks(count);
+                return this._tickGenerator(this);
             };
             QuantitativeScale.prototype.numTicks = function (count) {
                 if (count == null) {
@@ -2263,6 +2265,15 @@ var Plottable;
             };
             QuantitativeScale.prototype._defaultExtent = function () {
                 return [0, 1];
+            };
+            QuantitativeScale.prototype.tickGenerator = function (generator) {
+                if (generator == null) {
+                    return this._tickGenerator;
+                }
+                else {
+                    this._tickGenerator = generator;
+                    return this;
+                }
             };
             return QuantitativeScale;
         })(Abstract.Scale);

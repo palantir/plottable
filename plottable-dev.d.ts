@@ -863,6 +863,12 @@ declare module Plottable {
         drawer: Abstract._Drawer;
         key: string;
     }
+    /**
+     * A tick generator for quantitive scale.
+     */
+    interface TickGenerator {
+        (s: Abstract.QuantitativeScale<any>): number[];
+    }
 }
 
 
@@ -1083,6 +1089,7 @@ declare module Plottable {
             _userSetDomainer: boolean;
             _domainer: Domainer;
             _typeCoercer: (d: any) => number;
+            _tickGenerator: TickGenerator;
             /**
              * Constructs a new QuantitativeScale.
              *
@@ -1185,6 +1192,19 @@ declare module Plottable {
              */
             domainer(domainer: Domainer): QuantitativeScale<D>;
             _defaultExtent(): any[];
+            /**
+             * Gets the tick generator of the QuantitativeScale.
+             *
+             * @returns {TickGenerator} The current tick generator.
+             */
+            tickGenerator(): TickGenerator;
+            /**
+             * Sets a tick generator
+             *
+             * @param {TickGenerator} tick generation policy If provided, the new tick generation policy.
+             * @return {QuanitativeScale} The calling QuantitativeScale.
+             */
+            tickGenerator(generator: TickGenerator): QuantitativeScale<D>;
         }
     }
 }
