@@ -1050,7 +1050,7 @@ declare module Plottable {
          * A tick generator for quantitative scale.
          */
         interface TickGenerator {
-            (s: QuantitativeScale<any>, defaultTicks: number[]): any[];
+            (s: QuantitativeScale<any>, defaultTicks: any[]): any[];
         }
         class QuantitativeScale<D> extends Scale<D, number> {
             /**
