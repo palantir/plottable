@@ -33,13 +33,32 @@ export module Abstract {
         });
       });
 
-      var positiveDataArray: StackedDatum[][] = dataArray.map((data) => {
+      var keysArray: D3.Set<any>[] = dataArray.map((data) => d3.set(data.map((datum) => datum.key)));
+
+      var domainKeys = d3.set();
+      keysArray.forEach((keys) => domainKeys = _Util.Methods.union(domainKeys, keys));
+
+      keysArray.forEach((keys, i) => {
+        domainKeys.forEach((domainKey) => {
+          if (!keys.has(domainKey)) {
+            dataArray[i].push({key: domainKey, value: this._missingValue()});
+          }
+        });
+      });
+
+      var sortedDataArray = dataArray.map((data) => {
+        return domainKeys.values().map((domainKey) => {
+          return data.filter((datum) => String(datum.key) === domainKey)[0];
+        });
+      });
+
+      var positiveDataArray: StackedDatum[][] = sortedDataArray.map((data) => {
         return data.map((datum) => {
           return {key: datum.key, value: Math.max(0, datum.value)};
         });
       });
 
-      var negativeDataArray: StackedDatum[][] = dataArray.map((data) => {
+      var negativeDataArray: StackedDatum[][] = sortedDataArray.map((data) => {
         return data.map((datum) => {
           return {key: datum.key, value: Math.min(datum.value, 0)};
         });
@@ -85,14 +104,16 @@ export module Abstract {
      * to be determined correctly on the overall datasets
      */
     private setDatasetStackOffsets(positiveDataArray: StackedDatum[][], negativeDataArray: StackedDatum[][]) {
+      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-      var positiveDataArrayOffsets = positiveDataArray.map((data) => data.map((datum) => datum.offset));
-      var negativeDataArrayOffsets = negativeDataArray.map((data) => data.map((datum) => datum.offset));
 
       this._getDatasetsInOrder().forEach((dataset, datasetIndex) => {
+        var positiveData = positiveDataArray[datasetIndex];
+        var negativeData = negativeDataArray[datasetIndex];
+
         dataset.data().forEach((datum: any, datumIndex: number) => {
-          var positiveOffset = positiveDataArrayOffsets[datasetIndex][datumIndex];
-          var negativeOffset = negativeDataArrayOffsets[datasetIndex][datumIndex];
+          var positiveOffset = positiveData.filter((posDatum) => keyAccessor(datum) === posDatum.key)[0].offset;
+          var negativeOffset = negativeData.filter((negDatum) => keyAccessor(datum) === negDatum.key)[0].offset;
 
           datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) > 0 ? positiveOffset : negativeOffset;
         });
@@ -110,6 +131,10 @@ export module Abstract {
       } else {
         primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
       }
+    }
+
+    public _missingValue(): number {
+      return 0;
     }
   }
 }
