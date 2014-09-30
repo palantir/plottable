@@ -3784,6 +3784,7 @@ var Plottable;
                 }
                 this._scale = scale;
                 this.orient(orientation);
+                this._setDefaultAlignment();
                 this.classed("axis", true);
                 if (this._isHorizontal()) {
                     this.classed("x-axis", true);
@@ -3943,6 +3944,22 @@ var Plottable;
                 this._computedWidth = null;
                 this._computedHeight = null;
                 _super.prototype._invalidateLayout.call(this);
+            };
+            Axis.prototype._setDefaultAlignment = function () {
+                switch (this._orientation) {
+                    case "bottom":
+                        this.yAlign("top");
+                        break;
+                    case "top":
+                        this.yAlign("bottom");
+                        break;
+                    case "left":
+                        this.xAlign("right");
+                        break;
+                    case "right":
+                        this.xAlign("left");
+                        break;
+                }
             };
             Axis.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {

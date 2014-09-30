@@ -1835,6 +1835,7 @@ declare module Plottable {
                 y2: any;
             };
             _invalidateLayout(): void;
+            _setDefaultAlignment(): void;
             /**
              * Gets the current formatter on the axis. Data is passed through the
              * formatter before being displayed.
