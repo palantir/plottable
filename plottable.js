@@ -6761,11 +6761,17 @@ var Plottable;
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
                 this.linePath.datum(this._dataset.data());
+                var line = d3.svg.line().x(xFunction);
+                line.defined(function (d) {
+                    var yVal = yFunction(d, 0);
+                    return yVal != null && yVal === yVal; // not null and not NaN
+                });
+                attrToProjector["d"] = line;
                 if (this._dataChanged) {
-                    attrToProjector["d"] = d3.svg.line().x(xFunction).y(this._getResetYFunction());
+                    line.y(this._getResetYFunction());
                     this._applyAnimatedAttributes(this.linePath, "line-reset", attrToProjector);
                 }
-                attrToProjector["d"] = d3.svg.line().x(xFunction).y(yFunction);
+                line.y(yFunction);
                 this._applyAnimatedAttributes(this.linePath, "line", attrToProjector);
             };
             Line.prototype._wholeDatumAttributes = function () {
@@ -6858,11 +6864,17 @@ var Plottable;
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
                 this.areaPath.datum(this._dataset.data());
+                var area = d3.svg.area().x(xFunction).y0(y0Function);
+                area.defined(function (d) {
+                    var yVal = yFunction(d, 0);
+                    return yVal != null && yVal === yVal; // not null and not NaN
+                });
+                attrToProjector["d"] = area;
                 if (this._dataChanged) {
-                    attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(this._getResetYFunction());
+                    area.y1(this._getResetYFunction());
                     this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
                 }
-                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+                area.y1(yFunction);
                 this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
             };
             Area.prototype._wholeDatumAttributes = function () {

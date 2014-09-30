@@ -12,14 +12,12 @@ describe("Plots", () => {
     var y0Accessor: any;
     var colorAccessor: any;
     var fillAccessor: any;
+    var twoPointData = [{foo: 0, bar: 0}, {foo: 1, bar: 1}];
     var simpleDataset: Plottable.Dataset;
     var areaPlot: Plottable.Plot.Area<number>;
     var renderArea: D3.Selection;
-    var verifier: MultiTestVerifier;
 
     before(() => {
-      svg = generateSVG(500, 500);
-      verifier = new MultiTestVerifier();
       xScale = new Plottable.Scale.Linear().domain([0, 1]);
       yScale = new Plottable.Scale.Linear().domain([0, 1]);
       xAccessor = (d: any) => d.foo;
@@ -27,7 +25,11 @@ describe("Plots", () => {
       y0Accessor = () => 0;
       colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
       fillAccessor = () => "steelblue";
-      simpleDataset = new Plottable.Dataset([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
+    });
+
+    beforeEach(() => {
+      svg = generateSVG(500, 500);
+      simpleDataset = new Plottable.Dataset(twoPointData);
       areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
       areaPlot.project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)
@@ -36,10 +38,6 @@ describe("Plots", () => {
               .project("stroke", colorAccessor)
               .renderTo(svg);
       renderArea = areaPlot._renderArea;
-    });
-
-    beforeEach(() => {
-      verifier.start();
     });
 
     it("draws area and line correctly", () => {
@@ -54,7 +52,7 @@ describe("Plots", () => {
       assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
       var lineComputedStyle = window.getComputedStyle(linePath.node());
       assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
-      verifier.end();
+      svg.remove();
     });
 
     it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
@@ -63,7 +61,7 @@ describe("Plots", () => {
       renderArea = areaPlot._renderArea;
       var areaPath = renderArea.select(".area");
       assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
-      verifier.end();
+      svg.remove();
     });
 
     it("area is appended before line", () => {
@@ -71,11 +69,35 @@ describe("Plots", () => {
       var areaSelection = renderArea.select(".area")[0][0];
       var lineSelection = renderArea.select(".line")[0][0];
       assert.operator(paths.indexOf(areaSelection), "<", paths.indexOf(lineSelection), "area appended before line");
-      verifier.end();
+      svg.remove();
     });
 
-    after(() => {
-      if (verifier.passed) {svg.remove();};
+    it("correctly handles NaN and undefined y-values", () => {
+      simpleDataset.data([
+        { foo: 0.0, bar: 0.0 },
+        { foo: 0.2, bar: 0.2 },
+        { foo: 0.4, bar: NaN },
+        { foo: 0.6, bar: 0.6 },
+        { foo: 0.8, bar: 0.8 }
+      ]);
+      var areaPath = renderArea.select(".area");
+      assert.strictEqual(normalizePath(areaPath.attr("d")),
+              "M0,500L100,400L100,500L0,500ZM300,200L400,100L400,500L300,500Z",
+              "area d was set correctly");
+
+      simpleDataset.data([
+        { foo: 0.0, bar: 0.0 },
+        { foo: 0.2, bar: 0.2 },
+        { foo: 0.4, bar: undefined },
+        { foo: 0.6, bar: 0.6 },
+        { foo: 0.8, bar: 0.8 }
+      ]);
+      var areaPath = renderArea.select(".area");
+      assert.strictEqual(normalizePath(areaPath.attr("d")),
+              "M0,500L100,400L100,500L0,500ZM300,200L400,100L400,500L300,500Z",
+              "area d was set correctly");
+      svg.remove();
     });
+
   });
 });
