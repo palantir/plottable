@@ -1518,26 +1518,17 @@ var assert = chai.assert;
 describe("Plots", function () {
     describe("RadarPlot", function () {
         var svg;
-        var rScale;
-        var thetaScale;
-        var simpleDataset;
         var radarPlot;
-        var renderArea;
-        var verifier;
         before(function () {
             svg = generateSVG(500, 500);
-            verifier = new MultiTestVerifier();
-            rScale = new Plottable.Scale.Linear().domain([0, 10]);
-            thetaScale = new Plottable.Scale.Ordinal().domain(["attr0", "attr1", "attr2"]);
-            simpleDataset = new Plottable.Dataset([{ metric: "attr0", value: 5 }, { metric: "attr1", value: 10 }, { metric: "attr2", value: 7 }]);
-            radarPlot = new Plottable.Plot.Radar(rScale, thetaScale).addDataset(simpleDataset);
+            var rScale = new Plottable.Scale.Linear().domain([0, 10]);
+            var thetaScale = new Plottable.Scale.Ordinal().domain(["attr0", "attr1", "attr2"]);
+            var dataset = new Plottable.Dataset([{ metric: "attr0", value: 5 }, { metric: "attr1", value: 10 }, { metric: "attr2", value: 7 }]);
+            radarPlot = new Plottable.Plot.Radar(rScale, thetaScale).addDataset(dataset);
             radarPlot.renderTo(svg);
-            renderArea = radarPlot._renderArea;
-        });
-        beforeEach(function () {
-            verifier.start();
         });
         it("polygon is drawn correctly", function () {
+            var renderArea = radarPlot._renderArea;
             var polygon = renderArea.select("polygon");
             var points = polygon.attr("points").split(" ");
             var point0 = points[0].split(",").map(function (coordinate) { return parseFloat(coordinate); });
@@ -1549,13 +1540,7 @@ describe("Plots", function () {
             var point2 = points[2].split(",").map(function (coordinate) { return parseFloat(coordinate); });
             assert.closeTo(point2[0], -151.55, 1, "Goes left to the third point");
             assert.closeTo(point2[1], 87.5, 1, "Goes up to the third point");
-            verifier.end();
-        });
-        after(function () {
-            if (verifier.passed) {
-                svg.remove();
-            }
-            ;
+            svg.remove();
         });
     });
     describe("RadarPlot Metrics", function () {
