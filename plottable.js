@@ -6753,7 +6753,12 @@ var Plottable;
                 });
                 return attrToProjector;
             };
+            Line.prototype._rejectNullsAndNaNs = function (d, i, accessor) {
+                var value = accessor(d, i);
+                return value != null && value === value;
+            };
             Line.prototype._paint = function () {
+                var _this = this;
                 _super.prototype._paint.call(this);
                 var attrToProjector = this._generateAttrToProjector();
                 var xFunction = attrToProjector["x"];
@@ -6762,10 +6767,7 @@ var Plottable;
                 delete attrToProjector["y"];
                 this.linePath.datum(this._dataset.data());
                 var line = d3.svg.line().x(xFunction);
-                line.defined(function (d, i) {
-                    var yVal = yFunction(d, i);
-                    return yVal != null && yVal === yVal; // not null and not NaN
-                });
+                line.defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
                 attrToProjector["d"] = line;
                 if (this._dataChanged) {
                     line.y(this._getResetYFunction());
@@ -6855,6 +6857,7 @@ var Plottable;
                 return this._generateAttrToProjector()["y0"];
             };
             Area.prototype._paint = function () {
+                var _this = this;
                 _super.prototype._paint.call(this);
                 var attrToProjector = this._generateAttrToProjector();
                 var xFunction = attrToProjector["x"];
@@ -6865,10 +6868,7 @@ var Plottable;
                 delete attrToProjector["y"];
                 this.areaPath.datum(this._dataset.data());
                 var area = d3.svg.area().x(xFunction).y0(y0Function);
-                area.defined(function (d, i) {
-                    var yVal = yFunction(d, i);
-                    return yVal != null && yVal === yVal; // not null and not NaN
-                });
+                area.defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
                 attrToProjector["d"] = area;
                 if (this._dataChanged) {
                     area.y1(this._getResetYFunction());

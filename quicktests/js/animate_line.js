@@ -18,6 +18,7 @@ function run(div, data, Plottable) {
 
   var lineData = data[0].slice(0, 20);
   lineData[10].y = NaN;
+  lineData[13].x = undefined;
   var lineRenderer = new Plottable.Plot.Line(lineData, xScale, yScale);
   lineRenderer.attr("opacity", 0.75);
   lineRenderer.animate(doAnimate);

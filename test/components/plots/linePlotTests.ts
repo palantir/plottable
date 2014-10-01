@@ -71,7 +71,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("correctly handles NaN and undefined y-values", () => {
+    it("correctly handles NaN and undefined x and y values", () => {
       var lineData = [
         { foo: 0.0, bar: 0.0 },
         { foo: 0.2, bar: 0.2 },
@@ -83,29 +83,32 @@ describe("Plots", () => {
       var linePath = renderArea.select(".line");
       var d_original = normalizePath(linePath.attr("d"));
 
+      function assertCorrectPathSplitting(msgPrefix: string) {
+        var d = normalizePath(linePath.attr("d"));
+        var pathSegements = d.split("M").filter((segment) => segment !== "");
+        assert.lengthOf(pathSegements, 2, msgPrefix + " split path into two segments");
+        var firstSegmentContained = d_original.indexOf(pathSegements[0]) >= 0;
+        assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
+        var secondSegmentContained = d_original.indexOf(pathSegements[1]) >= 0;
+        assert.isTrue(firstSegmentContained, "second path segment is a subpath of the original path");
+      }
+
       var dataWithNaN = lineData.slice();
       dataWithNaN[2] = { foo: 0.4, bar: NaN };
       simpleDataset.data(dataWithNaN);
-      var d_NaN = normalizePath(linePath.attr("d"));
-      var pathSegements = d_NaN.split("M").filter((segment) => segment !== "");
-
-      assert.lengthOf(pathSegements, 2, "NaN split path into two segments");
-      var firstSegmentContained = d_original.indexOf(pathSegements[0]) >= 0;
-      assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
-      var secondSegmentContained = d_original.indexOf(pathSegements[1]) >= 0;
-      assert.isTrue(firstSegmentContained, "second path segment is a subpath of the original path");
+      assertCorrectPathSplitting("y=NaN");
+      dataWithNaN[2] = { foo: NaN, bar: 0.4 };
+      simpleDataset.data(dataWithNaN);
+      assertCorrectPathSplitting("x=NaN");
 
       var dataWithUndefined = lineData.slice();
       dataWithUndefined[2] = { foo: 0.4, bar: undefined };
       simpleDataset.data(dataWithUndefined);
-      var d_undefined = normalizePath(linePath.attr("d"));
-      pathSegements = d_undefined.split("M").filter((segment) => segment !== "");
+      assertCorrectPathSplitting("y=undefined");
+      dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
+      simpleDataset.data(dataWithUndefined);
+      assertCorrectPathSplitting("x=undefined");
 
-      assert.lengthOf(pathSegements, 2, "undefined split path into two segments");
-      firstSegmentContained = d_original.indexOf(pathSegements[0]) >= 0;
-      assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
-      secondSegmentContained = d_original.indexOf(pathSegements[1]) >= 0;
-      assert.isTrue(firstSegmentContained, "second path segment is a subpath of the original path");
       svg.remove();
     });
   });

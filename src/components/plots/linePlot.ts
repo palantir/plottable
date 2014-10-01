@@ -61,6 +61,11 @@ export module Plot {
       return attrToProjector;
     }
 
+    public _rejectNullsAndNaNs(d: any, i: number, accessor: IAppliedAccessor) {
+      var value = accessor(d, i);
+      return value != null && value === value;
+    }
+
     public _paint() {
       super._paint();
       var attrToProjector = this._generateAttrToProjector();
@@ -73,10 +78,7 @@ export module Plot {
 
       var line = d3.svg.line()
                        .x(xFunction);
-      line.defined((d, i) => {
-        var yVal = yFunction(d, i);
-        return yVal != null && yVal === yVal; // not null and not NaN
-      });
+      line.defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction));
       attrToProjector["d"] = line;
 
       if (this._dataChanged) {

@@ -87,10 +87,7 @@ export module Plot {
       var area = d3.svg.area()
                        .x(xFunction)
                        .y0(y0Function);
-      area.defined((d, i) => {
-        var yVal = yFunction(d, i);
-        return yVal != null && yVal === yVal; // not null and not NaN
-      });
+      area.defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction));
       attrToProjector["d"] = area;
 
       if (this._dataChanged) {

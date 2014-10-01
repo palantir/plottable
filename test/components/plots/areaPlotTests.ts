@@ -72,30 +72,37 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("correctly handles NaN and undefined y-values", () => {
-      simpleDataset.data([
+    it("correctly handles NaN and undefined x and y values", () => {
+      var areaData = [
         { foo: 0.0, bar: 0.0 },
         { foo: 0.2, bar: 0.2 },
-        { foo: 0.4, bar: NaN },
+        { foo: 0.4, bar: 0.4 },
         { foo: 0.6, bar: 0.6 },
         { foo: 0.8, bar: 0.8 }
-      ]);
+      ];
+      var expectedPath = "M0,500L100,400L100,500L0,500ZM300,200L400,100L400,500L300,500Z";
       var areaPath = renderArea.select(".area");
-      assert.strictEqual(normalizePath(areaPath.attr("d")),
-              "M0,500L100,400L100,500L0,500ZM300,200L400,100L400,500L300,500Z",
-              "area d was set correctly (NaN case)");
 
-      simpleDataset.data([
-        { foo: 0.0, bar: 0.0 },
-        { foo: 0.2, bar: 0.2 },
-        { foo: 0.4, bar: undefined },
-        { foo: 0.6, bar: 0.6 },
-        { foo: 0.8, bar: 0.8 }
-      ]);
-      areaPath = renderArea.select(".area");
-      assert.strictEqual(normalizePath(areaPath.attr("d")),
-              "M0,500L100,400L100,500L0,500ZM300,200L400,100L400,500L300,500Z",
-              "area d was set correctly (undefined case)");
+      var dataWithNaN = areaData.slice();
+      dataWithNaN[2] = { foo: 0.4, bar: NaN };
+      simpleDataset.data(dataWithNaN);
+      assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath,
+                        "area d was set correctly (y=NaN case)");
+      dataWithNaN[2] = { foo: NaN, bar: 0.4 };
+      simpleDataset.data(dataWithNaN);
+      assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath,
+                        "area d was set correctly (x=NaN case)");
+
+      var dataWithUndefined = areaData.slice();
+      dataWithUndefined[2] = { foo: 0.4, bar: undefined };
+      simpleDataset.data(dataWithUndefined);
+      assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath,
+                        "area d was set correctly (y=undefined case)");
+      dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
+      simpleDataset.data(dataWithUndefined);
+      assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath,
+                        "area d was set correctly (x=undefined case)");
+
       svg.remove();
     });
 
