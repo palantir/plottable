@@ -2957,7 +2957,6 @@ declare module Plottable {
             _isVertical: boolean;
             _onDatasetUpdate(): void;
             _updateScaleExtents(): void;
-            _missingValue(): number;
         }
     }
 }

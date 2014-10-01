@@ -27,7 +27,7 @@ export module Abstract {
 
       var dataMapArray = this.generateDefaultMapArray();
 
-      var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap: D3.Map<StackedDatum>) => {
+      var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
         return _Util.Methods.populateMap(dataMap.keys(), (key: string) => {
           return {key: key, value: Math.max(0, dataMap.get(key).value)};
         });
@@ -97,11 +97,10 @@ export module Abstract {
     }
 
     private generateDefaultMapArray(): D3.Map<StackedDatum>[] {
-      var domainKeys = d3.set();
-
       var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
 
+      var domainKeys = d3.set();
       var datasets = this._getDatasetsInOrder();
       datasets.forEach((dataset) => {
         dataset.data().forEach((datum) => {
@@ -111,7 +110,7 @@ export module Abstract {
 
       var dataMapArray = datasets.map(() => {
         return _Util.Methods.populateMap(domainKeys.values(), (domainKey) => {
-          return {key: domainKey, value: this._missingValue()};
+          return {key: domainKey, value: 0};
         });
       });
 
@@ -137,10 +136,6 @@ export module Abstract {
       } else {
         primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
       }
-    }
-
-    public _missingValue(): number {
-      return 0;
     }
   }
 }

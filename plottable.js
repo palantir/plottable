@@ -7117,10 +7117,9 @@ var Plottable;
                 });
             };
             Stacked.prototype.generateDefaultMapArray = function () {
-                var _this = this;
-                var domainKeys = d3.set();
                 var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+                var domainKeys = d3.set();
                 var datasets = this._getDatasetsInOrder();
                 datasets.forEach(function (dataset) {
                     dataset.data().forEach(function (datum) {
@@ -7129,7 +7128,7 @@ var Plottable;
                 });
                 var dataMapArray = datasets.map(function () {
                     return Plottable._Util.Methods.populateMap(domainKeys.values(), function (domainKey) {
-                        return { key: domainKey, value: _this._missingValue() };
+                        return { key: domainKey, value: 0 };
                     });
                 });
                 datasets.forEach(function (dataset, datasetIndex) {
@@ -7153,9 +7152,6 @@ var Plottable;
                 else {
                     primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
-            };
-            Stacked.prototype._missingValue = function () {
-                return 0;
             };
             return Stacked;
         })(Abstract.NewStylePlot);
