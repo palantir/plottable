@@ -16,8 +16,6 @@ describe("Plots", () => {
     var axisHeight = 0;
     var bandWidth = 0;
 
-    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
-
     before(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Ordinal();
@@ -105,8 +103,6 @@ describe("Plots", () => {
     var SVG_HEIGHT = 400;
     var rendererWidth: number;
     var bandWidth = 0;
-
-    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
 
     before(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);

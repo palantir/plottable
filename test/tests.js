@@ -108,6 +108,9 @@ var MultiTestVerifier = (function () {
 function normalizePath(pathString) {
     return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
 }
+function numAttr(s, a) {
+    return parseFloat(s.attr(a));
+}
 function triggerFakeUIEvent(type, target) {
     var e = document.createEvent("UIEvents");
     e.initUIEvent(type, true, true, window, 1);
@@ -2159,7 +2162,6 @@ describe("Plots", function () {
             var SVG_HEIGHT = 400;
             var axisWidth = 0;
             var bandWidth = 0;
-            var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
             before(function () {
                 svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
@@ -2456,7 +2458,6 @@ describe("Plots", function () {
         var renderer;
         var SVG_WIDTH = 600;
         var SVG_HEIGHT = 400;
-        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
         before(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Linear().domain([1, 3]);
@@ -2514,7 +2515,6 @@ describe("Plots", function () {
         var renderer;
         var SVG_WIDTH = 600;
         var SVG_HEIGHT = 400;
-        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
         before(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Linear().domain([1, 3]);
@@ -2681,7 +2681,6 @@ describe("Plots", function () {
         var SVG_HEIGHT = 400;
         var axisHeight = 0;
         var bandWidth = 0;
-        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
         before(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Ordinal();
@@ -2758,7 +2757,6 @@ describe("Plots", function () {
         var SVG_HEIGHT = 400;
         var axisHeight = 0;
         var bandWidth = 0;
-        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
         beforeEach(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Ordinal();
@@ -2824,7 +2822,6 @@ describe("Plots", function () {
         var SVG_HEIGHT = 400;
         var rendererWidth;
         var bandWidth = 0;
-        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
         before(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Linear().domain([0, 6]);
@@ -2911,7 +2908,6 @@ describe("Plots", function () {
         var SVG_HEIGHT = 400;
         var axisHeight = 0;
         var bandWidth = 0;
-        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
         before(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Ordinal();
@@ -2988,7 +2984,6 @@ describe("Plots", function () {
         var SVG_HEIGHT = 400;
         var rendererWidth;
         var bandWidth = 0;
-        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
         before(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             yScale = new Plottable.Scale.Ordinal();
