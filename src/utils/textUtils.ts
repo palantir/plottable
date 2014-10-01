@@ -199,6 +199,7 @@ export module _Util {
                                         width: number, height: number,
                                         xAlign = "left", yAlign = "top", rotation = "right") {
 
+      console.log("WRITE LINE VERTICALLY: " + rotation);
       if (rotation !== "right" && rotation !== "left") {
         throw new Error("unrecognized rotation: " + rotation);
       }
@@ -212,6 +213,7 @@ export module _Util {
       xForm.rotate = rotation === "right" ? 90 : -90;
       xForm.translate = [isRight ? width : 0, isRight ? 0 : height];
       innerG.attr("transform", xForm.toString());
+      innerG.classed("rotated-" + rotation, true);
 
       return wh;
     }
@@ -219,6 +221,7 @@ export module _Util {
     function writeTextHorizontally(brokenText: string[], g: D3.Selection,
                                    width: number, height: number,
                                    xAlign = "left", yAlign = "top") {
+      console.log("write text horizontally");
       var h = getTextMeasurer(g.append("text"))(HEIGHT_TEXT).height;
       var maxWidth = 0;
       var blockG = g.append("g");
@@ -240,6 +243,7 @@ export module _Util {
     function writeTextVertically(brokenText: string[], g: D3.Selection,
                                  width: number, height: number,
                                  xAlign = "left", yAlign = "top", rotation = "left") {
+      console.log("WTV: " + rotation);
       var h = getTextMeasurer(g.append("text"))(HEIGHT_TEXT).height;
       var maxHeight = 0;
       var blockG = g.append("g");
@@ -278,10 +282,14 @@ export module _Util {
      * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
      */
     export function writeText(text: string, width: number, height: number, tm: TextMeasurer,
-                              horizontally?: boolean,
+                              orient = "horizontal",
                               write?: IWriteOptions): IWriteTextResult {
 
-      var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
+      if (["left", "right", "horizontal"].indexOf(orient) === -1) {
+        throw new Error("Unrecognized orientation to writeText: " + orient);
+      }
+      console.log("WT ORIENT: " + orient + "WRITE?" + write);
+      var orientHorizontally = orient === "horizontal";
       var primaryDimension = orientHorizontally ? width : height;
       var secondaryDimension = orientHorizontally ? height : width;
       var wrappedText = _Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
@@ -301,7 +309,7 @@ export module _Util {
         // the outerG contains general transforms for positining the whole block, the inner g
         // will contain transforms specific to orienting the text properly within the block.
         var writeTextFn = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-        var wh = writeTextFn(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
+        var wh = writeTextFn.call(this, wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign, orient);
         usedWidth = wh.width;
         usedHeight = wh.height;
       }

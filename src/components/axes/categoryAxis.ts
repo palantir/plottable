@@ -4,6 +4,8 @@ module Plottable {
 export module Axis {
   export class Category extends Abstract.Axis {
     public _scale: Scale.Ordinal;
+    private _tickAngle = 0;
+    private _tickOrientation = "horizontal";
     private measurer: _Util.Text.CachingCharacterMeasurer;
 
     /**
@@ -60,6 +62,42 @@ export module Axis {
       return this._scale.domain();
     }
 
+    /**
+     * Set the tick orientation angle (-90 to 90)
+     * @param {number} angle The angle for the ticks (-90/0/90) (default = 0)
+     * @returns {Category} The calling Category Axis.
+     *
+     * Right now only -90, 0, and 90 are accepted, although we may add support for arbitrary angles in the future.
+     * 90 degrees will correspond to a right rotation, and -90 will correspond to a left rotation
+     *
+     * Warning - this is not currently well supported and is likely to break in all but the simplest cases.
+     * See tracking at https://github.com/palantir/plottable/issues/504
+     */
+    public tickAngle(angle: number): Category;
+    /**
+     * Get the tick angle angle (-90 to 90)
+     * @returns {number} the tick angle angle
+     */
+    public tickAngle(): number;
+    public tickAngle(angle?: number): any {
+      if (angle == null) {
+        return this._tickAngle;
+      } else {
+        if (angle !== 0 && angle !== 90 && angle !== -90) {
+          throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
+        }
+      if (angle === 0) {
+        this._tickOrientation = "horizontal";
+      } else if (angle === 90) {
+        this._tickOrientation = "right";
+      } else if (angle === -90) {
+        this._tickOrientation = "left";
+      }
+      this._tickAngle = angle;
+      this._invalidateLayout();
+      return this;
+      }
+    }
 
     /**
      * Measures the size of the ticks while also writing them to the DOM.
@@ -86,6 +124,7 @@ export module Axis {
       var textWriteResults: _Util.Text.IWriteTextResult[] = [];
       var tm = (s: string) => self.measurer.measure(s);
       var iterator = draw ? (f: Function) => dataOrTicks.each(f) : (f: Function) => dataOrTicks.forEach(f);
+      console.log("dOMT: " + self._tickOrientation + "DRAW?:" + draw);
 
       iterator(function (d: string) {
         var bandWidth = scale.fullBandStartAndWidth(d)[1];
@@ -94,17 +133,18 @@ export module Axis {
 
         var textWriteResult: _Util.Text.IWriteTextResult;
         var formatter = self._formatter;
+
         if (draw) {
           var d3this = d3.select(this);
           var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
           var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
-          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, true, {
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self._tickOrientation, {
                                                     g: d3this,
                                                     xAlign: xAlign[self._orientation],
                                                     yAlign: yAlign[self._orientation]
           });
         } else {
-          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, true);
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self._tickOrientation);
         }
 
         textWriteResults.push(textWriteResult);
