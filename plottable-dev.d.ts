@@ -760,8 +760,8 @@ declare module Plottable {
             _rescale(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest;
             _getTickValues(): string[];
-            tickAngle(angle: number): Category;
-            tickAngle(): number;
+            tickLabelAngle(angle: number): Category;
+            tickLabelAngle(): number;
             _doRender(): Category;
             _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
         }

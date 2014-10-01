@@ -630,8 +630,8 @@ declare module Plottable {
     module Axis {
         class Category extends Plottable.Abstract.Axis {
             constructor(scale: Plottable.Scale.Ordinal, orientation?: string, formatter?: (d: any) => string);
-            tickAngle(angle: number): Category;
-            tickAngle(): number;
+            tickLabelAngle(angle: number): Category;
+            tickLabelAngle(): number;
         }
     }
 }

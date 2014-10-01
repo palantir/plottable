@@ -4,7 +4,7 @@ module Plottable {
 export module Axis {
   export class Category extends Abstract.Axis {
     public _scale: Scale.Ordinal;
-    private _tickAngle = 0;
+    private _tickLabelAngle = 0;
     private _tickOrientation = "horizontal";
     private measurer: _Util.Text.CachingCharacterMeasurer;
 
@@ -63,39 +63,42 @@ export module Axis {
     }
 
     /**
-     * Set the tick orientation angle (-90 to 90)
-     * @param {number} angle The angle for the ticks (-90/0/90) (default = 0)
+     * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are valid options.
+     * @param {number} angle The angle for the ticks
      * @returns {Category} The calling Category Axis.
      *
-     * Right now only -90, 0, and 90 are accepted, although we may add support for arbitrary angles in the future.
-     * 90 degrees will correspond to a right rotation, and -90 will correspond to a left rotation
-     *
-     * Warning - this is not currently well supported and is likely to break in all but the simplest cases.
+     * Warning - this is not currently well supported and is likely to behave badly unless all the tick labels are short.
      * See tracking at https://github.com/palantir/plottable/issues/504
      */
-    public tickAngle(angle: number): Category;
+    public tickLabelAngle(angle: number): Category;
     /**
-     * Get the tick angle angle (-90 to 90)
-     * @returns {number} the tick angle angle
+     * Gets the tick label angle
+     * @returns {number} the tick label angle
      */
-    public tickAngle(): number;
-    public tickAngle(angle?: number): any {
+    public tickLabelAngle(): number;
+    public tickLabelAngle(angle?: number): any {
       if (angle == null) {
-        return this._tickAngle;
+        return this._tickLabelAngle;
       } else {
         if (angle !== 0 && angle !== 90 && angle !== -90) {
           throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
         }
-      if (angle === 0) {
-        this._tickOrientation = "horizontal";
-      } else if (angle === 90) {
-        this._tickOrientation = "right";
-      } else if (angle === -90) {
-        this._tickOrientation = "left";
-      }
-      this._tickAngle = angle;
+      this._tickLabelAngle = angle;
       this._invalidateLayout();
       return this;
+      }
+    }
+
+    private getTickLabelOrientation(angle: number) {
+      switch(angle) {
+        case 0:
+          return "horizontal";
+        case -90:
+          return "left";
+        case 90:
+          return "right";
+        default:
+          throw new Error("bad orientation");
       }
     }
 
@@ -137,13 +140,13 @@ export module Axis {
           var d3this = d3.select(this);
           var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
           var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
-          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self._tickOrientation, {
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self.getTickLabelOrientation(self._tickLabelAngle), {
                                                     g: d3this,
                                                     xAlign: xAlign[self._orientation],
                                                     yAlign: yAlign[self._orientation]
           });
         } else {
-          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self._tickOrientation);
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self.getTickLabelOrientation(self._tickLabelAngle));
         }
 
         textWriteResults.push(textWriteResult);

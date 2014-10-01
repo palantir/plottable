@@ -3496,7 +3496,7 @@ var Plottable;
                 if (orientation === void 0) { orientation = "bottom"; }
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
-                this._tickAngle = 0;
+                this._tickLabelAngle = 0;
                 this._tickOrientation = "horizontal";
                 this.classed("category-axis", true);
             }
@@ -3531,26 +3531,29 @@ var Plottable;
             Category.prototype._getTickValues = function () {
                 return this._scale.domain();
             };
-            Category.prototype.tickAngle = function (angle) {
+            Category.prototype.tickLabelAngle = function (angle) {
                 if (angle == null) {
-                    return this._tickAngle;
+                    return this._tickLabelAngle;
                 }
                 else {
                     if (angle !== 0 && angle !== 90 && angle !== -90) {
                         throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
                     }
-                    if (angle === 0) {
-                        this._tickOrientation = "horizontal";
-                    }
-                    else if (angle === 90) {
-                        this._tickOrientation = "right";
-                    }
-                    else if (angle === -90) {
-                        this._tickOrientation = "left";
-                    }
-                    this._tickAngle = angle;
+                    this._tickLabelAngle = angle;
                     this._invalidateLayout();
                     return this;
+                }
+            };
+            Category.prototype.getTickLabelOrientation = function (angle) {
+                switch (angle) {
+                    case 0:
+                        return "horizontal";
+                    case -90:
+                        return "left";
+                    case 90:
+                        return "right";
+                    default:
+                        throw new Error("bad orientation");
                 }
             };
             Category.prototype.drawTicks = function (axisWidth, axisHeight, scale, ticks) {
@@ -3574,14 +3577,14 @@ var Plottable;
                         var d3this = d3.select(this);
                         var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                         var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self._tickOrientation, {
+                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self.getTickLabelOrientation(self._tickLabelAngle), {
                             g: d3this,
                             xAlign: xAlign[self._orientation],
                             yAlign: yAlign[self._orientation]
                         });
                     }
                     else {
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self._tickOrientation);
+                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self.getTickLabelOrientation(self._tickLabelAngle));
                     }
                     textWriteResults.push(textWriteResult);
                 });
