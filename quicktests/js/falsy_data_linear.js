@@ -82,7 +82,6 @@ function run(div, data, Plottable) {
   var vbar_empty = new Plottable.Component.Table([[axis_array[39], vbar5],[null, axis_array[38]]]);
   var vbarTable = new Plottable.Component.Table([ [vbar_null, vbar_nan, vbar_undefined, vbar_false, vbar_empty] ]);
 
-
   var chartTable = new Plottable.Component.Table([
     [scatterLabel, scatterTable],
     [lineLabel, lineTable],
