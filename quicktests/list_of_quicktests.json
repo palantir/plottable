@@ -54,6 +54,15 @@
     "name":"domainChange",
     "categories":["Datasource", "Linear Scale", "Numeric Axis", "Line Plot", "Scatter Plot", "Label", "Click Interaction", "Domain"]
   },  {
+    "name":"falsy_data_linear",
+    "categories":["Linear Scale", "Numeric Axis", "Layout", "Data"]
+  },  {
+    "name":"falsy_data_ordinal",
+    "categories":["Ordinal Scale", "Category Axis", "Layout", "Data"]
+  },  {
+    "name":"falsy_data_time",
+    "categories":["Time Scale", "Time Axis", "Layout", "Data"]
+  },  {
     "name":"formatter",
     "categories":["Linear Scale", "Numeric Axis", "Line Plot", "Formatter", "Click Interaction", "Layout", "Data"]
   },  {
