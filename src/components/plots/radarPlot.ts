@@ -44,7 +44,7 @@ export module Plot {
      * @returns {string[]} The metrics measured in this RadarPlot
      */
     public metrics(): string[] {
-      return this._metrics.slice(0);
+      return this._metrics.slice();
     }
 
     public _onDatasetUpdate() {
