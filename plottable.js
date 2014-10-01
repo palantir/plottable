@@ -7531,10 +7531,17 @@ var Plottable;
 (function (Plottable) {
     (function (Animator) {
         /**
-         * The default animator implementation with easing, duration, and delay.
+         * A child class of RectAnimator that will move the rectangle
+         * as well as animate its growth.
          */
         var MovingRect = (function (_super) {
             __extends(MovingRect, _super);
+            /**
+             * Constructs a MovingRectAnimator
+             *
+             * @param {number} baseline The value to start moving from
+             * @param {boolean} isVertical If the movement/animation is vertical
+             */
             function MovingRect(baseline, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, isVertical);

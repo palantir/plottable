@@ -2834,10 +2834,20 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         /**
-         * The default animator implementation with easing, duration, and delay.
+         * A child class of RectAnimator that will move the rectangle
+         * as well as animate its growth.
          */
         class MovingRect extends Rect {
+            /**
+             * The value to move from
+             */
             baseline: number;
+            /**
+             * Constructs a MovingRectAnimator
+             *
+             * @param {number} baseline The value to start moving from
+             * @param {boolean} isVertical If the movement/animation is vertical
+             */
             constructor(baseline: number, isVertical?: boolean);
         }
     }
