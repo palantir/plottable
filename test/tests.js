@@ -1930,7 +1930,7 @@ describe("Plots", function () {
                 { foo: 0.6, bar: 0.6 },
                 { foo: 0.8, bar: 0.8 }
             ]);
-            var areaPath = renderArea.select(".area");
+            areaPath = renderArea.select(".area");
             assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L100,400L100,500L0,500ZM300,200L400,100L400,500L300,500Z", "area d was set correctly (undefined case)");
             svg.remove();
         });
