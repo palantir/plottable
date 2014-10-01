@@ -110,7 +110,7 @@ export module Plot {
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this._rScale.range([0, this.maxRadius()]);
-      this._thetaScale.range([0, 2 * Math.PI * (this._metrics.length - 1) / this._metrics.length]);
+      this._thetaScale.rangeType("points", 0, 0).range([0, 2 * Math.PI * (this._metrics.length - 1) / this._metrics.length]);
       this._renderArea.attr("transform", "translate(" + this.width() / 2 + ", " + this.height() / 2 + ")");
     }
 

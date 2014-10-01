@@ -5960,7 +5960,7 @@ var Plottable;
             Radar.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 this._rScale.range([0, this.maxRadius()]);
-                this._thetaScale.range([0, 2 * Math.PI * (this._metrics.length - 1) / this._metrics.length]);
+                this._thetaScale.rangeType("points", 0, 0).range([0, 2 * Math.PI * (this._metrics.length - 1) / this._metrics.length]);
                 this._renderArea.attr("transform", "translate(" + this.width() / 2 + ", " + this.height() / 2 + ")");
             };
             Radar.prototype._getAnimator = function (drawer, index) {

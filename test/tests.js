@@ -1524,13 +1524,11 @@ describe("Plots", function () {
         var radarPlot;
         var renderArea;
         var verifier;
-        // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
-        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
             rScale = new Plottable.Scale.Linear().domain([0, 10]);
-            thetaScale = new Plottable.Scale.Ordinal().rangeType("points", 0, 0).domain(["attr0", "attr1", "attr2"]);
+            thetaScale = new Plottable.Scale.Ordinal().domain(["attr0", "attr1", "attr2"]);
             simpleDataset = new Plottable.Dataset([{ metric: "attr0", value: 5 }, { metric: "attr1", value: 10 }, { metric: "attr2", value: 7 }]);
             radarPlot = new Plottable.Plot.Radar(rScale, thetaScale).addDataset(simpleDataset);
             radarPlot.renderTo(svg);

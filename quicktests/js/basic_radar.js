@@ -10,7 +10,7 @@ function run(div, data, Plottable) {
 
   var svg = div.append("svg").attr("height", 500);
   var rScale = new Plottable.Scale.Linear().domain([0, 10]);
-  var thetaScale = new Plottable.Scale.Ordinal().rangeType("points", 0, 0).domain(["attr0", "attr1", "attr2"]);
+  var thetaScale = new Plottable.Scale.Ordinal().domain(["attr0", "attr1", "attr2"]);
 
   var radarPlot = new Plottable.Plot.Radar(rScale, thetaScale)
                                     .addDataset(data)
