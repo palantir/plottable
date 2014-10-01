@@ -15,7 +15,13 @@ export module Animator {
      */
     public static DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
 
+    /**
+     * The start delay between each start of an animation
+     */
+    public static DEFAULT_TOTAL_DURATION_LIMIT_MILLISECONDS = Infinity;
+
     private _iterativeDelay: number;
+    private _totalDurationLimit: number;
 
     /**
      * Constructs an animator with a start delay between each selection animation
@@ -25,13 +31,17 @@ export module Animator {
     constructor() {
       super();
       this._iterativeDelay = IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+      this._totalDurationLimit = IterativeDelay.DEFAULT_TOTAL_DURATION_LIMIT_MILLISECONDS;
     }
 
     public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection {
+      var numberOfIterations = selection[0].length;
+      var adjustedIterativeDelay = Math.min(this.iterativeDelay(),
+            Math.max(this.totalDurationLimit() - this.duration(), 0) / numberOfIterations);
       return selection.transition()
         .ease(this.easing())
         .duration(this.duration())
-        .delay((d: any, i: number) => this.delay() + this.iterativeDelay() * i)
+        .delay((d: any, i: number) => this.delay() + adjustedIterativeDelay * i)
         .attr(attrToProjector);
     }
 
@@ -43,6 +53,12 @@ export module Animator {
     public iterativeDelay(): number;
     /**
      * Sets the start delay between animations in milliseconds.
+     *
+     * This value can be overriden in case of total animation's duration
+     * exceeds totalDurationLimit() value.
+     * Delay between animation is calculated by following formula:
+     * min(iterativeDelay(), 
+     *   max(totalDurationLimit() - duration(), 0) / <number of iterations>)
      *
      * @param {number} iterDelay The iterative delay in milliseconds.
      * @returns {IterativeDelay} The calling IterativeDelay Animator.
@@ -57,6 +73,27 @@ export module Animator {
       }
     }
 
+    /**
+     * Gets the total animation duration limit in milliseconds.
+     *
+     * @returns {number} The current total animation duration limit.
+     */
+    public totalDurationLimit(): number;
+    /**
+     * Sets the total animation duration limit in miliseconds.
+     *
+     * @param {number} timeLimit The total animation duration limit in milliseconds.
+     * @returns {IterativeDelay} The calling IterativeDelay Animator.
+     */
+    public totalDurationLimit(timeLimit: number): IterativeDelay;
+    public totalDurationLimit(timeLimit?: number): any {
+      if (timeLimit === undefined) {
+        return this._totalDurationLimit;
+      } else {
+        this._totalDurationLimit = timeLimit;
+        return this;
+      }
+    }
   }
 
 }

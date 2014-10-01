@@ -2791,6 +2791,10 @@ declare module Plottable {
              */
             static DEFAULT_ITERATIVE_DELAY_MILLISECONDS: number;
             /**
+             * The start delay between each start of an animation
+             */
+            static DEFAULT_TOTAL_DURATION_LIMIT_MILLISECONDS: number;
+            /**
              * Constructs an animator with a start delay between each selection animation
              *
              * @constructor
@@ -2806,10 +2810,29 @@ declare module Plottable {
             /**
              * Sets the start delay between animations in milliseconds.
              *
+             * This value can be overriden in case of total animation's duration
+             * exceeds totalDurationLimit() value.
+             * Delay between animation is calculated by following formula:
+             * min(iterativeDelay(),
+             *   max(totalDurationLimit() - duration(), 0) / <number of iterations>)
+             *
              * @param {number} iterDelay The iterative delay in milliseconds.
              * @returns {IterativeDelay} The calling IterativeDelay Animator.
              */
             iterativeDelay(iterDelay: number): IterativeDelay;
+            /**
+             * Gets the total animation duration limit in milliseconds.
+             *
+             * @returns {number} The current total animation duration limit.
+             */
+            totalDurationLimit(): number;
+            /**
+             * Sets the total animation duration limit in miliseconds.
+             *
+             * @param {number} timeLimit The total animation duration limit in milliseconds.
+             * @returns {IterativeDelay} The calling IterativeDelay Animator.
+             */
+            totalDurationLimit(timeLimit: number): IterativeDelay;
         }
     }
 }

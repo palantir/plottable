@@ -7425,10 +7425,13 @@ var Plottable;
             function IterativeDelay() {
                 _super.call(this);
                 this._iterativeDelay = IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+                this._totalDurationLimit = IterativeDelay.DEFAULT_TOTAL_DURATION_LIMIT_MILLISECONDS;
             }
             IterativeDelay.prototype.animate = function (selection, attrToProjector) {
                 var _this = this;
-                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + _this.iterativeDelay() * i; }).attr(attrToProjector);
+                var numberOfIterations = selection[0].length;
+                var adjustedIterativeDelay = Math.min(this.iterativeDelay(), Math.max(this.totalDurationLimit() - this.duration(), 0) / numberOfIterations);
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + adjustedIterativeDelay * i; }).attr(attrToProjector);
             };
             IterativeDelay.prototype.iterativeDelay = function (iterDelay) {
                 if (iterDelay === undefined) {
@@ -7439,10 +7442,23 @@ var Plottable;
                     return this;
                 }
             };
+            IterativeDelay.prototype.totalDurationLimit = function (timeLimit) {
+                if (timeLimit === undefined) {
+                    return this._totalDurationLimit;
+                }
+                else {
+                    this._totalDurationLimit = timeLimit;
+                    return this;
+                }
+            };
             /**
              * The start delay between each start of an animation
              */
             IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
+            /**
+             * The start delay between each start of an animation
+             */
+            IterativeDelay.DEFAULT_TOTAL_DURATION_LIMIT_MILLISECONDS = Infinity;
             return IterativeDelay;
         })(Animator.Base);
         Animator.IterativeDelay = IterativeDelay;
