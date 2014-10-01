@@ -5410,6 +5410,9 @@ describe("_Util.Methods", function () {
         assert.strictEqual(indexMap.get("a"), "a0Value", "key and index properly goes through map function");
         assert.strictEqual(indexMap.get("b"), "b1Value", "key and index properly goes through map function");
         assert.strictEqual(indexMap.get("c"), "c2Value", "key and index properly goes through map function");
+        var emptyKeys = [];
+        var emptyMap = Plottable._Util.Methods.populateMap(emptyKeys, function (key) { return key + "Value"; });
+        assert.isTrue(emptyMap.empty(), "no entries in map if no keys in input array");
     });
 });
 

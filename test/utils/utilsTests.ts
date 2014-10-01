@@ -88,5 +88,11 @@ describe("_Util.Methods", () => {
     assert.strictEqual(indexMap.get("a"), "a0Value", "key and index properly goes through map function");
     assert.strictEqual(indexMap.get("b"), "b1Value", "key and index properly goes through map function");
     assert.strictEqual(indexMap.get("c"), "c2Value", "key and index properly goes through map function");
+
+    var emptyKeys: string[] = [];
+    var emptyMap = Plottable._Util.Methods.populateMap(emptyKeys, (key) => key + "Value");
+
+    assert.isTrue(emptyMap.empty(), "no entries in map if no keys in input array");
+
   });
 });
