@@ -83,7 +83,7 @@ describe("Plots", () => {
       var areaPath = renderArea.select(".area");
       assert.strictEqual(normalizePath(areaPath.attr("d")),
               "M0,500L100,400L100,500L0,500ZM300,200L400,100L400,500L300,500Z",
-              "area d was set correctly");
+              "area d was set correctly (NaN case)");
 
       simpleDataset.data([
         { foo: 0.0, bar: 0.0 },
@@ -95,7 +95,7 @@ describe("Plots", () => {
       var areaPath = renderArea.select(".area");
       assert.strictEqual(normalizePath(areaPath.attr("d")),
               "M0,500L100,400L100,500L0,500ZM300,200L400,100L400,500L300,500Z",
-              "area d was set correctly");
+              "area d was set correctly (undefined case)");
       svg.remove();
     });
 

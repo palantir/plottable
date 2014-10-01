@@ -6762,8 +6762,8 @@ var Plottable;
                 delete attrToProjector["y"];
                 this.linePath.datum(this._dataset.data());
                 var line = d3.svg.line().x(xFunction);
-                line.defined(function (d) {
-                    var yVal = yFunction(d, 0);
+                line.defined(function (d, i) {
+                    var yVal = yFunction(d, i);
                     return yVal != null && yVal === yVal; // not null and not NaN
                 });
                 attrToProjector["d"] = line;
@@ -6865,8 +6865,8 @@ var Plottable;
                 delete attrToProjector["y"];
                 this.areaPath.datum(this._dataset.data());
                 var area = d3.svg.area().x(xFunction).y0(y0Function);
-                area.defined(function (d) {
-                    var yVal = yFunction(d, 0);
+                area.defined(function (d, i) {
+                    var yVal = yFunction(d, i);
                     return yVal != null && yVal === yVal; // not null and not NaN
                 });
                 attrToProjector["d"] = area;

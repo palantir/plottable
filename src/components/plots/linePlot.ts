@@ -73,8 +73,8 @@ export module Plot {
 
       var line = d3.svg.line()
                        .x(xFunction);
-      line.defined((d) => {
-        var yVal = yFunction(d, 0);
+      line.defined((d, i) => {
+        var yVal = yFunction(d, i);
         return yVal != null && yVal === yVal; // not null and not NaN
       });
       attrToProjector["d"] = line;

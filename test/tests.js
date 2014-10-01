@@ -1818,23 +1818,36 @@ describe("Plots", function () {
             svg.remove();
         });
         it("correctly handles NaN and undefined y-values", function () {
-            simpleDataset.data([
+            var lineData = [
                 { foo: 0.0, bar: 0.0 },
                 { foo: 0.2, bar: 0.2 },
-                { foo: 0.4, bar: NaN },
+                { foo: 0.4, bar: 0.4 },
                 { foo: 0.6, bar: 0.6 },
                 { foo: 0.8, bar: 0.8 }
-            ]);
+            ];
+            simpleDataset.data(lineData);
             var linePath = renderArea.select(".line");
-            assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L100,400M300,200L400,100", "line d was set correctly");
-            simpleDataset.data([
-                { foo: 0.0, bar: 0.0 },
-                { foo: 0.2, bar: 0.2 },
-                { foo: 0.4, bar: undefined },
-                { foo: 0.6, bar: 0.6 },
-                { foo: 0.8, bar: 0.8 }
-            ]);
-            assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L100,400M300,200L400,100", "line d was set correctly");
+            var d_original = normalizePath(linePath.attr("d"));
+            var dataWithNaN = lineData.slice();
+            dataWithNaN[2] = { foo: 0.4, bar: NaN };
+            simpleDataset.data(dataWithNaN);
+            var d_NaN = normalizePath(linePath.attr("d"));
+            var pathSegements = d_NaN.split("M").filter(function (segment) { return segment !== ""; });
+            assert.lengthOf(pathSegements, 2, "NaN split path into two segments");
+            var firstSegmentContained = d_original.indexOf(pathSegements[0]) >= 0;
+            assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
+            var secondSegmentContained = d_original.indexOf(pathSegements[1]) >= 0;
+            assert.isTrue(firstSegmentContained, "second path segment is a subpath of the original path");
+            var dataWithUndefined = lineData.slice();
+            dataWithUndefined[2] = { foo: 0.4, bar: undefined };
+            simpleDataset.data(dataWithUndefined);
+            var d_undefined = normalizePath(linePath.attr("d"));
+            pathSegements = d_undefined.split("M").filter(function (segment) { return segment !== ""; });
+            assert.lengthOf(pathSegements, 2, "undefined split path into two segments");
+            firstSegmentContained = d_original.indexOf(pathSegements[0]) >= 0;
+            assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
+            secondSegmentContained = d_original.indexOf(pathSegements[1]) >= 0;
+            assert.isTrue(firstSegmentContained, "second path segment is a subpath of the original path");
             svg.remove();
         });
     });
@@ -1909,7 +1922,7 @@ describe("Plots", function () {
                 { foo: 0.8, bar: 0.8 }
             ]);
             var areaPath = renderArea.select(".area");
-            assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L100,400L100,500L0,500ZM300,200L400,100L400,500L300,500Z", "area d was set correctly");
+            assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L100,400L100,500L0,500ZM300,200L400,100L400,500L300,500Z", "area d was set correctly (NaN case)");
             simpleDataset.data([
                 { foo: 0.0, bar: 0.0 },
                 { foo: 0.2, bar: 0.2 },
@@ -1918,7 +1931,7 @@ describe("Plots", function () {
                 { foo: 0.8, bar: 0.8 }
             ]);
             var areaPath = renderArea.select(".area");
-            assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L100,400L100,500L0,500ZM300,200L400,100L400,500L300,500Z", "area d was set correctly");
+            assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L100,400L100,500L0,500ZM300,200L400,100L400,500L300,500Z", "area d was set correctly (undefined case)");
             svg.remove();
         });
     });
