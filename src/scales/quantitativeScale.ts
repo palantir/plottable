@@ -6,7 +6,7 @@ export module Abstract {
    * A tick generator for quantitative scale.
    */
   export interface TickGenerator {
-    (s: Plottable.Abstract.QuantitativeScale<any>, defaultTicks: any[]): any[]
+    (defaultTicks: any[], s: Plottable.Abstract.QuantitativeScale<any>): any[]
   }
 
   export class QuantitativeScale<D> extends Scale<D, number> {
@@ -16,7 +16,7 @@ export module Abstract {
     public _userSetDomainer: boolean = false;
     public _domainer: Domainer = new Domainer();
     public _typeCoercer = (d: any) => +d;
-    public _tickGenerator: TickGenerator = (s: Plottable.Abstract.QuantitativeScale<D>, defaultTicks: any[]) => defaultTicks;
+    public _tickGenerator: TickGenerator = (defaultTicks: any[], s: Plottable.Abstract.QuantitativeScale<D>) => defaultTicks;
 
 
     /**
@@ -124,7 +124,7 @@ export module Abstract {
      * @returns {any[]} The generated ticks.
      */
     public ticks(): any[] {
-      return this._tickGenerator(this, this._d3Scale.ticks(this.numTicks()));
+      return this._tickGenerator(this._d3Scale.ticks(this.numTicks()), this);
     }
 
     /**

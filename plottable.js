@@ -2169,7 +2169,7 @@ var Plottable;
                 this._userSetDomainer = false;
                 this._domainer = new Plottable.Domainer();
                 this._typeCoercer = function (d) { return +d; };
-                this._tickGenerator = function (s, defaultTicks) { return defaultTicks; };
+                this._tickGenerator = function (defaultTicks, s) { return defaultTicks; };
             }
             QuantitativeScale.prototype._getExtent = function () {
                 return this._domainer.computeDomain(this._getAllExtents(), this);
@@ -2231,7 +2231,7 @@ var Plottable;
              * @returns {any[]} The generated ticks.
              */
             QuantitativeScale.prototype.ticks = function () {
-                return this._tickGenerator(this, this._d3Scale.ticks(this.numTicks()));
+                return this._tickGenerator(this._d3Scale.ticks(this.numTicks()), this);
             };
             QuantitativeScale.prototype.numTicks = function (count) {
                 if (count == null) {

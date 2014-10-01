@@ -4373,7 +4373,7 @@ describe("Scales", function () {
             scale.domain([0, 10]);
             var ticks = scale.ticks();
             assert.closeTo(ticks.length, 10, 1, "ticks were generated correctly with default generator");
-            scale.tickGenerator(function (s, d) { return d.filter(function (i) { return i % 3 === 0; }); });
+            scale.tickGenerator(function (d, s) { return d.filter(function (i) { return i % 3 === 0; }); });
             ticks = scale.ticks();
             assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
         });
