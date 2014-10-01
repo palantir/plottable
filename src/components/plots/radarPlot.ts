@@ -139,8 +139,13 @@ export module Plot {
            return [scaledValue * Math.sin(angle), -scaledValue * Math.cos(angle)];
          }).join(" ");
       };
-      attrToProjector["fill"] = () => "steelblue";
-      attrToProjector["opacity"] = () => "0.7";
+
+      if (attrToProjector["fill"] == null) {
+        attrToProjector["fill"] = () => Core.Colors.INDIGO;
+      }
+      if (attrToProjector["opacity"] == null) {
+        attrToProjector["opacity"] = () => "0.7";
+      }
       return attrToProjector;
     }
 

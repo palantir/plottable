@@ -5985,8 +5985,12 @@ var Plottable;
                         return [scaledValue * Math.sin(angle), -scaledValue * Math.cos(angle)];
                     }).join(" ");
                 };
-                attrToProjector["fill"] = function () { return "steelblue"; };
-                attrToProjector["opacity"] = function () { return "0.7"; };
+                if (attrToProjector["fill"] == null) {
+                    attrToProjector["fill"] = function () { return Plottable.Core.Colors.INDIGO; };
+                }
+                if (attrToProjector["opacity"] == null) {
+                    attrToProjector["opacity"] = function () { return "0.7"; };
+                }
                 return attrToProjector;
             };
             Radar.prototype._paint = function () {
