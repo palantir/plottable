@@ -21,7 +21,7 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
 
   var axis_array = [];
-  for (var i = 0; i < 100; i++){
+  for (var i = 0; i < 40; i++){
       axis_array.push(new Plottable.Axis.Numeric(xScale, "bottom"));
       axis_array.push(new Plottable.Axis.Numeric(yScale, "left"));
   }

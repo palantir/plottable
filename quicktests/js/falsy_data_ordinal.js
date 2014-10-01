@@ -17,15 +17,15 @@ function run(div, data, Plottable) {
 
   //Axis
   var scale_array = [];
-  for (var i = 0; i < 100; i++){
+  for (var i = 0; i < 40; i++){
       scale_array.push(new Plottable.Scale.Ordinal());
       scale_array.push(new Plottable.Scale.Linear());
   }
 
   var axis_array = [];
-  for (var i = 0; i < 100; i += 2){
-      axis_array.push(new Plottable.Axis.Category(scale_array[i], "bottom"));
-      axis_array.push(new Plottable.Axis.Numeric(scale_array[i+1], "left"));
+  for (var j = 0; j < 40; j += 2){
+      axis_array.push(new Plottable.Axis.Category(scale_array[j], "bottom"));
+      axis_array.push(new Plottable.Axis.Numeric(scale_array[j+1], "left"));
   }
 
   //Labels
