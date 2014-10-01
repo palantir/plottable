@@ -16,7 +16,7 @@ export module Animator {
     public static DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
 
     /**
-     * The start delay between each start of an animation
+     * The total animation duration limit
      */
     public static DEFAULT_TOTAL_DURATION_LIMIT_MILLISECONDS = Infinity;
 
@@ -87,7 +87,7 @@ export module Animator {
      */
     public totalDurationLimit(timeLimit: number): IterativeDelay;
     public totalDurationLimit(timeLimit?: number): any {
-      if (timeLimit === undefined) {
+      if (timeLimit == null) {
         return this._totalDurationLimit;
       } else {
         this._totalDurationLimit = timeLimit;

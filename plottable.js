@@ -7443,7 +7443,7 @@ var Plottable;
                 }
             };
             IterativeDelay.prototype.totalDurationLimit = function (timeLimit) {
-                if (timeLimit === undefined) {
+                if (timeLimit == null) {
                     return this._totalDurationLimit;
                 }
                 else {
@@ -7456,7 +7456,7 @@ var Plottable;
              */
             IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
             /**
-             * The start delay between each start of an animation
+             * The total animation duration limit
              */
             IterativeDelay.DEFAULT_TOTAL_DURATION_LIMIT_MILLISECONDS = Infinity;
             return IterativeDelay;

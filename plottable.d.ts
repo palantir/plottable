@@ -2791,7 +2791,7 @@ declare module Plottable {
              */
             static DEFAULT_ITERATIVE_DELAY_MILLISECONDS: number;
             /**
-             * The start delay between each start of an animation
+             * The total animation duration limit
              */
             static DEFAULT_TOTAL_DURATION_LIMIT_MILLISECONDS: number;
             /**
