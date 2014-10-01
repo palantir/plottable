@@ -445,7 +445,6 @@ var Plottable;
                 if (xAlign === void 0) { xAlign = "left"; }
                 if (yAlign === void 0) { yAlign = "top"; }
                 if (rotation === void 0) { rotation = "right"; }
-                console.log("WRITE LINE VERTICALLY: " + rotation);
                 if (rotation !== "right" && rotation !== "left") {
                     throw new Error("unrecognized rotation: " + rotation);
                 }
@@ -466,7 +465,6 @@ var Plottable;
             function writeTextHorizontally(brokenText, g, width, height, xAlign, yAlign) {
                 if (xAlign === void 0) { xAlign = "left"; }
                 if (yAlign === void 0) { yAlign = "top"; }
-                console.log("write text horizontally");
                 var h = getTextMeasurer(g.append("text"))(Text.HEIGHT_TEXT).height;
                 var maxWidth = 0;
                 var blockG = g.append("g");
@@ -488,7 +486,6 @@ var Plottable;
                 if (xAlign === void 0) { xAlign = "left"; }
                 if (yAlign === void 0) { yAlign = "top"; }
                 if (rotation === void 0) { rotation = "left"; }
-                console.log("WTV: " + rotation);
                 var h = getTextMeasurer(g.append("text"))(Text.HEIGHT_TEXT).height;
                 var maxHeight = 0;
                 var blockG = g.append("g");
@@ -512,7 +509,6 @@ var Plottable;
                 if (["left", "right", "horizontal"].indexOf(orient) === -1) {
                     throw new Error("Unrecognized orientation to writeText: " + orient);
                 }
-                console.log("WT ORIENT: " + orient + "WRITE?" + write);
                 var orientHorizontally = orient === "horizontal";
                 var primaryDimension = orientHorizontally ? width : height;
                 var secondaryDimension = orientHorizontally ? height : width;
@@ -3568,7 +3564,6 @@ var Plottable;
                 var textWriteResults = [];
                 var tm = function (s) { return self.measurer.measure(s); };
                 var iterator = draw ? function (f) { return dataOrTicks.each(f); } : function (f) { return dataOrTicks.forEach(f); };
-                console.log("dOMT: " + self._tickOrientation + "DRAW?:" + draw);
                 iterator(function (d) {
                     var bandWidth = scale.fullBandStartAndWidth(d)[1];
                     var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();

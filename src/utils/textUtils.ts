@@ -199,7 +199,6 @@ export module _Util {
                                         width: number, height: number,
                                         xAlign = "left", yAlign = "top", rotation = "right") {
 
-      console.log("WRITE LINE VERTICALLY: " + rotation);
       if (rotation !== "right" && rotation !== "left") {
         throw new Error("unrecognized rotation: " + rotation);
       }
@@ -221,7 +220,6 @@ export module _Util {
     function writeTextHorizontally(brokenText: string[], g: D3.Selection,
                                    width: number, height: number,
                                    xAlign = "left", yAlign = "top") {
-      console.log("write text horizontally");
       var h = getTextMeasurer(g.append("text"))(HEIGHT_TEXT).height;
       var maxWidth = 0;
       var blockG = g.append("g");
@@ -243,7 +241,6 @@ export module _Util {
     function writeTextVertically(brokenText: string[], g: D3.Selection,
                                  width: number, height: number,
                                  xAlign = "left", yAlign = "top", rotation = "left") {
-      console.log("WTV: " + rotation);
       var h = getTextMeasurer(g.append("text"))(HEIGHT_TEXT).height;
       var maxHeight = 0;
       var blockG = g.append("g");
@@ -288,7 +285,6 @@ export module _Util {
       if (["left", "right", "horizontal"].indexOf(orient) === -1) {
         throw new Error("Unrecognized orientation to writeText: " + orient);
       }
-      console.log("WT ORIENT: " + orient + "WRITE?" + write);
       var orientHorizontally = orient === "horizontal";
       var primaryDimension = orientHorizontally ? width : height;
       var secondaryDimension = orientHorizontally ? height : width;

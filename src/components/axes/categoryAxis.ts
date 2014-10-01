@@ -124,7 +124,6 @@ export module Axis {
       var textWriteResults: _Util.Text.IWriteTextResult[] = [];
       var tm = (s: string) => self.measurer.measure(s);
       var iterator = draw ? (f: Function) => dataOrTicks.each(f) : (f: Function) => dataOrTicks.forEach(f);
-      console.log("dOMT: " + self._tickOrientation + "DRAW?:" + draw);
 
       iterator(function (d: string) {
         var bandWidth = scale.fullBandStartAndWidth(d)[1];
