@@ -5400,6 +5400,17 @@ describe("_Util.Methods", function () {
         assert.isTrue(Plottable._Util.Methods.objEq({ a: "hello" }, { a: "hello" }));
         assert.isFalse(Plottable._Util.Methods.objEq({ constructor: {}.constructor }, {}), "using \"constructor\" isn't hidden");
     });
+    it("populateMap works as expected", function () {
+        var keys = ["a", "b", "c"];
+        var map = Plottable._Util.Methods.populateMap(keys, function (key) { return key + "Value"; });
+        assert.strictEqual(map.get("a"), "aValue", "key properly goes through map function");
+        assert.strictEqual(map.get("b"), "bValue", "key properly goes through map function");
+        assert.strictEqual(map.get("c"), "cValue", "key properly goes through map function");
+        var indexMap = Plottable._Util.Methods.populateMap(keys, function (key, i) { return key + i + "Value"; });
+        assert.strictEqual(indexMap.get("a"), "a0Value", "key and index properly goes through map function");
+        assert.strictEqual(indexMap.get("b"), "b1Value", "key and index properly goes through map function");
+        assert.strictEqual(indexMap.get("c"), "c2Value", "key and index properly goes through map function");
+    });
 });
 
 ///<reference path="../testReference.ts" />
