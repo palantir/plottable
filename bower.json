@@ -1,7 +1,7 @@
 {
   "name": "plottable",
   "description": "A library for creating charts out of D3",
-  "version": "0.26.2",
+  "version": "0.31.0",
   "main": ["plottable.js", "plottable.css"],
   "license": "MIT",
   "ignore": [
@@ -10,8 +10,7 @@
     "!plottable.js",
     "!plottable.css",
     "!plottable.min.js",
-    "!plottable.d.ts",
-    "!plottable-dev.d.ts"
+    "!plottable.d.ts"
   ],
   "keywords": [
     "plottable",
@@ -29,9 +28,9 @@
     "plots"
   ],
   "dependencies": {
-    "d3": "3.4.5"
+    "d3": "3.4.11"
   },
-  "homepage": "palantir.github.io/plottable",
+  "homepage": "plottablejs.org",
   "repository": {
     "type": "git",
     "url": "git://github.com/palantir/plottable.git"

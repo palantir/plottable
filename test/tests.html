@@ -20,7 +20,7 @@
     <script src="../bower_components/jQuery/dist/jquery.js"></script>
     <script src="../bower_components/jquery.simulate/libs/jquery.simulate.js"></script>
     <script src="../bower_components/jquery.simulate/src/jquery.simulate.ext.js"></script>
-    <script src="../plottable_multifile.js"></script>
+    <script src="../plottable.js"></script>
     <script>
       mocha.setup({
         globals: ["LiveReload", "Pixel_CloseTo_Requirement"],
@@ -28,7 +28,7 @@
       }).timeout(1500);
     </script>
 
-    <script src="../test/tests_multifile.js"></script>
+    <script src="../test/tests.js"></script>
     <script>
         if (window.PHANTOMJS) {
             blanket.options("reporter", "../node_modules/grunt-blanket-mocha/support/grunt-reporter.js");

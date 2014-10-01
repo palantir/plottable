@@ -1102,6 +1102,9 @@ declare module D3 {
             <T>(layers: T[], index?: number): T[];
             values(accessor?: (d: any) => any): StackLayout;
             offset(offset: string): StackLayout;
+            x(accessor: (d: any, i: number) => any): StackLayout;
+            y(accessor: (d: any, i: number) => any): StackLayout;
+            out(setter: (d: any, y: any, y0: any) => void): StackLayout;
         }
 
         export interface TreeLayout {

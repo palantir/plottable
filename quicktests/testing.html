@@ -1,0 +1,78 @@
+<html>
+<head>
+  <script src="/bower_components/jQuery/dist/jquery.js" charset="utf-8"></script>
+  <script src="/bower_components/d3/d3.js" charset="utf-8"></script>
+  <script src="/bower_components/lodash/dist/lodash.js"></script>
+  <script src="exampleUtil.js"></script>
+  <link rel="stylesheet" type="text/css" href="/plottable.css">
+  <link rel="stylesheet" type="text/css" href="/plottable_testing.css">
+
+  <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=desert"></script>
+  <script src="/quicktests/quicktest.js" defer> </script>
+  <style>
+    .example {
+
+    }
+    .source, .output {
+      display: inline-block;
+      vertical-align: top
+    }
+    code {
+      font-size: 8pt;
+    }
+    .fiddle-link {
+      font-size: 12pt;
+    }
+    .prettyprint {
+      padding: 5px;
+    }
+  </style>
+
+  <title>Plottable.js: Tests</title>
+</head>
+
+<body>
+<table style="width:100%"  border="0">
+
+  <tr>
+    <td>
+      <form>
+      <h2>Left Branch:</h2>
+       <select type="text" id="leftBranch" name="leftBranch" style="width:80%">
+        <option value="develop"></option>
+      </select>
+      </form>
+    </td>
+    <td>
+      <form>
+      <h2>Keyword:</h2>
+      <select type="text" id="filterWord" name="filterWord" style="width:80%">
+        <option value=""></option>
+      </select>
+      </form>
+    </td>
+    <td>
+    <form>
+      <h2>Right Branch:</h2>
+       <select type="text" id="rightBranch" name="rightBranch" style="width:80%">
+        <option value="#local"></option>
+      </select>
+      </form>
+
+    </td>
+  </tr>
+
+
+  <tr>
+    <td><center><h1 id ="masterHeader" class="cassiePink"></h1></center></td>
+    <td>
+            <center><button id="button" name="button" class="cassieButton" style="width:80%">Update</button></center>
+    </td>
+    <td><center><h1 id ="featureHeader" class="cassiePink"></h1></center></td>
+  </tr>
+
+  </table>
+
+
+</body>
+</html>

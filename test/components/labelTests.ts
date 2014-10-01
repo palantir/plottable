@@ -10,14 +10,14 @@ describe("Labels", () => {
     var label = new Plottable.Component.TitleLabel("A CHART TITLE");
     label.renderTo(svg);
 
-    var content = label.content;
-    assert.isTrue(label.element.classed("label"), "title element has label css class");
-    assert.isTrue(label.element.classed("title-label"), "title element has title-label css class");
+    var content = label._content;
+    assert.isTrue(label._element.classed("label"), "title element has label css class");
+    assert.isTrue(label._element.classed("title-label"), "title element has title-label css class");
     var textChildren = content.selectAll("text");
     assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
 
     var text = content.select("text");
-    var bbox = Plottable.Util.DOM.getBBox(text);
+    var bbox = Plottable._Util.DOM.getBBox(text);
     assert.closeTo(bbox.height, label.height(), 0.5, "text height === label.minimumHeight()");
     assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
     svg.remove();
@@ -27,10 +27,10 @@ describe("Labels", () => {
     var svg = generateSVG(100, 400);
     var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "vertical-left");
     label.renderTo(svg);
-    var content = label.content;
+    var content = label._content;
     var text = content.select("text");
-    var textBBox = Plottable.Util.DOM.getBBox(text);
-    assertBBoxInclusion(label.element.select(".bounding-box"), text);
+    var textBBox = Plottable._Util.DOM.getBBox(text);
+    assertBBoxInclusion(label._element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
     svg.remove();
   });
@@ -39,10 +39,10 @@ describe("Labels", () => {
     var svg = generateSVG(100, 400);
     var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "vertical-right");
     label.renderTo(svg);
-    var content = label.content;
+    var content = label._content;
     var text = content.select("text");
-    var textBBox = Plottable.Util.DOM.getBBox(text);
-    assertBBoxInclusion(label.element.select(".bounding-box"), text);
+    var textBBox = Plottable._Util.DOM.getBBox(text);
+    assertBBoxInclusion(label._element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
     svg.remove();
   });
@@ -51,11 +51,11 @@ describe("Labels", () => {
     var svg = generateSVG(400, 80);
     var label = new Plottable.Component.TitleLabel();
     label.renderTo(svg);
-    assert.equal(label.content.select("text").text(), "", "the text defaulted to empty string");
+    assert.equal(label._content.select("text").text(), "", "the text defaulted to empty string");
     assert.equal(label.height(), 0, "rowMin is 0 for empty string");
     label.text("hello world");
     label.renderTo(svg);
-    assert.equal(label.content.select("text").text(), "hello world", "the label text updated properly");
+    assert.equal(label._content.select("text").text(), "hello world", "the label text updated properly");
     assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
     svg.remove();
   });
@@ -66,9 +66,9 @@ describe("Labels", () => {
     var svg = generateSVG(svgWidth, 80);
     var label = new Plottable.Component.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
     label.renderTo(svg);
-    var content = label.content;
+    var content = label._content;
     var text = content.select("text");
-    var bbox = Plottable.Util.DOM.getBBox(text);
+    var bbox = Plottable._Util.DOM.getBBox(text);
     assert.equal(bbox.height, label.height(), "text height === label.minimumHeight()");
     assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
     svg.remove();
@@ -78,7 +78,7 @@ describe("Labels", () => {
     var svg = generateSVG(10, 10);
     var label = new Plottable.Component.TitleLabel("Yeah, not gonna fit...");
     label.renderTo(svg);
-    var text = label.content.select("text");
+    var text = label._content.select("text");
     assert.equal(text.text(), "", "text was truncated to empty string");
     svg.remove();
   });
@@ -89,9 +89,9 @@ describe("Labels", () => {
     var t = new Plottable.Component.Table().addComponent(0, 0, label)
                                  .addComponent(1, 0, new Plottable.Abstract.Component());
     t.renderTo(svg);
-    var textTranslate = d3.transform(label.content.select("g").attr("transform")).translate;
-    var eleTranslate  = d3.transform(label.element.attr("transform")).translate;
-    var textWidth = Plottable.Util.DOM.getBBox(label.content.select("text")).width;
+    var textTranslate = d3.transform(label._content.select("g").attr("transform")).translate;
+    var eleTranslate  = d3.transform(label._element.attr("transform")).translate;
+    var textWidth = Plottable._Util.DOM.getBBox(label._content.select("text")).width;
     assert.closeTo(eleTranslate[0] + textTranslate[0] + textWidth / 2, 200, 5, "label is centered");
     svg.remove();
   });
@@ -107,5 +107,24 @@ describe("Labels", () => {
 
   it("unsupported alignments and orientations are unsupported", () => {
     assert.throws(() => new Plottable.Component.Label("foo", "bar"), Error, "not a valid orientation");
+  });
+
+  it("Label orientation can be changed after label is created", () => {
+    var svg = generateSVG(400, 400);
+    var label = new Plottable.Component.AxisLabel("CHANGING ORIENTATION");
+    label.renderTo(svg);
+
+    var content = label._content;
+    var text = content.select("text");
+    var bbox = Plottable._Util.DOM.getBBox(text);
+    assert.closeTo(bbox.height, label.height(), 1, "label is in horizontal position");
+
+    label.orient("vertical-right");
+    text = content.select("text");
+    bbox = Plottable._Util.DOM.getBBox(text);
+    assertBBoxInclusion(label._element.select(".bounding-box"), text);
+    assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "label is in vertical position");
+
+    svg.remove();
   });
 });

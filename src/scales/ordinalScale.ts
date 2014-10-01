@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scale {
-  export class Ordinal extends Abstract.Scale {
+  export class Ordinal extends Abstract.Scale<string, number> {
     public _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
     private _rangeType: string = "bands";
@@ -10,9 +10,13 @@ export module Scale {
     // Padding as a proportion of the spacing between domain values
     private _innerPadding: number = 0.3;
     private _outerPadding: number = 0.5;
+    public _typeCoercer: (d: any) => any = (d: any) => d != null && d.toString ? d.toString() : d;
 
     /**
-     * Creates a new OrdinalScale. Domain and Range are set later.
+     * Creates an OrdinalScale.
+     *
+     * An OrdinalScale maps strings to numbers. A common use is to map the
+     * labels of a bar plot (strings) to their pixel locations (numbers).
      *
      * @constructor
      */
@@ -23,45 +27,23 @@ export module Scale {
       }
     }
 
-    public _getExtent(): any[] {
+    public _getExtent(): string[] {
       var extents: string[][] = this._getAllExtents();
-      return Util.Methods.uniq(Util.Methods.flatten(extents));
+      return _Util.Methods.uniq(_Util.Methods.flatten(extents));
     }
 
-    /**
-     * Gets the domain.
-     *
-     * @returns {any[]} The current domain.
-     */
-    public domain(): any[];
-    /**
-     * Sets the domain.
-     *
-     * @param {any[]} values The new values for the domain. This array may contain more than 2 values.
-     * @returns {Ordinal} The calling Ordinal Scale.
-     */
-    public domain(values: any[]): Ordinal;
-    public domain(values?: any[]): any {
+    public domain(): string[];
+    public domain(values: string[]): Ordinal;
+    public domain(values?: string[]): any {
       return super.domain(values);
     }
 
-    public _setDomain(values: any[]) {
+    public _setDomain(values: string[]) {
       super._setDomain(values);
       this.range(this.range()); // update range
     }
 
-    /**
-     * Gets the range of pixels spanned by the Ordinal Scale.
-     *
-     * @returns {number[]} The pixel range.
-     */
     public range(): number[];
-    /**
-     * Sets the range of pixels spanned by the Ordinal Scale.
-     *
-     * @param {number[]} values The pixel range to to be spanend by the scale.
-     * @returns {Ordinal} The calling Ordinal Scale.
-     */
     public range(values: number[]): Ordinal;
     public range(values?: number[]): any {
       if (values == null) {
@@ -95,29 +77,29 @@ export module Scale {
       return step - this.rangeBand();
     }
 
-    public fullBandStartAndWidth(v: any) {
+    public fullBandStartAndWidth(v: string) {
       var start = this.scale(v) - this.innerPadding() / 2;
       var width = this.rangeBand() + this.innerPadding();
       return [start, width];
     }
 
     /**
-     * Gets the range type.
+     * Get the range type.
      *
      * @returns {string} The current range type.
      */
     public rangeType() : string;
     /**
-     * Sets the range type.
+     * Set the range type.
      *
-     * @param {string} rangeType Either "points" or "bands" indicating the
+     * @param {string} rangeType If provided, either "points" or "bands" indicating the
      *     d3 method used to generate range bounds.
-     * @param {number} [outerPadding] The padding outside the range,
+     * @param {number} [outerPadding] If provided, the padding outside the range,
      *     proportional to the range step.
-     * @param {number} [innerPadding] The padding between bands in the range,
+     * @param {number} [innerPadding] If provided, the padding between bands in the range,
      *     proportional to the range step. This parameter is only used in
      *     "bands" type ranges.
-     * @returns {Ordinal} The calling Ordinal Scale.
+     * @returns {Ordinal} The calling Ordinal.
      */
     public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number) : Ordinal;
     public rangeType(rangeType?: string, outerPadding?: number, innerPadding?: number) : any {
@@ -134,16 +116,12 @@ export module Scale {
         if (innerPadding != null) {
           this._innerPadding = innerPadding;
         }
+        this.range(this.range());
         this.broadcaster.broadcast();
         return this;
       }
     }
 
-    /**
-     * Creates a copy of the Scale with the same domain and range but without any registered listeners.
-     *
-     * @returns {Ordinal} A copy of the calling Scale.
-     */
     public copy(): Ordinal {
       return new Ordinal(this._d3Scale.copy());
     }

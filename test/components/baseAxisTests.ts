@@ -37,18 +37,6 @@ describe("BaseAxis", () => {
     expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter();
     assert.strictEqual(verticalAxis.width(), expectedWidth, "changing the gutter size updates the width");
 
-    verticalAxis.width(20);
-    assert.strictEqual(verticalAxis.width(), 20, "width was set to user-specified value");
-
-    verticalAxis.width(10 * SVG_WIDTH); // way too big
-    assert.strictEqual(verticalAxis.width(), SVG_WIDTH, "returns actual used width if requested width is too large");
-
-    assert.doesNotThrow(() => verticalAxis.width("auto"), Error, "can be set to auto mode");
-    assert.throws(() => verticalAxis.width(-999), Error, "invalid");
-
-    var horizontalAxis = new Plottable.Abstract.Axis(scale, "bottom");
-    assert.throws(() => horizontalAxis.width(2014), Error, "horizontal");
-
     svg.remove();
   });
 
@@ -67,18 +55,6 @@ describe("BaseAxis", () => {
     expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter();
     assert.strictEqual(horizontalAxis.height(), expectedHeight, "changing the gutter size updates the height");
 
-    horizontalAxis.height(20);
-    assert.strictEqual(horizontalAxis.height(), 20, "height was set to user-specified value");
-
-    horizontalAxis.height(10 * SVG_HEIGHT); // way too big
-    assert.strictEqual(horizontalAxis.height(), SVG_HEIGHT, "returns actual used height if requested height is too large");
-
-    assert.doesNotThrow(() => horizontalAxis.height("auto"), Error, "can be set to auto mode");
-    assert.throws(() => horizontalAxis.height(-999), Error, "invalid");
-
-    var verticalAxis = new Plottable.Abstract.Axis(scale, "right");
-    assert.throws(() => verticalAxis.height(2014), Error, "vertical");
-
     svg.remove();
   });
 
@@ -90,7 +66,6 @@ describe("BaseAxis", () => {
     scale.domain([0, 10]);
     scale.range([0, SVG_WIDTH]);
     var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
-    baseAxis.height(SVG_HEIGHT);
     var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     (<any> baseAxis)._getTickValues = function() { return tickValues; };
     baseAxis.renderTo(svg);
@@ -109,8 +84,8 @@ describe("BaseAxis", () => {
     assert.isNotNull(baseline.node(), "baseline was drawn");
     assert.strictEqual(baseline.attr("x1"), "0");
     assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
-    assert.strictEqual(baseline.attr("y1"), String(SVG_HEIGHT));
-    assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
+    assert.strictEqual(baseline.attr("y1"), String(baseAxis.height()));
+    assert.strictEqual(baseline.attr("y2"), String(baseAxis.height()));
 
     svg.remove();
   });
@@ -123,7 +98,6 @@ describe("BaseAxis", () => {
     scale.domain([0, 10]);
     scale.range([0, SVG_HEIGHT]);
     var baseAxis = new Plottable.Abstract.Axis(scale, "left");
-    baseAxis.width(SVG_WIDTH);
     var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     (<any> baseAxis)._getTickValues = function() { return tickValues; };
     baseAxis.renderTo(svg);
@@ -133,8 +107,8 @@ describe("BaseAxis", () => {
     var baseline = svg.select(".baseline");
 
     assert.isNotNull(baseline.node(), "baseline was drawn");
-    assert.strictEqual(baseline.attr("x1"), String(SVG_WIDTH));
-    assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
+    assert.strictEqual(baseline.attr("x1"), String(baseAxis.width()));
+    assert.strictEqual(baseline.attr("x2"), String(baseAxis.width()));
     assert.strictEqual(baseline.attr("y1"), "0");
     assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
 
@@ -221,5 +195,17 @@ describe("BaseAxis", () => {
     assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should not decrease");
 
     svg.remove();
+  });
+
+  it("default alignment based on orientation", () => {
+    var scale = new Plottable.Scale.Linear();
+    var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+    assert.equal((<any> baseAxis)._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
+    baseAxis = new Plottable.Abstract.Axis(scale, "top");
+    assert.equal((<any> baseAxis)._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
+    baseAxis = new Plottable.Abstract.Axis(scale, "left");
+    assert.equal((<any> baseAxis)._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
+    baseAxis = new Plottable.Abstract.Axis(scale, "right");
+    assert.equal((<any> baseAxis)._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
   });
 });

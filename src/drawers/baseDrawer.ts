@@ -3,11 +3,11 @@
 module Plottable {
 export module Abstract {
   export class _Drawer {
-    public renderArea: D3.Selection;
+    public _renderArea: D3.Selection;
     public key: string;
 
     /**
-     * Creates a Drawer
+     * Constructs a Drawer
      *
      * @constructor
      * @param{string} key The key associated with this Drawer
@@ -20,18 +20,18 @@ export module Abstract {
      * Removes the Drawer and its renderArea
      */
     public remove() {
-      if (this.renderArea != null) {
-        this.renderArea.remove();
+      if (this._renderArea != null) {
+        this._renderArea.remove();
       }
     }
 
     /**
      * Draws the data into the renderArea using the attrHash for attributes
      *
-     * @param{any[][]} data The data to be drawn
+     * @param{any[]} data The data to be drawn
      * @param{attrHash} IAttributeToProjector The list of attributes to set on the data
      */
-    public draw(data: any[][], attrToProjector: IAttributeToProjector, animator = new Animator.Null()) {
+    public draw(data: any[], attrToProjector: IAttributeToProjector, animator = new Animator.Null()) {
       throw new Error("Abstract Method Not Implemented");
     }
   }

@@ -26,6 +26,18 @@ describe("Category Axes", () => {
     svg.remove();
   });
 
+  it("doesnt blow up for non-string data", () => {
+    var svg = generateSVG(1000, 400);
+    var domain: any[] = [null, undefined, true, 2, "foo"];
+    var scale = new Plottable.Scale.Ordinal().domain(domain);
+    var axis = new Plottable.Axis.Category(scale);
+    var table = new Plottable.Component.Table([[axis]]);
+    table.renderTo(svg);
+    var texts = svg.selectAll("text")[0].map((s: any) => d3.select(s).text());
+    assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);
+    svg.remove();
+  });
+
   it("width accounts for gutter. ticklength, and padding on vertical axes", () => {
     var svg = generateSVG(400, 400);
     var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
@@ -64,6 +76,27 @@ describe("Category Axes", () => {
     axisHeight = ca.height();
     ca.tickLength(ca.tickLength() + 5);
     assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing ticklength increases height");
+
+    svg.remove();
+  });
+
+  it("proper range values for different range types", () => {
+    var SVG_WIDTH = 400;
+    var svg = generateSVG(SVG_WIDTH, 100);
+    var scale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([0, 400]).rangeType("bands", 1, 0);
+    var categoryAxis = new Plottable.Axis.Category(scale, "bottom");
+    categoryAxis.renderTo(svg);
+
+    // Outer padding is equal to step
+    var step = SVG_WIDTH / 5;
+    var tickMarks = categoryAxis._tickMarkContainer.selectAll(".tick-mark")[0];
+    var ticksNormalizedPosition = tickMarks.map((s: any) => +d3.select(s).attr("x1") / step);
+    assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
+
+    scale.rangeType("points", 1, 0);
+    step = SVG_WIDTH / 4;
+    ticksNormalizedPosition = tickMarks.map((s: any) => +d3.select(s).attr("x1") / step);
+    assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
 
     svg.remove();
   });

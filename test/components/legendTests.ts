@@ -17,7 +17,7 @@ describe("Legends", () => {
   it("a basic legend renders", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
-    var rows = legend.content.selectAll(".legend-row");
+    var rows = legend._content.selectAll(".legend-row");
     assert.lengthOf(rows[0], 3, "there are 3 legend entries");
 
     rows.each(function(d, i) {
@@ -43,7 +43,7 @@ describe("Legends", () => {
     assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
     var actualHeight2 = legend.height();
     assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
-    var numRows = legend.content.selectAll(".legend-row")[0].length;
+    var numRows = legend._content.selectAll(".legend-row")[0].length;
     assert.equal(numRows, 3, "there are 3 rows");
     svg.remove();
   });
@@ -52,9 +52,9 @@ describe("Legends", () => {
     color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
     legend.renderTo(svg);
 
-    var contentBBox = Plottable.Util.DOM.getBBox(legend.content);
+    var contentBBox = Plottable._Util.DOM.getBBox(legend._content);
     var contentBottomEdge = contentBBox.y + contentBBox.height;
-    var bboxBBox = Plottable.Util.DOM.getBBox(legend.element.select(".bounding-box"));
+    var bboxBBox = Plottable._Util.DOM.getBBox(legend._element.select(".bounding-box"));
     var bboxBottomEdge = bboxBBox.y + bboxBBox.height;
 
     assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
@@ -65,10 +65,10 @@ describe("Legends", () => {
     color.domain(["foooboooloonoogoorooboopoo"]);
     svg.attr("width", 100);
     legend.renderTo(svg);
-    var text = legend.content.select("text").text();
+    var text = legend._content.select("text").text();
     assert.notEqual(text, "foooboooloonoogoorooboopoo", "the text was truncated");
-    var rightEdge = legend.content.select("text").node().getBoundingClientRect().right;
-    var bbox = legend.element.select(".bounding-box");
+    var rightEdge = legend._content.select("text").node().getBoundingClientRect().right;
+    var bbox = legend._element.select(".bounding-box");
     var rightEdgeBBox = bbox.node().getBoundingClientRect().right;
     assert.operator(rightEdge, "<=", rightEdgeBBox, "the long text did not overflow the legend");
     svg.remove();
@@ -77,10 +77,10 @@ describe("Legends", () => {
   it("calling legend.render multiple times does not add more elements", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
-    var numRows = legend.content.selectAll(".legend-row")[0].length;
+    var numRows = legend._content.selectAll(".legend-row")[0].length;
     assert.equal(numRows, 3, "there are 3 legend rows initially");
     legend._render();
-    numRows = legend.content.selectAll(".legend-row")[0].length;
+    numRows = legend._content.selectAll(".legend-row")[0].length;
     assert.equal(numRows, 3, "there are 3 legend rows after second render");
     svg.remove();
   });
@@ -92,14 +92,14 @@ describe("Legends", () => {
     color.domain(newDomain);
     // due to how joins work, this is how the elements should be arranged by d3
     var newDomainActualOrder = ["foo", "baz", "mushu", "persei", "eight"];
-    legend.content.selectAll(".legend-row").each(function(d, i) {
+    legend._content.selectAll(".legend-row").each(function(d, i) {
       assert.equal(d, newDomainActualOrder[i], "the data is set correctly");
       var text = d3.select(this).select("text").text();
       assert.equal(text, d, "the text was set properly");
       var fill = d3.select(this).select("circle").attr("fill");
       assert.equal(fill, color.scale(d), "the fill was set properly");
     });
-    assert.lengthOf(legend.content.selectAll(".legend-row")[0], 5, "there are the right number of legend elements");
+    assert.lengthOf(legend._content.selectAll(".legend-row")[0], 5, "there are the right number of legend elements");
     svg.remove();
   });
 
@@ -112,7 +112,7 @@ describe("Legends", () => {
     newColorScale.domain(newDomain);
     legend.scale(newColorScale);
 
-    legend.content.selectAll(".legend-row").each(function(d, i) {
+    legend._content.selectAll(".legend-row").each(function(d, i) {
       assert.equal(d, newDomain[i], "the data is set correctly");
       var text = d3.select(this).select("text").text();
       assert.equal(text, d, "the text was set properly");
@@ -134,7 +134,7 @@ describe("Legends", () => {
 
     var newDomain = ["a", "foo", "d"];
     newColorScale.domain(newDomain);
-    legend.content.selectAll(".legend-row").each(function(d, i) {
+    legend._content.selectAll(".legend-row").each(function(d, i) {
       assert.equal(d, newDomain[i], "the data is set correctly");
       var text = d3.select(this).select("text").text();
       assert.equal(text, d, "the text was set properly");
@@ -144,19 +144,19 @@ describe("Legends", () => {
     svg.remove();
   });
 
-  it("icon radius is not too small or too big", () => {
+  it("iconHeight / 2 < circleHeight < iconHeight", () => {
     color.domain(["foo"]);
     legend.renderTo(svg);
-    var style = legend.element.append("style");
+    var style = legend._element.append("style");
     style.attr("type", "text/css");
 
     function verifyCircleHeight() {
-      var text = legend.content.select("text");
-      var circle = legend.content.select("circle");
-      var textHeight = Plottable.Util.DOM.getBBox(text).height;
-      var circleHeight = Plottable.Util.DOM.getBBox(circle).height;
-      assert.operator(circleHeight, "<", textHeight, "icons are too big. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
-      assert.operator(circleHeight, ">", textHeight / 2, "icons are too small. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
+      var text = legend._content.select("text");
+      var circle = legend._content.select("circle");
+      var textHeight = Plottable._Util.DOM.getBBox(text).height;
+      var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
+      assert.operator(circleHeight, "<", textHeight, "icons too small: iconHeight < circleHeight");
+      assert.operator(circleHeight, ">", textHeight / 2, "icons too big: iconHeight / 2 > circleHeight");
     }
 
     verifyCircleHeight();
@@ -188,7 +188,7 @@ describe("Legends", () => {
     }
 
     function getSelection(datum: any) {
-      var selection = toggleLegend.content.selectAll(".legend-row")
+      var selection = toggleLegend._content.selectAll(".legend-row")
         .filter((d, i) => d === datum);
       return selection;
     }
@@ -204,7 +204,7 @@ describe("Legends", () => {
     it("basic initialization test", () => {
       color.domain(["a", "b", "c", "d", "e"]);
       toggleLegend.renderTo(svg);
-      toggleLegend.content.selectAll(".legend-row").each(function(d, i) {
+      toggleLegend._content.selectAll(".legend-row").each(function(d, i) {
         var selection = d3.select(this);
         verifyState(selection, true);
       });
@@ -214,7 +214,7 @@ describe("Legends", () => {
     it("basic toggling test", () => {
       color.domain(["a"]);
       toggleLegend.renderTo(svg);
-      toggleLegend.content.selectAll(".legend-row").each(function(d, i) {
+      toggleLegend._content.selectAll(".legend-row").each(function(d, i) {
         var selection = d3.select(this);
         selection.on("click")(d, i);
         verifyState(selection, false);
@@ -360,7 +360,7 @@ describe("Legends", () => {
     }
 
     function getSelection(datum: any) {
-      var selection = hoverLegend.content.selectAll(".legend-row")
+      var selection = hoverLegend._content.selectAll(".legend-row")
         .filter((d, i) => d === datum);
       return selection;
     }
@@ -384,7 +384,7 @@ describe("Legends", () => {
     it("basic initialization test", () => {
       color.domain(["a", "b", "c", "d", "e"]);
       hoverLegend.renderTo(svg);
-      hoverLegend.content.selectAll(".legend-row").each(function(d, i) {
+      hoverLegend._content.selectAll(".legend-row").each(function(d, i) {
         verifyEmpty(d);
       });
       svg.remove();
@@ -520,7 +520,7 @@ describe("HorizontalLegend", () => {
   var colorScale: Plottable.Scale.Color;
   var horizLegend: Plottable.Component.HorizontalLegend;
 
-  var entrySelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ENTRY_CLASS
+  var entrySelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ENTRY_CLASS;
   var rowSelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ROW_CLASS;
 
   beforeEach(() => {
@@ -537,7 +537,7 @@ describe("HorizontalLegend", () => {
   it("renders an entry for each item in the domain", () => {
     var svg = generateSVG(400, 100);
     horizLegend.renderTo(svg);
-    var entries = horizLegend.element.selectAll(entrySelector);
+    var entries = horizLegend._element.selectAll(entrySelector);
     assert.equal(entries[0].length, colorScale.domain().length, "one entry is created for each item in the domain");
 
     var elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
@@ -547,7 +547,7 @@ describe("HorizontalLegend", () => {
     newDomain.push("Madison");
     colorScale.domain(newDomain);
 
-    entries = horizLegend.element.selectAll(entrySelector);
+    entries = horizLegend._element.selectAll(entrySelector);
     assert.equal(entries[0].length, colorScale.domain().length, "Legend updated to include item added to the domain");
 
     svg.remove();
@@ -557,7 +557,7 @@ describe("HorizontalLegend", () => {
     var svg = generateSVG(200, 100);
     horizLegend.renderTo(svg);
 
-    var rows = horizLegend.element.selectAll(rowSelector);
+    var rows = horizLegend._element.selectAll(rowSelector);
     assert.lengthOf(rows[0], 2, "Wrapped text on to two rows when space is constrained");
 
     horizLegend.detach();
@@ -565,7 +565,7 @@ describe("HorizontalLegend", () => {
     svg = generateSVG(100, 100);
     horizLegend.renderTo(svg);
 
-    rows = horizLegend.element.selectAll(rowSelector);
+    rows = horizLegend._element.selectAll(rowSelector);
     assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
 
     svg.remove();
@@ -575,20 +575,20 @@ describe("HorizontalLegend", () => {
     var svg = generateSVG(70, 400);
     horizLegend.renderTo(svg);
 
-    var textEls = horizLegend.element.selectAll("text");
+    var textEls = horizLegend._element.selectAll("text");
     textEls.each(function(d: any) {
       var textEl = d3.select(this);
-      assertBBoxInclusion(horizLegend.element, textEl);
+      assertBBoxInclusion(horizLegend._element, textEl);
     });
 
     horizLegend.detach();
     svg.remove();
     svg = generateSVG(100, 50);
     horizLegend.renderTo(svg);
-    textEls = horizLegend.element.selectAll("text");
+    textEls = horizLegend._element.selectAll("text");
     textEls.each(function(d: any) {
       var textEl = d3.select(this);
-      assertBBoxInclusion(horizLegend.element, textEl);
+      assertBBoxInclusion(horizLegend._element, textEl);
     });
 
     svg.remove();
@@ -599,14 +599,14 @@ describe("HorizontalLegend", () => {
     var svg = generateSVG(400, 100);
     horizLegend.renderTo(svg);
 
-    var style = horizLegend.element.append("style");
+    var style = horizLegend._element.append("style");
     style.attr("type", "text/css");
 
     function verifyCircleHeight() {
-      var text = horizLegend.content.select("text");
-      var circle = horizLegend.content.select("circle");
-      var textHeight = Plottable.Util.DOM.getBBox(text).height;
-      var circleHeight = Plottable.Util.DOM.getBBox(circle).height;
+      var text = horizLegend._content.select("text");
+      var circle = horizLegend._content.select("circle");
+      var textHeight = Plottable._Util.DOM.getBBox(text).height;
+      var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
       assert.operator(circleHeight, "<", textHeight, "Icon is smaller than entry text");
       return circleHeight;
     }

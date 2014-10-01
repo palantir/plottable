@@ -16,12 +16,14 @@
 ///<reference path="components/labelTests.ts" />
 ///<reference path="components/legendTests.ts" />
 ///<reference path="components/plots/plotTests.ts" />
+///<reference path="components/plots/piePlotTests.ts" />
 ///<reference path="components/plots/newStylePlotTests.ts" />
 ///<reference path="components/plots/linePlotTests.ts" />
 ///<reference path="components/plots/areaPlotTests.ts" />
 ///<reference path="components/plots/barPlotTests.ts" />
 ///<reference path="components/plots/gridPlotTests.ts" />
 ///<reference path="components/plots/scatterPlotTests.ts" />
+///<reference path="components/plots/stackedAreaPlotTests.ts" />
 ///<reference path="components/plots/stackedBarPlotTests.ts" />
 ///<reference path="components/plots/clusteredBarPlotTests.ts" />
 
@@ -29,7 +31,7 @@
 ///<reference path="core/componentContainerTests.ts" />
 ///<reference path="core/componentGroupTests.ts" />
 ///<reference path="core/componentTests.ts" />
-///<reference path="core/dataSourceTests.ts" />
+///<reference path="core/datasetTests.ts" />
 ///<reference path="core/tableTests.ts" />
 ///<reference path="core/domainerTests.ts" />
 

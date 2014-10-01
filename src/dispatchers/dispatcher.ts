@@ -8,7 +8,7 @@ export module Abstract {
     private connected = false;
 
     /**
-     * Creates a Dispatcher with the specified target.
+     * Constructs a Dispatcher with the specified target.
      *
      * @param {D3.Selection} target The selection to listen for events on.
      */

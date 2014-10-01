@@ -2,25 +2,26 @@
 
 module Plottable {
 export module Plot {
-  export class Line extends Abstract.XYPlot {
+  export class Line<X> extends Abstract.XYPlot<X,number> {
     private linePath: D3.Selection;
 
+    public _yScale: Abstract.QuantitativeScale<number>;
     public _animators: Animator.IPlotAnimatorMap = {
       "line-reset" : new Animator.Null(),
-      "line"       : new Animator.Default()
+      "line"       : new Animator.Base()
         .duration(600)
         .easing("exp-in-out")
     };
 
     /**
-     * Creates a LinePlot.
+     * Constructs a LinePlot.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
-     * @param {Scale} xScale The x scale to use.
-     * @param {Scale} yScale The y scale to use.
+     * @param {any | IDataset} dataset The dataset to render.
+     * @param {QuantitativeScale} xScale The x scale to use.
+     * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
+    constructor(dataset: any, xScale: Abstract.QuantitativeScale<X>, yScale: Abstract.QuantitativeScale<number>) {
       super(dataset, xScale, yScale);
       this.classed("line-plot", true);
       this.project("stroke", () => Core.Colors.INDIGO); // default
@@ -33,42 +34,29 @@ export module Plot {
     }
 
     public _appendPath() {
-      this.linePath = this.renderArea.append("path").classed("line", true);
+      this.linePath = this._renderArea.append("path").classed("line", true);
     }
 
     public _getResetYFunction() {
       // gets the y-value generator for the animation start point
-      var yDomain = this.yScale.domain();
+      var yDomain = this._yScale.domain();
       var domainMax = Math.max(yDomain[0], yDomain[1]);
       var domainMin = Math.min(yDomain[0], yDomain[1]);
       // start from zero, or the closest domain value to zero
       // avoids lines zooming on from offscreen.
-      var startValue = 0;
-      if (domainMax < 0) {
-        startValue = domainMax;
-      } else if (domainMin > 0) {
-        startValue = domainMin;
-      }
-      var scaledStartValue = this.yScale.scale(startValue);
+      var startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
+      var scaledStartValue = this._yScale.scale(startValue);
       return (d: any, i: number) => scaledStartValue;
     }
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       var wholeDatumAttributes = this._wholeDatumAttributes();
-      function singleDatumAttributeFilter(attr: string) {
-        return wholeDatumAttributes.indexOf(attr) === -1;
-      }
-      var singleDatumAttributes = d3.keys(attrToProjector).filter(singleDatumAttributeFilter);
+      var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
+      var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
       singleDatumAttributes.forEach((attribute: string) => {
         var projector = attrToProjector[attribute];
-        attrToProjector[attribute] = (data: any[], i: number) => {
-          if (data.length > 0) {
-            return projector(data[0], i);
-          } else {
-            return null;
-          }
-        };
+        attrToProjector[attribute] = (data: any[], i: number) => data.length > 0 ? projector(data[0], i) : null;
       });
       return attrToProjector;
     }
@@ -81,10 +69,9 @@ export module Plot {
       delete attrToProjector["x"];
       delete attrToProjector["y"];
 
-      this.linePath.datum(this._dataSource.data());
+      this.linePath.datum(this._dataset.data());
 
       if (this._dataChanged) {
-
         attrToProjector["d"] = d3.svg.line()
           .x(xFunction)
           .y(this._getResetYFunction());

@@ -56,7 +56,7 @@ function loadTheQuicktests(quicktestsJSONArray) {
   return new Promise(function (f, r) {
     quicktestsJSONArray.forEach(function(q) {
       var name = q.name;
-      d3.text("/quicktests/" + name + ".js", function(error, text) {
+      d3.text("/quicktests/js/" + name + ".js", function(error, text) {
         if (error !== null) {
           console.warn("Tried to load nonexistant quicktest " + name);
           if (++numLoaded === numToLoad) {
@@ -106,30 +106,40 @@ function initializeByLoadingAllQuicktests() {
   });
 }
 
-function main() {
+function populateDropdown(dropDown, vals, initialVal) {
+  dropDown.empty();
+  vals.forEach(function(v) {
+    dropDown.append($('<option></option>').val(v).html(v));
+  });
+  if (initialVal != null) {
+    dropDown.val(initialVal);
+  }
+  return dropDown;
+}
+
+function setup() {
   //load keyword dropdown
   var keywordList = {};
   d3.json("/quicktests/list_of_quicktests.json", function(data) {
-    for(var obj in data){
-      for(var keyword in data[obj].categories){
-        keywordList[data[obj].categories[keyword]] = data[obj].categories[keyword];
-      }
-    }
-    var keywordDropdown = $('#filterWord');
-        $.each(keywordList, function(val, text) {
-          keywordDropdown.append(
-              $('<option></option>').val(text).html(text)
-          );
+    var categories = d3.set();
+    data.forEach(function(d) {
+      d.categories.forEach(function(c) {
+        categories.add(c);
       });
-      $("#filterWord").html($("#filterWord option").sort(function (a, b) {
-          return a.text === b.text ? 0 : a.text < b.text ? -1 : 1;
-      }));
+    });
+    categories = categories.values();
+    categories.push("#all");
+    categories.sort();
+    console.log(keywordList);
+    var keywordDropdown = $('#filterWord');
+    populateDropdown(keywordDropdown, categories, "#all");
   });
 
   d3.text("/quicktests/github_token.txt", function (err, data) {
     var auth = "";
     if (err != null) {
       console.log("Something went wrong acquiring the Github token. Using unauthenticated requests for feature branches");
+      console.log("The site will still work fine, but if you use it a lot you may hit an API rate limit.");
       console.log("To acquire a github token, go here: https://github.com/settings/applications#personal-access-tokens");
       console.log("Make a new token (it needs no permissions) and then save it as quicktests/github_token.txt");
     } else {
@@ -141,20 +151,19 @@ function main() {
       for(var i = 0; i < data.length; i++){
         branchOptions["val" + i] = data[i].name;
       }
-      var branchDropdown = $('#featureBranch');
-        $.each(branchOptions, function(val, text) {
-          branchDropdown.append(
-              $('<option></option>').val(text).html(text)
-          );
-      });
+      var names = data.map(function(x) {return x.name;});
+      names.push("#local");
+      populateDropdown($('#leftBranch'), names, "develop");
+      populateDropdown($('#rightBranch'), names, "#local");
     });
   });
+}
 
+function go() {
   var table = d3.select("table");
   table.selectAll(".quicktest-row").remove();
-  var firstBranch = "master";
-  var secondBranch = $('#featureBranch').val();
-  if (secondBranch === "") {secondBranch = "#local";}
+  var firstBranch = $('#leftBranch').val();
+  var secondBranch = $('#rightBranch').val();
   var quicktestCategory = $('#filterWord').val();
   if (quicktestCategory == null || quicktestCategory === "") {
     var query = window.location.search.substring(1);
@@ -167,40 +176,35 @@ function main() {
     });
   }
   console.log(quicktestCategory);
-  initializeByLoadingAllQuicktests()
-      .then(function() {
-        return loadPlottable(firstBranch);
-      })
-      .then(function() {
-        return loadPlottable(secondBranch);
-      })
-      .then(function () {
-        return window.quicktests.filter(function(q) {
-          if (quicktestCategory === "" || quicktestCategory === undefined) {
-            return true;
-          } else {
-            return q.categories.map(function(s) {return s.toLowerCase();}).indexOf(quicktestCategory.toLowerCase()) !== -1;
-          }
-        });
-      })
-      .then(function(qts) {
-        return Promise.all(qts.map(function(q) {
-          return new Promise(function() {
-            runQuicktest(table, q, Plottables[firstBranch], Plottables[secondBranch]);
-          });
-        }));
-      }).catch(function(error) {
-        // errors in Promises are swallowed into the abyss by default, we must
-        // throw the error in a non-promise callback to get a stack trace
-        setTimeout(function() {
-          throw error;
-        }, 0);
+  initializeByLoadingAllQuicktests().then(function() {
+    return loadPlottable(firstBranch);
+  }).then(function() {
+    return loadPlottable(secondBranch);
+  }).then(function () {
+    return window.quicktests.filter(function(q) {
+      if (quicktestCategory === "#all" || quicktestCategory === undefined) {
+        return true;
+      } else {
+        return q.categories.map(function(s) {return s.toLowerCase();}).indexOf(quicktestCategory.toLowerCase()) !== -1;
+      }
+    });
+  }).then(function(qts) {
+    return Promise.all(qts.map(function(q) {
+      return new Promise(function() {
+        runQuicktest(table, q, Plottables[firstBranch], Plottables[secondBranch]);
       });
+    }));
+  }).catch(function(error) {
+    // errors in Promises are swallowed into the abyss by default, we must
+    // throw the error in a non-promise callback to get a stack trace
+    setTimeout(function() {
+      throw error;
+    }, 0);
+  });
 }
 
-
 var button = document.getElementById('button');
-button.onclick = main;
+button.onclick = go;
 
-window.onload = main;
+window.onload = setup;
 })();

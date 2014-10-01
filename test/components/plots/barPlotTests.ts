@@ -7,10 +7,10 @@ describe("Plots", () => {
     describe("Vertical Bar Plot in points mode", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
-      var dataset: Plottable.DataSource;
+      var dataset: Plottable.Dataset;
       var xScale: Plottable.Scale.Ordinal;
       var yScale: Plottable.Scale.Linear;
-      var renderer: Plottable.Plot.VerticalBar;
+      var renderer: Plottable.Plot.VerticalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
@@ -23,7 +23,7 @@ describe("Plots", () => {
           {x: "B", y: -1.5},
           {x: "B", y: 1} // duplicate X-value
         ];
-        dataset = new Plottable.DataSource(data);
+        dataset = new Plottable.Dataset(data);
 
         renderer = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
         renderer.animate(false);
@@ -37,7 +37,7 @@ describe("Plots", () => {
       });
 
       it("renders correctly", () => {
-        var renderArea = renderer.renderArea;
+        var renderArea = renderer._renderArea;
         var bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
         var bar0 = d3.select(bars[0][0]);
@@ -62,7 +62,7 @@ describe("Plots", () => {
       it("baseline value can be changed; renderer updates appropriately", () => {
         renderer.baseline(-1);
 
-        var renderArea = renderer.renderArea;
+        var renderArea = renderer._renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
@@ -81,7 +81,7 @@ describe("Plots", () => {
 
       it("bar alignment can be changed; renderer updates appropriately", () => {
         renderer.barAlignment("center");
-        var renderArea = renderer.renderArea;
+        var renderArea = renderer._renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
@@ -91,7 +91,7 @@ describe("Plots", () => {
         assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
 
         renderer.barAlignment("right");
-        renderArea = renderer.renderArea;
+        renderArea = renderer._renderArea;
         bars = renderArea.selectAll("rect");
         bar0 = d3.select(bars[0][0]);
         bar1 = d3.select(bars[0][1]);
@@ -172,10 +172,10 @@ describe("Plots", () => {
     describe("Horizontal Bar Plot in Points Mode", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
-      var dataset: Plottable.DataSource;
+      var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
       var xScale: Plottable.Scale.Linear;
-      var renderer: Plottable.Plot.HorizontalBar;
+      var renderer: Plottable.Plot.HorizontalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       before(() => {
@@ -188,7 +188,7 @@ describe("Plots", () => {
           {y: "B", x: -1.5},
           {y: "B", x: 1} // duplicate Y-value
         ];
-        dataset = new Plottable.DataSource(data);
+        dataset = new Plottable.Dataset(data);
 
         renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
         renderer.animate(false);
@@ -202,7 +202,7 @@ describe("Plots", () => {
       });
 
       it("renders correctly", () => {
-        var renderArea = renderer.renderArea;
+        var renderArea = renderer._renderArea;
         var bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
         var bar0 = d3.select(bars[0][0]);
@@ -227,7 +227,7 @@ describe("Plots", () => {
       it("baseline value can be changed; renderer updates appropriately", () => {
         renderer.baseline(-1);
 
-        var renderArea = renderer.renderArea;
+        var renderArea = renderer._renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
@@ -246,7 +246,7 @@ describe("Plots", () => {
 
       it("bar alignment can be changed; renderer updates appropriately", () => {
         renderer.barAlignment("center");
-        var renderArea = renderer.renderArea;
+        var renderArea = renderer._renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
@@ -256,7 +256,7 @@ describe("Plots", () => {
         assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
 
         renderer.barAlignment("bottom");
-        renderArea = renderer.renderArea;
+        renderArea = renderer._renderArea;
         bars = renderArea.selectAll("rect");
         bar0 = d3.select(bars[0][0]);
         bar1 = d3.select(bars[0][1]);
@@ -278,10 +278,10 @@ describe("Plots", () => {
     describe("Horizontal Bar Plot in Bands mode", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
-      var dataset: Plottable.DataSource;
+      var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
       var xScale: Plottable.Scale.Linear;
-      var renderer: Plottable.Plot.HorizontalBar;
+      var renderer: Plottable.Plot.HorizontalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       var axisWidth = 0;
@@ -298,7 +298,7 @@ describe("Plots", () => {
           {y: "A", x: 1},
           {y: "B", x: 2},
         ];
-        dataset = new Plottable.DataSource(data);
+        dataset = new Plottable.Dataset(data);
 
         renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
         renderer.baseline(0);
@@ -317,7 +317,7 @@ describe("Plots", () => {
       });
 
       it("renders correctly", () => {
-        var bars = renderer.renderArea.selectAll("rect");
+        var bars = renderer._renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
         var bar0y = bar0.data()[0].y;
@@ -327,13 +327,15 @@ describe("Plots", () => {
         assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "width is correct for bar0");
         assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "width is correct for bar1");
         // check that bar is aligned on the center of the scale
-        assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "y pos correct for bar0");
-        assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "y pos correct for bar1");
+        assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01
+                    , "y pos correct for bar0");
+        assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01
+                    , "y pos correct for bar1");
         verifier.end();
       });
 
       it("width projector may be overwritten, and calling project queues rerender", () => {
-        var bars = renderer.renderArea.selectAll("rect");
+        var bars = renderer._renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
         var bar0y = bar0.data()[0].y;

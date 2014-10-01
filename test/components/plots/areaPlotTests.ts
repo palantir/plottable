@@ -12,12 +12,10 @@ describe("Plots", () => {
     var y0Accessor: any;
     var colorAccessor: any;
     var fillAccessor: any;
-    var simpleDataset: Plottable.DataSource;
-    var areaPlot: Plottable.Plot.Area;
+    var simpleDataset: Plottable.Dataset;
+    var areaPlot: Plottable.Plot.Area<number>;
     var renderArea: D3.Selection;
     var verifier: MultiTestVerifier;
-    // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
-    var normalizePath = (s: string) => s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
 
     before(() => {
       svg = generateSVG(500, 500);
@@ -29,7 +27,7 @@ describe("Plots", () => {
       y0Accessor = () => 0;
       colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
       fillAccessor = () => "steelblue";
-      simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
+      simpleDataset = new Plottable.Dataset([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
       areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
       areaPlot.project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)
@@ -37,7 +35,7 @@ describe("Plots", () => {
               .project("fill", fillAccessor)
               .project("stroke", colorAccessor)
               .renderTo(svg);
-      renderArea = areaPlot.renderArea;
+      renderArea = areaPlot._renderArea;
     });
 
     beforeEach(() => {
@@ -62,7 +60,7 @@ describe("Plots", () => {
     it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
       areaPlot.project("y0", (d: any) => d.bar/2, yScale);
       areaPlot.renderTo(svg);
-      renderArea = areaPlot.renderArea;
+      renderArea = areaPlot._renderArea;
       var areaPath = renderArea.select(".area");
       assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
       verifier.end();

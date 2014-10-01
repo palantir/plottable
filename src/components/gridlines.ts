@@ -3,8 +3,8 @@
 module Plottable {
 export module Component {
   export class Gridlines extends Abstract.Component {
-    private xScale: Abstract.QuantitativeScale;
-    private yScale: Abstract.QuantitativeScale;
+    private xScale: Abstract.QuantitativeScale<any>;
+    private yScale: Abstract.QuantitativeScale<any>;
     private xLinesContainer: D3.Selection;
     private yLinesContainer: D3.Selection;
 
@@ -15,26 +15,25 @@ export module Component {
      * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
      * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
      */
-    constructor(xScale: Abstract.QuantitativeScale, yScale: Abstract.QuantitativeScale) {
+    constructor(xScale: Abstract.QuantitativeScale<any>, yScale: Abstract.QuantitativeScale<any>) {
       super();
-      if (xScale == null && yScale == null) {throw new Error("Gridlines must have at least one scale");}
       this.classed("gridlines", true);
       this.xScale = xScale;
       this.yScale = yScale;
-      if (this.xScale != null) {
+      if (this.xScale) {
         this.xScale.broadcaster.registerListener(this, () => this._render());
       }
-      if (this.yScale != null) {
+      if (this.yScale) {
         this.yScale.broadcaster.registerListener(this, () => this._render());
       }
     }
 
     public remove() {
       super.remove();
-      if (this.xScale != null) {
+      if (this.xScale) {
         this.xScale.broadcaster.deregisterListener(this);
       }
-      if (this.yScale != null) {
+      if (this.yScale) {
         this.yScale.broadcaster.deregisterListener(this);
       }
       return this;
@@ -42,8 +41,8 @@ export module Component {
 
     public _setup() {
       super._setup();
-      this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);
-      this.yLinesContainer = this.content.append("g").classed("y-gridlines", true);
+      this.xLinesContainer = this._content.append("g").classed("x-gridlines", true);
+      this.yLinesContainer = this._content.append("g").classed("y-gridlines", true);
     }
 
     public _doRender() {
@@ -53,7 +52,7 @@ export module Component {
     }
 
     private redrawXLines() {
-      if (this.xScale != null) {
+      if (this.xScale) {
         var xTicks = this.xScale.ticks();
         var getScaledXValue = (tickVal: number) => this.xScale.scale(tickVal);
         var xLines = this.xLinesContainer.selectAll("line").data(xTicks);
@@ -68,7 +67,7 @@ export module Component {
     }
 
     private redrawYLines() {
-      if (this.yScale != null) {
+      if (this.yScale) {
         var yTicks = this.yScale.ticks();
         var getScaledYValue = (tickVal: number) => this.yScale.scale(tickVal);
         var yLines = this.yLinesContainer.selectAll("line").data(yTicks);
