@@ -186,38 +186,32 @@ describe("Plots", () => {
 
   describe("Clustered Bar Plot Missing Values", () => {
     var svg: D3.Selection;
-    var xScale: Plottable.Scale.Ordinal;
-    var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.ClusteredBar<string, number>;
-    var SVG_WIDTH = 600;
-    var SVG_HEIGHT = 400;
-    var axisHeight = 0;
-    var bandWidth = 0;
+    var plot: Plottable.Plot.ClusteredBar<string, number>;
 
     var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
 
     beforeEach(() => {
+      var SVG_WIDTH = 600;
+      var SVG_HEIGHT = 400;
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Ordinal();
-      yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scale.Ordinal();
+      var yScale = new Plottable.Scale.Linear();
 
       var data1 = [{x: "A", y: 1}, {x: "B", y: 2}, {x: "C", y: 1}];
       var data2 = [{x: "A", y: 2}, {x: "B", y: 4}];
       var data3 = [{x: "B", y: 15}, {x: "C", y: 15}];
 
-      renderer = new Plottable.Plot.ClusteredBar<string,number>(xScale, yScale);
-      renderer.addDataset(data1);
-      renderer.addDataset(data2);
-      renderer.addDataset(data3);
-      renderer.baseline(0);
+      plot = new Plottable.Plot.ClusteredBar<string,number>(xScale, yScale);
+      plot.addDataset(data1);
+      plot.addDataset(data2);
+      plot.addDataset(data3);
+      plot.baseline(0);
       var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-      var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
-      axisHeight = xAxis.height();
-      bandWidth = xScale.rangeBand();
+      new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
     });
 
     it("renders correctly", () => {
-      var bars = renderer._renderArea.selectAll("rect");
+      var bars = plot._renderArea.selectAll("rect");
 
       assert.lengthOf(bars[0], 7, "Number of bars should be equivalent to number of datum");
 

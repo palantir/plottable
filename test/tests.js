@@ -3055,33 +3055,27 @@ describe("Plots", function () {
     });
     describe("Clustered Bar Plot Missing Values", function () {
         var svg;
-        var xScale;
-        var yScale;
-        var renderer;
-        var SVG_WIDTH = 600;
-        var SVG_HEIGHT = 400;
-        var axisHeight = 0;
-        var bandWidth = 0;
+        var plot;
         var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
         beforeEach(function () {
+            var SVG_WIDTH = 600;
+            var SVG_HEIGHT = 400;
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scale.Ordinal();
-            yScale = new Plottable.Scale.Linear();
+            var xScale = new Plottable.Scale.Ordinal();
+            var yScale = new Plottable.Scale.Linear();
             var data1 = [{ x: "A", y: 1 }, { x: "B", y: 2 }, { x: "C", y: 1 }];
             var data2 = [{ x: "A", y: 2 }, { x: "B", y: 4 }];
             var data3 = [{ x: "B", y: 15 }, { x: "C", y: 15 }];
-            renderer = new Plottable.Plot.ClusteredBar(xScale, yScale);
-            renderer.addDataset(data1);
-            renderer.addDataset(data2);
-            renderer.addDataset(data3);
-            renderer.baseline(0);
+            plot = new Plottable.Plot.ClusteredBar(xScale, yScale);
+            plot.addDataset(data1);
+            plot.addDataset(data2);
+            plot.addDataset(data3);
+            plot.baseline(0);
             var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
-            axisHeight = xAxis.height();
-            bandWidth = xScale.rangeBand();
+            new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
-            var bars = renderer._renderArea.selectAll("rect");
+            var bars = plot._renderArea.selectAll("rect");
             assert.lengthOf(bars[0], 7, "Number of bars should be equivalent to number of datum");
             var aBar0 = d3.select(bars[0][0]);
             var aBar1 = d3.select(bars[0][3]);
