@@ -3004,7 +3004,7 @@ declare module Plottable {
              */
             constructor(xScale?: Abstract.Scale<X, number>, yScale?: Abstract.Scale<Y, number>, isVertical?: boolean);
             _setup(): void;
-            _getAnimator(drawer: Abstract._Drawer, index: number): Animator.Rect;
+            _getAnimator(drawer: Abstract._Drawer, index: number): Animator.MovingRect;
             _getDrawer(key: string): any;
             _generateAttrToProjector(): any;
             _paint(): void;
@@ -3184,7 +3184,7 @@ declare module Plottable {
         class MovingRect extends Rect {
             baseline: number;
             constructor(baseline: number, isVertical?: boolean);
-            _startMovingAttrProjector(attrToProjector: IAttributeToProjector): (p: any) => number;
+            _startMovingProjector(attrToProjector: IAttributeToProjector): (p: any) => number;
         }
     }
 }

@@ -7272,8 +7272,9 @@ var Plottable;
                 Plottable.Abstract.NewStyleBarPlot.prototype._setup.call(this);
             };
             StackedBar.prototype._getAnimator = function (drawer, index) {
-                var animator = new Plottable.Animator.Rect();
-                animator.delay(animator.duration() * index);
+                var primaryScale = this._isVertical ? this._yScale : this._xScale;
+                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var animator = new Plottable.Animator.MovingRect(scaledBaseline);
                 return animator;
             };
             StackedBar.prototype._getDrawer = function (key) {
@@ -7539,8 +7540,8 @@ var Plottable;
                 _super.call(this, isVertical);
                 this.baseline = baseline;
             }
-            MovingRect.prototype._startMovingAttrProjector = function (attrToProjector) {
-                return this.isVertical ? d3.functor(this.baseline) : d3.functor(0);
+            MovingRect.prototype._startMovingProjector = function (attrToProjector) {
+                return d3.functor(this.baseline);
             };
             return MovingRect;
         })(Animator.Rect);

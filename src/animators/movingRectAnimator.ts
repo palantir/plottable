@@ -15,8 +15,8 @@ export module Animator {
       this.baseline = baseline;
     }
 
-    public _startMovingAttrProjector(attrToProjector: IAttributeToProjector) {
-      return this.isVertical ? d3.functor(this.baseline) : d3.functor(0);
+    public _startMovingProjector(attrToProjector: IAttributeToProjector) {
+      return d3.functor(this.baseline);
     }
 
   }
