@@ -51,6 +51,9 @@
     "name":"changeData_onClick",
     "categories":["Data", "Datasource", "Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Scatter Plot", "Animate", "Merge", "Click Interaction"]
   },  {
+    "name":"clustered_bar",
+    "categories":["Linear Scale", "Numeric Axis", "Animate", "Legend", "Category Axis", "Linear Scale", "Vertical Bar Plot", "Clustered Plot"]
+  },  {
     "name":"domainChange",
     "categories":["Datasource", "Linear Scale", "Numeric Axis", "Line Plot", "Scatter Plot", "Label", "Click Interaction", "Domain"]
   },  {
