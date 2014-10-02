@@ -2087,7 +2087,7 @@ declare module Plottable {
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
-             * @param {string} orientation The orientation of the Label (horizontal/vertical-left/vertical-right) (default = "horizontal").
+             * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
              */
             constructor(displayText?: string, orientation?: string);
             /**
@@ -2131,7 +2131,7 @@ declare module Plottable {
              * Sets the orientation of the Label.
              *
              * @param {string} newOrientation If provided, the desired orientation
-             * (horizontal/vertical-left/vertical-right).
+             * (horizontal/left/right).
              * @returns {Label} The calling Label.
              */
             orient(newOrientation: string): Label;

@@ -4746,7 +4746,7 @@ var Plottable;
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
-             * @param {string} orientation The orientation of the Label (horizontal/vertical-left/vertical-right) (default = "horizontal").
+             * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
              */
             function Label(displayText, orientation) {
                 if (displayText === void 0) { displayText = ""; }
@@ -4818,12 +4818,6 @@ var Plottable;
                 }
                 else {
                     newOrientation = newOrientation.toLowerCase();
-                    if (newOrientation === "vertical-left") {
-                        newOrientation = "left";
-                    }
-                    if (newOrientation === "vertical-right") {
-                        newOrientation = "right";
-                    }
                     if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
                         this.orientation = newOrientation;
                     }
