@@ -7072,29 +7072,17 @@ var Plottable;
                 var datasets = this._getDatasetsInOrder();
                 var dataMapArray = this.generateDefaultMapArray();
                 var domainKeys = this.getDomainKeys();
-                var positiveDataArray = dataMapArray.map(function (dataMap) {
-                    return domainKeys.map(function (domainKey) {
+                var positiveDataMapArray = dataMapArray.map(function (dataMap) {
+                    return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) };
                     });
                 });
-                var negativeDataArray = dataMapArray.map(function (dataMap) {
-                    return domainKeys.map(function (domainKey) {
+                var negativeDataMapArray = dataMapArray.map(function (dataMap) {
+                    return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) };
                     });
                 });
-                var positiveDataMapArray = this._stack(positiveDataArray).map(function (positiveData, i) {
-                    return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey, i) {
-                        var positiveDatum = positiveData[i];
-                        return { key: domainKey, value: positiveDatum.value, offset: positiveDatum.offset };
-                    });
-                });
-                var negativeDataMapArray = this._stack(negativeDataArray).map(function (negativeData, i) {
-                    return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey, i) {
-                        var negativeDatum = negativeData[i];
-                        return { key: domainKey, value: negativeDatum.value, offset: negativeDatum.offset };
-                    });
-                });
-                this.setDatasetStackOffsets(positiveDataMapArray, negativeDataMapArray);
+                this.setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
                 var valueAccessor = this.valueAccessor();
                 var maxStack = Plottable._Util.Methods.max(datasets, function (dataset) {
                     return Plottable._Util.Methods.max(dataset.data(), function (datum) {
@@ -7113,10 +7101,11 @@ var Plottable;
              * the stack offsets and use the the function declared in .out to set the offsets on the data.
              */
             Stacked.prototype._stack = function (dataArray) {
+                var _this = this;
                 var outFunction = function (d, y0, y) {
                     d.offset = y0;
                 };
-                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return d; }).out(outFunction)(dataArray);
+                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return _this.getDomainKeys().map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
                 return dataArray;
             };
             /**

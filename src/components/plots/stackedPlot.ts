@@ -27,33 +27,19 @@ export module Abstract {
       var dataMapArray = this.generateDefaultMapArray();
       var domainKeys = this.getDomainKeys();
 
-      var positiveDataArray: StackedDatum[][] = dataMapArray.map((dataMap) => {
-        return domainKeys.map((domainKey) => {
+      var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
+        return _Util.Methods.populateMap(domainKeys, (domainKey) => {
           return {key: domainKey, value: Math.max(0, dataMap.get(domainKey).value)};
         });
       });
 
-      var negativeDataArray: StackedDatum[][] = dataMapArray.map((dataMap) => {
-        return domainKeys.map((domainKey) => {
+      var negativeDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
+        return _Util.Methods.populateMap(domainKeys, (domainKey) => {
           return {key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0)};
         });
       });
 
-      var positiveDataMapArray: D3.Map<StackedDatum>[] = this._stack(positiveDataArray).map((positiveData, i) => {
-        return _Util.Methods.populateMap(domainKeys, (domainKey, i) => {
-          var positiveDatum = positiveData[i];
-          return {key: domainKey, value: positiveDatum.value, offset: positiveDatum.offset};
-        });
-      });
-
-      var negativeDataMapArray: D3.Map<StackedDatum>[] = this._stack(negativeDataArray).map((negativeData, i) => {
-        return _Util.Methods.populateMap(domainKeys, (domainKey, i) => {
-          var negativeDatum = negativeData[i];
-          return {key: domainKey, value: negativeDatum.value, offset: negativeDatum.offset};
-        });
-      });
-
-      this.setDatasetStackOffsets(positiveDataMapArray, negativeDataMapArray);
+      this.setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
 
       var valueAccessor = this.valueAccessor();
       var maxStack = _Util.Methods.max(datasets, (dataset: Dataset) => {
@@ -75,7 +61,7 @@ export module Abstract {
      * Feeds the data through d3's stack layout function which will calculate
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
-    private _stack(dataArray: StackedDatum[][]): StackedDatum[][] {
+    private _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
       var outFunction = (d: StackedDatum, y0: number, y: number) => {
         d.offset = y0;
       };
@@ -83,7 +69,7 @@ export module Abstract {
       d3.layout.stack()
                .x((d) => d.key)
                .y((d) => d.value)
-               .values((d) => d)
+               .values((d) => this.getDomainKeys().map((domainKey) => d.get(domainKey)))
                .out(outFunction)(dataArray);
 
       return dataArray;
