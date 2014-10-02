@@ -15,7 +15,7 @@ export module Animator {
         animateArc.startAngle = startAngleInterpolate(t);
         animateArc.endAngle = endAngleInterpolate(t);
         return dProjector(animateArc);
-      }
+      };
     }
 
   }

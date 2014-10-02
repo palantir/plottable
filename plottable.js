@@ -7366,9 +7366,7 @@ var Plottable;
                 return _super.prototype.animate.call(this, selection.attr(attrToProjector), attrToProjector).attrTween("d", function (d) { return _this._pathTween(d, attrToProjector["d"]); });
             };
             Path.prototype._pathTween = function (d, dProjector) {
-                return function (t) {
-                    return dProjector(d);
-                };
+                return function (t) { return dProjector(d); };
             };
             return Path;
         })(Plottable.Animator.Base);

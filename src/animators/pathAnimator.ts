@@ -11,9 +11,7 @@ export module Abstract {
     }
 
     public _pathTween(d: any, dProjector: IAppliedAccessor): D3.Transition.BaseInterpolate {
-      return (t: any) => {
-        return dProjector(d);
-      }
+      return (t: any) => dProjector(d);
     }
 
   }
