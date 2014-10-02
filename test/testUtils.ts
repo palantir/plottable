@@ -129,6 +129,10 @@ function normalizePath(pathString: string) {
   return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
 }
 
+function numAttr(s: D3.Selection, a: string) {
+  return parseFloat(s.attr(a));
+}
+
 function triggerFakeUIEvent(type: string, target: D3.Selection) {
   var e = <UIEvent> document.createEvent("UIEvents");
   e.initUIEvent(type, true, true, window, 1);
