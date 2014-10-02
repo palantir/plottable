@@ -116,7 +116,7 @@ export module Abstract {
       });
     }
 
-    private getDomainKeys() {
+    private getDomainKeys(): string[] {
       var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var domainKeys = d3.set();
       var datasets = this._getDatasetsInOrder();
