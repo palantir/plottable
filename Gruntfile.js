@@ -109,7 +109,7 @@ module.exports = function(grunt) {
     sublime: {
       pattern: "(.*\\.ts)",
       replacement: '/// <reference path="../$1" />',
-      path: "build/sublime.d.ts",
+      path: "build/all.d.ts",
     },
     version_number: {
       pattern: "@VERSION",
@@ -298,7 +298,10 @@ module.exports = function(grunt) {
     },
     shell: {
       sublime: {
-        command: "(echo 'src/reference.ts'; find typings -name '*.d.ts') > build/sublime.d.ts",
+        command: "(echo 'src/reference.ts'; find typings -name '*.d.ts') > build/all.d.ts",
+      },
+      doc: {
+        command: "./node_modules/typedoc/bin/typedoc build/all.d.ts --out doc",
       },
     },
     'saucelabs-mocha': {
@@ -392,4 +395,8 @@ module.exports = function(grunt) {
                                   "sed:sublime",
                                   ]);
 
+  grunt.registerTask("doc", [
+                              "sublime",
+                              "shell:doc",
+                              ]);
 };
