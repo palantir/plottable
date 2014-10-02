@@ -108,13 +108,13 @@ var Plottable;
              * Populates a map from an array of keys and a transformation function.
              *
              * @param {string[]} keys The array of keys.
-             * @param {(string) => T} transform A transformation function to apply to the keys.
+             * @param {(string, number) => T} transform A transformation function to apply to the keys.
              * @return {D3.Map<T>} A map mapping keys to their transformed values.
              */
             function populateMap(keys, transform) {
                 var map = d3.map();
-                keys.forEach(function (key) {
-                    map.set(key, transform(key));
+                keys.forEach(function (key, i) {
+                    map.set(key, transform(key, i));
                 });
                 return map;
             }
@@ -3233,15 +3233,15 @@ var Plottable;
                 var xPosition = this.xOrigin;
                 var yPosition = this.yOrigin;
                 var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
-                xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
                 xPosition += this._xOffset;
                 if (this._isFixedWidth()) {
+                    xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
                     // Decrease size so hitbox / bounding box and children are sized correctly
                     availableWidth = Math.min(availableWidth, requestedSpace.width);
                 }
-                yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
                 yPosition += this._yOffset;
                 if (this._isFixedHeight()) {
+                    yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
                     availableHeight = Math.min(availableHeight, requestedSpace.height);
                 }
                 this._width = availableWidth;
@@ -3784,6 +3784,7 @@ var Plottable;
                 }
                 this._scale = scale;
                 this.orient(orientation);
+                this._setDefaultAlignment();
                 this.classed("axis", true);
                 if (this._isHorizontal()) {
                     this.classed("x-axis", true);
@@ -3943,6 +3944,22 @@ var Plottable;
                 this._computedWidth = null;
                 this._computedHeight = null;
                 _super.prototype._invalidateLayout.call(this);
+            };
+            Axis.prototype._setDefaultAlignment = function () {
+                switch (this._orientation) {
+                    case "bottom":
+                        this.yAlign("top");
+                        break;
+                    case "top":
+                        this.yAlign("bottom");
+                        break;
+                    case "left":
+                        this.xAlign("right");
+                        break;
+                    case "right":
+                        this.xAlign("left");
+                        break;
+                }
             };
             Axis.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
@@ -4729,7 +4746,7 @@ var Plottable;
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
-             * @param {string} orientation The orientation of the Label (horizontal/vertical-left/vertical-right) (default = "horizontal").
+             * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
              */
             function Label(displayText, orientation) {
                 if (displayText === void 0) { displayText = ""; }
@@ -4801,12 +4818,6 @@ var Plottable;
                 }
                 else {
                     newOrientation = newOrientation.toLowerCase();
-                    if (newOrientation === "vertical-left") {
-                        newOrientation = "left";
-                    }
-                    if (newOrientation === "vertical-right") {
-                        newOrientation = "right";
-                    }
                     if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
                         this.orientation = newOrientation;
                     }
@@ -7008,10 +7019,6 @@ var Plottable;
             ClusteredBar.prototype.cluster = function (accessor) {
                 var _this = this;
                 this.innerScale.domain(this._datasetKeysInOrder);
-                var lengths = this._getDatasetsInOrder().map(function (d) { return d.data().length; });
-                if (Plottable._Util.Methods.uniq(lengths).length > 1) {
-                    Plottable._Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
-                }
                 var clusters = {};
                 this._datasetKeysInOrder.forEach(function (key) {
                     var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
@@ -7076,20 +7083,16 @@ var Plottable;
                     });
                 });
                 var positiveDataMapArray = this._stack(positiveDataArray).map(function (positiveData, i) {
-                    var positiveDataMap = d3.map();
-                    domainKeys.forEach(function (domainKey, i) {
+                    return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey, i) {
                         var positiveDatum = positiveData[i];
-                        positiveDataMap.set(domainKey, { key: domainKey, value: positiveDatum.value, offset: positiveDatum.offset });
+                        return { key: domainKey, value: positiveDatum.value, offset: positiveDatum.offset };
                     });
-                    return positiveDataMap;
                 });
                 var negativeDataMapArray = this._stack(negativeDataArray).map(function (negativeData, i) {
-                    var negativeDataMap = d3.map();
-                    domainKeys.forEach(function (domainKey, i) {
+                    return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey, i) {
                         var negativeDatum = negativeData[i];
-                        negativeDataMap.set(domainKey, { key: domainKey, value: negativeDatum.value, offset: negativeDatum.offset });
+                        return { key: domainKey, value: negativeDatum.value, offset: negativeDatum.offset };
                     });
-                    return negativeDataMap;
                 });
                 this.setDatasetStackOffsets(positiveDataMapArray, negativeDataMapArray);
                 var valueAccessor = this.valueAccessor();

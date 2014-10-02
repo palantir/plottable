@@ -40,21 +40,17 @@ export module Abstract {
       });
 
       var positiveDataMapArray: D3.Map<StackedDatum>[] = this._stack(positiveDataArray).map((positiveData, i) => {
-        var positiveDataMap = d3.map();
-        domainKeys.forEach((domainKey, i) => {
+        return _Util.Methods.populateMap(domainKeys, (domainKey, i) => {
           var positiveDatum = positiveData[i];
-          positiveDataMap.set(domainKey, {key: domainKey, value: positiveDatum.value, offset: positiveDatum.offset});
+          return {key: domainKey, value: positiveDatum.value, offset: positiveDatum.offset};
         });
-        return positiveDataMap;
       });
 
       var negativeDataMapArray: D3.Map<StackedDatum>[] = this._stack(negativeDataArray).map((negativeData, i) => {
-        var negativeDataMap = d3.map();
-        domainKeys.forEach((domainKey, i) => {
+        return _Util.Methods.populateMap(domainKeys, (domainKey, i) => {
           var negativeDatum = negativeData[i];
-          negativeDataMap.set(domainKey, {key: domainKey, value: negativeDatum.value, offset: negativeDatum.offset});
+          return {key: domainKey, value: negativeDatum.value, offset: negativeDatum.offset};
         });
-        return negativeDataMap;
       });
 
       this.setDatasetStackOffsets(positiveDataMapArray, negativeDataMapArray);

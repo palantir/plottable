@@ -45,7 +45,7 @@ export module Abstract {
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
       this._scale = scale;
       this.orient(orientation);
-
+      this._setDefaultAlignment();
       this.classed("axis", true);
       if (this._isHorizontal()) {
         this.classed("x-axis", true);
@@ -234,6 +234,26 @@ export module Abstract {
       this._computedWidth = null;
       this._computedHeight = null;
       super._invalidateLayout();
+    }
+
+    public _setDefaultAlignment() {
+      switch(this._orientation) {
+        case "bottom":
+          this.yAlign("top");
+          break;
+
+        case "top":
+          this.yAlign("bottom");
+          break;
+
+        case "left":
+          this.xAlign("right");
+          break;
+
+        case "right":
+          this.xAlign("left");
+          break;
+      }
     }
 
     /**

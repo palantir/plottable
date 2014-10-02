@@ -65,6 +65,22 @@ function assertBBoxInclusion(outerEl: D3.Selection, innerEl: D3.Selection) {
           "bounding rect bottom included");
 }
 
+function assertBBoxNonIntersection(firstEl: D3.Selection, secondEl: D3.Selection) {
+  var firstBox = firstEl.node().getBoundingClientRect();
+  var secondBox = secondEl.node().getBoundingClientRect();
+
+  var intersectionBox = {
+    left: Math.max(firstBox.left, secondBox.left),
+    right: Math.min(firstBox.right, secondBox.right),
+    bottom: Math.min(firstBox.bottom, secondBox.bottom),
+    top: Math.max(firstBox.top, secondBox.top)
+  };
+
+  // +1 for inaccuracy in IE
+  assert.isTrue(intersectionBox.left + 1 >= intersectionBox.right || intersectionBox.bottom + 1 >= intersectionBox.top,
+          "bounding rects are not intersecting");
+}
+
 function assertXY(el: D3.Selection, xExpected: number, yExpected: number, message: string) {
   var x = el.attr("x");
   var y = el.attr("y");
@@ -111,6 +127,10 @@ class MultiTestVerifier {
 // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
 function normalizePath(pathString: string) {
   return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
+}
+
+function numAttr(s: D3.Selection, a: string) {
+  return parseFloat(s.attr(a));
 }
 
 function triggerFakeUIEvent(type: string, target: D3.Selection) {

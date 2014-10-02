@@ -287,8 +287,6 @@ describe("Plots", () => {
       var axisWidth = 0;
       var bandWidth = 0;
 
-      var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
-
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
