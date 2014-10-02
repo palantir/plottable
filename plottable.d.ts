@@ -2785,8 +2785,8 @@ declare module Plottable {
          *
          * The maximal delay between animations can be configured with the .maxIterativeDelay getter/setter.
          *
-         * The limit for total animation duration can be configured with the .totalDurationLimit getter/setter.
-         * totalDurationLimit does NOT set actual total animation duration.
+         * The maximum total animation duration can be configured with the .maxTotalDuration getter/setter.
+         * maxTotalDuration does NOT set actual total animation duration.
          *
          * The actual interval delay is calculated by following formula:
          * min(maxIterativeDelay(),
@@ -2798,9 +2798,9 @@ declare module Plottable {
              */
             static DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS: number;
             /**
-             * The default total animation duration limit
+             * The default maximum total animation duration
              */
-            static DEFAULT_TOTAL_DURATION_LIMIT_MILLISECONDS: number;
+            static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS: number;
             /**
              * Constructs an animator with a start delay between each selection animation
              *
@@ -2809,31 +2809,31 @@ declare module Plottable {
             constructor();
             animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
             /**
-             * Gets the start delay between animations in milliseconds.
+             * Gets the maximum start delay between animations in milliseconds.
              *
-             * @returns {number} The current iterative delay.
+             * @returns {number} The current maximum iterative delay.
              */
             maxIterativeDelay(): number;
             /**
-             * Sets the maximal start delay between animations in milliseconds.
+             * Sets the maximum start delay between animations in milliseconds.
              *
-             * @param {number} maxIterDelay The maximal iterative delay in milliseconds.
+             * @param {number} maxIterDelay The maximum iterative delay in milliseconds.
              * @returns {IterativeDelay} The calling IterativeDelay Animator.
              */
             maxIterativeDelay(maxIterDelay: number): IterativeDelay;
             /**
-             * Gets the total animation duration limit in milliseconds.
+             * Gets the maximum total animation duration in milliseconds.
              *
-             * @returns {number} The current total animation duration limit.
+             * @returns {number} The current maximum total animation duration.
              */
-            totalDurationLimit(): number;
+            maxTotalDuration(): number;
             /**
-             * Sets the total animation duration limit in miliseconds.
+             * Sets the maximum total animation duration in miliseconds.
              *
-             * @param {number} timeLimit The total animation duration limit in milliseconds.
+             * @param {number} maxDuration The maximum total animation duration in milliseconds.
              * @returns {IterativeDelay} The calling IterativeDelay Animator.
              */
-            totalDurationLimit(timeLimit: number): IterativeDelay;
+            maxTotalDuration(maxDuration: number): IterativeDelay;
         }
     }
 }

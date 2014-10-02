@@ -7415,8 +7415,8 @@ var Plottable;
          *
          * The maximal delay between animations can be configured with the .maxIterativeDelay getter/setter.
          *
-         * The limit for total animation duration can be configured with the .totalDurationLimit getter/setter.
-         * totalDurationLimit does NOT set actual total animation duration.
+         * The maximum total animation duration can be configured with the .maxTotalDuration getter/setter.
+         * maxTotalDuration does NOT set actual total animation duration.
          *
          * The actual interval delay is calculated by following formula:
          * min(maxIterativeDelay(),
@@ -7432,13 +7432,13 @@ var Plottable;
             function IterativeDelay() {
                 _super.call(this);
                 this._maxIterativeDelay = IterativeDelay.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
-                this._totalDurationLimit = IterativeDelay.DEFAULT_TOTAL_DURATION_LIMIT_MILLISECONDS;
+                this._maxTotalDuration = IterativeDelay.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
             }
             IterativeDelay.prototype.animate = function (selection, attrToProjector) {
                 var _this = this;
                 var numberOfIterations = selection[0].length;
                 var maxIterativeDelay = this.maxIterativeDelay();
-                var maxDelayForLastIteration = Math.max(this.totalDurationLimit() - this.duration(), 0);
+                var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
                 var adjustedIterativeDelay = Math.min(maxIterativeDelay, maxDelayForLastIteration / numberOfIterations);
                 return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + adjustedIterativeDelay * i; }).attr(attrToProjector);
             };
@@ -7451,12 +7451,12 @@ var Plottable;
                     return this;
                 }
             };
-            IterativeDelay.prototype.totalDurationLimit = function (timeLimit) {
-                if (timeLimit == null) {
-                    return this._totalDurationLimit;
+            IterativeDelay.prototype.maxTotalDuration = function (maxDuration) {
+                if (maxDuration == null) {
+                    return this._maxTotalDuration;
                 }
                 else {
-                    this._totalDurationLimit = timeLimit;
+                    this._maxTotalDuration = maxDuration;
                     return this;
                 }
             };
@@ -7465,9 +7465,9 @@ var Plottable;
              */
             IterativeDelay.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS = 15;
             /**
-             * The default total animation duration limit
+             * The default maximum total animation duration
              */
-            IterativeDelay.DEFAULT_TOTAL_DURATION_LIMIT_MILLISECONDS = Infinity;
+            IterativeDelay.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
             return IterativeDelay;
         })(Animator.Base);
         Animator.IterativeDelay = IterativeDelay;

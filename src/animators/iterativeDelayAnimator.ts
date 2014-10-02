@@ -9,8 +9,8 @@ export module Animator {
    *
    * The maximal delay between animations can be configured with the .maxIterativeDelay getter/setter.
    *
-   * The limit for total animation duration can be configured with the .totalDurationLimit getter/setter.
-   * totalDurationLimit does NOT set actual total animation duration.
+   * The maximum total animation duration can be configured with the .maxTotalDuration getter/setter.
+   * maxTotalDuration does NOT set actual total animation duration.
    *
    * The actual interval delay is calculated by following formula:
    * min(maxIterativeDelay(), 
@@ -23,12 +23,12 @@ export module Animator {
     public static DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS = 15;
 
     /**
-     * The default total animation duration limit
+     * The default maximum total animation duration
      */
-    public static DEFAULT_TOTAL_DURATION_LIMIT_MILLISECONDS = Infinity;
+    public static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
 
     private _maxIterativeDelay: number;
-    private _totalDurationLimit: number;
+    private _maxTotalDuration: number;
 
     /**
      * Constructs an animator with a start delay between each selection animation
@@ -38,13 +38,13 @@ export module Animator {
     constructor() {
       super();
       this._maxIterativeDelay = IterativeDelay.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
-      this._totalDurationLimit = IterativeDelay.DEFAULT_TOTAL_DURATION_LIMIT_MILLISECONDS;
+      this._maxTotalDuration = IterativeDelay.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
     }
 
     public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection {
       var numberOfIterations = selection[0].length;
       var maxIterativeDelay = this.maxIterativeDelay();
-      var maxDelayForLastIteration = Math.max(this.totalDurationLimit() - this.duration(), 0);
+      var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
       var adjustedIterativeDelay = Math.min(maxIterativeDelay, maxDelayForLastIteration / numberOfIterations);
       return selection.transition()
         .ease(this.easing())
@@ -54,15 +54,15 @@ export module Animator {
     }
 
     /**
-     * Gets the start delay between animations in milliseconds.
+     * Gets the maximum start delay between animations in milliseconds.
      *
-     * @returns {number} The current iterative delay.
+     * @returns {number} The current maximum iterative delay.
      */
     public maxIterativeDelay(): number;
     /**
-     * Sets the maximal start delay between animations in milliseconds.
+     * Sets the maximum start delay between animations in milliseconds.
      *
-     * @param {number} maxIterDelay The maximal iterative delay in milliseconds.
+     * @param {number} maxIterDelay The maximum iterative delay in milliseconds.
      * @returns {IterativeDelay} The calling IterativeDelay Animator.
      */
     public maxIterativeDelay(maxIterDelay: number): IterativeDelay;
@@ -76,23 +76,23 @@ export module Animator {
     }
 
     /**
-     * Gets the total animation duration limit in milliseconds.
+     * Gets the maximum total animation duration in milliseconds.
      *
-     * @returns {number} The current total animation duration limit.
+     * @returns {number} The current maximum total animation duration.
      */
-    public totalDurationLimit(): number;
+    public maxTotalDuration(): number;
     /**
-     * Sets the total animation duration limit in miliseconds.
+     * Sets the maximum total animation duration in miliseconds.
      *
-     * @param {number} timeLimit The total animation duration limit in milliseconds.
+     * @param {number} maxDuration The maximum total animation duration in milliseconds.
      * @returns {IterativeDelay} The calling IterativeDelay Animator.
      */
-    public totalDurationLimit(timeLimit: number): IterativeDelay;
-    public totalDurationLimit(timeLimit?: number): any {
-      if (timeLimit == null) {
-        return this._totalDurationLimit;
+    public maxTotalDuration(maxDuration: number): IterativeDelay;
+    public maxTotalDuration(maxDuration?: number): any {
+      if (maxDuration == null) {
+        return this._maxTotalDuration;
       } else {
-        this._totalDurationLimit = timeLimit;
+        this._maxTotalDuration = maxDuration;
         return this;
       }
     }
