@@ -2903,7 +2903,7 @@ describe("Plots", function () {
         });
         it("renders correctly", function () {
             var bars = plot._renderArea.selectAll("rect");
-            assert.lengthOf(bars[0], 7, "bars with no data are not rendered");
+            assert.lengthOf(bars[0], 7, "draws a bar for each datum");
             var aBars = [d3.select(bars[0][0]), d3.select(bars[0][3])];
             var bBars = [d3.select(bars[0][1]), d3.select(bars[0][4]), d3.select(bars[0][5])];
             var cBars = [d3.select(bars[0][2]), d3.select(bars[0][6])];

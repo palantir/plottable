@@ -289,7 +289,7 @@ describe("Plots", () => {
     it("renders correctly", () => {
       var bars = plot._renderArea.selectAll("rect");
 
-      assert.lengthOf(bars[0], 7, "bars with no data are not rendered");
+      assert.lengthOf(bars[0], 7, "draws a bar for each datum");
 
       var aBars = [d3.select(bars[0][0]), d3.select(bars[0][3])];
 
