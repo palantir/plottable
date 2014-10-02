@@ -5919,24 +5919,27 @@ var Plottable;
             };
             Radar.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-                this.radar();
+                this._metrics = this.getMetricsFromDataset();
+                this.radarData = this.getRadarDictionary();
             };
-            Radar.prototype.radar = function () {
-                var _this = this;
-                this.radarData = [];
-                this._metrics = [];
-                this._getDatasetsInOrder().forEach(function (dataset) {
+            Radar.prototype.getMetricsFromDataset = function () {
+                var metrics = this._getDatasetsInOrder().map(function (dataset) {
+                    return dataset.data().map(function (datum) { return datum["metric"]; });
+                });
+                return Plottable._Util.Methods.uniq(Plottable._Util.Methods.flatten(metrics));
+            };
+            Radar.prototype.getRadarDictionary = function () {
+                var radarData = [];
+                this._getDatasetsInOrder().map(function (dataset) {
                     var radarDatum = {};
                     dataset.data().forEach(function (datum) {
                         var metric = datum["metric"];
                         var value = datum["value"];
-                        if (_this._metrics.indexOf(metric) === -1) {
-                            _this._metrics.push(metric);
-                        }
                         radarDatum[metric] = value;
                     });
-                    _this.radarData.push(radarDatum);
+                    radarData.push(radarDatum);
                 });
+                return radarData;
             };
             Radar.prototype.addDataset = function (keyOrDataset, dataset) {
                 return Plottable.Abstract.NewStylePlot.prototype.addDataset.call(this, keyOrDataset, dataset);

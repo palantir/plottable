@@ -49,26 +49,29 @@ export module Plot {
 
     public _onDatasetUpdate() {
       super._onDatasetUpdate();
-      this.radar();
+      this._metrics = this.getMetricsFromDataset();
+      this.radarData = this.getRadarDictionary();
     }
 
-    private radar() {
-      this.radarData = [];
-      this._metrics = [];
-      this._getDatasetsInOrder().forEach((dataset) => {
+    public getMetricsFromDataset() {
+      var metrics: string[][] = this._getDatasetsInOrder().map((dataset) => {
+        return dataset.data().map((datum: any) => datum["metric"]);
+      });
+      return _Util.Methods.uniq(_Util.Methods.flatten(metrics));
+    }
+
+    private getRadarDictionary() {
+      var radarData: any[] = [];
+      this._getDatasetsInOrder().map((dataset) => {
         var radarDatum: any = {};
         dataset.data().forEach((datum: any) => {
           var metric = datum["metric"];
           var value = datum["value"];
-
-          if (this._metrics.indexOf(metric) === -1) {
-            this._metrics.push(metric);
-          }
-
           radarDatum[metric] = value;
         });
-        this.radarData.push(radarDatum);
+        radarData.push(radarDatum);
       });
+      return radarData;
     }
 
     /**

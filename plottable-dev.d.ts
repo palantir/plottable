@@ -2529,6 +2529,7 @@ declare module Plottable {
              */
             metrics(): string[];
             _onDatasetUpdate(): void;
+            getMetricsFromDataset(): string[];
             /**
              * Adds a dataset to this plot.
              * More than one dataset is not supported.

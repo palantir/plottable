@@ -2290,6 +2290,7 @@ declare module Plottable {
              * @returns {string[]} The metrics measured in this RadarPlot
              */
             metrics(): string[];
+            getMetricsFromDataset(): string[];
             /**
              * Adds a dataset to this plot.
              * More than one dataset is not supported.
