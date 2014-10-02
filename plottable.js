@@ -7092,7 +7092,7 @@ var Plottable;
                     return negativeDataMap;
                 });
                 this.setDatasetStackOffsets(positiveDataMapArray, negativeDataMapArray);
-                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+                var valueAccessor = this.valueAccessor();
                 var maxStack = Plottable._Util.Methods.max(datasets, function (dataset) {
                     return Plottable._Util.Methods.max(dataset.data(), function (datum) {
                         return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
@@ -7121,8 +7121,8 @@ var Plottable;
              * to be determined correctly on the overall datasets
              */
             Stacked.prototype.setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
-                var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+                var keyAccessor = this.keyAccessor();
+                var valueAccessor = this.valueAccessor();
                 this._getDatasetsInOrder().forEach(function (dataset, datasetIndex) {
                     var positiveDataMap = positiveDataMapArray[datasetIndex];
                     var negativeDataMap = negativeDataMapArray[datasetIndex];
@@ -7134,7 +7134,7 @@ var Plottable;
                 });
             };
             Stacked.prototype.getDomainKeys = function () {
-                var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                var keyAccessor = this.keyAccessor();
                 var domainKeys = d3.set();
                 var datasets = this._getDatasetsInOrder();
                 datasets.forEach(function (dataset) {
@@ -7145,8 +7145,8 @@ var Plottable;
                 return domainKeys.values();
             };
             Stacked.prototype.generateDefaultMapArray = function () {
-                var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+                var keyAccessor = this.keyAccessor();
+                var valueAccessor = this.valueAccessor();
                 var datasets = this._getDatasetsInOrder();
                 var domainKeys = this.getDomainKeys();
                 var dataMapArray = datasets.map(function () {
@@ -7175,6 +7175,12 @@ var Plottable;
                 else {
                     primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
+            };
+            Stacked.prototype.keyAccessor = function () {
+                return this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+            };
+            Stacked.prototype.valueAccessor = function () {
+                return this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
             };
             return Stacked;
         })(Abstract.NewStylePlot);

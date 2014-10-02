@@ -791,7 +791,7 @@ declare module Plottable {
      * Index, if used, will be the index of the datum in the array.
      */
     interface IAppliedAccessor {
-        (datum: any, index: number): any;
+        (datum: any, index?: number): any;
     }
     interface _IProjector {
         accessor: _IAccessor;

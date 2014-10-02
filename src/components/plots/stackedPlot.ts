@@ -59,7 +59,7 @@ export module Abstract {
 
       this.setDatasetStackOffsets(positiveDataMapArray, negativeDataMapArray);
 
-      var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+      var valueAccessor = this.valueAccessor();
       var maxStack = _Util.Methods.max(datasets, (dataset: Dataset) => {
         return _Util.Methods.max(dataset.data(), (datum: any) => {
           return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
@@ -98,8 +98,8 @@ export module Abstract {
      * to be determined correctly on the overall datasets
      */
     private setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
-      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-      var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+      var keyAccessor = this.keyAccessor();
+      var valueAccessor = this.valueAccessor();
 
       this._getDatasetsInOrder().forEach((dataset, datasetIndex) => {
         var positiveDataMap = positiveDataMapArray[datasetIndex];
@@ -115,7 +115,7 @@ export module Abstract {
     }
 
     private getDomainKeys(): string[] {
-      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+      var keyAccessor = this.keyAccessor();
       var domainKeys = d3.set();
       var datasets = this._getDatasetsInOrder();
 
@@ -129,8 +129,8 @@ export module Abstract {
     }
 
     private generateDefaultMapArray(): D3.Map<StackedDatum>[] {
-      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-      var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+      var keyAccessor = this.keyAccessor();
+      var valueAccessor = this.valueAccessor();
       var datasets = this._getDatasetsInOrder();
 
       var domainKeys = this.getDomainKeys();
@@ -163,6 +163,14 @@ export module Abstract {
       } else {
         primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
       }
+    }
+
+    private keyAccessor(): IAppliedAccessor {
+       return this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+    }
+
+    private valueAccessor(): IAppliedAccessor {
+       return this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
     }
   }
 }
