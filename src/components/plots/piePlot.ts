@@ -26,6 +26,10 @@ export module Plot {
       this.classed("pie-plot", true);
     }
 
+    public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
+      return new Animator.Arc();
+    }
+
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
