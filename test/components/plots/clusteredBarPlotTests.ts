@@ -179,4 +179,65 @@ describe("Plots", () => {
             , "y pos correct for bar3");
     });
   });
+
+  describe("Clustered Bar Plot Missing Values", () => {
+    var svg: D3.Selection;
+    var plot: Plottable.Plot.ClusteredBar<string, number>;
+
+    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
+
+    beforeEach(() => {
+      var SVG_WIDTH = 600;
+      var SVG_HEIGHT = 400;
+      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var xScale = new Plottable.Scale.Ordinal();
+      var yScale = new Plottable.Scale.Linear();
+
+      var data1 = [{x: "A", y: 1}, {x: "B", y: 2}, {x: "C", y: 1}];
+      var data2 = [{x: "A", y: 2}, {x: "B", y: 4}];
+      var data3 = [{x: "B", y: 15}, {x: "C", y: 15}];
+
+      plot = new Plottable.Plot.ClusteredBar<string,number>(xScale, yScale);
+      plot.addDataset(data1);
+      plot.addDataset(data2);
+      plot.addDataset(data3);
+      plot.baseline(0);
+      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+      new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
+    });
+
+    it("renders correctly", () => {
+      var bars = plot._renderArea.selectAll("rect");
+
+      assert.lengthOf(bars[0], 7, "Number of bars should be equivalent to number of datum");
+
+      var aBar0 = d3.select(bars[0][0]);
+      var aBar1 = d3.select(bars[0][3]);
+
+      var bBar0 = d3.select(bars[0][1]);
+      var bBar1 = d3.select(bars[0][4]);
+      var bBar2 = d3.select(bars[0][5]);
+
+      var cBar0 = d3.select(bars[0][2]);
+      var cBar1 = d3.select(bars[0][6]);
+
+      // check bars are in domain order
+      assert.operator(numAttr(aBar0, "x"), "<", numAttr(bBar0, "x"), "first dataset bars ordered correctly");
+      assert.operator(numAttr(bBar0, "x"), "<", numAttr(cBar0, "x"), "first dataset bars ordered correctly");
+
+      assert.operator(numAttr(aBar1, "x"), "<", numAttr(bBar1, "x"), "second dataset bars ordered correctly");
+
+      assert.operator(numAttr(bBar2, "x"), "<", numAttr(cBar1, "x"), "third dataset bars ordered correctly");
+
+      // check that clustering is correct
+      assert.operator(numAttr(aBar0, "x"), "<", numAttr(aBar1, "x"), "A bars clustered in dataset order");
+
+      assert.operator(numAttr(bBar0, "x"), "<", numAttr(bBar1, "x"), "B bars clustered in dataset order");
+      assert.operator(numAttr(bBar1, "x"), "<", numAttr(bBar2, "x"), "B bars clustered in dataset order");
+
+      assert.operator(numAttr(cBar0, "x"), "<", numAttr(cBar1, "x"), "C bars clustered in dataset order");
+
+      svg.remove();
+    });
+  });
 });
