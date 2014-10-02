@@ -34,6 +34,7 @@
 
 /// <reference path="drawers/baseDrawer.ts" />
 /// <reference path="drawers/areaDrawer.ts" />
+/// <reference path="drawers/polygonDrawer.ts" />
 /// <reference path="drawers/rectDrawer.ts" />
 
 /// <reference path="components/component.ts" />
@@ -52,6 +53,7 @@
 /// <reference path="components/table.ts" />
 
 /// <reference path="components/plots/plot.ts" />
+/// <reference path="components/plots/radarPlot.ts" />
 /// <reference path="components/plots/xyPlot.ts" />
 /// <reference path="components/plots/newStylePlot.ts" />
 /// <reference path="components/plots/scatterPlot.ts" />
