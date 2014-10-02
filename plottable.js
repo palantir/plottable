@@ -1,5 +1,5 @@
 /*!
-Plottable 0.30.0 (https://github.com/palantir/plottable)
+Plottable 0.31.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1290,7 +1290,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.30.0";
+    Plottable.version = "0.31.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2608,6 +2608,7 @@ var Plottable;
                     if (innerPadding != null) {
                         this._innerPadding = innerPadding;
                     }
+                    this.range(this.range());
                     this.broadcaster.broadcast();
                     return this;
                 }
@@ -3224,15 +3225,15 @@ var Plottable;
                 var xPosition = this.xOrigin;
                 var yPosition = this.yOrigin;
                 var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
-                xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
                 xPosition += this._xOffset;
                 if (this._isFixedWidth()) {
+                    xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
                     // Decrease size so hitbox / bounding box and children are sized correctly
                     availableWidth = Math.min(availableWidth, requestedSpace.width);
                 }
-                yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
                 yPosition += this._yOffset;
                 if (this._isFixedHeight()) {
+                    yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
                     availableHeight = Math.min(availableHeight, requestedSpace.height);
                 }
                 this._width = availableWidth;
@@ -3775,6 +3776,7 @@ var Plottable;
                 }
                 this._scale = scale;
                 this.orient(orientation);
+                this._setDefaultAlignment();
                 this.classed("axis", true);
                 if (this._isHorizontal()) {
                     this.classed("x-axis", true);
@@ -3934,6 +3936,22 @@ var Plottable;
                 this._computedWidth = null;
                 this._computedHeight = null;
                 _super.prototype._invalidateLayout.call(this);
+            };
+            Axis.prototype._setDefaultAlignment = function () {
+                switch (this._orientation) {
+                    case "bottom":
+                        this.yAlign("top");
+                        break;
+                    case "top":
+                        this.yAlign("bottom");
+                        break;
+                    case "left":
+                        this.xAlign("right");
+                        break;
+                    case "right":
+                        this.xAlign("left");
+                        break;
+                }
             };
             Axis.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
@@ -4580,9 +4598,6 @@ var Plottable;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
                 this.classed("category-axis", true);
-                if (scale.rangeType() !== "bands") {
-                    throw new Error("Only rangeBands category axes are implemented");
-                }
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -4731,19 +4746,7 @@ var Plottable;
                 _super.call(this);
                 this.classed("label", true);
                 this.text(displayText);
-                orientation = orientation.toLowerCase();
-                if (orientation === "vertical-left") {
-                    orientation = "left";
-                }
-                if (orientation === "vertical-right") {
-                    orientation = "right";
-                }
-                if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
-                    this.orientation = orientation;
-                }
-                else {
-                    throw new Error(orientation + " is not a valid orientation for LabelComponent");
-                }
+                this.orient(orientation);
                 this.xAlign("center").yAlign("center");
                 this._fixedHeightFlag = true;
                 this._fixedWidthFlag = true;
@@ -4797,6 +4800,28 @@ var Plottable;
                 }
                 else {
                     this._text = displayText;
+                    this._invalidateLayout();
+                    return this;
+                }
+            };
+            Label.prototype.orient = function (newOrientation) {
+                if (newOrientation == null) {
+                    return this.orientation;
+                }
+                else {
+                    newOrientation = newOrientation.toLowerCase();
+                    if (newOrientation === "vertical-left") {
+                        newOrientation = "left";
+                    }
+                    if (newOrientation === "vertical-right") {
+                        newOrientation = "right";
+                    }
+                    if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
+                        this.orientation = newOrientation;
+                    }
+                    else {
+                        throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
+                    }
                     this._invalidateLayout();
                     return this;
                 }
@@ -7338,7 +7363,7 @@ var Plottable;
             }
             Path.prototype.animate = function (selection, attrToProjector) {
                 var _this = this;
-                return _super.prototype.animate.call(this, selection, attrToProjector).attrTween("d", function (d) { return _this._pathTween(d, attrToProjector["d"]); });
+                return _super.prototype.animate.call(this, selection.attr(attrToProjector), attrToProjector).attrTween("d", function (d) { return _this._pathTween(d, attrToProjector["d"]); });
             };
             Path.prototype._pathTween = function (d, dProjector) {
                 return function (t) {
@@ -7368,12 +7393,13 @@ var Plottable;
                 _super.apply(this, arguments);
             }
             Arc.prototype._pathTween = function (d, dProjector) {
-                var i = d3.interpolate(0, d.endAngle);
-                var j = d3.interpolate(0, d.startAngle);
+                var animateArc = d3.svg.arc().innerRadius(dProjector.innerRadius()).outerRadius(dProjector.outerRadius());
+                var startAngleInterpolate = d3.interpolate(0, d.startAngle);
+                var endAngleInterpolate = d3.interpolate(0, d.endAngle);
                 return function (t) {
-                    d.startAngle = i(t);
-                    d.endAngle = j(t);
-                    return dProjector(d);
+                    animateArc.startAngle = startAngleInterpolate(t);
+                    animateArc.endAngle = endAngleInterpolate(t);
+                    return dProjector(animateArc);
                 };
             };
             return Arc;

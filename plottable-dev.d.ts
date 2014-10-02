@@ -794,7 +794,7 @@ declare module Plottable {
      * Index, if used, will be the index of the datum in the array.
      */
     interface IAppliedAccessor {
-        (datum: any, index: number): any;
+        (datum?: any, index?: number): any;
     }
     interface _IProjector {
         accessor: _IAccessor;
@@ -1831,6 +1831,7 @@ declare module Plottable {
                 y2: any;
             };
             _invalidateLayout(): void;
+            _setDefaultAlignment(): void;
             /**
              * Gets the current formatter on the axis. Data is passed through the
              * formatter before being displayed.
@@ -2116,6 +2117,20 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             text(displayText: string): Label;
+            /**
+             * Gets the orientation of the Label.
+             *
+             * @returns {string} the current orientation.
+             */
+            orient(): string;
+            /**
+             * Sets the orientation of the Label.
+             *
+             * @param {string} newOrientation If provided, the desired orientation
+             * (horizontal/vertical-left/vertical-right).
+             * @returns {Label} The calling Label.
+             */
+            orient(newOrientation: string): Label;
             _doRender(): void;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
         }
@@ -3050,7 +3065,7 @@ declare module Plottable {
     module Abstract {
         class Path extends Animator.Base {
             animate(selection: any, attrToProjector: IAttributeToProjector): D3.Transition.Transition;
-            _pathTween(d: any, dProjector: any): D3.Transition.BaseInterpolate;
+            _pathTween(d: any, dProjector: IAppliedAccessor): D3.Transition.BaseInterpolate;
         }
     }
 }
@@ -3059,7 +3074,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         class Arc extends Abstract.Path {
-            _pathTween(d: any, dProjector: any): D3.Transition.BaseInterpolate;
+            _pathTween(d: D3.Layout.ArcDescriptor, dProjector: D3.Svg.Arc): D3.Transition.BaseInterpolate;
         }
     }
 }

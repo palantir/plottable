@@ -55,6 +55,18 @@ function assertBBoxInclusion(outerEl, innerEl) {
     assert.operator(Math.ceil(outerBox.right) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.right), "bounding rect right included");
     assert.operator(Math.ceil(outerBox.bottom) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.bottom), "bounding rect bottom included");
 }
+function assertBBoxNonIntersection(firstEl, secondEl) {
+    var firstBox = firstEl.node().getBoundingClientRect();
+    var secondBox = secondEl.node().getBoundingClientRect();
+    var intersectionBox = {
+        left: Math.max(firstBox.left, secondBox.left),
+        right: Math.min(firstBox.right, secondBox.right),
+        bottom: Math.min(firstBox.bottom, secondBox.bottom),
+        top: Math.max(firstBox.top, secondBox.top)
+    };
+    // +1 for inaccuracy in IE
+    assert.isTrue(intersectionBox.left + 1 >= intersectionBox.right || intersectionBox.bottom + 1 >= intersectionBox.top, "bounding rects are not intersecting");
+}
 function assertXY(el, xExpected, yExpected, message) {
     var x = el.attr("x");
     var y = el.attr("y");
@@ -295,6 +307,17 @@ describe("BaseAxis", function () {
         baseAxis.tickLength(10);
         assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should not decrease");
         svg.remove();
+    });
+    it("default alignment based on orientation", function () {
+        var scale = new Plottable.Scale.Linear();
+        var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        assert.equal(baseAxis._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
+        baseAxis = new Plottable.Abstract.Axis(scale, "top");
+        assert.equal(baseAxis._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
+        baseAxis = new Plottable.Abstract.Axis(scale, "left");
+        assert.equal(baseAxis._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
+        baseAxis = new Plottable.Abstract.Axis(scale, "right");
+        assert.equal(baseAxis._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
     });
 });
 
@@ -701,6 +724,23 @@ describe("Category Axes", function () {
         assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing ticklength increases height");
         svg.remove();
     });
+    it("proper range values for different range types", function () {
+        var SVG_WIDTH = 400;
+        var svg = generateSVG(SVG_WIDTH, 100);
+        var scale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([0, 400]).rangeType("bands", 1, 0);
+        var categoryAxis = new Plottable.Axis.Category(scale, "bottom");
+        categoryAxis.renderTo(svg);
+        // Outer padding is equal to step
+        var step = SVG_WIDTH / 5;
+        var tickMarks = categoryAxis._tickMarkContainer.selectAll(".tick-mark")[0];
+        var ticksNormalizedPosition = tickMarks.map(function (s) { return +d3.select(s).attr("x1") / step; });
+        assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
+        scale.rangeType("points", 1, 0);
+        step = SVG_WIDTH / 4;
+        ticksNormalizedPosition = tickMarks.map(function (s) { return +d3.select(s).attr("x1") / step; });
+        assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -841,6 +881,21 @@ describe("Labels", function () {
     });
     it("unsupported alignments and orientations are unsupported", function () {
         assert.throws(function () { return new Plottable.Component.Label("foo", "bar"); }, Error, "not a valid orientation");
+    });
+    it("Label orientation can be changed after label is created", function () {
+        var svg = generateSVG(400, 400);
+        var label = new Plottable.Component.AxisLabel("CHANGING ORIENTATION");
+        label.renderTo(svg);
+        var content = label._content;
+        var text = content.select("text");
+        var bbox = Plottable._Util.DOM.getBBox(text);
+        assert.closeTo(bbox.height, label.height(), 1, "label is in horizontal position");
+        label.orient("vertical-right");
+        text = content.select("text");
+        bbox = Plottable._Util.DOM.getBBox(text);
+        assertBBoxInclusion(label._element.select(".bounding-box"), text);
+        assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "label is in vertical position");
+        svg.remove();
     });
 });
 
@@ -3628,6 +3683,18 @@ describe("Component behavior", function () {
         c.detach(); // no error thrown
         svg.remove();
     });
+    it("component remains in own cell", function () {
+        var horizontalComponent = new Plottable.Abstract.Component();
+        var verticalComponent = new Plottable.Abstract.Component();
+        var placeHolder = new Plottable.Abstract.Component();
+        var t = new Plottable.Component.Table().addComponent(0, 0, verticalComponent).addComponent(0, 1, new Plottable.Abstract.Component()).addComponent(1, 0, placeHolder).addComponent(1, 1, horizontalComponent);
+        t.renderTo(svg);
+        horizontalComponent.xAlign("center");
+        verticalComponent.yAlign("bottom");
+        assertBBoxNonIntersection(verticalComponent._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
+        assertBBoxInclusion(t.boxContainer.select(".bounding-box"), horizontalComponent._element.select(".bounding-box"));
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -4341,6 +4408,16 @@ describe("Scales", function () {
             assert.deepEqual(scale.rangeBand(), 399);
             scale.domain(["1", "2", "3", "4", "5"]);
             assert.deepEqual(scale.rangeBand(), 329);
+        });
+        it("rangeBand is updated when mode is changed", function () {
+            var scale = new Plottable.Scale.Ordinal();
+            scale.rangeType("bands");
+            assert.deepEqual(scale.rangeType(), "bands");
+            scale.range([0, 2679]);
+            scale.domain(["1", "2", "3", "4"]);
+            assert.deepEqual(scale.rangeBand(), 399);
+            scale.rangeType("points");
+            assert.deepEqual(scale.rangeBand(), 0, "Band width should be 0 in points mode");
         });
         it("rangeType triggers broadcast", function () {
             var scale = new Plottable.Scale.Ordinal();

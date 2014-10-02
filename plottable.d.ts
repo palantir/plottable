@@ -791,7 +791,7 @@ declare module Plottable {
      * Index, if used, will be the index of the datum in the array.
      */
     interface IAppliedAccessor {
-        (datum: any, index: number): any;
+        (datum?: any, index?: number): any;
     }
     interface _IProjector {
         accessor: _IAccessor;
@@ -1938,6 +1938,20 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             text(displayText: string): Label;
+            /**
+             * Gets the orientation of the Label.
+             *
+             * @returns {string} the current orientation.
+             */
+            orient(): string;
+            /**
+             * Sets the orientation of the Label.
+             *
+             * @param {string} newOrientation If provided, the desired orientation
+             * (horizontal/vertical-left/vertical-right).
+             * @returns {Label} The calling Label.
+             */
+            orient(newOrientation: string): Label;
         }
         class TitleLabel extends Label {
             /**

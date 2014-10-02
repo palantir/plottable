@@ -24,14 +24,7 @@ export module Component {
       super();
       this.classed("label", true);
       this.text(displayText);
-      orientation = orientation.toLowerCase();
-      if (orientation === "vertical-left")  { orientation = "left" ; }
-      if (orientation === "vertical-right") { orientation = "right"; }
-      if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
-        this.orientation = orientation;
-      } else {
-        throw new Error(orientation + " is not a valid orientation for LabelComponent");
-      }
+      this.orient(orientation);
       this.xAlign("center").yAlign("center");
       this._fixedHeightFlag = true;
       this._fixedWidthFlag = true;
@@ -103,6 +96,37 @@ export module Component {
         return this._text;
       } else {
         this._text = displayText;
+        this._invalidateLayout();
+        return this;
+      }
+    }
+
+    /**
+     * Gets the orientation of the Label.
+     *
+     * @returns {string} the current orientation.
+     */
+    public orient(): string;
+    /**
+     * Sets the orientation of the Label.
+     *
+     * @param {string} newOrientation If provided, the desired orientation
+     * (horizontal/vertical-left/vertical-right).
+     * @returns {Label} The calling Label.
+     */
+    public orient(newOrientation: string): Label;
+    public orient(newOrientation?: string): any {
+      if (newOrientation == null) {
+        return this.orientation;
+      } else {
+        newOrientation = newOrientation.toLowerCase();
+        if (newOrientation === "vertical-left")  { newOrientation = "left" ; }
+        if (newOrientation === "vertical-right") { newOrientation = "right"; }
+        if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
+          this.orientation = newOrientation;
+        } else {
+          throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
+        }
         this._invalidateLayout();
         return this;
       }

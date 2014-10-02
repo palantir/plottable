@@ -217,6 +217,19 @@ describe("Scales", () => {
       assert.deepEqual(scale.rangeBand(), 329);
     });
 
+    it("rangeBand is updated when mode is changed", () => {
+      var scale = new Plottable.Scale.Ordinal();
+      scale.rangeType("bands");
+      assert.deepEqual(scale.rangeType(), "bands");
+      scale.range([0, 2679]);
+
+      scale.domain(["1","2","3","4"]);
+      assert.deepEqual(scale.rangeBand(), 399);
+
+      scale.rangeType("points");
+      assert.deepEqual(scale.rangeBand(), 0, "Band width should be 0 in points mode");
+    });
+
     it("rangeType triggers broadcast", () => {
       var scale = new Plottable.Scale.Ordinal();
       var callbackWasCalled = false;
