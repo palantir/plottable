@@ -682,6 +682,7 @@ declare module Plottable {
                 y2: any;
             };
             _invalidateLayout(): void;
+            _setDefaultAlignment(): void;
             formatter(): Formatter;
             formatter(formatter: Formatter): Axis;
             tickLength(): number;
@@ -775,6 +776,8 @@ declare module Plottable {
             _setup(): void;
             text(): string;
             text(displayText: string): Label;
+            orient(): string;
+            orient(newOrientation: string): Label;
             _doRender(): void;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
         }
@@ -873,12 +876,12 @@ declare module Plottable {
             _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
             _datasetKeysInOrder: string[];
             _renderArea: D3.Selection;
-            _animate: boolean;
-            _animators: Plottable.Animator.IPlotAnimatorMap;
-            _ANIMATION_DURATION: number;
             _projectors: {
                 [x: string]: _IProjector;
             };
+            _animate: boolean;
+            _animators: Plottable.Animator.IPlotAnimatorMap;
+            _ANIMATION_DURATION: number;
             constructor();
             _anchor(element: D3.Selection): void;
             _setup(): void;

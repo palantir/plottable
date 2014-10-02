@@ -643,6 +643,8 @@ declare module Plottable {
             yAlign(alignment: string): Label;
             text(): string;
             text(displayText: string): Label;
+            orient(): string;
+            orient(newOrientation: string): Label;
         }
         class TitleLabel extends Label {
             constructor(text?: string, orientation?: string);
