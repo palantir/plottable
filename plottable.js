@@ -5271,6 +5271,12 @@ var Plottable;
              */
             function Gridlines(xScale, yScale) {
                 var _this = this;
+                if (xScale !== null && !(xScale instanceof Plottable.Abstract.QuantitativeScale)) {
+                    throw new Error("xScale needs to inherit from Abstract.QuantitativeScale");
+                }
+                if (yScale !== null && !(yScale instanceof Plottable.Abstract.QuantitativeScale)) {
+                    throw new Error("yScale needs to inherit from Abstract.QuantitativeScale");
+                }
                 _super.call(this);
                 this.classed("gridlines", true);
                 this.xScale = xScale;
