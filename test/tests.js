@@ -731,7 +731,7 @@ describe("Category Axes", function () {
         axis.tickLabelAngle(90);
         text = ticks[0].map(function (d) { return d3.select(d).text(); });
         assert.deepEqual(text, years, "text displayed correctly when horizontal");
-        assert.lengthOf(axis._content.selectAll(".rotated-right")[0], 4, "the ticks were rotated right");
+        assert.operator(axis._content.selectAll(".rotated-right")[0].length, ">=", 4, "the ticks were rotated right");
         axis.tickLabelAngle(0);
         text = ticks[0].map(function (d) { return d3.select(d).text(); });
         assert.deepEqual(text, years, "text displayed correctly when horizontal");
@@ -740,7 +740,7 @@ describe("Category Axes", function () {
         axis.tickLabelAngle(-90);
         text = ticks[0].map(function (d) { return d3.select(d).text(); });
         assert.deepEqual(text, years, "text displayed correctly when horizontal");
-        assert.lengthOf(axis._content.selectAll(".rotated-left")[0], 4, "the ticks were rotated left");
+        assert.operator(axis._content.selectAll(".rotated-left")[0].length, ">=", 4, "the ticks were rotated left");
         svg.remove();
     });
 });

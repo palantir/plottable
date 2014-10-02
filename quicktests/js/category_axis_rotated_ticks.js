@@ -55,9 +55,9 @@ function run(div, data, Plottable) {
   var xScale = new Plottable.Scale.Ordinal();
   var yScale = new Plottable.Scale.Linear();
 
-  var xAxis1 = new Plottable.Axis.Category(xScale, "bottom").tickAngle(-90);
-  var xAxis2 = new Plottable.Axis.Category(xScale, "bottom").tickAngle(0);
-  var xAxis3 = new Plottable.Axis.Category(xScale, "bottom").tickAngle(90);
+  var xAxis1 = new Plottable.Axis.Category(xScale, "bottom").tickLabelAngle(-90);
+  var xAxis2 = new Plottable.Axis.Category(xScale, "bottom").tickLabelAngle(0);
+  var xAxis3 = new Plottable.Axis.Category(xScale, "bottom").tickLabelAngle(90);
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   var plot = new Plottable.Plot.VerticalBar(data, xScale, yScale)

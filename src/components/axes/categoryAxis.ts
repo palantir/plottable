@@ -5,7 +5,6 @@ export module Axis {
   export class Category extends Abstract.Axis {
     public _scale: Scale.Ordinal;
     private _tickLabelAngle = 0;
-    private _tickOrientation = "horizontal";
     private measurer: _Util.Text.CachingCharacterMeasurer;
 
     /**
@@ -79,18 +78,17 @@ export module Axis {
     public tickLabelAngle(angle?: number): any {
       if (angle == null) {
         return this._tickLabelAngle;
-      } else {
-        if (angle !== 0 && angle !== 90 && angle !== -90) {
-          throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
-        }
+      }
+      if (angle !== 0 && angle !== 90 && angle !== -90) {
+        throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
+      }
       this._tickLabelAngle = angle;
       this._invalidateLayout();
       return this;
-      }
     }
 
-    private getTickLabelOrientation(angle: number) {
-      switch(angle) {
+    private tickLabelOrientation() {
+      switch(this._tickLabelAngle) {
         case 0:
           return "horizontal";
         case -90:
@@ -140,13 +138,13 @@ export module Axis {
           var d3this = d3.select(this);
           var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
           var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
-          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self.getTickLabelOrientation(self._tickLabelAngle), {
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation(), {
                                                     g: d3this,
                                                     xAlign: xAlign[self._orientation],
                                                     yAlign: yAlign[self._orientation]
           });
         } else {
-          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self.getTickLabelOrientation(self._tickLabelAngle));
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation());
         }
 
         textWriteResults.push(textWriteResult);

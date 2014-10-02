@@ -3497,7 +3497,6 @@ var Plottable;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
                 this._tickLabelAngle = 0;
-                this._tickOrientation = "horizontal";
                 this.classed("category-axis", true);
             }
             Category.prototype._setup = function () {
@@ -3535,17 +3534,15 @@ var Plottable;
                 if (angle == null) {
                     return this._tickLabelAngle;
                 }
-                else {
-                    if (angle !== 0 && angle !== 90 && angle !== -90) {
-                        throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
-                    }
-                    this._tickLabelAngle = angle;
-                    this._invalidateLayout();
-                    return this;
+                if (angle !== 0 && angle !== 90 && angle !== -90) {
+                    throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
                 }
+                this._tickLabelAngle = angle;
+                this._invalidateLayout();
+                return this;
             };
-            Category.prototype.getTickLabelOrientation = function (angle) {
-                switch (angle) {
+            Category.prototype.tickLabelOrientation = function () {
+                switch (this._tickLabelAngle) {
                     case 0:
                         return "horizontal";
                     case -90:
@@ -3577,14 +3574,14 @@ var Plottable;
                         var d3this = d3.select(this);
                         var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                         var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self.getTickLabelOrientation(self._tickLabelAngle), {
+                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation(), {
                             g: d3this,
                             xAlign: xAlign[self._orientation],
                             yAlign: yAlign[self._orientation]
                         });
                     }
                     else {
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self.getTickLabelOrientation(self._tickLabelAngle));
+                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation());
                     }
                     textWriteResults.push(textWriteResult);
                 });
