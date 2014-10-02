@@ -1,5 +1,5 @@
 /*!
-Plottable 0.30.0 (https://github.com/palantir/plottable)
+Plottable 0.31.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -108,13 +108,13 @@ var Plottable;
              * Populates a map from an array of keys and a transformation function.
              *
              * @param {string[]} keys The array of keys.
-             * @param {(string) => T} transform A transformation function to apply to the keys.
+             * @param {(string, number) => T} transform A transformation function to apply to the keys.
              * @return {D3.Map<T>} A map mapping keys to their transformed values.
              */
             function populateMap(keys, transform) {
                 var map = d3.map();
-                keys.forEach(function (key) {
-                    map.set(key, transform(key));
+                keys.forEach(function (key, i) {
+                    map.set(key, transform(key, i));
                 });
                 return map;
             }
@@ -1298,7 +1298,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.30.0";
+    Plottable.version = "0.31.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3233,15 +3233,15 @@ var Plottable;
                 var xPosition = this.xOrigin;
                 var yPosition = this.yOrigin;
                 var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
-                xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
                 xPosition += this._xOffset;
                 if (this._isFixedWidth()) {
+                    xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
                     // Decrease size so hitbox / bounding box and children are sized correctly
                     availableWidth = Math.min(availableWidth, requestedSpace.width);
                 }
-                yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
                 yPosition += this._yOffset;
                 if (this._isFixedHeight()) {
+                    yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
                     availableHeight = Math.min(availableHeight, requestedSpace.height);
                 }
                 this._width = availableWidth;
@@ -3784,6 +3784,7 @@ var Plottable;
                 }
                 this._scale = scale;
                 this.orient(orientation);
+                this._setDefaultAlignment();
                 this.classed("axis", true);
                 if (this._isHorizontal()) {
                     this.classed("x-axis", true);
@@ -3943,6 +3944,22 @@ var Plottable;
                 this._computedWidth = null;
                 this._computedHeight = null;
                 _super.prototype._invalidateLayout.call(this);
+            };
+            Axis.prototype._setDefaultAlignment = function () {
+                switch (this._orientation) {
+                    case "bottom":
+                        this.yAlign("top");
+                        break;
+                    case "top":
+                        this.yAlign("bottom");
+                        break;
+                    case "left":
+                        this.xAlign("right");
+                        break;
+                    case "right":
+                        this.xAlign("left");
+                        break;
+                }
             };
             Axis.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {

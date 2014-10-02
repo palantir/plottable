@@ -14,8 +14,6 @@ describe("Plots", () => {
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
-    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
-
     before(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Linear().domain([1, 3]);
@@ -80,8 +78,6 @@ describe("Plots", () => {
     var renderer: Plottable.Plot.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
-
-    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
 
     before(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
