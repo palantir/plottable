@@ -22,6 +22,12 @@ export module Plot {
       this.innerScale = new Scale.Ordinal();
     }
 
+    public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
+      var animator = new Animator.Rect();
+      animator.delay(Animator.IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS * index);
+      return animator;
+    }
+
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       // the width is constant, so set the inner scale range to that
@@ -61,7 +67,10 @@ export module Plot {
       var attrHash = this._generateAttrToProjector();
       var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var clusteredData = this.cluster(accessor);
-      this._getDrawersInOrder().forEach((d) => d.draw(clusteredData[d.key], attrHash));
+      this._getDrawersInOrder().forEach((d, i) => {
+        var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
+        d.draw(clusteredData[d.key], attrHash, animator);
+      });
     }
   }
 }
