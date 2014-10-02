@@ -108,13 +108,13 @@ var Plottable;
              * Populates a map from an array of keys and a transformation function.
              *
              * @param {string[]} keys The array of keys.
-             * @param {(string) => T} transform A transformation function to apply to the keys.
+             * @param {(string, number) => T} transform A transformation function to apply to the keys.
              * @return {D3.Map<T>} A map mapping keys to their transformed values.
              */
             function populateMap(keys, transform) {
                 var map = d3.map();
-                keys.forEach(function (key) {
-                    map.set(key, transform(key));
+                keys.forEach(function (key, i) {
+                    map.set(key, transform(key, i));
                 });
                 return map;
             }
@@ -4738,7 +4738,7 @@ var Plottable;
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
-             * @param {string} orientation The orientation of the Label (horizontal/vertical-left/vertical-right) (default = "horizontal").
+             * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
              */
             function Label(displayText, orientation) {
                 if (displayText === void 0) { displayText = ""; }
@@ -4810,12 +4810,6 @@ var Plottable;
                 }
                 else {
                     newOrientation = newOrientation.toLowerCase();
-                    if (newOrientation === "vertical-left") {
-                        newOrientation = "left";
-                    }
-                    if (newOrientation === "vertical-right") {
-                        newOrientation = "right";
-                    }
                     if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
                         this.orientation = newOrientation;
                     }
@@ -6852,10 +6846,6 @@ var Plottable;
             ClusteredBar.prototype.cluster = function (accessor) {
                 var _this = this;
                 this.innerScale.domain(this._datasetKeysInOrder);
-                var lengths = this._getDatasetsInOrder().map(function (d) { return d.data().length; });
-                if (Plottable._Util.Methods.uniq(lengths).length > 1) {
-                    Plottable._Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
-                }
                 var clusters = {};
                 this._datasetKeysInOrder.forEach(function (key) {
                     var data = _this._key2DatasetDrawerKey.get(key).dataset.data();

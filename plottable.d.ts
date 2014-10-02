@@ -53,10 +53,10 @@ declare module Plottable {
              * Populates a map from an array of keys and a transformation function.
              *
              * @param {string[]} keys The array of keys.
-             * @param {(string) => T} transform A transformation function to apply to the keys.
+             * @param {(string, number) => T} transform A transformation function to apply to the keys.
              * @return {D3.Map<T>} A map mapping keys to their transformed values.
              */
-            function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T>;
+            function populateMap<T>(keys: string[], transform: (key: string, index: number) => T): D3.Map<T>;
             /**
              * Take an array of values, and return the unique values.
              * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
@@ -1906,7 +1906,7 @@ declare module Plottable {
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
-             * @param {string} orientation The orientation of the Label (horizontal/vertical-left/vertical-right) (default = "horizontal").
+             * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
              */
             constructor(displayText?: string, orientation?: string);
             /**
@@ -1948,7 +1948,7 @@ declare module Plottable {
              * Sets the orientation of the Label.
              *
              * @param {string} newOrientation If provided, the desired orientation
-             * (horizontal/vertical-left/vertical-right).
+             * (horizontal/left/right).
              * @returns {Label} The calling Label.
              */
             orient(newOrientation: string): Label;
