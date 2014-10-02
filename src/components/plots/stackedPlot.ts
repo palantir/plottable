@@ -114,7 +114,6 @@ export module Abstract {
       var keyAccessor = this.keyAccessor();
       var valueAccessor = this.valueAccessor();
       var datasets = this._getDatasetsInOrder();
-
       var domainKeys = this.getDomainKeys();
 
       var dataMapArray = datasets.map(() => {
