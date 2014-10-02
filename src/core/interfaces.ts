@@ -25,7 +25,7 @@ module Plottable {
    * Index, if used, will be the index of the datum in the array.
    */
   export interface IAppliedAccessor {
-    (datum: any, index?: number) : any;
+    (datum?: any, index?: number) : any;
   }
 
   export interface _IProjector {
