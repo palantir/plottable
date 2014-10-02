@@ -53,14 +53,14 @@ export module Plot {
       this.radarData = this.getRadarDictionary();
     }
 
-    public getMetricsFromDataset() {
+    public getMetricsFromDataset(): string[] {
       var metrics: string[][] = this._getDatasetsInOrder().map((dataset) => {
         return dataset.data().map((datum: any) => datum["metric"]);
       });
       return _Util.Methods.uniq(_Util.Methods.flatten(metrics));
     }
 
-    private getRadarDictionary() {
+    private getRadarDictionary(): any[] {
       var radarData: any[] = [];
       this._getDatasetsInOrder().map((dataset) => {
         var radarDatum: any = {};
