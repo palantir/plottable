@@ -24,9 +24,7 @@ export module Abstract {
 
     private stack() {
       var datasets = this._getDatasetsInOrder();
-
       var dataMapArray = this.generateDefaultMapArray();
-
       var domainKeys = this.getDomainKeys();
 
       var positiveDataArray: StackedDatum[][] = dataMapArray.map((dataMap) => {
