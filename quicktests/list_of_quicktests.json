@@ -81,6 +81,9 @@
     "name":"legend_basic",
     "categories":["Legend", "Title", "Gridlines", "Color Scale", "Axis Label", "Scatter Plot", "Line Plot", "Numeric Axis", "Metadata", "Project", "Merge", "Linear Scale"]
   },  {
+    "name":"missing_stacked_bar",
+    "categories":["Linear Scale", "Numeric Axis", "Animate", "Legend", "Category Axis", "Linear Scale", "Vertical Bar Plot", "Stacked Plot"]
+  },  {
     "name":"modifiedLog",
     "categories":["Datasource", "Metadata", "Modified Log Scale", "Color Scale", "Line Plot", "Numeric Axis", "Accessor", "Project", "Toggle Legend"]
   },  {

@@ -7106,67 +7106,98 @@ var Plottable;
                 _super.prototype._onDatasetUpdate.call(this);
                 // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
                 if (this._datasetKeysInOrder && this._projectors["x"] && this._projectors["y"]) {
-                    this.stack();
+                    this.updateStackOffsets();
                 }
             };
-            Stacked.prototype.stack = function () {
+            Stacked.prototype.updateStackOffsets = function () {
+                var dataMapArray = this.generateDefaultMapArray();
+                var domainKeys = this.getDomainKeys();
+                var positiveDataMapArray = dataMapArray.map(function (dataMap) {
+                    return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
+                        return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) };
+                    });
+                });
+                var negativeDataMapArray = dataMapArray.map(function (dataMap) {
+                    return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
+                        return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) };
+                    });
+                });
+                this.setDatasetStackOffsets(this.stack(positiveDataMapArray), this.stack(negativeDataMapArray));
+                this.updateStackExtents();
+            };
+            Stacked.prototype.updateStackExtents = function () {
                 var datasets = this._getDatasetsInOrder();
-                var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-                var dataArray = datasets.map(function (dataset) {
-                    return dataset.data().map(function (datum) {
-                        return { key: keyAccessor(datum), value: valueAccessor(datum) };
-                    });
-                });
-                var positiveDataArray = dataArray.map(function (data) {
-                    return data.map(function (datum) {
-                        return { key: datum.key, value: Math.max(0, datum.value) };
-                    });
-                });
-                var negativeDataArray = dataArray.map(function (data) {
-                    return data.map(function (datum) {
-                        return { key: datum.key, value: Math.min(datum.value, 0) };
-                    });
-                });
-                this.setDatasetStackOffsets(this._stack(positiveDataArray), this._stack(negativeDataArray));
-                var maxStack = Plottable._Util.Methods.max(datasets, function (dataset) {
+                var valueAccessor = this.valueAccessor();
+                var maxStackExtent = Plottable._Util.Methods.max(datasets, function (dataset) {
                     return Plottable._Util.Methods.max(dataset.data(), function (datum) {
                         return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                     });
                 });
-                var minStack = Plottable._Util.Methods.min(datasets, function (dataset) {
+                var minStackExtent = Plottable._Util.Methods.min(datasets, function (dataset) {
                     return Plottable._Util.Methods.min(dataset.data(), function (datum) {
                         return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                     });
                 });
-                this.stackedExtent = [Math.min(minStack, 0), Math.max(0, maxStack)];
+                this.stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
             };
             /**
              * Feeds the data through d3's stack layout function which will calculate
              * the stack offsets and use the the function declared in .out to set the offsets on the data.
              */
-            Stacked.prototype._stack = function (dataArray) {
+            Stacked.prototype.stack = function (dataArray) {
+                var _this = this;
                 var outFunction = function (d, y0, y) {
                     d.offset = y0;
                 };
-                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return d; }).out(outFunction)(dataArray);
+                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return _this.getDomainKeys().map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
                 return dataArray;
             };
             /**
              * After the stack offsets have been determined on each separate dataset, the offsets need
              * to be determined correctly on the overall datasets
              */
-            Stacked.prototype.setDatasetStackOffsets = function (positiveDataArray, negativeDataArray) {
-                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-                var positiveDataArrayOffsets = positiveDataArray.map(function (data) { return data.map(function (datum) { return datum.offset; }); });
-                var negativeDataArrayOffsets = negativeDataArray.map(function (data) { return data.map(function (datum) { return datum.offset; }); });
+            Stacked.prototype.setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
+                var keyAccessor = this.keyAccessor();
+                var valueAccessor = this.valueAccessor();
                 this._getDatasetsInOrder().forEach(function (dataset, datasetIndex) {
+                    var positiveDataMap = positiveDataMapArray[datasetIndex];
+                    var negativeDataMap = negativeDataMapArray[datasetIndex];
                     dataset.data().forEach(function (datum, datumIndex) {
-                        var positiveOffset = positiveDataArrayOffsets[datasetIndex][datumIndex];
-                        var negativeOffset = negativeDataArrayOffsets[datasetIndex][datumIndex];
+                        var positiveOffset = positiveDataMap.get(keyAccessor(datum)).offset;
+                        var negativeOffset = negativeDataMap.get(keyAccessor(datum)).offset;
                         datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) > 0 ? positiveOffset : negativeOffset;
                     });
                 });
+            };
+            Stacked.prototype.getDomainKeys = function () {
+                var keyAccessor = this.keyAccessor();
+                var domainKeys = d3.set();
+                var datasets = this._getDatasetsInOrder();
+                datasets.forEach(function (dataset) {
+                    dataset.data().forEach(function (datum) {
+                        domainKeys.add(keyAccessor(datum));
+                    });
+                });
+                return domainKeys.values();
+            };
+            Stacked.prototype.generateDefaultMapArray = function () {
+                var keyAccessor = this.keyAccessor();
+                var valueAccessor = this.valueAccessor();
+                var datasets = this._getDatasetsInOrder();
+                var domainKeys = this.getDomainKeys();
+                var dataMapArray = datasets.map(function () {
+                    return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
+                        return { key: domainKey, value: 0 };
+                    });
+                });
+                datasets.forEach(function (dataset, datasetIndex) {
+                    dataset.data().forEach(function (datum) {
+                        var key = keyAccessor(datum);
+                        var value = valueAccessor(datum);
+                        dataMapArray[datasetIndex].set(key, { key: key, value: value });
+                    });
+                });
+                return dataMapArray;
             };
             Stacked.prototype._updateScaleExtents = function () {
                 _super.prototype._updateScaleExtents.call(this);
@@ -7180,6 +7211,12 @@ var Plottable;
                 else {
                     primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
+            };
+            Stacked.prototype.keyAccessor = function () {
+                return this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+            };
+            Stacked.prototype.valueAccessor = function () {
+                return this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
             };
             return Stacked;
         })(Abstract.NewStylePlot);
