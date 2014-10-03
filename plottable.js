@@ -6020,6 +6020,9 @@ var Plottable;
                 _super.call(this);
                 this.classed("pie-plot", true);
             }
+            Pie.prototype._getAnimator = function (drawer, index) {
+                return new Plottable.Animator.Arc();
+            };
             Pie.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
@@ -7427,6 +7430,67 @@ var Plottable;
             return Rect;
         })(Animator.Base);
         Animator.Rect = Rect;
+    })(Plottable.Animator || (Plottable.Animator = {}));
+    var Animator = Plottable.Animator;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var Path = (function (_super) {
+            __extends(Path, _super);
+            function Path() {
+                _super.apply(this, arguments);
+            }
+            Path.prototype.animate = function (selection, attrToProjector) {
+                var _this = this;
+                return _super.prototype.animate.call(this, selection.attr(attrToProjector), attrToProjector).attrTween("d", function (d) { return _this._pathTween(d, attrToProjector["d"]); });
+            };
+            Path.prototype._pathTween = function (d, dProjector) {
+                return function (t) { return dProjector(d); };
+            };
+            return Path;
+        })(Plottable.Animator.Base);
+        Abstract.Path = Path;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Animator) {
+        var Arc = (function (_super) {
+            __extends(Arc, _super);
+            function Arc() {
+                _super.apply(this, arguments);
+            }
+            Arc.prototype._pathTween = function (d, dProjector) {
+                var animateArc = d3.svg.arc().innerRadius(dProjector.innerRadius()).outerRadius(dProjector.outerRadius());
+                var startAngleInterpolate = d3.interpolate(0, d.startAngle);
+                var endAngleInterpolate = d3.interpolate(0, d.endAngle);
+                return function (t) {
+                    animateArc.startAngle = startAngleInterpolate(t);
+                    animateArc.endAngle = endAngleInterpolate(t);
+                    return dProjector(animateArc);
+                };
+            };
+            return Arc;
+        })(Plottable.Abstract.Path);
+        Animator.Arc = Arc;
     })(Plottable.Animator || (Plottable.Animator = {}));
     var Animator = Plottable.Animator;
 })(Plottable || (Plottable = {}));

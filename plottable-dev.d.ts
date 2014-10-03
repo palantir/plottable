@@ -2552,6 +2552,7 @@ declare module Plottable {
              * @constructor
              */
             constructor();
+            _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _addDataset(key: string, dataset: Dataset): void;
             _generateAttrToProjector(): IAttributeToProjector;
@@ -3094,6 +3095,25 @@ declare module Plottable {
             constructor(isVertical?: boolean, isReverse?: boolean);
             animate(selection: any, attrToProjector: IAttributeToProjector): D3.Transition.Transition;
             _startMovingProjector(attrToProjector: IAttributeToProjector): IAppliedAccessor;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class Path extends Animator.Base {
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Transition.Transition;
+            _pathTween(d: any, dProjector: IAppliedAccessor): D3.Transition.BaseInterpolate;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Animator {
+        class Arc extends Abstract.Path {
+            _pathTween(d: D3.Layout.ArcDescriptor, dProjector: D3.Svg.Arc): D3.Transition.BaseInterpolate;
         }
     }
 }

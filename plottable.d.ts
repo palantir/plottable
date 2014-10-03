@@ -2785,6 +2785,23 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Abstract {
+        class Path extends Animator.Base {
+            animate(selection: any, attrToProjector: IAttributeToProjector): D3.Transition.Transition;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Animator {
+        class Arc extends Abstract.Path {
+        }
+    }
+}
+
+
+declare module Plottable {
     module Core {
         /**
          * A function to be called when an event occurs. The argument is the d3 event
