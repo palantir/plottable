@@ -108,13 +108,13 @@ var Plottable;
              * Populates a map from an array of keys and a transformation function.
              *
              * @param {string[]} keys The array of keys.
-             * @param {(string) => T} transform A transformation function to apply to the keys.
+             * @param {(string, number) => T} transform A transformation function to apply to the keys.
              * @return {D3.Map<T>} A map mapping keys to their transformed values.
              */
             function populateMap(keys, transform) {
                 var map = d3.map();
-                keys.forEach(function (key) {
-                    map.set(key, transform(key));
+                keys.forEach(function (key, i) {
+                    map.set(key, transform(key, i));
                 });
                 return map;
             }
@@ -672,6 +672,7 @@ var Plottable;
                 xForm.rotate = rotation === "right" ? 90 : -90;
                 xForm.translate = [isRight ? width : 0, isRight ? 0 : height];
                 innerG.attr("transform", xForm.toString());
+                innerG.classed("rotated-" + rotation, true);
                 return wh;
             }
             Text.writeLineVertically = writeLineVertically;
@@ -723,8 +724,12 @@ var Plottable;
              *        that is appropriate.
              * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
              */
-            function writeText(text, width, height, tm, horizontally, write) {
-                var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
+            function writeText(text, width, height, tm, orientation, write) {
+                if (orientation === void 0) { orientation = "horizontal"; }
+                if (["left", "right", "horizontal"].indexOf(orientation) === -1) {
+                    throw new Error("Unrecognized orientation to writeText: " + orientation);
+                }
+                var orientHorizontally = orientation === "horizontal";
                 var primaryDimension = orientHorizontally ? width : height;
                 var secondaryDimension = orientHorizontally ? height : width;
                 var wrappedText = _Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
@@ -743,7 +748,7 @@ var Plottable;
                     // the outerG contains general transforms for positining the whole block, the inner g
                     // will contain transforms specific to orienting the text properly within the block.
                     var writeTextFn = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-                    var wh = writeTextFn(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
+                    var wh = writeTextFn.call(this, wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign, orientation);
                     usedWidth = wh.width;
                     usedHeight = wh.height;
                 }
@@ -3784,6 +3789,7 @@ var Plottable;
                 }
                 this._scale = scale;
                 this.orient(orientation);
+                this._setDefaultAlignment();
                 this.classed("axis", true);
                 if (this._isHorizontal()) {
                     this.classed("x-axis", true);
@@ -3943,6 +3949,22 @@ var Plottable;
                 this._computedWidth = null;
                 this._computedHeight = null;
                 _super.prototype._invalidateLayout.call(this);
+            };
+            Axis.prototype._setDefaultAlignment = function () {
+                switch (this._orientation) {
+                    case "bottom":
+                        this.yAlign("top");
+                        break;
+                    case "top":
+                        this.yAlign("bottom");
+                        break;
+                    case "left":
+                        this.xAlign("right");
+                        break;
+                    case "right":
+                        this.xAlign("left");
+                        break;
+                }
             };
             Axis.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
@@ -4588,6 +4610,7 @@ var Plottable;
                 if (orientation === void 0) { orientation = "bottom"; }
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
+                this._tickLabelAngle = 0;
                 this.classed("category-axis", true);
             }
             Category.prototype._setup = function () {
@@ -4621,6 +4644,29 @@ var Plottable;
             Category.prototype._getTickValues = function () {
                 return this._scale.domain();
             };
+            Category.prototype.tickLabelAngle = function (angle) {
+                if (angle == null) {
+                    return this._tickLabelAngle;
+                }
+                if (angle !== 0 && angle !== 90 && angle !== -90) {
+                    throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
+                }
+                this._tickLabelAngle = angle;
+                this._invalidateLayout();
+                return this;
+            };
+            Category.prototype.tickLabelOrientation = function () {
+                switch (this._tickLabelAngle) {
+                    case 0:
+                        return "horizontal";
+                    case -90:
+                        return "left";
+                    case 90:
+                        return "right";
+                    default:
+                        throw new Error("bad orientation");
+                }
+            };
             /**
              * Measures the size of the ticks while also writing them to the DOM.
              * @param {D3.Selection} ticks The tick elements to be written to.
@@ -4652,14 +4698,14 @@ var Plottable;
                         var d3this = d3.select(this);
                         var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                         var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, true, {
+                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation(), {
                             g: d3this,
                             xAlign: xAlign[self._orientation],
                             yAlign: yAlign[self._orientation]
                         });
                     }
                     else {
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, true);
+                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation());
                     }
                     textWriteResults.push(textWriteResult);
                 });
@@ -4729,7 +4775,7 @@ var Plottable;
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
-             * @param {string} orientation The orientation of the Label (horizontal/vertical-left/vertical-right) (default = "horizontal").
+             * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
              */
             function Label(displayText, orientation) {
                 if (displayText === void 0) { displayText = ""; }
@@ -4801,12 +4847,6 @@ var Plottable;
                 }
                 else {
                     newOrientation = newOrientation.toLowerCase();
-                    if (newOrientation === "vertical-left") {
-                        newOrientation = "left";
-                    }
-                    if (newOrientation === "vertical-right") {
-                        newOrientation = "right";
-                    }
                     if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
                         this.orientation = newOrientation;
                     }
@@ -6753,7 +6793,12 @@ var Plottable;
                 });
                 return attrToProjector;
             };
+            Line.prototype._rejectNullsAndNaNs = function (d, i, projector) {
+                var value = projector(d, i);
+                return value != null && value === value;
+            };
             Line.prototype._paint = function () {
+                var _this = this;
                 _super.prototype._paint.call(this);
                 var attrToProjector = this._generateAttrToProjector();
                 var xFunction = attrToProjector["x"];
@@ -6761,11 +6806,14 @@ var Plottable;
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
                 this.linePath.datum(this._dataset.data());
+                var line = d3.svg.line().x(xFunction);
+                line.defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
+                attrToProjector["d"] = line;
                 if (this._dataChanged) {
-                    attrToProjector["d"] = d3.svg.line().x(xFunction).y(this._getResetYFunction());
+                    line.y(this._getResetYFunction());
                     this._applyAnimatedAttributes(this.linePath, "line-reset", attrToProjector);
                 }
-                attrToProjector["d"] = d3.svg.line().x(xFunction).y(yFunction);
+                line.y(yFunction);
                 this._applyAnimatedAttributes(this.linePath, "line", attrToProjector);
             };
             Line.prototype._wholeDatumAttributes = function () {
@@ -6849,6 +6897,7 @@ var Plottable;
                 return this._generateAttrToProjector()["y0"];
             };
             Area.prototype._paint = function () {
+                var _this = this;
                 _super.prototype._paint.call(this);
                 var attrToProjector = this._generateAttrToProjector();
                 var xFunction = attrToProjector["x"];
@@ -6858,11 +6907,14 @@ var Plottable;
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
                 this.areaPath.datum(this._dataset.data());
+                var area = d3.svg.area().x(xFunction).y0(y0Function);
+                area.defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
+                attrToProjector["d"] = area;
                 if (this._dataChanged) {
-                    attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(this._getResetYFunction());
+                    area.y1(this._getResetYFunction());
                     this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
                 }
-                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+                area.y1(yFunction);
                 this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
             };
             Area.prototype._wholeDatumAttributes = function () {
@@ -7008,10 +7060,6 @@ var Plottable;
             ClusteredBar.prototype.cluster = function (accessor) {
                 var _this = this;
                 this.innerScale.domain(this._datasetKeysInOrder);
-                var lengths = this._getDatasetsInOrder().map(function (d) { return d.data().length; });
-                if (Plottable._Util.Methods.uniq(lengths).length > 1) {
-                    Plottable._Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
-                }
                 var clusters = {};
                 this._datasetKeysInOrder.forEach(function (key) {
                     var data = _this._key2DatasetDrawerKey.get(key).dataset.data();

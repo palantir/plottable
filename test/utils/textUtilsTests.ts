@@ -70,13 +70,13 @@ describe("_Util.Text", () => {
       var height = 1;
       var textSelection = svg.append("text");
       var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
-      var results = Plottable._Util.Text.writeText("hello world", width, height, measure, true);
+      var results = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal");
       assert.isFalse(results.textFits,    "measurement mode: text doesn't fit");
       assert.equal(0, results.usedWidth,  "measurement mode: no width used");
       assert.equal(0, results.usedHeight, "measurement mode: no height used");
 
       var writeOptions = {g: svg, xAlign: "center", yAlign: "center"};
-      results = Plottable._Util.Text.writeText("hello world", width, height, measure, true, writeOptions);
+      results = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal", writeOptions);
       assert.isFalse(results.textFits,    "write mode: text doesn't fit");
       assert.equal(0, results.usedWidth,  "write mode: no width used");
       assert.equal(0, results.usedHeight, "write mode: no height used");
@@ -91,13 +91,13 @@ describe("_Util.Text", () => {
       var height = 1;
       var textSelection = svg.append("text");
       var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
-      var results = Plottable._Util.Text.writeText("hello world", width, height, measure, true);
+      var results = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal");
       assert.isFalse(results.textFits,    "measurement mode: text doesn't fit");
       assert.equal(0, results.usedWidth,  "measurement mode: no width used");
       assert.equal(0, results.usedHeight, "measurement mode: no height used");
 
       var writeOptions = {g: svg, xAlign: "center", yAlign: "center"};
-      results = Plottable._Util.Text.writeText("hello world", width, height, measure, true, writeOptions);
+      results = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal", writeOptions);
       assert.isFalse(results.textFits,    "write mode: text doesn't fit");
       assert.equal(0, results.usedWidth,  "write mode: no width used");
       assert.equal(0, results.usedHeight, "write mode: no height used");

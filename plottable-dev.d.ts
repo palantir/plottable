@@ -53,10 +53,10 @@ declare module Plottable {
              * Populates a map from an array of keys and a transformation function.
              *
              * @param {string[]} keys The array of keys.
-             * @param {(string) => T} transform A transformation function to apply to the keys.
+             * @param {(string, number) => T} transform A transformation function to apply to the keys.
              * @return {D3.Map<T>} A map mapping keys to their transformed values.
              */
-            function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T>;
+            function populateMap<T>(keys: string[], transform: (key: string, index: number) => T): D3.Map<T>;
             /**
              * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
              */
@@ -344,7 +344,7 @@ declare module Plottable {
              *        that is appropriate.
              * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
              */
-            function writeText(text: string, width: number, height: number, tm: TextMeasurer, horizontally?: boolean, write?: IWriteOptions): IWriteTextResult;
+            function writeText(text: string, width: number, height: number, tm: TextMeasurer, orientation?: string, write?: IWriteOptions): IWriteTextResult;
         }
     }
 }
@@ -798,7 +798,7 @@ declare module Plottable {
      * Index, if used, will be the index of the datum in the array.
      */
     interface IAppliedAccessor {
-        (datum: any, index: number): any;
+        (datum?: any, index?: number): any;
     }
     interface _IProjector {
         accessor: _IAccessor;
@@ -1835,6 +1835,7 @@ declare module Plottable {
                 y2: any;
             };
             _invalidateLayout(): void;
+            _setDefaultAlignment(): void;
             /**
              * Gets the current formatter on the axis. Data is passed through the
              * formatter before being displayed.
@@ -2068,6 +2069,20 @@ declare module Plottable {
             _rescale(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest;
             _getTickValues(): string[];
+            /**
+             * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
+             * @param {number} angle The angle for the ticks
+             * @returns {Category} The calling Category Axis.
+             *
+             * Warning - this is not currently well supported and is likely to behave badly unless all the tick labels are short.
+             * See tracking at https://github.com/palantir/plottable/issues/504
+             */
+            tickLabelAngle(angle: number): Category;
+            /**
+             * Gets the tick label angle
+             * @returns {number} the tick label angle
+             */
+            tickLabelAngle(): number;
             _doRender(): Category;
             _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
         }
@@ -2086,7 +2101,7 @@ declare module Plottable {
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
-             * @param {string} orientation The orientation of the Label (horizontal/vertical-left/vertical-right) (default = "horizontal").
+             * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
              */
             constructor(displayText?: string, orientation?: string);
             /**
@@ -2130,7 +2145,7 @@ declare module Plottable {
              * Sets the orientation of the Label.
              *
              * @param {string} newOrientation If provided, the desired orientation
-             * (horizontal/vertical-left/vertical-right).
+             * (horizontal/left/right).
              * @returns {Label} The calling Label.
              */
             orient(newOrientation: string): Label;
@@ -2855,6 +2870,7 @@ declare module Plottable {
             _appendPath(): void;
             _getResetYFunction(): (d: any, i: number) => number;
             _generateAttrToProjector(): IAttributeToProjector;
+            _rejectNullsAndNaNs(d: any, i: number, projector: IAppliedAccessor): boolean;
             _paint(): void;
             _wholeDatumAttributes(): string[];
         }

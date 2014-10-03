@@ -41,6 +41,9 @@
   }, {
     "name":"category_project",
     "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Project", "Animate", "Title", "Label"]
+  }, {
+    "name":"category_axis_rotated_ticks",
+    "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Vertical Bar Plot"]
   },  {
     "name":"category_verticalBar",
     "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Project", "Animate"]
@@ -125,10 +128,13 @@
   },  {
     "name":"stacked_bar",
     "categories":["Linear Scale", "Numeric Axis", "Animate", "Legend", "Category Axis", "Linear Scale", "Vertical Bar Plot", "Stacked Plot"]
-  }, {
+  },  {
+    "name":"timeAxis_area_bar",
+    "categories":["Linear Scale", "Numeric Axis", "Time Scale", "Time Axis", "Vertical Bar Plot", "Stacked Plot", "Title", "Legend"]
+  },  {
     "name":"titleLegend_change",
     "categories":["Datasource", "Metadata", "Color Scale", "Scatter Plot", "Line Plot", "Area Plot", "Domain", "Linear Scale", "Numeric Axis", "Project", "Accessor", "Title", "Label", "Layout", "Legend", "Click Interaction"]
-  }, {
+  },  {
     "name":"stocks",
     "categories":["Integration", "Vertical Bar Plot", "Legend", "Layout", "PanZoom Interaction", "Key Interaction"]
   }
