@@ -100,4 +100,35 @@ describe("Category Axes", () => {
 
     svg.remove();
   });
+
+  it("vertically aligns short words properly", () => {
+    var SVG_WIDTH = 400;
+    var svg = generateSVG(SVG_WIDTH, 100);
+    var years = ["2000", "2001", "2002", "2003"];
+    var scale = new Plottable.Scale.Ordinal().domain(years).range([0, SVG_WIDTH]);
+    var axis = new Plottable.Axis.Category(scale, "bottom");
+    axis.renderTo(svg);
+
+    var ticks = axis._content.selectAll("text");
+    var text = ticks[0].map((d: any) => d3.select(d).text());
+    assert.deepEqual(text, years, "text displayed correctly when horizontal");
+
+    axis.tickLabelAngle(90);
+    text = ticks[0].map((d: any) => d3.select(d).text());
+    assert.deepEqual(text, years, "text displayed correctly when horizontal");
+    assert.operator(axis._content.selectAll(".rotated-right")[0].length, ">=", 4, "the ticks were rotated right");
+
+    axis.tickLabelAngle(0);
+    text = ticks[0].map((d: any) => d3.select(d).text());
+    assert.deepEqual(text, years, "text displayed correctly when horizontal");
+    assert.lengthOf(axis._content.selectAll(".rotated-left")[0], 0, "the ticks were not rotated left");
+    assert.lengthOf(axis._content.selectAll(".rotated-right")[0], 0, "the ticks were not rotated right");
+
+    axis.tickLabelAngle(-90);
+    text = ticks[0].map((d: any) => d3.select(d).text());
+    assert.deepEqual(text, years, "text displayed correctly when horizontal");
+    assert.operator(axis._content.selectAll(".rotated-left")[0].length, ">=", 4, "the ticks were rotated left");
+
+    svg.remove();
+  });
 });

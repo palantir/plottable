@@ -41,6 +41,9 @@
   }, {
     "name":"category_project",
     "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Project", "Animate", "Title", "Label"]
+  }, {
+    "name":"category_axis_rotated_ticks",
+    "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Vertical Bar Plot"]
   },  {
     "name":"category_verticalBar",
     "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Project", "Animate"]
