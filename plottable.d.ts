@@ -2839,16 +2839,16 @@ declare module Plottable {
          */
         class MovingRect extends Rect {
             /**
-             * The value to move from
+             * The pixel value to move from
              */
-            baseline: number;
+            startPixelValue: number;
             /**
              * Constructs a MovingRectAnimator
              *
-             * @param {number} baseline The value to start moving from
+             * @param {number} basePixel The pixel value to start moving from
              * @param {boolean} isVertical If the movement/animation is vertical
              */
-            constructor(baseline: number, isVertical?: boolean);
+            constructor(startPixelValue: number, isVertical?: boolean);
         }
     }
 }

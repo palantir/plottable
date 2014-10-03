@@ -10,23 +10,23 @@ export module Animator {
   export class MovingRect extends Rect {
 
     /**
-     * The value to move from
+     * The pixel value to move from
      */
-    public baseline: number;
+    public startPixelValue: number;
 
     /**
      * Constructs a MovingRectAnimator
      *
-     * @param {number} baseline The value to start moving from
+     * @param {number} basePixel The pixel value to start moving from
      * @param {boolean} isVertical If the movement/animation is vertical
      */
-    constructor(baseline: number, isVertical = true) {
+    constructor(startPixelValue: number, isVertical = true) {
       super(isVertical);
-      this.baseline = baseline;
+      this.startPixelValue = startPixelValue;
     }
 
     public _startMovingProjector(attrToProjector: IAttributeToProjector) {
-      return d3.functor(this.baseline);
+      return d3.functor(this.startPixelValue);
     }
 
   }

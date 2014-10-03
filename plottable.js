@@ -7538,16 +7538,16 @@ var Plottable;
             /**
              * Constructs a MovingRectAnimator
              *
-             * @param {number} baseline The value to start moving from
+             * @param {number} basePixel The pixel value to start moving from
              * @param {boolean} isVertical If the movement/animation is vertical
              */
-            function MovingRect(baseline, isVertical) {
+            function MovingRect(startPixelValue, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, isVertical);
-                this.baseline = baseline;
+                this.startPixelValue = startPixelValue;
             }
             MovingRect.prototype._startMovingProjector = function (attrToProjector) {
-                return d3.functor(this.baseline);
+                return d3.functor(this.startPixelValue);
             };
             return MovingRect;
         })(Animator.Rect);
