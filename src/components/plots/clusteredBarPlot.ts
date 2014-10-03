@@ -24,8 +24,7 @@ export module Plot {
 
     public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
       var animator = new Animator.Rect();
-      animator.delay(Animator.IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS * index);
-      return animator;
+      return animator.delay(Animator.IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS * index);
     }
 
     public _generateAttrToProjector() {
