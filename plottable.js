@@ -7413,10 +7413,10 @@ var Plottable;
          * An animator that delays the animation of the attributes using the index
          * of the selection data.
          *
-         * The maximal delay between animations can be configured with the .maxIterativeDelay getter/setter.
+         * The maximum delay between animations can be configured with maxIterativeDelay.
          *
-         * The maximum total animation duration can be configured with the .maxTotalDuration getter/setter.
-         * maxTotalDuration does NOT set actual total animation duration.
+         * The maximum total animation duration can be configured with maxTotalDuration.
+         * maxTotalDuration does not set actual total animation duration.
          *
          * The actual interval delay is calculated by following formula:
          * min(maxIterativeDelay(),
@@ -7437,9 +7437,8 @@ var Plottable;
             IterativeDelay.prototype.animate = function (selection, attrToProjector) {
                 var _this = this;
                 var numberOfIterations = selection[0].length;
-                var maxIterativeDelay = this.maxIterativeDelay();
                 var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
-                var adjustedIterativeDelay = Math.min(maxIterativeDelay, maxDelayForLastIteration / numberOfIterations);
+                var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / numberOfIterations);
                 return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + adjustedIterativeDelay * i; }).attr(attrToProjector);
             };
             IterativeDelay.prototype.maxIterativeDelay = function (maxIterDelay) {
@@ -7461,7 +7460,7 @@ var Plottable;
                 }
             };
             /**
-             * The default maximal start delay between each start of an animation
+             * The default maximum start delay between each start of an animation
              */
             IterativeDelay.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS = 15;
             /**
