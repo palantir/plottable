@@ -129,7 +129,7 @@ function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
 before(function () {
     // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
     Plottable.Core.RenderController.setRenderPolicy("immediate");
-    window.Pixel_CloseTo_Requirement = window.PHANTOMJS ? 2 : 0.5;
+    window.Pixel_CloseTo_Requirement = window.PHANTOMJS ? 2 : 1;
 });
 after(function () {
     var parent = getSVGParent();
