@@ -18,7 +18,7 @@ export module Component {
      *
      * @constructor
      * @param {string} displayText The text of the Label (default = "").
-     * @param {string} orientation The orientation of the Label (horizontal/vertical-left/vertical-right) (default = "horizontal").
+     * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
      */
     constructor(displayText = "", orientation = "horizontal") {
       super();
@@ -111,7 +111,7 @@ export module Component {
      * Sets the orientation of the Label.
      *
      * @param {string} newOrientation If provided, the desired orientation
-     * (horizontal/vertical-left/vertical-right).
+     * (horizontal/left/right).
      * @returns {Label} The calling Label.
      */
     public orient(newOrientation: string): Label;
@@ -120,8 +120,6 @@ export module Component {
         return this.orientation;
       } else {
         newOrientation = newOrientation.toLowerCase();
-        if (newOrientation === "vertical-left")  { newOrientation = "left" ; }
-        if (newOrientation === "vertical-right") { newOrientation = "right"; }
         if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
           this.orientation = newOrientation;
         } else {

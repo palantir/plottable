@@ -105,7 +105,7 @@ def get_template
         padding: 20px;
       }
     </style>
-    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="../../bower_components/d3/d3.js" charset="utf-8"></script>
     <script src="../../plottable.js"></script>
     <script src="../exampleUtil.js"></script>
     <script src="<%= js_path %>"></script>
@@ -122,5 +122,6 @@ def get_template
     <div id="testdiv"></div>
   </body>
 
-</html>}
+</html>
+}
 end

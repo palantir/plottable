@@ -16,8 +16,6 @@ describe("Plots", () => {
     var axisHeight = 0;
     var bandWidth = 0;
 
-    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
-
     before(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Ordinal();
@@ -99,8 +97,6 @@ describe("Plots", () => {
     var axisHeight = 0;
     var bandWidth = 0;
 
-    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
-
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Ordinal();
@@ -174,8 +170,6 @@ describe("Plots", () => {
     var rendererWidth: number;
     var bandWidth = 0;
 
-    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
-
     before(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Linear().domain([0, 6]);
@@ -248,6 +242,67 @@ describe("Plots", () => {
       assert.closeTo(numAttr(bar1, "x"), 0, 0.01, "x is correct for bar1");
       assert.closeTo(numAttr(bar2, "x"), 0, 0.01, "x is correct for bar2");
       assert.closeTo(numAttr(bar3, "x"), rendererWidth / 3, 0.01, "x is correct for bar3");
+    });
+  });
+
+  describe("Stacked Bar Plot Weird Values", () => {
+    var svg: D3.Selection;
+    var plot: Plottable.Plot.StackedBar<string, number>;
+    var SVG_WIDTH = 600;
+    var SVG_HEIGHT = 400;
+
+    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
+
+    beforeEach(() => {
+      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var xScale = new Plottable.Scale.Ordinal();
+      var yScale = new Plottable.Scale.Linear();
+
+      var data1 = [
+        {x: "A", y: 1, type: "a"},
+        {x: "B", y: 2, type: "a"},
+        {x: "C", y: 1, type: "a"}
+      ];
+      var data2 = [
+        {x: "A", y: 2, type: "b"},
+        {x: "B", y: 3, type: "b"}
+      ];
+      var data3 = [
+        {x: "B", y: 1, type: "c"},
+        {x: "C", y: 7, type: "c"}
+      ];
+
+      plot = new Plottable.Plot.StackedBar(xScale, yScale);
+      plot.addDataset(data1);
+      plot.addDataset(data2);
+      plot.addDataset(data3);
+      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+      var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
+    });
+
+    it("renders correctly", () => {
+      var bars = plot._renderArea.selectAll("rect");
+
+      assert.lengthOf(bars[0], 7, "draws a bar for each datum");
+
+      var aBars = [d3.select(bars[0][0]), d3.select(bars[0][3])];
+
+      var bBars = [d3.select(bars[0][1]), d3.select(bars[0][4]), d3.select(bars[0][5])];
+
+      var cBars = [d3.select(bars[0][2]), d3.select(bars[0][6])];
+
+      assert.closeTo(numAttr(aBars[0], "x"), numAttr(aBars[1], "x"), 0.01, "A bars at same x position");
+      assert.operator(numAttr(aBars[0], "y"), ">", numAttr(aBars[1], "y"), "first dataset A bar under second");
+
+      assert.closeTo(numAttr(bBars[0], "x"), numAttr(bBars[1], "x"), 0.01, "B bars at same x position");
+      assert.closeTo(numAttr(bBars[1], "x"), numAttr(bBars[2], "x"), 0.01, "B bars at same x position");
+      assert.operator(numAttr(bBars[0], "y"), ">", numAttr(bBars[1], "y"), "first dataset B bar under second");
+      assert.operator(numAttr(bBars[1], "y"), ">", numAttr(bBars[2], "y"), "second dataset B bar under third");
+
+      assert.closeTo(numAttr(cBars[0], "x"), numAttr(cBars[1], "x"), 0.01, "C bars at same x position");
+      assert.operator(numAttr(cBars[0], "y"), ">", numAttr(cBars[1], "y"), "first dataset C bar under second");
+
+      svg.remove();
     });
   });
 });

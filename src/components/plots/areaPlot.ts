@@ -84,18 +84,18 @@ export module Plot {
 
       this.areaPath.datum(this._dataset.data());
 
+      var area = d3.svg.area()
+                       .x(xFunction)
+                       .y0(y0Function);
+      area.defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction));
+      attrToProjector["d"] = area;
+
       if (this._dataChanged) {
-        attrToProjector["d"] = d3.svg.area()
-          .x(xFunction)
-          .y0(y0Function)
-          .y1(this._getResetYFunction());
+        area.y1(this._getResetYFunction());
         this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
       }
 
-      attrToProjector["d"] = d3.svg.area()
-        .x(xFunction)
-        .y0(y0Function)
-        .y1(yFunction);
+      area.y1(yFunction);
       this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
     }
 
