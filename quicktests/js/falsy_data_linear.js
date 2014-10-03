@@ -93,7 +93,7 @@ function run(div, data, Plottable) {
     [desc],
     [chartTable] ]);
 
-  finalTable.padding(10,0)
+  finalTable.padding(10,0);
 
   finalTable.renderTo(svg);
 
