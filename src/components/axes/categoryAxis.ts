@@ -62,7 +62,7 @@ export module Axis {
     }
 
     /**
-     * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are valid options.
+     * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
      * @param {number} angle The angle for the ticks
      * @returns {Category} The calling Category Axis.
      *

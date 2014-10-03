@@ -279,13 +279,13 @@ export module _Util {
      * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
      */
     export function writeText(text: string, width: number, height: number, tm: TextMeasurer,
-                              orient = "horizontal",
+                              orientation = "horizontal",
                               write?: IWriteOptions): IWriteTextResult {
 
-      if (["left", "right", "horizontal"].indexOf(orient) === -1) {
-        throw new Error("Unrecognized orientation to writeText: " + orient);
+      if (["left", "right", "horizontal"].indexOf(orientation) === -1) {
+        throw new Error("Unrecognized orientation to writeText: " + orientation);
       }
-      var orientHorizontally = orient === "horizontal";
+      var orientHorizontally = orientation === "horizontal";
       var primaryDimension = orientHorizontally ? width : height;
       var secondaryDimension = orientHorizontally ? height : width;
       var wrappedText = _Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
@@ -305,7 +305,7 @@ export module _Util {
         // the outerG contains general transforms for positining the whole block, the inner g
         // will contain transforms specific to orienting the text properly within the block.
         var writeTextFn = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-        var wh = writeTextFn.call(this, wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign, orient);
+        var wh = writeTextFn.call(this, wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign, orientation);
         usedWidth = wh.width;
         usedHeight = wh.height;
       }

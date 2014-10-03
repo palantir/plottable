@@ -504,12 +504,12 @@ var Plottable;
                 return { width: usedSpace, height: maxHeight };
             }
             ;
-            function writeText(text, width, height, tm, orient, write) {
-                if (orient === void 0) { orient = "horizontal"; }
-                if (["left", "right", "horizontal"].indexOf(orient) === -1) {
-                    throw new Error("Unrecognized orientation to writeText: " + orient);
+            function writeText(text, width, height, tm, orientation, write) {
+                if (orientation === void 0) { orientation = "horizontal"; }
+                if (["left", "right", "horizontal"].indexOf(orientation) === -1) {
+                    throw new Error("Unrecognized orientation to writeText: " + orientation);
                 }
-                var orientHorizontally = orient === "horizontal";
+                var orientHorizontally = orientation === "horizontal";
                 var primaryDimension = orientHorizontally ? width : height;
                 var secondaryDimension = orientHorizontally ? height : width;
                 var wrappedText = _Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
@@ -526,7 +526,7 @@ var Plottable;
                 else {
                     var innerG = write.g.append("g").classed("writeText-inner-g", true);
                     var writeTextFn = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-                    var wh = writeTextFn.call(this, wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign, orient);
+                    var wh = writeTextFn.call(this, wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign, orientation);
                     usedWidth = wh.width;
                     usedHeight = wh.height;
                 }

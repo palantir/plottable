@@ -108,7 +108,7 @@ declare module Plottable {
                 xAlign: string;
                 yAlign: string;
             }
-            function writeText(text: string, width: number, height: number, tm: TextMeasurer, orient?: string, write?: IWriteOptions): IWriteTextResult;
+            function writeText(text: string, width: number, height: number, tm: TextMeasurer, orientation?: string, write?: IWriteOptions): IWriteTextResult;
         }
     }
 }
