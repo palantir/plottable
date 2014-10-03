@@ -344,7 +344,7 @@ declare module Plottable {
              *        that is appropriate.
              * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
              */
-            function writeText(text: string, width: number, height: number, tm: TextMeasurer, horizontally?: boolean, write?: IWriteOptions): IWriteTextResult;
+            function writeText(text: string, width: number, height: number, tm: TextMeasurer, orientation?: string, write?: IWriteOptions): IWriteTextResult;
         }
     }
 }
@@ -2069,6 +2069,20 @@ declare module Plottable {
             _rescale(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest;
             _getTickValues(): string[];
+            /**
+             * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
+             * @param {number} angle The angle for the ticks
+             * @returns {Category} The calling Category Axis.
+             *
+             * Warning - this is not currently well supported and is likely to behave badly unless all the tick labels are short.
+             * See tracking at https://github.com/palantir/plottable/issues/504
+             */
+            tickLabelAngle(angle: number): Category;
+            /**
+             * Gets the tick label angle
+             * @returns {number} the tick label angle
+             */
+            tickLabelAngle(): number;
             _doRender(): Category;
             _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
         }
@@ -2856,6 +2870,7 @@ declare module Plottable {
             _appendPath(): void;
             _getResetYFunction(): (d: any, i: number) => number;
             _generateAttrToProjector(): IAttributeToProjector;
+            _rejectNullsAndNaNs(d: any, i: number, projector: IAppliedAccessor): boolean;
             _paint(): void;
             _wholeDatumAttributes(): string[];
         }
@@ -3128,13 +3143,24 @@ declare module Plottable {
          * An animator that delays the animation of the attributes using the index
          * of the selection data.
          *
-         * The delay between animations can be configured with the .delay getter/setter.
+         * The maximum delay between animations can be configured with maxIterativeDelay.
+         *
+         * The maximum total animation duration can be configured with maxTotalDuration.
+         * maxTotalDuration does not set actual total animation duration.
+         *
+         * The actual interval delay is calculated by following formula:
+         * min(maxIterativeDelay(),
+         *   max(totalDurationLimit() - duration(), 0) / <number of iterations>)
          */
         class IterativeDelay extends Base {
             /**
-             * The start delay between each start of an animation
+             * The default maximum start delay between each start of an animation
              */
-            static DEFAULT_ITERATIVE_DELAY_MILLISECONDS: number;
+            static DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS: number;
+            /**
+             * The default maximum total animation duration
+             */
+            static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS: number;
             /**
              * Constructs an animator with a start delay between each selection animation
              *
@@ -3143,18 +3169,31 @@ declare module Plottable {
             constructor();
             animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection;
             /**
-             * Gets the start delay between animations in milliseconds.
+             * Gets the maximum start delay between animations in milliseconds.
              *
-             * @returns {number} The current iterative delay.
+             * @returns {number} The current maximum iterative delay.
              */
-            iterativeDelay(): number;
+            maxIterativeDelay(): number;
             /**
-             * Sets the start delay between animations in milliseconds.
+             * Sets the maximum start delay between animations in milliseconds.
              *
-             * @param {number} iterDelay The iterative delay in milliseconds.
+             * @param {number} maxIterDelay The maximum iterative delay in milliseconds.
              * @returns {IterativeDelay} The calling IterativeDelay Animator.
              */
-            iterativeDelay(iterDelay: number): IterativeDelay;
+            maxIterativeDelay(maxIterDelay: number): IterativeDelay;
+            /**
+             * Gets the maximum total animation duration in milliseconds.
+             *
+             * @returns {number} The current maximum total animation duration.
+             */
+            maxTotalDuration(): number;
+            /**
+             * Sets the maximum total animation duration in miliseconds.
+             *
+             * @param {number} maxDuration The maximum total animation duration in milliseconds.
+             * @returns {IterativeDelay} The calling IterativeDelay Animator.
+             */
+            maxTotalDuration(maxDuration: number): IterativeDelay;
         }
     }
 }

@@ -17,7 +17,10 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var areaRenderer = new Plottable.Plot.Area(data[0].slice(0, 20), xScale, yScale);
+  var areaData = data[0].slice(0, 20);
+  areaData[10].y = NaN;
+  areaData[13].x = undefined;
+  var areaRenderer = new Plottable.Plot.Area(areaData, xScale, yScale);
   areaRenderer.attr("opacity", 0.75);
   areaRenderer.animate(doAnimate);
 

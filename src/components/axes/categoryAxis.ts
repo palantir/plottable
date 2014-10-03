@@ -4,6 +4,7 @@ module Plottable {
 export module Axis {
   export class Category extends Abstract.Axis {
     public _scale: Scale.Ordinal;
+    private _tickLabelAngle = 0;
     private measurer: _Util.Text.CachingCharacterMeasurer;
 
     /**
@@ -60,6 +61,44 @@ export module Axis {
       return this._scale.domain();
     }
 
+    /**
+     * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
+     * @param {number} angle The angle for the ticks
+     * @returns {Category} The calling Category Axis.
+     *
+     * Warning - this is not currently well supported and is likely to behave badly unless all the tick labels are short.
+     * See tracking at https://github.com/palantir/plottable/issues/504
+     */
+    public tickLabelAngle(angle: number): Category;
+    /**
+     * Gets the tick label angle
+     * @returns {number} the tick label angle
+     */
+    public tickLabelAngle(): number;
+    public tickLabelAngle(angle?: number): any {
+      if (angle == null) {
+        return this._tickLabelAngle;
+      }
+      if (angle !== 0 && angle !== 90 && angle !== -90) {
+        throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
+      }
+      this._tickLabelAngle = angle;
+      this._invalidateLayout();
+      return this;
+    }
+
+    private tickLabelOrientation() {
+      switch(this._tickLabelAngle) {
+        case 0:
+          return "horizontal";
+        case -90:
+          return "left";
+        case 90:
+          return "right";
+        default:
+          throw new Error("bad orientation");
+      }
+    }
 
     /**
      * Measures the size of the ticks while also writing them to the DOM.
@@ -94,17 +133,18 @@ export module Axis {
 
         var textWriteResult: _Util.Text.IWriteTextResult;
         var formatter = self._formatter;
+
         if (draw) {
           var d3this = d3.select(this);
           var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
           var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
-          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, true, {
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation(), {
                                                     g: d3this,
                                                     xAlign: xAlign[self._orientation],
                                                     yAlign: yAlign[self._orientation]
           });
         } else {
-          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, true);
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation());
         }
 
         textWriteResults.push(textWriteResult);
