@@ -7044,7 +7044,7 @@ var Plottable;
             }
             ClusteredBar.prototype._getAnimator = function (drawer, index) {
                 var animator = new Plottable.Animator.Rect();
-                return animator.delay(Plottable.Animator.IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS * index);
+                return animator.delay(Plottable.Animator.IterativeDelay.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS * index);
             };
             ClusteredBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
