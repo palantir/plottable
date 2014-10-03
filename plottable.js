@@ -7042,6 +7042,10 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.innerScale = new Plottable.Scale.Ordinal();
             }
+            ClusteredBar.prototype._getAnimator = function (drawer, index) {
+                var animator = new Plottable.Animator.Rect();
+                return animator.delay(Plottable.Animator.IterativeDelay.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS * index);
+            };
             ClusteredBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
@@ -7073,11 +7077,15 @@ var Plottable;
                 return clusters;
             };
             ClusteredBar.prototype._paint = function () {
+                var _this = this;
                 _super.prototype._paint.call(this);
                 var attrHash = this._generateAttrToProjector();
                 var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 var clusteredData = this.cluster(accessor);
-                this._getDrawersInOrder().forEach(function (d) { return d.draw(clusteredData[d.key], attrHash); });
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
+                    d.draw(clusteredData[d.key], attrHash, animator);
+                });
             };
             return ClusteredBar;
         })(Plottable.Abstract.NewStyleBarPlot);

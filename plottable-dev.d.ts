@@ -2960,6 +2960,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>, isVertical?: boolean);
+            _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator;
             _generateAttrToProjector(): IAttributeToProjector;
             _paint(): void;
         }
