@@ -8,20 +8,14 @@ describe("Plots", () => {
     var simpleDataset: Plottable.Dataset;
     var piePlot: Plottable.Plot.Pie;
     var renderArea: D3.Selection;
-    var verifier: MultiTestVerifier;
 
-    before(() => {
+    beforeEach(() => {
       svg = generateSVG(500, 500);
-      verifier = new MultiTestVerifier();
       simpleDataset = new Plottable.Dataset([{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}]);
       piePlot = new Plottable.Plot.Pie();
       piePlot.addDataset(simpleDataset);
       piePlot.renderTo(svg);
       renderArea = piePlot._renderArea;
-    });
-
-    beforeEach(() => {
-      verifier.start();
     });
 
     it("sectors divided evenly", () => {
@@ -56,7 +50,7 @@ describe("Plots", () => {
       var secondPathPoints1 = pathPoints1[2].split(",");
       assert.closeTo(parseFloat(secondPathPoints1[0]), 0, 1, "draws line to origin");
       assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin");
-      verifier.end();
+      svg.remove();
     });
 
     it("project value onto different attribute", () => {
@@ -87,7 +81,7 @@ describe("Plots", () => {
       assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above the center");
 
       piePlot.project("value", "value");
-      verifier.end();
+      svg.remove();
     });
 
     it("innerRadius project", () => {
@@ -108,7 +102,7 @@ describe("Plots", () => {
       assert.closeTo(innerArcPath0[6], -5, 1, "makes inner arc to top of inner circle");
 
       piePlot.project("inner-radius", () => 0);
-      verifier.end();
+      svg.remove();
     });
 
     it("outerRadius project", () => {
@@ -129,7 +123,7 @@ describe("Plots", () => {
       assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
 
       piePlot.project("outer-radius", () => 250);
-      verifier.end();
+      svg.remove();
     });
 
     describe("Fill", () => {
@@ -142,7 +136,7 @@ describe("Plots", () => {
 
         var arcPath1 = d3.select(arcPaths[0][1]);
         assert.strictEqual(arcPath1.attr("fill"), Plottable.Core.Colors.PLOTTABLE_COLORS[1], "second sector filled appropriately");
-        verifier.end();
+        svg.remove();
       });
 
       it("project fill", () => {
@@ -165,13 +159,9 @@ describe("Plots", () => {
 
         arcPath1 = d3.select(arcPaths[0][1]);
         assert.strictEqual(arcPath1.attr("fill"), "#aec7e8", "second sector filled appropriately");
-        verifier.end();
+        svg.remove();
       });
 
-    });
-
-    after(() => {
-      if (verifier.passed) {svg.remove();};
     });
   });
 });
