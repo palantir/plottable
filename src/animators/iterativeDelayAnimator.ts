@@ -13,7 +13,7 @@ export module Animator {
    * maxTotalDuration does not set actual total animation duration.
    *
    * The actual interval delay is calculated by following formula:
-   * min(maxIterativeDelay(), 
+   * min(maxIterativeDelay(),
    *   max(totalDurationLimit() - duration(), 0) / <number of iterations>)
    */
   export class IterativeDelay extends Base {
@@ -25,7 +25,7 @@ export module Animator {
     /**
      * The default maximum total animation duration
      */
-    public static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
+    public static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = 600;
 
     private _maxIterativeDelay: number;
     private _maxTotalDuration: number;

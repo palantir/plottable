@@ -7551,7 +7551,7 @@ var Plottable;
             /**
              * The default maximum total animation duration
              */
-            IterativeDelay.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
+            IterativeDelay.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = 600;
             return IterativeDelay;
         })(Animator.Base);
         Animator.IterativeDelay = IterativeDelay;
