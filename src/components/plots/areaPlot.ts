@@ -85,8 +85,13 @@ export module Plot {
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
 
-      var datasets = this._getDatasetsInOrder();
+      var area = d3.svg.area()
+                  .x(xFunction)
+                  .y0(y0Function)
+                  .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction));
+      attrToProjector["d"] = area;
 
+      var datasets = this._getDatasetsInOrder();
       this._getDrawersInOrder().forEach((d, i) => {
         var dataset = datasets[i];
         var areaPath: D3.Selection;
@@ -99,17 +104,11 @@ export module Plot {
         areaPath.datum(dataset.data());
 
         if (this._dataChanged) {
-          attrToProjector["d"] = d3.svg.area()
-            .x(xFunction)
-            .y0(y0Function)
-            .y1(this._getResetYFunction());
+          area.y1(this._getResetYFunction());
           this._applyAnimatedAttributes(areaPath, "area-reset", attrToProjector);
         }
 
-        attrToProjector["d"] = d3.svg.area()
-          .x(xFunction)
-          .y0(y0Function)
-          .y1(yFunction);
+        area.y1(yFunction);
         this._applyAnimatedAttributes(areaPath, "area", attrToProjector);
       });
     }

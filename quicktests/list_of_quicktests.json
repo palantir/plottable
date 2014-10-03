@@ -70,6 +70,11 @@
   },
 
   {
+    "name":"category_axis_rotated_ticks",
+    "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Vertical Bar Plot"]
+  },
+
+  {
     "name":"category_verticalBar",
     "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Project", "Animate"]
   },
@@ -147,6 +152,11 @@
   {
     "name":"negative_stacked_bar",
     "categories":["Linear Scale", "Numeric Axis", "Legend", "Category Axis", "Linear Scale", "Vertical Bar Plot", "Stacked Plot"]
+  },
+
+  {
+    "name":"missing_stacked_bar",
+    "categories":["Linear Scale", "Numeric Axis", "Animate", "Legend", "Category Axis", "Linear Scale", "Vertical Bar Plot", "Stacked Plot"]
   },
 
   {

@@ -1,7 +1,10 @@
 
 function makeData() {
   "use strict";
-  return makeRandomData(20);
+  var data = makeRandomData(20);
+  data[10].y = NaN;
+  data[13].x = undefined;
+  return data;
 }
 
 function run(div, data, Plottable) {
@@ -21,7 +24,7 @@ function run(div, data, Plottable) {
               .animate(doAnimate);
 
   var lineChart = new Plottable.Component.Table([[yAxis, lineRenderer],
-                                           [null,  xAxis]]);
+                                                 [null,  xAxis]]);
   lineChart.renderTo(svg);
 
   var cb = function(x, y){

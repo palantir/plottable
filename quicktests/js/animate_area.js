@@ -1,7 +1,10 @@
 function makeData() {
   "use strict";
 
-  return makeRandomData(20);
+  var data = makeRandomData(20);
+  data[0].y = NaN;
+  data[13].x = undefined;
+  return data;
 }
 
 function run(div, data, Plottable) {

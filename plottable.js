@@ -664,6 +664,7 @@ var Plottable;
                 xForm.rotate = rotation === "right" ? 90 : -90;
                 xForm.translate = [isRight ? width : 0, isRight ? 0 : height];
                 innerG.attr("transform", xForm.toString());
+                innerG.classed("rotated-" + rotation, true);
                 return wh;
             }
             Text.writeLineVertically = writeLineVertically;
@@ -715,8 +716,12 @@ var Plottable;
              *        that is appropriate.
              * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
              */
-            function writeText(text, width, height, tm, horizontally, write) {
-                var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
+            function writeText(text, width, height, tm, orientation, write) {
+                if (orientation === void 0) { orientation = "horizontal"; }
+                if (["left", "right", "horizontal"].indexOf(orientation) === -1) {
+                    throw new Error("Unrecognized orientation to writeText: " + orientation);
+                }
+                var orientHorizontally = orientation === "horizontal";
                 var primaryDimension = orientHorizontally ? width : height;
                 var secondaryDimension = orientHorizontally ? height : width;
                 var wrappedText = _Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
@@ -735,7 +740,7 @@ var Plottable;
                     // the outerG contains general transforms for positining the whole block, the inner g
                     // will contain transforms specific to orienting the text properly within the block.
                     var writeTextFn = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-                    var wh = writeTextFn(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
+                    var wh = writeTextFn.call(this, wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign, orientation);
                     usedWidth = wh.width;
                     usedHeight = wh.height;
                 }
@@ -4597,6 +4602,7 @@ var Plottable;
                 if (orientation === void 0) { orientation = "bottom"; }
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
+                this._tickLabelAngle = 0;
                 this.classed("category-axis", true);
             }
             Category.prototype._setup = function () {
@@ -4630,6 +4636,29 @@ var Plottable;
             Category.prototype._getTickValues = function () {
                 return this._scale.domain();
             };
+            Category.prototype.tickLabelAngle = function (angle) {
+                if (angle == null) {
+                    return this._tickLabelAngle;
+                }
+                if (angle !== 0 && angle !== 90 && angle !== -90) {
+                    throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
+                }
+                this._tickLabelAngle = angle;
+                this._invalidateLayout();
+                return this;
+            };
+            Category.prototype.tickLabelOrientation = function () {
+                switch (this._tickLabelAngle) {
+                    case 0:
+                        return "horizontal";
+                    case -90:
+                        return "left";
+                    case 90:
+                        return "right";
+                    default:
+                        throw new Error("bad orientation");
+                }
+            };
             /**
              * Measures the size of the ticks while also writing them to the DOM.
              * @param {D3.Selection} ticks The tick elements to be written to.
@@ -4661,14 +4690,14 @@ var Plottable;
                         var d3this = d3.select(this);
                         var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                         var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, true, {
+                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation(), {
                             g: d3this,
                             xAlign: xAlign[self._orientation],
                             yAlign: yAlign[self._orientation]
                         });
                     }
                     else {
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, true);
+                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation());
                     }
                     textWriteResults.push(textWriteResult);
                 });
@@ -6642,6 +6671,10 @@ var Plottable;
                 });
                 return attrToProjector;
             };
+            Line.prototype._rejectNullsAndNaNs = function (d, i, projector) {
+                var value = projector(d, i);
+                return value != null && value === value;
+            };
             // HACKHACK #1106 - should use drawers for paint logic
             Line.prototype._paint = function () {
                 var _this = this;
@@ -6650,6 +6683,8 @@ var Plottable;
                 var yFunction = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
+                var line = d3.svg.line().x(xFunction).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
+                attrToProjector["d"] = line;
                 var datasets = this._getDatasetsInOrder();
                 this._getDrawersInOrder().forEach(function (d, i) {
                     var dataset = datasets[i];
@@ -6662,10 +6697,10 @@ var Plottable;
                     }
                     linePath.datum(dataset.data());
                     if (_this._dataChanged) {
-                        attrToProjector["d"] = d3.svg.line().x(xFunction).y(_this._getResetYFunction());
+                        line.y(_this._getResetYFunction());
                         _this._applyAnimatedAttributes(linePath, "line-reset", attrToProjector);
                     }
-                    attrToProjector["d"] = d3.svg.line().x(xFunction).y(yFunction);
+                    line.y(yFunction);
                     _this._applyAnimatedAttributes(linePath, "line", attrToProjector);
                 });
             };
@@ -6764,6 +6799,8 @@ var Plottable;
                 delete attrToProjector["x"];
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
+                var area = d3.svg.area().x(xFunction).y0(y0Function).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
+                attrToProjector["d"] = area;
                 var datasets = this._getDatasetsInOrder();
                 this._getDrawersInOrder().forEach(function (d, i) {
                     var dataset = datasets[i];
@@ -6777,10 +6814,10 @@ var Plottable;
                     }
                     areaPath.datum(dataset.data());
                     if (_this._dataChanged) {
-                        attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(_this._getResetYFunction());
+                        area.y1(_this._getResetYFunction());
                         _this._applyAnimatedAttributes(areaPath, "area-reset", attrToProjector);
                     }
-                    attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+                    area.y1(yFunction);
                     _this._applyAnimatedAttributes(areaPath, "area", attrToProjector);
                 });
             };
@@ -6889,67 +6926,98 @@ var Plottable;
                 _super.prototype._onDatasetUpdate.call(this);
                 // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
                 if (this._datasetKeysInOrder && this._projectors["x"] && this._projectors["y"]) {
-                    this.stack();
+                    this.updateStackOffsets();
                 }
             };
-            Stacked.prototype.stack = function () {
+            Stacked.prototype.updateStackOffsets = function () {
+                var dataMapArray = this.generateDefaultMapArray();
+                var domainKeys = this.getDomainKeys();
+                var positiveDataMapArray = dataMapArray.map(function (dataMap) {
+                    return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
+                        return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) };
+                    });
+                });
+                var negativeDataMapArray = dataMapArray.map(function (dataMap) {
+                    return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
+                        return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) };
+                    });
+                });
+                this.setDatasetStackOffsets(this.stack(positiveDataMapArray), this.stack(negativeDataMapArray));
+                this.updateStackExtents();
+            };
+            Stacked.prototype.updateStackExtents = function () {
                 var datasets = this._getDatasetsInOrder();
-                var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-                var dataArray = datasets.map(function (dataset) {
-                    return dataset.data().map(function (datum) {
-                        return { key: keyAccessor(datum), value: valueAccessor(datum) };
-                    });
-                });
-                var positiveDataArray = dataArray.map(function (data) {
-                    return data.map(function (datum) {
-                        return { key: datum.key, value: Math.max(0, datum.value) };
-                    });
-                });
-                var negativeDataArray = dataArray.map(function (data) {
-                    return data.map(function (datum) {
-                        return { key: datum.key, value: Math.min(datum.value, 0) };
-                    });
-                });
-                this.setDatasetStackOffsets(this._stack(positiveDataArray), this._stack(negativeDataArray));
-                var maxStack = Plottable._Util.Methods.max(datasets, function (dataset) {
+                var valueAccessor = this.valueAccessor();
+                var maxStackExtent = Plottable._Util.Methods.max(datasets, function (dataset) {
                     return Plottable._Util.Methods.max(dataset.data(), function (datum) {
                         return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                     });
                 });
-                var minStack = Plottable._Util.Methods.min(datasets, function (dataset) {
+                var minStackExtent = Plottable._Util.Methods.min(datasets, function (dataset) {
                     return Plottable._Util.Methods.min(dataset.data(), function (datum) {
                         return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                     });
                 });
-                this.stackedExtent = [Math.min(minStack, 0), Math.max(0, maxStack)];
+                this.stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
             };
             /**
              * Feeds the data through d3's stack layout function which will calculate
              * the stack offsets and use the the function declared in .out to set the offsets on the data.
              */
-            Stacked.prototype._stack = function (dataArray) {
+            Stacked.prototype.stack = function (dataArray) {
+                var _this = this;
                 var outFunction = function (d, y0, y) {
                     d.offset = y0;
                 };
-                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return d; }).out(outFunction)(dataArray);
+                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return _this.getDomainKeys().map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
                 return dataArray;
             };
             /**
              * After the stack offsets have been determined on each separate dataset, the offsets need
              * to be determined correctly on the overall datasets
              */
-            Stacked.prototype.setDatasetStackOffsets = function (positiveDataArray, negativeDataArray) {
-                var valueAccessor = this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
-                var positiveDataArrayOffsets = positiveDataArray.map(function (data) { return data.map(function (datum) { return datum.offset; }); });
-                var negativeDataArrayOffsets = negativeDataArray.map(function (data) { return data.map(function (datum) { return datum.offset; }); });
+            Stacked.prototype.setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
+                var keyAccessor = this.keyAccessor();
+                var valueAccessor = this.valueAccessor();
                 this._getDatasetsInOrder().forEach(function (dataset, datasetIndex) {
+                    var positiveDataMap = positiveDataMapArray[datasetIndex];
+                    var negativeDataMap = negativeDataMapArray[datasetIndex];
                     dataset.data().forEach(function (datum, datumIndex) {
-                        var positiveOffset = positiveDataArrayOffsets[datasetIndex][datumIndex];
-                        var negativeOffset = negativeDataArrayOffsets[datasetIndex][datumIndex];
+                        var positiveOffset = positiveDataMap.get(keyAccessor(datum)).offset;
+                        var negativeOffset = negativeDataMap.get(keyAccessor(datum)).offset;
                         datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) > 0 ? positiveOffset : negativeOffset;
                     });
                 });
+            };
+            Stacked.prototype.getDomainKeys = function () {
+                var keyAccessor = this.keyAccessor();
+                var domainKeys = d3.set();
+                var datasets = this._getDatasetsInOrder();
+                datasets.forEach(function (dataset) {
+                    dataset.data().forEach(function (datum) {
+                        domainKeys.add(keyAccessor(datum));
+                    });
+                });
+                return domainKeys.values();
+            };
+            Stacked.prototype.generateDefaultMapArray = function () {
+                var keyAccessor = this.keyAccessor();
+                var valueAccessor = this.valueAccessor();
+                var datasets = this._getDatasetsInOrder();
+                var domainKeys = this.getDomainKeys();
+                var dataMapArray = datasets.map(function () {
+                    return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
+                        return { key: domainKey, value: 0 };
+                    });
+                });
+                datasets.forEach(function (dataset, datasetIndex) {
+                    dataset.data().forEach(function (datum) {
+                        var key = keyAccessor(datum);
+                        var value = valueAccessor(datum);
+                        dataMapArray[datasetIndex].set(key, { key: key, value: value });
+                    });
+                });
+                return dataMapArray;
             };
             Stacked.prototype._updateScaleExtents = function () {
                 _super.prototype._updateScaleExtents.call(this);
@@ -6963,6 +7031,12 @@ var Plottable;
                 else {
                     primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
+            };
+            Stacked.prototype.keyAccessor = function () {
+                return this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+            };
+            Stacked.prototype.valueAccessor = function () {
+                return this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
             };
             return Stacked;
         })(Abstract.XYPlot);
@@ -7244,7 +7318,14 @@ var Plottable;
          * An animator that delays the animation of the attributes using the index
          * of the selection data.
          *
-         * The delay between animations can be configured with the .delay getter/setter.
+         * The maximum delay between animations can be configured with maxIterativeDelay.
+         *
+         * The maximum total animation duration can be configured with maxTotalDuration.
+         * maxTotalDuration does not set actual total animation duration.
+         *
+         * The actual interval delay is calculated by following formula:
+         * min(maxIterativeDelay(),
+         *   max(totalDurationLimit() - duration(), 0) / <number of iterations>)
          */
         var IterativeDelay = (function (_super) {
             __extends(IterativeDelay, _super);
@@ -7255,25 +7336,42 @@ var Plottable;
              */
             function IterativeDelay() {
                 _super.call(this);
-                this._iterativeDelay = IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+                this._maxIterativeDelay = IterativeDelay.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
+                this._maxTotalDuration = IterativeDelay.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
             }
             IterativeDelay.prototype.animate = function (selection, attrToProjector) {
                 var _this = this;
-                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + _this.iterativeDelay() * i; }).attr(attrToProjector);
+                var numberOfIterations = selection[0].length;
+                var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
+                var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / numberOfIterations);
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + adjustedIterativeDelay * i; }).attr(attrToProjector);
             };
-            IterativeDelay.prototype.iterativeDelay = function (iterDelay) {
-                if (iterDelay === undefined) {
-                    return this._iterativeDelay;
+            IterativeDelay.prototype.maxIterativeDelay = function (maxIterDelay) {
+                if (maxIterDelay === undefined) {
+                    return this._maxIterativeDelay;
                 }
                 else {
-                    this._iterativeDelay = iterDelay;
+                    this._maxIterativeDelay = maxIterDelay;
+                    return this;
+                }
+            };
+            IterativeDelay.prototype.maxTotalDuration = function (maxDuration) {
+                if (maxDuration == null) {
+                    return this._maxTotalDuration;
+                }
+                else {
+                    this._maxTotalDuration = maxDuration;
                     return this;
                 }
             };
             /**
-             * The start delay between each start of an animation
+             * The default maximum start delay between each start of an animation
              */
-            IterativeDelay.DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
+            IterativeDelay.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS = 15;
+            /**
+             * The default maximum total animation duration
+             */
+            IterativeDelay.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = 600;
             return IterativeDelay;
         })(Animator.Base);
         Animator.IterativeDelay = IterativeDelay;

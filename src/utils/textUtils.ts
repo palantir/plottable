@@ -212,6 +212,7 @@ export module _Util {
       xForm.rotate = rotation === "right" ? 90 : -90;
       xForm.translate = [isRight ? width : 0, isRight ? 0 : height];
       innerG.attr("transform", xForm.toString());
+      innerG.classed("rotated-" + rotation, true);
 
       return wh;
     }
@@ -278,10 +279,13 @@ export module _Util {
      * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
      */
     export function writeText(text: string, width: number, height: number, tm: TextMeasurer,
-                              horizontally?: boolean,
+                              orientation = "horizontal",
                               write?: IWriteOptions): IWriteTextResult {
 
-      var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
+      if (["left", "right", "horizontal"].indexOf(orientation) === -1) {
+        throw new Error("Unrecognized orientation to writeText: " + orientation);
+      }
+      var orientHorizontally = orientation === "horizontal";
       var primaryDimension = orientHorizontally ? width : height;
       var secondaryDimension = orientHorizontally ? height : width;
       var wrappedText = _Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
@@ -301,7 +305,7 @@ export module _Util {
         // the outerG contains general transforms for positining the whole block, the inner g
         // will contain transforms specific to orienting the text properly within the block.
         var writeTextFn = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-        var wh = writeTextFn(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
+        var wh = writeTextFn.call(this, wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign, orientation);
         usedWidth = wh.width;
         usedHeight = wh.height;
       }
