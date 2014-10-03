@@ -5246,7 +5246,12 @@ var Plottable;
                 });
                 return attrToProjector;
             };
+            Line.prototype._rejectNullsAndNaNs = function (d, i, projector) {
+                var value = projector(d, i);
+                return value != null && value === value;
+            };
             Line.prototype._paint = function () {
+                var _this = this;
                 _super.prototype._paint.call(this);
                 var attrToProjector = this._generateAttrToProjector();
                 var xFunction = attrToProjector["x"];
@@ -5254,11 +5259,14 @@ var Plottable;
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
                 this.linePath.datum(this._dataset.data());
+                var line = d3.svg.line().x(xFunction);
+                line.defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
+                attrToProjector["d"] = line;
                 if (this._dataChanged) {
-                    attrToProjector["d"] = d3.svg.line().x(xFunction).y(this._getResetYFunction());
+                    line.y(this._getResetYFunction());
                     this._applyAnimatedAttributes(this.linePath, "line-reset", attrToProjector);
                 }
-                attrToProjector["d"] = d3.svg.line().x(xFunction).y(yFunction);
+                line.y(yFunction);
                 this._applyAnimatedAttributes(this.linePath, "line", attrToProjector);
             };
             Line.prototype._wholeDatumAttributes = function () {
@@ -5329,6 +5337,7 @@ var Plottable;
                 return this._generateAttrToProjector()["y0"];
             };
             Area.prototype._paint = function () {
+                var _this = this;
                 _super.prototype._paint.call(this);
                 var attrToProjector = this._generateAttrToProjector();
                 var xFunction = attrToProjector["x"];
@@ -5338,11 +5347,14 @@ var Plottable;
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
                 this.areaPath.datum(this._dataset.data());
+                var area = d3.svg.area().x(xFunction).y0(y0Function);
+                area.defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
+                attrToProjector["d"] = area;
                 if (this._dataChanged) {
-                    attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(this._getResetYFunction());
+                    area.y1(this._getResetYFunction());
                     this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
                 }
-                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+                area.y1(yFunction);
                 this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
             };
             Area.prototype._wholeDatumAttributes = function () {

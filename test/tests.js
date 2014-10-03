@@ -1768,37 +1768,35 @@ describe("Plots", function () {
         var xAccessor;
         var yAccessor;
         var colorAccessor;
+        var twoPointData = [{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }];
         var simpleDataset;
         var linePlot;
         var renderArea;
-        var verifier;
         before(function () {
-            svg = generateSVG(500, 500);
-            verifier = new MultiTestVerifier();
             xScale = new Plottable.Scale.Linear().domain([0, 1]);
             yScale = new Plottable.Scale.Linear().domain([0, 1]);
             xAccessor = function (d) { return d.foo; };
             yAccessor = function (d) { return d.bar; };
             colorAccessor = function (d, i, m) { return d3.rgb(d.foo, d.bar, i).toString(); };
-            simpleDataset = new Plottable.Dataset([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+        });
+        beforeEach(function () {
+            svg = generateSVG(500, 500);
+            simpleDataset = new Plottable.Dataset(twoPointData);
             linePlot = new Plottable.Plot.Line(simpleDataset, xScale, yScale);
             linePlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).renderTo(svg);
             renderArea = linePlot._renderArea;
-        });
-        beforeEach(function () {
-            verifier.start();
         });
         it("draws a line correctly", function () {
             var linePath = renderArea.select(".line");
             assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
             var lineComputedStyle = window.getComputedStyle(linePath.node());
             assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
-            verifier.end();
+            svg.remove();
         });
         it("attributes set appropriately from accessor", function () {
             var areaPath = renderArea.select(".line");
             assert.equal(areaPath.attr("stroke"), "#000000", "stroke set correctly");
-            verifier.end();
+            svg.remove();
         });
         it("attributes can be changed by projecting new accessor and re-render appropriately", function () {
             var newColorAccessor = function () { return "pink"; };
@@ -1806,7 +1804,7 @@ describe("Plots", function () {
             linePlot.renderTo(svg);
             var linePath = renderArea.select(".line");
             assert.equal(linePath.attr("stroke"), "pink", "stroke changed correctly");
-            verifier.end();
+            svg.remove();
         });
         it("attributes can be changed by projecting attribute accessor (sets to first datum attribute)", function () {
             var data = simpleDataset.data();
@@ -1820,13 +1818,43 @@ describe("Plots", function () {
             data[0].stroke = "green";
             simpleDataset.data(data);
             assert.equal(areaPath.attr("stroke"), "green", "stroke set to first datum stroke color");
-            verifier.end();
+            svg.remove();
         });
-        after(function () {
-            if (verifier.passed) {
-                svg.remove();
+        it("correctly handles NaN and undefined x and y values", function () {
+            var lineData = [
+                { foo: 0.0, bar: 0.0 },
+                { foo: 0.2, bar: 0.2 },
+                { foo: 0.4, bar: 0.4 },
+                { foo: 0.6, bar: 0.6 },
+                { foo: 0.8, bar: 0.8 }
+            ];
+            simpleDataset.data(lineData);
+            var linePath = renderArea.select(".line");
+            var d_original = normalizePath(linePath.attr("d"));
+            function assertCorrectPathSplitting(msgPrefix) {
+                var d = normalizePath(linePath.attr("d"));
+                var pathSegements = d.split("M").filter(function (segment) { return segment !== ""; });
+                assert.lengthOf(pathSegements, 2, msgPrefix + " split path into two segments");
+                var firstSegmentContained = d_original.indexOf(pathSegements[0]) >= 0;
+                assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
+                var secondSegmentContained = d_original.indexOf(pathSegements[1]) >= 0;
+                assert.isTrue(firstSegmentContained, "second path segment is a subpath of the original path");
             }
-            ;
+            var dataWithNaN = lineData.slice();
+            dataWithNaN[2] = { foo: 0.4, bar: NaN };
+            simpleDataset.data(dataWithNaN);
+            assertCorrectPathSplitting("y=NaN");
+            dataWithNaN[2] = { foo: NaN, bar: 0.4 };
+            simpleDataset.data(dataWithNaN);
+            assertCorrectPathSplitting("x=NaN");
+            var dataWithUndefined = lineData.slice();
+            dataWithUndefined[2] = { foo: 0.4, bar: undefined };
+            simpleDataset.data(dataWithUndefined);
+            assertCorrectPathSplitting("y=undefined");
+            dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
+            simpleDataset.data(dataWithUndefined);
+            assertCorrectPathSplitting("x=undefined");
+            svg.remove();
         });
     });
 });
@@ -1842,13 +1870,11 @@ describe("Plots", function () {
         var y0Accessor;
         var colorAccessor;
         var fillAccessor;
+        var twoPointData = [{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }];
         var simpleDataset;
         var areaPlot;
         var renderArea;
-        var verifier;
         before(function () {
-            svg = generateSVG(500, 500);
-            verifier = new MultiTestVerifier();
             xScale = new Plottable.Scale.Linear().domain([0, 1]);
             yScale = new Plottable.Scale.Linear().domain([0, 1]);
             xAccessor = function (d) { return d.foo; };
@@ -1856,13 +1882,13 @@ describe("Plots", function () {
             y0Accessor = function () { return 0; };
             colorAccessor = function (d, i, m) { return d3.rgb(d.foo, d.bar, i).toString(); };
             fillAccessor = function () { return "steelblue"; };
-            simpleDataset = new Plottable.Dataset([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+        });
+        beforeEach(function () {
+            svg = generateSVG(500, 500);
+            simpleDataset = new Plottable.Dataset(twoPointData);
             areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
             areaPlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
             renderArea = areaPlot._renderArea;
-        });
-        beforeEach(function () {
-            verifier.start();
         });
         it("draws area and line correctly", function () {
             var areaPath = renderArea.select(".area");
@@ -1875,7 +1901,7 @@ describe("Plots", function () {
             assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
             var lineComputedStyle = window.getComputedStyle(linePath.node());
             assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
-            verifier.end();
+            svg.remove();
         });
         it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", function () {
             areaPlot.project("y0", function (d) { return d.bar / 2; }, yScale);
@@ -1883,20 +1909,40 @@ describe("Plots", function () {
             renderArea = areaPlot._renderArea;
             var areaPath = renderArea.select(".area");
             assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
-            verifier.end();
+            svg.remove();
         });
         it("area is appended before line", function () {
             var paths = renderArea.selectAll("path")[0];
             var areaSelection = renderArea.select(".area")[0][0];
             var lineSelection = renderArea.select(".line")[0][0];
             assert.operator(paths.indexOf(areaSelection), "<", paths.indexOf(lineSelection), "area appended before line");
-            verifier.end();
+            svg.remove();
         });
-        after(function () {
-            if (verifier.passed) {
-                svg.remove();
-            }
-            ;
+        it("correctly handles NaN and undefined x and y values", function () {
+            var areaData = [
+                { foo: 0.0, bar: 0.0 },
+                { foo: 0.2, bar: 0.2 },
+                { foo: 0.4, bar: 0.4 },
+                { foo: 0.6, bar: 0.6 },
+                { foo: 0.8, bar: 0.8 }
+            ];
+            var expectedPath = "M0,500L100,400L100,500L0,500ZM300,200L400,100L400,500L300,500Z";
+            var areaPath = renderArea.select(".area");
+            var dataWithNaN = areaData.slice();
+            dataWithNaN[2] = { foo: 0.4, bar: NaN };
+            simpleDataset.data(dataWithNaN);
+            assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath, "area d was set correctly (y=NaN case)");
+            dataWithNaN[2] = { foo: NaN, bar: 0.4 };
+            simpleDataset.data(dataWithNaN);
+            assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath, "area d was set correctly (x=NaN case)");
+            var dataWithUndefined = areaData.slice();
+            dataWithUndefined[2] = { foo: 0.4, bar: undefined };
+            simpleDataset.data(dataWithUndefined);
+            assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath, "area d was set correctly (y=undefined case)");
+            dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
+            simpleDataset.data(dataWithUndefined);
+            assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath, "area d was set correctly (x=undefined case)");
+            svg.remove();
         });
     });
 });

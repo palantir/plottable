@@ -1073,6 +1073,7 @@ declare module Plottable {
             _appendPath(): void;
             _getResetYFunction(): (d: any, i: number) => number;
             _generateAttrToProjector(): IAttributeToProjector;
+            _rejectNullsAndNaNs(d: any, i: number, projector: IAppliedAccessor): boolean;
             _paint(): void;
             _wholeDatumAttributes(): string[];
         }
