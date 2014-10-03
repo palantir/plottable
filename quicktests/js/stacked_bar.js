@@ -17,7 +17,7 @@ function run(div, data, Plottable) {
 
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  var stackedBarPlot = new Plottable.Plot.StackedBar(xScale, yScale)                                   
+  var stackedBarPlot = new Plottable.Plot.StackedBar(xScale, yScale)
                                     .attr("x", "name", xScale)
                                     .attr("y", "y", yScale)
                                     .attr("fill", "type", colorScale)
