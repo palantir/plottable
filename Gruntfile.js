@@ -150,9 +150,9 @@ module.exports = function(grunt) {
   updateTestTsFiles();
 
   var browsers = [{
-  //   browserName: "firefox",
-  //   version: "30"
-  // }, {
+    browserName: "firefox",
+    version: "30"
+  }, {
     browserName: "chrome",
     version: "35"
   }, {
