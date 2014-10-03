@@ -7274,8 +7274,7 @@ var Plottable;
             StackedBar.prototype._getAnimator = function (drawer, index) {
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
-                var animator = new Plottable.Animator.MovingRect(scaledBaseline);
-                return animator;
+                return new Plottable.Animator.MovingRect(scaledBaseline);
             };
             StackedBar.prototype._getDrawer = function (key) {
                 return Plottable.Abstract.NewStyleBarPlot.prototype._getDrawer.apply(this, [key]);
