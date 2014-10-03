@@ -6753,8 +6753,8 @@ var Plottable;
                 });
                 return attrToProjector;
             };
-            Line.prototype._rejectNullsAndNaNs = function (d, i, accessor) {
-                var value = accessor(d, i);
+            Line.prototype._rejectNullsAndNaNs = function (d, i, projector) {
+                var value = projector(d, i);
                 return value != null && value === value;
             };
             Line.prototype._paint = function () {

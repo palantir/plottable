@@ -61,8 +61,8 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _rejectNullsAndNaNs(d: any, i: number, accessor: IAppliedAccessor) {
-      var value = accessor(d, i);
+    public _rejectNullsAndNaNs(d: any, i: number, projector: IAppliedAccessor) {
+      var value = projector(d, i);
       return value != null && value === value;
     }
 
