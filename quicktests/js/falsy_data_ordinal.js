@@ -1,11 +1,11 @@
 function makeData() {
   "use strict";
 
-  var data1 = [{x: null, y: 1}];
-  var data2 = [{x: NaN, y: 1}];
-  var data3 = [{x: undefined, y: 1}];
-  var data4 = [{x: false, y: 1}];
-  var data5 = [{x: "", y: 1}];
+  var data1 = [{x: null, y: null}, {x: null, y: 1}, {x: 1, y: null}, {x: 2, y: 2} ];
+  var data2 = [{x: NaN, y: NaN}, {x: NaN, y: 1}, {x: 1, y: NaN}, {x: 2, y: 2}];
+  var data3 = [{x: undefined, y: undefined}, {x: undefined, y: 1}, {x: 1, y: undefined},  {x: 2, y: 2}];
+  var data4 = [{x: false, y: false}, {x: false, y: 1}, {x: 1, y: false}, {x: 2, y: 2}];
+  var data5 = [{x: "", y: ""}, {x: "", y: 1}, {x: 1, y: ""}, {x: 2, y: 2}];
     
   return [data1, data2, data3, data4, data5];
 }
@@ -29,7 +29,8 @@ function run(div, data, Plottable) {
   }
 
   //Labels
-  var title = new Plottable.Component.TitleLabel("null , NaN, undefined, false, \"\" on Ordinal with y=1");
+  var title = new Plottable.Component.TitleLabel("null , NaN, undefined, false, \"\" on Ordinal");
+  var desc = new Plottable.Component.Label("data: {x: type, y: type}, {x: type, y: 1}, {x: 1, y: type}, {x: 2, y: 2} ");
   var scatterLabel = new Plottable.Component.Label("Scatter");
   var lineLabel = new Plottable.Component.Label("Line");
   var areaLabel = new Plottable.Component.Label("Area");
@@ -91,8 +92,11 @@ function run(div, data, Plottable) {
     [vbarLabel, vbarTable]]);
 
   var finalTable = new Plottable.Component.Table([
-    [null, title],
-    [null, chartTable] ]);
+    [title],
+    [desc],
+    [chartTable] ]);
+
+  finalTable.padding(10,0)
 
   finalTable.renderTo(svg);
 
