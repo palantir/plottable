@@ -18,50 +18,53 @@ export module Abstract {
       super._onDatasetUpdate();
       // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
       if (this._datasetKeysInOrder && this._projectors["x"]  && this._projectors["y"]) {
-        this.stack();
+        this.updateStackOffsets();
       }
     }
 
-    private stack() {
-      var datasets = this._getDatasetsInOrder();
+    private updateStackOffsets() {
       var dataMapArray = this.generateDefaultMapArray();
       var domainKeys = this.getDomainKeys();
 
       var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
         return _Util.Methods.populateMap(domainKeys, (domainKey) => {
-          return {key: domainKey, value: Math.max(0, dataMap.get(domainKey).value)};
+          return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) };
         });
       });
 
       var negativeDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
         return _Util.Methods.populateMap(domainKeys, (domainKey) => {
-          return {key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0)};
+          return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) };
         });
       });
 
-      this.setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
+      this.setDatasetStackOffsets(this.stack(positiveDataMapArray), this.stack(negativeDataMapArray));
+      this.updateStackExtents();
+    }
 
+    private updateStackExtents() {
+      var datasets = this._getDatasetsInOrder();
       var valueAccessor = this.valueAccessor();
-      var maxStack = _Util.Methods.max(datasets, (dataset: Dataset) => {
+      var maxStackExtent = _Util.Methods.max(datasets, (dataset: Dataset) => {
         return _Util.Methods.max(dataset.data(), (datum: any) => {
           return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
         });
       });
 
-      var minStack = _Util.Methods.min(datasets, (dataset: Dataset) => {
+      var minStackExtent = _Util.Methods.min(datasets, (dataset: Dataset) => {
         return _Util.Methods.min(dataset.data(), (datum: any) => {
           return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
         });
       });
 
-      this.stackedExtent = [Math.min(minStack, 0), Math.max(0, maxStack)];
+      this.stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
     }
 
     /**
      * Feeds the data through d3's stack layout function which will calculate
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
-    private _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
+    private stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
       var outFunction = (d: StackedDatum, y0: number, y: number) => {
         d.offset = y0;
       };

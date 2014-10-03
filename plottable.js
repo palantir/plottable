@@ -7065,11 +7065,10 @@ var Plottable;
                 _super.prototype._onDatasetUpdate.call(this);
                 // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
                 if (this._datasetKeysInOrder && this._projectors["x"] && this._projectors["y"]) {
-                    this.stack();
+                    this.updateStackOffsets();
                 }
             };
-            Stacked.prototype.stack = function () {
-                var datasets = this._getDatasetsInOrder();
+            Stacked.prototype.updateStackOffsets = function () {
                 var dataMapArray = this.generateDefaultMapArray();
                 var domainKeys = this.getDomainKeys();
                 var positiveDataMapArray = dataMapArray.map(function (dataMap) {
@@ -7082,25 +7081,29 @@ var Plottable;
                         return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) };
                     });
                 });
-                this.setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
+                this.setDatasetStackOffsets(this.stack(positiveDataMapArray), this.stack(negativeDataMapArray));
+                this.updateStackExtents();
+            };
+            Stacked.prototype.updateStackExtents = function () {
+                var datasets = this._getDatasetsInOrder();
                 var valueAccessor = this.valueAccessor();
-                var maxStack = Plottable._Util.Methods.max(datasets, function (dataset) {
+                var maxStackExtent = Plottable._Util.Methods.max(datasets, function (dataset) {
                     return Plottable._Util.Methods.max(dataset.data(), function (datum) {
                         return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                     });
                 });
-                var minStack = Plottable._Util.Methods.min(datasets, function (dataset) {
+                var minStackExtent = Plottable._Util.Methods.min(datasets, function (dataset) {
                     return Plottable._Util.Methods.min(dataset.data(), function (datum) {
                         return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                     });
                 });
-                this.stackedExtent = [Math.min(minStack, 0), Math.max(0, maxStack)];
+                this.stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
             };
             /**
              * Feeds the data through d3's stack layout function which will calculate
              * the stack offsets and use the the function declared in .out to set the offsets on the data.
              */
-            Stacked.prototype._stack = function (dataArray) {
+            Stacked.prototype.stack = function (dataArray) {
                 var _this = this;
                 var outFunction = function (d, y0, y) {
                     d.offset = y0;
