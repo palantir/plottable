@@ -8,7 +8,7 @@ declare module Plottable {
             function intersection<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
             function accessorize(accessor: any): _IAccessor;
             function union<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
-            function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T>;
+            function populateMap<T>(keys: string[], transform: (key: string, index: number) => T): D3.Map<T>;
             function _applyAccessor(accessor: _IAccessor, plot: Plottable.Abstract.Plot): (d: any, i: number) => any;
             function uniq<T>(arr: T[]): T[];
             function createFilledArray<T>(value: T, count: number): T[];
@@ -291,7 +291,7 @@ declare module Plottable {
         (datum: any, index?: number, metadata?: any): any;
     }
     interface IAppliedAccessor {
-        (datum: any, index: number): any;
+        (datum?: any, index?: number): any;
     }
     interface _IProjector {
         accessor: _IAccessor;

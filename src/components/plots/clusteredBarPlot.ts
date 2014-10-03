@@ -42,10 +42,6 @@ export module Plot {
 
     private cluster(accessor: _IAccessor) {
       this.innerScale.domain(this._datasetKeysInOrder);
-      var lengths = this._getDatasetsInOrder().map((d) => d.data().length);
-      if (_Util.Methods.uniq(lengths).length > 1) {
-        _Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
-      }
       var clusters: {[key: string]: any[]} = {};
       this._datasetKeysInOrder.forEach((key: string) => {
         var data = this._key2DatasetDrawerKey.get(key).dataset.data();
