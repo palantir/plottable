@@ -110,6 +110,20 @@ function makeQuadraticSeries(n: number): {x: number; y: number;}[] {
   return d3.range(n).map(makeQuadraticPoint);
 }
 
+class MultiTestVerifier {
+  public passed = true;
+  private temp: boolean;
+
+  public start() {
+    this.temp = this.passed;
+    this.passed = false;
+  }
+
+  public end() {
+    this.passed = this.temp;
+  }
+}
+
 // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
 function normalizePath(pathString: string) {
   return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");

@@ -116,20 +116,20 @@ describe("Plots", () => {
         selectedBar = renderer.selectBar(200, 50); // between the two bars
         assert.isNull(selectedBar, "returns null if no bar was selected");
 
-        selectedBar = renderer.selectBar(145, 10); // above bar 0
+        selectedBar = renderer.selectBar(155, 10); // above bar 0
         assert.isNull(selectedBar, "returns null if no bar was selected");
 
         // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
         // origin is at the top left!
 
-        selectedBar = renderer.selectBar({min: 145, max: 455}, {min: 150, max: 150}, true);
+        selectedBar = renderer.selectBar({min: 155, max: 455}, {min: 150, max: 150}, true);
         assert.isNotNull(selectedBar, "line between middle of two bars");
         assert.lengthOf(selectedBar.data(), 2, "selected 2 bars (not the negative one)");
         assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
         assert.equal(selectedBar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
         assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
 
-        selectedBar = renderer.selectBar({min: 145, max: 455}, {min: 150, max: 350}, true);
+        selectedBar = renderer.selectBar({min: 155, max: 455}, {min: 150, max: 350}, true);
         assert.isNotNull(selectedBar, "square between middle of two bars, & over the whole area");
         assert.lengthOf(selectedBar.data(), 3, "selected all the bars");
         assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
@@ -161,6 +161,7 @@ describe("Plots", () => {
     });
 
     describe("Horizontal Bar Plot in Points Mode", () => {
+      var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
@@ -168,7 +169,7 @@ describe("Plots", () => {
       var renderer: Plottable.Plot.HorizontalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
-      beforeEach(() => {
+      before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
         xScale = new Plottable.Scale.Linear();
@@ -185,6 +186,12 @@ describe("Plots", () => {
         renderer.renderTo(svg);
       });
 
+      beforeEach(() => {
+        xScale.domain([-3, 3]);
+        renderer.baseline(0);
+        verifier.start();
+      });
+
       it("renders correctly", () => {
         var renderArea = renderer._renderArea;
         var bars = renderArea.selectAll("rect");
@@ -193,19 +200,19 @@ describe("Plots", () => {
         var bar1 = d3.select(bars[0][1]);
         assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
         assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
-        assert.closeTo(numAttr(bar0, "width"), 228, 1, "bar0 width is correct");
-        assert.closeTo(numAttr(bar1, "width"), 343, 1, "bar1 width is correct");
+        assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
+        assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
         assert.equal(bar0.attr("y"), "300", "bar0 y is correct");
         assert.equal(bar1.attr("y"), "100", "bar1 y is correct");
-        assert.closeTo(numAttr(bar0, "x"), 357, 1, "bar0 x is correct");
-        assert.closeTo(numAttr(bar1, "x"), 14, 1, "bar1 x is correct");
+        assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
+        assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
 
         var baseline = renderArea.select(".baseline");
-        assert.closeTo(numAttr(baseline, "x1"), 357, 1, "the baseline is in the correct horizontal position");
-        assert.closeTo(numAttr(baseline, "x2"), 357, 1, "the baseline is in the correct horizontal position");
+        assert.equal(baseline.attr("x1"), "300", "the baseline is in the correct horizontal position");
+        assert.equal(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
         assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
         assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
-        svg.remove();
+        verifier.end();
       });
 
       it("baseline value can be changed; renderer updates appropriately", () => {
@@ -215,17 +222,17 @@ describe("Plots", () => {
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.closeTo(numAttr(bar0, "width"), 457, 1, "bar0 width is correct");
-        assert.closeTo(numAttr(bar1, "width"), 114, 1, "bar1 width is correct");
-        assert.closeTo(numAttr(bar0, "x"), 128, 1, "bar0 x is correct");
-        assert.closeTo(numAttr(bar1, "x"), 14, 1, "bar1 x is correct");
+        assert.equal(bar0.attr("width"), "200", "bar0 width is correct");
+        assert.equal(bar1.attr("width"), "50", "bar1 width is correct");
+        assert.equal(bar0.attr("x"), "200", "bar0 x is correct");
+        assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
 
         var baseline = renderArea.select(".baseline");
-        assert.closeTo(numAttr(baseline, "x1"), 128, 1, "the baseline is in the correct horizontal position");
-        assert.closeTo(numAttr(baseline, "x2"), 128, 1, "the baseline is in the correct horizontal position");
+        assert.equal(baseline.attr("x1"), "200", "the baseline is in the correct horizontal position");
+        assert.equal(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
         assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
         assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
-        svg.remove();
+        verifier.end();
       });
 
       it("bar alignment can be changed; renderer updates appropriately", () => {
@@ -251,7 +258,11 @@ describe("Plots", () => {
 
         assert.throws(() => renderer.barAlignment("blargh"), Error);
 
-        svg.remove();
+        verifier.end();
+      });
+
+      after(() => {
+        if (verifier.passed) {svg.remove();};
       });
     });
 
