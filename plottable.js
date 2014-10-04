@@ -1376,7 +1376,7 @@ var Plottable;
 (function (Plottable) {
     (function (Core) {
         /**
-         * The Broadcaster class is owned by an IListenable. Third parties can register and deregister listeners
+         * The Broadcaster class is owned by an Listenable. Third parties can register and deregister listeners
          * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
          * called. The registered callbacks are called with the registered Listenable that the broadcaster is attached
          * to, along with optional arguments passed to the `broadcast` method.
@@ -1389,7 +1389,7 @@ var Plottable;
              * Constructs a broadcaster, taking the Listenable that the broadcaster will be attached to.
              *
              * @constructor
-             * @param {IListenable} listenable The Listenable-object that this broadcaster is attached to.
+             * @param {Listenable} listenable The Listenable-object that this broadcaster is attached to.
              */
             function Broadcaster(listenable) {
                 _super.call(this);
@@ -1402,7 +1402,7 @@ var Plottable;
              * If there is already a callback associated with that key, then the callback will be replaced.
              *
              * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-             * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
+             * @param {BroadcasterCallback} callback A callback to be called when the Scale's domain changes.
              * @returns {Broadcaster} this object
              */
             Broadcaster.prototype.registerListener = function (key, callback) {
@@ -3002,7 +3002,7 @@ var Plottable;
              * Draws the data into the renderArea using the attrHash for attributes
              *
              * @param{any[]} data The data to be drawn
-             * @param{attrHash} IAttributeToProjector The list of attributes to set on the data
+             * @param{attrHash} AttributeToProjector The list of attributes to set on the data
              */
             _Drawer.prototype.draw = function (data, attrToProjector, animator) {
                 if (animator === void 0) { animator = new Plottable.Animator.Null(); }
@@ -5883,7 +5883,7 @@ var Plottable;
              *
              * @param {D3.Selection} selection The selection of elements to update.
              * @param {string} animatorKey The key for the animator.
-             * @param {IAttributeToProjector} attrToProjector The set of attributes to set on the selection.
+             * @param {AttributeToProjector} attrToProjector The set of attributes to set on the selection.
              * @returns {D3.Selection} The resulting selection (potentially after the transition)
              */
             Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
@@ -6286,7 +6286,7 @@ var Plottable;
              * Constructs a ScatterPlot.
              *
              * @constructor
-             * @param {IDataset | any} dataset The dataset to render.
+             * @param {DatasetInterface | any} dataset The dataset to render.
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
@@ -6356,7 +6356,7 @@ var Plottable;
              * grid, and the datum can control what color it is.
              *
              * @constructor
-             * @param {IDataset | any} dataset The dataset to render.
+             * @param {DatasetInterface | any} dataset The dataset to render.
              * @param {Scale.Ordinal} xScale The x scale to use.
              * @param {Scale.Ordinal} yScale The y scale to use.
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
@@ -6424,7 +6424,7 @@ var Plottable;
              * Constructs an AbstractBarPlot.
              *
              * @constructor
-             * @param {IDataset | any} dataset The dataset to render.
+             * @param {DatasetInterface | any} dataset The dataset to render.
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
@@ -6518,7 +6518,7 @@ var Plottable;
                     return input;
                 }
                 else {
-                    throw new Error("input '" + input + "' can't be parsed as an IExtent");
+                    throw new Error("input '" + input + "' can't be parsed as an Extent");
                 }
             };
             BarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
@@ -6663,7 +6663,7 @@ var Plottable;
              * Constructs a VerticalBarPlot.
              *
              * @constructor
-             * @param {IDataset | any} dataset The dataset to render.
+             * @param {DatasetInterface | any} dataset The dataset to render.
              * @param {Scale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
@@ -6707,7 +6707,7 @@ var Plottable;
              * Constructs a HorizontalBarPlot.
              *
              * @constructor
-             * @param {IDataset | any} dataset The dataset to render.
+             * @param {DatasetInterface | any} dataset The dataset to render.
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
@@ -6750,7 +6750,7 @@ var Plottable;
              * Constructs a LinePlot.
              *
              * @constructor
-             * @param {any | IDataset} dataset The dataset to render.
+             * @param {any | DatasetInterface} dataset The dataset to render.
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
@@ -6845,7 +6845,7 @@ var Plottable;
              * Constructs an AreaPlot.
              *
              * @constructor
-             * @param {IDataset | any} dataset The dataset to render.
+             * @param {DatasetInterface | any} dataset The dataset to render.
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */

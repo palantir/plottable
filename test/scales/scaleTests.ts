@@ -4,7 +4,7 @@ var assert = chai.assert;
 
 describe("Scales", () => {
   it("Scale's copy() works correctly", () => {
-    var testCallback: Plottable.Core.IBroadcasterCallback = (broadcaster: Plottable.Core.IListenable) => {
+    var testCallback: Plottable.Core.BroadcasterCallback = (broadcaster: Plottable.Core.Listenable) => {
       return true; // doesn't do anything
     };
     var scale = new Plottable.Scale.Linear();
@@ -19,7 +19,7 @@ describe("Scales", () => {
   it("Scale alerts listeners when its domain is updated", () => {
     var scale = new Plottable.Scale.Linear();
     var callbackWasCalled = false;
-    var testCallback: Plottable.Core.IBroadcasterCallback = (listenable: Plottable.Core.IListenable) => {
+    var testCallback: Plottable.Core.BroadcasterCallback = (listenable: Plottable.Core.Listenable) => {
       assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
       callbackWasCalled = true;
     };
@@ -230,7 +230,7 @@ describe("Scales", () => {
     it("rangeType triggers broadcast", () => {
       var scale = new Plottable.Scale.Ordinal();
       var callbackWasCalled = false;
-      var testCallback: Plottable.Core.IBroadcasterCallback = (listenable: Plottable.Core.IListenable) => {
+      var testCallback: Plottable.Core.BroadcasterCallback = (listenable: Plottable.Core.Listenable) => {
         assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
         callbackWasCalled = true;
       };

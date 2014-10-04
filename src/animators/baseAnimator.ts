@@ -6,7 +6,7 @@ export module Animator {
   /**
    * The base animator implementation with easing, duration, and delay.
    */
-  export class Base implements IPlotAnimator {
+  export class Base implements PlotAnimator {
     /**
      * The default duration of the animation in milliseconds
      */
@@ -35,7 +35,7 @@ export module Animator {
       this._easing = Base.DEFAULT_EASING;
     }
 
-    public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection {
+    public animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection {
       return selection.transition()
         .ease(this.easing())
         .duration(this.duration())

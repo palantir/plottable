@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Axis {
-  export interface _ITimeInterval {
+  export interface _TimeInterval {
       timeUnit: D3.Time.Interval;
       step: number;
       formatString: string;
@@ -16,7 +16,7 @@ export module Axis {
 
     // default intervals
     // these are for minor tick labels
-    public static _minorIntervals: _ITimeInterval[] = [
+    public static _minorIntervals: _TimeInterval[] = [
       {timeUnit: d3.time.second, step: 1,      formatString: "%I:%M:%S %p"},
       {timeUnit: d3.time.second, step: 5,      formatString: "%I:%M:%S %p"},
       {timeUnit: d3.time.second, step: 10,     formatString: "%I:%M:%S %p"},
@@ -49,7 +49,7 @@ export module Axis {
     ];
 
     // these are for major tick labels
-    public static _majorIntervals: _ITimeInterval[] = [
+    public static _majorIntervals: _TimeInterval[] = [
       {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
       {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
       {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
@@ -120,7 +120,7 @@ export module Axis {
       return this.measurer(d3.time.format(format)(longDate)).width;
     }
 
-    private getIntervalLength(interval: _ITimeInterval) {
+    private getIntervalLength(interval: _TimeInterval) {
       var startDate = this._scale.domain()[0];
       var endDate = interval.timeUnit.offset(startDate, interval.step);
       if (endDate > this._scale.domain()[1]) {
@@ -132,7 +132,7 @@ export module Axis {
       return stepLength;
     }
 
-    private isEnoughSpace(container: D3.Selection, interval: _ITimeInterval) {
+    private isEnoughSpace(container: D3.Selection, interval: _TimeInterval) {
       // compute number of ticks
       // if less than a certain threshold
       var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
@@ -162,7 +162,7 @@ export module Axis {
       return i;
     }
 
-    public _getTickIntervalValues(interval: _ITimeInterval): any[] {
+    public _getTickIntervalValues(interval: _TimeInterval): any[] {
       return this._scale._tickInterval(interval.timeUnit, interval.step);
     }
 
@@ -180,7 +180,7 @@ export module Axis {
       return textHeight;
     }
 
-    private renderTickLabels(container: D3.Selection, interval: _ITimeInterval, height: number) {
+    private renderTickLabels(container: D3.Selection, interval: _TimeInterval, height: number) {
       container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).remove();
       var tickPos = this._scale._tickInterval(interval.timeUnit,
                                               interval.step);
@@ -233,7 +233,7 @@ export module Axis {
       return endPosition < this.width() && startPosition > 0;
     }
 
-    private adjustTickLength(height: number, interval: _ITimeInterval) {
+    private adjustTickLength(height: number, interval: _TimeInterval) {
       var tickValues = this._getTickIntervalValues(interval);
       var selection = this._tickMarkContainer.selectAll("." + Abstract.Axis.TICK_MARK_CLASS).filter((d: Date) =>
         // we want to check if d is in tickValues

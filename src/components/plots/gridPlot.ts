@@ -7,7 +7,7 @@ export module Plot {
     public _xScale: Scale.Ordinal;
     public _yScale: Scale.Ordinal;
 
-    public _animators: Animator.IPlotAnimatorMap = {
+    public _animators: Animator.PlotAnimatorMap = {
       "cells" : new Animator.Null()
     };
 
@@ -18,7 +18,7 @@ export module Plot {
      * grid, and the datum can control what color it is.
      *
      * @constructor
-     * @param {IDataset | any} dataset The dataset to render.
+     * @param {DatasetInterface | any} dataset The dataset to render.
      * @param {Scale.Ordinal} xScale The x scale to use.
      * @param {Scale.Ordinal} yScale The y scale to use.
      * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale

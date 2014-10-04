@@ -15,7 +15,7 @@ export module Abstract {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public _isVertical: boolean;
 
-    public _animators: Animator.IPlotAnimatorMap = {
+    public _animators: Animator.PlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
       "bars"       : new Animator.IterativeDelay(),
       "baseline"   : new Animator.Null()
@@ -25,7 +25,7 @@ export module Abstract {
      * Constructs an AbstractBarPlot.
      *
      * @constructor
-     * @param {IDataset | any} dataset The dataset to render.
+     * @param {DatasetInterface | any} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
@@ -118,30 +118,30 @@ export module Abstract {
      }
 
 
-    private parseExtent(input: any): IExtent {
+    private parseExtent(input: any): Extent {
       if (typeof(input) === "number") {
         return {min: input, max: input};
       } else if (input instanceof Object && "min" in input && "max" in input) {
-        return <IExtent> input;
+        return <Extent> input;
       } else {
-        throw new Error("input '" + input + "' can't be parsed as an IExtent");
+        throw new Error("input '" + input + "' can't be parsed as an Extent");
       }
     }
 
     /**
      * Selects the bar under the given pixel position (if [xValOrExtent]
      * and [yValOrExtent] are {number}s), under a given line (if only one
-     * of [xValOrExtent] or [yValOrExtent] are {IExtent}s) or are under a
-     * 2D area (if [xValOrExtent] and [yValOrExtent] are both {IExtent}s).
+     * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
+     * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
      *
      * @param {any} xValOrExtent The pixel x position, or range of x values.
      * @param {any} yValOrExtent The pixel y position, or range of y values.
      * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
      * @returns {D3.Selection} The selected bar, or null if no bar was selected.
      */
-    public selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
-    public selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
-    public selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
+    public selectBar(xValOrExtent: Extent, yValOrExtent: Extent, select?: boolean): D3.Selection;
+    public selectBar(xValOrExtent: number, yValOrExtent: Extent, select?: boolean): D3.Selection;
+    public selectBar(xValOrExtent: Extent, yValOrExtent: number, select?: boolean): D3.Selection;
     public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
     public selectBar(xValOrExtent: any, yValOrExtent: any, select = true): D3.Selection {
       if (!this._isSetup) {
@@ -150,8 +150,8 @@ export module Abstract {
 
       var selectedBars: any[] = [];
 
-      var xExtent: IExtent = this.parseExtent(xValOrExtent);
-      var yExtent: IExtent = this.parseExtent(yValOrExtent);
+      var xExtent: Extent = this.parseExtent(xValOrExtent);
+      var yExtent: Extent = this.parseExtent(yValOrExtent);
 
       // the SVGRects are positioned with sub-pixel accuracy (the default unit
       // for the x, y, height & width attributes), but user selections (e.g. via

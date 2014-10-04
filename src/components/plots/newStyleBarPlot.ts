@@ -10,7 +10,7 @@ export module Abstract {
     public _barAlignmentFactor = 0;
     public _isVertical: boolean;
 
-    public _animators: Animator.IPlotAnimatorMap = {
+    public _animators: Animator.PlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
       "bars"       : new Animator.IterativeDelay(),
       "baseline"   : new Animator.Null()
@@ -70,7 +70,7 @@ export module Abstract {
       return Abstract.BarPlot.prototype._updateDomainer.apply(this, [scale]);
     }
 
-    public _generateAttrToProjector(): IAttributeToProjector {
+    public _generateAttrToProjector(): AttributeToProjector {
       return Abstract.BarPlot.prototype._generateAttrToProjector.apply(this);
     }
 

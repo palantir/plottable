@@ -18,7 +18,7 @@ export module Plot {
      * Constructs a HorizontalBarPlot.
      *
      * @constructor
-     * @param {IDataset | any} dataset The dataset to render.
+     * @param {DatasetInterface | any} dataset The dataset to render.
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
