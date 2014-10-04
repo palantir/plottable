@@ -91,19 +91,6 @@ function makeQuadraticSeries(n) {
     }
     return d3.range(n).map(makeQuadraticPoint);
 }
-var MultiTestVerifier = (function () {
-    function MultiTestVerifier() {
-        this.passed = true;
-    }
-    MultiTestVerifier.prototype.start = function () {
-        this.temp = this.passed;
-        this.passed = false;
-    };
-    MultiTestVerifier.prototype.end = function () {
-        this.passed = this.temp;
-    };
-    return MultiTestVerifier;
-})();
 // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
 function normalizePath(pathString) {
     return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
@@ -2107,7 +2094,6 @@ describe("Plots", function () {
             });
         });
         describe("Horizontal Bar Plot in Points Mode", function () {
-            var verifier = new MultiTestVerifier();
             var svg;
             var dataset;
             var yScale;
@@ -2115,7 +2101,7 @@ describe("Plots", function () {
             var renderer;
             var SVG_WIDTH = 600;
             var SVG_HEIGHT = 400;
-            before(function () {
+            beforeEach(function () {
                 svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
                 xScale = new Plottable.Scale.Linear();
@@ -2128,11 +2114,8 @@ describe("Plots", function () {
                 renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
                 renderer.animate(false);
                 renderer.renderTo(svg);
-            });
-            beforeEach(function () {
                 xScale.domain([-3, 3]);
                 renderer.baseline(0);
-                verifier.start();
             });
             it("renders correctly", function () {
                 var renderArea = renderer._renderArea;
@@ -2153,7 +2136,7 @@ describe("Plots", function () {
                 assert.equal(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
                 assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
                 assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
-                verifier.end();
+                svg.remove();
             });
             it("baseline value can be changed; renderer updates appropriately", function () {
                 renderer.baseline(-1);
@@ -2170,7 +2153,7 @@ describe("Plots", function () {
                 assert.equal(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
                 assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
                 assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
-                verifier.end();
+                svg.remove();
             });
             it("bar alignment can be changed; renderer updates appropriately", function () {
                 renderer.barAlignment("center");
@@ -2192,13 +2175,7 @@ describe("Plots", function () {
                 assert.equal(bar0.attr("y"), "290", "bar0 y is correct");
                 assert.equal(bar1.attr("y"), "90", "bar1 y is correct");
                 assert.throws(function () { return renderer.barAlignment("blargh"); }, Error);
-                verifier.end();
-            });
-            after(function () {
-                if (verifier.passed) {
-                    svg.remove();
-                }
-                ;
+                svg.remove();
             });
         });
         describe("Horizontal Bar Plot in Bands mode", function () {

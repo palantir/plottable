@@ -161,7 +161,6 @@ describe("Plots", () => {
     });
 
     describe("Horizontal Bar Plot in Points Mode", () => {
-      var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
@@ -169,7 +168,7 @@ describe("Plots", () => {
       var renderer: Plottable.Plot.HorizontalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
-      before(() => {
+      beforeEach(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
         xScale = new Plottable.Scale.Linear();
@@ -184,12 +183,8 @@ describe("Plots", () => {
         renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
         renderer.animate(false);
         renderer.renderTo(svg);
-      });
-
-      beforeEach(() => {
         xScale.domain([-3, 3]);
         renderer.baseline(0);
-        verifier.start();
       });
 
       it("renders correctly", () => {
@@ -212,7 +207,7 @@ describe("Plots", () => {
         assert.equal(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
         assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
         assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
-        verifier.end();
+        svg.remove();
       });
 
       it("baseline value can be changed; renderer updates appropriately", () => {
@@ -232,7 +227,7 @@ describe("Plots", () => {
         assert.equal(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
         assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
         assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
-        verifier.end();
+        svg.remove();
       });
 
       it("bar alignment can be changed; renderer updates appropriately", () => {
@@ -258,11 +253,7 @@ describe("Plots", () => {
 
         assert.throws(() => renderer.barAlignment("blargh"), Error);
 
-        verifier.end();
-      });
-
-      after(() => {
-        if (verifier.passed) {svg.remove();};
+        svg.remove();
       });
     });
 
