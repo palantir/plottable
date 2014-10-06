@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Abstract {
-  export class Scale<D,R> extends PlottableObject implements Core.IListenable {
+  export class Scale<D,R> extends PlottableObject implements Core.Listenable {
     public _d3Scale: D3.Scale.Scale;
     public _autoDomainAutomatically = true;
     public broadcaster = new Plottable.Core.Broadcaster(this);

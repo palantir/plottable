@@ -4,7 +4,7 @@ module Plottable {
 export module _Drawer {
   export class Arc extends Abstract._Drawer {
 
-    public draw(data: any[], attrToProjector: IAttributeToProjector, animator = new Animator.Null()) {
+    public draw(data: any[], attrToProjector: AttributeToProjector, animator = new Animator.Null()) {
       var svgElement = "path";
       var dataElements = this._renderArea.selectAll(svgElement).data(data);
 

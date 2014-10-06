@@ -41,7 +41,7 @@ export module Animator {
       this._maxTotalDuration = IterativeDelay.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
     }
 
-    public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection {
+    public animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection {
       var numberOfIterations = selection[0].length;
       var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
       var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / numberOfIterations);

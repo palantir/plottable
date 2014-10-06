@@ -16,7 +16,7 @@ function getSVGParent(): D3.Selection {
   }
 }
 
-function verifySpaceRequest(sr: Plottable._ISpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
+function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
   assert.equal(sr.width,  w, "width requested is as expected #"  + id);
   assert.equal(sr.height, h, "height requested is as expected #" + id);
   assert.equal(sr.wantsWidth , ww, "needs more width is as expected #"  + id);

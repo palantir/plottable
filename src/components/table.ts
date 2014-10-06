@@ -218,7 +218,7 @@ export module Component {
       var layoutWantsHeight = _Util.Methods.createFilledArray(false, this.nRows);
       this.rows.forEach((row: Abstract.Component[], rowIndex: number) => {
         row.forEach((component: Abstract.Component, colIndex: number) => {
-          var spaceRequest: _ISpaceRequest;
+          var spaceRequest: _SpaceRequest;
           if (component != null) {
             spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
           } else {
@@ -241,7 +241,7 @@ export module Component {
     }
 
 
-    public _requestedSpace(offeredWidth : number, offeredHeight: number): _ISpaceRequest {
+    public _requestedSpace(offeredWidth : number, offeredHeight: number): _SpaceRequest {
       var layout = this.iterateLayout(offeredWidth , offeredHeight);
       return {width : d3.sum(layout.guaranteedWidths ),
               height: d3.sum(layout.guaranteedHeights),

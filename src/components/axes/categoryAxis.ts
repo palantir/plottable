@@ -33,7 +33,7 @@ export module Axis {
       return this._invalidateLayout();
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
       var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
 

@@ -7,7 +7,7 @@ export module _Util {
     var LINE_BREAKS_BEFORE = /[{\[]/;
     var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
     var SPACES = /^\s+$/;
-    export interface IWrappedText {
+    export interface WrappedText {
       originalText: string;
       lines: string[];
       textFits: boolean;
@@ -17,7 +17,7 @@ export module _Util {
      * Takes a block of text, a width and height to fit it in, and a 2-d text measurement function.
      * Wraps words and fits as much of the text as possible into the given width and height.
      */
-    export function breakTextToFitRect(text: string, width: number, height: number, measureText: Text.TextMeasurer): IWrappedText {
+    export function breakTextToFitRect(text: string, width: number, height: number, measureText: Text.TextMeasurer): WrappedText {
       var widthMeasure = (s: string) => measureText(s).width;
       var lines = breakTextToFitWidth(text, width, widthMeasure);
       var textHeight = measureText("hello world").height;
