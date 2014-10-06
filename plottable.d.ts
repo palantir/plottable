@@ -2870,6 +2870,29 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Animator {
+        /**
+         * A child class of RectAnimator that will move the rectangle
+         * as well as animate its growth.
+         */
+        class MovingRect extends Rect {
+            /**
+             * The pixel value to move from
+             */
+            startPixelValue: number;
+            /**
+             * Constructs a MovingRectAnimator
+             *
+             * @param {number} basePixel The pixel value to start moving from
+             * @param {boolean} isVertical If the movement/animation is vertical
+             */
+            constructor(startPixelValue: number, isVertical?: boolean);
+        }
+    }
+}
+
+
+declare module Plottable {
     module Core {
         /**
          * A function to be called when an event occurs. The argument is the d3 event

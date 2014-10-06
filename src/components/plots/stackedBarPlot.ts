@@ -33,9 +33,9 @@ export module Plot {
     }
 
     public _getAnimator(drawer: Abstract._Drawer, index: number) {
-      var animator = new Animator.Rect();
-      animator.delay(animator.duration() * index);
-      return animator;
+      var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var scaledBaseline = primaryScale.scale(this._baselineValue);
+      return new Animator.MovingRect(scaledBaseline, this._isVertical);
     }
 
     public _getDrawer(key: string) {

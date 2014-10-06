@@ -3019,7 +3019,7 @@ declare module Plottable {
              */
             constructor(xScale?: Abstract.Scale<X, number>, yScale?: Abstract.Scale<Y, number>, isVertical?: boolean);
             _setup(): void;
-            _getAnimator(drawer: Abstract._Drawer, index: number): Animator.Rect;
+            _getAnimator(drawer: Abstract._Drawer, index: number): Animator.MovingRect;
             _getDrawer(key: string): any;
             _generateAttrToProjector(): any;
             _paint(): void;
@@ -3210,6 +3210,30 @@ declare module Plottable {
             constructor(isVertical?: boolean, isReverse?: boolean);
             animate(selection: any, attrToProjector: AttributeToProjector): any;
             _startMovingProjector(attrToProjector: AttributeToProjector): AppliedAccessor;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Animator {
+        /**
+         * A child class of RectAnimator that will move the rectangle
+         * as well as animate its growth.
+         */
+        class MovingRect extends Rect {
+            /**
+             * The pixel value to move from
+             */
+            startPixelValue: number;
+            /**
+             * Constructs a MovingRectAnimator
+             *
+             * @param {number} basePixel The pixel value to start moving from
+             * @param {boolean} isVertical If the movement/animation is vertical
+             */
+            constructor(startPixelValue: number, isVertical?: boolean);
+            _startMovingProjector(attrToProjector: IAttributeToProjector): (p: any) => number;
         }
     }
 }

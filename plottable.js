@@ -7340,9 +7340,9 @@ var Plottable;
                 Plottable.Abstract.NewStyleBarPlot.prototype._setup.call(this);
             };
             StackedBar.prototype._getAnimator = function (drawer, index) {
-                var animator = new Plottable.Animator.Rect();
-                animator.delay(animator.duration() * index);
-                return animator;
+                var primaryScale = this._isVertical ? this._yScale : this._xScale;
+                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                return new Plottable.Animator.MovingRect(scaledBaseline, this._isVertical);
             };
             StackedBar.prototype._getDrawer = function (key) {
                 return Plottable.Abstract.NewStyleBarPlot.prototype._getDrawer.apply(this, [key]);
@@ -7607,6 +7607,43 @@ var Plottable;
             return Rect;
         })(Animator.Base);
         Animator.Rect = Rect;
+    })(Plottable.Animator || (Plottable.Animator = {}));
+    var Animator = Plottable.Animator;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Animator) {
+        /**
+         * A child class of RectAnimator that will move the rectangle
+         * as well as animate its growth.
+         */
+        var MovingRect = (function (_super) {
+            __extends(MovingRect, _super);
+            /**
+             * Constructs a MovingRectAnimator
+             *
+             * @param {number} basePixel The pixel value to start moving from
+             * @param {boolean} isVertical If the movement/animation is vertical
+             */
+            function MovingRect(startPixelValue, isVertical) {
+                if (isVertical === void 0) { isVertical = true; }
+                _super.call(this, isVertical);
+                this.startPixelValue = startPixelValue;
+            }
+            MovingRect.prototype._startMovingProjector = function (attrToProjector) {
+                return d3.functor(this.startPixelValue);
+            };
+            return MovingRect;
+        })(Animator.Rect);
+        Animator.MovingRect = MovingRect;
     })(Plottable.Animator || (Plottable.Animator = {}));
     var Animator = Plottable.Animator;
 })(Plottable || (Plottable = {}));
