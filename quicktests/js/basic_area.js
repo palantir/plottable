@@ -9,7 +9,6 @@ function run(div, data, Plottable) {
 
   var svg = div.append("svg").attr("height", 500);
   var yScales = [];
-  data = _.cloneDeep(data);
 
   // Will receive function arguments: (svg, data, Plottable)
   function getY(d) { return d.y; }
