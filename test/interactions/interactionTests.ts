@@ -20,7 +20,12 @@ function makeFakeEvent(x: number, y: number): D3.D3Event {
 }
 
 function fakeDragSequence(anyedInteraction: any, startX: number, startY: number, endX: number, endY: number) {
+  var originalD3Mouse = d3.mouse;
+  d3.mouse = function() {
+    return [startX, startY];
+  };
   anyedInteraction._dragstart();
+  d3.mouse = originalD3Mouse;
   d3.event = makeFakeEvent(startX, startY);
   anyedInteraction._drag();
   d3.event = makeFakeEvent(endX, endY);
@@ -92,6 +97,8 @@ describe("Interactions", () => {
     var dragstartY = svgHeight-100;
     var dragendX = 100;
     var dragendY = svgHeight-20;
+    var draghalfwidth = Math.round((dragendX - dragstartX) / 2);
+    var draghalfheight = Math.round((dragendY - dragstartY) / 2);
 
     before(() => {
       svg = generateSVG(svgWidth, svgHeight);
@@ -112,14 +119,14 @@ describe("Interactions", () => {
     });
 
     it("All callbacks are notified with appropriate data on drag", () => {
-      var timesCalled = 0;
+      var dragStartCalled = 0, dragEndCalled = 0;
       interaction.dragstart(function(a: Plottable.Point) {
-        timesCalled++;
+        dragStartCalled++;
         var expectedStartLocation = {x: dragstartX, y: dragstartY};
         assert.deepEqual(a, expectedStartLocation, "areaCallback called with null arg on dragstart");
       });
       interaction.dragend(function(a: Plottable.Point, b: Plottable.Point) {
-        timesCalled++;
+        dragEndCalled++;
         var expectedStart = {
           x: dragstartX,
           y: dragstartY
@@ -135,7 +142,8 @@ describe("Interactions", () => {
       // fake a drag event
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
 
-      assert.equal(timesCalled, 2, "drag callbacks are called twice");
+      assert.equal(dragStartCalled, 1, "dragstart callback is called once");
+      assert.equal(dragEndCalled, 1, "dragend callback is called once");
     });
 
     it("Highlights and un-highlights areas appropriately", () => {
@@ -152,6 +160,101 @@ describe("Interactions", () => {
       interaction.clearBox();
       var boxGone = dragBox.attr("width") === "0" && dragBox.attr("height") === "0";
       assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
+    });
+
+    describe("resize enabled", () => {
+      var dragmidX = dragstartX + draghalfwidth;
+      var dragmidY = dragstartY + draghalfheight;
+      function test(dragstartX2: number, dragstartY2: number, expectedSelection: Plottable.SelectionArea) {
+        var timesCalled = 0;
+
+        // fake a drag event
+        fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
+
+        interaction.dragend(function(start: Plottable.Point, end: Plottable.Point) {
+          timesCalled++;
+          assert.deepEqual(start, {x: dragstartX2, y: dragstartY2}, "starting point given correctly");
+          assert.deepEqual(end, {x: dragmidX, y: dragmidY}, "ending point given correctly");
+          assert.deepEqual(interaction.selection, expectedSelection, "selection updated correctly");
+        });
+
+        // fake another drag event to resize the box.
+        interaction.resizeEnabled(true);
+        fakeDragSequence((<any> interaction), dragstartX2, dragstartY2, dragmidX, dragmidY);
+        assert.equal(timesCalled, 1, "drag callback not called once");
+      }
+
+      it("from the top left", () => {
+        test(dragstartX, dragendY, {
+          xMin: dragmidX,
+          yMin: dragstartY,
+          xMax: dragendX,
+          yMax: dragmidY
+        });
+      });
+
+      it("from the top", () => {
+        test(dragmidX, dragendY, {
+          xMin: dragstartX,
+          yMin: dragstartY,
+          xMax: dragendX,
+          yMax: dragmidY
+        });
+      });
+
+      it("from the top right", () => {
+        test(dragendX, dragendY, {
+          xMin: dragstartX,
+          yMin: dragstartY,
+          xMax: dragmidX,
+          yMax: dragmidY
+        });
+      });
+
+      it("from the right", () => {
+        test(dragendX, dragmidY, {
+          xMin: dragstartX,
+          yMin: dragstartY,
+          xMax: dragmidX,
+          yMax: dragendY
+        });
+      });
+
+      it("from the bottom right", () => {
+        test(dragendX, dragstartY, {
+          xMin: dragstartX,
+          yMin: dragmidY,
+          xMax: dragmidX,
+          yMax: dragendY
+        });
+      });
+
+      it("from the bottom", () => {
+        test(dragmidX, dragstartY, {
+          xMin: dragstartX,
+          yMin: dragmidY,
+          xMax: dragendX,
+          yMax: dragendY
+        });
+      });
+
+      it("from the bottom left", () => {
+        test(dragstartX, dragstartY, {
+          xMin: dragmidX,
+          yMin: dragmidY,
+          xMax: dragendX,
+          yMax: dragendY
+        });
+      });
+
+      it("from the left", () => {
+        test(dragstartX, dragmidY, {
+          xMin: dragmidX,
+          yMin: dragstartY,
+          xMax: dragendX,
+          yMax: dragendY
+        });
+      });
     });
 
     after(() => {
@@ -173,6 +276,8 @@ describe("Interactions", () => {
     var dragstartY = svgHeight-100;
     var dragendX = 100;
     var dragendY = svgHeight-20;
+    var dragwidth = dragendX - dragstartX;
+    var dragheight = dragendY - dragstartY;
 
     before(() => {
       svg = generateSVG(svgWidth, svgHeight);
@@ -193,14 +298,14 @@ describe("Interactions", () => {
     });
 
     it("All callbacks are notified with appropriate data when a drag finishes", () => {
-      var timesCalled = 0;
+      var dragStartCalled = 0, dragEndCalled = 0;
       interaction.dragstart(function(a: Plottable.Point) {
-        timesCalled++;
+        dragStartCalled++;
         var expectedY = dragstartY;
         assert.deepEqual(a.y, expectedY, "areaCallback called with null arg on dragstart");
       });
       interaction.dragend(function(a: Plottable.Point, b: Plottable.Point) {
-        timesCalled++;
+        dragEndCalled++;
         var expectedStartY = dragstartY;
         var expectedEndY = dragendY;
         assert.deepEqual(a.y, expectedStartY);
@@ -210,7 +315,8 @@ describe("Interactions", () => {
       // fake a drag event
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
 
-      assert.equal(timesCalled, 2, "drag callbacks area called twice");
+      assert.equal(dragStartCalled, 1, "dragstart callback is called once");
+      assert.equal(dragEndCalled, 1, "dragend callback is called once");
     });
 
     it("Highlights and un-highlights areas appropriately", () => {
@@ -227,6 +333,66 @@ describe("Interactions", () => {
       interaction.clearBox();
       var boxGone = dragBox.attr("width") === "0" && dragBox.attr("height") === "0";
       assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
+    });
+
+    describe("resizing enabled", () => {
+      it("from the top", () => {
+        var timesCalled = 0;
+
+        // fake a drag event
+        fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
+
+        var dragstartX2 = dragstartX + Math.round(dragwidth / 2);
+        var dragstartY2 = dragstartY;
+        var dragendX2 = dragstartX2;
+        var dragendY2 = dragstartY + Math.round(dragheight / 2);
+
+        interaction.dragend(function(start: Plottable.Point, end: Plottable.Point) {
+          timesCalled++;
+          assert.deepEqual(start, {x: dragstartX2, y: dragstartY2});
+          assert.deepEqual(end, {x: dragendX2, y: dragendY2});
+          assert.deepEqual(interaction.selection, {
+            xMin: 0,
+            xMax: svgWidth,
+            yMin: dragendY2,
+            yMax: dragendY
+          });
+        });
+
+        // fake another drag event to resize the box.
+        interaction.resizeEnabled(true);
+        fakeDragSequence((<any> interaction), dragstartX2, dragstartY2, dragendX2, dragendY2);
+        assert.equal(timesCalled, 1, "drag callback called");
+      });
+
+      it("from the bottom", () => {
+        var timesCalled = 0;
+
+        // fake a drag event
+        fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
+
+        var dragstartX2 = dragstartX + Math.round(dragwidth / 2);
+        var dragstartY2 = dragendY;
+        var dragendX2 = dragstartX2;
+        var dragendY2 = dragstartY2 - Math.round(dragheight / 2);
+
+        interaction.dragend(function(start: Plottable.Point, end: Plottable.Point) {
+          timesCalled++;
+          assert.deepEqual(start, {x: dragstartX2, y: dragstartY2});
+          assert.deepEqual(end, {x: dragendX2, y: dragendY2});
+          assert.deepEqual(interaction.selection, {
+            xMin: 0,
+            xMax: svgWidth,
+            yMin: dragstartY,
+            yMax: dragendY2
+          });
+        });
+
+        // fake another drag event to resize the box.
+        interaction.resizeEnabled(true);
+        fakeDragSequence((<any> interaction), dragstartX2, dragstartY2, dragendX2, dragendY2);
+        assert.equal(timesCalled, 1, "drag callback called");
+      });
     });
 
     after(() => {
