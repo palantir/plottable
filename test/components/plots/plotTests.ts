@@ -65,10 +65,10 @@ describe("Plots", () => {
       var yScaleCalls: number = 0;
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
-      // var metadataProjector = (d: any, i: number, m: any) => m.cssClass; #1089
+      var metadataProjector = (d: any, i: number, m: any) => m.cssClass;
       r.project("x", "x", xScale);
       r.project("y", "y", yScale);
-      // r.project("meta", metadataProjector); #1089
+      r.project("meta", metadataProjector);
       xScale.broadcaster.registerListener(null, (listenable: Plottable.Core.Listenable) => {
         assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
         ++xScaleCalls;
@@ -85,8 +85,8 @@ describe("Plots", () => {
       assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
       assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
-      // var metaProjector = r._generateAttrToProjector()["meta"];
-      // assert.equal(metaProjector(null, 0), "bar", "plot projector used the right metadata");
+      var metaProjector = r._generateAttrToProjector()["meta"];
+      assert.equal(metaProjector(null, 0), "bar", "plot projector used the right metadata");
 
       var d2 = new Plottable.Dataset([{x: 7, y: 8}], {cssClass: "boo"});
       r.removeDataset("d1");
@@ -102,8 +102,8 @@ describe("Plots", () => {
       assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
       assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
 
-      // metaProjector = r._generateAttrToProjector()["meta"]; #1089
-      // assert.equal(metaProjector(null, 0), "boo", "plot projector used the right metadata");
+      metaProjector = r._generateAttrToProjector()["meta"];
+      assert.equal(metaProjector(null, 0), "boo", "plot projector used the right metadata");
 
     });
 

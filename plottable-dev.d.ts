@@ -40,6 +40,12 @@ declare module Plottable {
              */
             function accessorize(accessor: any): _Accessor;
             /**
+             * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata.
+             * Temporarily always grabs the metadata of the first dataset.
+             * HACKHACK #1089 - The accessor currently only grabs the first dataset's metadata
+             */
+            function _applyAccessor(accessor: _Accessor, plot: Abstract.Plot): (d: any, i: number) => any;
+            /**
              * Takes two sets and returns the union
              *
              * Due to the fact that D3.Sets store strings internally, return type is always a string set
