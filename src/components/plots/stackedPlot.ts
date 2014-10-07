@@ -86,6 +86,10 @@ export module Abstract {
       var keyAccessor = this.keyAccessor();
       var valueAccessor = this.valueAccessor();
 
+      var isAllNegativeValues = this._getDatasetsInOrder().every((dataset) => {
+        return dataset.data().every((datum) => valueAccessor(datum) <= 0);
+      });
+
       this._getDatasetsInOrder().forEach((dataset, datasetIndex) => {
         var positiveDataMap = positiveDataMapArray[datasetIndex];
         var negativeDataMap = negativeDataMapArray[datasetIndex];
@@ -94,7 +98,12 @@ export module Abstract {
           var positiveOffset = positiveDataMap.get(keyAccessor(datum)).offset;
           var negativeOffset = negativeDataMap.get(keyAccessor(datum)).offset;
 
-          datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) >= 0 ? positiveOffset : negativeOffset;
+          var value = valueAccessor(datum);
+          if (value === 0) {
+            datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = isAllNegativeValues ? negativeOffset : positiveOffset;;
+          } else {
+            datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = value > 0 ? positiveOffset : negativeOffset;
+          }
         });
       });
     }
