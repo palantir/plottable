@@ -14,8 +14,7 @@ describe("Plots", () => {
       var yScale = new Plottable.Scale.Linear();
       renderer = new Plottable.Abstract.Stacked(xScale, yScale);
 
-      // HACKHACK getDrawer errors on use and _isVertical is not set on instantiation
-      Plottable.Abstract.NewStylePlot.prototype._getDrawer = (key: string) => new Plottable.Abstract._Drawer(key);
+      (<any> renderer)._getDrawer = (key: string) => new Plottable.Abstract._Drawer(key);
       renderer._isVertical = true;
     });
 

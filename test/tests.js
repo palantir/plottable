@@ -2527,8 +2527,7 @@ describe("Plots", function () {
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
             renderer = new Plottable.Abstract.Stacked(xScale, yScale);
-            // HACKHACK getDrawer errors on use and _isVertical is not set on instantiation
-            Plottable.Abstract.NewStylePlot.prototype._getDrawer = function (key) { return new Plottable.Abstract._Drawer(key); };
+            renderer._getDrawer = function (key) { return new Plottable.Abstract._Drawer(key); };
             renderer._isVertical = true;
         });
         it("uses positive offset on stacking the 0 value", function () {

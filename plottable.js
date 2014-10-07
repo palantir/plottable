@@ -7169,7 +7169,6 @@ var Plottable;
                         var value = valueAccessor(datum);
                         if (value === 0) {
                             datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = isAllNegativeValues ? negativeOffset : positiveOffset;
-                            ;
                         }
                         else {
                             datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = value > 0 ? positiveOffset : negativeOffset;
