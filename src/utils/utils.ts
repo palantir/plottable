@@ -82,6 +82,7 @@ export module _Util {
     /**
      * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata.
      * Temporarily always grabs the metadata of the first dataset.
+     * HACKHACK #1089 - The accessor currently only grabs the first dataset's metadata
      */
     export function _applyAccessor(accessor: _Accessor, plot: Abstract.Plot) {
       var activatedAccessor = accessorize(accessor);
