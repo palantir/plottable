@@ -6935,11 +6935,19 @@ var Plottable;
                 return clusters;
             };
             ClusteredBar.prototype._paint = function () {
-                _super.prototype._paint.call(this);
                 var attrHash = this._generateAttrToProjector();
                 var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 var clusteredData = this.cluster(accessor);
                 this._getDrawersInOrder().forEach(function (d) { return d.draw(clusteredData[d.key], attrHash); });
+                var primaryScale = this._isVertical ? this._yScale : this._xScale;
+                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var baselineAttr = {
+                    "x1": this._isVertical ? 0 : scaledBaseline,
+                    "y1": this._isVertical ? scaledBaseline : 0,
+                    "x2": this._isVertical ? this.width() : scaledBaseline,
+                    "y2": this._isVertical ? scaledBaseline : this.height()
+                };
+                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
             };
             return ClusteredBar;
         })(Plottable.Abstract.BarPlot);
