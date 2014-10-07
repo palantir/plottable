@@ -1515,10 +1515,10 @@ describe("Plots", function () {
             var yScaleCalls = 0;
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
-            // var metadataProjector = (d: any, i: number, m: any) => m.cssClass; #1089
+            var metadataProjector = function (d, i, m) { return m.cssClass; };
             r.project("x", "x", xScale);
             r.project("y", "y", yScale);
-            // r.project("meta", metadataProjector); #1089
+            r.project("meta", metadataProjector);
             xScale.broadcaster.registerListener(null, function (listenable) {
                 assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
                 ++xScaleCalls;
@@ -1532,8 +1532,8 @@ describe("Plots", function () {
             d1.broadcaster.broadcast();
             assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
             assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
-            // var metaProjector = r._generateAttrToProjector()["meta"];
-            // assert.equal(metaProjector(null, 0), "bar", "plot projector used the right metadata");
+            var metaProjector = r._generateAttrToProjector()["meta"];
+            assert.equal(metaProjector(null, 0), "bar", "plot projector used the right metadata");
             var d2 = new Plottable.Dataset([{ x: 7, y: 8 }], { cssClass: "boo" });
             r.removeDataset("d1");
             r.addDataset(d2);
@@ -1545,8 +1545,8 @@ describe("Plots", function () {
             d2.broadcaster.broadcast();
             assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
             assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
-            // metaProjector = r._generateAttrToProjector()["meta"]; #1089
-            // assert.equal(metaProjector(null, 0), "boo", "plot projector used the right metadata");
+            metaProjector = r._generateAttrToProjector()["meta"];
+            assert.equal(metaProjector(null, 0), "boo", "plot projector used the right metadata");
         });
         it("Plot automatically generates a Dataset if only data is provided", function () {
             var data = ["foo", "bar"];
@@ -2408,8 +2408,8 @@ describe("Plots", function () {
             yScale.domain([400, 0]);
             var data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
             var metadata = { foo: 10, bar: 20 };
-            var xAccessor = function (d, i, m) { return d.x + i; };
-            var yAccessor = function (d, i, m) { return 0; };
+            var xAccessor = function (d, i, m) { return d.x + i * m.foo; };
+            var yAccessor = function (d, i, m) { return m.bar; };
             var dataset = new Plottable.Dataset(data, metadata);
             var plot = new Plottable.Plot.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
             plot.addDataset(dataset);
@@ -2418,22 +2418,21 @@ describe("Plots", function () {
             var c1 = d3.select(circles[0][0]);
             var c2 = d3.select(circles[0][1]);
             assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
-            assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct");
-            assert.closeTo(parseFloat(c2.attr("cx")), 2, 0.01, "second circle cx is correct");
-            assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct");
+            assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct");
+            assert.closeTo(parseFloat(c2.attr("cx")), 11, 0.01, "second circle cx is correct");
+            assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct");
             data = [{ x: 2, y: 2 }, { x: 4, y: 4 }];
             dataset.data(data);
             assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after data change");
-            assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after data change");
-            assert.closeTo(parseFloat(c2.attr("cx")), 5, 0.01, "second circle cx is correct after data change");
-            assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after data change");
-            // Disabled for NewStylePlot refactor - fix in #1089
-            // metadata = {foo: 0, bar: 0};
-            // dataset.metadata(metadata);
-            // assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after metadata change");
-            // assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
-            // assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");
-            // assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
+            assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct after data change");
+            assert.closeTo(parseFloat(c2.attr("cx")), 14, 0.01, "second circle cx is correct after data change");
+            assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct after data change");
+            metadata = { foo: 0, bar: 0 };
+            dataset.metadata(metadata);
+            assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after metadata change");
+            assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
+            assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");
+            assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
             svg.remove();
         });
         describe("Example ScatterPlot with quadratic series", function () {
@@ -3886,12 +3885,12 @@ describe("Dataset", function () {
         var callbackCalled = false;
         var callback = function (listenable) {
             assert.equal(listenable, ds, "Callback received the Dataset as the first argument");
-            // assert.deepEqual(ds.metadata(), newMetadata, "Dataset arrives with correct metadata");
+            assert.deepEqual(ds.metadata(), newMetadata, "Dataset arrives with correct metadata");
             callbackCalled = true;
         };
         ds.broadcaster.registerListener(null, callback);
         ds.metadata(newMetadata);
-        // assert.isTrue(callbackCalled, "callback was called when the metadata was changed");
+        assert.isTrue(callbackCalled, "callback was called when the metadata was changed");
     });
     it("_getExtent works as expected", function () {
         var data = [1, 2, 3, 4, 1];
@@ -3899,13 +3898,13 @@ describe("Dataset", function () {
         var id = function (d) { return d; };
         var dataset = new Plottable.Dataset(data, metadata);
         var plot = new Plottable.Abstract.Plot().addDataset(dataset);
-        // var apply = (a: any) => Plottable._Util.Methods._applyAccessor(a, plot); #1089
+        var apply = function (a) { return Plottable._Util.Methods._applyAccessor(a, plot); };
         var a1 = function (d, i, m) { return d + i - 2; };
         assert.deepEqual(dataset._getExtent(a1, id), [-1, 5], "extent for numerical data works properly");
-        // var a2 = (d: number, i: number, m: any) => d + m.foo; #1089
-        // assert.deepEqual(dataset._getExtent(apply(a2), id), [12, 15], "extent uses metadata appropriately");
+        var a2 = function (d, i, m) { return d + m.foo; };
+        assert.deepEqual(dataset._getExtent(apply(a2), id), [12, 15], "extent uses metadata appropriately");
         dataset.metadata({ foo: -1 });
-        // assert.deepEqual(dataset._getExtent(apply(a2), id), [0, 3], "metadata change is reflected in extent results");
+        assert.deepEqual(dataset._getExtent(apply(a2), id), [0, 3], "metadata change is reflected in extent results");
         var a3 = function (d, i, m) { return "_" + d; };
         assert.deepEqual(dataset._getExtent(a3, id), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
         var a_toString = function (d) { return (d + 2).toString(); };

@@ -89,6 +89,20 @@ var Plottable;
             }
             Methods.accessorize = accessorize;
             /**
+             * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata.
+             * Temporarily always grabs the metadata of the first dataset.
+             */
+            function _applyAccessor(accessor, plot) {
+                var activatedAccessor = accessorize(accessor);
+                return function (d, i) {
+                    var datasets = plot._getDatasetsInOrder();
+                    var dataset = datasets.length > 0 ? datasets[0] : null;
+                    var metadata = dataset ? dataset.metadata() : null;
+                    return activatedAccessor(d, i, metadata);
+                };
+            }
+            Methods._applyAccessor = _applyAccessor;
+            /**
              * Takes two sets and returns the union
              *
              * Due to the fact that D3.Sets store strings internally, return type is always a string set
@@ -5834,7 +5848,7 @@ var Plottable;
                 if (scale) {
                     scale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
-                var activatedAccessor = Plottable._Util.Methods.accessorize(accessor);
+                var activatedAccessor = Plottable._Util.Methods._applyAccessor(accessor, this);
                 this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
                 this._updateScaleExtent(attrToSet);
                 this._render(); // queue a re-render upon changing projector

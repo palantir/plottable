@@ -80,6 +80,20 @@ export module _Util {
     }
 
     /**
+     * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata.
+     * Temporarily always grabs the metadata of the first dataset.
+     */
+    export function _applyAccessor(accessor: _Accessor, plot: Abstract.Plot) {
+      var activatedAccessor = accessorize(accessor);
+      return (d: any, i: number) => {
+        var datasets = plot._getDatasetsInOrder();
+        var dataset = datasets.length > 0 ? datasets[0] : null;
+        var metadata = dataset ? dataset.metadata() : null;
+        return activatedAccessor(d, i, metadata);
+      };
+    }
+
+    /**
      * Takes two sets and returns the union
      *
      * Due to the fact that D3.Sets store strings internally, return type is always a string set
