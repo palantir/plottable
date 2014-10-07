@@ -70,6 +70,46 @@ describe("Plots", () => {
 
   });
 
+  describe("Stacked Area Plot no data", () => {
+    var svg: D3.Selection;
+    var renderer: Plottable.Plot.StackedArea<number>;
+    var SVG_WIDTH = 600;
+    var SVG_HEIGHT = 400;
+
+    beforeEach(() => {
+      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var xScale = new Plottable.Scale.Linear().domain([1, 3]);
+      var yScale = new Plottable.Scale.Linear().domain([0, 4]);
+      var colorScale = new Plottable.Scale.Color("10");
+
+      var data1: any[] = [
+      ];
+      var data2 = [
+        {x: 1, y: 3, type: "b"},
+        {x: 3, y: 1, type: "b"}
+      ];
+
+      renderer = new Plottable.Plot.StackedArea(xScale, yScale);
+      renderer.addDataset(data1);
+      renderer.addDataset(data2);
+      renderer.project("fill", "type", colorScale);
+      new Plottable.Component.Table([[renderer]]).renderTo(svg);
+    });
+
+    it("path elements rendered correctly", () => {
+      var areas = renderer._renderArea.selectAll(".area");
+      var area0 = d3.select(areas[0][0]);
+      assert.strictEqual(area0.attr("d"), null, "no path string on an empty dataset");
+
+      var area1 = d3.select(areas[0][1]);
+      assert.notEqual(area1.attr("d"), "", "path string has been created");
+      assert.strictEqual(area1.attr("fill"), "#1f77b4", "fill attribute is correct");
+
+      svg.remove();
+    });
+
+  });
+
   describe("Stacked Area Plot Stacking", () => {
     var verifier = new MultiTestVerifier();
     var svg: D3.Selection;

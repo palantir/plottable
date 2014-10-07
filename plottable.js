@@ -7294,7 +7294,7 @@ var Plottable;
                 attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
                 // Align fill with first index
                 var fillProjector = attrToProjector["fill"];
-                attrToProjector["fill"] = function (d, i) { return fillProjector(d[0], i); };
+                attrToProjector["fill"] = function (d, i) { return (d && d.length) ? fillProjector(d[0], i) : null; };
                 return attrToProjector;
             };
             return StackedArea;

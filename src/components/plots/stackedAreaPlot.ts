@@ -75,7 +75,7 @@ export module Plot {
 
       // Align fill with first index
       var fillProjector = attrToProjector["fill"];
-      attrToProjector["fill"] = (d, i) => fillProjector(d[0], i);
+      attrToProjector["fill"] = (d, i) => (d && d.length) ? fillProjector(d[0], i) : null;
 
       return attrToProjector;
     }
