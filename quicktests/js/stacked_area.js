@@ -21,7 +21,6 @@ function run(div, data, Plottable) {
   // if (!Plottable.Plot.Area) {
   //   return;
   // }
-  debugger;
   var stackedAreaPlot = new Plottable.Plot.StackedArea(xScale, yScale)
     .project("x", "name", xScale)
     .project("y", "y", yScale)
@@ -29,7 +28,7 @@ function run(div, data, Plottable) {
     .addDataset("d1", data[0])
     .addDataset("d2", data[1])
     .addDataset("d3", data[2])
-    .animate(true)
+    .animate(true);
 
 
   var center = stackedAreaPlot.merge(new Plottable.Component.Legend(colorScale));
