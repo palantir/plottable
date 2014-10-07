@@ -86,13 +86,10 @@ export module Abstract {
       var keyAccessor = this.keyAccessor();
       var valueAccessor = this.valueAccessor();
 
-      var isAllNegativeValues = this._getDatasetsInOrder().every((dataset) => {
-        return dataset.data().every((datum) => valueAccessor(datum) <= 0);
-      });
-
       this._getDatasetsInOrder().forEach((dataset, datasetIndex) => {
         var positiveDataMap = positiveDataMapArray[datasetIndex];
         var negativeDataMap = negativeDataMapArray[datasetIndex];
+        var isAllNegativeValues = dataset.data().every((datum) => valueAccessor(datum) <= 0);
 
         dataset.data().forEach((datum: any, datumIndex: number) => {
           var positiveOffset = positiveDataMap.get(keyAccessor(datum)).offset;

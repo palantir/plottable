@@ -21,19 +21,24 @@ describe("Plots", () => {
 
     it("uses positive offset on stacking the 0 value", () => {
       var data1 = [
-        {x: 1, y: 1}
+        {x: 1, y: 1},
+        {x: 3, y: 1}
       ];
       var data2 = [
-        {x: 1, y: 0}
+        {x: 1, y: 0},
+        {x: 3, y: 1}
       ];
       var data3 = [
-        {x: 1, y: -1}
+        {x: 1, y: -1},
+        {x: 3, y: 1}
       ];
       var data4 = [
-        {x: 1, y: 1}
+        {x: 1, y: 1},
+        {x: 3, y: 1}
       ];
       var data5 = [
-        {x: 1, y: 0}
+        {x: 1, y: 0},
+        {x: 3, y: 1}
       ];
 
       renderer.addDataset(data1);
