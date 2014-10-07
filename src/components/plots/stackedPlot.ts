@@ -94,7 +94,7 @@ export module Abstract {
           var positiveOffset = positiveDataMap.get(keyAccessor(datum)).offset;
           var negativeOffset = negativeDataMap.get(keyAccessor(datum)).offset;
 
-          datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) > 0 ? positiveOffset : negativeOffset;
+          datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = valueAccessor(datum) >= 0 ? positiveOffset : negativeOffset;
         });
       });
     }
