@@ -7,7 +7,7 @@ function makeData() {
 function run(div, data, Plottable) {
   "use strict";
 
-  console.log("vertical_bar: ");
+  console.log("line");
   console.log(Plottable);
 
   var svg = div.append("svg").attr("height", 500);
@@ -17,13 +17,12 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var verticalBarRenderer = new Plottable.Plot.VerticalBar(data[0], xScale, yScale);
+  var verticalBarRenderer = new Plottable.Plot.Line(data[0], xScale, yScale);
   verticalBarRenderer.animate(true);
 
   var chart = new Plottable.Component.Table([[yAxis, verticalBarRenderer],
    [null,  xAxis]]);
 
   chart.renderTo(svg);
-
 
 }
