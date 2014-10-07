@@ -57,7 +57,6 @@ export module Plot {
     }
 
     public _paint() {
-      super._paint();
       var attrHash = this._generateAttrToProjector();
       var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var clusteredData = this.cluster(accessor);
