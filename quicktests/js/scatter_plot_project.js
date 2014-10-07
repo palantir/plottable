@@ -28,7 +28,7 @@ function run(div, data, Plottable) {
                                                   [subtitleLabel]
                                                   ]).xAlign("center");
 
-  var yAxisLabel = new Plottable.Component.AxisLabel("Absolute Value of Apparent Visual Magnitude", "vertical-left");
+  var yAxisLabel = new Plottable.Component.AxisLabel("Absolute Value of Apparent Visual Magnitude", "left");
   var xAxisLabel = new Plottable.Component.AxisLabel("Distance in parsecs");
   var plotTable = new Plottable.Component.Table([
                                                  [yAxisLabel, yAxis, scatterPlot],

@@ -319,7 +319,7 @@ it("components can be offset relative to their alignment, and throw errors if th
 
   it("detach() works as expected", () => {
     var cbCalled = 0;
-    var cb = (b: Plottable.Core.IListenable) => cbCalled++;
+    var cb = (b: Plottable.Core.Listenable) => cbCalled++;
     var b = new Plottable.Core.Broadcaster(null);
 
     var c1 = new Plottable.Abstract.Component();

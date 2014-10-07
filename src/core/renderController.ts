@@ -26,10 +26,10 @@ export module Core {
     var _componentsNeedingComputeLayout: {[key: string]: Abstract.Component} = {};
     var _animationRequested: boolean = false;
     var _isCurrentlyFlushing: boolean = false;
-    export var _renderPolicy: RenderPolicy.IRenderPolicy = new RenderPolicy.AnimationFrame();
+    export var _renderPolicy: RenderPolicy.RenderPolicy = new RenderPolicy.AnimationFrame();
 
     export function setRenderPolicy(policy: string): void;
-    export function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): void;
+    export function setRenderPolicy(policy: RenderPolicy.RenderPolicy): void;
     export function setRenderPolicy(policy: any): void {
       if (typeof(policy) === "string") {
         switch (policy.toLowerCase()) {

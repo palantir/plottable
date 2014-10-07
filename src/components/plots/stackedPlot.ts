@@ -147,11 +147,11 @@ export module Abstract {
       }
     }
 
-    private keyAccessor(): IAppliedAccessor {
+    private keyAccessor(): AppliedAccessor {
        return this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
     }
 
-    private valueAccessor(): IAppliedAccessor {
+    private valueAccessor(): AppliedAccessor {
        return this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
     }
   }

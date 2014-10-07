@@ -1,11 +1,11 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  interface ICachedExtent {
-    accessor: _IAccessor;
+  interface CachedExtent {
+    accessor: _Accessor;
     extent: any[];
   }
-  export class Dataset extends Abstract.PlottableObject implements Core.IListenable {
+  export class Dataset extends Abstract.PlottableObject implements Core.Listenable {
     private _data: any[];
     private _metadata: any;
     private accessor2cachedExtent: _Util.StrictEqualityAssociativeArray;
@@ -77,7 +77,7 @@ module Plottable {
       }
     }
 
-    public _getExtent(accessor: _IAccessor, typeCoercer: (d: any) => any): any[] {
+    public _getExtent(accessor: _Accessor, typeCoercer: (d: any) => any): any[] {
       var cachedExtent = this.accessor2cachedExtent.get(accessor);
       if (cachedExtent === undefined) {
         cachedExtent = this.computeExtent(accessor, typeCoercer);
@@ -86,7 +86,7 @@ module Plottable {
       return cachedExtent;
     }
 
-    private computeExtent(accessor: _IAccessor, typeCoercer: (d: any) => any): any[] {
+    private computeExtent(accessor: _Accessor, typeCoercer: (d: any) => any): any[] {
       var mappedData = this._data.map(accessor).map(typeCoercer);
       if (mappedData.length === 0){
         return [];

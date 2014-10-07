@@ -2,18 +2,18 @@ module Plottable {
   // TODO: I'm pretty sure this is a mistake, and we always just mean
   // any[]|DataSource. I mean, we just straight-up cast this thing into a
   // DataSource, but then we expect data to be a function
-  export interface IDataset {
+  export interface DatasetInterface {
     data: any[];
-    metadata: IMetadata;
+    metadata: Metadata;
   }
 
-  // TODO: only used by IDataset, remove when IDataset removed
-  export interface IMetadata {
+  // TODO: only used by DatasetInterface, remove when DatasetInterface removed
+  export interface Metadata {
     cssClass?: string;
     color?: string;
   }
 
-  export interface _IAccessor {
+  export interface _Accessor {
     (datum: any, index?: number, metadata?: any): any;
   };
 
@@ -24,12 +24,12 @@ module Plottable {
    *
    * Index, if used, will be the index of the datum in the array.
    */
-  export interface IAppliedAccessor {
+  export interface AppliedAccessor {
     (datum?: any, index?: number) : any;
   }
 
-  export interface _IProjector {
-    accessor: _IAccessor;
+  export interface _Projector {
+    accessor: _Accessor;
     scale?: Abstract.Scale<any, any>;
     attribute: string;
   }
@@ -42,8 +42,8 @@ module Plottable {
    * with both `foo` and `bar`, an entry in this type might be `{"r":
    * function(d) { return foo + bar; }`.
    */
-  export interface IAttributeToProjector {
-    [attrToSet: string]: IAppliedAccessor;
+  export interface AttributeToProjector {
+    [attrToSet: string]: AppliedAccessor;
   }
 
   /**
@@ -56,14 +56,14 @@ module Plottable {
     yMax: number;
   }
 
-  export interface _ISpaceRequest {
+  export interface _SpaceRequest {
     width: number;
     height: number;
     wantsWidth: boolean;
     wantsHeight: boolean;
   }
 
-  export interface _IPixelArea {
+  export interface _PixelArea {
     xMin: number;
     xMax: number;
     yMin: number;
@@ -71,13 +71,13 @@ module Plottable {
   }
 
   /**
-   * The range of your current data. For example, [1, 2, 6, -5] has the IExtent
+   * The range of your current data. For example, [1, 2, 6, -5] has the Extent
    * `{min: -5, max: 6}`.
    *
    * The point of this type is to hopefully replace the less-elegant `[min,
    * max]` extents produced by d3.
    */
-  export interface IExtent {
+  export interface Extent {
     min: number;
     max: number;
   }

@@ -90,6 +90,11 @@
   },
 
   {
+    "name":"clustered_bar",
+    "categories":["Linear Scale", "Numeric Axis", "Animate", "Legend", "Category Axis", "Vertical Bar Plot", "Clustered Plot"]
+  },
+
+  {
     "name":"domainChange",
     "categories":["Datasource", "Linear Scale", "Numeric Axis", "Line Plot", "Scatter Plot", "Label", "Click Interaction", "Domain"]
   },

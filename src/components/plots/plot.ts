@@ -8,12 +8,11 @@ export module Abstract {
     public _datasetKeysInOrder: string[];
 
     public _renderArea: D3.Selection;
-    public _projectors: { [attrToSet: string]: _IProjector; } = {};
+    public _projectors: { [attrToSet: string]: _Projector; } = {};
 
     public _animate: boolean = false;
-    public _animators: Animator.IPlotAnimatorMap = {};
+    public _animators: Animator.PlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
-
     private animateOnNextRender = true;
     private nextSeriesIndex: number;
 
@@ -111,7 +110,7 @@ export module Abstract {
       return new Abstract._Drawer(key);
     }
 
-    public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
+    public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.PlotAnimator {
       return new Animator.Null();
     }
 
@@ -174,8 +173,8 @@ export module Abstract {
       return this;
     }
 
-    public _generateAttrToProjector(): IAttributeToProjector {
-      var h: IAttributeToProjector = {};
+    public _generateAttrToProjector(): AttributeToProjector {
+      var h: AttributeToProjector = {};
       d3.keys(this._projectors).forEach((a) => {
         var projector = this._projectors[a];
         var accessor = projector.accessor;
@@ -245,10 +244,10 @@ export module Abstract {
      *
      * @param {D3.Selection} selection The selection of elements to update.
      * @param {string} animatorKey The key for the animator.
-     * @param {IAttributeToProjector} attrToProjector The set of attributes to set on the selection.
+     * @param {AttributeToProjector} attrToProjector The set of attributes to set on the selection.
      * @returns {D3.Selection} The resulting selection (potentially after the transition)
      */
-    public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any {
+    public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: AttributeToProjector): any {
       if (this._animate && this.animateOnNextRender && this._animators[animatorKey]) {
         return this._animators[animatorKey].animate(selection, attrToProjector);
       } else {
@@ -259,19 +258,19 @@ export module Abstract {
     /**
      * Get the animator associated with the specified Animator key.
      *
-     * @return {IPlotAnimator} The Animator for the specified key.
+     * @return {PlotAnimator} The Animator for the specified key.
      */
-    public animator(animatorKey: string): Animator.IPlotAnimator;
+    public animator(animatorKey: string): Animator.PlotAnimator;
     /**
      * Set the animator associated with the specified Animator key.
      *
      * @param {string} animatorKey The key for the Animator.
-     * @param {IPlotAnimator} animator An Animator to be assigned to
+     * @param {PlotAnimator} animator An Animator to be assigned to
      * the specified key.
      * @returns {Plot} The calling Plot.
      */
-    public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
-    public animator(animatorKey: string, animator?: Animator.IPlotAnimator): any {
+    public animator(animatorKey: string, animator: Animator.PlotAnimator): Plot;
+    public animator(animatorKey: string, animator?: Animator.PlotAnimator): any {
       if (animator === undefined){
         return this._animators[animatorKey];
       } else {

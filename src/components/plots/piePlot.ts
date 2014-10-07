@@ -40,7 +40,7 @@ export module Plot {
     }
 
 
-    public _generateAttrToProjector(): IAttributeToProjector {
+    public _generateAttrToProjector(): AttributeToProjector {
       var attrToProjector = this.retargetProjectors(super._generateAttrToProjector());
       var innerRadiusF = attrToProjector["inner-radius"] || d3.functor(0);
       var outerRadiusF = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
@@ -62,8 +62,8 @@ export module Plot {
      * Since the data goes through a pie function, which returns an array of ArcDescriptors,
      * projectors will need to be retargeted so they point to the data portion of each arc descriptor.
      */
-    private retargetProjectors(attrToProjector: IAttributeToProjector): IAttributeToProjector {
-      var retargetedAttrToProjector: IAttributeToProjector = {};
+    private retargetProjectors(attrToProjector: AttributeToProjector): AttributeToProjector {
+      var retargetedAttrToProjector: AttributeToProjector = {};
       d3.entries(attrToProjector).forEach((entry) => {
         retargetedAttrToProjector[entry.key] = (d: D3.Layout.ArcDescriptor, i: number) => entry.value(d.data, i);
       });

@@ -40,7 +40,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    private cluster(accessor: _IAccessor) {
+    private cluster(accessor: _Accessor) {
       this.innerScale.domain(this._datasetKeysInOrder);
       var clusters: {[key: string]: any[]} = {};
       this._datasetKeysInOrder.forEach((key: string) => {

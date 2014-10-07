@@ -62,7 +62,7 @@ export module Interaction {
         return this._componentToListenTo.selectBar(p.x, p.y, false);
       }
 
-      var maxExtent: IExtent = { min: -Infinity, max: Infinity };
+      var maxExtent: Extent = { min: -Infinity, max: Infinity };
       if (this.plotIsVertical) {
         return this._componentToListenTo.selectBar(p.x, maxExtent, false);
       } else {

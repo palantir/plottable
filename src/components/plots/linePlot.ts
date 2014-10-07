@@ -5,7 +5,7 @@ export module Plot {
   export class Line<X> extends Abstract.XYPlot<X,number> {
 
     public _yScale: Abstract.QuantitativeScale<number>;
-    public _animators: Animator.IPlotAnimatorMap = {
+    public _animators: Animator.PlotAnimatorMap = {
       "line-reset" : new Animator.Null(),
       "line"       : new Animator.Base()
         .duration(600)
@@ -16,7 +16,7 @@ export module Plot {
      * Constructs a LinePlot.
      *
      * @constructor
-     * @param {any | IDataset} dataset The dataset to render.
+     * @param {any | DatasetInterface} dataset The dataset to render.
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
@@ -51,7 +51,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _rejectNullsAndNaNs(d: any, i: number, projector: IAppliedAccessor) {
+    public _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor) {
       var value = projector(d, i);
       return value != null && value === value;
     }

@@ -47,7 +47,7 @@ function run(div, data, Plottable){
 
   var legend = new Plottable.Component.HorizontalLegend(colorScale);
   var title = new Plottable.Component.TitleLabel("Average Rainfall in Different Cities between 2013-2014", "horizontal" );
-  var yUnitLabel = new Plottable.Component.AxisLabel("Inches", "vertical-left" );
+  var yUnitLabel = new Plottable.Component.AxisLabel("Inches", "left" );
 
 
   legend.xAlign("right");

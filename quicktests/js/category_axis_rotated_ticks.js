@@ -63,5 +63,5 @@ function run(div, data, Plottable) {
   var plot = new Plottable.Plot.VerticalBar(data, xScale, yScale)
                     .project("x", "date", xScale)
                     .project("y", "y", yScale);
-  var table = new Plottable.Component.Table([[yAxis, plot], [null, xAxis1], [null, xAxis2], [null, xAxis3]]).renderTo("svg");
+  var table = new Plottable.Component.Table([[yAxis, plot], [null, xAxis1], [null, xAxis2], [null, xAxis3]]).renderTo(svg);
 }

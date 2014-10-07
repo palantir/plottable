@@ -20,13 +20,13 @@ export module Component {
       components.forEach((c: Abstract.Component) => this._addComponent(c));
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var requests = this._components.map((c: Abstract.Component) => c._requestedSpace(offeredWidth, offeredHeight));
       return {
-        width : _Util.Methods.max(requests, (request: _ISpaceRequest) => request.width ),
-        height: _Util.Methods.max(requests, (request: _ISpaceRequest) => request.height),
-        wantsWidth : requests.map((r: _ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
-        wantsHeight: requests.map((r: _ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
+        width : _Util.Methods.max(requests, (request: _SpaceRequest) => request.width ),
+        height: _Util.Methods.max(requests, (request: _SpaceRequest) => request.height),
+        wantsWidth : requests.map((r: _SpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
+        wantsHeight: requests.map((r: _SpaceRequest) => r.wantsHeight).some((x: boolean) => x)
       };
     }
 

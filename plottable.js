@@ -1,5 +1,5 @@
 /*!
-Plottable 0.31.0 (https://github.com/palantir/plottable)
+Plottable 0.32.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1295,7 +1295,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.31.0";
+    Plottable.version = "0.32.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1368,7 +1368,7 @@ var Plottable;
 (function (Plottable) {
     (function (Core) {
         /**
-         * The Broadcaster class is owned by an IListenable. Third parties can register and deregister listeners
+         * The Broadcaster class is owned by an Listenable. Third parties can register and deregister listeners
          * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
          * called. The registered callbacks are called with the registered Listenable that the broadcaster is attached
          * to, along with optional arguments passed to the `broadcast` method.
@@ -1381,7 +1381,7 @@ var Plottable;
              * Constructs a broadcaster, taking the Listenable that the broadcaster will be attached to.
              *
              * @constructor
-             * @param {IListenable} listenable The Listenable-object that this broadcaster is attached to.
+             * @param {Listenable} listenable The Listenable-object that this broadcaster is attached to.
              */
             function Broadcaster(listenable) {
                 _super.call(this);
@@ -1394,7 +1394,7 @@ var Plottable;
              * If there is already a callback associated with that key, then the callback will be replaced.
              *
              * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-             * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
+             * @param {BroadcasterCallback} callback A callback to be called when the Scale's domain changes.
              * @returns {Broadcaster} this object
              */
             Broadcaster.prototype.registerListener = function (key, callback) {
@@ -2994,7 +2994,7 @@ var Plottable;
              * Draws the data into the renderArea using the attrHash for attributes
              *
              * @param{any[]} data The data to be drawn
-             * @param{attrHash} IAttributeToProjector The list of attributes to set on the data
+             * @param{attrHash} AttributeToProjector The list of attributes to set on the data
              */
             _Drawer.prototype.draw = function (data, attrToProjector, animator) {
                 if (animator === void 0) { animator = new Plottable.Animator.Null(); }
@@ -5292,6 +5292,12 @@ var Plottable;
              */
             function Gridlines(xScale, yScale) {
                 var _this = this;
+                if (xScale != null && !(Plottable.Abstract.QuantitativeScale.prototype.isPrototypeOf(xScale))) {
+                    throw new Error("xScale needs to inherit from Abstract.QuantitativeScale");
+                }
+                if (yScale != null && !(Plottable.Abstract.QuantitativeScale.prototype.isPrototypeOf(yScale))) {
+                    throw new Error("yScale needs to inherit from Abstract.QuantitativeScale");
+                }
                 _super.call(this);
                 this.classed("gridlines", true);
                 this.xScale = xScale;
@@ -5903,7 +5909,7 @@ var Plottable;
              *
              * @param {D3.Selection} selection The selection of elements to update.
              * @param {string} animatorKey The key for the animator.
-             * @param {IAttributeToProjector} attrToProjector The set of attributes to set on the selection.
+             * @param {AttributeToProjector} attrToProjector The set of attributes to set on the selection.
              * @returns {D3.Selection} The resulting selection (potentially after the transition)
              */
             Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
@@ -6176,7 +6182,7 @@ var Plottable;
              * Constructs a ScatterPlot.
              *
              * @constructor
-             * @param {IDataset | any} dataset The dataset to render.
+             * @param {DatasetInterface | any} dataset The dataset to render.
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
@@ -6402,7 +6408,7 @@ var Plottable;
                     return input;
                 }
                 else {
-                    throw new Error("input '" + input + "' can't be parsed as an IExtent");
+                    throw new Error("input '" + input + "' can't be parsed as an Extent");
                 }
             };
             BarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
@@ -6549,7 +6555,7 @@ var Plottable;
              * Constructs a VerticalBarPlot.
              *
              * @constructor
-             * @param {IDataset | any} dataset The dataset to render.
+             * @param {DatasetInterface | any} dataset The dataset to render.
              * @param {Scale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
@@ -6635,7 +6641,7 @@ var Plottable;
              * Constructs a LinePlot.
              *
              * @constructor
-             * @param {any | IDataset} dataset The dataset to render.
+             * @param {any | DatasetInterface} dataset The dataset to render.
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
@@ -6733,7 +6739,7 @@ var Plottable;
              * Constructs an AreaPlot.
              *
              * @constructor
-             * @param {IDataset | any} dataset The dataset to render.
+             * @param {DatasetInterface | any} dataset The dataset to render.
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
@@ -7160,9 +7166,9 @@ var Plottable;
                 Plottable.Abstract.BarPlot.prototype._setup.call(this);
             };
             StackedBar.prototype._getAnimator = function (drawer, index) {
-                var animator = new Plottable.Animator.Rect();
-                animator.delay(animator.duration() * index);
-                return animator;
+                var primaryScale = this._isVertical ? this._yScale : this._xScale;
+                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                return new Plottable.Animator.MovingRect(scaledBaseline, this._isVertical);
             };
             StackedBar.prototype._getDrawer = function (key) {
                 return Plottable.Abstract.BarPlot.prototype._getDrawer.apply(this, [key]);
@@ -7427,6 +7433,43 @@ var Plottable;
             return Rect;
         })(Animator.Base);
         Animator.Rect = Rect;
+    })(Plottable.Animator || (Plottable.Animator = {}));
+    var Animator = Plottable.Animator;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Animator) {
+        /**
+         * A child class of RectAnimator that will move the rectangle
+         * as well as animate its growth.
+         */
+        var MovingRect = (function (_super) {
+            __extends(MovingRect, _super);
+            /**
+             * Constructs a MovingRectAnimator
+             *
+             * @param {number} basePixel The pixel value to start moving from
+             * @param {boolean} isVertical If the movement/animation is vertical
+             */
+            function MovingRect(startPixelValue, isVertical) {
+                if (isVertical === void 0) { isVertical = true; }
+                _super.call(this, isVertical);
+                this.startPixelValue = startPixelValue;
+            }
+            MovingRect.prototype._startMovingProjector = function (attrToProjector) {
+                return d3.functor(this.startPixelValue);
+            };
+            return MovingRect;
+        })(Animator.Rect);
+        Animator.MovingRect = MovingRect;
     })(Plottable.Animator || (Plottable.Animator = {}));
     var Animator = Plottable.Animator;
 })(Plottable || (Plottable = {}));

@@ -7,7 +7,7 @@ export module Plot {
     public _xScale: Scale.Ordinal;
     public _yScale: Scale.Ordinal;
 
-    public _animators: Animator.IPlotAnimatorMap = {
+    public _animators: Animator.PlotAnimatorMap = {
       "cells" : new Animator.Null()
     };
 
