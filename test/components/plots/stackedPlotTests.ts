@@ -5,17 +5,17 @@ var assert = chai.assert;
 describe("Plots", () => {
 
   describe("Stacked Plot Stacking", () => {
-    var renderer: Plottable.Abstract.Stacked<number, number>;
+    var stackedPlot: Plottable.Abstract.Stacked<number, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
-      renderer = new Plottable.Abstract.Stacked(xScale, yScale);
+      stackedPlot = new Plottable.Abstract.Stacked(xScale, yScale);
 
-      (<any> renderer)._getDrawer = (key: string) => new Plottable.Abstract._Drawer(key);
-      renderer._isVertical = true;
+      (<any> stackedPlot)._getDrawer = (key: string) => new Plottable.Abstract._Drawer(key);
+      stackedPlot._isVertical = true;
     });
 
     it("uses positive offset on stacking the 0 value", () => {
@@ -40,11 +40,11 @@ describe("Plots", () => {
         {x: 3, y: 1}
       ];
 
-      renderer.addDataset(data1);
-      renderer.addDataset(data2);
-      renderer.addDataset(data3);
-      renderer.addDataset(data4);
-      renderer.addDataset(data5);
+      stackedPlot.addDataset(data1);
+      stackedPlot.addDataset(data2);
+      stackedPlot.addDataset(data3);
+      stackedPlot.addDataset(data4);
+      stackedPlot.addDataset(data5);
 
       assert.strictEqual((<any> data2[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 1, "positive offset was used");
       assert.strictEqual((<any> data5[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 2, "positive offset was used");
@@ -64,10 +64,10 @@ describe("Plots", () => {
         {x: 1, y: 0}
       ];
 
-      renderer.addDataset(data1);
-      renderer.addDataset(data2);
-      renderer.addDataset(data3);
-      renderer.addDataset(data4);
+      stackedPlot.addDataset(data1);
+      stackedPlot.addDataset(data2);
+      stackedPlot.addDataset(data3);
+      stackedPlot.addDataset(data4);
 
       assert.strictEqual((<any> data2[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -2, "positive offset was used");
       assert.strictEqual((<any> data4[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "positive offset was used");

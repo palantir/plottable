@@ -2520,15 +2520,15 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("Stacked Plot Stacking", function () {
-        var renderer;
+        var stackedPlot;
         var SVG_WIDTH = 600;
         var SVG_HEIGHT = 400;
         beforeEach(function () {
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
-            renderer = new Plottable.Abstract.Stacked(xScale, yScale);
-            renderer._getDrawer = function (key) { return new Plottable.Abstract._Drawer(key); };
-            renderer._isVertical = true;
+            stackedPlot = new Plottable.Abstract.Stacked(xScale, yScale);
+            stackedPlot._getDrawer = function (key) { return new Plottable.Abstract._Drawer(key); };
+            stackedPlot._isVertical = true;
         });
         it("uses positive offset on stacking the 0 value", function () {
             var data1 = [
@@ -2551,11 +2551,11 @@ describe("Plots", function () {
                 { x: 1, y: 0 },
                 { x: 3, y: 1 }
             ];
-            renderer.addDataset(data1);
-            renderer.addDataset(data2);
-            renderer.addDataset(data3);
-            renderer.addDataset(data4);
-            renderer.addDataset(data5);
+            stackedPlot.addDataset(data1);
+            stackedPlot.addDataset(data2);
+            stackedPlot.addDataset(data3);
+            stackedPlot.addDataset(data4);
+            stackedPlot.addDataset(data5);
             assert.strictEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 1, "positive offset was used");
             assert.strictEqual(data5[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 2, "positive offset was used");
         });
@@ -2572,10 +2572,10 @@ describe("Plots", function () {
             var data4 = [
                 { x: 1, y: 0 }
             ];
-            renderer.addDataset(data1);
-            renderer.addDataset(data2);
-            renderer.addDataset(data3);
-            renderer.addDataset(data4);
+            stackedPlot.addDataset(data1);
+            stackedPlot.addDataset(data2);
+            stackedPlot.addDataset(data3);
+            stackedPlot.addDataset(data4);
             assert.strictEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -2, "positive offset was used");
             assert.strictEqual(data4[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "positive offset was used");
         });
