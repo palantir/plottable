@@ -40,18 +40,45 @@ export module Abstract {
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
+    // HACKHACK #1106 - should use drawers for paint logic
     public _paint() {
-      super._paint();
-
+      var attrToProjector = this._generateAttrToProjector();
+      var datasets = this._getDatasetsInOrder();
       var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
+      var positionAttr = this._isVertical ? "y" : "x";
+      var dimensionAttr = this._isVertical ? "height" : "width";
+
+      this._getDrawersInOrder().forEach((d, i) => {
+        var dataset = datasets[i];
+        var bars = d._renderArea.selectAll("rect").data(dataset.data());
+        bars.enter().append("rect");
+
+        if (this._dataChanged && this._animate) {
+          var resetAttrToProjector = this._generateAttrToProjector();
+          resetAttrToProjector[positionAttr] = () => scaledBaseline;
+          resetAttrToProjector[dimensionAttr] = () => 0;
+          this._applyAnimatedAttributes(bars, "bars-reset", resetAttrToProjector);
+        }
+
+        var attrToProjector = this._generateAttrToProjector();
+        if (attrToProjector["fill"]) {
+          bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
+        }
+        this._applyAnimatedAttributes(bars, "bars", attrToProjector);
+
+        bars.exit().remove();
+      });
+
       var baselineAttr: any = {
         "x1": this._isVertical ? 0 : scaledBaseline,
         "y1": this._isVertical ? scaledBaseline : 0,
         "x2": this._isVertical ? this.width() : scaledBaseline,
         "y2": this._isVertical ? scaledBaseline : this.height()
       };
+
       this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
+
     }
 
     /**

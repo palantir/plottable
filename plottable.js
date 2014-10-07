@@ -6355,10 +6355,32 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
+            // HACKHACK #1106 - should use drawers for paint logic
             BarPlot.prototype._paint = function () {
-                _super.prototype._paint.call(this);
+                var _this = this;
+                var attrToProjector = this._generateAttrToProjector();
+                var datasets = this._getDatasetsInOrder();
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var positionAttr = this._isVertical ? "y" : "x";
+                var dimensionAttr = this._isVertical ? "height" : "width";
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    var dataset = datasets[i];
+                    var bars = d._renderArea.selectAll("rect").data(dataset.data());
+                    bars.enter().append("rect");
+                    if (_this._dataChanged && _this._animate) {
+                        var resetAttrToProjector = _this._generateAttrToProjector();
+                        resetAttrToProjector[positionAttr] = function () { return scaledBaseline; };
+                        resetAttrToProjector[dimensionAttr] = function () { return 0; };
+                        _this._applyAnimatedAttributes(bars, "bars-reset", resetAttrToProjector);
+                    }
+                    var attrToProjector = _this._generateAttrToProjector();
+                    if (attrToProjector["fill"]) {
+                        bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                    }
+                    _this._applyAnimatedAttributes(bars, "bars", attrToProjector);
+                    bars.exit().remove();
+                });
                 var baselineAttr = {
                     "x1": this._isVertical ? 0 : scaledBaseline,
                     "y1": this._isVertical ? scaledBaseline : 0,
