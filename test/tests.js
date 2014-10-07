@@ -2529,6 +2529,72 @@ describe("Plots", function () {
 ///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
+    describe("Stacked Plot Stacking", function () {
+        var stackedPlot;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        beforeEach(function () {
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            stackedPlot = new Plottable.Abstract.Stacked(xScale, yScale);
+            stackedPlot._getDrawer = function (key) { return new Plottable.Abstract._Drawer(key); };
+            stackedPlot._isVertical = true;
+        });
+        it("uses positive offset on stacking the 0 value", function () {
+            var data1 = [
+                { x: 1, y: 1 },
+                { x: 3, y: 1 }
+            ];
+            var data2 = [
+                { x: 1, y: 0 },
+                { x: 3, y: 1 }
+            ];
+            var data3 = [
+                { x: 1, y: -1 },
+                { x: 3, y: 1 }
+            ];
+            var data4 = [
+                { x: 1, y: 1 },
+                { x: 3, y: 1 }
+            ];
+            var data5 = [
+                { x: 1, y: 0 },
+                { x: 3, y: 1 }
+            ];
+            stackedPlot.addDataset(data1);
+            stackedPlot.addDataset(data2);
+            stackedPlot.addDataset(data3);
+            stackedPlot.addDataset(data4);
+            stackedPlot.addDataset(data5);
+            assert.strictEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 1, "positive offset was used");
+            assert.strictEqual(data5[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 2, "positive offset was used");
+        });
+        it("uses negative offset on stacking the 0 value on all negative/0 valued data", function () {
+            var data1 = [
+                { x: 1, y: -2 }
+            ];
+            var data2 = [
+                { x: 1, y: 0 }
+            ];
+            var data3 = [
+                { x: 1, y: -1 }
+            ];
+            var data4 = [
+                { x: 1, y: 0 }
+            ];
+            stackedPlot.addDataset(data1);
+            stackedPlot.addDataset(data2);
+            stackedPlot.addDataset(data3);
+            stackedPlot.addDataset(data4);
+            assert.strictEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -2, "positive offset was used");
+            assert.strictEqual(data4[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "positive offset was used");
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+describe("Plots", function () {
     describe("Stacked Area Plot", function () {
         var verifier = new MultiTestVerifier();
         var svg;
