@@ -313,12 +313,33 @@ export module Abstract {
     }
 
     /**
-     * Removes a dataset
+     * Removes a dataset by string key
      *
      * @param {string} key The key of the dataset
      * @return {Plot} The calling Plot.
      */
-    public removeDataset(key: string): Plot {
+    public removeDataset(key: string): Plot;
+    /**
+     * Remove a dataset given the dataset itself
+     *
+     * @param {Dataset} dataset The dataset to remove
+     * @return {Plot} The calling Plot.
+     */
+    public removeDataset(dataset: Dataset): Plot;
+    public removeDataset(datasetOrKey: any): Plot {
+      var key: string;
+      if (typeof(datasetOrKey) === "string") {
+        key = datasetOrKey;
+      } else {
+        var idx = this.datasets().indexOf(datasetOrKey);
+        if (idx !== -1) {
+          key = this._datasetKeysInOrder[idx];
+        }
+      }
+      return this._removeDataset(key);
+    }
+
+    public _removeDataset(key: string): Plot {
       if (this._key2DatasetDrawerKey.has(key)) {
         var ddk = this._key2DatasetDrawerKey.get(key);
         ddk.drawer.remove();
