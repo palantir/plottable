@@ -72,5 +72,27 @@ describe("Plots", () => {
       assert.strictEqual((<any> data2[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -2, "positive offset was used");
       assert.strictEqual((<any> data4[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "positive offset was used");
     });
+
+    it("uses negative offset on stacking the 0 value on all negative/0 valued data", () => {
+      var data1: any[] = [
+      ];
+      var data2: any[] = [
+      ];
+
+      stackedPlot.addDataset(data1);
+      stackedPlot.addDataset(data2);
+
+      assert.deepEqual(data1, [], "positive offset was used");
+      assert.deepEqual(data2, [], "positive offset was used");
+    });
+
+    it("uses negative offset on stacking the 0 value on all negative/0 valued data", () => {
+      var data1 = [
+        {x: 1, y: -2}
+      ];
+
+      stackedPlot.addDataset("a", data1);
+      assert.doesNotThrow(() => stackedPlot.removeDataset("a"), Error);
+    });
   });
 });

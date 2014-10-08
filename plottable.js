@@ -7152,6 +7152,10 @@ var Plottable;
              */
             Stacked.prototype.stack = function (dataArray) {
                 var _this = this;
+                // HACKHACK d3's stack layout logic crashes on 0-length dataArray https://github.com/mbostock/d3/issues/2004
+                if (dataArray.length === 0) {
+                    return dataArray;
+                }
                 var outFunction = function (d, y0, y) {
                     d.offset = y0;
                 };

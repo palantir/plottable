@@ -2525,6 +2525,23 @@ describe("Plots", function () {
             assert.strictEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -2, "positive offset was used");
             assert.strictEqual(data4[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "positive offset was used");
         });
+        it("uses negative offset on stacking the 0 value on all negative/0 valued data", function () {
+            var data1 = [
+            ];
+            var data2 = [
+            ];
+            stackedPlot.addDataset(data1);
+            stackedPlot.addDataset(data2);
+            assert.deepEqual(data1, [], "positive offset was used");
+            assert.deepEqual(data2, [], "positive offset was used");
+        });
+        it("uses negative offset on stacking the 0 value on all negative/0 valued data", function () {
+            var data1 = [
+                { x: 1, y: -2 }
+            ];
+            stackedPlot.addDataset("a", data1);
+            assert.doesNotThrow(function () { return stackedPlot.removeDataset("a"); }, Error);
+        });
     });
 });
 
