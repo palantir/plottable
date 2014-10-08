@@ -153,5 +153,21 @@ describe("Plots", () => {
       var key2callback = (<any> s).broadcaster.key2callback;
       assert.isUndefined(key2callback.get(r), "the plot is no longer attached to the scale");
     });
+
+    it("removeDataset can work on datasets as well as keys", () => {
+      var plot = new Plottable.Abstract.Plot();
+      var d1 = new Plottable.Dataset();
+      var d2 = new Plottable.Dataset();
+      var d3 = new Plottable.Dataset();
+      plot.addDataset("foo", d1);
+      plot.addDataset("bar", d2);
+      plot.removeDataset("bad key");
+      plot.removeDataset(d3);
+      assert.deepEqual(plot.datasets(), [d1, d2], "nothing happened when bad keys/datasets removed");
+      plot.removeDataset(d2);
+      assert.deepEqual(plot.datasets(), [d1], "dataset could be removed by itself");
+      plot.removeDataset("foo");
+      assert.deepEqual(plot.datasets(), [], "dataset could be removed by key");
+    });
   });
 });

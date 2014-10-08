@@ -5962,13 +5962,20 @@ var Plottable;
                 }
                 return this;
             };
-            /**
-             * Removes a dataset
-             *
-             * @param {string} key The key of the dataset
-             * @return {Plot} The calling Plot.
-             */
-            Plot.prototype.removeDataset = function (key) {
+            Plot.prototype.removeDataset = function (datasetOrKey) {
+                var key;
+                if (typeof (datasetOrKey) === "string") {
+                    key = datasetOrKey;
+                }
+                else {
+                    var idx = this.datasets().indexOf(datasetOrKey);
+                    if (idx !== -1) {
+                        key = this._datasetKeysInOrder[idx];
+                    }
+                }
+                return this._removeDataset(key);
+            };
+            Plot.prototype._removeDataset = function (key) {
                 if (this._key2DatasetDrawerKey.has(key)) {
                     var ddk = this._key2DatasetDrawerKey.get(key);
                     ddk.drawer.remove();
