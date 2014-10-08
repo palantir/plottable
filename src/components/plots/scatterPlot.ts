@@ -51,7 +51,7 @@ export module Plot {
     // HACKHACK #1106 - should use drawers for paint logic
     public _paint() {
       var attrToProjector = this._generateAttrToProjector();
-      var datasets = this._getDatasetsInOrder();
+      var datasets = this.datasets();
 
       this._getDrawersInOrder().forEach((d, i) => {
         var dataset = datasets[i];

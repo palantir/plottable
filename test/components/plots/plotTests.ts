@@ -110,7 +110,7 @@ describe("Plots", () => {
     it("Plot automatically generates a Dataset if only data is provided", () => {
       var data = ["foo", "bar"];
       var r = new Plottable.Abstract.Plot().addDataset("foo", data);
-      var dataset = r._getDatasetsInOrder()[0];
+      var dataset = r.datasets()[0];
       assert.isNotNull(dataset, "A Dataset was automatically generated");
       assert.deepEqual(dataset.data(), data, "The generated Dataset has the correct data");
     });

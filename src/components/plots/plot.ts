@@ -339,7 +339,7 @@ export module Abstract {
       return this;
     }
 
-    public _getDatasetsInOrder(): Dataset[] {
+    public datasets(): Dataset[] {
       return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).dataset);
     }
 
@@ -349,7 +349,7 @@ export module Abstract {
 
     public _paint() {
       var attrHash = this._generateAttrToProjector();
-      var datasets = this._getDatasetsInOrder();
+      var datasets = this.datasets();
       this._getDrawersInOrder().forEach((d, i) => {
         var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
         d.draw(datasets[i].data(), attrHash, animator);

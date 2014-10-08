@@ -43,7 +43,7 @@ export module Plot {
       var y0Projector = this._projectors["y0"];
       var y0Accessor = y0Projector && y0Projector.accessor;
       if (y0Accessor != null) {
-        var extents = this._getDatasetsInOrder().map((d) => d._getExtent(y0Accessor, this._yScale._typeCoercer));
+        var extents = this.datasets().map((d) => d._getExtent(y0Accessor, this._yScale._typeCoercer));
         var extent = _Util.Methods.flatten(extents);
         var uniqExtentVals = _Util.Methods.uniq(extent);
         if (uniqExtentVals.length === 1) {
@@ -91,7 +91,7 @@ export module Plot {
                   .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction));
       attrToProjector["d"] = area;
 
-      var datasets = this._getDatasetsInOrder();
+      var datasets = this.datasets();
       this._getDrawersInOrder().forEach((d, i) => {
         var dataset = datasets[i];
         var areaPath: D3.Selection;
