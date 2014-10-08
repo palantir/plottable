@@ -3233,7 +3233,7 @@ declare module Plottable {
              * @param {boolean} isVertical If the movement/animation is vertical
              */
             constructor(startPixelValue: number, isVertical?: boolean);
-            _startMovingProjector(attrToProjector: IAttributeToProjector): (p: any) => number;
+            _startMovingProjector(attrToProjector: AttributeToProjector): (p: any) => number;
         }
     }
 }
