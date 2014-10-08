@@ -82,8 +82,8 @@ describe("Plots", () => {
       stackedPlot.addDataset(data1);
       stackedPlot.addDataset(data2);
 
-      assert.deepEqual(data1, [], "positive offset was used");
-      assert.deepEqual(data2, [], "positive offset was used");
+      assert.deepEqual(data1, [], "empty data causes no stacking to happen");
+      assert.deepEqual(data2, [], "empty data causes no stacking to happen");
     });
 
     it("does not crash on stacking on a 0-length dataset", () => {
