@@ -166,14 +166,14 @@ describe("Plots", () => {
         assert.deepEqual(plot.datasets(), [], "all datasets removed");
       });
 
-      it("removeDataset can work on keys", () => {
+      it("removeDataset can work on datasets", () => {
         plot.removeDataset(d2);
         assert.deepEqual(plot.datasets(), [d1], "second dataset removed");
         plot.removeDataset(d1);
         assert.deepEqual(plot.datasets(), [], "all datasets removed");
       });
 
-      it("removeDataset ignores bad inputs", () => {
+      it("removeDataset ignores inputs that do not correspond to a dataset", () => {
         var d3 = new Plottable.Dataset();
         plot.removeDataset(d3);
         plot.removeDataset("bad key");
