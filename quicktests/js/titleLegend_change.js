@@ -34,7 +34,7 @@ function run(div, data, Plottable) {
 
   // metadata is broken
   var colorProjector = function(d, i, m) {
-    return colorScale1.scale("series1");
+    return colorScale1.scale(m.name);
   };
 
   //rendering
