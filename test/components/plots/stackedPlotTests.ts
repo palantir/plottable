@@ -73,7 +73,7 @@ describe("Plots", () => {
       assert.strictEqual((<any> data4[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "positive offset was used");
     });
 
-    it("uses negative offset on stacking the 0 value on all negative/0 valued data", () => {
+    it("stacks correctly on empty data", () => {
       var data1: any[] = [
       ];
       var data2: any[] = [
@@ -86,7 +86,7 @@ describe("Plots", () => {
       assert.deepEqual(data2, [], "positive offset was used");
     });
 
-    it("uses negative offset on stacking the 0 value on all negative/0 valued data", () => {
+    it("does not crash on stacking on a 0-length dataset", () => {
       var data1 = [
         {x: 1, y: -2}
       ];
