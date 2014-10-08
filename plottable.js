@@ -96,7 +96,7 @@ var Plottable;
             function _applyAccessor(accessor, plot) {
                 var activatedAccessor = accessorize(accessor);
                 return function (d, i) {
-                    var datasets = plot._getDatasetsInOrder();
+                    var datasets = plot.datasets();
                     var dataset = datasets.length > 0 ? datasets[0] : null;
                     var metadata = dataset ? dataset.metadata() : null;
                     return activatedAccessor(d, i, metadata);
@@ -5986,7 +5986,7 @@ var Plottable;
                 }
                 return this;
             };
-            Plot.prototype._getDatasetsInOrder = function () {
+            Plot.prototype.datasets = function () {
                 var _this = this;
                 return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).dataset; });
             };
@@ -5997,7 +5997,7 @@ var Plottable;
             Plot.prototype._paint = function () {
                 var _this = this;
                 var attrHash = this._generateAttrToProjector();
-                var datasets = this._getDatasetsInOrder();
+                var datasets = this.datasets();
                 this._getDrawersInOrder().forEach(function (d, i) {
                     var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
                     d.draw(datasets[i].data(), attrHash, animator);
@@ -6082,7 +6082,7 @@ var Plottable;
             Pie.prototype._paint = function () {
                 var _this = this;
                 var attrHash = this._generateAttrToProjector();
-                var datasets = this._getDatasetsInOrder();
+                var datasets = this.datasets();
                 this._getDrawersInOrder().forEach(function (d, i) {
                     var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
                     var pieData = _this.pie(datasets[i].data());
@@ -6235,7 +6235,7 @@ var Plottable;
             Scatter.prototype._paint = function () {
                 var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
-                var datasets = this._getDatasetsInOrder();
+                var datasets = this.datasets();
                 this._getDrawersInOrder().forEach(function (d, i) {
                     var dataset = datasets[i];
                     var circles = d._renderArea.selectAll("circle").data(dataset.data());
@@ -6312,7 +6312,7 @@ var Plottable;
                 return this;
             };
             Grid.prototype._paint = function () {
-                var dataset = this._getDatasetsInOrder()[0];
+                var dataset = this.datasets()[0];
                 var cells = this._renderArea.selectAll("rect").data(dataset.data());
                 cells.enter().append("rect");
                 var xStep = this._xScale.rangeBand();
@@ -6374,7 +6374,7 @@ var Plottable;
             BarPlot.prototype._paint = function () {
                 var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
-                var datasets = this._getDatasetsInOrder();
+                var datasets = this.datasets();
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
                 var positionAttr = this._isVertical ? "y" : "x";
@@ -6728,7 +6728,7 @@ var Plottable;
                 delete attrToProjector["y"];
                 var line = d3.svg.line().x(xFunction).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
                 attrToProjector["d"] = line;
-                var datasets = this._getDatasetsInOrder();
+                var datasets = this.datasets();
                 this._getDrawersInOrder().forEach(function (d, i) {
                     var dataset = datasets[i];
                     var linePath;
@@ -6803,7 +6803,7 @@ var Plottable;
                 var y0Projector = this._projectors["y0"];
                 var y0Accessor = y0Projector && y0Projector.accessor;
                 if (y0Accessor != null) {
-                    var extents = this._getDatasetsInOrder().map(function (d) { return d._getExtent(y0Accessor, _this._yScale._typeCoercer); });
+                    var extents = this.datasets().map(function (d) { return d._getExtent(y0Accessor, _this._yScale._typeCoercer); });
                     var extent = Plottable._Util.Methods.flatten(extents);
                     var uniqExtentVals = Plottable._Util.Methods.uniq(extent);
                     if (uniqExtentVals.length === 1) {
@@ -6844,7 +6844,7 @@ var Plottable;
                 delete attrToProjector["y"];
                 var area = d3.svg.area().x(xFunction).y0(y0Function).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
                 attrToProjector["d"] = area;
-                var datasets = this._getDatasetsInOrder();
+                var datasets = this.datasets();
                 this._getDrawersInOrder().forEach(function (d, i) {
                     var dataset = datasets[i];
                     var areaPath;
@@ -6997,7 +6997,7 @@ var Plottable;
                 this.updateStackExtents();
             };
             Stacked.prototype.updateStackExtents = function () {
-                var datasets = this._getDatasetsInOrder();
+                var datasets = this.datasets();
                 var valueAccessor = this.valueAccessor();
                 var maxStackExtent = Plottable._Util.Methods.max(datasets, function (dataset) {
                     return Plottable._Util.Methods.max(dataset.data(), function (datum) {
@@ -7030,7 +7030,7 @@ var Plottable;
             Stacked.prototype.setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
                 var keyAccessor = this.keyAccessor();
                 var valueAccessor = this.valueAccessor();
-                this._getDatasetsInOrder().forEach(function (dataset, datasetIndex) {
+                this.datasets().forEach(function (dataset, datasetIndex) {
                     var positiveDataMap = positiveDataMapArray[datasetIndex];
                     var negativeDataMap = negativeDataMapArray[datasetIndex];
                     dataset.data().forEach(function (datum, datumIndex) {
@@ -7043,7 +7043,7 @@ var Plottable;
             Stacked.prototype.getDomainKeys = function () {
                 var keyAccessor = this.keyAccessor();
                 var domainKeys = d3.set();
-                var datasets = this._getDatasetsInOrder();
+                var datasets = this.datasets();
                 datasets.forEach(function (dataset) {
                     dataset.data().forEach(function (datum) {
                         domainKeys.add(keyAccessor(datum));
@@ -7054,7 +7054,7 @@ var Plottable;
             Stacked.prototype.generateDefaultMapArray = function () {
                 var keyAccessor = this.keyAccessor();
                 var valueAccessor = this.valueAccessor();
-                var datasets = this._getDatasetsInOrder();
+                var datasets = this.datasets();
                 var domainKeys = this.getDomainKeys();
                 var dataMapArray = datasets.map(function () {
                     return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {

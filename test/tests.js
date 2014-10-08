@@ -1551,7 +1551,7 @@ describe("Plots", function () {
         it("Plot automatically generates a Dataset if only data is provided", function () {
             var data = ["foo", "bar"];
             var r = new Plottable.Abstract.Plot().addDataset("foo", data);
-            var dataset = r._getDatasetsInOrder()[0];
+            var dataset = r.datasets()[0];
             assert.isNotNull(dataset, "A Dataset was automatically generated");
             assert.deepEqual(dataset.data(), data, "The generated Dataset has the correct data");
         });
@@ -1746,7 +1746,7 @@ describe("Plots", function () {
             var d4 = new Plottable.Dataset([10, 11, 12]);
             p.addDataset(d4);
             assert.deepEqual(p._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
-            var datasets = p._getDatasetsInOrder();
+            var datasets = p.datasets();
             assert.deepEqual(datasets[0].data(), [1, 2, 3]);
             assert.equal(datasets[1], d2);
             assert.deepEqual(datasets[2].data(), [7, 8, 9]);
@@ -1754,7 +1754,7 @@ describe("Plots", function () {
             p.removeDataset("foo");
             p.removeDataset("_0");
             assert.deepEqual(p._datasetKeysInOrder, ["bar", "_1"]);
-            assert.lengthOf(p._getDatasetsInOrder(), 2);
+            assert.lengthOf(p.datasets(), 2);
         });
         it("Datasets are listened to appropriately", function () {
             var callbackCounter = 0;

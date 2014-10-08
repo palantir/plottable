@@ -2303,6 +2303,7 @@ declare module Plottable {
              * @return {Plot} The calling Plot.
              */
             removeDataset(key: string): Plot;
+            datasets(): Dataset[];
         }
     }
 }

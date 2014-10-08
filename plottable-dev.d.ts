@@ -2541,7 +2541,7 @@ declare module Plottable {
              * @return {Plot} The calling Plot.
              */
             removeDataset(key: string): Plot;
-            _getDatasetsInOrder(): Dataset[];
+            datasets(): Dataset[];
             _getDrawersInOrder(): _Drawer[];
             _paint(): void;
         }
