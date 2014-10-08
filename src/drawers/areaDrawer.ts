@@ -2,7 +2,7 @@
 
 module Plottable {
 export module _Drawer {
-  export class Area extends Abstract._Drawer {
+  export class Area extends AbstractDrawer {
 
     public draw(data: any[], attrToProjector: AttributeToProjector) {
       var svgElement = "path";

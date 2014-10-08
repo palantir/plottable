@@ -2,10 +2,10 @@
 
 module Plottable {
 export module Scale {
-  export class Linear extends Abstract.QuantitativeScale<number> {
+  export class Linear extends Quantitative<number> {
 
     /**
-     * Constructs a new LinearScale.
+     * Constructs a new Scale.Linear.
      *
      * This scale maps from domain to range with a simple `mx + b` formula.
      *

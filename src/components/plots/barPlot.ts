@@ -1,8 +1,8 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Abstract {
-  export class BarPlot<X,Y> extends XYPlot<X,Y> {
+export module Plot {
+  export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     private static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
@@ -23,7 +23,7 @@ export module Abstract {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
+    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
@@ -44,7 +44,7 @@ export module Abstract {
     public _paint() {
       var attrToProjector = this._generateAttrToProjector();
       var datasets = this.datasets();
-      var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       var positionAttr = this._isVertical ? "y" : "x";
       var dimensionAttr = this._isVertical ? "height" : "width";
@@ -107,7 +107,7 @@ export module Abstract {
      */
      public barAlignment(alignment: string) {
        var alignmentLC = alignment.toLowerCase();
-       var align2factor = (<typeof BarPlot> this.constructor)._BarAlignmentToFactor;
+       var align2factor = (<typeof AbstractBarPlot> this.constructor)._BarAlignmentToFactor;
        if (align2factor[alignmentLC] === undefined) {
          throw new Error("unsupported bar alignment");
        }
@@ -190,9 +190,9 @@ export module Abstract {
       return this;
     }
 
-    public _updateDomainer(scale: Scale<any, number>) {
-      if (scale instanceof Abstract.QuantitativeScale) {
-        var qscale = <Abstract.QuantitativeScale<any>> scale;
+    public _updateDomainer(scale: Scale.AbstractScale<any, number>) {
+      if (scale instanceof Scale.Quantitative) {
+        var qscale = <Scale.Quantitative<any>> scale;
         if (!qscale._userSetDomainer) {
           if (this._baselineValue != null) {
             qscale.domainer()
@@ -230,15 +230,15 @@ export module Abstract {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale: Abstract.Scale<any,number>    = this._isVertical ? this._yScale : this._xScale;
-      var secondaryScale: Abstract.Scale<any,number>  = this._isVertical ? this._xScale : this._yScale;
+      var primaryScale: Scale.AbstractScale<any,number>    = this._isVertical ? this._yScale : this._xScale;
+      var secondaryScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
       var primaryAttr     = this._isVertical ? "y" : "x";
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
                       && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       if (!attrToProjector["width"]) {
-        var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : BarPlot.DEFAULT_WIDTH;
+        var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : AbstractBarPlot.DEFAULT_WIDTH;
         attrToProjector["width"] = (d: any, i: number) => constantWidth;
       }
 

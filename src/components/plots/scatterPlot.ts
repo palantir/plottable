@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class Scatter<X,Y> extends Abstract.XYPlot<X,Y> {
+  export class Scatter<X,Y> extends AbstractXYPlot<X,Y> {
 
     public _animators: Animator.PlotAnimatorMap = {
       "circles-reset" : new Animator.Null(),
@@ -19,7 +19,7 @@ export module Plot {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>) {
+    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
       super(xScale, yScale);
       this.classed("scatter-plot", true);
       this.project("r", 3); // default
@@ -32,7 +32,7 @@ export module Plot {
      * "fill"]. "cx" and "cy" are aliases for "x" and "y". "r" is the datum's
      * radius, and "fill" is the CSS color of the datum.
      */
-    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       attrToSet = attrToSet === "cx" ? "x" : attrToSet;
       attrToSet = attrToSet === "cy" ? "y" : attrToSet;
       super.project(attrToSet, accessor, scale);

@@ -56,7 +56,7 @@ export module Interaction {
       return this;
     }
 
-    public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
+    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       var cname = DragBox.CLASS_DRAG_BOX;
       var background = this._componentToListenTo._backgroundContainer;

@@ -2,8 +2,8 @@
 
 module Plottable {
 export module Plot {
-  export class Grid extends Abstract.XYPlot<string,string> {
-    public _colorScale: Abstract.Scale<any, string>;
+  export class Grid extends AbstractXYPlot<string,string> {
+    public _colorScale: Scale.AbstractScale<any, string>;
     public _xScale: Scale.Ordinal;
     public _yScale: Scale.Ordinal;
 
@@ -23,7 +23,7 @@ export module Plot {
      * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
      * to use for each grid cell.
      */
-    constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale<any, string>) {
+    constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>) {
       super(xScale, yScale);
       this.classed("grid-plot", true);
 
@@ -47,7 +47,7 @@ export module Plot {
      * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
      * the data should return a valid CSS color.
      */
-    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "fill") {
         this._colorScale = this._projectors["fill"].scale;

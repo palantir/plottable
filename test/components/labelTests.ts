@@ -87,7 +87,7 @@ describe("Labels", () => {
     var svg = generateSVG(400, 400);
     var label = new Plottable.Component.TitleLabel("X");
     var t = new Plottable.Component.Table().addComponent(0, 0, label)
-                                 .addComponent(1, 0, new Plottable.Abstract.Component());
+                                 .addComponent(1, 0, new Plottable.Component.AbstractComponent());
     t.renderTo(svg);
     var textTranslate = d3.transform(label._content.select("g").attr("transform")).translate;
     var eleTranslate  = d3.transform(label._element.attr("transform")).translate;

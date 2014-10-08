@@ -9,7 +9,7 @@ export module Component {
       (datum?: string): any;
   }
 
-  export class Legend extends Abstract.Component {
+  export class Legend extends AbstractComponent {
     /**
      * The css class applied to each legend row
      */

@@ -37,7 +37,7 @@ export module Core {
    *
    * The listeners are called synchronously.
    */
-  export class Broadcaster extends Abstract.PlottableObject {
+  export class Broadcaster extends Core.PlottableObject {
     private key2callback = new _Util.StrictEqualityAssociativeArray();
     public listenable: Listenable;
 

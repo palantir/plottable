@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Abstract {
-  export class _Drawer {
+export module _Drawer {
+  export class AbstractDrawer {
     public _renderArea: D3.Selection;
     public key: string;
 

@@ -6,11 +6,11 @@ function generateBasicTable(nRows: number, nCols: number) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
   // child being a basic component
   var table = new Plottable.Component.Table();
-  var rows: Plottable.Abstract.Component[][] = [];
-  var components: Plottable.Abstract.Component[] = [];
+  var rows: Plottable.Component.AbstractComponent[][] = [];
+  var components: Plottable.Component.AbstractComponent[] = [];
   for(var i = 0; i<nRows; i++) {
     for(var j = 0; j<nCols; j++) {
-      var r = new Plottable.Abstract.Component();
+      var r = new Plottable.Component.AbstractComponent();
       table.addComponent(i, j, r);
       components.push(r);
     }
@@ -37,25 +37,25 @@ describe("Tables", () => {
 
     (<any> t).padTableToSize(5,2);
     assert.lengthOf(rows, 5, "there are five rows");
-    rows.forEach((r: Plottable.Abstract.Component[]) => assert.lengthOf(r, 2, "there are two columsn per row"));
+    rows.forEach((r: Plottable.Component.AbstractComponent[]) => assert.lengthOf(r, 2, "there are two columsn per row"));
     assert.equal(rows[0][0], firstComponent, "the first component is unchanged");
   });
 
   it("table constructor can take a list of lists of components", () => {
-    var c0 = new Plottable.Abstract.Component();
+    var c0 = new Plottable.Component.AbstractComponent();
     var row1 = [null, c0];
-    var row2 = [new Plottable.Abstract.Component(), null];
+    var row2 = [new Plottable.Component.AbstractComponent(), null];
     var table = new Plottable.Component.Table([row1, row2]);
     assert.equal((<any> table).rows[0][1], c0, "the component is in the right spot");
-    var c1 = new Plottable.Abstract.Component();
+    var c1 = new Plottable.Component.AbstractComponent();
     table.addComponent(2, 2, c1);
     assert.equal((<any> table).rows[2][2], c1, "the inserted component went to the right spot");
   });
 
   it("tables can be constructed by adding components in matrix style", () => {
     var table = new Plottable.Component.Table();
-    var c1 = new Plottable.Abstract.Component();
-    var c2 = new Plottable.Abstract.Component();
+    var c1 = new Plottable.Component.AbstractComponent();
+    var c2 = new Plottable.Component.AbstractComponent();
     table.addComponent(0, 0, c1);
     table.addComponent(1, 1, c2);
     var rows = (<any> table).rows;
@@ -69,9 +69,9 @@ describe("Tables", () => {
   });
 
   it("can't add a component where one already exists", () => {
-    var c1 = new Plottable.Abstract.Component();
-    var c2 = new Plottable.Abstract.Component();
-    var c3 = new Plottable.Abstract.Component();
+    var c1 = new Plottable.Component.AbstractComponent();
+    var c2 = new Plottable.Component.AbstractComponent();
+    var c3 = new Plottable.Component.AbstractComponent();
     var t = new Plottable.Component.Table();
     t.addComponent(0, 2, c1);
     t.addComponent(0, 0, c2);
@@ -82,8 +82,8 @@ describe("Tables", () => {
     // Solves #180, a weird bug
     var t = new Plottable.Component.Table();
     var svg = generateSVG();
-    t.addComponent(1, 0, new Plottable.Abstract.Component());
-    t.addComponent(0, 2, new Plottable.Abstract.Component());
+    t.addComponent(1, 0, new Plottable.Component.AbstractComponent());
+    t.addComponent(0, 2, new Plottable.Component.AbstractComponent());
     t.renderTo(svg); //would throw an error without the fix (tested);
     svg.remove();
   });
@@ -135,7 +135,7 @@ describe("Tables", () => {
 
   it("table with fixed-size objects on every side lays out properly", () => {
     var svg = generateSVG();
-    var c4 = new Plottable.Abstract.Component();
+    var c4 = new Plottable.Component.AbstractComponent();
     // [0 1 2] \\
     // [3 4 5] \\
     // [6 7 8] \\
@@ -189,7 +189,7 @@ describe("Tables", () => {
   it.skip("table._requestedSpace works properly", () => {
     // [0 1]
     // [2 3]
-    var c0 = new Plottable.Abstract.Component();
+    var c0 = new Plottable.Component.AbstractComponent();
     var c1 = makeFixedSizeComponent(50, 50);
     var c2 = makeFixedSizeComponent(20, 50);
     var c3 = makeFixedSizeComponent(20, 20);
@@ -222,10 +222,10 @@ describe("Tables", () => {
       assert.deepEqual(result.wantsHeight, wH, "wantsHeight:" + id);
     }
 
-    var c1 = new Plottable.Abstract.Component();
-    var c2 = new Plottable.Abstract.Component();
-    var c3 = new Plottable.Abstract.Component();
-    var c4 = new Plottable.Abstract.Component();
+    var c1 = new Plottable.Component.AbstractComponent();
+    var c2 = new Plottable.Component.AbstractComponent();
+    var c3 = new Plottable.Component.AbstractComponent();
+    var c4 = new Plottable.Component.AbstractComponent();
     var table = new Plottable.Component.Table([
       [c1, c2],
       [c3, c4]]);
@@ -278,12 +278,12 @@ describe("Tables", () => {
   });
 
   describe("table._removeComponent works properly", () => {
-    var c1 = new Plottable.Abstract.Component();
-    var c2 = new Plottable.Abstract.Component();
-    var c3 = new Plottable.Abstract.Component();
-    var c4 = new Plottable.Abstract.Component();
-    var c5 = new Plottable.Abstract.Component();
-    var c6 = new Plottable.Abstract.Component();
+    var c1 = new Plottable.Component.AbstractComponent();
+    var c2 = new Plottable.Component.AbstractComponent();
+    var c3 = new Plottable.Component.AbstractComponent();
+    var c4 = new Plottable.Component.AbstractComponent();
+    var c5 = new Plottable.Component.AbstractComponent();
+    var c6 = new Plottable.Component.AbstractComponent();
     var table: Plottable.Component.Table;
     it("table._removeComponent works in basic case", () => {
       table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);

@@ -1,14 +1,14 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Abstract {
+export module Plot {
   interface StackedDatum {
     key: any;
     value: number;
     offset?: number;
   }
 
-  export class Stacked<X, Y> extends Abstract.XYPlot<X, Y> {
+  export class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
     private stackedExtent = [0, 0];
     public _isVertical: boolean;
 
@@ -136,7 +136,7 @@ export module Abstract {
 
     public _updateScaleExtents() {
       super._updateScaleExtents();
-      var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
       if (!primaryScale) {
         return;
       }

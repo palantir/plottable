@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Abstract {
-  export class QuantitativeScale<D> extends Scale<D, number> {
+export module Scale {
+  export class Quantitative<D> extends AbstractScale<D, number> {
     public _d3Scale: D3.Scale.QuantitativeScale;
     public _numTicks = 10;
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1;
@@ -11,14 +11,14 @@ export module Abstract {
     public _typeCoercer = (d: any) => +d;
 
     /**
-     * Constructs a new QuantitativeScale.
+     * Constructs a new Scale.Quantitative.
      *
-     * A QuantitativeScale is a Scale that maps anys to numbers. It
+     * A Scale.Quantitative is a Scale that maps anys to numbers. It
      * is invertible and continuous.
      *
      * @constructor
      * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale
-     * backing the QuantitativeScale.
+     * backing the Scale.Quantitative.
      */
     constructor(scale: D3.Scale.QuantitativeScale) {
       super(scale);
@@ -39,16 +39,16 @@ export module Abstract {
     }
 
     /**
-     * Creates a copy of the QuantitativeScale with the same domain and range but without any registered listeners.
+     * Creates a copy of the Scale.QuantitativeScale with the same domain and range but without any registered list.
      *
-     * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
+     * @returns {Scale.QuantitativeScale} A copy of the calling Scale.Quantitative.
      */
-    public copy(): QuantitativeScale<D> {
-      return new QuantitativeScale<D>(this._d3Scale.copy());
+    public copy(): Quantitative<D> {
+      return new Quantitative<D>(this._d3Scale.copy());
     }
 
     public domain(): D[];
-    public domain(values: D[]): QuantitativeScale<D>;
+    public domain(values: D[]): Quantitative<D>;
     public domain(values?: D[]): any {
       return super.domain(values); // need to override type sig to enable method chaining :/
     }
@@ -63,13 +63,13 @@ export module Abstract {
     }
 
     /**
-     * Sets or gets the QuantitativeScale's output interpolator
+     * Sets or gets the Scale.QuantitativeScale's output interpr
      *
      * @param {D3.Transition.Interpolate} [factory] The output interpolator to use.
-     * @returns {D3.Transition.Interpolate|QuantitativeScale} The current output interpolator, or the calling QuantitativeScale.
+     * @returns {D3.Transition.Interpolate|Scale.QuantitativeScale} The current output interpolator, or the calling Scale.Quantitative.
      */
     public interpolate(): D3.Transition.Interpolate;
-    public interpolate(factory: D3.Transition.Interpolate): QuantitativeScale<D>;
+    public interpolate(factory: D3.Transition.Interpolate): Quantitative<D>;
     public interpolate(factory?: D3.Transition.Interpolate): any {
       if (factory == null) {
         return this._d3Scale.interpolate();
@@ -79,7 +79,7 @@ export module Abstract {
     }
 
     /**
-     * Sets the range of the QuantitativeScale and sets the interpolator to d3.interpolateRound.
+     * Sets the range of the Scale.QuantitativeScale and sets the interpolator to d3.interpolate.
      *
      * @param {number[]} values The new range value for the range.
      */
@@ -89,18 +89,18 @@ export module Abstract {
     }
 
     /**
-     * Gets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
+     * Gets the clamp status of the Scale.QuantitativeScale (whether to cut off values outside the ouput r.
      *
      * @returns {boolean} The current clamp status.
      */
     public clamp(): boolean;
     /**
-     * Sets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
+     * Sets the clamp status of the Scale.QuantitativeScale (whether to cut off values outside the ouput r.
      *
-     * @param {boolean} clamp Whether or not to clamp the QuantitativeScale.
-     * @returns {QuantitativeScale} The calling QuantitativeScale.
+     * @param {boolean} clamp Whether or not to clamp the Scale.Quantitative.
+     * @returns {Scale.QuantitativeScale} The calling Scale.Quantitative.
      */
-    public clamp(clamp: boolean): QuantitativeScale<D>;
+    public clamp(clamp: boolean): Quantitative<D>;
     public clamp(clamp?: boolean): any {
       if (clamp == null) {
         return this._d3Scale.clamp();
@@ -133,7 +133,7 @@ export module Abstract {
      * @param {number} count The new default number of ticks.
      * @returns {Scale} The calling Scale.
      */
-    public numTicks(count: number): QuantitativeScale<D>;
+    public numTicks(count: number): Quantitative<D>;
     public numTicks(count?: number): any {
       if (count == null) {
         return this._numTicks;
@@ -166,9 +166,9 @@ export module Abstract {
      * includes 0, etc., will be the responsability of the new domainer.
      *
      * @param {Domainer} domainer If provided, the new domainer.
-     * @return {QuanitativeScale} The calling QuantitativeScale.
+     * @return {QuanitativeScale} The calling Scale.Quantitative.
      */
-    public domainer(domainer: Domainer): QuantitativeScale<D>;
+    public domainer(domainer: Domainer): Quantitative<D>;
     public domainer(domainer?: Domainer): any {
       if (domainer == null) {
         return this._domainer;

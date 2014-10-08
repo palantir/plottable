@@ -1,8 +1,8 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Abstract {
-  export class Plot extends Component {
+export module Plot {
+  export class AbstractPlot extends Component.AbstractComponent {
     public _dataChanged = false;
     public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
     public _datasetKeysInOrder: string[];
@@ -71,11 +71,11 @@ export module Abstract {
      * @param {any[]|Dataset} dataset dataset to add.
      * @returns {Plot} The calling Plot.
      */
-    public addDataset(key: string, dataset: Dataset): Plot;
-    public addDataset(key: string, dataset: any[]): Plot;
-    public addDataset(dataset: Dataset): Plot;
-    public addDataset(dataset: any[]): Plot;
-    public addDataset(keyOrDataset: any, dataset?: any): Plot {
+    public addDataset(key: string, dataset: Dataset): AbstractPlot;
+    public addDataset(key: string, dataset: any[]): AbstractPlot;
+    public addDataset(dataset: Dataset): AbstractPlot;
+    public addDataset(dataset: any[]): AbstractPlot;
+    public addDataset(keyOrDataset: any, dataset?: any): AbstractPlot {
       if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
         throw new Error("invalid input to addDataset");
       }
@@ -106,11 +106,11 @@ export module Abstract {
       this._onDatasetUpdate();
     }
 
-    public _getDrawer(key: string): Abstract._Drawer {
-      return new Abstract._Drawer(key);
+    public _getDrawer(key: string): _Drawer.AbstractDrawer {
+      return new _Drawer.AbstractDrawer(key);
     }
 
-    public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.PlotAnimator {
+    public _getAnimator(drawer: _Drawer.AbstractDrawer, index: number): Animator.PlotAnimator {
       return new Animator.Null();
     }
 
@@ -139,19 +139,19 @@ export module Abstract {
      * `d[accessor]` is used. If anything else, use `accessor` as a constant
      * across all data points.
      *
-     * @param {Abstract.Scale} scale If provided, the result of the accessor
+     * @param {Scale.AbstractScale} scale If provided, the result of the accessor
      * is passed through the scale, such as `scale.scale(accessor(d, i))`.
      *
      * @returns {Plot} The calling Plot.
      */
-    public attr(attrToSet: string, accessor: any, scale?: Abstract.Scale<any,any>) {
+    public attr(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any,any>) {
       return this.project(attrToSet, accessor, scale);
     }
 
     /**
      * Identical to plot.attr
      */
-    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
       var currentProjection = this._projectors[attrToSet];
       var existingScale = currentProjection && currentProjection.scale;
@@ -269,7 +269,7 @@ export module Abstract {
      * the specified key.
      * @returns {Plot} The calling Plot.
      */
-    public animator(animatorKey: string, animator: Animator.PlotAnimator): Plot;
+    public animator(animatorKey: string, animator: Animator.PlotAnimator): AbstractPlot;
     public animator(animatorKey: string, animator?: Animator.PlotAnimator): any {
       if (animator === undefined){
         return this._animators[animatorKey];
@@ -293,7 +293,7 @@ export module Abstract {
      *
      * @returns {Plot} The calling Plot.
      */
-    public datasetOrder(order: string[]): Plot;
+    public datasetOrder(order: string[]): AbstractPlot;
     public datasetOrder(order?: string[]): any {
       if (order === undefined) {
         return this._datasetKeysInOrder;
@@ -318,7 +318,7 @@ export module Abstract {
      * @param {string} key The key of the dataset
      * @return {Plot} The calling Plot.
      */
-    public removeDataset(key: string): Plot {
+    public removeDataset(key: string): AbstractPlot {
       if (this._key2DatasetDrawerKey.has(key)) {
         var ddk = this._key2DatasetDrawerKey.get(key);
         ddk.drawer.remove();
@@ -343,7 +343,7 @@ export module Abstract {
       return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).dataset);
     }
 
-    public _getDrawersInOrder(): Abstract._Drawer[] {
+    public _getDrawersInOrder(): _Drawer.AbstractDrawer[] {
       return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).drawer);
     }
 

@@ -60,7 +60,7 @@ describe("Scales", () => {
 
     it("scale autorange works as expected with single dataset", () => {
       var svg = generateSVG(100, 100);
-      var renderer = new Plottable.Abstract.Plot()
+      var renderer = new Plottable.Plot.AbstractPlot()
                         .addDataset(dataset)
                         .project("x", "foo", scale)
                         .renderTo(svg);
@@ -74,11 +74,11 @@ describe("Scales", () => {
     it("scale reference counting works as expected", () => {
       var svg1 = generateSVG(100, 100);
       var svg2 = generateSVG(100, 100);
-      var renderer1 = new Plottable.Abstract.Plot()
+      var renderer1 = new Plottable.Plot.AbstractPlot()
                           .addDataset(dataset)
                           .project("x", "foo", scale);
       renderer1.renderTo(svg1);
-      var renderer2 = new Plottable.Abstract.Plot()
+      var renderer2 = new Plottable.Plot.AbstractPlot()
                           .addDataset(dataset)
                           .project("x", "foo", scale);
       renderer2.renderTo(svg2);

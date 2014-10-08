@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Abstract {
-  export class Dispatcher extends PlottableObject {
+export module Dispatcher {
+  export class AbstractDispatcher extends Core.PlottableObject {
     public _target: D3.Selection;
     public _event2Callback: { [eventName: string]: () => any; } = {};
     private connected = false;
@@ -29,7 +29,7 @@ export module Abstract {
      * @param {D3.Selection} target The element to listen for updates on.
      * @returns {Dispatcher} The calling Dispatcher.
      */
-    public target(targetElement: D3.Selection): Dispatcher;
+    public target(targetElement: D3.Selection): AbstractDispatcher;
     public target(targetElement?: D3.Selection): any {
       if (targetElement == null) {
         return this._target;

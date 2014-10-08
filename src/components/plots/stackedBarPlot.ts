@@ -2,8 +2,7 @@
 
 module Plottable {
 export module Plot {
-
-  export class StackedBar<X,Y> extends Abstract.Stacked<X, Y> {
+  export class StackedBar<X,Y> extends AbstractStacked<X, Y> {
     public _baselineValue: number;
     public _baseline: D3.Selection;
     public _barAlignmentFactor: number;
@@ -17,7 +16,7 @@ export module Plot {
      * @param {Scale} yScale the y scale of the plot.
      * @param {boolean} isVertical if the plot if vertical.
      */
-    constructor(xScale?: Abstract.Scale<X,number>, yScale?: Abstract.Scale<Y,number>, isVertical = true) {
+    constructor(xScale?: Scale.AbstractScale<X,number>, yScale?: Scale.AbstractScale<Y,number>, isVertical = true) {
       this._isVertical = isVertical; // Has to be set before super()
       this._baselineValue = 0;
       this._barAlignmentFactor = 0.5;
@@ -29,24 +28,24 @@ export module Plot {
     }
 
     public _setup() {
-      Abstract.BarPlot.prototype._setup.call(this);
+      AbstractBarPlot.prototype._setup.call(this);
     }
 
-    public _getAnimator(drawer: Abstract._Drawer, index: number) {
-      var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
+    public _getAnimator(drawer: _Drawer.AbstractDrawer, index: number) {
+      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       return new Animator.MovingRect(scaledBaseline, this._isVertical);
     }
 
     public _getDrawer(key: string) {
-      return Abstract.BarPlot.prototype._getDrawer.apply(this, [key]);
+      return AbstractBarPlot.prototype._getDrawer.apply(this, [key]);
     }
 
     public _generateAttrToProjector() {
-      var attrToProjector = Abstract.BarPlot.prototype._generateAttrToProjector.apply(this);
+      var attrToProjector = AbstractBarPlot.prototype._generateAttrToProjector.apply(this);
 
       var primaryAttr = this._isVertical ? "y" : "x";
-      var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var primaryAccessor = this._projectors[primaryAttr].accessor;
       var getStart = (d: any) => primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
       var getEnd = (d: any) => primaryScale.scale(primaryAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
@@ -63,7 +62,7 @@ export module Plot {
 
     public _paint() {
       super._paint();
-      var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       var baselineAttr: any = {
         "x1": this._isVertical ? 0 : scaledBaseline,
@@ -75,19 +74,19 @@ export module Plot {
     }
 
     public baseline(value: number) {
-      return Abstract.BarPlot.prototype.baseline.apply(this, [value]);
+      return AbstractBarPlot.prototype.baseline.apply(this, [value]);
     }
 
-    public _updateDomainer(scale: Abstract.Scale<any,number>) {
-      return Abstract.BarPlot.prototype._updateDomainer.apply(this, [scale]);
+    public _updateDomainer(scale: Scale.AbstractScale<any,number>) {
+      return AbstractBarPlot.prototype._updateDomainer.apply(this, [scale]);
     }
 
     public _updateXDomainer() {
-      return Abstract.BarPlot.prototype._updateXDomainer.apply(this);
+      return AbstractBarPlot.prototype._updateXDomainer.apply(this);
     }
 
     public _updateYDomainer() {
-      return Abstract.BarPlot.prototype._updateYDomainer.apply(this);
+      return AbstractBarPlot.prototype._updateYDomainer.apply(this);
     }
   }
 }

@@ -12,7 +12,7 @@ export module Plot {
    *   "outer-radius" - Accessor determining the distance from the center to the outer edge of the sector
    *   "value" - Accessor to extract the value determining the proportion of each slice to the total
    */
-  export class Pie extends Abstract.Plot {
+  export class Pie extends AbstractPlot {
 
     private static DEFAULT_COLOR_SCALE = new Scale.Color();
 
@@ -70,7 +70,7 @@ export module Plot {
       return retargetedAttrToProjector;
     }
 
-    public _getDrawer(key: string): Abstract._Drawer {
+    public _getDrawer(key: string): _Drawer.AbstractDrawer {
       return new Plottable._Drawer.Arc(key);
     }
 

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scale {
-  export class Time extends Abstract.QuantitativeScale<any> {
+  export class Time extends Scale.Quantitative<any> {
     public _typeCoercer = (d: any) => d && d._isAMomentObject || d instanceof Date ? d : new Date(d);
 
     /**
