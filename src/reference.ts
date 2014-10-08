@@ -8,6 +8,7 @@
 /// <reference path="utils/domUtils.ts" />
 
 /// <reference path="utils/formatters.ts" />
+/// <reference path="utils/tickGenerators.ts" />
 
 /// <reference path="core/version.ts" />
 /// <reference path="core/colors.ts" />

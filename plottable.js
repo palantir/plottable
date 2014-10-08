@@ -1303,6 +1303,33 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    (function (TickGenerators) {
+        /**
+         * Creates a tick generator using specific interval.
+         *
+         * @param {number} [interval] The interval between two  ticks.
+         *
+         * @returns {TickGenerator} A tick generator using specific interval.
+         */
+        function intervalTickGenerator(interval) {
+            return function (s) {
+                var dom = s.domain();
+                var generatedTicks = [];
+                var startIndex = Math.ceil(dom[0] / interval);
+                for (var index = startIndex; index * interval <= dom[1]; index++) {
+                    generatedTicks[index - startIndex] = index * interval;
+                }
+                return generatedTicks;
+            };
+        }
+        TickGenerators.intervalTickGenerator = intervalTickGenerator;
+    })(Plottable.TickGenerators || (Plottable.TickGenerators = {}));
+    var TickGenerators = Plottable.TickGenerators;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     Plottable.version = "0.32.0";
 })(Plottable || (Plottable = {}));
 

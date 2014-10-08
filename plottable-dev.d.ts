@@ -477,6 +477,20 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module TickGenerators {
+        /**
+         * Creates a tick generator using specific interval.
+         *
+         * @param {number} [interval] The interval between two  ticks.
+         *
+         * @returns {TickGenerator} A tick generator using specific interval.
+         */
+        function intervalTickGenerator(interval: number): (s: Abstract.QuantitativeScale<any>) => number[];
+    }
+}
+
+
+declare module Plottable {
     var version: string;
 }
 

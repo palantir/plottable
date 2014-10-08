@@ -48,6 +48,7 @@
 ///<reference path="utils/cacheTests.ts" />
 ///<reference path="utils/textUtilsTests.ts" />
 ///<reference path="utils/utilsTests.ts" />
+///<reference path="utils/tickGeneratorsTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />
 
