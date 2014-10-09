@@ -216,5 +216,46 @@ describe("Plots", () => {
       var key2callback = (<any> s).broadcaster.key2callback;
       assert.isUndefined(key2callback.get(r), "the plot is no longer attached to the scale");
     });
+
+    it("extent registration works as intended", () => {
+      var scale1 = new Plottable.Scale.Linear();
+      var scale2 = new Plottable.Scale.Linear();
+
+      var d1 = new Plottable.Dataset([1,2,3]);
+      var d2 = new Plottable.Dataset([4,99,999]);
+      var d3 = new Plottable.Dataset([-1, -2, -3]);
+
+      var id = (d: number) => d;
+      var plot1 = new Plottable.Plot.AbstractPlot();
+      var plot2 = new Plottable.Plot.AbstractPlot();
+      var svg = generateSVG(400, 400);
+      plot1.attr("null", id, scale1);
+      plot2.attr("null", id, scale1);
+      plot1.renderTo(svg);
+      plot2.renderTo(svg);
+
+      function assertDomainIsClose(actualDomain: number[], expectedDomain: number[], msg: string) {
+        // to avoid floating point issues :/
+        assert.closeTo(actualDomain[0], expectedDomain[0], 0.01, msg);
+        assert.closeTo(actualDomain[1], expectedDomain[1], 0.01, msg);
+      }
+
+      plot1.addDataset(d1);
+      assertDomainIsClose(scale1.domain(), [1, 3], "scale includes plot1 projected data");
+
+      plot2.addDataset(d2);
+      assertDomainIsClose(scale1.domain(), [1, 999], "scale extent includes plot1 and plot2");
+
+      plot2.addDataset(d3);
+      assertDomainIsClose(scale1.domain(), [-3, 999], "extent widens further if we add more data to plot2");
+
+      plot2.removeDataset(d3);
+      assertDomainIsClose(scale1.domain(), [1, 999], "extent shrinks if we remove dataset");
+
+      plot2.attr("null", id, scale2);
+      assertDomainIsClose(scale1.domain(), [1, 3], "extent shrinks further if we project plot2 away");
+
+      svg.remove();
+    });
   });
 });
