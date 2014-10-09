@@ -481,6 +481,8 @@ declare module Plottable {
         /**
          * Creates a tick generator using specific interval.
          *
+         * It generates ticks at multiples of the interval including the domain boundaries
+         *
          * @param {number} [interval] The interval between two ticks.
          *
          * @returns {TickGenerator} A tick generator using specific interval.

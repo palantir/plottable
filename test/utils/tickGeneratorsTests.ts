@@ -11,11 +11,12 @@ describe("Tick generators", () => {
       assert.isTrue(ticks.map(t => t >= start && t <= end).reduce((a, b) => a && b, true), "generated ticks are within domain");
     });
 
-    it("generates multiplication of interval", () => {
+    it("generates multiplication of interval or domain boundaries", () => {
       var start = 5, end = 34, interval = 4;
       var scale = new Plottable.Scale.Linear().domain([start, end]);
       var ticks = Plottable.TickGenerators.intervalTickGenerator(interval)(scale);
-      assert.isTrue(ticks.map(t => t % interval === 0).reduce((a, b) => a && b, true), "generated ticks are mulitplication of interval");
+      assert.isTrue(ticks.map(t => t % interval === 0 || t === start || t === end).reduce((a, b) => a && b, true),
+        "generated ticks are mulitplication of interval or domain boundaries");
     });
 
     it("generated ticks contains both ends if they meet constraint", () => {

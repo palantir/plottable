@@ -5691,11 +5691,11 @@ describe("Tick generators", function () {
             var ticks = Plottable.TickGenerators.intervalTickGenerator(interval)(scale);
             assert.isTrue(ticks.map(function (t) { return t >= start && t <= end; }).reduce(function (a, b) { return a && b; }, true), "generated ticks are within domain");
         });
-        it("generates multiplication of interval", function () {
+        it("generates multiplication of interval or domain boundaries", function () {
             var start = 5, end = 34, interval = 4;
             var scale = new Plottable.Scale.Linear().domain([start, end]);
             var ticks = Plottable.TickGenerators.intervalTickGenerator(interval)(scale);
-            assert.isTrue(ticks.map(function (t) { return t % interval === 0; }).reduce(function (a, b) { return a && b; }, true), "generated ticks are mulitplication of interval");
+            assert.isTrue(ticks.map(function (t) { return t % interval === 0 || t === start || t === end; }).reduce(function (a, b) { return a && b; }, true), "generated ticks are mulitplication of interval or domain boundaries");
         });
         it("generated ticks contains both ends if they meet constraint", function () {
             var start = 4, end = 32, interval = 4;
