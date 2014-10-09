@@ -2535,13 +2535,28 @@ declare module Plottable {
              */
             datasetOrder(order: string[]): Plot;
             /**
-             * Removes a dataset
+             * Removes a dataset by string key
              *
              * @param {string} key The key of the dataset
              * @return {Plot} The calling Plot.
              */
             removeDataset(key: string): Plot;
-            _getDatasetsInOrder(): Dataset[];
+            /**
+             * Remove a dataset given the dataset itself
+             *
+             * @param {Dataset} dataset The dataset to remove
+             * @return {Plot} The calling Plot.
+             */
+            removeDataset(dataset: Dataset): Plot;
+            /**
+             * Remove a dataset given the underlying data array
+             *
+             * @param {any[]} dataArray The data to remove
+             * @return {Plot} The calling Plot.
+             */
+            removeDataset(dataArray: any[]): Plot;
+            _removeDataset(key: string): Plot;
+            datasets(): Dataset[];
             _getDrawersInOrder(): _Drawer[];
             _paint(): void;
         }

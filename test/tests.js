@@ -1551,7 +1551,7 @@ describe("Plots", function () {
         it("Plot automatically generates a Dataset if only data is provided", function () {
             var data = ["foo", "bar"];
             var r = new Plottable.Abstract.Plot().addDataset("foo", data);
-            var dataset = r._getDatasetsInOrder()[0];
+            var dataset = r.datasets()[0];
             assert.isNotNull(dataset, "A Dataset was automatically generated");
             assert.deepEqual(dataset.data(), data, "The generated Dataset has the correct data");
         });
@@ -1576,6 +1576,62 @@ describe("Plots", function () {
             assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
             svg1.remove();
             svg2.remove();
+        });
+        describe("Dataset removal", function () {
+            var plot;
+            var d1;
+            var d2;
+            beforeEach(function () {
+                plot = new Plottable.Abstract.Plot();
+                d1 = new Plottable.Dataset();
+                d2 = new Plottable.Dataset();
+                plot.addDataset("foo", d1);
+                plot.addDataset("bar", d2);
+                assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
+            });
+            it("removeDataset can work on keys", function () {
+                plot.removeDataset("bar");
+                assert.deepEqual(plot.datasets(), [d1], "second dataset removed");
+                plot.removeDataset("foo");
+                assert.deepEqual(plot.datasets(), [], "all datasets removed");
+            });
+            it("removeDataset can work on datasets", function () {
+                plot.removeDataset(d2);
+                assert.deepEqual(plot.datasets(), [d1], "second dataset removed");
+                plot.removeDataset(d1);
+                assert.deepEqual(plot.datasets(), [], "all datasets removed");
+            });
+            it("removeDataset ignores inputs that do not correspond to a dataset", function () {
+                var d3 = new Plottable.Dataset();
+                plot.removeDataset(d3);
+                plot.removeDataset("bad key");
+                assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
+            });
+            it("removeDataset functions on inputs that are data arrays, not datasets", function () {
+                var a1 = ["foo", "bar"];
+                var a2 = [1, 2, 3];
+                plot.addDataset(a1);
+                plot.addDataset(a2);
+                assert.lengthOf(plot.datasets(), 4, "there are four datasets");
+                assert.equal(plot.datasets()[3].data(), a2, "second array dataset correct");
+                assert.equal(plot.datasets()[2].data(), a1, "first array dataset correct");
+                plot.removeDataset(a2);
+                plot.removeDataset(a1);
+                assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
+            });
+            it("removeDataset behaves appropriately when the key 'undefined' is used", function () {
+                var a = [1, 2, 3];
+                plot.addDataset("undefined", a);
+                assert.lengthOf(plot.datasets(), 3, "there are three datasets initially");
+                plot.removeDataset("foofoofoofoofoofoofoofoo");
+                assert.lengthOf(plot.datasets(), 3, "there are three datasets after bad key removal");
+                plot.removeDataset(undefined);
+                assert.lengthOf(plot.datasets(), 3, "there are three datasets after removing `undefined`");
+                plot.removeDataset([94, 93, 92]);
+                assert.lengthOf(plot.datasets(), 3, "there are three datasets after removing random dataset");
+                plot.removeDataset("undefined");
+                assert.lengthOf(plot.datasets(), 2, "the dataset called 'undefined' could be removed");
+            });
         });
         it("remove() disconnects plots from its scales", function () {
             var r = new Plottable.Abstract.Plot();
@@ -1746,7 +1802,7 @@ describe("Plots", function () {
             var d4 = new Plottable.Dataset([10, 11, 12]);
             p.addDataset(d4);
             assert.deepEqual(p._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
-            var datasets = p._getDatasetsInOrder();
+            var datasets = p.datasets();
             assert.deepEqual(datasets[0].data(), [1, 2, 3]);
             assert.equal(datasets[1], d2);
             assert.deepEqual(datasets[2].data(), [7, 8, 9]);
@@ -1754,7 +1810,7 @@ describe("Plots", function () {
             p.removeDataset("foo");
             p.removeDataset("_0");
             assert.deepEqual(p._datasetKeysInOrder, ["bar", "_1"]);
-            assert.lengthOf(p._getDatasetsInOrder(), 2);
+            assert.lengthOf(p.datasets(), 2);
         });
         it("Datasets are listened to appropriately", function () {
             var callbackCounter = 0;

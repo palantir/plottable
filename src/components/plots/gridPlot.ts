@@ -56,7 +56,7 @@ export module Plot {
     }
 
     public _paint() {
-      var dataset = this._getDatasetsInOrder()[0];
+      var dataset = this.datasets()[0];
       var cells = this._renderArea.selectAll("rect").data(dataset.data());
       cells.enter().append("rect");
 

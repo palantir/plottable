@@ -43,7 +43,7 @@ export module Abstract {
     // HACKHACK #1106 - should use drawers for paint logic
     public _paint() {
       var attrToProjector = this._generateAttrToProjector();
-      var datasets = this._getDatasetsInOrder();
+      var datasets = this.datasets();
       var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       var positionAttr = this._isVertical ? "y" : "x";

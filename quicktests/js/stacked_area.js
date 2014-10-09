@@ -18,9 +18,9 @@ function run(div, data, Plottable) {
 
   xScale.rangeType("points");
 
-  if (!Plottable.Plot.Area) {
-    return;
-  }
+  // if (!Plottable.Plot.Area) {
+  //   return;
+  // }
   var stackedAreaPlot = new Plottable.Plot.StackedArea(xScale, yScale)
     .project("x", "name", xScale)
     .project("y", "y", yScale)

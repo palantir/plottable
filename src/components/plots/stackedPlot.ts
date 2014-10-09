@@ -41,7 +41,7 @@ export module Abstract {
     }
 
     private updateStackExtents() {
-      var datasets = this._getDatasetsInOrder();
+      var datasets = this.datasets();
       var valueAccessor = this.valueAccessor();
       var maxStackExtent = _Util.Methods.max(datasets, (dataset: Dataset) => {
         return _Util.Methods.max(dataset.data(), (datum: any) => {
@@ -84,7 +84,7 @@ export module Abstract {
       var keyAccessor = this.keyAccessor();
       var valueAccessor = this.valueAccessor();
 
-      this._getDatasetsInOrder().forEach((dataset, datasetIndex) => {
+      this.datasets().forEach((dataset, datasetIndex) => {
         var positiveDataMap = positiveDataMapArray[datasetIndex];
         var negativeDataMap = negativeDataMapArray[datasetIndex];
 
@@ -100,7 +100,7 @@ export module Abstract {
     private getDomainKeys(): string[] {
       var keyAccessor = this.keyAccessor();
       var domainKeys = d3.set();
-      var datasets = this._getDatasetsInOrder();
+      var datasets = this.datasets();
 
       datasets.forEach((dataset) => {
         dataset.data().forEach((datum) => {
@@ -114,7 +114,7 @@ export module Abstract {
     private generateDefaultMapArray(): D3.Map<StackedDatum>[] {
       var keyAccessor = this.keyAccessor();
       var valueAccessor = this.valueAccessor();
-      var datasets = this._getDatasetsInOrder();
+      var datasets = this.datasets();
       var domainKeys = this.getDomainKeys();
 
       var dataMapArray = datasets.map(() => {

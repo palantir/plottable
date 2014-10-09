@@ -24,7 +24,7 @@ describe("Plots", () => {
       p.addDataset(d4);
 
       assert.deepEqual(p._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
-      var datasets = p._getDatasetsInOrder();
+      var datasets = p.datasets();
       assert.deepEqual(datasets[0].data(), [1,2,3]);
       assert.equal(datasets[1], d2);
       assert.deepEqual(datasets[2].data(), [7,8,9]);
@@ -34,7 +34,7 @@ describe("Plots", () => {
       p.removeDataset("_0");
 
       assert.deepEqual(p._datasetKeysInOrder, ["bar", "_1"]);
-      assert.lengthOf(p._getDatasetsInOrder(), 2);
+      assert.lengthOf(p.datasets(), 2);
     });
 
     it("Datasets are listened to appropriately", () => {

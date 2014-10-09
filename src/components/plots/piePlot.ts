@@ -76,7 +76,7 @@ export module Plot {
 
     public _paint() {
       var attrHash = this._generateAttrToProjector();
-      var datasets = this._getDatasetsInOrder();
+      var datasets = this.datasets();
       this._getDrawersInOrder().forEach((d, i) => {
         var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
         var pieData = this.pie(datasets[i].data());

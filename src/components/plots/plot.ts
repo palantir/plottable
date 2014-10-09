@@ -313,13 +313,42 @@ export module Abstract {
     }
 
     /**
-     * Removes a dataset
+     * Removes a dataset by string key
      *
      * @param {string} key The key of the dataset
      * @return {Plot} The calling Plot.
      */
-    public removeDataset(key: string): Plot {
-      if (this._key2DatasetDrawerKey.has(key)) {
+    public removeDataset(key: string): Plot;
+    /**
+     * Remove a dataset given the dataset itself
+     *
+     * @param {Dataset} dataset The dataset to remove
+     * @return {Plot} The calling Plot.
+     */
+    public removeDataset(dataset: Dataset): Plot;
+    /**
+     * Remove a dataset given the underlying data array
+     *
+     * @param {any[]} dataArray The data to remove
+     * @return {Plot} The calling Plot.
+     */
+    public removeDataset(dataArray: any[]): Plot;
+    public removeDataset(datasetOrKeyOrArray: any): Plot {
+      var key: string;
+      if (typeof(datasetOrKeyOrArray) === "string") {
+        key = datasetOrKeyOrArray;
+      } else if (datasetOrKeyOrArray instanceof Dataset || datasetOrKeyOrArray instanceof Array) {
+        var array: any[] = (datasetOrKeyOrArray instanceof Dataset) ? this.datasets() : this.datasets().map(d => d.data());
+        var idx = array.indexOf(datasetOrKeyOrArray);
+        if (idx !== -1) {
+          key = this._datasetKeysInOrder[idx];
+        }
+      }
+      return this._removeDataset(key);
+    }
+
+    public _removeDataset(key: string): Plot {
+      if (key != null && this._key2DatasetDrawerKey.has(key)) {
         var ddk = this._key2DatasetDrawerKey.get(key);
         ddk.drawer.remove();
 
@@ -339,7 +368,7 @@ export module Abstract {
       return this;
     }
 
-    public _getDatasetsInOrder(): Dataset[] {
+    public datasets(): Dataset[] {
       return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).dataset);
     }
 
@@ -349,7 +378,7 @@ export module Abstract {
 
     public _paint() {
       var attrHash = this._generateAttrToProjector();
-      var datasets = this._getDatasetsInOrder();
+      var datasets = this.datasets();
       this._getDrawersInOrder().forEach((d, i) => {
         var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
         d.draw(datasets[i].data(), attrHash, animator);

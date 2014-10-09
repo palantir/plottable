@@ -69,7 +69,7 @@ export module Plot {
                    .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction));
       attrToProjector["d"] = line;
 
-      var datasets = this._getDatasetsInOrder();
+      var datasets = this.datasets();
       this._getDrawersInOrder().forEach((d, i) => {
         var dataset = datasets[i];
         var linePath: D3.Selection;
