@@ -4567,11 +4567,9 @@ describe("Scales", function () {
             var scale = new Plottable.Scale.Linear();
             var ticks10 = scale.ticks();
             assert.closeTo(ticks10.length, 10, 1, "defaults to (about) 10 ticks");
-            var ticks20 = scale.ticks(20);
+            scale.numTicks(20);
+            var ticks20 = scale.ticks();
             assert.closeTo(ticks20.length, 20, 1, "can request a different number of ticks");
-            scale.numTicks(5);
-            var ticks5 = scale.ticks();
-            assert.closeTo(ticks5.length, 5, 1, "can change the default number of ticks");
         });
         it("autorange defaults to [1, 10] on log scale", function () {
             var scale = new Plottable.Scale.Log();
@@ -4604,6 +4602,15 @@ describe("Scales", function () {
             plot.renderTo(svg);
             assert.deepEqual(xScale.domain(), [2, 1000], "the domain was calculated appropriately");
             svg.remove();
+        });
+        it("custom tick generator", function () {
+            var scale = new Plottable.Scale.Linear();
+            scale.domain([0, 10]);
+            var ticks = scale.ticks();
+            assert.closeTo(ticks.length, 10, 1, "ticks were generated correctly with default generator");
+            scale.tickGenerator(function (scale) { return scale.getDefaultTicks().filter(function (tick) { return tick % 3 === 0; }); });
+            ticks = scale.ticks();
+            assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
         });
     });
     describe("Ordinal Scales", function () {
