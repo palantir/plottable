@@ -5,7 +5,6 @@ var assert = chai.assert;
 describe("Plots", () => {
   describe("Bar Plot", () => {
     describe("Vertical Bar Plot in points mode", () => {
-      var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scale.Ordinal;
@@ -14,7 +13,7 @@ describe("Plots", () => {
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
-      before(() => {
+      beforeEach(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
         yScale = new Plottable.Scale.Linear();
@@ -24,17 +23,12 @@ describe("Plots", () => {
           {x: "B", y: 1} // duplicate X-value
         ];
         dataset = new Plottable.Dataset(data);
-
         barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
-        barPlot.renderTo(svg);
-      });
-
-      beforeEach(() => {
-        yScale.domain([-2, 2]);
         barPlot.baseline(0);
-        verifier.start();
+        yScale.domain([-2, 2]);
+        barPlot.renderTo(svg);
       });
 
       it("renders correctly", () => {
@@ -57,7 +51,7 @@ describe("Plots", () => {
         assert.equal(baseline.attr("y2"), "200", "the baseline is in the correct vertical position");
         assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
         assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
-        verifier.end();
+        svg.remove();
       });
 
       it("baseline value can be changed; barPlot updates appropriately", () => {
@@ -77,7 +71,7 @@ describe("Plots", () => {
         assert.equal(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
         assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
         assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
-        verifier.end();
+        svg.remove();
       });
 
       it("bar alignment can be changed; barPlot updates appropriately", () => {
@@ -103,11 +97,11 @@ describe("Plots", () => {
 
         assert.throws(() => barPlot.barAlignment("blargh"), Error);
         assert.equal(barPlot._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
-        verifier.end();
+        svg.remove();
       });
 
       it("can select and deselect bars", () => {
-        var selectedBar: D3.Selection = barPlot.selectBar(145, 150); // in the middle of bar 0
+        var selectedBar: D3.Selection = barPlot.selectBar(155, 150); // in the middle of bar 0
 
         assert.isNotNull(selectedBar, "clicked on a bar");
         assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
@@ -122,20 +116,20 @@ describe("Plots", () => {
         selectedBar = barPlot.selectBar(200, 50); // between the two bars
         assert.isNull(selectedBar, "returns null if no bar was selected");
 
-        selectedBar = barPlot.selectBar(145, 10); // above bar 0
+        selectedBar = barPlot.selectBar(155, 10); // above bar 0
         assert.isNull(selectedBar, "returns null if no bar was selected");
 
         // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
         // origin is at the top left!
 
-        selectedBar = barPlot.selectBar({min: 145, max: 445}, {min: 150, max: 150}, true);
+        selectedBar = barPlot.selectBar({min: 155, max: 455}, {min: 150, max: 150}, true);
         assert.isNotNull(selectedBar, "line between middle of two bars");
         assert.lengthOf(selectedBar.data(), 2, "selected 2 bars (not the negative one)");
         assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
         assert.equal(selectedBar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
         assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
 
-        selectedBar = barPlot.selectBar({min: 145, max: 445}, {min: 150, max: 350}, true);
+        selectedBar = barPlot.selectBar({min: 155, max: 455}, {min: 150, max: 350}, true);
         assert.isNotNull(selectedBar, "square between middle of two bars, & over the whole area");
         assert.lengthOf(selectedBar.data(), 3, "selected all the bars");
         assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
@@ -148,7 +142,7 @@ describe("Plots", () => {
         assert.throws(() => barPlot.selectBar(<any> "blargh", <any> 150), Error);
         assert.throws(() => barPlot.selectBar(<any> {min: 150}, <any> 150), Error);
 
-        verifier.end();
+        svg.remove();
       });
 
       it("shouldn't blow up if members called before the first render", () => {
@@ -163,16 +157,11 @@ describe("Plots", () => {
         assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
         assert.isNull(brandNew.selectBar(0, 0), "selects return empty after setup");
 
-        verifier.end();
-      });
-
-      after(() => {
-        if (verifier.passed) {svg.remove();};
+        svg.remove();
       });
     });
 
     describe("Horizontal Bar Plot in Points Mode", () => {
-      var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
@@ -180,10 +169,11 @@ describe("Plots", () => {
       var barPlot: Plottable.Plot.HorizontalBar<string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
-      before(() => {
+      beforeEach(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
         xScale = new Plottable.Scale.Linear();
+        xScale.domain([-3, 3]);
 
         var data = [
           {y: "A", x: 1},
@@ -195,13 +185,8 @@ describe("Plots", () => {
         barPlot = new Plottable.Plot.HorizontalBar(xScale, yScale);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
-        barPlot.renderTo(svg);
-      });
-
-      beforeEach(() => {
-        xScale.domain([-3, 3]);
         barPlot.baseline(0);
-        verifier.start();
+        barPlot.renderTo(svg);
       });
 
       it("renders correctly", () => {
@@ -224,7 +209,7 @@ describe("Plots", () => {
         assert.equal(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
         assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
         assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
-        verifier.end();
+        svg.remove();
       });
 
       it("baseline value can be changed; barPlot updates appropriately", () => {
@@ -244,7 +229,7 @@ describe("Plots", () => {
         assert.equal(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
         assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
         assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
-        verifier.end();
+        svg.remove();
       });
 
       it("bar alignment can be changed; barPlot updates appropriately", () => {
@@ -270,16 +255,11 @@ describe("Plots", () => {
 
         assert.throws(() => barPlot.barAlignment("blargh"), Error);
 
-        verifier.end();
-      });
-
-      after(() => {
-        if (verifier.passed) {svg.remove();};
+        svg.remove();
       });
     });
 
     describe("Horizontal Bar Plot in Bands mode", () => {
-      var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
@@ -290,7 +270,7 @@ describe("Plots", () => {
       var axisWidth = 0;
       var bandWidth = 0;
 
-      before(() => {
+      beforeEach(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
         xScale = new Plottable.Scale.Linear();
@@ -311,12 +291,6 @@ describe("Plots", () => {
         bandWidth = yScale.rangeBand();
         xScale.domainer(xScale.domainer().pad(0));
       });
-      beforeEach(() => {
-        verifier.start();
-      });
-      after(() => {
-        if (verifier.passed) {svg.remove();};
-      });
 
       it("renders correctly", () => {
         var bars = barPlot._renderArea.selectAll("rect");
@@ -333,7 +307,7 @@ describe("Plots", () => {
                     , "y pos correct for bar0");
         assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01
                     , "y pos correct for bar1");
-        verifier.end();
+        svg.remove();
       });
 
       it("width projector may be overwritten, and calling project queues rerender", () => {
@@ -349,7 +323,7 @@ describe("Plots", () => {
         assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "bar1 width");
         assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "bar0 ypos");
         assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "bar1 ypos");
-        verifier.end();
+        svg.remove();
       });
     });
   });

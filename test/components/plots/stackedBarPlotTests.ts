@@ -4,7 +4,6 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("Stacked Bar Plot", () => {
-    var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
@@ -16,7 +15,7 @@ describe("Plots", () => {
     var axisHeight = 0;
     var bandWidth = 0;
 
-    before(() => {
+    beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Ordinal();
       yScale = new Plottable.Scale.Linear().domain([0, 3]);
@@ -40,18 +39,6 @@ describe("Plots", () => {
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
       bandWidth = xScale.rangeBand();
-    });
-
-    beforeEach(() => {
-      verifier.start();
-    });
-
-    afterEach(() => {
-      verifier.end();
-    });
-
-    after(() => {
-      if (verifier.passed) {svg.remove();};
     });
 
     it("renders correctly", () => {
@@ -84,6 +71,7 @@ describe("Plots", () => {
       assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 3, 0.01, "y is correct for bar1");
       assert.closeTo(numAttr(bar2, "y"), 0, 0.01, "y is correct for bar2");
       assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
+      svg.remove();
     });
   });
 
@@ -158,7 +146,6 @@ describe("Plots", () => {
   });
 
   describe("Horizontal Stacked Bar Plot", () => {
-    var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
@@ -170,7 +157,7 @@ describe("Plots", () => {
     var rendererWidth: number;
     var bandWidth = 0;
 
-    before(() => {
+    beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Linear().domain([0, 6]);
       yScale = new Plottable.Scale.Ordinal();
@@ -196,18 +183,6 @@ describe("Plots", () => {
       var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
       rendererWidth = renderer.width();
       bandWidth = yScale.rangeBand();
-    });
-
-    beforeEach(() => {
-      verifier.start();
-    });
-
-    afterEach(() => {
-      verifier.end();
-    });
-
-    after(() => {
-      if (verifier.passed) {svg.remove();};
     });
 
     it("renders correctly", () => {
@@ -242,6 +217,7 @@ describe("Plots", () => {
       assert.closeTo(numAttr(bar1, "x"), 0, 0.01, "x is correct for bar1");
       assert.closeTo(numAttr(bar2, "x"), 0, 0.01, "x is correct for bar2");
       assert.closeTo(numAttr(bar3, "x"), rendererWidth / 3, 0.01, "x is correct for bar3");
+      svg.remove();
     });
   });
 
