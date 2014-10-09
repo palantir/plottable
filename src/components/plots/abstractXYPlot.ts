@@ -56,8 +56,8 @@ export module Plot {
     }
 
     public _updateXDomainer() {
-      if (this._xScale instanceof Scale.Quantitative) {
-        var scale = <Scale.Quantitative<any>> this._xScale;
+      if (this._xScale instanceof Scale.AbstractQuantitative) {
+        var scale = <Scale.AbstractQuantitative<any>> this._xScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
@@ -65,8 +65,8 @@ export module Plot {
     }
 
     public _updateYDomainer() {
-      if (this._yScale instanceof Scale.Quantitative) {
-        var scale = <Scale.Quantitative<any>> this._yScale;
+      if (this._yScale instanceof Scale.AbstractQuantitative) {
+        var scale = <Scale.AbstractQuantitative<any>> this._yScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }

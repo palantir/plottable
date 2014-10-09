@@ -3,8 +3,8 @@
 module Plottable {
 export module Component {
   export class Gridlines extends AbstractComponent {
-    private xScale: Scale.Quantitative<any>;
-    private yScale: Scale.Quantitative<any>;
+    private xScale: Scale.AbstractQuantitative<any>;
+    private yScale: Scale.AbstractQuantitative<any>;
     private xLinesContainer: D3.Selection;
     private yLinesContainer: D3.Selection;
 
@@ -15,12 +15,12 @@ export module Component {
      * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
      * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
      */
-    constructor(xScale: Scale.Quantitative<any>, yScale: Scale.Quantitative<any>) {
-      if (xScale != null && !(Scale.Quantitative.prototype.isPrototypeOf(xScale))) {
-        throw new Error("xScale needs to inherit from Scale.Quantitative");
+    constructor(xScale: Scale.AbstractQuantitative<any>, yScale: Scale.AbstractQuantitative<any>) {
+      if (xScale != null && !(Scale.AbstractQuantitative.prototype.isPrototypeOf(xScale))) {
+        throw new Error("xScale needs to inherit from Scale.AbstractQuantitative");
       }
-      if (yScale != null && !(Scale.Quantitative.prototype.isPrototypeOf(yScale))) {
-        throw new Error("yScale needs to inherit from Scale.Quantitative");
+      if (yScale != null && !(Scale.AbstractQuantitative.prototype.isPrototypeOf(yScale))) {
+        throw new Error("yScale needs to inherit from Scale.AbstractQuantitative");
       }
       super();
       this.classed("gridlines", true);

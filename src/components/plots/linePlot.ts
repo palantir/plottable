@@ -4,7 +4,7 @@ module Plottable {
 export module Plot {
   export class Line<X> extends AbstractXYPlot<X,number> {
 
-    public _yScale: Scale.Quantitative<number>;
+    public _yScale: Scale.AbstractQuantitative<number>;
     public _animators: Animator.PlotAnimatorMap = {
       "line-reset" : new Animator.Null(),
       "line"       : new Animator.Base()
@@ -20,7 +20,7 @@ export module Plot {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: Scale.Quantitative<X>, yScale: Scale.Quantitative<number>) {
+    constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
       super(xScale, yScale);
       this.classed("line-plot", true);
       this.project("stroke", () => Core.Colors.INDIGO); // default

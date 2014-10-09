@@ -191,8 +191,8 @@ export module Plot {
     }
 
     public _updateDomainer(scale: Scale.AbstractScale<any, number>) {
-      if (scale instanceof Scale.Quantitative) {
-        var qscale = <Scale.Quantitative<any>> scale;
+      if (scale instanceof Scale.AbstractQuantitative) {
+        var qscale = <Scale.AbstractQuantitative<any>> scale;
         if (!qscale._userSetDomainer) {
           if (this._baselineValue != null) {
             qscale.domainer()

@@ -154,7 +154,7 @@ export module Interaction {
      * @param {QuantitativeScale} yScale The scale along the y-axis.
      * @returns {Drag} The calling Drag.
      */
-    public setupZoomCallback(xScale?: Scale.Quantitative<any>, yScale?: Scale.Quantitative<any>) {
+    public setupZoomCallback(xScale?: Scale.AbstractQuantitative<any>, yScale?: Scale.AbstractQuantitative<any>) {
       var xDomainOriginal = xScale != null ? xScale.domain() : null;
       var yDomainOriginal = yScale != null ? yScale.domain() : null;
       var resetOnNextClick = false;

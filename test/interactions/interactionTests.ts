@@ -83,8 +83,8 @@ describe("Interactions", () => {
     var svgHeight = 400;
     var svg: D3.Selection;
     var dataset: Plottable.Dataset;
-    var xScale: Plottable.Scale.Quantitative<number>;
-    var yScale: Plottable.Scale.Quantitative<number>;
+    var xScale: Plottable.Scale.AbstractQuantitative<number>;
+    var yScale: Plottable.Scale.AbstractQuantitative<number>;
     var plot: Plottable.Plot.AbstractXYPlot<number,number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
@@ -165,8 +165,8 @@ describe("Interactions", () => {
     var svgHeight = 400;
     var svg: D3.Selection;
     var dataset: Plottable.Dataset;
-    var xScale: Plottable.Scale.Quantitative<number>;
-    var yScale: Plottable.Scale.Quantitative<number>;
+    var xScale: Plottable.Scale.AbstractQuantitative<number>;
+    var yScale: Plottable.Scale.AbstractQuantitative<number>;
     var plot: Plottable.Plot.AbstractXYPlot<number,number>;
     var interaction: Plottable.Interaction.XYDragBox;
 

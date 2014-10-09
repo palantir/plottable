@@ -885,7 +885,7 @@ declare module Plottable {
          * @returns {any[]} The domain, as a merging of all exents, as a [min, max]
          *                 pair.
          */
-        computeDomain(extents: any[][], scale: Scale.Quantitative<any>): any[];
+        computeDomain(extents: any[][], scale: Scale.AbstractQuantitative<any>): any[];
         /**
          * Sets the Domainer to pad by a given ratio.
          *
@@ -1046,16 +1046,16 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Quantitative<D> extends AbstractScale<D, number> {
+        class AbstractQuantitative<D> extends AbstractScale<D, number> {
             /**
-             * Constructs a new Scale.Quantitative.
+             * Constructs a new QuantitativeScale.
              *
-             * A Scale.Quantitative is a Scale that maps anys to numbers. It
+             * A QuantitativeScale is a Scale that maps anys to numbers. It
              * is invertible and continuous.
              *
              * @constructor
              * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale
-             * backing the Scale.Quantitative.
+             * backing the QuantitativeScale.
              */
             constructor(scale: D3.Scale.QuantitativeScale);
             /**
@@ -1066,40 +1066,40 @@ declare module Plottable {
              */
             invert(value: number): D;
             /**
-             * Creates a copy of the Scale.QuantitativeScale with the same domain and range but without any registered list.
+             * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
              *
-             * @returns {Scale.QuantitativeScale} A copy of the calling Scale.Quantitative.
+             * @returns {AbstractQuantitative} A copy of the calling QuantitativeScale.
              */
-            copy(): Quantitative<D>;
+            copy(): AbstractQuantitative<D>;
             domain(): D[];
-            domain(values: D[]): Quantitative<D>;
+            domain(values: D[]): AbstractQuantitative<D>;
             /**
-             * Sets or gets the Scale.QuantitativeScale's output interpr
+             * Sets or gets the QuantitativeScale's output interpolator
              *
              * @param {D3.Transition.Interpolate} [factory] The output interpolator to use.
-             * @returns {D3.Transition.Interpolate|Scale.QuantitativeScale} The current output interpolator, or the calling Scale.Quantitative.
+             * @returns {D3.Transition.Interpolate|AbstractQuantitative} The current output interpolator, or the calling QuantitativeScale.
              */
             interpolate(): D3.Transition.Interpolate;
-            interpolate(factory: D3.Transition.Interpolate): Quantitative<D>;
+            interpolate(factory: D3.Transition.Interpolate): AbstractQuantitative<D>;
             /**
-             * Sets the range of the Scale.QuantitativeScale and sets the interpolator to d3.interpolate.
+             * Sets the range of the QuantitativeScale and sets the interpolator to d3.interpolateRound.
              *
              * @param {number[]} values The new range value for the range.
              */
-            rangeRound(values: number[]): Quantitative<D>;
+            rangeRound(values: number[]): AbstractQuantitative<D>;
             /**
-             * Gets the clamp status of the Scale.QuantitativeScale (whether to cut off values outside the ouput r.
+             * Gets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
              *
              * @returns {boolean} The current clamp status.
              */
             clamp(): boolean;
             /**
-             * Sets the clamp status of the Scale.QuantitativeScale (whether to cut off values outside the ouput r.
+             * Sets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
              *
-             * @param {boolean} clamp Whether or not to clamp the Scale.Quantitative.
-             * @returns {Scale.QuantitativeScale} The calling Scale.Quantitative.
+             * @param {boolean} clamp Whether or not to clamp the QuantitativeScale.
+             * @returns {AbstractQuantitative} The calling QuantitativeScale.
              */
-            clamp(clamp: boolean): Quantitative<D>;
+            clamp(clamp: boolean): AbstractQuantitative<D>;
             /**
              * Gets a set of tick values spanning the domain.
              *
@@ -1119,9 +1119,9 @@ declare module Plottable {
              * Sets the default number of ticks to generate.
              *
              * @param {number} count The new default number of ticks.
-             * @returns {Scale} The calling Scale.
+             * @returns {Quantitative} The calling QuantitativeScale.
              */
-            numTicks(count: number): Quantitative<D>;
+            numTicks(count: number): AbstractQuantitative<D>;
             /**
              * Gets a Domainer of a scale. A Domainer is responsible for combining
              * multiple extents into a single domain.
@@ -1138,9 +1138,9 @@ declare module Plottable {
              * includes 0, etc., will be the responsability of the new domainer.
              *
              * @param {Domainer} domainer If provided, the new domainer.
-             * @return {QuanitativeScale} The calling Scale.Quantitative.
+             * @return {AbstractQuantitative} The calling QuantitativeScale.
              */
-            domainer(domainer: Domainer): Quantitative<D>;
+            domainer(domainer: Domainer): AbstractQuantitative<D>;
         }
     }
 }
@@ -1148,9 +1148,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Linear extends Quantitative<number> {
+        class Linear extends AbstractQuantitative<number> {
             /**
-             * Constructs a new Scale.Linear.
+             * Constructs a new LinearScale.
              *
              * This scale maps from domain to range with a simple `mx + b` formula.
              *
@@ -1161,10 +1161,10 @@ declare module Plottable {
             constructor();
             constructor(scale: D3.Scale.LinearScale);
             /**
-             * Constructs a copy of the Scale.Linear with the same domain and range but
+             * Constructs a copy of the LinearScale with the same domain and range but
              * without any registered listeners.
              *
-             * @returns {Linear} A copy of the calling Scale.Linear.
+             * @returns {Linear} A copy of the calling LinearScale.
              */
             copy(): Linear;
         }
@@ -1174,7 +1174,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Log extends Quantitative<number> {
+        class Log extends AbstractQuantitative<number> {
             /**
              * Constructs a new Scale.Log.
              *
@@ -1202,7 +1202,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class ModifiedLog extends Quantitative<number> {
+        class ModifiedLog extends AbstractQuantitative<number> {
             /**
              * Creates a new Scale.ModifiedLog.
              *
@@ -1322,7 +1322,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Time extends Quantitative<any> {
+        class Time extends AbstractQuantitative<any> {
             /**
              * Constructs a TimeScale.
              *
@@ -1828,7 +1828,7 @@ declare module Plottable {
              * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
              * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
              */
-            constructor(scale: Scale.Quantitative<number>, orientation: string, formatter?: (d: any) => string);
+            constructor(scale: Scale.AbstractQuantitative<number>, orientation: string, formatter?: (d: any) => string);
             /**
              * Gets the tick label position relative to the tick marks.
              *
@@ -2114,7 +2114,7 @@ declare module Plottable {
              * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
              * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
-            constructor(xScale: Scale.Quantitative<any>, yScale: Scale.Quantitative<any>);
+            constructor(xScale: Scale.AbstractQuantitative<any>, yScale: Scale.AbstractQuantitative<any>);
             remove(): Gridlines;
         }
     }
@@ -2471,7 +2471,7 @@ declare module Plottable {
              * @param {Scale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.Quantitative<number>);
+            constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractQuantitative<number>);
         }
     }
 }
@@ -2496,7 +2496,7 @@ declare module Plottable {
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
-            constructor(xScale: Scale.Quantitative<number>, yScale: Scale.AbstractScale<Y, number>);
+            constructor(xScale: Scale.AbstractQuantitative<number>, yScale: Scale.AbstractScale<Y, number>);
         }
     }
 }
@@ -2513,7 +2513,7 @@ declare module Plottable {
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            constructor(xScale: Scale.Quantitative<X>, yScale: Scale.Quantitative<number>);
+            constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
         }
     }
 }
@@ -2533,7 +2533,7 @@ declare module Plottable {
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            constructor(xScale: Scale.Quantitative<X>, yScale: Scale.Quantitative<number>);
+            constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Area<X>;
         }
     }
@@ -2578,7 +2578,7 @@ declare module Plottable {
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            constructor(xScale: Scale.Quantitative<X>, yScale: Scale.Quantitative<number>);
+            constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
         }
     }
 }
@@ -2901,7 +2901,7 @@ declare module Plottable {
              * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
              * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
              */
-            constructor(xScale?: Scale.Quantitative<any>, yScale?: Scale.Quantitative<any>);
+            constructor(xScale?: Scale.AbstractQuantitative<any>, yScale?: Scale.AbstractQuantitative<any>);
             /**
              * Sets the scales back to their original domains.
              */
@@ -3006,7 +3006,7 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The scale along the y-axis.
              * @returns {Drag} The calling Drag.
              */
-            setupZoomCallback(xScale?: Scale.Quantitative<any>, yScale?: Scale.Quantitative<any>): Drag;
+            setupZoomCallback(xScale?: Scale.AbstractQuantitative<any>, yScale?: Scale.AbstractQuantitative<any>): Drag;
         }
     }
 }

@@ -2,10 +2,10 @@
 
 module Plottable {
 export module Scale {
-  export class Linear extends Quantitative<number> {
+  export class Linear extends AbstractQuantitative<number> {
 
     /**
-     * Constructs a new Scale.Linear.
+     * Constructs a new LinearScale.
      *
      * This scale maps from domain to range with a simple `mx + b` formula.
      *
@@ -20,10 +20,10 @@ export module Scale {
     }
 
     /**
-     * Constructs a copy of the Scale.Linear with the same domain and range but
+     * Constructs a copy of the LinearScale with the same domain and range but
      * without any registered listeners.
      *
-     * @returns {Linear} A copy of the calling Scale.Linear.
+     * @returns {Linear} A copy of the calling LinearScale.
      */
     public copy(): Linear {
       return new Linear(this._d3Scale.copy());
