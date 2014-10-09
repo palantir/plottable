@@ -7043,7 +7043,7 @@ var Plottable;
                 this.innerScale = new Plottable.Scale.Ordinal();
             }
             ClusteredBar.prototype._getAnimator = function (drawer, index) {
-                var animator = new Plottable.Animator.Rect();
+                var animator = new Plottable.Animator.Rect(this._isVertical);
                 return animator.delay(Plottable.Animator.IterativeDelay.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS * index);
             };
             ClusteredBar.prototype._generateAttrToProjector = function () {

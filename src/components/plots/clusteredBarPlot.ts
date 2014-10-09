@@ -23,7 +23,7 @@ export module Plot {
     }
 
     public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
-      var animator = new Animator.Rect();
+      var animator = new Animator.Rect(this._isVertical);
       return animator.delay(Animator.IterativeDelay.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS * index);
     }
 
