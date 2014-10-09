@@ -4,24 +4,28 @@ function makeData() {
   return makeRandomData(50);
 }
 
-function onlyEvenTickGenerator(scale) {
-  "use strict";
-
-  return scale.getDefaultTicks().filter(function(x) { return x * 10 % 3 === 0; });
-}
-
 function run(div, data, Plottable) {
   "use strict";
 
-  var svg = div.append("svg").attr("height", 500).attr("width", 800);
+  var svg = div.append("svg").attr("height", 500);
+
+  var onlyEvenTickGenerator = function(scale){
+    return scale.getDefaultTicks().filter(function(x) { return x * 10 % 2 === 0; });
+  };
+
   var xScale = new Plottable.Scale.Linear().tickGenerator(onlyEvenTickGenerator);
   var yScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var titleLabel = new Plottable.Component.TitleLabel("Ticks in Increments of 0.2");
 
-  var plot = new Plottable.Plot.Line(data, xScale, yScale);
+  var plot = new Plottable.Plot.Line(xScale, yScale);
+    plot.addDataset(data);
 
-  new Plottable.Component.Table([[yAxis, plot], [null, xAxis]])
-              .renderTo(svg);
-
+  var chart = new Plottable.Component.Table([
+                                            [null, titleLabel],
+                                            [yAxis, plot], 
+                                            [null, xAxis]
+                                            ]); 
+  chart.renderTo(svg);
 }
