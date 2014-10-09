@@ -305,9 +305,6 @@ module.exports = function(grunt) {
   grunt.registerTask("definitions_prod", function() {
     grunt.file.copy("build/plottable.d.ts", "plottable.d.ts");
   });
-  grunt.registerTask("copy-dev-defs", function () {
-    grunt.file.copy("plottable.d.ts", "plottable-dev.d.ts");
-  });
   grunt.registerTask("test-compile", [
                                   "ts:test",
                                   "concat:tests_multifile",
