@@ -6162,6 +6162,16 @@ var Plottable;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
             };
+            AbstractXYPlot.prototype._generateAttrToProjector = function () {
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                // Hide points from outside of domain.
+                var positionF = attrToProjector["x"];
+                attrToProjector["visibility"] = function (d, i) {
+                    var position = positionF(d, i);
+                    return position != null && position === position && position >= 0 ? "visible" : "hidden";
+                };
+                return attrToProjector;
+            };
             AbstractXYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 this._xScale.range([0, this.width()]);

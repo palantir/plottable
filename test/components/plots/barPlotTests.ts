@@ -159,6 +159,14 @@ describe("Plots", () => {
 
         svg.remove();
       });
+
+      it("don't show points from outside of domain", () => {
+        xScale.domain(["C"]);
+        var bars =  barPlot._renderArea.selectAll("rect");
+        var visibleBars = bars.filter(function(d, i) { return d3.select(this).attr("visibility") === "visible"; });
+        assert.lengthOf(visibleBars[0], 0, "all bars are hidden, because they are outside of domain");
+        svg.remove();
+      });
     });
 
     describe("Horizontal Bar Plot in Points Mode", () => {

@@ -49,6 +49,17 @@ export module Plot {
       return this;
     }
 
+    public _generateAttrToProjector(): AttributeToProjector {
+      var attrToProjector: AttributeToProjector = super._generateAttrToProjector();
+      // Hide points from outside of domain.
+      var positionF = attrToProjector["x"];
+      attrToProjector["visibility"] = (d: any, i: number) => {
+        var position = positionF(d, i);
+        return position != null && position === position && position >= 0 ? "visible" : "hidden";
+      };
+      return attrToProjector;
+    }
+
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this._xScale.range([0, this.width()]);
