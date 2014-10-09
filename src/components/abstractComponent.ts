@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Abstract {
-  export class Component extends PlottableObject {
+export module Component {
+  export class AbstractComponent extends Core.PlottableObject {
     public static AUTORESIZE_BY_DEFAULT = true;
 
     public _element: D3.Selection;
@@ -13,7 +13,7 @@ export module Abstract {
     private xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
     private yOrigin: number;
 
-    public _parent: ComponentContainer;
+    public _parent: AbstractComponentContainer;
     public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
     public _yAlignProportion = 0;
     public _fixedHeightFlag = false;
@@ -22,7 +22,7 @@ export module Abstract {
     public _isAnchored = false;
 
     private hitBox: D3.Selection;
-    private interactionsToRegister: Interaction[] = [];
+    private interactionsToRegister: Interaction.AbstractInteraction[] = [];
     private boxes: D3.Selection[] = [];
     private boxContainer: D3.Selection;
     private rootSVG: D3.Selection;
@@ -91,12 +91,12 @@ export module Abstract {
       this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this.interactionsToRegister = null;
       if (this.isTopLevelComponent) {
-        this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
+        this.autoResize(AbstractComponent.AUTORESIZE_BY_DEFAULT);
       }
       this._isSetup = true;
     }
 
-    public _requestedSpace(availableWidth : number, availableHeight: number): _ISpaceRequest {
+    public _requestedSpace(availableWidth : number, availableHeight: number): _SpaceRequest {
       return {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
     }
 
@@ -193,9 +193,9 @@ export module Abstract {
      * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
      * @returns {Component} The calling component.
      */
-    public renderTo(selector: String): Component;
-    public renderTo(element: D3.Selection): Component;
-    public renderTo(element: any): Component {
+    public renderTo(selector: String): AbstractComponent;
+    public renderTo(element: D3.Selection): AbstractComponent;
+    public renderTo(element: any): AbstractComponent {
       if (element != null) {
         var selection: D3.Selection;
         if (typeof(element.node) === "function") {
@@ -229,7 +229,7 @@ export module Abstract {
      * @param {number} [availableHeight] - the height of the container element
      * @returns {Component} The calling component.
      */
-    public resize(width?: number, height?: number): Component {
+    public resize(width?: number, height?: number): AbstractComponent {
       if (!this.isTopLevelComponent) {
         throw new Error("Cannot resize on non top-level component");
       }
@@ -250,7 +250,7 @@ export module Abstract {
      * @param {boolean} flag Enable (true) or disable (false) auto-resize.
      * @returns {Component} The calling component.
      */
-    public autoResize(flag: boolean): Component {
+    public autoResize(flag: boolean): AbstractComponent {
       if (flag) {
         Core.ResizeBroadcaster.register(this);
       } else {
@@ -270,7 +270,7 @@ export module Abstract {
      * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
      * @returns {Component} The calling Component.
      */
-    public xAlign(alignment: string): Component {
+    public xAlign(alignment: string): AbstractComponent {
       alignment = alignment.toLowerCase();
       if (alignment === "left") {
         this._xAlignProportion = 0;
@@ -296,7 +296,7 @@ export module Abstract {
      * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
      * @returns {Component} The calling Component.
      */
-    public yAlign(alignment: string): Component {
+    public yAlign(alignment: string): AbstractComponent {
       alignment = alignment.toLowerCase();
       if (alignment === "top") {
         this._yAlignProportion = 0;
@@ -319,7 +319,7 @@ export module Abstract {
      * side of the container.
      * @returns {Component} The calling Component.
      */
-    public xOffset(offset: number): Component {
+    public xOffset(offset: number): AbstractComponent {
       this._xOffset = offset;
       this._invalidateLayout();
       return this;
@@ -333,7 +333,7 @@ export module Abstract {
      * side of the container.
      * @returns {Component} The calling Component.
      */
-    public yOffset(offset: number): Component {
+    public yOffset(offset: number): AbstractComponent {
       this._yOffset = offset;
       this._invalidateLayout();
       return this;
@@ -371,7 +371,7 @@ export module Abstract {
      * @param {Interaction} interaction The Interaction to attach to the Component.
      * @returns {Component} The calling Component.
      */
-    public registerInteraction(interaction: Interaction) {
+    public registerInteraction(interaction: Interaction.AbstractInteraction) {
       // Interactions can be registered before or after anchoring. If registered before, they are
       // pushed to this.interactionsToRegister and registered during anchoring. If after, they are
       // registered immediately
@@ -396,7 +396,7 @@ export module Abstract {
      * @returns {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
      */
     public classed(cssClass: string): boolean;
-    public classed(cssClass: string, addClass: boolean): Component;
+    public classed(cssClass: string, addClass: boolean): AbstractComponent;
     public classed(cssClass: string, addClass?: boolean): any {
       if (addClass == null) {
         if (cssClass == null) {
@@ -457,7 +457,7 @@ export module Abstract {
      * @param {Component} c The component to merge in.
      * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
      */
-    public merge(c: Component): Component.Group {
+    public merge(c: AbstractComponent): Component.Group {
       var cg: Component.Group;
       if (this._isSetup || this._isAnchored) {
         throw new Error("Can't presently merge a component that's already been anchored");

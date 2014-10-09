@@ -2,7 +2,7 @@
 function makeData() {
   "use strict";
 
-  return [makeRandomData(50), makeRandomData(50)];
+  return makeRandomData(50);
 }
 
 function run(div, data, Plottable) {
@@ -32,7 +32,8 @@ function run(div, data, Plottable) {
     return w;
   };
 
-  var barRenderer = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
+  var barRenderer = new Plottable.Plot.VerticalBar(xScale, yScale)
+                                 .addDataset(ds)
                                  .attr("x", "name", xScale)
                                  .attr("y", "age", yScale)
                                  .attr("width", widthPicker);
@@ -46,7 +47,7 @@ function run(div, data, Plottable) {
   function addBar() {
     var d = ds.data();
     if(d.length < alphabet.length) {
-      d.push({ name: alphabet[d.length], age: data[0][d.length].y });
+      d.push({ name: alphabet[d.length], age: data[d.length].y });
     }
     ds.data(d);
     barRenderer.attr("width", widthPicker);

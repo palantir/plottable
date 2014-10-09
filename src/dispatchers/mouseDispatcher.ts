@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Dispatcher {
-  export class Mouse extends Abstract.Dispatcher {
+  export class Mouse extends Dispatcher.AbstractDispatcher {
     private _mouseover: (location: Point) => any;
     private _mousemove: (location: Point) => any;
     private _mouseout: (location: Point) => any;

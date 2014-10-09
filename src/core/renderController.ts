@@ -22,14 +22,14 @@ export module Core {
    * ```
    */
   export module RenderController {
-    var _componentsNeedingRender: {[key: string]: Abstract.Component} = {};
-    var _componentsNeedingComputeLayout: {[key: string]: Abstract.Component} = {};
+    var _componentsNeedingRender: {[key: string]: Component.AbstractComponent} = {};
+    var _componentsNeedingComputeLayout: {[key: string]: Component.AbstractComponent} = {};
     var _animationRequested: boolean = false;
     var _isCurrentlyFlushing: boolean = false;
-    export var _renderPolicy: RenderPolicy.IRenderPolicy = new RenderPolicy.AnimationFrame();
+    export var _renderPolicy: RenderPolicy.RenderPolicy = new RenderPolicy.AnimationFrame();
 
     export function setRenderPolicy(policy: string): void;
-    export function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): void;
+    export function setRenderPolicy(policy: RenderPolicy.RenderPolicy): void;
     export function setRenderPolicy(policy: any): void {
       if (typeof(policy) === "string") {
         switch (policy.toLowerCase()) {
@@ -54,9 +54,9 @@ export module Core {
      * If the RenderController is enabled, we enqueue the component for
      * render. Otherwise, it is rendered immediately.
      *
-     * @param {Abstract.Component} component Any Plottable component.
+     * @param {AbstractComponent} component Any Plottable component.
      */
-    export function registerToRender(c: Abstract.Component) {
+    export function registerToRender(c: Component.AbstractComponent) {
       if (_isCurrentlyFlushing) {
         _Util.Methods.warn("Registered to render while other components are flushing: request may be ignored");
       }
@@ -68,9 +68,9 @@ export module Core {
      * If the RenderController is enabled, we enqueue the component for
      * layout and render. Otherwise, it is rendered immediately.
      *
-     * @param {Abstract.Component} component Any Plottable component.
+     * @param {AbstractComponent} component Any Plottable component.
      */
-    export function registerToComputeLayout(c: Abstract.Component) {
+    export function registerToComputeLayout(c: Component.AbstractComponent) {
       _componentsNeedingComputeLayout[c._plottableID] = c;
       _componentsNeedingRender[c._plottableID] = c;
       requestRender();
@@ -105,7 +105,7 @@ export module Core {
         _isCurrentlyFlushing = true;
 
         // Finally, perform render of all components
-        var failed: {[key: string]: Abstract.Component} = {};
+        var failed: {[key: string]: Component.AbstractComponent} = {};
         Object.keys(_componentsNeedingRender).forEach((k) => {
           try {
             _componentsNeedingRender[k]._doRender();

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class ClusteredBar<X,Y> extends Abstract.NewStyleBarPlot<X,Y> {
+  export class ClusteredBar<X,Y> extends AbstractBarPlot<X,Y> {
     private innerScale: Scale.Ordinal;
 
     /**
@@ -16,7 +16,7 @@ export module Plot {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>, isVertical = true) {
+    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
       this._isVertical = isVertical; // Has to be set before super()
       super(xScale, yScale);
       this.innerScale = new Scale.Ordinal();
@@ -40,19 +40,15 @@ export module Plot {
       return attrToProjector;
     }
 
-    private cluster(accessor: _IAccessor) {
+    private cluster(accessor: _Accessor) {
       this.innerScale.domain(this._datasetKeysInOrder);
-      var lengths = this._getDatasetsInOrder().map((d) => d.data().length);
-      if (_Util.Methods.uniq(lengths).length > 1) {
-        _Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
-      }
       var clusters: {[key: string]: any[]} = {};
       this._datasetKeysInOrder.forEach((key: string) => {
         var data = this._key2DatasetDrawerKey.get(key).dataset.data();
 
         clusters[key] = data.map((d, i) => {
           var val = accessor(d, i);
-          var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._xScale : this._yScale;
+          var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._xScale : this._yScale;
           d["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + this.innerScale.scale(key);
           return d;
         });
@@ -61,11 +57,23 @@ export module Plot {
     }
 
     public _paint() {
-      super._paint();
       var attrHash = this._generateAttrToProjector();
       var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var clusteredData = this.cluster(accessor);
       this._getDrawersInOrder().forEach((d) => d.draw(clusteredData[d.key], attrHash));
+
+      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var scaledBaseline = primaryScale.scale(this._baselineValue);
+
+      var baselineAttr: any = {
+        "x1": this._isVertical ? 0 : scaledBaseline,
+        "y1": this._isVertical ? scaledBaseline : 0,
+        "x2": this._isVertical ? this.width() : scaledBaseline,
+        "y2": this._isVertical ? scaledBaseline : this.height()
+      };
+
+      this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
+
     }
   }
 }

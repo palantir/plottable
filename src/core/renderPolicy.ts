@@ -8,7 +8,7 @@ export module RenderController {
     /**
      * A policy to render components.
      */
-    export interface IRenderPolicy {
+    export interface RenderPolicy {
       render(): any;
     }
 
@@ -16,7 +16,7 @@ export module RenderController {
      * Never queue anything, render everything immediately. Useful for
      * debugging, horrible for performance.
      */
-    export class Immediate implements IRenderPolicy {
+    export class Immediate implements RenderPolicy {
       public render() {
         RenderController.flush();
       }
@@ -26,7 +26,7 @@ export module RenderController {
      * The default way to render, which only tries to render every frame
      * (usually, 1/60th of a second).
      */
-    export class AnimationFrame implements IRenderPolicy {
+    export class AnimationFrame implements RenderPolicy {
       public render() {
         _Util.DOM.requestAnimationFramePolyfill(RenderController.flush);
       }
@@ -37,7 +37,7 @@ export module RenderController {
      * compared to `requestAnimationFrame`, but it's still there if you want
      * it.
      */
-    export class Timeout implements IRenderPolicy {
+    export class Timeout implements RenderPolicy {
       public _timeoutMsec: number = _Util.DOM.POLYFILL_TIMEOUT_MSEC;
 
       public render() {

@@ -16,14 +16,14 @@ function getSVGParent(): D3.Selection {
   }
 }
 
-function verifySpaceRequest(sr: Plottable._ISpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
+function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
   assert.equal(sr.width,  w, "width requested is as expected #"  + id);
   assert.equal(sr.height, h, "height requested is as expected #" + id);
   assert.equal(sr.wantsWidth , ww, "needs more width is as expected #"  + id);
   assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
 }
 
-function fixComponentSize(c: Plottable.Abstract.Component, fixedWidth?: number, fixedHeight?: number) {
+function fixComponentSize(c: Plottable.Component.AbstractComponent, fixedWidth?: number, fixedHeight?: number) {
   c._requestedSpace = function(w, h) {
     return {
       width:  fixedWidth  == null ? 0 : fixedWidth,
@@ -38,7 +38,7 @@ function fixComponentSize(c: Plottable.Abstract.Component, fixedWidth?: number, 
 }
 
 function makeFixedSizeComponent(fixedWidth?: number, fixedHeight?: number) {
-  return fixComponentSize(new Plottable.Abstract.Component(), fixedWidth, fixedHeight);
+  return fixComponentSize(new Plottable.Component.AbstractComponent(), fixedWidth, fixedHeight);
 }
 
 function getTranslate(element: D3.Selection) {
@@ -110,23 +110,13 @@ function makeQuadraticSeries(n: number): {x: number; y: number;}[] {
   return d3.range(n).map(makeQuadraticPoint);
 }
 
-class MultiTestVerifier {
-  public passed = true;
-  private temp: boolean;
-
-  public start() {
-    this.temp = this.passed;
-    this.passed = false;
-  }
-
-  public end() {
-    this.passed = this.temp;
-  }
-}
-
 // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
 function normalizePath(pathString: string) {
   return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
+}
+
+function numAttr(s: D3.Selection, a: string) {
+  return parseFloat(s.attr(a));
 }
 
 function triggerFakeUIEvent(type: string, target: D3.Selection) {

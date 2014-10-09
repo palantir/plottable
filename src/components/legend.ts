@@ -9,7 +9,7 @@ export module Component {
       (datum?: string): any;
   }
 
-  export class Legend extends Abstract.Component {
+  export class Legend extends AbstractComponent {
     /**
      * The css class applied to each legend row
      */
@@ -171,7 +171,7 @@ export module Component {
       this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.height() / textHeight));
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
       var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend.MARGIN) / textHeight));

@@ -25,7 +25,7 @@ describe("Labels", () => {
 
   it("Left-rotated text is handled properly", () => {
     var svg = generateSVG(100, 400);
-    var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "vertical-left");
+    var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "left");
     label.renderTo(svg);
     var content = label._content;
     var text = content.select("text");
@@ -37,7 +37,7 @@ describe("Labels", () => {
 
   it("Right-rotated text is handled properly", () => {
     var svg = generateSVG(100, 400);
-    var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "vertical-right");
+    var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "right");
     label.renderTo(svg);
     var content = label._content;
     var text = content.select("text");
@@ -87,7 +87,7 @@ describe("Labels", () => {
     var svg = generateSVG(400, 400);
     var label = new Plottable.Component.TitleLabel("X");
     var t = new Plottable.Component.Table().addComponent(0, 0, label)
-                                 .addComponent(1, 0, new Plottable.Abstract.Component());
+                                 .addComponent(1, 0, new Plottable.Component.AbstractComponent());
     t.renderTo(svg);
     var textTranslate = d3.transform(label._content.select("g").attr("transform")).translate;
     var eleTranslate  = d3.transform(label._element.attr("transform")).translate;
@@ -119,7 +119,7 @@ describe("Labels", () => {
     var bbox = Plottable._Util.DOM.getBBox(text);
     assert.closeTo(bbox.height, label.height(), 1, "label is in horizontal position");
 
-    label.orient("vertical-right");
+    label.orient("right");
     text = content.select("text");
     bbox = Plottable._Util.DOM.getBBox(text);
     assertBBoxInclusion(label._element.select(".bounding-box"), text);

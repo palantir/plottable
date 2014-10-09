@@ -69,13 +69,28 @@ export module _Util {
      * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
      * and "activate" it by turning it into a function in (datum, index, metadata)
      */
-    export function accessorize(accessor: any): _IAccessor {
+    export function accessorize(accessor: any): _Accessor {
       if (typeof(accessor) === "function") {
-        return (<_IAccessor> accessor);
+        return (<_Accessor> accessor);
       } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
         return (d: any, i: number, s: any) => d[accessor];
       } else {
         return (d: any, i: number, s: any) => accessor;
+      };
+    }
+
+    /**
+     * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata.
+     * Temporarily always grabs the metadata of the first dataset.
+     * HACKHACK #1089 - The accessor currently only grabs the first dataset's metadata
+     */
+    export function _applyAccessor(accessor: _Accessor, plot: Plot.AbstractPlot) {
+      var activatedAccessor = accessorize(accessor);
+      return (d: any, i: number) => {
+        var datasets = plot.datasets();
+        var dataset = datasets.length > 0 ? datasets[0] : null;
+        var metadata = dataset ? dataset.metadata() : null;
+        return activatedAccessor(d, i, metadata);
       };
     }
 
@@ -99,23 +114,15 @@ export module _Util {
      * Populates a map from an array of keys and a transformation function.
      *
      * @param {string[]} keys The array of keys.
-     * @param {(string) => T} transform A transformation function to apply to the keys.
+     * @param {(string, number) => T} transform A transformation function to apply to the keys.
      * @return {D3.Map<T>} A map mapping keys to their transformed values.
      */
-    export function populateMap<T>(keys: string[], transform: (key: string) => T): D3.Map<T> {
+    export function populateMap<T>(keys: string[], transform: (key: string, index: number) => T): D3.Map<T> {
       var map: D3.Map<T> = d3.map();
-      keys.forEach((key: string) => {
-        map.set(key, transform(key));
+      keys.forEach((key: string, i: number) => {
+        map.set(key, transform(key, i));
       });
       return map;
-    }
-
-    /**
-     * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
-     */
-    export function _applyAccessor(accessor: _IAccessor, plot: Abstract.Plot) {
-      var activatedAccessor = accessorize(accessor);
-      return (d: any, i: number) => activatedAccessor(d, i, plot.dataset().metadata());
     }
 
     /**

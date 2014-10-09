@@ -24,19 +24,22 @@ function run(div, data, Plottable){
   var yAxis3 = new Plottable.Axis.Numeric(yScale, "left");
 
 
-  var paloAltoBar = new Plottable.Plot.VerticalBar(data[0], xScale, yScale)
+  var paloAltoBar = new Plottable.Plot.VerticalBar(xScale, yScale)
+    .addDataset(data[0])
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
     .project("fill", "city", colorScale);
 
-  var sanFranciscoBar = new Plottable.Plot.VerticalBar(data[1], xScale, yScale)
+  var sanFranciscoBar = new Plottable.Plot.VerticalBar(xScale, yScale)
+    .addDataset(data[1])
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
     .project("fill", "city", colorScale);
 
-  var sanJoseBar = new Plottable.Plot.VerticalBar(data[2], xScale, yScale)
+  var sanJoseBar = new Plottable.Plot.VerticalBar(xScale, yScale)
+    .addDataset(data[2])
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
@@ -44,7 +47,7 @@ function run(div, data, Plottable){
 
   var legend = new Plottable.Component.HorizontalLegend(colorScale);
   var title = new Plottable.Component.TitleLabel("Average Rainfall in Different Cities between 2013-2014", "horizontal" );
-  var yUnitLabel = new Plottable.Component.AxisLabel("Inches", "vertical-left" );
+  var yUnitLabel = new Plottable.Component.AxisLabel("Inches", "left" );
 
 
   legend.xAlign("right");

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Component {
-  export class Label extends Abstract.Component {
+  export class Label extends AbstractComponent {
     private textContainer: D3.Selection;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private orientation: string;
@@ -18,7 +18,7 @@ export module Component {
      *
      * @constructor
      * @param {string} displayText The text of the Label (default = "").
-     * @param {string} orientation The orientation of the Label (horizontal/vertical-left/vertical-right) (default = "horizontal").
+     * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
      */
     constructor(displayText = "", orientation = "horizontal") {
       super();
@@ -58,7 +58,7 @@ export module Component {
       return this;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var desiredWH = this.measurer(this._text);
       var desiredWidth  = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height);
       var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
@@ -111,7 +111,7 @@ export module Component {
      * Sets the orientation of the Label.
      *
      * @param {string} newOrientation If provided, the desired orientation
-     * (horizontal/vertical-left/vertical-right).
+     * (horizontal/left/right).
      * @returns {Label} The calling Label.
      */
     public orient(newOrientation: string): Label;
@@ -120,8 +120,6 @@ export module Component {
         return this.orientation;
       } else {
         newOrientation = newOrientation.toLowerCase();
-        if (newOrientation === "vertical-left")  { newOrientation = "left" ; }
-        if (newOrientation === "vertical-right") { newOrientation = "right"; }
         if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
           this.orientation = newOrientation;
         } else {
