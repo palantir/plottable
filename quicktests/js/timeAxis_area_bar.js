@@ -66,10 +66,12 @@ function run(div, data, Plottable) {
   var legend = new Plottable.Component.HorizontalLegend(colorScale).xAlign("center");
   var title = new Plottable.Component.TitleLabel("Area & Bar on Time Axes");
 
-  var areaPlot = new Plottable.Plot.Area(data[0], xScale, yScale1)
+  var areaPlot = new Plottable.Plot.Area(xScale, yScale1)
+      .addDataset(data[0])
       .project("x", timeFormat, xScale);
 
-  var barPlot = new Plottable.Plot.VerticalBar(data[0], xScale, yScale1)
+  var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale1)
+      .addDataset(data[0])
       .project("x", timeFormat, xScale)
       .project("width", 40)
       .barAlignment("center");

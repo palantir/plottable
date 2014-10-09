@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Abstract {
-  export class QuantitativeScale<D> extends Scale<D, number> {
+export module Scale {
+  export class AbstractQuantitative<D> extends AbstractScale<D, number> {
     public _d3Scale: D3.Scale.QuantitativeScale;
     public _numTicks = 10;
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1;
@@ -39,16 +39,16 @@ export module Abstract {
     }
 
     /**
-     * Creates a copy of the QuantitativeScale with the same domain and range but without any registered listeners.
+     * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
      *
-     * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
+     * @returns {AbstractQuantitative} A copy of the calling QuantitativeScale.
      */
-    public copy(): QuantitativeScale<D> {
-      return new QuantitativeScale<D>(this._d3Scale.copy());
+    public copy(): AbstractQuantitative<D> {
+      return new AbstractQuantitative<D>(this._d3Scale.copy());
     }
 
     public domain(): D[];
-    public domain(values: D[]): QuantitativeScale<D>;
+    public domain(values: D[]): AbstractQuantitative<D>;
     public domain(values?: D[]): any {
       return super.domain(values); // need to override type sig to enable method chaining :/
     }
@@ -66,10 +66,10 @@ export module Abstract {
      * Sets or gets the QuantitativeScale's output interpolator
      *
      * @param {D3.Transition.Interpolate} [factory] The output interpolator to use.
-     * @returns {D3.Transition.Interpolate|QuantitativeScale} The current output interpolator, or the calling QuantitativeScale.
+     * @returns {D3.Transition.Interpolate|AbstractQuantitative} The current output interpolator, or the calling QuantitativeScale.
      */
     public interpolate(): D3.Transition.Interpolate;
-    public interpolate(factory: D3.Transition.Interpolate): QuantitativeScale<D>;
+    public interpolate(factory: D3.Transition.Interpolate): AbstractQuantitative<D>;
     public interpolate(factory?: D3.Transition.Interpolate): any {
       if (factory == null) {
         return this._d3Scale.interpolate();
@@ -98,9 +98,9 @@ export module Abstract {
      * Sets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
      *
      * @param {boolean} clamp Whether or not to clamp the QuantitativeScale.
-     * @returns {QuantitativeScale} The calling QuantitativeScale.
+     * @returns {AbstractQuantitative} The calling QuantitativeScale.
      */
-    public clamp(clamp: boolean): QuantitativeScale<D>;
+    public clamp(clamp: boolean): AbstractQuantitative<D>;
     public clamp(clamp?: boolean): any {
       if (clamp == null) {
         return this._d3Scale.clamp();
@@ -131,9 +131,9 @@ export module Abstract {
      * Sets the default number of ticks to generate.
      *
      * @param {number} count The new default number of ticks.
-     * @returns {Scale} The calling Scale.
+     * @returns {Quantitative} The calling QuantitativeScale.
      */
-    public numTicks(count: number): QuantitativeScale<D>;
+    public numTicks(count: number): AbstractQuantitative<D>;
     public numTicks(count?: number): any {
       if (count == null) {
         return this._numTicks;
@@ -166,9 +166,9 @@ export module Abstract {
      * includes 0, etc., will be the responsability of the new domainer.
      *
      * @param {Domainer} domainer If provided, the new domainer.
-     * @return {QuanitativeScale} The calling QuantitativeScale.
+     * @return {AbstractQuantitative} The calling QuantitativeScale.
      */
-    public domainer(domainer: Domainer): QuantitativeScale<D>;
+    public domainer(domainer: Domainer): AbstractQuantitative<D>;
     public domainer(domainer?: Domainer): any {
       if (domainer == null) {
         return this._domainer;

@@ -23,7 +23,7 @@ function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, w
   assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
 }
 
-function fixComponentSize(c: Plottable.Abstract.Component, fixedWidth?: number, fixedHeight?: number) {
+function fixComponentSize(c: Plottable.Component.AbstractComponent, fixedWidth?: number, fixedHeight?: number) {
   c._requestedSpace = function(w, h) {
     return {
       width:  fixedWidth  == null ? 0 : fixedWidth,
@@ -38,7 +38,7 @@ function fixComponentSize(c: Plottable.Abstract.Component, fixedWidth?: number, 
 }
 
 function makeFixedSizeComponent(fixedWidth?: number, fixedHeight?: number) {
-  return fixComponentSize(new Plottable.Abstract.Component(), fixedWidth, fixedHeight);
+  return fixComponentSize(new Plottable.Component.AbstractComponent(), fixedWidth, fixedHeight);
 }
 
 function getTranslate(element: D3.Selection) {

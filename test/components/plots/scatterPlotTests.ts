@@ -15,11 +15,12 @@ describe("Plots", () => {
       var xAccessor = (d: any, i?: number, m?: any) => d.x + i * m.foo;
       var yAccessor = (d: any, i?: number, m?: any) => m.bar;
       var dataset = new Plottable.Dataset(data, metadata);
-      var renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale)
+      var plot = new Plottable.Plot.Scatter(xScale, yScale)
                                   .project("x", xAccessor)
                                   .project("y", yAccessor);
-      renderer.renderTo(svg);
-      var circles = renderer._renderArea.selectAll("circle");
+      plot.addDataset(dataset);
+      plot.renderTo(svg);
+      var circles = plot._renderArea.selectAll("circle");
       var c1 = d3.select(circles[0][0]);
       var c2 = d3.select(circles[0][1]);
       assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
@@ -88,7 +89,8 @@ describe("Plots", () => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.Scale.Linear().domain([0, 9]);
         yScale = new Plottable.Scale.Linear().domain([0, 81]);
-        circlePlot = new Plottable.Plot.Scatter(quadraticDataset, xScale, yScale);
+        circlePlot = new Plottable.Plot.Scatter(xScale, yScale);
+        circlePlot.addDataset(quadraticDataset);
         circlePlot.project("fill", colorAccessor);
         circlePlot.renderTo(svg);
       });
