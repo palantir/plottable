@@ -2310,6 +2310,13 @@ declare module Plottable {
              * @return {Plot} The calling Plot.
              */
             removeDataset(dataset: Dataset): Plot;
+            /**
+             * Remove a dataset given the underlying data array
+             *
+             * @param {any[]} dataArray The data to remove
+             * @return {Plot} The calling Plot.
+             */
+            removeDataset(dataArray: any[]): Plot;
             datasets(): Dataset[];
         }
     }

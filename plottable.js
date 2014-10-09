@@ -5962,18 +5962,20 @@ var Plottable;
                 }
                 return this;
             };
-            Plot.prototype.removeDataset = function (datasetOrKey) {
-                var key;
-                if (typeof (datasetOrKey) === "string") {
-                    key = datasetOrKey;
+            Plot.prototype.removeDataset = function (datasetOrKeyOrArray) {
+                if (typeof (datasetOrKeyOrArray) === "string") {
+                    return this._removeDataset(datasetOrKeyOrArray);
                 }
                 else {
-                    var idx = this.datasets().indexOf(datasetOrKey);
+                    var array = (datasetOrKeyOrArray instanceof Plottable.Dataset) ? this.datasets() : this.datasets().map(function (d) { return d.data(); });
+                    var idx = array.indexOf(datasetOrKeyOrArray);
                     if (idx !== -1) {
-                        key = this._datasetKeysInOrder[idx];
+                        var key = this._datasetKeysInOrder[idx];
+                        return this._removeDataset(key);
                     }
                 }
-                return this._removeDataset(key);
+                Plottable._Util.Methods.warn("Plot.removeDataset: could not match input to dataset or data array");
+                return this;
             };
             Plot.prototype._removeDataset = function (key) {
                 if (this._key2DatasetDrawerKey.has(key)) {

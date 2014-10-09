@@ -179,6 +179,19 @@ describe("Plots", () => {
         plot.removeDataset("bad key");
         assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
       });
+
+      it("removeDataset functions on inputs that are data arrays, not datasets", () => {
+        var a1 = ["foo", "bar"];
+        var a2 = [1,2,3];
+        plot.addDataset(a1);
+        plot.addDataset(a2);
+        assert.lengthOf(plot.datasets(), 4, "there are four datasets");
+        assert.equal(plot.datasets()[3].data(), a2, "second array dataset correct");
+        assert.equal(plot.datasets()[2].data(), a1, "first array dataset correct");
+        plot.removeDataset(a2);
+        plot.removeDataset(a1);
+        assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
+      });
     });
 
     it("remove() disconnects plots from its scales", () => {
