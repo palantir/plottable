@@ -252,5 +252,10 @@
   {
     "name":"stocks",
     "categories":["Integration", "Vertical Bar Plot", "Legend", "Layout", "PanZoom Interaction", "Key Interaction"]
+  },
+
+  {
+    "name":"domain_adjustment_algorithm",
+    "categories":["Linear Scale", "Numeric Axis", "Line Plot", "Adjustment", "Layout"]
   }
 ]

@@ -98,4 +98,11 @@ module Plottable {
     drawer: _Drawer.AbstractDrawer;
     key: string;
   }
+
+  /**
+   * An adjustment for y domain in case of change of x domain.
+   */
+  export interface AdjustmentYDomainAlgorithm<X,Y> {
+    (datasets: Dataset[], xDomain: X[]): Y[];
+  }
 }

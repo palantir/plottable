@@ -856,6 +856,12 @@ declare module Plottable {
         drawer: _Drawer.AbstractDrawer;
         key: string;
     }
+    /**
+     * An adjustment for y domain in case of change of x domain.
+     */
+    interface AdjustmentYDomainAlgorithm<X, Y> {
+        (datasets: Dataset[], xDomain: X[]): Y[];
+    }
 }
 
 
@@ -2357,6 +2363,19 @@ declare module Plottable {
              * x and y position in the Plot.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractXYPlot<X, Y>;
+            /**
+             * Gets the adjustDomainAlgorithm for y scale.
+             *
+             * @returns {AdjustmentYDomainAlgorithm} The current adjustDomainAlgorithm for y scale.
+             */
+            adjustmentYScaleDomainAlgorithm(): AdjustmentYDomainAlgorithm<X, Y>;
+            /**
+             * Sets the adjustDomainAlgorithm for y scale.
+             *
+             * @param {AdjustmentYDomainAlgorithm} values If provided, the new value for the adjustDomainAlgorithm for y scale.
+             * @returns {AbstractXYPlot} The calling AbstractXYPlot.
+             */
+            adjustmentYScaleDomainAlgorithm(algorithm: AdjustmentYDomainAlgorithm<X, Y>): AbstractXYPlot<X, Y>;
         }
     }
 }

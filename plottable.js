@@ -6149,11 +6149,13 @@ var Plottable;
              * x and y position in the Plot.
              */
             AbstractXYPlot.prototype.project = function (attrToSet, accessor, scale) {
+                var _this = this;
                 // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
                 // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
                 if (attrToSet === "x" && scale) {
                     this._xScale = scale;
                     this._updateXDomainer();
+                    scale.broadcaster.registerListener("yScaleAdjustument" + this._plottableID, function () { return _this._adjustYDomainer(); });
                 }
                 if (attrToSet === "y" && scale) {
                     this._yScale = scale;
@@ -6161,6 +6163,15 @@ var Plottable;
                 }
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
+            };
+            AbstractXYPlot.prototype.adjustmentYScaleDomainAlgorithm = function (algorithm) {
+                if (algorithm == null) {
+                    return this._adjustmentYScaleDomainAlgorithm;
+                }
+                else {
+                    this._adjustmentYScaleDomainAlgorithm = algorithm;
+                    return this;
+                }
             };
             AbstractXYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
@@ -6180,6 +6191,18 @@ var Plottable;
                     var scale = this._yScale;
                     if (!scale._userSetDomainer) {
                         scale.domainer().pad().nice();
+                    }
+                }
+            };
+            AbstractXYPlot.prototype._adjustYDomainer = function () {
+                if (this._yScale instanceof Plottable.Scale.AbstractQuantitative) {
+                    var scale = this._yScale;
+                    if (!scale._userSetDomainer) {
+                        if (this._adjustmentYScaleDomainAlgorithm !== undefined) {
+                            var adjustedDomain = this._adjustmentYScaleDomainAlgorithm(this.datasets(), this._xScale.domain());
+                            adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
+                            scale._setDomain(adjustedDomain);
+                        }
                     }
                 }
             };
