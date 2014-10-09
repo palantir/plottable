@@ -2,7 +2,7 @@
 
 var assert = chai.assert;
 
-describe("Tick generatros", () => {
+describe("Tick generators", () => {
   describe("interval", () => {
     it("generate ticks within domain", () => {
       var start = 0.5, end = 10.01, interval = 1;

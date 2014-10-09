@@ -16,9 +16,9 @@ export module TickGenerators {
       var generatedTicks: number[] = [];
       var startIndex = Math.ceil(dom[0] / interval);
       for(var index = startIndex; index * interval <= dom[1]; index++) {
-    	generatedTicks[index - startIndex] = index * interval;
-	  }
-	  return generatedTicks;
+        generatedTicks[index - startIndex] = index * interval;
+      }
+      return generatedTicks;
     };
   }
 }

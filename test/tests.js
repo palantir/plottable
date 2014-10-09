@@ -5683,7 +5683,7 @@ describe("_Util.Methods", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("Tick generatros", function () {
+describe("Tick generators", function () {
     describe("interval", function () {
         it("generate ticks within domain", function () {
             var start = 0.5, end = 10.01, interval = 1;
