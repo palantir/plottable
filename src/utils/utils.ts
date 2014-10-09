@@ -84,7 +84,7 @@ export module _Util {
      * Temporarily always grabs the metadata of the first dataset.
      * HACKHACK #1089 - The accessor currently only grabs the first dataset's metadata
      */
-    export function _applyAccessor(accessor: _Accessor, plot: Abstract.Plot) {
+    export function _applyAccessor(accessor: _Accessor, plot: Plot.AbstractPlot) {
       var activatedAccessor = accessorize(accessor);
       return (d: any, i: number) => {
         var datasets = plot.datasets();

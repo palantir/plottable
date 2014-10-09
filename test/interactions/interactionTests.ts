@@ -83,9 +83,9 @@ describe("Interactions", () => {
     var svgHeight = 400;
     var svg: D3.Selection;
     var dataset: Plottable.Dataset;
-    var xScale: Plottable.Abstract.QuantitativeScale<number>;
-    var yScale: Plottable.Abstract.QuantitativeScale<number>;
-    var plot: Plottable.Abstract.XYPlot<number,number>;
+    var xScale: Plottable.Scale.AbstractQuantitative<number>;
+    var yScale: Plottable.Scale.AbstractQuantitative<number>;
+    var plot: Plottable.Plot.AbstractXYPlot<number,number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
     var dragstartX = 20;
@@ -165,9 +165,9 @@ describe("Interactions", () => {
     var svgHeight = 400;
     var svg: D3.Selection;
     var dataset: Plottable.Dataset;
-    var xScale: Plottable.Abstract.QuantitativeScale<number>;
-    var yScale: Plottable.Abstract.QuantitativeScale<number>;
-    var plot: Plottable.Abstract.XYPlot<number,number>;
+    var xScale: Plottable.Scale.AbstractQuantitative<number>;
+    var yScale: Plottable.Scale.AbstractQuantitative<number>;
+    var plot: Plottable.Plot.AbstractXYPlot<number,number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
     var dragstartX = 20;
@@ -240,7 +240,7 @@ describe("Interactions", () => {
     it("Triggers the callback only when the Component is moused over and appropriate key is pressed", () => {
       var svg = generateSVG(400, 400);
       // svg.attr("id", "key-interaction-test");
-      var component = new Plottable.Abstract.Component();
+      var component = new Plottable.Component.AbstractComponent();
       component.renderTo(svg);
 
       var code = 65; // "a" key

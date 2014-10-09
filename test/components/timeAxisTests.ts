@@ -43,7 +43,7 @@ describe("TimeAxis", () => {
 
       function checkLabelsForContainer(container: D3.Selection) {
         var visibleTickLabels = container
-                .selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS)
+                .selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS)
                 .filter(function(d: any, i: number) {
                   return d3.select(this).style("visibility") === "visible";
                 });

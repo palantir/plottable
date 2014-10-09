@@ -16,7 +16,7 @@ export module Plot {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.QuantitativeScale<X>, yScale: Abstract.QuantitativeScale<number>) {
+    constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this.project("y0", 0, yScale); // default
@@ -62,7 +62,7 @@ export module Plot {
       }
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "y0") {
         this._updateYDomainer();

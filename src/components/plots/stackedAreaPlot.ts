@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class StackedArea<X> extends Abstract.Stacked<X, number> {
+  export class StackedArea<X> extends AbstractStacked<X, number> {
 
     public _baseline: D3.Selection;
     public _baselineValue = 0;
@@ -14,7 +14,7 @@ export module Plot {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.QuantitativeScale<X>, yScale: Abstract.QuantitativeScale<number>) {
+    constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
@@ -45,7 +45,7 @@ export module Plot {
 
     public _updateYDomainer() {
       super._updateYDomainer();
-      var scale = <Abstract.QuantitativeScale<any>> this._yScale;
+      var scale = <Scale.AbstractQuantitative<any>> this._yScale;
       if (!scale._userSetDomainer) {
         scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions

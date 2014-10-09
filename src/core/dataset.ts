@@ -5,7 +5,7 @@ module Plottable {
     accessor: _Accessor;
     extent: any[];
   }
-  export class Dataset extends Abstract.PlottableObject implements Core.Listenable {
+  export class Dataset extends Core.PlottableObject implements Core.Listenable {
     private _data: any[];
     private _metadata: any;
     private accessor2cachedExtent: _Util.StrictEqualityAssociativeArray;

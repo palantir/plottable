@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Abstract {
+export module Core {
   /**
    * A class most other Plottable classes inherit from, in order to have a
    * unique ID.

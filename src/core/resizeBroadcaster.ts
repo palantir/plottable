@@ -58,7 +58,7 @@ export module Core {
      *
      * @param {Component} component Any Plottable component.
      */
-    export function register(c: Abstract.Component) {
+    export function register(c: Component.AbstractComponent) {
       _lazyInitialize();
       broadcaster.registerListener(c._plottableID, () => c._invalidateLayout());
     }
@@ -70,7 +70,7 @@ export module Core {
      *
      * @param {Component} component Any Plottable component.
      */
-    export function deregister(c: Abstract.Component) {
+    export function deregister(c: Component.AbstractComponent) {
       if (broadcaster) {
         broadcaster.deregisterListener(c._plottableID);
       }

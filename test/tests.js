@@ -36,7 +36,7 @@ function fixComponentSize(c, fixedWidth, fixedHeight) {
     return c;
 }
 function makeFixedSizeComponent(fixedWidth, fixedHeight) {
-    return fixComponentSize(new Plottable.Abstract.Component(), fixedWidth, fixedHeight);
+    return fixComponentSize(new Plottable.Component.AbstractComponent(), fixedWidth, fixedHeight);
 }
 function getTranslate(element) {
     return d3.transform(element.attr("transform")).translate;
@@ -161,16 +161,16 @@ var assert = chai.assert;
 describe("BaseAxis", function () {
     it("orientation", function () {
         var scale = new Plottable.Scale.Linear();
-        assert.throws(function () { return new Plottable.Abstract.Axis(scale, "blargh"); }, "unsupported");
+        assert.throws(function () { return new Plottable.Axis.AbstractAxis(scale, "blargh"); }, "unsupported");
     });
     it("tickLabelPadding() rejects negative values", function () {
         var scale = new Plottable.Scale.Linear();
-        var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
         assert.throws(function () { return baseAxis.tickLabelPadding(-1); }, "must be positive");
     });
     it("gutter() rejects negative values", function () {
         var scale = new Plottable.Scale.Linear();
-        var axis = new Plottable.Abstract.Axis(scale, "right");
+        var axis = new Plottable.Axis.AbstractAxis(scale, "right");
         assert.throws(function () { return axis.gutter(-1); }, "must be positive");
     });
     it("width() + gutter()", function () {
@@ -178,7 +178,7 @@ describe("BaseAxis", function () {
         var SVG_HEIGHT = 500;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scale.Linear();
-        var verticalAxis = new Plottable.Abstract.Axis(scale, "right");
+        var verticalAxis = new Plottable.Axis.AbstractAxis(scale, "right");
         verticalAxis.renderTo(svg);
         var expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter(); // tick length and gutter by default
         assert.strictEqual(verticalAxis.width(), expectedWidth, "calling width() with no arguments returns currently used width");
@@ -192,7 +192,7 @@ describe("BaseAxis", function () {
         var SVG_HEIGHT = 100;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scale.Linear();
-        var horizontalAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        var horizontalAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
         horizontalAxis.renderTo(svg);
         var expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter(); // tick length and gutter by default
         assert.strictEqual(horizontalAxis.height(), expectedHeight, "calling height() with no arguments returns currently used height");
@@ -208,13 +208,13 @@ describe("BaseAxis", function () {
         var scale = new Plottable.Scale.Linear();
         scale.domain([0, 10]);
         scale.range([0, SVG_WIDTH]);
-        var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
             return tickValues;
         };
         baseAxis.renderTo(svg);
-        var tickMarks = svg.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        var tickMarks = svg.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
         assert.strictEqual(tickMarks[0].length, tickValues.length, "A tick mark was created for each value");
         var baseline = svg.select(".baseline");
         assert.isNotNull(baseline.node(), "baseline was drawn");
@@ -237,13 +237,13 @@ describe("BaseAxis", function () {
         var scale = new Plottable.Scale.Linear();
         scale.domain([0, 10]);
         scale.range([0, SVG_HEIGHT]);
-        var baseAxis = new Plottable.Abstract.Axis(scale, "left");
+        var baseAxis = new Plottable.Axis.AbstractAxis(scale, "left");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
             return tickValues;
         };
         baseAxis.renderTo(svg);
-        var tickMarks = svg.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        var tickMarks = svg.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
         assert.strictEqual(tickMarks[0].length, tickValues.length, "A tick mark was created for each value");
         var baseline = svg.select(".baseline");
         assert.isNotNull(baseline.node(), "baseline was drawn");
@@ -266,13 +266,13 @@ describe("BaseAxis", function () {
         var scale = new Plottable.Scale.Linear();
         scale.domain([0, 10]);
         scale.range([0, SVG_WIDTH]);
-        var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
             return tickValues;
         };
         baseAxis.renderTo(svg);
-        var secondTickMark = svg.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS + ":nth-child(2)");
+        var secondTickMark = svg.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS + ":nth-child(2)");
         assert.strictEqual(secondTickMark.attr("x1"), "50");
         assert.strictEqual(secondTickMark.attr("x2"), "50");
         assert.strictEqual(secondTickMark.attr("y1"), "0");
@@ -289,11 +289,11 @@ describe("BaseAxis", function () {
         var scale = new Plottable.Scale.Linear();
         scale.domain([0, 10]);
         scale.range([0, SVG_WIDTH]);
-        var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () { return tickValues; };
         baseAxis.renderTo(svg);
-        var firstTickMark = svg.selectAll("." + Plottable.Abstract.Axis.END_TICK_MARK_CLASS);
+        var firstTickMark = svg.selectAll("." + Plottable.Axis.AbstractAxis.END_TICK_MARK_CLASS);
         assert.strictEqual(firstTickMark.attr("x1"), "0");
         assert.strictEqual(firstTickMark.attr("x2"), "0");
         assert.strictEqual(firstTickMark.attr("y1"), "0");
@@ -308,7 +308,7 @@ describe("BaseAxis", function () {
         var SVG_HEIGHT = 100;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scale.Linear();
-        var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
         baseAxis.showEndTickLabels(true);
         baseAxis.renderTo(svg);
         var expectedHeight = Math.max(baseAxis.tickLength(), baseAxis.endTickLength()) + baseAxis.gutter();
@@ -323,13 +323,13 @@ describe("BaseAxis", function () {
     });
     it("default alignment based on orientation", function () {
         var scale = new Plottable.Scale.Linear();
-        var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
         assert.equal(baseAxis._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
-        baseAxis = new Plottable.Abstract.Axis(scale, "top");
+        baseAxis = new Plottable.Axis.AbstractAxis(scale, "top");
         assert.equal(baseAxis._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
-        baseAxis = new Plottable.Abstract.Axis(scale, "left");
+        baseAxis = new Plottable.Axis.AbstractAxis(scale, "left");
         assert.equal(baseAxis._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
-        baseAxis = new Plottable.Abstract.Axis(scale, "right");
+        baseAxis = new Plottable.Axis.AbstractAxis(scale, "right");
         assert.equal(baseAxis._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
     });
 });
@@ -367,7 +367,7 @@ describe("TimeAxis", function () {
             scale.domain(domain);
             axis.renderTo(svg);
             function checkLabelsForContainer(container) {
-                var visibleTickLabels = container.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+                var visibleTickLabels = container.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
                     return d3.select(this).style("visibility") === "visible";
                 });
                 var numLabels = visibleTickLabels[0].length;
@@ -461,9 +461,9 @@ describe("NumericAxis", function () {
         scale.range([0, SVG_WIDTH]);
         var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
         numericAxis.renderTo(svg);
-        var tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS);
         assert.operator(tickLabels[0].length, ">=", 2, "at least two tick labels were drawn");
-        var tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        var tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
         assert.strictEqual(tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
         var i;
         var markBB;
@@ -477,8 +477,8 @@ describe("NumericAxis", function () {
         }
         // labels to left
         numericAxis.tickLabelPosition("left");
-        tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
-        tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
         for (i = 0; i < tickLabels[0].length; i++) {
             markBB = tickMarks[0][i].getBoundingClientRect();
             labelBB = tickLabels[0][i].getBoundingClientRect();
@@ -486,8 +486,8 @@ describe("NumericAxis", function () {
         }
         // labels to right
         numericAxis.tickLabelPosition("right");
-        tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
-        tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
         for (i = 0; i < tickLabels[0].length; i++) {
             markBB = tickMarks[0][i].getBoundingClientRect();
             labelBB = tickLabels[0][i].getBoundingClientRect();
@@ -503,9 +503,9 @@ describe("NumericAxis", function () {
         scale.range([0, SVG_HEIGHT]);
         var numericAxis = new Plottable.Axis.Numeric(scale, "left");
         numericAxis.renderTo(svg);
-        var tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS);
         assert.operator(tickLabels[0].length, ">=", 2, "at least two tick labels were drawn");
-        var tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        var tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
         assert.strictEqual(tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
         var i;
         var markBB;
@@ -519,8 +519,8 @@ describe("NumericAxis", function () {
         }
         // labels to top
         numericAxis.tickLabelPosition("top");
-        tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
-        tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
         for (i = 0; i < tickLabels[0].length; i++) {
             markBB = tickMarks[0][i].getBoundingClientRect();
             labelBB = tickLabels[0][i].getBoundingClientRect();
@@ -528,8 +528,8 @@ describe("NumericAxis", function () {
         }
         // labels to bottom
         numericAxis.tickLabelPosition("bottom");
-        tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
-        tickMarks = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
         for (i = 0; i < tickLabels[0].length; i++) {
             markBB = tickMarks[0][i].getBoundingClientRect();
             labelBB = tickLabels[0][i].getBoundingClientRect();
@@ -546,7 +546,7 @@ describe("NumericAxis", function () {
         var formatter = Plottable.Formatters.fixed(2);
         var numericAxis = new Plottable.Axis.Numeric(scale, "left", formatter);
         numericAxis.renderTo(svg);
-        var tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS);
         tickLabels.each(function (d, i) {
             var labelText = d3.select(this).text();
             var formattedValue = formatter(d);
@@ -568,7 +568,7 @@ describe("NumericAxis", function () {
         assert.throws(function () { return numericAxis.showEndTickLabel("top", true); }, Error);
         assert.throws(function () { return numericAxis.showEndTickLabel("bottom", true); }, Error);
         numericAxis.renderTo(svg);
-        var tickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS);
         var firstLabel = d3.select(tickLabels[0][0]);
         assert.strictEqual(firstLabel.style("visibility"), "hidden", "first label is hidden");
         var lastLabel = d3.select(tickLabels[0][tickLabels[0].length - 1]);
@@ -584,7 +584,7 @@ describe("NumericAxis", function () {
         var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
         numericAxis.showEndTickLabel("left", false).showEndTickLabel("right", false);
         numericAxis.renderTo(svg);
-        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
         var numLabels = visibleTickLabels[0].length;
@@ -598,7 +598,7 @@ describe("NumericAxis", function () {
             }
         }
         numericAxis.orient("bottom");
-        visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+        visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
         numLabels = visibleTickLabels[0].length;
@@ -626,7 +626,7 @@ describe("NumericAxis", function () {
         };
         var numericAxis = new Plottable.Axis.Numeric(scale, "left", formatter);
         numericAxis.renderTo(svg);
-        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
         var boundingBox = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
@@ -636,7 +636,7 @@ describe("NumericAxis", function () {
             assert.isTrue(boxIsInside(labelBox, boundingBox), "tick labels don't extend outside the bounding box");
         });
         scale.domain([50000000000, -50000000000]);
-        visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+        visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
         boundingBox = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
@@ -656,7 +656,7 @@ describe("NumericAxis", function () {
         var formatter = Plottable.Formatters.fixed(2);
         var numericAxis = new Plottable.Axis.Numeric(scale, "bottom", formatter);
         numericAxis.renderTo(svg);
-        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
         var boundingBox = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
@@ -799,7 +799,7 @@ describe("Gridlines", function () {
         xScale.range([0, xAxis.width()]); // manually set range since we don't have a renderer
         yScale.range([yAxis.height(), 0]);
         basicTable._render();
-        var xAxisTickMarks = xAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS)[0];
+        var xAxisTickMarks = xAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0];
         var xGridlines = gridlines._element.select(".x-gridlines").selectAll("line")[0];
         assert.equal(xAxisTickMarks.length, xGridlines.length, "There is an x gridline for each x tick");
         for (var i = 0; i < xAxisTickMarks.length; i++) {
@@ -807,7 +807,7 @@ describe("Gridlines", function () {
             var xGridlineRect = xGridlines[i].getBoundingClientRect();
             assert.closeTo(xTickMarkRect.left, xGridlineRect.left, 1, "x tick and gridline align");
         }
-        var yAxisTickMarks = yAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS)[0];
+        var yAxisTickMarks = yAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0];
         var yGridlines = gridlines._element.select(".y-gridlines").selectAll("line")[0];
         assert.equal(yAxisTickMarks.length, yGridlines.length, "There is an x gridline for each x tick");
         for (var j = 0; j < yAxisTickMarks.length; j++) {
@@ -901,7 +901,7 @@ describe("Labels", function () {
     it("centered text in a table is positioned properly", function () {
         var svg = generateSVG(400, 400);
         var label = new Plottable.Component.TitleLabel("X");
-        var t = new Plottable.Component.Table().addComponent(0, 0, label).addComponent(1, 0, new Plottable.Abstract.Component());
+        var t = new Plottable.Component.Table().addComponent(0, 0, label).addComponent(1, 0, new Plottable.Component.AbstractComponent());
         t.renderTo(svg);
         var textTranslate = d3.transform(label._content.select("g").attr("transform")).translate;
         var eleTranslate = d3.transform(label._element.attr("transform")).translate;
@@ -1472,16 +1472,16 @@ var CountingPlot = (function (_super) {
         return _super.prototype._render.call(this);
     };
     return CountingPlot;
-})(Plottable.Abstract.Plot);
+})(Plottable.Plot.AbstractPlot);
 describe("Plots", function () {
     describe("Abstract Plot", function () {
         it("Plots default correctly", function () {
-            var r = new Plottable.Abstract.Plot();
+            var r = new Plottable.Plot.AbstractPlot();
             assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
         });
         it("Base Plot functionality works", function () {
             var svg = generateSVG(400, 300);
-            var r = new Plottable.Abstract.Plot();
+            var r = new Plottable.Plot.AbstractPlot();
             r._anchor(svg);
             r._computeLayout();
             var renderArea = r._content.select(".render-area");
@@ -1509,7 +1509,7 @@ describe("Plots", function () {
         });
         it("Updates its projectors when the Dataset is changed", function () {
             var d1 = new Plottable.Dataset([{ x: 5, y: 6 }], { cssClass: "bar" });
-            var r = new Plottable.Abstract.Plot();
+            var r = new Plottable.Plot.AbstractPlot();
             r.addDataset("d1", d1);
             var xScaleCalls = 0;
             var yScaleCalls = 0;
@@ -1550,13 +1550,13 @@ describe("Plots", function () {
         });
         it("Plot automatically generates a Dataset if only data is provided", function () {
             var data = ["foo", "bar"];
-            var r = new Plottable.Abstract.Plot().addDataset("foo", data);
+            var r = new Plottable.Plot.AbstractPlot().addDataset("foo", data);
             var dataset = r.datasets()[0];
             assert.isNotNull(dataset, "A Dataset was automatically generated");
             assert.deepEqual(dataset.data(), data, "The generated Dataset has the correct data");
         });
         it("Plot.project works as intended", function () {
-            var r = new Plottable.Abstract.Plot();
+            var r = new Plottable.Plot.AbstractPlot();
             var s = new Plottable.Scale.Linear().domain([0, 1]).range([0, 10]);
             r.project("attr", "a", s);
             var attrToProjector = r._generateAttrToProjector();
@@ -1569,8 +1569,8 @@ describe("Plots", function () {
             var s = new Plottable.Scale.Linear();
             var svg1 = generateSVG(100, 100);
             var svg2 = generateSVG(100, 100);
-            var r1 = new Plottable.Abstract.Plot().addDataset(ds1).project("x", function (x) { return x; }, s).renderTo(svg1);
-            var r2 = new Plottable.Abstract.Plot().addDataset(ds2).project("x", function (x) { return x; }, s).renderTo(svg2);
+            var r1 = new Plottable.Plot.AbstractPlot().addDataset(ds1).project("x", function (x) { return x; }, s).renderTo(svg1);
+            var r2 = new Plottable.Plot.AbstractPlot().addDataset(ds2).project("x", function (x) { return x; }, s).renderTo(svg2);
             assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
             ds1.data([]);
             assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
@@ -1582,7 +1582,7 @@ describe("Plots", function () {
             var d1;
             var d2;
             beforeEach(function () {
-                plot = new Plottable.Abstract.Plot();
+                plot = new Plottable.Plot.AbstractPlot();
                 d1 = new Plottable.Dataset();
                 d2 = new Plottable.Dataset();
                 plot.addDataset("foo", d1);
@@ -1634,7 +1634,7 @@ describe("Plots", function () {
             });
         });
         it("remove() disconnects plots from its scales", function () {
-            var r = new Plottable.Abstract.Plot();
+            var r = new Plottable.Plot.AbstractPlot();
             var s = new Plottable.Scale.Linear();
             r.project("attr", "a", s);
             r.remove();
@@ -1788,7 +1788,7 @@ describe("Plots", function () {
         var p;
         var oldWarn = Plottable._Util.Methods.warn;
         beforeEach(function () {
-            p = new Plottable.Abstract.Plot();
+            p = new Plottable.Plot.AbstractPlot();
             p._getDrawer = function (k) { return new Plottable._Drawer.Rect(k); };
         });
         afterEach(function () {
@@ -3350,10 +3350,10 @@ describe("Broadcasters", function () {
 var assert = chai.assert;
 describe("ComponentContainer", function () {
     it("_addComponent()", function () {
-        var container = new Plottable.Abstract.ComponentContainer();
-        var c1 = new Plottable.Abstract.Component();
-        var c2 = new Plottable.Abstract.Component();
-        var c3 = new Plottable.Abstract.Component();
+        var container = new Plottable.Component.AbstractComponentContainer();
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
+        var c3 = new Plottable.Component.AbstractComponent();
         assert.isTrue(container._addComponent(c1), "returns true on successful adding");
         assert.deepEqual(container.components(), [c1], "component was added");
         container._addComponent(c2);
@@ -3366,9 +3366,9 @@ describe("ComponentContainer", function () {
         assert.deepEqual(container.components(), [c3, c1, c2], "component list was unchanged");
     });
     it("_removeComponent()", function () {
-        var container = new Plottable.Abstract.ComponentContainer();
-        var c1 = new Plottable.Abstract.Component();
-        var c2 = new Plottable.Abstract.Component();
+        var container = new Plottable.Component.AbstractComponentContainer();
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
         container._addComponent(c1);
         container._addComponent(c2);
         container._removeComponent(c2);
@@ -3377,25 +3377,25 @@ describe("ComponentContainer", function () {
         assert.deepEqual(container.components(), [c1], "there are no side effects from removing already-removed components");
     });
     it("empty()", function () {
-        var container = new Plottable.Abstract.ComponentContainer();
+        var container = new Plottable.Component.AbstractComponentContainer();
         assert.isTrue(container.empty());
-        var c1 = new Plottable.Abstract.Component();
+        var c1 = new Plottable.Component.AbstractComponent();
         container._addComponent(c1);
         assert.isFalse(container.empty());
     });
     it("detachAll()", function () {
-        var container = new Plottable.Abstract.ComponentContainer();
-        var c1 = new Plottable.Abstract.Component();
-        var c2 = new Plottable.Abstract.Component();
+        var container = new Plottable.Component.AbstractComponentContainer();
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
         container._addComponent(c1);
         container._addComponent(c2);
         container.detachAll();
         assert.deepEqual(container.components(), [], "container was cleared of components");
     });
     it("components() returns a shallow copy", function () {
-        var container = new Plottable.Abstract.ComponentContainer();
-        var c1 = new Plottable.Abstract.Component();
-        var c2 = new Plottable.Abstract.Component();
+        var container = new Plottable.Component.AbstractComponentContainer();
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
         container._addComponent(c1);
         container._addComponent(c2);
         var componentList = container.components();
@@ -3409,8 +3409,8 @@ var assert = chai.assert;
 describe("ComponentGroups", function () {
     it("components in componentGroups overlap", function () {
         var c1 = makeFixedSizeComponent(10, 10);
-        var c2 = new Plottable.Abstract.Component();
-        var c3 = new Plottable.Abstract.Component();
+        var c2 = new Plottable.Component.AbstractComponent();
+        var c3 = new Plottable.Component.AbstractComponent();
         var cg = new Plottable.Component.Group([c1, c2, c3]);
         var svg = generateSVG(400, 400);
         cg._anchor(svg);
@@ -3429,7 +3429,7 @@ describe("ComponentGroups", function () {
     it("components can be added before and after anchoring", function () {
         var c1 = makeFixedSizeComponent(10, 10);
         var c2 = makeFixedSizeComponent(20, 20);
-        var c3 = new Plottable.Abstract.Component();
+        var c3 = new Plottable.Component.AbstractComponent();
         var cg = new Plottable.Component.Group([c1]);
         var svg = generateSVG(400, 400);
         cg.merge(c2)._anchor(svg);
@@ -3449,8 +3449,8 @@ describe("ComponentGroups", function () {
     });
     it("component fixity is computed appropriately", function () {
         var cg = new Plottable.Component.Group();
-        var c1 = new Plottable.Abstract.Component();
-        var c2 = new Plottable.Abstract.Component();
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
         cg.merge(c1).merge(c2);
         assert.isFalse(cg._isFixedHeight(), "height not fixed when both components unfixed");
         assert.isFalse(cg._isFixedWidth(), "width not fixed when both components unfixed");
@@ -3463,8 +3463,8 @@ describe("ComponentGroups", function () {
     });
     it("componentGroup subcomponents have xOffset, yOffset of 0", function () {
         var cg = new Plottable.Component.Group();
-        var c1 = new Plottable.Abstract.Component();
-        var c2 = new Plottable.Abstract.Component();
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
         cg.merge(c1).merge(c2);
         var svg = generateSVG();
         cg._anchor(svg);
@@ -3481,8 +3481,8 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
     it("detach() and _removeComponent work correctly for componentGroup", function () {
-        var c1 = new Plottable.Abstract.Component().classed("component-1", true);
-        var c2 = new Plottable.Abstract.Component().classed("component-2", true);
+        var c1 = new Plottable.Component.AbstractComponent().classed("component-1", true);
+        var c2 = new Plottable.Component.AbstractComponent().classed("component-2", true);
         var cg = new Plottable.Component.Group([c1, c2]);
         var svg = generateSVG(200, 200);
         cg.renderTo(svg);
@@ -3509,9 +3509,9 @@ describe("ComponentGroups", function () {
     });
     it("detachAll() works as expected", function () {
         var cg = new Plottable.Component.Group();
-        var c1 = new Plottable.Abstract.Component();
-        var c2 = new Plottable.Abstract.Component();
-        var c3 = new Plottable.Abstract.Component();
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
+        var c3 = new Plottable.Component.AbstractComponent();
         assert.isTrue(cg.empty(), "cg initially empty");
         cg.merge(c1).merge(c2).merge(c3);
         assert.isFalse(cg.empty(), "cg not empty after merging components");
@@ -3530,17 +3530,17 @@ describe("ComponentGroups", function () {
         });
         it("works for a ComponentGroup with only proportional-size components", function () {
             var cg = new Plottable.Component.Group();
-            var c1 = new Plottable.Abstract.Component();
-            var c2 = new Plottable.Abstract.Component();
+            var c1 = new Plottable.Component.AbstractComponent();
+            var c2 = new Plottable.Component.AbstractComponent();
             cg.merge(c1).merge(c2);
             var request = cg._requestedSpace(10, 10);
             verifySpaceRequest(request, 0, 0, false, false, "");
         });
         it("works when there are fixed-size components", function () {
             var cg = new Plottable.Component.Group();
-            var c1 = new Plottable.Abstract.Component();
-            var c2 = new Plottable.Abstract.Component();
-            var c3 = new Plottable.Abstract.Component();
+            var c1 = new Plottable.Component.AbstractComponent();
+            var c2 = new Plottable.Component.AbstractComponent();
+            var c3 = new Plottable.Component.AbstractComponent();
             cg.merge(c1).merge(c2).merge(c3);
             fixComponentSize(c1, null, 10);
             fixComponentSize(c2, null, 50);
@@ -3549,10 +3549,10 @@ describe("ComponentGroups", function () {
         });
     });
     describe("Component.merge works as expected", function () {
-        var c1 = new Plottable.Abstract.Component();
-        var c2 = new Plottable.Abstract.Component();
-        var c3 = new Plottable.Abstract.Component();
-        var c4 = new Plottable.Abstract.Component();
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
+        var c3 = new Plottable.Component.AbstractComponent();
+        var c4 = new Plottable.Component.AbstractComponent();
         it("Component.merge works as expected (Component.merge Component)", function () {
             var cg = c1.merge(c2);
             var innerComponents = cg._components;
@@ -3610,7 +3610,7 @@ describe("Component behavior", function () {
     var SVG_HEIGHT = 300;
     beforeEach(function () {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        c = new Plottable.Abstract.Component();
+        c = new Plottable.Component.AbstractComponent();
     });
     describe("anchor", function () {
         it("anchoring works as expected", function () {
@@ -3776,10 +3776,10 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("componentID works as expected", function () {
-        var expectedID = Plottable.Abstract.PlottableObject.nextID;
-        var c1 = new Plottable.Abstract.Component();
+        var expectedID = Plottable.Core.PlottableObject.nextID;
+        var c1 = new Plottable.Component.AbstractComponent();
         assert.equal(c1._plottableID, expectedID, "component id on next component was as expected");
-        var c2 = new Plottable.Abstract.Component();
+        var c2 = new Plottable.Component.AbstractComponent();
         assert.equal(c2._plottableID, expectedID + 1, "future components increment appropriately");
         svg.remove();
     });
@@ -3812,16 +3812,16 @@ describe("Component behavior", function () {
         assert.isUndefined(c.hitBox, "no hitBox was created when there were no registered interactions");
         svg.remove();
         svg = generateSVG();
-        c = new Plottable.Abstract.Component();
-        var i = new Plottable.Abstract.Interaction();
+        c = new Plottable.Component.AbstractComponent();
+        var i = new Plottable.Interaction.AbstractInteraction();
         c.registerInteraction(i);
         c._anchor(svg);
         verifyHitbox(c);
         svg.remove();
         svg = generateSVG();
-        c = new Plottable.Abstract.Component();
+        c = new Plottable.Component.AbstractComponent();
         c._anchor(svg);
-        i = new Plottable.Abstract.Interaction();
+        i = new Plottable.Interaction.AbstractInteraction();
         c.registerInteraction(i);
         verifyHitbox(c);
         svg.remove();
@@ -3868,7 +3868,7 @@ describe("Component behavior", function () {
         var cbCalled = 0;
         var cb = function (b) { return cbCalled++; };
         var b = new Plottable.Core.Broadcaster(null);
-        var c1 = new Plottable.Abstract.Component();
+        var c1 = new Plottable.Component.AbstractComponent();
         b.registerListener(c1, cb);
         c1.renderTo(svg);
         b.broadcast();
@@ -3881,7 +3881,7 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("can't reuse component if it's been remove()-ed", function () {
-        var c1 = new Plottable.Abstract.Component();
+        var c1 = new Plottable.Component.AbstractComponent();
         c1.renderTo(svg);
         c1.remove();
         assert.throws(function () { return c1.renderTo(svg); }, "reuse");
@@ -3901,15 +3901,15 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("components can be detached even if not anchored", function () {
-        var c = new Plottable.Abstract.Component();
+        var c = new Plottable.Component.AbstractComponent();
         c.detach(); // no error thrown
         svg.remove();
     });
     it("component remains in own cell", function () {
-        var horizontalComponent = new Plottable.Abstract.Component();
-        var verticalComponent = new Plottable.Abstract.Component();
-        var placeHolder = new Plottable.Abstract.Component();
-        var t = new Plottable.Component.Table().addComponent(0, 0, verticalComponent).addComponent(0, 1, new Plottable.Abstract.Component()).addComponent(1, 0, placeHolder).addComponent(1, 1, horizontalComponent);
+        var horizontalComponent = new Plottable.Component.AbstractComponent();
+        var verticalComponent = new Plottable.Component.AbstractComponent();
+        var placeHolder = new Plottable.Component.AbstractComponent();
+        var t = new Plottable.Component.Table().addComponent(0, 0, verticalComponent).addComponent(0, 1, new Plottable.Component.AbstractComponent()).addComponent(1, 0, placeHolder).addComponent(1, 1, horizontalComponent);
         t.renderTo(svg);
         horizontalComponent.xAlign("center");
         verticalComponent.yAlign("bottom");
@@ -3953,7 +3953,7 @@ describe("Dataset", function () {
         var metadata = { foo: 11 };
         var id = function (d) { return d; };
         var dataset = new Plottable.Dataset(data, metadata);
-        var plot = new Plottable.Abstract.Plot().addDataset(dataset);
+        var plot = new Plottable.Plot.AbstractPlot().addDataset(dataset);
         var apply = function (a) { return Plottable._Util.Methods._applyAccessor(a, plot); };
         var a1 = function (d, i, m) { return d + i - 2; };
         assert.deepEqual(dataset._getExtent(a1, id), [-1, 5], "extent for numerical data works properly");
@@ -3979,7 +3979,7 @@ function generateBasicTable(nRows, nCols) {
     var components = [];
     for (var i = 0; i < nRows; i++) {
         for (var j = 0; j < nCols; j++) {
-            var r = new Plottable.Abstract.Component();
+            var r = new Plottable.Component.AbstractComponent();
             table.addComponent(i, j, r);
             components.push(r);
         }
@@ -4007,19 +4007,19 @@ describe("Tables", function () {
         assert.equal(rows[0][0], firstComponent, "the first component is unchanged");
     });
     it("table constructor can take a list of lists of components", function () {
-        var c0 = new Plottable.Abstract.Component();
+        var c0 = new Plottable.Component.AbstractComponent();
         var row1 = [null, c0];
-        var row2 = [new Plottable.Abstract.Component(), null];
+        var row2 = [new Plottable.Component.AbstractComponent(), null];
         var table = new Plottable.Component.Table([row1, row2]);
         assert.equal(table.rows[0][1], c0, "the component is in the right spot");
-        var c1 = new Plottable.Abstract.Component();
+        var c1 = new Plottable.Component.AbstractComponent();
         table.addComponent(2, 2, c1);
         assert.equal(table.rows[2][2], c1, "the inserted component went to the right spot");
     });
     it("tables can be constructed by adding components in matrix style", function () {
         var table = new Plottable.Component.Table();
-        var c1 = new Plottable.Abstract.Component();
-        var c2 = new Plottable.Abstract.Component();
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
         table.addComponent(0, 0, c1);
         table.addComponent(1, 1, c2);
         var rows = table.rows;
@@ -4032,9 +4032,9 @@ describe("Tables", function () {
         assert.isNull(rows[1][0], "component at (1, 0) is null");
     });
     it("can't add a component where one already exists", function () {
-        var c1 = new Plottable.Abstract.Component();
-        var c2 = new Plottable.Abstract.Component();
-        var c3 = new Plottable.Abstract.Component();
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
+        var c3 = new Plottable.Component.AbstractComponent();
         var t = new Plottable.Component.Table();
         t.addComponent(0, 2, c1);
         t.addComponent(0, 0, c2);
@@ -4044,8 +4044,8 @@ describe("Tables", function () {
         // Solves #180, a weird bug
         var t = new Plottable.Component.Table();
         var svg = generateSVG();
-        t.addComponent(1, 0, new Plottable.Abstract.Component());
-        t.addComponent(0, 2, new Plottable.Abstract.Component());
+        t.addComponent(1, 0, new Plottable.Component.AbstractComponent());
+        t.addComponent(0, 2, new Plottable.Component.AbstractComponent());
         t.renderTo(svg); //would throw an error without the fix (tested);
         svg.remove();
     });
@@ -4090,7 +4090,7 @@ describe("Tables", function () {
     });
     it("table with fixed-size objects on every side lays out properly", function () {
         var svg = generateSVG();
-        var c4 = new Plottable.Abstract.Component();
+        var c4 = new Plottable.Component.AbstractComponent();
         // [0 1 2] \\
         // [3 4 5] \\
         // [6 7 8] \\
@@ -4137,7 +4137,7 @@ describe("Tables", function () {
     it.skip("table._requestedSpace works properly", function () {
         // [0 1]
         // [2 3]
-        var c0 = new Plottable.Abstract.Component();
+        var c0 = new Plottable.Component.AbstractComponent();
         var c1 = makeFixedSizeComponent(50, 50);
         var c2 = makeFixedSizeComponent(20, 50);
         var c3 = makeFixedSizeComponent(20, 20);
@@ -4161,10 +4161,10 @@ describe("Tables", function () {
             assert.deepEqual(result.wantsWidth, wW, "wantsWidth:" + id);
             assert.deepEqual(result.wantsHeight, wH, "wantsHeight:" + id);
         }
-        var c1 = new Plottable.Abstract.Component();
-        var c2 = new Plottable.Abstract.Component();
-        var c3 = new Plottable.Abstract.Component();
-        var c4 = new Plottable.Abstract.Component();
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
+        var c3 = new Plottable.Component.AbstractComponent();
+        var c4 = new Plottable.Component.AbstractComponent();
         var table = new Plottable.Component.Table([
             [c1, c2],
             [c3, c4]
@@ -4211,12 +4211,12 @@ describe("Tables", function () {
         });
     });
     describe("table._removeComponent works properly", function () {
-        var c1 = new Plottable.Abstract.Component();
-        var c2 = new Plottable.Abstract.Component();
-        var c3 = new Plottable.Abstract.Component();
-        var c4 = new Plottable.Abstract.Component();
-        var c5 = new Plottable.Abstract.Component();
-        var c6 = new Plottable.Abstract.Component();
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
+        var c3 = new Plottable.Component.AbstractComponent();
+        var c4 = new Plottable.Component.AbstractComponent();
+        var c5 = new Plottable.Component.AbstractComponent();
+        var c6 = new Plottable.Component.AbstractComponent();
         var table;
         it("table._removeComponent works in basic case", function () {
             table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
@@ -4498,7 +4498,7 @@ describe("Scales", function () {
         });
         it("scale autorange works as expected with single dataset", function () {
             var svg = generateSVG(100, 100);
-            var renderer = new Plottable.Abstract.Plot().addDataset(dataset).project("x", "foo", scale).renderTo(svg);
+            var renderer = new Plottable.Plot.AbstractPlot().addDataset(dataset).project("x", "foo", scale).renderTo(svg);
             assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
             data.push({ foo: 100, bar: 200 });
             dataset.data(data);
@@ -4508,9 +4508,9 @@ describe("Scales", function () {
         it("scale reference counting works as expected", function () {
             var svg1 = generateSVG(100, 100);
             var svg2 = generateSVG(100, 100);
-            var renderer1 = new Plottable.Abstract.Plot().addDataset(dataset).project("x", "foo", scale);
+            var renderer1 = new Plottable.Plot.AbstractPlot().addDataset(dataset).project("x", "foo", scale);
             renderer1.renderTo(svg1);
-            var renderer2 = new Plottable.Abstract.Plot().addDataset(dataset).project("x", "foo", scale);
+            var renderer2 = new Plottable.Plot.AbstractPlot().addDataset(dataset).project("x", "foo", scale);
             renderer2.renderTo(svg2);
             var otherScale = new Plottable.Scale.Linear();
             renderer1.project("x", "foo", otherScale);
@@ -5853,7 +5853,7 @@ describe("Interactions", function () {
         it("Triggers the callback only when the Component is moused over and appropriate key is pressed", function () {
             var svg = generateSVG(400, 400);
             // svg.attr("id", "key-interaction-test");
-            var component = new Plottable.Abstract.Component();
+            var component = new Plottable.Component.AbstractComponent();
             component.renderTo(svg);
             var code = 65; // "a" key
             var ki = new Plottable.Interaction.Key(code);
@@ -5985,7 +5985,7 @@ var assert = chai.assert;
 describe("Dispatchers", function () {
     it("correctly registers for and deregisters from events", function () {
         var target = generateSVG();
-        var dispatcher = new Plottable.Abstract.Dispatcher(target);
+        var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target);
         var callbackWasCalled = false;
         dispatcher._event2Callback["click"] = function () {
             callbackWasCalled = true;
@@ -6004,7 +6004,7 @@ describe("Dispatchers", function () {
     it("target can be changed", function () {
         var target1 = generateSVG();
         var target2 = generateSVG();
-        var dispatcher = new Plottable.Abstract.Dispatcher(target1);
+        var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target1);
         var callbackWasCalled = false;
         dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
         dispatcher.connect();
@@ -6021,11 +6021,11 @@ describe("Dispatchers", function () {
     });
     it("multiple dispatchers can be attached to the same target", function () {
         var target = generateSVG();
-        var dispatcher1 = new Plottable.Abstract.Dispatcher(target);
+        var dispatcher1 = new Plottable.Dispatcher.AbstractDispatcher(target);
         var called1 = false;
         dispatcher1._event2Callback["click"] = function () { return called1 = true; };
         dispatcher1.connect();
-        var dispatcher2 = new Plottable.Abstract.Dispatcher(target);
+        var dispatcher2 = new Plottable.Dispatcher.AbstractDispatcher(target);
         var called2 = false;
         dispatcher2._event2Callback["click"] = function () { return called2 = true; };
         dispatcher2.connect();
@@ -6036,7 +6036,7 @@ describe("Dispatchers", function () {
     });
     it("can't double-connect", function () {
         var target = generateSVG();
-        var dispatcher = new Plottable.Abstract.Dispatcher(target);
+        var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target);
         dispatcher.connect();
         assert.throws(function () { return dispatcher.connect(); }, "connect");
         target.remove();

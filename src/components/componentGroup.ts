@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Component {
-  export class Group extends Abstract.ComponentContainer {
+  export class Group extends AbstractComponentContainer {
 
     /**
      * Constructs a GroupComponent.
@@ -14,14 +14,14 @@ export module Component {
      * @constructor
      * @param {Component[]} components The Components in the Group (default = []).
      */
-    constructor(components: Abstract.Component[] = []){
+    constructor(components: AbstractComponent[] = []){
       super();
       this.classed("component-group", true);
-      components.forEach((c: Abstract.Component) => this._addComponent(c));
+      components.forEach((c: AbstractComponent) => this._addComponent(c));
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var requests = this._components.map((c: Abstract.Component) => c._requestedSpace(offeredWidth, offeredHeight));
+      var requests = this._components.map((c: AbstractComponent) => c._requestedSpace(offeredWidth, offeredHeight));
       return {
         width : _Util.Methods.max(requests, (request: _SpaceRequest) => request.width ),
         height: _Util.Methods.max(requests, (request: _SpaceRequest) => request.height),
@@ -30,7 +30,7 @@ export module Component {
       };
     }
 
-    public merge(c: Abstract.Component): Group {
+    public merge(c: AbstractComponent): Group {
       this._addComponent(c);
       return this;
     }

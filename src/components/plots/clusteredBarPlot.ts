@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class ClusteredBar<X,Y> extends Abstract.BarPlot<X,Y> {
+  export class ClusteredBar<X,Y> extends AbstractBarPlot<X,Y> {
     private innerScale: Scale.Ordinal;
 
     /**
@@ -16,7 +16,7 @@ export module Plot {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.Scale<X, number>, yScale: Abstract.Scale<Y, number>, isVertical = true) {
+    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
       this._isVertical = isVertical; // Has to be set before super()
       super(xScale, yScale);
       this.innerScale = new Scale.Ordinal();
@@ -48,7 +48,7 @@ export module Plot {
 
         clusters[key] = data.map((d, i) => {
           var val = accessor(d, i);
-          var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._xScale : this._yScale;
+          var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._xScale : this._yScale;
           d["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + this.innerScale.scale(key);
           return d;
         });
@@ -62,7 +62,7 @@ export module Plot {
       var clusteredData = this.cluster(accessor);
       this._getDrawersInOrder().forEach((d) => d.draw(clusteredData[d.key], attrHash));
 
-      var primaryScale: Abstract.Scale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 
       var baselineAttr: any = {

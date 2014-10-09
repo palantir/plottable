@@ -30,7 +30,7 @@ module Plottable {
 
   export interface _Projector {
     accessor: _Accessor;
-    scale?: Abstract.Scale<any, any>;
+    scale?: Scale.AbstractScale<any, any>;
     attribute: string;
   }
 
@@ -95,7 +95,7 @@ module Plottable {
    */
   export interface DatasetDrawerKey {
     dataset: Dataset;
-    drawer: Abstract._Drawer;
+    drawer: _Drawer.AbstractDrawer;
     key: string;
   }
 }

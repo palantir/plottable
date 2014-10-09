@@ -8,7 +8,7 @@ export module Axis {
       formatString: string;
   };
 
-  export class Time extends Abstract.Axis {
+  export class Time extends AbstractAxis {
 
     public _majorTickLabels: D3.Selection;
     public _minorTickLabels: D3.Selection;
@@ -142,8 +142,8 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this._majorTickLabels = this._content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      this._minorTickLabels = this._content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      this._majorTickLabels = this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
+      this._minorTickLabels = this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       this.measurer = _Util.Text.getTextMeasurer(this._majorTickLabels.append("text"));
     }
 
@@ -174,14 +174,14 @@ export module Axis {
     }
 
     public _measureTextHeight(container: D3.Selection): number {
-      var fakeTickLabel = container.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      var fakeTickLabel = container.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       var textHeight = this.measurer(_Util.Text.HEIGHT_TEXT).height;
       fakeTickLabel.remove();
       return textHeight;
     }
 
     private renderTickLabels(container: D3.Selection, interval: _TimeInterval, height: number) {
-      container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).remove();
+      container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
       var tickPos = this._scale._tickInterval(interval.timeUnit,
                                               interval.step);
       tickPos.splice(0, 0, this._scale.domain()[0]);
@@ -201,8 +201,8 @@ export module Axis {
       }
       labelPos = labelPos.filter((d: any) =>
         this.canFitLabelFilter(container, d, d3.time.format(interval.formatString)(d), shouldCenterText));
-      var tickLabels = container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
-      var tickLabelsEnter = tickLabels.enter().append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      var tickLabels = container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
+      var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
       var yTranslate = (this._orientation === "bottom" ? (this._maxLabelTickLength() / 2 * height) :
@@ -235,7 +235,7 @@ export module Axis {
 
     private adjustTickLength(height: number, interval: _TimeInterval) {
       var tickValues = this._getTickIntervalValues(interval);
-      var selection = this._tickMarkContainer.selectAll("." + Abstract.Axis.TICK_MARK_CLASS).filter((d: Date) =>
+      var selection = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).filter((d: Date) =>
         // we want to check if d is in tickValues
         // however, if two dates a, b, have the same date, it may not be true that a === b.
         // thus, we convert them to values first, then do the comparison
@@ -255,8 +255,8 @@ export module Axis {
       var smallTicks = this._getTickIntervalValues(Time._minorIntervals[index]);
       var allTicks = this._getTickValues().concat(smallTicks);
 
-      var tickMarks = this._tickMarkContainer.selectAll("." + Abstract.Axis.TICK_MARK_CLASS).data(allTicks);
-      tickMarks.enter().append("line").classed(Abstract.Axis.TICK_MARK_CLASS, true);
+      var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(allTicks);
+      tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
       tickMarks.exit().remove();
       this.adjustTickLength(this.tickLabelPadding(), Time._minorIntervals[index]);

@@ -1,7 +1,7 @@
 ///<reference path="../../testReference.ts" />
 
 var assert = chai.assert;
-class CountingPlot extends Plottable.Abstract.Plot {
+class CountingPlot extends Plottable.Plot.AbstractPlot {
   public renders: number = 0;
 
   public _render() {
@@ -14,13 +14,13 @@ describe("Plots", () => {
   describe("Abstract Plot", () => {
 
     it("Plots default correctly", () => {
-      var r = new Plottable.Abstract.Plot();
+      var r = new Plottable.Plot.AbstractPlot();
       assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
     });
 
     it("Base Plot functionality works", () => {
       var svg = generateSVG(400, 300);
-      var r = new Plottable.Abstract.Plot();
+      var r = new Plottable.Plot.AbstractPlot();
       r._anchor(svg);
       r._computeLayout();
       var renderArea = r._content.select(".render-area");
@@ -58,7 +58,7 @@ describe("Plots", () => {
 
     it("Updates its projectors when the Dataset is changed", () => {
       var d1 = new Plottable.Dataset([{x: 5, y: 6}], {cssClass: "bar"});
-      var r = new Plottable.Abstract.Plot();
+      var r = new Plottable.Plot.AbstractPlot();
       r.addDataset("d1", d1);
 
       var xScaleCalls: number = 0;
@@ -109,14 +109,14 @@ describe("Plots", () => {
 
     it("Plot automatically generates a Dataset if only data is provided", () => {
       var data = ["foo", "bar"];
-      var r = new Plottable.Abstract.Plot().addDataset("foo", data);
+      var r = new Plottable.Plot.AbstractPlot().addDataset("foo", data);
       var dataset = r.datasets()[0];
       assert.isNotNull(dataset, "A Dataset was automatically generated");
       assert.deepEqual(dataset.data(), data, "The generated Dataset has the correct data");
     });
 
     it("Plot.project works as intended", () => {
-      var r = new Plottable.Abstract.Plot();
+      var r = new Plottable.Plot.AbstractPlot();
       var s = new Plottable.Scale.Linear().domain([0, 1]).range([0, 10]);
       r.project("attr", "a", s);
       var attrToProjector = r._generateAttrToProjector();
@@ -130,11 +130,11 @@ describe("Plots", () => {
       var s = new Plottable.Scale.Linear();
       var svg1 = generateSVG(100, 100);
       var svg2 = generateSVG(100, 100);
-      var r1 = new Plottable.Abstract.Plot()
+      var r1 = new Plottable.Plot.AbstractPlot()
                     .addDataset(ds1)
                     .project("x", (x: number) => x, s)
                     .renderTo(svg1);
-      var r2 = new Plottable.Abstract.Plot()
+      var r2 = new Plottable.Plot.AbstractPlot()
                     .addDataset(ds2)
                     .project("x", (x: number) => x, s)
                     .renderTo(svg2);
@@ -146,12 +146,12 @@ describe("Plots", () => {
     });
 
     describe("Dataset removal", () => {
-      var plot: Plottable.Abstract.Plot;
+      var plot: Plottable.Plot.AbstractPlot;
       var d1: Plottable.Dataset;
       var d2: Plottable.Dataset;
 
       beforeEach(() => {
-        plot = new Plottable.Abstract.Plot();
+        plot = new Plottable.Plot.AbstractPlot();
         d1 = new Plottable.Dataset();
         d2 = new Plottable.Dataset();
         plot.addDataset("foo", d1);
@@ -209,7 +209,7 @@ describe("Plots", () => {
     });
 
     it("remove() disconnects plots from its scales", () => {
-      var r = new Plottable.Abstract.Plot();
+      var r = new Plottable.Plot.AbstractPlot();
       var s = new Plottable.Scale.Linear();
       r.project("attr", "a", s);
       r.remove();
