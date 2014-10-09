@@ -313,13 +313,42 @@ export module Plot {
     }
 
     /**
-     * Removes a dataset
+     * Removes a dataset by string key
      *
      * @param {string} key The key of the dataset
      * @return {Plot} The calling Plot.
      */
-    public removeDataset(key: string): AbstractPlot {
-      if (this._key2DatasetDrawerKey.has(key)) {
+    public removeDataset(key: string): AbstractPlot;
+    /**
+     * Remove a dataset given the dataset itself
+     *
+     * @param {Dataset} dataset The dataset to remove
+     * @return {Plot} The calling Plot.
+     */
+    public removeDataset(dataset: Dataset): AbstractPlot;
+    /**
+     * Remove a dataset given the underlying data array
+     *
+     * @param {any[]} dataArray The data to remove
+     * @return {Plot} The calling Plot.
+     */
+    public removeDataset(dataArray: any[]): AbstractPlot;
+    public removeDataset(datasetOrKeyOrArray: any): AbstractPlot {
+      var key: string;
+      if (typeof(datasetOrKeyOrArray) === "string") {
+        key = datasetOrKeyOrArray;
+      } else if (datasetOrKeyOrArray instanceof Dataset || datasetOrKeyOrArray instanceof Array) {
+        var array: any[] = (datasetOrKeyOrArray instanceof Dataset) ? this.datasets() : this.datasets().map(d => d.data());
+        var idx = array.indexOf(datasetOrKeyOrArray);
+        if (idx !== -1) {
+          key = this._datasetKeysInOrder[idx];
+        }
+      }
+      return this._removeDataset(key);
+    }
+
+    public _removeDataset(key: string): AbstractPlot {
+      if (key != null && this._key2DatasetDrawerKey.has(key)) {
         var ddk = this._key2DatasetDrawerKey.get(key);
         ddk.drawer.remove();
 
