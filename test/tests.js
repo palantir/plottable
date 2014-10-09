@@ -1619,6 +1619,19 @@ describe("Plots", function () {
                 plot.removeDataset(a1);
                 assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
             });
+            it("removeDataset behaves appropriately when the key 'undefined' is used", function () {
+                var a = [1, 2, 3];
+                plot.addDataset("undefined", a);
+                assert.lengthOf(plot.datasets(), 3, "there are three datasets initially");
+                plot.removeDataset("foofoofoofoofoofoofoofoo");
+                assert.lengthOf(plot.datasets(), 3, "there are three datasets after bad key removal");
+                plot.removeDataset(undefined);
+                assert.lengthOf(plot.datasets(), 3, "there are three datasets after removing `undefined`");
+                plot.removeDataset([94, 93, 92]);
+                assert.lengthOf(plot.datasets(), 3, "there are three datasets after removing random dataset");
+                plot.removeDataset("undefined");
+                assert.lengthOf(plot.datasets(), 2, "the dataset called 'undefined' could be removed");
+            });
         });
         it("remove() disconnects plots from its scales", function () {
             var r = new Plottable.Abstract.Plot();

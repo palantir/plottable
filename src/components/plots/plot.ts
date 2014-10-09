@@ -334,22 +334,21 @@ export module Abstract {
      */
     public removeDataset(dataArray: any[]): Plot;
     public removeDataset(datasetOrKeyOrArray: any): Plot {
+      var key: string;
       if (typeof(datasetOrKeyOrArray) === "string") {
-        return this._removeDataset(datasetOrKeyOrArray);
-      } else {
+        key = datasetOrKeyOrArray;
+      } else if (datasetOrKeyOrArray instanceof Dataset || datasetOrKeyOrArray instanceof Array) {
         var array: any[] = (datasetOrKeyOrArray instanceof Dataset) ? this.datasets() : this.datasets().map(d => d.data());
         var idx = array.indexOf(datasetOrKeyOrArray);
         if (idx !== -1) {
-          var key = this._datasetKeysInOrder[idx];
-          return this._removeDataset(key);
+          key = this._datasetKeysInOrder[idx];
         }
       }
-      _Util.Methods.warn("Plot.removeDataset: could not match input to dataset or data array");
-      return this;
+      return this._removeDataset(key);
     }
 
     public _removeDataset(key: string): Plot {
-      if (this._key2DatasetDrawerKey.has(key)) {
+      if (key != null && this._key2DatasetDrawerKey.has(key)) {
         var ddk = this._key2DatasetDrawerKey.get(key);
         ddk.drawer.remove();
 

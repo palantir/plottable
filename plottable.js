@@ -5963,22 +5963,21 @@ var Plottable;
                 return this;
             };
             Plot.prototype.removeDataset = function (datasetOrKeyOrArray) {
+                var key;
                 if (typeof (datasetOrKeyOrArray) === "string") {
-                    return this._removeDataset(datasetOrKeyOrArray);
+                    key = datasetOrKeyOrArray;
                 }
-                else {
+                else if (datasetOrKeyOrArray instanceof Plottable.Dataset || datasetOrKeyOrArray instanceof Array) {
                     var array = (datasetOrKeyOrArray instanceof Plottable.Dataset) ? this.datasets() : this.datasets().map(function (d) { return d.data(); });
                     var idx = array.indexOf(datasetOrKeyOrArray);
                     if (idx !== -1) {
-                        var key = this._datasetKeysInOrder[idx];
-                        return this._removeDataset(key);
+                        key = this._datasetKeysInOrder[idx];
                     }
                 }
-                Plottable._Util.Methods.warn("Plot.removeDataset: could not match input to dataset or data array");
-                return this;
+                return this._removeDataset(key);
             };
             Plot.prototype._removeDataset = function (key) {
-                if (this._key2DatasetDrawerKey.has(key)) {
+                if (key != null && this._key2DatasetDrawerKey.has(key)) {
                     var ddk = this._key2DatasetDrawerKey.get(key);
                     ddk.drawer.remove();
                     var projectors = d3.values(this._projectors);
