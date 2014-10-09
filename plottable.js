@@ -6214,7 +6214,7 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._animators = {
                     "circles-reset": new Plottable.Animator.Null(),
-                    "circles": new Plottable.Animator.IterativeDelay().duration(250).delay(5)
+                    "circles": new Plottable.Animator.Base().duration(250).delay(5)
                 };
                 this.classed("scatter-plot", true);
                 this.project("r", 3); // default
@@ -6364,7 +6364,7 @@ var Plottable;
                 this._barAlignmentFactor = 0;
                 this._animators = {
                     "bars-reset": new Plottable.Animator.Null(),
-                    "bars": new Plottable.Animator.IterativeDelay(),
+                    "bars": new Plottable.Animator.Base(),
                     "baseline": new Plottable.Animator.Null()
                 };
                 this.classed("bar-plot", true);
@@ -7310,6 +7310,15 @@ var Plottable;
     (function (Animator) {
         /**
          * The base animator implementation with easing, duration, and delay.
+         *
+         * The maximum delay between animations can be configured with maxIterativeDelay.
+         *
+         * The maximum total animation duration can be configured with maxTotalDuration.
+         * maxTotalDuration does not set actual total animation duration.
+         *
+         * The actual interval delay is calculated by following formula:
+         * min(maxIterativeDelay(),
+         *   max(maxTotalDuration() - duration(), 0) / <number of iterations>)
          */
         var Base = (function () {
             /**
@@ -7323,7 +7332,11 @@ var Plottable;
                 this._easing = Base.DEFAULT_EASING;
             }
             Base.prototype.animate = function (selection, attrToProjector) {
-                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attrToProjector);
+                var _this = this;
+                var numberOfIterations = selection[0].length - 1;
+                var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
+                var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / numberOfIterations);
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + adjustedIterativeDelay * i; }).attr(attrToProjector);
             };
             Base.prototype.duration = function (duration) {
                 if (duration === undefined) {
@@ -7352,68 +7365,7 @@ var Plottable;
                     return this;
                 }
             };
-            /**
-             * The default duration of the animation in milliseconds
-             */
-            Base.DEFAULT_DURATION_MILLISECONDS = 300;
-            /**
-             * The default starting delay of the animation in milliseconds
-             */
-            Base.DEFAULT_DELAY_MILLISECONDS = 0;
-            /**
-             * The default easing of the animation
-             */
-            Base.DEFAULT_EASING = "exp-out";
-            return Base;
-        })();
-        Animator.Base = Base;
-    })(Plottable.Animator || (Plottable.Animator = {}));
-    var Animator = Plottable.Animator;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Animator) {
-        /**
-         * An animator that delays the animation of the attributes using the index
-         * of the selection data.
-         *
-         * The maximum delay between animations can be configured with maxIterativeDelay.
-         *
-         * The maximum total animation duration can be configured with maxTotalDuration.
-         * maxTotalDuration does not set actual total animation duration.
-         *
-         * The actual interval delay is calculated by following formula:
-         * min(maxIterativeDelay(),
-         *   max(totalDurationLimit() - duration(), 0) / <number of iterations>)
-         */
-        var IterativeDelay = (function (_super) {
-            __extends(IterativeDelay, _super);
-            /**
-             * Constructs an animator with a start delay between each selection animation
-             *
-             * @constructor
-             */
-            function IterativeDelay() {
-                _super.call(this);
-                this._maxIterativeDelay = IterativeDelay.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
-                this._maxTotalDuration = IterativeDelay.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
-            }
-            IterativeDelay.prototype.animate = function (selection, attrToProjector) {
-                var _this = this;
-                var numberOfIterations = selection[0].length;
-                var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
-                var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / numberOfIterations);
-                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + adjustedIterativeDelay * i; }).attr(attrToProjector);
-            };
-            IterativeDelay.prototype.maxIterativeDelay = function (maxIterDelay) {
+            Base.prototype.maxIterativeDelay = function (maxIterDelay) {
                 if (maxIterDelay === undefined) {
                     return this._maxIterativeDelay;
                 }
@@ -7422,7 +7374,7 @@ var Plottable;
                     return this;
                 }
             };
-            IterativeDelay.prototype.maxTotalDuration = function (maxDuration) {
+            Base.prototype.maxTotalDuration = function (maxDuration) {
                 if (maxDuration == null) {
                     return this._maxTotalDuration;
                 }
@@ -7432,16 +7384,28 @@ var Plottable;
                 }
             };
             /**
+             * The default duration of the animation in milliseconds
+             */
+            Base.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default starting delay of the animation in milliseconds
+             */
+            Base.DEFAULT_DELAY_MILLISECONDS = 0;
+            /**
              * The default maximum start delay between each start of an animation
              */
-            IterativeDelay.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS = 15;
+            Base.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS = 15;
             /**
              * The default maximum total animation duration
              */
-            IterativeDelay.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = 600;
-            return IterativeDelay;
-        })(Animator.Base);
-        Animator.IterativeDelay = IterativeDelay;
+            Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = 600;
+            /**
+             * The default easing of the animation
+             */
+            Base.DEFAULT_EASING = "exp-out";
+            return Base;
+        })();
+        Animator.Base = Base;
     })(Plottable.Animator || (Plottable.Animator = {}));
     var Animator = Plottable.Animator;
 })(Plottable || (Plottable = {}));
