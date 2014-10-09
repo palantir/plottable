@@ -46,6 +46,7 @@ export module Plot {
     public _setup() {
       super._setup();
       this._renderArea = this._content.append("g").classed("render-area", true);
+      // HACKHACK on 591
       this._getDrawersInOrder().forEach((d) => d._renderArea = this._renderArea.append("g"));
     }
 

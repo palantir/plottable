@@ -5750,6 +5750,7 @@ var Plottable;
                 var _this = this;
                 _super.prototype._setup.call(this);
                 this._renderArea = this._content.append("g").classed("render-area", true);
+                // HACKHACK on 591
                 this._getDrawersInOrder().forEach(function (d) { return d._renderArea = _this._renderArea.append("g"); });
             };
             AbstractPlot.prototype.remove = function () {
