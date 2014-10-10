@@ -857,10 +857,10 @@ declare module Plottable {
         key: string;
     }
     /**
-     * An adjustment for y domain in case of change of x domain.
+     * An adjustment for secondary domain in case of change of primary domain.
      */
-    interface AdjustmentYDomainAlgorithm<X, Y> {
-        (datasets: Dataset[], xDomain: X[]): Y[];
+    interface AdjustmentDomainAlgorithm<X, Y> {
+        (values: any[], primaryDomain: X[]): Y[];
     }
 }
 
@@ -2364,18 +2364,31 @@ declare module Plottable {
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractXYPlot<X, Y>;
             /**
-             * Gets the adjustDomainAlgorithm for y scale.
+             * Gets the adjustDmentomainAlgorithm for y scale.
              *
-             * @returns {AdjustmentYDomainAlgorithm} The current adjustDomainAlgorithm for y scale.
+             * @returns {AdjustmentDomainAlgorithm} The current adjustDomainAlgorithm for y scale.
              */
-            adjustmentYScaleDomainAlgorithm(): AdjustmentYDomainAlgorithm<X, Y>;
+            adjustmentYScaleDomainAlgorithm(): AdjustmentDomainAlgorithm<X, Y>;
             /**
              * Sets the adjustDomainAlgorithm for y scale.
              *
-             * @param {AdjustmentYDomainAlgorithm} values If provided, the new value for the adjustDomainAlgorithm for y scale.
+             * @param {AdjustmentDomainAlgorithm} values If provided, the new value for the adjustDomainAlgorithm for y scale.
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
-            adjustmentYScaleDomainAlgorithm(algorithm: AdjustmentYDomainAlgorithm<X, Y>): AbstractXYPlot<X, Y>;
+            adjustmentYScaleDomainAlgorithm(algorithm: AdjustmentDomainAlgorithm<X, Y>): AbstractXYPlot<X, Y>;
+            /**
+             * Gets the adjustDmentomainAlgorithm for x scale.
+             *
+             * @returns {AdjustmentDomainAlgorithm} The current adjustDomainAlgorithm for x scale.
+             */
+            adjustmentXScaleDomainAlgorithm(): AdjustmentDomainAlgorithm<Y, X>;
+            /**
+             * Sets the adjustDomainAlgorithm for x scale.
+             *
+             * @param {AdjustmentDomainAlgorithm} values If provided, the new value for the adjustDomainAlgorithm for x scale.
+             * @returns {AbstractXYPlot} The calling AbstractXYPlot.
+             */
+            adjustmentXScaleDomainAlgorithm(algorithm: AdjustmentDomainAlgorithm<Y, X>): AbstractXYPlot<X, Y>;
         }
     }
 }

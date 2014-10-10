@@ -1660,6 +1660,47 @@ describe("Plots", function () {
             svg.remove();
         });
     });
+    describe("Abstract XY Plot", function () {
+        it("custom scale adjustment algorithm", function () {
+            var xScale = new Plottable.Scale.Linear().domain([-10, 10]);
+            var yScale = new Plottable.Scale.Linear().domain([-10, 10]);
+            var plot = new Plottable.Plot.AbstractXYPlot(xScale, yScale);
+            plot.adjustmentYScaleDomainAlgorithm(function (values, xDomain) { return [-2, 2]; });
+            var svg = generateSVG(400, 400);
+            plot.renderTo(svg);
+            xScale.domain([-1, -1]);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain is adjusted using custom algorithm and domainer");
+            svg.remove();
+        });
+        it("no cycle in adjustment algorithms", function () {
+            var xScale = new Plottable.Scale.Linear().domain([-10, 10]);
+            var yScale = new Plottable.Scale.Linear().domain([-10, 10]);
+            var zScale = new Plottable.Scale.Linear().domain([-10, 10]);
+            var plot1 = new Plottable.Plot.AbstractXYPlot(xScale, yScale);
+            var algorithm = function (values, domain) { return [-2, 2]; };
+            plot1.adjustmentXScaleDomainAlgorithm(algorithm);
+            plot1.adjustmentYScaleDomainAlgorithm(algorithm);
+            var plot2 = new Plottable.Plot.AbstractXYPlot(zScale, yScale);
+            plot2.adjustmentXScaleDomainAlgorithm(algorithm);
+            plot2.adjustmentYScaleDomainAlgorithm(algorithm);
+            var plot3 = new Plottable.Plot.AbstractXYPlot(zScale, xScale);
+            plot3.adjustmentXScaleDomainAlgorithm(algorithm);
+            plot3.adjustmentYScaleDomainAlgorithm(algorithm);
+            var svg = generateSVG(400, 400);
+            plot1.renderTo(svg);
+            plot2.renderTo(svg);
+            plot3.renderTo(svg);
+            xScale.domain([-1, 1]);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "y domain is adjusted using custom algorithm and domainer");
+            assert.deepEqual(zScale.domain(), [-2.5, 2.5], "z domain is adjusted using custom algorithm and domainer");
+            assert.deepEqual(xScale.domain(), [-1, 1], "x domain is not adjusted using custom algorithm and domainer");
+            yScale.domain([-3, 3]);
+            assert.deepEqual(xScale.domain(), [-2.5, 2.5], "x domain is adjusted using custom algorithm and domainer");
+            assert.deepEqual(zScale.domain(), [-2.5, 2.5], "z domain is adjusted using custom algorithm and domainer");
+            assert.deepEqual(yScale.domain(), [-3, 3], "y domain is not adjusted using custom algorithm and domainer");
+            svg.remove();
+        });
+    });
 });
 
 ///<reference path="../../testReference.ts" />
@@ -1957,12 +1998,6 @@ describe("Plots", function () {
             dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
             simpleDataset.data(dataWithUndefined);
             assertCorrectPathSplitting("x=undefined");
-            svg.remove();
-        });
-        it("custom y scale adjustment algorithm", function () {
-            linePlot.adjustmentYScaleDomainAlgorithm(function (dataSets, xDomain) { return [-2, 2]; });
-            xScale.domain([-3, 3]);
-            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain is adjusted using custom algorithm and domainer");
             svg.remove();
         });
     });

@@ -2047,6 +2047,7 @@ var Plottable;
                 this.broadcaster = new Plottable.Core.Broadcaster(this);
                 this._rendererAttrID2Extent = {};
                 this._typeCoercer = function (d) { return d; };
+                this._adjustmentInProgress = false;
                 this._d3Scale = scale;
             }
             AbstractScale.prototype._getAllExtents = function () {
@@ -2104,8 +2105,12 @@ var Plottable;
                 return this._d3Scale.domain();
             };
             AbstractScale.prototype._setDomain = function (values) {
-                this._d3Scale.domain(values);
-                this.broadcaster.broadcast();
+                if (!this._adjustmentInProgress) {
+                    this._adjustmentInProgress = true;
+                    this._d3Scale.domain(values);
+                    this.broadcaster.broadcast();
+                    this._adjustmentInProgress = false;
+                }
             };
             AbstractScale.prototype.range = function (values) {
                 if (values == null) {
@@ -6155,11 +6160,12 @@ var Plottable;
                 if (attrToSet === "x" && scale) {
                     this._xScale = scale;
                     this._updateXDomainer();
-                    scale.broadcaster.registerListener("yScaleAdjustument" + this._plottableID, function () { return _this._adjustYDomainer(); });
+                    scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this._adjustYDomain(); });
                 }
                 if (attrToSet === "y" && scale) {
                     this._yScale = scale;
                     this._updateYDomainer();
+                    scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this._adjustXDomain(); });
                 }
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
@@ -6170,6 +6176,15 @@ var Plottable;
                 }
                 else {
                     this._adjustmentYScaleDomainAlgorithm = algorithm;
+                    return this;
+                }
+            };
+            AbstractXYPlot.prototype.adjustmentXScaleDomainAlgorithm = function (algorithm) {
+                if (algorithm == null) {
+                    return this._adjustmentXScaleDomainAlgorithm;
+                }
+                else {
+                    this._adjustmentXScaleDomainAlgorithm = algorithm;
                     return this;
                 }
             };
@@ -6194,15 +6209,43 @@ var Plottable;
                     }
                 }
             };
-            AbstractXYPlot.prototype._adjustYDomainer = function () {
-                if (this._yScale instanceof Plottable.Scale.AbstractQuantitative) {
-                    var scale = this._yScale;
-                    if (!scale._userSetDomainer) {
-                        if (this._adjustmentYScaleDomainAlgorithm !== undefined) {
-                            var adjustedDomain = this._adjustmentYScaleDomainAlgorithm(this.datasets(), this._xScale.domain());
+            AbstractXYPlot.prototype._adjustXDomain = function () {
+                var _this = this;
+                if (this._adjustmentXScaleDomainAlgorithm != null) {
+                    var flattenDatasets = Plottable._Util.Methods.flatten(this.datasets().map(function (d) { return d.data(); }));
+                    var values = flattenDatasets.map(function (d) {
+                        return { x: _this._projectors["x"].accessor(d), y: _this._projectors["y"].accessor(d) };
+                    });
+                    var adjustedDomain = this._adjustmentXScaleDomainAlgorithm(values, this._yScale.domain());
+                    if (this._xScale instanceof Plottable.Scale.AbstractQuantitative) {
+                        var scale = this._xScale;
+                        if (!scale._userSetDomainer) {
                             adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
                             scale._setDomain(adjustedDomain);
                         }
+                    }
+                    else {
+                        this._xScale._setDomain(adjustedDomain);
+                    }
+                }
+            };
+            AbstractXYPlot.prototype._adjustYDomain = function () {
+                var _this = this;
+                if (this._adjustmentYScaleDomainAlgorithm != null) {
+                    var flattenDatasets = Plottable._Util.Methods.flatten(this.datasets().map(function (d) { return d.data(); }));
+                    var values = flattenDatasets.map(function (d) {
+                        return { x: _this._projectors["x"].accessor(d), y: _this._projectors["y"].accessor(d) };
+                    });
+                    var adjustedDomain = this._adjustmentYScaleDomainAlgorithm(values, this._xScale.domain());
+                    if (this._yScale instanceof Plottable.Scale.AbstractQuantitative) {
+                        var scale = this._yScale;
+                        if (!scale._userSetDomainer) {
+                            adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
+                            scale._setDomain(adjustedDomain);
+                        }
+                    }
+                    else {
+                        this._yScale._setDomain(adjustedDomain);
                     }
                 }
             };

@@ -113,12 +113,5 @@ describe("Plots", () => {
 
       svg.remove();
     });
-
-    it("custom y scale adjustment algorithm", () => {
-      linePlot.adjustmentYScaleDomainAlgorithm((dataSets, xDomain) => [-2, 2]);
-      xScale.domain([-3, 3]);
-      assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain is adjusted using custom algorithm and domainer");
-      svg.remove();
-    });
   });
 });

@@ -3,7 +3,6 @@ function makeData() {
   "use strict";
 
   return makeRandomData(50);
-
 }
 
 function run(div, data, Plottable) {
@@ -30,8 +29,8 @@ function run(div, data, Plottable) {
   basicTable.renderTo(svg);
 
   function yAuto(){
-    linePlot.adjustmentYScaleDomainAlgorithm(function (dataSets, xDomain) {
-      var visiblePoints = dataSets[0].data().filter(function(d) { return d.x >= xDomain[0] && d.x <= xDomain[1]; });
+    linePlot.adjustmentYScaleDomainAlgorithm(function (values, xDomain) {
+      var visiblePoints = values.filter(function(d, i) { return d.x >= xDomain[0] && d.x <= xDomain[1]; });
       var yValues = visiblePoints.map(function(d) { return d.y; });
       return [d3.min(yValues), d3.max(yValues)];
     });
