@@ -3,7 +3,7 @@
 var assert = chai.assert;
 
 
-function assertComponentXY(component: Plottable.Abstract.Component, x: number, y: number, message: string) {
+function assertComponentXY(component: Plottable.Component.AbstractComponent, x: number, y: number, message: string) {
   // use <any> to examine the private variables
   var translate = d3.transform(component._element.attr("transform")).translate;
   var xActual = translate[0];
@@ -14,12 +14,12 @@ function assertComponentXY(component: Plottable.Abstract.Component, x: number, y
 
 describe("Component behavior", () => {
   var svg: D3.Selection;
-  var c: Plottable.Abstract.Component;
+  var c: Plottable.Component.AbstractComponent;
   var SVG_WIDTH = 400;
   var SVG_HEIGHT = 300;
   beforeEach(() => {
     svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    c = new Plottable.Abstract.Component();
+    c = new Plottable.Component.AbstractComponent();
   });
 
   describe("anchor", () => {
@@ -218,10 +218,10 @@ it("components can be offset relative to their alignment, and throw errors if th
   });
 
   it("componentID works as expected", () => {
-    var expectedID = (<any> Plottable.Abstract.PlottableObject).nextID;
-    var c1 = new Plottable.Abstract.Component();
+    var expectedID = (<any> Plottable.Core.PlottableObject).nextID;
+    var c1 = new Plottable.Component.AbstractComponent();
     assert.equal(c1._plottableID, expectedID, "component id on next component was as expected");
-    var c2 = new Plottable.Abstract.Component();
+    var c2 = new Plottable.Component.AbstractComponent();
     assert.equal(c2._plottableID, expectedID+1, "future components increment appropriately");
     svg.remove();
   });
@@ -245,7 +245,7 @@ it("components can be offset relative to their alignment, and throw errors if th
   });
 
   it("hitboxes are created iff there are registered interactions", () => {
-    function verifyHitbox(component: Plottable.Abstract.Component) {
+    function verifyHitbox(component: Plottable.Component.AbstractComponent) {
       var hitBox = (<any> component).hitBox;
       assert.isNotNull(hitBox, "the hitbox was created");
       var hitBoxFill = hitBox.style("fill");
@@ -259,17 +259,17 @@ it("components can be offset relative to their alignment, and throw errors if th
     svg.remove();
     svg = generateSVG();
 
-    c = new Plottable.Abstract.Component();
-    var i = new Plottable.Abstract.Interaction();
+    c = new Plottable.Component.AbstractComponent();
+    var i = new Plottable.Interaction.AbstractInteraction();
     c.registerInteraction(i);
     c._anchor(svg);
     verifyHitbox(c);
     svg.remove();
     svg = generateSVG();
 
-    c = new Plottable.Abstract.Component();
+    c = new Plottable.Component.AbstractComponent();
     c._anchor(svg);
-    i = new Plottable.Abstract.Interaction();
+    i = new Plottable.Interaction.AbstractInteraction();
     c.registerInteraction(i);
     verifyHitbox(c);
     svg.remove();
@@ -278,8 +278,8 @@ it("components can be offset relative to their alignment, and throw errors if th
   it("interaction registration works properly", () => {
     var hitBox1: Element = null;
     var hitBox2: Element = null;
-    var interaction1: any = {_anchor: (comp: Plottable.Abstract.Component, hb: D3.Selection) => hitBox1 = hb.node()};
-    var interaction2: any = {_anchor: (comp: Plottable.Abstract.Component, hb: D3.Selection) => hitBox2 = hb.node()};
+    var interaction1: any = {_anchor: (comp: Plottable.Component.AbstractComponent, hb: D3.Selection) => hitBox1 = hb.node()};
+    var interaction2: any = {_anchor: (comp: Plottable.Component.AbstractComponent, hb: D3.Selection) => hitBox2 = hb.node()};
     c.registerInteraction(interaction1);
     c.renderTo(svg);
     c.registerInteraction(interaction2);
@@ -322,7 +322,7 @@ it("components can be offset relative to their alignment, and throw errors if th
     var cb = (b: Plottable.Core.Listenable) => cbCalled++;
     var b = new Plottable.Core.Broadcaster(null);
 
-    var c1 = new Plottable.Abstract.Component();
+    var c1 = new Plottable.Component.AbstractComponent();
 
     b.registerListener(c1, cb);
 
@@ -340,7 +340,7 @@ it("components can be offset relative to their alignment, and throw errors if th
   });
 
   it("can't reuse component if it's been remove()-ed", () => {
-    var c1 = new Plottable.Abstract.Component();
+    var c1 = new Plottable.Component.AbstractComponent();
     c1.renderTo(svg);
     c1.remove();
 
@@ -363,17 +363,17 @@ it("components can be offset relative to their alignment, and throw errors if th
   });
 
   it("components can be detached even if not anchored", () => {
-    var c = new Plottable.Abstract.Component();
+    var c = new Plottable.Component.AbstractComponent();
     c.detach(); // no error thrown
     svg.remove();
   });
 
   it("component remains in own cell", () => {
-    var horizontalComponent = new Plottable.Abstract.Component();
-    var verticalComponent = new Plottable.Abstract.Component();
-    var placeHolder = new Plottable.Abstract.Component();
+    var horizontalComponent = new Plottable.Component.AbstractComponent();
+    var verticalComponent = new Plottable.Component.AbstractComponent();
+    var placeHolder = new Plottable.Component.AbstractComponent();
     var t = new Plottable.Component.Table().addComponent(0, 0, verticalComponent)
-                                 .addComponent(0, 1, new Plottable.Abstract.Component())
+                                 .addComponent(0, 1, new Plottable.Component.AbstractComponent())
                                  .addComponent(1, 0, placeHolder)
                                  .addComponent(1, 1, horizontalComponent);
     t.renderTo(svg);

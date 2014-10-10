@@ -9,7 +9,6 @@ function run(div, data, Plottable) {
 
   var svg = div.append("svg").attr("height", 500);
   var yScales = [];
-  data = _.cloneDeep(data);
 
   // Will receive function arguments: (svg, data, Plottable)
   function getY(d) { return d.y; }
@@ -30,8 +29,8 @@ function run(div, data, Plottable) {
 
   var y0Accessor = function(d, i) { return dataseries[i].y; };
 
-  var areaPlot1 = new Plottable.Plot.Area(dataseries, xScale, yScale);
-  var areaPlot2 = new Plottable.Plot.Area(dataseries_top, xScale, yScale).attr("y0", y0Accessor, yScale);
+  var areaPlot1 = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries);
+  var areaPlot2 = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries_top).attr("y0", y0Accessor, yScale);
 
   var fillAccessor = function() { return "steelblue"; };
   var fillAccessorTop = function() { return "pink"; };

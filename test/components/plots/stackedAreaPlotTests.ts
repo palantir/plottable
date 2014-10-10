@@ -4,7 +4,6 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("Stacked Area Plot", () => {
-    var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
@@ -14,7 +13,7 @@ describe("Plots", () => {
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
-    before(() => {
+    beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Linear().domain([1, 3]);
       yScale = new Plottable.Scale.Linear().domain([0, 4]);
@@ -39,18 +38,6 @@ describe("Plots", () => {
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
     });
 
-    beforeEach(() => {
-      verifier.start();
-    });
-
-    afterEach(() => {
-      verifier.end();
-    });
-
-    after(() => {
-      if (verifier.passed) {svg.remove();};
-    });
-
     it("renders correctly", () => {
       var areas = renderer._renderArea.selectAll(".area");
       var area0 = d3.select(areas[0][0]);
@@ -66,6 +53,7 @@ describe("Plots", () => {
       var domain = yScale.domain();
       assert.strictEqual(0, domain[0], "domain starts at a min value at 0");
       assert.strictEqual(4, domain[1], "highest area stacking is at upper limit of yScale domain");
+      svg.remove();
     });
 
   });
@@ -111,7 +99,6 @@ describe("Plots", () => {
   });
 
   describe("Stacked Area Plot Stacking", () => {
-    var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
     var xScale: Plottable.Scale.Linear;
     var yScale: Plottable.Scale.Linear;
@@ -119,7 +106,7 @@ describe("Plots", () => {
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
-    before(() => {
+    beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Linear().domain([1, 3]);
       yScale = new Plottable.Scale.Linear();
@@ -139,18 +126,6 @@ describe("Plots", () => {
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
       renderer.renderTo(svg);
-    });
-
-    beforeEach(() => {
-      verifier.start();
-    });
-
-    afterEach(() => {
-      verifier.end();
-    });
-
-    after(() => {
-      if (verifier.passed) {svg.remove();};
     });
 
     it("stacks correctly on adding datasets", () => {
@@ -198,6 +173,7 @@ describe("Plots", () => {
       renderer.removeDataset("a");
       renderer.removeDataset("b");
       renderer.removeDataset("c");
+      svg.remove();
     });
 
     it("stacks correctly on removing datasets", () => {
@@ -244,6 +220,7 @@ describe("Plots", () => {
       renderer.renderTo(svg);
 
       assert.strictEqual(oldUpperBound, yScale.domain()[1], "Extent doesn't change if maximum doesn't change");
+      svg.remove();
     });
 
     it("stacks correctly on modifying a dataset", () => {
@@ -298,6 +275,7 @@ describe("Plots", () => {
       renderer.renderTo(svg);
 
       assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound does not change");
+      svg.remove();
     });
   });
 });

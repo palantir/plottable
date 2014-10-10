@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Abstract {
-  export class _Drawer {
+export module _Drawer {
+  export class AbstractDrawer {
     public _renderArea: D3.Selection;
     public key: string;
 
@@ -32,7 +32,7 @@ export module Abstract {
      * @param{attrHash} AttributeToProjector The list of attributes to set on the data
      */
     public draw(data: any[], attrToProjector: AttributeToProjector, animator = new Animator.Null()) {
-      throw new Error("Abstract Method Not Implemented");
+        // no-op
     }
   }
 }

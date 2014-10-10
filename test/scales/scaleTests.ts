@@ -60,8 +60,8 @@ describe("Scales", () => {
 
     it("scale autorange works as expected with single dataset", () => {
       var svg = generateSVG(100, 100);
-      var renderer = new Plottable.Abstract.Plot()
-                        .dataset(dataset)
+      var renderer = new Plottable.Plot.AbstractPlot()
+                        .addDataset(dataset)
                         .project("x", "foo", scale)
                         .renderTo(svg);
       assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
@@ -74,12 +74,12 @@ describe("Scales", () => {
     it("scale reference counting works as expected", () => {
       var svg1 = generateSVG(100, 100);
       var svg2 = generateSVG(100, 100);
-      var renderer1 = new Plottable.Abstract.Plot()
-                          .dataset(dataset)
+      var renderer1 = new Plottable.Plot.AbstractPlot()
+                          .addDataset(dataset)
                           .project("x", "foo", scale);
       renderer1.renderTo(svg1);
-      var renderer2 = new Plottable.Abstract.Plot()
-                          .dataset(dataset)
+      var renderer2 = new Plottable.Plot.AbstractPlot()
+                          .addDataset(dataset)
                           .project("x", "foo", scale);
       renderer2.renderTo(svg2);
       var otherScale = new Plottable.Scale.Linear();
@@ -118,8 +118,10 @@ describe("Scales", () => {
       xScale.domainer(new Plottable.Domainer());
       var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
       var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-      var renderAreaD1 = new Plottable.Plot.Line(ds1, xScale, yScale);
-      var renderAreaD2 = new Plottable.Plot.Line(ds2, xScale, yScale);
+      var renderAreaD1 = new Plottable.Plot.Line(xScale, yScale);
+      renderAreaD1.addDataset(ds1);
+      var renderAreaD2 = new Plottable.Plot.Line(xScale, yScale);
+      renderAreaD2.addDataset(ds2);
       var renderAreas = renderAreaD1.merge(renderAreaD2);
       renderAreas.renderTo(svg);
       assert.deepEqual(xScale.domain(), [0, 2]);
@@ -145,12 +147,9 @@ describe("Scales", () => {
       var ticks10 = scale.ticks();
       assert.closeTo(ticks10.length, 10, 1, "defaults to (about) 10 ticks");
 
-      var ticks20 = scale.ticks(20);
+      scale.numTicks(20);
+      var ticks20 = scale.ticks();
       assert.closeTo(ticks20.length, 20, 1, "can request a different number of ticks");
-
-      scale.numTicks(5);
-      var ticks5 = scale.ticks();
-      assert.closeTo(ticks5.length, 5, 1, "can change the default number of ticks");
     });
 
     it("autorange defaults to [1, 10] on log scale", () => {
@@ -176,7 +175,8 @@ describe("Scales", () => {
       var sadTimesData = ["999", "10", "100", "1000", "2", "999"];
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
-      var plot = new Plottable.Plot.Scatter(sadTimesData, xScale, yScale);
+      var plot = new Plottable.Plot.Scatter(xScale, yScale);
+      plot.addDataset(sadTimesData);
       var id = (d: any) => d;
       xScale.domainer(new Plottable.Domainer()); // to disable padding, etc
       plot.project("x", id, xScale);
@@ -185,6 +185,16 @@ describe("Scales", () => {
       plot.renderTo(svg);
       assert.deepEqual(xScale.domain(), [2, 1000], "the domain was calculated appropriately");
       svg.remove();
+    });
+
+    it("custom tick generator", () => {
+      var scale = new Plottable.Scale.Linear();
+      scale.domain([0, 10]);
+      var ticks = scale.ticks();
+      assert.closeTo(ticks.length, 10, 1, "ticks were generated correctly with default generator");
+      scale.tickGenerator((scale) => scale.getDefaultTicks().filter(tick => tick % 3 === 0));
+      ticks = scale.ticks();
+      assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
     });
 
   });
@@ -247,7 +257,8 @@ describe("Scales", () => {
     var dA = {x: "A", y: 2};
     var dB = {x: "B", y: 2};
     var dC = {x: "C", y: 2};
-    var barPlot = new Plottable.Plot.VerticalBar([dA, dB], xScale, yScale);
+    var dataset = new Plottable.Dataset([dA, dB]);
+    var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale).addDataset(dataset);
     var svg = generateSVG();
     assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
     barPlot.renderTo(svg);
@@ -255,7 +266,7 @@ describe("Scales", () => {
 
     function iterateDataChanges(...dataChanges: any[]) {
       dataChanges.forEach((dataChange) => {
-        barPlot.dataset().data(dataChange);
+        dataset.data(dataChange);
       });
     }
 

@@ -30,8 +30,9 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
-      areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
-      areaPlot.project("x", xAccessor, xScale)
+      areaPlot = new Plottable.Plot.Area(xScale, yScale);
+      areaPlot.addDataset(simpleDataset)
+              .project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)
               .project("y0", y0Accessor, yScale)
               .project("fill", fillAccessor)

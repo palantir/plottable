@@ -6,10 +6,10 @@ var assert = chai.assert;
 describe("ComponentContainer", () => {
 
   it("_addComponent()", () => {
-    var container = new Plottable.Abstract.ComponentContainer();
-    var c1 = new Plottable.Abstract.Component();
-    var c2 = new Plottable.Abstract.Component();
-    var c3 = new Plottable.Abstract.Component();
+    var container = new Plottable.Component.AbstractComponentContainer();
+    var c1 = new Plottable.Component.AbstractComponent();
+    var c2 = new Plottable.Component.AbstractComponent();
+    var c3 = new Plottable.Component.AbstractComponent();
 
     assert.isTrue(container._addComponent(c1), "returns true on successful adding");
     assert.deepEqual(container.components(), [c1], "component was added");
@@ -28,9 +28,9 @@ describe("ComponentContainer", () => {
   });
 
   it("_removeComponent()", () => {
-    var container = new Plottable.Abstract.ComponentContainer();
-    var c1 = new Plottable.Abstract.Component();
-    var c2 = new Plottable.Abstract.Component();
+    var container = new Plottable.Component.AbstractComponentContainer();
+    var c1 = new Plottable.Component.AbstractComponent();
+    var c2 = new Plottable.Component.AbstractComponent();
     container._addComponent(c1);
     container._addComponent(c2);
 
@@ -43,17 +43,17 @@ describe("ComponentContainer", () => {
   });
 
   it("empty()", () => {
-    var container = new Plottable.Abstract.ComponentContainer();
+    var container = new Plottable.Component.AbstractComponentContainer();
     assert.isTrue(container.empty());
-    var c1 = new Plottable.Abstract.Component();
+    var c1 = new Plottable.Component.AbstractComponent();
     container._addComponent(c1);
     assert.isFalse(container.empty());
   });
 
   it("detachAll()", () => {
-    var container = new Plottable.Abstract.ComponentContainer();
-    var c1 = new Plottable.Abstract.Component();
-    var c2 = new Plottable.Abstract.Component();
+    var container = new Plottable.Component.AbstractComponentContainer();
+    var c1 = new Plottable.Component.AbstractComponent();
+    var c2 = new Plottable.Component.AbstractComponent();
     container._addComponent(c1);
     container._addComponent(c2);
     container.detachAll();
@@ -62,9 +62,9 @@ describe("ComponentContainer", () => {
   });
 
   it("components() returns a shallow copy", () => {
-    var container = new Plottable.Abstract.ComponentContainer();
-    var c1 = new Plottable.Abstract.Component();
-    var c2 = new Plottable.Abstract.Component();
+    var container = new Plottable.Component.AbstractComponentContainer();
+    var c1 = new Plottable.Component.AbstractComponent();
+    var c2 = new Plottable.Component.AbstractComponent();
     container._addComponent(c1);
     container._addComponent(c2);
 

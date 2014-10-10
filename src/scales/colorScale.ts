@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scale {
-  export class Color extends Abstract.Scale<string, string> {
+  export class Color extends AbstractScale<string, string> {
     /**
      * Constructs a ColorScale.
      *
