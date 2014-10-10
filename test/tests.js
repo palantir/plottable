@@ -4989,7 +4989,7 @@ describe("Formatters", function () {
             result = fixed3(1.234);
             assert.strictEqual(result, "1.234", "shows three decimal places");
             result = fixed3(1.2345);
-            assert.strictEqual(result, "", "changed values are not shown (get turned into empty strings)");
+            assert.strictEqual(result, "1.234", "changed values are not shown (get turned into empty strings)");
         });
         it("precision can be changed", function () {
             var fixed2 = Plottable.Formatters.fixed(2);
@@ -4997,7 +4997,7 @@ describe("Formatters", function () {
             assert.strictEqual(result, "1.00", "formatter was changed to show only two decimal places");
         });
         it("can be set to show rounded values", function () {
-            var fixed3 = Plottable.Formatters.fixed(3, false);
+            var fixed3 = Plottable.Formatters.fixed(3);
             var result = fixed3(1.2349);
             assert.strictEqual(result, "1.235", "long values are rounded correctly");
         });
@@ -5010,7 +5010,7 @@ describe("Formatters", function () {
             result = general(1.234);
             assert.strictEqual(result, "1.234", "shows up to three decimal places");
             result = general(1.2345);
-            assert.strictEqual(result, "", "(changed) values with more than three decimal places are not shown");
+            assert.strictEqual(result, "1.235", "(changed) values with more than three decimal places are not shown");
         });
         it("stringifies non-number values", function () {
             var general = Plottable.Formatters.general();
@@ -5095,7 +5095,7 @@ describe("Formatters", function () {
             assert.strictEqual(result2, "0.35%", "works even if multiplying by 100 does not make it an integer");
         });
         it("onlyShowUnchanged set to false", function () {
-            var percentFormatter = Plottable.Formatters.percentage(0, false);
+            var percentFormatter = Plottable.Formatters.percentage(0);
             var result = percentFormatter(0.075);
             assert.strictEqual(result, "8%", "shows formatter changed value");
         });

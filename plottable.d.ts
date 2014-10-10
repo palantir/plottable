@@ -413,7 +413,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter for currency values.
          */
-        function currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
+        function currency(precision?: number, symbol?: string, prefix?: boolean): (d: any) => string;
         /**
          * Creates a formatter that displays exactly [precision] decimal places.
          *
@@ -422,7 +422,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
          */
-        function fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function fixed(precision?: number): (d: any) => string;
         /**
          * Creates a formatter that formats numbers to show no more than
          * [precision] decimal places. All other values are stringified.
@@ -432,7 +432,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter for general values.
          */
-        function general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function general(precision?: number): (d: any) => string;
         /**
          * Creates a formatter that stringifies its input.
          *
@@ -448,7 +448,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter for percentage values.
          */
-        function percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function percentage(precision?: number): (d: any) => string;
         /**
          * Creates a formatter for values that displays [precision] significant figures
          * and puts SI notation.
@@ -2014,7 +2014,7 @@ declare module Plottable {
              * @constructor
              * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
              * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-             * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
+             * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
              */
             constructor(scale: Scale.AbstractQuantitative<number>, orientation: string, formatter?: (d: any) => string);
             _setup(): void;

@@ -1093,17 +1093,13 @@ var Plottable;
          *
          * @returns {Formatter} A formatter for currency values.
          */
-        function currency(precision, symbol, prefix, onlyShowUnchanged) {
+        function currency(precision, symbol, prefix) {
             if (precision === void 0) { precision = 2; }
             if (symbol === void 0) { symbol = "$"; }
             if (prefix === void 0) { prefix = true; }
-            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
             var fixedFormatter = Formatters.fixed(precision);
             return function (d) {
                 var formattedValue = fixedFormatter(Math.abs(d));
-                if (onlyShowUnchanged && valueChanged(Math.abs(d), formattedValue)) {
-                    return "";
-                }
                 if (formattedValue !== "") {
                     if (prefix) {
                         formattedValue = symbol + formattedValue;
@@ -1127,16 +1123,11 @@ var Plottable;
          *
          * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
          */
-        function fixed(precision, onlyShowUnchanged) {
+        function fixed(precision) {
             if (precision === void 0) { precision = 3; }
-            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
             verifyPrecision(precision);
             return function (d) {
-                var formattedValue = d.toFixed(precision);
-                if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
-                    return "";
-                }
-                return formattedValue;
+                return d.toFixed(precision);
             };
         }
         Formatters.fixed = fixed;
@@ -1149,18 +1140,13 @@ var Plottable;
          *
          * @returns {Formatter} A formatter for general values.
          */
-        function general(precision, onlyShowUnchanged) {
+        function general(precision) {
             if (precision === void 0) { precision = 3; }
-            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
             verifyPrecision(precision);
             return function (d) {
                 if (typeof d === "number") {
                     var multiplier = Math.pow(10, precision);
-                    var formattedValue = String(Math.round(d * multiplier) / multiplier);
-                    if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
-                        return "";
-                    }
-                    return formattedValue;
+                    return String(Math.round(d * multiplier) / multiplier);
                 }
                 else {
                     return String(d);
@@ -1188,24 +1174,16 @@ var Plottable;
          *
          * @returns {Formatter} A formatter for percentage values.
          */
-        function percentage(precision, onlyShowUnchanged) {
+        function percentage(precision) {
             if (precision === void 0) { precision = 0; }
-            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
-            var fixedFormatter = Formatters.fixed(precision, onlyShowUnchanged);
+            var fixedFormatter = Formatters.fixed(precision);
             return function (d) {
                 var valToFormat = d * 100;
                 // Account for float imprecision
                 var valString = d.toString();
                 var integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
                 valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
-                var formattedValue = fixedFormatter(valToFormat);
-                if (onlyShowUnchanged && valueChanged(valToFormat, formattedValue)) {
-                    return "";
-                }
-                if (formattedValue !== "") {
-                    formattedValue += "%";
-                }
-                return formattedValue;
+                return fixedFormatter(valToFormat) + "%";
             };
         }
         Formatters.percentage = percentage;
@@ -1299,9 +1277,6 @@ var Plottable;
             if (precision < 0 || precision > 20) {
                 throw new RangeError("Formatter precision must be between 0 and 20");
             }
-        }
-        function valueChanged(d, formattedValue) {
-            return d !== parseFloat(formattedValue);
         }
     })(Plottable.Formatters || (Plottable.Formatters = {}));
     var Formatters = Plottable.Formatters;
@@ -4407,10 +4382,10 @@ var Plottable;
              * @constructor
              * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
              * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-             * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
+             * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
              */
             function Numeric(scale, orientation, formatter) {
-                if (formatter === void 0) { formatter = Plottable.Formatters.general(3, false); }
+                if (formatter === void 0) { formatter = Plottable.Formatters.general(); }
                 _super.call(this, scale, orientation, formatter);
                 this.tickLabelPositioning = "center";
                 // Whether or not first/last tick label will still be displayed even if
