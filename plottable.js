@@ -6540,9 +6540,8 @@ var Plottable;
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var secondaryAttr = this._isVertical ? "x" : "y";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
-                var width = this._getBarWidth();
                 if (!attrToProjector["width"]) {
-                    attrToProjector["width"] = function () { return width; };
+                    attrToProjector["width"] = function () { return _this._getBarWidth(); };
                 }
                 var positionF = attrToProjector[secondaryAttr];
                 var widthF = attrToProjector["width"];
