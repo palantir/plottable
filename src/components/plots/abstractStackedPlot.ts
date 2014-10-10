@@ -69,7 +69,7 @@ export module Plot {
 
       d3.layout.stack()
                .x((d) => d.key)
-               .y((d) => d.value)
+               .y((d) => parseFloat(d.value))
                .values((d) => this.getDomainKeys().map((domainKey) => d.get(domainKey)))
                .out(outFunction)(dataArray);
 

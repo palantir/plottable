@@ -7054,7 +7054,7 @@ var Plottable;
                 var outFunction = function (d, y0, y) {
                     d.offset = y0;
                 };
-                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return _this.getDomainKeys().map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
+                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return parseFloat(d.value); }).values(function (d) { return _this.getDomainKeys().map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
                 return dataArray;
             };
             /**
