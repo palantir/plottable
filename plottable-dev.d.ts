@@ -2673,7 +2673,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class AbstractBarPlot<X, Y> extends AbstractXYPlot<X, Y> {
+        class AbstractBarPlot<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
@@ -2735,6 +2735,26 @@ declare module Plottable {
             _updateYDomainer(): void;
             _updateXDomainer(): void;
             _generateAttrToProjector(): AttributeToProjector;
+            /**
+             * Gets the current hover mode.
+             *
+             * @return {string} The current hover mode.
+             */
+            hoverMode(): string;
+            /**
+             * Sets the hover mode for hover interactions. There are two modes:
+             *     - "point": Selects the bar under the mouse cursor (default).
+             *     - "line" : Selects any bar that would be hit by a line extending
+             *                in the same direction as the bar and passing through
+             *                the cursor.
+             *
+             * @param {string} mode The desired hover mode.
+             * @return {AbstractBarPlot} The calling Bar Plot.
+             */
+            hoverMode(mode: String): AbstractBarPlot<X, Y>;
+            hoverOver(p: Point): void;
+            hoverOut(p: Point): void;
+            getHoverData(p: Point): Interaction.HoverData;
         }
     }
 }
@@ -3176,6 +3196,8 @@ declare module Plottable {
 
 declare module Plottable {
     module Interaction {
+        interface Interactable extends Component.AbstractComponent {
+        }
         class AbstractInteraction extends Core.PlottableObject {
             /**
              * It maintains a 'hitBox' which is where all event listeners are
@@ -3185,8 +3207,8 @@ declare module Plottable {
              * e.g. crosshairs.
              */
             _hitBox: D3.Selection;
-            _componentToListenTo: Component.AbstractComponent;
-            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _componentToListenTo: Interactable;
+            _anchor(component: Interactable, hitBox: D3.Selection): void;
         }
     }
 }
@@ -3440,6 +3462,42 @@ declare module Plottable {
         class YDragBox extends DragBox {
             _drag(): void;
             setBox(y0: number, y1: number): YDragBox;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
+        interface HoverData {
+            data: any[];
+            selection: D3.Selection;
+        }
+        interface Hoverable extends Interactable {
+            hoverOver(p: Point): any;
+            hoverOut(p: Point): any;
+            getHoverData(p: Point): HoverData;
+        }
+        class Hover extends AbstractInteraction {
+            _componentToListenTo: Hoverable;
+            _anchor(component: Hoverable, hitBox: D3.Selection): void;
+            /**
+             * Attaches an callback to be called when the user mouses over an element.
+             *
+             * @param {(hoverData: HoverData) => any} callback The callback to be called.
+             *      The callback will be passed data for newly hovered-over elements.
+             * @return {Interaction.Hover} The calling Interaction.Hover.
+             */
+            onHoverOver(callback: (hoverData: HoverData) => any): Hover;
+            /**
+             * Attaches a callback to be called when the user mouses off of an element.
+             *
+             * @param {(hoverData: HoverData) => any} callback The callback to be called.
+             *      The callback will be passed data from the hovered-out elements.
+             * @return {Interaction.Hover} The calling Interaction.Hover.
+             */
+            onHoverOut(callback: (hoverData: HoverData) => any): Hover;
+            getCurrentlyHovered(): HoverData;
         }
     }
 }

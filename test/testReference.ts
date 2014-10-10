@@ -50,5 +50,6 @@
 ///<reference path="utils/utilsTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />
+///<reference path="interactions/hoverInteractionTests.ts" />
 
 ///<reference path="dispatchers/dispatcherTests.ts" />

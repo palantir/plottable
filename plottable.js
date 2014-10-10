@@ -6362,6 +6362,7 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
                 this._barAlignmentFactor = 0;
+                this._hoverMode = "point";
                 this._animators = {
                     "bars-reset": new Plottable.Animator.Null(),
                     "bars": new Plottable.Animator.IterativeDelay(),
@@ -6566,6 +6567,53 @@ var Plottable;
                     return Math.abs(scaledBaseline - originalPositionFn(d, i));
                 };
                 return attrToProjector;
+            };
+            AbstractBarPlot.prototype.hoverMode = function (mode) {
+                if (mode == null) {
+                    return this._hoverMode;
+                }
+                var modeLC = mode.toLowerCase();
+                if (modeLC !== "point" && modeLC !== "line") {
+                    throw new Error(mode + " is not a valid hover mode");
+                }
+                this._hoverMode = modeLC;
+                return this;
+            };
+            //===== Hover logic =====
+            AbstractBarPlot.prototype.hoverOver = function (p) {
+                // no-op
+            };
+            AbstractBarPlot.prototype.hoverOut = function (p) {
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
+                });
+            };
+            AbstractBarPlot.prototype.getHoverData = function (p) {
+                var x = p.x;
+                var y = p.y;
+                if (this._hoverMode === "line") {
+                    var maxExtent = { min: -Infinity, max: Infinity };
+                    if (this._isVertical) {
+                        y = maxExtent;
+                    }
+                    else {
+                        x = maxExtent;
+                    }
+                }
+                var selectedBars = this.selectBar(x, y, false);
+                if (selectedBars) {
+                    this._getDrawersInOrder().forEach(function (d, i) {
+                        d._renderArea.selectAll("rect").classed("hovered", false).classed("not-hovered", true);
+                    });
+                    selectedBars.classed("hovered", true).classed("not-hovered", false);
+                }
+                else {
+                    this.hoverOut(p);
+                }
+                return {
+                    data: selectedBars ? selectedBars.data() : null,
+                    selection: selectedBars
+                };
             };
             AbstractBarPlot._BarAlignmentToFactor = {};
             AbstractBarPlot.DEFAULT_WIDTH = 10;
@@ -8211,6 +8259,115 @@ var Plottable;
             return YDragBox;
         })(Interaction.DragBox);
         Interaction.YDragBox = YDragBox;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Interaction) {
+        var Hover = (function (_super) {
+            __extends(Hover, _super);
+            function Hover() {
+                _super.apply(this, arguments);
+                this.lastHoverData = {
+                    data: null,
+                    selection: null
+                };
+            }
+            Hover.prototype._anchor = function (component, hitBox) {
+                var _this = this;
+                _super.prototype._anchor.call(this, component, hitBox);
+                this.dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
+                this.dispatcher.mouseover(function (p) {
+                    _this._componentToListenTo.hoverOver(p);
+                    _this.handleHoverOver(p);
+                });
+                this.dispatcher.mouseout(function (p) {
+                    _this._componentToListenTo.hoverOut(p);
+                    _this.safeHoverOut();
+                });
+                this.dispatcher.mousemove(function (p) { return _this.handleHoverOver(p); });
+                this.dispatcher.connect();
+            };
+            Hover.prototype.handleHoverOver = function (p) {
+                var _this = this;
+                var newHoverData = this._componentToListenTo.getHoverData(p);
+                if (newHoverData.data == null) {
+                    this.safeHoverOut();
+                }
+                else {
+                    var overData = newHoverData.data;
+                    var overSelection = newHoverData.selection;
+                    if (this.lastHoverData.data != null) {
+                        var wasHoveredOut = function (d) { return newHoverData.data.indexOf(d) === -1; };
+                        var outData = this.lastHoverData.data.filter(wasHoveredOut);
+                        if (outData.length > 0) {
+                            var outSelection = this.lastHoverData.selection.filter(wasHoveredOut);
+                            if (this.hoverOutCallback) {
+                                this.hoverOutCallback({
+                                    data: outData,
+                                    selection: outSelection
+                                });
+                            }
+                        }
+                        var newlyHoveredOver = function (d) { return _this.lastHoverData.data.indexOf(d) === -1; };
+                        overData = newHoverData.data.filter(newlyHoveredOver);
+                        overSelection = newHoverData.selection.filter(newlyHoveredOver);
+                    }
+                    if (this.hoverOverCallback && overData.length > 0) {
+                        this.hoverOverCallback({
+                            data: overData,
+                            selection: overSelection
+                        });
+                    }
+                }
+                this.lastHoverData = newHoverData;
+            };
+            Hover.prototype.safeHoverOut = function () {
+                if (this.hoverOutCallback && this.lastHoverData.data != null) {
+                    this.hoverOutCallback(this.lastHoverData);
+                }
+                this.lastHoverData = {
+                    data: null,
+                    selection: null
+                };
+            };
+            /**
+             * Attaches an callback to be called when the user mouses over an element.
+             *
+             * @param {(hoverData: HoverData) => any} callback The callback to be called.
+             *      The callback will be passed data for newly hovered-over elements.
+             * @return {Interaction.Hover} The calling Interaction.Hover.
+             */
+            Hover.prototype.onHoverOver = function (callback) {
+                this.hoverOverCallback = callback;
+                return this;
+            };
+            /**
+             * Attaches a callback to be called when the user mouses off of an element.
+             *
+             * @param {(hoverData: HoverData) => any} callback The callback to be called.
+             *      The callback will be passed data from the hovered-out elements.
+             * @return {Interaction.Hover} The calling Interaction.Hover.
+             */
+            Hover.prototype.onHoverOut = function (callback) {
+                this.hoverOutCallback = callback;
+                return this;
+            };
+            Hover.prototype.getCurrentlyHovered = function () {
+                return this.lastHoverData;
+            };
+            return Hover;
+        })(Interaction.AbstractInteraction);
+        Interaction.Hover = Hover;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
