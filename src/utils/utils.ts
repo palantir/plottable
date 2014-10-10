@@ -69,13 +69,28 @@ export module _Util {
      * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
      * and "activate" it by turning it into a function in (datum, index, metadata)
      */
-    export function accessorize(accessor: any): _IAccessor {
+    export function accessorize(accessor: any): _Accessor {
       if (typeof(accessor) === "function") {
-        return (<_IAccessor> accessor);
+        return (<_Accessor> accessor);
       } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
         return (d: any, i: number, s: any) => d[accessor];
       } else {
         return (d: any, i: number, s: any) => accessor;
+      };
+    }
+
+    /**
+     * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata.
+     * Temporarily always grabs the metadata of the first dataset.
+     * HACKHACK #1089 - The accessor currently only grabs the first dataset's metadata
+     */
+    export function _applyAccessor(accessor: _Accessor, plot: Plot.AbstractPlot) {
+      var activatedAccessor = accessorize(accessor);
+      return (d: any, i: number) => {
+        var datasets = plot.datasets();
+        var dataset = datasets.length > 0 ? datasets[0] : null;
+        var metadata = dataset ? dataset.metadata() : null;
+        return activatedAccessor(d, i, metadata);
       };
     }
 
@@ -108,14 +123,6 @@ export module _Util {
         map.set(key, transform(key, i));
       });
       return map;
-    }
-
-    /**
-     * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
-     */
-    export function _applyAccessor(accessor: _IAccessor, plot: Abstract.Plot) {
-      var activatedAccessor = accessorize(accessor);
-      return (d: any, i: number) => activatedAccessor(d, i, plot.dataset().metadata());
     }
 
     /**

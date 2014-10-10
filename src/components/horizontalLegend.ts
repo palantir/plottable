@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Component {
-  export class HorizontalLegend extends Abstract.Component {
+  export class HorizontalLegend extends AbstractComponent {
     /**
      * The css class applied to each legend row
      */
@@ -73,7 +73,7 @@ export module Component {
       };
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var estimatedLayout = this.calculateLayoutInfo(offeredWidth, offeredHeight);
 
       var rowLengths = estimatedLayout.rows.map((row: string[]) => {

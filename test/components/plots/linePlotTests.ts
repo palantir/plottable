@@ -26,10 +26,12 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
-      linePlot = new Plottable.Plot.Line(simpleDataset, xScale, yScale);
-      linePlot.project("x", xAccessor, xScale)
+      linePlot = new Plottable.Plot.Line(xScale, yScale);
+      linePlot.addDataset(simpleDataset)
+              .project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)
               .project("stroke", colorAccessor)
+              .addDataset(simpleDataset)
               .renderTo(svg);
       renderArea = linePlot._renderArea;
     });

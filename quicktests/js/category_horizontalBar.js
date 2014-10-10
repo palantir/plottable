@@ -21,14 +21,13 @@ function run(div, data, Plottable) {
     var xScale = new Plottable.Scale.Linear();
     var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
-    var barPlot = new Plottable.Plot.HorizontalBar(ds, xScale, yScale)
-    .attr("y", "name", yScale)
-    .attr("x", "age", xScale);
-    barPlot.animate(true);
+    var barPlot = new Plottable.Plot.HorizontalBar(xScale, yScale)
+        .addDataset(ds)
+        .attr("y", "name", yScale)
+        .attr("x", "age", xScale)
+        .animate(true);
     var chart = new Plottable.Component.Table([[yAxis, barPlot],
-       [null,  xAxis]]);
-
-
+                                               [null,  xAxis]]);
     chart.renderTo(svg);
 
 }

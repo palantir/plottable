@@ -1,6 +1,5 @@
 function makeData() {
   "use strict";
-
   return [{name: "Frodo", y: 3}, {name: "Sam", y: 2}, {name: "Gollum", y: 4}];
 }
 
@@ -15,7 +14,8 @@ function run(div, data, Plottable) {
   var title = new Plottable.Component.TitleLabel("Hover over bars");
   var colorScale = new Plottable.Scale.Color();
 
-  var plot = new Plottable.Plot.VerticalBar(data, xScale, yScale)
+  var plot = new Plottable.Plot.VerticalBar(xScale, yScale)
+    .addDataset(data)
     .project("x", "name", xScale)
     .project("y", "y", yScale)
     .project("fill", "name", colorScale);
@@ -26,12 +26,12 @@ function run(div, data, Plottable) {
       [null, xAxis]]);
 
   chart.renderTo(svg);
-  
+
   //callbacks
-  var hoverHandler = function(datum, bar){
+  var hoverHandler = function(datum, bar) {
       title.text(datum.name);
   };
-  var unhoverHandler = function(datum, bar){
+  var unhoverHandler = function(datum, bar) {
       title.text("Who?");
   };
 

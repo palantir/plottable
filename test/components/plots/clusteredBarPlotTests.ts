@@ -4,7 +4,6 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("Clustered Bar Plot", () => {
-    var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
@@ -16,7 +15,7 @@ describe("Plots", () => {
     var axisHeight = 0;
     var bandWidth = 0;
 
-    before(() => {
+    beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Ordinal();
       yScale = new Plottable.Scale.Linear().domain([0, 2]);
@@ -40,18 +39,6 @@ describe("Plots", () => {
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
       bandWidth = xScale.rangeBand();
-    });
-
-    beforeEach(() => {
-      verifier.start();
-    });
-
-    afterEach(() => {
-      verifier.end();
-    });
-
-    after(() => {
-      if (verifier.passed) {svg.remove();};
     });
 
     it("renders correctly", () => {
@@ -88,11 +75,11 @@ describe("Plots", () => {
           , "x pos correct for bar2");
       assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2 + off, 0.01
           , "x pos correct for bar3");
+      svg.remove();
     });
   });
 
   describe("Horizontal Clustered Bar Plot", () => {
-    var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
@@ -104,7 +91,7 @@ describe("Plots", () => {
     var rendererWidth: number;
     var bandWidth = 0;
 
-    before(() => {
+    beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       yScale = new Plottable.Scale.Ordinal();
       xScale = new Plottable.Scale.Linear().domain([0, 2]);
@@ -128,18 +115,6 @@ describe("Plots", () => {
       var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
       rendererWidth = renderer.width();
       bandWidth = yScale.rangeBand();
-    });
-
-    beforeEach(() => {
-      verifier.start();
-    });
-
-    afterEach(() => {
-      verifier.end();
-    });
-
-    after(() => {
-      if (verifier.passed) {svg.remove();};
     });
 
     it("renders correctly", () => {
@@ -177,6 +152,7 @@ describe("Plots", () => {
             , "y pos correct for bar2");
       assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + bandWidth / 2 + off, 0.01
             , "y pos correct for bar3");
+      svg.remove();
     });
   });
 
