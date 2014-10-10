@@ -2392,8 +2392,22 @@ declare module Plottable {
              * Sets the layout weight of a particular row.
              * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
              *
-             * A common case would be to have one graph take up 2/3rds of the space,
-             * and the other graph take up 1/3rd.
+             * A common case would be to have one row take up 2/3rds of the space,
+             * and the other row take up 1/3rd.
+             *
+             * Example:
+             *
+             * ```JavaScript
+             * plot = new Plottable.Component.Table([
+             *  [row1],
+             *  [row2]
+             * ]);
+             *
+             * // assign twice as much space to the first row
+             * plot
+             *  .rowWeight(0, 2)
+             *  .rowWeight(1, 1)
+             * ```
              *
              * @param {number} index The index of the row.
              * @param {number} weight The weight to be set on the row.
@@ -2404,8 +2418,7 @@ declare module Plottable {
              * Sets the layout weight of a particular column.
              * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
              *
-             * A common case would be to have one graph take up 2/3rds of the space,
-             * and the other graph take up 1/3rd.
+             * Please see `rowWeight` docs for an example.
              *
              * @param {number} index The index of the column.
              * @param {number} weight The weight to be set on the column.
