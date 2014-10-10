@@ -4,13 +4,13 @@ module Plottable {
 export module TickGenerators {
 
   /**
-   * Creates a tick generator using specific interval.
+   * Creates a tick generator using specified interval.
    *
-   * It generates ticks at multiples of the interval including the domain boundaries
+   * Generates ticks at multiples of the interval while also including the domain boundaries.
    *
-   * @param {number} [interval] The interval between two ticks.
+   * @param {number} interval The interval between two ticks (not including the end ticks).
    *
-   * @returns {TickGenerator} A tick generator using specific interval.
+   * @returns {TickGenerator} A tick generator using specified interval.
    */
   export function intervalTickGenerator(interval: number) : Scale.TickGenerator<number> {
     return function(s: Scale.AbstractQuantitative<any>) {
