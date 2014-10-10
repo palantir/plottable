@@ -4,7 +4,6 @@ module Plottable {
 export module Plot {
   export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
-    private static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignmentFactor = 0;
@@ -234,16 +233,16 @@ export module Plot {
       var secondaryScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
       var primaryAttr     = this._isVertical ? "y" : "x";
       var secondaryAttr   = this._isVertical ? "x" : "y";
-      var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
-                      && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
+      var width = this._getBarWidth();
       if (!attrToProjector["width"]) {
-        var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : AbstractBarPlot.DEFAULT_WIDTH;
-        attrToProjector["width"] = (d: any, i: number) => constantWidth;
+        attrToProjector["width"] = () => width;
       }
 
       var positionF = attrToProjector[secondaryAttr];
       var widthF = attrToProjector["width"];
+      var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
+                      && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
       if (!bandsMode) {
         attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) * this._barAlignmentFactor;
       } else {
@@ -265,6 +264,22 @@ export module Plot {
       };
 
       return attrToProjector;
+    }
+
+    public _getBarWidth() {
+      var barWidth: number;
+      var secondaryScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
+      var secondaryDimension = this._isVertical ? this.width() : this.height();
+
+      if (secondaryScale instanceof Plottable.Scale.Ordinal) {
+        var ordScale = <Plottable.Scale.Ordinal> secondaryScale;
+        barWidth = ordScale.rangeType() === "bands" ? ordScale.rangeBand() : secondaryDimension / ordScale.domain().length * 0.4;
+      } else if (secondaryScale instanceof Plottable.Scale.AbstractQuantitative) {
+        var qScale = <Scale.AbstractQuantitative<any>> secondaryScale;
+        barWidth = secondaryDimension / qScale.ticks().length;
+      }
+
+      return barWidth;
     }
   }
 }

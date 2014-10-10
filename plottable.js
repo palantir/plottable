@@ -6539,14 +6539,14 @@ var Plottable;
                 var secondaryScale = this._isVertical ? this._xScale : this._yScale;
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var secondaryAttr = this._isVertical ? "x" : "y";
-                var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var width = this._getBarWidth();
                 if (!attrToProjector["width"]) {
-                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : AbstractBarPlot.DEFAULT_WIDTH;
-                    attrToProjector["width"] = function (d, i) { return constantWidth; };
+                    attrToProjector["width"] = function () { return width; };
                 }
                 var positionF = attrToProjector[secondaryAttr];
                 var widthF = attrToProjector["width"];
+                var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                 if (!bandsMode) {
                     attrToProjector[secondaryAttr] = function (d, i) { return positionF(d, i) - widthF(d, i) * _this._barAlignmentFactor; };
                 }
@@ -6567,8 +6567,21 @@ var Plottable;
                 };
                 return attrToProjector;
             };
+            AbstractBarPlot.prototype._getBarWidth = function () {
+                var barWidth;
+                var secondaryScale = this._isVertical ? this._xScale : this._yScale;
+                var secondaryDimension = this._isVertical ? this.width() : this.height();
+                if (secondaryScale instanceof Plottable.Scale.Ordinal) {
+                    var ordScale = secondaryScale;
+                    barWidth = ordScale.rangeType() === "bands" ? ordScale.rangeBand() : secondaryDimension / ordScale.domain().length * 0.4;
+                }
+                else if (secondaryScale instanceof Plottable.Scale.AbstractQuantitative) {
+                    var qScale = secondaryScale;
+                    barWidth = secondaryDimension / qScale.ticks().length;
+                }
+                return barWidth;
+            };
             AbstractBarPlot._BarAlignmentToFactor = {};
-            AbstractBarPlot.DEFAULT_WIDTH = 10;
             return AbstractBarPlot;
         })(Plot.AbstractXYPlot);
         Plot.AbstractBarPlot = AbstractBarPlot;
@@ -7273,6 +7286,9 @@ var Plottable;
             };
             StackedBar.prototype._updateYDomainer = function () {
                 return Plot.AbstractBarPlot.prototype._updateYDomainer.apply(this);
+            };
+            StackedBar.prototype._getBarWidth = function () {
+                return Plot.AbstractBarPlot.prototype._getBarWidth.apply(this);
             };
             return StackedBar;
         })(Plot.AbstractStacked);
