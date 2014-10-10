@@ -12,8 +12,8 @@ export module TickGenerators {
    *
    * @returns {TickGenerator} A tick generator using specific interval.
    */
-  export function intervalTickGenerator(interval: number) {
-    return function(s: Abstract.QuantitativeScale<any>) {
+  export function intervalTickGenerator(interval: number) : Scale.TickGenerator<number> {
+    return function(s: Scale.AbstractQuantitative<any>) {
       var domain = s.domain();
       var generatedTicks: number[] = [];
       var firstTick = Math.ceil(domain[0] / interval) * interval;

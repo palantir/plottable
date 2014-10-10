@@ -489,7 +489,7 @@ declare module Plottable {
          *
          * @returns {TickGenerator} A tick generator using specific interval.
          */
-        function intervalTickGenerator(interval: number): (s: Abstract.QuantitativeScale<any>) => number[];
+        function intervalTickGenerator(interval: number): Scale.TickGenerator<number>;
     }
 }
 
