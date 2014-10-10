@@ -1,7 +1,7 @@
 function renderPlots(){
 	var dropdown = $("#category")[0];
-  var branch1 = $("#branch1")[0];
-  var branch2 = $("#branch2")[0];
+  var branch1 = $("#branch1")[0].value;
+  var branch2 = $("#branch2")[0].value;
 	var category = dropdown.options[dropdown.selectedIndex].value;
   loadQuickTests(category, branch1, branch2);
 }
@@ -29,18 +29,16 @@ function loadQuickTests(category, branch1, branch2){
 
 function loadQuickTestsInCategory(quickTestNames, category, branchName, order){
   //x here is an array of test names
-  console.log("quicktests retrieved are: " + quickTestNames); 
 
-  debugger;
   var plottableBranches=[];
-  var result;
   var branchName = branchName; //this needs to be retrieved from before
+  var div;
 
   if(order === "first"){
-    var div = d3.select("#result1");
+    div = d3.select("#result1");
   }
   else {
-    var div = d3.select("#result2");
+    div = d3.select("#result2");
   }
 
   quickTestNames.forEach(function(q) { //for each quicktest 
@@ -51,13 +49,14 @@ function loadQuickTestsInCategory(quickTestNames, category, branchName, order){
         return;
       }        
       text = "(function(){" + text +
-        "\nreturn {makeData: makeData, run: run};" +
-             "})();" +
-        "\n////# sourceURL=" + name + ".js\n";
+          "\nreturn {makeData: makeData, run: run};" +
+               "})();" +
+          "\n////# sourceURL=" + name + ".js\n";
 
       result = eval(text);
-
+      console.log(text)
       prepareQuickTest(div, result, branchName, plottableBranches);
+
     });
   });//forEach
     
@@ -72,18 +71,19 @@ function prepareQuickTest(div, result, branchName, plottableBranches) {
   }
 
   if (branchName !== "#local") {
-    url = "https://rawgithub.com/palantir/plottable/" + branchName + "/plottable.js";
+    url = "https://rawgit.com/palantir/plottable/" + branchName + "/plottable.js";
   } else {
     url = "/plottable.js"; //load local version
   }
 
-  debugger;
-
   $.getScript(url, function(data, textStatus) { 
-
     if(textStatus === "success"){
+      console.log("success!")
       plottableBranches[branchName] = Plottable;
       runQuickTest(div, result, branchName, plottableBranches); //run the quicktest once the plottable object is retrieved
+    }
+    if(textStatus === "error"){
+      console.log("errored!")
     }
 
   });
@@ -92,5 +92,44 @@ function prepareQuickTest(div, result, branchName, plottableBranches) {
 //run a single quicktest
 function runQuickTest(div, result, branch, plottableBranches){
   result.run(div, result.makeData(), plottableBranches[branch])
+};
+
+
+window.onkeyup = function(e){
+  var key = e.keyCode ? e.keyCode : e.which;
+  //if 1 is pressed
+  if(key == 49){
+    $("#result1 svg").css("display", "block");
+    $("#result2 svg").css("display", "none");
+  }
+  //if 2 is pressed
+  if(key == 50){
+    $("#result1 svg").css("display", "none");
+    $("#result2 svg").css("display", "block");
+  }
+  //if 3 is pressed
+  if(key == 51){
+    $("#result1 svg").css("display", "block");
+    $("#result2 svg").css("display", "block");
+  }
+    //if 3 is pressed
+  if(key == 52){
+    $("#result1 svg").css("display", "none");
+    $("#result2 svg").css("display", "none");
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
