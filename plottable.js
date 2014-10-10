@@ -7330,16 +7330,18 @@ var Plottable;
                 this._duration = Base.DEFAULT_DURATION_MILLISECONDS;
                 this._delay = Base.DEFAULT_DELAY_MILLISECONDS;
                 this._easing = Base.DEFAULT_EASING;
+                this._maxIterativeDelay = Base.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
+                this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
             }
             Base.prototype.animate = function (selection, attrToProjector) {
                 var _this = this;
-                var numberOfIterations = selection[0].length - 1;
+                var numberOfIterations = Math.max(selection[0].length - 1, 1);
                 var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
                 var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / numberOfIterations);
                 return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + adjustedIterativeDelay * i; }).attr(attrToProjector);
             };
             Base.prototype.duration = function (duration) {
-                if (duration === undefined) {
+                if (duration == null) {
                     return this._duration;
                 }
                 else {
@@ -7348,7 +7350,7 @@ var Plottable;
                 }
             };
             Base.prototype.delay = function (delay) {
-                if (delay === undefined) {
+                if (delay == null) {
                     return this._delay;
                 }
                 else {
@@ -7357,7 +7359,7 @@ var Plottable;
                 }
             };
             Base.prototype.easing = function (easing) {
-                if (easing === undefined) {
+                if (easing == null) {
                     return this._easing;
                 }
                 else {
@@ -7366,7 +7368,7 @@ var Plottable;
                 }
             };
             Base.prototype.maxIterativeDelay = function (maxIterDelay) {
-                if (maxIterDelay === undefined) {
+                if (maxIterDelay == null) {
                     return this._maxIterativeDelay;
                 }
                 else {

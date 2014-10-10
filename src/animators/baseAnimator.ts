@@ -52,10 +52,12 @@ export module Animator {
       this._duration = Base.DEFAULT_DURATION_MILLISECONDS;
       this._delay = Base.DEFAULT_DELAY_MILLISECONDS;
       this._easing = Base.DEFAULT_EASING;
+      this._maxIterativeDelay = Base.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
+      this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
     }
 
     public animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition {
-      var numberOfIterations = selection[0].length - 1;
+      var numberOfIterations = Math.max(selection[0].length - 1, 1);
       var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
       var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / numberOfIterations);
       return selection.transition()
@@ -79,7 +81,7 @@ export module Animator {
      */
     public duration(duration: number): Base;
     public duration(duration?: number): any{
-      if (duration === undefined) {
+      if (duration == null) {
         return this._duration;
       } else {
         this._duration = duration;
@@ -101,7 +103,7 @@ export module Animator {
      */
     public delay(delay: number): Base;
     public delay(delay?: number): any{
-      if (delay === undefined) {
+      if (delay == null) {
         return this._delay;
       } else {
         this._delay = delay;
@@ -123,7 +125,7 @@ export module Animator {
      */
     public easing(easing: string): Base;
     public easing(easing?: string): any{
-      if (easing === undefined) {
+      if (easing == null) {
         return this._easing;
       } else {
         this._easing = easing;
@@ -145,7 +147,7 @@ export module Animator {
      */
     public maxIterativeDelay(maxIterDelay: number): Base;
     public maxIterativeDelay(maxIterDelay?: number): any {
-      if (maxIterDelay === undefined) {
+      if (maxIterDelay == null) {
         return this._maxIterativeDelay;
       } else {
         this._maxIterativeDelay = maxIterDelay;
