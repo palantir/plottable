@@ -1,4 +1,5 @@
 function renderPlots(){
+  clearTests();
 	var dropdown = $("#category")[0];
   var branch1 = $("#branch1")[0].value;
   var branch2 = $("#branch2")[0].value;
@@ -35,9 +36,11 @@ function loadQuickTestsInCategory(quickTestNames, category, branchName, order){
   var div;
 
   if(order === "first"){
+    //div = $("#result1");
     div = d3.select("#result1");
   }
   else {
+    //div = $("#result2");
     div = d3.select("#result2");
   }
 
@@ -54,9 +57,10 @@ function loadQuickTestsInCategory(quickTestNames, category, branchName, order){
           "\n////# sourceURL=" + name + ".js\n";
 
       result = eval(text);
-      console.log(text)
-      prepareQuickTest(div, result, branchName, plottableBranches);
-
+      var className = "quicktest " + name;
+      //div.append("<div id='" + name + "'> </div>"); //create specific div for a specific quicktest
+      var qtdiv = div.append("div").attr("class", className).append("div");
+      prepareQuickTest(qtdiv, result, branchName, plottableBranches);
     });
   });//forEach
     
@@ -94,6 +98,10 @@ function runQuickTest(div, result, branch, plottableBranches){
   result.run(div, result.makeData(), plottableBranches[branch])
 };
 
+
+function clearTests(){
+  d3.selectAll(".quicktest").remove();
+}
 
 window.onkeyup = function(e){
   var key = e.keyCode ? e.keyCode : e.which;

@@ -1,10 +1,7 @@
 function makeData() {
   "use strict";
 
-  var data = makeRandomData(20);
-  data[0].y = NaN;
-  data[13].x = undefined;
-  return data;
+  return makeRandomData(6);
 }
 
 function run(div, data, Plottable) {
@@ -21,22 +18,21 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   var dataset = new Plottable.Dataset(data);
-  var areaRenderer = new Plottable.Plot.Area(xScale, yScale)
-            .addDataset(dataset)
-            .attr("opacity", 0.75)
-            .animate(doAnimate);
 
-  var areaChart = new Plottable.Component.Table([[yAxis, areaRenderer],
+  var hBarRenderer = new Plottable.Plot.HorizontalBar(xScale, yScale).addDataset(dataset);
+  hBarRenderer.attr("opacity", 0.75);
+  hBarRenderer.animate(doAnimate);
+
+  var hBarChart = new Plottable.Component.Table([[yAxis, hBarRenderer],
    [null,  xAxis]]);
-
-  areaChart.renderTo(svg);
+  hBarChart.renderTo(svg);
 
   var cb = function(x, y){
     var d = dataset.data();
     dataset.data(d);
   };
 
-  areaRenderer.registerInteraction(
-    new Plottable.Interaction.Click(areaRenderer).callback(cb)
+  hBarRenderer.registerInteraction(
+    new Plottable.Interaction.Click(hBarRenderer).callback(cb)
   );
 }
