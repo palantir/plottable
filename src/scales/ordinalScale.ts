@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scale {
-  export class Ordinal extends Abstract.Scale<string, number> {
+  export class Ordinal extends AbstractScale<string, number> {
     public _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
     private _rangeType: string = "bands";
@@ -116,6 +116,7 @@ export module Scale {
         if (innerPadding != null) {
           this._innerPadding = innerPadding;
         }
+        this.range(this.range());
         this.broadcaster.broadcast();
         return this;
       }

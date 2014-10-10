@@ -12,13 +12,9 @@ export module Plot {
    *   "outer-radius" - Accessor determining the distance from the center to the outer edge of the sector
    *   "value" - Accessor to extract the value determining the proportion of each slice to the total
    */
-  export class Pie extends Abstract.Plot {
+  export class Pie extends AbstractPlot {
 
     private static DEFAULT_COLOR_SCALE = new Scale.Color();
-
-    public _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
-    public _datasetKeysInOrder: string[];
-    private nextSeriesIndex: number;
 
     /**
      * Constructs a PiePlot.
@@ -26,16 +22,8 @@ export module Plot {
      * @constructor
      */
     constructor() {
-      // make a dummy dataset to satisfy the base Plot (HACKHACK)
-      this._key2DatasetDrawerKey = d3.map();
-      this._datasetKeysInOrder = [];
-      this.nextSeriesIndex = 0;
-      super(new Plottable.Dataset());
+      super();
       this.classed("pie-plot", true);
-    }
-
-    public _setup() {
-      Abstract.NewStylePlot.prototype._setup.call(this);
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
@@ -43,42 +31,16 @@ export module Plot {
       this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
     }
 
-    /**
-     * Adds a dataset to this plot. Only one dataset can be added to a PiePlot.
-     *
-     * A key is automatically generated if not supplied.
-     *
-     * @param {string} [key] The key of the dataset.
-     * @param {any[]|Dataset} dataset dataset to add.
-     * @returns {Pie} The calling PiePlot.
-     */
-    public addDataset(key: string, dataset: Dataset): Pie;
-    public addDataset(key: string, dataset: any[]): Pie;
-    public addDataset(dataset: Dataset): Pie;
-    public addDataset(dataset: any[]): Pie;
-    public addDataset(keyOrDataset: any, dataset?: any): Pie {
-      return Abstract.NewStylePlot.prototype.addDataset.call(this, keyOrDataset, dataset);
-    }
-
     public _addDataset(key: string, dataset: Dataset) {
       if (this._datasetKeysInOrder.length === 1) {
-        _Util.Methods.warn("Only one dataset is supported in pie plots");
+        _Util.Methods.warn("Only one dataset is supported in Pie plots");
         return;
       }
-      Abstract.NewStylePlot.prototype._addDataset.call(this, key, dataset);
+      super._addDataset(key, dataset);
     }
 
-    /**
-     * Removes a dataset
-     *
-     * @param {string} key The key of the dataset
-     * @returns {Pie} The calling PiePlot.
-     */
-    public removeDataset(key: string): Pie {
-      return Abstract.NewStylePlot.prototype.removeDataset.call(this, key);
-    }
 
-    public _generateAttrToProjector(): IAttributeToProjector {
+    public _generateAttrToProjector(): AttributeToProjector {
       var attrToProjector = this.retargetProjectors(super._generateAttrToProjector());
       var innerRadiusF = attrToProjector["inner-radius"] || d3.functor(0);
       var outerRadiusF = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
@@ -100,37 +62,21 @@ export module Plot {
      * Since the data goes through a pie function, which returns an array of ArcDescriptors,
      * projectors will need to be retargeted so they point to the data portion of each arc descriptor.
      */
-    private retargetProjectors(attrToProjector: IAttributeToProjector): IAttributeToProjector {
-      var retargetedAttrToProjector: IAttributeToProjector = {};
+    private retargetProjectors(attrToProjector: AttributeToProjector): AttributeToProjector {
+      var retargetedAttrToProjector: AttributeToProjector = {};
       d3.entries(attrToProjector).forEach((entry) => {
         retargetedAttrToProjector[entry.key] = (d: D3.Layout.ArcDescriptor, i: number) => entry.value(d.data, i);
       });
       return retargetedAttrToProjector;
     }
 
-    public _getAnimator(drawer: Abstract._Drawer, index: number): Animator.IPlotAnimator {
-      return Abstract.NewStylePlot.prototype._getAnimator.call(this, drawer, index);
-    }
-
-    public _getDrawer(key: string): Abstract._Drawer {
+    public _getDrawer(key: string): _Drawer.AbstractDrawer {
       return new Plottable._Drawer.Arc(key);
-    }
-
-    public _getDatasetsInOrder(): Dataset[] {
-      return Abstract.NewStylePlot.prototype._getDatasetsInOrder.call(this);
-    }
-
-    public _getDrawersInOrder(): Abstract._Drawer[] {
-      return Abstract.NewStylePlot.prototype._getDrawersInOrder.call(this);
-    }
-
-    public _updateScaleExtent(attr: string) {
-      Abstract.NewStylePlot.prototype._updateScaleExtent.call(this, attr);
     }
 
     public _paint() {
       var attrHash = this._generateAttrToProjector();
-      var datasets = this._getDatasetsInOrder();
+      var datasets = this.datasets();
       this._getDrawersInOrder().forEach((d, i) => {
         var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
         var pieData = this.pie(datasets[i].data());

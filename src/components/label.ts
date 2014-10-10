@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Component {
-  export class Label extends Abstract.Component {
+  export class Label extends AbstractComponent {
     private textContainer: D3.Selection;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private orientation: string;
@@ -18,20 +18,13 @@ export module Component {
      *
      * @constructor
      * @param {string} displayText The text of the Label (default = "").
-     * @param {string} orientation The orientation of the Label (horizontal/vertical-left/vertical-right) (default = "horizontal").
+     * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
      */
     constructor(displayText = "", orientation = "horizontal") {
       super();
       this.classed("label", true);
       this.text(displayText);
-      orientation = orientation.toLowerCase();
-      if (orientation === "vertical-left")  { orientation = "left" ; }
-      if (orientation === "vertical-right") { orientation = "right"; }
-      if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
-        this.orientation = orientation;
-      } else {
-        throw new Error(orientation + " is not a valid orientation for LabelComponent");
-      }
+      this.orient(orientation);
       this.xAlign("center").yAlign("center");
       this._fixedHeightFlag = true;
       this._fixedWidthFlag = true;
@@ -65,7 +58,7 @@ export module Component {
       return this;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var desiredWH = this.measurer(this._text);
       var desiredWidth  = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height);
       var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
@@ -103,6 +96,35 @@ export module Component {
         return this._text;
       } else {
         this._text = displayText;
+        this._invalidateLayout();
+        return this;
+      }
+    }
+
+    /**
+     * Gets the orientation of the Label.
+     *
+     * @returns {string} the current orientation.
+     */
+    public orient(): string;
+    /**
+     * Sets the orientation of the Label.
+     *
+     * @param {string} newOrientation If provided, the desired orientation
+     * (horizontal/left/right).
+     * @returns {Label} The calling Label.
+     */
+    public orient(newOrientation: string): Label;
+    public orient(newOrientation?: string): any {
+      if (newOrientation == null) {
+        return this.orientation;
+      } else {
+        newOrientation = newOrientation.toLowerCase();
+        if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
+          this.orientation = newOrientation;
+        } else {
+          throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
+        }
         this._invalidateLayout();
         return this;
       }

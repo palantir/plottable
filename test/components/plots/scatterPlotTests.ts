@@ -15,11 +15,12 @@ describe("Plots", () => {
       var xAccessor = (d: any, i?: number, m?: any) => d.x + i * m.foo;
       var yAccessor = (d: any, i?: number, m?: any) => m.bar;
       var dataset = new Plottable.Dataset(data, metadata);
-      var renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale)
+      var plot = new Plottable.Plot.Scatter(xScale, yScale)
                                   .project("x", xAccessor)
                                   .project("y", yAccessor);
-      renderer.renderTo(svg);
-      var circles = renderer._renderArea.selectAll("circle");
+      plot.addDataset(dataset);
+      plot.renderTo(svg);
+      var circles = plot._renderArea.selectAll("circle");
       var c1 = d3.select(circles[0][0]);
       var c2 = d3.select(circles[0][1]);
       assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
@@ -51,7 +52,6 @@ describe("Plots", () => {
       var circlePlot: Plottable.Plot.Scatter<number,number>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 300;
-      var verifier = new MultiTestVerifier();
       var pixelAreaFull = {xMin: 0, xMax: SVG_WIDTH, yMin: 0, yMax: SVG_HEIGHT};
       var pixelAreaPart = {xMin: 200, xMax: 600, yMin: 100, yMax: 200};
       var dataAreaFull = {xMin: 0, xMax: 9, yMin: 81, yMax: 0};
@@ -86,14 +86,11 @@ describe("Plots", () => {
       };
 
       beforeEach(() => {
-        verifier.start();
-      });
-
-      before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.Scale.Linear().domain([0, 9]);
         yScale = new Plottable.Scale.Linear().domain([0, 81]);
-        circlePlot = new Plottable.Plot.Scatter(quadraticDataset, xScale, yScale);
+        circlePlot = new Plottable.Plot.Scatter(xScale, yScale);
+        circlePlot.addDataset(quadraticDataset);
         circlePlot.project("fill", colorAccessor);
         circlePlot.renderTo(svg);
       });
@@ -103,7 +100,7 @@ describe("Plots", () => {
         assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "yScale range was set by the renderer");
         circlePlot._renderArea.selectAll("circle").each(getCirclePlotVerifier());
         assert.equal(circlesInArea, 10, "10 circles were drawn");
-        verifier.end();
+        svg.remove();
       });
 
       it("rendering is idempotent", () => {
@@ -111,11 +108,11 @@ describe("Plots", () => {
         circlePlot._render();
         circlePlot._renderArea.selectAll("circle").each(getCirclePlotVerifier());
         assert.equal(circlesInArea, 10, "10 circles were drawn");
-        verifier.end();
+        svg.remove();
       });
 
       describe("after the scale has changed", () => {
-        before(() => {
+        beforeEach(() => {
           xScale.domain([0, 3]);
           yScale.domain([0, 9]);
           dataAreaFull = {xMin: 0, xMax: 3, yMin: 9, yMax: 0};
@@ -127,12 +124,8 @@ describe("Plots", () => {
           var circles = renderArea.selectAll("circle");
           circles.each(getCirclePlotVerifier());
           assert.equal(circlesInArea, 4, "four circles were found in the render area");
-          verifier.end();
+          svg.remove();
         });
-      });
-
-      after(() => {
-        if (verifier.passed) {svg.remove();};
       });
     });
   });

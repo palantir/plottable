@@ -2,10 +2,10 @@
 
 module Plottable {
 export module Interaction {
-  export class Click extends Abstract.Interaction {
+  export class Click extends AbstractInteraction {
     private _callback: (p: Point) => any;
 
-    public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
+    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       hitBox.on(this._listenTo(), () => {
         var xy = d3.mouse(hitBox.node());

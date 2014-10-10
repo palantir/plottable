@@ -4,7 +4,6 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("Stacked Bar Plot", () => {
-    var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
@@ -16,9 +15,7 @@ describe("Plots", () => {
     var axisHeight = 0;
     var bandWidth = 0;
 
-    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
-
-    before(() => {
+    beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Ordinal();
       yScale = new Plottable.Scale.Linear().domain([0, 3]);
@@ -42,18 +39,6 @@ describe("Plots", () => {
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
       bandWidth = xScale.rangeBand();
-    });
-
-    beforeEach(() => {
-      verifier.start();
-    });
-
-    afterEach(() => {
-      verifier.end();
-    });
-
-    after(() => {
-      if (verifier.passed) {svg.remove();};
     });
 
     it("renders correctly", () => {
@@ -86,11 +71,81 @@ describe("Plots", () => {
       assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 3, 0.01, "y is correct for bar1");
       assert.closeTo(numAttr(bar2, "y"), 0, 0.01, "y is correct for bar2");
       assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
+      svg.remove();
+    });
+  });
+
+  describe("Stacked Bar Plot Negative Values", () => {
+    var svg: D3.Selection;
+    var xScale: Plottable.Scale.Ordinal;
+    var yScale: Plottable.Scale.Linear;
+    var plot: Plottable.Plot.StackedBar<string, number>;
+    var SVG_WIDTH = 600;
+    var SVG_HEIGHT = 400;
+    var axisHeight = 0;
+    var bandWidth = 0;
+
+    beforeEach(() => {
+      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      xScale = new Plottable.Scale.Ordinal();
+      yScale = new Plottable.Scale.Linear();
+
+      var data1 = [
+        {x: "A", y: -1},
+        {x: "B", y: -4}
+      ];
+      var data2 = [
+        {x: "A", y: -1},
+        {x: "B", y: 4}
+      ];
+      var data3 = [
+        {x: "A", y: -2},
+        {x: "B", y: -4}
+      ];
+      var data4 = [
+        {x: "A", y: -3},
+        {x: "B", y: 4}
+      ];
+
+      plot = new Plottable.Plot.StackedBar(xScale, yScale);
+      plot.addDataset(data1);
+      plot.addDataset(data2);
+      plot.addDataset(data3);
+      plot.addDataset(data4);
+      plot.baseline(0);
+      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+      var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
+      axisHeight = xAxis.height();
+    });
+
+    it("stacking done correctly for negative values", () => {
+      var bars = plot._renderArea.selectAll("rect");
+      var bar0 = d3.select(bars[0][0]);
+      var bar1 = d3.select(bars[0][1]);
+      var bar2 = d3.select(bars[0][2]);
+      var bar3 = d3.select(bars[0][3]);
+      var bar4 = d3.select(bars[0][4]);
+      var bar5 = d3.select(bars[0][5]);
+      var bar6 = d3.select(bars[0][6]);
+      var bar7 = d3.select(bars[0][7]);
+      // check stacking order
+      assert.operator(numAttr(bar0, "y"), "<", numAttr(bar2, "y"), "'A' bars added below the baseline in dataset order");
+      assert.operator(numAttr(bar2, "y"), "<", numAttr(bar4, "y"), "'A' bars added below the baseline in dataset order");
+      assert.operator(numAttr(bar4, "y"), "<", numAttr(bar6, "y"), "'A' bars added below the baseline in dataset order");
+
+      assert.operator(numAttr(bar1, "y"), "<", numAttr(bar5, "y"), "'B' bars added below the baseline in dataset order");
+      assert.operator(numAttr(bar3, "y"), ">", numAttr(bar7, "y"), "'B' bars added above the baseline in dataset order");
+
+      svg.remove();
+    });
+
+    it("stacked extent is set correctly", () => {
+      assert.deepEqual((<any> plot).stackedExtent, [-8, 8], "stacked extent is updated accordingly");
+      svg.remove();
     });
   });
 
   describe("Horizontal Stacked Bar Plot", () => {
-    var verifier = new MultiTestVerifier();
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
@@ -102,9 +157,7 @@ describe("Plots", () => {
     var rendererWidth: number;
     var bandWidth = 0;
 
-    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
-
-    before(() => {
+    beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Linear().domain([0, 6]);
       yScale = new Plottable.Scale.Ordinal();
@@ -130,18 +183,6 @@ describe("Plots", () => {
       var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
       rendererWidth = renderer.width();
       bandWidth = yScale.rangeBand();
-    });
-
-    beforeEach(() => {
-      verifier.start();
-    });
-
-    afterEach(() => {
-      verifier.end();
-    });
-
-    after(() => {
-      if (verifier.passed) {svg.remove();};
     });
 
     it("renders correctly", () => {
@@ -176,6 +217,68 @@ describe("Plots", () => {
       assert.closeTo(numAttr(bar1, "x"), 0, 0.01, "x is correct for bar1");
       assert.closeTo(numAttr(bar2, "x"), 0, 0.01, "x is correct for bar2");
       assert.closeTo(numAttr(bar3, "x"), rendererWidth / 3, 0.01, "x is correct for bar3");
+      svg.remove();
+    });
+  });
+
+  describe("Stacked Bar Plot Weird Values", () => {
+    var svg: D3.Selection;
+    var plot: Plottable.Plot.StackedBar<string, number>;
+    var SVG_WIDTH = 600;
+    var SVG_HEIGHT = 400;
+
+    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
+
+    beforeEach(() => {
+      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var xScale = new Plottable.Scale.Ordinal();
+      var yScale = new Plottable.Scale.Linear();
+
+      var data1 = [
+        {x: "A", y: 1, type: "a"},
+        {x: "B", y: 2, type: "a"},
+        {x: "C", y: 1, type: "a"}
+      ];
+      var data2 = [
+        {x: "A", y: 2, type: "b"},
+        {x: "B", y: 3, type: "b"}
+      ];
+      var data3 = [
+        {x: "B", y: 1, type: "c"},
+        {x: "C", y: 7, type: "c"}
+      ];
+
+      plot = new Plottable.Plot.StackedBar(xScale, yScale);
+      plot.addDataset(data1);
+      plot.addDataset(data2);
+      plot.addDataset(data3);
+      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+      var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
+    });
+
+    it("renders correctly", () => {
+      var bars = plot._renderArea.selectAll("rect");
+
+      assert.lengthOf(bars[0], 7, "draws a bar for each datum");
+
+      var aBars = [d3.select(bars[0][0]), d3.select(bars[0][3])];
+
+      var bBars = [d3.select(bars[0][1]), d3.select(bars[0][4]), d3.select(bars[0][5])];
+
+      var cBars = [d3.select(bars[0][2]), d3.select(bars[0][6])];
+
+      assert.closeTo(numAttr(aBars[0], "x"), numAttr(aBars[1], "x"), 0.01, "A bars at same x position");
+      assert.operator(numAttr(aBars[0], "y"), ">", numAttr(aBars[1], "y"), "first dataset A bar under second");
+
+      assert.closeTo(numAttr(bBars[0], "x"), numAttr(bBars[1], "x"), 0.01, "B bars at same x position");
+      assert.closeTo(numAttr(bBars[1], "x"), numAttr(bBars[2], "x"), 0.01, "B bars at same x position");
+      assert.operator(numAttr(bBars[0], "y"), ">", numAttr(bBars[1], "y"), "first dataset B bar under second");
+      assert.operator(numAttr(bBars[1], "y"), ">", numAttr(bBars[2], "y"), "second dataset B bar under third");
+
+      assert.closeTo(numAttr(cBars[0], "x"), numAttr(cBars[1], "x"), 0.01, "C bars at same x position");
+      assert.operator(numAttr(cBars[0], "y"), ">", numAttr(cBars[1], "y"), "first dataset C bar under second");
+
+      svg.remove();
     });
   });
 });

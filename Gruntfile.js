@@ -35,16 +35,6 @@ module.exports = function(grunt) {
     }
   };
 
-  // poor man's deep copy
-  var deepCopy = function(x) {
-    return JSON.parse(JSON.stringify(x));
-  };
-
-  tsJSON.dev_release = deepCopy(tsJSON.dev);
-  delete tsJSON.dev_release.options.compiler;
-  tsJSON.test_release = deepCopy(tsJSON.test);
-  delete tsJSON.test_release.options.compiler;
-
   var bumpJSON = {
     options: {
       files: ['package.json', 'bower.json'],
@@ -58,7 +48,6 @@ module.exports = function(grunt) {
   var FILES_TO_COMMIT = ['plottable.js',
                          'plottable.min.js',
                          'plottable.d.ts',
-                         'examples/exampleUtil.js',
                          'test/tests.js',
                          "plottable.css",
                          "plottable.zip",
@@ -80,16 +69,6 @@ module.exports = function(grunt) {
       pattern: jsdoc + prefixMatch + "private " + varNameMatch + finalMatch,
       replacement: "",
       path: "build/plottable.d.ts",
-    },
-    public_protected_definitions: {
-      pattern: jsdoc + prefixMatch + "public _" + varNameMatch + finalMatch,
-      replacement: "",
-      path: "plottable.d.ts",
-    },
-    protected_definitions: {
-      pattern: jsdoc + prefixMatch + "_" + varNameMatch + finalMatch,
-      replacement: "",
-      path: "plottable.d.ts",
     },
     plottable_multifile: {
       pattern: '/// *<reference path="([^."]*).ts" */>',
@@ -150,9 +129,9 @@ module.exports = function(grunt) {
   updateTestTsFiles();
 
   var browsers = [{
-  //   browserName: "firefox",
-  //   version: "30"
-  // }, {
+    browserName: "firefox",
+    version: "30"
+  }, {
     browserName: "chrome",
     version: "35"
   }, {
@@ -326,9 +305,6 @@ module.exports = function(grunt) {
   grunt.registerTask("definitions_prod", function() {
     grunt.file.copy("build/plottable.d.ts", "plottable.d.ts");
   });
-  grunt.registerTask("copy-dev-defs", function () {
-    grunt.file.copy("plottable.d.ts", "plottable-dev.d.ts");
-  });
   grunt.registerTask("test-compile", [
                                   "ts:test",
                                   "concat:tests_multifile",
@@ -336,11 +312,10 @@ module.exports = function(grunt) {
                                   "concat:tests",
                                   ]);
   grunt.registerTask("default", "launch");
-  function makeDevCompile(release) {
-    return [
+  var compile_task = [
       "update_ts_files",
       "update_test_ts_files",
-      release ? "ts:dev_release" : "ts:dev",
+      "ts:dev",
       "concat:plottable",
       "concat:definitions",
       "sed:definitions",
@@ -349,24 +324,19 @@ module.exports = function(grunt) {
       "sed:version_number",
       "definitions_prod",
       "test-compile",
-      "copy-dev-defs",
-      "sed:public_protected_definitions",
-      "sed:protected_definitions",
       "concat:plottable_multifile",
       "sed:plottable_multifile",
       "clean:tscommand"
-    ];
-  }
+  ];
 
-  grunt.registerTask("dev-compile", makeDevCompile(false));
-  grunt.registerTask("release-compile", makeDevCompile(true));
+  grunt.registerTask("dev-compile", compile_task);
 
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:major", ["bump:major", "dist-compile", "gitcommit:version"]);
 
   grunt.registerTask("dist-compile", [
-                                  "release-compile",
+                                  "dev-compile",
                                   "blanket_mocha",
                                   "tslint",
                                   "ts:verify_d_ts",

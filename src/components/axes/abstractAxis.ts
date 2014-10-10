@@ -1,8 +1,8 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Abstract {
-  export class Axis extends Abstract.Component {
+export module Axis {
+  export class AbstractAxis extends Component.AbstractComponent {
     /**
      * The css class applied to each end tick mark (the line on the end tick).
      */
@@ -18,11 +18,9 @@ export module Abstract {
     public _tickMarkContainer: D3.Selection;
     public _tickLabelContainer: D3.Selection;
     public _baseline: D3.Selection;
-    public _scale: Abstract.Scale<any, number>;
+    public _scale: Scale.AbstractScale<any, number>;
     public _formatter: Formatter;
     public _orientation: string;
-    public _userRequestedWidth: any = "auto";
-    public _userRequestedHeight: any = "auto";
     public _computedWidth: number;
     public _computedHeight: number;
     private _endTickLength = 5;
@@ -42,12 +40,12 @@ export module Abstract {
      * @param {Formatter} Data is passed through this formatter before being
      * displayed.
      */
-    constructor(scale: Abstract.Scale<any, number>, orientation: string, formatter = Formatters.identity()) {
+    constructor(scale: Scale.AbstractScale<any, number>, orientation: string, formatter = Formatters.identity()) {
       super();
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
       this._scale = scale;
       this.orient(orientation);
-
+      this._setDefaultAlignment();
       this.classed("axis", true);
       if (this._isHorizontal()) {
         this.classed("x-axis", true);
@@ -81,26 +79,20 @@ export module Abstract {
       return this._computedHeight;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
-      var requestedWidth = this._userRequestedWidth;
-      var requestedHeight = this._userRequestedHeight;
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+      var requestedWidth = 0;
+      var requestedHeight = 0;
 
       if (this._isHorizontal()) {
-        if (this._userRequestedHeight === "auto") {
-          if (this._computedHeight == null) {
-            this._computeHeight();
-          }
-          requestedHeight = this._computedHeight + this._gutter;
+        if (this._computedHeight == null) {
+          this._computeHeight();
         }
-        requestedWidth = 0;
+        requestedHeight = this._computedHeight + this._gutter;
       } else { // vertical
-        if (this._userRequestedWidth === "auto") {
-          if (this._computedWidth == null) {
-            this._computeWidth();
-          }
-          requestedWidth = this._computedWidth + this._gutter;
+        if (this._computedWidth == null) {
+          this._computeWidth();
         }
-        requestedHeight = 0;
+        requestedWidth = this._computedWidth + this._gutter;
       }
 
       return {
@@ -136,9 +128,9 @@ export module Abstract {
     public _setup() {
       super._setup();
       this._tickMarkContainer = this._content.append("g")
-                                            .classed(Axis.TICK_MARK_CLASS + "-container", true);
+                                            .classed(AbstractAxis.TICK_MARK_CLASS + "-container", true);
       this._tickLabelContainer = this._content.append("g")
-                                             .classed(Axis.TICK_LABEL_CLASS + "-container", true);
+                                             .classed(AbstractAxis.TICK_LABEL_CLASS + "-container", true);
       this._baseline = this._content.append("line").classed("baseline", true);
     }
 
@@ -152,12 +144,12 @@ export module Abstract {
 
     public _doRender() {
       var tickMarkValues = this._getTickValues();
-      var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
-      tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
+      var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(tickMarkValues);
+      tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
-      d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true)
+      d3.select(tickMarks[0][0]).classed(AbstractAxis.END_TICK_MARK_CLASS, true)
                                 .attr(this._generateTickMarkAttrHash(true));
-      d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
+      d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(AbstractAxis.END_TICK_MARK_CLASS, true)
                                                       .attr(this._generateTickMarkAttrHash(true));
       tickMarks.exit().remove();
       this._baseline.attr(this._generateBaselineAttrHash());
@@ -244,63 +236,23 @@ export module Abstract {
       super._invalidateLayout();
     }
 
-    /**
-     * Gets the current width.
-     *
-     * @returns {number} The current width.
-     */
-    public width(): number;
-    /**
-     * Sets the current width.
-     *
-     * @param {number|String} w A fixed width for the Axis, or
-     * "auto" for automatic mode.
-     * @returns {Axis} The calling Axis.
-     */
-    public width(w: any): Axis;
-    public width(w?: any): any {
-      if (w == null) {
-        return super.width();
-      } else {
-        if (this._isHorizontal()) {
-          throw new Error("width cannot be set on a horizontal Axis");
-        }
-        if (w !== "auto" && w < 0) {
-          throw new Error("invalid value for width");
-        }
-        this._userRequestedWidth = w;
-        this._invalidateLayout();
-        return this;
-      }
-    }
+    public _setDefaultAlignment() {
+      switch(this._orientation) {
+        case "bottom":
+          this.yAlign("top");
+          break;
 
-    /**
-     * Gets the current height.
-     *
-     * @returns {Axis} The current height.
-     */
-    public height(): number;
-    /**
-     * Sets the current height.
-     *
-     * @param {number|String} h If provided, a fixed height for the Axis, or
-     * "auto" for automatic mode.
-     * @returns {Axis} The calling Axis.
-     */
-    public height(h: any): Axis;
-    public height(h?: any): any {
-      if (h == null) {
-        return super.height();
-      } else {
-        if (!this._isHorizontal()) {
-          throw new Error("height cannot be set on a vertical Axis");
-        }
-        if (h !== "auto" && h < 0) {
-          throw new Error("invalid value for height");
-        }
-        this._userRequestedHeight = h;
-        this._invalidateLayout();
-        return this;
+        case "top":
+          this.yAlign("bottom");
+          break;
+
+        case "left":
+          this.xAlign("right");
+          break;
+
+        case "right":
+          this.xAlign("left");
+          break;
       }
     }
 
@@ -319,7 +271,7 @@ export module Abstract {
      * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
      * @returns {Axis} The calling Axis.
      */
-    public formatter(formatter: Formatter): Axis;
+    public formatter(formatter: Formatter): AbstractAxis;
     public formatter(formatter?: Formatter): any {
       if (formatter === undefined) {
         return this._formatter;
@@ -341,7 +293,7 @@ export module Abstract {
      * @param {number} length If provided, length of each tick.
      * @returns {Axis} The calling Axis.
      */
-    public tickLength(length: number): Axis;
+    public tickLength(length: number): AbstractAxis;
     public tickLength(length?: number): any {
       if (length == null) {
         return this._tickLength;
@@ -367,7 +319,7 @@ export module Abstract {
      * @param {number} length If provided, the length of the end ticks.
      * @returns {BaseAxis} The calling Axis.
      */
-    public endTickLength(length: number): Axis;
+    public endTickLength(length: number): AbstractAxis;
     public endTickLength(length?: number): any {
       if (length == null) {
         return this._endTickLength;
@@ -402,7 +354,7 @@ export module Abstract {
      * @param {number} padding If provided, the desired padding.
      * @returns {Axis} The calling Axis.
      */
-    public tickLabelPadding(padding: number): Axis;
+    public tickLabelPadding(padding: number): AbstractAxis;
     public tickLabelPadding(padding?: number): any {
       if (padding == null) {
         return this._tickLabelPadding;
@@ -431,7 +383,7 @@ export module Abstract {
      * @param {number} size If provided, the desired gutter.
      * @returns {Axis} The calling Axis.
      */
-    public gutter(size: number): Axis;
+    public gutter(size: number): AbstractAxis;
     public gutter(size?: number): any {
       if (size == null) {
         return this._gutter;
@@ -458,7 +410,7 @@ export module Abstract {
      * (top/bottom/left/right).
      * @returns {Axis} The calling Axis.
      */
-    public orient(newOrientation: string): Axis;
+    public orient(newOrientation: string): AbstractAxis;
     public orient(newOrientation?: string): any {
       if (newOrientation == null) {
         return this._orientation;
@@ -492,7 +444,7 @@ export module Abstract {
      * labels.
      * @returns {Axis} The calling Axis.
      */
-    public showEndTickLabels(show: boolean): Axis;
+    public showEndTickLabels(show: boolean): AbstractAxis;
     public showEndTickLabels(show?: boolean): any {
       if (show == null) {
         return this._showEndTickLabels;
@@ -514,7 +466,7 @@ export module Abstract {
         );
       };
 
-      var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS);
+      var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
       if (tickLabels[0].length === 0) {
         return;
       }
@@ -530,7 +482,7 @@ export module Abstract {
 
     public _hideOverlappingTickLabels() {
       var visibleTickLabels = this._tickLabelContainer
-                                    .selectAll("." + Abstract.Axis.TICK_LABEL_CLASS)
+                                    .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
                                     .filter(function(d: any, i: number) {
                                       return d3.select(this).style("visibility") === "visible";
                                     });

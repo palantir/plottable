@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Interaction {
-  export class Key extends Abstract.Interaction {
+  export class Key extends AbstractInteraction {
     private _callback: () => any;
     private activated = false;
     private keyCode: number;
@@ -21,7 +21,7 @@ export module Interaction {
       this.keyCode = keyCode;
     }
 
-    public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
+    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       hitBox.on("mouseover", () => {
         this.activated = true;

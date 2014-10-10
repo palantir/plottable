@@ -27,11 +27,11 @@ function run(div, data, Plottable) {
 
 
 
-    var renderAreaD0 = new Plottable.Plot.Line(dataseries1, xScale, yScale);
-    var renderAreaD1 = new Plottable.Plot.Line(dataseries2, xScale, yScale)
+    var renderAreaD0 = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries1);
+    var renderAreaD1 = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries2)
                                       .attr( "stroke", d3.functor("red"));
-    var renderAreaD2 = new Plottable.Plot.Area(dataseries1, xScale, yScale);
-    var renderAreaD3 = new Plottable.Plot.Area(dataseries2, xScale, yScale)
+    var renderAreaD2 = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries1);
+    var renderAreaD3 = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries2)
                                       .attr( "fill", d3.functor("red"));
 
 

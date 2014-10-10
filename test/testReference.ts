@@ -23,6 +23,7 @@
 ///<reference path="components/plots/barPlotTests.ts" />
 ///<reference path="components/plots/gridPlotTests.ts" />
 ///<reference path="components/plots/scatterPlotTests.ts" />
+///<reference path="components/plots/stackedPlotTests.ts" />
 ///<reference path="components/plots/stackedAreaPlotTests.ts" />
 ///<reference path="components/plots/stackedBarPlotTests.ts" />
 ///<reference path="components/plots/clusteredBarPlotTests.ts" />
