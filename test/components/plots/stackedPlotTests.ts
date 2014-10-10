@@ -86,7 +86,7 @@ describe("Plots", () => {
       assert.deepEqual(data2, [], "empty data causes no stacking to happen");
     });
 
-    it("does not crash on stacking on a 0-length dataset", () => {
+    it("does not crash on stacking no datasets", () => {
       var data1 = [
         {x: 1, y: -2}
       ];
