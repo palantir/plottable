@@ -866,10 +866,10 @@ declare module Plottable {
         key: string;
     }
     /**
-     * An adjustment for secondary domain in case of change of primary domain.
+     * An adjustment policy for domain to set based of datasets' points and affected domain.
      */
-    interface AdjustmentDomainAlgorithm<X, Y> {
-        (values: any[], primaryDomain: X[]): Y[];
+    interface AdjustmentDomainPolicy<A, B> {
+        (values: Point[], affectedDomain: A[]): B[];
     }
 }
 
@@ -2595,8 +2595,8 @@ declare module Plottable {
         class AbstractXYPlot<X, Y> extends AbstractPlot {
             _xScale: Scale.AbstractScale<X, number>;
             _yScale: Scale.AbstractScale<Y, number>;
-            _adjustmentYScaleDomainAlgorithm: AdjustmentDomainAlgorithm<X, Y>;
-            _adjustmentXScaleDomainAlgorithm: AdjustmentDomainAlgorithm<Y, X>;
+            _adjustmentYScaleDomainPolicy: AdjustmentDomainPolicy<X, Y>;
+            _adjustmentXScaleDomainPolicy: AdjustmentDomainPolicy<Y, X>;
             /**
              * Constructs an XYPlot.
              *
@@ -2615,36 +2615,35 @@ declare module Plottable {
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractXYPlot<X, Y>;
             /**
-             * Gets the adjustDmentomainAlgorithm for y scale.
+             * Gets the adjustment domain policy for y scale.
              *
-             * @returns {AdjustmentDomainAlgorithm} The current adjustDomainAlgorithm for y scale.
+             * @returns {AdjustmentDomainPolicy} The current adjustment domain policy for y scale.
              */
-            adjustmentYScaleDomainAlgorithm(): AdjustmentDomainAlgorithm<X, Y>;
+            adjustmentYScaleDomainPolicy(): AdjustmentDomainPolicy<X, Y>;
             /**
-             * Sets the adjustDomainAlgorithm for y scale.
+             * Sets the adjustment domain policy for y scale.
              *
-             * @param {AdjustmentDomainAlgorithm} values If provided, the new value for the adjustDomainAlgorithm for y scale.
+             * @param {AdjustmentDomainPolicy} policy The new value for the adjustment domain policy for y scale.
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
-            adjustmentYScaleDomainAlgorithm(algorithm: AdjustmentDomainAlgorithm<X, Y>): AbstractXYPlot<X, Y>;
+            adjustmentYScaleDomainPolicy(policy: AdjustmentDomainPolicy<X, Y>): AbstractXYPlot<X, Y>;
             /**
              * Gets the adjustDmentomainAlgorithm for x scale.
              *
-             * @returns {AdjustmentDomainAlgorithm} The current adjustDomainAlgorithm for x scale.
+             * @returns {AdjustmentDomainPolicy} The current adjustDomainAlgorithm for x scale.
              */
-            adjustmentXScaleDomainAlgorithm(): AdjustmentDomainAlgorithm<Y, X>;
+            adjustmentXScaleDomainPolicy(): AdjustmentDomainPolicy<Y, X>;
             /**
              * Sets the adjustDomainAlgorithm for x scale.
              *
-             * @param {AdjustmentDomainAlgorithm} values If provided, the new value for the adjustDomainAlgorithm for x scale.
+             * @param {AdjustmentDomainPolicy} policy The new value for the adjustDomainAlgorithm for x scale.
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
-            adjustmentXScaleDomainAlgorithm(algorithm: AdjustmentDomainAlgorithm<Y, X>): AbstractXYPlot<X, Y>;
+            adjustmentXScaleDomainPolicy(policy: AdjustmentDomainPolicy<Y, X>): AbstractXYPlot<X, Y>;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _updateXDomainer(): void;
             _updateYDomainer(): void;
-            _adjustXDomain(): void;
-            _adjustYDomain(): void;
+            _adjustDomain(xDomainChanged: boolean): void;
         }
     }
 }

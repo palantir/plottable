@@ -5,8 +5,8 @@ export module Plot {
   export class AbstractXYPlot<X,Y> extends AbstractPlot {
     public _xScale: Scale.AbstractScale<X, number>;
     public _yScale: Scale.AbstractScale<Y, number>;
-    public _adjustmentYScaleDomainAlgorithm: AdjustmentDomainAlgorithm<X,Y>;
-    public _adjustmentXScaleDomainAlgorithm: AdjustmentDomainAlgorithm<Y,X>;
+    public _adjustmentYScaleDomainPolicy: AdjustmentDomainPolicy<X,Y>;
+    public _adjustmentXScaleDomainPolicy: AdjustmentDomainPolicy<Y,X>;
 
     /**
      * Constructs an XYPlot.
@@ -40,13 +40,13 @@ export module Plot {
       if (attrToSet === "x" && scale) {
         this._xScale = scale;
         this._updateXDomainer();
-        scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, () => this._adjustYDomain());
+        scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, () => this._adjustDomain(true));
       }
 
       if (attrToSet === "y" && scale) {
         this._yScale = scale;
         this._updateYDomainer();
-        scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, () => this._adjustXDomain());
+        scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, () => this._adjustDomain(false));
       }
 
       super.project(attrToSet, accessor, scale);
@@ -55,23 +55,23 @@ export module Plot {
     }
 
     /**
-     * Gets the adjustDmentomainAlgorithm for y scale.
+     * Gets the adjustment domain policy for y scale.
      *
-     * @returns {AdjustmentDomainAlgorithm} The current adjustDomainAlgorithm for y scale.
+     * @returns {AdjustmentDomainPolicy} The current adjustment domain policy for y scale.
      */
-    public adjustmentYScaleDomainAlgorithm(): AdjustmentDomainAlgorithm<X,Y> ;
+    public adjustmentYScaleDomainPolicy(): AdjustmentDomainPolicy<X,Y> ;
     /**
-     * Sets the adjustDomainAlgorithm for y scale.
+     * Sets the adjustment domain policy for y scale.
      *
-     * @param {AdjustmentDomainAlgorithm} values If provided, the new value for the adjustDomainAlgorithm for y scale.
+     * @param {AdjustmentDomainPolicy} policy The new value for the adjustment domain policy for y scale.
      * @returns {AbstractXYPlot} The calling AbstractXYPlot.
      */
-    public adjustmentYScaleDomainAlgorithm(algorithm: AdjustmentDomainAlgorithm<X,Y>): AbstractXYPlot<X,Y> ;
-    public adjustmentYScaleDomainAlgorithm(algorithm?: AdjustmentDomainAlgorithm<X,Y>): any {
-      if (algorithm == null) {
-        return this._adjustmentYScaleDomainAlgorithm;
+    public adjustmentYScaleDomainPolicy(policy: AdjustmentDomainPolicy<X,Y>): AbstractXYPlot<X,Y> ;
+    public adjustmentYScaleDomainPolicy(policy?: AdjustmentDomainPolicy<X,Y>): any {
+      if (policy == null) {
+        return this._adjustmentYScaleDomainPolicy;
       } else {
-        this._adjustmentYScaleDomainAlgorithm = algorithm;
+        this._adjustmentYScaleDomainPolicy = policy;
         return this;
       }
     }
@@ -79,21 +79,21 @@ export module Plot {
     /**
      * Gets the adjustDmentomainAlgorithm for x scale.
      *
-     * @returns {AdjustmentDomainAlgorithm} The current adjustDomainAlgorithm for x scale.
+     * @returns {AdjustmentDomainPolicy} The current adjustDomainAlgorithm for x scale.
      */
-    public adjustmentXScaleDomainAlgorithm(): AdjustmentDomainAlgorithm<Y,X> ;
+    public adjustmentXScaleDomainPolicy(): AdjustmentDomainPolicy<Y,X> ;
     /**
      * Sets the adjustDomainAlgorithm for x scale.
      *
-     * @param {AdjustmentDomainAlgorithm} values If provided, the new value for the adjustDomainAlgorithm for x scale.
+     * @param {AdjustmentDomainPolicy} policy The new value for the adjustDomainAlgorithm for x scale.
      * @returns {AbstractXYPlot} The calling AbstractXYPlot.
      */
-    public adjustmentXScaleDomainAlgorithm(algorithm: AdjustmentDomainAlgorithm<Y,X>): AbstractXYPlot<X,Y> ;
-    public adjustmentXScaleDomainAlgorithm(algorithm?: AdjustmentDomainAlgorithm<Y,X>): any {
-      if (algorithm == null) {
-        return this._adjustmentXScaleDomainAlgorithm;
+    public adjustmentXScaleDomainPolicy(policy: AdjustmentDomainPolicy<Y,X>): AbstractXYPlot<X,Y> ;
+    public adjustmentXScaleDomainPolicy(policy?: AdjustmentDomainPolicy<Y,X>): any {
+      if (policy == null) {
+        return this._adjustmentXScaleDomainPolicy;
       } else {
-        this._adjustmentXScaleDomainAlgorithm = algorithm;
+        this._adjustmentXScaleDomainPolicy = policy;
         return this;
       }
     }
@@ -122,36 +122,23 @@ export module Plot {
       }
     }
 
-    public _adjustXDomain() {
-      if(this._adjustmentXScaleDomainAlgorithm != null) {
+    public _adjustDomain(xDomainChanged: boolean) {
+      var adjustmentPolicy: AdjustmentDomainPolicy<any, any> = xDomainChanged ?
+        this._adjustmentYScaleDomainPolicy : this._adjustmentXScaleDomainPolicy;
+      var changedScale: Scale.AbstractScale<any, any> = xDomainChanged ? this._xScale : this._yScale;
+      var adjustingScale: Scale.AbstractScale<any, any> = xDomainChanged ? this._yScale : this._xScale;
+      if(adjustmentPolicy != null) {
         var flattenDatasets = _Util.Methods.flatten(this.datasets().map(d => d.data()));
         var values = flattenDatasets.map(d => { return { x: this._projectors["x"].accessor(d), y: this._projectors["y"].accessor(d) }; });
-        var adjustedDomain = this._adjustmentXScaleDomainAlgorithm(values, this._yScale.domain());
-        if (this._xScale instanceof Scale.AbstractQuantitative) {
-          var scale = <Scale.AbstractQuantitative<any>> this._xScale;
+        var adjustedDomain: any[] = adjustmentPolicy(values, changedScale.domain());
+        if (adjustingScale instanceof Scale.AbstractQuantitative) {
+          var scale = <Scale.AbstractQuantitative<any>> adjustingScale;
           if (!scale._userSetDomainer) {
             adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
             scale._setDomain(adjustedDomain);
           }
         } else {
-          this._xScale._setDomain(adjustedDomain);
-        }
-      }
-    }
-
-    public _adjustYDomain() {
-      if(this._adjustmentYScaleDomainAlgorithm != null) {
-        var flattenDatasets = _Util.Methods.flatten(this.datasets().map(d => d.data()));
-        var values = flattenDatasets.map(d => { return { x: this._projectors["x"].accessor(d), y: this._projectors["y"].accessor(d) }; });
-        var adjustedDomain = this._adjustmentYScaleDomainAlgorithm(values, this._xScale.domain());
-        if (this._yScale instanceof Scale.AbstractQuantitative) {
-          var scale = <Scale.AbstractQuantitative<any>> this._yScale;
-          if (!scale._userSetDomainer) {
-            adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
-            scale._setDomain(adjustedDomain);
-          }
-        } else {
-          this._yScale._setDomain(adjustedDomain);
+          adjustingScale._setDomain(adjustedDomain);
         }
       }
     }

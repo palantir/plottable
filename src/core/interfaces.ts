@@ -100,9 +100,9 @@ module Plottable {
   }
 
   /**
-   * An adjustment for secondary domain in case of change of primary domain.
+   * An adjustment policy for domain to set based of datasets' points and affected domain.
    */
-  export interface AdjustmentDomainAlgorithm<X,Y> {
-    (values: any[], primaryDomain: X[]): Y[];
+  export interface AdjustmentDomainPolicy<A,B> {
+    (values: Point[], affectedDomain: A[]): B[];
   }
 }

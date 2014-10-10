@@ -6160,31 +6160,31 @@ var Plottable;
                 if (attrToSet === "x" && scale) {
                     this._xScale = scale;
                     this._updateXDomainer();
-                    scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this._adjustYDomain(); });
+                    scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this._adjustDomain(true); });
                 }
                 if (attrToSet === "y" && scale) {
                     this._yScale = scale;
                     this._updateYDomainer();
-                    scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this._adjustXDomain(); });
+                    scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this._adjustDomain(false); });
                 }
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
             };
-            AbstractXYPlot.prototype.adjustmentYScaleDomainAlgorithm = function (algorithm) {
-                if (algorithm == null) {
-                    return this._adjustmentYScaleDomainAlgorithm;
+            AbstractXYPlot.prototype.adjustmentYScaleDomainPolicy = function (policy) {
+                if (policy == null) {
+                    return this._adjustmentYScaleDomainPolicy;
                 }
                 else {
-                    this._adjustmentYScaleDomainAlgorithm = algorithm;
+                    this._adjustmentYScaleDomainPolicy = policy;
                     return this;
                 }
             };
-            AbstractXYPlot.prototype.adjustmentXScaleDomainAlgorithm = function (algorithm) {
-                if (algorithm == null) {
-                    return this._adjustmentXScaleDomainAlgorithm;
+            AbstractXYPlot.prototype.adjustmentXScaleDomainPolicy = function (policy) {
+                if (policy == null) {
+                    return this._adjustmentXScaleDomainPolicy;
                 }
                 else {
-                    this._adjustmentXScaleDomainAlgorithm = algorithm;
+                    this._adjustmentXScaleDomainPolicy = policy;
                     return this;
                 }
             };
@@ -6209,43 +6209,26 @@ var Plottable;
                     }
                 }
             };
-            AbstractXYPlot.prototype._adjustXDomain = function () {
+            AbstractXYPlot.prototype._adjustDomain = function (xDomainChanged) {
                 var _this = this;
-                if (this._adjustmentXScaleDomainAlgorithm != null) {
+                var adjustmentPolicy = xDomainChanged ? this._adjustmentYScaleDomainPolicy : this._adjustmentXScaleDomainPolicy;
+                var changedScale = xDomainChanged ? this._xScale : this._yScale;
+                var adjustingScale = xDomainChanged ? this._yScale : this._xScale;
+                if (adjustmentPolicy != null) {
                     var flattenDatasets = Plottable._Util.Methods.flatten(this.datasets().map(function (d) { return d.data(); }));
                     var values = flattenDatasets.map(function (d) {
                         return { x: _this._projectors["x"].accessor(d), y: _this._projectors["y"].accessor(d) };
                     });
-                    var adjustedDomain = this._adjustmentXScaleDomainAlgorithm(values, this._yScale.domain());
-                    if (this._xScale instanceof Plottable.Scale.AbstractQuantitative) {
-                        var scale = this._xScale;
+                    var adjustedDomain = adjustmentPolicy(values, changedScale.domain());
+                    if (adjustingScale instanceof Plottable.Scale.AbstractQuantitative) {
+                        var scale = adjustingScale;
                         if (!scale._userSetDomainer) {
                             adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
                             scale._setDomain(adjustedDomain);
                         }
                     }
                     else {
-                        this._xScale._setDomain(adjustedDomain);
-                    }
-                }
-            };
-            AbstractXYPlot.prototype._adjustYDomain = function () {
-                var _this = this;
-                if (this._adjustmentYScaleDomainAlgorithm != null) {
-                    var flattenDatasets = Plottable._Util.Methods.flatten(this.datasets().map(function (d) { return d.data(); }));
-                    var values = flattenDatasets.map(function (d) {
-                        return { x: _this._projectors["x"].accessor(d), y: _this._projectors["y"].accessor(d) };
-                    });
-                    var adjustedDomain = this._adjustmentYScaleDomainAlgorithm(values, this._xScale.domain());
-                    if (this._yScale instanceof Plottable.Scale.AbstractQuantitative) {
-                        var scale = this._yScale;
-                        if (!scale._userSetDomainer) {
-                            adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
-                            scale._setDomain(adjustedDomain);
-                        }
-                    }
-                    else {
-                        this._yScale._setDomain(adjustedDomain);
+                        adjustingScale._setDomain(adjustedDomain);
                     }
                 }
             };
