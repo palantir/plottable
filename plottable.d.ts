@@ -481,13 +481,13 @@ declare module Plottable {
 declare module Plottable {
     module TickGenerators {
         /**
-         * Creates a tick generator using specified interval.
+         * Creates a tick generator using the specified interval.
          *
          * Generates ticks at multiples of the interval while also including the domain boundaries.
          *
          * @param {number} interval The interval between two ticks (not including the end ticks).
          *
-         * @returns {TickGenerator} A tick generator using specified interval.
+         * @returns {TickGenerator} A tick generator using the specified interval.
          */
         function intervalTickGenerator(interval: number): Scale.TickGenerator<number>;
     }
