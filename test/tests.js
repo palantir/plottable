@@ -2613,6 +2613,20 @@ describe("Plots", function () {
             assert.strictEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -2, "positive offset was used");
             assert.strictEqual(data4[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "positive offset was used");
         });
+        it("project can be called after addDataset", function () {
+            var data1 = [
+                { a: 1, b: 2 }
+            ];
+            var data2 = [
+                { a: 1, b: 4 }
+            ];
+            stackedPlot.addDataset(data1);
+            stackedPlot.addDataset(data2);
+            assert.notEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 2, "stacking is initially incorrect");
+            stackedPlot.project("x", "a");
+            stackedPlot.project("y", "b");
+            assert.strictEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 2, "stacking was done correctly");
+        });
     });
 });
 

@@ -12,6 +12,14 @@ export module Plot {
     private stackedExtent = [0, 0];
     public _isVertical: boolean;
 
+    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
+      super.project(attrToSet, accessor, scale);
+      if (this._datasetKeysInOrder.length > 0 && this._projectors["x"] && this._projectors["y"]) {
+        this.updateStackOffsets();
+      }
+      return this;
+    }
+
     public _onDatasetUpdate() {
       super._onDatasetUpdate();
       // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803

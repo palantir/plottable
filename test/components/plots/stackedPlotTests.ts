@@ -72,5 +72,24 @@ describe("Plots", () => {
       assert.strictEqual((<any> data2[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -2, "positive offset was used");
       assert.strictEqual((<any> data4[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "positive offset was used");
     });
+
+    it("project can be called after addDataset", () => {
+      var data1 = [
+        {a: 1, b: 2}
+      ];
+      var data2 = [
+        {a: 1, b: 4}
+      ];
+
+      stackedPlot.addDataset(data1);
+      stackedPlot.addDataset(data2);
+
+      assert.notEqual((<any> data2[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 2, "stacking is initially incorrect");
+
+      stackedPlot.project("x", "a");
+      stackedPlot.project("y", "b");
+
+      assert.strictEqual((<any> data2[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 2, "stacking was done correctly");
+    });
   });
 });
