@@ -2613,7 +2613,7 @@ describe("Plots", function () {
             assert.strictEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -2, "positive offset was used");
             assert.strictEqual(data4[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "positive offset was used");
         });
-        it("uses negative offset on stacking the 0 value on all negative/0 valued data", function () {
+        it("strings are coerced to numbers for stacking", function () {
             var data1 = [
                 { x: 1, y: "-2" }
             ];
