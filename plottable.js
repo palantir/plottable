@@ -7335,7 +7335,7 @@ var Plottable;
             }
             Base.prototype.animate = function (selection, attrToProjector) {
                 var _this = this;
-                var numberOfIterations = Math.max(selection[0].length - 1, 1);
+                var numberOfIterations = selection[0].length - 1;
                 var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
                 var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / numberOfIterations);
                 return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + adjustedIterativeDelay * i; }).attr(attrToProjector);
