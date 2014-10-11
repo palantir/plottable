@@ -40,13 +40,13 @@ export module Plot {
       if (attrToSet === "x" && scale) {
         this._xScale = scale;
         this._updateXDomainer();
-        scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, () => this._adjustDomain(true));
+        scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, () => this.adjustDomain(true));
       }
 
       if (attrToSet === "y" && scale) {
         this._yScale = scale;
         this._updateYDomainer();
-        scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, () => this._adjustDomain(false));
+        scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, () => this.adjustDomain(false));
       }
 
       super.project(attrToSet, accessor, scale);
@@ -122,7 +122,7 @@ export module Plot {
       }
     }
 
-    public _adjustDomain(xDomainChanged: boolean) {
+    private adjustDomain(xDomainChanged: boolean) {
       var adjustmentPolicy: AdjustmentDomainPolicy<any, any> = xDomainChanged ?
         this._adjustmentYScaleDomainPolicy : this._adjustmentXScaleDomainPolicy;
       var changedScale: Scale.AbstractScale<any, any> = xDomainChanged ? this._xScale : this._yScale;
@@ -133,10 +133,8 @@ export module Plot {
         var adjustedDomain: any[] = adjustmentPolicy(values, changedScale.domain());
         if (adjustingScale instanceof Scale.AbstractQuantitative) {
           var scale = <Scale.AbstractQuantitative<any>> adjustingScale;
-          if (!scale._userSetDomainer) {
-            adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
-            scale._setDomain(adjustedDomain);
-          }
+          adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
+          scale._setDomain(adjustedDomain);
         } else {
           adjustingScale._setDomain(adjustedDomain);
         }

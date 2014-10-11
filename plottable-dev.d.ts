@@ -2643,7 +2643,6 @@ declare module Plottable {
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _updateXDomainer(): void;
             _updateYDomainer(): void;
-            _adjustDomain(xDomainChanged: boolean): void;
         }
     }
 }

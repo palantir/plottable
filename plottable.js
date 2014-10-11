@@ -6160,12 +6160,12 @@ var Plottable;
                 if (attrToSet === "x" && scale) {
                     this._xScale = scale;
                     this._updateXDomainer();
-                    scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this._adjustDomain(true); });
+                    scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this.adjustDomain(true); });
                 }
                 if (attrToSet === "y" && scale) {
                     this._yScale = scale;
                     this._updateYDomainer();
-                    scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this._adjustDomain(false); });
+                    scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this.adjustDomain(false); });
                 }
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
@@ -6209,7 +6209,7 @@ var Plottable;
                     }
                 }
             };
-            AbstractXYPlot.prototype._adjustDomain = function (xDomainChanged) {
+            AbstractXYPlot.prototype.adjustDomain = function (xDomainChanged) {
                 var _this = this;
                 var adjustmentPolicy = xDomainChanged ? this._adjustmentYScaleDomainPolicy : this._adjustmentXScaleDomainPolicy;
                 var changedScale = xDomainChanged ? this._xScale : this._yScale;
@@ -6222,10 +6222,8 @@ var Plottable;
                     var adjustedDomain = adjustmentPolicy(values, changedScale.domain());
                     if (adjustingScale instanceof Plottable.Scale.AbstractQuantitative) {
                         var scale = adjustingScale;
-                        if (!scale._userSetDomainer) {
-                            adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
-                            scale._setDomain(adjustedDomain);
-                        }
+                        adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
+                        scale._setDomain(adjustedDomain);
                     }
                     else {
                         adjustingScale._setDomain(adjustedDomain);
