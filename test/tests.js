@@ -2613,6 +2613,23 @@ describe("Plots", function () {
             assert.strictEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -2, "positive offset was used");
             assert.strictEqual(data4[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "positive offset was used");
         });
+        it("stacks correctly on empty data", function () {
+            var data1 = [
+            ];
+            var data2 = [
+            ];
+            stackedPlot.addDataset(data1);
+            stackedPlot.addDataset(data2);
+            assert.deepEqual(data1, [], "empty data causes no stacking to happen");
+            assert.deepEqual(data2, [], "empty data causes no stacking to happen");
+        });
+        it("does not crash on stacking no datasets", function () {
+            var data1 = [
+                { x: 1, y: -2 }
+            ];
+            stackedPlot.addDataset("a", data1);
+            assert.doesNotThrow(function () { return stackedPlot.removeDataset("a"); }, Error);
+        });
     });
 });
 
