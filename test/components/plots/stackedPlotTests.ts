@@ -5,16 +5,16 @@ var assert = chai.assert;
 describe("Plots", () => {
 
   describe("Stacked Plot Stacking", () => {
-    var stackedPlot: Plottable.Abstract.Stacked<number, number>;
+    var stackedPlot: Plottable.Plot.AbstractStacked<number, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
-      stackedPlot = new Plottable.Abstract.Stacked(xScale, yScale);
+      stackedPlot = new Plottable.Plot.AbstractStacked(xScale, yScale);
 
-      (<any> stackedPlot)._getDrawer = (key: string) => new Plottable.Abstract._Drawer(key);
+      (<any> stackedPlot)._getDrawer = (key: string) => new Plottable._Drawer.AbstractDrawer(key);
       stackedPlot._isVertical = true;
     });
 

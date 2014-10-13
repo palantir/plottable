@@ -37,7 +37,7 @@ function run(div, data, Plottable) {
   var yAxisBottom2 = new Plottable.Axis.Numeric(yScale, "right").tickLabelPosition("bottom");
   var yAxisTable2 = new Plottable.Component.Table([[yAxisTop2, yAxisMiddle2, yAxisBottom2]]);
 
-  var renderAreaD1 = new Plottable.Plot.Scatter(dataseries, xScale, yScale);
+  var renderAreaD1 = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries);
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
 
   var basicTable = new Plottable.Component.Table([[null, xAxisTable2, null],

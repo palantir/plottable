@@ -2,10 +2,9 @@
 
 module Plottable {
 export module Plot {
-  export class Line<X> extends Abstract.XYPlot<X,number> {
-    private linePath: D3.Selection;
+  export class Line<X> extends AbstractXYPlot<X,number> {
 
-    public _yScale: Abstract.QuantitativeScale<number>;
+    public _yScale: Scale.AbstractQuantitative<number>;
     public _animators: Animator.PlotAnimatorMap = {
       "line-reset" : new Animator.Null(),
       "line"       : new Animator.Base()
@@ -21,20 +20,11 @@ export module Plot {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.QuantitativeScale<X>, yScale: Abstract.QuantitativeScale<number>) {
-      super(dataset, xScale, yScale);
+    constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
+      super(xScale, yScale);
       this.classed("line-plot", true);
       this.project("stroke", () => Core.Colors.INDIGO); // default
       this.project("stroke-width", () => "2px"); // default
-    }
-
-    public _setup() {
-      super._setup();
-      this._appendPath();
-    }
-
-    public _appendPath() {
-      this.linePath = this._renderArea.append("path").classed("line", true);
     }
 
     public _getResetYFunction() {
@@ -66,28 +56,38 @@ export module Plot {
       return value != null && value === value;
     }
 
+    // HACKHACK #1106 - should use drawers for paint logic
     public _paint() {
-      super._paint();
       var attrToProjector = this._generateAttrToProjector();
       var xFunction       = attrToProjector["x"];
       var yFunction       = attrToProjector["y"];
       delete attrToProjector["x"];
       delete attrToProjector["y"];
 
-      this.linePath.datum(this._dataset.data());
-
       var line = d3.svg.line()
-                       .x(xFunction);
-      line.defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction));
+                   .x(xFunction)
+                   .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction));
       attrToProjector["d"] = line;
 
-      if (this._dataChanged) {
-        line.y(this._getResetYFunction());
-        this._applyAnimatedAttributes(this.linePath, "line-reset", attrToProjector);
-      }
+      var datasets = this.datasets();
+      this._getDrawersInOrder().forEach((d, i) => {
+        var dataset = datasets[i];
+        var linePath: D3.Selection;
+        if (d._renderArea.select(".line").node()) {
+          linePath = d._renderArea.select(".line");
+        } else {
+          linePath = d._renderArea.append("path").classed("line", true);
+        }
+        linePath.datum(dataset.data());
 
-      line.y(yFunction);
-      this._applyAnimatedAttributes(this.linePath, "line", attrToProjector);
+        if (this._dataChanged) {
+          line.y(this._getResetYFunction());
+          this._applyAnimatedAttributes(linePath, "line-reset", attrToProjector);
+        }
+
+        line.y(yFunction);
+        this._applyAnimatedAttributes(linePath, "line", attrToProjector);
+      });
     }
 
     public _wholeDatumAttributes() {

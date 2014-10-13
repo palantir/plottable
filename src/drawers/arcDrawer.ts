@@ -2,7 +2,7 @@
 
 module Plottable {
 export module _Drawer {
-  export class Arc extends Abstract._Drawer {
+  export class Arc extends AbstractDrawer {
 
     public draw(data: any[], attrToProjector: AttributeToProjector, animator = new Animator.Null()) {
       var svgElement = "path";

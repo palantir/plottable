@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Abstract {
-  export class Interaction extends PlottableObject {
+export module Interaction {
+  export class AbstractInteraction extends Core.PlottableObject {
     /**
      * It maintains a 'hitBox' which is where all event listeners are
      * attached. Due to cross- browser weirdness, the hitbox needs to be an
@@ -11,9 +11,9 @@ export module Abstract {
      * e.g. crosshairs.
      */
     public _hitBox: D3.Selection;
-    public _componentToListenTo: Abstract.Component;
+    public _componentToListenTo: Component.AbstractComponent;
 
-    public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
+    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       this._componentToListenTo = component;
       this._hitBox = hitBox;
     }

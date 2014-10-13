@@ -8,7 +8,7 @@ export module _Util {
     does change its domain, it re-propogates the change to every linked scale.
     */
     private rescaleInProgress = false;
-    private scales: Abstract.Scale<D,any>[];
+    private scales: Scale.AbstractScale<D,any>[];
 
     /**
      * Constructs a ScaleDomainCoordinator.
@@ -16,13 +16,13 @@ export module _Util {
      * @constructor
      * @param {Scale[]} scales A list of scales whose domains should be linked.
      */
-    constructor(scales: Abstract.Scale<D,any>[]) {
+    constructor(scales: Scale.AbstractScale<D,any>[]) {
       if (scales == null) {throw new Error("ScaleDomainCoordinator requires scales to coordinate");}
       this.scales = scales;
-      this.scales.forEach((s) => s.broadcaster.registerListener(this, (sx: Abstract.Scale<D,any>) => this.rescale(sx)));
+      this.scales.forEach((s) => s.broadcaster.registerListener(this, (sx: Scale.AbstractScale<D,any>) => this.rescale(sx)));
     }
 
-    public rescale(scale: Abstract.Scale<D,any>) {
+    public rescale(scale: Scale.AbstractScale<D,any>) {
       if (this.rescaleInProgress) {
         return;
       }

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Axis {
-  export class Category extends Abstract.Axis {
+  export class Category extends AbstractAxis {
     public _scale: Scale.Ordinal;
     private _tickLabelAngle = 0;
     private measurer: _Util.Text.CachingCharacterMeasurer;
@@ -161,7 +161,7 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
-      var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
+      var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
         var startAndWidth = this._scale.fullBandStartAndWidth(d);
@@ -170,7 +170,7 @@ export module Axis {
         var y = this._isHorizontal() ? 0 : bandStartPosition;
         return "translate(" + x + "," + y + ")";
       };
-      tickLabels.enter().append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       tickLabels.exit().remove();
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite

@@ -24,7 +24,7 @@ describe("Gridlines", () => {
     yScale.range([yAxis.height(), 0]);
     basicTable._render();
 
-    var xAxisTickMarks = xAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS)[0];
+    var xAxisTickMarks = xAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0];
     var xGridlines = gridlines._element.select(".x-gridlines").selectAll("line")[0];
     assert.equal(xAxisTickMarks.length, xGridlines.length, "There is an x gridline for each x tick");
     for (var i = 0; i<xAxisTickMarks.length; i++) {
@@ -33,7 +33,7 @@ describe("Gridlines", () => {
       assert.closeTo(xTickMarkRect.left, xGridlineRect.left, 1, "x tick and gridline align");
     }
 
-    var yAxisTickMarks = yAxis._element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS)[0];
+    var yAxisTickMarks = yAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0];
     var yGridlines = gridlines._element.select(".y-gridlines").selectAll("line")[0];
     assert.equal(yAxisTickMarks.length, yGridlines.length, "There is an x gridline for each x tick");
     for (var j = 0; j<yAxisTickMarks.length; j++) {

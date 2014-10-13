@@ -11,19 +11,18 @@ export module Plot {
    *  - "x" - the horizontal length of a bar
    *  - "y" - the vertical position of a bar
    */
-  export class HorizontalBar<Y> extends Abstract.BarPlot<number,Y> {
+  export class HorizontalBar<Y> extends AbstractBarPlot<number,Y> {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {"top": 0, "center": 0.5, "bottom": 1};
 
     /**
      * Constructs a HorizontalBarPlot.
      *
      * @constructor
-     * @param {DatasetInterface | any} dataset The dataset to render.
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.QuantitativeScale<number>, yScale: Abstract.Scale<Y,number>) {
-      super(dataset, xScale, yScale);
+    constructor(xScale: Scale.AbstractQuantitative<number>, yScale: Scale.AbstractScale<Y,number>) {
+      super(xScale, yScale);
     }
 
     public _updateXDomainer() {

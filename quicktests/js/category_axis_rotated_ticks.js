@@ -60,7 +60,8 @@ function run(div, data, Plottable) {
   var xAxis3 = new Plottable.Axis.Category(xScale, "bottom").tickLabelAngle(90);
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var plot = new Plottable.Plot.VerticalBar(data, xScale, yScale)
+  var plot = new Plottable.Plot.VerticalBar(xScale, yScale)
+                    .addDataset(data)
                     .project("x", "date", xScale)
                     .project("y", "y", yScale);
   var table = new Plottable.Component.Table([[yAxis, plot], [null, xAxis1], [null, xAxis2], [null, xAxis3]]).renderTo(svg);

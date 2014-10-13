@@ -17,7 +17,7 @@ function run(div, data, Plottable) {
 
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  stackedBarRenderer = new Plottable.Plot.Clustered(xScale, yScale)
+  var clusteredBarRenderer = new Plottable.Plot.ClusteredBar(xScale, yScale)
     .addDataset("d1", data[0])
     .addDataset("d2", data[1])
     .addDataset("d3", data[2])
@@ -27,7 +27,7 @@ function run(div, data, Plottable) {
     .attr("type", "type")
     .attr("yval", "y");
 
-  var center = stackedBarRenderer.merge(new Plottable.Component.Legend(colorScale));
+  var center = clusteredBarRenderer.merge(new Plottable.Component.Legend(colorScale));
 
   horizChart = new Plottable.Component.Table([
     [yAxis, center], [null, xAxis]

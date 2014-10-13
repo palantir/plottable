@@ -2,8 +2,8 @@
 
 module Plottable {
 export module Plot {
-  export class Grid extends Abstract.XYPlot<string,string> {
-    public _colorScale: Abstract.Scale<any, string>;
+  export class Grid extends AbstractXYPlot<string,string> {
+    public _colorScale: Scale.AbstractScale<any, string>;
     public _xScale: Scale.Ordinal;
     public _yScale: Scale.Ordinal;
 
@@ -18,14 +18,13 @@ export module Plot {
      * grid, and the datum can control what color it is.
      *
      * @constructor
-     * @param {DatasetInterface | any} dataset The dataset to render.
      * @param {Scale.Ordinal} xScale The x scale to use.
      * @param {Scale.Ordinal} yScale The y scale to use.
      * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
      * to use for each grid cell.
      */
-    constructor(dataset: any, xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale<any, string>) {
-      super(dataset, xScale, yScale);
+    constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>) {
+      super(xScale, yScale);
       this.classed("grid-plot", true);
 
       // The x and y scales should render in bands with no padding
@@ -36,11 +35,19 @@ export module Plot {
       this.project("fill", "value", colorScale); // default
     }
 
+    public _addDataset(key: string, dataset: Dataset) {
+      if (this._datasetKeysInOrder.length === 1) {
+        _Util.Methods.warn("Only one dataset is supported in Grid plots");
+        return;
+      }
+      super._addDataset(key, dataset);
+    }
+
     /**
      * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
      * the data should return a valid CSS color.
      */
-    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "fill") {
         this._colorScale = this._projectors["fill"].scale;
@@ -49,9 +56,8 @@ export module Plot {
     }
 
     public _paint() {
-      super._paint();
-
-      var cells = this._renderArea.selectAll("rect").data(this._dataset.data());
+      var dataset = this.datasets()[0];
+      var cells = this._renderArea.selectAll("rect").data(dataset.data());
       cells.enter().append("rect");
 
       var xStep = this._xScale.rangeBand();
