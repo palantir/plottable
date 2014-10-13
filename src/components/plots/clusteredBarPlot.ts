@@ -60,7 +60,7 @@ export module Plot {
       var attrHash = this._generateAttrToProjector();
       var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var clusteredData = this.cluster(accessor);
-      this._getDrawersInOrder().forEach((d) => d.draw(clusteredData[d.key], attrHash));
+      this._getDrawersInOrder().forEach((d) => d.draw(clusteredData[d.key], [attrHash]));
 
       var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);

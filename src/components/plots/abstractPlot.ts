@@ -382,7 +382,7 @@ export module Plot {
       var datasets = this.datasets();
       this._getDrawersInOrder().forEach((d, i) => {
         var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
-        d.draw(datasets[i].data(), attrHash, animator);
+        d.draw(datasets[i].data(), [attrHash], [animator]);
       });
     }
   }

@@ -71,7 +71,7 @@ export module Plot {
     }
 
     public _getDrawer(key: string): _Drawer.AbstractDrawer {
-      return new Plottable._Drawer.Arc(key);
+      return new Plottable._Drawer.Element(key).svgElement("path").classed("arc");
     }
 
     public _paint() {
@@ -80,7 +80,7 @@ export module Plot {
       this._getDrawersInOrder().forEach((d, i) => {
         var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
         var pieData = this.pie(datasets[i].data());
-        d.draw(pieData, attrHash, animator);
+        d.draw(pieData, [attrHash], [animator]);
       });
     }
 

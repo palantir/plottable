@@ -1796,7 +1796,7 @@ describe("Plots", function () {
         var oldWarn = Plottable._Util.Methods.warn;
         beforeEach(function () {
             p = new Plottable.Plot.AbstractPlot();
-            p._getDrawer = function (k) { return new Plottable._Drawer.Rect(k); };
+            p._getDrawer = function (k) { return new Plottable._Drawer.Element(k).svgElement("rect"); };
         });
         afterEach(function () {
             Plottable._Util.Methods.warn = oldWarn;

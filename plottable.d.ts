@@ -1496,7 +1496,9 @@ declare module Plottable {
     module _Drawer {
         class AbstractDrawer {
             _renderArea: D3.Selection;
+            _className: string;
             key: string;
+            classed(className: string): AbstractDrawer;
             /**
              * Constructs a Drawer
              *
@@ -1508,22 +1510,14 @@ declare module Plottable {
              * Removes the Drawer and its renderArea
              */
             remove(): void;
+            _getDrawSelection(data: any[]): any;
             /**
              * Draws the data into the renderArea using the attrHash for attributes
              *
              * @param{any[]} data The data to be drawn
              * @param{attrHash} AttributeToProjector The list of attributes to set on the data
              */
-            draw(data: any[], attrToProjector: AttributeToProjector, animator?: Animator.Null): void;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module _Drawer {
-        class Arc extends AbstractDrawer {
-            draw(data: any[], attrToProjector: AttributeToProjector, animator?: Animator.Null): void;
+            draw(data: any[], attrToProjectors: AttributeToProjector[], animators?: Animator.PlotAnimator[]): void;
         }
     }
 }
@@ -1532,7 +1526,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Area extends AbstractDrawer {
-            draw(data: any[], attrToProjector: AttributeToProjector): void;
+            _getDrawSelection(data: any[]): any;
         }
     }
 }
@@ -1540,8 +1534,10 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Rect extends AbstractDrawer {
-            draw(data: any[], attrToProjector: AttributeToProjector, animator?: Animator.Null): void;
+        class Element extends AbstractDrawer {
+            _svgElement: string;
+            svgElement(tag: string): Element;
+            _getDrawSelection(data: any[]): any;
         }
     }
 }
@@ -2721,7 +2717,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
-            _getDrawer(key: string): _Drawer.Rect;
+            _getDrawer(key: string): _Drawer.Element;
             _setup(): void;
             _paint(): void;
             /**

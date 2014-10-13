@@ -93,23 +93,14 @@ export module Plot {
 
       var datasets = this.datasets();
       this._getDrawersInOrder().forEach((d, i) => {
-        var dataset = datasets[i];
-        var areaPath: D3.Selection;
-        if (d._renderArea.select(".area").node()) {
-          areaPath = d._renderArea.select(".area");
-        } else {
-          // Make sure to insert the area before the line
-          areaPath = d._renderArea.insert("path", ".line").classed("area", true);
-        }
-        areaPath.datum(dataset.data());
+        
+        // if (this._dataChanged) {
+        //   area.y1(this._getResetYFunction());
+        //   this._applyAnimatedAttributes(areaPath, "area-reset", attrToProjector);
+        // }
 
-        if (this._dataChanged) {
-          area.y1(this._getResetYFunction());
-          this._applyAnimatedAttributes(areaPath, "area-reset", attrToProjector);
-        }
-
-        area.y1(yFunction);
-        this._applyAnimatedAttributes(areaPath, "area", attrToProjector);
+        // area.y1(yFunction);
+        // this._applyAnimatedAttributes(areaPath, "area", attrToProjector);
       });
     }
 

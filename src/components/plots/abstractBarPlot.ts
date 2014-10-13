@@ -32,7 +32,7 @@ export module Plot {
     }
 
     public _getDrawer(key: string) {
-      return new Plottable._Drawer.Rect(key);
+      return new Plottable._Drawer.Element(key).svgElement("rect");
     }
 
     public _setup() {
@@ -50,24 +50,28 @@ export module Plot {
       var dimensionAttr = this._isVertical ? "height" : "width";
 
       this._getDrawersInOrder().forEach((d, i) => {
-        var dataset = datasets[i];
-        var bars = d._renderArea.selectAll("rect").data(dataset.data());
-        bars.enter().append("rect");
+        // var dataset = datasets[i];
+        // var bars = d._renderArea.selectAll("rect").data(dataset.data());
+        // bars.enter().append("rect");
 
+        var attrToProjectors: AttributeToProjector[] = [];
+        var animators: Animator.PlotAnimator[] = []
         if (this._dataChanged && this._animate) {
           var resetAttrToProjector = this._generateAttrToProjector();
           resetAttrToProjector[positionAttr] = () => scaledBaseline;
           resetAttrToProjector[dimensionAttr] = () => 0;
-          this._applyAnimatedAttributes(bars, "bars-reset", resetAttrToProjector);
+          animators.push(this._animators["bars-reset"]);
+          attrToProjectors.push(resetAttrToProjector);
         }
 
         var attrToProjector = this._generateAttrToProjector();
-        if (attrToProjector["fill"]) {
-          bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
-        }
-        this._applyAnimatedAttributes(bars, "bars", attrToProjector);
+        // if (attrToProjector["fill"]) {
+        //   bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
+        // }
+        animators.push(this._animate ? this._animators["bars"] : new Animator.Null());
+        attrToProjectors.push(attrToProjector);
+        d.draw(datasets[i].data(), attrToProjectors, animators);
 
-        bars.exit().remove();
       });
 
       var baselineAttr: any = {

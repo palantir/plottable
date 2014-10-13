@@ -3009,6 +3009,10 @@ var Plottable;
             function AbstractDrawer(key) {
                 this.key = key;
             }
+            AbstractDrawer.prototype.classed = function (className) {
+                this._className = className;
+                return this;
+            };
             /**
              * Removes the Drawer and its renderArea
              */
@@ -3017,50 +3021,29 @@ var Plottable;
                     this._renderArea.remove();
                 }
             };
+            AbstractDrawer.prototype._getDrawSelection = function (data) {
+                return null;
+            };
             /**
              * Draws the data into the renderArea using the attrHash for attributes
              *
              * @param{any[]} data The data to be drawn
              * @param{attrHash} AttributeToProjector The list of attributes to set on the data
              */
-            AbstractDrawer.prototype.draw = function (data, attrToProjector, animator) {
-                if (animator === void 0) { animator = new Plottable.Animator.Null(); }
-                // no-op
+            AbstractDrawer.prototype.draw = function (data, attrToProjectors, animators) {
+                if (animators === void 0) { animators = []; }
+                var drawSelection = this._getDrawSelection(data);
+                if (this._className)
+                    drawSelection.classed(this._className, true);
+                attrToProjectors.forEach(function (attrToProjector, i) {
+                    var animator = animators[i] || new Plottable.Animator.Null();
+                    animator.animate(drawSelection, attrToProjector);
+                });
+                drawSelection.exit().remove();
             };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
-    })(Plottable._Drawer || (Plottable._Drawer = {}));
-    var _Drawer = Plottable._Drawer;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (_Drawer) {
-        var Arc = (function (_super) {
-            __extends(Arc, _super);
-            function Arc() {
-                _super.apply(this, arguments);
-            }
-            Arc.prototype.draw = function (data, attrToProjector, animator) {
-                if (animator === void 0) { animator = new Plottable.Animator.Null(); }
-                var svgElement = "path";
-                var dataElements = this._renderArea.selectAll(svgElement).data(data);
-                dataElements.enter().append(svgElement);
-                dataElements.classed("arc", true);
-                animator.animate(dataElements, attrToProjector);
-                dataElements.exit().remove();
-            };
-            return Arc;
-        })(_Drawer.AbstractDrawer);
-        _Drawer.Arc = Arc;
     })(Plottable._Drawer || (Plottable._Drawer = {}));
     var _Drawer = Plottable._Drawer;
 })(Plottable || (Plottable = {}));
@@ -3080,12 +3063,17 @@ var Plottable;
             function Area() {
                 _super.apply(this, arguments);
             }
-            Area.prototype.draw = function (data, attrToProjector) {
-                var svgElement = "path";
-                var dataElements = this._renderArea.selectAll(svgElement).data([data]);
-                dataElements.enter().append(svgElement);
-                dataElements.attr(attrToProjector).classed("area", true);
-                dataElements.exit().remove();
+            Area.prototype._getDrawSelection = function (data) {
+                var areaPath;
+                if (this._renderArea.select(".area").node()) {
+                    areaPath = this._renderArea.select(".area");
+                }
+                else {
+                    // Make sure to insert the area before the line
+                    areaPath = this._renderArea.insert("path", ".line");
+                }
+                areaPath.datum(data);
+                return areaPath;
             };
             return Area;
         })(_Drawer.AbstractDrawer);
@@ -3104,22 +3092,23 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (_Drawer) {
-        var Rect = (function (_super) {
-            __extends(Rect, _super);
-            function Rect() {
+        var Element = (function (_super) {
+            __extends(Element, _super);
+            function Element() {
                 _super.apply(this, arguments);
             }
-            Rect.prototype.draw = function (data, attrToProjector, animator) {
-                if (animator === void 0) { animator = new Plottable.Animator.Null(); }
-                var svgElement = "rect";
-                var dataElements = this._renderArea.selectAll(svgElement).data(data);
-                dataElements.enter().append(svgElement);
-                animator.animate(dataElements, attrToProjector);
-                dataElements.exit().remove();
+            Element.prototype.svgElement = function (tag) {
+                this._svgElement = tag;
+                return this;
             };
-            return Rect;
+            Element.prototype._getDrawSelection = function (data) {
+                var dataElements = this._renderArea.selectAll(this._svgElement).data(data);
+                dataElements.enter().append(this._svgElement);
+                return dataElements;
+            };
+            return Element;
         })(_Drawer.AbstractDrawer);
-        _Drawer.Rect = Rect;
+        _Drawer.Element = Element;
     })(Plottable._Drawer || (Plottable._Drawer = {}));
     var _Drawer = Plottable._Drawer;
 })(Plottable || (Plottable = {}));
@@ -6034,7 +6023,7 @@ var Plottable;
                 var datasets = this.datasets();
                 this._getDrawersInOrder().forEach(function (d, i) {
                     var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
-                    d.draw(datasets[i].data(), attrHash, animator);
+                    d.draw(datasets[i].data(), [attrHash], [animator]);
                 });
             };
             return AbstractPlot;
@@ -6111,7 +6100,7 @@ var Plottable;
                 return retargetedAttrToProjector;
             };
             Pie.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Arc(key);
+                return new Plottable._Drawer.Element(key).svgElement("path").classed("arc");
             };
             Pie.prototype._paint = function () {
                 var _this = this;
@@ -6120,7 +6109,7 @@ var Plottable;
                 this._getDrawersInOrder().forEach(function (d, i) {
                     var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
                     var pieData = _this.pie(datasets[i].data());
-                    d.draw(pieData, attrHash, animator);
+                    d.draw(pieData, [attrHash], [animator]);
                 });
             };
             Pie.prototype.pie = function (d) {
@@ -6398,7 +6387,7 @@ var Plottable;
                 this.baseline(this._baselineValue);
             }
             AbstractBarPlot.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Rect(key);
+                return new Plottable._Drawer.Element(key).svgElement("rect");
             };
             AbstractBarPlot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -6414,21 +6403,25 @@ var Plottable;
                 var positionAttr = this._isVertical ? "y" : "x";
                 var dimensionAttr = this._isVertical ? "height" : "width";
                 this._getDrawersInOrder().forEach(function (d, i) {
-                    var dataset = datasets[i];
-                    var bars = d._renderArea.selectAll("rect").data(dataset.data());
-                    bars.enter().append("rect");
+                    // var dataset = datasets[i];
+                    // var bars = d._renderArea.selectAll("rect").data(dataset.data());
+                    // bars.enter().append("rect");
+                    var attrToProjectors = [];
+                    var animators = [];
                     if (_this._dataChanged && _this._animate) {
                         var resetAttrToProjector = _this._generateAttrToProjector();
                         resetAttrToProjector[positionAttr] = function () { return scaledBaseline; };
                         resetAttrToProjector[dimensionAttr] = function () { return 0; };
-                        _this._applyAnimatedAttributes(bars, "bars-reset", resetAttrToProjector);
+                        animators.push(_this._animators["bars-reset"]);
+                        attrToProjectors.push(resetAttrToProjector);
                     }
                     var attrToProjector = _this._generateAttrToProjector();
-                    if (attrToProjector["fill"]) {
-                        bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
-                    }
-                    _this._applyAnimatedAttributes(bars, "bars", attrToProjector);
-                    bars.exit().remove();
+                    // if (attrToProjector["fill"]) {
+                    //   bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                    // }
+                    animators.push(_this._animate ? _this._animators["bars"] : new Plottable.Animator.Null());
+                    attrToProjectors.push(attrToProjector);
+                    d.draw(datasets[i].data(), attrToProjectors, animators);
                 });
                 var baselineAttr = {
                     "x1": this._isVertical ? 0 : scaledBaseline,
@@ -6880,22 +6873,12 @@ var Plottable;
                 attrToProjector["d"] = area;
                 var datasets = this.datasets();
                 this._getDrawersInOrder().forEach(function (d, i) {
-                    var dataset = datasets[i];
-                    var areaPath;
-                    if (d._renderArea.select(".area").node()) {
-                        areaPath = d._renderArea.select(".area");
-                    }
-                    else {
-                        // Make sure to insert the area before the line
-                        areaPath = d._renderArea.insert("path", ".line").classed("area", true);
-                    }
-                    areaPath.datum(dataset.data());
-                    if (_this._dataChanged) {
-                        area.y1(_this._getResetYFunction());
-                        _this._applyAnimatedAttributes(areaPath, "area-reset", attrToProjector);
-                    }
-                    area.y1(yFunction);
-                    _this._applyAnimatedAttributes(areaPath, "area", attrToProjector);
+                    // if (this._dataChanged) {
+                    //   area.y1(this._getResetYFunction());
+                    //   this._applyAnimatedAttributes(areaPath, "area-reset", attrToProjector);
+                    // }
+                    // area.y1(yFunction);
+                    // this._applyAnimatedAttributes(areaPath, "area", attrToProjector);
                 });
             };
             Area.prototype._wholeDatumAttributes = function () {
@@ -6973,7 +6956,7 @@ var Plottable;
                 var attrHash = this._generateAttrToProjector();
                 var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 var clusteredData = this.cluster(accessor);
-                this._getDrawersInOrder().forEach(function (d) { return d.draw(clusteredData[d.key], attrHash); });
+                this._getDrawersInOrder().forEach(function (d) { return d.draw(clusteredData[d.key], [attrHash]); });
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
                 var baselineAttr = {
