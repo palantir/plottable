@@ -70,16 +70,6 @@ module.exports = function(grunt) {
       replacement: "",
       path: "build/plottable.d.ts",
     },
-    public_protected_definitions: {
-      pattern: jsdoc + prefixMatch + "public _" + varNameMatch + finalMatch,
-      replacement: "",
-      path: "plottable.d.ts",
-    },
-    protected_definitions: {
-      pattern: jsdoc + prefixMatch + "_" + varNameMatch + finalMatch,
-      replacement: "",
-      path: "plottable.d.ts",
-    },
     plottable_multifile: {
       pattern: '/// *<reference path="([^."]*).ts" */>',
       replacement: 'synchronousRequire("/build/src/$1.js");',
@@ -315,9 +305,6 @@ module.exports = function(grunt) {
   grunt.registerTask("definitions_prod", function() {
     grunt.file.copy("build/plottable.d.ts", "plottable.d.ts");
   });
-  grunt.registerTask("copy-dev-defs", function () {
-    grunt.file.copy("plottable.d.ts", "plottable-dev.d.ts");
-  });
   grunt.registerTask("test-compile", [
                                   "ts:test",
                                   "concat:tests_multifile",
@@ -337,9 +324,6 @@ module.exports = function(grunt) {
       "sed:version_number",
       "definitions_prod",
       "test-compile",
-      "copy-dev-defs",
-      "sed:public_protected_definitions",
-      "sed:protected_definitions",
       "concat:plottable_multifile",
       "sed:plottable_multifile",
       "clean:tscommand"
