@@ -3242,22 +3242,13 @@ var Plottable;
                 }
                 this.xOrigin = xOrigin;
                 this.yOrigin = yOrigin;
-                var xPosition = this.xOrigin;
-                var yPosition = this.yOrigin;
                 var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
-                xPosition += this._xOffset;
-                if (this._isFixedWidth()) {
-                    xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
-                    // Decrease size so hitbox / bounding box and children are sized correctly
-                    availableWidth = Math.min(availableWidth, requestedSpace.width);
-                }
-                yPosition += this._yOffset;
-                if (this._isFixedHeight()) {
-                    yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
-                    availableHeight = Math.min(availableHeight, requestedSpace.height);
-                }
-                this._width = availableWidth;
-                this._height = availableHeight;
+                this._width = this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth;
+                this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
+                var xPosition = this.xOrigin + this._xOffset;
+                var yPosition = this.yOrigin + this._yOffset;
+                xPosition += (availableWidth - this.width()) * this._xAlignProportion;
+                yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
                 this._element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
                 this.boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             };
