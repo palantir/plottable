@@ -102,6 +102,7 @@ declare module Plottable {
             function max<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
             function min(arr: number[], default_val?: number): number;
             function min<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
+            function range(start: number, stop: number, step?: number): number[];
         }
     }
 }

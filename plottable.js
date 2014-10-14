@@ -241,6 +241,19 @@ var Plottable;
                 /* tslint:enable:ban */
             }
             Methods.min = min;
+            function range(start, stop, step) {
+                if (step === void 0) { step = 1; }
+                if (step === 0) {
+                    throw new Error("incorrect step");
+                }
+                var length = Math.max(Math.ceil((stop - start) / step), 0);
+                var range = [];
+                for (var i = 0; i < length; i++, start += step) {
+                    range[i] = start;
+                }
+                return range;
+            }
+            Methods.range = range;
         })(_Util.Methods || (_Util.Methods = {}));
         var Methods = _Util.Methods;
     })(Plottable._Util || (Plottable._Util = {}));
@@ -1321,18 +1334,26 @@ var Plottable;
          * @returns {TickGenerator} A tick generator using the specified interval.
          */
         function intervalTickGenerator(interval) {
+            if (interval <= 0) {
+                throw new Error("interval must be positive number");
+            }
             return function (s) {
                 var domain = s.domain();
+                var firstTick;
                 var generatedTicks = [];
-                var firstTick = Math.ceil(domain[0] / interval) * interval;
-                var lastTick = Math.floor(domain[1] / interval) * interval;
-                if (firstTick !== domain[0]) {
+                if (domain[0] <= domain[1]) {
+                    firstTick = Math.ceil(domain[0] / interval) * interval;
+                }
+                else {
+                    firstTick = Math.floor(domain[0] / interval) * interval;
+                    interval = -interval;
+                }
+                var numTicks = Math.max(Math.floor((domain[1] - firstTick) / interval) + 1, 0);
+                if (domain[0] % interval !== 0) {
                     generatedTicks.push(domain[0]);
                 }
-                for (var tick = firstTick; tick <= lastTick; tick += interval) {
-                    generatedTicks.push(tick);
-                }
-                if (lastTick !== domain[1]) {
+                Plottable._Util.Methods.range(0, numTicks).forEach(function (t) { return generatedTicks.push(firstTick + t * interval); });
+                if (domain[1] % interval !== 0) {
                     generatedTicks.push(domain[1]);
                 }
                 return generatedTicks;

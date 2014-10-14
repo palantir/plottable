@@ -13,7 +13,7 @@ function run(div, data, Plottable) {
     return scale.getDefaultTicks().filter(function(x) { return x * 10 % 2 === 0; });
   };
 
-  var xScale = new Plottable.Scale.Linear().tickGenerator(onlyEvenTickGenerator);
+  var xScale = new Plottable.Scale.Linear().tickGenerator(Plottable.TickGenerators.intervalTickGenerator(0.05));
   var yScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");

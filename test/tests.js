@@ -5646,6 +5646,48 @@ describe("_Util.Methods", function () {
         var emptyMap = Plottable._Util.Methods.populateMap(emptyKeys, function (key) { return key + "Value"; });
         assert.isTrue(emptyMap.empty(), "no entries in map if no keys in input array");
     });
+    it("range works as expected", function () {
+        var start = 0;
+        var end = 10;
+        var step = 1;
+        var range = Plottable._Util.Methods.range(start, end);
+        var lastVal = start - step;
+        range.forEach(function (t) {
+            assert.operator(t, ">=", start, "entry is not less then start");
+            assert.operator(t, "<=", end, "entry is not greater then end");
+            assert.equal(t - lastVal, step, "step requirment is met");
+            lastVal = t;
+        });
+        assert.lengthOf(range, 10, "all entries has been generated");
+        step = 3;
+        range = Plottable._Util.Methods.range(start, end, step);
+        lastVal = start - step;
+        range.forEach(function (t) {
+            assert.operator(t, ">=", start, "entry is not less then start");
+            assert.operator(t, "<=", end, "entry is not greater then end");
+            assert.equal(t - lastVal, step, "step requirment is met");
+            lastVal = t;
+        });
+        assert.lengthOf(range, 4, "all entries has been generated");
+        step = 11;
+        range = Plottable._Util.Methods.range(start, end, step);
+        assert.lengthOf(range, 1, "all entries has been generated");
+        step = 0;
+        assert.throws(function () { return Plottable._Util.Methods.range(start, end, step); });
+        step = -1;
+        range = Plottable._Util.Methods.range(start, end, step);
+        assert.lengthOf(range, 0, "no enries because of invalid step");
+        step = -1;
+        range = Plottable._Util.Methods.range(end, start, step);
+        lastVal = end - step;
+        range.forEach(function (t) {
+            assert.operator(t, ">=", start, "entry is not less then start");
+            assert.operator(t, "<=", end, "entry is not greater then end");
+            assert.equal(t - lastVal, step, "step requirment is met");
+            lastVal = t;
+        });
+        assert.lengthOf(range, 10, "all entries has been generated");
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -5656,31 +5698,46 @@ describe("Tick generators", function () {
             var start = 0.5, end = 10.01, interval = 1;
             var scale = new Plottable.Scale.Linear().domain([start, end]);
             var ticks = Plottable.TickGenerators.intervalTickGenerator(interval)(scale);
-            assert.isTrue(ticks.map(function (t) { return t >= start && t <= end; }).reduce(function (a, b) { return a && b; }, true), "generated ticks are within domain");
+            var lastValue = 0;
+            ticks.forEach(function (t) {
+                assert.operator(t, ">=", start, "entry is not less then start");
+                assert.operator(t, "<=", end, "entry is not greater then end");
+                assert.operator(t, ">", lastValue, "entries are in ascending order");
+                assert.isTrue(t % interval === 0 || t === start || t === end, "entry is generated using interval or it is either ends");
+                lastValue = t;
+            });
+            assert.include(ticks, start, "generated ticks contains start");
+            assert.include(ticks, end, "generated ticks contains end");
+            assert.lengthOf(ticks, 12, "generated ticks contains all possible ticks within range");
         });
-        it("generates multiplication of interval or domain boundaries", function () {
-            var start = 5, end = 34, interval = 4;
+        it("reversed domain", function () {
+            var start = -2.2, end = -12.5, interval = 2.5;
             var scale = new Plottable.Scale.Linear().domain([start, end]);
             var ticks = Plottable.TickGenerators.intervalTickGenerator(interval)(scale);
-            assert.isTrue(ticks.map(function (t) { return t % interval === 0 || t === start || t === end; }).reduce(function (a, b) { return a && b; }, true), "generated ticks are mulitplication of interval or domain boundaries");
+            var lastValue = 0;
+            ticks.forEach(function (t) {
+                assert.operator(t, "<=", start, "entry is not greater then start");
+                assert.operator(t, ">=", end, "entry is not less then end");
+                assert.operator(t, "<", lastValue, "entries are in descending order");
+                assert.isTrue(t % interval === 0 || t === start || t === end, "entry is generated using interval or it is either ends");
+                lastValue = t;
+            });
+            assert.include(ticks, start, "generated ticks contains start");
+            assert.include(ticks, end, "generated ticks contains end");
+            assert.lengthOf(ticks, 6, "generated ticks contains all possible ticks within range");
         });
-        it("generated ticks contains both ends if they meet constraint", function () {
-            var start = 4, end = 32, interval = 4;
+        it("passing big interval", function () {
+            var start = 0.5, end = 10.01, interval = 11;
             var scale = new Plottable.Scale.Linear().domain([start, end]);
             var ticks = Plottable.TickGenerators.intervalTickGenerator(interval)(scale);
-            assert.include(ticks, start, "generated ticks contains start, because it is interval multiplication");
-            assert.include(ticks, end, "generated ticks contains end, because it is interval multiplication");
+            assert.include(ticks, start, "generated ticks contains start");
+            assert.include(ticks, end, "generated ticks contains end");
+            assert.lengthOf(ticks, 2, "generated ticks contains all possible ticks within range");
         });
-        it("generated ticks are unique and in ascending order", function () {
-            var start = 4, end = 16, interval = 4;
-            var scale = new Plottable.Scale.Linear().domain([start, end]);
-            var ticks = Plottable.TickGenerators.intervalTickGenerator(interval)(scale);
-            assert.deepEqual(ticks.map(function (x) { return x / interval; }), [1, 2, 3, 4], "generated ticks are unique and in ascending order");
-            start = 0.5;
-            end = 2.5;
-            interval = 0.5;
-            ticks = Plottable.TickGenerators.intervalTickGenerator(interval)(scale.domain([start, end]));
-            assert.deepEqual(ticks.map(function (x) { return x / interval; }), [1, 2, 3, 4, 5], "generated ticks are unique and in ascending order");
+        it("passing non positive interval", function () {
+            var scale = new Plottable.Scale.Linear().domain([0, 1]);
+            assert.throws(function () { return Plottable.TickGenerators.intervalTickGenerator(0); }, Error);
+            assert.throws(function () { return Plottable.TickGenerators.intervalTickGenerator(-2); }, Error);
         });
     });
 });
