@@ -7202,7 +7202,7 @@ var Plottable;
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var xFunction = attrToProjector["x"];
-                var yFunction = function (d) { return _this._yScale.scale(d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                var yFunction = function (d) { return _this._yScale.scale(+d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 var y0Function = function (d) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 delete attrToProjector["x"];
                 delete attrToProjector["y0"];
