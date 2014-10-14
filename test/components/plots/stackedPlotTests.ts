@@ -104,6 +104,8 @@ describe("Plots", () => {
       assert.strictEqual((<any> data4[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 3, "stacking on data2 numerical y value");
       assert.strictEqual((<any> data5[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 8, "stacking on data1 + data3 numerical y values");
       assert.strictEqual((<any> data6[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "stacking on data2 + data4 numerical y values");
+
+      assert.deepEqual((<any> stackedPlot).stackedExtent, [-4, 9], "stacked extent is as normal");
     });
 
     it("stacks correctly on empty data", () => {
