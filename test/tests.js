@@ -2862,6 +2862,50 @@ describe("Plots", function () {
             svg.remove();
         });
     });
+    describe("Stacked Area Plot Project", function () {
+        var svg;
+        var xScale;
+        var yScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        beforeEach(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Linear().domain([1, 3]);
+            yScale = new Plottable.Scale.Linear().domain([0, 4]);
+            var colorScale = new Plottable.Scale.Color("10").domain(["a", "b"]);
+            var data1 = [
+                { x: 1, yTest: 1, type: "a" },
+                { x: 3, yTest: 2, type: "a" }
+            ];
+            var data2 = [
+                { x: 1, yTest: 3, type: "b" },
+                { x: 3, yTest: 1, type: "b" }
+            ];
+            renderer = new Plottable.Plot.StackedArea(xScale, yScale);
+            renderer.project("y", "yTest", yScale);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.project("fill", "type", colorScale);
+            var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+        });
+        it("renders correctly", function () {
+            var areas = renderer._renderArea.selectAll(".area");
+            var area0 = d3.select(areas[0][0]);
+            var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
+            var d0Ys = d0.slice(1, d0.length - 1).map(function (s) { return parseFloat(s.split(",")[1]); });
+            assert.strictEqual(d0Ys.indexOf(0), -1, "bottom area never touches the top");
+            var area1 = d3.select(areas[0][1]);
+            var d1 = normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
+            var d1Ys = d1.slice(1, d1.length - 1).map(function (s) { return parseFloat(s.split(",")[1]); });
+            assert.notEqual(d1Ys.indexOf(0), -1, "touches the top");
+            var domain = yScale.domain();
+            assert.strictEqual(0, domain[0], "domain starts at a min value at 0");
+            assert.strictEqual(4, domain[1], "highest area stacking is at upper limit of yScale domain");
+            svg.remove();
+        });
+    });
 });
 
 ///<reference path="../../testReference.ts" />
