@@ -27,10 +27,6 @@ We Want To Help!
 ---
 If you run into any problems using Plottable, please let us know. We want Plottable to be easy-to-use, so if you are getting confused, it is our fault, not yours. [Create an issue](https://github.com/palantir/plottable/issues) and we'll be happy to help you out.
 
-API Changes in Progress
----
-Please be aware: as of 9/12/2014, there is currently an API change underway. In the near future, plots like `Plot.Scatter` and `Plot.Line` will receive data differently, so that they can maintain multiple datasets instead of being stuck with only one. For more details, [see the API change proposal](https://github.com/palantir/plottable/wiki/Proposed-API-Change:-Multi-dataset-Plots).
-
 Development
 ---
 
