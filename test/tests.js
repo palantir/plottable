@@ -2643,6 +2643,23 @@ describe("Plots", function () {
             assert.strictEqual(data5[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 8, "stacking on data1 + data3 numerical y values");
             assert.strictEqual(data6[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "stacking on data2 + data4 numerical y values");
         });
+        it("stacks correctly on empty data", function () {
+            var data1 = [
+            ];
+            var data2 = [
+            ];
+            stackedPlot.addDataset(data1);
+            stackedPlot.addDataset(data2);
+            assert.deepEqual(data1, [], "empty data causes no stacking to happen");
+            assert.deepEqual(data2, [], "empty data causes no stacking to happen");
+        });
+        it("does not crash on stacking no datasets", function () {
+            var data1 = [
+                { x: 1, y: -2 }
+            ];
+            stackedPlot.addDataset("a", data1);
+            assert.doesNotThrow(function () { return stackedPlot.removeDataset("a"); }, Error);
+        });
     });
 });
 
