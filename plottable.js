@@ -7035,12 +7035,12 @@ var Plottable;
                 var valueAccessor = this.valueAccessor();
                 var maxStackExtent = Plottable._Util.Methods.max(datasets, function (dataset) {
                     return Plottable._Util.Methods.max(dataset.data(), function (datum) {
-                        return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                        return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                     });
                 });
                 var minStackExtent = Plottable._Util.Methods.min(datasets, function (dataset) {
                     return Plottable._Util.Methods.min(dataset.data(), function (datum) {
-                        return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                        return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                     });
                 });
                 this.stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
@@ -7058,7 +7058,7 @@ var Plottable;
                 var outFunction = function (d, y0, y) {
                     d.offset = y0;
                 };
-                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return d.value; }).values(function (d) { return _this.getDomainKeys().map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
+                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return +d.value; }).values(function (d) { return _this.getDomainKeys().map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
                 return dataArray;
             };
             /**
@@ -7202,7 +7202,7 @@ var Plottable;
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var xFunction = attrToProjector["x"];
-                var yFunction = function (d) { return _this._yScale.scale(d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                var yFunction = function (d) { return _this._yScale.scale(+d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 var y0Function = function (d) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 delete attrToProjector["x"];
                 delete attrToProjector["y0"];
@@ -7270,12 +7270,12 @@ var Plottable;
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 var primaryAccessor = this._projectors[primaryAttr].accessor;
                 var getStart = function (d) { return primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                var getEnd = function (d) { return primaryScale.scale(primaryAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                var getEnd = function (d) { return primaryScale.scale(+primaryAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 var heightF = function (d) { return Math.abs(getEnd(d) - getStart(d)); };
                 var widthF = attrToProjector["width"];
                 attrToProjector["height"] = this._isVertical ? heightF : widthF;
                 attrToProjector["width"] = this._isVertical ? widthF : heightF;
-                var attrFunction = function (d) { return primaryAccessor(d) < 0 ? getStart(d) : getEnd(d); };
+                var attrFunction = function (d) { return +primaryAccessor(d) < 0 ? getStart(d) : getEnd(d); };
                 attrToProjector[primaryAttr] = function (d) { return _this._isVertical ? attrFunction(d) : attrFunction(d) - heightF(d); };
                 return attrToProjector;
             };
