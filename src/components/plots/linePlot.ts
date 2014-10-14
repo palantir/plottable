@@ -5,12 +5,6 @@ export module Plot {
   export class Line<X> extends AbstractXYPlot<X,number> {
 
     public _yScale: Scale.AbstractQuantitative<number>;
-    public _animators: Animator.PlotAnimatorMap = {
-      "line-reset" : new Animator.Null(),
-      "line"       : new Animator.Base()
-        .duration(600)
-        .easing("exp-in-out")
-    };
 
     /**
      * Constructs a LinePlot.
@@ -25,6 +19,14 @@ export module Plot {
       this.classed("line-plot", true);
       this.project("stroke", () => Core.Colors.INDIGO); // default
       this.project("stroke-width", () => "2px"); // default
+      this._animators["line-reset"] = new Animator.Null();
+      this._animators["line"]       = new Animator.Base()
+                                        .duration(600)
+                                        .easing("exp-in-out");
+    }
+
+     public _getDrawer(key: string) {
+      return new Plottable._Drawer.Line(key);
     }
 
     public _getResetYFunction() {
@@ -71,22 +73,24 @@ export module Plot {
 
       var datasets = this.datasets();
       this._getDrawersInOrder().forEach((d, i) => {
-        var dataset = datasets[i];
-        var linePath: D3.Selection;
-        if (d._renderArea.select(".line").node()) {
-          linePath = d._renderArea.select(".line");
-        } else {
-          linePath = d._renderArea.append("path").classed("line", true);
-        }
-        linePath.datum(dataset.data());
-
-        if (this._dataChanged) {
-          line.y(this._getResetYFunction());
-          this._applyAnimatedAttributes(linePath, "line-reset", attrToProjector);
+        var animators: Animator.PlotAnimator[] = [];
+        var attrToProjectors: AttributeToProjector[] = [];
+        if (this._dataChanged && this._animate) {
+          var resetAttrToProjector: AttributeToProjector = {} 
+          d3.keys(attrToProjector).forEach((key) => resetAttrToProjector[key] = attrToProjector[key]);
+          var resetedLine = d3.svg.line()
+                   .x(xFunction)
+                   .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction))
+                   .y(this._getResetYFunction());
+          resetAttrToProjector["d"] = resetedLine;
+          animators.push(this._getAnimator("line-reset"));
+          attrToProjectors.push(resetAttrToProjector);
         }
 
         line.y(yFunction);
-        this._applyAnimatedAttributes(linePath, "line", attrToProjector);
+        animators.push(this._getAnimator("line"));
+        attrToProjectors.push(attrToProjector);
+        d.draw(datasets[i].data(), attrToProjectors, animators);
       });
     }
 

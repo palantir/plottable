@@ -31,10 +31,14 @@ export module Plot {
       AbstractBarPlot.prototype._setup.call(this);
     }
 
-    public _getAnimator(drawer: _Drawer.AbstractDrawer, index: number) {
-      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-      var scaledBaseline = primaryScale.scale(this._baselineValue);
-      return new Animator.MovingRect(scaledBaseline, this._isVertical);
+    public _getAnimator(key: string): Animator.PlotAnimator {
+      if(!this._animate) {
+        return new Animator.Null();
+      } else {
+        var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+        var scaledBaseline = primaryScale.scale(this._baselineValue);
+        return new Animator.MovingRect(scaledBaseline, this._isVertical);
+      }
     }
 
     public _getDrawer(key: string) {

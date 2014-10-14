@@ -50,10 +50,6 @@ export module Plot {
       var dimensionAttr = this._isVertical ? "height" : "width";
 
       this._getDrawersInOrder().forEach((d, i) => {
-        // var dataset = datasets[i];
-        // var bars = d._renderArea.selectAll("rect").data(dataset.data());
-        // bars.enter().append("rect");
-
         var attrToProjectors: AttributeToProjector[] = [];
         var animators: Animator.PlotAnimator[] = []
         if (this._dataChanged && this._animate) {
@@ -65,9 +61,6 @@ export module Plot {
         }
 
         var attrToProjector = this._generateAttrToProjector();
-        // if (attrToProjector["fill"]) {
-        //   bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
-        // }
         animators.push(this._animate ? this._animators["bars"] : new Animator.Null());
         attrToProjectors.push(attrToProjector);
         d.draw(datasets[i].data(), attrToProjectors, animators);

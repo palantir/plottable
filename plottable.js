@@ -3021,6 +3021,9 @@ var Plottable;
                     this._renderArea.remove();
                 }
             };
+            AbstractDrawer.prototype._finishDrawing = function (selection) {
+                // no-op
+            };
             AbstractDrawer.prototype._getDrawSelection = function (data) {
                 return null;
             };
@@ -3033,13 +3036,19 @@ var Plottable;
             AbstractDrawer.prototype.draw = function (data, attrToProjectors, animators) {
                 if (animators === void 0) { animators = []; }
                 var drawSelection = this._getDrawSelection(data);
+                if (!drawSelection) {
+                    return;
+                }
                 if (this._className)
                     drawSelection.classed(this._className, true);
                 attrToProjectors.forEach(function (attrToProjector, i) {
+                    if (attrToProjector["fill"]) {
+                        drawSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                    }
                     var animator = animators[i] || new Plottable.Animator.Null();
                     animator.animate(drawSelection, attrToProjector);
                 });
-                drawSelection.exit().remove();
+                this._finishDrawing(drawSelection);
             };
             return AbstractDrawer;
         })();
@@ -3062,22 +3071,52 @@ var Plottable;
             __extends(Area, _super);
             function Area() {
                 _super.apply(this, arguments);
+                this._className = "area";
             }
-            Area.prototype._getDrawSelection = function (data) {
-                var areaPath;
-                if (this._renderArea.select(".area").node()) {
-                    areaPath = this._renderArea.select(".area");
+            Area.prototype._createDrawSelection = function () {
+                return this._renderArea.insert("path", ".line");
+            };
+            return Area;
+        })(_Drawer.Line);
+        _Drawer.Area = Area;
+    })(Plottable._Drawer || (Plottable._Drawer = {}));
+    var _Drawer = Plottable._Drawer;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (_Drawer) {
+        var Line = (function (_super) {
+            __extends(Line, _super);
+            function Line() {
+                _super.apply(this, arguments);
+                this._className = "line";
+            }
+            Line.prototype._createDrawSelection = function () {
+                return this._renderArea.append("path");
+            };
+            Line.prototype._getDrawSelection = function (data) {
+                var drawSelection;
+                if (this._renderArea.select("." + this._className).node()) {
+                    drawSelection = this._renderArea.select("." + this._className);
                 }
                 else {
                     // Make sure to insert the area before the line
-                    areaPath = this._renderArea.insert("path", ".line");
+                    drawSelection = this._createDrawSelection();
                 }
-                areaPath.datum(data);
-                return areaPath;
+                drawSelection.datum(data);
+                return drawSelection;
             };
-            return Area;
+            return Line;
         })(_Drawer.AbstractDrawer);
-        _Drawer.Area = Area;
+        _Drawer.Line = Line;
     })(Plottable._Drawer || (Plottable._Drawer = {}));
     var _Drawer = Plottable._Drawer;
 })(Plottable || (Plottable = {}));
@@ -3105,6 +3144,9 @@ var Plottable;
                 var dataElements = this._renderArea.selectAll(this._svgElement).data(data);
                 dataElements.enter().append(this._svgElement);
                 return dataElements;
+            };
+            Element.prototype._finishDrawing = function (selection) {
+                selection.exit().remove();
             };
             return Element;
         })(_Drawer.AbstractDrawer);
@@ -5812,8 +5854,13 @@ var Plottable;
             AbstractPlot.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.AbstractDrawer(key);
             };
-            AbstractPlot.prototype._getAnimator = function (drawer, index) {
-                return new Plottable.Animator.Null();
+            AbstractPlot.prototype._getAnimator = function (key) {
+                if (!this._animate) {
+                    return new Plottable.Animator.Null();
+                }
+                else {
+                    return this._animators[key] || new Plottable.Animator.Null();
+                }
             };
             AbstractPlot.prototype._onDatasetUpdate = function () {
                 this._updateScaleExtents();
@@ -6022,8 +6069,7 @@ var Plottable;
                 var attrHash = this._generateAttrToProjector();
                 var datasets = this.datasets();
                 this._getDrawersInOrder().forEach(function (d, i) {
-                    var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
-                    d.draw(datasets[i].data(), [attrHash], [animator]);
+                    d.draw(datasets[i].data(), [attrHash], [_this._getAnimator("")]);
                 });
             };
             return AbstractPlot;
@@ -6107,9 +6153,8 @@ var Plottable;
                 var attrHash = this._generateAttrToProjector();
                 var datasets = this.datasets();
                 this._getDrawersInOrder().forEach(function (d, i) {
-                    var animator = _this._animate ? _this._getAnimator(d, i) : new Plottable.Animator.Null();
                     var pieData = _this.pie(datasets[i].data());
-                    d.draw(pieData, [attrHash], [animator]);
+                    d.draw(pieData, [attrHash], [_this._getAnimator("")]);
                 });
             };
             Pie.prototype.pie = function (d) {
@@ -6403,9 +6448,6 @@ var Plottable;
                 var positionAttr = this._isVertical ? "y" : "x";
                 var dimensionAttr = this._isVertical ? "height" : "width";
                 this._getDrawersInOrder().forEach(function (d, i) {
-                    // var dataset = datasets[i];
-                    // var bars = d._renderArea.selectAll("rect").data(dataset.data());
-                    // bars.enter().append("rect");
                     var attrToProjectors = [];
                     var animators = [];
                     if (_this._dataChanged && _this._animate) {
@@ -6416,9 +6458,6 @@ var Plottable;
                         attrToProjectors.push(resetAttrToProjector);
                     }
                     var attrToProjector = _this._generateAttrToProjector();
-                    // if (attrToProjector["fill"]) {
-                    //   bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
-                    // }
                     animators.push(_this._animate ? _this._animators["bars"] : new Plottable.Animator.Null());
                     attrToProjectors.push(attrToProjector);
                     d.draw(datasets[i].data(), attrToProjectors, animators);
@@ -6711,14 +6750,15 @@ var Plottable;
              */
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this._animators = {
-                    "line-reset": new Plottable.Animator.Null(),
-                    "line": new Plottable.Animator.Base().duration(600).easing("exp-in-out")
-                };
                 this.classed("line-plot", true);
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
                 this.project("stroke-width", function () { return "2px"; }); // default
+                this._animators["line-reset"] = new Plottable.Animator.Null();
+                this._animators["line"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
+            Line.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Line(key);
+            };
             Line.prototype._getResetYFunction = function () {
                 // gets the y-value generator for the animation start point
                 var yDomain = this._yScale.domain();
@@ -6757,21 +6797,20 @@ var Plottable;
                 attrToProjector["d"] = line;
                 var datasets = this.datasets();
                 this._getDrawersInOrder().forEach(function (d, i) {
-                    var dataset = datasets[i];
-                    var linePath;
-                    if (d._renderArea.select(".line").node()) {
-                        linePath = d._renderArea.select(".line");
-                    }
-                    else {
-                        linePath = d._renderArea.append("path").classed("line", true);
-                    }
-                    linePath.datum(dataset.data());
-                    if (_this._dataChanged) {
-                        line.y(_this._getResetYFunction());
-                        _this._applyAnimatedAttributes(linePath, "line-reset", attrToProjector);
+                    var animators = [];
+                    var attrToProjectors = [];
+                    if (_this._dataChanged && _this._animate) {
+                        var resetAttrToProjector = {};
+                        d3.keys(attrToProjector).forEach(function (key) { return resetAttrToProjector[key] = attrToProjector[key]; });
+                        var resetedLine = d3.svg.line().x(xFunction).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); }).y(_this._getResetYFunction());
+                        resetAttrToProjector["d"] = resetedLine;
+                        animators.push(_this._getAnimator("line-reset"));
+                        attrToProjectors.push(resetAttrToProjector);
                     }
                     line.y(yFunction);
-                    _this._applyAnimatedAttributes(linePath, "line", attrToProjector);
+                    animators.push(_this._getAnimator("line"));
+                    attrToProjectors.push(attrToProjector);
+                    d.draw(datasets[i].data(), attrToProjectors, animators);
                 });
             };
             Line.prototype._wholeDatumAttributes = function () {
@@ -6823,6 +6862,9 @@ var Plottable;
                     this._updateYDomainer();
                 }
             };
+            Area.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Area(key);
+            };
             Area.prototype._updateYDomainer = function () {
                 var _this = this;
                 _super.prototype._updateYDomainer.call(this);
@@ -6873,12 +6915,20 @@ var Plottable;
                 attrToProjector["d"] = area;
                 var datasets = this.datasets();
                 this._getDrawersInOrder().forEach(function (d, i) {
-                    // if (this._dataChanged) {
-                    //   area.y1(this._getResetYFunction());
-                    //   this._applyAnimatedAttributes(areaPath, "area-reset", attrToProjector);
-                    // }
-                    // area.y1(yFunction);
-                    // this._applyAnimatedAttributes(areaPath, "area", attrToProjector);
+                    var animators = [];
+                    var attrToProjectors = [];
+                    if (_this._dataChanged && _this._animate) {
+                        var resetAttrToProjector = {};
+                        d3.keys(attrToProjector).forEach(function (key) { return resetAttrToProjector[key] = attrToProjector[key]; });
+                        var resetedArea = d3.svg.area().x(xFunction).y0(y0Function).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); }).y1(_this._getResetYFunction());
+                        resetAttrToProjector["d"] = resetedArea;
+                        animators.push(_this._getAnimator("area-reset"));
+                        attrToProjectors.push(resetAttrToProjector);
+                    }
+                    area.y1(yFunction);
+                    animators.push(_this._getAnimator("area"));
+                    attrToProjectors.push(attrToProjector);
+                    d.draw(datasets[i].data(), attrToProjectors, animators);
                 });
             };
             Area.prototype._wholeDatumAttributes = function () {
@@ -7234,10 +7284,15 @@ var Plottable;
             StackedBar.prototype._setup = function () {
                 Plot.AbstractBarPlot.prototype._setup.call(this);
             };
-            StackedBar.prototype._getAnimator = function (drawer, index) {
-                var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                var scaledBaseline = primaryScale.scale(this._baselineValue);
-                return new Plottable.Animator.MovingRect(scaledBaseline, this._isVertical);
+            StackedBar.prototype._getAnimator = function (key) {
+                if (!this._animate) {
+                    return new Plottable.Animator.Null();
+                }
+                else {
+                    var primaryScale = this._isVertical ? this._yScale : this._xScale;
+                    var scaledBaseline = primaryScale.scale(this._baselineValue);
+                    return new Plottable.Animator.MovingRect(scaledBaseline, this._isVertical);
+                }
             };
             StackedBar.prototype._getDrawer = function (key) {
                 return Plot.AbstractBarPlot.prototype._getDrawer.apply(this, [key]);

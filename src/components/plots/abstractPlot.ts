@@ -111,8 +111,12 @@ export module Plot {
       return new _Drawer.AbstractDrawer(key);
     }
 
-    public _getAnimator(drawer: _Drawer.AbstractDrawer, index: number): Animator.PlotAnimator {
-      return new Animator.Null();
+    public _getAnimator(key: string): Animator.PlotAnimator {
+      if(!this._animate) {
+        return new Animator.Null();
+      } else { 
+        return this._animators[key] || new Animator.Null();
+      }
     }
 
     public _onDatasetUpdate() {
@@ -381,8 +385,7 @@ export module Plot {
       var attrHash = this._generateAttrToProjector();
       var datasets = this.datasets();
       this._getDrawersInOrder().forEach((d, i) => {
-        var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
-        d.draw(datasets[i].data(), [attrHash], [animator]);
+        d.draw(datasets[i].data(), [attrHash], [this._getAnimator("")]);
       });
     }
   }

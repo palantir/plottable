@@ -1510,6 +1510,7 @@ declare module Plottable {
              * Removes the Drawer and its renderArea
              */
             remove(): void;
+            _finishDrawing(selection: any): void;
             _getDrawSelection(data: any[]): any;
             /**
              * Draws the data into the renderArea using the attrHash for attributes
@@ -1525,7 +1526,19 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Area extends AbstractDrawer {
+        class Area extends Line {
+            _className: string;
+            _createDrawSelection(): D3.Selection;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Line extends AbstractDrawer {
+            _className: string;
+            _createDrawSelection(): D3.Selection;
             _getDrawSelection(data: any[]): any;
         }
     }
@@ -1538,6 +1551,7 @@ declare module Plottable {
             _svgElement: string;
             svgElement(tag: string): Element;
             _getDrawSelection(data: any[]): any;
+            _finishDrawing(selection: any): void;
         }
     }
 }
@@ -2471,7 +2485,7 @@ declare module Plottable {
             addDataset(dataset: any[]): AbstractPlot;
             _addDataset(key: string, dataset: Dataset): void;
             _getDrawer(key: string): _Drawer.AbstractDrawer;
-            _getAnimator(drawer: _Drawer.AbstractDrawer, index: number): Animator.PlotAnimator;
+            _getAnimator(key: string): Animator.PlotAnimator;
             _onDatasetUpdate(): void;
             /**
              * Sets an attribute of every data point.
@@ -2831,7 +2845,6 @@ declare module Plottable {
     module Plot {
         class Line<X> extends AbstractXYPlot<X, number> {
             _yScale: Scale.AbstractQuantitative<number>;
-            _animators: Animator.PlotAnimatorMap;
             /**
              * Constructs a LinePlot.
              *
@@ -2841,6 +2854,7 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
+            _getDrawer(key: string): _Drawer.Line;
             _getResetYFunction(): (d: any, i: number) => number;
             _generateAttrToProjector(): AttributeToProjector;
             _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor): boolean;
@@ -2867,6 +2881,7 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _onDatasetUpdate(): void;
+            _getDrawer(key: string): _Drawer.Area;
             _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Area<X>;
             _getResetYFunction(): AppliedAccessor;
@@ -2951,7 +2966,7 @@ declare module Plottable {
              */
             constructor(xScale?: Scale.AbstractScale<X, number>, yScale?: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             _setup(): void;
-            _getAnimator(drawer: _Drawer.AbstractDrawer, index: number): Animator.MovingRect;
+            _getAnimator(key: string): Animator.PlotAnimator;
             _getDrawer(key: string): any;
             _generateAttrToProjector(): any;
             _paint(): void;

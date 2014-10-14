@@ -15,6 +15,10 @@ export module _Drawer {
       dataElements.enter().append(this._svgElement);
       return dataElements;
     }
+
+    public _finishDrawing(selection: any) {
+      selection.exit().remove();
+    }
   }
 }
 }

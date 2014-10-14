@@ -36,6 +36,10 @@ export module Plot {
       }
     }
 
+     public _getDrawer(key: string) {
+      return new Plottable._Drawer.Area(key);
+    }
+
     public _updateYDomainer() {
       super._updateYDomainer();
 
@@ -93,14 +97,26 @@ export module Plot {
 
       var datasets = this.datasets();
       this._getDrawersInOrder().forEach((d, i) => {
-        
-        // if (this._dataChanged) {
-        //   area.y1(this._getResetYFunction());
-        //   this._applyAnimatedAttributes(areaPath, "area-reset", attrToProjector);
-        // }
+        var animators: Animator.PlotAnimator[] = [];
+        var attrToProjectors: AttributeToProjector[] = [];
 
-        // area.y1(yFunction);
-        // this._applyAnimatedAttributes(areaPath, "area", attrToProjector);
+        if (this._dataChanged && this._animate) {
+          var resetAttrToProjector: AttributeToProjector = {} 
+          d3.keys(attrToProjector).forEach((key) => resetAttrToProjector[key] = attrToProjector[key]);
+          var resetedArea = d3.svg.area()
+                  .x(xFunction)
+                  .y0(y0Function)
+                  .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction))
+                  .y1(this._getResetYFunction());
+          resetAttrToProjector["d"] = resetedArea;
+          animators.push(this._getAnimator("area-reset"));
+          attrToProjectors.push(resetAttrToProjector);
+        }
+        
+        area.y1(yFunction);
+        animators.push(this._getAnimator("area"));
+        attrToProjectors.push(attrToProjector);
+        d.draw(datasets[i].data(), attrToProjectors, animators);
       });
     }
 

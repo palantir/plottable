@@ -31,6 +31,10 @@ export module _Drawer {
       }
     }
 
+    public _finishDrawing(selection: any) {
+      // no-op
+    }
+
     public _getDrawSelection(data: any[]): any {
       return null;
     }
@@ -43,13 +47,18 @@ export module _Drawer {
      */
     public draw(data: any[], attrToProjectors: AttributeToProjector[], animators: Animator.PlotAnimator[] = []) {
       var drawSelection = this._getDrawSelection(data);
+      if(!drawSelection) {
+        return;
+      }
       if(this._className) drawSelection.classed(this._className, true);
       attrToProjectors.forEach((attrToProjector, i) => {
+        if (attrToProjector["fill"]) {
+          drawSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+        }
         var animator = animators[i] || new Animator.Null();
         animator.animate(drawSelection, attrToProjector);
       });
-
-      drawSelection.exit().remove();
+      this._finishDrawing(drawSelection);
     }
   }
 }
