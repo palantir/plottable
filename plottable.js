@@ -7009,7 +7009,7 @@ var Plottable;
             }
             AbstractStacked.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
-                if (this._projectors["x"] && this._projectors["y"]) {
+                if (this._projectors["x"] && this._projectors["y"] && (attrToSet === "x" || attrToSet === "y")) {
                     this.updateStackOffsets();
                 }
                 return this;

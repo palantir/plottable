@@ -14,7 +14,7 @@ export module Plot {
 
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
-      if (this._projectors["x"] && this._projectors["y"]) {
+      if (this._projectors["x"] && this._projectors["y"] && (attrToSet === "x" || attrToSet === "y")) {
         this.updateStackOffsets();
       }
       return this;
