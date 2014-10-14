@@ -12,7 +12,7 @@ export module Plot {
 
     public _animators: Animator.PlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
-      "bars"       : new Animator.IterativeDelay(),
+      "bars"       : new Animator.Base(),
       "baseline"   : new Animator.Null()
     };
 
