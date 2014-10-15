@@ -2613,6 +2613,68 @@ describe("Plots", function () {
             assert.strictEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -2, "positive offset was used");
             assert.strictEqual(data4[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "positive offset was used");
         });
+        it("project can be called after addDataset", function () {
+            var data1 = [
+                { a: 1, b: 2 }
+            ];
+            var data2 = [
+                { a: 1, b: 4 }
+            ];
+            stackedPlot.addDataset(data1);
+            stackedPlot.addDataset(data2);
+            assert.isTrue(isNaN(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]), "stacking is initially incorrect");
+            stackedPlot.project("x", "a");
+            stackedPlot.project("y", "b");
+            assert.strictEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 2, "stacking was done correctly");
+        });
+        it("strings are coerced to numbers for stacking", function () {
+            var data1 = [
+                { x: 1, y: "-2" }
+            ];
+            var data2 = [
+                { x: 1, y: "3" }
+            ];
+            var data3 = [
+                { x: 1, y: "-1" }
+            ];
+            var data4 = [
+                { x: 1, y: "5" }
+            ];
+            var data5 = [
+                { x: 1, y: "1" }
+            ];
+            var data6 = [
+                { x: 1, y: "-1" }
+            ];
+            stackedPlot.addDataset(data1);
+            stackedPlot.addDataset(data2);
+            stackedPlot.addDataset(data3);
+            stackedPlot.addDataset(data4);
+            stackedPlot.addDataset(data5);
+            stackedPlot.addDataset(data6);
+            assert.strictEqual(data3[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -2, "stacking on data1 numerical y value");
+            assert.strictEqual(data4[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 3, "stacking on data2 numerical y value");
+            assert.strictEqual(data5[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 8, "stacking on data1 + data3 numerical y values");
+            assert.strictEqual(data6[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "stacking on data2 + data4 numerical y values");
+            assert.deepEqual(stackedPlot.stackedExtent, [-4, 9], "stacked extent is as normal");
+        });
+        it("stacks correctly on empty data", function () {
+            var data1 = [
+            ];
+            var data2 = [
+            ];
+            stackedPlot.addDataset(data1);
+            stackedPlot.addDataset(data2);
+            assert.deepEqual(data1, [], "empty data causes no stacking to happen");
+            assert.deepEqual(data2, [], "empty data causes no stacking to happen");
+        });
+        it("does not crash on stacking no datasets", function () {
+            var data1 = [
+                { x: 1, y: -2 }
+            ];
+            stackedPlot.addDataset("a", data1);
+            assert.doesNotThrow(function () { return stackedPlot.removeDataset("a"); }, Error);
+        });
     });
 });
 
@@ -2842,6 +2904,50 @@ describe("Plots", function () {
             dataset.data(data);
             renderer.renderTo(svg);
             assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound does not change");
+            svg.remove();
+        });
+    });
+    describe("Stacked Area Plot Project", function () {
+        var svg;
+        var xScale;
+        var yScale;
+        var renderer;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        beforeEach(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Linear().domain([1, 3]);
+            yScale = new Plottable.Scale.Linear().domain([0, 4]);
+            var colorScale = new Plottable.Scale.Color("10").domain(["a", "b"]);
+            var data1 = [
+                { x: 1, yTest: 1, type: "a" },
+                { x: 3, yTest: 2, type: "a" }
+            ];
+            var data2 = [
+                { x: 1, yTest: 3, type: "b" },
+                { x: 3, yTest: 1, type: "b" }
+            ];
+            renderer = new Plottable.Plot.StackedArea(xScale, yScale);
+            renderer.project("y", "yTest", yScale);
+            renderer.addDataset(data1);
+            renderer.addDataset(data2);
+            renderer.project("fill", "type", colorScale);
+            var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+        });
+        it("renders correctly", function () {
+            var areas = renderer._renderArea.selectAll(".area");
+            var area0 = d3.select(areas[0][0]);
+            var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
+            var d0Ys = d0.slice(1, d0.length - 1).map(function (s) { return parseFloat(s.split(",")[1]); });
+            assert.strictEqual(d0Ys.indexOf(0), -1, "bottom area never touches the top");
+            var area1 = d3.select(areas[0][1]);
+            var d1 = normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
+            var d1Ys = d1.slice(1, d1.length - 1).map(function (s) { return parseFloat(s.split(",")[1]); });
+            assert.notEqual(d1Ys.indexOf(0), -1, "touches the top");
+            var domain = yScale.domain();
+            assert.strictEqual(0, domain[0], "domain starts at a min value at 0");
+            assert.strictEqual(4, domain[1], "highest area stacking is at upper limit of yScale domain");
             svg.remove();
         });
     });
@@ -3912,6 +4018,21 @@ describe("Component behavior", function () {
         assertBBoxInclusion(t.boxContainer.select(".bounding-box"), horizontalComponent._element.select(".bounding-box"));
         svg.remove();
     });
+    it("Components will not translate if they are fixed width/height and request more space than offered", function () {
+        // catches #1188
+        var c = new Plottable.Component.AbstractComponent();
+        c._requestedSpace = function () {
+            return { width: 500, height: 500, wantsWidth: true, wantsHeight: true };
+        };
+        c._fixedWidthFlag = true;
+        c._fixedHeightFlag = true;
+        c.xAlign("left");
+        var t = new Plottable.Component.Table([[c]]);
+        t.renderTo(svg);
+        var transform = d3.transform(c._element.attr("transform"));
+        assert.deepEqual(transform.translate, [0, 0], "the element was not translated");
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -4567,11 +4688,9 @@ describe("Scales", function () {
             var scale = new Plottable.Scale.Linear();
             var ticks10 = scale.ticks();
             assert.closeTo(ticks10.length, 10, 1, "defaults to (about) 10 ticks");
-            var ticks20 = scale.ticks(20);
+            scale.numTicks(20);
+            var ticks20 = scale.ticks();
             assert.closeTo(ticks20.length, 20, 1, "can request a different number of ticks");
-            scale.numTicks(5);
-            var ticks5 = scale.ticks();
-            assert.closeTo(ticks5.length, 5, 1, "can change the default number of ticks");
         });
         it("autorange defaults to [1, 10] on log scale", function () {
             var scale = new Plottable.Scale.Log();
@@ -4604,6 +4723,15 @@ describe("Scales", function () {
             plot.renderTo(svg);
             assert.deepEqual(xScale.domain(), [2, 1000], "the domain was calculated appropriately");
             svg.remove();
+        });
+        it("custom tick generator", function () {
+            var scale = new Plottable.Scale.Linear();
+            scale.domain([0, 10]);
+            var ticks = scale.ticks();
+            assert.closeTo(ticks.length, 10, 1, "ticks were generated correctly with default generator");
+            scale.tickGenerator(function (scale) { return scale.getDefaultTicks().filter(function (tick) { return tick % 3 === 0; }); });
+            ticks = scale.ticks();
+            assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
         });
     });
     describe("Ordinal Scales", function () {

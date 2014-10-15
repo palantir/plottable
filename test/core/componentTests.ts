@@ -385,4 +385,19 @@ it("components can be offset relative to their alignment, and throw errors if th
 
     svg.remove();
   });
+
+  it("Components will not translate if they are fixed width/height and request more space than offered", () => {
+    // catches #1188
+    var c: any = new Plottable.Component.AbstractComponent();
+    c._requestedSpace = () => {return {width: 500, height: 500, wantsWidth: true, wantsHeight: true};};
+    c._fixedWidthFlag = true;
+    c._fixedHeightFlag = true;
+    c.xAlign("left");
+    var t = new Plottable.Component.Table([[c]]);
+    t.renderTo(svg);
+
+    var transform = d3.transform(c._element.attr("transform"));
+    assert.deepEqual(transform.translate, [0, 0], "the element was not translated");
+    svg.remove();
+  });
 });
