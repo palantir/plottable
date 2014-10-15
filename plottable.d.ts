@@ -1531,9 +1531,10 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Area extends Path {
+        class Path extends AbstractDrawer {
             _applyData(data: any[]): void;
-            setup(): void;
+            _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor): boolean;
+            setup(area: D3.Selection): void;
             _drawStep(step: DrawStep): void;
         }
     }
@@ -1542,10 +1543,9 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Path extends AbstractDrawer {
+        class Area extends Path {
             _applyData(data: any[]): void;
-            _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor): boolean;
-            setup(area: D3.Selection): void;
+            setup(): void;
             _drawStep(step: DrawStep): void;
         }
     }

@@ -3060,57 +3060,6 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (_Drawer) {
-        var Area = (function (_super) {
-            __extends(Area, _super);
-            function Area() {
-                _super.apply(this, arguments);
-            }
-            Area.prototype._applyData = function (data) {
-                _super.prototype._applyData.call(this, data);
-                this.areaSelection.datum(data);
-            };
-            Area.prototype.setup = function () {
-                _super.prototype.setup.call(this, this._renderArea.append("path").classed(this._className, true));
-                this.areaSelection = this._renderArea.select(".area");
-            };
-            Area.prototype.createArea = function (xFunction, y0Function, y1Function) {
-                var _this = this;
-                return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, y1Function); });
-            };
-            Area.prototype._drawStep = function (step) {
-                _super.prototype._drawStep.call(this, step);
-                var attrToProjector = step.attrToProjector;
-                var xFunction = attrToProjector["x"];
-                var y0Function = attrToProjector["y0"];
-                var y1Function = attrToProjector["y"];
-                delete attrToProjector["x"];
-                delete attrToProjector["y0"];
-                delete attrToProjector["y"];
-                var area = this.createArea(xFunction, y0Function, y1Function);
-                attrToProjector["d"] = area;
-                if (attrToProjector["fill"]) {
-                    this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
-                }
-                var animator = step.animator || new Plottable.Animator.Null();
-                animator.animate(this.areaSelection, attrToProjector);
-            };
-            return Area;
-        })(_Drawer.Path);
-        _Drawer.Area = Area;
-    })(Plottable._Drawer || (Plottable._Drawer = {}));
-    var _Drawer = Plottable._Drawer;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (_Drawer) {
         var Path = (function (_super) {
             __extends(Path, _super);
             function Path() {
@@ -3150,6 +3099,57 @@ var Plottable;
             return Path;
         })(_Drawer.AbstractDrawer);
         _Drawer.Path = Path;
+    })(Plottable._Drawer || (Plottable._Drawer = {}));
+    var _Drawer = Plottable._Drawer;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (_Drawer) {
+        var Area = (function (_super) {
+            __extends(Area, _super);
+            function Area() {
+                _super.apply(this, arguments);
+            }
+            Area.prototype._applyData = function (data) {
+                _super.prototype._applyData.call(this, data);
+                this.areaSelection.datum(data);
+            };
+            Area.prototype.setup = function () {
+                _super.prototype.setup.call(this, this._renderArea.append("path").classed(this._className, true));
+                this.areaSelection = this._renderArea.select(".area");
+            };
+            Area.prototype.createArea = function (xFunction, y0Function, y1Function) {
+                var _this = this;
+                return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, y1Function); });
+            };
+            Area.prototype._drawStep = function (step) {
+                _super.prototype._drawStep.call(this, step);
+                var attrToProjector = step.attrToProjector;
+                var xFunction = attrToProjector["x"];
+                var y0Function = attrToProjector["y0"];
+                var y1Function = attrToProjector["y"];
+                delete attrToProjector["x"];
+                delete attrToProjector["y0"];
+                delete attrToProjector["y"];
+                var area = this.createArea(xFunction, y0Function, y1Function);
+                attrToProjector["d"] = area;
+                if (attrToProjector["fill"]) {
+                    this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                }
+                var animator = step.animator || new Plottable.Animator.Null();
+                animator.animate(this.areaSelection, attrToProjector);
+            };
+            return Area;
+        })(_Drawer.Path);
+        _Drawer.Area = Area;
     })(Plottable._Drawer || (Plottable._Drawer = {}));
     var _Drawer = Plottable._Drawer;
 })(Plottable || (Plottable = {}));
