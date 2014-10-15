@@ -24,22 +24,17 @@ function renderPlots(plottablePlots){
   });
 }
 
-function addAllDatasets(plot, arr, type){
+function addAllDatasets(plot, arr, numOfDatasets){
   "use strict";
 
-  if(type === "single"){
+  if(numOfDatasets === "single"){
     plot.addDataset("d1" , arr[0]);
   }
-  if(type === "multiple"){
+  if(numOfDatasets === "multiple"){
     arr.forEach(function(dataset){
       plot.addDataset(dataset);
     });
-  }
-  if(type === "stacked"){
-    arr.forEach(function(dataset){
-      plot.addDataset(dataset);
-    });
-  }
+  } 
   return plot;
 }
 
@@ -51,9 +46,8 @@ function generatePlots(plots, dataType){
   "use strict";
 
   var plottablePlots = [];
-  for(var i = 0; i < plots.length; i++){
+  plots.forEach(function(plotType){
 
-    var plotType = plots[i];
     var xScale = new Plottable.Scale.Ordinal();
     var yScale = new Plottable.Scale.Linear();
     var colorScale = new Plottable.Scale.Color();
@@ -91,7 +85,7 @@ function generatePlots(plots, dataType){
     }
 
     if(stackedPlots.indexOf(plotType) > -1){ //if stacked dataset plot
-      plot = addAllDatasets(plot, dataType[2], "stacked");
+      plot = addAllDatasets(plot, dataType[2], "multiple");
       plottablePlots.push(plot);
     }
 
@@ -107,7 +101,7 @@ function generatePlots(plots, dataType){
           .project("fill", "type", colorScale)
           .animate(true);
       
-      plot = addAllDatasets(plot, dataType[2], "stacked");
+      plot = addAllDatasets(plot, dataType[2], "multiple");
       plottablePlots.push(plot);
     }
 
@@ -116,7 +110,8 @@ function generatePlots(plots, dataType){
       plot = addAllDatasets(plot, dataType[0], "single");
       plottablePlots.push(plot);
     }
-  }
+    
+  });
   renderPlots(plottablePlots);
 }
 
