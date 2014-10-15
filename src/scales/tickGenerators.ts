@@ -20,7 +20,7 @@ module Plottable {
            throw new Error("interval must be positive number");
         }
 
-        return function(s: Scale.AbstractQuantitative<any>) {
+        return function(s: Scale.AbstractQuantitative<number>) {
           var domain = s.domain();
           var low = Math.min(domain[0], domain[1]);
           var high = Math.max(domain[0], domain[1]);

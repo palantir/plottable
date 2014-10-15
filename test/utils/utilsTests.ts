@@ -108,12 +108,21 @@ describe("_Util.Methods", () => {
     range = Plottable._Util.Methods.range(start, end, 11);
     assert.deepEqual(range, [0], "all entries has been generated");
 
-    assert.throws(() => Plottable._Util.Methods.range(start, end, 0));
+    assert.throws(() => Plottable._Util.Methods.range(start, end, 0), "incorrect step");
 
     range = Plottable._Util.Methods.range(start, end, -1);
-    assert.lengthOf(range, 0, "no enries because of invalid step");
+    assert.lengthOf(range, 0, "no entries because of invalid step");
 
     range = Plottable._Util.Methods.range(end, start, -1);
     assert.deepEqual(range, [6, 5, 4, 3, 2, 1], "all entries has been generated");
+
+    range = Plottable._Util.Methods.range(-2, 2);
+    assert.deepEqual(range, [-2, -1, 0, 1], "all entries has been generated range crossing 0");
+
+    range = Plottable._Util.Methods.range(0.2, 4);
+    assert.deepEqual(range, [0.2, 1.2, 2.2, 3.2], "all entries has been generated with float start");
+
+    range = Plottable._Util.Methods.range(0.6, 2.2, 0.5);
+    assert.deepEqual(range, [0.6, 1.1, 1.6, 2.1], "all entries has been generated with float step");
   });
 });
