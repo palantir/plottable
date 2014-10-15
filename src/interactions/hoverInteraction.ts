@@ -78,14 +78,14 @@ export module Interaction {
         return {
           data: null,
           selection: null
-        }
+        };
       }
 
       var diffSelection = A.selection.filter(notInB);
       return {
         data: diffData,
         selection: diffSelection
-      }
+      };
     }
 
     private handleHoverOver(p: Point) {
