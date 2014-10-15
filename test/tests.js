@@ -6102,10 +6102,10 @@ var TestHoverable = (function (_super) {
     function TestHoverable() {
         _super.apply(this, arguments);
     }
-    TestHoverable.prototype.hoverOver = function (p) {
+    TestHoverable.prototype.hoverOverComponent = function (p) {
         // cast-override
     };
-    TestHoverable.prototype.hoverOut = function (p) {
+    TestHoverable.prototype.hoverOutComponent = function (p) {
         // cast-override
     };
     TestHoverable.prototype.getHoverData = function (p) {

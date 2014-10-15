@@ -4,11 +4,11 @@ var assert = chai.assert;
 
 class TestHoverable extends Plottable.Component.AbstractComponent
                     implements Plottable.Interaction.Hoverable {
-  public hoverOver(p: Plottable.Point) {
+  public hoverOverComponent(p: Plottable.Point) {
     // cast-override
   }
 
-  public hoverOut(p: Plottable.Point) {
+  public hoverOutComponent(p: Plottable.Point) {
     // cast-override
   }
 

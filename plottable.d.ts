@@ -2783,8 +2783,8 @@ declare module Plottable {
              * @return {AbstractBarPlot} The calling Bar Plot.
              */
             hoverMode(mode: String): AbstractBarPlot<X, Y>;
-            hoverOver(p: Point): void;
-            hoverOut(p: Point): void;
+            hoverOverComponent(p: Point): void;
+            hoverOutComponent(p: Point): void;
             getHoverData(p: Point): Interaction.HoverData;
         }
     }
@@ -3208,8 +3208,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Interaction {
-        interface Interactable extends Component.AbstractComponent {
-        }
         class AbstractInteraction extends Core.PlottableObject {
             /**
              * It maintains a 'hitBox' which is where all event listeners are
@@ -3219,8 +3217,8 @@ declare module Plottable {
              * e.g. crosshairs.
              */
             _hitBox: D3.Selection;
-            _componentToListenTo: Interactable;
-            _anchor(component: Interactable, hitBox: D3.Selection): void;
+            _componentToListenTo: Component.AbstractComponent;
+            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
         }
     }
 }
@@ -3485,9 +3483,25 @@ declare module Plottable {
             data: any[];
             selection: D3.Selection;
         }
-        interface Hoverable extends Interactable {
-            hoverOver(p: Point): any;
-            hoverOut(p: Point): any;
+        interface Hoverable extends Component.AbstractComponent {
+            /**
+             * Called when the user first mouses over the Component.
+             *
+             * @param {Point} The cursor's position relative to the Component's origin.
+             */
+            hoverOverComponent(p: Point): void;
+            /**
+             * Called when the user mouses out of the Component.
+             *
+             * @param {Point} The cursor's position relative to the Component's origin.
+             */
+            hoverOutComponent(p: Point): void;
+            /**
+             * Get the HoverData associated with the given position.
+             *
+             * @param {Point} The cursor's position relative to the Component's origin.
+             * @return {HoverData}
+             */
             getHoverData(p: Point): HoverData;
         }
         class Hover extends AbstractInteraction {
@@ -3509,6 +3523,12 @@ declare module Plottable {
              * @return {Interaction.Hover} The calling Interaction.Hover.
              */
             onHoverOut(callback: (hoverData: HoverData) => any): Hover;
+            /**
+             * Retrieves the HoverData associated with the elements the user is currently hovering over.
+             *
+             * @return {HoverData} The data and selection corresponding to the elements
+             *                     the user is currently hovering over.
+             */
             getCurrentlyHovered(): HoverData;
         }
     }

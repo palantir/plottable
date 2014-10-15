@@ -7,9 +7,25 @@ export module Interaction {
     selection: D3.Selection;
   }
 
-  export interface Hoverable extends Interactable {
-    hoverOver(p: Point): any;
-    hoverOut(p: Point): any;
+  export interface Hoverable extends Component.AbstractComponent {
+    /**
+     * Called when the user first mouses over the Component.
+     *
+     * @param {Point} The cursor's position relative to the Component's origin.
+     */
+    hoverOverComponent(p: Point): void;
+    /**
+     * Called when the user mouses out of the Component.
+     *
+     * @param {Point} The cursor's position relative to the Component's origin.
+     */
+    hoverOutComponent(p: Point): void;
+    /**
+     * Get the HoverData associated with the given position.
+     *
+     * @param {Point} The cursor's position relative to the Component's origin.
+     * @return {HoverData}
+     */
     getHoverData(p: Point): HoverData;
   }
 
@@ -29,13 +45,17 @@ export module Interaction {
       this.dispatcher = new Dispatcher.Mouse(this._hitBox);
 
       this.dispatcher.mouseover((p: Point) => {
-        this._componentToListenTo.hoverOver(p);
+        this._componentToListenTo.hoverOverComponent(p);
         this.handleHoverOver(p);
       });
 
       this.dispatcher.mouseout((p: Point) => {
-        this._componentToListenTo.hoverOut(p);
-        this.safeHoverOut();
+        this._componentToListenTo.hoverOutComponent(p);
+        this.safeHoverOut(this.lastHoverData);
+        this.lastHoverData = {
+          data: null,
+          selection: null
+        };
       });
 
       this.dispatcher.mousemove((p: Point) => this.handleHoverOver(p));
@@ -43,52 +63,53 @@ export module Interaction {
       this.dispatcher.connect();
     }
 
+    /**
+     * Returns a HoverData consisting of all data and selections in A but not in B.
+     */
+    private diffHoverData(A: HoverData, B: HoverData): HoverData {
+      if (A.data == null || B.data == null) {
+        return A;
+      }
+
+      var notInB = (d: any) => B.data.indexOf(d) === -1;
+
+      var diffData = A.data.filter(notInB);
+      if (diffData.length === 0) {
+        return {
+          data: null,
+          selection: null
+        }
+      }
+
+      var diffSelection = A.selection.filter(notInB);
+      return {
+        data: diffData,
+        selection: diffSelection
+      }
+    }
+
     private handleHoverOver(p: Point) {
       var newHoverData = this._componentToListenTo.getHoverData(p);
 
-      if (newHoverData.data == null) {
-        this.safeHoverOut();
-      } else {
-        var overData = newHoverData.data;
-        var overSelection = newHoverData.selection;
+      var outData = this.diffHoverData(this.lastHoverData, newHoverData);
+      this.safeHoverOut(outData);
 
-        if (this.lastHoverData.data != null) {
-          var wasHoveredOut = (d: any) => newHoverData.data.indexOf(d) === -1;
-          var outData = this.lastHoverData.data.filter(wasHoveredOut);
-          if (outData.length > 0) {
-            var outSelection = this.lastHoverData.selection.filter(wasHoveredOut);
-            if (this.hoverOutCallback) {
-              this.hoverOutCallback({
-                data: outData,
-                selection: outSelection
-              });
-            }
-          }
-
-          var newlyHoveredOver = (d: any) => this.lastHoverData.data.indexOf(d) === -1;
-          overData = newHoverData.data.filter(newlyHoveredOver);
-          overSelection = newHoverData.selection.filter(newlyHoveredOver);
-        }
-
-        if (this.hoverOverCallback && overData.length > 0) {
-          this.hoverOverCallback({
-            data: overData,
-            selection: overSelection
-          });
-        }
-      }
+      var overData = this.diffHoverData(newHoverData, this.lastHoverData);
+      this.safeHoverOver(overData);
 
       this.lastHoverData = newHoverData;
     }
 
-    private safeHoverOut() {
-      if (this.hoverOutCallback && this.lastHoverData.data != null) {
-        this.hoverOutCallback(this.lastHoverData);
+    private safeHoverOut(outData: HoverData) {
+      if (this.hoverOutCallback && outData.data) {
+        this.hoverOutCallback(outData);
       }
-      this.lastHoverData = {
-        data: null,
-        selection: null
-      };
+    }
+
+    private safeHoverOver(overData: HoverData) {
+      if (this.hoverOverCallback && overData.data) {
+        this.hoverOverCallback(overData);
+      }
     }
 
     /**
@@ -115,6 +136,12 @@ export module Interaction {
       return this;
     }
 
+    /**
+     * Retrieves the HoverData associated with the elements the user is currently hovering over.
+     *
+     * @return {HoverData} The data and selection corresponding to the elements
+     *                     the user is currently hovering over.
+     */
     public getCurrentlyHovered(): HoverData {
       return this.lastHoverData;
     }

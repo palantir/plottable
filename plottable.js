@@ -6596,27 +6596,27 @@ var Plottable;
                 return this;
             };
             //===== Hover logic =====
-            AbstractBarPlot.prototype.hoverOver = function (p) {
+            AbstractBarPlot.prototype.hoverOverComponent = function (p) {
                 // no-op
             };
-            AbstractBarPlot.prototype.hoverOut = function (p) {
+            AbstractBarPlot.prototype.hoverOutComponent = function (p) {
                 this._getDrawersInOrder().forEach(function (d, i) {
                     d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
                 });
             };
             AbstractBarPlot.prototype.getHoverData = function (p) {
-                var x = p.x;
-                var y = p.y;
+                var xPositionOrExtent = p.x;
+                var yPositionOrExtent = p.y;
                 if (this._hoverMode === "line") {
                     var maxExtent = { min: -Infinity, max: Infinity };
                     if (this._isVertical) {
-                        y = maxExtent;
+                        yPositionOrExtent = maxExtent;
                     }
                     else {
-                        x = maxExtent;
+                        xPositionOrExtent = maxExtent;
                     }
                 }
-                var selectedBars = this.selectBar(x, y, false);
+                var selectedBars = this.selectBar(xPositionOrExtent, yPositionOrExtent, false);
                 if (selectedBars) {
                     this._getDrawersInOrder().forEach(function (d, i) {
                         d._renderArea.selectAll("rect").classed("hovered", false).classed("not-hovered", true);
@@ -6624,7 +6624,7 @@ var Plottable;
                     selectedBars.classed("hovered", true).classed("not-hovered", false);
                 }
                 else {
-                    this.hoverOut(p);
+                    this.hoverOutComponent(p);
                 }
                 return {
                     data: selectedBars ? selectedBars.data() : null,
@@ -8274,58 +8274,58 @@ var Plottable;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this.dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
                 this.dispatcher.mouseover(function (p) {
-                    _this._componentToListenTo.hoverOver(p);
+                    _this._componentToListenTo.hoverOverComponent(p);
                     _this.handleHoverOver(p);
                 });
                 this.dispatcher.mouseout(function (p) {
-                    _this._componentToListenTo.hoverOut(p);
-                    _this.safeHoverOut();
+                    _this._componentToListenTo.hoverOutComponent(p);
+                    _this.safeHoverOut(_this.lastHoverData);
+                    _this.lastHoverData = {
+                        data: null,
+                        selection: null
+                    };
                 });
                 this.dispatcher.mousemove(function (p) { return _this.handleHoverOver(p); });
                 this.dispatcher.connect();
             };
+            /**
+             * Returns a HoverData consisting of all data and selections in A but not in B.
+             */
+            Hover.prototype.diffHoverData = function (A, B) {
+                if (A.data == null || B.data == null) {
+                    return A;
+                }
+                var notInB = function (d) { return B.data.indexOf(d) === -1; };
+                var diffData = A.data.filter(notInB);
+                if (diffData.length === 0) {
+                    return {
+                        data: null,
+                        selection: null
+                    };
+                }
+                var diffSelection = A.selection.filter(notInB);
+                return {
+                    data: diffData,
+                    selection: diffSelection
+                };
+            };
             Hover.prototype.handleHoverOver = function (p) {
-                var _this = this;
                 var newHoverData = this._componentToListenTo.getHoverData(p);
-                if (newHoverData.data == null) {
-                    this.safeHoverOut();
-                }
-                else {
-                    var overData = newHoverData.data;
-                    var overSelection = newHoverData.selection;
-                    if (this.lastHoverData.data != null) {
-                        var wasHoveredOut = function (d) { return newHoverData.data.indexOf(d) === -1; };
-                        var outData = this.lastHoverData.data.filter(wasHoveredOut);
-                        if (outData.length > 0) {
-                            var outSelection = this.lastHoverData.selection.filter(wasHoveredOut);
-                            if (this.hoverOutCallback) {
-                                this.hoverOutCallback({
-                                    data: outData,
-                                    selection: outSelection
-                                });
-                            }
-                        }
-                        var newlyHoveredOver = function (d) { return _this.lastHoverData.data.indexOf(d) === -1; };
-                        overData = newHoverData.data.filter(newlyHoveredOver);
-                        overSelection = newHoverData.selection.filter(newlyHoveredOver);
-                    }
-                    if (this.hoverOverCallback && overData.length > 0) {
-                        this.hoverOverCallback({
-                            data: overData,
-                            selection: overSelection
-                        });
-                    }
-                }
+                var outData = this.diffHoverData(this.lastHoverData, newHoverData);
+                this.safeHoverOut(outData);
+                var overData = this.diffHoverData(newHoverData, this.lastHoverData);
+                this.safeHoverOver(overData);
                 this.lastHoverData = newHoverData;
             };
-            Hover.prototype.safeHoverOut = function () {
-                if (this.hoverOutCallback && this.lastHoverData.data != null) {
-                    this.hoverOutCallback(this.lastHoverData);
+            Hover.prototype.safeHoverOut = function (outData) {
+                if (this.hoverOutCallback && outData.data) {
+                    this.hoverOutCallback(outData);
                 }
-                this.lastHoverData = {
-                    data: null,
-                    selection: null
-                };
+            };
+            Hover.prototype.safeHoverOver = function (overData) {
+                if (this.hoverOverCallback && overData.data) {
+                    this.hoverOverCallback(overData);
+                }
             };
             /**
              * Attaches an callback to be called when the user mouses over an element.
@@ -8349,6 +8349,12 @@ var Plottable;
                 this.hoverOutCallback = callback;
                 return this;
             };
+            /**
+             * Retrieves the HoverData associated with the elements the user is currently hovering over.
+             *
+             * @return {HoverData} The data and selection corresponding to the elements
+             *                     the user is currently hovering over.
+             */
             Hover.prototype.getCurrentlyHovered = function () {
                 return this.lastHoverData;
             };

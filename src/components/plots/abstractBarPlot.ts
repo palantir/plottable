@@ -298,28 +298,28 @@ export module Plot {
     }
 
     //===== Hover logic =====
-    public hoverOver(p: Point) {
+    public hoverOverComponent(p: Point) {
       // no-op
     }
 
-    public hoverOut(p: Point) {
+    public hoverOutComponent(p: Point) {
       this._getDrawersInOrder().forEach((d, i) => {
         d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
       });
     }
 
     public getHoverData(p: Point): Interaction.HoverData {
-      var x: any = p.x;
-      var y: any = p.y;
+      var xPositionOrExtent: any = p.x;
+      var yPositionOrExtent: any = p.y;
       if (this._hoverMode === "line") {
         var maxExtent: Extent = { min: -Infinity, max: Infinity };
         if (this._isVertical) {
-          y = maxExtent;
+          yPositionOrExtent = maxExtent;
         } else {
-          x = maxExtent;
+          xPositionOrExtent = maxExtent;
         }
       }
-      var selectedBars = this.selectBar(x, y, false);
+      var selectedBars = this.selectBar(xPositionOrExtent, yPositionOrExtent, false);
 
       if (selectedBars) {
         this._getDrawersInOrder().forEach((d, i) => {
@@ -327,7 +327,7 @@ export module Plot {
         });
         selectedBars.classed("hovered", true).classed("not-hovered", false);
       } else {
-        this.hoverOut(p);
+        this.hoverOutComponent(p);
       }
       return {
         data: selectedBars ? selectedBars.data() : null,

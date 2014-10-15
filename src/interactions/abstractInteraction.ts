@@ -2,10 +2,6 @@
 
 module Plottable {
 export module Interaction {
-  export interface Interactable extends Component.AbstractComponent {
-    // no features
-  }
-
   export class AbstractInteraction extends Core.PlottableObject {
     /**
      * It maintains a 'hitBox' which is where all event listeners are
@@ -15,9 +11,9 @@ export module Interaction {
      * e.g. crosshairs.
      */
     public _hitBox: D3.Selection;
-    public _componentToListenTo: Interaction.Interactable;
+    public _componentToListenTo: Component.AbstractComponent;
 
-    public _anchor(component: Interaction.Interactable, hitBox: D3.Selection) {
+    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       this._componentToListenTo = component;
       this._hitBox = hitBox;
     }
