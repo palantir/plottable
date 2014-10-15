@@ -73,6 +73,41 @@ describe("Plots", () => {
       assert.strictEqual((<any> data4[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "positive offset was used");
     });
 
+    it("strings are coerced to numbers for stacking", () => {
+      var data1 = [
+        {x: 1, y: "-2"}
+      ];
+      var data2 = [
+        {x: 1, y: "3"}
+      ];
+      var data3 = [
+        {x: 1, y: "-1"}
+      ];
+      var data4 = [
+        {x: 1, y: "5"}
+      ];
+      var data5 = [
+        {x: 1, y: "1"}
+      ];
+      var data6 = [
+        {x: 1, y: "-1"}
+      ];
+
+      stackedPlot.addDataset(data1);
+      stackedPlot.addDataset(data2);
+      stackedPlot.addDataset(data3);
+      stackedPlot.addDataset(data4);
+      stackedPlot.addDataset(data5);
+      stackedPlot.addDataset(data6);
+
+      assert.strictEqual((<any> data3[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -2, "stacking on data1 numerical y value");
+      assert.strictEqual((<any> data4[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 3, "stacking on data2 numerical y value");
+      assert.strictEqual((<any> data5[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 8, "stacking on data1 + data3 numerical y values");
+      assert.strictEqual((<any> data6[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "stacking on data2 + data4 numerical y values");
+
+      assert.deepEqual((<any> stackedPlot).stackedExtent, [-4, 9], "stacked extent is as normal");
+    });
+
     it("stacks correctly on empty data", () => {
       var data1: any[] = [
       ];

@@ -45,13 +45,13 @@ export module Plot {
       var valueAccessor = this.valueAccessor();
       var maxStackExtent = _Util.Methods.max(datasets, (dataset: Dataset) => {
         return _Util.Methods.max(dataset.data(), (datum: any) => {
-          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+          return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
         });
       });
 
       var minStackExtent = _Util.Methods.min(datasets, (dataset: Dataset) => {
         return _Util.Methods.min(dataset.data(), (datum: any) => {
-          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+          return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
         });
       });
 
@@ -74,7 +74,7 @@ export module Plot {
 
       d3.layout.stack()
                .x((d) => d.key)
-               .y((d) => d.value)
+               .y((d) => +d.value)
                .values((d) => this.getDomainKeys().map((domainKey) => d.get(domainKey)))
                .out(outFunction)(dataArray);
 

@@ -70,7 +70,6 @@
 /// <reference path="core/animator.ts" />
 /// <reference path="animators/nullAnimator.ts" />
 /// <reference path="animators/baseAnimator.ts" />
-/// <reference path="animators/iterativeDelayAnimator.ts" />
 /// <reference path="animators/rectAnimator.ts" />
 /// <reference path="animators/movingRectAnimator.ts" />
 

@@ -62,7 +62,7 @@ export module Plot {
       var attrToProjector = super._generateAttrToProjector();
       var xFunction = attrToProjector["x"];
       var yAccessor = this._projectors["y"].accessor;
-      var yFunction = (d: any) => this._yScale.scale(yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var yFunction = (d: any) => this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
       var y0Function = (d: any) => this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
       delete attrToProjector["x"];
