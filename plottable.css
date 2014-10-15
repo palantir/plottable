@@ -3,46 +3,6 @@ svg.plottable {
   display : block; /* SVGs must be block elements for width/height calculations to work in Firefox. */
 }
 
-.plottable-color-0 {
-  color: #5279c7; /* INDIGO */
-}
-
-.plottable-color-1 {
-  color: #fd373e; /* CORAL_RED */
-}
-
-.plottable-color-2 {
-  color: #63c261; /* FERN */
-}
-
-.plottable-color-3 {
-  color: #fad419; /* BRIGHT_SUN */
-}
-
-.plottable-color-4 {
-  color: #2c2b6f; /* JACARTA */
-}
-
-.plottable-color-5 {
-  color: #ff7939; /* BURNING_ORANGE */
-}
-
-.plottable-color-6 {
-  color: #db2e65; /* CERISE_RED */
-}
-
-.plottable-color-7 {
-  color: #99ce50; /* CONIFER */
-}
-
-.plottable-color-8 {
-  color: #962565; /* ROYAL_HEATH */
-}
-
-.plottable-color-9 {
-  color: #06cccc; /* ROBINS_EGG_BLUE */
-}
-
 .plottable .bounding-box {
   /* Invisible pink bounding-box to allow for collision testing */
   fill: pink;
