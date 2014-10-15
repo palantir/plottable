@@ -11,18 +11,25 @@ describe("Tick generators", () => {
       assert.deepEqual(ticks, [0.5, 1, 2, 3, 4, 4.01], "generated ticks contains all possible ticks within range");
     });
 
-    it("reversed domain", () => {
-      var start = -2.2, end = -7.5, interval = 2.5;
+    it("domain crossing 0", () => {
+      var start = -1.5, end = 1, interval = 0.5;
       var scale = new Plottable.Scale.Linear().domain([start, end]);
       var ticks = Plottable.Scale.TickGenerators.intervalTickGenerator(interval)(scale);
-      assert.deepEqual(ticks, [-7.5, -5, -2.5, -2.2], "generated ticks contains all possible ticks within range");
+      assert.deepEqual(ticks, [-1.5, -1, -0.5, 0, 0.5, 1], "generated all number divisible by 0.5 in domain");
+    });
+
+    it("generate ticks with reversed domain", () => {
+      var start = -2.2, end = -7.6, interval = 2.5;
+      var scale = new Plottable.Scale.Linear().domain([start, end]);
+      var ticks = Plottable.Scale.TickGenerators.intervalTickGenerator(interval)(scale);
+      assert.deepEqual(ticks, [-7.6, -7.5, -5, -2.5, -2.2], "generated all ticks between lower and higher value");
     });
 
     it("passing big interval", () => {
       var start = 0.5, end = 10.01, interval = 11;
       var scale = new Plottable.Scale.Linear().domain([start, end]);
       var ticks = Plottable.Scale.TickGenerators.intervalTickGenerator(interval)(scale);
-      assert.deepEqual(ticks, [0.5, 10.01], "generated ticks contains all possible ticks within range");
+      assert.deepEqual(ticks, [0.5, 10.01], "no middle ticks were added");
     });
 
     it("passing non positive interval", () => {
