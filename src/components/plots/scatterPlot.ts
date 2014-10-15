@@ -6,7 +6,7 @@ export module Plot {
 
     public _animators: Animator.PlotAnimatorMap = {
       "circles-reset" : new Animator.Null(),
-      "circles"       : new Animator.IterativeDelay()
+      "circles"       : new Animator.Base()
         .duration(250)
         .delay(5)
     };
