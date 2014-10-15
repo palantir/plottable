@@ -1323,50 +1323,6 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    (function (TickGenerators) {
-        /**
-         * Creates a tick generator using the specified interval.
-         *
-         * Generates ticks at multiples of the interval while also including the domain boundaries.
-         *
-         * @param {number} interval The interval between two ticks (not including the end ticks).
-         *
-         * @returns {TickGenerator} A tick generator using the specified interval.
-         */
-        function intervalTickGenerator(interval) {
-            if (interval <= 0) {
-                throw new Error("interval must be positive number");
-            }
-            return function (s) {
-                var domain = s.domain();
-                var firstTick;
-                var generatedTicks = [];
-                if (domain[0] <= domain[1]) {
-                    firstTick = Math.ceil(domain[0] / interval) * interval;
-                }
-                else {
-                    firstTick = Math.floor(domain[0] / interval) * interval;
-                    interval = -interval;
-                }
-                var numTicks = Math.max(Math.floor((domain[1] - firstTick) / interval) + 1, 0);
-                if (domain[0] % interval !== 0) {
-                    generatedTicks.push(domain[0]);
-                }
-                Plottable._Util.Methods.range(0, numTicks).forEach(function (t) { return generatedTicks.push(firstTick + t * interval); });
-                if (domain[1] % interval !== 0) {
-                    generatedTicks.push(domain[1]);
-                }
-                return generatedTicks;
-            };
-        }
-        TickGenerators.intervalTickGenerator = intervalTickGenerator;
-    })(Plottable.TickGenerators || (Plottable.TickGenerators = {}));
-    var TickGenerators = Plottable.TickGenerators;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
     Plottable.version = "0.33.0";
 })(Plottable || (Plottable = {}));
 
@@ -3050,6 +3006,43 @@ var Plottable;
         _Util.ScaleDomainCoordinator = ScaleDomainCoordinator;
     })(Plottable._Util || (Plottable._Util = {}));
     var _Util = Plottable._Util;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Scale) {
+        (function (TickGenerators) {
+            /**
+             * Creates a tick generator using the specified interval.
+             *
+             * Generates ticks at multiples of the interval while also including the domain boundaries.
+             *
+             * @param {number} interval The interval between two ticks (not including the end ticks).
+             *
+             * @returns {TickGenerator} A tick generator using the specified interval.
+             */
+            function intervalTickGenerator(interval) {
+                if (interval <= 0) {
+                    throw new Error("interval must be positive number");
+                }
+                return function (s) {
+                    var domain = s.domain();
+                    var low = Math.min(domain[0], domain[1]);
+                    var high = Math.max(domain[0], domain[1]);
+                    var firstTick = Math.ceil(low / interval) * interval;
+                    var numTicks = Math.max(Math.floor((high - firstTick) / interval) + 1, 0);
+                    var lowTicks = low % interval === 0 ? [] : [low];
+                    var middleTicks = Plottable._Util.Methods.range(0, numTicks).map(function (t) { return firstTick + t * interval; });
+                    var highTicks = high % interval === 0 ? [] : [high];
+                    return lowTicks.concat(middleTicks).concat(highTicks);
+                };
+            }
+            TickGenerators.intervalTickGenerator = intervalTickGenerator;
+        })(Scale.TickGenerators || (Scale.TickGenerators = {}));
+        var TickGenerators = Scale.TickGenerators;
+    })(Plottable.Scale || (Plottable.Scale = {}));
+    var Scale = Plottable.Scale;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />

@@ -4963,6 +4963,36 @@ describe("TimeScale tests", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("Tick generators", function () {
+    describe("interval", function () {
+        it("generate ticks within domain", function () {
+            var start = 0.5, end = 4.01, interval = 1;
+            var scale = new Plottable.Scale.Linear().domain([start, end]);
+            var ticks = Plottable.Scale.TickGenerators.intervalTickGenerator(interval)(scale);
+            assert.deepEqual(ticks, [0.5, 1, 2, 3, 4, 4.01], "generated ticks contains all possible ticks within range");
+        });
+        it("reversed domain", function () {
+            var start = -2.2, end = -7.5, interval = 2.5;
+            var scale = new Plottable.Scale.Linear().domain([start, end]);
+            var ticks = Plottable.Scale.TickGenerators.intervalTickGenerator(interval)(scale);
+            assert.deepEqual(ticks, [-7.5, -5, -2.5, -2.2], "generated ticks contains all possible ticks within range");
+        });
+        it("passing big interval", function () {
+            var start = 0.5, end = 10.01, interval = 11;
+            var scale = new Plottable.Scale.Linear().domain([start, end]);
+            var ticks = Plottable.Scale.TickGenerators.intervalTickGenerator(interval)(scale);
+            assert.deepEqual(ticks, [0.5, 10.01], "generated ticks contains all possible ticks within range");
+        });
+        it("passing non positive interval", function () {
+            var scale = new Plottable.Scale.Linear().domain([0, 1]);
+            assert.throws(function () { return Plottable.Scale.TickGenerators.intervalTickGenerator(0); }, Error);
+            assert.throws(function () { return Plottable.Scale.TickGenerators.intervalTickGenerator(-2); }, Error);
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("_Util.DOM", function () {
     it("getBBox works properly", function () {
         var svg = generateSVG();
@@ -5711,97 +5741,18 @@ describe("_Util.Methods", function () {
     });
     it("range works as expected", function () {
         var start = 0;
-        var end = 10;
-        var step = 1;
+        var end = 6;
         var range = Plottable._Util.Methods.range(start, end);
-        var lastVal = start - step;
-        range.forEach(function (t) {
-            assert.operator(t, ">=", start, "entry is not less then start");
-            assert.operator(t, "<=", end, "entry is not greater then end");
-            assert.equal(t - lastVal, step, "step requirment is met");
-            lastVal = t;
-        });
-        assert.lengthOf(range, 10, "all entries has been generated");
-        step = 3;
-        range = Plottable._Util.Methods.range(start, end, step);
-        lastVal = start - step;
-        range.forEach(function (t) {
-            assert.operator(t, ">=", start, "entry is not less then start");
-            assert.operator(t, "<=", end, "entry is not greater then end");
-            assert.equal(t - lastVal, step, "step requirment is met");
-            lastVal = t;
-        });
-        assert.lengthOf(range, 4, "all entries has been generated");
-        step = 11;
-        range = Plottable._Util.Methods.range(start, end, step);
-        assert.lengthOf(range, 1, "all entries has been generated");
-        step = 0;
-        assert.throws(function () { return Plottable._Util.Methods.range(start, end, step); });
-        step = -1;
-        range = Plottable._Util.Methods.range(start, end, step);
+        assert.deepEqual(range, [0, 1, 2, 3, 4, 5], "all entries has been generated");
+        range = Plottable._Util.Methods.range(start, end, 2);
+        assert.deepEqual(range, [0, 2, 4], "all entries has been generated");
+        range = Plottable._Util.Methods.range(start, end, 11);
+        assert.deepEqual(range, [0], "all entries has been generated");
+        assert.throws(function () { return Plottable._Util.Methods.range(start, end, 0); });
+        range = Plottable._Util.Methods.range(start, end, -1);
         assert.lengthOf(range, 0, "no enries because of invalid step");
-        step = -1;
-        range = Plottable._Util.Methods.range(end, start, step);
-        lastVal = end - step;
-        range.forEach(function (t) {
-            assert.operator(t, ">=", start, "entry is not less then start");
-            assert.operator(t, "<=", end, "entry is not greater then end");
-            assert.equal(t - lastVal, step, "step requirment is met");
-            lastVal = t;
-        });
-        assert.lengthOf(range, 10, "all entries has been generated");
-    });
-});
-
-///<reference path="../testReference.ts" />
-var assert = chai.assert;
-describe("Tick generators", function () {
-    describe("interval", function () {
-        it("generate ticks within domain", function () {
-            var start = 0.5, end = 10.01, interval = 1;
-            var scale = new Plottable.Scale.Linear().domain([start, end]);
-            var ticks = Plottable.TickGenerators.intervalTickGenerator(interval)(scale);
-            var lastValue = 0;
-            ticks.forEach(function (t) {
-                assert.operator(t, ">=", start, "entry is not less then start");
-                assert.operator(t, "<=", end, "entry is not greater then end");
-                assert.operator(t, ">", lastValue, "entries are in ascending order");
-                assert.isTrue(t % interval === 0 || t === start || t === end, "entry is generated using interval or it is either ends");
-                lastValue = t;
-            });
-            assert.include(ticks, start, "generated ticks contains start");
-            assert.include(ticks, end, "generated ticks contains end");
-            assert.lengthOf(ticks, 12, "generated ticks contains all possible ticks within range");
-        });
-        it("reversed domain", function () {
-            var start = -2.2, end = -12.5, interval = 2.5;
-            var scale = new Plottable.Scale.Linear().domain([start, end]);
-            var ticks = Plottable.TickGenerators.intervalTickGenerator(interval)(scale);
-            var lastValue = 0;
-            ticks.forEach(function (t) {
-                assert.operator(t, "<=", start, "entry is not greater then start");
-                assert.operator(t, ">=", end, "entry is not less then end");
-                assert.operator(t, "<", lastValue, "entries are in descending order");
-                assert.isTrue(t % interval === 0 || t === start || t === end, "entry is generated using interval or it is either ends");
-                lastValue = t;
-            });
-            assert.include(ticks, start, "generated ticks contains start");
-            assert.include(ticks, end, "generated ticks contains end");
-            assert.lengthOf(ticks, 6, "generated ticks contains all possible ticks within range");
-        });
-        it("passing big interval", function () {
-            var start = 0.5, end = 10.01, interval = 11;
-            var scale = new Plottable.Scale.Linear().domain([start, end]);
-            var ticks = Plottable.TickGenerators.intervalTickGenerator(interval)(scale);
-            assert.include(ticks, start, "generated ticks contains start");
-            assert.include(ticks, end, "generated ticks contains end");
-            assert.lengthOf(ticks, 2, "generated ticks contains all possible ticks within range");
-        });
-        it("passing non positive interval", function () {
-            var scale = new Plottable.Scale.Linear().domain([0, 1]);
-            assert.throws(function () { return Plottable.TickGenerators.intervalTickGenerator(0); }, Error);
-            assert.throws(function () { return Plottable.TickGenerators.intervalTickGenerator(-2); }, Error);
-        });
+        range = Plottable._Util.Methods.range(end, start, -1);
+        assert.deepEqual(range, [6, 5, 4, 3, 2, 1], "all entries has been generated");
     });
 });
 

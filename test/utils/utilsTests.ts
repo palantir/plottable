@@ -98,52 +98,22 @@ describe("_Util.Methods", () => {
 
   it("range works as expected", () => {
     var start = 0;
-    var end = 10;
-    var step = 1;
+    var end = 6;
     var range = Plottable._Util.Methods.range(start, end);
+    assert.deepEqual(range, [0, 1, 2, 3, 4, 5], "all entries has been generated");
 
-    var lastVal = start - step;
-    range.forEach(t => {
-      assert.operator(t, ">=", start,"entry is not less then start");
-      assert.operator(t, "<=", end, "entry is not greater then end");
-      assert.equal(t - lastVal, step, "step requirment is met");
-      lastVal = t;
-    });
-    assert.lengthOf(range, 10, "all entries has been generated");
+    range = Plottable._Util.Methods.range(start, end, 2);
+    assert.deepEqual(range, [0, 2, 4], "all entries has been generated");
 
-    step = 3;
-    range = Plottable._Util.Methods.range(start, end, step);
+    range = Plottable._Util.Methods.range(start, end, 11);
+    assert.deepEqual(range, [0], "all entries has been generated");
 
-    lastVal = start - step;
-    range.forEach(t => {
-      assert.operator(t, ">=", start, "entry is not less then start");
-      assert.operator(t, "<=", end,   "entry is not greater then end");
-      assert.equal(t - lastVal, step, "step requirment is met");
-      lastVal = t;
-    });
-    assert.lengthOf(range, 4, "all entries has been generated");
+    assert.throws(() => Plottable._Util.Methods.range(start, end, 0));
 
-    step = 11;
-    range = Plottable._Util.Methods.range(start, end, step);
-    assert.lengthOf(range, 1, "all entries has been generated");
-
-    step = 0;
-    assert.throws(() => Plottable._Util.Methods.range(start, end, step));
-
-    step = -1;
-    range = Plottable._Util.Methods.range(start, end, step);
+    range = Plottable._Util.Methods.range(start, end, -1);
     assert.lengthOf(range, 0, "no enries because of invalid step");
 
-    step = -1;
-    range = Plottable._Util.Methods.range(end, start, step);
-
-    lastVal = end - step;
-    range.forEach(t => {
-      assert.operator(t, ">=", start,"entry is not less then start");
-      assert.operator(t, "<=", end, "entry is not greater then end");
-      assert.equal(t - lastVal, step, "step requirment is met");
-      lastVal = t;
-    });
-    assert.lengthOf(range, 10, "all entries has been generated");
+    range = Plottable._Util.Methods.range(end, start, -1);
+    assert.deepEqual(range, [6, 5, 4, 3, 2, 1], "all entries has been generated");
   });
 });

@@ -8,7 +8,6 @@
 /// <reference path="utils/domUtils.ts" />
 
 /// <reference path="utils/formatters.ts" />
-/// <reference path="utils/tickGenerators.ts" />
 
 /// <reference path="core/version.ts" />
 /// <reference path="core/colors.ts" />
@@ -32,6 +31,7 @@
 /// <reference path="scales/timeScale.ts" />
 /// <reference path="scales/interpolatedColorScale.ts" />
 /// <reference path="scales/scaleDomainCoordinator.ts" />
+/// <reference path="scales/tickGenerators.ts" />
 
 /// <reference path="drawers/abstractDrawer.ts" />
 /// <reference path="drawers/arcDrawer.ts" />

@@ -480,22 +480,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module TickGenerators {
-        /**
-         * Creates a tick generator using the specified interval.
-         *
-         * Generates ticks at multiples of the interval while also including the domain boundaries.
-         *
-         * @param {number} interval The interval between two ticks (not including the end ticks).
-         *
-         * @returns {TickGenerator} A tick generator using the specified interval.
-         */
-        function intervalTickGenerator(interval: number): Scale.TickGenerator<number>;
-    }
-}
-
-
-declare module Plottable {
     var version: string;
 }
 
@@ -1095,9 +1079,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        interface TickGenerator<D> {
-            (scale: AbstractQuantitative<D>): D[];
-        }
         class AbstractQuantitative<D> extends AbstractScale<D, number> {
             _d3Scale: D3.Scale.QuantitativeScale;
             _numTicks: number;
@@ -1105,7 +1086,7 @@ declare module Plottable {
             _userSetDomainer: boolean;
             _domainer: Domainer;
             _typeCoercer: (d: any) => number;
-            _tickGenerator: TickGenerator<D>;
+            _tickGenerator: TickGenerators.TickGenerator<D>;
             /**
              * Constructs a new QuantitativeScale.
              *
@@ -1214,14 +1195,14 @@ declare module Plottable {
              *
              * @returns {TickGenerator} The current tick generator.
              */
-            tickGenerator(): TickGenerator<D>;
+            tickGenerator(): TickGenerators.TickGenerator<D>;
             /**
              * Sets a tick generator
              *
              * @param {TickGenerator} generator, the new tick generator.
              * @return {AbstractQuantitative} The calling AbstractQuantitative.
              */
-            tickGenerator(generator: TickGenerator<D>): AbstractQuantitative<D>;
+            tickGenerator(generator: TickGenerators.TickGenerator<D>): AbstractQuantitative<D>;
         }
     }
 }
@@ -1504,6 +1485,27 @@ declare module Plottable {
              */
             constructor(scales: Scale.AbstractScale<D, any>[]);
             rescale(scale: Scale.AbstractScale<D, any>): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Scale {
+        module TickGenerators {
+            interface TickGenerator<D> {
+                (scale: AbstractQuantitative<D>): D[];
+            }
+            /**
+             * Creates a tick generator using the specified interval.
+             *
+             * Generates ticks at multiples of the interval while also including the domain boundaries.
+             *
+             * @param {number} interval The interval between two ticks (not including the end ticks).
+             *
+             * @returns {TickGenerator} A tick generator using the specified interval.
+             */
+            function intervalTickGenerator(interval: number): TickGenerator<number>;
         }
     }
 }
