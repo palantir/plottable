@@ -23,6 +23,10 @@ export module Plot {
       this.project("fill", () => Core.Colors.INDIGO); // default
       this.project("fill-opacity", () => 0.25); // default
       this.project("stroke", () => Core.Colors.INDIGO); // default
+      this._animators["area-reset"] = new Animator.Null();
+      this._animators["area"]       = new Animator.Base()
+                                        .duration(600)
+                                        .easing("exp-in-out");
     }
 
     public _onDatasetUpdate() {
@@ -72,6 +76,37 @@ export module Plot {
 
     public _getResetYFunction() {
       return this._generateAttrToProjector()["y0"];
+    }
+
+    private createArea(xFunction: AppliedAccessor, y0Function: AppliedAccessor, y1Function: AppliedAccessor) {
+      return d3.svg.area()
+              .x(xFunction)
+              .y0(y0Function)
+              .y1(y1Function)
+              .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, y0Function) && this._rejectNullsAndNaNs(d, i, y1Function));
+    }
+
+    public _generateDrawSteps(): DrawStep[] {
+      var drawSteps: DrawStep[] = super._generateDrawSteps();
+
+      var attrToProjector = this._generateAttrToProjector();
+      var xFunction       = attrToProjector["x"];
+      var y0Function      = attrToProjector["y0"];
+      var y1Function       = attrToProjector["y"];
+      delete attrToProjector["x"];
+      delete attrToProjector["y0"];
+      delete attrToProjector["y"];
+
+      if(this._dataChanged) {
+        var resetAttrToProjector: AttributeToProjector = {};
+        d3.keys(attrToProjector).forEach((key) => { resetAttrToProjector[key] = attrToProjector[key]; });
+        resetAttrToProjector["d"] = this.createArea(xFunction, y0Function, this._getResetYFunction());
+        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("area-reset")});
+      }
+
+      attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function);
+      drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("area")});
+      return drawSteps;
     }
 
     public _wholeDatumAttributes() {

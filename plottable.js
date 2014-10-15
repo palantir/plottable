@@ -3069,27 +3069,14 @@ var Plottable;
                 _super.prototype._applyData.call(this, data);
                 this.pathSelection.datum(data);
             };
-            Path.prototype._rejectNullsAndNaNs = function (d, i, projector) {
-                var value = projector(d, i);
-                return value != null && value === value;
-            };
             Path.prototype.setup = function (area) {
+                debugger;
                 _super.prototype.setup.call(this, area.append("path").classed("line", true));
                 this.pathSelection = this._renderArea.select(".line");
-            };
-            Path.prototype.createLine = function (xFunction, yFunction) {
-                var _this = this;
-                return d3.svg.line().x(xFunction).y(yFunction).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
             };
             Path.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
                 var attrToProjector = step.attrToProjector;
-                var xFunction = attrToProjector["x"];
-                var yFunction = attrToProjector["y"];
-                delete attrToProjector["x"];
-                delete attrToProjector["y"];
-                var line = this.createLine(xFunction, yFunction);
-                attrToProjector["d"] = line;
                 if (attrToProjector["fill"]) {
                     this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
@@ -3122,25 +3109,14 @@ var Plottable;
                 _super.prototype._applyData.call(this, data);
                 this.areaSelection.datum(data);
             };
-            Area.prototype.setup = function () {
-                _super.prototype.setup.call(this, this._renderArea.append("path").classed(this._className, true));
+            Area.prototype.setup = function (area) {
+                area.append("path").classed("area", true);
+                _super.prototype.setup.call(this, area);
                 this.areaSelection = this._renderArea.select(".area");
-            };
-            Area.prototype.createArea = function (xFunction, y0Function, y1Function) {
-                var _this = this;
-                return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, y1Function); });
             };
             Area.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
                 var attrToProjector = step.attrToProjector;
-                var xFunction = attrToProjector["x"];
-                var y0Function = attrToProjector["y0"];
-                var y1Function = attrToProjector["y"];
-                delete attrToProjector["x"];
-                delete attrToProjector["y0"];
-                delete attrToProjector["y"];
-                var area = this.createArea(xFunction, y0Function, y1Function);
-                attrToProjector["d"] = area;
                 if (attrToProjector["fill"]) {
                     this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
@@ -5842,7 +5818,7 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._renderArea = this._content.append("g").classed("render-area", true);
                 // HACKHACK on 591
-                this._getDrawersInOrder().forEach(function (d) { return d._renderArea = _this._renderArea.append("g"); });
+                this._getDrawersInOrder().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
             };
             AbstractPlot.prototype.remove = function () {
                 var _this = this;
@@ -5881,7 +5857,7 @@ var Plottable;
                 this._datasetKeysInOrder.push(key);
                 this._key2DatasetDrawerKey.set(key, ddk);
                 if (this._isSetup) {
-                    drawer._renderArea = this._renderArea.append("g");
+                    drawer.setup(this._renderArea.append("g"));
                 }
                 dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
                 this._onDatasetUpdate();
@@ -6114,19 +6090,11 @@ var Plottable;
                 });
                 return dataSets;
             };
-            AbstractPlot.prototype._getDrawers = function () {
-                var _this = this;
-                var drawers = {};
-                this._datasetKeysInOrder.forEach(function (k) {
-                    drawers[k] = _this._key2DatasetDrawerKey.get(k).drawer;
-                });
-                return drawers;
-            };
             AbstractPlot.prototype._paint = function () {
                 var drawSteps = this._generateDrawSteps();
                 var datasets = this._getDataToDraw();
-                var drawers = this._getDrawers();
-                this._datasetKeysInOrder.forEach(function (k) { return drawers[k].draw(datasets[k], drawSteps); });
+                var drawers = this._getDrawersInOrder();
+                this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].draw(datasets[k], drawSteps); });
                 this._additionalPaint();
             };
             return AbstractPlot;
@@ -6205,7 +6173,7 @@ var Plottable;
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Element(key).svgElement("path").classed("arc");
             };
-            Pie.prototype._getDataToRender = function () {
+            Pie.prototype._getDataToDraw = function () {
                 var _this = this;
                 var defaultAccessor = function (d) { return d.value; };
                 var valueProjector = this._projectors["value"];
@@ -6799,8 +6767,8 @@ var Plottable;
                 this.classed("line-plot", true);
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
                 this.project("stroke-width", function () { return "2px"; }); // default
-                this._animators["reset"] = new Plottable.Animator.Null();
-                this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
+                this._animators["line-reset"] = new Plottable.Animator.Null();
+                this._animators["line-main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
             Line.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Path(key);
@@ -6816,14 +6784,32 @@ var Plottable;
                 var scaledStartValue = this._yScale.scale(startValue);
                 return function (d, i) { return scaledStartValue; };
             };
+            Line.prototype._rejectNullsAndNaNs = function (d, i, projector) {
+                var value = projector(d, i);
+                return value != null && value === value;
+            };
+            Line.prototype.createLine = function (xFunction, yFunction) {
+                var _this = this;
+                return d3.svg.line().x(xFunction).y(yFunction).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
+            };
             Line.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
+                debugger;
+                var attrToProjector = this._generateAttrToProjector();
+                var xFunction = attrToProjector["x"];
+                var yFunction = attrToProjector["y"];
+                delete attrToProjector["x"];
+                delete attrToProjector["y"];
                 if (this._dataChanged) {
-                    var attrToProjector = this._generateAttrToProjector();
-                    attrToProjector["y"] = this._getResetYFunction();
-                    drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator("reset") });
+                    var resetAttrToProjector = {};
+                    d3.keys(attrToProjector).forEach(function (key) {
+                        resetAttrToProjector[key] = attrToProjector[key];
+                    });
+                    resetAttrToProjector["d"] = this.createLine(xFunction, this._getResetYFunction());
+                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("line-reset") });
                 }
-                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main") });
+                attrToProjector["d"] = this.createLine(xFunction, yFunction);
+                drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator("line") });
                 return drawSteps;
             };
             Line.prototype._generateAttrToProjector = function () {
@@ -6877,6 +6863,8 @@ var Plottable;
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; }); // default
                 this.project("fill-opacity", function () { return 0.25; }); // default
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
+                this._animators["area-reset"] = new Plottable.Animator.Null();
+                this._animators["area"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
@@ -6921,6 +6909,31 @@ var Plottable;
             };
             Area.prototype._getResetYFunction = function () {
                 return this._generateAttrToProjector()["y0"];
+            };
+            Area.prototype.createArea = function (xFunction, y0Function, y1Function) {
+                var _this = this;
+                return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, y0Function) && _this._rejectNullsAndNaNs(d, i, y1Function); });
+            };
+            Area.prototype._generateDrawSteps = function () {
+                var drawSteps = _super.prototype._generateDrawSteps.call(this);
+                var attrToProjector = this._generateAttrToProjector();
+                var xFunction = attrToProjector["x"];
+                var y0Function = attrToProjector["y0"];
+                var y1Function = attrToProjector["y"];
+                delete attrToProjector["x"];
+                delete attrToProjector["y0"];
+                delete attrToProjector["y"];
+                if (this._dataChanged) {
+                    var resetAttrToProjector = {};
+                    d3.keys(attrToProjector).forEach(function (key) {
+                        resetAttrToProjector[key] = attrToProjector[key];
+                    });
+                    resetAttrToProjector["d"] = this.createArea(xFunction, y0Function, this._getResetYFunction());
+                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("area-reset") });
+                }
+                attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function);
+                drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator("area") });
+                return drawSteps;
             };
             Area.prototype._wholeDatumAttributes = function () {
                 var wholeDatumAttributes = _super.prototype._wholeDatumAttributes.call(this);

@@ -19,8 +19,8 @@ export module Plot {
       this.classed("line-plot", true);
       this.project("stroke", () => Core.Colors.INDIGO); // default
       this.project("stroke-width", () => "2px"); // default
-      this._animators["reset"] = new Animator.Null();
-      this._animators["main"]       = new Animator.Base()
+      this._animators["line-reset"] = new Animator.Null();
+      this._animators["line-main"] = new Animator.Base()
                                         .duration(600)
                                         .easing("exp-in-out");
     }
@@ -41,16 +41,36 @@ export module Plot {
       return (d: any, i: number) => scaledStartValue;
     }
 
+    public _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor) {
+      var value = projector(d, i);
+      return value != null && value === value;
+    }
+
+    private createLine(xFunction: AppliedAccessor, yFunction: AppliedAccessor) {
+      return d3.svg.line()
+               .x(xFunction)
+               .y(yFunction)
+               .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction));
+    }
+
     public _generateDrawSteps(): DrawStep[] {
       var drawSteps: DrawStep[] = [];
+      debugger;
+      var attrToProjector = this._generateAttrToProjector();
+      var xFunction       = attrToProjector["x"];
+      var yFunction       = attrToProjector["y"];
+      delete attrToProjector["x"];
+      delete attrToProjector["y"];
 
       if(this._dataChanged) {
-        var attrToProjector = this._generateAttrToProjector();
-        attrToProjector["y"] = this._getResetYFunction();
-        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
+        var resetAttrToProjector: AttributeToProjector = {};
+        d3.keys(attrToProjector).forEach((key) => { resetAttrToProjector[key] = attrToProjector[key]; });
+        resetAttrToProjector["d"] = this.createLine(xFunction, this._getResetYFunction());
+        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("line-reset")});
       }
-      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main")});
 
+      attrToProjector["d"] = this.createLine(xFunction, yFunction);
+      drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("line")});
       return drawSteps;
     }
 

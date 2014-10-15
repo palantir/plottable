@@ -74,7 +74,7 @@ export module Plot {
       return new Plottable._Drawer.Element(key).svgElement("path").classed("arc");
     }
 
-    private _getDataToRender() {
+    public _getDataToDraw() {
       var defaultAccessor = (d: any) => d.value;
       var valueProjector = this._projectors["value"];
       var valueAccessor = valueProjector ? valueProjector.accessor : defaultAccessor;

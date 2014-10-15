@@ -47,7 +47,7 @@ export module Plot {
       super._setup();
       this._renderArea = this._content.append("g").classed("render-area", true);
       // HACKHACK on 591
-      this._getDrawersInOrder().forEach((d) => d._renderArea = this._renderArea.append("g"));
+      this._getDrawersInOrder().forEach((d) => d.setup(this._renderArea.append("g")));
     }
 
     public remove() {
@@ -101,7 +101,7 @@ export module Plot {
       this._key2DatasetDrawerKey.set(key, ddk);
 
       if (this._isSetup) {
-        drawer._renderArea = this._renderArea.append("g");
+        drawer.setup(this._renderArea.append("g"));
       }
       dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
       this._onDatasetUpdate();
@@ -398,19 +398,11 @@ export module Plot {
       return dataSets;
     }
 
-     public _getDrawers() {
-      var drawers: {[key: string]: _Drawer.AbstractDrawer} = {};
-      this._datasetKeysInOrder.forEach((k: string) => {
-        drawers[k] = this._key2DatasetDrawerKey.get(k).drawer
-      });
-      return drawers;
-    }
-
     public _paint() {
       var drawSteps = this._generateDrawSteps();
       var datasets = this._getDataToDraw();
-      var drawers = this._getDrawers();
-      this._datasetKeysInOrder.forEach((k: string) => drawers[k].draw(datasets[k], drawSteps));
+      var drawers = this._getDrawersInOrder();
+      this._datasetKeysInOrder.forEach((k, i) => drawers[i].draw(datasets[k], drawSteps));
       this._additionalPaint();
     }
   }
