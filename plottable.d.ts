@@ -3033,6 +3033,15 @@ declare module Plottable {
     module Animator {
         /**
          * The base animator implementation with easing, duration, and delay.
+         *
+         * The maximum delay between animations can be configured with maxIterativeDelay.
+         *
+         * The maximum total animation duration can be configured with maxTotalDuration.
+         * maxTotalDuration does not set actual total animation duration.
+         *
+         * The actual interval delay is calculated by following formula:
+         * min(maxIterativeDelay(),
+         *   max(maxTotalDuration() - duration(), 0) / <number of iterations>)
          */
         class Base implements PlotAnimator {
             /**
@@ -3043,6 +3052,14 @@ declare module Plottable {
              * The default starting delay of the animation in milliseconds
              */
             static DEFAULT_DELAY_MILLISECONDS: number;
+            /**
+             * The default maximum start delay between each start of an animation
+             */
+            static DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS: number;
+            /**
+             * The default maximum total animation duration
+             */
+            static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS: number;
             /**
              * The default easing of the animation
              */
@@ -3093,42 +3110,6 @@ declare module Plottable {
              * @returns {Default} The calling Default Animator.
              */
             easing(easing: string): Base;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Animator {
-        /**
-         * An animator that delays the animation of the attributes using the index
-         * of the selection data.
-         *
-         * The maximum delay between animations can be configured with maxIterativeDelay.
-         *
-         * The maximum total animation duration can be configured with maxTotalDuration.
-         * maxTotalDuration does not set actual total animation duration.
-         *
-         * The actual interval delay is calculated by following formula:
-         * min(maxIterativeDelay(),
-         *   max(totalDurationLimit() - duration(), 0) / <number of iterations>)
-         */
-        class IterativeDelay extends Base {
-            /**
-             * The default maximum start delay between each start of an animation
-             */
-            static DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS: number;
-            /**
-             * The default maximum total animation duration
-             */
-            static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS: number;
-            /**
-             * Constructs an animator with a start delay between each selection animation
-             *
-             * @constructor
-             */
-            constructor();
-            animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition;
             /**
              * Gets the maximum start delay between animations in milliseconds.
              *
@@ -3139,9 +3120,9 @@ declare module Plottable {
              * Sets the maximum start delay between animations in milliseconds.
              *
              * @param {number} maxIterDelay The maximum iterative delay in milliseconds.
-             * @returns {IterativeDelay} The calling IterativeDelay Animator.
+             * @returns {Base} The calling Base Animator.
              */
-            maxIterativeDelay(maxIterDelay: number): IterativeDelay;
+            maxIterativeDelay(maxIterDelay: number): Base;
             /**
              * Gets the maximum total animation duration in milliseconds.
              *
@@ -3152,9 +3133,9 @@ declare module Plottable {
              * Sets the maximum total animation duration in miliseconds.
              *
              * @param {number} maxDuration The maximum total animation duration in milliseconds.
-             * @returns {IterativeDelay} The calling IterativeDelay Animator.
+             * @returns {Base} The calling Base Animator.
              */
-            maxTotalDuration(maxDuration: number): IterativeDelay;
+            maxTotalDuration(maxDuration: number): Base;
         }
     }
 }

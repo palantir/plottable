@@ -22,7 +22,7 @@ export module Plot {
       this.classed("bar-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
       this._animators["bars-reset"] = new Animator.Null();
-      this._animators["bars"] = new Animator.IterativeDelay();
+      this._animators["bars"] = new Animator.Base();
       this._animators["baseline"] = new Animator.Null();
       // super() doesn't set baseline
       this.baseline(this._baselineValue);
