@@ -41,52 +41,23 @@ export module Plot {
 
 
     public _generateAttrToProjector(): AttributeToProjector {
-      var attrToProjector = this.retargetProjectors(super._generateAttrToProjector());
-      var innerRadiusF = attrToProjector["inner-radius"] || d3.functor(0);
-      var outerRadiusF = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
-      attrToProjector["d"] = d3.svg.arc()
-                      .innerRadius(innerRadiusF)
-                      .outerRadius(outerRadiusF);
-      delete attrToProjector["inner-radius"];
-      delete attrToProjector["outer-radius"];
+      var attrToProjector = super._generateAttrToProjector();
+      attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
+      attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
 
       if (attrToProjector["fill"] == null) {
         attrToProjector["fill"] = (d: any, i: number) => Pie.DEFAULT_COLOR_SCALE.scale(String(i));
       }
-
-      delete attrToProjector["value"];
+      
+      var defaultAccessor = (d: any) => d.value;
+      var valueProjector = this._projectors["value"];
+      attrToProjector["value"] = valueProjector ? valueProjector.accessor : defaultAccessor;
+      
       return attrToProjector;
     }
 
-    /**
-     * Since the data goes through a pie function, which returns an array of ArcDescriptors,
-     * projectors will need to be retargeted so they point to the data portion of each arc descriptor.
-     */
-    private retargetProjectors(attrToProjector: AttributeToProjector): AttributeToProjector {
-      var retargetedAttrToProjector: AttributeToProjector = {};
-      d3.entries(attrToProjector).forEach((entry) => {
-        retargetedAttrToProjector[entry.key] = (d: D3.Layout.ArcDescriptor, i: number) => entry.value(d.data, i);
-      });
-      return retargetedAttrToProjector;
-    }
-
     public _getDrawer(key: string): _Drawer.AbstractDrawer {
-      return new Plottable._Drawer.Element(key).svgElement("path").classed("arc");
-    }
-
-    public _getDataToDraw() {
-      var defaultAccessor = (d: any) => d.value;
-      var valueProjector = this._projectors["value"];
-      var valueAccessor = valueProjector ? valueProjector.accessor : defaultAccessor;
-      var pies: {[key: string]: any[]} = {};
-      this._datasetKeysInOrder.forEach((key: string) => {
-        var data = this._key2DatasetDrawerKey.get(key).dataset.data();
-
-        pies[key] = d3.layout.pie()
-                      .sort(null)
-                      .value(valueAccessor)(data);
-      });
-      return pies;
+      return new Plottable._Drawer.Arc(key).classed("arc");
     }
   }
 }

@@ -37,6 +37,7 @@ export module Plot {
       attrToProjector["x"] = this._isVertical ? positionF : attrToProjector["x"];
       attrToProjector["y"] = this._isVertical ? attrToProjector["y"] : positionF;
 
+      debugger;
       return attrToProjector;
     }
 

@@ -1533,6 +1533,7 @@ declare module Plottable {
     module _Drawer {
         class Path extends AbstractDrawer {
             _applyData(data: any[]): void;
+            _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor): boolean;
             setup(area: D3.Selection): void;
             _drawStep(step: DrawStep): void;
         }
@@ -1559,6 +1560,17 @@ declare module Plottable {
             _getDrawSelection(): D3.Selection;
             _drawStep(step: DrawStep): void;
             _applyData(data: any[]): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Arc extends Element {
+            _svgElement: string;
+            _drawStep(step: DrawStep): void;
+            draw(data: any[], drawSteps: DrawStep[]): void;
         }
     }
 }
@@ -2630,9 +2642,6 @@ declare module Plottable {
             _addDataset(key: string, dataset: Dataset): void;
             _generateAttrToProjector(): AttributeToProjector;
             _getDrawer(key: string): _Drawer.AbstractDrawer;
-            _getDataToDraw(): {
-                [x: string]: any[];
-            };
         }
     }
 }
@@ -2870,7 +2879,6 @@ declare module Plottable {
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _getDrawer(key: string): _Drawer.Path;
             _getResetYFunction(): (d: any, i: number) => number;
-            _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor): boolean;
             _generateDrawSteps(): DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
             _wholeDatumAttributes(): string[];
@@ -2899,7 +2907,6 @@ declare module Plottable {
             _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Area<X>;
             _getResetYFunction(): AppliedAccessor;
-            _generateDrawSteps(): DrawStep[];
             _wholeDatumAttributes(): string[];
         }
     }

@@ -41,36 +41,17 @@ export module Plot {
       return (d: any, i: number) => scaledStartValue;
     }
 
-    public _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor) {
-      var value = projector(d, i);
-      return value != null && value === value;
-    }
-
-    private createLine(xFunction: AppliedAccessor, yFunction: AppliedAccessor) {
-      return d3.svg.line()
-               .x(xFunction)
-               .y(yFunction)
-               .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction));
-    }
-
     public _generateDrawSteps(): DrawStep[] {
       var drawSteps: DrawStep[] = [];
-      debugger;
-      var attrToProjector = this._generateAttrToProjector();
-      var xFunction       = attrToProjector["x"];
-      var yFunction       = attrToProjector["y"];
-      delete attrToProjector["x"];
-      delete attrToProjector["y"];
-
+      
       if(this._dataChanged) {
-        var resetAttrToProjector: AttributeToProjector = {};
-        d3.keys(attrToProjector).forEach((key) => { resetAttrToProjector[key] = attrToProjector[key]; });
-        resetAttrToProjector["d"] = this.createLine(xFunction, this._getResetYFunction());
-        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("line-reset")});
+        var attrToProjector = this._generateAttrToProjector();
+        attrToProjector["y"] = this._getResetYFunction();
+        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
       }
 
-      attrToProjector["d"] = this.createLine(xFunction, yFunction);
-      drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("line")});
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main")});
+
       return drawSteps;
     }
 

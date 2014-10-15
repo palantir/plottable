@@ -3069,19 +3069,35 @@ var Plottable;
                 _super.prototype._applyData.call(this, data);
                 this.pathSelection.datum(data);
             };
+            Path.prototype._rejectNullsAndNaNs = function (d, i, projector) {
+                var value = projector(d, i);
+                return value != null && value === value;
+            };
             Path.prototype.setup = function (area) {
-                debugger;
-                _super.prototype.setup.call(this, area.append("path").classed("line", true));
+                area.append("path").classed("line", true);
+                _super.prototype.setup.call(this, area);
                 this.pathSelection = this._renderArea.select(".line");
+            };
+            Path.prototype.createLine = function (xFunction, yFunction) {
+                var _this = this;
+                return d3.svg.line().x(xFunction).y(yFunction).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
             };
             Path.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
                 var attrToProjector = step.attrToProjector;
+                var xFunction = attrToProjector["x"];
+                var yFunction = attrToProjector["y"];
+                delete attrToProjector["x"];
+                delete attrToProjector["y"];
+                var line = this.createLine(xFunction, yFunction);
+                attrToProjector["d"] = line;
                 if (attrToProjector["fill"]) {
                     this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
                 var animator = step.animator || new Plottable.Animator.Null();
                 animator.animate(this.pathSelection, attrToProjector);
+                attrToProjector["x"] = xFunction;
+                attrToProjector["y"] = yFunction;
             };
             return Path;
         })(_Drawer.AbstractDrawer);
@@ -3114,14 +3130,29 @@ var Plottable;
                 _super.prototype.setup.call(this, area);
                 this.areaSelection = this._renderArea.select(".area");
             };
+            Area.prototype.createArea = function (xFunction, y0Function, y1Function) {
+                var _this = this;
+                return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, y0Function) && _this._rejectNullsAndNaNs(d, i, y1Function); });
+            };
             Area.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
                 var attrToProjector = step.attrToProjector;
+                var xFunction = attrToProjector["x"];
+                var y0Function = attrToProjector["y0"];
+                var y1Function = attrToProjector["y"];
+                delete attrToProjector["x"];
+                delete attrToProjector["y0"];
+                delete attrToProjector["y"];
+                var area = this.createArea(xFunction, y0Function, y1Function);
+                attrToProjector["d"] = area;
                 if (attrToProjector["fill"]) {
                     this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
                 var animator = step.animator || new Plottable.Animator.Null();
                 animator.animate(this.areaSelection, attrToProjector);
+                attrToProjector["x"] = xFunction;
+                attrToProjector["y0"] = y0Function;
+                attrToProjector["y"] = y1Function;
             };
             return Area;
         })(_Drawer.Path);
@@ -3153,6 +3184,7 @@ var Plottable;
                 return this._renderArea.selectAll(this._svgElement);
             };
             Element.prototype._drawStep = function (step) {
+                debugger;
                 _super.prototype._drawStep.call(this, step);
                 var drawSelection = this._getDrawSelection();
                 if (step.attrToProjector["fill"]) {
@@ -3171,6 +3203,55 @@ var Plottable;
             return Element;
         })(_Drawer.AbstractDrawer);
         _Drawer.Element = Element;
+    })(Plottable._Drawer || (Plottable._Drawer = {}));
+    var _Drawer = Plottable._Drawer;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (_Drawer) {
+        var Arc = (function (_super) {
+            __extends(Arc, _super);
+            function Arc() {
+                _super.apply(this, arguments);
+                this._svgElement = "path";
+            }
+            Arc.prototype.createArc = function (innerRadiusF, outerRadiusF) {
+                return d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
+            };
+            Arc.prototype.retargetProjectors = function (attrToProjector) {
+                var retargetedAttrToProjector = {};
+                d3.entries(attrToProjector).forEach(function (entry) {
+                    retargetedAttrToProjector[entry.key] = function (d, i) { return entry.value(d.data, i); };
+                });
+                return retargetedAttrToProjector;
+            };
+            Arc.prototype._drawStep = function (step) {
+                var attrToProjector = this.retargetProjectors(step.attrToProjector);
+                var innerRadiusF = attrToProjector["inner-radius"];
+                var outerRadiusF = attrToProjector["outer-radius"];
+                delete attrToProjector["inner-radius"];
+                delete attrToProjector["outer-radius"];
+                attrToProjector["d"] = this.createArc(innerRadiusF, outerRadiusF);
+                step.attrToProjector = attrToProjector;
+                _super.prototype._drawStep.call(this, step);
+            };
+            Arc.prototype.draw = function (data, drawSteps) {
+                var valueAccessor = drawSteps[0].attrToProjector["value"];
+                var pie = d3.layout.pie().sort(null).value(valueAccessor)(data);
+                drawSteps.map(function (s) { return delete s.attrToProjector["value"]; });
+                _super.prototype.draw.call(this, pie, drawSteps);
+            };
+            return Arc;
+        })(_Drawer.Element);
+        _Drawer.Arc = Arc;
     })(Plottable._Drawer || (Plottable._Drawer = {}));
     var _Drawer = Plottable._Drawer;
 })(Plottable || (Plottable = {}));
@@ -6147,43 +6228,19 @@ var Plottable;
                 _super.prototype._addDataset.call(this, key, dataset);
             };
             Pie.prototype._generateAttrToProjector = function () {
-                var attrToProjector = this.retargetProjectors(_super.prototype._generateAttrToProjector.call(this));
-                var innerRadiusF = attrToProjector["inner-radius"] || d3.functor(0);
-                var outerRadiusF = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
-                attrToProjector["d"] = d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
-                delete attrToProjector["inner-radius"];
-                delete attrToProjector["outer-radius"];
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
+                attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
                 if (attrToProjector["fill"] == null) {
                     attrToProjector["fill"] = function (d, i) { return Pie.DEFAULT_COLOR_SCALE.scale(String(i)); };
                 }
-                delete attrToProjector["value"];
-                return attrToProjector;
-            };
-            /**
-             * Since the data goes through a pie function, which returns an array of ArcDescriptors,
-             * projectors will need to be retargeted so they point to the data portion of each arc descriptor.
-             */
-            Pie.prototype.retargetProjectors = function (attrToProjector) {
-                var retargetedAttrToProjector = {};
-                d3.entries(attrToProjector).forEach(function (entry) {
-                    retargetedAttrToProjector[entry.key] = function (d, i) { return entry.value(d.data, i); };
-                });
-                return retargetedAttrToProjector;
-            };
-            Pie.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Element(key).svgElement("path").classed("arc");
-            };
-            Pie.prototype._getDataToDraw = function () {
-                var _this = this;
                 var defaultAccessor = function (d) { return d.value; };
                 var valueProjector = this._projectors["value"];
-                var valueAccessor = valueProjector ? valueProjector.accessor : defaultAccessor;
-                var pies = {};
-                this._datasetKeysInOrder.forEach(function (key) {
-                    var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
-                    pies[key] = d3.layout.pie().sort(null).value(valueAccessor)(data);
-                });
-                return pies;
+                attrToProjector["value"] = valueProjector ? valueProjector.accessor : defaultAccessor;
+                return attrToProjector;
+            };
+            Pie.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Arc(key).classed("arc");
             };
             Pie.DEFAULT_COLOR_SCALE = new Plottable.Scale.Color();
             return Pie;
@@ -6784,32 +6841,14 @@ var Plottable;
                 var scaledStartValue = this._yScale.scale(startValue);
                 return function (d, i) { return scaledStartValue; };
             };
-            Line.prototype._rejectNullsAndNaNs = function (d, i, projector) {
-                var value = projector(d, i);
-                return value != null && value === value;
-            };
-            Line.prototype.createLine = function (xFunction, yFunction) {
-                var _this = this;
-                return d3.svg.line().x(xFunction).y(yFunction).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
-            };
             Line.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                debugger;
-                var attrToProjector = this._generateAttrToProjector();
-                var xFunction = attrToProjector["x"];
-                var yFunction = attrToProjector["y"];
-                delete attrToProjector["x"];
-                delete attrToProjector["y"];
                 if (this._dataChanged) {
-                    var resetAttrToProjector = {};
-                    d3.keys(attrToProjector).forEach(function (key) {
-                        resetAttrToProjector[key] = attrToProjector[key];
-                    });
-                    resetAttrToProjector["d"] = this.createLine(xFunction, this._getResetYFunction());
-                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("line-reset") });
+                    var attrToProjector = this._generateAttrToProjector();
+                    attrToProjector["y"] = this._getResetYFunction();
+                    drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator("reset") });
                 }
-                attrToProjector["d"] = this.createLine(xFunction, yFunction);
-                drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator("line") });
+                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main") });
                 return drawSteps;
             };
             Line.prototype._generateAttrToProjector = function () {
@@ -6863,8 +6902,8 @@ var Plottable;
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; }); // default
                 this.project("fill-opacity", function () { return 0.25; }); // default
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
-                this._animators["area-reset"] = new Plottable.Animator.Null();
-                this._animators["area"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
+                this._animators["reset"] = new Plottable.Animator.Null();
+                this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
@@ -6909,31 +6948,6 @@ var Plottable;
             };
             Area.prototype._getResetYFunction = function () {
                 return this._generateAttrToProjector()["y0"];
-            };
-            Area.prototype.createArea = function (xFunction, y0Function, y1Function) {
-                var _this = this;
-                return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, y0Function) && _this._rejectNullsAndNaNs(d, i, y1Function); });
-            };
-            Area.prototype._generateDrawSteps = function () {
-                var drawSteps = _super.prototype._generateDrawSteps.call(this);
-                var attrToProjector = this._generateAttrToProjector();
-                var xFunction = attrToProjector["x"];
-                var y0Function = attrToProjector["y0"];
-                var y1Function = attrToProjector["y"];
-                delete attrToProjector["x"];
-                delete attrToProjector["y0"];
-                delete attrToProjector["y"];
-                if (this._dataChanged) {
-                    var resetAttrToProjector = {};
-                    d3.keys(attrToProjector).forEach(function (key) {
-                        resetAttrToProjector[key] = attrToProjector[key];
-                    });
-                    resetAttrToProjector["d"] = this.createArea(xFunction, y0Function, this._getResetYFunction());
-                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("area-reset") });
-                }
-                attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function);
-                drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator("area") });
-                return drawSteps;
             };
             Area.prototype._wholeDatumAttributes = function () {
                 var wholeDatumAttributes = _super.prototype._wholeDatumAttributes.call(this);
@@ -6989,6 +7003,7 @@ var Plottable;
                 var positionF = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_POSITION; };
                 attrToProjector["x"] = this._isVertical ? positionF : attrToProjector["x"];
                 attrToProjector["y"] = this._isVertical ? attrToProjector["y"] : positionF;
+                debugger;
                 return attrToProjector;
             };
             ClusteredBar.prototype._getDataToRender = function () {
@@ -7224,14 +7239,9 @@ var Plottable;
             StackedArea.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var xFunction = attrToProjector["x"];
                 var yAccessor = this._projectors["y"].accessor;
-                var yFunction = function (d) { return _this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                var y0Function = function (d) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                delete attrToProjector["x"];
-                delete attrToProjector["y0"];
-                delete attrToProjector["y"];
-                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+                attrToProjector["y"] = function (d) { return _this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                attrToProjector["y0"] = function (d) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 // Align fill with first index
                 var fillProjector = attrToProjector["fill"];
                 attrToProjector["fill"] = function (d, i) { return (d && d[0]) ? fillProjector(d[0], i) : null; };
