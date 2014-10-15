@@ -84,7 +84,7 @@ describe("Plots", () => {
       stackedPlot.addDataset(data1);
       stackedPlot.addDataset(data2);
 
-      assert.notEqual((<any> data2[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 2, "stacking is initially incorrect");
+      assert.isTrue(isNaN((<any> data2[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]), "stacking is initially incorrect");
 
       stackedPlot.project("x", "a");
       stackedPlot.project("y", "b");
