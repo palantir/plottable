@@ -244,7 +244,7 @@ var Plottable;
             function range(start, stop, step) {
                 if (step === void 0) { step = 1; }
                 if (step === 0) {
-                    throw new Error("incorrect step");
+                    throw new Error("step cannot be 0");
                 }
                 var length = Math.max(Math.ceil((stop - start) / step), 0);
                 var range = [];
@@ -3031,7 +3031,7 @@ var Plottable;
                     var low = Math.min(domain[0], domain[1]);
                     var high = Math.max(domain[0], domain[1]);
                     var firstTick = Math.ceil(low / interval) * interval;
-                    var numTicks = Math.max(Math.floor((high - firstTick) / interval) + 1, 0);
+                    var numTicks = Math.floor((high - firstTick) / interval) + 1;
                     var lowTicks = low % interval === 0 ? [] : [low];
                     var middleTicks = Plottable._Util.Methods.range(0, numTicks).map(function (t) { return firstTick + t * interval; });
                     var highTicks = high % interval === 0 ? [] : [high];

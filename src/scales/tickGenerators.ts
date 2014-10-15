@@ -25,7 +25,7 @@ module Plottable {
           var low = Math.min(domain[0], domain[1]);
           var high = Math.max(domain[0], domain[1]);
           var firstTick = Math.ceil(low / interval) * interval;
-          var numTicks = Math.max(Math.floor((high - firstTick) / interval) + 1, 0);
+          var numTicks = Math.floor((high - firstTick) / interval) + 1;
 
           var lowTicks = low % interval === 0 ? [] : [low];
           var middleTicks = _Util.Methods.range(0, numTicks).map(t => firstTick + t * interval);

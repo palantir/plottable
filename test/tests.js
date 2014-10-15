@@ -5754,7 +5754,7 @@ describe("_Util.Methods", function () {
         assert.deepEqual(range, [0, 2, 4], "all entries has been generated");
         range = Plottable._Util.Methods.range(start, end, 11);
         assert.deepEqual(range, [0], "all entries has been generated");
-        assert.throws(function () { return Plottable._Util.Methods.range(start, end, 0); }, "incorrect step");
+        assert.throws(function () { return Plottable._Util.Methods.range(start, end, 0); }, "step cannot be 0");
         range = Plottable._Util.Methods.range(start, end, -1);
         assert.lengthOf(range, 0, "no entries because of invalid step");
         range = Plottable._Util.Methods.range(end, start, -1);

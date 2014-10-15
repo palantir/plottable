@@ -239,9 +239,9 @@ export module _Util {
       /* tslint:enable:ban */
     }
 
-    export function range(start: number, stop: number, step: number = 1): number[] {
+    export function range(start: number, stop: number, step = 1): number[] {
       if(step === 0) {
-        throw new Error("incorrect step");
+        throw new Error("step cannot be 0");
       }
       var length = Math.max(Math.ceil((stop - start) / step), 0);
       var range: number[] = [];
