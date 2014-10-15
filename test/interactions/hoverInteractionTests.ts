@@ -4,15 +4,15 @@ var assert = chai.assert;
 
 class TestHoverable extends Plottable.Component.AbstractComponent
                     implements Plottable.Interaction.Hoverable {
-  public hoverOverComponent(p: Plottable.Point) {
+  public _hoverOverComponent(p: Plottable.Point) {
     // cast-override
   }
 
-  public hoverOutComponent(p: Plottable.Point) {
+  public _hoverOutComponent(p: Plottable.Point) {
     // cast-override
   }
 
-  public getHoverData(p: Plottable.Point): Plottable.Interaction.HoverData {
+  public _doHover(p: Plottable.Point): Plottable.Interaction.HoverData {
     var data: string[] = [];
     if (p.x < 250) {
       data.push("left");

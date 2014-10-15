@@ -2783,9 +2783,9 @@ declare module Plottable {
              * @return {AbstractBarPlot} The calling Bar Plot.
              */
             hoverMode(mode: String): AbstractBarPlot<X, Y>;
-            hoverOverComponent(p: Point): void;
-            hoverOutComponent(p: Point): void;
-            getHoverData(p: Point): Interaction.HoverData;
+            _hoverOverComponent(p: Point): void;
+            _hoverOutComponent(p: Point): void;
+            _doHover(p: Point): Interaction.HoverData;
         }
     }
 }
@@ -3489,20 +3489,21 @@ declare module Plottable {
              *
              * @param {Point} The cursor's position relative to the Component's origin.
              */
-            hoverOverComponent(p: Point): void;
+            _hoverOverComponent(p: Point): void;
             /**
              * Called when the user mouses out of the Component.
              *
              * @param {Point} The cursor's position relative to the Component's origin.
              */
-            hoverOutComponent(p: Point): void;
+            _hoverOutComponent(p: Point): void;
             /**
-             * Get the HoverData associated with the given position.
+             * Returns the HoverData associated with the given position, and performs
+             * any visual changes associated with hovering inside a Component.
              *
              * @param {Point} The cursor's position relative to the Component's origin.
-             * @return {HoverData}
+             * @return {HoverData} The HoverData associated with the given position.
              */
-            getHoverData(p: Point): HoverData;
+            _doHover(p: Point): HoverData;
         }
         class Hover extends AbstractInteraction {
             _componentToListenTo: Hoverable;

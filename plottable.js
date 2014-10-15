@@ -6596,15 +6596,15 @@ var Plottable;
                 return this;
             };
             //===== Hover logic =====
-            AbstractBarPlot.prototype.hoverOverComponent = function (p) {
+            AbstractBarPlot.prototype._hoverOverComponent = function (p) {
                 // no-op
             };
-            AbstractBarPlot.prototype.hoverOutComponent = function (p) {
+            AbstractBarPlot.prototype._hoverOutComponent = function (p) {
                 this._getDrawersInOrder().forEach(function (d, i) {
                     d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
                 });
             };
-            AbstractBarPlot.prototype.getHoverData = function (p) {
+            AbstractBarPlot.prototype._doHover = function (p) {
                 var xPositionOrExtent = p.x;
                 var yPositionOrExtent = p.y;
                 if (this._hoverMode === "line") {
@@ -6624,7 +6624,7 @@ var Plottable;
                     selectedBars.classed("hovered", true).classed("not-hovered", false);
                 }
                 else {
-                    this.hoverOutComponent(p);
+                    this._hoverOutComponent(p);
                 }
                 return {
                     data: selectedBars ? selectedBars.data() : null,
@@ -8274,11 +8274,11 @@ var Plottable;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this.dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
                 this.dispatcher.mouseover(function (p) {
-                    _this._componentToListenTo.hoverOverComponent(p);
+                    _this._componentToListenTo._hoverOverComponent(p);
                     _this.handleHoverOver(p);
                 });
                 this.dispatcher.mouseout(function (p) {
-                    _this._componentToListenTo.hoverOutComponent(p);
+                    _this._componentToListenTo._hoverOutComponent(p);
                     _this.safeHoverOut(_this.lastHoverData);
                     _this.lastHoverData = {
                         data: null,
@@ -8310,7 +8310,7 @@ var Plottable;
                 };
             };
             Hover.prototype.handleHoverOver = function (p) {
-                var newHoverData = this._componentToListenTo.getHoverData(p);
+                var newHoverData = this._componentToListenTo._doHover(p);
                 var outData = this.diffHoverData(this.lastHoverData, newHoverData);
                 this.safeHoverOut(outData);
                 var overData = this.diffHoverData(newHoverData, this.lastHoverData);

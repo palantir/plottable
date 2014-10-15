@@ -13,20 +13,21 @@ export module Interaction {
      *
      * @param {Point} The cursor's position relative to the Component's origin.
      */
-    hoverOverComponent(p: Point): void;
+    _hoverOverComponent(p: Point): void;
     /**
      * Called when the user mouses out of the Component.
      *
      * @param {Point} The cursor's position relative to the Component's origin.
      */
-    hoverOutComponent(p: Point): void;
+    _hoverOutComponent(p: Point): void;
     /**
-     * Get the HoverData associated with the given position.
+     * Returns the HoverData associated with the given position, and performs
+     * any visual changes associated with hovering inside a Component.
      *
      * @param {Point} The cursor's position relative to the Component's origin.
-     * @return {HoverData}
+     * @return {HoverData} The HoverData associated with the given position.
      */
-    getHoverData(p: Point): HoverData;
+    _doHover(p: Point): HoverData;
   }
 
   export class Hover extends Interaction.AbstractInteraction {
@@ -45,12 +46,12 @@ export module Interaction {
       this.dispatcher = new Dispatcher.Mouse(this._hitBox);
 
       this.dispatcher.mouseover((p: Point) => {
-        this._componentToListenTo.hoverOverComponent(p);
+        this._componentToListenTo._hoverOverComponent(p);
         this.handleHoverOver(p);
       });
 
       this.dispatcher.mouseout((p: Point) => {
-        this._componentToListenTo.hoverOutComponent(p);
+        this._componentToListenTo._hoverOutComponent(p);
         this.safeHoverOut(this.lastHoverData);
         this.lastHoverData = {
           data: null,
@@ -89,7 +90,7 @@ export module Interaction {
     }
 
     private handleHoverOver(p: Point) {
-      var newHoverData = this._componentToListenTo.getHoverData(p);
+      var newHoverData = this._componentToListenTo._doHover(p);
 
       var outData = this.diffHoverData(this.lastHoverData, newHoverData);
       this.safeHoverOut(outData);

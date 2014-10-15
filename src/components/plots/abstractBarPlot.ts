@@ -298,17 +298,17 @@ export module Plot {
     }
 
     //===== Hover logic =====
-    public hoverOverComponent(p: Point) {
+    public _hoverOverComponent(p: Point) {
       // no-op
     }
 
-    public hoverOutComponent(p: Point) {
+    public _hoverOutComponent(p: Point) {
       this._getDrawersInOrder().forEach((d, i) => {
         d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
       });
     }
 
-    public getHoverData(p: Point): Interaction.HoverData {
+    public _doHover(p: Point): Interaction.HoverData {
       var xPositionOrExtent: any = p.x;
       var yPositionOrExtent: any = p.y;
       if (this._hoverMode === "line") {
@@ -327,7 +327,7 @@ export module Plot {
         });
         selectedBars.classed("hovered", true).classed("not-hovered", false);
       } else {
-        this.hoverOutComponent(p);
+        this._hoverOutComponent(p);
       }
       return {
         data: selectedBars ? selectedBars.data() : null,
