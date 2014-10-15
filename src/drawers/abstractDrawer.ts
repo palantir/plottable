@@ -22,6 +22,10 @@ export module _Drawer {
         this.key = key;
     }
 
+    public setup(area: D3.Selection) {
+      this._renderArea = area;
+    }
+
     /**
      * Removes the Drawer and its renderArea
      */
@@ -31,12 +35,12 @@ export module _Drawer {
       }
     }
 
-    public _finishDrawing(selection: any) {
+    public _applyData(data: any[]) {
       // no-op
     }
 
-    public _getDrawSelection(data: any[]): any {
-      return null;
+    public _drawStep(drawStep: DrawStep) {
+      // no-op
     }
 
     /**
@@ -45,20 +49,11 @@ export module _Drawer {
      * @param{any[]} data The data to be drawn
      * @param{attrHash} AttributeToProjector The list of attributes to set on the data
      */
-    public draw(data: any[], attrToProjectors: AttributeToProjector[], animators: Animator.PlotAnimator[] = []) {
-      var drawSelection = this._getDrawSelection(data);
-      if(!drawSelection) {
-        return;
-      }
-      if(this._className) drawSelection.classed(this._className, true);
-      attrToProjectors.forEach((attrToProjector, i) => {
-        if (attrToProjector["fill"]) {
-          drawSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
-        }
-        var animator = animators[i] || new Animator.Null();
-        animator.animate(drawSelection, attrToProjector);
+    public draw(data: any[], drawSteps: DrawStep[]) {
+      this._applyData(data);
+      drawSteps.forEach((drawStep) => {
+        this._drawStep(drawStep);
       });
-      this._finishDrawing(drawSelection);
     }
   }
 }

@@ -3013,6 +3013,9 @@ var Plottable;
                 this._className = className;
                 return this;
             };
+            AbstractDrawer.prototype.setup = function (area) {
+                this._renderArea = area;
+            };
             /**
              * Removes the Drawer and its renderArea
              */
@@ -3021,11 +3024,11 @@ var Plottable;
                     this._renderArea.remove();
                 }
             };
-            AbstractDrawer.prototype._finishDrawing = function (selection) {
+            AbstractDrawer.prototype._applyData = function (data) {
                 // no-op
             };
-            AbstractDrawer.prototype._getDrawSelection = function (data) {
-                return null;
+            AbstractDrawer.prototype._drawStep = function (drawStep) {
+                // no-op
             };
             /**
              * Draws the data into the renderArea using the attrHash for attributes
@@ -3033,22 +3036,12 @@ var Plottable;
              * @param{any[]} data The data to be drawn
              * @param{attrHash} AttributeToProjector The list of attributes to set on the data
              */
-            AbstractDrawer.prototype.draw = function (data, attrToProjectors, animators) {
-                if (animators === void 0) { animators = []; }
-                var drawSelection = this._getDrawSelection(data);
-                if (!drawSelection) {
-                    return;
-                }
-                if (this._className)
-                    drawSelection.classed(this._className, true);
-                attrToProjectors.forEach(function (attrToProjector, i) {
-                    if (attrToProjector["fill"]) {
-                        drawSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
-                    }
-                    var animator = animators[i] || new Plottable.Animator.Null();
-                    animator.animate(drawSelection, attrToProjector);
+            AbstractDrawer.prototype.draw = function (data, drawSteps) {
+                var _this = this;
+                this._applyData(data);
+                drawSteps.forEach(function (drawStep) {
+                    _this._drawStep(drawStep);
                 });
-                this._finishDrawing(drawSelection);
             };
             return AbstractDrawer;
         })();
@@ -3071,13 +3064,38 @@ var Plottable;
             __extends(Area, _super);
             function Area() {
                 _super.apply(this, arguments);
-                this._className = "area";
             }
-            Area.prototype._createDrawSelection = function () {
-                return this._renderArea.insert("path", ".line");
+            Area.prototype._applyData = function (data) {
+                _super.prototype._applyData.call(this, data);
+                this.areaSelection.datum(data);
+            };
+            Area.prototype.setup = function () {
+                _super.prototype.setup.call(this, this._renderArea.append("path").classed(this._className, true));
+                this.areaSelection = this._renderArea.select(".area");
+            };
+            Area.prototype.createArea = function (xFunction, y0Function, y1Function) {
+                var _this = this;
+                return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, y1Function); });
+            };
+            Area.prototype._drawStep = function (step) {
+                _super.prototype._drawStep.call(this, step);
+                var attrToProjector = step.attrToProjector;
+                var xFunction = attrToProjector["x"];
+                var y0Function = attrToProjector["y0"];
+                var y1Function = attrToProjector["y"];
+                delete attrToProjector["x"];
+                delete attrToProjector["y0"];
+                delete attrToProjector["y"];
+                var area = this.createArea(xFunction, y0Function, y1Function);
+                attrToProjector["d"] = area;
+                if (attrToProjector["fill"]) {
+                    this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                }
+                var animator = step.animator || new Plottable.Animator.Null();
+                animator.animate(this.areaSelection, attrToProjector);
             };
             return Area;
-        })(_Drawer.Line);
+        })(_Drawer.Path);
         _Drawer.Area = Area;
     })(Plottable._Drawer || (Plottable._Drawer = {}));
     var _Drawer = Plottable._Drawer;
@@ -3093,30 +3111,45 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (_Drawer) {
-        var Line = (function (_super) {
-            __extends(Line, _super);
-            function Line() {
+        var Path = (function (_super) {
+            __extends(Path, _super);
+            function Path() {
                 _super.apply(this, arguments);
-                this._className = "line";
             }
-            Line.prototype._createDrawSelection = function () {
-                return this._renderArea.append("path");
+            Path.prototype._applyData = function (data) {
+                _super.prototype._applyData.call(this, data);
+                this.pathSelection.datum(data);
             };
-            Line.prototype._getDrawSelection = function (data) {
-                var drawSelection;
-                if (this._renderArea.select("." + this._className).node()) {
-                    drawSelection = this._renderArea.select("." + this._className);
-                }
-                else {
-                    // Make sure to insert the area before the line
-                    drawSelection = this._createDrawSelection();
-                }
-                drawSelection.datum(data);
-                return drawSelection;
+            Path.prototype._rejectNullsAndNaNs = function (d, i, projector) {
+                var value = projector(d, i);
+                return value != null && value === value;
             };
-            return Line;
+            Path.prototype.setup = function (area) {
+                _super.prototype.setup.call(this, area.append("path").classed("line", true));
+                this.pathSelection = this._renderArea.select(".line");
+            };
+            Path.prototype.createLine = function (xFunction, yFunction) {
+                var _this = this;
+                return d3.svg.line().x(xFunction).y(yFunction).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
+            };
+            Path.prototype._drawStep = function (step) {
+                _super.prototype._drawStep.call(this, step);
+                var attrToProjector = step.attrToProjector;
+                var xFunction = attrToProjector["x"];
+                var yFunction = attrToProjector["y"];
+                delete attrToProjector["x"];
+                delete attrToProjector["y"];
+                var line = this.createLine(xFunction, yFunction);
+                attrToProjector["d"] = line;
+                if (attrToProjector["fill"]) {
+                    this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                }
+                var animator = step.animator || new Plottable.Animator.Null();
+                animator.animate(this.pathSelection, attrToProjector);
+            };
+            return Path;
         })(_Drawer.AbstractDrawer);
-        _Drawer.Line = Line;
+        _Drawer.Path = Path;
     })(Plottable._Drawer || (Plottable._Drawer = {}));
     var _Drawer = Plottable._Drawer;
 })(Plottable || (Plottable = {}));
@@ -3140,13 +3173,24 @@ var Plottable;
                 this._svgElement = tag;
                 return this;
             };
-            Element.prototype._getDrawSelection = function (data) {
-                var dataElements = this._renderArea.selectAll(this._svgElement).data(data);
-                dataElements.enter().append(this._svgElement);
-                return dataElements;
+            Element.prototype._getDrawSelection = function () {
+                return this._renderArea.selectAll(this._svgElement);
             };
-            Element.prototype._finishDrawing = function (selection) {
-                selection.exit().remove();
+            Element.prototype._drawStep = function (step) {
+                _super.prototype._drawStep.call(this, step);
+                var drawSelection = this._getDrawSelection();
+                if (step.attrToProjector["fill"]) {
+                    drawSelection.attr("fill", step.attrToProjector["fill"]); // so colors don't animate
+                }
+                var animator = step.animator || new Plottable.Animator.Null();
+                animator.animate(drawSelection, step.attrToProjector);
+            };
+            Element.prototype._applyData = function (data) {
+                _super.prototype._applyData.call(this, data);
+                var dataElements = this._getDrawSelection().data(data);
+                dataElements.enter().append(this._svgElement);
+                dataElements.classed(this._className, true);
+                dataElements.exit().remove();
             };
             return Element;
         })(_Drawer.AbstractDrawer);
@@ -6064,13 +6108,35 @@ var Plottable;
                 var _this = this;
                 return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).drawer; });
             };
-            AbstractPlot.prototype._paint = function () {
+            AbstractPlot.prototype._generateDrawSteps = function () {
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animator.Null() }];
+            };
+            AbstractPlot.prototype._additionalPaint = function () {
+                // no-op
+            };
+            AbstractPlot.prototype._getDataToDraw = function () {
                 var _this = this;
-                var attrHash = this._generateAttrToProjector();
-                var datasets = this.datasets();
-                this._getDrawersInOrder().forEach(function (d, i) {
-                    d.draw(datasets[i].data(), [attrHash], [_this._getAnimator("")]);
+                var dataSets = {};
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
+                    dataSets[key] = data;
                 });
+                return dataSets;
+            };
+            AbstractPlot.prototype._getDrawers = function () {
+                var _this = this;
+                var drawers = {};
+                this._datasetKeysInOrder.forEach(function (k) {
+                    drawers[k] = _this._key2DatasetDrawerKey.get(k).drawer;
+                });
+                return drawers;
+            };
+            AbstractPlot.prototype._paint = function () {
+                var drawSteps = this._generateDrawSteps();
+                var datasets = this._getDataToDraw();
+                var drawers = this._getDrawers();
+                this._datasetKeysInOrder.forEach(function (k) { return drawers[k].draw(datasets[k], drawSteps); });
+                this._additionalPaint();
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
@@ -6148,20 +6214,17 @@ var Plottable;
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Element(key).svgElement("path").classed("arc");
             };
-            Pie.prototype._paint = function () {
+            Pie.prototype._getDataToRender = function () {
                 var _this = this;
-                var attrHash = this._generateAttrToProjector();
-                var datasets = this.datasets();
-                this._getDrawersInOrder().forEach(function (d, i) {
-                    var pieData = _this.pie(datasets[i].data());
-                    d.draw(pieData, [attrHash], [_this._getAnimator("")]);
-                });
-            };
-            Pie.prototype.pie = function (d) {
                 var defaultAccessor = function (d) { return d.value; };
                 var valueProjector = this._projectors["value"];
                 var valueAccessor = valueProjector ? valueProjector.accessor : defaultAccessor;
-                return d3.layout.pie().sort(null).value(valueAccessor)(d);
+                var pies = {};
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
+                    pies[key] = d3.layout.pie().sort(null).value(valueAccessor)(data);
+                });
+                return pies;
             };
             Pie.DEFAULT_COLOR_SCALE = new Plottable.Scale.Color();
             return Pie;
@@ -6421,13 +6484,11 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
                 this._barAlignmentFactor = 0;
-                this._animators = {
-                    "bars-reset": new Plottable.Animator.Null(),
-                    "bars": new Plottable.Animator.IterativeDelay(),
-                    "baseline": new Plottable.Animator.Null()
-                };
                 this.classed("bar-plot", true);
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
+                this._animators["bars-reset"] = new Plottable.Animator.Null();
+                this._animators["bars"] = new Plottable.Animator.IterativeDelay();
+                this._animators["baseline"] = new Plottable.Animator.Null();
                 // super() doesn't set baseline
                 this.baseline(this._baselineValue);
             }
@@ -6437,38 +6498,6 @@ var Plottable;
             AbstractBarPlot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
-            };
-            // HACKHACK #1106 - should use drawers for paint logic
-            AbstractBarPlot.prototype._paint = function () {
-                var _this = this;
-                var attrToProjector = this._generateAttrToProjector();
-                var datasets = this.datasets();
-                var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                var scaledBaseline = primaryScale.scale(this._baselineValue);
-                var positionAttr = this._isVertical ? "y" : "x";
-                var dimensionAttr = this._isVertical ? "height" : "width";
-                this._getDrawersInOrder().forEach(function (d, i) {
-                    var attrToProjectors = [];
-                    var animators = [];
-                    if (_this._dataChanged && _this._animate) {
-                        var resetAttrToProjector = _this._generateAttrToProjector();
-                        resetAttrToProjector[positionAttr] = function () { return scaledBaseline; };
-                        resetAttrToProjector[dimensionAttr] = function () { return 0; };
-                        animators.push(_this._animators["bars-reset"]);
-                        attrToProjectors.push(resetAttrToProjector);
-                    }
-                    var attrToProjector = _this._generateAttrToProjector();
-                    animators.push(_this._animate ? _this._animators["bars"] : new Plottable.Animator.Null());
-                    attrToProjectors.push(attrToProjector);
-                    d.draw(datasets[i].data(), attrToProjectors, animators);
-                });
-                var baselineAttr = {
-                    "x1": this._isVertical ? 0 : scaledBaseline,
-                    "y1": this._isVertical ? scaledBaseline : 0,
-                    "x2": this._isVertical ? this.width() : scaledBaseline,
-                    "y2": this._isVertical ? scaledBaseline : this.height()
-                };
-                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
             };
             /**
              * Sets the baseline for the bars to the specified value.
@@ -6586,6 +6615,32 @@ var Plottable;
                 else {
                     _super.prototype._updateXDomainer.call(this);
                 }
+            };
+            AbstractBarPlot.prototype._additionalPaint = function () {
+                var primaryScale = this._isVertical ? this._yScale : this._xScale;
+                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var baselineAttr = {
+                    "x1": this._isVertical ? 0 : scaledBaseline,
+                    "y1": this._isVertical ? scaledBaseline : 0,
+                    "x2": this._isVertical ? this.width() : scaledBaseline,
+                    "y2": this._isVertical ? scaledBaseline : this.height()
+                };
+                this._getAnimator("baseline").animate(this._baseline, baselineAttr);
+            };
+            AbstractBarPlot.prototype._generateDrawSteps = function () {
+                var drawSteps = [];
+                if (this._dataChanged && this._animate) {
+                    var resetAttrToProjector = this._generateAttrToProjector();
+                    var primaryScale = this._isVertical ? this._yScale : this._xScale;
+                    var scaledBaseline = primaryScale.scale(this._baselineValue);
+                    var positionAttr = this._isVertical ? "y" : "x";
+                    var dimensionAttr = this._isVertical ? "height" : "width";
+                    resetAttrToProjector[positionAttr] = function () { return scaledBaseline; };
+                    resetAttrToProjector[dimensionAttr] = function () { return 0; };
+                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("bars-reset") });
+                }
+                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("bars") });
+                return drawSteps;
             };
             AbstractBarPlot.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -6753,11 +6808,11 @@ var Plottable;
                 this.classed("line-plot", true);
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
                 this.project("stroke-width", function () { return "2px"; }); // default
-                this._animators["line-reset"] = new Plottable.Animator.Null();
-                this._animators["line"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
+                this._animators["reset"] = new Plottable.Animator.Null();
+                this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
             Line.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Line(key);
+                return new Plottable._Drawer.Path(key);
             };
             Line.prototype._getResetYFunction = function () {
                 // gets the y-value generator for the animation start point
@@ -6770,6 +6825,16 @@ var Plottable;
                 var scaledStartValue = this._yScale.scale(startValue);
                 return function (d, i) { return scaledStartValue; };
             };
+            Line.prototype._generateDrawSteps = function () {
+                var drawSteps = [];
+                if (this._dataChanged) {
+                    var attrToProjector = this._generateAttrToProjector();
+                    attrToProjector["y"] = this._getResetYFunction();
+                    drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator("reset") });
+                }
+                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main") });
+                return drawSteps;
+            };
             Line.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var wholeDatumAttributes = this._wholeDatumAttributes();
@@ -6780,38 +6845,6 @@ var Plottable;
                     attrToProjector[attribute] = function (data, i) { return data.length > 0 ? projector(data[0], i) : null; };
                 });
                 return attrToProjector;
-            };
-            Line.prototype._rejectNullsAndNaNs = function (d, i, projector) {
-                var value = projector(d, i);
-                return value != null && value === value;
-            };
-            // HACKHACK #1106 - should use drawers for paint logic
-            Line.prototype._paint = function () {
-                var _this = this;
-                var attrToProjector = this._generateAttrToProjector();
-                var xFunction = attrToProjector["x"];
-                var yFunction = attrToProjector["y"];
-                delete attrToProjector["x"];
-                delete attrToProjector["y"];
-                var line = d3.svg.line().x(xFunction).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
-                attrToProjector["d"] = line;
-                var datasets = this.datasets();
-                this._getDrawersInOrder().forEach(function (d, i) {
-                    var animators = [];
-                    var attrToProjectors = [];
-                    if (_this._dataChanged && _this._animate) {
-                        var resetAttrToProjector = {};
-                        d3.keys(attrToProjector).forEach(function (key) { return resetAttrToProjector[key] = attrToProjector[key]; });
-                        var resetedLine = d3.svg.line().x(xFunction).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); }).y(_this._getResetYFunction());
-                        resetAttrToProjector["d"] = resetedLine;
-                        animators.push(_this._getAnimator("line-reset"));
-                        attrToProjectors.push(resetAttrToProjector);
-                    }
-                    line.y(yFunction);
-                    animators.push(_this._getAnimator("line"));
-                    attrToProjectors.push(attrToProjector);
-                    d.draw(datasets[i].data(), attrToProjectors, animators);
-                });
             };
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
@@ -6853,8 +6886,6 @@ var Plottable;
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; }); // default
                 this.project("fill-opacity", function () { return 0.25; }); // default
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
-                this._animators["area-reset"] = new Plottable.Animator.Null();
-                this._animators["area"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
@@ -6899,37 +6930,6 @@ var Plottable;
             };
             Area.prototype._getResetYFunction = function () {
                 return this._generateAttrToProjector()["y0"];
-            };
-            // HACKHACK #1106 - should use drawers for paint logic
-            Area.prototype._paint = function () {
-                var _this = this;
-                _super.prototype._paint.call(this);
-                var attrToProjector = this._generateAttrToProjector();
-                var xFunction = attrToProjector["x"];
-                var y0Function = attrToProjector["y0"];
-                var yFunction = attrToProjector["y"];
-                delete attrToProjector["x"];
-                delete attrToProjector["y0"];
-                delete attrToProjector["y"];
-                var area = d3.svg.area().x(xFunction).y0(y0Function).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
-                attrToProjector["d"] = area;
-                var datasets = this.datasets();
-                this._getDrawersInOrder().forEach(function (d, i) {
-                    var animators = [];
-                    var attrToProjectors = [];
-                    if (_this._dataChanged && _this._animate) {
-                        var resetAttrToProjector = {};
-                        d3.keys(attrToProjector).forEach(function (key) { return resetAttrToProjector[key] = attrToProjector[key]; });
-                        var resetedArea = d3.svg.area().x(xFunction).y0(y0Function).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); }).y1(_this._getResetYFunction());
-                        resetAttrToProjector["d"] = resetedArea;
-                        animators.push(_this._getAnimator("area-reset"));
-                        attrToProjectors.push(resetAttrToProjector);
-                    }
-                    area.y1(yFunction);
-                    animators.push(_this._getAnimator("area"));
-                    attrToProjectors.push(attrToProjector);
-                    d.draw(datasets[i].data(), attrToProjectors, animators);
-                });
             };
             Area.prototype._wholeDatumAttributes = function () {
                 var wholeDatumAttributes = _super.prototype._wholeDatumAttributes.call(this);
@@ -6987,8 +6987,9 @@ var Plottable;
                 attrToProjector["y"] = this._isVertical ? attrToProjector["y"] : positionF;
                 return attrToProjector;
             };
-            ClusteredBar.prototype.cluster = function (accessor) {
+            ClusteredBar.prototype._getDataToRender = function () {
                 var _this = this;
+                var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 this.innerScale.domain(this._datasetKeysInOrder);
                 var clusters = {};
                 this._datasetKeysInOrder.forEach(function (key) {
@@ -7001,21 +7002,6 @@ var Plottable;
                     });
                 });
                 return clusters;
-            };
-            ClusteredBar.prototype._paint = function () {
-                var attrHash = this._generateAttrToProjector();
-                var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                var clusteredData = this.cluster(accessor);
-                this._getDrawersInOrder().forEach(function (d) { return d.draw(clusteredData[d.key], [attrHash]); });
-                var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                var scaledBaseline = primaryScale.scale(this._baselineValue);
-                var baselineAttr = {
-                    "x1": this._isVertical ? 0 : scaledBaseline,
-                    "y1": this._isVertical ? scaledBaseline : 0,
-                    "x2": this._isVertical ? this.width() : scaledBaseline,
-                    "y2": this._isVertical ? scaledBaseline : this.height()
-                };
-                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
             };
             return ClusteredBar;
         })(Plot.AbstractBarPlot);

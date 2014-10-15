@@ -381,12 +381,37 @@ export module Plot {
       return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).drawer);
     }
 
-    public _paint() {
-      var attrHash = this._generateAttrToProjector();
-      var datasets = this.datasets();
-      this._getDrawersInOrder().forEach((d, i) => {
-        d.draw(datasets[i].data(), [attrHash], [this._getAnimator("")]);
+    public _generateDrawSteps(): DrawStep[] {
+      return [{attrToProjector: this._generateAttrToProjector(), animator: new Animator.Null()}]
+    }
+
+    public _additionalPaint() {
+      // no-op
+    }
+
+    public _getDataToDraw() {
+      var dataSets: {[key: string]: any[]} = {};
+      this._datasetKeysInOrder.forEach((key: string) => {
+        var data = this._key2DatasetDrawerKey.get(key).dataset.data();
+        dataSets[key] = data;
       });
+      return dataSets;
+    }
+
+     public _getDrawers() {
+      var drawers: {[key: string]: _Drawer.AbstractDrawer} = {};
+      this._datasetKeysInOrder.forEach((k: string) => {
+        drawers[k] = this._key2DatasetDrawerKey.get(k).drawer
+      });
+      return drawers;
+    }
+
+    public _paint() {
+      var drawSteps = this._generateDrawSteps();
+      var datasets = this._getDataToDraw();
+      var drawers = this._getDrawers();
+      this._datasetKeysInOrder.forEach((k: string) => drawers[k].draw(datasets[k], drawSteps));
+      this._additionalPaint();
     }
   }
 }

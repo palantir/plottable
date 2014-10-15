@@ -23,10 +23,6 @@ export module Plot {
       this.project("fill", () => Core.Colors.INDIGO); // default
       this.project("fill-opacity", () => 0.25); // default
       this.project("stroke", () => Core.Colors.INDIGO); // default
-      this._animators["area-reset"] = new Animator.Null();
-      this._animators["area"]       = new Animator.Base()
-                                        .duration(600)
-                                        .easing("exp-in-out");
     }
 
     public _onDatasetUpdate() {
@@ -76,48 +72,6 @@ export module Plot {
 
     public _getResetYFunction() {
       return this._generateAttrToProjector()["y0"];
-    }
-
-    // HACKHACK #1106 - should use drawers for paint logic
-    public _paint() {
-      super._paint();
-      var attrToProjector = this._generateAttrToProjector();
-      var xFunction       = attrToProjector["x"];
-      var y0Function      = attrToProjector["y0"];
-      var yFunction       = attrToProjector["y"];
-      delete attrToProjector["x"];
-      delete attrToProjector["y0"];
-      delete attrToProjector["y"];
-
-      var area = d3.svg.area()
-                  .x(xFunction)
-                  .y0(y0Function)
-                  .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction));
-      attrToProjector["d"] = area;
-
-      var datasets = this.datasets();
-      this._getDrawersInOrder().forEach((d, i) => {
-        var animators: Animator.PlotAnimator[] = [];
-        var attrToProjectors: AttributeToProjector[] = [];
-
-        if (this._dataChanged && this._animate) {
-          var resetAttrToProjector: AttributeToProjector = {} 
-          d3.keys(attrToProjector).forEach((key) => resetAttrToProjector[key] = attrToProjector[key]);
-          var resetedArea = d3.svg.area()
-                  .x(xFunction)
-                  .y0(y0Function)
-                  .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction))
-                  .y1(this._getResetYFunction());
-          resetAttrToProjector["d"] = resetedArea;
-          animators.push(this._getAnimator("area-reset"));
-          attrToProjectors.push(resetAttrToProjector);
-        }
-        
-        area.y1(yFunction);
-        animators.push(this._getAnimator("area"));
-        attrToProjectors.push(attrToProjector);
-        d.draw(datasets[i].data(), attrToProjectors, animators);
-      });
     }
 
     public _wholeDatumAttributes() {

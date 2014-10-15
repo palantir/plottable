@@ -74,24 +74,20 @@ export module Plot {
       return new Plottable._Drawer.Element(key).svgElement("path").classed("arc");
     }
 
-    public _paint() {
-      var attrHash = this._generateAttrToProjector();
-      var datasets = this.datasets();
-      this._getDrawersInOrder().forEach((d, i) => {
-        var pieData = this.pie(datasets[i].data());
-        d.draw(pieData, [attrHash], [this._getAnimator("")]);
-      });
-    }
-
-    private pie(d: any[]): D3.Layout.ArcDescriptor[] {
+    private _getDataToRender() {
       var defaultAccessor = (d: any) => d.value;
       var valueProjector = this._projectors["value"];
       var valueAccessor = valueProjector ? valueProjector.accessor : defaultAccessor;
-      return d3.layout.pie()
-                      .sort(null)
-                      .value(valueAccessor)(d);
-    }
+      var pies: {[key: string]: any[]} = {};
+      this._datasetKeysInOrder.forEach((key: string) => {
+        var data = this._key2DatasetDrawerKey.get(key).dataset.data();
 
+        pies[key] = d3.layout.pie()
+                      .sort(null)
+                      .value(valueAccessor)(data);
+      });
+      return pies;
+    }
   }
 }
 }

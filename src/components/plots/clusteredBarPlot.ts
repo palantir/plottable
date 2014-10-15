@@ -40,7 +40,8 @@ export module Plot {
       return attrToProjector;
     }
 
-    private cluster(accessor: _Accessor) {
+    public _getDataToRender() {
+      var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       this.innerScale.domain(this._datasetKeysInOrder);
       var clusters: {[key: string]: any[]} = {};
       this._datasetKeysInOrder.forEach((key: string) => {
@@ -54,26 +55,6 @@ export module Plot {
         });
       });
       return clusters;
-    }
-
-    public _paint() {
-      var attrHash = this._generateAttrToProjector();
-      var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-      var clusteredData = this.cluster(accessor);
-      this._getDrawersInOrder().forEach((d) => d.draw(clusteredData[d.key], [attrHash]));
-
-      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-      var scaledBaseline = primaryScale.scale(this._baselineValue);
-
-      var baselineAttr: any = {
-        "x1": this._isVertical ? 0 : scaledBaseline,
-        "y1": this._isVertical ? scaledBaseline : 0,
-        "x2": this._isVertical ? this.width() : scaledBaseline,
-        "y2": this._isVertical ? scaledBaseline : this.height()
-      };
-
-      this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
-
     }
   }
 }

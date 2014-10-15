@@ -10,12 +10,6 @@ export module Plot {
     public _barAlignmentFactor = 0;
     public _isVertical: boolean;
 
-    public _animators: Animator.PlotAnimatorMap = {
-      "bars-reset" : new Animator.Null(),
-      "bars"       : new Animator.IterativeDelay(),
-      "baseline"   : new Animator.Null()
-    };
-
     /**
      * Constructs a BarPlot.
      *
@@ -27,6 +21,9 @@ export module Plot {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
+      this._animators["bars-reset"] = new Animator.Null();
+      this._animators["bars"] = new Animator.IterativeDelay();
+      this._animators["baseline"] = new Animator.Null();
       // super() doesn't set baseline
       this.baseline(this._baselineValue);
     }
@@ -38,44 +35,6 @@ export module Plot {
     public _setup() {
       super._setup();
       this._baseline = this._renderArea.append("line").classed("baseline", true);
-    }
-
-    // HACKHACK #1106 - should use drawers for paint logic
-    public _paint() {
-      var attrToProjector = this._generateAttrToProjector();
-      var datasets = this.datasets();
-      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-      var scaledBaseline = primaryScale.scale(this._baselineValue);
-      var positionAttr = this._isVertical ? "y" : "x";
-      var dimensionAttr = this._isVertical ? "height" : "width";
-
-      this._getDrawersInOrder().forEach((d, i) => {
-        var attrToProjectors: AttributeToProjector[] = [];
-        var animators: Animator.PlotAnimator[] = []
-        if (this._dataChanged && this._animate) {
-          var resetAttrToProjector = this._generateAttrToProjector();
-          resetAttrToProjector[positionAttr] = () => scaledBaseline;
-          resetAttrToProjector[dimensionAttr] = () => 0;
-          animators.push(this._animators["bars-reset"]);
-          attrToProjectors.push(resetAttrToProjector);
-        }
-
-        var attrToProjector = this._generateAttrToProjector();
-        animators.push(this._animate ? this._animators["bars"] : new Animator.Null());
-        attrToProjectors.push(attrToProjector);
-        d.draw(datasets[i].data(), attrToProjectors, animators);
-
-      });
-
-      var baselineAttr: any = {
-        "x1": this._isVertical ? 0 : scaledBaseline,
-        "y1": this._isVertical ? scaledBaseline : 0,
-        "x2": this._isVertical ? this.width() : scaledBaseline,
-        "y2": this._isVertical ? scaledBaseline : this.height()
-      };
-
-      this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
-
     }
 
     /**
@@ -221,6 +180,37 @@ export module Plot {
       } else {
         super._updateXDomainer();
       }
+    }
+
+    public _additionalPaint() {
+      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var scaledBaseline = primaryScale.scale(this._baselineValue);
+
+      var baselineAttr: any = {
+        "x1": this._isVertical ? 0 : scaledBaseline,
+        "y1": this._isVertical ? scaledBaseline : 0,
+        "x2": this._isVertical ? this.width() : scaledBaseline,
+        "y2": this._isVertical ? scaledBaseline : this.height()
+      };
+
+      this._getAnimator("baseline").animate(this._baseline, baselineAttr)
+    }
+
+    public _generateDrawSteps(): DrawStep[] {
+      var drawSteps: DrawStep[] = [];
+      if (this._dataChanged && this._animate) {
+        var resetAttrToProjector = this._generateAttrToProjector();
+        var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+        var scaledBaseline = primaryScale.scale(this._baselineValue);
+        var positionAttr = this._isVertical ? "y" : "x";
+        var dimensionAttr = this._isVertical ? "height" : "width";
+        resetAttrToProjector[positionAttr] = () => scaledBaseline;
+        resetAttrToProjector[dimensionAttr] = () => 0;
+        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("bars-reset")});
+      }
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("bars")});
+
+      return drawSteps;
     }
 
     public _generateAttrToProjector() {

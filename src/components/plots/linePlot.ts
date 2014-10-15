@@ -19,14 +19,14 @@ export module Plot {
       this.classed("line-plot", true);
       this.project("stroke", () => Core.Colors.INDIGO); // default
       this.project("stroke-width", () => "2px"); // default
-      this._animators["line-reset"] = new Animator.Null();
-      this._animators["line"]       = new Animator.Base()
+      this._animators["reset"] = new Animator.Null();
+      this._animators["main"]       = new Animator.Base()
                                         .duration(600)
                                         .easing("exp-in-out");
     }
 
      public _getDrawer(key: string) {
-      return new Plottable._Drawer.Line(key);
+      return new Plottable._Drawer.Path(key);
     }
 
     public _getResetYFunction() {
@@ -41,6 +41,19 @@ export module Plot {
       return (d: any, i: number) => scaledStartValue;
     }
 
+    public _generateDrawSteps(): DrawStep[] {
+      var drawSteps: DrawStep[] = [];
+
+      if(this._dataChanged) {
+        var attrToProjector = this._generateAttrToProjector();
+        attrToProjector["y"] = this._getResetYFunction();
+        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
+      }
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main")});
+
+      return drawSteps;
+    }
+
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       var wholeDatumAttributes = this._wholeDatumAttributes();
@@ -51,47 +64,6 @@ export module Plot {
         attrToProjector[attribute] = (data: any[], i: number) => data.length > 0 ? projector(data[0], i) : null;
       });
       return attrToProjector;
-    }
-
-    public _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor) {
-      var value = projector(d, i);
-      return value != null && value === value;
-    }
-
-    // HACKHACK #1106 - should use drawers for paint logic
-    public _paint() {
-      var attrToProjector = this._generateAttrToProjector();
-      var xFunction       = attrToProjector["x"];
-      var yFunction       = attrToProjector["y"];
-      delete attrToProjector["x"];
-      delete attrToProjector["y"];
-
-      var line = d3.svg.line()
-                   .x(xFunction)
-                   .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction));
-      attrToProjector["d"] = line;
-
-      var datasets = this.datasets();
-      this._getDrawersInOrder().forEach((d, i) => {
-        var animators: Animator.PlotAnimator[] = [];
-        var attrToProjectors: AttributeToProjector[] = [];
-        if (this._dataChanged && this._animate) {
-          var resetAttrToProjector: AttributeToProjector = {} 
-          d3.keys(attrToProjector).forEach((key) => resetAttrToProjector[key] = attrToProjector[key]);
-          var resetedLine = d3.svg.line()
-                   .x(xFunction)
-                   .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction))
-                   .y(this._getResetYFunction());
-          resetAttrToProjector["d"] = resetedLine;
-          animators.push(this._getAnimator("line-reset"));
-          attrToProjectors.push(resetAttrToProjector);
-        }
-
-        line.y(yFunction);
-        animators.push(this._getAnimator("line"));
-        attrToProjectors.push(attrToProjector);
-        d.draw(datasets[i].data(), attrToProjectors, animators);
-      });
     }
 
     public _wholeDatumAttributes() {

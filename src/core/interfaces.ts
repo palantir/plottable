@@ -98,4 +98,9 @@ module Plottable {
     drawer: _Drawer.AbstractDrawer;
     key: string;
   }
+
+  export interface DrawStep {
+    attrToProjector: AttributeToProjector;
+    animator?: Animator.PlotAnimator;
+  }
 }

@@ -34,7 +34,7 @@
 
 /// <reference path="drawers/abstractDrawer.ts" />
 /// <reference path="drawers/areaDrawer.ts" />
-/// <reference path="drawers/lineDrawer.ts" />
+/// <reference path="drawers/pathDrawer.ts" />
 /// <reference path="drawers/elementDrawer.ts" />
 
 /// <reference path="components/abstractComponent.ts" />
