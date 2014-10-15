@@ -1,0 +1,17 @@
+
+.plottable .colors-default {
+  color0: "#5279c7"; /* INDIGO */
+  color1: "#fd373e"; /* CORAL_RED */
+  color2: "#63c261"; /* FERN */
+  color3: "#fad419"; /* BRIGHT_SUN */
+  color4: "#2c2b6f"; /* JACARTA */
+  color5: "#ff7939"; /* BURNING_ORANGE */
+  color6: "#db2e65"; /* CERISE_RED */
+  color7: "#99ce50"; /* CONIFER */
+  color8: "#962565"; /* ROYAL_HEATH */
+  color9: "#06cccc"; /* ROBINS_EGG_BLUE */
+}
+
+.plottable .colors {
+  /* OVERWRITE COLORS */
+}
