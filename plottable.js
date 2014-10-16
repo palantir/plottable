@@ -6245,7 +6245,7 @@ var Plottable;
             AbstractXYPlot.prototype.adjustDomainToVisiblePoints = function (values, affectedDomain) {
                 var visiblePoints = values.filter(function (d) { return d.x >= affectedDomain[0] && d.x <= affectedDomain[1]; });
                 var yValues = visiblePoints.map(function (d) { return d.y; });
-                if (yValues.length == 0) {
+                if (yValues.length === 0) {
                     yValues = [0];
                 }
                 return [Plottable._Util.Methods.min(yValues), Plottable._Util.Methods.max(yValues)];

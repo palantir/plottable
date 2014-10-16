@@ -120,7 +120,7 @@ export module Plot {
         var scale = <Scale.AbstractQuantitative<any>> adjustingScale;
         var adjustedDomain: any[] = this.adjustDomainToVisiblePoints(this.normalizeDatasets(), changedScale.domain());
         adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
-        scale._setDomain(adjustedDomain);  
+        scale._setDomain(adjustedDomain);
       }
     }
 
@@ -132,7 +132,7 @@ export module Plot {
     private adjustDomainToVisiblePoints(values: Point[], affectedDomain: any[]): any[] {
       var visiblePoints = values.filter(d => d.x >= affectedDomain[0] && d.x <= affectedDomain[1]);
       var yValues = visiblePoints.map(d => d.y);
-      if (yValues.length == 0) {
+      if (yValues.length === 0) {
         yValues = [0];
       }
 

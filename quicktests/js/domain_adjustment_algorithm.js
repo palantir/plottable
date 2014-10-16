@@ -15,7 +15,7 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  var linePlot = new Plottable.Plot.Line(xScale, yScale).addDataset(ds).autoDomainYScale(true);;
+  var linePlot = new Plottable.Plot.Line(xScale, yScale).autoDomainYScale(true).addDataset(ds);
   
   var focusXLabel = new Plottable.Component.Label("focus X");
 
