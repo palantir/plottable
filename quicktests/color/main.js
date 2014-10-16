@@ -1,11 +1,15 @@
+(function iife(){
 
-var singlePlots = ["VerticalBar"];
-var singleHorizontalPlots = ["HorizontalBar"];
-var multipleDatasetPlots = ["Line", "Area", "Scatter"];
-var stackedPlots = ["StackedBar", "StackedArea", "ClusteredBar"];
-var stackedHorizontalPlots = ["StackedBar", "ClusteredBar"];
-var piePlots = ["Pie"];
-var otherPlots = ["Grid"];
+"use strict";
+
+var P = Plottable.Plot;
+var singlePlots = [P.VerticalBar];
+var singleHorizontalPlots = [P.HorizontalBar];
+var multipleDatasetPlots = [P.Line, P.Area, P.Scatter];
+var stackedPlots = [P.StackedBar, P.StackedArea, P.ClusteredBar];
+var stackedHorizontalPlots = [P.StackedBar, P.ClusteredBar];
+var piePlots = [P.Pie];
+var otherPlots = [P.Grid];
 
 var plots = singlePlots.concat(singleHorizontalPlots, multipleDatasetPlots, stackedPlots, piePlots);
 var div = d3.select(".results");
@@ -15,8 +19,6 @@ var plotheight;
 //functions
 
 function renderPlots(plottablePlots){
-  "use strict";
-
   plottablePlots.forEach(function(plot){
     var box = div.append("svg").attr("height", plotheight).attr("width", plotwidth);
     var chart = new Plottable.Component.Table([[plot]]);
@@ -25,12 +27,10 @@ function renderPlots(plottablePlots){
 }
 
 function addAllDatasets(plot, arr, numOfDatasets){
-  "use strict";
-
-  if(numOfDatasets === "single"){
+  if (numOfDatasets === "single") {
     plot.addDataset("d1" , arr[0]);
   }
-  if(numOfDatasets === "multiple"){
+  if (numOfDatasets === "multiple") {
     arr.forEach(function(dataset){
       plot.addDataset(dataset);
     });
@@ -38,74 +38,61 @@ function addAllDatasets(plot, arr, numOfDatasets){
   return plot;
 }
 
-//dataType[0] = singleData
-//dataType[1] = multipleData
-//dataType[2] = stackedData
-
 function generatePlots(plots, dataType){
-  "use strict";
-
   var plottablePlots = [];
-  plots.forEach(function(plotType){
-
+  plots.forEach(function(PlotType){
     var xScale = new Plottable.Scale.Ordinal();
     var yScale = new Plottable.Scale.Linear();
     var colorScale = new Plottable.Scale.Color();
-    var string = "new Plottable.Plot." + plotType + "(xScale, yScale)";
-    var plot = eval(string);
-    plot.project("fill", "type", colorScale)
-        .animate(true);
+    var plot = new PlotType(xScale, yScale);
+      plot.attr("fill", "type", colorScale)
+      .animate(true);
 
 
-    if(singlePlots.indexOf(plotType) > -1){ //if single dataset plot
+    if (singlePlots.indexOf(PlotType) > -1) { //if single dataset plot
       plot = addAllDatasets(plot, dataType[0], "single");
       plottablePlots.push(plot);
     }
 
-    if(singleHorizontalPlots.indexOf(plotType) > -1){ //if single horizontal plot
+    if (singleHorizontalPlots.indexOf(PlotType) > -1) { //if single horizontal plot
       xScale = new Plottable.Scale.Linear();
       yScale = new Plottable.Scale.Ordinal();
       colorScale = new Plottable.Scale.Color();
-      string = "new Plottable.Plot." + plotType + "(xScale, yScale)";
-      plot = eval(string);
-
+      plot = new PlotType(xScale, yScale);
       plot.project("x", "y", xScale)
           .project("y", "x", yScale)
-          .project("fill", "type", colorScale)
+          .attr("fill", "type", colorScale)
           .animate(true);
-      
       plot = addAllDatasets(plot, dataType[0], "single");
       plottablePlots.push(plot);
     }
 
-
-    if(multipleDatasetPlots.indexOf(plotType) > -1){ //if multiple dataset plot
+    if (multipleDatasetPlots.indexOf(PlotType) > -1) { //if multiple dataset plot
       plot = addAllDatasets(plot, dataType[1], "multiple");
       plottablePlots.push(plot);
     }
 
-    if(stackedPlots.indexOf(plotType) > -1){ //if stacked dataset plot
+    if (stackedPlots.indexOf(PlotType) > -1) { //if stacked dataset plot
       plot = addAllDatasets(plot, dataType[2], "multiple");
       plottablePlots.push(plot);
     }
 
-    if(stackedHorizontalPlots.indexOf(plotType) > -1){ //if stacked horizontal dataset plot
+    if (stackedHorizontalPlots.indexOf(PlotType) > -1) { //if stacked horizontal dataset plot
       xScale = new Plottable.Scale.Linear();
       yScale = new Plottable.Scale.Ordinal();
       colorScale = new Plottable.Scale.Color();
-      string = "new Plottable.Plot." + plotType + "(xScale, yScale, false)";
-      plot = eval(string);
+      plot = new PlotType(xScale, yScale, false);
 
       plot.project("x", "y", xScale)
           .project("y", "x", yScale)
-          .project("fill", "type", colorScale)
+          .attr("fill", "type", colorScale)
           .animate(true);
       
       plot = addAllDatasets(plot, dataType[2], "multiple");
       plottablePlots.push(plot);
     }
 
-    if(piePlots.indexOf(plotType) > -1){ //if pie dataset plot
+    if (piePlots.indexOf(PlotType) > -1) { //if pie dataset plot
       plot.project("value", "x");
       plot = addAllDatasets(plot, dataType[0], "single");
       plottablePlots.push(plot);
@@ -116,21 +103,16 @@ function generatePlots(plots, dataType){
 }
 
 var orderByX = function(a,b){ 
-  "use strict";
   return a.x - b.x;
 };
 
 function setDatasetType(dataset, setType){
-  "use strict";
-
   dataset.forEach(function(datum){
     datum.type = setType;
   });
 }
 
 function makeRandomData(numPoints, series, scaleFactor) {
-  "use strict";
-
   if (typeof scaleFactor === "undefined") { scaleFactor = 1; }
   var data = [];
   for (var j = 0; j < series; j++){
@@ -148,25 +130,20 @@ function makeRandomData(numPoints, series, scaleFactor) {
 }
 
 function prepareSingleData(data){
-  "use strict";
-
   data[0].map(function(element){element.type = ""+ element.x;});
   return data;
 }
 
 function prepareMultipleData(data){
-  "use strict";
   return data;
 }
 
 function prepareStackedData(data){
-  "use strict";
-
   var stackedData = [];
   var firstDataset = data[0];
-  for (var i = 0; i < data.length; i++){
+  for (var i = 0; i < data.length; i++) {
     var dataset = data[i];
-    for(var j = 0; j < dataset.length; j++){
+    for (var j = 0; j < dataset.length; j++) {
       dataset[j].x = firstDataset[j].x;
     }
     stackedData.push(dataset);
@@ -175,8 +152,6 @@ function prepareStackedData(data){
 }
 
 function prepareData(seriesNumber){
-  "use strict";
-
   var data = [{x: "0", y: 0, type: "0"}];
 
   var categories = 5; //change this number for more/less data in multiple & stacked dataset
@@ -191,14 +166,17 @@ function prepareData(seriesNumber){
 }
 
 function initialize(){
-  "use strict";
-
-  var seriesNumber = Number($("#series")[0].value);
-  plotwidth = Number($("#width")[0].value);
-  plotheight = Number($("#height")[0].value);
+  var seriesNumber = Number(document.getElementById("series").value);
+  plotwidth = Number(document.getElementById("width").value);
+  plotheight = Number(document.getElementById("height").value);
 
   d3.selectAll("svg").remove();
   var dataArray = prepareData(seriesNumber);
   generatePlots(plots, dataArray);
 }
+
+var button = document.getElementById("render");
+button.onclick = initialize;
+
+})();
 
