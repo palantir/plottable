@@ -2929,7 +2929,7 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             _generateAttrToProjector(): AttributeToProjector;
-            _getDataToRender(): {
+            _getDataToDraw(): {
                 [x: string]: any[];
             };
         }

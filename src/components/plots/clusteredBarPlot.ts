@@ -37,11 +37,10 @@ export module Plot {
       attrToProjector["x"] = this._isVertical ? positionF : attrToProjector["x"];
       attrToProjector["y"] = this._isVertical ? attrToProjector["y"] : positionF;
 
-      debugger;
       return attrToProjector;
     }
 
-    public _getDataToRender() {
+    public _getDataToDraw() {
       var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       this.innerScale.domain(this._datasetKeysInOrder);
       var clusters: {[key: string]: any[]} = {};

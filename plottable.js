@@ -3184,7 +3184,6 @@ var Plottable;
                 return this._renderArea.selectAll(this._svgElement);
             };
             Element.prototype._drawStep = function (step) {
-                debugger;
                 _super.prototype._drawStep.call(this, step);
                 var drawSelection = this._getDrawSelection();
                 if (step.attrToProjector["fill"]) {
@@ -7003,10 +7002,9 @@ var Plottable;
                 var positionF = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_POSITION; };
                 attrToProjector["x"] = this._isVertical ? positionF : attrToProjector["x"];
                 attrToProjector["y"] = this._isVertical ? attrToProjector["y"] : positionF;
-                debugger;
                 return attrToProjector;
             };
-            ClusteredBar.prototype._getDataToRender = function () {
+            ClusteredBar.prototype._getDataToDraw = function () {
                 var _this = this;
                 var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 this.innerScale.domain(this._datasetKeysInOrder);

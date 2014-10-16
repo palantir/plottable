@@ -15,7 +15,6 @@ export module _Drawer {
     }
 
     public _drawStep(step: DrawStep) {
-      debugger;
       super._drawStep(step);
       var drawSelection = this._getDrawSelection();
       if (step.attrToProjector["fill"]) {

@@ -1995,7 +1995,6 @@ describe("Plots", function () {
             renderArea = areaPlot._renderArea;
         });
         it("draws area and line correctly", function () {
-            debugger;
             var areaPath = renderArea.select(".area");
             assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
             assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
