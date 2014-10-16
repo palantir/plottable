@@ -36,7 +36,7 @@ export module Interaction {
     private hoverOverCallback: (hoverData: HoverData) => any;
     private hoverOutCallback: (hoverData: HoverData) => any;
 
-    private lastHoverData: HoverData = {
+    private currentHoverData: HoverData = {
       data: null,
       selection: null
     };
@@ -52,8 +52,8 @@ export module Interaction {
 
       this.dispatcher.mouseout((p: Point) => {
         this._componentToListenTo._hoverOutComponent(p);
-        this.safeHoverOut(this.lastHoverData);
-        this.lastHoverData = {
+        this.safeHoverOut(this.currentHoverData);
+        this.currentHoverData = {
           data: null,
           selection: null
         };
@@ -90,15 +90,16 @@ export module Interaction {
     }
 
     private handleHoverOver(p: Point) {
+      var lastHoverData = this.currentHoverData;
       var newHoverData = this._componentToListenTo._doHover(p);
 
-      var outData = Hover.diffHoverData(this.lastHoverData, newHoverData);
+      var outData = Hover.diffHoverData(lastHoverData, newHoverData);
       this.safeHoverOut(outData);
 
-      var overData = Hover.diffHoverData(newHoverData, this.lastHoverData);
+      var overData = Hover.diffHoverData(newHoverData, lastHoverData);
       this.safeHoverOver(overData);
 
-      this.lastHoverData = newHoverData;
+      this.currentHoverData = newHoverData;
     }
 
     private safeHoverOut(outData: HoverData) {
@@ -143,8 +144,8 @@ export module Interaction {
      * @return {HoverData} The data and selection corresponding to the elements
      *                     the user is currently hovering over.
      */
-    public getCurrentlyHovered(): HoverData {
-      return this.lastHoverData;
+    public getCurrentHoverData(): HoverData {
+      return this.currentHoverData;
     }
   }
 }

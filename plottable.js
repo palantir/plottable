@@ -8267,7 +8267,7 @@ var Plottable;
             __extends(Hover, _super);
             function Hover() {
                 _super.apply(this, arguments);
-                this.lastHoverData = {
+                this.currentHoverData = {
                     data: null,
                     selection: null
                 };
@@ -8282,8 +8282,8 @@ var Plottable;
                 });
                 this.dispatcher.mouseout(function (p) {
                     _this._componentToListenTo._hoverOutComponent(p);
-                    _this.safeHoverOut(_this.lastHoverData);
-                    _this.lastHoverData = {
+                    _this.safeHoverOut(_this.currentHoverData);
+                    _this.currentHoverData = {
                         data: null,
                         selection: null
                     };
@@ -8313,12 +8313,13 @@ var Plottable;
                 };
             };
             Hover.prototype.handleHoverOver = function (p) {
+                var lastHoverData = this.currentHoverData;
                 var newHoverData = this._componentToListenTo._doHover(p);
-                var outData = Hover.diffHoverData(this.lastHoverData, newHoverData);
+                var outData = Hover.diffHoverData(lastHoverData, newHoverData);
                 this.safeHoverOut(outData);
-                var overData = Hover.diffHoverData(newHoverData, this.lastHoverData);
+                var overData = Hover.diffHoverData(newHoverData, lastHoverData);
                 this.safeHoverOver(overData);
-                this.lastHoverData = newHoverData;
+                this.currentHoverData = newHoverData;
             };
             Hover.prototype.safeHoverOut = function (outData) {
                 if (this.hoverOutCallback && outData.data) {
@@ -8358,8 +8359,8 @@ var Plottable;
              * @return {HoverData} The data and selection corresponding to the elements
              *                     the user is currently hovering over.
              */
-            Hover.prototype.getCurrentlyHovered = function () {
-                return this.lastHoverData;
+            Hover.prototype.getCurrentHoverData = function () {
+                return this.currentHoverData;
             };
             return Hover;
         })(Interaction.AbstractInteraction);

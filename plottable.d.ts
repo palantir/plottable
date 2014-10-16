@@ -3530,7 +3530,7 @@ declare module Plottable {
              * @return {HoverData} The data and selection corresponding to the elements
              *                     the user is currently hovering over.
              */
-            getCurrentlyHovered(): HoverData;
+            getCurrentHoverData(): HoverData;
         }
     }
 }

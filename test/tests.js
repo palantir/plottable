@@ -6189,15 +6189,15 @@ describe("Interactions", function () {
             assert.deepEqual(outData.data, ["left", "right"], "onHoverOut is called with the correct data");
             svg.remove();
         });
-        it("getCurrentlyHovered()", function () {
+        it("getCurrentHoverData()", function () {
             triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
-            var currentlyHovered = hoverInteraction.getCurrentlyHovered();
+            var currentlyHovered = hoverInteraction.getCurrentHoverData();
             assert.deepEqual(currentlyHovered.data, ["left"], "retrieves data corresponding to the current position");
             triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
-            currentlyHovered = hoverInteraction.getCurrentlyHovered();
+            currentlyHovered = hoverInteraction.getCurrentHoverData();
             assert.deepEqual(currentlyHovered.data, ["left", "right"], "retrieves data corresponding to the current position");
             triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
-            currentlyHovered = hoverInteraction.getCurrentlyHovered();
+            currentlyHovered = hoverInteraction.getCurrentHoverData();
             assert.isNull(currentlyHovered.data, "returns null if not currently hovering");
             svg.remove();
         });
