@@ -62,7 +62,7 @@ describe("Interactions", () => {
       hitbox = testTarget._element.select(".hit-box");
     });
 
-    it("correctly triggers onHoverOver() and onHOverOut() callbacks", () => {
+    it("correctly triggers onHoverOver() callbacks", () => {
       overCallbackCalled = false;
       triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
       assert.isTrue(overCallbackCalled, "onHoverOver was called on mousing over a target area");
@@ -80,6 +80,22 @@ describe("Interactions", () => {
       assert.deepEqual(overData.data, ["right"],
                         "onHoverOver was called with the new data only (left --> center)");
 
+      triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+      overCallbackCalled = false;
+      triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
+      assert.deepEqual(overData.data, ["left", "right"], "onHoverOver is called with the correct data");
+
+      svg.remove();
+    });
+
+    it("correctly triggers onHoverOut() callbacks", () => {
+      triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
+
+      outCallbackCalled = false;
+      triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
+      assert.isFalse(outCallbackCalled,
+        "onHoverOut isn't called when mousing into a new region without leaving the old one");
+
       outCallbackCalled = false;
       triggerFakeMouseEvent("mousemove", hitbox, 300, 200);
       assert.isTrue(outCallbackCalled, "onHoverOut was called when the hover data changes");
@@ -91,9 +107,10 @@ describe("Interactions", () => {
       assert.isTrue(outCallbackCalled, "onHoverOut is called on mousing out of the Component");
       assert.deepEqual(outData.data, ["right"], "onHoverOut was called with the correct data");
 
-      overCallbackCalled = false;
+      outCallbackCalled = false;
       triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
-      assert.deepEqual(overData.data, ["left", "right"], "onHoverOver is called with the correct data");
+      triggerFakeMouseEvent("mouseout", hitbox, 200, 400);
+      assert.deepEqual(outData.data, ["left", "right"], "onHoverOut is called with the correct data");
 
       svg.remove();
     });
