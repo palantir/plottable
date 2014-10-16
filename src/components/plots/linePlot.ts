@@ -19,8 +19,8 @@ export module Plot {
       this.classed("line-plot", true);
       this.project("stroke", () => Core.Colors.INDIGO); // default
       this.project("stroke-width", () => "2px"); // default
-      this._animators["line-reset"] = new Animator.Null();
-      this._animators["line-main"] = new Animator.Base()
+      this._animators["reset"] = new Animator.Null();
+      this._animators["main"] = new Animator.Base()
                                         .duration(600)
                                         .easing("exp-in-out");
     }

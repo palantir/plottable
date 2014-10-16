@@ -6852,8 +6852,8 @@ var Plottable;
                 this.classed("line-plot", true);
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
                 this.project("stroke-width", function () { return "2px"; }); // default
-                this._animators["line-reset"] = new Plottable.Animator.Null();
-                this._animators["line-main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
+                this._animators["reset"] = new Plottable.Animator.Null();
+                this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
             Line.prototype._rejectNullsAndNaNs = function (d, i, projector) {
                 var value = projector(d, i);
