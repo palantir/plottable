@@ -37,7 +37,7 @@ export module _Drawer {
                       .sort(null)
                       .value(valueAccessor)(data);
 
-      drawSteps.map(s => delete s.attrToProjector["value"]); 
+      drawSteps.map(s => delete s.attrToProjector["value"]);
       super.draw(pie, drawSteps);
     }
   }

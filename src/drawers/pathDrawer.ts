@@ -16,7 +16,7 @@ export module _Drawer {
     }
 
     public setup(area: D3.Selection) {
-      area.append("path").classed("line", true)
+      area.append("path").classed("line", true);
       super.setup(area);
       this.pathSelection = this._renderArea.select(".line");
     }
@@ -25,7 +25,8 @@ export module _Drawer {
       return d3.svg.line()
                .x(xFunction)
                .y(yFunction)
-               .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction));
+               .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction)
+                               && this._rejectNullsAndNaNs(d, i, yFunction));
     }
 
     public _drawStep(step: DrawStep) {
@@ -38,7 +39,7 @@ export module _Drawer {
 
       var line = this.createLine(xFunction, yFunction);
       attrToProjector["d"] = line;
-      
+
       if (attrToProjector["fill"]) {
         this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }

@@ -48,11 +48,11 @@ export module Plot {
       if (attrToProjector["fill"] == null) {
         attrToProjector["fill"] = (d: any, i: number) => Pie.DEFAULT_COLOR_SCALE.scale(String(i));
       }
-      
+
       var defaultAccessor = (d: any) => d.value;
       var valueProjector = this._projectors["value"];
       attrToProjector["value"] = valueProjector ? valueProjector.accessor : defaultAccessor;
-      
+
       return attrToProjector;
     }
 

@@ -11,7 +11,7 @@ export module _Drawer {
     }
 
     public setup(area: D3.Selection) {
-      area.append("path").classed("area", true)
+      area.append("path").classed("area", true);
       super.setup(area);
       this.areaSelection = this._renderArea.select(".area");
     }
@@ -21,11 +21,13 @@ export module _Drawer {
               .x(xFunction)
               .y0(y0Function)
               .y1(y1Function)
-              .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, y0Function) && this._rejectNullsAndNaNs(d, i, y1Function));
+              .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction)
+                              && this._rejectNullsAndNaNs(d, i, y0Function)
+                              && this._rejectNullsAndNaNs(d, i, y1Function));
     }
 
     public _drawStep(step: DrawStep) {
-      super._drawStep(step); 
+      super._drawStep(step);
       var attrToProjector = step.attrToProjector;
       var xFunction       = attrToProjector["x"];
       var y0Function      = attrToProjector["y0"];
@@ -33,7 +35,7 @@ export module _Drawer {
       delete attrToProjector["x"];
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
-      
+
       var area = this.createArea(xFunction, y0Function, y1Function);
       attrToProjector["d"] = area;
 

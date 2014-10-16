@@ -193,7 +193,7 @@ export module Plot {
         "y2": this._isVertical ? scaledBaseline : this.height()
       };
 
-      this._getAnimator("baseline").animate(this._baseline, baselineAttr)
+      this._getAnimator("baseline").animate(this._baseline, baselineAttr);
     }
 
     public _generateDrawSteps(): DrawStep[] {
