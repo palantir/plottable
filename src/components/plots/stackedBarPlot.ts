@@ -48,14 +48,14 @@ export module Plot {
       var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var primaryAccessor = this._projectors[primaryAttr].accessor;
       var getStart = (d: any) => primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      var getEnd = (d: any) => primaryScale.scale(primaryAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var getEnd = (d: any) => primaryScale.scale(+primaryAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
       var heightF = (d: any) => Math.abs(getEnd(d) - getStart(d));
       var widthF = attrToProjector["width"];
       attrToProjector["height"] = this._isVertical ? heightF : widthF;
       attrToProjector["width"] = this._isVertical ? widthF : heightF;
 
-      var attrFunction = (d: any) => primaryAccessor(d) < 0 ? getStart(d) : getEnd(d);
+      var attrFunction = (d: any) => +primaryAccessor(d) < 0 ? getStart(d) : getEnd(d);
       attrToProjector[primaryAttr] = (d: any) => this._isVertical ? attrFunction(d) : attrFunction(d) - heightF(d);
       return attrToProjector;
     }

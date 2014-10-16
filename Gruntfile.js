@@ -70,16 +70,6 @@ module.exports = function(grunt) {
       replacement: "",
       path: "build/plottable.d.ts",
     },
-    public_protected_definitions: {
-      pattern: jsdoc + prefixMatch + "public _" + varNameMatch + finalMatch,
-      replacement: "",
-      path: "plottable.d.ts",
-    },
-    protected_definitions: {
-      pattern: jsdoc + prefixMatch + "_" + varNameMatch + finalMatch,
-      replacement: "",
-      path: "plottable.d.ts",
-    },
     plottable_multifile: {
       pattern: '/// *<reference path="([^."]*).ts" */>',
       replacement: 'synchronousRequire("/build/src/$1.js");',
@@ -190,7 +180,9 @@ module.exports = function(grunt) {
       options: {
         configuration: grunt.file.readJSON("tslint.json")
       },
-      files: ["src/**/*.ts", "test/**/*.ts"]
+      all: {
+        src: ["src/**/*.ts", "test/**/*.ts"]
+      }
     },
     jshint: {
       files: ['Gruntfile.js', 'quicktests/**/*.js'],
@@ -213,6 +205,11 @@ module.exports = function(grunt) {
           },
           "strict": true,
           "eqnull": true
+      }
+    },
+    parallelize: {
+      tslint: {
+        all: 4
       }
     },
     watch: {
@@ -315,9 +312,6 @@ module.exports = function(grunt) {
   grunt.registerTask("definitions_prod", function() {
     grunt.file.copy("build/plottable.d.ts", "plottable.d.ts");
   });
-  grunt.registerTask("copy-dev-defs", function () {
-    grunt.file.copy("plottable.d.ts", "plottable-dev.d.ts");
-  });
   grunt.registerTask("test-compile", [
                                   "ts:test",
                                   "concat:tests_multifile",
@@ -337,9 +331,6 @@ module.exports = function(grunt) {
       "sed:version_number",
       "definitions_prod",
       "test-compile",
-      "copy-dev-defs",
-      "sed:public_protected_definitions",
-      "sed:protected_definitions",
       "concat:plottable_multifile",
       "sed:plottable_multifile",
       "clean:tscommand"
@@ -354,7 +345,7 @@ module.exports = function(grunt) {
   grunt.registerTask("dist-compile", [
                                   "dev-compile",
                                   "blanket_mocha",
-                                  "tslint",
+                                  "parallelize:tslint",
                                   "ts:verify_d_ts",
                                   "uglify",
                                   "compress"
@@ -364,7 +355,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
-  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "tslint", "jshint", "ts:verify_d_ts"]);
+  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "parallelize:tslint", "jshint", "ts:verify_d_ts"]);
   // Disable saucelabs for external pull requests. Check if we can see the SAUCE_USERNAME
   var travisTests = ["test"];
   if (process.env.SAUCE_USERNAME) {
