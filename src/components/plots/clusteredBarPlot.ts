@@ -75,6 +75,6 @@ export module Plot {
       this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
 
     }
-  }
+
 }
 }

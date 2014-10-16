@@ -14,6 +14,20 @@ svg.plottable {
   fill: #32313F;
 }
 
+.plottable .bar-label-text-area {
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  /*font-weight: bold;*/
+}
+
+.plottable .light-label {
+  fill: white;
+}
+
+.plottable .dark-label {
+  fill: #32313F;
+}
+
 .plottable .axis-label text {
   font-size: 10px;
   font-weight: bold;

@@ -12,7 +12,6 @@ function makeData() {
 
 function run(div, data, Plottable) {
   "use strict";
-
   var svg = div.append("svg").attr("height", 800);
 
   var xScale1 = new Plottable.Scale.Ordinal();
@@ -36,6 +35,7 @@ function run(div, data, Plottable) {
     .project("x", "quarter", xScale1)
     .project("y", "earnings", yScale1)
     .project("fill", "team", colorScale)
+    .project("label", "earnings")
     .addDataset("d1", data[0])
     .addDataset("d2", data[1])
     .addDataset("d3", data[2])
@@ -44,6 +44,7 @@ function run(div, data, Plottable) {
 
   var horizontalPlot = new Plottable.Plot.StackedBar(xScale2, yScale2, false)
     .project("x", "earnings", xScale2)
+    .project("label", "earnings")
     .project("y", "quarter", yScale2)
     .project("fill", "team", colorScale)
     .addDataset("d1", data[0])
@@ -59,7 +60,7 @@ function run(div, data, Plottable) {
   var chart2 = new Plottable.Component.Table([
     [yAxis2, horizontalPlot], [null, xAxis2]
     ]);
-  
+
   var finalchart = new Plottable.Component.Table([
     [title],
     [legend],

@@ -6,6 +6,7 @@
 /// <reference path="utils/textUtils.ts" />
 /// <reference path="utils/wordWrapUtils.ts" />
 /// <reference path="utils/domUtils.ts" />
+/// <reference path="utils/color.ts" />
 
 /// <reference path="utils/formatters.ts" />
 

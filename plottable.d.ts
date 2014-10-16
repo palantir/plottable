@@ -398,6 +398,21 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module _Util {
+        module Color {
+            /**
+             * Return contrast ratio between two colors
+             * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under modified MIT)
+             * chroma.js may be found here: https://github.com/gka/chroma.js
+             * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
+             */
+            function contrast(a: string, b: string): number;
+        }
+    }
+}
+
+
+declare module Plottable {
     interface Formatter {
         (d: any): string;
     }
@@ -1542,6 +1557,7 @@ declare module Plottable {
     module _Drawer {
         class Rect extends AbstractDrawer {
             draw(data: any[], attrToProjector: AttributeToProjector, animator?: Animator.Null): void;
+            drawText(data: any[], attrToProjector: AttributeToProjector): void;
         }
     }
 }

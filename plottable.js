@@ -1081,6 +1081,45 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    (function (_Util) {
+        (function (Color) {
+            /**
+             * Return relative luminance (defined here: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef)
+             * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under modified MIT)
+             * chroma.js may be found here: https://github.com/gka/chroma.js
+             */
+            function luminance(color) {
+                var rgb = d3.rgb(color);
+                var luminance_x = function (x) {
+                    x = x / 255;
+                    return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+                };
+                var r = luminance_x(rgb.r);
+                var g = luminance_x(rgb.g);
+                var b = luminance_x(rgb.b);
+                return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            }
+            /**
+             * Return contrast ratio between two colors
+             * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under modified MIT)
+             * chroma.js may be found here: https://github.com/gka/chroma.js
+             * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
+             */
+            function contrast(a, b) {
+                var l1 = luminance(a) + 0.05;
+                var l2 = luminance(b) + 0.05;
+                return l1 > l2 ? l1 / l2 : l2 / l1;
+            }
+            Color.contrast = contrast;
+        })(_Util.Color || (_Util.Color = {}));
+        var Color = _Util.Color;
+    })(Plottable._Util || (Plottable._Util = {}));
+    var _Util = Plottable._Util;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
     (function (Formatters) {
         /**
@@ -3116,6 +3155,66 @@ var Plottable;
                 dataElements.enter().append(svgElement);
                 animator.animate(dataElements, attrToProjector);
                 dataElements.exit().remove();
+                if (attrToProjector["label"]) {
+                    this.drawText(data, attrToProjector);
+                }
+            };
+            Rect.prototype.drawText = function (data, attrToProjector) {
+                // HACKHACK #1109
+                this._renderArea.select(".bar-label-text-area").remove();
+                var textArea = this._renderArea.append("g").classed("bar-label-text-area", true);
+                var measurer = Plottable._Util.Text.getTextMeasurer(textArea.append("text"));
+                var allFitWidth = true;
+                var isVertical = true;
+                var toDraw = data.map(function (d, i) {
+                    var text = attrToProjector["label"](d, i).toString();
+                    isVertical = attrToProjector["isVertical"](d, i); // HACKHACK for convenience
+                    var w = attrToProjector["width"](d, i);
+                    var h = attrToProjector["height"](d, i);
+                    var x = attrToProjector["x"](d, i);
+                    var y = attrToProjector["y"](d, i);
+                    var positive = attrToProjector["positive"](d, i);
+                    var measurement = measurer(text);
+                    var color = attrToProjector["fill"](d, i);
+                    var dark = Plottable._Util.Color.contrast('white', color) * 1.6 < Plottable._Util.Color.contrast('black', color);
+                    var primary = isVertical ? h : w;
+                    var primarySpace = isVertical ? measurement.height : measurement.width;
+                    // allFitWidth = allFitWidth && (isVertical ? measurement.width <= w : measurement.height <= h);
+                    if (measurement.height <= h && measurement.width <= w) {
+                        var offset = Math.min((primary - primarySpace) / 2, 5);
+                        if (!positive) {
+                            offset = offset * -1;
+                        }
+                        if (isVertical) {
+                            y += offset;
+                        }
+                        else {
+                            x += offset;
+                        }
+                        return { x: x, y: y, width: w, height: h, text: text, positive: positive, dark: dark };
+                    }
+                    else {
+                        return null;
+                    }
+                }).filter(function (d) { return !!d; }); // reject nulls
+                if (allFitWidth) {
+                    toDraw.forEach(function (t) {
+                        var g = textArea.append("g").attr("transform", "translate(" + t.x + "," + t.y + ")");
+                        var className = t.dark ? "dark-label" : "light-label";
+                        g.classed(className, true);
+                        var xAlign;
+                        var yAlign;
+                        if (isVertical) {
+                            xAlign = "center";
+                            yAlign = t.positive ? "top" : "bottom";
+                        }
+                        else {
+                            xAlign = t.positive ? "left" : "right";
+                            yAlign = "center";
+                        }
+                        Plottable._Util.Text.writeLineHorizontally(t.text, g, t.width, t.height, xAlign, yAlign);
+                    });
+                }
             };
             return Rect;
         })(_Drawer.AbstractDrawer);
@@ -6581,6 +6680,8 @@ var Plottable;
                 attrToProjector["height"] = function (d, i) {
                     return Math.abs(scaledBaseline - originalPositionFn(d, i));
                 };
+                attrToProjector["positive"] = function (d, i) { return originalPositionFn(d, i) <= scaledBaseline; };
+                attrToProjector["isVertical"] = d3.functor(this._isVertical);
                 return attrToProjector;
             };
             AbstractBarPlot._BarAlignmentToFactor = {};

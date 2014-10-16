@@ -264,6 +264,8 @@ export module Plot {
         return Math.abs(scaledBaseline - originalPositionFn(d, i));
       };
 
+      attrToProjector["positive"] = (d: any, i: number) => originalPositionFn(d, i) <= scaledBaseline;
+      attrToProjector["isVertical"] = d3.functor(this._isVertical);
       return attrToProjector;
     }
   }
