@@ -5,8 +5,8 @@ export module Plot {
   export class AbstractXYPlot<X,Y> extends AbstractPlot {
     public _xScale: Scale.AbstractScale<X, number>;
     public _yScale: Scale.AbstractScale<Y, number>;
-    public _adjustmentYScaleDomainPolicy: AdjustmentDomainPolicy<X,Y>;
-    public _adjustmentXScaleDomainPolicy: AdjustmentDomainPolicy<Y,X>;
+    public _autoDomainXScale = false;
+    public _autoDomainYScale = false;
 
     /**
      * Constructs an XYPlot.
@@ -55,47 +55,25 @@ export module Plot {
     }
 
     /**
-     * Gets the adjustment domain policy for y scale.
+     * Sets the auto domain to visible points for y scale.
      *
-     * @returns {AdjustmentDomainPolicy} The current adjustment domain policy for y scale.
-     */
-    public adjustmentYScaleDomainPolicy(): AdjustmentDomainPolicy<X,Y> ;
-    /**
-     * Sets the adjustment domain policy for y scale.
-     *
-     * @param {AdjustmentDomainPolicy} policy The new value for the adjustment domain policy for y scale.
+     * @param {boolean} autoDomain The new value for the auto domain for y scale.
      * @returns {AbstractXYPlot} The calling AbstractXYPlot.
      */
-    public adjustmentYScaleDomainPolicy(policy: AdjustmentDomainPolicy<X,Y>): AbstractXYPlot<X,Y> ;
-    public adjustmentYScaleDomainPolicy(policy?: AdjustmentDomainPolicy<X,Y>): any {
-      if (policy == null) {
-        return this._adjustmentYScaleDomainPolicy;
-      } else {
-        this._adjustmentYScaleDomainPolicy = policy;
-        return this;
-      }
+    public autoDomainYScale(autoDomain: boolean): AbstractXYPlot<X,Y> {
+      this._autoDomainYScale = autoDomain;
+      return this;
     }
 
     /**
-     * Gets the adjustDmentomainAlgorithm for x scale.
+     * Sets the auto domain to visible points for x scale.
      *
-     * @returns {AdjustmentDomainPolicy} The current adjustDomainAlgorithm for x scale.
-     */
-    public adjustmentXScaleDomainPolicy(): AdjustmentDomainPolicy<Y,X> ;
-    /**
-     * Sets the adjustDomainAlgorithm for x scale.
-     *
-     * @param {AdjustmentDomainPolicy} policy The new value for the adjustDomainAlgorithm for x scale.
+     * @param {boolean} autoDomain The new value for the auto domain for x scale.
      * @returns {AbstractXYPlot} The calling AbstractXYPlot.
      */
-    public adjustmentXScaleDomainPolicy(policy: AdjustmentDomainPolicy<Y,X>): AbstractXYPlot<X,Y> ;
-    public adjustmentXScaleDomainPolicy(policy?: AdjustmentDomainPolicy<Y,X>): any {
-      if (policy == null) {
-        return this._adjustmentXScaleDomainPolicy;
-      } else {
-        this._adjustmentXScaleDomainPolicy = policy;
-        return this;
-      }
+    public autoDomainXScale(autoDomain: boolean): AbstractXYPlot<X,Y>  {
+      this._autoDomainXScale = autoDomain;
+      return this;
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
@@ -122,23 +100,43 @@ export module Plot {
       }
     }
 
+    /**
+     * Adjust both domains to show all datasets.
+     *
+     * This call does not override auto domain logic to visible points.
+     */
+    public showAllData() {
+      this._xScale.autoDomain();
+      if(!this._autoDomainYScale) {
+        this._yScale.autoDomain();
+      }
+    }
+
     private adjustDomain(xDomainChanged: boolean) {
-      var adjustmentPolicy: AdjustmentDomainPolicy<any, any> = xDomainChanged ?
-        this._adjustmentYScaleDomainPolicy : this._adjustmentXScaleDomainPolicy;
+      var autoDomain = xDomainChanged ? this._autoDomainYScale : this._autoDomainXScale;
       var changedScale: Scale.AbstractScale<any, any> = xDomainChanged ? this._xScale : this._yScale;
       var adjustingScale: Scale.AbstractScale<any, any> = xDomainChanged ? this._yScale : this._xScale;
-      if(adjustmentPolicy != null) {
-        var flattenDatasets = _Util.Methods.flatten(this.datasets().map(d => d.data()));
-        var values = flattenDatasets.map(d => { return { x: this._projectors["x"].accessor(d), y: this._projectors["y"].accessor(d) }; });
-        var adjustedDomain: any[] = adjustmentPolicy(values, changedScale.domain());
-        if (adjustingScale instanceof Scale.AbstractQuantitative) {
-          var scale = <Scale.AbstractQuantitative<any>> adjustingScale;
-          adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
-          scale._setDomain(adjustedDomain);
-        } else {
-          adjustingScale._setDomain(adjustedDomain);
-        }
+      if(autoDomain && adjustingScale instanceof Scale.AbstractQuantitative) {
+        var scale = <Scale.AbstractQuantitative<any>> adjustingScale;
+        var adjustedDomain: any[] = this.adjustDomainToVisiblePoints(this.normalizeDatasets(), changedScale.domain());
+        adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
+        scale._setDomain(adjustedDomain);  
       }
+    }
+
+    private normalizeDatasets() {
+      var flattenDatasets = _Util.Methods.flatten(this.datasets().map(d => d.data()));
+      return flattenDatasets.map(d => { return { x: this._projectors["x"].accessor(d), y: this._projectors["y"].accessor(d) }; });
+    }
+
+    private adjustDomainToVisiblePoints(values: Point[], affectedDomain: any[]): any[] {
+      var visiblePoints = values.filter(d => d.x >= affectedDomain[0] && d.x <= affectedDomain[1]);
+      var yValues = visiblePoints.map(d => d.y);
+      if (yValues.length == 0) {
+        yValues = [0];
+      }
+
+      return [_Util.Methods.min(yValues), _Util.Methods.max(yValues)];
     }
   }
 }

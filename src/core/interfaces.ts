@@ -98,11 +98,4 @@ module Plottable {
     drawer: _Drawer.AbstractDrawer;
     key: string;
   }
-
-  /**
-   * An adjustment policy for domain to set based of datasets' points and affected domain.
-   */
-  export interface AdjustmentDomainPolicy<A,B> {
-    (values: Point[], affectedDomain: A[]): B[];
-  }
 }

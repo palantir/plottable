@@ -260,44 +260,87 @@ describe("Plots", () => {
   });
 
   describe("Abstract XY Plot", () => {
-    it("custom scale adjustment algorithm", () => {
-      var xScale = new Plottable.Scale.Linear().domain([-10, 10]);
-      var yScale = new Plottable.Scale.Linear().domain([-10, 10]);
-      var plot = new Plottable.Plot.AbstractXYPlot(xScale, yScale);
-      plot.adjustmentYScaleDomainPolicy((values, xDomain) => [-2, 2]);
-      var svg = generateSVG(400, 400);
-      plot.renderTo(svg);
-      xScale.domain([-1, -1]);
-      assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain is adjusted using custom algorithm and domainer");
+    var svg: D3.Selection;
+    var xScale: Plottable.Scale.Linear;
+    var yScale: Plottable.Scale.Linear;
+    var xAccessor: any;
+    var yAccessor: any;
+    var simpleDataset: Plottable.Dataset;
+    var plot: Plottable.Plot.AbstractXYPlot<number, number>;
+
+    before(() => {
+      xAccessor = (d: any) => d.x;
+      yAccessor = (d: any) => d.y;
+    });
+
+    beforeEach(() => {
+      svg = generateSVG(500, 500);
+      simpleDataset = new Plottable.Dataset([{x: -5, y: 6}, {x: -2, y: 2}, {x: 2, y: -2}, {x: 5, y: -6}]);
+      xScale = new Plottable.Scale.Linear().domain([-10, 10]);
+      yScale = new Plottable.Scale.Linear().domain([-10, 10]);
+      plot = new Plottable.Plot.AbstractXYPlot(xScale, yScale);
+      plot.addDataset(simpleDataset)
+          .project("x", xAccessor, xScale)
+          .project("y", yAccessor, yScale)
+          .renderTo(svg);
+    });
+
+    it("plot auto domain scale to visible points", () => {
+      xScale.domain([-3, -3]);
+      assert.deepEqual(yScale.domain(), [-10, 10], "domain has not been adjusted to visible points");
+      plot.autoDomainYScale(true);
+      xScale.domain([-2, 2]);
+      assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
       svg.remove();
     });
 
-    it("no cycle in adjustment algorithms", () => {
-      var xScale = new Plottable.Scale.Linear().domain([-10, 10]);
-      var yScale = new Plottable.Scale.Linear().domain([-10, 10]);
-      var zScale = new Plottable.Scale.Linear().domain([-10, 10]);
-      var plot1 = new Plottable.Plot.AbstractXYPlot(xScale, yScale);
-      var changeDomainPolicyGenerator = (newDomain: number[]) => (values: any, domain: number[]) => newDomain;
-      plot1.adjustmentYScaleDomainPolicy(changeDomainPolicyGenerator([-2, 2]));
-      var plot2 = new Plottable.Plot.AbstractXYPlot(zScale, yScale);
-      plot2.adjustmentXScaleDomainPolicy(changeDomainPolicyGenerator([-4, 4]));
-      var plot3 = new Plottable.Plot.AbstractXYPlot(zScale, xScale);
-      plot3.adjustmentYScaleDomainPolicy(changeDomainPolicyGenerator([-6, 6]));
+    it("no visible points", () => {
+      plot.autoDomainYScale(true);
+      xScale.domain([-0.5, 0.5]);
+      assert.deepEqual(yScale.domain(), [-1, 1], "domain has been adjusted to default domain");
+      svg.remove();
+    });
 
-      var svg = generateSVG(400, 400);
-      plot1.renderTo(svg);
+    it("show all data", () => {
+      plot.autoDomainYScale(true);
+      xScale.domain([-0.5, 0.5]);
+      plot.showAllData();
+      assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
+      assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
+      svg.remove();
+    });
+
+    it("show all data without auto domain", () => {
+      plot.autoDomainYScale(true);
+      xScale.domain([-0.5, 0.5]);
+      plot.autoDomainYScale(false);
+      plot.showAllData();
+      assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
+      assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
+      svg.remove();
+    });
+
+    it("no cycle in auto domain on plot", () => {
+      var zScale = new Plottable.Scale.Linear().domain([-10, 10]);
+      plot.autoDomainYScale(true);
+      var plot2 = new Plottable.Plot.AbstractXYPlot(zScale, yScale)
+                                    .autoDomainXScale(true)
+                                    .project("x", xAccessor, zScale)
+                                    .project("y", yAccessor, yScale)
+                                    .addDataset(simpleDataset);
+      var plot3 = new Plottable.Plot.AbstractXYPlot(zScale, xScale)
+                                    .autoDomainYScale(true)
+                                    .project("x", xAccessor, zScale)
+                                    .project("y", yAccessor, xScale)
+                                    .addDataset(simpleDataset);
       plot2.renderTo(svg);
       plot3.renderTo(svg);
-      xScale.domain([0, 0]);
-      assert.deepEqual(yScale.domain(), [-2.5, 2.5], "y domain is adjusted by x domain using custom algorithm and domainer");
-      assert.deepEqual(zScale.domain(), [-5, 5],     "z domain is adjusted by y domain using custom algorithm and domainer");
-      assert.deepEqual(xScale.domain(), [0, 0],      "x domain is not adjusted using custom algorithm and domainer");
 
-      plot2.adjustmentXScaleDomainPolicy(changeDomainPolicyGenerator([-8, 8]));
-      yScale.domain([0, 0]);
-      assert.deepEqual(xScale.domain(), [-6, 6],   "x domain is adjusted by z domain using custom algorithm and domainer");
-      assert.deepEqual(zScale.domain(), [-10, 10], "z domain is adjusted by y domain using custom algorithm and domainer");
-      assert.deepEqual(yScale.domain(), [0, 0],    "y domain is not adjusted using custom algorithm and domainer");
+      xScale.domain([-2, 2]);
+      assert.deepEqual(yScale.domain(), [-2.5, 2.5], "y domain is adjusted by x domain using custom algorithm and domainer");
+      assert.deepEqual(zScale.domain(), [-2.5, 2.5], "z domain is adjusted by y domain using custom algorithm and domainer");
+      assert.deepEqual(xScale.domain(), [-2, 2],     "x domain is not adjusted using custom algorithm and domainer");
+
       svg.remove();
     });
 

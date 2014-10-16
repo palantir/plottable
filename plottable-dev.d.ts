@@ -865,12 +865,6 @@ declare module Plottable {
         drawer: _Drawer.AbstractDrawer;
         key: string;
     }
-    /**
-     * An adjustment policy for domain to set based of datasets' points and affected domain.
-     */
-    interface AdjustmentDomainPolicy<A, B> {
-        (values: Point[], affectedDomain: A[]): B[];
-    }
 }
 
 
@@ -2595,8 +2589,8 @@ declare module Plottable {
         class AbstractXYPlot<X, Y> extends AbstractPlot {
             _xScale: Scale.AbstractScale<X, number>;
             _yScale: Scale.AbstractScale<Y, number>;
-            _adjustmentYScaleDomainPolicy: AdjustmentDomainPolicy<X, Y>;
-            _adjustmentXScaleDomainPolicy: AdjustmentDomainPolicy<Y, X>;
+            _autoDomainXScale: boolean;
+            _autoDomainYScale: boolean;
             /**
              * Constructs an XYPlot.
              *
@@ -2615,34 +2609,28 @@ declare module Plottable {
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractXYPlot<X, Y>;
             /**
-             * Gets the adjustment domain policy for y scale.
+             * Sets the auto domain to visible points for y scale.
              *
-             * @returns {AdjustmentDomainPolicy} The current adjustment domain policy for y scale.
-             */
-            adjustmentYScaleDomainPolicy(): AdjustmentDomainPolicy<X, Y>;
-            /**
-             * Sets the adjustment domain policy for y scale.
-             *
-             * @param {AdjustmentDomainPolicy} policy The new value for the adjustment domain policy for y scale.
+             * @param {boolean} autoDomain The new value for the auto domain for y scale.
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
-            adjustmentYScaleDomainPolicy(policy: AdjustmentDomainPolicy<X, Y>): AbstractXYPlot<X, Y>;
+            autoDomainYScale(autoDomain: boolean): AbstractXYPlot<X, Y>;
             /**
-             * Gets the adjustDmentomainAlgorithm for x scale.
+             * Sets the auto domain to visible points for x scale.
              *
-             * @returns {AdjustmentDomainPolicy} The current adjustDomainAlgorithm for x scale.
-             */
-            adjustmentXScaleDomainPolicy(): AdjustmentDomainPolicy<Y, X>;
-            /**
-             * Sets the adjustDomainAlgorithm for x scale.
-             *
-             * @param {AdjustmentDomainPolicy} policy The new value for the adjustDomainAlgorithm for x scale.
+             * @param {boolean} autoDomain The new value for the auto domain for x scale.
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
-            adjustmentXScaleDomainPolicy(policy: AdjustmentDomainPolicy<Y, X>): AbstractXYPlot<X, Y>;
+            autoDomainXScale(autoDomain: boolean): AbstractXYPlot<X, Y>;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _updateXDomainer(): void;
             _updateYDomainer(): void;
+            /**
+             * Adjust both domains to show all datasets.
+             *
+             * This call does not override auto domain logic to visible points.
+             */
+            showAllData(): void;
         }
     }
 }

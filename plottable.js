@@ -6142,6 +6142,8 @@ var Plottable;
              */
             function AbstractXYPlot(xScale, yScale) {
                 _super.call(this);
+                this._autoDomainXScale = false;
+                this._autoDomainYScale = false;
                 if (xScale == null || yScale == null) {
                     throw new Error("XYPlots require an xScale and yScale");
                 }
@@ -6170,23 +6172,25 @@ var Plottable;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
             };
-            AbstractXYPlot.prototype.adjustmentYScaleDomainPolicy = function (policy) {
-                if (policy == null) {
-                    return this._adjustmentYScaleDomainPolicy;
-                }
-                else {
-                    this._adjustmentYScaleDomainPolicy = policy;
-                    return this;
-                }
+            /**
+             * Sets the auto domain to visible points for y scale.
+             *
+             * @param {boolean} autoDomain The new value for the auto domain for y scale.
+             * @returns {AbstractXYPlot} The calling AbstractXYPlot.
+             */
+            AbstractXYPlot.prototype.autoDomainYScale = function (autoDomain) {
+                this._autoDomainYScale = autoDomain;
+                return this;
             };
-            AbstractXYPlot.prototype.adjustmentXScaleDomainPolicy = function (policy) {
-                if (policy == null) {
-                    return this._adjustmentXScaleDomainPolicy;
-                }
-                else {
-                    this._adjustmentXScaleDomainPolicy = policy;
-                    return this;
-                }
+            /**
+             * Sets the auto domain to visible points for x scale.
+             *
+             * @param {boolean} autoDomain The new value for the auto domain for x scale.
+             * @returns {AbstractXYPlot} The calling AbstractXYPlot.
+             */
+            AbstractXYPlot.prototype.autoDomainXScale = function (autoDomain) {
+                this._autoDomainXScale = autoDomain;
+                return this;
             };
             AbstractXYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
@@ -6209,26 +6213,42 @@ var Plottable;
                     }
                 }
             };
+            /**
+             * Adjust both domains to show all datasets.
+             *
+             * This call does not override auto domain logic to visible points.
+             */
+            AbstractXYPlot.prototype.showAllData = function () {
+                this._xScale.autoDomain();
+                if (!this._autoDomainYScale) {
+                    this._yScale.autoDomain();
+                }
+            };
             AbstractXYPlot.prototype.adjustDomain = function (xDomainChanged) {
-                var _this = this;
-                var adjustmentPolicy = xDomainChanged ? this._adjustmentYScaleDomainPolicy : this._adjustmentXScaleDomainPolicy;
+                var autoDomain = xDomainChanged ? this._autoDomainYScale : this._autoDomainXScale;
                 var changedScale = xDomainChanged ? this._xScale : this._yScale;
                 var adjustingScale = xDomainChanged ? this._yScale : this._xScale;
-                if (adjustmentPolicy != null) {
-                    var flattenDatasets = Plottable._Util.Methods.flatten(this.datasets().map(function (d) { return d.data(); }));
-                    var values = flattenDatasets.map(function (d) {
-                        return { x: _this._projectors["x"].accessor(d), y: _this._projectors["y"].accessor(d) };
-                    });
-                    var adjustedDomain = adjustmentPolicy(values, changedScale.domain());
-                    if (adjustingScale instanceof Plottable.Scale.AbstractQuantitative) {
-                        var scale = adjustingScale;
-                        adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
-                        scale._setDomain(adjustedDomain);
-                    }
-                    else {
-                        adjustingScale._setDomain(adjustedDomain);
-                    }
+                if (autoDomain && adjustingScale instanceof Plottable.Scale.AbstractQuantitative) {
+                    var scale = adjustingScale;
+                    var adjustedDomain = this.adjustDomainToVisiblePoints(this.normalizeDatasets(), changedScale.domain());
+                    adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
+                    scale._setDomain(adjustedDomain);
                 }
+            };
+            AbstractXYPlot.prototype.normalizeDatasets = function () {
+                var _this = this;
+                var flattenDatasets = Plottable._Util.Methods.flatten(this.datasets().map(function (d) { return d.data(); }));
+                return flattenDatasets.map(function (d) {
+                    return { x: _this._projectors["x"].accessor(d), y: _this._projectors["y"].accessor(d) };
+                });
+            };
+            AbstractXYPlot.prototype.adjustDomainToVisiblePoints = function (values, affectedDomain) {
+                var visiblePoints = values.filter(function (d) { return d.x >= affectedDomain[0] && d.x <= affectedDomain[1]; });
+                var yValues = visiblePoints.map(function (d) { return d.y; });
+                if (yValues.length == 0) {
+                    yValues = [0];
+                }
+                return [Plottable._Util.Methods.min(yValues), Plottable._Util.Methods.max(yValues)];
             };
             return AbstractXYPlot;
         })(Plot.AbstractPlot);
