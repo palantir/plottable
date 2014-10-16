@@ -22,7 +22,7 @@ export module Plot {
     }
 
     public _getDrawer(key: string) {
-      return new Plottable._Drawer.Area(key);
+      return new Plottable._Drawer.Area(key).drawLine(false);
     }
 
     public _setup() {

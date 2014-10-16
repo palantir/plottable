@@ -4,39 +4,66 @@ module Plottable {
 export module _Drawer {
   export class Area extends Path {
     private areaSelection: D3.Selection;
+    private _drawLine = true;
 
     public _enterData(data: any[]) {
-      super._enterData(data);
+      if(this._drawLine) {
+        super._enterData(data);
+      }
       this.areaSelection.datum(data);
+    }
+
+    /**
+     * Sets the value determining if line should be drawn.
+     *
+     * @param{boolean} draw The value determing if line should be drawn.
+     */
+    public drawLine(draw: boolean): Area {
+      this._drawLine = draw;
+      return this;
     }
 
     public setup(area: D3.Selection) {
       area.append("path").classed("area", true);
-      super.setup(area);
+      if(this._drawLine) {
+        super.setup(area);
+      } else {
+        this._renderArea = area;
+      }
       this.areaSelection = this._renderArea.select(".area");
     }
 
-    private createArea(xFunction: AppliedAccessor, y0Function: AppliedAccessor, y1Function: AppliedAccessor) {
+    private createArea(xFunction: AppliedAccessor,
+                       y0Function: AppliedAccessor,
+                       y1Function: AppliedAccessor,
+                       definedFunction: (d: any, i: number) => boolean) {
       return d3.svg.area()
               .x(xFunction)
               .y0(y0Function)
               .y1(y1Function)
-              .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction)
-                              && this._rejectNullsAndNaNs(d, i, y0Function)
-                              && this._rejectNullsAndNaNs(d, i, y1Function));
+              .defined(definedFunction);
     }
 
     public _drawStep(step: DrawStep) {
-      super._drawStep(step);
+      if(this._drawLine) {
+        super._drawStep(step);
+      }
+
       var attrToProjector = <AttributeToProjector>_Util.Methods.copyMap(step.attrToProjector);
       var xFunction       = attrToProjector["x"];
       var y0Function      = attrToProjector["y0"];
-      var y1Function       = attrToProjector["y"];
+      var y1Function      = attrToProjector["y"];
+      var definedFunction = attrToProjector["defined"];
       delete attrToProjector["x"];
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
+      if(definedFunction) {
+        delete attrToProjector["defined"];
+      } else {
+        definedFunction = (d: any, i: number) => true;
+      }
 
-      var area = this.createArea(xFunction, y0Function, y1Function);
+      var area = this.createArea(xFunction, y0Function, y1Function, definedFunction);
       attrToProjector["d"] = area;
 
       if (attrToProjector["fill"]) {

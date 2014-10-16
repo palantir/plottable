@@ -10,23 +10,17 @@ export module _Drawer {
       this.pathSelection.datum(data);
     }
 
-    public _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor) {
-      var value = projector(d, i);
-      return value != null && value === value;
-    }
-
     public setup(area: D3.Selection) {
       area.append("path").classed("line", true);
       super.setup(area);
       this.pathSelection = this._renderArea.select(".line");
     }
 
-    private createLine(xFunction: AppliedAccessor, yFunction: AppliedAccessor) {
+    private createLine(xFunction: AppliedAccessor, yFunction: AppliedAccessor, definedFunction: (d: any, i: number) => boolean) {
       return d3.svg.line()
                .x(xFunction)
                .y(yFunction)
-               .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction)
-                               && this._rejectNullsAndNaNs(d, i, yFunction));
+               .defined(definedFunction);
     }
 
     public _drawStep(step: DrawStep) {
@@ -34,10 +28,16 @@ export module _Drawer {
       var attrToProjector = <AttributeToProjector>_Util.Methods.copyMap(step.attrToProjector);
       var xFunction       = attrToProjector["x"];
       var yFunction       = attrToProjector["y"];
+      var definedFunction = attrToProjector["defined"];
       delete attrToProjector["x"];
       delete attrToProjector["y"];
+      if(definedFunction) {
+        delete attrToProjector["defined"];
+      } else {
+        definedFunction = (d: any, i: number) => true;
+      }
 
-      var line = this.createLine(xFunction, yFunction);
+      var line = this.createLine(xFunction, yFunction, definedFunction);
       attrToProjector["d"] = line;
 
       if (attrToProjector["fill"]) {

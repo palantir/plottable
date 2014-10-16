@@ -25,6 +25,11 @@ export module Plot {
                                         .easing("exp-in-out");
     }
 
+    public _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor) {
+      var value = projector(d, i);
+      return value != null && value === value;
+    }
+
      public _getDrawer(key: string) {
       return new Plottable._Drawer.Path(key);
     }
@@ -63,6 +68,10 @@ export module Plot {
         var projector = attrToProjector[attribute];
         attrToProjector[attribute] = (data: any[], i: number) => data.length > 0 ? projector(data[0], i) : null;
       });
+
+      var xFunction       = attrToProjector["x"];
+      var yFunction       = attrToProjector["y"];
+      attrToProjector["defined"] = (d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction);
       return attrToProjector;
     }
 

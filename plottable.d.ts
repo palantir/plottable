@@ -1564,7 +1564,6 @@ declare module Plottable {
     module _Drawer {
         class Path extends AbstractDrawer {
             _enterData(data: any[]): void;
-            _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor): boolean;
             setup(area: D3.Selection): void;
             _drawStep(step: DrawStep): void;
         }
@@ -1576,6 +1575,12 @@ declare module Plottable {
     module _Drawer {
         class Area extends Path {
             _enterData(data: any[]): void;
+            /**
+             * Sets the value determining if line should be drawn.
+             *
+             * @param{boolean} draw The value determing if line should be drawn.
+             */
+            drawLine(draw: boolean): Area;
             setup(area: D3.Selection): void;
             _drawStep(step: DrawStep): void;
         }
@@ -2900,6 +2905,7 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
+            _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor): boolean;
             _getDrawer(key: string): _Drawer.Path;
             _getResetYFunction(): (d: any, i: number) => number;
             _generateDrawSteps(): DrawStep[];

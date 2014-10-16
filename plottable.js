@@ -3096,27 +3096,29 @@ var Plottable;
                 _super.prototype._enterData.call(this, data);
                 this.pathSelection.datum(data);
             };
-            Path.prototype._rejectNullsAndNaNs = function (d, i, projector) {
-                var value = projector(d, i);
-                return value != null && value === value;
-            };
             Path.prototype.setup = function (area) {
                 area.append("path").classed("line", true);
                 _super.prototype.setup.call(this, area);
                 this.pathSelection = this._renderArea.select(".line");
             };
-            Path.prototype.createLine = function (xFunction, yFunction) {
-                var _this = this;
-                return d3.svg.line().x(xFunction).y(yFunction).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); });
+            Path.prototype.createLine = function (xFunction, yFunction, definedFunction) {
+                return d3.svg.line().x(xFunction).y(yFunction).defined(definedFunction);
             };
             Path.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var xFunction = attrToProjector["x"];
                 var yFunction = attrToProjector["y"];
+                var definedFunction = attrToProjector["defined"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
-                var line = this.createLine(xFunction, yFunction);
+                if (definedFunction) {
+                    delete attrToProjector["defined"];
+                }
+                else {
+                    definedFunction = function (d, i) { return true; };
+                }
+                var line = this.createLine(xFunction, yFunction, definedFunction);
                 attrToProjector["d"] = line;
                 if (attrToProjector["fill"]) {
                     this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
@@ -3145,30 +3147,55 @@ var Plottable;
             __extends(Area, _super);
             function Area() {
                 _super.apply(this, arguments);
+                this._drawLine = true;
             }
             Area.prototype._enterData = function (data) {
-                _super.prototype._enterData.call(this, data);
+                if (this._drawLine) {
+                    _super.prototype._enterData.call(this, data);
+                }
                 this.areaSelection.datum(data);
+            };
+            /**
+             * Sets the value determining if line should be drawn.
+             *
+             * @param{boolean} draw The value determing if line should be drawn.
+             */
+            Area.prototype.drawLine = function (draw) {
+                this._drawLine = draw;
+                return this;
             };
             Area.prototype.setup = function (area) {
                 area.append("path").classed("area", true);
-                _super.prototype.setup.call(this, area);
+                if (this._drawLine) {
+                    _super.prototype.setup.call(this, area);
+                }
+                else {
+                    this._renderArea = area;
+                }
                 this.areaSelection = this._renderArea.select(".area");
             };
-            Area.prototype.createArea = function (xFunction, y0Function, y1Function) {
-                var _this = this;
-                return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, y0Function) && _this._rejectNullsAndNaNs(d, i, y1Function); });
+            Area.prototype.createArea = function (xFunction, y0Function, y1Function, definedFunction) {
+                return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(definedFunction);
             };
             Area.prototype._drawStep = function (step) {
-                _super.prototype._drawStep.call(this, step);
+                if (this._drawLine) {
+                    _super.prototype._drawStep.call(this, step);
+                }
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var xFunction = attrToProjector["x"];
                 var y0Function = attrToProjector["y0"];
                 var y1Function = attrToProjector["y"];
+                var definedFunction = attrToProjector["defined"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
-                var area = this.createArea(xFunction, y0Function, y1Function);
+                if (definedFunction) {
+                    delete attrToProjector["defined"];
+                }
+                else {
+                    definedFunction = function (d, i) { return true; };
+                }
+                var area = this.createArea(xFunction, y0Function, y1Function, definedFunction);
                 attrToProjector["d"] = area;
                 if (attrToProjector["fill"]) {
                     this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
@@ -6826,6 +6853,10 @@ var Plottable;
                 this._animators["line-reset"] = new Plottable.Animator.Null();
                 this._animators["line-main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
+            Line.prototype._rejectNullsAndNaNs = function (d, i, projector) {
+                var value = projector(d, i);
+                return value != null && value === value;
+            };
             Line.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Path(key);
             };
@@ -6851,6 +6882,7 @@ var Plottable;
                 return drawSteps;
             };
             Line.prototype._generateAttrToProjector = function () {
+                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var wholeDatumAttributes = this._wholeDatumAttributes();
                 var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
@@ -6859,6 +6891,9 @@ var Plottable;
                     var projector = attrToProjector[attribute];
                     attrToProjector[attribute] = function (data, i) { return data.length > 0 ? projector(data[0], i) : null; };
                 });
+                var xFunction = attrToProjector["x"];
+                var yFunction = attrToProjector["y"];
+                attrToProjector["defined"] = function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); };
                 return attrToProjector;
             };
             Line.prototype._wholeDatumAttributes = function () {
@@ -7204,7 +7239,7 @@ var Plottable;
                 this._isVertical = true;
             }
             StackedArea.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Area(key);
+                return new Plottable._Drawer.Area(key).drawLine(false);
             };
             StackedArea.prototype._setup = function () {
                 _super.prototype._setup.call(this);
