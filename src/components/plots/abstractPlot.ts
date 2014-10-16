@@ -360,7 +360,7 @@ export module Plot {
     }
 
     public _generateDrawSteps(): DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: new Animator.Null()}];
+      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("")}];
     }
 
     public _additionalPaint() {

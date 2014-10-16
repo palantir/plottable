@@ -6134,7 +6134,7 @@ var Plottable;
                 return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).drawer; });
             };
             AbstractPlot.prototype._generateDrawSteps = function () {
-                return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animator.Null() }];
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("") }];
             };
             AbstractPlot.prototype._additionalPaint = function () {
                 // no-op
