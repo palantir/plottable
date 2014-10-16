@@ -65,16 +65,16 @@ export module Interaction {
     }
 
     /**
-     * Returns a HoverData consisting of all data and selections in A but not in B.
+     * Returns a HoverData consisting of all data and selections in a but not in b.
      */
-    private diffHoverData(A: HoverData, B: HoverData): HoverData {
-      if (A.data == null || B.data == null) {
-        return A;
+    private static diffHoverData(a: HoverData, b: HoverData): HoverData {
+      if (a.data == null || b.data == null) {
+        return a;
       }
 
-      var notInB = (d: any) => B.data.indexOf(d) === -1;
+      var notInB = (d: any) => b.data.indexOf(d) === -1;
 
-      var diffData = A.data.filter(notInB);
+      var diffData = a.data.filter(notInB);
       if (diffData.length === 0) {
         return {
           data: null,
@@ -82,7 +82,7 @@ export module Interaction {
         };
       }
 
-      var diffSelection = A.selection.filter(notInB);
+      var diffSelection = a.selection.filter(notInB);
       return {
         data: diffData,
         selection: diffSelection
@@ -92,10 +92,10 @@ export module Interaction {
     private handleHoverOver(p: Point) {
       var newHoverData = this._componentToListenTo._doHover(p);
 
-      var outData = this.diffHoverData(this.lastHoverData, newHoverData);
+      var outData = Hover.diffHoverData(this.lastHoverData, newHoverData);
       this.safeHoverOut(outData);
 
-      var overData = this.diffHoverData(newHoverData, this.lastHoverData);
+      var overData = Hover.diffHoverData(newHoverData, this.lastHoverData);
       this.safeHoverOver(overData);
 
       this.lastHoverData = newHoverData;

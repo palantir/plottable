@@ -6595,14 +6595,17 @@ var Plottable;
                 this._hoverMode = modeLC;
                 return this;
             };
+            AbstractBarPlot.prototype.clearHoverSelection = function () {
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
+                });
+            };
             //===== Hover logic =====
             AbstractBarPlot.prototype._hoverOverComponent = function (p) {
                 // no-op
             };
             AbstractBarPlot.prototype._hoverOutComponent = function (p) {
-                this._getDrawersInOrder().forEach(function (d, i) {
-                    d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
-                });
+                this.clearHoverSelection();
             };
             AbstractBarPlot.prototype._doHover = function (p) {
                 var xPositionOrExtent = p.x;
@@ -6619,12 +6622,12 @@ var Plottable;
                 var selectedBars = this.selectBar(xPositionOrExtent, yPositionOrExtent, false);
                 if (selectedBars) {
                     this._getDrawersInOrder().forEach(function (d, i) {
-                        d._renderArea.selectAll("rect").classed("hovered", false).classed("not-hovered", true);
+                        d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
                     });
-                    selectedBars.classed("hovered", true).classed("not-hovered", false);
+                    selectedBars.classed({ "hovered": true, "not-hovered": false });
                 }
                 else {
-                    this._hoverOutComponent(p);
+                    this.clearHoverSelection();
                 }
                 return {
                     data: selectedBars ? selectedBars.data() : null,
@@ -8289,21 +8292,21 @@ var Plottable;
                 this.dispatcher.connect();
             };
             /**
-             * Returns a HoverData consisting of all data and selections in A but not in B.
+             * Returns a HoverData consisting of all data and selections in a but not in b.
              */
-            Hover.prototype.diffHoverData = function (A, B) {
-                if (A.data == null || B.data == null) {
-                    return A;
+            Hover.diffHoverData = function (a, b) {
+                if (a.data == null || b.data == null) {
+                    return a;
                 }
-                var notInB = function (d) { return B.data.indexOf(d) === -1; };
-                var diffData = A.data.filter(notInB);
+                var notInB = function (d) { return b.data.indexOf(d) === -1; };
+                var diffData = a.data.filter(notInB);
                 if (diffData.length === 0) {
                     return {
                         data: null,
                         selection: null
                     };
                 }
-                var diffSelection = A.selection.filter(notInB);
+                var diffSelection = a.selection.filter(notInB);
                 return {
                     data: diffData,
                     selection: diffSelection
@@ -8311,9 +8314,9 @@ var Plottable;
             };
             Hover.prototype.handleHoverOver = function (p) {
                 var newHoverData = this._componentToListenTo._doHover(p);
-                var outData = this.diffHoverData(this.lastHoverData, newHoverData);
+                var outData = Hover.diffHoverData(this.lastHoverData, newHoverData);
                 this.safeHoverOut(outData);
-                var overData = this.diffHoverData(newHoverData, this.lastHoverData);
+                var overData = Hover.diffHoverData(newHoverData, this.lastHoverData);
                 this.safeHoverOver(overData);
                 this.lastHoverData = newHoverData;
             };

@@ -297,15 +297,19 @@ export module Plot {
       return this;
     }
 
+    private clearHoverSelection() {
+      this._getDrawersInOrder().forEach((d, i) => {
+        d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
+      });
+    }
+
     //===== Hover logic =====
     public _hoverOverComponent(p: Point) {
       // no-op
     }
 
     public _hoverOutComponent(p: Point) {
-      this._getDrawersInOrder().forEach((d, i) => {
-        d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
-      });
+      this.clearHoverSelection();
     }
 
     public _doHover(p: Point): Interaction.HoverData {
@@ -323,11 +327,11 @@ export module Plot {
 
       if (selectedBars) {
         this._getDrawersInOrder().forEach((d, i) => {
-          d._renderArea.selectAll("rect").classed("hovered", false).classed("not-hovered", true);
+          d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
         });
-        selectedBars.classed("hovered", true).classed("not-hovered", false);
+        selectedBars.classed({ "hovered": true, "not-hovered": false });
       } else {
-        this._hoverOutComponent(p);
+        this.clearHoverSelection();
       }
       return {
         data: selectedBars ? selectedBars.data() : null,

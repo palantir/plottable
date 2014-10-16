@@ -6125,58 +6125,68 @@ var TestHoverable = (function (_super) {
 })(Plottable.Component.AbstractComponent);
 describe("Interactions", function () {
     describe("Hover", function () {
-        it("correctly triggers callbacks", function () {
-            var svg = generateSVG();
-            var testTarget = new TestHoverable();
+        var svg;
+        var testTarget;
+        var hitbox;
+        var hoverInteraction;
+        var overData;
+        var overCallbackCalled = false;
+        var outData;
+        var outCallbackCalled = false;
+        beforeEach(function () {
+            svg = generateSVG();
+            testTarget = new TestHoverable();
             testTarget.classed("test-hoverable", true);
             testTarget.renderTo(svg);
-            var hoverInteraction = new Plottable.Interaction.Hover();
-            var lastOverData;
-            var overCallbackCalled = false;
+            hoverInteraction = new Plottable.Interaction.Hover();
+            overCallbackCalled = false;
             hoverInteraction.onHoverOver(function (hd) {
                 overCallbackCalled = true;
-                lastOverData = hd.data;
+                overData = hd;
             });
-            var outCallbackCalled = false;
-            var lastOutData;
+            outCallbackCalled = false;
             hoverInteraction.onHoverOut(function (hd) {
                 outCallbackCalled = true;
-                lastOutData = hd.data;
+                outData = hd;
             });
             testTarget.registerInteraction(hoverInteraction);
-            var hitbox = testTarget._element.select(".hit-box");
+            hitbox = testTarget._element.select(".hit-box");
+        });
+        it("correctly triggers onHoverOver() and onHOverOut() callbacks", function () {
+            overCallbackCalled = false;
             triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
             assert.isTrue(overCallbackCalled, "onHoverOver was called on mousing over a target area");
-            assert.deepEqual(lastOverData, ["left"], "onHoverOver was called with the correct data (mouse onto left)");
+            assert.deepEqual(overData.data, ["left"], "onHoverOver was called with the correct data (mouse onto left)");
             overCallbackCalled = false;
             triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
             assert.isFalse(overCallbackCalled, "onHoverOver isn't called if the hover data didn't change");
+            overCallbackCalled = false;
             triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
             assert.isTrue(overCallbackCalled, "onHoverOver was called when mousing into a new region");
-            assert.deepEqual(lastOverData, ["right"], "onHoverOver was called with the new data only (left --> center)");
+            assert.deepEqual(overData.data, ["right"], "onHoverOver was called with the new data only (left --> center)");
+            outCallbackCalled = false;
             triggerFakeMouseEvent("mousemove", hitbox, 300, 200);
             assert.isTrue(outCallbackCalled, "onHoverOut was called when the hover data changes");
-            assert.deepEqual(lastOutData, ["left"], "onHoverOut was called with the correct data (center --> right)");
+            assert.deepEqual(outData.data, ["left"], "onHoverOut was called with the correct data (center --> right)");
             outCallbackCalled = false;
-            lastOutData = null;
             triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
             assert.isTrue(outCallbackCalled, "onHoverOut is called on mousing out of the Component");
-            assert.deepEqual(lastOutData, ["right"], "onHoverOut was called with the correct data");
+            assert.deepEqual(outData.data, ["right"], "onHoverOut was called with the correct data");
+            overCallbackCalled = false;
             triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
-            assert.deepEqual(lastOverData, ["left", "right"], "onHoverOver is called with the correct data");
+            assert.deepEqual(overData.data, ["left", "right"], "onHoverOver is called with the correct data");
             svg.remove();
         });
-        it("can get the currently-hovered values", function () {
-            var svg = generateSVG();
-            var testTarget = new TestHoverable();
-            testTarget.classed("test-hoverable", true);
-            testTarget.renderTo(svg);
-            var hoverInteraction = new Plottable.Interaction.Hover();
-            testTarget.registerInteraction(hoverInteraction);
-            var hitbox = testTarget._element.select(".hit-box");
-            triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
+        it("getCurrentlyHovered()", function () {
+            triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
             var currentlyHovered = hoverInteraction.getCurrentlyHovered();
-            assert.deepEqual(currentlyHovered.data, ["left", "right"], "correctly retrieves last-hovered data");
+            assert.deepEqual(currentlyHovered.data, ["left"], "retrieves data corresponding to the current position");
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
+            currentlyHovered = hoverInteraction.getCurrentlyHovered();
+            assert.deepEqual(currentlyHovered.data, ["left", "right"], "retrieves data corresponding to the current position");
+            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            currentlyHovered = hoverInteraction.getCurrentlyHovered();
+            assert.isNull(currentlyHovered.data, "returns null if not currently hovering");
             svg.remove();
         });
     });
