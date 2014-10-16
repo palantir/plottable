@@ -33,6 +33,7 @@ export module Plot {
 
       this._colorScale = colorScale;
       this.project("fill", "value", colorScale); // default
+      this._animators["cells"] = new Animator.Null();
     }
 
     public _addDataset(key: string, dataset: Dataset) {
@@ -41,6 +42,10 @@ export module Plot {
         return;
       }
       super._addDataset(key, dataset);
+    }
+
+    public _getDrawer(key: string) {
+      return new _Drawer.Element(key).svgElement("rect");
     }
 
     /**
@@ -55,20 +60,17 @@ export module Plot {
       return this;
     }
 
-    public _paint() {
-      var dataset = this.datasets()[0];
-      var cells = this._renderArea.selectAll("rect").data(dataset.data());
-      cells.enter().append("rect");
-
+    public _generateAttrToProjector() {
+      var attrToProjector = super._generateAttrToProjector();
       var xStep = this._xScale.rangeBand();
       var yStep = this._yScale.rangeBand();
-
-      var attrToProjector = this._generateAttrToProjector();
       attrToProjector["width"]  = () => xStep;
       attrToProjector["height"] = () => yStep;
+      return attrToProjector;
+    }
 
-      this._applyAnimatedAttributes(cells, "cells", attrToProjector);
-      cells.exit().remove();
+    public _generateDrawSteps(): DrawStep[] {
+      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
     }
   }
 }

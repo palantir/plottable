@@ -6066,28 +6066,6 @@ var Plottable;
                     });
                 }
             };
-            /**
-             * Applies attributes to the selection.
-             *
-             * If animation is enabled and a valid animator's key is specified, the
-             * attributes are applied with the animator. Otherwise, they are applied
-             * immediately to the selection.
-             *
-             * The animation will not animate during auto-resize renders.
-             *
-             * @param {D3.Selection} selection The selection of elements to update.
-             * @param {string} animatorKey The key for the animator.
-             * @param {AttributeToProjector} attrToProjector The set of attributes to set on the selection.
-             * @returns {D3.Selection} The resulting selection (potentially after the transition)
-             */
-            AbstractPlot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
-                if (this._animate && this.animateOnNextRender && this._animators[animatorKey]) {
-                    return this._animators[animatorKey].animate(selection, attrToProjector);
-                }
-                else {
-                    return selection.attr(attrToProjector);
-                }
-            };
             AbstractPlot.prototype.animator = function (animatorKey, animator) {
                 if (animator === undefined) {
                     return this._animators[animatorKey];
@@ -6430,6 +6408,7 @@ var Plottable;
                 this._yScale.rangeType("bands", 0, 0);
                 this._colorScale = colorScale;
                 this.project("fill", "value", colorScale); // default
+                this._animators["cells"] = new Plottable.Animator.Null();
             }
             Grid.prototype._addDataset = function (key, dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
@@ -6437,6 +6416,9 @@ var Plottable;
                     return;
                 }
                 _super.prototype._addDataset.call(this, key, dataset);
+            };
+            Grid.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Element(key).svgElement("rect");
             };
             /**
              * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
@@ -6449,17 +6431,16 @@ var Plottable;
                 }
                 return this;
             };
-            Grid.prototype._paint = function () {
-                var dataset = this.datasets()[0];
-                var cells = this._renderArea.selectAll("rect").data(dataset.data());
-                cells.enter().append("rect");
+            Grid.prototype._generateAttrToProjector = function () {
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var xStep = this._xScale.rangeBand();
                 var yStep = this._yScale.rangeBand();
-                var attrToProjector = this._generateAttrToProjector();
                 attrToProjector["width"] = function () { return xStep; };
                 attrToProjector["height"] = function () { return yStep; };
-                this._applyAnimatedAttributes(cells, "cells", attrToProjector);
-                cells.exit().remove();
+                return attrToProjector;
+            };
+            Grid.prototype._generateDrawSteps = function () {
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells") }];
             };
             return Grid;
         })(Plot.AbstractXYPlot);

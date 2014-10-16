@@ -2550,21 +2550,6 @@ declare module Plottable {
             _updateScaleExtents(): void;
             _updateScaleExtent(attr: string): void;
             /**
-             * Applies attributes to the selection.
-             *
-             * If animation is enabled and a valid animator's key is specified, the
-             * attributes are applied with the animator. Otherwise, they are applied
-             * immediately to the selection.
-             *
-             * The animation will not animate during auto-resize renders.
-             *
-             * @param {D3.Selection} selection The selection of elements to update.
-             * @param {string} animatorKey The key for the animator.
-             * @param {AttributeToProjector} attrToProjector The set of attributes to set on the selection.
-             * @returns {D3.Selection} The resulting selection (potentially after the transition)
-             */
-            _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: AttributeToProjector): any;
-            /**
              * Get the animator associated with the specified Animator key.
              *
              * @return {PlotAnimator} The Animator for the specified key.
@@ -2724,12 +2709,14 @@ declare module Plottable {
              */
             constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>);
             _addDataset(key: string, dataset: Dataset): void;
+            _getDrawer(key: string): _Drawer.Element;
             /**
              * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
              * the data should return a valid CSS color.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Grid;
-            _paint(): void;
+            _generateAttrToProjector(): AttributeToProjector;
+            _generateDrawSteps(): DrawStep[];
         }
     }
 }

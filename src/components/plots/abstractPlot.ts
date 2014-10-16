@@ -239,28 +239,6 @@ export module Plot {
     }
 
     /**
-     * Applies attributes to the selection.
-     *
-     * If animation is enabled and a valid animator's key is specified, the
-     * attributes are applied with the animator. Otherwise, they are applied
-     * immediately to the selection.
-     *
-     * The animation will not animate during auto-resize renders.
-     *
-     * @param {D3.Selection} selection The selection of elements to update.
-     * @param {string} animatorKey The key for the animator.
-     * @param {AttributeToProjector} attrToProjector The set of attributes to set on the selection.
-     * @returns {D3.Selection} The resulting selection (potentially after the transition)
-     */
-    public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: AttributeToProjector): any {
-      if (this._animate && this.animateOnNextRender && this._animators[animatorKey]) {
-        return this._animators[animatorKey].animate(selection, attrToProjector);
-      } else {
-        return selection.attr(attrToProjector);
-      }
-    }
-
-    /**
      * Get the animator associated with the specified Animator key.
      *
      * @return {PlotAnimator} The Animator for the specified key.
