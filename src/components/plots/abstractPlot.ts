@@ -192,7 +192,7 @@ export module Plot {
 
     public _doRender() {
       if (this._isAnchored) {
-        this._paint();
+        this.paint();
         this._dataChanged = false;
         this.animateOnNextRender = false;
       }
@@ -368,15 +368,15 @@ export module Plot {
     }
 
     public _getDataToDraw() {
-      var dataSets: {[key: string]: any[]} = {};
+      var datasets: {[key: string]: any[]} = {};
       this._datasetKeysInOrder.forEach((key: string) => {
         var data = this._key2DatasetDrawerKey.get(key).dataset.data();
-        dataSets[key] = data;
+        datasets[key] = data;
       });
-      return dataSets;
+      return datasets;
     }
 
-    public _paint() {
+    private paint() {
       var drawSteps = this._generateDrawSteps();
       var datasets = this._getDataToDraw();
       var drawers = this._getDrawersInOrder();

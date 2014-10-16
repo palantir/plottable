@@ -106,6 +106,6 @@ module Plottable {
    */
   export interface DrawStep {
     attrToProjector: AttributeToProjector;
-    animator?: Animator.PlotAnimator;
+    animator: Animator.PlotAnimator;
   }
 }

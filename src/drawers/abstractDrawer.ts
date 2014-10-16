@@ -54,7 +54,7 @@ export module _Drawer {
      *
      * @param{DataStep} step The step, how data should be drawn.
      */
-    public _drawStep(drawStep: DrawStep) {
+    public _drawStep(step: DrawStep) {
       // no-op
     }
 

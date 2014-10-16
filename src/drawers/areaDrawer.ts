@@ -9,6 +9,8 @@ export module _Drawer {
     public _enterData(data: any[]) {
       if(this._drawLine) {
         super._enterData(data);
+      } else {
+        AbstractDrawer.prototype._enterData.call(this, data);
       }
       this.areaSelection.datum(data);
     }
@@ -28,7 +30,7 @@ export module _Drawer {
       if(this._drawLine) {
         super.setup(area);
       } else {
-        this._renderArea = area;
+        AbstractDrawer.prototype.setup.call(this, area);
       }
       this.areaSelection = this._renderArea.select(".area");
     }
@@ -47,6 +49,8 @@ export module _Drawer {
     public _drawStep(step: DrawStep) {
       if(this._drawLine) {
         super._drawStep(step);
+      } else {
+        AbstractDrawer.prototype._drawStep.call(this, step);
       }
 
       var attrToProjector = <AttributeToProjector>_Util.Methods.copyMap(step.attrToProjector);
@@ -69,8 +73,7 @@ export module _Drawer {
       if (attrToProjector["fill"]) {
         this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
-      var animator = step.animator || new Animator.Null();
-      animator.animate(this.areaSelection, attrToProjector);
+      step.animator.animate(this.areaSelection, attrToProjector);
     }
   }
 }

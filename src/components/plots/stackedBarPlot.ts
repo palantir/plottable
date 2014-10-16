@@ -65,7 +65,7 @@ export module Plot {
     }
 
      public _additionalPaint() {
-      AbstractBarPlot.prototype._additionalPaint.apply(this, []);
+      AbstractBarPlot.prototype._additionalPaint.apply(this);
     }
 
     public baseline(value: number) {

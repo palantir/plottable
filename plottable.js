@@ -3054,7 +3054,7 @@ var Plottable;
              *
              * @param{DataStep} step The step, how data should be drawn.
              */
-            AbstractDrawer.prototype._drawStep = function (drawStep) {
+            AbstractDrawer.prototype._drawStep = function (step) {
                 // no-op
             };
             /**
@@ -3123,8 +3123,7 @@ var Plottable;
                 if (attrToProjector["fill"]) {
                     this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
-                var animator = step.animator || new Plottable.Animator.Null();
-                animator.animate(this.pathSelection, attrToProjector);
+                step.animator.animate(this.pathSelection, attrToProjector);
             };
             return Path;
         })(_Drawer.AbstractDrawer);
@@ -3153,6 +3152,9 @@ var Plottable;
                 if (this._drawLine) {
                     _super.prototype._enterData.call(this, data);
                 }
+                else {
+                    _Drawer.AbstractDrawer.prototype._enterData.call(this, data);
+                }
                 this.areaSelection.datum(data);
             };
             /**
@@ -3170,7 +3172,7 @@ var Plottable;
                     _super.prototype.setup.call(this, area);
                 }
                 else {
-                    this._renderArea = area;
+                    _Drawer.AbstractDrawer.prototype.setup.call(this, area);
                 }
                 this.areaSelection = this._renderArea.select(".area");
             };
@@ -3180,6 +3182,9 @@ var Plottable;
             Area.prototype._drawStep = function (step) {
                 if (this._drawLine) {
                     _super.prototype._drawStep.call(this, step);
+                }
+                else {
+                    _Drawer.AbstractDrawer.prototype._drawStep.call(this, step);
                 }
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var xFunction = attrToProjector["x"];
@@ -3200,8 +3205,7 @@ var Plottable;
                 if (attrToProjector["fill"]) {
                     this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
-                var animator = step.animator || new Plottable.Animator.Null();
-                animator.animate(this.areaSelection, attrToProjector);
+                step.animator.animate(this.areaSelection, attrToProjector);
             };
             return Area;
         })(_Drawer.Path);
@@ -3243,8 +3247,7 @@ var Plottable;
                 if (step.attrToProjector["fill"]) {
                     drawSelection.attr("fill", step.attrToProjector["fill"]); // so colors don't animate
                 }
-                var animator = step.animator || new Plottable.Animator.Null();
-                animator.animate(drawSelection, step.attrToProjector);
+                step.animator.animate(drawSelection, step.attrToProjector);
             };
             Element.prototype._enterData = function (data) {
                 _super.prototype._enterData.call(this, data);
@@ -6076,7 +6079,7 @@ var Plottable;
             };
             AbstractPlot.prototype._doRender = function () {
                 if (this._isAnchored) {
-                    this._paint();
+                    this.paint();
                     this._dataChanged = false;
                     this.animateOnNextRender = false;
                 }
@@ -6195,14 +6198,14 @@ var Plottable;
             };
             AbstractPlot.prototype._getDataToDraw = function () {
                 var _this = this;
-                var dataSets = {};
+                var datasets = {};
                 this._datasetKeysInOrder.forEach(function (key) {
                     var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
-                    dataSets[key] = data;
+                    datasets[key] = data;
                 });
-                return dataSets;
+                return datasets;
             };
-            AbstractPlot.prototype._paint = function () {
+            AbstractPlot.prototype.paint = function () {
                 var drawSteps = this._generateDrawSteps();
                 var datasets = this._getDataToDraw();
                 var drawers = this._getDrawersInOrder();
@@ -6531,7 +6534,6 @@ var Plottable;
                 this._animators["bars-reset"] = new Plottable.Animator.Null();
                 this._animators["bars"] = new Plottable.Animator.Base();
                 this._animators["baseline"] = new Plottable.Animator.Null();
-                // super() doesn't set baseline
                 this.baseline(this._baselineValue);
             }
             AbstractBarPlot.prototype._getDrawer = function (key) {
@@ -7351,7 +7353,7 @@ var Plottable;
                 return attrToProjector;
             };
             StackedBar.prototype._additionalPaint = function () {
-                Plot.AbstractBarPlot.prototype._additionalPaint.apply(this, []);
+                Plot.AbstractBarPlot.prototype._additionalPaint.apply(this);
             };
             StackedBar.prototype.baseline = function (value) {
                 return Plot.AbstractBarPlot.prototype.baseline.apply(this, [value]);

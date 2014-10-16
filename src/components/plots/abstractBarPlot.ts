@@ -24,7 +24,6 @@ export module Plot {
       this._animators["bars-reset"] = new Animator.Null();
       this._animators["bars"] = new Animator.Base();
       this._animators["baseline"] = new Animator.Null();
-      // super() doesn't set baseline
       this.baseline(this._baselineValue);
     }
 

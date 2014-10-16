@@ -25,8 +25,7 @@ export module _Drawer {
       if (step.attrToProjector["fill"]) {
         drawSelection.attr("fill", step.attrToProjector["fill"]); // so colors don't animate
       }
-      var animator = step.animator || new Animator.Null();
-      animator.animate(drawSelection, step.attrToProjector);
+      step.animator.animate(drawSelection, step.attrToProjector);
     }
 
     public _enterData(data: any[]) {

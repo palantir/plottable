@@ -24,9 +24,9 @@ export module Plot {
       this.project("fill-opacity", () => 0.25); // default
       this.project("stroke", () => Core.Colors.INDIGO); // default
       this._animators["reset"] = new Animator.Null();
-      this._animators["main"]       = new Animator.Base()
-                                        .duration(600)
-                                        .easing("exp-in-out");
+      this._animators["main"]  = new Animator.Base()
+                                             .duration(600)
+                                             .easing("exp-in-out");
     }
 
     public _onDatasetUpdate() {

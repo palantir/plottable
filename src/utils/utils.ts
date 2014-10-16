@@ -245,7 +245,7 @@ export module _Util {
      *
      * @returns {[{ [key: string]: any }} coppied map.
      */
-    export function copyMap(oldMap: { [key: string]: any }) {
+    export function copyMap<T>(oldMap: { [key: string]: T }): { [key: string]: T } {
       var newMap: { [key: string]: any } = {};
       d3.keys(oldMap).forEach(key => newMap[key] = oldMap[key]);
       return newMap;

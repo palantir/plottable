@@ -108,10 +108,10 @@ declare module Plottable {
              *
              * @returns {[{ [key: string]: any }} coppied map.
              */
-            function copyMap(oldMap: {
-                [x: string]: any;
+            function copyMap<T>(oldMap: {
+                [x: string]: T;
             }): {
-                [x: string]: any;
+                [x: string]: T;
             };
         }
     }
@@ -883,7 +883,7 @@ declare module Plottable {
      */
     interface DrawStep {
         attrToProjector: AttributeToProjector;
-        animator?: Animator.PlotAnimator;
+        animator: Animator.PlotAnimator;
     }
 }
 
@@ -1547,7 +1547,7 @@ declare module Plottable {
              *
              * @param{DataStep} step The step, how data should be drawn.
              */
-            _drawStep(drawStep: DrawStep): void;
+            _drawStep(step: DrawStep): void;
             /**
              * Draws the data into the renderArea using the spefic steps
              *
@@ -2649,7 +2649,6 @@ declare module Plottable {
             _getDataToDraw(): {
                 [x: string]: any[];
             };
-            _paint(): void;
         }
     }
 }

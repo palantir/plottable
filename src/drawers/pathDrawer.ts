@@ -43,8 +43,7 @@ export module _Drawer {
       if (attrToProjector["fill"]) {
         this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
-      var animator = step.animator || new Animator.Null();
-      animator.animate(this.pathSelection, attrToProjector);
+      step.animator.animate(this.pathSelection, attrToProjector);
     }
   }
 }
