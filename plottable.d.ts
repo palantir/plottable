@@ -2515,6 +2515,7 @@ declare module Plottable {
             _animate: boolean;
             _animators: Animator.PlotAnimatorMap;
             _ANIMATION_DURATION: number;
+            _animateOnNextRender: boolean;
             /**
              * Constructs a Plot.
              *

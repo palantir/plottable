@@ -13,7 +13,7 @@ export module Plot {
     public _animate: boolean = false;
     public _animators: Animator.PlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
-    private animateOnNextRender = true;
+    public _animateOnNextRender = true;
     private nextSeriesIndex: number;
 
     /**
@@ -38,7 +38,7 @@ export module Plot {
 
     public _anchor(element: D3.Selection) {
       super._anchor(element);
-      this.animateOnNextRender = true;
+      this._animateOnNextRender = true;
       this._dataChanged = true;
       this._updateScaleExtents();
     }
@@ -112,16 +112,16 @@ export module Plot {
     }
 
     public _getAnimator(key: string): Animator.PlotAnimator {
-      if(!this._animate) {
-        return new Animator.Null();
-      } else {
+      if(this._animate && this._animateOnNextRender) {
         return this._animators[key] || new Animator.Null();
+      } else {
+        return new Animator.Null();
       }
     }
 
     public _onDatasetUpdate() {
       this._updateScaleExtents();
-      this.animateOnNextRender = true;
+      this._animateOnNextRender = true;
       this._dataChanged = true;
       this._render();
     }
@@ -194,7 +194,7 @@ export module Plot {
       if (this._isAnchored) {
         this.paint();
         this._dataChanged = false;
-        this.animateOnNextRender = false;
+        this._animateOnNextRender = false;
       }
     }
 

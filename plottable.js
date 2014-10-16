@@ -5937,7 +5937,7 @@ var Plottable;
                 this._animate = false;
                 this._animators = {};
                 this._ANIMATION_DURATION = 250; // milliseconds
-                this.animateOnNextRender = true;
+                this._animateOnNextRender = true;
                 this.clipPathEnabled = true;
                 this.classed("plot", true);
                 this._key2DatasetDrawerKey = d3.map();
@@ -5946,7 +5946,7 @@ var Plottable;
             }
             AbstractPlot.prototype._anchor = function (element) {
                 _super.prototype._anchor.call(this, element);
-                this.animateOnNextRender = true;
+                this._animateOnNextRender = true;
                 this._dataChanged = true;
                 this._updateScaleExtents();
             };
@@ -6003,16 +6003,16 @@ var Plottable;
                 return new Plottable._Drawer.AbstractDrawer(key);
             };
             AbstractPlot.prototype._getAnimator = function (key) {
-                if (!this._animate) {
-                    return new Plottable.Animator.Null();
+                if (this._animate && this._animateOnNextRender) {
+                    return this._animators[key] || new Plottable.Animator.Null();
                 }
                 else {
-                    return this._animators[key] || new Plottable.Animator.Null();
+                    return new Plottable.Animator.Null();
                 }
             };
             AbstractPlot.prototype._onDatasetUpdate = function () {
                 this._updateScaleExtents();
-                this.animateOnNextRender = true;
+                this._animateOnNextRender = true;
                 this._dataChanged = true;
                 this._render();
             };
@@ -6081,7 +6081,7 @@ var Plottable;
                 if (this._isAnchored) {
                     this.paint();
                     this._dataChanged = false;
-                    this.animateOnNextRender = false;
+                    this._animateOnNextRender = false;
                 }
             };
             /**
@@ -7324,13 +7324,13 @@ var Plottable;
                 Plot.AbstractBarPlot.prototype._setup.call(this);
             };
             StackedBar.prototype._getAnimator = function (key) {
-                if (!this._animate) {
-                    return new Plottable.Animator.Null();
-                }
-                else {
+                if (this._animate && this._animateOnNextRender) {
                     var primaryScale = this._isVertical ? this._yScale : this._xScale;
                     var scaledBaseline = primaryScale.scale(this._baselineValue);
                     return new Plottable.Animator.MovingRect(scaledBaseline, this._isVertical);
+                }
+                else {
+                    return new Plottable.Animator.Null();
                 }
             };
             StackedBar.prototype._getDrawer = function (key) {

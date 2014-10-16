@@ -32,12 +32,12 @@ export module Plot {
     }
 
     public _getAnimator(key: string): Animator.PlotAnimator {
-      if(!this._animate) {
-        return new Animator.Null();
-      } else {
+      if(this._animate && this._animateOnNextRender) {
         var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
         var scaledBaseline = primaryScale.scale(this._baselineValue);
         return new Animator.MovingRect(scaledBaseline, this._isVertical);
+      } else {
+        return new Animator.Null();
       }
     }
 
