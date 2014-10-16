@@ -102,6 +102,17 @@ declare module Plottable {
             function max<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
             function min(arr: number[], default_val?: number): number;
             function min<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
+            /**
+             * Creates shallow copy of map.
+             * @param {{ [key: string]: any }} oldMap Map to copy
+             *
+             * @returns {[{ [key: string]: any }} coppied map.
+             */
+            function copyMap(oldMap: {
+                [x: string]: any;
+            }): {
+                [x: string]: any;
+            };
         }
     }
 }
@@ -865,6 +876,11 @@ declare module Plottable {
         drawer: _Drawer.AbstractDrawer;
         key: string;
     }
+    /**
+     * A draw step for drawer.
+     *
+     * Specifies how attribute to projector needs to be animated.
+     */
     interface DrawStep {
         attrToProjector: AttributeToProjector;
         animator?: Animator.PlotAnimator;
@@ -1502,6 +1518,11 @@ declare module Plottable {
             _renderArea: D3.Selection;
             _className: string;
             key: string;
+            /**
+             * Sets the class, which needs to be applied to bound elements.
+             *
+             * @param{string} className The class name to be applied.
+             */
             classed(className: string): AbstractDrawer;
             /**
              * Constructs a Drawer
@@ -1515,13 +1536,23 @@ declare module Plottable {
              * Removes the Drawer and its renderArea
              */
             remove(): void;
-            _applyData(data: any[]): void;
-            _drawStep(drawStep: DrawStep): void;
             /**
-             * Draws the data into the renderArea using the attrHash for attributes
+             * Enter new data to render arrea and creates binding
              *
              * @param{any[]} data The data to be drawn
-             * @param{attrHash} AttributeToProjector The list of attributes to set on the data
+             */
+            _enterData(data: any[]): void;
+            /**
+             * Draws data using one step
+             *
+             * @param{DataStep} step The step, how data should be drawn.
+             */
+            _drawStep(drawStep: DrawStep): void;
+            /**
+             * Draws the data into the renderArea using the spefic steps
+             *
+             * @param{any[]} data The data to be drawn
+             * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
              */
             draw(data: any[], drawSteps: DrawStep[]): void;
         }
@@ -1532,7 +1563,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Path extends AbstractDrawer {
-            _applyData(data: any[]): void;
+            _enterData(data: any[]): void;
             _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor): boolean;
             setup(area: D3.Selection): void;
             _drawStep(step: DrawStep): void;
@@ -1544,7 +1575,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Area extends Path {
-            _applyData(data: any[]): void;
+            _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
             _drawStep(step: DrawStep): void;
         }
@@ -1556,10 +1587,15 @@ declare module Plottable {
     module _Drawer {
         class Element extends AbstractDrawer {
             _svgElement: string;
+            /**
+             * Sets the svg element, which needs to be bind to data
+             *
+             * @param{string} tag The svg element to be bind
+             */
             svgElement(tag: string): Element;
             _getDrawSelection(): D3.Selection;
             _drawStep(step: DrawStep): void;
-            _applyData(data: any[]): void;
+            _enterData(data: any[]): void;
         }
     }
 }

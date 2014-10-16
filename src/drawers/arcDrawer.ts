@@ -20,15 +20,15 @@ export module _Drawer {
     }
 
     public _drawStep(step: DrawStep) {
-      var attrToProjector = this.retargetProjectors(step.attrToProjector);
+      var attrToProjector = <AttributeToProjector>_Util.Methods.copyMap(step.attrToProjector);
+      attrToProjector = this.retargetProjectors(attrToProjector);
       var innerRadiusF = attrToProjector["inner-radius"];
       var outerRadiusF = attrToProjector["outer-radius"];
       delete attrToProjector["inner-radius"];
       delete attrToProjector["outer-radius"];
 
       attrToProjector["d"] = this.createArc(innerRadiusF, outerRadiusF);
-      step.attrToProjector = attrToProjector;
-      super._drawStep(step);
+      super._drawStep({attrToProjector: attrToProjector, animator: step.animator});
     }
 
     public draw(data: any[], drawSteps: DrawStep[]) {

@@ -5753,6 +5753,16 @@ describe("_Util.Methods", function () {
         var emptyMap = Plottable._Util.Methods.populateMap(emptyKeys, function (key) { return key + "Value"; });
         assert.isTrue(emptyMap.empty(), "no entries in map if no keys in input array");
     });
+    it("copyMap works as expected", function () {
+        var oldMap = {};
+        oldMap["a"] = 1;
+        oldMap["b"] = 2;
+        oldMap["c"] = 3;
+        var map = Plottable._Util.Methods.copyMap(oldMap);
+        assert.deepEqual(map, oldMap, "All values were copied.");
+        map = Plottable._Util.Methods.copyMap({});
+        assert.deepEqual(map, {}, "No values were added.");
+    });
 });
 
 ///<reference path="../testReference.ts" />

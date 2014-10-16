@@ -5,6 +5,11 @@ export module _Drawer {
   export class Element extends AbstractDrawer {
     public _svgElement: string;
 
+    /**
+     * Sets the svg element, which needs to be bind to data
+     *
+     * @param{string} tag The svg element to be bind
+     */
     public svgElement(tag: string): Element {
       this._svgElement = tag;
       return this;
@@ -24,8 +29,8 @@ export module _Drawer {
       animator.animate(drawSelection, step.attrToProjector);
     }
 
-    public _applyData(data: any[]) {
-      super._applyData(data);
+    public _enterData(data: any[]) {
+      super._enterData(data);
       var dataElements = this._getDrawSelection().data(data);
       dataElements.enter().append(this._svgElement);
       dataElements.classed(this._className, true);

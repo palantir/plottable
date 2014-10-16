@@ -238,6 +238,18 @@ export module _Util {
       return acc === undefined ? d3.min(arr) : d3.min(arr, acc);
       /* tslint:enable:ban */
     }
+
+    /**
+     * Creates shallow copy of map.
+     * @param {{ [key: string]: any }} oldMap Map to copy
+     *
+     * @returns {[{ [key: string]: any }} coppied map.
+     */
+    export function copyMap(oldMap: { [key: string]: any }) {
+      var newMap: { [key: string]: any } = {};
+      d3.keys(oldMap).forEach(key => newMap[key] = oldMap[key]);
+      return newMap;
+    }
   }
 }
 }

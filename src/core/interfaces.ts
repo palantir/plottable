@@ -99,6 +99,11 @@ module Plottable {
     key: string;
   }
 
+  /**
+   * A draw step for drawer.
+   *
+   * Specifies how attribute to projector needs to be animated.
+   */
   export interface DrawStep {
     attrToProjector: AttributeToProjector;
     animator?: Animator.PlotAnimator;

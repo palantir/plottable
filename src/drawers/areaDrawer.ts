@@ -5,8 +5,8 @@ export module _Drawer {
   export class Area extends Path {
     private areaSelection: D3.Selection;
 
-    public _applyData(data: any[]) {
-      super._applyData(data);
+    public _enterData(data: any[]) {
+      super._enterData(data);
       this.areaSelection.datum(data);
     }
 
@@ -28,7 +28,7 @@ export module _Drawer {
 
     public _drawStep(step: DrawStep) {
       super._drawStep(step);
-      var attrToProjector = step.attrToProjector;
+      var attrToProjector = <AttributeToProjector>_Util.Methods.copyMap(step.attrToProjector);
       var xFunction       = attrToProjector["x"];
       var y0Function      = attrToProjector["y0"];
       var y1Function       = attrToProjector["y"];
@@ -44,9 +44,6 @@ export module _Drawer {
       }
       var animator = step.animator || new Animator.Null();
       animator.animate(this.areaSelection, attrToProjector);
-      attrToProjector["x"] = xFunction;
-      attrToProjector["y0"] = y0Function;
-      attrToProjector["y"] = y1Function;
     }
   }
 }

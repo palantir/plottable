@@ -241,6 +241,18 @@ var Plottable;
                 /* tslint:enable:ban */
             }
             Methods.min = min;
+            /**
+             * Creates shallow copy of map.
+             * @param {{ [key: string]: any }} oldMap Map to copy
+             *
+             * @returns {[{ [key: string]: any }} coppied map.
+             */
+            function copyMap(oldMap) {
+                var newMap = {};
+                d3.keys(oldMap).forEach(function (key) { return newMap[key] = oldMap[key]; });
+                return newMap;
+            }
+            Methods.copyMap = copyMap;
         })(_Util.Methods || (_Util.Methods = {}));
         var Methods = _Util.Methods;
     })(Plottable._Util || (Plottable._Util = {}));
@@ -3009,6 +3021,11 @@ var Plottable;
             function AbstractDrawer(key) {
                 this.key = key;
             }
+            /**
+             * Sets the class, which needs to be applied to bound elements.
+             *
+             * @param{string} className The class name to be applied.
+             */
             AbstractDrawer.prototype.classed = function (className) {
                 this._className = className;
                 return this;
@@ -3024,21 +3041,31 @@ var Plottable;
                     this._renderArea.remove();
                 }
             };
-            AbstractDrawer.prototype._applyData = function (data) {
+            /**
+             * Enter new data to render arrea and creates binding
+             *
+             * @param{any[]} data The data to be drawn
+             */
+            AbstractDrawer.prototype._enterData = function (data) {
                 // no-op
             };
+            /**
+             * Draws data using one step
+             *
+             * @param{DataStep} step The step, how data should be drawn.
+             */
             AbstractDrawer.prototype._drawStep = function (drawStep) {
                 // no-op
             };
             /**
-             * Draws the data into the renderArea using the attrHash for attributes
+             * Draws the data into the renderArea using the spefic steps
              *
              * @param{any[]} data The data to be drawn
-             * @param{attrHash} AttributeToProjector The list of attributes to set on the data
+             * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
              */
             AbstractDrawer.prototype.draw = function (data, drawSteps) {
                 var _this = this;
-                this._applyData(data);
+                this._enterData(data);
                 drawSteps.forEach(function (drawStep) {
                     _this._drawStep(drawStep);
                 });
@@ -3065,8 +3092,8 @@ var Plottable;
             function Path() {
                 _super.apply(this, arguments);
             }
-            Path.prototype._applyData = function (data) {
-                _super.prototype._applyData.call(this, data);
+            Path.prototype._enterData = function (data) {
+                _super.prototype._enterData.call(this, data);
                 this.pathSelection.datum(data);
             };
             Path.prototype._rejectNullsAndNaNs = function (d, i, projector) {
@@ -3084,7 +3111,7 @@ var Plottable;
             };
             Path.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
-                var attrToProjector = step.attrToProjector;
+                var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var xFunction = attrToProjector["x"];
                 var yFunction = attrToProjector["y"];
                 delete attrToProjector["x"];
@@ -3096,8 +3123,6 @@ var Plottable;
                 }
                 var animator = step.animator || new Plottable.Animator.Null();
                 animator.animate(this.pathSelection, attrToProjector);
-                attrToProjector["x"] = xFunction;
-                attrToProjector["y"] = yFunction;
             };
             return Path;
         })(_Drawer.AbstractDrawer);
@@ -3121,8 +3146,8 @@ var Plottable;
             function Area() {
                 _super.apply(this, arguments);
             }
-            Area.prototype._applyData = function (data) {
-                _super.prototype._applyData.call(this, data);
+            Area.prototype._enterData = function (data) {
+                _super.prototype._enterData.call(this, data);
                 this.areaSelection.datum(data);
             };
             Area.prototype.setup = function (area) {
@@ -3136,7 +3161,7 @@ var Plottable;
             };
             Area.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
-                var attrToProjector = step.attrToProjector;
+                var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var xFunction = attrToProjector["x"];
                 var y0Function = attrToProjector["y0"];
                 var y1Function = attrToProjector["y"];
@@ -3150,9 +3175,6 @@ var Plottable;
                 }
                 var animator = step.animator || new Plottable.Animator.Null();
                 animator.animate(this.areaSelection, attrToProjector);
-                attrToProjector["x"] = xFunction;
-                attrToProjector["y0"] = y0Function;
-                attrToProjector["y"] = y1Function;
             };
             return Area;
         })(_Drawer.Path);
@@ -3176,6 +3198,11 @@ var Plottable;
             function Element() {
                 _super.apply(this, arguments);
             }
+            /**
+             * Sets the svg element, which needs to be bind to data
+             *
+             * @param{string} tag The svg element to be bind
+             */
             Element.prototype.svgElement = function (tag) {
                 this._svgElement = tag;
                 return this;
@@ -3192,8 +3219,8 @@ var Plottable;
                 var animator = step.animator || new Plottable.Animator.Null();
                 animator.animate(drawSelection, step.attrToProjector);
             };
-            Element.prototype._applyData = function (data) {
-                _super.prototype._applyData.call(this, data);
+            Element.prototype._enterData = function (data) {
+                _super.prototype._enterData.call(this, data);
                 var dataElements = this._getDrawSelection().data(data);
                 dataElements.enter().append(this._svgElement);
                 dataElements.classed(this._className, true);
@@ -3233,14 +3260,14 @@ var Plottable;
                 return retargetedAttrToProjector;
             };
             Arc.prototype._drawStep = function (step) {
-                var attrToProjector = this.retargetProjectors(step.attrToProjector);
+                var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
+                attrToProjector = this.retargetProjectors(attrToProjector);
                 var innerRadiusF = attrToProjector["inner-radius"];
                 var outerRadiusF = attrToProjector["outer-radius"];
                 delete attrToProjector["inner-radius"];
                 delete attrToProjector["outer-radius"];
                 attrToProjector["d"] = this.createArc(innerRadiusF, outerRadiusF);
-                step.attrToProjector = attrToProjector;
-                _super.prototype._drawStep.call(this, step);
+                _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
             };
             Arc.prototype.draw = function (data, drawSteps) {
                 var valueAccessor = drawSteps[0].attrToProjector["value"];

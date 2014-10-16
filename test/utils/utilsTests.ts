@@ -95,4 +95,20 @@ describe("_Util.Methods", () => {
     assert.isTrue(emptyMap.empty(), "no entries in map if no keys in input array");
 
   });
+
+  it("copyMap works as expected", () => {
+    var oldMap: {[key: string]: any} = {};
+    oldMap["a"] = 1;
+    oldMap["b"] = 2;
+    oldMap["c"] = 3;
+
+    var map = Plottable._Util.Methods.copyMap(oldMap);
+
+    assert.deepEqual(map, oldMap, "All values were copied.");
+
+    map = Plottable._Util.Methods.copyMap({});
+
+    assert.deepEqual(map, {}, "No values were added.");
+
+  });
 });

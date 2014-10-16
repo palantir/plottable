@@ -5,8 +5,8 @@ export module _Drawer {
   export class Path extends AbstractDrawer {
     private pathSelection: D3.Selection;
 
-    public _applyData(data: any[]) {
-      super._applyData(data);
+    public _enterData(data: any[]) {
+      super._enterData(data);
       this.pathSelection.datum(data);
     }
 
@@ -31,7 +31,7 @@ export module _Drawer {
 
     public _drawStep(step: DrawStep) {
       super._drawStep(step);
-      var attrToProjector = step.attrToProjector;
+      var attrToProjector = <AttributeToProjector>_Util.Methods.copyMap(step.attrToProjector);
       var xFunction       = attrToProjector["x"];
       var yFunction       = attrToProjector["y"];
       delete attrToProjector["x"];
@@ -45,9 +45,6 @@ export module _Drawer {
       }
       var animator = step.animator || new Animator.Null();
       animator.animate(this.pathSelection, attrToProjector);
-
-      attrToProjector["x"] = xFunction;
-      attrToProjector["y"] = yFunction;
     }
   }
 }
