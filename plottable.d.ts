@@ -2680,7 +2680,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Scatter<X, Y> extends AbstractXYPlot<X, Y> {
-            _animators: Animator.PlotAnimatorMap;
             /**
              * Constructs a ScatterPlot.
              *
@@ -2696,8 +2695,9 @@ declare module Plottable {
              * radius, and "fill" is the CSS color of the datum.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Scatter<X, Y>;
+            _getDrawer(key: string): _Drawer.Element;
             _generateAttrToProjector(): AttributeToProjector;
-            _paint(): void;
+            _generateDrawSteps(): DrawStep[];
         }
     }
 }
@@ -2963,7 +2963,7 @@ declare module Plottable {
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _getDrawer(key: string): _Drawer.Area;
             _setup(): void;
-            _paint(): void;
+            _additionalPaint(): void;
             _updateYDomainer(): void;
             _onDatasetUpdate(): void;
             _generateAttrToProjector(): AttributeToProjector;
@@ -2992,7 +2992,7 @@ declare module Plottable {
             _getAnimator(key: string): Animator.PlotAnimator;
             _getDrawer(key: string): any;
             _generateAttrToProjector(): any;
-            _paint(): void;
+            _additionalPaint(): void;
             baseline(value: number): any;
             _updateDomainer(scale: Scale.AbstractScale<any, number>): any;
             _updateXDomainer(): any;

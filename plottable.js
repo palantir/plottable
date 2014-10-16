@@ -6349,14 +6349,12 @@ var Plottable;
              */
             function Scatter(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this._animators = {
-                    "circles-reset": new Plottable.Animator.Null(),
-                    "circles": new Plottable.Animator.Base().duration(250).delay(5)
-                };
                 this.classed("scatter-plot", true);
                 this.project("r", 3); // default
                 this.project("opacity", 0.6); // default
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; }); // default
+                this._animators["circles-reset"] = new Plottable.Animator.Null();
+                this._animators["circles"] = new Plottable.Animator.Base().duration(250).delay(5);
             }
             /**
              * @param {string} attrToSet One of ["x", "y", "cx", "cy", "r",
@@ -6369,6 +6367,9 @@ var Plottable;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
             };
+            Scatter.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Element(key).svgElement("circle");
+            };
             Scatter.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 attrToProjector["cx"] = attrToProjector["x"];
@@ -6377,24 +6378,15 @@ var Plottable;
                 delete attrToProjector["y"];
                 return attrToProjector;
             };
-            // HACKHACK #1106 - should use drawers for paint logic
-            Scatter.prototype._paint = function () {
-                var _this = this;
-                var attrToProjector = this._generateAttrToProjector();
-                var datasets = this.datasets();
-                this._getDrawersInOrder().forEach(function (d, i) {
-                    var dataset = datasets[i];
-                    var circles = d._renderArea.selectAll("circle").data(dataset.data());
-                    circles.enter().append("circle");
-                    if (_this._dataChanged) {
-                        var rFunction = attrToProjector["r"];
-                        attrToProjector["r"] = function () { return 0; };
-                        _this._applyAnimatedAttributes(circles, "circles-reset", attrToProjector);
-                        attrToProjector["r"] = rFunction;
-                    }
-                    _this._applyAnimatedAttributes(circles, "circles", attrToProjector);
-                    circles.exit().remove();
-                });
+            Scatter.prototype._generateDrawSteps = function () {
+                var drawSteps = [];
+                if (this._dataChanged) {
+                    var resetAttrToProjector = this._generateAttrToProjector();
+                    resetAttrToProjector["r"] = function () { return 0; };
+                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("circles-reset") });
+                }
+                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("circles") });
+                return drawSteps;
             };
             return Scatter;
         })(Plot.AbstractXYPlot);
@@ -7210,8 +7202,7 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
-            StackedArea.prototype._paint = function () {
-                _super.prototype._paint.call(this);
+            StackedArea.prototype._additionalPaint = function () {
                 var scaledBaseline = this._yScale.scale(this._baselineValue);
                 var baselineAttr = {
                     "x1": 0,
@@ -7219,7 +7210,7 @@ var Plottable;
                     "x2": this.width(),
                     "y2": scaledBaseline
                 };
-                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
+                this._getAnimator("baseline").animate(this._baseline, baselineAttr);
             };
             StackedArea.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
@@ -7316,17 +7307,8 @@ var Plottable;
                 attrToProjector[primaryAttr] = function (d) { return _this._isVertical ? attrFunction(d) : attrFunction(d) - heightF(d); };
                 return attrToProjector;
             };
-            StackedBar.prototype._paint = function () {
-                _super.prototype._paint.call(this);
-                var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                var scaledBaseline = primaryScale.scale(this._baselineValue);
-                var baselineAttr = {
-                    "x1": this._isVertical ? 0 : scaledBaseline,
-                    "y1": this._isVertical ? scaledBaseline : 0,
-                    "x2": this._isVertical ? this.width() : scaledBaseline,
-                    "y2": this._isVertical ? scaledBaseline : this.height()
-                };
-                this._baseline.attr(baselineAttr);
+            StackedBar.prototype._additionalPaint = function () {
+                Plot.AbstractBarPlot.prototype._additionalPaint.apply(this, []);
             };
             StackedBar.prototype.baseline = function (value) {
                 return Plot.AbstractBarPlot.prototype.baseline.apply(this, [value]);

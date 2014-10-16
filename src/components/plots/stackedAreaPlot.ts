@@ -30,8 +30,7 @@ export module Plot {
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
-    public _paint() {
-      super._paint();
+    public _additionalPaint() {
       var scaledBaseline = this._yScale.scale(this._baselineValue);
       var baselineAttr: any = {
         "x1": 0,
@@ -39,8 +38,8 @@ export module Plot {
         "x2": this.width(),
         "y2": scaledBaseline
       };
-      this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
 
+      this._getAnimator("baseline").animate(this._baseline, baselineAttr);
     }
 
     public _updateYDomainer() {
