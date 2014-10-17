@@ -43,16 +43,16 @@ export module Plot {
     public _getDataToDraw() {
       var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       this.innerScale.domain(this._datasetKeysInOrder);
-      var clusters: {[key: string]: any[]} = {};
+      var clusters: D3.Map<any[]> = d3.map();
       this._datasetKeysInOrder.forEach((key: string) => {
         var data = this._key2DatasetDrawerKey.get(key).dataset.data();
 
-        clusters[key] = data.map((d, i) => {
+        clusters.set(key, data.map((d, i) => {
           var val = accessor(d, i);
           var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._xScale : this._yScale;
           d["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + this.innerScale.scale(key);
           return d;
-        });
+        }));
       });
       return clusters;
     }

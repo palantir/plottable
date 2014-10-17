@@ -57,7 +57,7 @@ export module Plot {
     }
 
     public _getDrawer(key: string): _Drawer.AbstractDrawer {
-      return new Plottable._Drawer.Arc(key).classed("arc");
+      return new Plottable._Drawer.Arc(key).setClass("arc");
     }
   }
 }

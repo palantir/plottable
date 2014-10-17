@@ -3,12 +3,16 @@
 module Plottable {
 export module _Drawer {
   export class Arc extends Element {
-    public _svgElement = "path";
+
+    constructor(key: string) {
+      super(key);
+      this.svgElement("path");
+    }
 
     private createArc(innerRadiusF: AppliedAccessor, outerRadiusF: AppliedAccessor) {
       return d3.svg.arc()
-                .innerRadius(innerRadiusF)
-                .outerRadius(outerRadiusF);
+                   .innerRadius(innerRadiusF)
+                   .outerRadius(outerRadiusF);
     }
 
     private retargetProjectors(attrToProjector: AttributeToProjector): AttributeToProjector {
@@ -34,10 +38,10 @@ export module _Drawer {
     public draw(data: any[], drawSteps: DrawStep[]) {
       var valueAccessor = drawSteps[0].attrToProjector["value"];
       var pie = d3.layout.pie()
-                      .sort(null)
-                      .value(valueAccessor)(data);
+                          .sort(null)
+                          .value(valueAccessor)(data);
 
-      drawSteps.map(s => delete s.attrToProjector["value"]);
+      drawSteps.forEach(s => delete s.attrToProjector["value"]);
       super.draw(pie, drawSteps);
     }
   }

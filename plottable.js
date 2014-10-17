@@ -3026,7 +3026,7 @@ var Plottable;
              *
              * @param{string} className The class name to be applied.
              */
-            AbstractDrawer.prototype.classed = function (className) {
+            AbstractDrawer.prototype.setClass = function (className) {
                 this._className = className;
                 return this;
             };
@@ -3042,7 +3042,7 @@ var Plottable;
                 }
             };
             /**
-             * Enter new data to render arrea and creates binding
+             * Enter new data to render area and creates binding
              *
              * @param{any[]} data The data to be drawn
              */
@@ -3087,24 +3087,24 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (_Drawer) {
-        var Path = (function (_super) {
-            __extends(Path, _super);
-            function Path() {
+        var Line = (function (_super) {
+            __extends(Line, _super);
+            function Line() {
                 _super.apply(this, arguments);
             }
-            Path.prototype._enterData = function (data) {
+            Line.prototype._enterData = function (data) {
                 _super.prototype._enterData.call(this, data);
                 this.pathSelection.datum(data);
             };
-            Path.prototype.setup = function (area) {
+            Line.prototype.setup = function (area) {
                 area.append("path").classed("line", true);
                 _super.prototype.setup.call(this, area);
                 this.pathSelection = this._renderArea.select(".line");
             };
-            Path.prototype.createLine = function (xFunction, yFunction, definedFunction) {
+            Line.prototype.createLine = function (xFunction, yFunction, definedFunction) {
                 return d3.svg.line().x(xFunction).y(yFunction).defined(definedFunction);
             };
-            Path.prototype._drawStep = function (step) {
+            Line.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var xFunction = attrToProjector["x"];
@@ -3118,16 +3118,15 @@ var Plottable;
                 else {
                     definedFunction = function (d, i) { return true; };
                 }
-                var line = this.createLine(xFunction, yFunction, definedFunction);
-                attrToProjector["d"] = line;
+                attrToProjector["d"] = this.createLine(xFunction, yFunction, definedFunction);
                 if (attrToProjector["fill"]) {
                     this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
                 step.animator.animate(this.pathSelection, attrToProjector);
             };
-            return Path;
+            return Line;
         })(_Drawer.AbstractDrawer);
-        _Drawer.Path = Path;
+        _Drawer.Line = Line;
     })(Plottable._Drawer || (Plottable._Drawer = {}));
     var _Drawer = Plottable._Drawer;
 })(Plottable || (Plottable = {}));
@@ -3200,15 +3199,14 @@ var Plottable;
                 else {
                     definedFunction = function (d, i) { return true; };
                 }
-                var area = this.createArea(xFunction, y0Function, y1Function, definedFunction);
-                attrToProjector["d"] = area;
+                attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function, definedFunction);
                 if (attrToProjector["fill"]) {
                     this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
                 step.animator.animate(this.areaSelection, attrToProjector);
             };
             return Area;
-        })(_Drawer.Path);
+        })(_Drawer.Line);
         _Drawer.Area = Area;
     })(Plottable._Drawer || (Plottable._Drawer = {}));
     var _Drawer = Plottable._Drawer;
@@ -3275,9 +3273,9 @@ var Plottable;
     (function (_Drawer) {
         var Arc = (function (_super) {
             __extends(Arc, _super);
-            function Arc() {
-                _super.apply(this, arguments);
-                this._svgElement = "path";
+            function Arc(key) {
+                _super.call(this, key);
+                this.svgElement("path");
             }
             Arc.prototype.createArc = function (innerRadiusF, outerRadiusF) {
                 return d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
@@ -3302,7 +3300,7 @@ var Plottable;
             Arc.prototype.draw = function (data, drawSteps) {
                 var valueAccessor = drawSteps[0].attrToProjector["value"];
                 var pie = d3.layout.pie().sort(null).value(valueAccessor)(data);
-                drawSteps.map(function (s) { return delete s.attrToProjector["value"]; });
+                drawSteps.forEach(function (s) { return delete s.attrToProjector["value"]; });
                 _super.prototype.draw.call(this, pie, drawSteps);
             };
             return Arc;
@@ -6198,18 +6196,17 @@ var Plottable;
             };
             AbstractPlot.prototype._getDataToDraw = function () {
                 var _this = this;
-                var datasets = {};
+                var datasets = d3.map();
                 this._datasetKeysInOrder.forEach(function (key) {
-                    var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
-                    datasets[key] = data;
+                    datasets.set(key, _this._key2DatasetDrawerKey.get(key).dataset.data());
                 });
                 return datasets;
             };
             AbstractPlot.prototype.paint = function () {
                 var drawSteps = this._generateDrawSteps();
-                var datasets = this._getDataToDraw();
+                var dataToDraw = this._getDataToDraw();
                 var drawers = this._getDrawersInOrder();
-                this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].draw(datasets[k], drawSteps); });
+                this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].draw(dataToDraw.get(k), drawSteps); });
                 this._additionalPaint();
             };
             return AbstractPlot;
@@ -6274,7 +6271,7 @@ var Plottable;
                 return attrToProjector;
             };
             Pie.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Arc(key).classed("arc");
+                return new Plottable._Drawer.Arc(key).setClass("arc");
             };
             Pie.DEFAULT_COLOR_SCALE = new Plottable.Scale.Color();
             return Pie;
@@ -6860,7 +6857,7 @@ var Plottable;
                 return value != null && value === value;
             };
             Line.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Path(key);
+                return new Plottable._Drawer.Line(key);
             };
             Line.prototype._getResetYFunction = function () {
                 // gets the y-value generator for the animation start point
@@ -7045,15 +7042,15 @@ var Plottable;
                 var _this = this;
                 var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 this.innerScale.domain(this._datasetKeysInOrder);
-                var clusters = {};
+                var clusters = d3.map();
                 this._datasetKeysInOrder.forEach(function (key) {
                     var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
-                    clusters[key] = data.map(function (d, i) {
+                    clusters.set(key, data.map(function (d, i) {
                         var val = accessor(d, i);
                         var primaryScale = _this._isVertical ? _this._xScale : _this._yScale;
                         d["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + _this.innerScale.scale(key);
                         return d;
-                    });
+                    }));
                 });
                 return clusters;
             };

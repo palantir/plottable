@@ -20,8 +20,8 @@ export module Plot {
       this.project("fill", () => Core.Colors.INDIGO); // default
       this._animators["circles-reset"] = new Animator.Null();
       this._animators["circles"] = new Animator.Base()
-                                              .duration(250)
-                                              .delay(5);
+                                               .duration(250)
+                                               .delay(5);
     }
 
     /**
@@ -49,8 +49,8 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _generateDrawSteps(): DrawStep[] {
-      var drawSteps: DrawStep[] = [];
+    public _generateDrawSteps(): _Drawer.DrawStep[] {
+      var drawSteps: _Drawer.DrawStep[] = [];
       if (this._dataChanged) {
         var resetAttrToProjector = this._generateAttrToProjector();
         resetAttrToProjector["r"] = () => 0;

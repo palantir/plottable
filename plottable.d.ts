@@ -876,15 +876,6 @@ declare module Plottable {
         drawer: _Drawer.AbstractDrawer;
         key: string;
     }
-    /**
-     * A draw step for drawer.
-     *
-     * Specifies how attribute to projector needs to be animated.
-     */
-    interface DrawStep {
-        attrToProjector: AttributeToProjector;
-        animator: Animator.PlotAnimator;
-    }
 }
 
 
@@ -1514,6 +1505,15 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
+        /**
+         * A step for drawer to draw.
+         *
+         * Specifies how AttributeToProjector needs to be animated.
+         */
+        interface DrawStep {
+            attrToProjector: AttributeToProjector;
+            animator: Animator.PlotAnimator;
+        }
         class AbstractDrawer {
             _renderArea: D3.Selection;
             _className: string;
@@ -1523,7 +1523,7 @@ declare module Plottable {
              *
              * @param{string} className The class name to be applied.
              */
-            classed(className: string): AbstractDrawer;
+            setClass(className: string): AbstractDrawer;
             /**
              * Constructs a Drawer
              *
@@ -1537,7 +1537,7 @@ declare module Plottable {
              */
             remove(): void;
             /**
-             * Enter new data to render arrea and creates binding
+             * Enter new data to render area and creates binding
              *
              * @param{any[]} data The data to be drawn
              */
@@ -1562,7 +1562,7 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Path extends AbstractDrawer {
+        class Line extends AbstractDrawer {
             _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
             _drawStep(step: DrawStep): void;
@@ -1573,7 +1573,7 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Area extends Path {
+        class Area extends Line {
             _enterData(data: any[]): void;
             /**
              * Sets the value determining if line should be drawn.
@@ -1609,7 +1609,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Arc extends Element {
-            _svgElement: string;
+            constructor(key: string);
             _drawStep(step: DrawStep): void;
             draw(data: any[], drawSteps: DrawStep[]): void;
         }
@@ -2645,11 +2645,9 @@ declare module Plottable {
             _removeDataset(key: string): AbstractPlot;
             datasets(): Dataset[];
             _getDrawersInOrder(): _Drawer.AbstractDrawer[];
-            _generateDrawSteps(): DrawStep[];
+            _generateDrawSteps(): _Drawer.DrawStep[];
             _additionalPaint(): void;
-            _getDataToDraw(): {
-                [x: string]: any[];
-            };
+            _getDataToDraw(): D3.Map<any[]>;
         }
     }
 }
@@ -2723,7 +2721,7 @@ declare module Plottable {
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Scatter<X, Y>;
             _getDrawer(key: string): _Drawer.Element;
             _generateAttrToProjector(): AttributeToProjector;
-            _generateDrawSteps(): DrawStep[];
+            _generateDrawSteps(): _Drawer.DrawStep[];
         }
     }
 }
@@ -2757,7 +2755,7 @@ declare module Plottable {
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Grid;
             _generateAttrToProjector(): AttributeToProjector;
-            _generateDrawSteps(): DrawStep[];
+            _generateDrawSteps(): _Drawer.DrawStep[];
         }
     }
 }
@@ -2825,7 +2823,7 @@ declare module Plottable {
             _updateYDomainer(): void;
             _updateXDomainer(): void;
             _additionalPaint(): void;
-            _generateDrawSteps(): DrawStep[];
+            _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
         }
     }
@@ -2906,9 +2904,9 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor): boolean;
-            _getDrawer(key: string): _Drawer.Path;
+            _getDrawer(key: string): _Drawer.Line;
             _getResetYFunction(): (d: any, i: number) => number;
-            _generateDrawSteps(): DrawStep[];
+            _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
             _wholeDatumAttributes(): string[];
         }
@@ -2958,9 +2956,7 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             _generateAttrToProjector(): AttributeToProjector;
-            _getDataToDraw(): {
-                [x: string]: any[];
-            };
+            _getDataToDraw(): D3.Map<any[]>;
         }
     }
 }

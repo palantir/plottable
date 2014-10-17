@@ -2,7 +2,7 @@
 
 module Plottable {
 export module _Drawer {
-  export class Path extends AbstractDrawer {
+  export class Line extends AbstractDrawer {
     private pathSelection: D3.Selection;
 
     public _enterData(data: any[]) {
@@ -37,8 +37,7 @@ export module _Drawer {
         definedFunction = (d: any, i: number) => true;
       }
 
-      var line = this.createLine(xFunction, yFunction, definedFunction);
-      attrToProjector["d"] = line;
+      attrToProjector["d"] = this.createLine(xFunction, yFunction, definedFunction);
 
       if (attrToProjector["fill"]) {
         this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate

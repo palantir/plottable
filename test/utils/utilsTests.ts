@@ -101,6 +101,11 @@ describe("_Util.Methods", () => {
     oldMap["a"] = 1;
     oldMap["b"] = 2;
     oldMap["c"] = 3;
+    oldMap["undefined"] = undefined;
+    oldMap["null"] = null;
+    oldMap["fun"] = (d: number) => d;
+    oldMap["NaN"] = 0 / 0;
+    oldMap["inf"] = 1 / 0;
 
     var map = Plottable._Util.Methods.copyMap(oldMap);
 

@@ -112,7 +112,7 @@ export module Plot {
     }
 
     public _getAnimator(key: string): Animator.PlotAnimator {
-      if(this._animate && this._animateOnNextRender) {
+      if (this._animate && this._animateOnNextRender) {
         return this._animators[key] || new Animator.Null();
       } else {
         return new Animator.Null();
@@ -359,7 +359,7 @@ export module Plot {
       return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).drawer);
     }
 
-    public _generateDrawSteps(): DrawStep[] {
+    public _generateDrawSteps(): _Drawer.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("")}];
     }
 
@@ -368,19 +368,18 @@ export module Plot {
     }
 
     public _getDataToDraw() {
-      var datasets: {[key: string]: any[]} = {};
+      var datasets: D3.Map<any[]> = d3.map();
       this._datasetKeysInOrder.forEach((key: string) => {
-        var data = this._key2DatasetDrawerKey.get(key).dataset.data();
-        datasets[key] = data;
+        datasets.set(key, this._key2DatasetDrawerKey.get(key).dataset.data());
       });
       return datasets;
     }
 
     private paint() {
       var drawSteps = this._generateDrawSteps();
-      var datasets = this._getDataToDraw();
+      var dataToDraw = this._getDataToDraw();
       var drawers = this._getDrawersInOrder();
-      this._datasetKeysInOrder.forEach((k, i) => drawers[i].draw(datasets[k], drawSteps));
+      this._datasetKeysInOrder.forEach((k, i) => drawers[i].draw(dataToDraw.get(k), drawSteps));
       this._additionalPaint();
     }
   }

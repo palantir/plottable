@@ -2,6 +2,16 @@
 
 module Plottable {
 export module _Drawer {
+  /**
+   * A step for drawer to draw.
+   *
+   * Specifies how AttributeToProjector needs to be animated.
+   */
+  export interface DrawStep {
+    attrToProjector: AttributeToProjector;
+    animator: Animator.PlotAnimator;
+  }
+
   export class AbstractDrawer {
     public _renderArea: D3.Selection;
     public _className: string;
@@ -12,7 +22,7 @@ export module _Drawer {
      *
      * @param{string} className The class name to be applied.
      */
-    public classed(className: string): AbstractDrawer {
+    public setClass(className: string): AbstractDrawer {
       this._className = className;
       return this;
     }
@@ -41,7 +51,7 @@ export module _Drawer {
     }
 
     /**
-     * Enter new data to render arrea and creates binding
+     * Enter new data to render area and creates binding
      *
      * @param{any[]} data The data to be drawn
      */

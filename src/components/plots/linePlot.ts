@@ -21,8 +21,8 @@ export module Plot {
       this.project("stroke-width", () => "2px"); // default
       this._animators["reset"] = new Animator.Null();
       this._animators["main"] = new Animator.Base()
-                                        .duration(600)
-                                        .easing("exp-in-out");
+                                            .duration(600)
+                                            .easing("exp-in-out");
     }
 
     public _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor) {
@@ -31,7 +31,7 @@ export module Plot {
     }
 
      public _getDrawer(key: string) {
-      return new Plottable._Drawer.Path(key);
+      return new Plottable._Drawer.Line(key);
     }
 
     public _getResetYFunction() {
@@ -46,9 +46,9 @@ export module Plot {
       return (d: any, i: number) => scaledStartValue;
     }
 
-    public _generateDrawSteps(): DrawStep[] {
-      var drawSteps: DrawStep[] = [];
-      if(this._dataChanged) {
+    public _generateDrawSteps(): _Drawer.DrawStep[] {
+      var drawSteps: _Drawer.DrawStep[] = [];
+      if (this._dataChanged) {
         var attrToProjector = this._generateAttrToProjector();
         attrToProjector["y"] = this._getResetYFunction();
         drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});

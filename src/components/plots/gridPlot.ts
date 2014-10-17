@@ -69,7 +69,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _generateDrawSteps(): DrawStep[] {
+    public _generateDrawSteps(): _Drawer.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
     }
   }

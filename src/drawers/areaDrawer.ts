@@ -2,12 +2,12 @@
 
 module Plottable {
 export module _Drawer {
-  export class Area extends Path {
+  export class Area extends Line {
     private areaSelection: D3.Selection;
     private _drawLine = true;
 
     public _enterData(data: any[]) {
-      if(this._drawLine) {
+      if (this._drawLine) {
         super._enterData(data);
       } else {
         AbstractDrawer.prototype._enterData.call(this, data);
@@ -27,7 +27,7 @@ export module _Drawer {
 
     public setup(area: D3.Selection) {
       area.append("path").classed("area", true);
-      if(this._drawLine) {
+      if (this._drawLine) {
         super.setup(area);
       } else {
         AbstractDrawer.prototype.setup.call(this, area);
@@ -47,7 +47,7 @@ export module _Drawer {
     }
 
     public _drawStep(step: DrawStep) {
-      if(this._drawLine) {
+      if (this._drawLine) {
         super._drawStep(step);
       } else {
         AbstractDrawer.prototype._drawStep.call(this, step);
@@ -61,14 +61,13 @@ export module _Drawer {
       delete attrToProjector["x"];
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
-      if(definedFunction) {
+      if (definedFunction) {
         delete attrToProjector["defined"];
       } else {
         definedFunction = (d: any, i: number) => true;
       }
 
-      var area = this.createArea(xFunction, y0Function, y1Function, definedFunction);
-      attrToProjector["d"] = area;
+      attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function, definedFunction);
 
       if (attrToProjector["fill"]) {
         this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate

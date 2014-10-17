@@ -195,8 +195,8 @@ export module Plot {
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);
     }
 
-    public _generateDrawSteps(): DrawStep[] {
-      var drawSteps: DrawStep[] = [];
+    public _generateDrawSteps(): _Drawer.DrawStep[] {
+      var drawSteps: _Drawer.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
         var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;

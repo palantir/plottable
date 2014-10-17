@@ -33,7 +33,7 @@
 /// <reference path="scales/scaleDomainCoordinator.ts" />
 
 /// <reference path="drawers/abstractDrawer.ts" />
-/// <reference path="drawers/pathDrawer.ts" />
+/// <reference path="drawers/lineDrawer.ts" />
 /// <reference path="drawers/areaDrawer.ts" />
 /// <reference path="drawers/elementDrawer.ts" />
 /// <reference path="drawers/arcDrawer.ts" />
