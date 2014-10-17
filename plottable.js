@@ -211,11 +211,11 @@ var Plottable;
                 if (one === void 0) { one = 0; }
                 if (two === void 0) { two = 0; }
                 if (arr.length === 0) {
-                    if (typeof (one) === "number") {
-                        return one;
+                    if (typeof (one) === "function") {
+                        return two;
                     }
                     else {
-                        return two;
+                        return one;
                     }
                 }
                 /* tslint:disable:ban */
@@ -228,11 +228,11 @@ var Plottable;
                 if (one === void 0) { one = 0; }
                 if (two === void 0) { two = 0; }
                 if (arr.length === 0) {
-                    if (typeof (one) === "number") {
-                        return one;
+                    if (typeof (one) === "function") {
+                        return two;
                     }
                     else {
-                        return two;
+                        return one;
                     }
                 }
                 /* tslint:disable:ban */

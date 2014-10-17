@@ -207,14 +207,14 @@ export module _Util {
       return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
     }
 
-    export function max(arr: number[], default_val?: number): number;
+    export function max<T>(arr: T[], default_val?: T): T;
     export function max<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
-    export function max(arr: any[], one: any = 0, two: any = 0) {
+    export function max(arr: any[], one: any = 0, two: any = 0): any {
       if (arr.length === 0) {
-        if (typeof(one) === "number") {
-          return one;
-        } else {
+        if (typeof(one) === "function") {
           return two;
+        } else {
+          return one;
         }
       }
       /* tslint:disable:ban */
@@ -223,14 +223,14 @@ export module _Util {
       /* tslint:enable:ban */
     }
 
-    export function min(arr: number[], default_val?: number): number;
+    export function min<T>(arr: T[], default_val?: T): T;
     export function min<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
-    export function min(arr: any[], one: any = 0, two: any = 0) {
+    export function min(arr: any[], one: any = 0, two: any = 0): any {
       if (arr.length === 0) {
-        if (typeof(one) === "number") {
-          return one;
-        } else {
+        if (typeof(one) === "function") {
           return two;
+        } else {
+          return one;
         }
       }
       /* tslint:disable:ban */
@@ -252,6 +252,7 @@ export module _Util {
 
       return range;
     }
+
   }
 }
 }

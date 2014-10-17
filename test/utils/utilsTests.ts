@@ -63,6 +63,17 @@ describe("_Util.Methods", () => {
     var strings = ["a", "bb", "ccc", "ddd"];
     assert.deepEqual(max(strings, (s: string) => s.length), 3, "works on arrays of non-numbers with a function");
     assert.deepEqual(max([], (s: string) => s.length, 5), 5, "defaults work even with non-number function type");
+
+    var today = new Date();
+    var tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    var dayAfterTomorrow = new Date();
+    dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
+
+    var dates: Date[] = [today, tomorrow, dayAfterTomorrow];
+    assert.deepEqual(min<Date>(dates), today, "works on arrays of non-numbers but comperable");
+    assert.deepEqual(max<Date>(dates), dayAfterTomorrow, "works on arrays of non-numbers but comperable");
+    assert.deepEqual(max<Date>([], today), today, "defaults work even with non-number");
   });
 
   it("objEq works as expected", () => {
