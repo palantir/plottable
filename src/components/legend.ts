@@ -177,7 +177,7 @@ export module Component {
       var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend.MARGIN) / textHeight));
       var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var measure = _Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
-      var maxWidth = _Util.Methods.max<string>(this.colorScale.domain(), (d: string) => measure(d).width);
+      var maxWidth = _Util.Methods.max<string, number>(this.colorScale.domain(), (d: string) => measure(d).width);
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
       var desiredWidth  = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;

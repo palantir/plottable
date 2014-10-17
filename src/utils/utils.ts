@@ -207,8 +207,13 @@ export module _Util {
       return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
     }
 
-    export function max<T>(arr: T[], default_val?: T): T;
-    export function max<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
+    /**
+     * Computes max values from array.
+     *
+     * If type is not comperable then it will be converted to comperable one before computing max.
+     */
+    export function max<C>(arr: C[], default_val?: C): C;
+    export function max<T,C>(arr: T[], acc: (x: T) => C, default_val?: C): C;
     export function max(arr: any[], one: any = 0, two: any = 0): any {
       if (arr.length === 0) {
         if (typeof(one) === "function") {
@@ -223,8 +228,13 @@ export module _Util {
       /* tslint:enable:ban */
     }
 
-    export function min<T>(arr: T[], default_val?: T): T;
-    export function min<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
+    /**
+     * Computes min values from array.
+     *
+     * If type is not comperable then it will be converted to comperable one before computing min.
+     */
+    export function min<C>(arr: C[], default_val?: C): C;
+    export function min<T,C>(arr: T[], acc: (x: T) => C, default_val?: C): C;
     export function min(arr: any[], one: any = 0, two: any = 0): any {
       if (arr.length === 0) {
         if (typeof(one) === "function") {
@@ -252,7 +262,6 @@ export module _Util {
 
       return range;
     }
-
   }
 }
 }

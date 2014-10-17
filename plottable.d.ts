@@ -98,10 +98,20 @@ declare module Plottable {
              *          with ===.
              */
             function objEq(a: any, b: any): boolean;
-            function max<T>(arr: T[], default_val?: T): T;
-            function max<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
-            function min<T>(arr: T[], default_val?: T): T;
-            function min<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
+            /**
+             * Computes max values from array.
+             *
+             * If type is not comperable then it will be converted to comperable one before computing max.
+             */
+            function max<C>(arr: C[], default_val?: C): C;
+            function max<T, C>(arr: T[], acc: (x: T) => C, default_val?: C): C;
+            /**
+             * Computes min values from array.
+             *
+             * If type is not comperable then it will be converted to comperable one before computing min.
+             */
+            function min<C>(arr: C[], default_val?: C): C;
+            function min<T, C>(arr: T[], acc: (x: T) => C, default_val?: C): C;
             function range(start: number, stop: number, step?: number): number[];
         }
     }
