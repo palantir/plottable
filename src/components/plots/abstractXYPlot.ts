@@ -40,13 +40,13 @@ export module Plot {
       if (attrToSet === "x" && scale) {
         this._xScale = scale;
         this._updateXDomainer();
-        scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, () => this.adjustDomain(true));
+        scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, () => this.adjustYDomainOnChangeFromX());
       }
 
       if (attrToSet === "y" && scale) {
         this._yScale = scale;
         this._updateYDomainer();
-        scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, () => this.adjustDomain(false));
+        scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, () => this.adjustXDomainOnChangeFromY());
       }
 
       super.project(attrToSet, accessor, scale);
@@ -112,31 +112,43 @@ export module Plot {
       }
     }
 
-    private adjustDomain(xDomainChanged: boolean) {
-      var shouldAutoDomain = xDomainChanged ? this._autoDomainYScale : this._autoDomainXScale;
-      var propatingChangeScale: Scale.AbstractScale<any, number> = xDomainChanged ? this._xScale : this._yScale;
-      var modifiedScale: Scale.AbstractScale<any, number> = xDomainChanged ? this._yScale : this._xScale;
-      if(shouldAutoDomain && modifiedScale instanceof Scale.AbstractQuantitative) {
-        var scale = <Scale.AbstractQuantitative<any>> modifiedScale;
-        var adjustedDomain: any[] = this.adjustDomainOverVisiblePoints(this.normalizeDatasets(), propatingChangeScale.domain());
-        adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
-        scale._setDomain(adjustedDomain);
+    private adjustYDomainOnChangeFromX() {
+      this.adjustDomainToVisiblePoints<X,Y>(this._xScale, this._yScale, true);
+    }
+    private adjustXDomainOnChangeFromY() {
+      this.adjustDomainToVisiblePoints<Y,X>(this._yScale, this._xScale, false);
+    }
+
+    private adjustDomainToVisiblePoints<A,B>(fromScale: Scale.AbstractScale<A, number>, toScale: Scale.AbstractScale<B, number>, fromX: boolean): void {
+      if (toScale instanceof Scale.AbstractQuantitative) {
+        var toScaleQ = <Scale.AbstractQuantitative<B>> toScale;
+        var normalizedData = this.normalizeDatasets<A,B>(fromX);
+        var adjustedDomain = this.adjustDomainOverVisiblePoints<A,B>(normalizedData, fromScale.domain());
+        adjustedDomain = toScaleQ.domainer().computeDomain([adjustedDomain], toScaleQ);
+        toScaleQ._setDomain(adjustedDomain);
       }
     }
 
-    private normalizeDatasets() {
+    private normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
       var flattenDatasets = _Util.Methods.flatten(this.datasets().map(d => d.data()));
-      return flattenDatasets.map(d => { return { x: this._projectors["x"].accessor(d), y: this._projectors["y"].accessor(d) }; });
+      var aAccessor: (d: any, i: number) => A = this._projectors[fromX ? "x" : "y"].accessor;
+      var bAccessor: (d: any, i: number) => B = this._projectors[fromX ? "y" : "x"].accessor;
+      return flattenDatasets.map((d, i) => { return { a: aAccessor(d, i), b: bAccessor(d, i) }; });
     }
 
-    private adjustDomainOverVisiblePoints(values: Point[], affectedDomain: any[]): any[] {
-      var visiblePoints = values.filter(d => d.x >= affectedDomain[0] && d.x <= affectedDomain[1]);
-      var yValues = visiblePoints.map(d => d.y);
-      if (yValues.length === 0) {
-        yValues = [0];
-      }
+    private adjustDomainOverVisiblePoints<A,B>(values: {a: A; b: B}[], fromDomain: A[]): B[] {
+      var bVals = values
+                    .map(v => v.b)
+                    .filter(b => _Util.Methods.inRange(+b, +fromDomain[0], +fromDomain[1]));
 
-      return [_Util.Methods.min(yValues), _Util.Methods.max(yValues)];
+      var retVal: any[];
+      if (bVals.length === 0) {
+        retVal = [0, 0];
+      } else {
+        var acc = (b: B) => +b;
+        retVal = [_Util.Methods.min(bVals, acc), _Util.Methods.max(bVals, acc)];
+      }
+      return retVal;
     }
   }
 }
