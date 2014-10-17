@@ -154,8 +154,8 @@ export module Axis {
       var heightFn = this._isHorizontal() ? _Util.Methods.max : d3.sum;
       return {
         textFits: textWriteResults.every((t: _Util.Text.IWriteTextResult) => t.textFits),
-        usedWidth : widthFn(textWriteResults, (t: _Util.Text.IWriteTextResult) => t.usedWidth),
-        usedHeight: heightFn(textWriteResults, (t: _Util.Text.IWriteTextResult) => t.usedHeight)
+        usedWidth : widthFn<_Util.Text.IWriteTextResult>(textWriteResults, (t: _Util.Text.IWriteTextResult) => t.usedWidth),
+        usedHeight: heightFn<_Util.Text.IWriteTextResult>(textWriteResults, (t: _Util.Text.IWriteTextResult) => t.usedHeight)
       };
     }
 

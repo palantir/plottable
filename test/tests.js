@@ -5809,6 +5809,15 @@ describe("_Util.Methods", function () {
         var strings = ["a", "bb", "ccc", "ddd"];
         assert.deepEqual(max(strings, function (s) { return s.length; }), 3, "works on arrays of non-numbers with a function");
         assert.deepEqual(max([], function (s) { return s.length; }, 5), 5, "defaults work even with non-number function type");
+        var today = new Date();
+        var tomorrow = new Date();
+        tomorrow.setDate(today.getDate() + 1);
+        var dayAfterTomorrow = new Date();
+        dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
+        var dates = [today, tomorrow, dayAfterTomorrow];
+        assert.deepEqual(min(dates), today, "works on arrays of non-numbers but comperable");
+        assert.deepEqual(max(dates), dayAfterTomorrow, "works on arrays of non-numbers but comperable");
+        assert.deepEqual(max([], today), today, "defaults work even with non-number");
     });
     it("objEq works as expected", function () {
         assert.isTrue(Plottable._Util.Methods.objEq({}, {}));

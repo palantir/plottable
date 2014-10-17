@@ -23,8 +23,8 @@ export module Component {
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var requests = this._components.map((c: AbstractComponent) => c._requestedSpace(offeredWidth, offeredHeight));
       return {
-        width : _Util.Methods.max(requests, (request: _SpaceRequest) => request.width ),
-        height: _Util.Methods.max(requests, (request: _SpaceRequest) => request.height),
+        width : _Util.Methods.max<_SpaceRequest>(requests, (request: _SpaceRequest) => request.width ),
+        height: _Util.Methods.max<_SpaceRequest>(requests, (request: _SpaceRequest) => request.height),
         wantsWidth : requests.map((r: _SpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
         wantsHeight: requests.map((r: _SpaceRequest) => r.wantsHeight).some((x: boolean) => x)
       };

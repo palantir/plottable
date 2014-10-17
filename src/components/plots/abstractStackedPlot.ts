@@ -51,14 +51,14 @@ export module Plot {
     private updateStackExtents() {
       var datasets = this.datasets();
       var valueAccessor = this.valueAccessor();
-      var maxStackExtent = _Util.Methods.max(datasets, (dataset: Dataset) => {
-        return _Util.Methods.max(dataset.data(), (datum: any) => {
+      var maxStackExtent = _Util.Methods.max<Dataset>(datasets, (dataset: Dataset) => {
+        return _Util.Methods.max<any>(dataset.data(), (datum: any) => {
           return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
         });
       });
 
-      var minStackExtent = _Util.Methods.min(datasets, (dataset: Dataset) => {
-        return _Util.Methods.min(dataset.data(), (datum: any) => {
+      var minStackExtent = _Util.Methods.min<Dataset>(datasets, (dataset: Dataset) => {
+        return _Util.Methods.min<any>(dataset.data(), (datum: any) => {
           return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
         });
       });
