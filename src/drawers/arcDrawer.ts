@@ -6,7 +6,7 @@ export module _Drawer {
 
     constructor(key: string) {
       super(key);
-      this.svgElement("path");
+      this._svgElement = "path";
     }
 
     private createArc(innerRadiusF: AppliedAccessor, outerRadiusF: AppliedAccessor) {

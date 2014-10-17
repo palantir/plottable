@@ -3275,7 +3275,7 @@ var Plottable;
             __extends(Arc, _super);
             function Arc(key) {
                 _super.call(this, key);
-                this.svgElement("path");
+                this._svgElement = "path";
             }
             Arc.prototype.createArc = function (innerRadiusF, outerRadiusF) {
                 return d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);

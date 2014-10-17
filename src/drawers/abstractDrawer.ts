@@ -3,7 +3,7 @@
 module Plottable {
 export module _Drawer {
   /**
-   * A step for drawer to draw.
+   * A step for the drawer to draw.
    *
    * Specifies how AttributeToProjector needs to be animated.
    */

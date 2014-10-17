@@ -1506,7 +1506,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         /**
-         * A step for drawer to draw.
+         * A step for the drawer to draw.
          *
          * Specifies how AttributeToProjector needs to be animated.
          */
