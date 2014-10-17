@@ -19,7 +19,6 @@ export module Plot {
     constructor(xScale?: Scale.AbstractScale<X,number>, yScale?: Scale.AbstractScale<Y,number>, isVertical = true) {
       this._isVertical = isVertical; // Has to be set before super()
       this._baselineValue = 0;
-      this._barAlignmentFactor = 0.5;
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);

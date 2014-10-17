@@ -7260,7 +7260,6 @@ var Plottable;
                 if (isVertical === void 0) { isVertical = true; }
                 this._isVertical = isVertical; // Has to be set before super()
                 this._baselineValue = 0;
-                this._barAlignmentFactor = 0.5;
                 _super.call(this, xScale, yScale);
                 this.classed("bar-plot", true);
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
