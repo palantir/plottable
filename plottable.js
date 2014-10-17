@@ -3103,7 +3103,7 @@ var Plottable;
             };
             Line.prototype.createLine = function (xFunction, yFunction, definedFunction) {
                 if (!definedFunction) {
-                    definedFunction = function (d, i) { return true; };
+                    definedFunction = function () { return true; };
                 }
                 return d3.svg.line().x(xFunction).y(yFunction).defined(definedFunction);
             };
@@ -3177,7 +3177,7 @@ var Plottable;
             };
             Area.prototype.createArea = function (xFunction, y0Function, y1Function, definedFunction) {
                 if (!definedFunction) {
-                    definedFunction = function (d, i) { return true; };
+                    definedFunction = function () { return true; };
                 }
                 return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(definedFunction);
             };

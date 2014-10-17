@@ -18,7 +18,7 @@ export module _Drawer {
 
     private createLine(xFunction: AppliedAccessor, yFunction: AppliedAccessor, definedFunction: (d: any, i: number) => boolean) {
       if(!definedFunction) {
-        definedFunction = (d, i) => true;
+        definedFunction = () => true;
       }
 
       return d3.svg.line()
