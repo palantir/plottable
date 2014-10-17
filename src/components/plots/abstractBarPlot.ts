@@ -39,6 +39,19 @@ export module Plot {
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
+    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
+      super.project(attrToSet, accessor, scale);
+      if ((this._isVertical && attrToSet === "x") || (!this._isVertical && attrToSet === "y")) {
+        var barWidth = this._getBarWidth();
+        var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+        var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
+        this.project("x-min", (d: any, i: number) => barAccessor(d, i) - barWidth / 2, barScale);
+        this.project("x-max", (d: any, i: number) => barAccessor(d, i) + barWidth / 2, barScale);
+      }
+      this._render();
+      return this;
+    }
+
     // HACKHACK #1106 - should use drawers for paint logic
     public _paint() {
       var attrToProjector = this._generateAttrToProjector();
@@ -234,6 +247,7 @@ export module Plot {
       var primaryAttr     = this._isVertical ? "y" : "x";
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
+      this._getBarWidth();
       if (!attrToProjector["width"]) {
         attrToProjector["width"] = () => this._getBarWidth();
       }
@@ -269,13 +283,14 @@ export module Plot {
       var barWidth: number;
       var secondaryScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
       var secondaryDimension = this._isVertical ? this.width() : this.height();
+      var secondaryAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
 
       if (secondaryScale instanceof Plottable.Scale.Ordinal) {
         var ordScale = <Plottable.Scale.Ordinal> secondaryScale;
         barWidth = ordScale.rangeType() === "bands" ? ordScale.rangeBand() : secondaryDimension / ordScale.domain().length * 0.4;
       } else if (secondaryScale instanceof Plottable.Scale.AbstractQuantitative) {
-        var qScale = <Scale.AbstractQuantitative<any>> secondaryScale;
-        barWidth = secondaryDimension / qScale.ticks().length;
+        var datasetDataPairs = _Util.Methods.flatten(this.datasets().map((dataset) => d3.pairs(dataset.data())));
+        barWidth = _Util.Methods.min(datasetDataPairs, (pair: any[]) => +secondaryAccessor(pair[1]) - +secondaryAccessor(pair[0]), 1);
       }
 
       return barWidth;

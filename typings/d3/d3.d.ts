@@ -232,6 +232,7 @@ declare module D3 {
         * @param matrix Two dimensional array to transpose
         */
         transpose(matrix: any[]): any[];
+        pairs(stuff: any[]): any[];
         /**
         * List the keys of an associative array.
         *

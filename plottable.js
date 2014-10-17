@@ -6379,6 +6379,18 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
+            AbstractBarPlot.prototype.project = function (attrToSet, accessor, scale) {
+                _super.prototype.project.call(this, attrToSet, accessor, scale);
+                if ((this._isVertical && attrToSet === "x") || (!this._isVertical && attrToSet === "y")) {
+                    var barWidth = this._getBarWidth();
+                    var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                    var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
+                    this.project("x-min", function (d, i) { return barAccessor(d, i) - barWidth / 2; }, barScale);
+                    this.project("x-max", function (d, i) { return barAccessor(d, i) + barWidth / 2; }, barScale);
+                }
+                this._render();
+                return this;
+            };
             // HACKHACK #1106 - should use drawers for paint logic
             AbstractBarPlot.prototype._paint = function () {
                 var _this = this;
@@ -6540,6 +6552,7 @@ var Plottable;
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var secondaryAttr = this._isVertical ? "x" : "y";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
+                this._getBarWidth();
                 if (!attrToProjector["width"]) {
                     attrToProjector["width"] = function () { return _this._getBarWidth(); };
                 }
@@ -6570,13 +6583,14 @@ var Plottable;
                 var barWidth;
                 var secondaryScale = this._isVertical ? this._xScale : this._yScale;
                 var secondaryDimension = this._isVertical ? this.width() : this.height();
+                var secondaryAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 if (secondaryScale instanceof Plottable.Scale.Ordinal) {
                     var ordScale = secondaryScale;
                     barWidth = ordScale.rangeType() === "bands" ? ordScale.rangeBand() : secondaryDimension / ordScale.domain().length * 0.4;
                 }
                 else if (secondaryScale instanceof Plottable.Scale.AbstractQuantitative) {
-                    var qScale = secondaryScale;
-                    barWidth = secondaryDimension / qScale.ticks().length;
+                    var datasetDataPairs = Plottable._Util.Methods.flatten(this.datasets().map(function (dataset) { return d3.pairs(dataset.data()); }));
+                    barWidth = Plottable._Util.Methods.min(datasetDataPairs, function (pair) { return +secondaryAccessor(pair[1]) - +secondaryAccessor(pair[0]); }, 1);
                 }
                 return barWidth;
             };

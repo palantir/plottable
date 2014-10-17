@@ -2692,6 +2692,7 @@ declare module Plottable {
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
             _getDrawer(key: string): _Drawer.Rect;
             _setup(): void;
+            project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractBarPlot<X, Y>;
             _paint(): void;
             /**
              * Sets the baseline for the bars to the specified value.
