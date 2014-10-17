@@ -241,6 +241,19 @@ var Plottable;
                 /* tslint:enable:ban */
             }
             Methods.min = min;
+            function range(start, stop, step) {
+                if (step === void 0) { step = 1; }
+                if (step === 0) {
+                    throw new Error("step cannot be 0");
+                }
+                var length = Math.max(Math.ceil((stop - start) / step), 0);
+                var range = [];
+                for (var i = 0; i < length; i++, start += step) {
+                    range[i] = start;
+                }
+                return range;
+            }
+            Methods.range = range;
         })(_Util.Methods || (_Util.Methods = {}));
         var Methods = _Util.Methods;
     })(Plottable._Util || (Plottable._Util = {}));
@@ -2993,6 +3006,43 @@ var Plottable;
         _Util.ScaleDomainCoordinator = ScaleDomainCoordinator;
     })(Plottable._Util || (Plottable._Util = {}));
     var _Util = Plottable._Util;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Scale) {
+        (function (TickGenerators) {
+            /**
+             * Creates a tick generator using the specified interval.
+             *
+             * Generates ticks at multiples of the interval while also including the domain boundaries.
+             *
+             * @param {number} interval The interval between two ticks (not including the end ticks).
+             *
+             * @returns {TickGenerator} A tick generator using the specified interval.
+             */
+            function intervalTickGenerator(interval) {
+                if (interval <= 0) {
+                    throw new Error("interval must be positive number");
+                }
+                return function (s) {
+                    var domain = s.domain();
+                    var low = Math.min(domain[0], domain[1]);
+                    var high = Math.max(domain[0], domain[1]);
+                    var firstTick = Math.ceil(low / interval) * interval;
+                    var numTicks = Math.floor((high - firstTick) / interval) + 1;
+                    var lowTicks = low % interval === 0 ? [] : [low];
+                    var middleTicks = Plottable._Util.Methods.range(0, numTicks).map(function (t) { return firstTick + t * interval; });
+                    var highTicks = high % interval === 0 ? [] : [high];
+                    return lowTicks.concat(middleTicks).concat(highTicks);
+                };
+            }
+            TickGenerators.intervalTickGenerator = intervalTickGenerator;
+        })(Scale.TickGenerators || (Scale.TickGenerators = {}));
+        var TickGenerators = Scale.TickGenerators;
+    })(Plottable.Scale || (Plottable.Scale = {}));
+    var Scale = Plottable.Scale;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />

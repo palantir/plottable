@@ -5021,6 +5021,42 @@ describe("TimeScale tests", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("Tick generators", function () {
+    describe("interval", function () {
+        it("generate ticks within domain", function () {
+            var start = 0.5, end = 4.01, interval = 1;
+            var scale = new Plottable.Scale.Linear().domain([start, end]);
+            var ticks = Plottable.Scale.TickGenerators.intervalTickGenerator(interval)(scale);
+            assert.deepEqual(ticks, [0.5, 1, 2, 3, 4, 4.01], "generated ticks contains all possible ticks within range");
+        });
+        it("domain crossing 0", function () {
+            var start = -1.5, end = 1, interval = 0.5;
+            var scale = new Plottable.Scale.Linear().domain([start, end]);
+            var ticks = Plottable.Scale.TickGenerators.intervalTickGenerator(interval)(scale);
+            assert.deepEqual(ticks, [-1.5, -1, -0.5, 0, 0.5, 1], "generated all number divisible by 0.5 in domain");
+        });
+        it("generate ticks with reversed domain", function () {
+            var start = -2.2, end = -7.6, interval = 2.5;
+            var scale = new Plottable.Scale.Linear().domain([start, end]);
+            var ticks = Plottable.Scale.TickGenerators.intervalTickGenerator(interval)(scale);
+            assert.deepEqual(ticks, [-7.6, -7.5, -5, -2.5, -2.2], "generated all ticks between lower and higher value");
+        });
+        it("passing big interval", function () {
+            var start = 0.5, end = 10.01, interval = 11;
+            var scale = new Plottable.Scale.Linear().domain([start, end]);
+            var ticks = Plottable.Scale.TickGenerators.intervalTickGenerator(interval)(scale);
+            assert.deepEqual(ticks, [0.5, 10.01], "no middle ticks were added");
+        });
+        it("passing non positive interval", function () {
+            var scale = new Plottable.Scale.Linear().domain([0, 1]);
+            assert.throws(function () { return Plottable.Scale.TickGenerators.intervalTickGenerator(0); }, "interval must be positive number");
+            assert.throws(function () { return Plottable.Scale.TickGenerators.intervalTickGenerator(-2); }, "interval must be positive number");
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("_Util.DOM", function () {
     it("getBBox works properly", function () {
         var svg = generateSVG();
@@ -5766,6 +5802,27 @@ describe("_Util.Methods", function () {
         var emptyKeys = [];
         var emptyMap = Plottable._Util.Methods.populateMap(emptyKeys, function (key) { return key + "Value"; });
         assert.isTrue(emptyMap.empty(), "no entries in map if no keys in input array");
+    });
+    it("range works as expected", function () {
+        var start = 0;
+        var end = 6;
+        var range = Plottable._Util.Methods.range(start, end);
+        assert.deepEqual(range, [0, 1, 2, 3, 4, 5], "all entries has been generated");
+        range = Plottable._Util.Methods.range(start, end, 2);
+        assert.deepEqual(range, [0, 2, 4], "all entries has been generated");
+        range = Plottable._Util.Methods.range(start, end, 11);
+        assert.deepEqual(range, [0], "all entries has been generated");
+        assert.throws(function () { return Plottable._Util.Methods.range(start, end, 0); }, "step cannot be 0");
+        range = Plottable._Util.Methods.range(start, end, -1);
+        assert.lengthOf(range, 0, "no entries because of invalid step");
+        range = Plottable._Util.Methods.range(end, start, -1);
+        assert.deepEqual(range, [6, 5, 4, 3, 2, 1], "all entries has been generated");
+        range = Plottable._Util.Methods.range(-2, 2);
+        assert.deepEqual(range, [-2, -1, 0, 1], "all entries has been generated range crossing 0");
+        range = Plottable._Util.Methods.range(0.2, 4);
+        assert.deepEqual(range, [0.2, 1.2, 2.2, 3.2], "all entries has been generated with float start");
+        range = Plottable._Util.Methods.range(0.6, 2.2, 0.5);
+        assert.deepEqual(range, [0.6, 1.1, 1.6, 2.1], "all entries has been generated with float step");
     });
 });
 
