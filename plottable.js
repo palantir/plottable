@@ -6361,7 +6361,7 @@ var Plottable;
             function AbstractBarPlot(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
-                this._barAlignmentFactor = 0;
+                this._barAlignmentFactor = 0.5;
                 this._animators = {
                     "bars-reset": new Plottable.Animator.Null(),
                     "bars": new Plottable.Animator.IterativeDelay(),
@@ -6380,13 +6380,14 @@ var Plottable;
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
             AbstractBarPlot.prototype.project = function (attrToSet, accessor, scale) {
+                var _this = this;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 if ((this._isVertical && attrToSet === "x") || (!this._isVertical && attrToSet === "y")) {
-                    var barWidth = this._getBarWidth();
+                    var barWidth = this._getMinimumDataWidth();
                     var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                     var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
-                    this.project("x-min", function (d, i) { return barAccessor(d, i) - barWidth / 2; }, barScale);
-                    this.project("x-max", function (d, i) { return barAccessor(d, i) + barWidth / 2; }, barScale);
+                    this.project("x-min", function (d, i) { return barAccessor(d, i) - barWidth * _this._barAlignmentFactor; }, barScale);
+                    this.project("x-max", function (d, i) { return barAccessor(d, i) + barWidth * (1 - _this._barAlignmentFactor); }, barScale);
                 }
                 this._render();
                 return this;
@@ -6552,9 +6553,8 @@ var Plottable;
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var secondaryAttr = this._isVertical ? "x" : "y";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
-                this._getBarWidth();
                 if (!attrToProjector["width"]) {
-                    attrToProjector["width"] = function () { return _this._getBarWidth(); };
+                    attrToProjector["width"] = function () { return _this.getBarPixelWidth(); };
                 }
                 var positionF = attrToProjector[secondaryAttr];
                 var widthF = attrToProjector["width"];
@@ -6579,20 +6579,38 @@ var Plottable;
                 };
                 return attrToProjector;
             };
-            AbstractBarPlot.prototype._getBarWidth = function () {
+            AbstractBarPlot.prototype._getMinimumDataWidth = function () {
                 var barWidth;
                 var secondaryScale = this._isVertical ? this._xScale : this._yScale;
                 var secondaryDimension = this._isVertical ? this.width() : this.height();
                 var secondaryAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                if (secondaryScale instanceof Plottable.Scale.Ordinal) {
-                    var ordScale = secondaryScale;
-                    barWidth = ordScale.rangeType() === "bands" ? ordScale.rangeBand() : secondaryDimension / ordScale.domain().length * 0.4;
-                }
-                else if (secondaryScale instanceof Plottable.Scale.AbstractQuantitative) {
+                if (secondaryScale instanceof Plottable.Scale.AbstractQuantitative) {
                     var datasetDataPairs = Plottable._Util.Methods.flatten(this.datasets().map(function (dataset) { return d3.pairs(dataset.data()); }));
                     barWidth = Plottable._Util.Methods.min(datasetDataPairs, function (pair) { return +secondaryAccessor(pair[1]) - +secondaryAccessor(pair[0]); }, 1);
                 }
+                else if (secondaryScale instanceof Plottable.Scale.Ordinal) {
+                    barWidth = 1;
+                }
                 return barWidth;
+            };
+            AbstractBarPlot.prototype.getBarPixelWidth = function () {
+                var barPixelWidth;
+                var barScale = this._isVertical ? this._xScale : this._yScale;
+                if (barScale instanceof Plottable.Scale.Ordinal) {
+                    var ordScale = barScale;
+                    if (ordScale.rangeType() === "bands") {
+                        barPixelWidth = ordScale.rangeBand();
+                    }
+                    else {
+                        var secondaryDimension = this._isVertical ? this.width() : this.height();
+                        var step = secondaryDimension / (ordScale._outerPadding + ordScale.domain().length - 1);
+                        barPixelWidth = step * ordScale._outerPadding * 0.6;
+                    }
+                }
+                else {
+                    barPixelWidth = (barScale.scale(this._getMinimumDataWidth()) - barScale.scale(0)) * 0.6;
+                }
+                return barPixelWidth;
             };
             AbstractBarPlot._BarAlignmentToFactor = {};
             return AbstractBarPlot;
@@ -7299,9 +7317,6 @@ var Plottable;
             };
             StackedBar.prototype._updateYDomainer = function () {
                 return Plot.AbstractBarPlot.prototype._updateYDomainer.apply(this);
-            };
-            StackedBar.prototype._getBarWidth = function () {
-                return Plot.AbstractBarPlot.prototype._getBarWidth.apply(this);
             };
             return StackedBar;
         })(Plot.AbstractStacked);

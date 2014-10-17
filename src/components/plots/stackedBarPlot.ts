@@ -89,9 +89,9 @@ export module Plot {
       return AbstractBarPlot.prototype._updateYDomainer.apply(this);
     }
 
-    public _getBarWidth() {
-      return AbstractBarPlot.prototype._getBarWidth.apply(this);
-    }
+//    public _getBarWidth() {
+//      return AbstractBarPlot.prototype._getBarWidth.apply(this);
+//    }
   }
 }
 }

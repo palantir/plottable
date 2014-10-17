@@ -6,7 +6,7 @@ export module Plot {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public _baseline: D3.Selection;
     public _baselineValue = 0;
-    public _barAlignmentFactor = 0;
+    public _barAlignmentFactor = 0.5;
     public _isVertical: boolean;
 
     public _animators: Animator.PlotAnimatorMap = {
@@ -42,11 +42,11 @@ export module Plot {
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if ((this._isVertical && attrToSet === "x") || (!this._isVertical && attrToSet === "y")) {
-        var barWidth = this._getBarWidth();
+        var barWidth = this._getMinimumDataWidth();
         var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
         var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
-        this.project("x-min", (d: any, i: number) => barAccessor(d, i) - barWidth / 2, barScale);
-        this.project("x-max", (d: any, i: number) => barAccessor(d, i) + barWidth / 2, barScale);
+        this.project("x-min", (d: any, i: number) => barAccessor(d, i) - barWidth * this._barAlignmentFactor, barScale);
+        this.project("x-max", (d: any, i: number) => barAccessor(d, i) + barWidth * (1 - this._barAlignmentFactor), barScale);
       }
       this._render();
       return this;
@@ -247,9 +247,8 @@ export module Plot {
       var primaryAttr     = this._isVertical ? "y" : "x";
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
-      this._getBarWidth();
       if (!attrToProjector["width"]) {
-        attrToProjector["width"] = () => this._getBarWidth();
+        attrToProjector["width"] = () => this.getBarPixelWidth();
       }
 
       var positionF = attrToProjector[secondaryAttr];
@@ -279,21 +278,38 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _getBarWidth() {
+    public _getMinimumDataWidth() {
       var barWidth: number;
       var secondaryScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
       var secondaryDimension = this._isVertical ? this.width() : this.height();
       var secondaryAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
 
-      if (secondaryScale instanceof Plottable.Scale.Ordinal) {
-        var ordScale = <Plottable.Scale.Ordinal> secondaryScale;
-        barWidth = ordScale.rangeType() === "bands" ? ordScale.rangeBand() : secondaryDimension / ordScale.domain().length * 0.4;
-      } else if (secondaryScale instanceof Plottable.Scale.AbstractQuantitative) {
+      if (secondaryScale instanceof Plottable.Scale.AbstractQuantitative) {
         var datasetDataPairs = _Util.Methods.flatten(this.datasets().map((dataset) => d3.pairs(dataset.data())));
         barWidth = _Util.Methods.min(datasetDataPairs, (pair: any[]) => +secondaryAccessor(pair[1]) - +secondaryAccessor(pair[0]), 1);
+      } else if (secondaryScale instanceof Plottable.Scale.Ordinal) {
+        barWidth = 1;
       }
 
       return barWidth;
+    }
+
+    private getBarPixelWidth() {
+      var barPixelWidth: number;
+      var barScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
+      if (barScale instanceof Plottable.Scale.Ordinal) {
+        var ordScale = <Plottable.Scale.Ordinal> barScale;
+        if (ordScale.rangeType() === "bands") {
+          barPixelWidth = ordScale.rangeBand();
+        } else {
+          var secondaryDimension = this._isVertical ? this.width() : this.height();
+          var step = secondaryDimension / ((<any> ordScale)._outerPadding + ordScale.domain().length - 1);
+          barPixelWidth = step * (<any> ordScale)._outerPadding * 0.6;
+        }
+      } else {
+        barPixelWidth = (barScale.scale(this._getMinimumDataWidth()) - barScale.scale(0)) * 0.6;
+      }
+      return barPixelWidth;
     }
   }
 }
