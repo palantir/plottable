@@ -31,6 +31,7 @@
 /// <reference path="scales/timeScale.ts" />
 /// <reference path="scales/interpolatedColorScale.ts" />
 /// <reference path="scales/scaleDomainCoordinator.ts" />
+/// <reference path="scales/tickGenerators.ts" />
 
 /// <reference path="drawers/abstractDrawer.ts" />
 /// <reference path="drawers/lineDrawer.ts" />

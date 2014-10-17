@@ -250,6 +250,20 @@ export module _Util {
       d3.keys(oldMap).forEach(key => newMap[key] = oldMap[key]);
       return newMap;
     }
+
+    export function range(start: number, stop: number, step = 1): number[] {
+      if(step === 0) {
+        throw new Error("step cannot be 0");
+      }
+      var length = Math.max(Math.ceil((stop - start) / step), 0);
+      var range: number[] = [];
+
+      for (var i = 0; i < length; i++, start += step) {
+        range[i] = start;
+      }
+
+      return range;
+    }
   }
 }
 }

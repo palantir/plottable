@@ -8,7 +8,6 @@ export module Plot {
      * Constructs a ScatterPlot.
      *
      * @constructor
-     * @param {DatasetInterface | any} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
