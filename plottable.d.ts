@@ -2657,9 +2657,9 @@ declare module Plottable {
             _updateXDomainer(): void;
             _updateYDomainer(): void;
             /**
-             * Adjust both domains to show all datasets.
+             * Adjusts both domains' extents to show all datasets.
              *
-             * This call does not override auto domain logic to visible points.
+             * This call does not override auto domain adjustment behavior over visible points.
              */
             showAllData(): void;
         }

@@ -6230,9 +6230,9 @@ var Plottable;
                 }
             };
             /**
-             * Adjust both domains to show all datasets.
+             * Adjusts both domains' extents to show all datasets.
              *
-             * This call does not override auto domain logic to visible points.
+             * This call does not override auto domain adjustment behavior over visible points.
              */
             AbstractXYPlot.prototype.showAllData = function () {
                 this._xScale.autoDomain();
@@ -6241,12 +6241,12 @@ var Plottable;
                 }
             };
             AbstractXYPlot.prototype.adjustDomain = function (xDomainChanged) {
-                var autoDomain = xDomainChanged ? this._autoDomainYScale : this._autoDomainXScale;
-                var changedScale = xDomainChanged ? this._xScale : this._yScale;
-                var adjustingScale = xDomainChanged ? this._yScale : this._xScale;
-                if (autoDomain && adjustingScale instanceof Plottable.Scale.AbstractQuantitative) {
-                    var scale = adjustingScale;
-                    var adjustedDomain = this.adjustDomainToVisiblePoints(this.normalizeDatasets(), changedScale.domain());
+                var shouldAutoDomain = xDomainChanged ? this._autoDomainYScale : this._autoDomainXScale;
+                var propatingChangeScale = xDomainChanged ? this._xScale : this._yScale;
+                var modifiedScale = xDomainChanged ? this._yScale : this._xScale;
+                if (shouldAutoDomain && modifiedScale instanceof Plottable.Scale.AbstractQuantitative) {
+                    var scale = modifiedScale;
+                    var adjustedDomain = this.adjustDomainOverVisiblePoints(this.normalizeDatasets(), propatingChangeScale.domain());
                     adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
                     scale._setDomain(adjustedDomain);
                 }
@@ -6258,7 +6258,7 @@ var Plottable;
                     return { x: _this._projectors["x"].accessor(d), y: _this._projectors["y"].accessor(d) };
                 });
             };
-            AbstractXYPlot.prototype.adjustDomainToVisiblePoints = function (values, affectedDomain) {
+            AbstractXYPlot.prototype.adjustDomainOverVisiblePoints = function (values, affectedDomain) {
                 var visiblePoints = values.filter(function (d) { return d.x >= affectedDomain[0] && d.x <= affectedDomain[1]; });
                 var yValues = visiblePoints.map(function (d) { return d.y; });
                 if (yValues.length === 0) {

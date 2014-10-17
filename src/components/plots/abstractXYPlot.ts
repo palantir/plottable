@@ -101,9 +101,9 @@ export module Plot {
     }
 
     /**
-     * Adjust both domains to show all datasets.
+     * Adjusts both domains' extents to show all datasets.
      *
-     * This call does not override auto domain logic to visible points.
+     * This call does not override auto domain adjustment behavior over visible points.
      */
     public showAllData() {
       this._xScale.autoDomain();
@@ -113,12 +113,12 @@ export module Plot {
     }
 
     private adjustDomain(xDomainChanged: boolean) {
-      var autoDomain = xDomainChanged ? this._autoDomainYScale : this._autoDomainXScale;
-      var changedScale: Scale.AbstractScale<any, any> = xDomainChanged ? this._xScale : this._yScale;
-      var adjustingScale: Scale.AbstractScale<any, any> = xDomainChanged ? this._yScale : this._xScale;
-      if(autoDomain && adjustingScale instanceof Scale.AbstractQuantitative) {
-        var scale = <Scale.AbstractQuantitative<any>> adjustingScale;
-        var adjustedDomain: any[] = this.adjustDomainToVisiblePoints(this.normalizeDatasets(), changedScale.domain());
+      var shouldAutoDomain = xDomainChanged ? this._autoDomainYScale : this._autoDomainXScale;
+      var propatingChangeScale: Scale.AbstractScale<any, number> = xDomainChanged ? this._xScale : this._yScale;
+      var modifiedScale: Scale.AbstractScale<any, number> = xDomainChanged ? this._yScale : this._xScale;
+      if(shouldAutoDomain && modifiedScale instanceof Scale.AbstractQuantitative) {
+        var scale = <Scale.AbstractQuantitative<any>> modifiedScale;
+        var adjustedDomain: any[] = this.adjustDomainOverVisiblePoints(this.normalizeDatasets(), propatingChangeScale.domain());
         adjustedDomain = scale.domainer().computeDomain([adjustedDomain], scale);
         scale._setDomain(adjustedDomain);
       }
@@ -129,7 +129,7 @@ export module Plot {
       return flattenDatasets.map(d => { return { x: this._projectors["x"].accessor(d), y: this._projectors["y"].accessor(d) }; });
     }
 
-    private adjustDomainToVisiblePoints(values: Point[], affectedDomain: any[]): any[] {
+    private adjustDomainOverVisiblePoints(values: Point[], affectedDomain: any[]): any[] {
       var visiblePoints = values.filter(d => d.x >= affectedDomain[0] && d.x <= affectedDomain[1]);
       var yValues = visiblePoints.map(d => d.y);
       if (yValues.length === 0) {
