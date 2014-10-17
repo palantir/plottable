@@ -1796,7 +1796,7 @@ describe("Plots", function () {
         var oldWarn = Plottable._Util.Methods.warn;
         beforeEach(function () {
             p = new Plottable.Plot.AbstractPlot();
-            p._getDrawer = function (k) { return new Plottable._Drawer.Rect(k); };
+            p._getDrawer = function (k) { return new Plottable._Drawer.Element(k).svgElement("rect"); };
         });
         afterEach(function () {
             Plottable._Util.Methods.warn = oldWarn;
@@ -5802,6 +5802,21 @@ describe("_Util.Methods", function () {
         var emptyKeys = [];
         var emptyMap = Plottable._Util.Methods.populateMap(emptyKeys, function (key) { return key + "Value"; });
         assert.isTrue(emptyMap.empty(), "no entries in map if no keys in input array");
+    });
+    it("copyMap works as expected", function () {
+        var oldMap = {};
+        oldMap["a"] = 1;
+        oldMap["b"] = 2;
+        oldMap["c"] = 3;
+        oldMap["undefined"] = undefined;
+        oldMap["null"] = null;
+        oldMap["fun"] = function (d) { return d; };
+        oldMap["NaN"] = 0 / 0;
+        oldMap["inf"] = 1 / 0;
+        var map = Plottable._Util.Methods.copyMap(oldMap);
+        assert.deepEqual(map, oldMap, "All values were copied.");
+        map = Plottable._Util.Methods.copyMap({});
+        assert.deepEqual(map, {}, "No values were added.");
     });
     it("range works as expected", function () {
         var start = 0;
