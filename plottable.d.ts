@@ -2773,7 +2773,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class AbstractBarPlot<X, Y> extends AbstractXYPlot<X, Y> {
+        class AbstractBarPlot<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
@@ -2835,6 +2835,26 @@ declare module Plottable {
             _additionalPaint(): void;
             _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
+            /**
+             * Gets the current hover mode.
+             *
+             * @return {string} The current hover mode.
+             */
+            hoverMode(): string;
+            /**
+             * Sets the hover mode for hover interactions. There are two modes:
+             *     - "point": Selects the bar under the mouse cursor (default).
+             *     - "line" : Selects any bar that would be hit by a line extending
+             *                in the same direction as the bar and passing through
+             *                the cursor.
+             *
+             * @param {string} mode The desired hover mode.
+             * @return {AbstractBarPlot} The calling Bar Plot.
+             */
+            hoverMode(mode: String): AbstractBarPlot<X, Y>;
+            _hoverOverComponent(p: Point): void;
+            _hoverOutComponent(p: Point): void;
+            _doHover(p: Point): Interaction.HoverData;
         }
     }
 }
@@ -3519,6 +3539,65 @@ declare module Plottable {
         class YDragBox extends DragBox {
             _drag(): void;
             setBox(y0: number, y1: number): YDragBox;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
+        interface HoverData {
+            data: any[];
+            selection: D3.Selection;
+        }
+        interface Hoverable extends Component.AbstractComponent {
+            /**
+             * Called when the user first mouses over the Component.
+             *
+             * @param {Point} The cursor's position relative to the Component's origin.
+             */
+            _hoverOverComponent(p: Point): void;
+            /**
+             * Called when the user mouses out of the Component.
+             *
+             * @param {Point} The cursor's position relative to the Component's origin.
+             */
+            _hoverOutComponent(p: Point): void;
+            /**
+             * Returns the HoverData associated with the given position, and performs
+             * any visual changes associated with hovering inside a Component.
+             *
+             * @param {Point} The cursor's position relative to the Component's origin.
+             * @return {HoverData} The HoverData associated with the given position.
+             */
+            _doHover(p: Point): HoverData;
+        }
+        class Hover extends AbstractInteraction {
+            _componentToListenTo: Hoverable;
+            _anchor(component: Hoverable, hitBox: D3.Selection): void;
+            /**
+             * Attaches an callback to be called when the user mouses over an element.
+             *
+             * @param {(hoverData: HoverData) => any} callback The callback to be called.
+             *      The callback will be passed data for newly hovered-over elements.
+             * @return {Interaction.Hover} The calling Interaction.Hover.
+             */
+            onHoverOver(callback: (hoverData: HoverData) => any): Hover;
+            /**
+             * Attaches a callback to be called when the user mouses off of an element.
+             *
+             * @param {(hoverData: HoverData) => any} callback The callback to be called.
+             *      The callback will be passed data from the hovered-out elements.
+             * @return {Interaction.Hover} The calling Interaction.Hover.
+             */
+            onHoverOut(callback: (hoverData: HoverData) => any): Hover;
+            /**
+             * Retrieves the HoverData associated with the elements the user is currently hovering over.
+             *
+             * @return {HoverData} The data and selection corresponding to the elements
+             *                     the user is currently hovering over.
+             */
+            getCurrentHoverData(): HoverData;
         }
     }
 }

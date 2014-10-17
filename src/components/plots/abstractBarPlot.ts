@@ -2,13 +2,14 @@
 
 module Plottable {
 export module Plot {
-  export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> {
+  export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     private static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignmentFactor = 0;
     public _isVertical: boolean;
+    private _hoverMode = "point";
 
     /**
      * Constructs a BarPlot.
@@ -252,6 +253,78 @@ export module Plot {
 
       return attrToProjector;
     }
+
+    /**
+     * Gets the current hover mode.
+     *
+     * @return {string} The current hover mode.
+     */
+    public hoverMode(): string;
+    /**
+     * Sets the hover mode for hover interactions. There are two modes:
+     *     - "point": Selects the bar under the mouse cursor (default).
+     *     - "line" : Selects any bar that would be hit by a line extending
+     *                in the same direction as the bar and passing through
+     *                the cursor.
+     *
+     * @param {string} mode The desired hover mode.
+     * @return {AbstractBarPlot} The calling Bar Plot.
+     */
+    public hoverMode(mode: String): AbstractBarPlot<X, Y>;
+    public hoverMode(mode?: String): any {
+      if (mode == null) {
+        return this._hoverMode;
+      }
+      var modeLC = mode.toLowerCase();
+      if (modeLC !== "point" && modeLC !== "line") {
+        throw new Error(mode + " is not a valid hover mode");
+      }
+      this._hoverMode = modeLC;
+      return this;
+    }
+
+    private clearHoverSelection() {
+      this._getDrawersInOrder().forEach((d, i) => {
+        d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
+      });
+    }
+
+    //===== Hover logic =====
+    public _hoverOverComponent(p: Point) {
+      // no-op
+    }
+
+    public _hoverOutComponent(p: Point) {
+      this.clearHoverSelection();
+    }
+
+    public _doHover(p: Point): Interaction.HoverData {
+      var xPositionOrExtent: any = p.x;
+      var yPositionOrExtent: any = p.y;
+      if (this._hoverMode === "line") {
+        var maxExtent: Extent = { min: -Infinity, max: Infinity };
+        if (this._isVertical) {
+          yPositionOrExtent = maxExtent;
+        } else {
+          xPositionOrExtent = maxExtent;
+        }
+      }
+      var selectedBars = this.selectBar(xPositionOrExtent, yPositionOrExtent, false);
+
+      if (selectedBars) {
+        this._getDrawersInOrder().forEach((d, i) => {
+          d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
+        });
+        selectedBars.classed({ "hovered": true, "not-hovered": false });
+      } else {
+        this.clearHoverSelection();
+      }
+      return {
+        data: selectedBars ? selectedBars.data() : null,
+        selection: selectedBars
+      };
+    }
+    //===== /Hover logic =====
   }
 }
 }

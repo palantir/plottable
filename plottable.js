@@ -6575,6 +6575,7 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
                 this._barAlignmentFactor = 0;
+                this._hoverMode = "point";
                 this.classed("bar-plot", true);
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
                 this._animators["bars-reset"] = new Plottable.Animator.Null();
@@ -6768,6 +6769,56 @@ var Plottable;
                     return Math.abs(scaledBaseline - originalPositionFn(d, i));
                 };
                 return attrToProjector;
+            };
+            AbstractBarPlot.prototype.hoverMode = function (mode) {
+                if (mode == null) {
+                    return this._hoverMode;
+                }
+                var modeLC = mode.toLowerCase();
+                if (modeLC !== "point" && modeLC !== "line") {
+                    throw new Error(mode + " is not a valid hover mode");
+                }
+                this._hoverMode = modeLC;
+                return this;
+            };
+            AbstractBarPlot.prototype.clearHoverSelection = function () {
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
+                });
+            };
+            //===== Hover logic =====
+            AbstractBarPlot.prototype._hoverOverComponent = function (p) {
+                // no-op
+            };
+            AbstractBarPlot.prototype._hoverOutComponent = function (p) {
+                this.clearHoverSelection();
+            };
+            AbstractBarPlot.prototype._doHover = function (p) {
+                var xPositionOrExtent = p.x;
+                var yPositionOrExtent = p.y;
+                if (this._hoverMode === "line") {
+                    var maxExtent = { min: -Infinity, max: Infinity };
+                    if (this._isVertical) {
+                        yPositionOrExtent = maxExtent;
+                    }
+                    else {
+                        xPositionOrExtent = maxExtent;
+                    }
+                }
+                var selectedBars = this.selectBar(xPositionOrExtent, yPositionOrExtent, false);
+                if (selectedBars) {
+                    this._getDrawersInOrder().forEach(function (d, i) {
+                        d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
+                    });
+                    selectedBars.classed({ "hovered": true, "not-hovered": false });
+                }
+                else {
+                    this.clearHoverSelection();
+                }
+                return {
+                    data: selectedBars ? selectedBars.data() : null,
+                    selection: selectedBars
+                };
             };
             AbstractBarPlot._BarAlignmentToFactor = {};
             AbstractBarPlot.DEFAULT_WIDTH = 10;
@@ -8320,6 +8371,122 @@ var Plottable;
             return YDragBox;
         })(Interaction.DragBox);
         Interaction.YDragBox = YDragBox;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Interaction) {
+        var Hover = (function (_super) {
+            __extends(Hover, _super);
+            function Hover() {
+                _super.apply(this, arguments);
+                this.currentHoverData = {
+                    data: null,
+                    selection: null
+                };
+            }
+            Hover.prototype._anchor = function (component, hitBox) {
+                var _this = this;
+                _super.prototype._anchor.call(this, component, hitBox);
+                this.dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
+                this.dispatcher.mouseover(function (p) {
+                    _this._componentToListenTo._hoverOverComponent(p);
+                    _this.handleHoverOver(p);
+                });
+                this.dispatcher.mouseout(function (p) {
+                    _this._componentToListenTo._hoverOutComponent(p);
+                    _this.safeHoverOut(_this.currentHoverData);
+                    _this.currentHoverData = {
+                        data: null,
+                        selection: null
+                    };
+                });
+                this.dispatcher.mousemove(function (p) { return _this.handleHoverOver(p); });
+                this.dispatcher.connect();
+            };
+            /**
+             * Returns a HoverData consisting of all data and selections in a but not in b.
+             */
+            Hover.diffHoverData = function (a, b) {
+                if (a.data == null || b.data == null) {
+                    return a;
+                }
+                var notInB = function (d) { return b.data.indexOf(d) === -1; };
+                var diffData = a.data.filter(notInB);
+                if (diffData.length === 0) {
+                    return {
+                        data: null,
+                        selection: null
+                    };
+                }
+                var diffSelection = a.selection.filter(notInB);
+                return {
+                    data: diffData,
+                    selection: diffSelection
+                };
+            };
+            Hover.prototype.handleHoverOver = function (p) {
+                var lastHoverData = this.currentHoverData;
+                var newHoverData = this._componentToListenTo._doHover(p);
+                var outData = Hover.diffHoverData(lastHoverData, newHoverData);
+                this.safeHoverOut(outData);
+                var overData = Hover.diffHoverData(newHoverData, lastHoverData);
+                this.safeHoverOver(overData);
+                this.currentHoverData = newHoverData;
+            };
+            Hover.prototype.safeHoverOut = function (outData) {
+                if (this.hoverOutCallback && outData.data) {
+                    this.hoverOutCallback(outData);
+                }
+            };
+            Hover.prototype.safeHoverOver = function (overData) {
+                if (this.hoverOverCallback && overData.data) {
+                    this.hoverOverCallback(overData);
+                }
+            };
+            /**
+             * Attaches an callback to be called when the user mouses over an element.
+             *
+             * @param {(hoverData: HoverData) => any} callback The callback to be called.
+             *      The callback will be passed data for newly hovered-over elements.
+             * @return {Interaction.Hover} The calling Interaction.Hover.
+             */
+            Hover.prototype.onHoverOver = function (callback) {
+                this.hoverOverCallback = callback;
+                return this;
+            };
+            /**
+             * Attaches a callback to be called when the user mouses off of an element.
+             *
+             * @param {(hoverData: HoverData) => any} callback The callback to be called.
+             *      The callback will be passed data from the hovered-out elements.
+             * @return {Interaction.Hover} The calling Interaction.Hover.
+             */
+            Hover.prototype.onHoverOut = function (callback) {
+                this.hoverOutCallback = callback;
+                return this;
+            };
+            /**
+             * Retrieves the HoverData associated with the elements the user is currently hovering over.
+             *
+             * @return {HoverData} The data and selection corresponding to the elements
+             *                     the user is currently hovering over.
+             */
+            Hover.prototype.getCurrentHoverData = function () {
+                return this.currentHoverData;
+            };
+            return Hover;
+        })(Interaction.AbstractInteraction);
+        Interaction.Hover = Hover;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
