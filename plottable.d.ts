@@ -2966,6 +2966,7 @@ declare module Plottable {
     module Plot {
         class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
             _isVertical: boolean;
+            project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractStacked<X, Y>;
             _onDatasetUpdate(): void;
             _updateScaleExtents(): void;
         }

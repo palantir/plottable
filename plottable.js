@@ -1,5 +1,5 @@
 /*!
-Plottable 0.33.0 (https://github.com/palantir/plottable)
+Plottable 0.33.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1322,7 +1322,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.33.0";
+    Plottable.version = "0.33.1";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -7077,6 +7077,13 @@ var Plottable;
                 _super.apply(this, arguments);
                 this.stackedExtent = [0, 0];
             }
+            AbstractStacked.prototype.project = function (attrToSet, accessor, scale) {
+                _super.prototype.project.call(this, attrToSet, accessor, scale);
+                if (this._projectors["x"] && this._projectors["y"] && (attrToSet === "x" || attrToSet === "y")) {
+                    this.updateStackOffsets();
+                }
+                return this;
+            };
             AbstractStacked.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
                 // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
