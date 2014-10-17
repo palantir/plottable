@@ -17,10 +17,14 @@ export module _Drawer {
     }
 
     private createLine(xFunction: AppliedAccessor, yFunction: AppliedAccessor, definedFunction: (d: any, i: number) => boolean) {
+      if(!definedFunction) {
+        definedFunction = (d: any, i: number) => true;
+      }
+
       return d3.svg.line()
-               .x(xFunction)
-               .y(yFunction)
-               .defined(definedFunction);
+                   .x(xFunction)
+                   .y(yFunction)
+                   .defined(definedFunction);
     }
 
     public _drawStep(step: DrawStep) {
@@ -31,13 +35,11 @@ export module _Drawer {
       var definedFunction = attrToProjector["defined"];
       delete attrToProjector["x"];
       delete attrToProjector["y"];
-      if(definedFunction) {
-        delete attrToProjector["defined"];
-      } else {
-        definedFunction = (d: any, i: number) => true;
-      }
 
-      attrToProjector["d"] = this.createLine(xFunction, yFunction, definedFunction);
+      attrToProjector["d"] = this.createLine(xFunction, yFunction, attrToProjector["defined"]);
+      if (attrToProjector["defined"]) {
+        delete attrToProjector["defined"];
+      }
 
       if (attrToProjector["fill"]) {
         this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate

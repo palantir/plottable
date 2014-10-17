@@ -39,11 +39,15 @@ export module _Drawer {
                        y0Function: AppliedAccessor,
                        y1Function: AppliedAccessor,
                        definedFunction: (d: any, i: number) => boolean) {
+      if(!definedFunction) {
+        definedFunction = (d: any, i: number) => true;
+      }
+
       return d3.svg.area()
-              .x(xFunction)
-              .y0(y0Function)
-              .y1(y1Function)
-              .defined(definedFunction);
+                   .x(xFunction)
+                   .y0(y0Function)
+                   .y1(y1Function)
+                   .defined(definedFunction);
     }
 
     public _drawStep(step: DrawStep) {
@@ -61,13 +65,11 @@ export module _Drawer {
       delete attrToProjector["x"];
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
-      if (definedFunction) {
-        delete attrToProjector["defined"];
-      } else {
-        definedFunction = (d: any, i: number) => true;
-      }
 
-      attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function, definedFunction);
+      attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function, attrToProjector["defined"]);
+      if (attrToProjector["defined"]) {
+        delete attrToProjector["defined"];
+      }
 
       if (attrToProjector["fill"]) {
         this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate

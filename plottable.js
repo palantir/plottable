@@ -3102,6 +3102,9 @@ var Plottable;
                 this.pathSelection = this._renderArea.select(".line");
             };
             Line.prototype.createLine = function (xFunction, yFunction, definedFunction) {
+                if (!definedFunction) {
+                    definedFunction = function (d, i) { return true; };
+                }
                 return d3.svg.line().x(xFunction).y(yFunction).defined(definedFunction);
             };
             Line.prototype._drawStep = function (step) {
@@ -3112,13 +3115,10 @@ var Plottable;
                 var definedFunction = attrToProjector["defined"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
-                if (definedFunction) {
+                attrToProjector["d"] = this.createLine(xFunction, yFunction, attrToProjector["defined"]);
+                if (attrToProjector["defined"]) {
                     delete attrToProjector["defined"];
                 }
-                else {
-                    definedFunction = function (d, i) { return true; };
-                }
-                attrToProjector["d"] = this.createLine(xFunction, yFunction, definedFunction);
                 if (attrToProjector["fill"]) {
                     this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
@@ -3176,6 +3176,9 @@ var Plottable;
                 this.areaSelection = this._renderArea.select(".area");
             };
             Area.prototype.createArea = function (xFunction, y0Function, y1Function, definedFunction) {
+                if (!definedFunction) {
+                    definedFunction = function (d, i) { return true; };
+                }
                 return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(definedFunction);
             };
             Area.prototype._drawStep = function (step) {
@@ -3193,13 +3196,10 @@ var Plottable;
                 delete attrToProjector["x"];
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
-                if (definedFunction) {
+                attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function, attrToProjector["defined"]);
+                if (attrToProjector["defined"]) {
                     delete attrToProjector["defined"];
                 }
-                else {
-                    definedFunction = function (d, i) { return true; };
-                }
-                attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function, definedFunction);
                 if (attrToProjector["fill"]) {
                     this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
@@ -6001,6 +6001,7 @@ var Plottable;
                 return new Plottable._Drawer.AbstractDrawer(key);
             };
             AbstractPlot.prototype._getAnimator = function (key) {
+                if (key === void 0) { key = ""; }
                 if (this._animate && this._animateOnNextRender) {
                     return this._animators[key] || new Plottable.Animator.Null();
                 }
@@ -6189,7 +6190,7 @@ var Plottable;
                 return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).drawer; });
             };
             AbstractPlot.prototype._generateDrawSteps = function () {
-                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("") }];
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator() }];
             };
             AbstractPlot.prototype._additionalPaint = function () {
                 // no-op

@@ -2546,7 +2546,7 @@ declare module Plottable {
             addDataset(dataset: any[]): AbstractPlot;
             _addDataset(key: string, dataset: Dataset): void;
             _getDrawer(key: string): _Drawer.AbstractDrawer;
-            _getAnimator(key: string): Animator.PlotAnimator;
+            _getAnimator(key?: string): Animator.PlotAnimator;
             _onDatasetUpdate(): void;
             /**
              * Sets an attribute of every data point.
