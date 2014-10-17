@@ -252,16 +252,15 @@
   {
     "name":"stocks",
     "categories":["Integration", "Vertical Bar Plot", "Legend", "Layout", "PanZoom Interaction", "Key Interaction"]
-<<<<<<< HEAD
   },
 
   {
     "name":"domain_adjustment_algorithm",
     "categories":["Linear Scale", "Numeric Axis", "Line Plot", "Adjustment", "Layout"]
-=======
-  }, {
+  }, 
+
+  {
     "name":"tick_generator",
     "categories":["Linear Scale", "Tick Generation", "Line Plot"]
->>>>>>> develop
   }
 ]

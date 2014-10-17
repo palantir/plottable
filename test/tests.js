@@ -1683,29 +1683,29 @@ describe("Plots", function () {
         it("plot auto domain scale to visible points", function () {
             xScale.domain([-3, -3]);
             assert.deepEqual(yScale.domain(), [-10, 10], "domain has not been adjusted to visible points");
-            plot.autoDomainYScale(true);
+            plot.autoAdjustmentYScaleOverVisiblePoints(true);
             xScale.domain([-2, 2]);
             assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
             svg.remove();
         });
         it("no visible points", function () {
-            plot.autoDomainYScale(true);
+            plot.autoAdjustmentYScaleOverVisiblePoints(true);
             xScale.domain([-0.5, 0.5]);
             assert.deepEqual(yScale.domain(), [-1, 1], "domain has been adjusted to default domain");
             svg.remove();
         });
         it("show all data", function () {
-            plot.autoDomainYScale(true);
+            plot.autoAdjustmentYScaleOverVisiblePoints(true);
             xScale.domain([-0.5, 0.5]);
             plot.showAllData();
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
             assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
             svg.remove();
         });
-        it("show all data without auto domain", function () {
-            plot.autoDomainYScale(true);
+        it("show all data without auto adjust domain", function () {
+            plot.autoAdjustmentYScaleOverVisiblePoints(true);
             xScale.domain([-0.5, 0.5]);
-            plot.autoDomainYScale(false);
+            plot.autoAdjustmentYScaleOverVisiblePoints(false);
             plot.showAllData();
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
             assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
@@ -1713,9 +1713,9 @@ describe("Plots", function () {
         });
         it("no cycle in auto domain on plot", function () {
             var zScale = new Plottable.Scale.Linear().domain([-10, 10]);
-            plot.autoDomainYScale(true);
-            var plot2 = new Plottable.Plot.AbstractXYPlot(zScale, yScale).autoDomainXScale(true).project("x", xAccessor, zScale).project("y", yAccessor, yScale).addDataset(simpleDataset);
-            var plot3 = new Plottable.Plot.AbstractXYPlot(zScale, xScale).autoDomainYScale(true).project("x", xAccessor, zScale).project("y", yAccessor, xScale).addDataset(simpleDataset);
+            plot.autoAdjustmentYScaleOverVisiblePoints(true);
+            var plot2 = new Plottable.Plot.AbstractXYPlot(zScale, yScale).autoAdjustmentXScaleOverVisiblePoints(true).project("x", xAccessor, zScale).project("y", yAccessor, yScale).addDataset(simpleDataset);
+            var plot3 = new Plottable.Plot.AbstractXYPlot(zScale, xScale).autoAdjustmentYScaleOverVisiblePoints(true).project("x", xAccessor, zScale).project("y", yAccessor, xScale).addDataset(simpleDataset);
             plot2.renderTo(svg);
             plot3.renderTo(svg);
             xScale.domain([-2, 2]);

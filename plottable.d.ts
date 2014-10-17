@@ -2640,19 +2640,19 @@ declare module Plottable {
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractXYPlot<X, Y>;
             /**
-             * Sets the auto domain to visible points for y scale.
+             * Sets the automatic domain adjustment over visible points for y scale.
              *
-             * @param {boolean} autoDomain The new value for the auto domain for y scale.
+             * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
-            autoDomainYScale(autoDomain: boolean): AbstractXYPlot<X, Y>;
+            autoAdjustmentYScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y>;
             /**
-             * Sets the auto domain to visible points for x scale.
+             * Sets the automatic domain adjustment over visible points for x scale.
              *
-             * @param {boolean} autoDomain The new value for the auto domain for x scale.
+             * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
-            autoDomainXScale(autoDomain: boolean): AbstractXYPlot<X, Y>;
+            autoAdjustmentXScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y>;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _updateXDomainer(): void;
             _updateYDomainer(): void;

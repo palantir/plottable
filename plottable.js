@@ -6189,23 +6189,23 @@ var Plottable;
                 return this;
             };
             /**
-             * Sets the auto domain to visible points for y scale.
+             * Sets the automatic domain adjustment over visible points for y scale.
              *
-             * @param {boolean} autoDomain The new value for the auto domain for y scale.
+             * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
-            AbstractXYPlot.prototype.autoDomainYScale = function (autoDomain) {
-                this._autoDomainYScale = autoDomain;
+            AbstractXYPlot.prototype.autoAdjustmentYScaleOverVisiblePoints = function (autoAdjustment) {
+                this._autoDomainYScale = autoAdjustment;
                 return this;
             };
             /**
-             * Sets the auto domain to visible points for x scale.
+             * Sets the automatic domain adjustment over visible points for x scale.
              *
-             * @param {boolean} autoDomain The new value for the auto domain for x scale.
+             * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
-            AbstractXYPlot.prototype.autoDomainXScale = function (autoDomain) {
-                this._autoDomainXScale = autoDomain;
+            AbstractXYPlot.prototype.autoAdjustmentXScaleOverVisiblePoints = function (autoAdjustment) {
+                this._autoDomainXScale = autoAdjustment;
                 return this;
             };
             AbstractXYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
