@@ -5786,8 +5786,8 @@ describe("_Util.Methods", function () {
         var dayAfterTomorrow = new Date();
         dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
         var dates = [today, tomorrow, dayAfterTomorrow];
-        assert.deepEqual(min(dates), today, "works on arrays of non-numbers but comperable");
-        assert.deepEqual(max(dates), dayAfterTomorrow, "works on arrays of non-numbers but comperable");
+        assert.deepEqual(min(dates), today, "works on arrays of non-numbers but comparable");
+        assert.deepEqual(max(dates), dayAfterTomorrow, "works on arrays of non-numbers but comparable");
         assert.deepEqual(max([], today), today, "defaults work even with non-number");
     });
     it("objEq works as expected", function () {

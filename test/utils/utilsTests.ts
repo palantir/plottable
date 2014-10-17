@@ -71,8 +71,8 @@ describe("_Util.Methods", () => {
     dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
 
     var dates: Date[] = [today, tomorrow, dayAfterTomorrow];
-    assert.deepEqual(min<Date>(dates), today, "works on arrays of non-numbers but comperable");
-    assert.deepEqual(max<Date>(dates), dayAfterTomorrow, "works on arrays of non-numbers but comperable");
+    assert.deepEqual(min<Date>(dates), today, "works on arrays of non-numbers but comparable");
+    assert.deepEqual(max<Date>(dates), dayAfterTomorrow, "works on arrays of non-numbers but comparable");
     assert.deepEqual(max<Date>([], today), today, "defaults work even with non-number");
   });
 
