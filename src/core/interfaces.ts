@@ -1,18 +1,4 @@
 module Plottable {
-  // TODO: I'm pretty sure this is a mistake, and we always just mean
-  // any[]|DataSource. I mean, we just straight-up cast this thing into a
-  // DataSource, but then we expect data to be a function
-  export interface DatasetInterface {
-    data: any[];
-    metadata: Metadata;
-  }
-
-  // TODO: only used by DatasetInterface, remove when DatasetInterface removed
-  export interface Metadata {
-    cssClass?: string;
-    color?: string;
-  }
-
   export interface _Accessor {
     (datum: any, index?: number, metadata?: any): any;
   };
