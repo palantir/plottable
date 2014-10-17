@@ -111,7 +111,7 @@ export module Plot {
       return new _Drawer.AbstractDrawer(key);
     }
 
-    public _getAnimator(key = ""): Animator.PlotAnimator {
+    public _getAnimator(key: string): Animator.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
         return this._animators[key] || new Animator.Null();
       } else {
@@ -360,7 +360,7 @@ export module Plot {
     }
 
     public _generateDrawSteps(): _Drawer.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator()}];
+      return [{attrToProjector: this._generateAttrToProjector(), animator: new Animator.Null()}];
     }
 
     public _additionalPaint() {

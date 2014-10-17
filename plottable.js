@@ -6001,7 +6001,6 @@ var Plottable;
                 return new Plottable._Drawer.AbstractDrawer(key);
             };
             AbstractPlot.prototype._getAnimator = function (key) {
-                if (key === void 0) { key = ""; }
                 if (this._animate && this._animateOnNextRender) {
                     return this._animators[key] || new Plottable.Animator.Null();
                 }
@@ -6190,7 +6189,7 @@ var Plottable;
                 return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey.get(k).drawer; });
             };
             AbstractPlot.prototype._generateDrawSteps = function () {
-                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator() }];
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animator.Null() }];
             };
             AbstractPlot.prototype._additionalPaint = function () {
                 // no-op
