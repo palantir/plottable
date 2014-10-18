@@ -13,7 +13,8 @@ describe("Domainer", () => {
   it("pad() works in general case", () => {
     scale._updateExtent("1", "x", [100, 200]);
     scale.domainer(new Plottable.Domainer().pad(0.2));
-    assert.deepEqual(scale.domain(), [90, 210]);
+    assert.closeTo(scale.domain()[0], 90, 0.1, "lower bound of domain correct");
+    assert.closeTo(scale.domain()[1], 210, 0.1, "upper bound of domain correct");
   });
 
   it("pad() works for date scales", () => {

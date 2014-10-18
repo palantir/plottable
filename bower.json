@@ -28,7 +28,7 @@
     "plots"
   ],
   "dependencies": {
-    "d3": "3.4.11"
+    "d3": "3.4.13"
   },
   "homepage": "plottablejs.org",
   "repository": {
