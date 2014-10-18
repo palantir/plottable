@@ -231,11 +231,7 @@ export module _Util {
     /**
      * Computes min values from array.
      *
-<<<<<<< HEAD
-     * If type is not comperable then it will be converted to comperable one before computing min.
-=======
-     * If type is not comparable then t will be converted to a comparable before computing min.
->>>>>>> 7d05d00... Fix jsdoc and more edge case tests.
+     * If type is not comparable then it will be converted to a comparable before computing min.
      */
     export function min<C>(arr: C[], default_val?: C): C;
     export function min<T,C>(arr: T[], acc: (x: T) => C, default_val?: C): C;

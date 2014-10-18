@@ -1681,7 +1681,7 @@ describe("Plots", function () {
             plot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).renderTo(svg);
         });
         it("plot auto domain scale to visible points", function () {
-            xScale.domain([-3, -3]);
+            xScale.domain([-3, 3]);
             assert.deepEqual(yScale.domain(), [-10, 10], "domain has not been adjusted to visible points");
             plot.autoAdjustmentYScaleOverVisiblePoints(true);
             xScale.domain([-2, 2]);
@@ -1691,7 +1691,7 @@ describe("Plots", function () {
         it("no visible points", function () {
             plot.autoAdjustmentYScaleOverVisiblePoints(true);
             xScale.domain([-0.5, 0.5]);
-            assert.deepEqual(yScale.domain(), [-1, 1], "domain has been adjusted to default domain");
+            assert.deepEqual(yScale.domain(), [-10, 10], "domain has been not benn adjusted");
             svg.remove();
         });
         it("show all data", function () {
@@ -5814,18 +5814,11 @@ describe("_Util.Methods", function () {
         tomorrow.setDate(today.getDate() + 1);
         var dayAfterTomorrow = new Date();
         dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
-<<<<<<< HEAD
-        var dates = [today, tomorrow, dayAfterTomorrow];
-        assert.deepEqual(min(dates), today, "works on arrays of non-numbers but comparable");
-        assert.deepEqual(max(dates), dayAfterTomorrow, "works on arrays of non-numbers but comparable");
-        assert.deepEqual(max([], today), today, "defaults work even with non-number");
-=======
         var dates = [today, tomorrow, dayAfterTomorrow, null];
         assert.deepEqual(min(dates), today, "works on arrays of non-numeric values but comparable");
         assert.deepEqual(max(dates), dayAfterTomorrow, "works on arrays of non-number values but comparable");
-        assert.deepEqual(max([null], today), undefined, "returns undefined from array of null");
+        assert.deepEqual(max([null], today), undefined, "returns undefined from array of null values");
         assert.deepEqual(max([], today), today, "correct default non-numeric value returned");
->>>>>>> 7d05d00... Fix jsdoc and more edge case tests.
     });
     it("objEq works as expected", function () {
         assert.isTrue(Plottable._Util.Methods.objEq({}, {}));

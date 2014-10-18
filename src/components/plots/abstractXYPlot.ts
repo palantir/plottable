@@ -5,8 +5,8 @@ export module Plot {
   export class AbstractXYPlot<X,Y> extends AbstractPlot {
     public _xScale: Scale.AbstractScale<X, number>;
     public _yScale: Scale.AbstractScale<Y, number>;
-    public _autoDomainXScale = false;
-    public _autoDomainYScale = false;
+    public _autoAdjustXScaleDomain = false;
+    public _autoAdjustYScaleDomain = false;
 
     /**
      * Constructs an XYPlot.
@@ -61,7 +61,7 @@ export module Plot {
      * @returns {AbstractXYPlot} The calling AbstractXYPlot.
      */
     public autoAdjustmentYScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X,Y> {
-      this._autoDomainYScale = autoAdjustment;
+      this._autoAdjustYScaleDomain = autoAdjustment;
       return this;
     }
 
@@ -72,7 +72,7 @@ export module Plot {
      * @returns {AbstractXYPlot} The calling AbstractXYPlot.
      */
     public autoAdjustmentXScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X,Y>  {
-      this._autoDomainXScale = autoAdjustment;
+      this._autoAdjustXScaleDomain = autoAdjustment;
       return this;
     }
 
@@ -107,23 +107,32 @@ export module Plot {
      */
     public showAllData() {
       this._xScale.autoDomain();
-      if(!this._autoDomainYScale) {
+      if(!this._autoAdjustYScaleDomain) {
         this._yScale.autoDomain();
       }
     }
 
     private adjustYDomainOnChangeFromX() {
-      this.adjustDomainToVisiblePoints<X,Y>(this._xScale, this._yScale, true);
+      if(this._autoAdjustYScaleDomain) {
+        this.adjustDomainToVisiblePoints<X,Y>(this._xScale, this._yScale, true);
+      }
     }
     private adjustXDomainOnChangeFromY() {
-      this.adjustDomainToVisiblePoints<Y,X>(this._yScale, this._xScale, false);
+      if(this._autoAdjustXScaleDomain) {
+        this.adjustDomainToVisiblePoints<Y,X>(this._yScale, this._xScale, false);
+      }
     }
 
-    private adjustDomainToVisiblePoints<A,B>(fromScale: Scale.AbstractScale<A, number>, toScale: Scale.AbstractScale<B, number>, fromX: boolean): void {
+    private adjustDomainToVisiblePoints<A,B>(fromScale: Scale.AbstractScale<A, number>,
+                                             toScale: Scale.AbstractScale<B, number>,
+                                             fromX: boolean) {
       if (toScale instanceof Scale.AbstractQuantitative) {
         var toScaleQ = <Scale.AbstractQuantitative<B>> toScale;
         var normalizedData = this.normalizeDatasets<A,B>(fromX);
         var adjustedDomain = this.adjustDomainOverVisiblePoints<A,B>(normalizedData, fromScale.domain());
+        if(adjustedDomain.length === 0) {
+          return;
+        }
         adjustedDomain = toScaleQ.domainer().computeDomain([adjustedDomain], toScaleQ);
         toScaleQ._setDomain(adjustedDomain);
       }
@@ -137,16 +146,10 @@ export module Plot {
     }
 
     private adjustDomainOverVisiblePoints<A,B>(values: {a: A; b: B}[], fromDomain: A[]): B[] {
-      var bVals = values
-                    .map(v => v.b)
-                    .filter(b => _Util.Methods.inRange(+b, +fromDomain[0], +fromDomain[1]));
-
-      var retVal: any[];
-      if (bVals.length === 0) {
-        retVal = [0, 0];
-      } else {
-        var acc = (b: B) => +b;
-        retVal = [_Util.Methods.min(bVals, acc), _Util.Methods.max(bVals, acc)];
+      var bVals = values.filter(v => fromDomain[0] <= v.a && v.a <= fromDomain[1]).map(v => v.b);
+      var retVal: B[] = [];
+      if (bVals.length !== 0) {
+        retVal = [_Util.Methods.min<B>(bVals), _Util.Methods.max<B>(bVals)];
       }
       return retVal;
     }

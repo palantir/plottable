@@ -286,7 +286,7 @@ describe("Plots", () => {
     });
 
     it("plot auto domain scale to visible points", () => {
-      xScale.domain([-3, -3]);
+      xScale.domain([-3, 3]);
       assert.deepEqual(yScale.domain(), [-10, 10], "domain has not been adjusted to visible points");
       plot.autoAdjustmentYScaleOverVisiblePoints(true);
       xScale.domain([-2, 2]);
@@ -297,7 +297,7 @@ describe("Plots", () => {
     it("no visible points", () => {
       plot.autoAdjustmentYScaleOverVisiblePoints(true);
       xScale.domain([-0.5, 0.5]);
-      assert.deepEqual(yScale.domain(), [-1, 1], "domain has been adjusted to default domain");
+      assert.deepEqual(yScale.domain(), [-10, 10], "domain has been not benn adjusted");
       svg.remove();
     });
 

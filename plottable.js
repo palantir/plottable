@@ -6171,8 +6171,8 @@ var Plottable;
              */
             function AbstractXYPlot(xScale, yScale) {
                 _super.call(this);
-                this._autoDomainXScale = false;
-                this._autoDomainYScale = false;
+                this._autoAdjustXScaleDomain = false;
+                this._autoAdjustYScaleDomain = false;
                 if (xScale == null || yScale == null) {
                     throw new Error("XYPlots require an xScale and yScale");
                 }
@@ -6208,7 +6208,7 @@ var Plottable;
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
             AbstractXYPlot.prototype.autoAdjustmentYScaleOverVisiblePoints = function (autoAdjustment) {
-                this._autoDomainYScale = autoAdjustment;
+                this._autoAdjustYScaleDomain = autoAdjustment;
                 return this;
             };
             /**
@@ -6218,7 +6218,7 @@ var Plottable;
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
             AbstractXYPlot.prototype.autoAdjustmentXScaleOverVisiblePoints = function (autoAdjustment) {
-                this._autoDomainXScale = autoAdjustment;
+                this._autoAdjustXScaleDomain = autoAdjustment;
                 return this;
             };
             AbstractXYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
@@ -6249,21 +6249,28 @@ var Plottable;
              */
             AbstractXYPlot.prototype.showAllData = function () {
                 this._xScale.autoDomain();
-                if (!this._autoDomainYScale) {
+                if (!this._autoAdjustYScaleDomain) {
                     this._yScale.autoDomain();
                 }
             };
             AbstractXYPlot.prototype.adjustYDomainOnChangeFromX = function () {
-                this.adjustDomainToVisiblePoints(this._xScale, this._yScale, true);
+                if (this._autoAdjustYScaleDomain) {
+                    this.adjustDomainToVisiblePoints(this._xScale, this._yScale, true);
+                }
             };
             AbstractXYPlot.prototype.adjustXDomainOnChangeFromY = function () {
-                this.adjustDomainToVisiblePoints(this._yScale, this._xScale, false);
+                if (this._autoAdjustXScaleDomain) {
+                    this.adjustDomainToVisiblePoints(this._yScale, this._xScale, false);
+                }
             };
             AbstractXYPlot.prototype.adjustDomainToVisiblePoints = function (fromScale, toScale, fromX) {
                 if (toScale instanceof Plottable.Scale.AbstractQuantitative) {
                     var toScaleQ = toScale;
                     var normalizedData = this.normalizeDatasets(fromX);
                     var adjustedDomain = this.adjustDomainOverVisiblePoints(normalizedData, fromScale.domain());
+                    if (adjustedDomain.length === 0) {
+                        return;
+                    }
                     adjustedDomain = toScaleQ.domainer().computeDomain([adjustedDomain], toScaleQ);
                     toScaleQ._setDomain(adjustedDomain);
                 }
@@ -6277,14 +6284,10 @@ var Plottable;
                 });
             };
             AbstractXYPlot.prototype.adjustDomainOverVisiblePoints = function (values, fromDomain) {
-                var bVals = values.map(function (v) { return v.b; }).filter(function (b) { return Plottable._Util.Methods.inRange(+b, +fromDomain[0], +fromDomain[1]); });
-                var retVal;
-                if (bVals.length === 0) {
-                    retVal = [0, 0];
-                }
-                else {
-                    var acc = function (b) { return +b; };
-                    retVal = [Plottable._Util.Methods.min(bVals, acc), Plottable._Util.Methods.max(bVals, acc)];
+                var bVals = values.filter(function (v) { return fromDomain[0] <= v.a && v.a <= fromDomain[1]; }).map(function (v) { return v.b; });
+                var retVal = [];
+                if (bVals.length !== 0) {
+                    retVal = [Plottable._Util.Methods.min(bVals), Plottable._Util.Methods.max(bVals)];
                 }
                 return retVal;
             };
