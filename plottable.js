@@ -241,6 +241,19 @@ var Plottable;
                 /* tslint:enable:ban */
             }
             Methods.min = min;
+            function range(start, stop, step) {
+                if (step === void 0) { step = 1; }
+                if (step === 0) {
+                    throw new Error("step cannot be 0");
+                }
+                var length = Math.max(Math.ceil((stop - start) / step), 0);
+                var range = [];
+                for (var i = 0; i < length; i++, start += step) {
+                    range[i] = start;
+                }
+                return range;
+            }
+            Methods.range = range;
         })(_Util.Methods || (_Util.Methods = {}));
         var Methods = _Util.Methods;
     })(Plottable._Util || (Plottable._Util = {}));
