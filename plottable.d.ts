@@ -108,7 +108,7 @@ declare module Plottable {
             /**
              * Computes the min value from the array.
              *
-             * If type is not comparable then t will be converted to a comparable before computing max.
+             * If type is not comparable then t will be converted to a comparable before computing min.
              */
             function min<C>(arr: C[], default_val?: C): C;
             function min<T, C>(arr: T[], acc: (x: T) => C, default_val?: C): C;

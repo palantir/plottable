@@ -76,9 +76,10 @@ describe("_Util.Methods", () => {
     var dayAfterTomorrow = new Date();
     dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
 
-    var dates: Date[] = [today, tomorrow, dayAfterTomorrow];
+    var dates: Date[] = [today, tomorrow, dayAfterTomorrow, null];
     assert.deepEqual(min<Date>(dates), today, "works on arrays of non-numeric values but comparable");
     assert.deepEqual(max<Date>(dates), dayAfterTomorrow, "works on arrays of non-number values but comparable");
+    assert.deepEqual(max<Date>([null], today), undefined, "returns undefined from array of null values");
     assert.deepEqual(max<Date>([], today), today, "correct default non-numeric value returned");
   });
 

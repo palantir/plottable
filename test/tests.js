@@ -5794,9 +5794,10 @@ describe("_Util.Methods", function () {
         tomorrow.setDate(today.getDate() + 1);
         var dayAfterTomorrow = new Date();
         dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
-        var dates = [today, tomorrow, dayAfterTomorrow];
+        var dates = [today, tomorrow, dayAfterTomorrow, null];
         assert.deepEqual(min(dates), today, "works on arrays of non-numeric values but comparable");
         assert.deepEqual(max(dates), dayAfterTomorrow, "works on arrays of non-number values but comparable");
+        assert.deepEqual(max([null], today), undefined, "returns undefined from array of null");
         assert.deepEqual(max([], today), today, "correct default non-numeric value returned");
     });
     it("objEq works as expected", function () {
