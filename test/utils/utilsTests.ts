@@ -45,35 +45,41 @@ describe("_Util.Methods", () => {
   it("max/min work as expected", () => {
     var alist = [1,2,3,4,5];
     var dbl = (x: number) => x * 2;
+    var today = new Date();
+    var numToDate = (x: number) => { var t = new Date(); t.setDate(today.getDate() + x); return t; };
     var max = Plottable._Util.Methods.max;
     var min = Plottable._Util.Methods.min;
+
     assert.deepEqual(max(alist), 5, "max works as expected on plain array");
     assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
     assert.deepEqual(max(alist, dbl), 10, "max applies function appropriately");
+    assert.deepEqual(max(alist, numToDate), numToDate(5), "max applies non-numeric function appropriately");
     assert.deepEqual(max([]), 0, "default value zero by default");
     assert.deepEqual(max([], 10), 10, "works as intended with default value");
     assert.deepEqual(max([], dbl), 0, "default value zero as expected when fn provided");
     assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
+    assert.deepEqual(max([], numToDate, today), today, "default non-numeric value works with non-numeric function");
 
     assert.deepEqual(min(alist, 0), 1, "min works for basic list");
     assert.deepEqual(min(alist, dbl, 0), 2, "min works with function arg");
+    assert.deepEqual(min(alist, numToDate, today), numToDate(1), "min works with non-numeric function arg");
     assert.deepEqual(min([]), 0, "min defaults to 0");
     assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
+    assert.deepEqual(min([], numToDate, today), today, "min accepts non-numeric default and function");
 
     var strings = ["a", "bb", "ccc", "ddd"];
     assert.deepEqual(max(strings, (s: string) => s.length), 3, "works on arrays of non-numbers with a function");
     assert.deepEqual(max([], (s: string) => s.length, 5), 5, "defaults work even with non-number function type");
 
-    var today = new Date();
     var tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
     var dayAfterTomorrow = new Date();
     dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
 
     var dates: Date[] = [today, tomorrow, dayAfterTomorrow];
-    assert.deepEqual(min<Date>(dates), today, "works on arrays of non-numbers but comparable");
-    assert.deepEqual(max<Date>(dates), dayAfterTomorrow, "works on arrays of non-numbers but comparable");
-    assert.deepEqual(max<Date>([], today), today, "defaults work even with non-number");
+    assert.deepEqual(min<Date>(dates), today, "works on arrays of non-numeric values but comparable");
+    assert.deepEqual(max<Date>(dates), dayAfterTomorrow, "works on arrays of non-number values but comparable");
+    assert.deepEqual(max<Date>([], today), today, "correct default non-numeric value returned");
   });
 
   it("objEq works as expected", () => {

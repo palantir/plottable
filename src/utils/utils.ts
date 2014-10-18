@@ -208,18 +208,18 @@ export module _Util {
     }
 
     /**
-     * Computes max values from array.
+     * Computes the max value from the array.
      *
-     * If type is not comperable then it will be converted to comperable one before computing max.
+     * If type is not comparable then t will be converted to a comparable before computing max.
      */
     export function max<C>(arr: C[], default_val?: C): C;
     export function max<T,C>(arr: T[], acc: (x: T) => C, default_val?: C): C;
     export function max(arr: any[], one: any = 0, two: any = 0): any {
       if (arr.length === 0) {
-        if (typeof(one) === "function") {
-          return two;
-        } else {
+        if (typeof(one) !== "function") {
           return one;
+        } else {
+          return two;
         }
       }
       /* tslint:disable:ban */
@@ -229,18 +229,18 @@ export module _Util {
     }
 
     /**
-     * Computes min values from array.
+     * Computes the min value from the array.
      *
-     * If type is not comperable then it will be converted to comperable one before computing min.
+     * If type is not comparable then t will be converted to a comparable before computing max.
      */
     export function min<C>(arr: C[], default_val?: C): C;
     export function min<T,C>(arr: T[], acc: (x: T) => C, default_val?: C): C;
     export function min(arr: any[], one: any = 0, two: any = 0): any {
       if (arr.length === 0) {
-        if (typeof(one) === "function") {
-          return two;
-        } else {
+        if (typeof(one) !== "function") {
           return one;
+        } else {
+          return two;
         }
       }
       /* tslint:disable:ban */
