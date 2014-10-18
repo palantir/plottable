@@ -71,11 +71,6 @@ export module Plot {
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
     private stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
-      // HACKHACK d3's stack layout logic crashes on 0-length dataArray https://github.com/mbostock/d3/issues/2004
-      if (dataArray.length === 0) {
-        return dataArray;
-      }
-
       var outFunction = (d: StackedDatum, y0: number, y: number) => {
         d.offset = y0;
       };
