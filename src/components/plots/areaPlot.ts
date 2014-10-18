@@ -12,7 +12,6 @@ export module Plot {
      * Constructs an AreaPlot.
      *
      * @constructor
-     * @param {DatasetInterface | any} dataset The dataset to render.
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
@@ -23,10 +22,10 @@ export module Plot {
       this.project("fill", () => Core.Colors.INDIGO); // default
       this.project("fill-opacity", () => 0.25); // default
       this.project("stroke", () => Core.Colors.INDIGO); // default
-      this._animators["area-reset"] = new Animator.Null();
-      this._animators["area"]       = new Animator.Base()
-                                        .duration(600)
-                                        .easing("exp-in-out");
+      this._animators["reset"] = new Animator.Null();
+      this._animators["main"]  = new Animator.Base()
+                                             .duration(600)
+                                             .easing("exp-in-out");
     }
 
     public _onDatasetUpdate() {
@@ -34,6 +33,10 @@ export module Plot {
       if (this._yScale != null) {
         this._updateYDomainer();
       }
+    }
+
+     public _getDrawer(key: string) {
+      return new Plottable._Drawer.Area(key);
     }
 
     public _updateYDomainer() {
@@ -72,45 +75,6 @@ export module Plot {
 
     public _getResetYFunction() {
       return this._generateAttrToProjector()["y0"];
-    }
-
-    // HACKHACK #1106 - should use drawers for paint logic
-    public _paint() {
-      super._paint();
-      var attrToProjector = this._generateAttrToProjector();
-      var xFunction       = attrToProjector["x"];
-      var y0Function      = attrToProjector["y0"];
-      var yFunction       = attrToProjector["y"];
-      delete attrToProjector["x"];
-      delete attrToProjector["y0"];
-      delete attrToProjector["y"];
-
-      var area = d3.svg.area()
-                  .x(xFunction)
-                  .y0(y0Function)
-                  .defined((d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction));
-      attrToProjector["d"] = area;
-
-      var datasets = this.datasets();
-      this._getDrawersInOrder().forEach((d, i) => {
-        var dataset = datasets[i];
-        var areaPath: D3.Selection;
-        if (d._renderArea.select(".area").node()) {
-          areaPath = d._renderArea.select(".area");
-        } else {
-          // Make sure to insert the area before the line
-          areaPath = d._renderArea.insert("path", ".line").classed("area", true);
-        }
-        areaPath.datum(dataset.data());
-
-        if (this._dataChanged) {
-          area.y1(this._getResetYFunction());
-          this._applyAnimatedAttributes(areaPath, "area-reset", attrToProjector);
-        }
-
-        area.y1(yFunction);
-        this._applyAnimatedAttributes(areaPath, "area", attrToProjector);
-      });
     }
 
     public _wholeDatumAttributes() {

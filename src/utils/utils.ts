@@ -238,6 +238,32 @@ export module _Util {
       return acc === undefined ? d3.min(arr) : d3.min(arr, acc);
       /* tslint:enable:ban */
     }
+
+    /**
+     * Creates shallow copy of map.
+     * @param {{ [key: string]: any }} oldMap Map to copy
+     *
+     * @returns {[{ [key: string]: any }} coppied map.
+     */
+    export function copyMap<T>(oldMap: { [key: string]: T }): { [key: string]: T } {
+      var newMap: { [key: string]: any } = {};
+      d3.keys(oldMap).forEach(key => newMap[key] = oldMap[key]);
+      return newMap;
+    }
+
+    export function range(start: number, stop: number, step = 1): number[] {
+      if(step === 0) {
+        throw new Error("step cannot be 0");
+      }
+      var length = Math.max(Math.ceil((stop - start) / step), 0);
+      var range: number[] = [];
+
+      for (var i = 0; i < length; i++, start += step) {
+        range[i] = start;
+      }
+
+      return range;
+    }
   }
 }
 }
