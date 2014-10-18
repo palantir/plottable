@@ -6383,11 +6383,13 @@ var Plottable;
                 var _this = this;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 if ((this._isVertical && attrToSet === "x") || (!this._isVertical && attrToSet === "y")) {
-                    var barWidth = this._getMinimumDataWidth();
-                    var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                     var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
-                    this.project("x-min", function (d, i) { return barAccessor(d, i) - barWidth * _this._barAlignmentFactor; }, barScale);
-                    this.project("x-max", function (d, i) { return barAccessor(d, i) + barWidth * (1 - _this._barAlignmentFactor); }, barScale);
+                    if (barScale instanceof Plottable.Scale.AbstractQuantitative) {
+                        var barWidth = this._getMinimumDataWidth();
+                        var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                        this.project("x-min", function (d, i) { return barAccessor(d, i) - barWidth * _this._barAlignmentFactor; }, barScale);
+                        this.project("x-max", function (d, i) { return barAccessor(d, i) + barWidth * (1 - _this._barAlignmentFactor); }, barScale);
+                    }
                 }
                 this._render();
                 return this;
@@ -6603,8 +6605,9 @@ var Plottable;
                     }
                     else {
                         var secondaryDimension = this._isVertical ? this.width() : this.height();
-                        var step = secondaryDimension / (ordScale._outerPadding + ordScale.domain().length - 1);
-                        barPixelWidth = step * ordScale._outerPadding * 0.6;
+                        var padding = ordScale._outerPadding * 2;
+                        var step = secondaryDimension / (padding + ordScale.domain().length - 1);
+                        barPixelWidth = step * padding * 0.6;
                     }
                 }
                 else {

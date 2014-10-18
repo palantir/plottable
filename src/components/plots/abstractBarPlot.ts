@@ -42,11 +42,13 @@ export module Plot {
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if ((this._isVertical && attrToSet === "x") || (!this._isVertical && attrToSet === "y")) {
-        var barWidth = this._getMinimumDataWidth();
-        var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
         var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
-        this.project("x-min", (d: any, i: number) => barAccessor(d, i) - barWidth * this._barAlignmentFactor, barScale);
-        this.project("x-max", (d: any, i: number) => barAccessor(d, i) + barWidth * (1 - this._barAlignmentFactor), barScale);
+        if (barScale instanceof Plottable.Scale.AbstractQuantitative) {
+          var barWidth = this._getMinimumDataWidth();
+          var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+          this.project("x-min", (d: any, i: number) => barAccessor(d, i) - barWidth * this._barAlignmentFactor, barScale);
+          this.project("x-max", (d: any, i: number) => barAccessor(d, i) + barWidth * (1 - this._barAlignmentFactor), barScale);
+        }
       }
       this._render();
       return this;
@@ -303,8 +305,9 @@ export module Plot {
           barPixelWidth = ordScale.rangeBand();
         } else {
           var secondaryDimension = this._isVertical ? this.width() : this.height();
-          var step = secondaryDimension / ((<any> ordScale)._outerPadding + ordScale.domain().length - 1);
-          barPixelWidth = step * (<any> ordScale)._outerPadding * 0.6;
+          var padding = (<any> ordScale)._outerPadding * 2;
+          var step = secondaryDimension / (padding + ordScale.domain().length - 1);
+          barPixelWidth = step * padding * 0.6;
         }
       } else {
         barPixelWidth = (barScale.scale(this._getMinimumDataWidth()) - barScale.scale(0)) * 0.6;
