@@ -250,7 +250,7 @@ export module Plot {
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       if (!attrToProjector["width"]) {
-        attrToProjector["width"] = () => this.getBarPixelWidth();
+        attrToProjector["width"] = () => this._getBarPixelWidth();
       }
 
       var positionF = attrToProjector[secondaryAttr];
@@ -296,7 +296,7 @@ export module Plot {
       return barWidth;
     }
 
-    private getBarPixelWidth() {
+    public _getBarPixelWidth() {
       var barPixelWidth: number;
       var barScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
       if (barScale instanceof Plottable.Scale.Ordinal) {

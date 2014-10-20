@@ -2737,6 +2737,7 @@ declare module Plottable {
             _updateXDomainer(): void;
             _generateAttrToProjector(): AttributeToProjector;
             _getMinimumDataWidth(): number;
+            _getBarPixelWidth(): number;
         }
     }
 }
@@ -2934,6 +2935,8 @@ declare module Plottable {
             _updateDomainer(scale: Scale.AbstractScale<any, number>): any;
             _updateXDomainer(): any;
             _updateYDomainer(): any;
+            _getMinimumDataWidth(): any;
+            _getBarPixelWidth(): any;
         }
     }
 }
