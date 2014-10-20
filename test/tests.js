@@ -1686,6 +1686,10 @@ describe("Plots", function () {
             plot.autoAdjustmentYScaleOverVisiblePoints(true);
             xScale.domain([-2, 2]);
             assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
+            plot.autoAdjustmentYScaleOverVisiblePoints(false);
+            plot.autoAdjustmentXScaleOverVisiblePoints(true);
+            yScale.domain([-6, 6]);
+            assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to visible points");
             svg.remove();
         });
         it("no visible points", function () {
