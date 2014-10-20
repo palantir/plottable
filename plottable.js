@@ -6382,6 +6382,8 @@ var Plottable;
             AbstractBarPlot.prototype.project = function (attrToSet, accessor, scale) {
                 var _this = this;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
+                // If a QuantitativeScale is used, the plot can easily extend outside the component boundary.
+                // Thus, the extent must be updated to account for the possible extension
                 if ((this._isVertical && attrToSet === "x") || (!this._isVertical && attrToSet === "y")) {
                     var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
                     if (barScale instanceof Plottable.Scale.AbstractQuantitative) {
@@ -6617,17 +6619,17 @@ var Plottable;
                         barPixelWidth = ordScale.rangeBand();
                     }
                     else {
-                        // step is defined as the range_interval / (padding + number of bars)
-                        var secondaryDimension = this._isVertical ? this.width() : this.height();
-                        var step = secondaryDimension / (padding + ordScale.domain().length - 1);
                         // padding is defined as 2 * the ordinal scale's _outerPadding variable
                         // HACKHACK need to use _outerPadding for formula as above
                         var padding = ordScale._outerPadding * 2;
-                        barPixelWidth = step * padding * 0.6;
+                        // step is defined as the range_interval / (padding + number of bars)
+                        var secondaryDimension = this._isVertical ? this.width() : this.height();
+                        var step = secondaryDimension / (padding + ordScale.domain().length - 1);
+                        barPixelWidth = step * padding * 0.5;
                     }
                 }
                 else {
-                    barPixelWidth = (barScale.scale(this._getMinimumDataWidth()) - barScale.scale(0)) * 0.6;
+                    barPixelWidth = (barScale.scale(this._getMinimumDataWidth()) - barScale.scale(0)) * 0.5;
                 }
                 return barPixelWidth;
             };
