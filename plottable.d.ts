@@ -414,8 +414,9 @@ declare module Plottable {
         module Color {
             /**
              * Return contrast ratio between two colors
-             * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under modified MIT)
+             * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
              * chroma.js may be found here: https://github.com/gka/chroma.js
+             * License may be found here: https://github.com/gka/chroma.js/blob/master/LICENSE
              * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
              */
             function contrast(a: string, b: string): number;
