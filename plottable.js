@@ -3314,13 +3314,17 @@ var Plottable;
             };
             Element.prototype.draw = function (data, drawSteps) {
                 var _this = this;
-                var definedData = drawSteps.reduce(function (a, b) { return _this.filterDefinedData(a, b.attrToProjector["defined"]); }, data);
-                drawSteps.forEach(function (d) {
+                var modifiedDrawSteps = [];
+                drawSteps.forEach(function (d, i) {
+                    modifiedDrawSteps[i] = { animator: d.animator, attrToProjector: Plottable._Util.Methods.copyMap(d.attrToProjector) };
+                });
+                var definedData = modifiedDrawSteps.reduce(function (a, b) { return _this.filterDefinedData(a, b.attrToProjector["defined"]); }, data);
+                modifiedDrawSteps.forEach(function (d) {
                     if (d.attrToProjector["defined"]) {
                         delete d.attrToProjector["defined"];
                     }
                 });
-                _super.prototype.draw.call(this, definedData, drawSteps);
+                _super.prototype.draw.call(this, definedData, modifiedDrawSteps);
             };
             return Element;
         })(_Drawer.AbstractDrawer);

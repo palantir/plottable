@@ -45,14 +45,21 @@ export module _Drawer {
     }
 
     public draw(data: any[], drawSteps: DrawStep[]) {
-      var definedData: any[] = drawSteps.reduce((a: any[], b: DrawStep) => this.filterDefinedData(a, b.attrToProjector["defined"]), data);
-      drawSteps.forEach((d: DrawStep) => {
+      var modifiedDrawSteps: DrawStep[] = [];
+      drawSteps.forEach((d: DrawStep, i: number) => {
+        modifiedDrawSteps[i] = {animator: d.animator, attrToProjector: _Util.Methods.copyMap(d.attrToProjector)};
+      });
+
+      var definedData: any[] = modifiedDrawSteps.reduce((a: any[], b: DrawStep) =>
+                                this.filterDefinedData(a, b.attrToProjector["defined"]), data);
+
+      modifiedDrawSteps.forEach((d: DrawStep) => {
         if (d.attrToProjector["defined"]) {
           delete d.attrToProjector["defined"];
         }
       });
 
-      super.draw(definedData, drawSteps);
+      super.draw(definedData, modifiedDrawSteps);
     }
   }
 }
