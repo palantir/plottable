@@ -110,6 +110,26 @@ describe("_Util.Methods", () => {
 
   });
 
+  it("copyMap works as expected", () => {
+    var oldMap: {[key: string]: any} = {};
+    oldMap["a"] = 1;
+    oldMap["b"] = 2;
+    oldMap["c"] = 3;
+    oldMap["undefined"] = undefined;
+    oldMap["null"] = null;
+    oldMap["fun"] = (d: number) => d;
+    oldMap["NaN"] = 0 / 0;
+    oldMap["inf"] = 1 / 0;
+
+    var map = Plottable._Util.Methods.copyMap(oldMap);
+
+    assert.deepEqual(map, oldMap, "All values were copied.");
+
+    map = Plottable._Util.Methods.copyMap({});
+
+    assert.deepEqual(map, {}, "No values were added.");
+  });
+
   it("range works as expected", () => {
     var start = 0;
     var end = 6;

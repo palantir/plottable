@@ -1796,7 +1796,7 @@ describe("Plots", function () {
         var oldWarn = Plottable._Util.Methods.warn;
         beforeEach(function () {
             p = new Plottable.Plot.AbstractPlot();
-            p._getDrawer = function (k) { return new Plottable._Drawer.Rect(k); };
+            p._getDrawer = function (k) { return new Plottable._Drawer.Element(k).svgElement("rect"); };
         });
         afterEach(function () {
             Plottable._Util.Methods.warn = oldWarn;
@@ -5818,6 +5818,21 @@ describe("_Util.Methods", function () {
         var emptyMap = Plottable._Util.Methods.populateMap(emptyKeys, function (key) { return key + "Value"; });
         assert.isTrue(emptyMap.empty(), "no entries in map if no keys in input array");
     });
+    it("copyMap works as expected", function () {
+        var oldMap = {};
+        oldMap["a"] = 1;
+        oldMap["b"] = 2;
+        oldMap["c"] = 3;
+        oldMap["undefined"] = undefined;
+        oldMap["null"] = null;
+        oldMap["fun"] = function (d) { return d; };
+        oldMap["NaN"] = 0 / 0;
+        oldMap["inf"] = 1 / 0;
+        var map = Plottable._Util.Methods.copyMap(oldMap);
+        assert.deepEqual(map, oldMap, "All values were copied.");
+        map = Plottable._Util.Methods.copyMap({});
+        assert.deepEqual(map, {}, "No values were added.");
+    });
     it("range works as expected", function () {
         var start = 0;
         var end = 6;
@@ -6170,6 +6185,121 @@ describe("Interactions", function () {
             bhi.hoverMode("line");
             triggerFakeMouseEvent("mousemove", hitbox, 399, 250);
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var assert = chai.assert;
+var TestHoverable = (function (_super) {
+    __extends(TestHoverable, _super);
+    function TestHoverable() {
+        _super.apply(this, arguments);
+    }
+    TestHoverable.prototype._hoverOverComponent = function (p) {
+        // cast-override
+    };
+    TestHoverable.prototype._hoverOutComponent = function (p) {
+        // cast-override
+    };
+    TestHoverable.prototype._doHover = function (p) {
+        var data = [];
+        if (p.x < 250) {
+            data.push("left");
+        }
+        if (p.x > 150) {
+            data.push("right");
+        }
+        return {
+            data: data,
+            selection: this._element
+        };
+    };
+    return TestHoverable;
+})(Plottable.Component.AbstractComponent);
+describe("Interactions", function () {
+    describe("Hover", function () {
+        var svg;
+        var testTarget;
+        var hitbox;
+        var hoverInteraction;
+        var overData;
+        var overCallbackCalled = false;
+        var outData;
+        var outCallbackCalled = false;
+        beforeEach(function () {
+            svg = generateSVG();
+            testTarget = new TestHoverable();
+            testTarget.classed("test-hoverable", true);
+            testTarget.renderTo(svg);
+            hoverInteraction = new Plottable.Interaction.Hover();
+            overCallbackCalled = false;
+            hoverInteraction.onHoverOver(function (hd) {
+                overCallbackCalled = true;
+                overData = hd;
+            });
+            outCallbackCalled = false;
+            hoverInteraction.onHoverOut(function (hd) {
+                outCallbackCalled = true;
+                outData = hd;
+            });
+            testTarget.registerInteraction(hoverInteraction);
+            hitbox = testTarget._element.select(".hit-box");
+        });
+        it("correctly triggers onHoverOver() callbacks", function () {
+            overCallbackCalled = false;
+            triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
+            assert.isTrue(overCallbackCalled, "onHoverOver was called on mousing over a target area");
+            assert.deepEqual(overData.data, ["left"], "onHoverOver was called with the correct data (mouse onto left)");
+            overCallbackCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
+            assert.isFalse(overCallbackCalled, "onHoverOver isn't called if the hover data didn't change");
+            overCallbackCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
+            assert.isTrue(overCallbackCalled, "onHoverOver was called when mousing into a new region");
+            assert.deepEqual(overData.data, ["right"], "onHoverOver was called with the new data only (left --> center)");
+            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            overCallbackCalled = false;
+            triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
+            assert.deepEqual(overData.data, ["left", "right"], "onHoverOver is called with the correct data");
+            svg.remove();
+        });
+        it("correctly triggers onHoverOut() callbacks", function () {
+            triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
+            outCallbackCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
+            assert.isFalse(outCallbackCalled, "onHoverOut isn't called when mousing into a new region without leaving the old one");
+            outCallbackCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 300, 200);
+            assert.isTrue(outCallbackCalled, "onHoverOut was called when the hover data changes");
+            assert.deepEqual(outData.data, ["left"], "onHoverOut was called with the correct data (center --> right)");
+            outCallbackCalled = false;
+            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            assert.isTrue(outCallbackCalled, "onHoverOut is called on mousing out of the Component");
+            assert.deepEqual(outData.data, ["right"], "onHoverOut was called with the correct data");
+            outCallbackCalled = false;
+            triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
+            triggerFakeMouseEvent("mouseout", hitbox, 200, 400);
+            assert.deepEqual(outData.data, ["left", "right"], "onHoverOut is called with the correct data");
+            svg.remove();
+        });
+        it("getCurrentHoverData()", function () {
+            triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
+            var currentlyHovered = hoverInteraction.getCurrentHoverData();
+            assert.deepEqual(currentlyHovered.data, ["left"], "retrieves data corresponding to the current position");
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
+            currentlyHovered = hoverInteraction.getCurrentHoverData();
+            assert.deepEqual(currentlyHovered.data, ["left", "right"], "retrieves data corresponding to the current position");
+            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            currentlyHovered = hoverInteraction.getCurrentHoverData();
+            assert.isNull(currentlyHovered.data, "returns null if not currently hovering");
             svg.remove();
         });
     });

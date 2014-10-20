@@ -4,13 +4,6 @@ module Plottable {
 export module Plot {
   export class Scatter<X,Y> extends AbstractXYPlot<X,Y> {
 
-    public _animators: Animator.PlotAnimatorMap = {
-      "circles-reset" : new Animator.Null(),
-      "circles"       : new Animator.Base()
-        .duration(250)
-        .delay(5)
-    };
-
     /**
      * Constructs a ScatterPlot.
      *
@@ -24,6 +17,10 @@ export module Plot {
       this.project("r", 3); // default
       this.project("opacity", 0.6); // default
       this.project("fill", () => Core.Colors.INDIGO); // default
+      this._animators["circles-reset"] = new Animator.Null();
+      this._animators["circles"] = new Animator.Base()
+                                               .duration(250)
+                                               .delay(5);
     }
 
     /**
@@ -38,6 +35,10 @@ export module Plot {
       return this;
     }
 
+    public _getDrawer(key: string) {
+      return new Plottable._Drawer.Element(key).svgElement("circle");
+    }
+
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       attrToProjector["cx"] = attrToProjector["x"];
@@ -47,26 +48,16 @@ export module Plot {
       return attrToProjector;
     }
 
-    // HACKHACK #1106 - should use drawers for paint logic
-    public _paint() {
-      var attrToProjector = this._generateAttrToProjector();
-      var datasets = this.datasets();
+    public _generateDrawSteps(): _Drawer.DrawStep[] {
+      var drawSteps: _Drawer.DrawStep[] = [];
+      if (this._dataChanged) {
+        var resetAttrToProjector = this._generateAttrToProjector();
+        resetAttrToProjector["r"] = () => 0;
+        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("circles-reset")});
+      }
 
-      this._getDrawersInOrder().forEach((d, i) => {
-        var dataset = datasets[i];
-        var circles = d._renderArea.selectAll("circle").data(dataset.data());
-        circles.enter().append("circle");
-
-        if (this._dataChanged) {
-          var rFunction = attrToProjector["r"];
-          attrToProjector["r"] = () => 0;
-          this._applyAnimatedAttributes(circles, "circles-reset", attrToProjector);
-          attrToProjector["r"] = rFunction;
-        }
-
-        this._applyAnimatedAttributes(circles, "circles", attrToProjector);
-        circles.exit().remove();
-      });
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("circles")});
+      return drawSteps;
     }
   }
 }
