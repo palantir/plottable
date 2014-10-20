@@ -3367,7 +3367,6 @@ var Plottable;
                 this._allLabelsFitOnSecondaryAttribute = true;
                 this._isVertical = true;
                 this.svgElement("rect");
-                console.log("got a RAT drawer");
             }
             RectAndText.prototype.setup = function (area) {
                 // need to put the bars in a seperate container so we can ensure that they don't cover labels
@@ -3379,11 +3378,7 @@ var Plottable;
                 this.textArea.selectAll("g").remove();
                 var lastStepAttrToProjector = drawSteps[drawSteps.length - 1].attrToProjector;
                 if (lastStepAttrToProjector["label"]) {
-                    console.log("found label");
                     this.drawText(data, lastStepAttrToProjector);
-                }
-                else {
-                    console.log("didnt find label");
                 }
             };
             RectAndText.prototype.drawText = function (data, attrToProjector) {
@@ -3399,7 +3394,7 @@ var Plottable;
                     var positive = attrToProjector["positive"](d, i);
                     var measurement = measurer(text);
                     var color = attrToProjector["fill"](d, i);
-                    var dark = Plottable._Util.Color.contrast('white', color) * 1.6 < Plottable._Util.Color.contrast('black', color);
+                    var dark = Plottable._Util.Color.contrast("white", color) * 1.6 < Plottable._Util.Color.contrast("black", color);
                     var primary = _this._isVertical ? h : w;
                     var primarySpace = _this._isVertical ? measurement.height : measurement.width;
                     _this._allLabelsFitOnSecondaryAttribute = _this._allLabelsFitOnSecondaryAttribute && (_this._isVertical ? measurement.width <= w : measurement.height <= h);
@@ -6719,7 +6714,6 @@ var Plottable;
                 this.baseline(this._baselineValue);
             }
             AbstractBarPlot.prototype._getDrawer = function (key) {
-                console.log("aBP getDrawer");
                 var d = new Plottable._Drawer.RectAndText(key);
                 d._isVertical = this._isVertical;
                 return d;

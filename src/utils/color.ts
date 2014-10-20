@@ -14,7 +14,7 @@ export module _Util {
       var luminance_x = (x: number) => {
         x = x / 255;
         return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
-      }
+      };
       var r = luminance_x(rgb.r);
       var g = luminance_x(rgb.g);
       var b = luminance_x(rgb.b);

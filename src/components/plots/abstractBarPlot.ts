@@ -30,7 +30,6 @@ export module Plot {
     }
 
     public _getDrawer(key: string) {
-      console.log("aBP getDrawer");
       var d = new Plottable._Drawer.RectAndText(key);
       d._isVertical = this._isVertical;
       return d;
@@ -272,7 +271,7 @@ export module Plot {
       if (this.barLabelFormatter) {
         attrToProjector["label"] = (d: any, i: number) => {
           return this.barLabelFormatter(primaryAccessor(d, i));
-        }
+        };
         attrToProjector["positive"] = (d: any, i: number) => originalPositionFn(d, i) <= scaledBaseline;
       }
       return attrToProjector;

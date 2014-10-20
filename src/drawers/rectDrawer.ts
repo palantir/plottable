@@ -19,7 +19,6 @@ export module _Drawer {
     constructor(key: string) {
       super(key);
       this.svgElement("rect");
-      console.log("got a RAT drawer");
     }
 
     public setup(area: D3.Selection) {
@@ -33,10 +32,7 @@ export module _Drawer {
       this.textArea.selectAll("g").remove();
       var lastStepAttrToProjector = drawSteps[drawSteps.length - 1].attrToProjector;
       if (lastStepAttrToProjector["label"]) {
-        console.log("found label");
         this.drawText(data, lastStepAttrToProjector);
-      } else {
-        console.log("didnt find label");
       }
     }
 
@@ -52,7 +48,7 @@ export module _Drawer {
         var positive = attrToProjector["positive"](d, i);
         var measurement = measurer(text);
         var color = attrToProjector["fill"](d, i);
-        var dark = _Util.Color.contrast('white', color) * 1.6 < _Util.Color.contrast('black', color);
+        var dark = _Util.Color.contrast("white", color) * 1.6 < _Util.Color.contrast("black", color);
         var primary = this._isVertical ? h : w;
         var primarySpace = this._isVertical ? measurement.height : measurement.width;
 
