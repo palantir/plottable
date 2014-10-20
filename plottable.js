@@ -6581,6 +6581,11 @@ var Plottable;
                 };
                 return attrToProjector;
             };
+            /**
+             * Computes the minimum position difference in data space between two adjacent data entries.
+             * Mainly used to compute the size for all bars in the plot.
+             * OrdinalScales default to a value of 1.
+             */
             AbstractBarPlot.prototype._getMinimumDataWidth = function () {
                 var barWidth;
                 var secondaryScale = this._isVertical ? this._xScale : this._yScale;
@@ -6595,6 +6600,14 @@ var Plottable;
                 }
                 return barWidth;
             };
+            /**
+             * Computes the barPixelWidth of all the bars in the plot.
+             *
+             * If the position scale of the plot is an OrdinalScale and in bands mode, then the rangeBands function will be used.
+             * If the position scale of the plot is an OrdinalScale and in points mode, then
+             *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
+             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             */
             AbstractBarPlot.prototype._getBarPixelWidth = function () {
                 var barPixelWidth;
                 var barScale = this._isVertical ? this._xScale : this._yScale;
@@ -6604,9 +6617,12 @@ var Plottable;
                         barPixelWidth = ordScale.rangeBand();
                     }
                     else {
+                        // step is defined as the range_interval / (padding + number of bars)
                         var secondaryDimension = this._isVertical ? this.width() : this.height();
-                        var padding = ordScale._outerPadding * 2;
                         var step = secondaryDimension / (padding + ordScale.domain().length - 1);
+                        // padding is defined as 2 * the ordinal scale's _outerPadding variable
+                        // HACKHACK need to use _outerPadding for formula as above
+                        var padding = ordScale._outerPadding * 2;
                         barPixelWidth = step * padding * 0.6;
                     }
                 }

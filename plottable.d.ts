@@ -2736,7 +2736,20 @@ declare module Plottable {
             _updateYDomainer(): void;
             _updateXDomainer(): void;
             _generateAttrToProjector(): AttributeToProjector;
+            /**
+             * Computes the minimum position difference in data space between two adjacent data entries.
+             * Mainly used to compute the size for all bars in the plot.
+             * OrdinalScales default to a value of 1.
+             */
             _getMinimumDataWidth(): number;
+            /**
+             * Computes the barPixelWidth of all the bars in the plot.
+             *
+             * If the position scale of the plot is an OrdinalScale and in bands mode, then the rangeBands function will be used.
+             * If the position scale of the plot is an OrdinalScale and in points mode, then
+             *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
+             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             */
             _getBarPixelWidth(): number;
         }
     }
