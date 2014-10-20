@@ -47,7 +47,7 @@ export module Dispatcher {
     /**
      * Gets a namespaced version of the event name.
      */
-    private getEventString(eventName: string) {
+    public _getEventString(eventName: string) {
       return eventName + ".dispatcher" + this._plottableID;
     }
 
@@ -60,11 +60,13 @@ export module Dispatcher {
       if (this.connected) {
         throw new Error("Can't connect dispatcher twice!");
       }
-      this.connected = true;
-      Object.keys(this._event2Callback).forEach((event: string) => {
-        var callback = this._event2Callback[event];
-        this._target.on(this.getEventString(event), callback);
-      });
+      if (this._target) {
+        this.connected = true;
+        Object.keys(this._event2Callback).forEach((event: string) => {
+          var callback = this._event2Callback[event];
+          this._target.on(this._getEventString(event), callback);
+        });
+      }
 
       return this;
     }
@@ -76,9 +78,11 @@ export module Dispatcher {
      */
     public disconnect() {
       this.connected = false;
-      Object.keys(this._event2Callback).forEach((event: string) => {
-        this._target.on(this.getEventString(event), null);
-      });
+      if (this._target) {
+        Object.keys(this._event2Callback).forEach((event: string) => {
+          this._target.on(this._getEventString(event), null);
+        });
+      }
       return this;
     }
   }
