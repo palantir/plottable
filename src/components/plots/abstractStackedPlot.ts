@@ -54,14 +54,14 @@ export module Plot {
       var maxStackExtent = _Util.Methods.max<Dataset, number>(datasets, (dataset: Dataset) => {
         return _Util.Methods.max<any, number>(dataset.data(), (datum: any) => {
           return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-        });
-      });
+        }, 0);
+      }, 0);
 
       var minStackExtent = _Util.Methods.min<Dataset, number>(datasets, (dataset: Dataset) => {
         return _Util.Methods.min<any, number>(dataset.data(), (datum: any) => {
           return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-        });
-      });
+        }, 0);
+      }, 0);
 
       this.stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
     }
