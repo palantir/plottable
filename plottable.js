@@ -3360,11 +3360,13 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (_Drawer) {
+        var LABEL_VERTICAL_PADDING = 5;
+        var LABEL_HORIZONTAL_PADDING = 5;
         var RectAndText = (function (_super) {
             __extends(RectAndText, _super);
             function RectAndText(key) {
                 _super.call(this, key);
-                this._allLabelsFitOnSecondaryAttribute = true;
+                this._labelsDidNotFitOnSecondaryAttribute = false;
                 this._isVertical = true;
                 this.svgElement("rect");
             }
@@ -3375,16 +3377,19 @@ var Plottable;
             };
             RectAndText.prototype.draw = function (data, drawSteps) {
                 _super.prototype.draw.call(this, data, drawSteps);
-                this.textArea.selectAll("g").remove();
+                this.removeLabels();
                 var lastStepAttrToProjector = drawSteps[drawSteps.length - 1].attrToProjector;
                 if (lastStepAttrToProjector["label"]) {
                     this.drawText(data, lastStepAttrToProjector);
                 }
             };
+            RectAndText.prototype.removeLabels = function () {
+                this.textArea.selectAll("g").remove();
+            };
             RectAndText.prototype.drawText = function (data, attrToProjector) {
                 var _this = this;
                 var measurer = Plottable._Util.Text.getTextMeasurer(this.textArea.append("text"));
-                this._allLabelsFitOnSecondaryAttribute = true;
+                this._labelsDidNotFitOnSecondaryAttribute = false;
                 var toDraw = data.map(function (d, i) {
                     var text = attrToProjector["label"](d, i).toString();
                     var w = attrToProjector["width"](d, i);
@@ -3397,9 +3402,13 @@ var Plottable;
                     var dark = Plottable._Util.Color.contrast("white", color) * 1.6 < Plottable._Util.Color.contrast("black", color);
                     var primary = _this._isVertical ? h : w;
                     var primarySpace = _this._isVertical ? measurement.height : measurement.width;
-                    _this._allLabelsFitOnSecondaryAttribute = _this._allLabelsFitOnSecondaryAttribute && (_this._isVertical ? measurement.width <= w : measurement.height <= h);
+                    var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
+                    var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
+                    if (secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace) {
+                        _this._labelsDidNotFitOnSecondaryAttribute = true;
+                    }
                     if (measurement.height <= h && measurement.width <= w) {
-                        var offset = Math.min((primary - primarySpace) / 2, 5);
+                        var offset = Math.min((primary - primarySpace) / 2, LABEL_VERTICAL_PADDING);
                         if (!positive) {
                             offset = offset * -1;
                         }
@@ -3415,7 +3424,7 @@ var Plottable;
                         return null;
                     }
                 }).filter(function (d) { return !!d; }); // reject nulls
-                if (this._allLabelsFitOnSecondaryAttribute) {
+                if (!this._labelsDidNotFitOnSecondaryAttribute) {
                     toDraw.forEach(function (t) {
                         var g = _this.textArea.append("g").attr("transform", "translate(" + t.x + "," + t.y + ")");
                         var className = t.dark ? "dark-label" : "light-label";
@@ -6862,6 +6871,9 @@ var Plottable;
                     "y2": this._isVertical ? scaledBaseline : this.height()
                 };
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
+                if (this._getDrawersInOrder().some(function (d) { return d._labelsDidNotFitOnSecondaryAttribute; })) {
+                    this._getDrawersInOrder().forEach(function (d) { return d.removeLabels(); });
+                }
             };
             AbstractBarPlot.prototype._generateDrawSteps = function () {
                 var drawSteps = [];

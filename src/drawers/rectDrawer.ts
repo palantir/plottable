@@ -11,8 +11,11 @@ export module _Drawer {
     positive: boolean;
     dark: boolean;
   }
+
+  var LABEL_VERTICAL_PADDING = 5;
+  var LABEL_HORIZONTAL_PADDING = 5;
   export class RectAndText extends Element {
-    public _allLabelsFitOnSecondaryAttribute = true;
+    public _labelsDidNotFitOnSecondaryAttribute = false;
     public _isVertical = true;
     private textArea: D3.Selection;
 
@@ -29,16 +32,20 @@ export module _Drawer {
 
     public draw(data: any[], drawSteps: DrawStep[]) {
       super.draw(data, drawSteps);
-      this.textArea.selectAll("g").remove();
+      this.removeLabels();
       var lastStepAttrToProjector = drawSteps[drawSteps.length - 1].attrToProjector;
       if (lastStepAttrToProjector["label"]) {
         this.drawText(data, lastStepAttrToProjector);
       }
     }
 
+    public removeLabels() {
+      this.textArea.selectAll("g").remove();
+    }
+
     public drawText(data: any[], attrToProjector: AttributeToProjector) {
       var measurer = _Util.Text.getTextMeasurer(this.textArea.append("text"));
-      this._allLabelsFitOnSecondaryAttribute = true;
+      this._labelsDidNotFitOnSecondaryAttribute = false;
       var toDraw: TextToDraw[] = data.map((d, i) => {
         var text = attrToProjector["label"](d, i).toString();
         var w = attrToProjector["width"](d, i);
@@ -52,10 +59,13 @@ export module _Drawer {
         var primary = this._isVertical ? h : w;
         var primarySpace = this._isVertical ? measurement.height : measurement.width;
 
-        this._allLabelsFitOnSecondaryAttribute = this._allLabelsFitOnSecondaryAttribute &&
-                                                                      (this._isVertical ? measurement.width <= w : measurement.height <= h);
+        var secondaryAttrTextSpace = this._isVertical ? measurement.width : measurement.height;
+        var secondaryAttrAvailableSpace = this._isVertical ? w : h;
+        if (secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace) {
+          this._labelsDidNotFitOnSecondaryAttribute = true;
+        }
         if (measurement.height <= h && measurement.width <= w) {
-          var offset = Math.min((primary - primarySpace) / 2, 5);
+          var offset = Math.min((primary - primarySpace) / 2, LABEL_VERTICAL_PADDING);
           if (!positive) {offset = offset * -1;}
           if (this._isVertical) {
             y += offset;
@@ -67,7 +77,7 @@ export module _Drawer {
           return null;
         }
       }).filter(d => !!d); // reject nulls
-      if (this._allLabelsFitOnSecondaryAttribute) {
+      if (!this._labelsDidNotFitOnSecondaryAttribute) {
         toDraw.forEach((t) => {
           var g = this.textArea.append("g").attr("transform", "translate(" + t.x + "," + t.y + ")");
           var className = t.dark ? "dark-label" : "light-label";

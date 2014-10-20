@@ -211,6 +211,9 @@ export module Plot {
       };
 
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);
+      if (this._getDrawersInOrder().some((d: _Drawer.RectAndText) => d._labelsDidNotFitOnSecondaryAttribute)) {
+        this._getDrawersInOrder().forEach((d: _Drawer.RectAndText) => d.removeLabels());
+      }
     }
 
     public _generateDrawSteps(): _Drawer.DrawStep[] {

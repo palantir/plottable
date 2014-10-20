@@ -1635,11 +1635,12 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class RectAndText extends Element {
-            _allLabelsFitOnSecondaryAttribute: boolean;
+            _labelsDidNotFitOnSecondaryAttribute: boolean;
             _isVertical: boolean;
             constructor(key: string);
             setup(area: D3.Selection): void;
             draw(data: any[], drawSteps: DrawStep[]): void;
+            removeLabels(): void;
             drawText(data: any[], attrToProjector: AttributeToProjector): void;
         }
     }
