@@ -73,28 +73,48 @@ describe("Plots", () => {
       assert.strictEqual((<any> data4[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "positive offset was used");
     });
 
-    it("strings are coerced to numbers for stacking", () => {
+    it("project can be called after addDataset", () => {
       var data1 = [
-        {x: 1, y: "-2"}
+        { a: 1, b: 2 }
       ];
       var data2 = [
-        {x: 1, y: "3"}
-      ];
-      var data3 = [
-        {x: 1, y: "-1"}
-      ];
-      var data4 = [
-        {x: 1, y: "5"}
-      ];
-      var data5 = [
-        {x: 1, y: "1"}
-      ];
-      var data6 = [
-        {x: 1, y: "-1"}
+        { a: 1, b: 4 }
       ];
 
       stackedPlot.addDataset(data1);
       stackedPlot.addDataset(data2);
+
+      assert.isTrue(isNaN((<any> data2[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]), "stacking is initially incorrect");
+
+      stackedPlot.project("x", "a");
+      stackedPlot.project("y", "b");
+
+      assert.strictEqual((<any> data2[0])["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 2, "stacking was done correctly");
+    });
+
+    it("strings are coerced to numbers for stacking", () => {
+      var data1 = [
+        { x: 1, y: "-2" }
+      ];
+      var data2 = [
+        { x: 1, y: "3" }
+      ];
+      var data3 = [
+        { x: 1, y: "-1" }
+      ];
+      var data4 = [
+        { x: 1, y: "5" }
+      ];
+      var data5 = [
+        { x: 1, y: "1" }
+      ];
+      var data6 = [
+        { x: 1, y: "-1" }
+      ];
+
+      stackedPlot.addDataset(data1);
+      stackedPlot.addDataset(data2);
+
       stackedPlot.addDataset(data3);
       stackedPlot.addDataset(data4);
       stackedPlot.addDataset(data5);

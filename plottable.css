@@ -14,17 +14,17 @@ svg.plottable {
   fill: #32313F;
 }
 
-.plottable .bar-label-text-area {
+.plottable .bar-label-text-area text {
   font-family: "Helvetica Neue", sans-serif;
   font-size: 14px;
   /*font-weight: bold;*/
 }
 
-.plottable .light-label {
+.plottable .light-label text {
   fill: white;
 }
 
-.plottable .dark-label {
+.plottable .dark-label text {
   fill: #32313F;
 }
 
