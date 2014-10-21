@@ -1558,14 +1558,14 @@ declare module Plottable {
              *
              * @param{DataStep} step The step, how data should be drawn.
              */
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: DrawStep): number;
             /**
              * Draws the data into the renderArea using the spefic steps
              *
              * @param{any[]} data The data to be drawn
              * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
              */
-            draw(data: any[], drawSteps: DrawStep[]): void;
+            draw(data: any[], drawSteps: DrawStep[]): number;
         }
     }
 }
@@ -1576,7 +1576,7 @@ declare module Plottable {
         class Line extends AbstractDrawer {
             _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: DrawStep): number;
         }
     }
 }
@@ -1593,7 +1593,7 @@ declare module Plottable {
              */
             drawLine(draw: boolean): Area;
             setup(area: D3.Selection): void;
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: DrawStep): number;
         }
     }
 }
@@ -1610,7 +1610,7 @@ declare module Plottable {
              */
             svgElement(tag: string): Element;
             _getDrawSelection(): D3.Selection;
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: DrawStep): number;
             _enterData(data: any[]): void;
         }
     }
@@ -1621,8 +1621,8 @@ declare module Plottable {
     module _Drawer {
         class Arc extends Element {
             constructor(key: string);
-            _drawStep(step: DrawStep): void;
-            draw(data: any[], drawSteps: DrawStep[]): void;
+            _drawStep(step: DrawStep): number;
+            draw(data: any[], drawSteps: DrawStep[]): number;
         }
     }
 }
@@ -2657,7 +2657,7 @@ declare module Plottable {
             datasets(): Dataset[];
             _getDrawersInOrder(): _Drawer.AbstractDrawer[];
             _generateDrawSteps(): _Drawer.DrawStep[];
-            _additionalPaint(): void;
+            _additionalPaint(time: number): void;
             _getDataToDraw(): D3.Map<any[]>;
         }
     }
@@ -3057,6 +3057,10 @@ declare module Plottable {
 
 declare module Plottable {
     module Animator {
+        interface TransitionAndTime {
+            selection: any;
+            time: number;
+        }
         interface PlotAnimator {
             /**
              * Applies the supplied attributes to a D3.Selection with some animation.
@@ -3068,7 +3072,7 @@ declare module Plottable {
              *     transition object so that plots may chain the transitions between
              *     animators.
              */
-            animate(selection: any, attrToProjector: AttributeToProjector): any;
+            animate(selection: any, attrToProjector: AttributeToProjector): TransitionAndTime;
         }
         interface PlotAnimatorMap {
             [animatorKey: string]: PlotAnimator;
@@ -3084,7 +3088,7 @@ declare module Plottable {
          * immediately set on the selection.
          */
         class Null implements PlotAnimator {
-            animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection;
+            animate(selection: any, attrToProjector: AttributeToProjector): TransitionAndTime;
         }
     }
 }
@@ -3131,7 +3135,7 @@ declare module Plottable {
              * @constructor
              */
             constructor();
-            animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition;
+            animate(selection: any, attrToProjector: AttributeToProjector): TransitionAndTime;
             /**
              * Gets the duration of the animation in milliseconds.
              *
@@ -3212,7 +3216,7 @@ declare module Plottable {
             isVertical: boolean;
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
-            animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition;
+            animate(selection: any, attrToProjector: AttributeToProjector): TransitionAndTime;
             _startMovingProjector(attrToProjector: AttributeToProjector): AppliedAccessor;
         }
     }

@@ -64,8 +64,8 @@ export module _Drawer {
      *
      * @param{DataStep} step The step, how data should be drawn.
      */
-    public _drawStep(step: DrawStep) {
-      // no-op
+    public _drawStep(step: DrawStep): number {
+      return 0;
     }
 
     /**
@@ -76,9 +76,16 @@ export module _Drawer {
      */
     public draw(data: any[], drawSteps: DrawStep[]) {
       this._enterData(data);
-      drawSteps.forEach((drawStep) => {
-        this._drawStep(drawStep);
-      });
+      var totalTime = 0;
+      function transitionFunction(i: number) {
+        if (drawSteps[i]) {
+          var time = this._drawStep(drawSteps[i]);
+          totalTime += time;
+          setTimeout(() => transitionFunction(i+1), time);
+        }
+      }
+      transitionFunction(0);
+      return totalTime;
     }
   }
 }

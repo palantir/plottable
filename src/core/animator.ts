@@ -3,6 +3,11 @@
 module Plottable {
 export module Animator {
 
+  export interface TransitionAndTime {
+    selection: any; // a D3.Transition or D3.Selection
+    time: number;
+  }
+
   export interface PlotAnimator {
     /**
      * Applies the supplied attributes to a D3.Selection with some animation.
@@ -14,7 +19,7 @@ export module Animator {
      *     transition object so that plots may chain the transitions between
      *     animators.
      */
-    animate(selection: any, attrToProjector: AttributeToProjector): any;
+    animate(selection: any, attrToProjector: AttributeToProjector): TransitionAndTime;
   }
 
   export interface PlotAnimatorMap {
