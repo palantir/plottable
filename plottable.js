@@ -208,8 +208,6 @@ var Plottable;
             }
             Methods.objEq = objEq;
             function max(arr, one, two) {
-                if (one === void 0) { one = 0; }
-                if (two === void 0) { two = 0; }
                 if (arr.length === 0) {
                     if (typeof (one) !== "function") {
                         return one;
@@ -225,8 +223,6 @@ var Plottable;
             }
             Methods.max = max;
             function min(arr, one, two) {
-                if (one === void 0) { one = 0; }
-                if (two === void 0) { two = 0; }
                 if (arr.length === 0) {
                     if (typeof (one) !== "function") {
                         return one;
