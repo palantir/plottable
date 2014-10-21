@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class StackedBar<X,Y> extends AbstractStacked<X, Y> {
+  export class StackedBar<X,Y> extends AbstractBarPlot<X, Y> {
     public _baselineValue: number;
     public _baseline: D3.Selection;
     public _barAlignmentFactor: number;
@@ -27,10 +27,6 @@ export module Plot {
       this._isVertical = isVertical;
     }
 
-    public _setup() {
-      AbstractBarPlot.prototype._setup.call(this);
-    }
-
     public _getAnimator(key: string): Animator.PlotAnimator {
       if(this._animate && this._animateOnNextRender) {
         var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
@@ -39,10 +35,6 @@ export module Plot {
       } else {
         return new Animator.Null();
       }
-    }
-
-    public _getDrawer(key: string) {
-      return AbstractBarPlot.prototype._getDrawer.apply(this, [key]);
     }
 
     public _generateAttrToProjector() {
@@ -64,25 +56,55 @@ export module Plot {
       return attrToProjector;
     }
 
-     public _additionalPaint() {
-      AbstractBarPlot.prototype._additionalPaint.apply(this);
+    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
+      super.project(attrToSet, accessor, scale);
+      AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
+      return this;
     }
 
-    public baseline(value: number) {
-      return AbstractBarPlot.prototype.baseline.apply(this, [value]);
+    public _onDatasetUpdate() {
+      super._onDatasetUpdate();
+      AbstractStacked.prototype._onDatasetUpdate.apply(this);
+      return this;
     }
 
-    public _updateDomainer(scale: Scale.AbstractScale<any,number>) {
-      return AbstractBarPlot.prototype._updateDomainer.apply(this, [scale]);
+    //===== Stack logic from AbstractStackedPlot =====
+    public _updateStackOffsets() {
+      AbstractStacked.prototype._updateStackOffsets.apply(this);
     }
 
-    public _updateXDomainer() {
-      return AbstractBarPlot.prototype._updateXDomainer.apply(this);
+    public _updateStackExtents() {
+      AbstractStacked.prototype._updateStackExtents.apply(this);
     }
 
-    public _updateYDomainer() {
-      return AbstractBarPlot.prototype._updateYDomainer.apply(this);
+    public _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
+      return AbstractStacked.prototype._stack.apply(this, [dataArray]);
     }
+
+    public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
+      AbstractStacked.prototype._setDatasetStackOffsets.apply(this, [positiveDataMapArray, negativeDataMapArray]);
+    }
+
+    public _getDomainKeys() {
+      return AbstractStacked.prototype._getDomainKeys.apply(this);
+    }
+
+    public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
+      return AbstractStacked.prototype._generateDefaultMapArray.apply(this);
+    }
+
+    public _updateScaleExtents() {
+      AbstractStacked.prototype._updateScaleExtents.apply(this);
+    }
+
+    public _keyAccessor(): AppliedAccessor {
+      return AbstractStacked.prototype._keyAccessor.apply(this);
+    }
+
+    public _valueAccessor(): AppliedAccessor {
+      return AbstractStacked.prototype._valueAccessor.apply(this);
+    }
+    //===== /Stack logic =====
   }
 }
 }
