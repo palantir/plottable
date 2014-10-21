@@ -23,6 +23,7 @@ export module Plot {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
+      this._animators["baseline"] = new Animator.Null();
       this.baseline(this._baselineValue);
       this._isVertical = isVertical;
     }
@@ -32,7 +33,10 @@ export module Plot {
     }
 
     public _getAnimator(key: string): Animator.PlotAnimator {
-      if(this._animate && this._animateOnNextRender) {
+      if (this._animate && this._animateOnNextRender) {
+        if (this._animators[key]) {
+          return this._animators[key];
+        }
         var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
         var scaledBaseline = primaryScale.scale(this._baselineValue);
         return new Animator.MovingRect(scaledBaseline, this._isVertical);
@@ -64,8 +68,12 @@ export module Plot {
       return attrToProjector;
     }
 
-     public _additionalPaint() {
+    public _additionalPaint() {
       AbstractBarPlot.prototype._additionalPaint.apply(this);
+    }
+
+    public _generateDrawSteps(): _Drawer.DrawStep[] {
+      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar")}];
     }
 
     public baseline(value: number) {

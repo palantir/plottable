@@ -7420,6 +7420,7 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.classed("bar-plot", true);
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
+                this._animators["baseline"] = new Plottable.Animator.Null();
                 this.baseline(this._baselineValue);
                 this._isVertical = isVertical;
             }
@@ -7428,6 +7429,9 @@ var Plottable;
             };
             StackedBar.prototype._getAnimator = function (key) {
                 if (this._animate && this._animateOnNextRender) {
+                    if (this._animators[key]) {
+                        return this._animators[key];
+                    }
                     var primaryScale = this._isVertical ? this._yScale : this._xScale;
                     var scaledBaseline = primaryScale.scale(this._baselineValue);
                     return new Plottable.Animator.MovingRect(scaledBaseline, this._isVertical);
@@ -7457,6 +7461,9 @@ var Plottable;
             };
             StackedBar.prototype._additionalPaint = function () {
                 Plot.AbstractBarPlot.prototype._additionalPaint.apply(this);
+            };
+            StackedBar.prototype._generateDrawSteps = function () {
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar") }];
             };
             StackedBar.prototype.baseline = function (value) {
                 return Plot.AbstractBarPlot.prototype.baseline.apply(this, [value]);

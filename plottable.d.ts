@@ -3046,6 +3046,7 @@ declare module Plottable {
             _getDrawer(key: string): any;
             _generateAttrToProjector(): any;
             _additionalPaint(): void;
+            _generateDrawSteps(): _Drawer.DrawStep[];
             baseline(value: number): any;
             _updateDomainer(scale: Scale.AbstractScale<any, number>): any;
             _updateXDomainer(): any;
