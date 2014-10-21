@@ -30,6 +30,19 @@ export module Plot {
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
+    public _updateStackOffsets() {
+      var domainKeys = this._getDomainKeys();
+      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+      this._datasetKeysInOrder.forEach((datasetKey) => {
+        var dataset = this._key2DatasetDrawerKey.get(datasetKey).dataset;
+        var datasetDomainKeys = dataset.data().map((datum) => keyAccessor(datum).toString());
+        if (domainKeys.some((domainKey) => datasetDomainKeys.indexOf(domainKey) === -1)) {
+          _Util.Methods.warn("dataset " + datasetKey + " does not contain all domain keys.  Plot may have unintended behavior.");
+        }
+      });
+      super._updateStackOffsets();
+    }
+
     public _additionalPaint() {
       var scaledBaseline = this._yScale.scale(this._baselineValue);
       var baselineAttr: any = {

@@ -2995,6 +2995,8 @@ declare module Plottable {
             _isVertical: boolean;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractStacked<X, Y>;
             _onDatasetUpdate(): void;
+            _updateStackOffsets(): void;
+            _getDomainKeys(): string[];
             _updateScaleExtents(): void;
         }
     }
@@ -3016,6 +3018,7 @@ declare module Plottable {
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _getDrawer(key: string): _Drawer.Area;
             _setup(): void;
+            _updateStackOffsets(): void;
             _additionalPaint(): void;
             _updateYDomainer(): void;
             _onDatasetUpdate(): void;

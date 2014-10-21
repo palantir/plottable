@@ -7177,7 +7177,7 @@ var Plottable;
             AbstractStacked.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 if (this._projectors["x"] && this._projectors["y"] && (attrToSet === "x" || attrToSet === "y")) {
-                    this.updateStackOffsets();
+                    this._updateStackOffsets();
                 }
                 return this;
             };
@@ -7185,12 +7185,12 @@ var Plottable;
                 _super.prototype._onDatasetUpdate.call(this);
                 // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
                 if (this._datasetKeysInOrder && this._projectors["x"] && this._projectors["y"]) {
-                    this.updateStackOffsets();
+                    this._updateStackOffsets();
                 }
             };
-            AbstractStacked.prototype.updateStackOffsets = function () {
+            AbstractStacked.prototype._updateStackOffsets = function () {
                 var dataMapArray = this.generateDefaultMapArray();
-                var domainKeys = this.getDomainKeys();
+                var domainKeys = this._getDomainKeys();
                 var positiveDataMapArray = dataMapArray.map(function (dataMap) {
                     return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) };
@@ -7232,7 +7232,7 @@ var Plottable;
                 var outFunction = function (d, y0, y) {
                     d.offset = y0;
                 };
-                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return +d.value; }).values(function (d) { return _this.getDomainKeys().map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
+                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return +d.value; }).values(function (d) { return _this._getDomainKeys().map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
                 return dataArray;
             };
             /**
@@ -7259,7 +7259,7 @@ var Plottable;
                     });
                 });
             };
-            AbstractStacked.prototype.getDomainKeys = function () {
+            AbstractStacked.prototype._getDomainKeys = function () {
                 var keyAccessor = this.keyAccessor();
                 var domainKeys = d3.set();
                 var datasets = this.datasets();
@@ -7274,7 +7274,7 @@ var Plottable;
                 var keyAccessor = this.keyAccessor();
                 var valueAccessor = this.valueAccessor();
                 var datasets = this.datasets();
-                var domainKeys = this.getDomainKeys();
+                var domainKeys = this._getDomainKeys();
                 var dataMapArray = datasets.map(function () {
                     return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: 0 };
@@ -7347,6 +7347,19 @@ var Plottable;
             StackedArea.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
+            };
+            StackedArea.prototype._updateStackOffsets = function () {
+                var _this = this;
+                var domainKeys = this._getDomainKeys();
+                var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                this._datasetKeysInOrder.forEach(function (datasetKey) {
+                    var dataset = _this._key2DatasetDrawerKey.get(datasetKey).dataset;
+                    var datasetDomainKeys = dataset.data().map(function (datum) { return keyAccessor(datum).toString(); });
+                    if (domainKeys.some(function (domainKey) { return datasetDomainKeys.indexOf(domainKey) === -1; })) {
+                        Plottable._Util.Methods.warn("dataset " + datasetKey + " does not contain all domain keys.  Plot may have unintended behavior.");
+                    }
+                });
+                _super.prototype._updateStackOffsets.call(this);
             };
             StackedArea.prototype._additionalPaint = function () {
                 var scaledBaseline = this._yScale.scale(this._baselineValue);

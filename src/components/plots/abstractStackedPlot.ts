@@ -15,7 +15,7 @@ export module Plot {
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (this._projectors["x"] && this._projectors["y"] && (attrToSet === "x" || attrToSet === "y")) {
-        this.updateStackOffsets();
+        this._updateStackOffsets();
       }
       return this;
     }
@@ -24,13 +24,13 @@ export module Plot {
       super._onDatasetUpdate();
       // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
       if (this._datasetKeysInOrder && this._projectors["x"]  && this._projectors["y"]) {
-        this.updateStackOffsets();
+        this._updateStackOffsets();
       }
     }
 
-    private updateStackOffsets() {
+    public _updateStackOffsets() {
       var dataMapArray = this.generateDefaultMapArray();
-      var domainKeys = this.getDomainKeys();
+      var domainKeys = this._getDomainKeys();
 
       var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
         return _Util.Methods.populateMap(domainKeys, (domainKey) => {
@@ -83,7 +83,7 @@ export module Plot {
       d3.layout.stack()
                .x((d) => d.key)
                .y((d) => +d.value)
-               .values((d) => this.getDomainKeys().map((domainKey) => d.get(domainKey)))
+               .values((d) => this._getDomainKeys().map((domainKey) => d.get(domainKey)))
                .out(outFunction)(dataArray);
 
       return dataArray;
@@ -116,7 +116,7 @@ export module Plot {
       });
     }
 
-    private getDomainKeys(): string[] {
+    public _getDomainKeys(): string[] {
       var keyAccessor = this.keyAccessor();
       var domainKeys = d3.set();
       var datasets = this.datasets();
@@ -134,7 +134,7 @@ export module Plot {
       var keyAccessor = this.keyAccessor();
       var valueAccessor = this.valueAccessor();
       var datasets = this.datasets();
-      var domainKeys = this.getDomainKeys();
+      var domainKeys = this._getDomainKeys();
 
       var dataMapArray = datasets.map(() => {
         return _Util.Methods.populateMap(domainKeys, (domainKey) => {
