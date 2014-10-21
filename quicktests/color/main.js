@@ -166,9 +166,9 @@ function prepareData(seriesNumber){
 }
 
 function initialize(){
-  var seriesNumber = Number(document.getElementById("series").value);
-  plotwidth = Number(document.getElementById("width").value);
-  plotheight = Number(document.getElementById("height").value);
+  var seriesNumber = Number(d3.select("#series").node().value);
+  plotwidth = Number(d3.select("#width").node().value);
+  plotheight = Number(d3.select("#height").node().value);
 
   d3.selectAll("svg").remove();
   var dataArray = prepareData(seriesNumber);
