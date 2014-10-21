@@ -13,6 +13,7 @@ export module Axis {
     public _majorTickLabels: D3.Selection;
     public _minorTickLabels: D3.Selection;
     public _scale: Scale.Time;
+    public _isUTC: boolean;
 
     // default intervals
     // these are for minor tick labels
@@ -92,11 +93,12 @@ export module Axis {
      * @param {TimeScale} scale The scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom)
      */
-    constructor(scale: Scale.Time, orientation: string) {
+    constructor(scale: Scale.Time, orientation: string, isUTC: boolean) {
       orientation = orientation.toLowerCase();
       if (orientation !== "top" && orientation !== "bottom") {
         throw new Error ("unsupported orientation: " + orientation);
       }
+      this._isUTC = isUTC; 
       super(scale, orientation);
       this.classed("time-axis", true);
       this.tickLabelPadding(5);
@@ -121,8 +123,9 @@ export module Axis {
     }
 
     private getIntervalLength(interval: _TimeInterval) {
+      var tzTimeUnit = this._isUTC ? interval.timeUnit.utc : interval.timeUnit;
       var startDate = this._scale.domain()[0];
-      var endDate = interval.timeUnit.offset(startDate, interval.step);
+      var endDate = tzTimeUnit.offset(startDate, interval.step);
       if (endDate > this._scale.domain()[1]) {
         // this offset is too large, so just return available width
         return this.width();
@@ -163,7 +166,8 @@ export module Axis {
     }
 
     public _getTickIntervalValues(interval: _TimeInterval): any[] {
-      return this._scale._tickInterval(interval.timeUnit, interval.step);
+      var tzTimeUnit = this._isUTC ? interval.timeUnit.utc : interval.timeUnit;
+      return this._scale._tickInterval(tzTimeUnit, interval.step);
     }
 
     public _getTickValues(): any[] {
@@ -182,7 +186,8 @@ export module Axis {
 
     private renderTickLabels(container: D3.Selection, interval: _TimeInterval, height: number) {
       container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
-      var tickPos = this._scale._tickInterval(interval.timeUnit,
+      var tzTimeUnit = this._isUTC ? interval.timeUnit.utc : interval.timeUnit;
+      var tickPos = this._scale._tickInterval(tzTimeUnit,
                                               interval.step);
       tickPos.splice(0, 0, this._scale.domain()[0]);
       tickPos.push(this._scale.domain()[1]);
@@ -214,7 +219,8 @@ export module Axis {
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
       var anchor = shouldCenterText ? "middle" : "start";
-      tickLabels.selectAll("text").text((d: any) => d3.time.format(interval.formatString)(d))
+      var formatter = this._isUTC ? d3.time.format.utc : d3.time.format;
+      tickLabels.selectAll("text").text((d: any) => formatter(interval.formatString)(d))
                                   .style("text-anchor", anchor);
     }
 
