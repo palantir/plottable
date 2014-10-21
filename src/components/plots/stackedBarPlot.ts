@@ -36,13 +36,14 @@ export module Plot {
       if (this._animate && this._animateOnNextRender) {
         if (this._animators[key]) {
           return this._animators[key];
+        } else if (key === "stacked-bar") {
+          var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+          var scaledBaseline = primaryScale.scale(this._baselineValue);
+          return new Animator.MovingRect(scaledBaseline, this._isVertical);
         }
-        var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-        var scaledBaseline = primaryScale.scale(this._baselineValue);
-        return new Animator.MovingRect(scaledBaseline, this._isVertical);
-      } else {
-        return new Animator.Null();
       }
+
+      return new Animator.Null();
     }
 
     public _getDrawer(key: string) {

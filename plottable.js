@@ -7432,13 +7432,13 @@ var Plottable;
                     if (this._animators[key]) {
                         return this._animators[key];
                     }
-                    var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                    var scaledBaseline = primaryScale.scale(this._baselineValue);
-                    return new Plottable.Animator.MovingRect(scaledBaseline, this._isVertical);
+                    else if (key === "stacked-bar") {
+                        var primaryScale = this._isVertical ? this._yScale : this._xScale;
+                        var scaledBaseline = primaryScale.scale(this._baselineValue);
+                        return new Plottable.Animator.MovingRect(scaledBaseline, this._isVertical);
+                    }
                 }
-                else {
-                    return new Plottable.Animator.Null();
-                }
+                return new Plottable.Animator.Null();
             };
             StackedBar.prototype._getDrawer = function (key) {
                 return Plot.AbstractBarPlot.prototype._getDrawer.apply(this, [key]);
