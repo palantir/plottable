@@ -3026,6 +3026,22 @@ var Plottable;
                 };
             }
             TickGenerators.intervalTickGenerator = intervalTickGenerator;
+            /**
+             * Creates a tick generator that will return only integer ticks.
+             *
+             * Filters the integers from defaultTicks and returns them.
+             *
+             * Will also include the end ticks.
+             *
+             * @returns {TickGenerator} A tick generator returning only integer ticks.
+             */
+            function integerTickGenerator() {
+                return function (s) {
+                    var defaultTicks = s.getDefaultTicks();
+                    return defaultTicks.filter(function (tick, i) { return tick % 1 === 0; });
+                };
+            }
+            TickGenerators.integerTickGenerator = integerTickGenerator;
         })(Scale.TickGenerators || (Scale.TickGenerators = {}));
         var TickGenerators = Scale.TickGenerators;
     })(Plottable.Scale || (Plottable.Scale = {}));
