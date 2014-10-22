@@ -45,6 +45,7 @@ describe("_Util.Methods", () => {
   it("max/min work as expected", () => {
     var alist = [1,2,3,4,5];
     var dbl = (x: number) => x * 2;
+    var dblIndexOffset = (x: number, i: number) => x * 2 - i;
     var today = new Date();
     var numToDate = (x: number) => { var t = new Date(); t.setDate(today.getDate() + x); return t; };
     var max = Plottable._Util.Methods.max;
@@ -52,6 +53,7 @@ describe("_Util.Methods", () => {
 
     assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
     assert.deepEqual(max(alist, dbl, 0), 10, "max applies function appropriately");
+    assert.deepEqual(max(alist, dblIndexOffset, 5), 6, "max applies function with index");
     assert.deepEqual(max(alist, numToDate, today), numToDate(5), "max applies non-numeric function appropriately");
     assert.deepEqual(max([], 10), 10, "works as intended with default value");
     assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
@@ -59,6 +61,7 @@ describe("_Util.Methods", () => {
 
     assert.deepEqual(min(alist, 0), 1, "min works for basic list");
     assert.deepEqual(min(alist, dbl, 0), 2, "min works with function arg");
+    assert.deepEqual(min(alist, dblIndexOffset, 0), 2, "min works with function index arg");
     assert.deepEqual(min(alist, numToDate, today), numToDate(1), "min works with non-numeric function arg");
     assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
     assert.deepEqual(min([], numToDate, today), today, "min accepts non-numeric default and function");
