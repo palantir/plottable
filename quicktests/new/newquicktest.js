@@ -3,20 +3,27 @@ var qtestnames = [];
 var firstBranch;
 var secondBranch;
 var first = true; //boolean to set order
+var newWidth = Number($("#width").val());
+var newHeight = Number($("#height").val());
 
-function renderPlots(){
-  var dropdown = $("#category")[0];
-  firstBranch = $("#branch1")[0].value;
-  secondBranch = $("#branch2")[0].value;
-  var category = dropdown.options[dropdown.selectedIndex].value;
+
+function initialize(){
   var branches = [];
+  var dropdown = $("#category")[0];
+  var category = dropdown.options[dropdown.selectedIndex].value;
+
+  firstBranch = $("#branch1").val();
+  secondBranch = $("#branch2").val();
+  newWidth = Number($("#width").val());
+  newHeight = Number($("#height").val());
+
   branches.push(firstBranch, secondBranch);
   clearTests();
 
-  pushBranchToArray(category, branches);
+  loadPlottableBranches(category, branches);
 }
 
-function loadQuickTests(category, branchList){
+function filterQuickTests(category, branchList){
   //filter list of quicktests to list of quicktest names to pass to doSomething
   d3.json("list_of_quicktests.json", function (data){
     data.forEach(function(quicktestobj){
@@ -38,25 +45,12 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
 
   var div = d3.select("#results");
 
-  // if(order){
-  //   //div = $("#result1");
-  //   div = d3.select("#result1");
-  // }
-  // else {
-  //   //div = $("#result2");
-  //   div = d3.select("#result2");
-  // }
-
-  // make all divs here
-
-  //CHECK IF CLASS QUICKTEST QUICKTESTNAME EXISTS. if doesnt, then create, then append. if there is, then just append.
   quickTestNames.forEach(function(q) { //for each quicktest 
     var name = q;
     d3.text("/quicktests/new/list/" + category + "/" + name + ".js", function(error, text) {
       if (error !== null) {
         console.warn("Tried to load nonexistant quicktest " + name);
         return;
-      }        
       text = "(function(){" + text +
           "\nreturn {makeData: makeData, run: run};" +
                "})();" +
@@ -65,7 +59,7 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
       result = eval(text);
       var className = "quicktest " + name;
       //div.append("<div class='" + name + "'> </div>"); //create specific div for a specific quicktest
-      var div = d3.select("#results").append("div").attr("class", className);
+      var div = d3.select("#results").append("div").attr("class", className).attr("width", newWidth).attr("height", newHeight);;
       var firstdiv = div.append("div").attr("class", "first");
       var seconddiv = div.append("div").attr("class", "second");
       var data = result.makeData();
@@ -79,7 +73,7 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
 
 //METHODS
 
-function pushBranchToArray(category, branchList){
+function loadPlottableBranches(category, branchList){
   var listOfUrl = [];
   var branchName1 = branchList[0];
   var branchName2 = branchList[1];
@@ -105,7 +99,7 @@ function pushBranchToArray(category, branchList){
       $.getScript(listOfUrl[1], function(data, testStatus){ //load second 
         if(textStatus === "success"){
           plottableBranches[branchName2] = Plottable;
-          loadQuickTests(category, branchList);
+          filterQuickTests(category, branchList);
         }
       });
       console.log("success!")
@@ -117,12 +111,10 @@ function pushBranchToArray(category, branchList){
   });
 }
 
-
 //run a single quicktest
 function runQuickTest(div, data, branch){
   result.run(div, data, plottableBranches[branch])
 };
-
 
 function clearTests(){
   plottableBranches = [];
@@ -173,9 +165,20 @@ window.onkeyup = function(e){
   }
 }
 
-
-
-
+function showSizeControls(){
+  var buttonstatus = $("#expand").val()
+  if (buttonstatus == "+"){
+    $( ".size-controls" ).slideDown( 300, function() {
+      $(this).focus();
+      $("#expand").val("-");
+    }); 
+  }
+  else{
+    $( ".size-controls" ).slideUp( 300, function() {
+      $("#expand").val("+");
+    });
+  }
+}
 
 
 

@@ -26,16 +26,26 @@
     </select>
 
     <input type="text" id="branch1" name="branch1" value="master" placeholder="1st branch (ex. master)">
-    </input>
 
     <input type="text" id="branch2" name="branch2" value="develop" placeholder="2nd branch (ex. develop)">
-    </input>
     
-    <input id="render" type="submit" value="Compare!" onclick="renderPlots();">
+    <input id="render" type="submit" class="button" value="Compare!" onclick="renderPlots();">
+
+    <input id="expand" type="button" class="button" value="+" onclick="showSizeControls();">
+      
+  </div>
+</div>
+
+<div class="size-controls">
+  <div class="control-knobs">
+    <input type="text" id="width" name="width" value="500" placeholder="svg width">
+
+    <input type="text" id="height" name="height" value="400" placeholder="svg height">
   </div>
 </div>
 
 <div id="results">
+
 </div>
 
 </body>

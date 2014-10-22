@@ -7,8 +7,8 @@ h2{
 }
 
 svg{
-/*  position: relative;
-*/  width: 500px;
+  position: relative;
+  width: 500px;
   height: 400px;
 }
 
@@ -52,10 +52,9 @@ svg{
 .control-knobs{
   margin-top: 10px;
   color: white;
-    font-family: sans-serif;
+  font-family: sans-serif;
   font-weight: 100;
   font-size: 13px;
-
 }
 
 input, select{
@@ -63,7 +62,7 @@ input, select{
   border: solid 1px;
   border-color: white;
   border-radius: 5;
-  width: 150px;
+  width: auto;
   height: 30px;
   font-family: sans-serif;
   font-weight: 100;
@@ -71,9 +70,31 @@ input, select{
   text-align: center;
 }
 
-#render{
+.button{
   background-color: white;
-  width: auto;
 }
 
+.button:hover{
+  background-color: whitesmoke;
+}
 
+.button:active{
+  background-color: white;
+}
+
+.size-controls{
+  background-color: #41407D;
+  width: 100%;
+  height: 50px;
+  position: fixed;
+  text-align: center;
+  z-index: 1;
+  left: 0px;
+  display:none;
+}
+
+#expand{
+  width: 25px;
+  height: 25px;
+  text-align: center;
+}
