@@ -7349,16 +7349,12 @@ var Plottable;
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
             StackedArea.prototype._updateStackOffsets = function () {
-                var _this = this;
                 var domainKeys = this._getDomainKeys();
                 var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                this._datasetKeysInOrder.forEach(function (datasetKey) {
-                    var dataset = _this._key2DatasetDrawerKey.get(datasetKey).dataset;
-                    var datasetDomainKeys = dataset.data().map(function (datum) { return keyAccessor(datum).toString(); });
-                    if (domainKeys.some(function (domainKey) { return datasetDomainKeys.indexOf(domainKey) === -1; })) {
-                        Plottable._Util.Methods.warn("dataset " + datasetKey + " does not contain all domain keys.  Plot may have unintended behavior.");
-                    }
-                });
+                var keySets = this.datasets().map(function (dataset) { return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i).toString(); })).values(); });
+                if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
+                    Plottable._Util.Methods.warn("datasets do not contain all domain keys.  Plot may have unintended behavior.");
+                }
                 _super.prototype._updateStackOffsets.call(this);
             };
             StackedArea.prototype._additionalPaint = function () {
