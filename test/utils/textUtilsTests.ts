@@ -137,10 +137,8 @@ describe("_Util.Text", () => {
       var style = window.getComputedStyle(svg.node());
       var errString = "";
       for(var i = 0; i < style.length; i++) {
-        if(style[i].indexOf("font-") === 0 ) {
-          var prop: any = style[i];
-          errString += prop + ": " + style[prop] + " ";
-        }
+        var prop: any = style[i];
+        errString += prop + ": " + style[prop] + " ";
       }
       assert.isTrue(false, errString);
       assert.isTrue(measureResults.textFits, "mesurement mode: text fits");
