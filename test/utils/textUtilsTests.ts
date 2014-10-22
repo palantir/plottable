@@ -142,11 +142,12 @@ describe("_Util.Text", () => {
 
       var writeOptions = {g: svg, xAlign: "left", yAlign: "top"};
       var writeResults = Plottable._Util.Text.writeText("hello world", width, height, measure, "left", writeOptions);
+      var style = window.getComputedStyle(svg.node());
+      var errString = String(style["font"]);
+      assert.isTrue(false, errString);
       assert.isTrue(writeResults.textFits, "write mode: text fits");
       assert.equal(measureResults.usedWidth, writeResults.usedWidth,  "write mode: used the same width as measurement");
       assert.equal(measureResults.usedHeight, writeResults.usedHeight, "write mode: used the same height as measurement");
-      var style = window.getComputedStyle(svg.node());
-      assert.isTrue(false, style["font"]);
       svg.remove();
     });
   });
