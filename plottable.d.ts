@@ -1558,7 +1558,8 @@ declare module Plottable {
              *
              * @param{DataStep} step The step, how data should be drawn.
              */
-            _drawStep(step: DrawStep): number;
+            _drawStep(step: DrawStep): void;
+            _numberOfAnimationIterations(data: any[]): number;
             /**
              * Draws the data into the renderArea using the spefic steps
              *
@@ -1576,7 +1577,8 @@ declare module Plottable {
         class Line extends AbstractDrawer {
             _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
-            _drawStep(step: DrawStep): number;
+            _numberOfAnimationIterations(data: any[]): number;
+            _drawStep(step: DrawStep): void;
         }
     }
 }
@@ -1593,7 +1595,7 @@ declare module Plottable {
              */
             drawLine(draw: boolean): Area;
             setup(area: D3.Selection): void;
-            _drawStep(step: DrawStep): number;
+            _drawStep(step: DrawStep): void;
         }
     }
 }
@@ -1610,7 +1612,7 @@ declare module Plottable {
              */
             svgElement(tag: string): Element;
             _getDrawSelection(): D3.Selection;
-            _drawStep(step: DrawStep): number;
+            _drawStep(step: DrawStep): void;
             _enterData(data: any[]): void;
         }
     }
@@ -1621,7 +1623,7 @@ declare module Plottable {
     module _Drawer {
         class Arc extends Element {
             constructor(key: string);
-            _drawStep(step: DrawStep): number;
+            _drawStep(step: DrawStep): void;
             draw(data: any[], drawSteps: DrawStep[]): number;
         }
     }
@@ -2832,7 +2834,7 @@ declare module Plottable {
             _updateDomainer(scale: Scale.AbstractScale<any, number>): void;
             _updateYDomainer(): void;
             _updateXDomainer(): void;
-            _additionalPaint(): void;
+            _additionalPaint(time: number): void;
             _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
             /**
@@ -3057,10 +3059,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Animator {
-        interface TransitionAndTime {
-            selection: any;
-            time: number;
-        }
         interface PlotAnimator {
             /**
              * Applies the supplied attributes to a D3.Selection with some animation.
@@ -3072,7 +3070,13 @@ declare module Plottable {
              *     transition object so that plots may chain the transitions between
              *     animators.
              */
-            animate(selection: any, attrToProjector: AttributeToProjector): TransitionAndTime;
+            animate(selection: any, attrToProjector: AttributeToProjector): any;
+            /**
+             * Given the number of elements, return the total time the animation requires
+             * @param number numberofIterations The number of elements that will be drawn
+             * @returns {any} The time required for the animation
+             */
+            getTiming(numberOfIterations: number): number;
         }
         interface PlotAnimatorMap {
             [animatorKey: string]: PlotAnimator;
@@ -3088,7 +3092,8 @@ declare module Plottable {
          * immediately set on the selection.
          */
         class Null implements PlotAnimator {
-            animate(selection: any, attrToProjector: AttributeToProjector): TransitionAndTime;
+            getTiming(selection: any): number;
+            animate(selection: any, attrToProjector: AttributeToProjector): any;
         }
     }
 }
@@ -3135,7 +3140,8 @@ declare module Plottable {
              * @constructor
              */
             constructor();
-            animate(selection: any, attrToProjector: AttributeToProjector): TransitionAndTime;
+            getTiming(numberOfIterations: number): number;
+            animate(selection: any, attrToProjector: AttributeToProjector): any;
             /**
              * Gets the duration of the animation in milliseconds.
              *
@@ -3216,7 +3222,7 @@ declare module Plottable {
             isVertical: boolean;
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
-            animate(selection: any, attrToProjector: AttributeToProjector): TransitionAndTime;
+            animate(selection: any, attrToProjector: AttributeToProjector): any;
             _startMovingProjector(attrToProjector: AttributeToProjector): AppliedAccessor;
         }
     }

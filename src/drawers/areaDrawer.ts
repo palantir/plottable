@@ -51,11 +51,10 @@ export module _Drawer {
     }
 
     public _drawStep(step: DrawStep) {
-      var baseTime: number;
       if (this._drawLine) {
-        baseTime = super._drawStep(step);
+        super._drawStep(step);
       } else {
-        baseTime = AbstractDrawer.prototype._drawStep.call(this, step);
+        AbstractDrawer.prototype._drawStep.call(this, step);
       }
 
       var attrToProjector = <AttributeToProjector>_Util.Methods.copyMap(step.attrToProjector);
@@ -75,8 +74,7 @@ export module _Drawer {
       if (attrToProjector["fill"]) {
         this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
-      var time = step.animator.animate(this.areaSelection, attrToProjector).time;
-      return Math.max(baseTime, time);
+      step.animator.animate(this.areaSelection, attrToProjector);
     }
   }
 }

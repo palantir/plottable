@@ -20,13 +20,11 @@ export module _Drawer {
     }
 
     public _drawStep(step: DrawStep) {
-      var superTime = super._drawStep(step);
       var drawSelection = this._getDrawSelection();
       if (step.attrToProjector["fill"]) {
         drawSelection.attr("fill", step.attrToProjector["fill"]); // so colors don't animate
       }
-      var selectionAndTime = step.animator.animate(drawSelection, step.attrToProjector);
-      return Math.max(superTime, selectionAndTime.time);
+      step.animator.animate(drawSelection, step.attrToProjector);
     }
 
     public _enterData(data: any[]) {

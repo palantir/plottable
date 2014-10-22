@@ -27,6 +27,10 @@ export module _Drawer {
                    .defined(definedFunction);
     }
 
+    public _numberOfAnimationIterations(data: any[]): number {
+      return 1;
+    }
+
     public _drawStep(step: DrawStep) {
       var baseTime = super._drawStep(step);
       var attrToProjector = <AttributeToProjector>_Util.Methods.copyMap(step.attrToProjector);
@@ -44,8 +48,7 @@ export module _Drawer {
       if (attrToProjector["fill"]) {
         this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
-      var time = step.animator.animate(this.pathSelection, attrToProjector).time;
-      return Math.max(baseTime, time);
+      step.animator.animate(this.pathSelection, attrToProjector);
     }
   }
 }

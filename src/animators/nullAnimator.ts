@@ -8,8 +8,12 @@ export module Animator {
    * immediately set on the selection.
    */
   export class Null implements PlotAnimator {
-    public animate(selection: any, attrToProjector: AttributeToProjector): TransitionAndTime {
-      return {selection: selection.attr(attrToProjector), time: 0};
+
+    public getTiming(selection: any) {
+      return 0;
+    }
+    public animate(selection: any, attrToProjector: AttributeToProjector): any {
+      return selection.attr(attrToProjector);
     }
   }
 

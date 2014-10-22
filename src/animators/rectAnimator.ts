@@ -19,7 +19,7 @@ export module Animator {
       this.isReverse = isReverse;
     }
 
-    public animate(selection: any, attrToProjector: AttributeToProjector): TransitionAndTime {
+    public animate(selection: any, attrToProjector: AttributeToProjector) {
       var startAttrToProjector: AttributeToProjector = {};
       Rect.ANIMATED_ATTRIBUTES.forEach((attr: string) => startAttrToProjector[attr] = attrToProjector[attr]);
 

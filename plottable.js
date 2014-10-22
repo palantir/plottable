@@ -3105,7 +3105,10 @@ var Plottable;
              * @param{DataStep} step The step, how data should be drawn.
              */
             AbstractDrawer.prototype._drawStep = function (step) {
-                return 0;
+                // no-op
+            };
+            AbstractDrawer.prototype._numberOfAnimationIterations = function (data) {
+                return data.length;
             };
             /**
              * Draws the data into the renderArea using the spefic steps
@@ -3114,15 +3117,22 @@ var Plottable;
              * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
              */
             AbstractDrawer.prototype.draw = function (data, drawSteps) {
+                var _this = this;
                 this._enterData(data);
-                var totalTime = 0;
-                function transitionFunction(i) {
+                var numberOfIterations = this._numberOfAnimationIterations(data);
+                var totalTime = d3.sum(drawSteps.map(function (d) { return d.animator.getTiming(numberOfIterations); }));
+                var transitionFunction = function (i) {
                     if (drawSteps[i]) {
-                        var time = this._drawStep(drawSteps[i]);
-                        totalTime += time;
-                        setTimeout(function () { return transitionFunction(i + 1); }, time);
+                        _this._drawStep(drawSteps[i]);
+                        var time = drawSteps[i].animator.getTiming(numberOfIterations);
+                        if (time > 0) {
+                            setTimeout(function () { return transitionFunction(i + 1); }, time);
+                        }
+                        else {
+                            transitionFunction(i + 1);
+                        }
                     }
-                }
+                };
                 transitionFunction(0);
                 return totalTime;
             };
@@ -3163,6 +3173,9 @@ var Plottable;
                 }
                 return d3.svg.line().x(xFunction).y(yFunction).defined(definedFunction);
             };
+            Line.prototype._numberOfAnimationIterations = function (data) {
+                return 1;
+            };
             Line.prototype._drawStep = function (step) {
                 var baseTime = _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
@@ -3178,8 +3191,7 @@ var Plottable;
                 if (attrToProjector["fill"]) {
                     this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
-                var time = step.animator.animate(this.pathSelection, attrToProjector).time;
-                return Math.max(baseTime, time);
+                step.animator.animate(this.pathSelection, attrToProjector);
             };
             return Line;
         })(_Drawer.AbstractDrawer);
@@ -3239,12 +3251,11 @@ var Plottable;
                 return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(definedFunction);
             };
             Area.prototype._drawStep = function (step) {
-                var baseTime;
                 if (this._drawLine) {
-                    baseTime = _super.prototype._drawStep.call(this, step);
+                    _super.prototype._drawStep.call(this, step);
                 }
                 else {
-                    baseTime = _Drawer.AbstractDrawer.prototype._drawStep.call(this, step);
+                    _Drawer.AbstractDrawer.prototype._drawStep.call(this, step);
                 }
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var xFunction = attrToProjector["x"];
@@ -3261,8 +3272,7 @@ var Plottable;
                 if (attrToProjector["fill"]) {
                     this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
-                var time = step.animator.animate(this.areaSelection, attrToProjector).time;
-                return Math.max(baseTime, time);
+                step.animator.animate(this.areaSelection, attrToProjector);
             };
             return Area;
         })(_Drawer.Line);
@@ -3299,13 +3309,11 @@ var Plottable;
                 return this._renderArea.selectAll(this._svgElement);
             };
             Element.prototype._drawStep = function (step) {
-                var superTime = _super.prototype._drawStep.call(this, step);
                 var drawSelection = this._getDrawSelection();
                 if (step.attrToProjector["fill"]) {
                     drawSelection.attr("fill", step.attrToProjector["fill"]); // so colors don't animate
                 }
-                var selectionAndTime = step.animator.animate(drawSelection, step.attrToProjector);
-                return Math.max(superTime, selectionAndTime.time);
+                step.animator.animate(drawSelection, step.attrToProjector);
             };
             Element.prototype._enterData = function (data) {
                 _super.prototype._enterData.call(this, data);
@@ -6139,6 +6147,7 @@ var Plottable;
             };
             AbstractPlot.prototype._doRender = function () {
                 if (this._isAnchored) {
+                    console.log("doRender");
                     this.paint();
                     this._dataChanged = false;
                     this._animateOnNextRender = false;
@@ -6265,6 +6274,7 @@ var Plottable;
                 return datasets;
             };
             AbstractPlot.prototype.paint = function () {
+                console.log("paint");
                 var drawSteps = this._generateDrawSteps();
                 var dataToDraw = this._getDataToDraw();
                 var drawers = this._getDrawersInOrder();
@@ -6720,7 +6730,7 @@ var Plottable;
                     _super.prototype._updateXDomainer.call(this);
                 }
             };
-            AbstractBarPlot.prototype._additionalPaint = function () {
+            AbstractBarPlot.prototype._additionalPaint = function (time) {
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
                 var baselineAttr = {
@@ -7501,8 +7511,11 @@ var Plottable;
         var Null = (function () {
             function Null() {
             }
+            Null.prototype.getTiming = function (selection) {
+                return 0;
+            };
             Null.prototype.animate = function (selection, attrToProjector) {
-                return { selection: selection.attr(attrToProjector), time: 0 };
+                return selection.attr(attrToProjector);
             };
             return Null;
         })();
@@ -7540,14 +7553,19 @@ var Plottable;
                 this._maxIterativeDelay = Base.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
                 this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
             }
+            Base.prototype.getTiming = function (numberOfIterations) {
+                var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
+                var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
+                var time = adjustedIterativeDelay * numberOfIterations + this.delay() + this.duration();
+                return time;
+            };
             Base.prototype.animate = function (selection, attrToProjector) {
                 var _this = this;
                 var numberOfIterations = selection[0].length;
                 var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
                 var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
-                var time = adjustedIterativeDelay * numberOfIterations + this.delay() + this.duration();
                 var transition = selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + adjustedIterativeDelay * i; }).attr(attrToProjector);
-                return { selection: transition, time: time };
+                return transition;
             };
             Base.prototype.duration = function (duration) {
                 if (duration == null) {

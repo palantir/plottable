@@ -64,8 +64,12 @@ export module _Drawer {
      *
      * @param{DataStep} step The step, how data should be drawn.
      */
-    public _drawStep(step: DrawStep): number {
-      return 0;
+    public _drawStep(step: DrawStep) {
+      // no-op
+    }
+
+    public _numberOfAnimationIterations(data: any[]): number {
+      return data.length;
     }
 
     /**
@@ -74,16 +78,22 @@ export module _Drawer {
      * @param{any[]} data The data to be drawn
      * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
      */
-    public draw(data: any[], drawSteps: DrawStep[]) {
+    public draw(data: any[], drawSteps: DrawStep[]): number {
       this._enterData(data);
-      var totalTime = 0;
-      function transitionFunction(i: number) {
+      var numberOfIterations = this._numberOfAnimationIterations(data);
+      var totalTime = d3.sum(drawSteps.map(d => d.animator.getTiming(numberOfIterations)));
+
+      var transitionFunction = (i: number) => {
         if (drawSteps[i]) {
-          var time = this._drawStep(drawSteps[i]);
-          totalTime += time;
-          setTimeout(() => transitionFunction(i+1), time);
+          this._drawStep(drawSteps[i]);
+          var time = drawSteps[i].animator.getTiming(numberOfIterations);
+          if (time > 0) {
+            setTimeout(() => transitionFunction(i+1), time);
+          } else {
+            transitionFunction(i+1);
+          }
         }
-      }
+      };
       transitionFunction(0);
       return totalTime;
     }
