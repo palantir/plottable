@@ -5,7 +5,7 @@ export module _Drawer {
   var LABEL_VERTICAL_PADDING = 5;
   var LABEL_HORIZONTAL_PADDING = 5;
   export class Rect extends Element {
-    public _labelsDidNotFitOnSecondaryAttribute = false;
+    public _someLabelsWereTooWide = false;
     public _isVertical: boolean;
     private textArea: D3.Selection;
 
@@ -27,7 +27,7 @@ export module _Drawer {
 
     public drawText(data: any[], attrToProjector: AttributeToProjector) {
       var measurer = _Util.Text.getTextMeasurer(this.textArea.append("text"));
-      var didNotFitSecondary: boolean[] = data.map((d, i) => {
+      var labelWasTooWide: boolean[] = data.map((d, i) => {
         var text = attrToProjector["label"](d, i).toString();
         var w = attrToProjector["width"](d, i);
         var h = attrToProjector["height"](d, i);
@@ -67,8 +67,8 @@ export module _Drawer {
           _Util.Text.writeLineHorizontally(text, g, w, h, xAlign, yAlign);
           return didNotFitOnSecondaryAttribute;
         }
-      this._labelsDidNotFitOnSecondaryAttribute = didNotFitSecondary.some((d: boolean) => d);
       });
+      this._someLabelsWereTooWide = labelWasTooWide.some((d: boolean) => d);
     }
   }
 }

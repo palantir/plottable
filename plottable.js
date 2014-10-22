@@ -3366,7 +3366,7 @@ var Plottable;
             __extends(Rect, _super);
             function Rect(key, _isVertical) {
                 _super.call(this, key);
-                this._labelsDidNotFitOnSecondaryAttribute = false;
+                this._someLabelsWereTooWide = false;
                 this.svgElement("rect");
                 this._isVertical = _isVertical;
             }
@@ -3381,7 +3381,7 @@ var Plottable;
             Rect.prototype.drawText = function (data, attrToProjector) {
                 var _this = this;
                 var measurer = Plottable._Util.Text.getTextMeasurer(this.textArea.append("text"));
-                var didNotFitSecondary = data.map(function (d, i) {
+                var labelWasTooWide = data.map(function (d, i) {
                     var text = attrToProjector["label"](d, i).toString();
                     var w = attrToProjector["width"](d, i);
                     var h = attrToProjector["height"](d, i);
@@ -3423,8 +3423,8 @@ var Plottable;
                         Plottable._Util.Text.writeLineHorizontally(text, g, w, h, xAlign, yAlign);
                         return didNotFitOnSecondaryAttribute;
                     }
-                    _this._labelsDidNotFitOnSecondaryAttribute = didNotFitSecondary.some(function (d) { return d; });
                 });
+                this._someLabelsWereTooWide = labelWasTooWide.some(function (d) { return d; });
             };
             return Rect;
         })(_Drawer.Element);
@@ -6862,11 +6862,12 @@ var Plottable;
                 };
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
                 if (this._barLabelsEnabled) {
+                    var drawers = this._getDrawersInOrder();
+                    drawers.forEach(function (d) { return d.removeLabels(); });
                     var attrToProjector = this._generateAttrToProjector();
                     var dataToDraw = this._getDataToDraw();
-                    var drawers = this._getDrawersInOrder();
                     this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector); });
-                    if (this.hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._labelsDidNotFitOnSecondaryAttribute; })) {
+                    if (this.hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._someLabelsWereTooWide; })) {
                         drawers.forEach(function (d) { return d.removeLabels(); });
                     }
                 }
