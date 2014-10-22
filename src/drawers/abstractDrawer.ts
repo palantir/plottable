@@ -85,7 +85,7 @@ export module _Drawer {
       var delay = 0;
       this.drawSteps.forEach((drawStep, i) => {
         if (delay > 0) {
-          setTimeout(() => this._drawStep(drawStep);)
+          setTimeout(() => this._drawStep(drawStep););
         } else {
           this._drawStep(drawStep);
         }
