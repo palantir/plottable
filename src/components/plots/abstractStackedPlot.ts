@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  interface StackedDatum {
+  export interface StackedDatum {
     key: any;
     value: number;
     offset?: number;
@@ -29,7 +29,7 @@ export module Plot {
     }
 
     public _updateStackOffsets() {
-      var dataMapArray = this.generateDefaultMapArray();
+      var dataMapArray = this._generateDefaultMapArray();
       var domainKeys = this._getDomainKeys();
 
       var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
@@ -44,24 +44,24 @@ export module Plot {
         });
       });
 
-      this.setDatasetStackOffsets(this.stack(positiveDataMapArray), this.stack(negativeDataMapArray));
-      this.updateStackExtents();
+      this._setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
+      this._updateStackExtents();
     }
 
-    private updateStackExtents() {
+    public _updateStackExtents() {
       var datasets = this.datasets();
-      var valueAccessor = this.valueAccessor();
-      var maxStackExtent = _Util.Methods.max(datasets, (dataset: Dataset) => {
-        return _Util.Methods.max(dataset.data(), (datum: any) => {
+      var valueAccessor = this._valueAccessor();
+      var maxStackExtent = _Util.Methods.max<Dataset, number>(datasets, (dataset: Dataset) => {
+        return _Util.Methods.max<any, number>(dataset.data(), (datum: any) => {
           return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-        });
-      });
+        }, 0);
+      }, 0);
 
-      var minStackExtent = _Util.Methods.min(datasets, (dataset: Dataset) => {
-        return _Util.Methods.min(dataset.data(), (datum: any) => {
+      var minStackExtent = _Util.Methods.min<Dataset, number>(datasets, (dataset: Dataset) => {
+        return _Util.Methods.min<any, number>(dataset.data(), (datum: any) => {
           return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-        });
-      });
+        }, 0);
+      }, 0);
 
       this.stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
     }
@@ -70,7 +70,7 @@ export module Plot {
      * Feeds the data through d3's stack layout function which will calculate
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
-    private stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
+    public _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
       // HACKHACK d3's stack layout logic crashes on 0-length dataArray https://github.com/mbostock/d3/issues/2004
       if (dataArray.length === 0) {
         return dataArray;
@@ -93,9 +93,9 @@ export module Plot {
      * After the stack offsets have been determined on each separate dataset, the offsets need
      * to be determined correctly on the overall datasets
      */
-    private setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
-      var keyAccessor = this.keyAccessor();
-      var valueAccessor = this.valueAccessor();
+    public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
+      var keyAccessor = this._keyAccessor();
+      var valueAccessor = this._valueAccessor();
 
       this.datasets().forEach((dataset, datasetIndex) => {
         var positiveDataMap = positiveDataMapArray[datasetIndex];
@@ -117,7 +117,7 @@ export module Plot {
     }
 
     public _getDomainKeys(): string[] {
-      var keyAccessor = this.keyAccessor();
+      var keyAccessor = this._keyAccessor();
       var domainKeys = d3.set();
       var datasets = this.datasets();
 
@@ -130,9 +130,9 @@ export module Plot {
       return domainKeys.values();
     }
 
-    private generateDefaultMapArray(): D3.Map<StackedDatum>[] {
-      var keyAccessor = this.keyAccessor();
-      var valueAccessor = this.valueAccessor();
+    public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
+      var keyAccessor = this._keyAccessor();
+      var valueAccessor = this._valueAccessor();
       var datasets = this.datasets();
       var domainKeys = this._getDomainKeys();
 
@@ -166,11 +166,11 @@ export module Plot {
       }
     }
 
-    private keyAccessor(): AppliedAccessor {
+    public _keyAccessor(): AppliedAccessor {
        return this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
     }
 
-    private valueAccessor(): AppliedAccessor {
+    public _valueAccessor(): AppliedAccessor {
        return this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
     }
   }
