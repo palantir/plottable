@@ -3374,13 +3374,13 @@ var Plottable;
                 // need to put the bars in a seperate container so we can ensure that they don't cover labels
                 _super.prototype.setup.call(this, area.append("g").classed("bar-area", true));
                 this.textArea = area.append("g").classed("bar-label-text-area", true);
+                this.measurer = new Plottable._Util.Text.CachingCharacterMeasurer(this.textArea.append("text")).measure;
             };
             Rect.prototype.removeLabels = function () {
                 this.textArea.selectAll("g").remove();
             };
             Rect.prototype.drawText = function (data, attrToProjector) {
                 var _this = this;
-                var measurer = Plottable._Util.Text.getTextMeasurer(this.textArea.append("text"));
                 var labelWasTooWide = data.map(function (d, i) {
                     var text = attrToProjector["label"](d, i).toString();
                     var w = attrToProjector["width"](d, i);
@@ -3388,7 +3388,7 @@ var Plottable;
                     var x = attrToProjector["x"](d, i);
                     var y = attrToProjector["y"](d, i);
                     var positive = attrToProjector["positive"](d, i);
-                    var measurement = measurer(text);
+                    var measurement = _this.measurer(text);
                     var color = attrToProjector["fill"](d, i);
                     var dark = Plottable._Util.Color.contrast("white", color) * 1.6 < Plottable._Util.Color.contrast("black", color);
                     var primary = _this._isVertical ? h : w;

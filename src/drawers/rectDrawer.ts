@@ -8,6 +8,7 @@ export module _Drawer {
     public _someLabelsWereTooWide = false;
     public _isVertical: boolean;
     private textArea: D3.Selection;
+    private measurer: _Util.Text.TextMeasurer;
 
     constructor(key: string, _isVertical: boolean) {
       super(key);
@@ -19,6 +20,7 @@ export module _Drawer {
       // need to put the bars in a seperate container so we can ensure that they don't cover labels
       super.setup(area.append("g").classed("bar-area", true));
       this.textArea = area.append("g").classed("bar-label-text-area", true);
+      this.measurer = new _Util.Text.CachingCharacterMeasurer(this.textArea.append("text")).measure;
     }
 
     public removeLabels() {
@@ -26,7 +28,6 @@ export module _Drawer {
     }
 
     public drawText(data: any[], attrToProjector: AttributeToProjector) {
-      var measurer = _Util.Text.getTextMeasurer(this.textArea.append("text"));
       var labelWasTooWide: boolean[] = data.map((d, i) => {
         var text = attrToProjector["label"](d, i).toString();
         var w = attrToProjector["width"](d, i);
@@ -34,7 +35,7 @@ export module _Drawer {
         var x = attrToProjector["x"](d, i);
         var y = attrToProjector["y"](d, i);
         var positive = attrToProjector["positive"](d, i);
-        var measurement = measurer(text);
+        var measurement = this.measurer(text);
         var color = attrToProjector["fill"](d, i);
         var dark = _Util.Color.contrast("white", color) * 1.6 < _Util.Color.contrast("black", color);
         var primary = this._isVertical ? h : w;
