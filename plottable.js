@@ -6389,8 +6389,8 @@ var Plottable;
                     if (barScale instanceof Plottable.Scale.AbstractQuantitative) {
                         var barWidth = this._getMinimumDataWidth();
                         var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                        this.project("x-min", function (d, i) { return barAccessor(d, i) - barWidth * _this._barAlignmentFactor; }, barScale);
-                        this.project("x-max", function (d, i) { return barAccessor(d, i) + barWidth * (1 - _this._barAlignmentFactor); }, barScale);
+                        this.project("bar-min", function (d, i) { return barAccessor(d, i) - barWidth * _this._barAlignmentFactor; }, barScale);
+                        this.project("bar-max", function (d, i) { return barAccessor(d, i) + barWidth * (1 - _this._barAlignmentFactor); }, barScale);
                     }
                 }
                 this._render();
@@ -6581,6 +6581,8 @@ var Plottable;
                 attrToProjector["height"] = function (d, i) {
                     return Math.abs(scaledBaseline - originalPositionFn(d, i));
                 };
+                delete attrToProjector["bar-min"];
+                delete attrToProjector["bar-max"];
                 return attrToProjector;
             };
             /**

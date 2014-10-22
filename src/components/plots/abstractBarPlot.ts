@@ -49,8 +49,8 @@ export module Plot {
         if (barScale instanceof Plottable.Scale.AbstractQuantitative) {
           var barWidth = this._getMinimumDataWidth();
           var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-          this.project("x-min", (d: any, i: number) => barAccessor(d, i) - barWidth * this._barAlignmentFactor, barScale);
-          this.project("x-max", (d: any, i: number) => barAccessor(d, i) + barWidth * (1 - this._barAlignmentFactor), barScale);
+          this.project("bar-min", (d: any, i: number) => barAccessor(d, i) - barWidth * this._barAlignmentFactor, barScale);
+          this.project("bar-max", (d: any, i: number) => barAccessor(d, i) + barWidth * (1 - this._barAlignmentFactor), barScale);
         }
       }
 
@@ -280,6 +280,9 @@ export module Plot {
       attrToProjector["height"] = (d: any, i: number) => {
         return Math.abs(scaledBaseline - originalPositionFn(d, i));
       };
+
+      delete attrToProjector["bar-min"];
+      delete attrToProjector["bar-max"];
 
       return attrToProjector;
     }
