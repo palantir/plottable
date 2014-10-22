@@ -213,7 +213,7 @@ export module _Util {
      * If type is not comparable then t will be converted to a comparable before computing max.
      */
     export function max<C>(arr: C[], default_val: C): C;
-    export function max<T,C>(arr: T[], acc: (x: T) => C, default_val: C): C;
+    export function max<T,C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
     export function max(arr: any[], one: any, two?: any): any {
       if (arr.length === 0) {
         if (typeof(one) !== "function") {
@@ -234,7 +234,7 @@ export module _Util {
      * If type is not comparable then t will be converted to a comparable before computing min.
      */
     export function min<C>(arr: C[], default_val: C): C;
-    export function min<T,C>(arr: T[], acc: (x: T) => C, default_val: C): C;
+    export function min<T,C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
     export function min(arr: any[], one: any, two?: any): any {
       if (arr.length === 0) {
         if (typeof(one) !== "function") {
