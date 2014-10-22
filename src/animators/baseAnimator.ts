@@ -68,12 +68,11 @@ export module Animator {
       var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
       var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
 
-      var transition = selection.transition()
+      return selection.transition()
         .ease(this.easing())
         .duration(this.duration())
         .delay((d: any, i: number) => this.delay() + adjustedIterativeDelay * i)
         .attr(attrToProjector);
-      return transition;
     }
 
     /**

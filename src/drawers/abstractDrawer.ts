@@ -83,18 +83,17 @@ export module _Drawer {
       var numberOfIterations = this._numberOfAnimationIterations(data);
       var totalTime = d3.sum(drawSteps.map(d => d.animator.getTiming(numberOfIterations)));
 
-      var transitionFunction = (i: number) => {
-        if (drawSteps[i]) {
-          this._drawStep(drawSteps[i]);
-          var time = drawSteps[i].animator.getTiming(numberOfIterations);
-          if (time > 0) {
-            setTimeout(() => transitionFunction(i+1), time);
-          } else {
-            transitionFunction(i+1);
-          }
+      var delay = 0;
+      this.drawSteps.forEach((drawStep, i) => {
+        if (delay > 0) {
+          setTimeout(() => this._drawStep(drawStep);)
+        } else {
+          this._drawStep(drawStep);
         }
-      };
-      transitionFunction(0);
+        var time = drawStep.animator.getTiming(numberOfIterations);
+        delay += time;
+      });
+
       return totalTime;
     }
   }
