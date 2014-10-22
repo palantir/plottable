@@ -31,12 +31,6 @@ export module Plot {
       AbstractBarPlot.prototype._setup.call(this);
     }
 
-    public barLabels(enabled: boolean): StackedBar<X,Y>;
-    public barLabels(formatter: Formatter): StackedBar<X,Y>;
-    public barLabels(ipt: any): StackedBar<X,Y> {
-      return AbstractBarPlot.prototype.barLabels.call(this, ipt);
-    }
-
     public _getAnimator(key: string): Animator.PlotAnimator {
       if(this._animate && this._animateOnNextRender) {
         var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;

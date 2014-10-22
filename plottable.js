@@ -3364,35 +3364,26 @@ var Plottable;
     (function (_Drawer) {
         var LABEL_VERTICAL_PADDING = 5;
         var LABEL_HORIZONTAL_PADDING = 5;
-        var RectAndText = (function (_super) {
-            __extends(RectAndText, _super);
-            function RectAndText(key) {
+        var Rect = (function (_super) {
+            __extends(Rect, _super);
+            function Rect(key, _isVertical) {
                 _super.call(this, key);
                 this._labelsDidNotFitOnSecondaryAttribute = false;
-                this._isVertical = true;
                 this.svgElement("rect");
+                this._isVertical = _isVertical;
             }
-            RectAndText.prototype.setup = function (area) {
+            Rect.prototype.setup = function (area) {
                 // need to put the bars in a seperate container so we can ensure that they don't cover labels
                 _super.prototype.setup.call(this, area.append("g").classed("bar-area", true));
                 this.textArea = area.append("g").classed("bar-label-text-area", true);
             };
-            RectAndText.prototype.draw = function (data, drawSteps) {
-                _super.prototype.draw.call(this, data, drawSteps);
-                this.removeLabels();
-                var lastStepAttrToProjector = drawSteps[drawSteps.length - 1].attrToProjector;
-                if (lastStepAttrToProjector["label"]) {
-                    this.drawText(data, lastStepAttrToProjector);
-                }
-            };
-            RectAndText.prototype.removeLabels = function () {
+            Rect.prototype.removeLabels = function () {
                 this.textArea.selectAll("g").remove();
             };
-            RectAndText.prototype.drawText = function (data, attrToProjector) {
+            Rect.prototype.drawText = function (data, attrToProjector) {
                 var _this = this;
                 var measurer = Plottable._Util.Text.getTextMeasurer(this.textArea.append("text"));
-                this._labelsDidNotFitOnSecondaryAttribute = false;
-                var toDraw = data.map(function (d, i) {
+                var didNotFitSecondary = data.map(function (d, i) {
                     var text = attrToProjector["label"](d, i).toString();
                     var w = attrToProjector["width"](d, i);
                     var h = attrToProjector["height"](d, i);
@@ -3406,9 +3397,7 @@ var Plottable;
                     var primarySpace = _this._isVertical ? measurement.height : measurement.width;
                     var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
                     var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
-                    if (secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace) {
-                        _this._labelsDidNotFitOnSecondaryAttribute = true;
-                    }
+                    var didNotFitOnSecondaryAttribute = secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
                     if (measurement.height <= h && measurement.width <= w) {
                         var offset = Math.min((primary - primarySpace) / 2, LABEL_VERTICAL_PADDING);
                         if (!positive) {
@@ -3420,34 +3409,28 @@ var Plottable;
                         else {
                             x += offset;
                         }
-                        return { x: x, y: y, width: w, height: h, text: text, positive: positive, dark: dark };
-                    }
-                    else {
-                        return null;
-                    }
-                }).filter(function (d) { return !!d; }); // reject nulls
-                if (!this._labelsDidNotFitOnSecondaryAttribute) {
-                    toDraw.forEach(function (t) {
-                        var g = _this.textArea.append("g").attr("transform", "translate(" + t.x + "," + t.y + ")");
-                        var className = t.dark ? "dark-label" : "light-label";
+                        var g = _this.textArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                        var className = dark ? "dark-label" : "light-label";
                         g.classed(className, true);
                         var xAlign;
                         var yAlign;
                         if (_this._isVertical) {
                             xAlign = "center";
-                            yAlign = t.positive ? "top" : "bottom";
+                            yAlign = positive ? "top" : "bottom";
                         }
                         else {
-                            xAlign = t.positive ? "left" : "right";
+                            xAlign = positive ? "left" : "right";
                             yAlign = "center";
                         }
-                        Plottable._Util.Text.writeLineHorizontally(t.text, g, t.width, t.height, xAlign, yAlign);
-                    });
-                }
+                        Plottable._Util.Text.writeLineHorizontally(text, g, w, h, xAlign, yAlign);
+                        return didNotFitOnSecondaryAttribute;
+                    }
+                    _this._labelsDidNotFitOnSecondaryAttribute = didNotFitSecondary.some(function (d) { return d; });
+                });
             };
-            return RectAndText;
+            return Rect;
         })(_Drawer.Element);
-        _Drawer.RectAndText = RectAndText;
+        _Drawer.Rect = Rect;
     })(Plottable._Drawer || (Plottable._Drawer = {}));
     var _Drawer = Plottable._Drawer;
 })(Plottable || (Plottable = {}));
@@ -6716,7 +6699,10 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
                 this._barAlignmentFactor = 0;
+                this._barLabelFormatter = Plottable.Formatters.identity();
+                this._barLabelsEnabled = false;
                 this._hoverMode = "point";
+                this.hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
                 this._animators["bars-reset"] = new Plottable.Animator.Null();
@@ -6725,9 +6711,7 @@ var Plottable;
                 this.baseline(this._baselineValue);
             }
             AbstractBarPlot.prototype._getDrawer = function (key) {
-                var d = new Plottable._Drawer.RectAndText(key);
-                d._isVertical = this._isVertical;
-                return d;
+                return new Plottable._Drawer.Rect(key, this._isVertical);
             };
             AbstractBarPlot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -6777,18 +6761,24 @@ var Plottable;
                     throw new Error("input '" + input + "' can't be parsed as an Extent");
                 }
             };
-            AbstractBarPlot.prototype.barLabels = function (ipt) {
-                if (typeof (ipt) === "function") {
-                    this.barLabelFormatter = ipt;
-                }
-                else if (ipt) {
-                    this.barLabelFormatter = Plottable.Formatters.identity();
+            AbstractBarPlot.prototype.barLabelsEnabled = function (enabled) {
+                if (enabled === undefined) {
+                    return this._barLabelsEnabled;
                 }
                 else {
-                    this.barLabelFormatter = null;
+                    this._barLabelsEnabled = enabled;
+                    return this;
                 }
-                this._render();
-                return this;
+            };
+            AbstractBarPlot.prototype.barLabelFormatter = function (formatter) {
+                if (formatter === undefined) {
+                    return this._barLabelFormatter;
+                }
+                else {
+                    this._barLabelFormatter = formatter;
+                    this._render();
+                    return this;
+                }
             };
             AbstractBarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
                 if (select === void 0) { select = true; }
@@ -6873,8 +6863,14 @@ var Plottable;
                     "y2": this._isVertical ? scaledBaseline : this.height()
                 };
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
-                if (this._getDrawersInOrder().some(function (d) { return d._labelsDidNotFitOnSecondaryAttribute; })) {
-                    this._getDrawersInOrder().forEach(function (d) { return d.removeLabels(); });
+                if (this._barLabelsEnabled) {
+                    var attrToProjector = this._generateAttrToProjector();
+                    var dataToDraw = this._getDataToDraw();
+                    var drawers = this._getDrawersInOrder();
+                    this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector); });
+                    if (this.hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._labelsDidNotFitOnSecondaryAttribute; })) {
+                        drawers.forEach(function (d) { return d.removeLabels(); });
+                    }
                 }
             };
             AbstractBarPlot.prototype._generateDrawSteps = function () {
@@ -6928,9 +6924,9 @@ var Plottable;
                     return Math.abs(scaledBaseline - originalPositionFn(d, i));
                 };
                 var primaryAccessor = this._projectors[primaryAttr].accessor;
-                if (this.barLabelFormatter) {
+                if (this.barLabelsEnabled && this.barLabelFormatter) {
                     attrToProjector["label"] = function (d, i) {
-                        return _this.barLabelFormatter(primaryAccessor(d, i));
+                        return _this._barLabelFormatter(primaryAccessor(d, i));
                     };
                     attrToProjector["positive"] = function (d, i) { return originalPositionFn(d, i) <= scaledBaseline; };
                 }
@@ -7589,9 +7585,6 @@ var Plottable;
             }
             StackedBar.prototype._setup = function () {
                 Plot.AbstractBarPlot.prototype._setup.call(this);
-            };
-            StackedBar.prototype.barLabels = function (ipt) {
-                return Plot.AbstractBarPlot.prototype.barLabels.call(this, ipt);
             };
             StackedBar.prototype._getAnimator = function (key) {
                 if (this._animate && this._animateOnNextRender) {

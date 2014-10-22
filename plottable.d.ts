@@ -1635,12 +1635,11 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class RectAndText extends Element {
+        class Rect extends Element {
             _labelsDidNotFitOnSecondaryAttribute: boolean;
             _isVertical: boolean;
-            constructor(key: string);
+            constructor(key: string, _isVertical: boolean);
             setup(area: D3.Selection): void;
-            draw(data: any[], drawSteps: DrawStep[]): void;
             removeLabels(): void;
             drawText(data: any[], attrToProjector: AttributeToProjector): void;
         }
@@ -2820,7 +2819,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
-            _getDrawer(key: string): _Drawer.RectAndText;
+            _getDrawer(key: string): _Drawer.Rect;
             _setup(): void;
             /**
              * Sets the baseline for the bars to the specified value.
@@ -2840,8 +2839,32 @@ declare module Plottable {
              * @returns {AbstractBarPlot} The calling AbstractBarPlot.
              */
             barAlignment(alignment: string): AbstractBarPlot<X, Y>;
-            barLabels(enabled: boolean): AbstractBarPlot<X, Y>;
-            barLabels(formatter: Formatter): AbstractBarPlot<X, Y>;
+            /**
+             * Get whether bar labels are enabled.
+             *
+             * @returns {boolean} Whether bar labels are enabled
+             */
+            barLabelsEnabled(): boolean;
+            /**
+             * Set whether bar labels are enabled.
+             * @param {boolean} Whether bars should display labels or not.
+             *
+             * @returns {AbstractBarPlot} The calling plot.
+             */
+            barLabelsEnabled(enabled: boolean): AbstractBarPlot<X, Y>;
+            /**
+             * Get the formatter for bar labels.
+             *
+             * @returns {Formatter} The formatting function for bar labels.
+             */
+            barLabelFormatter(): Formatter;
+            /**
+             * Change the formatting function for bar labels.
+             * @param {Formatter} The function that formats the bar labels.
+             *
+             * @returns {AbstractBarPlot} The calling plot.
+             */
+            barLabelFormatter(formatter: Formatter): AbstractBarPlot<X, Y>;
             /**
              * Selects the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one
@@ -3075,8 +3098,6 @@ declare module Plottable {
              */
             constructor(xScale?: Scale.AbstractScale<X, number>, yScale?: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             _setup(): void;
-            barLabels(enabled: boolean): StackedBar<X, Y>;
-            barLabels(formatter: Formatter): StackedBar<X, Y>;
             _getAnimator(key: string): Animator.PlotAnimator;
             _getDrawer(key: string): any;
             _generateAttrToProjector(): any;

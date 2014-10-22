@@ -9,8 +9,10 @@ export module Plot {
     public _baselineValue = 0;
     public _barAlignmentFactor = 0;
     public _isVertical: boolean;
-    private barLabelFormatter: Formatter;
+    private _barLabelFormatter: Formatter = Formatters.identity();
+    private _barLabelsEnabled = false;
     private _hoverMode = "point";
+    private hideBarsIfAnyAreTooWide = true;
 
     /**
      * Constructs a BarPlot.
@@ -30,9 +32,7 @@ export module Plot {
     }
 
     public _getDrawer(key: string) {
-      var d = new Plottable._Drawer.RectAndText(key);
-      d._isVertical = this._isVertical;
-      return d;
+      return new Plottable._Drawer.Rect(key, this._isVertical);
     }
 
     public _setup() {
@@ -87,18 +87,49 @@ export module Plot {
       }
     }
 
-    public barLabels(enabled: boolean): AbstractBarPlot<X,Y>;
-    public barLabels(formatter: Formatter): AbstractBarPlot<X,Y>;
-    public barLabels(ipt: any): AbstractBarPlot<X,Y> {
-      if (typeof(ipt) === "function") {
-        this.barLabelFormatter = ipt;
-      } else if (ipt) {
-        this.barLabelFormatter = Formatters.identity();
+    /**
+     * Get whether bar labels are enabled.
+     *
+     * @returns {boolean} Whether bar labels are enabled
+     */
+    public barLabelsEnabled(): boolean;
+    /**
+     * Set whether bar labels are enabled.
+     * @param {boolean} Whether bars should display labels or not.
+     *
+     * @returns {AbstractBarPlot} The calling plot.
+     */
+    public barLabelsEnabled(enabled: boolean): AbstractBarPlot<X,Y>;
+    public barLabelsEnabled(enabled?: boolean): any {
+      if (enabled === undefined) {
+        return this._barLabelsEnabled;
       } else {
-        this.barLabelFormatter = null;
+        this._barLabelsEnabled = enabled;
+        return this;
       }
-      this._render();
-      return this;
+    }
+
+    /**
+     * Get the formatter for bar labels.
+     *
+     * @returns {Formatter} The formatting function for bar labels.
+     */
+    public barLabelFormatter(): Formatter;
+    /**
+     * Change the formatting function for bar labels.
+     * @param {Formatter} The function that formats the bar labels.
+     *
+     * @returns {AbstractBarPlot} The calling plot.
+     */
+    public barLabelFormatter(formatter: Formatter): AbstractBarPlot<X,Y>;
+    public barLabelFormatter(formatter?: Formatter): any {
+      if (formatter === undefined) {
+        return this._barLabelFormatter;
+      } else {
+        this._barLabelFormatter = formatter;
+        this._render();
+        return this;
+      }
     }
 
     /**
@@ -211,8 +242,14 @@ export module Plot {
       };
 
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);
-      if (this._getDrawersInOrder().some((d: _Drawer.RectAndText) => d._labelsDidNotFitOnSecondaryAttribute)) {
-        this._getDrawersInOrder().forEach((d: _Drawer.RectAndText) => d.removeLabels());
+      if (this._barLabelsEnabled) {
+        var attrToProjector = this._generateAttrToProjector();
+        var dataToDraw = this._getDataToDraw();
+        var drawers: _Drawer.Rect[] = <any> this._getDrawersInOrder();
+        this._datasetKeysInOrder.forEach((k, i) => drawers[i].drawText(dataToDraw.get(k), attrToProjector));
+        if (this.hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._labelsDidNotFitOnSecondaryAttribute)) {
+          drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
+        }
       }
     }
 
@@ -271,9 +308,9 @@ export module Plot {
         return Math.abs(scaledBaseline - originalPositionFn(d, i));
       };
       var primaryAccessor = this._projectors[primaryAttr].accessor;
-      if (this.barLabelFormatter) {
+      if (this.barLabelsEnabled && this.barLabelFormatter) {
         attrToProjector["label"] = (d: any, i: number) => {
-          return this.barLabelFormatter(primaryAccessor(d, i));
+          return this._barLabelFormatter(primaryAccessor(d, i));
         };
         attrToProjector["positive"] = (d: any, i: number) => originalPositionFn(d, i) <= scaledBaseline;
       }

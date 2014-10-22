@@ -2,26 +2,17 @@
 
 module Plottable {
 export module _Drawer {
-  interface TextToDraw {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    text: string;
-    positive: boolean;
-    dark: boolean;
-  }
-
   var LABEL_VERTICAL_PADDING = 5;
   var LABEL_HORIZONTAL_PADDING = 5;
-  export class RectAndText extends Element {
+  export class Rect extends Element {
     public _labelsDidNotFitOnSecondaryAttribute = false;
-    public _isVertical = true;
+    public _isVertical: boolean;
     private textArea: D3.Selection;
 
-    constructor(key: string) {
+    constructor(key: string, _isVertical: boolean) {
       super(key);
       this.svgElement("rect");
+      this._isVertical = _isVertical;
     }
 
     public setup(area: D3.Selection) {
@@ -30,23 +21,13 @@ export module _Drawer {
       this.textArea = area.append("g").classed("bar-label-text-area", true);
     }
 
-    public draw(data: any[], drawSteps: DrawStep[]) {
-      super.draw(data, drawSteps);
-      this.removeLabels();
-      var lastStepAttrToProjector = drawSteps[drawSteps.length - 1].attrToProjector;
-      if (lastStepAttrToProjector["label"]) {
-        this.drawText(data, lastStepAttrToProjector);
-      }
-    }
-
     public removeLabels() {
       this.textArea.selectAll("g").remove();
     }
 
     public drawText(data: any[], attrToProjector: AttributeToProjector) {
       var measurer = _Util.Text.getTextMeasurer(this.textArea.append("text"));
-      this._labelsDidNotFitOnSecondaryAttribute = false;
-      var toDraw: TextToDraw[] = data.map((d, i) => {
+      var didNotFitSecondary: boolean[] = data.map((d, i) => {
         var text = attrToProjector["label"](d, i).toString();
         var w = attrToProjector["width"](d, i);
         var h = attrToProjector["height"](d, i);
@@ -61,9 +42,7 @@ export module _Drawer {
 
         var secondaryAttrTextSpace = this._isVertical ? measurement.width : measurement.height;
         var secondaryAttrAvailableSpace = this._isVertical ? w : h;
-        if (secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace) {
-          this._labelsDidNotFitOnSecondaryAttribute = true;
-        }
+        var didNotFitOnSecondaryAttribute = secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
         if (measurement.height <= h && measurement.width <= w) {
           var offset = Math.min((primary - primarySpace) / 2, LABEL_VERTICAL_PADDING);
           if (!positive) {offset = offset * -1;}
@@ -72,28 +51,24 @@ export module _Drawer {
           } else {
             x += offset;
           }
-          return {x: x, y: y, width: w, height: h, text: text, positive: positive, dark: dark};
-        } else {
-          return null;
-        }
-      }).filter(d => !!d); // reject nulls
-      if (!this._labelsDidNotFitOnSecondaryAttribute) {
-        toDraw.forEach((t) => {
-          var g = this.textArea.append("g").attr("transform", "translate(" + t.x + "," + t.y + ")");
-          var className = t.dark ? "dark-label" : "light-label";
+
+          var g = this.textArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+          var className = dark ? "dark-label" : "light-label";
           g.classed(className, true);
           var xAlign: string;
           var yAlign: string;
           if (this._isVertical) {
             xAlign = "center";
-            yAlign = t.positive ? "top" : "bottom";
+            yAlign = positive ? "top" : "bottom";
           } else {
-            xAlign = t.positive ? "left" : "right";
+            xAlign = positive ? "left" : "right";
             yAlign = "center";
           }
-          _Util.Text.writeLineHorizontally(t.text, g, t.width, t.height, xAlign, yAlign);
-        });
-      }
+          _Util.Text.writeLineHorizontally(text, g, w, h, xAlign, yAlign);
+          return didNotFitOnSecondaryAttribute;
+        }
+      this._labelsDidNotFitOnSecondaryAttribute = didNotFitSecondary.some((d: boolean) => d);
+      });
     }
   }
 }
