@@ -5603,6 +5603,8 @@ describe("_Util.Text", function () {
             assert.isTrue(writeResults.textFits, "write mode: text fits");
             assert.equal(measureResults.usedWidth, writeResults.usedWidth, "write mode: used the same width as measurement");
             assert.equal(measureResults.usedHeight, writeResults.usedHeight, "write mode: used the same height as measurement");
+            var style = window.getComputedStyle(svg.node());
+            assert.isTrue(false, style["font"]);
             svg.remove();
         });
     });
