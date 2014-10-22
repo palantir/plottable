@@ -54,13 +54,24 @@ export module Plot {
       return this;
     }
 
+    public remove() {
+      super.remove();
+      if (this._xScale) {
+        this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this._plottableID);
+      }
+      if (this._yScale) {
+        this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this._plottableID);
+      }
+      return this;
+    }
+
     /**
      * Sets the automatic domain adjustment over visible points for y scale.
      *
      * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
      * @returns {AbstractXYPlot} The calling AbstractXYPlot.
      */
-    public autoAdjustmentYScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X,Y> {
+    public automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X,Y> {
       this._autoAdjustYScaleDomain = autoAdjustment;
       return this;
     }
@@ -71,7 +82,7 @@ export module Plot {
      * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
      * @returns {AbstractXYPlot} The calling AbstractXYPlot.
      */
-    public autoAdjustmentXScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X,Y>  {
+    public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X,Y>  {
       this._autoAdjustXScaleDomain = autoAdjustment;
       return this;
     }
@@ -149,7 +160,7 @@ export module Plot {
       var bVals = values.filter(v => fromDomain[0] <= v.a && v.a <= fromDomain[1]).map(v => v.b);
       var retVal: B[] = [];
       if (bVals.length !== 0) {
-        retVal = [_Util.Methods.min<B>(bVals), _Util.Methods.max<B>(bVals)];
+        retVal = [_Util.Methods.min<B>(bVals, null), _Util.Methods.max<B>(bVals, null)];
       }
       return retVal;
     }

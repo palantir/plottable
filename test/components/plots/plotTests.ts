@@ -288,25 +288,25 @@ describe("Plots", () => {
     it("plot auto domain scale to visible points", () => {
       xScale.domain([-3, 3]);
       assert.deepEqual(yScale.domain(), [-10, 10], "domain has not been adjusted to visible points");
-      plot.autoAdjustmentYScaleOverVisiblePoints(true);
+      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       xScale.domain([-2, 2]);
       assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
-      plot.autoAdjustmentYScaleOverVisiblePoints(false);
-      plot.autoAdjustmentXScaleOverVisiblePoints(true);
+      plot.automaticallyAdjustYScaleOverVisiblePoints(false);
+      plot.automaticallyAdjustXScaleOverVisiblePoints(true);
       yScale.domain([-6, 6]);
       assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to visible points");
       svg.remove();
     });
 
     it("no visible points", () => {
-      plot.autoAdjustmentYScaleOverVisiblePoints(true);
+      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       xScale.domain([-0.5, 0.5]);
       assert.deepEqual(yScale.domain(), [-10, 10], "domain has been not benn adjusted");
       svg.remove();
     });
 
     it("show all data", () => {
-      plot.autoAdjustmentYScaleOverVisiblePoints(true);
+      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       xScale.domain([-0.5, 0.5]);
       plot.showAllData();
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
@@ -315,9 +315,9 @@ describe("Plots", () => {
     });
 
     it("show all data without auto adjust domain", () => {
-      plot.autoAdjustmentYScaleOverVisiblePoints(true);
+      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       xScale.domain([-0.5, 0.5]);
-      plot.autoAdjustmentYScaleOverVisiblePoints(false);
+      plot.automaticallyAdjustYScaleOverVisiblePoints(false);
       plot.showAllData();
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
       assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
@@ -326,14 +326,14 @@ describe("Plots", () => {
 
     it("no cycle in auto domain on plot", () => {
       var zScale = new Plottable.Scale.Linear().domain([-10, 10]);
-      plot.autoAdjustmentYScaleOverVisiblePoints(true);
+      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       var plot2 = new Plottable.Plot.AbstractXYPlot(zScale, yScale)
-                                    .autoAdjustmentXScaleOverVisiblePoints(true)
+                                    .automaticallyAdjustXScaleOverVisiblePoints(true)
                                     .project("x", xAccessor, zScale)
                                     .project("y", yAccessor, yScale)
                                     .addDataset(simpleDataset);
       var plot3 = new Plottable.Plot.AbstractXYPlot(zScale, xScale)
-                                    .autoAdjustmentYScaleOverVisiblePoints(true)
+                                    .automaticallyAdjustYScaleOverVisiblePoints(true)
                                     .project("x", xAccessor, zScale)
                                     .project("y", yAccessor, xScale)
                                     .addDataset(simpleDataset);
@@ -345,6 +345,16 @@ describe("Plots", () => {
       assert.deepEqual(zScale.domain(), [-2.5, 2.5], "z domain is adjusted by y domain using custom algorithm and domainer");
       assert.deepEqual(xScale.domain(), [-2, 2],     "x domain is not adjusted using custom algorithm and domainer");
 
+      svg.remove();
+    });
+
+    it("listeners are deregistered after removal", () => {
+      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+      plot.remove();
+      var key2callback = (<any> xScale).broadcaster.key2callback;
+      assert.isUndefined(key2callback.get("yDomainAdjustment" + plot._plottableID), "the plot is no longer attached to the xScale");
+      key2callback = (<any> yScale).broadcaster.key2callback;
+      assert.isUndefined(key2callback.get("xDomainAdjustment" + plot._plottableID), "the plot is no longer attached to the yScale");
       svg.remove();
     });
 

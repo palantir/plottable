@@ -1683,23 +1683,23 @@ describe("Plots", function () {
         it("plot auto domain scale to visible points", function () {
             xScale.domain([-3, 3]);
             assert.deepEqual(yScale.domain(), [-10, 10], "domain has not been adjusted to visible points");
-            plot.autoAdjustmentYScaleOverVisiblePoints(true);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             xScale.domain([-2, 2]);
             assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
-            plot.autoAdjustmentYScaleOverVisiblePoints(false);
-            plot.autoAdjustmentXScaleOverVisiblePoints(true);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(false);
+            plot.automaticallyAdjustXScaleOverVisiblePoints(true);
             yScale.domain([-6, 6]);
             assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to visible points");
             svg.remove();
         });
         it("no visible points", function () {
-            plot.autoAdjustmentYScaleOverVisiblePoints(true);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             xScale.domain([-0.5, 0.5]);
             assert.deepEqual(yScale.domain(), [-10, 10], "domain has been not benn adjusted");
             svg.remove();
         });
         it("show all data", function () {
-            plot.autoAdjustmentYScaleOverVisiblePoints(true);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             xScale.domain([-0.5, 0.5]);
             plot.showAllData();
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
@@ -1707,9 +1707,9 @@ describe("Plots", function () {
             svg.remove();
         });
         it("show all data without auto adjust domain", function () {
-            plot.autoAdjustmentYScaleOverVisiblePoints(true);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             xScale.domain([-0.5, 0.5]);
-            plot.autoAdjustmentYScaleOverVisiblePoints(false);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(false);
             plot.showAllData();
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
             assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
@@ -1717,15 +1717,24 @@ describe("Plots", function () {
         });
         it("no cycle in auto domain on plot", function () {
             var zScale = new Plottable.Scale.Linear().domain([-10, 10]);
-            plot.autoAdjustmentYScaleOverVisiblePoints(true);
-            var plot2 = new Plottable.Plot.AbstractXYPlot(zScale, yScale).autoAdjustmentXScaleOverVisiblePoints(true).project("x", xAccessor, zScale).project("y", yAccessor, yScale).addDataset(simpleDataset);
-            var plot3 = new Plottable.Plot.AbstractXYPlot(zScale, xScale).autoAdjustmentYScaleOverVisiblePoints(true).project("x", xAccessor, zScale).project("y", yAccessor, xScale).addDataset(simpleDataset);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            var plot2 = new Plottable.Plot.AbstractXYPlot(zScale, yScale).automaticallyAdjustXScaleOverVisiblePoints(true).project("x", xAccessor, zScale).project("y", yAccessor, yScale).addDataset(simpleDataset);
+            var plot3 = new Plottable.Plot.AbstractXYPlot(zScale, xScale).automaticallyAdjustYScaleOverVisiblePoints(true).project("x", xAccessor, zScale).project("y", yAccessor, xScale).addDataset(simpleDataset);
             plot2.renderTo(svg);
             plot3.renderTo(svg);
             xScale.domain([-2, 2]);
             assert.deepEqual(yScale.domain(), [-2.5, 2.5], "y domain is adjusted by x domain using custom algorithm and domainer");
             assert.deepEqual(zScale.domain(), [-2.5, 2.5], "z domain is adjusted by y domain using custom algorithm and domainer");
             assert.deepEqual(xScale.domain(), [-2, 2], "x domain is not adjusted using custom algorithm and domainer");
+            svg.remove();
+        });
+        it("listeners are deregistered after removal", function () {
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.remove();
+            var key2callback = xScale.broadcaster.key2callback;
+            assert.isUndefined(key2callback.get("yDomainAdjustment" + plot._plottableID), "the plot is no longer attached to the xScale");
+            key2callback = yScale.broadcaster.key2callback;
+            assert.isUndefined(key2callback.get("xDomainAdjustment" + plot._plottableID), "the plot is no longer attached to the yScale");
             svg.remove();
         });
     });
@@ -1865,7 +1874,7 @@ describe("Plots", function () {
         var oldWarn = Plottable._Util.Methods.warn;
         beforeEach(function () {
             p = new Plottable.Plot.AbstractPlot();
-            p._getDrawer = function (k) { return new Plottable._Drawer.Rect(k); };
+            p._getDrawer = function (k) { return new Plottable._Drawer.Element(k).svgElement("rect"); };
         });
         afterEach(function () {
             Plottable._Util.Methods.warn = oldWarn;
@@ -5090,6 +5099,42 @@ describe("TimeScale tests", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("Tick generators", function () {
+    describe("interval", function () {
+        it("generate ticks within domain", function () {
+            var start = 0.5, end = 4.01, interval = 1;
+            var scale = new Plottable.Scale.Linear().domain([start, end]);
+            var ticks = Plottable.Scale.TickGenerators.intervalTickGenerator(interval)(scale);
+            assert.deepEqual(ticks, [0.5, 1, 2, 3, 4, 4.01], "generated ticks contains all possible ticks within range");
+        });
+        it("domain crossing 0", function () {
+            var start = -1.5, end = 1, interval = 0.5;
+            var scale = new Plottable.Scale.Linear().domain([start, end]);
+            var ticks = Plottable.Scale.TickGenerators.intervalTickGenerator(interval)(scale);
+            assert.deepEqual(ticks, [-1.5, -1, -0.5, 0, 0.5, 1], "generated all number divisible by 0.5 in domain");
+        });
+        it("generate ticks with reversed domain", function () {
+            var start = -2.2, end = -7.6, interval = 2.5;
+            var scale = new Plottable.Scale.Linear().domain([start, end]);
+            var ticks = Plottable.Scale.TickGenerators.intervalTickGenerator(interval)(scale);
+            assert.deepEqual(ticks, [-7.6, -7.5, -5, -2.5, -2.2], "generated all ticks between lower and higher value");
+        });
+        it("passing big interval", function () {
+            var start = 0.5, end = 10.01, interval = 11;
+            var scale = new Plottable.Scale.Linear().domain([start, end]);
+            var ticks = Plottable.Scale.TickGenerators.intervalTickGenerator(interval)(scale);
+            assert.deepEqual(ticks, [0.5, 10.01], "no middle ticks were added");
+        });
+        it("passing non positive interval", function () {
+            var scale = new Plottable.Scale.Linear().domain([0, 1]);
+            assert.throws(function () { return Plottable.Scale.TickGenerators.intervalTickGenerator(0); }, "interval must be positive number");
+            assert.throws(function () { return Plottable.Scale.TickGenerators.intervalTickGenerator(-2); }, "interval must be positive number");
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("_Util.DOM", function () {
     it("getBBox works properly", function () {
         var svg = generateSVG();
@@ -5797,30 +5842,35 @@ describe("_Util.Methods", function () {
     it("max/min work as expected", function () {
         var alist = [1, 2, 3, 4, 5];
         var dbl = function (x) { return x * 2; };
+        var today = new Date();
+        var numToDate = function (x) {
+            var t = new Date();
+            t.setDate(today.getDate() + x);
+            return t;
+        };
         var max = Plottable._Util.Methods.max;
         var min = Plottable._Util.Methods.min;
-        assert.deepEqual(max(alist), 5, "max works as expected on plain array");
         assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
-        assert.deepEqual(max(alist, dbl), 10, "max applies function appropriately");
-        assert.deepEqual(max([]), 0, "default value zero by default");
+        assert.deepEqual(max(alist, dbl, 0), 10, "max applies function appropriately");
+        assert.deepEqual(max(alist, numToDate, today), numToDate(5), "max applies non-numeric function appropriately");
         assert.deepEqual(max([], 10), 10, "works as intended with default value");
-        assert.deepEqual(max([], dbl), 0, "default value zero as expected when fn provided");
         assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
+        assert.deepEqual(max([], numToDate, today), today, "default non-numeric value works with non-numeric function");
         assert.deepEqual(min(alist, 0), 1, "min works for basic list");
         assert.deepEqual(min(alist, dbl, 0), 2, "min works with function arg");
-        assert.deepEqual(min([]), 0, "min defaults to 0");
+        assert.deepEqual(min(alist, numToDate, today), numToDate(1), "min works with non-numeric function arg");
         assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
+        assert.deepEqual(min([], numToDate, today), today, "min accepts non-numeric default and function");
         var strings = ["a", "bb", "ccc", "ddd"];
-        assert.deepEqual(max(strings, function (s) { return s.length; }), 3, "works on arrays of non-numbers with a function");
+        assert.deepEqual(max(strings, function (s) { return s.length; }, 0), 3, "works on arrays of non-numbers with a function");
         assert.deepEqual(max([], function (s) { return s.length; }, 5), 5, "defaults work even with non-number function type");
-        var today = new Date();
         var tomorrow = new Date();
         tomorrow.setDate(today.getDate() + 1);
         var dayAfterTomorrow = new Date();
         dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
         var dates = [today, tomorrow, dayAfterTomorrow, null];
-        assert.deepEqual(min(dates), today, "works on arrays of non-numeric values but comparable");
-        assert.deepEqual(max(dates), dayAfterTomorrow, "works on arrays of non-number values but comparable");
+        assert.deepEqual(min(dates, dayAfterTomorrow), today, "works on arrays of non-numeric values but comparable");
+        assert.deepEqual(max(dates, today), dayAfterTomorrow, "works on arrays of non-number values but comparable");
         assert.deepEqual(max([null], today), undefined, "returns undefined from array of null values");
         assert.deepEqual(max([], today), today, "correct default non-numeric value returned");
     });
@@ -5845,6 +5895,42 @@ describe("_Util.Methods", function () {
         var emptyKeys = [];
         var emptyMap = Plottable._Util.Methods.populateMap(emptyKeys, function (key) { return key + "Value"; });
         assert.isTrue(emptyMap.empty(), "no entries in map if no keys in input array");
+    });
+    it("copyMap works as expected", function () {
+        var oldMap = {};
+        oldMap["a"] = 1;
+        oldMap["b"] = 2;
+        oldMap["c"] = 3;
+        oldMap["undefined"] = undefined;
+        oldMap["null"] = null;
+        oldMap["fun"] = function (d) { return d; };
+        oldMap["NaN"] = 0 / 0;
+        oldMap["inf"] = 1 / 0;
+        var map = Plottable._Util.Methods.copyMap(oldMap);
+        assert.deepEqual(map, oldMap, "All values were copied.");
+        map = Plottable._Util.Methods.copyMap({});
+        assert.deepEqual(map, {}, "No values were added.");
+    });
+    it("range works as expected", function () {
+        var start = 0;
+        var end = 6;
+        var range = Plottable._Util.Methods.range(start, end);
+        assert.deepEqual(range, [0, 1, 2, 3, 4, 5], "all entries has been generated");
+        range = Plottable._Util.Methods.range(start, end, 2);
+        assert.deepEqual(range, [0, 2, 4], "all entries has been generated");
+        range = Plottable._Util.Methods.range(start, end, 11);
+        assert.deepEqual(range, [0], "all entries has been generated");
+        assert.throws(function () { return Plottable._Util.Methods.range(start, end, 0); }, "step cannot be 0");
+        range = Plottable._Util.Methods.range(start, end, -1);
+        assert.lengthOf(range, 0, "no entries because of invalid step");
+        range = Plottable._Util.Methods.range(end, start, -1);
+        assert.deepEqual(range, [6, 5, 4, 3, 2, 1], "all entries has been generated");
+        range = Plottable._Util.Methods.range(-2, 2);
+        assert.deepEqual(range, [-2, -1, 0, 1], "all entries has been generated range crossing 0");
+        range = Plottable._Util.Methods.range(0.2, 4);
+        assert.deepEqual(range, [0.2, 1.2, 2.2, 3.2], "all entries has been generated with float start");
+        range = Plottable._Util.Methods.range(0.6, 2.2, 0.5);
+        assert.deepEqual(range, [0.6, 1.1, 1.6, 2.1], "all entries has been generated with float step");
     });
 });
 
@@ -6177,6 +6263,121 @@ describe("Interactions", function () {
             bhi.hoverMode("line");
             triggerFakeMouseEvent("mousemove", hitbox, 399, 250);
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var assert = chai.assert;
+var TestHoverable = (function (_super) {
+    __extends(TestHoverable, _super);
+    function TestHoverable() {
+        _super.apply(this, arguments);
+    }
+    TestHoverable.prototype._hoverOverComponent = function (p) {
+        // cast-override
+    };
+    TestHoverable.prototype._hoverOutComponent = function (p) {
+        // cast-override
+    };
+    TestHoverable.prototype._doHover = function (p) {
+        var data = [];
+        if (p.x < 250) {
+            data.push("left");
+        }
+        if (p.x > 150) {
+            data.push("right");
+        }
+        return {
+            data: data,
+            selection: this._element
+        };
+    };
+    return TestHoverable;
+})(Plottable.Component.AbstractComponent);
+describe("Interactions", function () {
+    describe("Hover", function () {
+        var svg;
+        var testTarget;
+        var hitbox;
+        var hoverInteraction;
+        var overData;
+        var overCallbackCalled = false;
+        var outData;
+        var outCallbackCalled = false;
+        beforeEach(function () {
+            svg = generateSVG();
+            testTarget = new TestHoverable();
+            testTarget.classed("test-hoverable", true);
+            testTarget.renderTo(svg);
+            hoverInteraction = new Plottable.Interaction.Hover();
+            overCallbackCalled = false;
+            hoverInteraction.onHoverOver(function (hd) {
+                overCallbackCalled = true;
+                overData = hd;
+            });
+            outCallbackCalled = false;
+            hoverInteraction.onHoverOut(function (hd) {
+                outCallbackCalled = true;
+                outData = hd;
+            });
+            testTarget.registerInteraction(hoverInteraction);
+            hitbox = testTarget._element.select(".hit-box");
+        });
+        it("correctly triggers onHoverOver() callbacks", function () {
+            overCallbackCalled = false;
+            triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
+            assert.isTrue(overCallbackCalled, "onHoverOver was called on mousing over a target area");
+            assert.deepEqual(overData.data, ["left"], "onHoverOver was called with the correct data (mouse onto left)");
+            overCallbackCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
+            assert.isFalse(overCallbackCalled, "onHoverOver isn't called if the hover data didn't change");
+            overCallbackCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
+            assert.isTrue(overCallbackCalled, "onHoverOver was called when mousing into a new region");
+            assert.deepEqual(overData.data, ["right"], "onHoverOver was called with the new data only (left --> center)");
+            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            overCallbackCalled = false;
+            triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
+            assert.deepEqual(overData.data, ["left", "right"], "onHoverOver is called with the correct data");
+            svg.remove();
+        });
+        it("correctly triggers onHoverOut() callbacks", function () {
+            triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
+            outCallbackCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
+            assert.isFalse(outCallbackCalled, "onHoverOut isn't called when mousing into a new region without leaving the old one");
+            outCallbackCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 300, 200);
+            assert.isTrue(outCallbackCalled, "onHoverOut was called when the hover data changes");
+            assert.deepEqual(outData.data, ["left"], "onHoverOut was called with the correct data (center --> right)");
+            outCallbackCalled = false;
+            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            assert.isTrue(outCallbackCalled, "onHoverOut is called on mousing out of the Component");
+            assert.deepEqual(outData.data, ["right"], "onHoverOut was called with the correct data");
+            outCallbackCalled = false;
+            triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
+            triggerFakeMouseEvent("mouseout", hitbox, 200, 400);
+            assert.deepEqual(outData.data, ["left", "right"], "onHoverOut is called with the correct data");
+            svg.remove();
+        });
+        it("getCurrentHoverData()", function () {
+            triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
+            var currentlyHovered = hoverInteraction.getCurrentHoverData();
+            assert.deepEqual(currentlyHovered.data, ["left"], "retrieves data corresponding to the current position");
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
+            currentlyHovered = hoverInteraction.getCurrentHoverData();
+            assert.deepEqual(currentlyHovered.data, ["left", "right"], "retrieves data corresponding to the current position");
+            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            currentlyHovered = hoverInteraction.getCurrentHoverData();
+            assert.isNull(currentlyHovered.data, "returns null if not currently hovering");
             svg.remove();
         });
     });

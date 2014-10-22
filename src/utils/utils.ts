@@ -208,18 +208,18 @@ export module _Util {
     }
 
     /**
-     * Computes max values from array.
+     * Computes the max value from the array.
      *
-     * If type is not comperable then it will be converted to comperable one before computing max.
+     * If type is not comparable then t will be converted to a comparable before computing max.
      */
-    export function max<C>(arr: C[], default_val?: C): C;
-    export function max<T,C>(arr: T[], acc: (x: T) => C, default_val?: C): C;
-    export function max(arr: any[], one: any = 0, two: any = 0): any {
+    export function max<C>(arr: C[], default_val: C): C;
+    export function max<T,C>(arr: T[], acc: (x: T) => C, default_val: C): C;
+    export function max(arr: any[], one: any, two?: any): any {
       if (arr.length === 0) {
-        if (typeof(one) === "function") {
-          return two;
-        } else {
+        if (typeof(one) !== "function") {
           return one;
+        } else {
+          return two;
         }
       }
       /* tslint:disable:ban */
@@ -229,24 +229,36 @@ export module _Util {
     }
 
     /**
-     * Computes min values from array.
+     * Computes the min value from the array.
      *
-     * If type is not comparable then it will be converted to a comparable before computing min.
+     * If type is not comparable then t will be converted to a comparable before computing min.
      */
-    export function min<C>(arr: C[], default_val?: C): C;
-    export function min<T,C>(arr: T[], acc: (x: T) => C, default_val?: C): C;
-    export function min(arr: any[], one: any = 0, two: any = 0): any {
+    export function min<C>(arr: C[], default_val: C): C;
+    export function min<T,C>(arr: T[], acc: (x: T) => C, default_val: C): C;
+    export function min(arr: any[], one: any, two?: any): any {
       if (arr.length === 0) {
-        if (typeof(one) === "function") {
-          return two;
-        } else {
+        if (typeof(one) !== "function") {
           return one;
+        } else {
+          return two;
         }
       }
       /* tslint:disable:ban */
       var acc = typeof(one) === "function" ? one : typeof(two) === "function" ? two : undefined;
       return acc === undefined ? d3.min(arr) : d3.min(arr, acc);
       /* tslint:enable:ban */
+    }
+
+    /**
+     * Creates shallow copy of map.
+     * @param {{ [key: string]: any }} oldMap Map to copy
+     *
+     * @returns {[{ [key: string]: any }} coppied map.
+     */
+    export function copyMap<T>(oldMap: { [key: string]: T }): { [key: string]: T } {
+      var newMap: { [key: string]: any } = {};
+      d3.keys(oldMap).forEach(key => newMap[key] = oldMap[key]);
+      return newMap;
     }
 
     export function range(start: number, stop: number, step = 1): number[] {
