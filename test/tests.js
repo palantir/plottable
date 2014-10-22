@@ -2332,6 +2332,54 @@ describe("Plots", function () {
                 svg.remove();
             });
         });
+        describe("Vertical Bar Plot With Bar Labels", function () {
+            var plot;
+            var data;
+            var xScale;
+            var yScale;
+            var svg;
+            beforeEach(function () {
+                svg = generateSVG();
+                data = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+                xScale = new Plottable.Scale.Ordinal();
+                yScale = new Plottable.Scale.Linear();
+                plot = new Plottable.Plot.VerticalBar(xScale, yScale);
+                plot.addDataset(data);
+            });
+            it("bar labels disabled by default", function () {
+                plot.renderTo(svg);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 0, "by default, no texts are drawn");
+                svg.remove();
+            });
+            it("bar labels render properly", function () {
+                plot.renderTo(svg);
+                plot.barLabelsEnabled(true);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 2, "both texts drawn");
+                assert.equal(texts[0], "640", "first label is 640");
+                assert.equal(texts[1], "12345", "first label is 2000");
+                svg.remove();
+            });
+            it("bar labels hide if bars too skinny", function () {
+                plot.barLabelsEnabled(true);
+                plot.renderTo(svg);
+                plot.barLabelFormatter(function (n) { return n.toString() + (n === 12345 ? "looong" : ""); });
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 0, "no text drawn");
+                svg.remove();
+            });
+            it("formatters are used properly", function () {
+                plot.barLabelsEnabled(true);
+                plot.barLabelFormatter(function (n) { return n.toString() + "%"; });
+                plot.renderTo(svg);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 2, "both texts drawn");
+                assert.equal(texts[0], "640%", "first label is 640%");
+                assert.equal(texts[1], "12345%", "first label is 2000%");
+                svg.remove();
+            });
+        });
     });
 });
 
