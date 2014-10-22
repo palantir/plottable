@@ -290,9 +290,10 @@ describe("Plots", () => {
       ];
       var dataset = new Plottable.Dataset(missingDomainData);
       renderer.addDataset(dataset);
-      assert.isTrue(flag, "warning has been issued about differing domains");
 
       (<any> Plottable._Util.Methods).warn = oldWarn;
+      assert.isTrue(flag, "warning has been issued about differing domains");
+
       svg.remove();
     });
   });
