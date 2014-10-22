@@ -10,8 +10,8 @@ describe("Formatters", () => {
       assert.strictEqual(result, "1.000", "defaults to three decimal places");
       result = fixed3(1.234);
       assert.strictEqual(result, "1.234", "shows three decimal places");
-      result = fixed3(1.2345);
-      assert.strictEqual(result, "1.234", "changed values are not shown (get turned into empty strings)");
+      result = fixed3(1.2346);
+      assert.strictEqual(result, "1.235", "changed values are not shown (get turned into empty strings)");
     });
 
     it("precision can be changed", () => {
