@@ -10,9 +10,10 @@ export module Dispatcher {
     /**
      * Constructs a Dispatcher with the specified target.
      *
-     * @param {D3.Selection} target The selection to listen for events on.
+     * @constructor
+     * @param {D3.Selection} [target] The selection to listen for events on.
      */
-    constructor(target: D3.Selection) {
+    constructor(target?: D3.Selection) {
       super();
       this._target = target;
     }

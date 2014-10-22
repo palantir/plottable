@@ -10,9 +10,10 @@ export module Dispatcher {
     /**
      * Constructs a Keypress Dispatcher with the specified target.
      *
-     * @param {D3.Selection} target The selection to listen for events on.
+     * @constructor
+     * @param {D3.Selection} [target] The selection to listen for events on.
      */
-    constructor(target: D3.Selection) {
+    constructor(target?: D3.Selection) {
       super(target);
 
       // Can't attach the key listener to the target (a sub-svg element)
@@ -31,26 +32,39 @@ export module Dispatcher {
 
     public connect() {
       super.connect();
-
       this.keydownListenerTarget.on(this._getEventString("keydown"), () => {
         if (this.mousedOverTarget && this._onKeyDown) {
           this._onKeyDown(d3.event);
         }
       });
-
       return this;
     }
 
     public disconnect() {
       super.disconnect();
-
       this.keydownListenerTarget.on(this._getEventString("keydown"), null);
-
       return this;
     }
 
-    public onKeyDown(callback: (e: D3.D3Event) => void) {
+    /**
+     * Gets the callback to be called when a key is pressed.
+     *
+     * @return {(e: D3.D3Event) => void} The current keydown callback.
+     */
+    public onKeyDown(): (e: D3.D3Event) => void;
+    /**
+     * Sets a callback to be called when a key is pressed.
+     *
+     * @param {(e: D3.D3Event) => void} A callback that takes in a D3Event.
+     * @return {Keypress} The calling Dispatcher.Keypress.
+     */
+    public onKeyDown(callback: (e: D3.D3Event) => void): Keypress;
+    public onKeyDown(callback?: (e: D3.D3Event) => void): any {
+      if (callback === undefined) {
+        return this._onKeyDown;
+      }
       this._onKeyDown = callback;
+      return this;
     }
   }
 }

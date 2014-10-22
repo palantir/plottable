@@ -6053,13 +6053,9 @@ describe("Interactions", function () {
             var aCode = 65; // "a" key
             var bCode = 66; // "b" key
             var aCallbackCalled = false;
-            var aCallback = function () {
-                aCallbackCalled = true;
-            };
+            var aCallback = function () { return aCallbackCalled = true; };
             var bCallbackCalled = false;
-            var bCallback = function () {
-                bCallbackCalled = true;
-            };
+            var bCallback = function () { return bCallbackCalled = true; };
             ki.on(aCode, aCallback);
             ki.on(bCode, bCallback);
             component.registerInteraction(ki);
@@ -6398,7 +6394,7 @@ describe("Dispatchers", function () {
             var target = generateSVG(400, 400);
             var kpd = new Plottable.Dispatcher.Keypress(target);
             var keyDownCalled = false;
-            var lastKeyCode = -1;
+            var lastKeyCode;
             kpd.onKeyDown(function (e) {
                 keyDownCalled = true;
                 lastKeyCode = e.keyCode;

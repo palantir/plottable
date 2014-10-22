@@ -3253,9 +3253,10 @@ declare module Plottable {
             /**
              * Constructs a Dispatcher with the specified target.
              *
-             * @param {D3.Selection} target The selection to listen for events on.
+             * @constructor
+             * @param {D3.Selection} [target] The selection to listen for events on.
              */
-            constructor(target: D3.Selection);
+            constructor(target?: D3.Selection);
             /**
              * Gets the target of the Dispatcher.
              *
@@ -3352,12 +3353,25 @@ declare module Plottable {
             /**
              * Constructs a Keypress Dispatcher with the specified target.
              *
-             * @param {D3.Selection} target The selection to listen for events on.
+             * @constructor
+             * @param {D3.Selection} [target] The selection to listen for events on.
              */
-            constructor(target: D3.Selection);
+            constructor(target?: D3.Selection);
             connect(): Keypress;
             disconnect(): Keypress;
-            onKeyDown(callback: (e: D3.D3Event) => void): void;
+            /**
+             * Gets the callback to be called when a key is pressed.
+             *
+             * @return {(e: D3.D3Event) => void} The current keydown callback.
+             */
+            onKeyDown(): (e: D3.D3Event) => void;
+            /**
+             * Sets a callback to be called when a key is pressed.
+             *
+             * @param {(e: D3.D3Event) => void} A callback that takes in a D3Event.
+             * @return {Keypress} The calling Dispatcher.Keypress.
+             */
+            onKeyDown(callback: (e: D3.D3Event) => void): Keypress;
         }
     }
 }

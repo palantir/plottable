@@ -27,6 +27,7 @@ function run(div, data, Plottable) {
   scatterPlot.registerInteraction(pzi);
 
   var ki = new Plottable.Interaction.Key();
+  // press "a" (keycode 65) to reset
   ki.on(65, function() {
     xScale.autoDomain();
     yScale.autoDomain();

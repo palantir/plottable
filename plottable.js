@@ -7710,7 +7710,8 @@ var Plottable;
             /**
              * Constructs a Dispatcher with the specified target.
              *
-             * @param {D3.Selection} target The selection to listen for events on.
+             * @constructor
+             * @param {D3.Selection} [target] The selection to listen for events on.
              */
             function AbstractDispatcher(target) {
                 _super.call(this);
@@ -7864,7 +7865,8 @@ var Plottable;
             /**
              * Constructs a Keypress Dispatcher with the specified target.
              *
-             * @param {D3.Selection} target The selection to listen for events on.
+             * @constructor
+             * @param {D3.Selection} [target] The selection to listen for events on.
              */
             function Keypress(target) {
                 var _this = this;
@@ -7897,7 +7899,11 @@ var Plottable;
                 return this;
             };
             Keypress.prototype.onKeyDown = function (callback) {
+                if (callback === undefined) {
+                    return this._onKeyDown;
+                }
                 this._onKeyDown = callback;
+                return this;
             };
             return Keypress;
         })(Dispatcher.AbstractDispatcher);
@@ -8011,7 +8017,7 @@ var Plottable;
                 _super.call(this);
                 this.activated = false;
                 this.keyCode2Callback = {};
-                this.dispatcher = new Plottable.Dispatcher.Keypress(null);
+                this.dispatcher = new Plottable.Dispatcher.Keypress();
             }
             Key.prototype._anchor = function (component, hitBox) {
                 var _this = this;

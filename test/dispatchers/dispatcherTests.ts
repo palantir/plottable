@@ -130,7 +130,7 @@ describe("Dispatchers", () => {
 
       var kpd = new Plottable.Dispatcher.Keypress(target);
       var keyDownCalled = false;
-      var lastKeyCode = -1;
+      var lastKeyCode: number;
       kpd.onKeyDown((e: D3.D3Event) => {
         keyDownCalled = true;
         lastKeyCode = e.keyCode;

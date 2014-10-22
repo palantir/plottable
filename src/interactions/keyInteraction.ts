@@ -18,7 +18,7 @@ export module Interaction {
      */
     constructor() {
       super();
-      this.dispatcher = new Plottable.Dispatcher.Keypress(null);
+      this.dispatcher = new Plottable.Dispatcher.Keypress();
     }
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {

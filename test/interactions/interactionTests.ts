@@ -248,13 +248,9 @@ describe("Interactions", () => {
       var bCode = 66; // "b" key
 
       var aCallbackCalled = false;
-      var aCallback = () => {
-        aCallbackCalled = true;
-      };
+      var aCallback = () => aCallbackCalled = true;
       var bCallbackCalled = false;
-      var bCallback = () => {
-        bCallbackCalled = true;
-      };
+      var bCallback = () => bCallbackCalled = true;
 
       ki.on(aCode, aCallback);
       ki.on(bCode, bCallback);
