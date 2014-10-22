@@ -274,6 +274,11 @@ export module _Util {
 
       return range;
     }
+
+    export function isInOrder<C>(arr: C[], ascendinf: boolean, compFn: (a: C, b: C) => number) {
+      var orderFn = r => ascending ? r >= 0 : r <= 0;
+      return arr.every((a: C, i: number) => i == 0 || orderFn(compFn(arr[i - 1], a)));
+    }
   }
 }
 }
