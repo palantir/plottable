@@ -29,7 +29,7 @@ function run(div, data, Plottable) {
 
   var center = clusteredBarRenderer.merge(new Plottable.Component.Legend(colorScale));
 
-  horizChart = new Plottable.Component.Table([
+  var plot = new Plottable.Component.Table([
     [yAxis, center], [null, xAxis]
     ]).renderTo(svg);
 }
