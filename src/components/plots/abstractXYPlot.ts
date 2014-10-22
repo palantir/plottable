@@ -51,11 +51,14 @@ export module Plot {
 
     public _generateAttrToProjector(): AttributeToProjector {
       var attrToProjector: AttributeToProjector = super._generateAttrToProjector();
-      // Hide points from outside of domain.
-      var positionF = attrToProjector["x"];
+      var positionXFn = attrToProjector["x"];
+      var positionYFn = attrToProjector["y"];
       attrToProjector["defined"] = (d: any, i: number) => {
-        var position = positionF(d, i);
-        return position != null && position === position && position >= 0;
+        var positionX = positionXFn(d, i);
+        var positionY = positionYFn(d, i);
+        return positionX != null && positionX === positionX &&
+               positionY != null && positionY === positionY &&
+               _Util.Methods.inRange(positionX, 0,this.width()) && _Util.Methods.inRange(positionY, this.height(), 0);
       };
       return attrToProjector;
     }

@@ -3305,12 +3305,7 @@ var Plottable;
                 dataElements.exit().remove();
             };
             Element.prototype.filterDefinedData = function (data, definedFunction) {
-                if (!definedFunction) {
-                    return data;
-                }
-                else {
-                    return data.filter(definedFunction);
-                }
+                return definedFunction ? data.filter(definedFunction) : data;
             };
             Element.prototype.draw = function (data, drawSteps) {
                 var _this = this;
@@ -3318,7 +3313,7 @@ var Plottable;
                 drawSteps.forEach(function (d, i) {
                     modifiedDrawSteps[i] = { animator: d.animator, attrToProjector: Plottable._Util.Methods.copyMap(d.attrToProjector) };
                 });
-                var definedData = modifiedDrawSteps.reduce(function (a, b) { return _this.filterDefinedData(a, b.attrToProjector["defined"]); }, data);
+                var definedData = modifiedDrawSteps.reduce(function (data, drawStep) { return _this.filterDefinedData(data, drawStep.attrToProjector["defined"]); }, data);
                 modifiedDrawSteps.forEach(function (d) {
                     if (d.attrToProjector["defined"]) {
                         delete d.attrToProjector["defined"];
@@ -6404,12 +6399,14 @@ var Plottable;
                 return this;
             };
             AbstractXYPlot.prototype._generateAttrToProjector = function () {
+                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                // Hide points from outside of domain.
-                var positionF = attrToProjector["x"];
+                var positionXFn = attrToProjector["x"];
+                var positionYFn = attrToProjector["y"];
                 attrToProjector["defined"] = function (d, i) {
-                    var position = positionF(d, i);
-                    return position != null && position === position && position >= 0;
+                    var positionX = positionXFn(d, i);
+                    var positionY = positionYFn(d, i);
+                    return positionX != null && positionX === positionX && positionY != null && positionY === positionY && Plottable._Util.Methods.inRange(positionX, 0, _this.width()) && Plottable._Util.Methods.inRange(positionY, _this.height(), 0);
                 };
                 return attrToProjector;
             };

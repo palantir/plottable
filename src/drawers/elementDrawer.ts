@@ -37,11 +37,7 @@ export module _Drawer {
     }
 
     private filterDefinedData(data: any[], definedFunction: (d: any, i: number) => boolean): any[] {
-      if (!definedFunction) {
-        return data;
-      } else {
-        return data.filter(definedFunction);
-      }
+      return definedFunction ? data.filter(definedFunction) : data;
     }
 
     public draw(data: any[], drawSteps: DrawStep[]) {
@@ -50,8 +46,8 @@ export module _Drawer {
         modifiedDrawSteps[i] = {animator: d.animator, attrToProjector: _Util.Methods.copyMap(d.attrToProjector)};
       });
 
-      var definedData: any[] = modifiedDrawSteps.reduce((a: any[], b: DrawStep) =>
-                                this.filterDefinedData(a, b.attrToProjector["defined"]), data);
+      var definedData: any[] = modifiedDrawSteps.reduce((data: any[], drawStep: DrawStep) =>
+                                this.filterDefinedData(data, drawStep.attrToProjector["defined"]), data);
 
       modifiedDrawSteps.forEach((d: DrawStep) => {
         if (d.attrToProjector["defined"]) {
