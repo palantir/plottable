@@ -79,7 +79,7 @@ export module Component {
       var rowLengths = estimatedLayout.rows.map((row: string[]) => {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
       });
-      var longestRowLength = _Util.Methods.max(rowLengths);
+      var longestRowLength = _Util.Methods.max(rowLengths, 0);
       longestRowLength = longestRowLength === undefined ? 0 : longestRowLength; // HACKHACK: #843
       var desiredWidth = this.padding + longestRowLength;
 

@@ -98,10 +98,20 @@ declare module Plottable {
              *          with ===.
              */
             function objEq(a: any, b: any): boolean;
-            function max(arr: number[], default_val?: number): number;
-            function max<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
-            function min(arr: number[], default_val?: number): number;
-            function min<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
+            /**
+             * Computes the max value from the array.
+             *
+             * If type is not comparable then t will be converted to a comparable before computing max.
+             */
+            function max<C>(arr: C[], default_val: C): C;
+            function max<T, C>(arr: T[], acc: (x: T) => C, default_val: C): C;
+            /**
+             * Computes the min value from the array.
+             *
+             * If type is not comparable then t will be converted to a comparable before computing min.
+             */
+            function min<C>(arr: C[], default_val: C): C;
+            function min<T, C>(arr: T[], acc: (x: T) => C, default_val: C): C;
             /**
              * Creates shallow copy of map.
              * @param {{ [key: string]: any }} oldMap Map to copy
