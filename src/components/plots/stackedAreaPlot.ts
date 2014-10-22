@@ -36,7 +36,7 @@ export module Plot {
       var keySets = this.datasets().map((dataset) => d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i).toString())).values());
 
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
-        _Util.Methods.warn("datasets do not contain all domain keys.  Plot may have unintended behavior.");
+        _Util.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
       }
       super._updateStackOffsets();
     }
