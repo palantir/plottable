@@ -3501,7 +3501,7 @@ var Plottable;
                 this.boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             };
             AbstractComponent.prototype._render = function () {
-                if (this._isAnchored && this._isSetup && this.width() != null && this.height() != null) {
+                if (this._isAnchored && this._isSetup && this.width() > 0 && this.height() > 0) {
                     Plottable.Core.RenderController.registerToRender(this);
                 }
             };
