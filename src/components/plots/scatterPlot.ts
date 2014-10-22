@@ -93,18 +93,11 @@ export module Plot {
         });
       });
 
-      if (closestElement) {
-        var closestSelection = d3.select(closestElement);
-        return {
-          selection: closestSelection,
-          data: closestSelection.data()
-        };
-      } else {
-        return {
-          selection: null,
-          data: null
-        };
-      }
+      var closestSelection = d3.select(closestElement);
+      return {
+        selection: closestElement ? closestSelection : null,
+        data: closestElement ? closestSelection.data() : null
+      };
     }
 
     //===== Hover logic =====
