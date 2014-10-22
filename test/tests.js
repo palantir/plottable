@@ -5560,12 +5560,12 @@ describe("_Util.Text", function () {
             var height = 1;
             var textSelection = svg.append("text");
             var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
-            var results = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal");
+            var results = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal");
             assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "measurement mode: no width used");
             assert.equal(0, results.usedHeight, "measurement mode: no height used");
             var writeOptions = { g: svg, xAlign: "center", yAlign: "center" };
-            results = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal", writeOptions);
+            results = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal", writeOptions);
             assert.isFalse(results.textFits, "write mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "write mode: no width used");
             assert.equal(0, results.usedHeight, "write mode: no height used");
@@ -5579,11 +5579,11 @@ describe("_Util.Text", function () {
             var height = 50;
             var textSelection = svg.append("text");
             var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
-            var measureResults = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal");
+            var measureResults = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal");
             assert.isTrue(measureResults.textFits, "mesurement mode: text fits");
             assert.operator(measureResults.usedHeight, "<=", measureResults.usedWidth, "mesurement mode: used more width than height");
             var writeOptions = { g: svg, xAlign: "left", yAlign: "top" };
-            var writeResults = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal", writeOptions);
+            var writeResults = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal", writeOptions);
             assert.isTrue(writeResults.textFits, "write mode: text fits");
             assert.equal(measureResults.usedWidth, writeResults.usedWidth, "write mode: used the same width as measurement");
             assert.equal(measureResults.usedHeight, writeResults.usedHeight, "write mode: used the same height as measurement");
@@ -5595,18 +5595,11 @@ describe("_Util.Text", function () {
             var height = 50;
             var textSelection = svg.append("text");
             var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
-            var measureResults = Plottable._Util.Text.writeText("a", width, height, measure, "left");
-            var style = window.getComputedStyle(svg.node());
-            var errString = "";
-            for (var i = 0; i < style.length; i++) {
-                var prop = style[i];
-                errString += prop + ": " + style[prop] + " ";
-            }
-            //assert.isTrue(false, errString);
+            var measureResults = Plottable._Util.Text.writeText("abc", width, height, measure, "left");
             assert.isTrue(measureResults.textFits, "mesurement mode: text fits");
             assert.operator(measureResults.usedHeight, ">=", measureResults.usedWidth, "mesurement mode: used more height than width");
             var writeOptions = { g: svg, xAlign: "left", yAlign: "top" };
-            var writeResults = Plottable._Util.Text.writeText("a", width, height, measure, "left", writeOptions);
+            var writeResults = Plottable._Util.Text.writeText("abc", width, height, measure, "left", writeOptions);
             assert.isTrue(writeResults.textFits, "write mode: text fits");
             assert.equal(measureResults.usedWidth, writeResults.usedWidth, "write mode: used the same width as measurement");
             assert.equal(measureResults.usedHeight, writeResults.usedHeight, "write mode: used the same height as measurement");
