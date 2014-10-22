@@ -3058,6 +3058,7 @@ declare module Plottable {
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _getDrawer(key: string): _Drawer.Area;
             _setup(): void;
+            _updateStackOffsets(): void;
             _additionalPaint(): void;
             _updateYDomainer(): void;
             _onDatasetUpdate(): void;
