@@ -5072,7 +5072,7 @@ describe("Tick generators", function () {
         it("all float ticks", function () {
             var scale = new Plottable.Scale.Linear().domain([1.1, 1.5]);
             var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
-            assert.deepEqual(ticks, [1.1, 1.5], "only the enticks are returned");
+            assert.deepEqual(ticks, [1.1, 1.5], "only the end ticks are returned");
         });
     });
 });
