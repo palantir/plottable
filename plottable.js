@@ -6430,6 +6430,7 @@ var Plottable;
              */
             function Scatter(xScale, yScale) {
                 _super.call(this, xScale, yScale);
+                this.closeDetectionRadius = 5;
                 this.classed("scatter-plot", true);
                 this.project("r", 3); // default
                 this.project("opacity", 0.6); // default
@@ -6468,6 +6469,58 @@ var Plottable;
                 }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("circles") });
                 return drawSteps;
+            };
+            Scatter.prototype._getClosestStruckPoint = function (p, range) {
+                var drawers = this._getDrawersInOrder();
+                var attrToProjector = this._generateAttrToProjector();
+                var getDistSq = function (d, i) {
+                    var dx = attrToProjector["cx"](d, i) - p.x;
+                    var dy = attrToProjector["cy"](d, i) - p.y;
+                    return (dx * dx + dy * dy);
+                };
+                var overAPoint = false;
+                var closestElement;
+                var minDistSq = range * range;
+                drawers.forEach(function (drawer) {
+                    drawer._getDrawSelection().each(function (d, i) {
+                        var distSq = getDistSq(d, i);
+                        var r = attrToProjector["r"](d, i);
+                        if (distSq < r * r) {
+                            if (!overAPoint || distSq < minDistSq) {
+                                closestElement = this;
+                                minDistSq = distSq;
+                            }
+                            overAPoint = true;
+                        }
+                        else if (!overAPoint && distSq < minDistSq) {
+                            closestElement = this;
+                            minDistSq = distSq;
+                        }
+                    });
+                });
+                if (closestElement) {
+                    var closestSelection = d3.select(closestElement);
+                    return {
+                        selection: closestSelection,
+                        data: closestSelection.data()
+                    };
+                }
+                else {
+                    return {
+                        selection: null,
+                        data: null
+                    };
+                }
+            };
+            //===== Hover logic =====
+            Scatter.prototype._hoverOverComponent = function (p) {
+                // no-op
+            };
+            Scatter.prototype._hoverOutComponent = function (p) {
+                // no-op
+            };
+            Scatter.prototype._doHover = function (p) {
+                return this._getClosestStruckPoint(p, this.closeDetectionRadius);
             };
             return Scatter;
         })(Plot.AbstractXYPlot);
