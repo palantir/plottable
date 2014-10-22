@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class StackedBar<X,Y> extends AbstractStacked<X, Y> {
+  export class StackedBar<X,Y> extends AbstractBarPlot<X, Y> {
     public _baselineValue: number;
     public _baseline: D3.Selection;
     public _barAlignmentFactor: number;
@@ -26,18 +26,14 @@ export module Plot {
       this._isVertical = isVertical;
     }
 
-    public _setup() {
-      AbstractBarPlot.prototype._setup.call(this);
-    }
-
-    public _getAnimator(drawer: _Drawer.AbstractDrawer, index: number) {
-      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-      var scaledBaseline = primaryScale.scale(this._baselineValue);
-      return new Animator.MovingRect(scaledBaseline, this._isVertical);
-    }
-
-    public _getDrawer(key: string) {
-      return AbstractBarPlot.prototype._getDrawer.apply(this, [key]);
+    public _getAnimator(key: string): Animator.PlotAnimator {
+      if(this._animate && this._animateOnNextRender) {
+        var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+        var scaledBaseline = primaryScale.scale(this._baselineValue);
+        return new Animator.MovingRect(scaledBaseline, this._isVertical);
+      } else {
+        return new Animator.Null();
+      }
     }
 
     public _generateAttrToProjector() {
@@ -59,34 +55,55 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _paint() {
-      super._paint();
-      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-      var scaledBaseline = primaryScale.scale(this._baselineValue);
-      var baselineAttr: any = {
-        "x1": this._isVertical ? 0 : scaledBaseline,
-        "y1": this._isVertical ? scaledBaseline : 0,
-        "x2": this._isVertical ? this.width() : scaledBaseline,
-        "y2": this._isVertical ? scaledBaseline : this.height()
-      };
-      this._baseline.attr(baselineAttr);
+    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
+      super.project(attrToSet, accessor, scale);
+      AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
+      return this;
     }
 
-    public baseline(value: number) {
-      return AbstractBarPlot.prototype.baseline.apply(this, [value]);
+    public _onDatasetUpdate() {
+      super._onDatasetUpdate();
+      AbstractStacked.prototype._onDatasetUpdate.apply(this);
+      return this;
     }
 
-    public _updateDomainer(scale: Scale.AbstractScale<any,number>) {
-      return AbstractBarPlot.prototype._updateDomainer.apply(this, [scale]);
+    //===== Stack logic from AbstractStackedPlot =====
+    public _updateStackOffsets() {
+      AbstractStacked.prototype._updateStackOffsets.call(this);
     }
 
-    public _updateXDomainer() {
-      return AbstractBarPlot.prototype._updateXDomainer.apply(this);
+    public _updateStackExtents() {
+      AbstractStacked.prototype._updateStackExtents.call(this);
     }
 
-    public _updateYDomainer() {
-      return AbstractBarPlot.prototype._updateYDomainer.apply(this);
+    public _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
+      return AbstractStacked.prototype._stack.call(this, dataArray);
     }
+
+    public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
+      AbstractStacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+    }
+
+    public _getDomainKeys() {
+      return AbstractStacked.prototype._getDomainKeys.call(this);
+    }
+
+    public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
+      return AbstractStacked.prototype._generateDefaultMapArray.call(this);
+    }
+
+    public _updateScaleExtents() {
+      AbstractStacked.prototype._updateScaleExtents.call(this);
+    }
+
+    public _keyAccessor(): AppliedAccessor {
+      return AbstractStacked.prototype._keyAccessor.call(this);
+    }
+
+    public _valueAccessor(): AppliedAccessor {
+      return AbstractStacked.prototype._valueAccessor.call(this);
+    }
+    //===== /Stack logic =====
   }
 }
 }
