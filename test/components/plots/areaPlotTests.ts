@@ -89,110 +89,26 @@ describe("Plots", () => {
       simpleDataset.data(dataWithNaN);
 
       var areaPathString = normalizePath(areaPath.attr("d"));
-      var areaPathStrings = areaPathString.split("Z");
-      areaPathStrings.pop();
-      var areaPathPoints = areaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
-      areaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
-
-      assert.closeTo(+areaPathPoints[0][0][0], 0, 0.1, "area d was set correctly (y=NaN case)");
-      assert.closeTo(+areaPathPoints[0][0][1], 500, 0.1, "area d was set correctly (y=NaN case)");
-      assert.closeTo(+areaPathPoints[0][1][0], 100, 0.1, "area d was set correctly (y=NaN case)");
-      assert.closeTo(+areaPathPoints[0][1][1], 400, 0.1, "area d was set correctly (y=NaN case)");
-      assert.closeTo(+areaPathPoints[0][2][0], 100, 0.1, "area d was set correctly (y=NaN case)");
-      assert.closeTo(+areaPathPoints[0][2][1], 500, 0.1, "area d was set correctly (y=NaN case)");
-      assert.closeTo(+areaPathPoints[0][3][0], 0, 0.1, "area d was set correctly (y=NaN case)");
-      assert.closeTo(+areaPathPoints[0][3][1], 500, 0.1, "area d was set correctly (y=NaN case)");
-
-      assert.closeTo(+areaPathPoints[1][0][0], 300, 0.1, "area d was set correctly (y=NaN case)");
-      assert.closeTo(+areaPathPoints[1][0][1], 200, 0.1, "area d was set correctly (y=NaN case)");
-      assert.closeTo(+areaPathPoints[1][1][0], 400, 0.1, "area d was set correctly (y=NaN case)");
-      assert.closeTo(+areaPathPoints[1][1][1], 100, 0.1, "area d was set correctly (y=NaN case)");
-      assert.closeTo(+areaPathPoints[1][2][0], 400, 0.1, "area d was set correctly (y=NaN case)");
-      assert.closeTo(+areaPathPoints[1][2][1], 500, 0.1, "area d was set correctly (y=NaN case)");
-      assert.closeTo(+areaPathPoints[1][3][0], 300, 0.1, "area d was set correctly (y=NaN case)");
-      assert.closeTo(+areaPathPoints[1][3][1], 500, 0.1, "area d was set correctly (y=NaN case)");
+      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=NaN case)");
 
       dataWithNaN[2] = { foo: NaN, bar: 0.4 };
       simpleDataset.data(dataWithNaN);
 
       areaPathString = normalizePath(areaPath.attr("d"));
-      areaPathStrings = areaPathString.split("Z");
-      areaPathStrings.pop();
-      areaPathPoints = areaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
-      areaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
-
-      assert.closeTo(+areaPathPoints[0][0][0], 0, 0.1, "area d was set correctly (x=NaN case)");
-      assert.closeTo(+areaPathPoints[0][0][1], 500, 0.1, "area d was set correctly (x=NaN case)");
-      assert.closeTo(+areaPathPoints[0][1][0], 100, 0.1, "area d was set correctly (x=NaN case)");
-      assert.closeTo(+areaPathPoints[0][1][1], 400, 0.1, "area d was set correctly (x=NaN case)");
-      assert.closeTo(+areaPathPoints[0][2][0], 100, 0.1, "area d was set correctly (x=NaN case)");
-      assert.closeTo(+areaPathPoints[0][2][1], 500, 0.1, "area d was set correctly (x=NaN case)");
-      assert.closeTo(+areaPathPoints[0][3][0], 0, 0.1, "area d was set correctly (x=NaN case)");
-      assert.closeTo(+areaPathPoints[0][3][1], 500, 0.1, "area d was set correctly (x=NaN case)");
-
-      assert.closeTo(+areaPathPoints[1][0][0], 300, 0.1, "area d was set correctly (x=NaN case)");
-      assert.closeTo(+areaPathPoints[1][0][1], 200, 0.1, "area d was set correctly (x=NaN case)");
-      assert.closeTo(+areaPathPoints[1][1][0], 400, 0.1, "area d was set correctly (x=NaN case)");
-      assert.closeTo(+areaPathPoints[1][1][1], 100, 0.1, "area d was set correctly (x=NaN case)");
-      assert.closeTo(+areaPathPoints[1][2][0], 400, 0.1, "area d was set correctly (x=NaN case)");
-      assert.closeTo(+areaPathPoints[1][2][1], 500, 0.1, "area d was set correctly (x=NaN case)");
-      assert.closeTo(+areaPathPoints[1][3][0], 300, 0.1, "area d was set correctly (x=NaN case)");
-      assert.closeTo(+areaPathPoints[1][3][1], 500, 0.1, "area d was set correctly (x=NaN case)");
+      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=NaN case)");
 
       var dataWithUndefined = areaData.slice();
       dataWithUndefined[2] = { foo: 0.4, bar: undefined };
       simpleDataset.data(dataWithUndefined);
 
       areaPathString = normalizePath(areaPath.attr("d"));
-      areaPathStrings = areaPathString.split("Z");
-      areaPathStrings.pop();
-      areaPathPoints = areaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
-      areaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
-
-      assert.closeTo(+areaPathPoints[0][0][0], 0, 0.1, "area d was set correctly (y=undefined case)");
-      assert.closeTo(+areaPathPoints[0][0][1], 500, 0.1, "area d was set correctly (y=undefined case)");
-      assert.closeTo(+areaPathPoints[0][1][0], 100, 0.1, "area d was set correctly (y=undefined case)");
-      assert.closeTo(+areaPathPoints[0][1][1], 400, 0.1, "area d was set correctly (y=undefined case)");
-      assert.closeTo(+areaPathPoints[0][2][0], 100, 0.1, "area d was set correctly (y=undefined case)");
-      assert.closeTo(+areaPathPoints[0][2][1], 500, 0.1, "area d was set correctly (y=undefined case)");
-      assert.closeTo(+areaPathPoints[0][3][0], 0, 0.1, "area d was set correctly (y=undefined case)");
-      assert.closeTo(+areaPathPoints[0][3][1], 500, 0.1, "area d was set correctly (y=undefined case)");
-
-      assert.closeTo(+areaPathPoints[1][0][0], 300, 0.1, "area d was set correctly (y=undefined case)");
-      assert.closeTo(+areaPathPoints[1][0][1], 200, 0.1, "area d was set correctly (y=undefined case)");
-      assert.closeTo(+areaPathPoints[1][1][0], 400, 0.1, "area d was set correctly (y=undefined case)");
-      assert.closeTo(+areaPathPoints[1][1][1], 100, 0.1, "area d was set correctly (y=undefined case)");
-      assert.closeTo(+areaPathPoints[1][2][0], 400, 0.1, "area d was set correctly (y=undefined case)");
-      assert.closeTo(+areaPathPoints[1][2][1], 500, 0.1, "area d was set correctly (y=undefined case)");
-      assert.closeTo(+areaPathPoints[1][3][0], 300, 0.1, "area d was set correctly (y=undefined case)");
-      assert.closeTo(+areaPathPoints[1][3][1], 500, 0.1, "area d was set correctly (y=undefined case)");
+      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=undefined case)");
 
       dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
       simpleDataset.data(dataWithUndefined);
 
       areaPathString = normalizePath(areaPath.attr("d"));
-      areaPathStrings = areaPathString.split("Z");
-      areaPathStrings.pop();
-      areaPathPoints = areaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
-      areaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
-
-      assert.closeTo(+areaPathPoints[0][0][0], 0, 0.1, "area d was set correctly (x=undefined case)");
-      assert.closeTo(+areaPathPoints[0][0][1], 500, 0.1, "area d was set correctly (x=undefined case)");
-      assert.closeTo(+areaPathPoints[0][1][0], 100, 0.1, "area d was set correctly (x=undefined case)");
-      assert.closeTo(+areaPathPoints[0][1][1], 400, 0.1, "area d was set correctly (x=undefined case)");
-      assert.closeTo(+areaPathPoints[0][2][0], 100, 0.1, "area d was set correctly (x=undefined case)");
-      assert.closeTo(+areaPathPoints[0][2][1], 500, 0.1, "area d was set correctly (x=undefined case)");
-      assert.closeTo(+areaPathPoints[0][3][0], 0, 0.1, "area d was set correctly (x=undefined case)");
-      assert.closeTo(+areaPathPoints[0][3][1], 500, 0.1, "area d was set correctly (x=undefined case)");
-
-      assert.closeTo(+areaPathPoints[1][0][0], 300, 0.1, "area d was set correctly (x=undefined case)");
-      assert.closeTo(+areaPathPoints[1][0][1], 200, 0.1, "area d was set correctly (x=undefined case)");
-      assert.closeTo(+areaPathPoints[1][1][0], 400, 0.1, "area d was set correctly (x=undefined case)");
-      assert.closeTo(+areaPathPoints[1][1][1], 100, 0.1, "area d was set correctly (x=undefined case)");
-      assert.closeTo(+areaPathPoints[1][2][0], 400, 0.1, "area d was set correctly (x=undefined case)");
-      assert.closeTo(+areaPathPoints[1][2][1], 500, 0.1, "area d was set correctly (x=undefined case)");
-      assert.closeTo(+areaPathPoints[1][3][0], 300, 0.1, "area d was set correctly (x=undefined case)");
-      assert.closeTo(+areaPathPoints[1][3][1], 500, 0.1, "area d was set correctly (x=undefined case)");
+      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=undefined case)");
 
       svg.remove();
     });
