@@ -5596,13 +5596,13 @@ describe("_Util.Text", function () {
             var textSelection = svg.append("text");
             var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
             var measureResults = Plottable._Util.Text.writeText("hello world", width, height, measure, "left");
+            var style = window.getComputedStyle(svg.node());
+            var errString = String(style["font"]);
+            assert.isTrue(false, errString);
             assert.isTrue(measureResults.textFits, "mesurement mode: text fits");
             assert.operator(measureResults.usedHeight, ">=", measureResults.usedWidth, "mesurement mode: used more height than width");
             var writeOptions = { g: svg, xAlign: "left", yAlign: "top" };
             var writeResults = Plottable._Util.Text.writeText("hello world", width, height, measure, "left", writeOptions);
-            var style = window.getComputedStyle(svg.node());
-            var errString = String(style["font"]);
-            assert.isTrue(false, errString);
             assert.isTrue(writeResults.textFits, "write mode: text fits");
             assert.equal(measureResults.usedWidth, writeResults.usedWidth, "write mode: used the same width as measurement");
             assert.equal(measureResults.usedHeight, writeResults.usedHeight, "write mode: used the same height as measurement");
