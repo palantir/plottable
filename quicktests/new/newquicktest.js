@@ -1,52 +1,55 @@
 var plottableBranches=[];
+var qtestnames = [];
+var firstBranch;
+var secondBranch;
 var first = true; //boolean to set order
 
 function renderPlots(){
-  first = true;
   var dropdown = $("#category")[0];
-  var branch1 = $("#branch1")[0].value;
-  var branch2 = $("#branch2")[0].value;
+  firstBranch = $("#branch1")[0].value;
+  secondBranch = $("#branch2")[0].value;
   var category = dropdown.options[dropdown.selectedIndex].value;
-
+  var branches = [];
+  branches.push(firstBranch, secondBranch);
   clearTests();
-  pushBranchToArray(category, branch1);
-  pushBranchToArray(category, branch2);
+
+  pushBranchToArray(category, branches);
 }
 
-function loadQuickTests(category, branch){
-  var qtestnames = []; //array of quicktest names
+function loadQuickTests(category, branchList){
   //filter list of quicktests to list of quicktest names to pass to doSomething
   d3.json("list_of_quicktests.json", function (data){
-    var quickTestNames = [];
     data.forEach(function(quicktestobj){
       var path = quicktestobj.path;
 
-      if (-1 !== path.indexOf(category)){
+      if (-1 !== path.indexOf("list/" + category)){
         var name = path.replace(/.*\/|\.js/g, '');
-        quickTestNames.push(name);
+        //quickTestNames.push(name);
+        qtestnames.push(name)
       }
 
     });
-    loadQuickTestsInCategory(quickTestNames, category, branch, first);
-    first = false;
+    loadQuickTestsInCategory(qtestnames, category, branchList[0], branchList[1]);
   });
 }
 
-function loadQuickTestsInCategory(quickTestNames, category, branchName, order){
+function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondBranch){
   //x here is an array of test names
 
-  var branchName = branchName; //this needs to be retrieved from before
-  var div;
+  var div = d3.select("#results");
 
-  if(order){
-    //div = $("#result1");
-    div = d3.select("#result1");
-  }
-  else {
-    //div = $("#result2");
-    div = d3.select("#result2");
-  }
+  // if(order){
+  //   //div = $("#result1");
+  //   div = d3.select("#result1");
+  // }
+  // else {
+  //   //div = $("#result2");
+  //   div = d3.select("#result2");
+  // }
 
+  // make all divs here
+
+  //CHECK IF CLASS QUICKTEST QUICKTESTNAME EXISTS. if doesnt, then create, then append. if there is, then just append.
   quickTestNames.forEach(function(q) { //for each quicktest 
     var name = q;
     d3.text("/quicktests/new/list/" + category + "/" + name + ".js", function(error, text) {
@@ -61,9 +64,14 @@ function loadQuickTestsInCategory(quickTestNames, category, branchName, order){
 
       result = eval(text);
       var className = "quicktest " + name;
-      //div.append("<div id='" + name + "'> </div>"); //create specific div for a specific quicktest
-      var qtdiv = div.append("div").attr("class", className).append("div");
-        runQuickTest(qtdiv, result, branchName, plottableBranches);
+      //div.append("<div class='" + name + "'> </div>"); //create specific div for a specific quicktest
+      var div = d3.select("#results").append("div").attr("class", className);
+      var firstdiv = div.append("div").attr("class", "first");
+      var seconddiv = div.append("div").attr("class", "second");
+      var data = result.makeData();
+      runQuickTest(firstdiv, data, firstBranch ); //just runQuickTest twice here with same result
+      runQuickTest(seconddiv, data, secondBranch); //just runQuickTest twice here with same result
+
     });
   });//forEach
     
@@ -71,22 +79,36 @@ function loadQuickTestsInCategory(quickTestNames, category, branchName, order){
 
 //METHODS
 
-function pushBranchToArray(category, branchName){
-  if (plottableBranches[branchName] != null) {
+function pushBranchToArray(category, branchList){
+  var listOfUrl = [];
+  var branchName1 = branchList[0];
+  var branchName2 = branchList[1];
+
+
+  if (plottableBranches[branchName1] != null  && plottableBranches[branchName2] != null ) {
     return;
   }
 
-  if (branchName !== "#local") {
-    url = "https://rawgit.com/palantir/plottable/" + branchName + "/plottable.js";
-  } else {
-    url = "/plottable.js"; //load local version
-  }
+  branchList.forEach(function(branch){
+    if (branch !== "#local") {
+      listOfUrl.push("https://rawgit.com/palantir/plottable/" + branch + "/plottable.js");
+    } else {
+      listOfUrl.push("/plottable.js"); //load local version
+    }
 
-  $.getScript(url, function(data, textStatus) { 
+  })
+
+  $.getScript(listOfUrl[0], function(data, textStatus) { 
     if(textStatus === "success"){
+      console.log("success!");
+      plottableBranches[branchName1] = Plottable;
+      $.getScript(listOfUrl[1], function(data, testStatus){ //load second 
+        if(textStatus === "success"){
+          plottableBranches[branchName2] = Plottable;
+          loadQuickTests(category, branchList);
+        }
+      });
       console.log("success!")
-      plottableBranches[branchName] = Plottable;
-      loadQuickTests(category, branchName);
     }
     if(textStatus === "error"){
       console.log("errored!")
@@ -94,21 +116,17 @@ function pushBranchToArray(category, branchName){
 
   });
 }
-//retrieves the plottable object according to branch, then run
-function prepareQuickTest(div, result, branchName, plottableBranches) {
-        runQuickTest(div, result, branchName, plottableBranches); //run the quicktest once the plottable object is retrieved
 
-
-}//appendQuickTestBranch
 
 //run a single quicktest
-function runQuickTest(div, result, branch, plottableBranches){
-  result.run(div, result.makeData(), plottableBranches[branch])
+function runQuickTest(div, data, branch){
+  result.run(div, data, plottableBranches[branch])
 };
 
 
 function clearTests(){
   plottableBranches = [];
+  qtestnames= [];
   resetDisplayProperties();
   d3.selectAll(".quicktest").remove();
 }
@@ -122,23 +140,23 @@ window.onkeyup = function(e){
   var key = e.keyCode ? e.keyCode : e.which;
   //if 1 is pressed
   if(key == 49){
-    $("#result1, #result1 svg").css("display", "block");
-    $("#result2, #result2 svg").css("display", "none");
+    $(".first svg").css("display", "block");
+    $(".second svg").css("display", "none");
   }
   //if 2 is pressed
   if(key == 50){
-    $("#result1, #result1 svg").css("display", "none");
-    $("#result2, #result2 svg").css("display", "block");
+    $(".first svg").css("display", "none");
+    $(".second svg").css("display", "block");
   }
   //if 3 is pressed
   if(key == 51){
-    $("#result1, #result1 svg").css("display", "block");
-    $("#result2, #result2 svg").css("display", "block");
+    $(".first svg").css("display", "block");
+    $(".second svg").css("display", "block");
   }
   //if 4 is pressed
   if(key == 52){
-    $("#result1, #result1 svg").css("display", "none");
-    $("#result2, #result2 svg").css("display", "none");
+    $(".first svg").css("display", "none");
+    $(".second svg").css("display", "none");
   }
 }
 

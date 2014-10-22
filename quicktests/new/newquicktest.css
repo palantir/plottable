@@ -7,8 +7,8 @@ h2{
 }
 
 svg{
-  position: relative;
-  width: 500px;
+/*  position: relative;
+*/  width: 500px;
   height: 400px;
 }
 
@@ -18,17 +18,33 @@ svg{
   float: left;
   padding: 10px;
   margin: 5px;
+  width: 500px;
+  height: 400px;
 }
 
-#result1{
+.first{
   position: absolute;
-  display: block;
 }
 
-#result2{
+.second{
   position: absolute;
-  display: block;
 }
 
-div{
+#results{
+  margin: 50px auto;
+  position: relative;
+  height: 100%;
+  width: 100%;
+
+}
+
+.navigation{
+  background-color: #db2e65;
+  width: 100%;
+  height: 50px;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  text-align: center;
+  z-index: 1;
 }

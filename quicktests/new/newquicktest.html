@@ -14,7 +14,7 @@
 
 <body>
 
-<div>
+<div class="navigation">
     <label>Category:</label>
      <select type="text" id="category" name="category">
       <option value="basic">Basic</option>
@@ -24,23 +24,16 @@
       <option value="realistic">Realistic</option>
     </select>
 
-    <select type="text" id="branch1" name="branch1">
-      <option value="v0.33.0-preview">v0.33.0-preview</option>
-      <option value="develop">develop</option>
-    </select>
+    <input type="text" id="branch1" name="branch1" placeholder="first branch (ex. master)">
+    </input>
 
-    <select type="text" id="branch2" name="branch2">
-      <option value="develop">develop</option>
-      <option value="master">master</option>
-    </select>
+    <input type="text" id="branch2" name="branch2" placeholder="second branch (ex. develop)">
+    </input>
     
     <input id="render" type="submit" value="Render" onclick="renderPlots();">
 </div>
 
-<div id="result1">
-</div>
-
-<div id="result2">
+<div id="results">
 </div>
 
 </body>
