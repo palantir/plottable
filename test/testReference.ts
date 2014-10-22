@@ -39,6 +39,7 @@
 ///<reference path="scales/coordinatorTests.ts" />
 ///<reference path="scales/scaleTests.ts" />
 ///<reference path="scales/timeScaleTests.ts" />
+///<reference path="scales/tickGeneratorsTests.ts" />
 
 ///<reference path="utils/domUtilsTests.ts" />
 ///<reference path="utils/formattersTests.ts" />
@@ -50,5 +51,6 @@
 ///<reference path="utils/utilsTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />
+///<reference path="interactions/hoverInteractionTests.ts" />
 
 ///<reference path="dispatchers/dispatcherTests.ts" />

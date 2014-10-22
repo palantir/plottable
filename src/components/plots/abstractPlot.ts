@@ -13,7 +13,7 @@ export module Plot {
     public _animate: boolean = false;
     public _animators: Animator.PlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
-    private animateOnNextRender = true;
+    public _animateOnNextRender = true;
     private nextSeriesIndex: number;
 
     /**
@@ -38,7 +38,7 @@ export module Plot {
 
     public _anchor(element: D3.Selection) {
       super._anchor(element);
-      this.animateOnNextRender = true;
+      this._animateOnNextRender = true;
       this._dataChanged = true;
       this._updateScaleExtents();
     }
@@ -47,7 +47,7 @@ export module Plot {
       super._setup();
       this._renderArea = this._content.append("g").classed("render-area", true);
       // HACKHACK on 591
-      this._getDrawersInOrder().forEach((d) => d._renderArea = this._renderArea.append("g"));
+      this._getDrawersInOrder().forEach((d) => d.setup(this._renderArea.append("g")));
     }
 
     public remove() {
@@ -101,7 +101,7 @@ export module Plot {
       this._key2DatasetDrawerKey.set(key, ddk);
 
       if (this._isSetup) {
-        drawer._renderArea = this._renderArea.append("g");
+        drawer.setup(this._renderArea.append("g"));
       }
       dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
       this._onDatasetUpdate();
@@ -111,13 +111,17 @@ export module Plot {
       return new _Drawer.AbstractDrawer(key);
     }
 
-    public _getAnimator(drawer: _Drawer.AbstractDrawer, index: number): Animator.PlotAnimator {
-      return new Animator.Null();
+    public _getAnimator(key: string): Animator.PlotAnimator {
+      if (this._animate && this._animateOnNextRender) {
+        return this._animators[key] || new Animator.Null();
+      } else {
+        return new Animator.Null();
+      }
     }
 
     public _onDatasetUpdate() {
       this._updateScaleExtents();
-      this.animateOnNextRender = true;
+      this._animateOnNextRender = true;
       this._dataChanged = true;
       this._render();
     }
@@ -188,9 +192,9 @@ export module Plot {
 
     public _doRender() {
       if (this._isAnchored) {
-        this._paint();
+        this.paint();
         this._dataChanged = false;
-        this.animateOnNextRender = false;
+        this._animateOnNextRender = false;
       }
     }
 
@@ -231,28 +235,6 @@ export module Plot {
             projector.scale._updateExtent(scaleKey, attr, extent);
           }
         });
-      }
-    }
-
-    /**
-     * Applies attributes to the selection.
-     *
-     * If animation is enabled and a valid animator's key is specified, the
-     * attributes are applied with the animator. Otherwise, they are applied
-     * immediately to the selection.
-     *
-     * The animation will not animate during auto-resize renders.
-     *
-     * @param {D3.Selection} selection The selection of elements to update.
-     * @param {string} animatorKey The key for the animator.
-     * @param {AttributeToProjector} attrToProjector The set of attributes to set on the selection.
-     * @returns {D3.Selection} The resulting selection (potentially after the transition)
-     */
-    public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: AttributeToProjector): any {
-      if (this._animate && this.animateOnNextRender && this._animators[animatorKey]) {
-        return this._animators[animatorKey].animate(selection, attrToProjector);
-      } else {
-        return selection.attr(attrToProjector);
       }
     }
 
@@ -377,13 +359,28 @@ export module Plot {
       return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey.get(k).drawer);
     }
 
-    public _paint() {
-      var attrHash = this._generateAttrToProjector();
-      var datasets = this.datasets();
-      this._getDrawersInOrder().forEach((d, i) => {
-        var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
-        d.draw(datasets[i].data(), attrHash, animator);
+    public _generateDrawSteps(): _Drawer.DrawStep[] {
+      return [{attrToProjector: this._generateAttrToProjector(), animator: new Animator.Null()}];
+    }
+
+    public _additionalPaint() {
+      // no-op
+    }
+
+    public _getDataToDraw() {
+      var datasets: D3.Map<any[]> = d3.map();
+      this._datasetKeysInOrder.forEach((key: string) => {
+        datasets.set(key, this._key2DatasetDrawerKey.get(key).dataset.data());
       });
+      return datasets;
+    }
+
+    private paint() {
+      var drawSteps = this._generateDrawSteps();
+      var dataToDraw = this._getDataToDraw();
+      var drawers = this._getDrawersInOrder();
+      this._datasetKeysInOrder.forEach((k, i) => drawers[i].draw(dataToDraw.get(k), drawSteps));
+      this._additionalPaint();
     }
   }
 }

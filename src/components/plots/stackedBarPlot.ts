@@ -31,10 +31,14 @@ export module Plot {
       AbstractBarPlot.prototype._setup.call(this);
     }
 
-    public _getAnimator(drawer: _Drawer.AbstractDrawer, index: number) {
-      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-      var scaledBaseline = primaryScale.scale(this._baselineValue);
-      return new Animator.MovingRect(scaledBaseline, this._isVertical);
+    public _getAnimator(key: string): Animator.PlotAnimator {
+      if(this._animate && this._animateOnNextRender) {
+        var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+        var scaledBaseline = primaryScale.scale(this._baselineValue);
+        return new Animator.MovingRect(scaledBaseline, this._isVertical);
+      } else {
+        return new Animator.Null();
+      }
     }
 
     public _getDrawer(key: string) {
@@ -48,29 +52,20 @@ export module Plot {
       var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var primaryAccessor = this._projectors[primaryAttr].accessor;
       var getStart = (d: any) => primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      var getEnd = (d: any) => primaryScale.scale(primaryAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var getEnd = (d: any) => primaryScale.scale(+primaryAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
       var heightF = (d: any) => Math.abs(getEnd(d) - getStart(d));
       var widthF = attrToProjector["width"];
       attrToProjector["height"] = this._isVertical ? heightF : widthF;
       attrToProjector["width"] = this._isVertical ? widthF : heightF;
 
-      var attrFunction = (d: any) => primaryAccessor(d) < 0 ? getStart(d) : getEnd(d);
+      var attrFunction = (d: any) => +primaryAccessor(d) < 0 ? getStart(d) : getEnd(d);
       attrToProjector[primaryAttr] = (d: any) => this._isVertical ? attrFunction(d) : attrFunction(d) - heightF(d);
       return attrToProjector;
     }
 
-    public _paint() {
-      super._paint();
-      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-      var scaledBaseline = primaryScale.scale(this._baselineValue);
-      var baselineAttr: any = {
-        "x1": this._isVertical ? 0 : scaledBaseline,
-        "y1": this._isVertical ? scaledBaseline : 0,
-        "x2": this._isVertical ? this.width() : scaledBaseline,
-        "y2": this._isVertical ? scaledBaseline : this.height()
-      };
-      this._baseline.attr(baselineAttr);
+     public _additionalPaint() {
+      AbstractBarPlot.prototype._additionalPaint.apply(this);
     }
 
     public baseline(value: number) {

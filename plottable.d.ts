@@ -102,6 +102,18 @@ declare module Plottable {
             function max<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
             function min(arr: number[], default_val?: number): number;
             function min<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
+            /**
+             * Creates shallow copy of map.
+             * @param {{ [key: string]: any }} oldMap Map to copy
+             *
+             * @returns {[{ [key: string]: any }} coppied map.
+             */
+            function copyMap<T>(oldMap: {
+                [x: string]: T;
+            }): {
+                [x: string]: T;
+            };
+            function range(start: number, stop: number, step?: number): number[];
         }
     }
 }
@@ -781,14 +793,6 @@ declare module Plottable {
 }
 
 declare module Plottable {
-    interface DatasetInterface {
-        data: any[];
-        metadata: Metadata;
-    }
-    interface Metadata {
-        cssClass?: string;
-        color?: string;
-    }
     interface _Accessor {
         (datum: any, index?: number, metadata?: any): any;
     }
@@ -1078,9 +1082,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        interface TickGenerator<D> {
-            (scale: AbstractQuantitative<D>): D[];
-        }
         class AbstractQuantitative<D> extends AbstractScale<D, number> {
             _d3Scale: D3.Scale.QuantitativeScale;
             _numTicks: number;
@@ -1088,7 +1089,7 @@ declare module Plottable {
             _userSetDomainer: boolean;
             _domainer: Domainer;
             _typeCoercer: (d: any) => number;
-            _tickGenerator: TickGenerator<D>;
+            _tickGenerator: TickGenerators.TickGenerator<D>;
             /**
              * Constructs a new QuantitativeScale.
              *
@@ -1197,14 +1198,14 @@ declare module Plottable {
              *
              * @returns {TickGenerator} The current tick generator.
              */
-            tickGenerator(): TickGenerator<D>;
+            tickGenerator(): TickGenerators.TickGenerator<D>;
             /**
              * Sets a tick generator
              *
              * @param {TickGenerator} generator, the new tick generator.
              * @return {AbstractQuantitative} The calling AbstractQuantitative.
              */
-            tickGenerator(generator: TickGenerator<D>): AbstractQuantitative<D>;
+            tickGenerator(generator: TickGenerators.TickGenerator<D>): AbstractQuantitative<D>;
         }
     }
 }
@@ -1493,10 +1494,47 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Scale {
+        module TickGenerators {
+            interface TickGenerator<D> {
+                (scale: AbstractQuantitative<D>): D[];
+            }
+            /**
+             * Creates a tick generator using the specified interval.
+             *
+             * Generates ticks at multiples of the interval while also including the domain boundaries.
+             *
+             * @param {number} interval The interval between two ticks (not including the end ticks).
+             *
+             * @returns {TickGenerator} A tick generator using the specified interval.
+             */
+            function intervalTickGenerator(interval: number): TickGenerator<number>;
+        }
+    }
+}
+
+
+declare module Plottable {
     module _Drawer {
+        /**
+         * A step for the drawer to draw.
+         *
+         * Specifies how AttributeToProjector needs to be animated.
+         */
+        interface DrawStep {
+            attrToProjector: AttributeToProjector;
+            animator: Animator.PlotAnimator;
+        }
         class AbstractDrawer {
             _renderArea: D3.Selection;
+            _className: string;
             key: string;
+            /**
+             * Sets the class, which needs to be applied to bound elements.
+             *
+             * @param{string} className The class name to be applied.
+             */
+            setClass(className: string): AbstractDrawer;
             /**
              * Constructs a Drawer
              *
@@ -1504,17 +1542,30 @@ declare module Plottable {
              * @param{string} key The key associated with this Drawer
              */
             constructor(key: string);
+            setup(area: D3.Selection): void;
             /**
              * Removes the Drawer and its renderArea
              */
             remove(): void;
             /**
-             * Draws the data into the renderArea using the attrHash for attributes
+             * Enter new data to render area and creates binding
              *
              * @param{any[]} data The data to be drawn
-             * @param{attrHash} AttributeToProjector The list of attributes to set on the data
              */
-            draw(data: any[], attrToProjector: AttributeToProjector, animator?: Animator.Null): void;
+            _enterData(data: any[]): void;
+            /**
+             * Draws data using one step
+             *
+             * @param{DataStep} step The step, how data should be drawn.
+             */
+            _drawStep(step: DrawStep): void;
+            /**
+             * Draws the data into the renderArea using the spefic steps
+             *
+             * @param{any[]} data The data to be drawn
+             * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
+             */
+            draw(data: any[], drawSteps: DrawStep[]): void;
         }
     }
 }
@@ -1522,8 +1573,10 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Arc extends AbstractDrawer {
-            draw(data: any[], attrToProjector: AttributeToProjector, animator?: Animator.Null): void;
+        class Line extends AbstractDrawer {
+            _enterData(data: any[]): void;
+            setup(area: D3.Selection): void;
+            _drawStep(step: DrawStep): void;
         }
     }
 }
@@ -1531,8 +1584,16 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Area extends AbstractDrawer {
-            draw(data: any[], attrToProjector: AttributeToProjector): void;
+        class Area extends Line {
+            _enterData(data: any[]): void;
+            /**
+             * Sets the value determining if line should be drawn.
+             *
+             * @param{boolean} draw The value determing if line should be drawn.
+             */
+            drawLine(draw: boolean): Area;
+            setup(area: D3.Selection): void;
+            _drawStep(step: DrawStep): void;
         }
     }
 }
@@ -1540,8 +1601,28 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Rect extends AbstractDrawer {
-            draw(data: any[], attrToProjector: AttributeToProjector, animator?: Animator.Null): void;
+        class Element extends AbstractDrawer {
+            _svgElement: string;
+            /**
+             * Sets the svg element, which needs to be bind to data
+             *
+             * @param{string} tag The svg element to be bind
+             */
+            svgElement(tag: string): Element;
+            _getDrawSelection(): D3.Selection;
+            _drawStep(step: DrawStep): void;
+            _enterData(data: any[]): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Arc extends Element {
+            constructor(key: string);
+            _drawStep(step: DrawStep): void;
+            draw(data: any[], drawSteps: DrawStep[]): void;
         }
     }
 }
@@ -2445,6 +2526,7 @@ declare module Plottable {
             _animate: boolean;
             _animators: Animator.PlotAnimatorMap;
             _ANIMATION_DURATION: number;
+            _animateOnNextRender: boolean;
             /**
              * Constructs a Plot.
              *
@@ -2475,7 +2557,7 @@ declare module Plottable {
             addDataset(dataset: any[]): AbstractPlot;
             _addDataset(key: string, dataset: Dataset): void;
             _getDrawer(key: string): _Drawer.AbstractDrawer;
-            _getAnimator(drawer: _Drawer.AbstractDrawer, index: number): Animator.PlotAnimator;
+            _getAnimator(key: string): Animator.PlotAnimator;
             _onDatasetUpdate(): void;
             /**
              * Sets an attribute of every data point.
@@ -2520,21 +2602,6 @@ declare module Plottable {
              */
             _updateScaleExtents(): void;
             _updateScaleExtent(attr: string): void;
-            /**
-             * Applies attributes to the selection.
-             *
-             * If animation is enabled and a valid animator's key is specified, the
-             * attributes are applied with the animator. Otherwise, they are applied
-             * immediately to the selection.
-             *
-             * The animation will not animate during auto-resize renders.
-             *
-             * @param {D3.Selection} selection The selection of elements to update.
-             * @param {string} animatorKey The key for the animator.
-             * @param {AttributeToProjector} attrToProjector The set of attributes to set on the selection.
-             * @returns {D3.Selection} The resulting selection (potentially after the transition)
-             */
-            _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: AttributeToProjector): any;
             /**
              * Get the animator associated with the specified Animator key.
              *
@@ -2589,7 +2656,9 @@ declare module Plottable {
             _removeDataset(key: string): AbstractPlot;
             datasets(): Dataset[];
             _getDrawersInOrder(): _Drawer.AbstractDrawer[];
-            _paint(): void;
+            _generateDrawSteps(): _Drawer.DrawStep[];
+            _additionalPaint(): void;
+            _getDataToDraw(): D3.Map<any[]>;
         }
     }
 }
@@ -2608,7 +2677,6 @@ declare module Plottable {
             _addDataset(key: string, dataset: Dataset): void;
             _generateAttrToProjector(): AttributeToProjector;
             _getDrawer(key: string): _Drawer.AbstractDrawer;
-            _paint(): void;
         }
     }
 }
@@ -2647,12 +2715,10 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Scatter<X, Y> extends AbstractXYPlot<X, Y> {
-            _animators: Animator.PlotAnimatorMap;
             /**
              * Constructs a ScatterPlot.
              *
              * @constructor
-             * @param {DatasetInterface | any} dataset The dataset to render.
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
@@ -2663,8 +2729,9 @@ declare module Plottable {
              * radius, and "fill" is the CSS color of the datum.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Scatter<X, Y>;
+            _getDrawer(key: string): _Drawer.Element;
             _generateAttrToProjector(): AttributeToProjector;
-            _paint(): void;
+            _generateDrawSteps(): _Drawer.DrawStep[];
         }
     }
 }
@@ -2691,12 +2758,14 @@ declare module Plottable {
              */
             constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>);
             _addDataset(key: string, dataset: Dataset): void;
+            _getDrawer(key: string): _Drawer.Element;
             /**
              * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
              * the data should return a valid CSS color.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Grid;
-            _paint(): void;
+            _generateAttrToProjector(): AttributeToProjector;
+            _generateDrawSteps(): _Drawer.DrawStep[];
         }
     }
 }
@@ -2704,7 +2773,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class AbstractBarPlot<X, Y> extends AbstractXYPlot<X, Y> {
+        class AbstractBarPlot<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
@@ -2712,7 +2781,6 @@ declare module Plottable {
             _baselineValue: number;
             _barAlignmentFactor: number;
             _isVertical: boolean;
-            _animators: Animator.PlotAnimatorMap;
             /**
              * Constructs a BarPlot.
              *
@@ -2721,9 +2789,8 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
-            _getDrawer(key: string): _Drawer.Rect;
+            _getDrawer(key: string): _Drawer.Element;
             _setup(): void;
-            _paint(): void;
             /**
              * Sets the baseline for the bars to the specified value.
              *
@@ -2765,7 +2832,29 @@ declare module Plottable {
             _updateDomainer(scale: Scale.AbstractScale<any, number>): void;
             _updateYDomainer(): void;
             _updateXDomainer(): void;
+            _additionalPaint(): void;
+            _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
+            /**
+             * Gets the current hover mode.
+             *
+             * @return {string} The current hover mode.
+             */
+            hoverMode(): string;
+            /**
+             * Sets the hover mode for hover interactions. There are two modes:
+             *     - "point": Selects the bar under the mouse cursor (default).
+             *     - "line" : Selects any bar that would be hit by a line extending
+             *                in the same direction as the bar and passing through
+             *                the cursor.
+             *
+             * @param {string} mode The desired hover mode.
+             * @return {AbstractBarPlot} The calling Bar Plot.
+             */
+            hoverMode(mode: String): AbstractBarPlot<X, Y>;
+            _hoverOverComponent(p: Point): void;
+            _hoverOutComponent(p: Point): void;
+            _doHover(p: Point): Interaction.HoverData;
         }
     }
 }
@@ -2790,7 +2879,6 @@ declare module Plottable {
              * Constructs a VerticalBarPlot.
              *
              * @constructor
-             * @param {DatasetInterface | any} dataset The dataset to render.
              * @param {Scale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
@@ -2835,20 +2923,19 @@ declare module Plottable {
     module Plot {
         class Line<X> extends AbstractXYPlot<X, number> {
             _yScale: Scale.AbstractQuantitative<number>;
-            _animators: Animator.PlotAnimatorMap;
             /**
              * Constructs a LinePlot.
              *
              * @constructor
-             * @param {any | DatasetInterface} dataset The dataset to render.
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
-            _getResetYFunction(): (d: any, i: number) => number;
-            _generateAttrToProjector(): AttributeToProjector;
             _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor): boolean;
-            _paint(): void;
+            _getDrawer(key: string): _Drawer.Line;
+            _getResetYFunction(): (d: any, i: number) => number;
+            _generateDrawSteps(): _Drawer.DrawStep[];
+            _generateAttrToProjector(): AttributeToProjector;
             _wholeDatumAttributes(): string[];
         }
     }
@@ -2865,16 +2952,15 @@ declare module Plottable {
              * Constructs an AreaPlot.
              *
              * @constructor
-             * @param {DatasetInterface | any} dataset The dataset to render.
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _onDatasetUpdate(): void;
+            _getDrawer(key: string): _Drawer.Area;
             _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Area<X>;
             _getResetYFunction(): AppliedAccessor;
-            _paint(): void;
             _wholeDatumAttributes(): string[];
         }
     }
@@ -2897,7 +2983,7 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             _generateAttrToProjector(): AttributeToProjector;
-            _paint(): void;
+            _getDataToDraw(): D3.Map<any[]>;
         }
     }
 }
@@ -2907,6 +2993,7 @@ declare module Plottable {
     module Plot {
         class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
             _isVertical: boolean;
+            project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractStacked<X, Y>;
             _onDatasetUpdate(): void;
             _updateScaleExtents(): void;
         }
@@ -2929,7 +3016,7 @@ declare module Plottable {
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _getDrawer(key: string): _Drawer.Area;
             _setup(): void;
-            _paint(): void;
+            _additionalPaint(): void;
             _updateYDomainer(): void;
             _onDatasetUpdate(): void;
             _generateAttrToProjector(): AttributeToProjector;
@@ -2955,10 +3042,10 @@ declare module Plottable {
              */
             constructor(xScale?: Scale.AbstractScale<X, number>, yScale?: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             _setup(): void;
-            _getAnimator(drawer: _Drawer.AbstractDrawer, index: number): Animator.MovingRect;
+            _getAnimator(key: string): Animator.PlotAnimator;
             _getDrawer(key: string): any;
             _generateAttrToProjector(): any;
-            _paint(): void;
+            _additionalPaint(): void;
             baseline(value: number): any;
             _updateDomainer(scale: Scale.AbstractScale<any, number>): any;
             _updateXDomainer(): any;
@@ -3007,6 +3094,15 @@ declare module Plottable {
     module Animator {
         /**
          * The base animator implementation with easing, duration, and delay.
+         *
+         * The maximum delay between animations can be configured with maxIterativeDelay.
+         *
+         * The maximum total animation duration can be configured with maxTotalDuration.
+         * maxTotalDuration does not set actual total animation duration.
+         *
+         * The actual interval delay is calculated by following formula:
+         * min(maxIterativeDelay(),
+         *   max(maxTotalDuration() - duration(), 0) / <number of iterations>)
          */
         class Base implements PlotAnimator {
             /**
@@ -3017,6 +3113,14 @@ declare module Plottable {
              * The default starting delay of the animation in milliseconds
              */
             static DEFAULT_DELAY_MILLISECONDS: number;
+            /**
+             * The default maximum start delay between each start of an animation
+             */
+            static DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS: number;
+            /**
+             * The default maximum total animation duration
+             */
+            static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS: number;
             /**
              * The default easing of the animation
              */
@@ -3067,42 +3171,6 @@ declare module Plottable {
              * @returns {Default} The calling Default Animator.
              */
             easing(easing: string): Base;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Animator {
-        /**
-         * An animator that delays the animation of the attributes using the index
-         * of the selection data.
-         *
-         * The maximum delay between animations can be configured with maxIterativeDelay.
-         *
-         * The maximum total animation duration can be configured with maxTotalDuration.
-         * maxTotalDuration does not set actual total animation duration.
-         *
-         * The actual interval delay is calculated by following formula:
-         * min(maxIterativeDelay(),
-         *   max(totalDurationLimit() - duration(), 0) / <number of iterations>)
-         */
-        class IterativeDelay extends Base {
-            /**
-             * The default maximum start delay between each start of an animation
-             */
-            static DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS: number;
-            /**
-             * The default maximum total animation duration
-             */
-            static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS: number;
-            /**
-             * Constructs an animator with a start delay between each selection animation
-             *
-             * @constructor
-             */
-            constructor();
-            animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition;
             /**
              * Gets the maximum start delay between animations in milliseconds.
              *
@@ -3113,9 +3181,9 @@ declare module Plottable {
              * Sets the maximum start delay between animations in milliseconds.
              *
              * @param {number} maxIterDelay The maximum iterative delay in milliseconds.
-             * @returns {IterativeDelay} The calling IterativeDelay Animator.
+             * @returns {Base} The calling Base Animator.
              */
-            maxIterativeDelay(maxIterDelay: number): IterativeDelay;
+            maxIterativeDelay(maxIterDelay: number): Base;
             /**
              * Gets the maximum total animation duration in milliseconds.
              *
@@ -3126,9 +3194,9 @@ declare module Plottable {
              * Sets the maximum total animation duration in miliseconds.
              *
              * @param {number} maxDuration The maximum total animation duration in milliseconds.
-             * @returns {IterativeDelay} The calling IterativeDelay Animator.
+             * @returns {Base} The calling Base Animator.
              */
-            maxTotalDuration(maxDuration: number): IterativeDelay;
+            maxTotalDuration(maxDuration: number): Base;
         }
     }
 }
@@ -3471,6 +3539,65 @@ declare module Plottable {
         class YDragBox extends DragBox {
             _drag(): void;
             setBox(y0: number, y1: number): YDragBox;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
+        interface HoverData {
+            data: any[];
+            selection: D3.Selection;
+        }
+        interface Hoverable extends Component.AbstractComponent {
+            /**
+             * Called when the user first mouses over the Component.
+             *
+             * @param {Point} The cursor's position relative to the Component's origin.
+             */
+            _hoverOverComponent(p: Point): void;
+            /**
+             * Called when the user mouses out of the Component.
+             *
+             * @param {Point} The cursor's position relative to the Component's origin.
+             */
+            _hoverOutComponent(p: Point): void;
+            /**
+             * Returns the HoverData associated with the given position, and performs
+             * any visual changes associated with hovering inside a Component.
+             *
+             * @param {Point} The cursor's position relative to the Component's origin.
+             * @return {HoverData} The HoverData associated with the given position.
+             */
+            _doHover(p: Point): HoverData;
+        }
+        class Hover extends AbstractInteraction {
+            _componentToListenTo: Hoverable;
+            _anchor(component: Hoverable, hitBox: D3.Selection): void;
+            /**
+             * Attaches an callback to be called when the user mouses over an element.
+             *
+             * @param {(hoverData: HoverData) => any} callback The callback to be called.
+             *      The callback will be passed data for newly hovered-over elements.
+             * @return {Interaction.Hover} The calling Interaction.Hover.
+             */
+            onHoverOver(callback: (hoverData: HoverData) => any): Hover;
+            /**
+             * Attaches a callback to be called when the user mouses off of an element.
+             *
+             * @param {(hoverData: HoverData) => any} callback The callback to be called.
+             *      The callback will be passed data from the hovered-out elements.
+             * @return {Interaction.Hover} The calling Interaction.Hover.
+             */
+            onHoverOut(callback: (hoverData: HoverData) => any): Hover;
+            /**
+             * Retrieves the HoverData associated with the elements the user is currently hovering over.
+             *
+             * @return {HoverData} The data and selection corresponding to the elements
+             *                     the user is currently hovering over.
+             */
+            getCurrentHoverData(): HoverData;
         }
     }
 }

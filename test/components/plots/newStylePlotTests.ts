@@ -8,7 +8,7 @@ describe("Plots", () => {
 
     beforeEach(() => {
       p = new Plottable.Plot.AbstractPlot();
-      p._getDrawer = (k: string) => new Plottable._Drawer.Rect(k);
+      p._getDrawer = (k: string) => new Plottable._Drawer.Element(k).svgElement("rect");
     });
 
     afterEach(() => {
