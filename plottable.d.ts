@@ -989,7 +989,7 @@ declare module Plottable {
                 [x: string]: D[];
             };
             _typeCoercer: (d: any) => any;
-            _adjustmentInProgress: boolean;
+            _domainModificationInProgress: boolean;
             /**
              * Constructs a new Scale.
              *
@@ -2721,12 +2721,16 @@ declare module Plottable {
             /**
              * Sets the automatic domain adjustment over visible points for y scale.
              *
+             * If autoAdjustment is true adjustment is immediately performend.
+             *
              * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
             automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y>;
             /**
              * Sets the automatic domain adjustment over visible points for x scale.
+             *
+             * If autoAdjustment is true adjustment is immediately performend.
              *
              * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.

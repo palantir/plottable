@@ -38,12 +38,18 @@ export module Plot {
       // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale) {
+        if (this._xScale) {
+          this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this._plottableID);
+        }
         this._xScale = scale;
         this._updateXDomainer();
         scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, () => this.adjustYDomainOnChangeFromX());
       }
 
       if (attrToSet === "y" && scale) {
+       if (this._yScale) {
+          this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this._plottableID);
+        }
         this._yScale = scale;
         this._updateYDomainer();
         scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, () => this.adjustXDomainOnChangeFromY());
@@ -68,22 +74,28 @@ export module Plot {
     /**
      * Sets the automatic domain adjustment over visible points for y scale.
      *
+     * If autoAdjustment is true adjustment is immediately performend.
+     *
      * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
      * @returns {AbstractXYPlot} The calling AbstractXYPlot.
      */
     public automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X,Y> {
       this._autoAdjustYScaleDomain = autoAdjustment;
+      this.adjustYDomainOnChangeFromX();
       return this;
     }
 
     /**
      * Sets the automatic domain adjustment over visible points for x scale.
      *
+     * If autoAdjustment is true adjustment is immediately performend.
+     *
      * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
      * @returns {AbstractXYPlot} The calling AbstractXYPlot.
      */
     public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X,Y>  {
       this._autoAdjustXScaleDomain = autoAdjustment;
+      this.adjustXDomainOnChangeFromY();
       return this;
     }
 

@@ -2068,7 +2068,7 @@ var Plottable;
                 this.broadcaster = new Plottable.Core.Broadcaster(this);
                 this._rendererAttrID2Extent = {};
                 this._typeCoercer = function (d) { return d; };
-                this._adjustmentInProgress = false;
+                this._domainModificationInProgress = false;
                 this._d3Scale = scale;
             }
             AbstractScale.prototype._getAllExtents = function () {
@@ -2126,11 +2126,11 @@ var Plottable;
                 return this._d3Scale.domain();
             };
             AbstractScale.prototype._setDomain = function (values) {
-                if (!this._adjustmentInProgress) {
-                    this._adjustmentInProgress = true;
+                if (!this._domainModificationInProgress) {
+                    this._domainModificationInProgress = true;
                     this._d3Scale.domain(values);
                     this.broadcaster.broadcast();
-                    this._adjustmentInProgress = false;
+                    this._domainModificationInProgress = false;
                 }
             };
             AbstractScale.prototype.range = function (values) {
@@ -6377,11 +6377,17 @@ var Plottable;
                 // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
                 // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
                 if (attrToSet === "x" && scale) {
+                    if (this._xScale) {
+                        this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this._plottableID);
+                    }
                     this._xScale = scale;
                     this._updateXDomainer();
                     scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this.adjustYDomainOnChangeFromX(); });
                 }
                 if (attrToSet === "y" && scale) {
+                    if (this._yScale) {
+                        this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this._plottableID);
+                    }
                     this._yScale = scale;
                     this._updateYDomainer();
                     scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this.adjustXDomainOnChangeFromY(); });
@@ -6402,21 +6408,27 @@ var Plottable;
             /**
              * Sets the automatic domain adjustment over visible points for y scale.
              *
+             * If autoAdjustment is true adjustment is immediately performend.
+             *
              * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
             AbstractXYPlot.prototype.automaticallyAdjustYScaleOverVisiblePoints = function (autoAdjustment) {
                 this._autoAdjustYScaleDomain = autoAdjustment;
+                this.adjustYDomainOnChangeFromX();
                 return this;
             };
             /**
              * Sets the automatic domain adjustment over visible points for x scale.
+             *
+             * If autoAdjustment is true adjustment is immediately performend.
              *
              * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
             AbstractXYPlot.prototype.automaticallyAdjustXScaleOverVisiblePoints = function (autoAdjustment) {
                 this._autoAdjustXScaleDomain = autoAdjustment;
+                this.adjustXDomainOnChangeFromY();
                 return this;
             };
             AbstractXYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
