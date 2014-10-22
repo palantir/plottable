@@ -1646,9 +1646,9 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Rect extends Element {
-            _someLabelsWereTooWide: boolean;
+            _someLabelsAreTooWide: boolean;
             _isVertical: boolean;
-            constructor(key: string, _isVertical: boolean);
+            constructor(key: string, isVertical: boolean);
             setup(area: D3.Selection): void;
             removeLabels(): void;
             drawText(data: any[], attrToProjector: AttributeToProjector): void;
@@ -2852,7 +2852,7 @@ declare module Plottable {
             /**
              * Get whether bar labels are enabled.
              *
-             * @returns {boolean} Whether bar labels are enabled
+             * @returns {boolean} Whether bars should display labels or not.
              */
             barLabelsEnabled(): boolean;
             /**
@@ -2870,7 +2870,7 @@ declare module Plottable {
             barLabelFormatter(): Formatter;
             /**
              * Change the formatting function for bar labels.
-             * @param {Formatter} The function that formats the bar labels.
+             * @param {Formatter} The formatting function for bar labels.
              *
              * @returns {AbstractBarPlot} The calling plot.
              */

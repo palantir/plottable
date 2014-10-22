@@ -90,7 +90,7 @@ export module Plot {
     /**
      * Get whether bar labels are enabled.
      *
-     * @returns {boolean} Whether bar labels are enabled
+     * @returns {boolean} Whether bars should display labels or not.
      */
     public barLabelsEnabled(): boolean;
     /**
@@ -105,6 +105,7 @@ export module Plot {
         return this._barLabelsEnabled;
       } else {
         this._barLabelsEnabled = enabled;
+        this._render();
         return this;
       }
     }
@@ -117,7 +118,7 @@ export module Plot {
     public barLabelFormatter(): Formatter;
     /**
      * Change the formatting function for bar labels.
-     * @param {Formatter} The function that formats the bar labels.
+     * @param {Formatter} The formatting function for bar labels.
      *
      * @returns {AbstractBarPlot} The calling plot.
      */
@@ -248,7 +249,7 @@ export module Plot {
         var attrToProjector = this._generateAttrToProjector();
         var dataToDraw = this._getDataToDraw();
         this._datasetKeysInOrder.forEach((k, i) => drawers[i].drawText(dataToDraw.get(k), attrToProjector));
-        if (this.hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._someLabelsWereTooWide)) {
+        if (this.hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._someLabelsAreTooWide)) {
           drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
         }
       }

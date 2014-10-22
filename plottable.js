@@ -3364,11 +3364,11 @@ var Plottable;
         var LABEL_HORIZONTAL_PADDING = 5;
         var Rect = (function (_super) {
             __extends(Rect, _super);
-            function Rect(key, _isVertical) {
+            function Rect(key, isVertical) {
                 _super.call(this, key);
-                this._someLabelsWereTooWide = false;
+                this._someLabelsAreTooWide = false;
                 this.svgElement("rect");
-                this._isVertical = _isVertical;
+                this._isVertical = isVertical;
             }
             Rect.prototype.setup = function (area) {
                 // need to put the bars in a seperate container so we can ensure that they don't cover labels
@@ -3381,7 +3381,7 @@ var Plottable;
             };
             Rect.prototype.drawText = function (data, attrToProjector) {
                 var _this = this;
-                var labelWasTooWide = data.map(function (d, i) {
+                var labelIsTooWide = data.map(function (d, i) {
                     var text = attrToProjector["label"](d, i).toString();
                     var w = attrToProjector["width"](d, i);
                     var h = attrToProjector["height"](d, i);
@@ -3395,7 +3395,7 @@ var Plottable;
                     var primarySpace = _this._isVertical ? measurement.height : measurement.width;
                     var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
                     var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
-                    var didNotFitOnSecondaryAttribute = secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
+                    var wasTooWide = secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
                     if (measurement.height <= h && measurement.width <= w) {
                         var offset = Math.min((primary - primarySpace) / 2, LABEL_VERTICAL_PADDING);
                         if (!positive) {
@@ -3421,10 +3421,10 @@ var Plottable;
                             yAlign = "center";
                         }
                         Plottable._Util.Text.writeLineHorizontally(text, g, w, h, xAlign, yAlign);
-                        return didNotFitOnSecondaryAttribute;
                     }
+                    return wasTooWide;
                 });
-                this._someLabelsWereTooWide = labelWasTooWide.some(function (d) { return d; });
+                this._someLabelsAreTooWide = labelIsTooWide.some(function (d) { return d; });
             };
             return Rect;
         })(_Drawer.Element);
@@ -6765,6 +6765,7 @@ var Plottable;
                 }
                 else {
                     this._barLabelsEnabled = enabled;
+                    this._render();
                     return this;
                 }
             };
@@ -6867,7 +6868,7 @@ var Plottable;
                     var attrToProjector = this._generateAttrToProjector();
                     var dataToDraw = this._getDataToDraw();
                     this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector); });
-                    if (this.hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._someLabelsWereTooWide; })) {
+                    if (this.hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._someLabelsAreTooWide; })) {
                         drawers.forEach(function (d) { return d.removeLabels(); });
                     }
                 }
