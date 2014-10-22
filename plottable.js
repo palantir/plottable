@@ -7457,31 +7457,31 @@ var Plottable;
             };
             //===== Stack logic from AbstractStackedPlot =====
             StackedBar.prototype._updateStackOffsets = function () {
-                Plot.AbstractStacked.prototype._updateStackOffsets.apply(this);
+                Plot.AbstractStacked.prototype._updateStackOffsets.call(this);
             };
             StackedBar.prototype._updateStackExtents = function () {
-                Plot.AbstractStacked.prototype._updateStackExtents.apply(this);
+                Plot.AbstractStacked.prototype._updateStackExtents.call(this);
             };
             StackedBar.prototype._stack = function (dataArray) {
-                return Plot.AbstractStacked.prototype._stack.apply(this, [dataArray]);
+                return Plot.AbstractStacked.prototype._stack.call(this, dataArray);
             };
             StackedBar.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
-                Plot.AbstractStacked.prototype._setDatasetStackOffsets.apply(this, [positiveDataMapArray, negativeDataMapArray]);
+                Plot.AbstractStacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
             };
             StackedBar.prototype._getDomainKeys = function () {
-                return Plot.AbstractStacked.prototype._getDomainKeys.apply(this);
+                return Plot.AbstractStacked.prototype._getDomainKeys.call(this);
             };
             StackedBar.prototype._generateDefaultMapArray = function () {
-                return Plot.AbstractStacked.prototype._generateDefaultMapArray.apply(this);
+                return Plot.AbstractStacked.prototype._generateDefaultMapArray.call(this);
             };
             StackedBar.prototype._updateScaleExtents = function () {
-                Plot.AbstractStacked.prototype._updateScaleExtents.apply(this);
+                Plot.AbstractStacked.prototype._updateScaleExtents.call(this);
             };
             StackedBar.prototype._keyAccessor = function () {
-                return Plot.AbstractStacked.prototype._keyAccessor.apply(this);
+                return Plot.AbstractStacked.prototype._keyAccessor.call(this);
             };
             StackedBar.prototype._valueAccessor = function () {
-                return Plot.AbstractStacked.prototype._valueAccessor.apply(this);
+                return Plot.AbstractStacked.prototype._valueAccessor.call(this);
             };
             return StackedBar;
         })(Plot.AbstractBarPlot);
