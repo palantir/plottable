@@ -81,7 +81,6 @@ export module _Drawer {
     public draw(data: any[], drawSteps: DrawStep[]): number {
       this._enterData(data);
       var numberOfIterations = this._numberOfAnimationIterations(data);
-      var totalTime = d3.sum(drawSteps.map(d => d.animator.getTiming(numberOfIterations)));
 
       var delay = 0;
       this.drawSteps.forEach((drawStep, i) => {
@@ -94,7 +93,7 @@ export module _Drawer {
         delay += time;
       });
 
-      return totalTime;
+      return delay;
     }
   }
 }
