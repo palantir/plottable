@@ -232,7 +232,13 @@ declare module D3 {
         * @param matrix Two dimensional array to transpose
         */
         transpose(matrix: any[]): any[];
-        pairs(stuff: any[]): any[];
+        /**
+        * Creates an array containing tuples of adjacent pairs
+        *
+        * @param arr An array containing entries to pair
+        * @returns any[][] An array of 2-element tuples for each pair
+        */
+        pairs(arr: any[]): any[][];
         /**
         * List the keys of an associative array.
         *
