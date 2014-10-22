@@ -3120,21 +3120,18 @@ var Plottable;
                 var _this = this;
                 this._enterData(data);
                 var numberOfIterations = this._numberOfAnimationIterations(data);
-                var totalTime = d3.sum(drawSteps.map(function (d) { return d.animator.getTiming(numberOfIterations); }));
-                var transitionFunction = function (i) {
-                    if (drawSteps[i]) {
-                        _this._drawStep(drawSteps[i]);
-                        var time = drawSteps[i].animator.getTiming(numberOfIterations);
-                        if (time > 0) {
-                            setTimeout(function () { return transitionFunction(i + 1); }, time);
-                        }
-                        else {
-                            transitionFunction(i + 1);
-                        }
+                var delay = 0;
+                drawSteps.forEach(function (drawStep, i) {
+                    if (delay > 0) {
+                        setTimeout(function () { return _this._drawStep(drawStep); });
                     }
-                };
-                transitionFunction(0);
-                return totalTime;
+                    else {
+                        _this._drawStep(drawStep);
+                    }
+                    var time = drawStep.animator.getTiming(numberOfIterations);
+                    delay += time;
+                });
+                return delay;
             };
             return AbstractDrawer;
         })();
@@ -3309,6 +3306,7 @@ var Plottable;
                 return this._renderArea.selectAll(this._svgElement);
             };
             Element.prototype._drawStep = function (step) {
+                _super.prototype._drawStep.call(this, step);
                 var drawSelection = this._getDrawSelection();
                 if (step.attrToProjector["fill"]) {
                     drawSelection.attr("fill", step.attrToProjector["fill"]); // so colors don't animate
@@ -6147,7 +6145,6 @@ var Plottable;
             };
             AbstractPlot.prototype._doRender = function () {
                 if (this._isAnchored) {
-                    console.log("doRender");
                     this.paint();
                     this._dataChanged = false;
                     this._animateOnNextRender = false;
@@ -6274,7 +6271,6 @@ var Plottable;
                 return datasets;
             };
             AbstractPlot.prototype.paint = function () {
-                console.log("paint");
                 var drawSteps = this._generateDrawSteps();
                 var dataToDraw = this._getDataToDraw();
                 var drawers = this._getDrawersInOrder();
@@ -7564,8 +7560,7 @@ var Plottable;
                 var numberOfIterations = selection[0].length;
                 var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
                 var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
-                var transition = selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + adjustedIterativeDelay * i; }).attr(attrToProjector);
-                return transition;
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + adjustedIterativeDelay * i; }).attr(attrToProjector);
             };
             Base.prototype.duration = function (duration) {
                 if (duration == null) {
