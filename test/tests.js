@@ -5597,7 +5597,13 @@ describe("_Util.Text", function () {
             var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
             var measureResults = Plottable._Util.Text.writeText("hello world", width, height, measure, "left");
             var style = window.getComputedStyle(svg.node());
-            var errString = String(style["font"]);
+            var errString = "";
+            for (var i = 0; i < style.length; i++) {
+                if (style[i].indexOf("font-") === 0) {
+                    var prop = style[i];
+                    errString += prop + ": " + style[prop] + " ";
+                }
+            }
             assert.isTrue(false, errString);
             assert.isTrue(measureResults.textFits, "mesurement mode: text fits");
             assert.operator(measureResults.usedHeight, ">=", measureResults.usedWidth, "mesurement mode: used more height than width");
