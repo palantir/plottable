@@ -5064,6 +5064,16 @@ describe("Tick generators", function () {
             var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
             assert.deepEqual(ticks, [-2, -1, 0, 1], "only the integers are returned");
         });
+        it("includes endticks", function () {
+            var scale = new Plottable.Scale.Linear().domain([-2.7, 1.5]);
+            var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
+            assert.deepEqual(ticks, [-2.5, -2, -1, 0, 1, 1.5], "end ticks are included");
+        });
+        it("all float ticks", function () {
+            var scale = new Plottable.Scale.Linear().domain([1.1, 1.5]);
+            var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
+            assert.deepEqual(ticks, [1.1, 1.5], "only the enticks are returned");
+        });
     });
 });
 

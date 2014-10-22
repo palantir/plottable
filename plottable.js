@@ -3027,9 +3027,7 @@ var Plottable;
             }
             TickGenerators.intervalTickGenerator = intervalTickGenerator;
             /**
-             * Creates a tick generator that will return only integer ticks.
-             *
-             * Filters the integers from defaultTicks and returns them.
+             * Creates a tick generator that will filter for only the integers in defaultTicks and return them.
              *
              * Will also include the end ticks.
              *
@@ -3038,7 +3036,7 @@ var Plottable;
             function integerTickGenerator() {
                 return function (s) {
                     var defaultTicks = s.getDefaultTicks();
-                    return defaultTicks.filter(function (tick, i) { return tick % 1 === 0; });
+                    return defaultTicks.filter(function (tick, i) { return (tick % 1 === 0) || (i === 0) || (i === defaultTicks.length - 1); });
                 };
             }
             TickGenerators.integerTickGenerator = integerTickGenerator;

@@ -1510,9 +1510,7 @@ declare module Plottable {
              */
             function intervalTickGenerator(interval: number): TickGenerator<number>;
             /**
-             * Creates a tick generator that will return only integer ticks.
-             *
-             * Filters the integers from defaultTicks and returns them.
+             * Creates a tick generator that will filter for only the integers in defaultTicks and return them.
              *
              * Will also include the end ticks.
              *
