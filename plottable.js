@@ -6798,7 +6798,9 @@ var Plottable;
                 var secondaryAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 if (secondaryScale instanceof Plottable.Scale.AbstractQuantitative) {
                     var datasetDataPairs = Plottable._Util.Methods.flatten(this.datasets().map(function (dataset) { return d3.pairs(dataset.data()); }));
-                    barWidth = Plottable._Util.Methods.min(datasetDataPairs, function (pair) { return +secondaryAccessor(pair[1]) - +secondaryAccessor(pair[0]); }, 1);
+                    barWidth = Plottable._Util.Methods.min(datasetDataPairs, function (pair, i) {
+                        return Math.abs(+secondaryAccessor(pair[1], i + 1) - +secondaryAccessor(pair[0], i));
+                    }, 1);
                 }
                 else if (secondaryScale instanceof Plottable.Scale.Ordinal) {
                     barWidth = 1;

@@ -287,7 +287,9 @@ export module Plot {
 
       if (secondaryScale instanceof Plottable.Scale.AbstractQuantitative) {
         var datasetDataPairs = _Util.Methods.flatten(this.datasets().map((dataset) => d3.pairs(dataset.data())));
-        barWidth = _Util.Methods.min(datasetDataPairs, (pair: any[]) => +secondaryAccessor(pair[1]) - +secondaryAccessor(pair[0]), 1);
+        barWidth = _Util.Methods.min(datasetDataPairs, (pair: any[], i: number) => {
+          return Math.abs(+secondaryAccessor(pair[1], i + 1) - +secondaryAccessor(pair[0], i));
+        }, 1);
       } else if (secondaryScale instanceof Plottable.Scale.Ordinal) {
         barWidth = 1;
       }
