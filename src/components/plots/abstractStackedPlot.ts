@@ -12,6 +12,14 @@ export module Plot {
     private stackedExtent = [0, 0];
     public _isVertical: boolean;
 
+    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
+      super.project(attrToSet, accessor, scale);
+      if (this._projectors["x"] && this._projectors["y"] && (attrToSet === "x" || attrToSet === "y")) {
+        this.updateStackOffsets();
+      }
+      return this;
+    }
+
     public _onDatasetUpdate() {
       super._onDatasetUpdate();
       // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
@@ -43,17 +51,17 @@ export module Plot {
     private updateStackExtents() {
       var datasets = this.datasets();
       var valueAccessor = this.valueAccessor();
-      var maxStackExtent = _Util.Methods.max(datasets, (dataset: Dataset) => {
-        return _Util.Methods.max(dataset.data(), (datum: any) => {
-          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-        });
-      });
+      var maxStackExtent = _Util.Methods.max<Dataset, number>(datasets, (dataset: Dataset) => {
+        return _Util.Methods.max<any, number>(dataset.data(), (datum: any) => {
+          return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+        }, 0);
+      }, 0);
 
-      var minStackExtent = _Util.Methods.min(datasets, (dataset: Dataset) => {
-        return _Util.Methods.min(dataset.data(), (datum: any) => {
-          return valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
-        });
-      });
+      var minStackExtent = _Util.Methods.min<Dataset, number>(datasets, (dataset: Dataset) => {
+        return _Util.Methods.min<any, number>(dataset.data(), (datum: any) => {
+          return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+        }, 0);
+      }, 0);
 
       this.stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
     }
@@ -63,13 +71,18 @@ export module Plot {
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
     private stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
+      // HACKHACK d3's stack layout logic crashes on 0-length dataArray https://github.com/mbostock/d3/issues/2004
+      if (dataArray.length === 0) {
+        return dataArray;
+      }
+
       var outFunction = (d: StackedDatum, y0: number, y: number) => {
         d.offset = y0;
       };
 
       d3.layout.stack()
                .x((d) => d.key)
-               .y((d) => d.value)
+               .y((d) => +d.value)
                .values((d) => this.getDomainKeys().map((domainKey) => d.get(domainKey)))
                .out(outFunction)(dataArray);
 
