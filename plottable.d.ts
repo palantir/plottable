@@ -2106,9 +2106,12 @@ declare module Plottable {
              * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
              * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
              * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
+             * @param {string} tickMode A way how tick label should be rendered (point/interval, default point)
              */
-            constructor(scale: Scale.AbstractQuantitative<number>, orientation: string, formatter?: (d: any) => string);
+            constructor(scale: Scale.AbstractQuantitative<number>, orientation: string, formatter?: (d: any) => string, tickMode?: string);
             _setup(): void;
+            tickMode(): string;
+            tickMode(mode: string): Numeric;
             _computeWidth(): number;
             _computeHeight(): number;
             _getTickValues(): any[];

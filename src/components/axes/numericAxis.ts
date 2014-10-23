@@ -21,14 +21,27 @@ export module Axis {
      * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
      * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
      * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
+     * @param {string} tickMode A way how tick label should be rendered (point/interval, default point)
      */
-    constructor(scale: Scale.AbstractQuantitative<number>, orientation: string, formatter = Formatters.general(3, false)) {
+    constructor(scale: Scale.AbstractQuantitative<number>,
+                orientation: string,
+                formatter = Formatters.general(3, false),
+                tickMode = "point") {
       super(scale, orientation, formatter);
     }
 
     public _setup() {
       super._setup();
       this.measurer = _Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(AbstractAxis.TICK_LABEL_CLASS, true));
+    }
+
+    /*
+     * Sets or gets tick mode (point/interval)
+     */
+    public tickMode(): string;
+    public tickMode(mode: string): Numeric;
+    public tickMode(mode?: string): any {
+      return null;
     }
 
     public _computeWidth() {

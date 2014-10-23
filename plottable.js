@@ -4633,9 +4633,11 @@ var Plottable;
              * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
              * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
              * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
+             * @param {string} tickMode A way how tick label should be rendered (point/interval, default point)
              */
-            function Numeric(scale, orientation, formatter) {
+            function Numeric(scale, orientation, formatter, tickMode) {
                 if (formatter === void 0) { formatter = Plottable.Formatters.general(3, false); }
+                if (tickMode === void 0) { tickMode = "point"; }
                 _super.call(this, scale, orientation, formatter);
                 this.tickLabelPositioning = "center";
                 // Whether or not first/last tick label will still be displayed even if
@@ -4646,6 +4648,9 @@ var Plottable;
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.measurer = Plottable._Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
+            };
+            Numeric.prototype.tickMode = function (mode) {
+                return null;
             };
             Numeric.prototype._computeWidth = function () {
                 var _this = this;
