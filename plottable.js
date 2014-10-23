@@ -6870,6 +6870,7 @@ var Plottable;
                 }
             };
             AbstractBarPlot.prototype._additionalPaint = function (time) {
+                var _this = this;
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
                 var baselineAttr = {
@@ -6879,9 +6880,12 @@ var Plottable;
                     "y2": this._isVertical ? scaledBaseline : this.height()
                 };
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
+                setTimeout(function () { return _this._drawLabels(); }, time);
+            };
+            AbstractBarPlot.prototype._drawLabels = function () {
+                var drawers = this._getDrawersInOrder();
+                drawers.forEach(function (d) { return d.removeLabels(); });
                 if (this._barLabelsEnabled) {
-                    var drawers = this._getDrawersInOrder();
-                    drawers.forEach(function (d) { return d.removeLabels(); });
                     var attrToProjector = this._generateAttrToProjector();
                     var dataToDraw = this._getDataToDraw();
                     this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector); });

@@ -40,7 +40,8 @@ function run(div, data, Plottable) {
     .addDataset("d4", data[3])
     .addDataset("d5", data[4])
     .barLabelsEnabled(true)
-    .barLabelFormatter(Plottable.Formatters.siSuffix());
+    .barLabelFormatter(Plottable.Formatters.siSuffix())
+    .animate(true);
 
   var horizontalPlot = new Plottable.Plot.StackedBar(xScale2, yScale2, false)
     .project("x", "earnings", xScale2)
@@ -52,7 +53,8 @@ function run(div, data, Plottable) {
     .addDataset("d4", data[3])
     .addDataset("d5", data[4])
     .barLabelsEnabled(true)
-    .barLabelFormatter(Plottable.Formatters.siSuffix());
+    .barLabelFormatter(Plottable.Formatters.siSuffix())
+    .animate(true);
 
   var chart1 = new Plottable.Component.Table([
     [yAxis1, verticalPlot], [null, xAxis1]
