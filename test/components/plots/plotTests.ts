@@ -269,13 +269,13 @@ describe("Plots", () => {
     var plot: Plottable.Plot.AbstractXYPlot<number, number>;
 
     before(() => {
-      xAccessor = (d: any) => d.x;
-      yAccessor = (d: any) => d.y;
+      xAccessor = (d: any) => d.a;
+      yAccessor = (d: any) => d.b;
     });
 
     beforeEach(() => {
       svg = generateSVG(500, 500);
-      simpleDataset = new Plottable.Dataset([{x: -5, y: 6}, {x: -2, y: 2}, {x: 2, y: -2}, {x: 5, y: -6}]);
+      simpleDataset = new Plottable.Dataset([{a: -5, b: 6}, {a: -2, b: 2}, {a: 2, b: -2}, {a: 5, b: -6}]);
       xScale = new Plottable.Scale.Linear().domain([-10, 10]);
       yScale = new Plottable.Scale.Linear().domain([-10, 10]);
       plot = new Plottable.Plot.AbstractXYPlot(xScale, yScale);

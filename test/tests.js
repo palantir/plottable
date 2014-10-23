@@ -1669,12 +1669,12 @@ describe("Plots", function () {
         var simpleDataset;
         var plot;
         before(function () {
-            xAccessor = function (d) { return d.x; };
-            yAccessor = function (d) { return d.y; };
+            xAccessor = function (d) { return d.a; };
+            yAccessor = function (d) { return d.b; };
         });
         beforeEach(function () {
             svg = generateSVG(500, 500);
-            simpleDataset = new Plottable.Dataset([{ x: -5, y: 6 }, { x: -2, y: 2 }, { x: 2, y: -2 }, { x: 5, y: -6 }]);
+            simpleDataset = new Plottable.Dataset([{ a: -5, b: 6 }, { a: -2, b: 2 }, { a: 2, b: -2 }, { a: 5, b: -6 }]);
             xScale = new Plottable.Scale.Linear().domain([-10, 10]);
             yScale = new Plottable.Scale.Linear().domain([-10, 10]);
             plot = new Plottable.Plot.AbstractXYPlot(xScale, yScale);
