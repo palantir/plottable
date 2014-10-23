@@ -124,7 +124,7 @@ export module Plot {
      */
     public barLabelFormatter(formatter: Formatter): AbstractBarPlot<X,Y>;
     public barLabelFormatter(formatter?: Formatter): any {
-      if (formatter === undefined) {
+      if (formatter == null) {
         return this._barLabelFormatter;
       } else {
         this._barLabelFormatter = formatter;
@@ -249,7 +249,7 @@ export module Plot {
         var attrToProjector = this._generateAttrToProjector();
         var dataToDraw = this._getDataToDraw();
         this._datasetKeysInOrder.forEach((k, i) => drawers[i].drawText(dataToDraw.get(k), attrToProjector));
-        if (this.hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._someLabelsAreTooWide)) {
+        if (this.hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._someLabelsTooWide)) {
           drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
         }
       }

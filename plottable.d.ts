@@ -1646,7 +1646,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Rect extends Element {
-            _someLabelsAreTooWide: boolean;
+            _someLabelsTooWide: boolean;
             _isVertical: boolean;
             constructor(key: string, isVertical: boolean);
             setup(area: D3.Selection): void;

@@ -5,7 +5,7 @@ export module _Drawer {
   var LABEL_VERTICAL_PADDING = 5;
   var LABEL_HORIZONTAL_PADDING = 5;
   export class Rect extends Element {
-    public _someLabelsAreTooWide = false;
+    public _someLabelsTooWide = false;
     public _isVertical: boolean;
     private textArea: D3.Selection;
     private measurer: _Util.Text.TextMeasurer;
@@ -28,7 +28,7 @@ export module _Drawer {
     }
 
     public drawText(data: any[], attrToProjector: AttributeToProjector) {
-      var labelIsTooWide: boolean[] = data.map((d, i) => {
+      var labelTooWide: boolean[] = data.map((d, i) => {
         var text = attrToProjector["label"](d, i).toString();
         var w = attrToProjector["width"](d, i);
         var h = attrToProjector["height"](d, i);
@@ -43,7 +43,7 @@ export module _Drawer {
 
         var secondaryAttrTextSpace = this._isVertical ? measurement.width : measurement.height;
         var secondaryAttrAvailableSpace = this._isVertical ? w : h;
-        var wasTooWide = secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
+        var tooWide = secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
         if (measurement.height <= h && measurement.width <= w) {
           var offset = Math.min((primary - primarySpace) / 2, LABEL_VERTICAL_PADDING);
           if (!positive) {offset = offset * -1;}
@@ -67,9 +67,9 @@ export module _Drawer {
           }
           _Util.Text.writeLineHorizontally(text, g, w, h, xAlign, yAlign);
         }
-        return wasTooWide;
+        return tooWide;
       });
-      this._someLabelsAreTooWide = labelIsTooWide.some((d: boolean) => d);
+      this._someLabelsTooWide = labelTooWide.some((d: boolean) => d);
     }
   }
 }

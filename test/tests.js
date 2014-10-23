@@ -2358,7 +2358,7 @@ describe("Plots", function () {
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");
                 assert.equal(texts[0], "640", "first label is 640");
-                assert.equal(texts[1], "12345", "first label is 2000");
+                assert.equal(texts[1], "12345", "first label is 12345");
                 svg.remove();
             });
             it("bar labels hide if bars too skinny", function () {
@@ -2376,7 +2376,7 @@ describe("Plots", function () {
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");
                 assert.equal(texts[0], "640%", "first label is 640%");
-                assert.equal(texts[1], "12345%", "first label is 2000%");
+                assert.equal(texts[1], "12345%", "first label is 12345%");
                 svg.remove();
             });
         });
