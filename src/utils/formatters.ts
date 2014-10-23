@@ -202,6 +202,12 @@ module Plottable {
       };
     }
 
+    export function timeString(format: string) {
+      return function(d: any) {
+        return d3.time.format(format)(d);
+      }
+    }
+
     /**
      * Creates a formatter for relative dates.
      *

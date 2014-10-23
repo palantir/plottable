@@ -2,11 +2,38 @@
 
 module Plottable {
 export module Axis {
-  export interface _TimeInterval {
-      timeUnit: D3.Time.Interval;
-      step: number;
-      formatString: string;
+  /*
+   * Represents time interval to generate ticks
+   */
+  export interface TimeInterval {
+    timeUnit: D3.Time.Interval;
+    step: number;
+    formatter: Formatter;
   };
+
+  /*
+   * Represents axis time interval, which is two-level ticks layer
+   */
+  export interface TimeAxisInterval {
+    minor: TimeInterval;
+    major?: TimeInterval;
+  }
+
+  /*
+   * For given sorted array of axis time intervals function returns subarray
+   * of interval which meets given time unit constraints.
+   */
+  export function filterIntervals(intevals: TimeAxisInterval[], minTimeUnit: any, maxTimeUnit: any) {
+    var compTimeUnit = (a: any, b: any) => {
+        var now = new Date();
+        return a.offset(now, 1) >= b.offset(now, 1);
+      };
+
+    var bottomLimit = (a: any) => minTimeUnit ? compTimeUnit(minTimeUnit, a) : true;
+    var upperLimit = (a: any) => maxTimeUnit ? compTimeUnit(a, maxTimeUnit) : true;
+
+    return intervals.filter(function(a: TimeAxisInterval) { return bottomLimit(a) && upperLimit(a);});
+  }
 
   export class Time extends AbstractAxis {
 
@@ -14,71 +41,48 @@ export module Axis {
     public _minorTickLabels: D3.Selection;
     public _scale: Scale.Time;
 
-    // default intervals
-    // these are for minor tick labels
-    public static _minorIntervals: _TimeInterval[] = [
-      {timeUnit: d3.time.second, step: 1,      formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 5,      formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 10,     formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 15,     formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 30,     formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.minute, step: 1,      formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 5,      formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 10,     formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 15,     formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 30,     formatString: "%I:%M %p"},
-      {timeUnit: d3.time.hour,   step: 1,      formatString: "%I %p"},
-      {timeUnit: d3.time.hour,   step: 3,      formatString: "%I %p"},
-      {timeUnit: d3.time.hour,   step: 6,      formatString: "%I %p"},
-      {timeUnit: d3.time.hour,   step: 12,     formatString: "%I %p"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%a %e"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%e"},
-      {timeUnit: d3.time.month,  step: 1,      formatString: "%B"},
-      {timeUnit: d3.time.month,  step: 1,      formatString: "%b"},
-      {timeUnit: d3.time.month,  step: 3,      formatString: "%B"},
-      {timeUnit: d3.time.month,  step: 6,      formatString: "%B"},
-      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 1,      formatString: "%y"},
-      {timeUnit: d3.time.year,   step: 5,      formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 25,     formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 50,     formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 100,    formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 200,    formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 500,    formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 1000,   formatString: "%Y"}
-    ];
+    /*
+     * Array of supported major time intervals
+     */
+    private static supportedMajorTimeIntervals: TimeInterval[] = [
+      { timeUnit: d3.time.day, step: 1, formatter: timeString("%B %e, %Y")},
+      { timeUnit: d3.time.month, step: 1, formatter: timeString("%B %Y")},
+      { timeUnit: d3.time.year, step: 1, formatter: timeString("%Y")}
+      ];
 
-    // these are for major tick labels
-    public static _majorIntervals: _TimeInterval[] = [
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.month,  step: 1,      formatString: "%B %Y"},
-      {timeUnit: d3.time.month,  step: 1,      formatString: "%B %Y"},
-      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""}, // this is essentially blank
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""}
+    /*
+     * Array of default axis time intervals
+     */
+    public _intervals: TimeAxisInterval[] = [
+      {minor: {timeUnit: d3.time.second, step: 1,      formatter: timeString("%I:%M:%S %p")}},
+      {minor: {timeUnit: d3.time.second, step: 5,      formatter: timeString("%I:%M:%S %p")}},
+      {minor: {timeUnit: d3.time.second, step: 10,     formatter: timeString("%I:%M:%S %p")}},
+      {minor: {timeUnit: d3.time.second, step: 15,     formatter: timeString("%I:%M:%S %p")}},
+      {minor: {timeUnit: d3.time.second, step: 30,     formatter: timeString("%I:%M:%S %p")}},
+      {minor: {timeUnit: d3.time.minute, step: 1,      formatter: timeString("%I:%M %p")}},
+      {minor: {timeUnit: d3.time.minute, step: 5,      formatter: timeString("%I:%M %p")}},
+      {minor: {timeUnit: d3.time.minute, step: 10,     formatter: timeString("%I:%M %p")}},
+      {minor: {timeUnit: d3.time.minute, step: 15,     formatter: timeString("%I:%M %p")}},
+      {minor: {timeUnit: d3.time.minute, step: 30,     formatter: timeString("%I:%M %p")}},
+      {minor: {timeUnit: d3.time.hour,   step: 1,      formatter: timeString("%I %p")}},
+      {minor: {timeUnit: d3.time.hour,   step: 3,      formatter: timeString("%I %p")}},
+      {minor: {timeUnit: d3.time.hour,   step: 6,      formatter: timeString("%I %p")}},
+      {minor: {timeUnit: d3.time.hour,   step: 12,     formatter: timeString("%I %p")}},
+      {minor: {timeUnit: d3.time.day,    step: 1,      formatter: timeString("%a %e")}},
+      {minor: {timeUnit: d3.time.day,    step: 1,      formatter: timeString("%e")}},
+      {minor: {timeUnit: d3.time.month,  step: 1,      formatter: timeString("%B")}},
+      {minor: {timeUnit: d3.time.month,  step: 1,      formatter: timeString("%b")}},
+      {minor: {timeUnit: d3.time.month,  step: 3,      formatter: timeString("%B")}},
+      {minor: {timeUnit: d3.time.month,  step: 6,      formatter: timeString("%B")}},
+      {minor: {timeUnit: d3.time.year,   step: 1,      formatter: timeString("%Y")}},
+      {minor: {timeUnit: d3.time.year,   step: 1,      formatter: timeString("%y")}},
+      {minor: {timeUnit: d3.time.year,   step: 5,      formatter: timeString("%Y")}},
+      {minor: {timeUnit: d3.time.year,   step: 25,     formatter: timeString("%Y")}},
+      {minor: {timeUnit: d3.time.year,   step: 50,     formatter: timeString("%Y")}},
+      {minor: {timeUnit: d3.time.year,   step: 100,    formatter: timeString("%Y")}},
+      {minor: {timeUnit: d3.time.year,   step: 200,    formatter: timeString("%Y")}},
+      {minor: {timeUnit: d3.time.year,   step: 500,    formatter: timeString("%Y")}},
+      {minor: {timeUnit: d3.time.year,   step: 1000,   formatter: timeString("%Y")}}
     ];
 
     private measurer: _Util.Text.TextMeasurer;
@@ -102,6 +106,24 @@ export module Axis {
       this.tickLabelPadding(5);
     }
 
+    /*
+     * Gets current axis time intervals array
+     */
+    public intervals(): TimeAxisInterval[];
+    /*
+     * Sets custom axis time interval array. Needs to be sorted.
+     */
+    public intervals(possibleIntervals: TimeAxisInterval[]): Time;
+    public intervals(possibleIntervals?: TimeAxisInterval[]): any {
+      if(possibleIntervals === undefined) {
+        return this._intervals;
+      } else {
+        // Check if timeUnits and steps are in ascending order and major are bigger than associated minor
+        this._intervals = possibleIntervals;
+        return this;
+      }
+    }
+
     public _computeHeight() {
       if (this._computedHeight !== null) {
         return this._computedHeight;
@@ -120,7 +142,7 @@ export module Axis {
       return this.measurer(d3.time.format(format)(longDate)).width;
     }
 
-    private getIntervalLength(interval: _TimeInterval) {
+    private getIntervalLength(interval: TimeInterval) {
       var startDate = this._scale.domain()[0];
       var endDate = interval.timeUnit.offset(startDate, interval.step);
       if (endDate > this._scale.domain()[1]) {
@@ -132,12 +154,38 @@ export module Axis {
       return stepLength;
     }
 
-    private isEnoughSpace(container: D3.Selection, interval: _TimeInterval) {
-      // compute number of ticks
-      // if less than a certain threshold
-      var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
-      var stepLength = Math.min(this.getIntervalLength(interval), this.width());
-      return worst < stepLength;
+    private isEnoughSpace(container: D3.Selection, interval: TimeAxisInterval) {
+      var majorInterval = this.calculateMajor(interval);
+      var worstMinor = this.calculateWorstWidth(container, interval.minor) + 2 * this.tickLabelPadding();
+      var worstMajor = this.calculateWorstWidth(container, majorInterval) + 2 * this.tickLabelPadding();
+      var stepLengthMinor = Math.min(this.getIntervalLength(interval.minor), this.width());
+      var stepLengthMajor = Math.min(this.getIntervalLength(majorInterval), this.width());
+      return worstMinor < stepLengthMinor && worstMajor < stepLengthMajor;
+    }
+
+    /*
+     * Determins major time interval based on provided axis time interval.
+     * If major interval is not present, then smallest from supported major interval, 
+     * but greater than given minor interval is returned.
+     * If non of supported major interval meet requirement than there is no major interval.
+     */
+    private calculateMajor(interval: TimeAxisInterval) {
+      if (interval.major) {
+        return interval.major;
+      } else {
+        var compTimeUnit = (a: any, b: any) => {
+          var now = new Date();
+          return a.offset(now, 1) > b.offset(now, 1);
+        };
+
+        for (var index = 0; index < supportedMajorIntervals.length; ++index) {
+          if (compTimeUnit(supportedMajorIntervals[index], interval.minor.timeUnit)) {
+            return  {timeUnit: supportedMajorIntervals[index], step: 1, foramtter: supportedMajorFormatters[index]};
+          }
+        }
+
+        return null;
+      }
     }
 
     public _setup() {
@@ -150,8 +198,7 @@ export module Axis {
     // returns a number to index into the major/minor intervals
     private getTickLevel(): number {
       for (var i = 0; i < Time._minorIntervals.length; i++) {
-        if (this.isEnoughSpace(this._minorTickLabels, Time._minorIntervals[i])
-            && this.isEnoughSpace(this._majorTickLabels, Time._majorIntervals[i])) {
+        if (this.isEnoughSpace(this._minorTickLabels, Time._intervals[i])) {
           break;
         }
       }
@@ -200,7 +247,7 @@ export module Axis {
         labelPos = tickPos;
       }
       labelPos = labelPos.filter((d: any) =>
-        this.canFitLabelFilter(container, d, d3.time.format(interval.formatString)(d), shouldCenterText));
+        this.canFitLabelFilter(container, d, d3.time.format(interval.formatter)(d), shouldCenterText));
       var tickLabels = container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
       var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
@@ -214,7 +261,7 @@ export module Axis {
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
       var anchor = shouldCenterText ? "middle" : "start";
-      tickLabels.selectAll("text").text((d: any) => d3.time.format(interval.formatString)(d))
+      tickLabels.selectAll("text").text((d: any) => d3.time.format(interval.formatter)(d))
                                   .style("text-anchor", anchor);
     }
 
