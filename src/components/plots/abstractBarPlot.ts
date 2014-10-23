@@ -2,19 +2,14 @@
 
 module Plottable {
 export module Plot {
-  export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> {
+  export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     private static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignmentFactor = 0;
     public _isVertical: boolean;
-
-    public _animators: Animator.PlotAnimatorMap = {
-      "bars-reset" : new Animator.Null(),
-      "bars"       : new Animator.IterativeDelay(),
-      "baseline"   : new Animator.Null()
-    };
+    private _hoverMode = "point";
 
     /**
      * Constructs a BarPlot.
@@ -27,58 +22,19 @@ export module Plot {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
-      // super() doesn't set baseline
+      this._animators["bars-reset"] = new Animator.Null();
+      this._animators["bars"] = new Animator.Base();
+      this._animators["baseline"] = new Animator.Null();
       this.baseline(this._baselineValue);
     }
 
     public _getDrawer(key: string) {
-      return new Plottable._Drawer.Rect(key);
+      return new Plottable._Drawer.Element(key).svgElement("rect");
     }
 
     public _setup() {
       super._setup();
       this._baseline = this._renderArea.append("line").classed("baseline", true);
-    }
-
-    // HACKHACK #1106 - should use drawers for paint logic
-    public _paint() {
-      var attrToProjector = this._generateAttrToProjector();
-      var datasets = this.datasets();
-      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-      var scaledBaseline = primaryScale.scale(this._baselineValue);
-      var positionAttr = this._isVertical ? "y" : "x";
-      var dimensionAttr = this._isVertical ? "height" : "width";
-
-      this._getDrawersInOrder().forEach((d, i) => {
-        var dataset = datasets[i];
-        var bars = d._renderArea.selectAll("rect").data(dataset.data());
-        bars.enter().append("rect");
-
-        if (this._dataChanged && this._animate) {
-          var resetAttrToProjector = this._generateAttrToProjector();
-          resetAttrToProjector[positionAttr] = () => scaledBaseline;
-          resetAttrToProjector[dimensionAttr] = () => 0;
-          this._applyAnimatedAttributes(bars, "bars-reset", resetAttrToProjector);
-        }
-
-        var attrToProjector = this._generateAttrToProjector();
-        if (attrToProjector["fill"]) {
-          bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
-        }
-        this._applyAnimatedAttributes(bars, "bars", attrToProjector);
-
-        bars.exit().remove();
-      });
-
-      var baselineAttr: any = {
-        "x1": this._isVertical ? 0 : scaledBaseline,
-        "y1": this._isVertical ? scaledBaseline : 0,
-        "x2": this._isVertical ? this.width() : scaledBaseline,
-        "y2": this._isVertical ? scaledBaseline : this.height()
-      };
-
-      this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
-
     }
 
     /**
@@ -226,6 +182,37 @@ export module Plot {
       }
     }
 
+    public _additionalPaint() {
+      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var scaledBaseline = primaryScale.scale(this._baselineValue);
+
+      var baselineAttr: any = {
+        "x1": this._isVertical ? 0 : scaledBaseline,
+        "y1": this._isVertical ? scaledBaseline : 0,
+        "x2": this._isVertical ? this.width() : scaledBaseline,
+        "y2": this._isVertical ? scaledBaseline : this.height()
+      };
+
+      this._getAnimator("baseline").animate(this._baseline, baselineAttr);
+    }
+
+    public _generateDrawSteps(): _Drawer.DrawStep[] {
+      var drawSteps: _Drawer.DrawStep[] = [];
+      if (this._dataChanged && this._animate) {
+        var resetAttrToProjector = this._generateAttrToProjector();
+        var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+        var scaledBaseline = primaryScale.scale(this._baselineValue);
+        var positionAttr = this._isVertical ? "y" : "x";
+        var dimensionAttr = this._isVertical ? "height" : "width";
+        resetAttrToProjector[positionAttr] = () => scaledBaseline;
+        resetAttrToProjector[dimensionAttr] = () => 0;
+        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("bars-reset")});
+      }
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("bars")});
+
+      return drawSteps;
+    }
+
     public _generateAttrToProjector() {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
@@ -266,6 +253,78 @@ export module Plot {
 
       return attrToProjector;
     }
+
+    /**
+     * Gets the current hover mode.
+     *
+     * @return {string} The current hover mode.
+     */
+    public hoverMode(): string;
+    /**
+     * Sets the hover mode for hover interactions. There are two modes:
+     *     - "point": Selects the bar under the mouse cursor (default).
+     *     - "line" : Selects any bar that would be hit by a line extending
+     *                in the same direction as the bar and passing through
+     *                the cursor.
+     *
+     * @param {string} mode The desired hover mode.
+     * @return {AbstractBarPlot} The calling Bar Plot.
+     */
+    public hoverMode(mode: String): AbstractBarPlot<X, Y>;
+    public hoverMode(mode?: String): any {
+      if (mode == null) {
+        return this._hoverMode;
+      }
+      var modeLC = mode.toLowerCase();
+      if (modeLC !== "point" && modeLC !== "line") {
+        throw new Error(mode + " is not a valid hover mode");
+      }
+      this._hoverMode = modeLC;
+      return this;
+    }
+
+    private clearHoverSelection() {
+      this._getDrawersInOrder().forEach((d, i) => {
+        d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
+      });
+    }
+
+    //===== Hover logic =====
+    public _hoverOverComponent(p: Point) {
+      // no-op
+    }
+
+    public _hoverOutComponent(p: Point) {
+      this.clearHoverSelection();
+    }
+
+    public _doHover(p: Point): Interaction.HoverData {
+      var xPositionOrExtent: any = p.x;
+      var yPositionOrExtent: any = p.y;
+      if (this._hoverMode === "line") {
+        var maxExtent: Extent = { min: -Infinity, max: Infinity };
+        if (this._isVertical) {
+          yPositionOrExtent = maxExtent;
+        } else {
+          xPositionOrExtent = maxExtent;
+        }
+      }
+      var selectedBars = this.selectBar(xPositionOrExtent, yPositionOrExtent, false);
+
+      if (selectedBars) {
+        this._getDrawersInOrder().forEach((d, i) => {
+          d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
+        });
+        selectedBars.classed({ "hovered": true, "not-hovered": false });
+      } else {
+        this.clearHoverSelection();
+      }
+      return {
+        data: selectedBars ? selectedBars.data() : null,
+        selection: selectedBars
+      };
+    }
+    //===== /Hover logic =====
   }
 }
 }
