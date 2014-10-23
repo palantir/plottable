@@ -98,9 +98,12 @@ function loadPlottableBranches(category, branchList){
     if(textStatus === "success"){
       console.log("success!");
       plottableBranches[branchName1] =  $.extend(true, {}, Plottable);
+      Plottable = null;
+
       $.getScript(listOfUrl[1], function(data, testStatus){ //load second 
         if(textStatus === "success"){
           plottableBranches[branchName2] = $.extend(true, {}, Plottable);
+          Plottable = null;
           filterQuickTests(category, branchList);
         }
       });
@@ -115,6 +118,7 @@ function loadPlottableBranches(category, branchList){
 
 //run a single quicktest
 function runQuickTest(div, data, branch){
+  debugger;
   result.run(div, data, plottableBranches[branch])
 };
 
