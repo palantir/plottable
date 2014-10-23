@@ -2,16 +2,27 @@
 
 module Plottable {
 export module Axis {
+  /*
+   * Represents time interval to generate ticks
+   */
   export interface TimeInterval {
-    timeUnit: any; // no such thing like D3.Time.Interval
+    timeUnit: D3.Time.Interval;
     step: number;
     formatter: Formatter;
   };
+
+  /*
+   * Represents axis time interval, which is two-level ticks layer
+   */
   export interface TimeAxisInterval {
     minor: TimeInterval;
     major?: TimeInterval;
   }
 
+  /*
+   * For given sorted array of axis time intervals function returns subarray
+   * of interval which meets given time unit constraints.
+   */
   export function filterIntervals(intevals: TimeAxisInterval[], minTimeUnit: any, maxTimeUnit: any) {
     var compTimeUnit = (a: any, b: any) => {
         var now = new Date();
@@ -30,11 +41,18 @@ export module Axis {
     public _minorTickLabels: D3.Selection;
     public _scale: Scale.Time;
 
-    private static supportedMajorFormatters = [timeString("%B %e, %Y"), timeString("%B %Y"), timeString("%Y")];
-    private static supportedMajorIntervals = [d3.time.day, d3.time.month, d3.time.year];
+    /*
+     * Array of supported major time intervals
+     */
+    private static supportedMajorTimeIntervals: TimeInterval[] = [
+      { timeUnit: d3.time.day, step: 1, formatter: timeString("%B %e, %Y")},
+      { timeUnit: d3.time.month, step: 1, formatter: timeString("%B %Y")},
+      { timeUnit: d3.time.year, step: 1, formatter: timeString("%Y")}
+      ];
 
-    // default intervals
-    // these are for minor tick labels
+    /*
+     * Array of default axis time intervals
+     */
     public _intervals: TimeAxisInterval[] = [
       {minor: {timeUnit: d3.time.second, step: 1,      formatter: timeString("%I:%M:%S %p")}},
       {minor: {timeUnit: d3.time.second, step: 5,      formatter: timeString("%I:%M:%S %p")}},
@@ -88,7 +106,13 @@ export module Axis {
       this.tickLabelPadding(5);
     }
 
+    /*
+     * Gets current axis time intervals array
+     */
     public intervals(): TimeAxisInterval[];
+    /*
+     * Sets custom axis time interval array. Needs to be sorted.
+     */
     public intervals(possibleIntervals: TimeAxisInterval[]): Time;
     public intervals(possibleIntervals?: TimeAxisInterval[]): any {
       if(possibleIntervals === undefined) {
@@ -139,6 +163,12 @@ export module Axis {
       return worstMinor < stepLengthMinor && worstMajor < stepLengthMajor;
     }
 
+    /*
+     * Determins major time interval based on provided axis time interval.
+     * If major interval is not present, then smallest from supported major interval, 
+     * but greater than given minor interval is returned.
+     * If non of supported major interval meet requirement than there is no major interval.
+     */
     private calculateMajor(interval: TimeAxisInterval) {
       if (interval.major) {
         return interval.major;
