@@ -3160,7 +3160,7 @@ var Plottable;
                 var delay = 0;
                 drawSteps.forEach(function (drawStep, i) {
                     if (delay > 0) {
-                        setTimeout(function () { return _this._drawStep(drawStep); });
+                        setTimeout(function () { return _this._drawStep(drawStep); }, delay);
                     }
                     else {
                         _this._drawStep(drawStep);
