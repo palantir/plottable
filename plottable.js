@@ -4633,19 +4633,36 @@ var Plottable;
              * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
              * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
              * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
+             * @param {string} mode A way how tick label should be rendered (point/interval, default point)
              */
-            function Numeric(scale, orientation, formatter) {
+            function Numeric(scale, orientation, formatter, mode) {
                 if (formatter === void 0) { formatter = Plottable.Formatters.general(3, false); }
+                if (mode === void 0) { mode = "point"; }
                 _super.call(this, scale, orientation, formatter);
                 this.tickLabelPositioning = "center";
                 // Whether or not first/last tick label will still be displayed even if
                 // the label is cut off.
                 this.showFirstTickLabel = false;
                 this.showLastTickLabel = false;
+                this.tickLabelMode(mode);
             }
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.measurer = Plottable._Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
+            };
+            Numeric.prototype.tickLabelMode = function (mode) {
+                if (mode === undefined) {
+                    return this._tickLabelMode;
+                }
+                else {
+                    mode = mode.toLowerCase();
+                    if (mode !== "point" && mode !== "interval") {
+                        throw new Error("unsupported tick label mode: " + mode);
+                    }
+                    this._tickLabelMode = mode;
+                    this._invalidateLayout();
+                    return this;
+                }
             };
             Numeric.prototype._computeWidth = function () {
                 var _this = this;
@@ -4655,7 +4672,7 @@ var Plottable;
                     return _this.measurer(formattedValue).width;
                 });
                 var maxTextLength = Plottable._Util.Methods.max(textLengths, 0);
-                if (this.tickLabelPositioning === "center") {
+                if (this.tickLabelPositioning === "center" && this._tickLabelMode === "point") {
                     this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
                 }
                 else {
@@ -4665,7 +4682,7 @@ var Plottable;
             };
             Numeric.prototype._computeHeight = function () {
                 var textHeight = this.measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
-                if (this.tickLabelPositioning === "center") {
+                if (this.tickLabelPositioning === "center" && this._tickLabelMode === "point") {
                     this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
                 }
                 else {
@@ -4675,6 +4692,21 @@ var Plottable;
             };
             Numeric.prototype._getTickValues = function () {
                 return this._scale.ticks();
+            };
+            Numeric.prototype._getTickLabelValues = function () {
+                var tickLabels = [];
+                if (this._tickLabelMode === "point" || this.tickLabelPositioning !== "center") {
+                    return tickLabels = this._scale.ticks();
+                }
+                else {
+                    var ticks = this._scale.ticks();
+                    ticks.forEach(function (tick, i) {
+                        if (i !== 0) {
+                            tickLabels.push((ticks[i - 1] + tick) / 2);
+                        }
+                    });
+                    return tickLabels;
+                }
             };
             Numeric.prototype._rescale = function () {
                 if (!this._isSetup) {
@@ -4697,7 +4729,7 @@ var Plottable;
                     dx: "0em",
                     dy: "0.3em"
                 };
-                var tickMarkLength = this._maxLabelTickLength();
+                var tickMarkOffset = this._tickLabelMode === "point" ? this._maxLabelTickLength() : 0;
                 var tickLabelPadding = this.tickLabelPadding();
                 var tickLabelTextAnchor = "middle";
                 var labelGroupTransformX = 0;
@@ -4712,7 +4744,7 @@ var Plottable;
                             labelGroupShiftY = tickLabelPadding;
                             break;
                         case "center":
-                            labelGroupShiftY = tickMarkLength + tickLabelPadding;
+                            labelGroupShiftY = tickMarkOffset + tickLabelPadding;
                             break;
                         case "right":
                             tickLabelTextAnchor = "start";
@@ -4729,7 +4761,7 @@ var Plottable;
                             labelGroupTransformY = -tickLabelPadding;
                             break;
                         case "center":
-                            labelGroupShiftX = tickMarkLength + tickLabelPadding;
+                            labelGroupShiftX = tickMarkOffset + tickLabelPadding;
                             break;
                         case "bottom":
                             tickLabelAttrHash["dy"] = "1em";
@@ -4761,7 +4793,7 @@ var Plottable;
                         tickLabelAttrHash["y"] = tickMarkAttrHash["y1"];
                         break;
                 }
-                var tickLabelValues = this._getTickValues();
+                var tickLabelValues = this._getTickLabelValues();
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(tickLabelValues);
                 tickLabels.enter().append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();

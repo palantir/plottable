@@ -4,6 +4,7 @@ module Plottable {
 export module Axis {
   export class Numeric extends AbstractAxis {
     public _scale: Scale.AbstractQuantitative<number>;
+    private _tickLabelMode: string;
     private tickLabelPositioning = "center";
     // Whether or not first/last tick label will still be displayed even if
     // the label is cut off.
@@ -21,14 +22,46 @@ export module Axis {
      * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
      * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
      * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
+     * @param {string} mode A way how tick label should be rendered (point/interval, default point)
      */
-    constructor(scale: Scale.AbstractQuantitative<number>, orientation: string, formatter = Formatters.general(3, false)) {
+    constructor(scale: Scale.AbstractQuantitative<number>,
+                orientation: string,
+                formatter = Formatters.general(3, false),
+                mode = "point") {
       super(scale, orientation, formatter);
+      this.tickLabelMode(mode);
     }
 
     public _setup() {
       super._setup();
       this.measurer = _Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(AbstractAxis.TICK_LABEL_CLASS, true));
+    }
+
+    /**
+     * Gets the current mode on the axis's tick labels. 
+     *
+     * @returns {string} The current tick label mode.
+     */
+    public tickLabelMode(): string;
+    /**
+     * Sets the current mode on the axis's tick labels. 
+     *
+     * @param {string} mode If provided, tick labels will be rendered in this mode(point/interval).
+     * @returns {Axis} The calling Axis.
+     */
+    public tickLabelMode(mode: string): Numeric;
+    public tickLabelMode(mode?: string): any {
+      if(mode === undefined) {
+        return this._tickLabelMode;
+      } else {
+        mode = mode.toLowerCase();
+        if (mode !== "point" && mode !== "interval") {
+          throw new Error ("unsupported tick label mode: " + mode);
+        }
+        this._tickLabelMode = mode;
+        this._invalidateLayout();
+        return this;
+      }
     }
 
     public _computeWidth() {
@@ -40,7 +73,7 @@ export module Axis {
 
       var maxTextLength = _Util.Methods.max(textLengths, 0);
 
-      if (this.tickLabelPositioning === "center") {
+      if (this.tickLabelPositioning === "center" && this._tickLabelMode === "point") {
         this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
       } else {
         this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextLength);
@@ -52,7 +85,7 @@ export module Axis {
     public _computeHeight() {
       var textHeight = this.measurer(_Util.Text.HEIGHT_TEXT).height;
 
-      if (this.tickLabelPositioning === "center") {
+      if (this.tickLabelPositioning === "center" && this._tickLabelMode === "point") {
         this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
       } else {
         this._computedHeight = Math.max(this._maxLabelTickLength(), this.tickLabelPadding()+ textHeight);
@@ -63,6 +96,21 @@ export module Axis {
 
     public _getTickValues(): any[] {
       return this._scale.ticks();
+    }
+
+    public _getTickLabelValues(): any[] {
+      var tickLabels: any[] = [];
+      if(this._tickLabelMode === "point" || this.tickLabelPositioning !== "center") {
+        return tickLabels = this._scale.ticks();
+      } else {
+        var ticks = this._scale.ticks();
+        ticks.forEach((tick: any, i: number) => {
+          if (i !== 0) {
+            tickLabels.push((ticks[i - 1] + tick) / 2);
+          }
+        });
+        return tickLabels;
+      }
     }
 
     public _rescale() {
@@ -91,7 +139,7 @@ export module Axis {
         dy: "0.3em"
       };
 
-      var tickMarkLength = this._maxLabelTickLength();
+      var tickMarkOffset = this._tickLabelMode === "point" ? this._maxLabelTickLength() : 0;
       var tickLabelPadding = this.tickLabelPadding();
 
       var tickLabelTextAnchor = "middle";
@@ -108,7 +156,7 @@ export module Axis {
             labelGroupShiftY = tickLabelPadding;
             break;
           case "center":
-            labelGroupShiftY = tickMarkLength + tickLabelPadding;
+            labelGroupShiftY = tickMarkOffset + tickLabelPadding;
             break;
           case "right":
             tickLabelTextAnchor = "start";
@@ -124,7 +172,7 @@ export module Axis {
             labelGroupTransformY = -tickLabelPadding;
             break;
           case "center":
-            labelGroupShiftX = tickMarkLength + tickLabelPadding;
+            labelGroupShiftX = tickMarkOffset + tickLabelPadding;
             break;
           case "bottom":
             tickLabelAttrHash["dy"] = "1em";
@@ -161,7 +209,7 @@ export module Axis {
           break;
       }
 
-      var tickLabelValues = this._getTickValues();
+      var tickLabelValues = this._getTickLabelValues();
       var tickLabels = this._tickLabelContainer
                            .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
                            .data(tickLabelValues);
