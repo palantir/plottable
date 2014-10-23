@@ -51,6 +51,7 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
       if (error !== null) {
         console.warn("Tried to load nonexistant quicktest " + name);
         return;
+      }
       text = "(function(){" + text +
           "\nreturn {makeData: makeData, run: run};" +
                "})();" +
@@ -63,6 +64,7 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
       var firstdiv = div.append("div").attr("class", "first");
       var seconddiv = div.append("div").attr("class", "second");
       var data = result.makeData();
+      debugger;
       runQuickTest(firstdiv, data, firstBranch ); //just runQuickTest twice here with same result
       runQuickTest(seconddiv, data, secondBranch); //just runQuickTest twice here with same result
 
@@ -95,10 +97,10 @@ function loadPlottableBranches(category, branchList){
   $.getScript(listOfUrl[0], function(data, textStatus) { 
     if(textStatus === "success"){
       console.log("success!");
-      plottableBranches[branchName1] = Plottable;
+      plottableBranches[branchName1] =  $.extend(true, {}, Plottable);
       $.getScript(listOfUrl[1], function(data, testStatus){ //load second 
         if(textStatus === "success"){
-          plottableBranches[branchName2] = Plottable;
+          plottableBranches[branchName2] = $.extend(true, {}, Plottable);
           filterQuickTests(category, branchList);
         }
       });
@@ -179,11 +181,6 @@ function showSizeControls(){
     });
   }
 }
-
-
-
-
-
 
 
 
