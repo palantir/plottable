@@ -41,6 +41,6 @@ function run(div, data, Plottable) {
   });
   hover.onHoverOut(function(hoverData) {
     title.text("Hover over points");
-  })
+  });
   plot.registerInteraction(hover);
 }
