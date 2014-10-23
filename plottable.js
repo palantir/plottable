@@ -6845,7 +6845,7 @@ var Plottable;
                     }
                 }
                 else {
-                    barPixelWidth = (barScale.scale(this._getMinimumDataWidth()) - barScale.scale(0)) * 0.5;
+                    barPixelWidth = Math.abs(barScale.scale(this._getMinimumDataWidth()) - barScale.scale(0)) * 0.5;
                 }
                 return barPixelWidth;
             };

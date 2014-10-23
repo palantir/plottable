@@ -337,7 +337,7 @@ export module Plot {
           barPixelWidth = step * padding * 0.5;
         }
       } else {
-        barPixelWidth = (barScale.scale(this._getMinimumDataWidth()) - barScale.scale(0)) * 0.5;
+        barPixelWidth = Math.abs(barScale.scale(this._getMinimumDataWidth()) - barScale.scale(0)) * 0.5;
       }
       return barPixelWidth;
     }
