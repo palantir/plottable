@@ -256,8 +256,8 @@ var Plottable;
                 }
                 var length = Math.max(Math.ceil((stop - start) / step), 0);
                 var range = [];
-                for (var i = 0; i < length; i++, start += step) {
-                    range[i] = start;
+                for (var i = 0; i < length; ++i) {
+                    range[i] = start + step * i;
                 }
                 return range;
             }
@@ -7509,6 +7509,15 @@ var Plottable;
             StackedArea.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
+            };
+            StackedArea.prototype._updateStackOffsets = function () {
+                var domainKeys = this._getDomainKeys();
+                var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                var keySets = this.datasets().map(function (dataset) { return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i).toString(); })).values(); });
+                if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
+                    Plottable._Util.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
+                }
+                _super.prototype._updateStackOffsets.call(this);
             };
             StackedArea.prototype._additionalPaint = function () {
                 var scaledBaseline = this._yScale.scale(this._baselineValue);

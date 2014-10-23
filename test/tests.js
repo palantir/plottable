@@ -2954,6 +2954,23 @@ describe("Plots", function () {
             assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound does not change");
             svg.remove();
         });
+        it("warning is thrown when datasets are updated with different domains", function () {
+            var flag = false;
+            var oldWarn = Plottable._Util.Methods.warn;
+            Plottable._Util.Methods.warn = function (msg) {
+                if (msg.indexOf("domain") > -1) {
+                    flag = true;
+                }
+            };
+            var missingDomainData = [
+                { x: 1, y: 0, type: "c" }
+            ];
+            var dataset = new Plottable.Dataset(missingDomainData);
+            renderer.addDataset(dataset);
+            Plottable._Util.Methods.warn = oldWarn;
+            assert.isTrue(flag, "warning has been issued about differing domains");
+            svg.remove();
+        });
     });
     describe("Stacked Area Plot Project", function () {
         var svg;
@@ -5812,6 +5829,7 @@ describe("_Util.Methods", function () {
     it("max/min work as expected", function () {
         var alist = [1, 2, 3, 4, 5];
         var dbl = function (x) { return x * 2; };
+        var dblIndexOffset = function (x, i) { return x * 2 - i; };
         var today = new Date();
         var numToDate = function (x) {
             var t = new Date();
@@ -5822,12 +5840,14 @@ describe("_Util.Methods", function () {
         var min = Plottable._Util.Methods.min;
         assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
         assert.deepEqual(max(alist, dbl, 0), 10, "max applies function appropriately");
+        assert.deepEqual(max(alist, dblIndexOffset, 5), 6, "max applies function with index");
         assert.deepEqual(max(alist, numToDate, today), numToDate(5), "max applies non-numeric function appropriately");
         assert.deepEqual(max([], 10), 10, "works as intended with default value");
         assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
         assert.deepEqual(max([], numToDate, today), today, "default non-numeric value works with non-numeric function");
         assert.deepEqual(min(alist, 0), 1, "min works for basic list");
         assert.deepEqual(min(alist, dbl, 0), 2, "min works with function arg");
+        assert.deepEqual(min(alist, dblIndexOffset, 0), 2, "min works with function index arg");
         assert.deepEqual(min(alist, numToDate, today), numToDate(1), "min works with non-numeric function arg");
         assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
         assert.deepEqual(min([], numToDate, today), today, "min accepts non-numeric default and function");

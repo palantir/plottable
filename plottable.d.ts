@@ -104,14 +104,14 @@ declare module Plottable {
              * If type is not comparable then t will be converted to a comparable before computing max.
              */
             function max<C>(arr: C[], default_val: C): C;
-            function max<T, C>(arr: T[], acc: (x: T) => C, default_val: C): C;
+            function max<T, C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
             /**
              * Computes the min value from the array.
              *
              * If type is not comparable then t will be converted to a comparable before computing min.
              */
             function min<C>(arr: C[], default_val: C): C;
-            function min<T, C>(arr: T[], acc: (x: T) => C, default_val: C): C;
+            function min<T, C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
             /**
              * Creates shallow copy of map.
              * @param {{ [key: string]: any }} oldMap Map to copy
@@ -3103,6 +3103,7 @@ declare module Plottable {
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _getDrawer(key: string): _Drawer.Area;
             _setup(): void;
+            _updateStackOffsets(): void;
             _additionalPaint(): void;
             _updateYDomainer(): void;
             _onDatasetUpdate(): void;
