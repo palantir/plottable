@@ -115,6 +115,11 @@
   },
 
   {
+    "name":"interaction_hover_scatter",
+    "categories":["Label", "Scatter Plot", "Hover Interaction"]
+  },
+
+  {
     "name":"interaction_panzoom",
     "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Gridlines", "Merge", "PanZoom Interaction"]
   },

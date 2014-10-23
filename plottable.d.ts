@@ -2724,7 +2724,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Scatter<X, Y> extends AbstractXYPlot<X, Y> {
+        class Scatter<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
             /**
              * Constructs a ScatterPlot.
              *
@@ -2742,6 +2742,13 @@ declare module Plottable {
             _getDrawer(key: string): _Drawer.Element;
             _generateAttrToProjector(): AttributeToProjector;
             _generateDrawSteps(): _Drawer.DrawStep[];
+            _getClosestStruckPoint(p: Point, range: number): {
+                selection: D3.Selection;
+                data: any[];
+            };
+            _hoverOverComponent(p: Point): void;
+            _hoverOutComponent(p: Point): void;
+            _doHover(p: Point): Interaction.HoverData;
         }
     }
 }
