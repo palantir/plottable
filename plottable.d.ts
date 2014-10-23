@@ -420,6 +420,22 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module _Util {
+        module Color {
+            /**
+             * Return contrast ratio between two colors
+             * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
+             * chroma.js may be found here: https://github.com/gka/chroma.js
+             * License may be found here: https://github.com/gka/chroma.js/blob/master/LICENSE
+             * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
+             */
+            function contrast(a: string, b: string): number;
+        }
+    }
+}
+
+
+declare module Plottable {
     interface Formatter {
         (d: any): string;
     }
@@ -1629,6 +1645,20 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
+        class Rect extends Element {
+            _someLabelsTooWide: boolean;
+            _isVertical: boolean;
+            constructor(key: string, isVertical: boolean);
+            setup(area: D3.Selection): void;
+            removeLabels(): void;
+            drawText(data: any[], attrToProjector: AttributeToProjector): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
         class Arc extends Element {
             constructor(key: string);
             _drawStep(step: DrawStep): void;
@@ -2799,7 +2829,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
-            _getDrawer(key: string): _Drawer.Element;
+            _getDrawer(key: string): _Drawer.Rect;
             _setup(): void;
             /**
              * Sets the baseline for the bars to the specified value.
@@ -2819,6 +2849,32 @@ declare module Plottable {
              * @returns {AbstractBarPlot} The calling AbstractBarPlot.
              */
             barAlignment(alignment: string): AbstractBarPlot<X, Y>;
+            /**
+             * Get whether bar labels are enabled.
+             *
+             * @returns {boolean} Whether bars should display labels or not.
+             */
+            barLabelsEnabled(): boolean;
+            /**
+             * Set whether bar labels are enabled.
+             * @param {boolean} Whether bars should display labels or not.
+             *
+             * @returns {AbstractBarPlot} The calling plot.
+             */
+            barLabelsEnabled(enabled: boolean): AbstractBarPlot<X, Y>;
+            /**
+             * Get the formatter for bar labels.
+             *
+             * @returns {Formatter} The formatting function for bar labels.
+             */
+            barLabelFormatter(): Formatter;
+            /**
+             * Change the formatting function for bar labels.
+             * @param {Formatter} The formatting function for bar labels.
+             *
+             * @returns {AbstractBarPlot} The calling plot.
+             */
+            barLabelFormatter(formatter: Formatter): AbstractBarPlot<X, Y>;
             /**
              * Selects the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one

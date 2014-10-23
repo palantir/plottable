@@ -1102,6 +1102,47 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    (function (_Util) {
+        (function (Color) {
+            /**
+             * Return relative luminance (defined here: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef)
+             * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
+             * chroma.js may be found here: https://github.com/gka/chroma.js
+             * License may be found here: https://github.com/gka/chroma.js/blob/master/LICENSE
+             */
+            function luminance(color) {
+                var rgb = d3.rgb(color);
+                var lum = function (x) {
+                    x = x / 255;
+                    return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+                };
+                var r = lum(rgb.r);
+                var g = lum(rgb.g);
+                var b = lum(rgb.b);
+                return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            }
+            /**
+             * Return contrast ratio between two colors
+             * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
+             * chroma.js may be found here: https://github.com/gka/chroma.js
+             * License may be found here: https://github.com/gka/chroma.js/blob/master/LICENSE
+             * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
+             */
+            function contrast(a, b) {
+                var l1 = luminance(a) + 0.05;
+                var l2 = luminance(b) + 0.05;
+                return l1 > l2 ? l1 / l2 : l2 / l1;
+            }
+            Color.contrast = contrast;
+        })(_Util.Color || (_Util.Color = {}));
+        var Color = _Util.Color;
+    })(Plottable._Util || (Plottable._Util = {}));
+    var _Util = Plottable._Util;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
     (function (Formatters) {
         /**
@@ -3305,6 +3346,89 @@ var Plottable;
             return Element;
         })(_Drawer.AbstractDrawer);
         _Drawer.Element = Element;
+    })(Plottable._Drawer || (Plottable._Drawer = {}));
+    var _Drawer = Plottable._Drawer;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (_Drawer) {
+        var LABEL_VERTICAL_PADDING = 5;
+        var LABEL_HORIZONTAL_PADDING = 5;
+        var Rect = (function (_super) {
+            __extends(Rect, _super);
+            function Rect(key, isVertical) {
+                _super.call(this, key);
+                this._someLabelsTooWide = false;
+                this.svgElement("rect");
+                this._isVertical = isVertical;
+            }
+            Rect.prototype.setup = function (area) {
+                // need to put the bars in a seperate container so we can ensure that they don't cover labels
+                _super.prototype.setup.call(this, area.append("g").classed("bar-area", true));
+                this.textArea = area.append("g").classed("bar-label-text-area", true);
+                this.measurer = new Plottable._Util.Text.CachingCharacterMeasurer(this.textArea.append("text")).measure;
+            };
+            Rect.prototype.removeLabels = function () {
+                this.textArea.selectAll("g").remove();
+            };
+            Rect.prototype.drawText = function (data, attrToProjector) {
+                var _this = this;
+                var labelTooWide = data.map(function (d, i) {
+                    var text = attrToProjector["label"](d, i).toString();
+                    var w = attrToProjector["width"](d, i);
+                    var h = attrToProjector["height"](d, i);
+                    var x = attrToProjector["x"](d, i);
+                    var y = attrToProjector["y"](d, i);
+                    var positive = attrToProjector["positive"](d, i);
+                    var measurement = _this.measurer(text);
+                    var color = attrToProjector["fill"](d, i);
+                    var dark = Plottable._Util.Color.contrast("white", color) * 1.6 < Plottable._Util.Color.contrast("black", color);
+                    var primary = _this._isVertical ? h : w;
+                    var primarySpace = _this._isVertical ? measurement.height : measurement.width;
+                    var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
+                    var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
+                    var tooWide = secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
+                    if (measurement.height <= h && measurement.width <= w) {
+                        var offset = Math.min((primary - primarySpace) / 2, LABEL_VERTICAL_PADDING);
+                        if (!positive) {
+                            offset = offset * -1;
+                        }
+                        if (_this._isVertical) {
+                            y += offset;
+                        }
+                        else {
+                            x += offset;
+                        }
+                        var g = _this.textArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                        var className = dark ? "dark-label" : "light-label";
+                        g.classed(className, true);
+                        var xAlign;
+                        var yAlign;
+                        if (_this._isVertical) {
+                            xAlign = "center";
+                            yAlign = positive ? "top" : "bottom";
+                        }
+                        else {
+                            xAlign = positive ? "left" : "right";
+                            yAlign = "center";
+                        }
+                        Plottable._Util.Text.writeLineHorizontally(text, g, w, h, xAlign, yAlign);
+                    }
+                    return tooWide;
+                });
+                this._someLabelsTooWide = labelTooWide.some(function (d) { return d; });
+            };
+            return Rect;
+        })(_Drawer.Element);
+        _Drawer.Rect = Rect;
     })(Plottable._Drawer || (Plottable._Drawer = {}));
     var _Drawer = Plottable._Drawer;
 })(Plottable || (Plottable = {}));
@@ -6573,7 +6697,10 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
                 this._barAlignmentFactor = 0;
+                this._barLabelFormatter = Plottable.Formatters.identity();
+                this._barLabelsEnabled = false;
                 this._hoverMode = "point";
+                this.hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
                 this._animators["bars-reset"] = new Plottable.Animator.Null();
@@ -6582,7 +6709,7 @@ var Plottable;
                 this.baseline(this._baselineValue);
             }
             AbstractBarPlot.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Element(key).svgElement("rect");
+                return new Plottable._Drawer.Rect(key, this._isVertical);
             };
             AbstractBarPlot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -6630,6 +6757,26 @@ var Plottable;
                 }
                 else {
                     throw new Error("input '" + input + "' can't be parsed as an Extent");
+                }
+            };
+            AbstractBarPlot.prototype.barLabelsEnabled = function (enabled) {
+                if (enabled === undefined) {
+                    return this._barLabelsEnabled;
+                }
+                else {
+                    this._barLabelsEnabled = enabled;
+                    this._render();
+                    return this;
+                }
+            };
+            AbstractBarPlot.prototype.barLabelFormatter = function (formatter) {
+                if (formatter == null) {
+                    return this._barLabelFormatter;
+                }
+                else {
+                    this._barLabelFormatter = formatter;
+                    this._render();
+                    return this;
                 }
             };
             AbstractBarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
@@ -6715,6 +6862,16 @@ var Plottable;
                     "y2": this._isVertical ? scaledBaseline : this.height()
                 };
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
+                if (this._barLabelsEnabled) {
+                    var drawers = this._getDrawersInOrder();
+                    drawers.forEach(function (d) { return d.removeLabels(); });
+                    var attrToProjector = this._generateAttrToProjector();
+                    var dataToDraw = this._getDataToDraw();
+                    this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector); });
+                    if (this.hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._someLabelsTooWide; })) {
+                        drawers.forEach(function (d) { return d.removeLabels(); });
+                    }
+                }
             };
             AbstractBarPlot.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
@@ -6766,6 +6923,13 @@ var Plottable;
                 attrToProjector["height"] = function (d, i) {
                     return Math.abs(scaledBaseline - originalPositionFn(d, i));
                 };
+                var primaryAccessor = this._projectors[primaryAttr].accessor;
+                if (this.barLabelsEnabled && this.barLabelFormatter) {
+                    attrToProjector["label"] = function (d, i) {
+                        return _this._barLabelFormatter(primaryAccessor(d, i));
+                    };
+                    attrToProjector["positive"] = function (d, i) { return originalPositionFn(d, i) <= scaledBaseline; };
+                }
                 return attrToProjector;
             };
             AbstractBarPlot.prototype.hoverMode = function (mode) {
