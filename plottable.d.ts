@@ -2901,6 +2901,7 @@ declare module Plottable {
             _updateYDomainer(): void;
             _updateXDomainer(): void;
             _additionalPaint(time: number): void;
+            _drawLabels(): void;
             _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
             /**
