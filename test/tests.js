@@ -440,7 +440,14 @@ describe("NumericAxis", function () {
         assert.throws(function () { return verticalAxis.tickLabelPosition("left"); }, "vertical");
         assert.throws(function () { return verticalAxis.tickLabelPosition("right"); }, "vertical");
     });
-    it("draws tick labels correctly (horizontal)", function () {
+    it("tickLabelMode() input validation", function () {
+        var scale = new Plottable.Scale.Linear();
+        var horizontalAxis = new Plottable.Axis.Numeric(scale, "bottom");
+        assert.doesNotThrow(function () { return horizontalAxis.tickLabelMode("interval"); }, "inteval is valid input");
+        assert.doesNotThrow(function () { return horizontalAxis.tickLabelMode("point"); }, "point is valid input");
+        assert.throws(function () { return horizontalAxis.tickLabelMode("right"); }, "unsupported tick label mode: right");
+    });
+    it("draws tick labels correctly (point, horizontal)", function () {
         var SVG_WIDTH = 500;
         var SVG_HEIGHT = 100;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -482,7 +489,7 @@ describe("NumericAxis", function () {
         }
         svg.remove();
     });
-    it("draws ticks correctly (vertical)", function () {
+    it("draws ticks correctly (point, vertical)", function () {
         var SVG_WIDTH = 100;
         var SVG_HEIGHT = 500;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -521,6 +528,100 @@ describe("NumericAxis", function () {
             markBB = tickMarks[0][i].getBoundingClientRect();
             labelBB = tickLabels[0][i].getBoundingClientRect();
             assert.operator(markBB.bottom, "<=", labelBB.top, "tick label is below mark");
+        }
+        svg.remove();
+    });
+    it("draws tick labels correctly (interval, horizontal)", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.range([0, SVG_WIDTH]);
+        var numericAxis = new Plottable.Axis.Numeric(scale, "bottom").tickLabelMode("interval");
+        numericAxis.renderTo(svg);
+        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS);
+        assert.operator(tickLabels[0].length, ">=", 1, "at least one tick labels were drawn");
+        var tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
+        assert.strictEqual(tickLabels[0].length, tickMarks[0].length - 1, "there is one label per two consecutive marks");
+        var i;
+        var markLeftBB, markRightBB;
+        var labelBB;
+        for (i = 0; i < tickLabels[0].length; i++) {
+            markLeftBB = tickMarks[0][i].getBoundingClientRect();
+            markRightBB = tickMarks[0][i + 1].getBoundingClientRect();
+            var marksCenter = (markLeftBB.left + markRightBB.right) / 2;
+            labelBB = tickLabels[0][i].getBoundingClientRect();
+            var labelCenter = (labelBB.left + labelBB.right) / 2;
+            assert.closeTo(labelCenter, marksCenter, 1, "tick label is centered between two consecutive marks");
+        }
+        // labels to left
+        numericAxis.tickLabelPosition("left");
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS);
+        assert.operator(tickLabels[0].length, ">=", 2, "at least two tick labels were drawn");
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
+        assert.strictEqual(tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
+        for (i = 0; i < tickLabels[0].length; i++) {
+            markLeftBB = tickMarks[0][i].getBoundingClientRect();
+            labelBB = tickLabels[0][i].getBoundingClientRect();
+            assert.operator(labelBB.left, "<=", markLeftBB.right, "tick label is to left of mark");
+        }
+        // labels to right
+        numericAxis.tickLabelPosition("right");
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS);
+        assert.operator(tickLabels[0].length, ">=", 2, "at least two tick labels were drawn");
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
+        assert.strictEqual(tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
+        for (i = 0; i < tickLabels[0].length; i++) {
+            markLeftBB = tickMarks[0][i].getBoundingClientRect();
+            labelBB = tickLabels[0][i].getBoundingClientRect();
+            assert.operator(markLeftBB.right, "<=", labelBB.left, "tick label is to right of mark");
+        }
+        svg.remove();
+    });
+    it("draws ticks correctly (interval, vertical)", function () {
+        var SVG_WIDTH = 100;
+        var SVG_HEIGHT = 500;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.range([0, SVG_HEIGHT]);
+        var numericAxis = new Plottable.Axis.Numeric(scale, "left").tickLabelMode("interval");
+        numericAxis.renderTo(svg);
+        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS);
+        assert.operator(tickLabels[0].length, ">=", 1, "at least one tick labels were drawn");
+        var tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
+        assert.strictEqual(tickLabels[0].length, tickMarks[0].length - 1, "there is one label per two consecutive marks");
+        var i;
+        var markTopBB, markBottomBB;
+        var labelBB;
+        for (i = 0; i < tickLabels[0].length; i++) {
+            markTopBB = tickMarks[0][i].getBoundingClientRect();
+            markBottomBB = tickMarks[0][i + 1].getBoundingClientRect();
+            var marksCenter = (markTopBB.top + markBottomBB.bottom) / 2;
+            labelBB = tickLabels[0][i].getBoundingClientRect();
+            var labelCenter = (labelBB.top + labelBB.bottom) / 2;
+            assert.closeTo(labelCenter, marksCenter, 1, "tick label is centered between two consecutive marks");
+        }
+        // labels to top
+        numericAxis.tickLabelPosition("top");
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS);
+        assert.operator(tickLabels[0].length, ">=", 2, "at least two tick labels were drawn");
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
+        assert.strictEqual(tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
+        for (i = 0; i < tickLabels[0].length; i++) {
+            markTopBB = tickMarks[0][i].getBoundingClientRect();
+            labelBB = tickLabels[0][i].getBoundingClientRect();
+            assert.operator(labelBB.bottom, "<=", markTopBB.top, "tick label is above mark");
+        }
+        // labels to bottom
+        numericAxis.tickLabelPosition("bottom");
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS);
+        assert.operator(tickLabels[0].length, ">=", 2, "at least two tick labels were drawn");
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
+        assert.strictEqual(tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
+        for (i = 0; i < tickLabels[0].length; i++) {
+            markTopBB = tickMarks[0][i].getBoundingClientRect();
+            labelBB = tickLabels[0][i].getBoundingClientRect();
+            assert.operator(markTopBB.bottom, "<=", labelBB.top, "tick label is below mark");
         }
         svg.remove();
     });
