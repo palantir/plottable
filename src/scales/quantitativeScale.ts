@@ -2,10 +2,6 @@
 
 module Plottable {
 export module Scale {
-  export interface TickGenerator<D> {
-    (scale: Plottable.Scale.AbstractQuantitative<D>): D[]
-  }
-
   export class AbstractQuantitative<D> extends AbstractScale<D, number> {
     public _d3Scale: D3.Scale.QuantitativeScale;
     public _numTicks = 10;
@@ -13,7 +9,7 @@ export module Scale {
     public _userSetDomainer: boolean = false;
     public _domainer: Domainer = new Domainer();
     public _typeCoercer = (d: any) => +d;
-    public _tickGenerator: TickGenerator<D> = (scale: Plottable.Scale.AbstractQuantitative<D>) => scale.getDefaultTicks();
+    public _tickGenerator: TickGenerators.TickGenerator<D> = (scale: Plottable.Scale.AbstractQuantitative<D>) => scale.getDefaultTicks();
 
 
     /**
@@ -199,15 +195,15 @@ export module Scale {
      *
      * @returns {TickGenerator} The current tick generator.
      */
-    public tickGenerator() : TickGenerator<D>;
+    public tickGenerator(): TickGenerators.TickGenerator<D>;
     /**
      * Sets a tick generator
      *
      * @param {TickGenerator} generator, the new tick generator.
      * @return {AbstractQuantitative} The calling AbstractQuantitative.
      */
-    public tickGenerator(generator: TickGenerator<D>): AbstractQuantitative<D>;
-    public tickGenerator(generator?: TickGenerator<D>): any {
+    public tickGenerator(generator: TickGenerators.TickGenerator<D>): AbstractQuantitative<D>;
+    public tickGenerator(generator?: TickGenerators.TickGenerator<D>): any {
       if(generator == null) {
         return this._tickGenerator;
       } else {

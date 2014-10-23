@@ -41,58 +41,24 @@ export module Plot {
 
 
     public _generateAttrToProjector(): AttributeToProjector {
-      var attrToProjector = this.retargetProjectors(super._generateAttrToProjector());
-      var innerRadiusF = attrToProjector["inner-radius"] || d3.functor(0);
-      var outerRadiusF = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
-      attrToProjector["d"] = d3.svg.arc()
-                      .innerRadius(innerRadiusF)
-                      .outerRadius(outerRadiusF);
-      delete attrToProjector["inner-radius"];
-      delete attrToProjector["outer-radius"];
+      var attrToProjector = super._generateAttrToProjector();
+      attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
+      attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
 
       if (attrToProjector["fill"] == null) {
         attrToProjector["fill"] = (d: any, i: number) => Pie.DEFAULT_COLOR_SCALE.scale(String(i));
       }
 
-      delete attrToProjector["value"];
+      var defaultAccessor = (d: any) => d.value;
+      var valueProjector = this._projectors["value"];
+      attrToProjector["value"] = valueProjector ? valueProjector.accessor : defaultAccessor;
+
       return attrToProjector;
     }
 
-    /**
-     * Since the data goes through a pie function, which returns an array of ArcDescriptors,
-     * projectors will need to be retargeted so they point to the data portion of each arc descriptor.
-     */
-    private retargetProjectors(attrToProjector: AttributeToProjector): AttributeToProjector {
-      var retargetedAttrToProjector: AttributeToProjector = {};
-      d3.entries(attrToProjector).forEach((entry) => {
-        retargetedAttrToProjector[entry.key] = (d: D3.Layout.ArcDescriptor, i: number) => entry.value(d.data, i);
-      });
-      return retargetedAttrToProjector;
-    }
-
     public _getDrawer(key: string): _Drawer.AbstractDrawer {
-      return new Plottable._Drawer.Arc(key);
+      return new Plottable._Drawer.Arc(key).setClass("arc");
     }
-
-    public _paint() {
-      var attrHash = this._generateAttrToProjector();
-      var datasets = this.datasets();
-      this._getDrawersInOrder().forEach((d, i) => {
-        var animator = this._animate ? this._getAnimator(d, i) : new Animator.Null();
-        var pieData = this.pie(datasets[i].data());
-        d.draw(pieData, attrHash, animator);
-      });
-    }
-
-    private pie(d: any[]): D3.Layout.ArcDescriptor[] {
-      var defaultAccessor = (d: any) => d.value;
-      var valueProjector = this._projectors["value"];
-      var valueAccessor = valueProjector ? valueProjector.accessor : defaultAccessor;
-      return d3.layout.pie()
-                      .sort(null)
-                      .value(valueAccessor)(d);
-    }
-
   }
 }
 }

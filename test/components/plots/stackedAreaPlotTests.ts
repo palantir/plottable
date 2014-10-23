@@ -277,6 +277,25 @@ describe("Plots", () => {
       assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound does not change");
       svg.remove();
     });
+
+    it("warning is thrown when datasets are updated with different domains", () => {
+      var flag = false;
+      var oldWarn = Plottable._Util.Methods.warn;
+      (<any> Plottable._Util.Methods).warn = (msg: string) => {
+        if (msg.indexOf("domain") > -1) { flag = true; }
+      };
+
+      var missingDomainData = [
+        { x: 1, y: 0, type: "c" }
+      ];
+      var dataset = new Plottable.Dataset(missingDomainData);
+      renderer.addDataset(dataset);
+
+      (<any> Plottable._Util.Methods).warn = oldWarn;
+      assert.isTrue(flag, "warning has been issued about differing domains");
+
+      svg.remove();
+    });
   });
 
   describe("Stacked Area Plot Project", () => {
