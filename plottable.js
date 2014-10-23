@@ -6589,28 +6589,32 @@ var Plottable;
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
             AbstractBarPlot.prototype.project = function (attrToSet, accessor, scale) {
-                var _this = this;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 // If a QuantitativeScale is used, the plot can easily extend outside the component boundary.
                 // Thus, the extent must be updated to account for the possible extension
-                if ((this._isVertical && attrToSet === "x") || (!this._isVertical && attrToSet === "y")) {
-                    var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
-                    if (barScale instanceof Plottable.Scale.AbstractQuantitative) {
-                        var barQScale = barScale;
-                        var barWidth;
-                        if (this._projectors["width"]) {
-                            barWidth = function (d, i) { return barQScale.invert(_this._projectors["width"].accessor(d, i)); };
-                        }
-                        else {
-                            barWidth = function () { return _this._getMinimumDataWidth(); };
-                        }
-                        var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                        this.project("bar-min", function (d, i) { return barAccessor(d, i) - barWidth(d, i) * _this._barAlignmentFactor; }, barQScale);
-                        this.project("bar-max", function (d, i) { return barAccessor(d, i) + barWidth(d, i) * (1 - _this._barAlignmentFactor); }, barQScale);
-                    }
+                if ((this._isVertical && attrToSet === "x") || (!this._isVertical && attrToSet === "y") || attrToSet === "width") {
+                    this.updateBarScaleExtents();
                 }
                 this._render();
                 return this;
+            };
+            AbstractBarPlot.prototype.updateBarScaleExtents = function () {
+                var _this = this;
+                var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
+                if (!(barScale instanceof Plottable.Scale.AbstractQuantitative)) {
+                    return;
+                }
+                var barQScale = barScale;
+                var barWidth;
+                if (this._projectors["width"]) {
+                    barWidth = function (d, i) { return barQScale.invert(_this._projectors["width"].accessor(d, i)); };
+                }
+                else {
+                    barWidth = function () { return _this._getMinimumDataWidth(); };
+                }
+                var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                this.project("bar-min", function (d, i) { return barAccessor(d, i) - barWidth(d, i) * _this._barAlignmentFactor; }, barQScale);
+                this.project("bar-max", function (d, i) { return barAccessor(d, i) + barWidth(d, i) * (1 - _this._barAlignmentFactor); }, barQScale);
             };
             /**
              * Sets the baseline for the bars to the specified value.

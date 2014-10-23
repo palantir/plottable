@@ -41,24 +41,31 @@ export module Plot {
 
       // If a QuantitativeScale is used, the plot can easily extend outside the component boundary.
       // Thus, the extent must be updated to account for the possible extension
-      if ((this._isVertical && attrToSet === "x") || (!this._isVertical && attrToSet === "y")) {
-        var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
-        if (barScale instanceof Plottable.Scale.AbstractQuantitative) {
-          var barQScale = <Plottable.Scale.AbstractQuantitative<any>> barScale;
-          var barWidth: (d?: any, i?: number) => number;
-          if (this._projectors["width"]) {
-            barWidth = (d, i) => barQScale.invert(this._projectors["width"].accessor(d, i));
-          } else {
-            barWidth = () => this._getMinimumDataWidth();
-          }
-          var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-          this.project("bar-min", (d: any, i: number) => barAccessor(d, i) - barWidth(d, i) * this._barAlignmentFactor, barQScale);
-          this.project("bar-max", (d: any, i: number) => barAccessor(d, i) + barWidth(d, i) * (1 - this._barAlignmentFactor), barQScale);
-        }
+      if ((this._isVertical && attrToSet === "x") || (!this._isVertical && attrToSet === "y") || attrToSet === "width") {
+        this.updateBarScaleExtents();
       }
 
       this._render();
       return this;
+    }
+
+    private updateBarScaleExtents() {
+      var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
+      if (!(barScale instanceof Plottable.Scale.AbstractQuantitative)) {
+        return;
+      }
+      var barQScale = <Plottable.Scale.AbstractQuantitative<any>> barScale;
+
+      var barWidth: (d?: any, i?: number) => number;
+      if (this._projectors["width"]) {
+        barWidth = (d, i) => barQScale.invert(this._projectors["width"].accessor(d, i));
+      } else {
+        barWidth = () => this._getMinimumDataWidth();
+      }
+
+      var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+      this.project("bar-min", (d: any, i: number) => barAccessor(d, i) - barWidth(d, i) * this._barAlignmentFactor, barQScale);
+      this.project("bar-max", (d: any, i: number) => barAccessor(d, i) + barWidth(d, i) * (1 - this._barAlignmentFactor), barQScale);
     }
 
     /**
