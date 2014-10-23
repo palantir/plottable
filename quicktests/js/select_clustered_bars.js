@@ -32,7 +32,13 @@ function run(div, data, Plottable) {
   var clickInteraction = new Plottable.Interaction.Click();
   barPlot.registerInteraction(clickInteraction);
   clickInteraction.callback(function (p) {
-    barPlot.selectBar(p.x, p.y, true);
+    var selectedBar = barPlot.selectBar(p.x, p.y, true);
+    if (selectedBar == null) {
+      d3.selectAll(".selected").style("fill", null);
+      barPlot.deselectAll();
+    } else {
+      d3.selectAll(".selected").style("fill", "red");
+    }
   });
 
 }
