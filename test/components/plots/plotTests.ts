@@ -257,5 +257,22 @@ describe("Plots", () => {
 
       svg.remove();
     });
+
+    it("additionalPaint timing works properly", () => {
+      var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
+      var x = new Plottable.Scale.Linear();
+      var y = new Plottable.Scale.Linear();
+      var plot = new Plottable.Plot.VerticalBar(x, y).addDataset([]).animate(true);
+      var recordedTime: number = -1;
+      var additionalPaint = (x: number) => {
+        recordedTime = Math.max(x, recordedTime);
+      };
+      plot._additionalPaint = additionalPaint;
+      plot.animator("bars", animator);
+      var svg = generateSVG();
+      plot.renderTo(svg);
+      svg.remove();
+      assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");
+    });
   });
 });

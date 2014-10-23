@@ -182,7 +182,7 @@ export module Plot {
       }
     }
 
-    public _additionalPaint() {
+    public _additionalPaint(time: number) {
       var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 
@@ -209,7 +209,6 @@ export module Plot {
         drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("bars-reset")});
       }
       drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("bars")});
-
       return drawSteps;
     }
 

@@ -1659,6 +1659,22 @@ describe("Plots", function () {
             assertDomainIsClose(scale1.domain(), [1, 3], "extent shrinks further if we project plot2 away");
             svg.remove();
         });
+        it("additionalPaint timing works properly", function () {
+            var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
+            var x = new Plottable.Scale.Linear();
+            var y = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.VerticalBar(x, y).addDataset([]).animate(true);
+            var recordedTime = -1;
+            var additionalPaint = function (x) {
+                recordedTime = Math.max(x, recordedTime);
+            };
+            plot._additionalPaint = additionalPaint;
+            plot.animator("bars", animator);
+            var svg = generateSVG();
+            plot.renderTo(svg);
+            svg.remove();
+            assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");
+        });
     });
 });
 

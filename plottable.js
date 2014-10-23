@@ -3103,6 +3103,9 @@ var Plottable;
             AbstractDrawer.prototype._drawStep = function (step) {
                 // no-op
             };
+            AbstractDrawer.prototype._numberOfAnimationIterations = function (data) {
+                return data.length;
+            };
             /**
              * Draws the data into the renderArea using the spefic steps
              *
@@ -3112,9 +3115,19 @@ var Plottable;
             AbstractDrawer.prototype.draw = function (data, drawSteps) {
                 var _this = this;
                 this._enterData(data);
-                drawSteps.forEach(function (drawStep) {
-                    _this._drawStep(drawStep);
+                var numberOfIterations = this._numberOfAnimationIterations(data);
+                var delay = 0;
+                drawSteps.forEach(function (drawStep, i) {
+                    if (delay > 0) {
+                        setTimeout(function () { return _this._drawStep(drawStep); });
+                    }
+                    else {
+                        _this._drawStep(drawStep);
+                    }
+                    var time = drawStep.animator.getTiming(numberOfIterations);
+                    delay += time;
                 });
+                return delay;
             };
             return AbstractDrawer;
         })();
@@ -3153,8 +3166,11 @@ var Plottable;
                 }
                 return d3.svg.line().x(xFunction).y(yFunction).defined(definedFunction);
             };
+            Line.prototype._numberOfAnimationIterations = function (data) {
+                return 1;
+            };
             Line.prototype._drawStep = function (step) {
-                _super.prototype._drawStep.call(this, step);
+                var baseTime = _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var xFunction = attrToProjector["x"];
                 var yFunction = attrToProjector["y"];
@@ -3343,13 +3359,13 @@ var Plottable;
                 delete attrToProjector["inner-radius"];
                 delete attrToProjector["outer-radius"];
                 attrToProjector["d"] = this.createArc(innerRadiusF, outerRadiusF);
-                _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
+                return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
             };
             Arc.prototype.draw = function (data, drawSteps) {
                 var valueAccessor = drawSteps[0].attrToProjector["value"];
                 var pie = d3.layout.pie().sort(null).value(valueAccessor)(data);
                 drawSteps.forEach(function (s) { return delete s.attrToProjector["value"]; });
-                _super.prototype.draw.call(this, pie, drawSteps);
+                return _super.prototype.draw.call(this, pie, drawSteps);
             };
             return Arc;
         })(_Drawer.Element);
@@ -6239,7 +6255,7 @@ var Plottable;
             AbstractPlot.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animator.Null() }];
             };
-            AbstractPlot.prototype._additionalPaint = function () {
+            AbstractPlot.prototype._additionalPaint = function (time) {
                 // no-op
             };
             AbstractPlot.prototype._getDataToDraw = function () {
@@ -6254,8 +6270,9 @@ var Plottable;
                 var drawSteps = this._generateDrawSteps();
                 var dataToDraw = this._getDataToDraw();
                 var drawers = this._getDrawersInOrder();
-                this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].draw(dataToDraw.get(k), drawSteps); });
-                this._additionalPaint();
+                var times = this._datasetKeysInOrder.map(function (k, i) { return drawers[i].draw(dataToDraw.get(k), drawSteps); });
+                var maxTime = Plottable._Util.Methods.max(times, 0);
+                this._additionalPaint(maxTime);
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
@@ -6705,7 +6722,7 @@ var Plottable;
                     _super.prototype._updateXDomainer.call(this);
                 }
             };
-            AbstractBarPlot.prototype._additionalPaint = function () {
+            AbstractBarPlot.prototype._additionalPaint = function (time) {
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
                 var baselineAttr = {
@@ -7512,6 +7529,9 @@ var Plottable;
         var Null = (function () {
             function Null() {
             }
+            Null.prototype.getTiming = function (selection) {
+                return 0;
+            };
             Null.prototype.animate = function (selection, attrToProjector) {
                 return selection.attr(attrToProjector);
             };
@@ -7551,6 +7571,12 @@ var Plottable;
                 this._maxIterativeDelay = Base.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
                 this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
             }
+            Base.prototype.getTiming = function (numberOfIterations) {
+                var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
+                var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
+                var time = adjustedIterativeDelay * numberOfIterations + this.delay() + this.duration();
+                return time;
+            };
             Base.prototype.animate = function (selection, attrToProjector) {
                 var _this = this;
                 var numberOfIterations = selection[0].length;

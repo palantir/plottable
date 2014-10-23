@@ -27,8 +27,12 @@ export module _Drawer {
                    .defined(definedFunction);
     }
 
+    public _numberOfAnimationIterations(data: any[]): number {
+      return 1;
+    }
+
     public _drawStep(step: DrawStep) {
-      super._drawStep(step);
+      var baseTime = super._drawStep(step);
       var attrToProjector = <AttributeToProjector>_Util.Methods.copyMap(step.attrToProjector);
       var xFunction       = attrToProjector["x"];
       var yFunction       = attrToProjector["y"];
