@@ -244,11 +244,7 @@ export module Plot {
 
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);
 
-      if (time > 0) {
-        setTimeout(() => this._drawLabels(), time);
-      } else {
-        this._drawLabels();
-      }
+      setTimeout(() => this._drawLabels(), time);
     }
 
     public _drawLabels() {

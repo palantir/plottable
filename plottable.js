@@ -6880,12 +6880,7 @@ var Plottable;
                     "y2": this._isVertical ? scaledBaseline : this.height()
                 };
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
-                if (time > 0) {
-                    setTimeout(function () { return _this._drawLabels(); }, time);
-                }
-                else {
-                    this._drawLabels();
-                }
+                setTimeout(function () { return _this._drawLabels(); }, time);
             };
             AbstractBarPlot.prototype._drawLabels = function () {
                 var drawers = this._getDrawersInOrder();
