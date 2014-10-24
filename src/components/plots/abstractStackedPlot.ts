@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  interface StackedDatum {
+  export interface StackedDatum {
     key: any;
     value: number;
     offset?: number;
@@ -15,7 +15,7 @@ export module Plot {
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (this._projectors["x"] && this._projectors["y"] && (attrToSet === "x" || attrToSet === "y")) {
-        this.updateStackOffsets();
+        this._updateStackOffsets();
       }
       return this;
     }
@@ -24,13 +24,13 @@ export module Plot {
       super._onDatasetUpdate();
       // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
       if (this._datasetKeysInOrder && this._projectors["x"]  && this._projectors["y"]) {
-        this.updateStackOffsets();
+        this._updateStackOffsets();
       }
     }
 
-    private updateStackOffsets() {
-      var dataMapArray = this.generateDefaultMapArray();
-      var domainKeys = this.getDomainKeys();
+    public _updateStackOffsets() {
+      var dataMapArray = this._generateDefaultMapArray();
+      var domainKeys = this._getDomainKeys();
 
       var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
         return _Util.Methods.populateMap(domainKeys, (domainKey) => {
@@ -44,13 +44,13 @@ export module Plot {
         });
       });
 
-      this.setDatasetStackOffsets(this.stack(positiveDataMapArray), this.stack(negativeDataMapArray));
-      this.updateStackExtents();
+      this._setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
+      this._updateStackExtents();
     }
 
-    private updateStackExtents() {
+    public _updateStackExtents() {
       var datasets = this.datasets();
-      var valueAccessor = this.valueAccessor();
+      var valueAccessor = this._valueAccessor();
       var maxStackExtent = _Util.Methods.max<Dataset, number>(datasets, (dataset: Dataset) => {
         return _Util.Methods.max<any, number>(dataset.data(), (datum: any) => {
           return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
@@ -70,12 +70,7 @@ export module Plot {
      * Feeds the data through d3's stack layout function which will calculate
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
-    private stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
-      // HACKHACK d3's stack layout logic crashes on 0-length dataArray https://github.com/mbostock/d3/issues/2004
-      if (dataArray.length === 0) {
-        return dataArray;
-      }
-
+    public _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
       var outFunction = (d: StackedDatum, y0: number, y: number) => {
         d.offset = y0;
       };
@@ -83,7 +78,7 @@ export module Plot {
       d3.layout.stack()
                .x((d) => d.key)
                .y((d) => +d.value)
-               .values((d) => this.getDomainKeys().map((domainKey) => d.get(domainKey)))
+               .values((d) => this._getDomainKeys().map((domainKey) => d.get(domainKey)))
                .out(outFunction)(dataArray);
 
       return dataArray;
@@ -93,9 +88,9 @@ export module Plot {
      * After the stack offsets have been determined on each separate dataset, the offsets need
      * to be determined correctly on the overall datasets
      */
-    private setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
-      var keyAccessor = this.keyAccessor();
-      var valueAccessor = this.valueAccessor();
+    public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
+      var keyAccessor = this._keyAccessor();
+      var valueAccessor = this._valueAccessor();
 
       this.datasets().forEach((dataset, datasetIndex) => {
         var positiveDataMap = positiveDataMapArray[datasetIndex];
@@ -116,8 +111,8 @@ export module Plot {
       });
     }
 
-    private getDomainKeys(): string[] {
-      var keyAccessor = this.keyAccessor();
+    public _getDomainKeys(): string[] {
+      var keyAccessor = this._keyAccessor();
       var domainKeys = d3.set();
       var datasets = this.datasets();
 
@@ -130,11 +125,11 @@ export module Plot {
       return domainKeys.values();
     }
 
-    private generateDefaultMapArray(): D3.Map<StackedDatum>[] {
-      var keyAccessor = this.keyAccessor();
-      var valueAccessor = this.valueAccessor();
+    public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
+      var keyAccessor = this._keyAccessor();
+      var valueAccessor = this._valueAccessor();
       var datasets = this.datasets();
-      var domainKeys = this.getDomainKeys();
+      var domainKeys = this._getDomainKeys();
 
       var dataMapArray = datasets.map(() => {
         return _Util.Methods.populateMap(domainKeys, (domainKey) => {
@@ -166,11 +161,11 @@ export module Plot {
       }
     }
 
-    private keyAccessor(): AppliedAccessor {
+    public _keyAccessor(): AppliedAccessor {
        return this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
     }
 
-    private valueAccessor(): AppliedAccessor {
+    public _valueAccessor(): AppliedAccessor {
        return this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
     }
   }

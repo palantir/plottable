@@ -12,9 +12,7 @@ function makeData() {
 
 function run(div, data, Plottable) {
   "use strict";
-
   var svg = div.append("svg").attr("height", 800);
-
   var xScale1 = new Plottable.Scale.Ordinal();
   var yScale1 = new Plottable.Scale.Linear();
   var xScale2 = new Plottable.Scale.Linear();
@@ -40,7 +38,10 @@ function run(div, data, Plottable) {
     .addDataset("d2", data[1])
     .addDataset("d3", data[2])
     .addDataset("d4", data[3])
-    .addDataset("d5", data[4]);
+    .addDataset("d5", data[4])
+    .barLabelsEnabled(true)
+    .barLabelFormatter(Plottable.Formatters.siSuffix())
+    .animate(true);
 
   var horizontalPlot = new Plottable.Plot.StackedBar(xScale2, yScale2, false)
     .project("x", "earnings", xScale2)
@@ -50,7 +51,10 @@ function run(div, data, Plottable) {
     .addDataset("d2", data[1])
     .addDataset("d3", data[2])
     .addDataset("d4", data[3])
-    .addDataset("d5", data[4]);
+    .addDataset("d5", data[4])
+    .barLabelsEnabled(true)
+    .barLabelFormatter(Plottable.Formatters.siSuffix())
+    .animate(true);
 
   var chart1 = new Plottable.Component.Table([
     [yAxis1, verticalPlot], [null, xAxis1]
@@ -59,7 +63,7 @@ function run(div, data, Plottable) {
   var chart2 = new Plottable.Component.Table([
     [yAxis2, horizontalPlot], [null, xAxis2]
     ]);
-  
+
   var finalchart = new Plottable.Component.Table([
     [title],
     [legend],

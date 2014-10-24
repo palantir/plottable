@@ -68,17 +68,27 @@ export module _Drawer {
       // no-op
     }
 
+    public _numberOfAnimationIterations(data: any[]): number {
+      return data.length;
+    }
+
     /**
      * Draws the data into the renderArea using the spefic steps
      *
      * @param{any[]} data The data to be drawn
      * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
      */
-    public draw(data: any[], drawSteps: DrawStep[]) {
+    public draw(data: any[], drawSteps: DrawStep[]): number {
       this._enterData(data);
-      drawSteps.forEach((drawStep) => {
-        this._drawStep(drawStep);
+      var numberOfIterations = this._numberOfAnimationIterations(data);
+
+      var delay = 0;
+      drawSteps.forEach((drawStep, i) => {
+        setTimeout(() => this._drawStep(drawStep), delay);
+        delay += drawStep.animator.getTiming(numberOfIterations);
       });
+
+      return delay;
     }
   }
 }

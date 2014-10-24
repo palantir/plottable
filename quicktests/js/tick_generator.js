@@ -9,7 +9,7 @@ function run(div, data, Plottable) {
 
   var svg = div.append("svg").attr("height", 500);
 
-  var xScale = new Plottable.Scale.Linear().tickGenerator(Plottable.TickGenerators.intervalTickGenerator(0.2));
+  var xScale = new Plottable.Scale.Linear().tickGenerator(Plottable.Scale.TickGenerators.intervalTickGenerator(0.2));
   var yScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");

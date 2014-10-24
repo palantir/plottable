@@ -6,6 +6,7 @@
 /// <reference path="utils/textUtils.ts" />
 /// <reference path="utils/wordWrapUtils.ts" />
 /// <reference path="utils/domUtils.ts" />
+/// <reference path="utils/color.ts" />
 
 /// <reference path="utils/formatters.ts" />
 
@@ -37,6 +38,7 @@
 /// <reference path="drawers/lineDrawer.ts" />
 /// <reference path="drawers/areaDrawer.ts" />
 /// <reference path="drawers/elementDrawer.ts" />
+/// <reference path="drawers/rectDrawer.ts" />
 /// <reference path="drawers/arcDrawer.ts" />
 
 /// <reference path="components/abstractComponent.ts" />
