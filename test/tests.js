@@ -127,6 +127,23 @@ before(function () {
     else {
         window.Pixel_CloseTo_Requirement = 0.5;
     }
+    // Override setTimeout with a version that fires synchronously if time=0
+    // To make synchronous testing easier.
+    var oldSetTimeout = window.setTimeout;
+    window.setTimeout = function (f, t) {
+        if (t === void 0) { t = 0; }
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
+        if (t === 0) {
+            f();
+            return 0;
+        }
+        else {
+            return oldSetTimeout(f, t, args);
+        }
+    };
 });
 after(function () {
     var parent = getSVGParent();
@@ -141,6 +158,104 @@ after(function () {
     else {
         assert(d3.select("body").selectAll("svg").node() === null, "all svgs have been removed");
     }
+});
+
+///<reference path="../testReference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var MockAnimator = (function () {
+    function MockAnimator(time, callback) {
+        this.time = time;
+        this.callback = callback;
+    }
+    MockAnimator.prototype.getTiming = function (selection) {
+        return this.time;
+    };
+    MockAnimator.prototype.animate = function (selection, attrToProjector) {
+        if (this.callback) {
+            this.callback();
+        }
+        return selection;
+    };
+    return MockAnimator;
+})();
+var MockDrawer = (function (_super) {
+    __extends(MockDrawer, _super);
+    function MockDrawer() {
+        _super.apply(this, arguments);
+    }
+    MockDrawer.prototype._drawStep = function (step) {
+        step.animator.animate(this._renderArea, step.attrToProjector);
+    };
+    return MockDrawer;
+})(Plottable._Drawer.AbstractDrawer);
+describe("Drawers", function () {
+    describe("Abstract Drawer", function () {
+        var oldTimeout;
+        var timings = [];
+        var svg;
+        var drawer;
+        before(function () {
+            oldTimeout = window.setTimeout;
+            window.setTimeout = function (f, time) {
+                var args = [];
+                for (var _i = 2; _i < arguments.length; _i++) {
+                    args[_i - 2] = arguments[_i];
+                }
+                timings.push(time);
+                return oldTimeout(f, time, args);
+            };
+        });
+        after(function () {
+            window.setTimeout = oldTimeout;
+        });
+        beforeEach(function () {
+            timings = [];
+            svg = generateSVG();
+            drawer = new MockDrawer("foo");
+            drawer.setup(svg);
+        });
+        afterEach(function () {
+            svg.remove(); // no point keeping it around since we don't draw anything in it anyway
+        });
+        it("drawer timing works as expected for null animators", function () {
+            var a1 = new Plottable.Animator.Null();
+            var a2 = new Plottable.Animator.Null();
+            var ds1 = { attrToProjector: {}, animator: a1 };
+            var ds2 = { attrToProjector: {}, animator: a2 };
+            var steps = [ds1, ds2];
+            drawer.draw([], steps);
+            assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
+        });
+        it("drawer timing works for non-null animators", function (done) {
+            var callback1Called = false;
+            var callback2Called = false;
+            var callback1 = function () {
+                callback1Called = true;
+            };
+            var callback2 = function () {
+                assert.isTrue(callback1Called, "callback2 called after callback 1");
+                callback2Called = true;
+            };
+            var callback3 = function () {
+                assert.isTrue(callback2Called, "callback3 called after callback 2");
+                done();
+            };
+            var a1 = new MockAnimator(20, callback1);
+            var a2 = new MockAnimator(10, callback2);
+            var a3 = new MockAnimator(0, callback3);
+            var ds1 = { attrToProjector: {}, animator: a1 };
+            var ds2 = { attrToProjector: {}, animator: a2 };
+            var ds3 = { attrToProjector: {}, animator: a3 };
+            var steps = [ds1, ds2, ds3];
+            drawer.draw([], steps);
+            assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
+        });
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -1659,6 +1774,22 @@ describe("Plots", function () {
             assertDomainIsClose(scale1.domain(), [1, 3], "extent shrinks further if we project plot2 away");
             svg.remove();
         });
+        it("additionalPaint timing works properly", function () {
+            var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
+            var x = new Plottable.Scale.Linear();
+            var y = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.VerticalBar(x, y).addDataset([]).animate(true);
+            var recordedTime = -1;
+            var additionalPaint = function (x) {
+                recordedTime = Math.max(x, recordedTime);
+            };
+            plot._additionalPaint = additionalPaint;
+            plot.animator("bars", animator);
+            var svg = generateSVG();
+            plot.renderTo(svg);
+            svg.remove();
+            assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");
+        });
     });
 });
 
@@ -2330,6 +2461,78 @@ describe("Plots", function () {
                 assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "bar0 ypos");
                 assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "bar1 ypos");
                 svg.remove();
+            });
+        });
+        describe("Vertical Bar Plot With Bar Labels", function () {
+            var plot;
+            var data;
+            var dataset;
+            var xScale;
+            var yScale;
+            var svg;
+            beforeEach(function () {
+                svg = generateSVG();
+                data = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+                dataset = new Plottable.Dataset(data);
+                xScale = new Plottable.Scale.Ordinal();
+                yScale = new Plottable.Scale.Linear();
+                plot = new Plottable.Plot.VerticalBar(xScale, yScale);
+                plot.addDataset(dataset);
+            });
+            it("bar labels disabled by default", function () {
+                plot.renderTo(svg);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 0, "by default, no texts are drawn");
+                svg.remove();
+            });
+            it("bar labels render properly", function () {
+                plot.renderTo(svg);
+                plot.barLabelsEnabled(true);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 2, "both texts drawn");
+                assert.equal(texts[0], "640", "first label is 640");
+                assert.equal(texts[1], "12345", "first label is 12345");
+                svg.remove();
+            });
+            it("bar labels hide if bars too skinny", function () {
+                plot.barLabelsEnabled(true);
+                plot.renderTo(svg);
+                plot.barLabelFormatter(function (n) { return n.toString() + (n === 12345 ? "looong" : ""); });
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 0, "no text drawn");
+                svg.remove();
+            });
+            it("formatters are used properly", function () {
+                plot.barLabelsEnabled(true);
+                plot.barLabelFormatter(function (n) { return n.toString() + "%"; });
+                plot.renderTo(svg);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 2, "both texts drawn");
+                assert.equal(texts[0], "640%", "first label is 640%");
+                assert.equal(texts[1], "12345%", "first label is 12345%");
+                svg.remove();
+            });
+            it("bar labels are removed instantly on dataset change, even if animation is enabled", function (done) {
+                plot.barLabelsEnabled(true);
+                plot.animate(true);
+                plot.renderTo(svg);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 2, "both texts drawn");
+                var originalDrawLabels = plot._drawLabels;
+                var called = false;
+                plot._drawLabels = function () {
+                    if (!called) {
+                        originalDrawLabels.apply(plot);
+                        texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                        assert.lengthOf(texts, 2, "texts were repopulated by drawLabels after the update");
+                        svg.remove();
+                        called = true; // for some reason, in phantomJS, `done` was being called multiple times and this caused the test to fail.
+                        done();
+                    }
+                };
+                dataset.data(data);
+                texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 0, "texts were immediately removed");
             });
         });
     });

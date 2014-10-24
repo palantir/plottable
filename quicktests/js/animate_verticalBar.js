@@ -6,7 +6,6 @@ function makeData() {
 
 function run(div, data, Plottable) {
   "use strict";
-
   var svg = div.append("svg").attr("height", 500);
 
   var doAnimate = true;
