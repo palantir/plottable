@@ -3159,14 +3159,8 @@ var Plottable;
                 var numberOfIterations = this._numberOfAnimationIterations(data);
                 var delay = 0;
                 drawSteps.forEach(function (drawStep, i) {
-                    if (delay > 0) {
-                        setTimeout(function () { return _this._drawStep(drawStep); }, delay);
-                    }
-                    else {
-                        _this._drawStep(drawStep);
-                    }
-                    var time = drawStep.animator.getTiming(numberOfIterations);
-                    delay += time;
+                    setTimeout(function () { return _this._drawStep(drawStep); }, delay);
+                    delay += drawStep.animator.getTiming(numberOfIterations);
                 });
                 return delay;
             };

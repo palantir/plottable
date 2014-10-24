@@ -161,6 +161,104 @@ after(function () {
 });
 
 ///<reference path="../testReference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var MockAnimator = (function () {
+    function MockAnimator(time, callback) {
+        this.time = time;
+        this.callback = callback;
+    }
+    MockAnimator.prototype.getTiming = function (selection) {
+        return this.time;
+    };
+    MockAnimator.prototype.animate = function (selection, attrToProjector) {
+        if (this.callback) {
+            this.callback();
+        }
+        return selection;
+    };
+    return MockAnimator;
+})();
+var MockDrawer = (function (_super) {
+    __extends(MockDrawer, _super);
+    function MockDrawer() {
+        _super.apply(this, arguments);
+    }
+    MockDrawer.prototype._drawStep = function (step) {
+        step.animator.animate(this._renderArea, step.attrToProjector);
+    };
+    return MockDrawer;
+})(Plottable._Drawer.AbstractDrawer);
+describe("Drawers", function () {
+    describe("Abstract Drawer", function () {
+        var oldTimeout;
+        var timings = [];
+        var svg;
+        var drawer;
+        before(function () {
+            oldTimeout = window.setTimeout;
+            window.setTimeout = function (f, time) {
+                var args = [];
+                for (var _i = 2; _i < arguments.length; _i++) {
+                    args[_i - 2] = arguments[_i];
+                }
+                timings.push(time);
+                return oldTimeout(f, time, args);
+            };
+        });
+        after(function () {
+            window.setTimeout = oldTimeout;
+        });
+        beforeEach(function () {
+            timings = [];
+            svg = generateSVG();
+            drawer = new MockDrawer("foo");
+            drawer.setup(svg);
+        });
+        afterEach(function () {
+            svg.remove(); // no point keeping it around since we don't draw anything in it anyway
+        });
+        it("drawer timing works as expected for null animators", function () {
+            var a1 = new Plottable.Animator.Null();
+            var a2 = new Plottable.Animator.Null();
+            var ds1 = { attrToProjector: {}, animator: a1 };
+            var ds2 = { attrToProjector: {}, animator: a2 };
+            var steps = [ds1, ds2];
+            drawer.draw([], steps);
+            assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
+        });
+        it("drawer timing works for non-null animators", function (done) {
+            var cb1Called = false;
+            var cb2Called = false;
+            var cb1 = function () {
+                cb1Called = true;
+            };
+            var cb2 = function () {
+                assert.isTrue(cb1Called, "callback2 called after callback 1");
+                cb2Called = true;
+            };
+            var cb3 = function () {
+                assert.isTrue(cb2Called, "callback3 called after callback 2");
+                done();
+            };
+            var a1 = new MockAnimator(20, cb1);
+            var a2 = new MockAnimator(10, cb2);
+            var a3 = new MockAnimator(0, cb3);
+            var ds1 = { attrToProjector: {}, animator: a1 };
+            var ds2 = { attrToProjector: {}, animator: a2 };
+            var ds3 = { attrToProjector: {}, animator: a3 };
+            var steps = [ds1, ds2, ds3];
+            drawer.draw([], steps);
+            assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("BaseAxis", function () {
     it("orientation", function () {
