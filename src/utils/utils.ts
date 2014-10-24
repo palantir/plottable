@@ -207,11 +207,16 @@ export module _Util {
       return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
     }
 
-    export function max(arr: number[], default_val?: number): number;
-    export function max<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
-    export function max(arr: any[], one: any = 0, two: any = 0) {
+    /**
+     * Computes the max value from the array.
+     *
+     * If type is not comparable then t will be converted to a comparable before computing max.
+     */
+    export function max<C>(arr: C[], default_val: C): C;
+    export function max<T,C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
+    export function max(arr: any[], one: any, two?: any): any {
       if (arr.length === 0) {
-        if (typeof(one) === "number") {
+        if (typeof(one) !== "function") {
           return one;
         } else {
           return two;
@@ -223,11 +228,16 @@ export module _Util {
       /* tslint:enable:ban */
     }
 
-    export function min(arr: number[], default_val?: number): number;
-    export function min<T>(arr: T[], acc: (x: T) => number, default_val?: number): number;
-    export function min(arr: any[], one: any = 0, two: any = 0) {
+    /**
+     * Computes the min value from the array.
+     *
+     * If type is not comparable then t will be converted to a comparable before computing min.
+     */
+    export function min<C>(arr: C[], default_val: C): C;
+    export function min<T,C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
+    export function min(arr: any[], one: any, two?: any): any {
       if (arr.length === 0) {
-        if (typeof(one) === "number") {
+        if (typeof(one) !== "function") {
           return one;
         } else {
           return two;
@@ -258,8 +268,8 @@ export module _Util {
       var length = Math.max(Math.ceil((stop - start) / step), 0);
       var range: number[] = [];
 
-      for (var i = 0; i < length; i++, start += step) {
-        range[i] = start;
+      for (var i = 0; i < length; ++i) {
+        range[i] = start + step * i;
       }
 
       return range;
