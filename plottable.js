@@ -6826,7 +6826,7 @@ var Plottable;
                 else {
                     var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                     var barAccessorData = d3.set(Plottable._Util.Methods.flatten(this.datasets().map(function (dataset) {
-                        return dataset.data().map(function (datum, i) { return +barAccessor(datum, i); });
+                        return dataset.data().map(barAccessor);
                     }))).values().map(function (value) { return +value; });
                     barAccessorData.sort(function (a, b) { return a - b; });
                     var barAccessorDataPairs = d3.pairs(barAccessorData);
