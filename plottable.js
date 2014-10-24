@@ -6605,16 +6605,16 @@ var Plottable;
                     return;
                 }
                 var barQScale = barScale;
-                var barWidth;
-                if (this._projectors["width"]) {
-                    barWidth = function (d, i) { return barQScale.invert(_this._projectors["width"].accessor(d, i)); };
-                }
-                else {
-                    barWidth = function () { return _this._getMinimumDataWidth(); };
-                }
+                var pixelWidthF = function (d, i) {
+                    return _this._projectors["width"] ? _this._projectors["width"].accessor(d, i) : _this._getBarPixelWidth();
+                };
                 var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                this.project("bar-min", function (d, i) { return barAccessor(d, i) - barWidth(d, i) * _this._barAlignmentFactor; }, barQScale);
-                this.project("bar-max", function (d, i) { return barAccessor(d, i) + barWidth(d, i) * (1 - _this._barAlignmentFactor); }, barQScale);
+                this.project("bar-min", function (d, i) {
+                    return barQScale.invert(barQScale.scale(barAccessor(d, i)) - pixelWidthF(d, i) * _this._barAlignmentFactor);
+                }, barQScale);
+                this.project("bar-max", function (d, i) {
+                    return barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - _this._barAlignmentFactor));
+                }, barQScale);
             };
             /**
              * Sets the baseline for the bars to the specified value.
@@ -6798,27 +6798,6 @@ var Plottable;
                 return attrToProjector;
             };
             /**
-             * Computes the minimum position difference in data space between two adjacent data entries.
-             * Mainly used to compute the size for all bars in the plot.
-             * OrdinalScales default to a value of 1.
-             */
-            AbstractBarPlot.prototype._getMinimumDataWidth = function () {
-                var barWidth;
-                var secondaryScale = this._isVertical ? this._xScale : this._yScale;
-                var secondaryDimension = this._isVertical ? this.width() : this.height();
-                var secondaryAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                if (secondaryScale instanceof Plottable.Scale.AbstractQuantitative) {
-                    var datasetDataPairs = Plottable._Util.Methods.flatten(this.datasets().map(function (dataset) { return d3.pairs(dataset.data()); }));
-                    barWidth = Plottable._Util.Methods.min(datasetDataPairs, function (pair, i) {
-                        return Math.abs(+secondaryAccessor(pair[1], i + 1) - +secondaryAccessor(pair[0], i));
-                    }, 1);
-                }
-                else if (secondaryScale instanceof Plottable.Scale.Ordinal) {
-                    barWidth = 1;
-                }
-                return barWidth;
-            };
-            /**
              * Computes the barPixelWidth of all the bars in the plot.
              *
              * If the position scale of the plot is an OrdinalScale and in bands mode, then the rangeBands function will be used.
@@ -6845,7 +6824,11 @@ var Plottable;
                     }
                 }
                 else {
-                    barPixelWidth = Math.abs(barScale.scale(this._getMinimumDataWidth()) - barScale.scale(0)) * 0.5;
+                    var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                    var datasetDataPairs = Plottable._Util.Methods.flatten(this.datasets().map(function (dataset) { return d3.pairs(dataset.data()); }));
+                    barPixelWidth = Plottable._Util.Methods.min(datasetDataPairs, function (pair, i) {
+                        return Math.abs(barScale.scale(barAccessor(pair[1], i + 1)) - barScale.scale(barAccessor(pair[0], i)));
+                    }, 1);
                 }
                 return barPixelWidth;
             };
@@ -7572,9 +7555,6 @@ var Plottable;
                 return Plot.AbstractStacked.prototype._valueAccessor.call(this);
             };
             //===== /Stack logic =====
-            StackedBar.prototype._getMinimumDataWidth = function () {
-                return Plot.AbstractBarPlot.prototype._getMinimumDataWidth.apply(this);
-            };
             StackedBar.prototype._getBarPixelWidth = function () {
                 return Plot.AbstractBarPlot.prototype._getBarPixelWidth.apply(this);
             };

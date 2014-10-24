@@ -56,16 +56,17 @@ export module Plot {
       }
       var barQScale = <Plottable.Scale.AbstractQuantitative<any>> barScale;
 
-      var barWidth: (d?: any, i?: number) => number;
-      if (this._projectors["width"]) {
-        barWidth = (d, i) => barQScale.invert(this._projectors["width"].accessor(d, i));
-      } else {
-        barWidth = () => this._getMinimumDataWidth();
-      }
+      var pixelWidthF = (d: any, i: number) => {
+        return this._projectors["width"] ? this._projectors["width"].accessor(d, i) : this._getBarPixelWidth();
+      };
 
       var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-      this.project("bar-min", (d: any, i: number) => barAccessor(d, i) - barWidth(d, i) * this._barAlignmentFactor, barQScale);
-      this.project("bar-max", (d: any, i: number) => barAccessor(d, i) + barWidth(d, i) * (1 - this._barAlignmentFactor), barQScale);
+      this.project("bar-min", (d: any, i: number) => {
+        return barQScale.invert(barQScale.scale(barAccessor(d, i)) - pixelWidthF(d, i) * this._barAlignmentFactor);
+      }, barQScale);
+      this.project("bar-max", (d: any, i: number) => {
+        return barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - this._barAlignmentFactor));
+      }, barQScale);
     }
 
     /**
@@ -288,29 +289,6 @@ export module Plot {
     }
 
     /**
-     * Computes the minimum position difference in data space between two adjacent data entries.
-     * Mainly used to compute the size for all bars in the plot.
-     * OrdinalScales default to a value of 1.
-     */
-    public _getMinimumDataWidth(): number {
-      var barWidth: number;
-      var secondaryScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
-      var secondaryDimension = this._isVertical ? this.width() : this.height();
-      var secondaryAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-
-      if (secondaryScale instanceof Plottable.Scale.AbstractQuantitative) {
-        var datasetDataPairs = _Util.Methods.flatten(this.datasets().map((dataset) => d3.pairs(dataset.data())));
-        barWidth = _Util.Methods.min(datasetDataPairs, (pair: any[], i: number) => {
-          return Math.abs(+secondaryAccessor(pair[1], i + 1) - +secondaryAccessor(pair[0], i));
-        }, 1);
-      } else if (secondaryScale instanceof Plottable.Scale.Ordinal) {
-        barWidth = 1;
-      }
-
-      return barWidth;
-    }
-
-    /**
      * Computes the barPixelWidth of all the bars in the plot.
      *
      * If the position scale of the plot is an OrdinalScale and in bands mode, then the rangeBands function will be used.
@@ -337,7 +315,11 @@ export module Plot {
           barPixelWidth = step * padding * 0.5;
         }
       } else {
-        barPixelWidth = Math.abs(barScale.scale(this._getMinimumDataWidth()) - barScale.scale(0)) * 0.5;
+        var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+        var datasetDataPairs = _Util.Methods.flatten(this.datasets().map((dataset) => d3.pairs(dataset.data())));
+        barPixelWidth = _Util.Methods.min(datasetDataPairs, (pair: any[], i: number) => {
+          return Math.abs(barScale.scale(barAccessor(pair[1], i + 1)) - barScale.scale(barAccessor(pair[0], i)));
+        }, 1);
       }
       return barPixelWidth;
     }

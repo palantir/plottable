@@ -2847,12 +2847,6 @@ declare module Plottable {
             _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
             /**
-             * Computes the minimum position difference in data space between two adjacent data entries.
-             * Mainly used to compute the size for all bars in the plot.
-             * OrdinalScales default to a value of 1.
-             */
-            _getMinimumDataWidth(): number;
-            /**
              * Computes the barPixelWidth of all the bars in the plot.
              *
              * If the position scale of the plot is an OrdinalScale and in bands mode, then the rangeBands function will be used.
@@ -3097,7 +3091,6 @@ declare module Plottable {
             _updateScaleExtents(): void;
             _keyAccessor(): AppliedAccessor;
             _valueAccessor(): AppliedAccessor;
-            _getMinimumDataWidth(): any;
             _getBarPixelWidth(): any;
         }
     }

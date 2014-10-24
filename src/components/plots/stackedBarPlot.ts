@@ -105,10 +105,6 @@ export module Plot {
     }
     //===== /Stack logic =====
 
-    public _getMinimumDataWidth() {
-      return AbstractBarPlot.prototype._getMinimumDataWidth.apply(this);
-    }
-
     public _getBarPixelWidth() {
       return AbstractBarPlot.prototype._getBarPixelWidth.apply(this);
     }
