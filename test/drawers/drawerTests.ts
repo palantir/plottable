@@ -13,7 +13,9 @@ class MockAnimator implements Plottable.Animator.PlotAnimator {
 
 
   public animate(selection: any, attrToProjector: Plottable.AttributeToProjector): any {
-    if (this.callback) {this.callback();}
+    if (this.callback) {
+      this.callback();
+    }
     return selection;
   }
 }
@@ -64,22 +66,22 @@ describe("Drawers", () => {
     });
 
     it("drawer timing works for non-null animators", (done) => {
-      var cb1Called = false;
-      var cb2Called = false;
-      var cb1 = () => {
-        cb1Called = true;
+      var callback1Called = false;
+      var callback2Called = false;
+      var callback1 = () => {
+        callback1Called = true;
       };
-      var cb2 = () => {
-        assert.isTrue(cb1Called, "callback2 called after callback 1");
-        cb2Called = true;
+      var callback2 = () => {
+        assert.isTrue(callback1Called, "callback2 called after callback 1");
+        callback2Called = true;
       };
-      var cb3 = () => {
-        assert.isTrue(cb2Called, "callback3 called after callback 2");
+      var callback3 = () => {
+        assert.isTrue(callback2Called, "callback3 called after callback 2");
         done();
       };
-      var a1 = new MockAnimator(20, cb1);
-      var a2 = new MockAnimator(10, cb2);
-      var a3 = new MockAnimator(0, cb3);
+      var a1 = new MockAnimator(20, callback1);
+      var a2 = new MockAnimator(10, callback2);
+      var a3 = new MockAnimator(0, callback3);
       var ds1: Plottable._Drawer.DrawStep = {attrToProjector: {}, animator: a1};
       var ds2: Plottable._Drawer.DrawStep = {attrToProjector: {}, animator: a2};
       var ds3: Plottable._Drawer.DrawStep = {attrToProjector: {}, animator: a3};
