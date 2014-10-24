@@ -23,7 +23,6 @@ export module Plot {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
-      this._animators["baseline"] = new Animator.Null();
       this.baseline(this._baselineValue);
       this._isVertical = isVertical;
     }

@@ -7472,7 +7472,6 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.classed("bar-plot", true);
                 this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
-                this._animators["baseline"] = new Plottable.Animator.Null();
                 this.baseline(this._baselineValue);
                 this._isVertical = isVertical;
             }
