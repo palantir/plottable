@@ -2297,9 +2297,14 @@ describe("Plots", function () {
             });
             it("sensible bar width same datum", function () {
                 barPlot.removeDataset(dataset);
-                barPlot.addDataset([{ x: 10, y: 2 }]);
-                barPlot.addDataset([{ x: 10, y: 2 }]);
+                barPlot.addDataset([{ x: 10, y: 2 }, { x: 10, y: 2 }]);
                 assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
+                svg.remove();
+            });
+            it("sensible bar width unsorted data", function () {
+                barPlot.removeDataset(dataset);
+                barPlot.addDataset([{ x: 2, y: 2 }, { x: 20, y: 2 }, { x: 5, y: 2 }]);
+                assert.closeTo(barPlot._getBarPixelWidth(), 77.72, 0.1, "sensible bar width for only one datum");
                 svg.remove();
             });
         });
