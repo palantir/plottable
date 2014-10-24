@@ -394,15 +394,15 @@ describe("Plots", () => {
         plot._drawLabels = () => {
           if (!called) {
             originalDrawLabels.apply(plot);
-            var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+            texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
             assert.lengthOf(texts, 2, "texts were repopulated by drawLabels after the update");
             svg.remove();
             called = true; // for some reason, in phantomJS, `done` was being called multiple times and this caused the test to fail.
             done();
           }
-        }
+        };
         dataset.data(data);
-        var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 0, "texts were immediately removed");
       });
     });

@@ -2523,7 +2523,7 @@ describe("Plots", function () {
                 plot._drawLabels = function () {
                     if (!called) {
                         originalDrawLabels.apply(plot);
-                        var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                        texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                         assert.lengthOf(texts, 2, "texts were repopulated by drawLabels after the update");
                         svg.remove();
                         called = true; // for some reason, in phantomJS, `done` was being called multiple times and this caused the test to fail.
@@ -2531,7 +2531,7 @@ describe("Plots", function () {
                     }
                 };
                 dataset.data(data);
-                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 0, "texts were immediately removed");
             });
         });
