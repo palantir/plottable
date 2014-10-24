@@ -8242,6 +8242,7 @@ var Plottable;
             BarHover.prototype._anchor = function (barPlot, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, barPlot, hitBox);
+                Plottable._Util.Methods.warn("Interaction.BarHover is deprecated; please use Interaction.Hover instead");
                 this.plotIsVertical = this._componentToListenTo._isVertical;
                 this.dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
                 this.dispatcher.mousemove(function (p) {
