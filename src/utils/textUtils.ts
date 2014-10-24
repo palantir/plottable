@@ -214,7 +214,7 @@ export module _Util {
       innerG.attr("transform", xForm.toString());
       innerG.classed("rotated-" + rotation, true);
 
-      return wh;
+      return {width: wh.height, height: wh.width};
     }
 
     function writeTextHorizontally(brokenText: string[], g: D3.Selection,
@@ -298,8 +298,11 @@ export module _Util {
       if (write == null) {
         var widthFn = orientHorizontally ? _Util.Methods.max : d3.sum;
         var heightFn = orientHorizontally ? d3.sum : _Util.Methods.max;
-        usedWidth = widthFn<string, number>(wrappedText.lines, (line: string) => tm(line).width, 0);
-        usedHeight = heightFn<string, number>(wrappedText.lines, (line: string) => tm(line).height, 0);
+        var heightAcc = (line: string) => orientHorizontally ? tm(line).height : tm(line).width;
+        var widthAcc = (line: string) => orientHorizontally ? tm(line).width : tm(line).height;
+
+        usedWidth = widthFn(wrappedText.lines, widthAcc, 0);
+        usedHeight = heightFn(wrappedText.lines, heightAcc, 0);
       } else {
         var innerG = write.g.append("g").classed("writeText-inner-g", true); // unleash your inner G
         // the outerG contains general transforms for positining the whole block, the inner g

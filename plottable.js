@@ -701,7 +701,7 @@ var Plottable;
                 xForm.translate = [isRight ? width : 0, isRight ? 0 : height];
                 innerG.attr("transform", xForm.toString());
                 innerG.classed("rotated-" + rotation, true);
-                return wh;
+                return { width: wh.height, height: wh.width };
             }
             Text.writeLineVertically = writeLineVertically;
             function writeTextHorizontally(brokenText, g, width, height, xAlign, yAlign) {
@@ -768,8 +768,10 @@ var Plottable;
                 if (write == null) {
                     var widthFn = orientHorizontally ? _Util.Methods.max : d3.sum;
                     var heightFn = orientHorizontally ? d3.sum : _Util.Methods.max;
-                    usedWidth = widthFn(wrappedText.lines, function (line) { return tm(line).width; }, 0);
-                    usedHeight = heightFn(wrappedText.lines, function (line) { return tm(line).height; }, 0);
+                    var heightAcc = function (line) { return orientHorizontally ? tm(line).height : tm(line).width; };
+                    var widthAcc = function (line) { return orientHorizontally ? tm(line).width : tm(line).height; };
+                    usedWidth = widthFn(wrappedText.lines, widthAcc, 0);
+                    usedHeight = heightFn(wrappedText.lines, heightAcc, 0);
                 }
                 else {
                     var innerG = write.g.append("g").classed("writeText-inner-g", true); // unleash your inner G
