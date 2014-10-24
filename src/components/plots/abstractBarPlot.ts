@@ -7,7 +7,7 @@ export module Plot {
     private static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
-    public _barAlignmentFactor = 0;
+    public _barAlignmentFactor = 0.5;
     public _isVertical: boolean;
     private _barLabelFormatter: Formatter = Formatters.identity();
     private _barLabelsEnabled = false;
