@@ -103,10 +103,12 @@ describe("Scales", () => {
       assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled3");
       scale._removeExtent("1", "x");
       assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled4");
-      assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
+      assert.closeTo(scale.domain()[0], -20, 0.1, "only the bar accessor is active");
+      assert.closeTo(scale.domain()[1], 1, 0.1, "only the bar accessor is active");
       scale._updateExtent("2", "x", d3.extent(data, (e) => e.foo));
       assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled5");
-      assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
+      assert.closeTo(scale.domain()[0], 0, 0.1, "the bar accessor was overwritten");
+      assert.closeTo(scale.domain()[1], 5, 0.1, "the bar accessor was overwritten");
     });
 
     it("should resize when a plot is removed", () => {
