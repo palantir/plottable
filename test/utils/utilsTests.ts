@@ -52,8 +52,11 @@ describe("_Util.Methods", () => {
       var alist = [1,2,3,4,5];
       var dbl = (x: number) => x * 2;
       var dblIndexOffset = (x: number, i: number) => x * 2 - i;
-      var today = new Date();
-      var numToDate = (x: number) => { var t = new Date(); t.setDate(today.getDate() + x); return t; };
+      var numToDate = (x: number) => {
+        var t = new Date(today.getTime());
+        t.setDate(today.getDate() + x);
+        return t;
+      };
 
       assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
       assert.deepEqual(max(alist, dbl, 0), 10, "max applies function appropriately");
@@ -77,11 +80,11 @@ describe("_Util.Methods", () => {
       assert.deepEqual(max([], (s: string) => s.length, 5), 5, "defaults work even with non-number function type");
     });
 
-    it.skip("max/min works as expected on non-numeric values (dates)", () => { //HACKHACK skip a flakey test #1242
-      var tomorrow = new Date();
+    it("max/min works as expected on non-numeric values (dates)", () => {
+      var tomorrow = new Date(today.getTime());
       tomorrow.setDate(today.getDate() + 1);
-      var dayAfterTomorrow = new Date();
-      dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
+      var dayAfterTomorrow = new Date(today.getTime());
+      dayAfterTomorrow.setDate(today.getDate() + 2);
       var dates: Date[] = [today, tomorrow, dayAfterTomorrow, null];
       assert.deepEqual(min<Date>(dates, dayAfterTomorrow), today, "works on arrays of non-numeric values but comparable");
       assert.deepEqual(max<Date>(dates, today), dayAfterTomorrow, "works on arrays of non-number values but comparable");

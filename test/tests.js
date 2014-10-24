@@ -6047,9 +6047,8 @@ describe("_Util.Methods", function () {
             var alist = [1, 2, 3, 4, 5];
             var dbl = function (x) { return x * 2; };
             var dblIndexOffset = function (x, i) { return x * 2 - i; };
-            var today = new Date();
             var numToDate = function (x) {
-                var t = new Date();
+                var t = new Date(today.getTime());
                 t.setDate(today.getDate() + x);
                 return t;
             };
@@ -6072,11 +6071,11 @@ describe("_Util.Methods", function () {
             assert.deepEqual(max(strings, function (s) { return s.length; }, 0), 3, "works on arrays of non-numbers with a function");
             assert.deepEqual(max([], function (s) { return s.length; }, 5), 5, "defaults work even with non-number function type");
         });
-        it.skip("max/min works as expected on non-numeric values (dates)", function () {
-            var tomorrow = new Date();
+        it("max/min works as expected on non-numeric values (dates)", function () {
+            var tomorrow = new Date(today.getTime());
             tomorrow.setDate(today.getDate() + 1);
-            var dayAfterTomorrow = new Date();
-            dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
+            var dayAfterTomorrow = new Date(today.getTime());
+            dayAfterTomorrow.setDate(today.getDate() + 2);
             var dates = [today, tomorrow, dayAfterTomorrow, null];
             assert.deepEqual(min(dates, dayAfterTomorrow), today, "works on arrays of non-numeric values but comparable");
             assert.deepEqual(max(dates, today), dayAfterTomorrow, "works on arrays of non-number values but comparable");
