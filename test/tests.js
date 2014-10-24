@@ -2468,6 +2468,32 @@ describe("Plots", function () {
             assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
             svg.remove();
         });
+        it("_getClosestStruckPoint()", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            xScale.domain([0, 400]);
+            yScale.domain([400, 0]);
+            var data1 = [
+                { x: 80, y: 200, r: 20 },
+                { x: 100, y: 200, r: 20 },
+                { x: 125, y: 200, r: 5 },
+                { x: 138, y: 200, r: 5 }
+            ];
+            var plot = new Plottable.Plot.Scatter(xScale, yScale);
+            plot.addDataset(data1);
+            plot.project("x", "x").project("y", "y").project("r", "r");
+            plot.renderTo(svg);
+            var twoOverlappingCirclesResult = plot._getClosestStruckPoint({ x: 85, y: 200 }, 10);
+            assert.strictEqual(twoOverlappingCirclesResult.data[0], data1[0], "returns closest circle among circles that the test point touches");
+            var overlapAndCloseToPointResult = plot._getClosestStruckPoint({ x: 118, y: 200 }, 10);
+            assert.strictEqual(overlapAndCloseToPointResult.data[0], data1[1], "returns closest circle that test point touches, even if non-touched circles are closer");
+            var twoPointsInRangeResult = plot._getClosestStruckPoint({ x: 130, y: 200 }, 10);
+            assert.strictEqual(twoPointsInRangeResult.data[0], data1[2], "returns closest circle within range if test point does not touch any circles");
+            var farFromAnyPointsResult = plot._getClosestStruckPoint({ x: 400, y: 400 }, 10);
+            assert.isNull(farFromAnyPointsResult.data, "returns no data if no circle were within range and test point does not touch any circles");
+            svg.remove();
+        });
         describe("Example ScatterPlot with quadratic series", function () {
             var svg;
             var xScale;
@@ -2904,6 +2930,23 @@ describe("Plots", function () {
             dataset.data(data);
             renderer.renderTo(svg);
             assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound does not change");
+            svg.remove();
+        });
+        it("warning is thrown when datasets are updated with different domains", function () {
+            var flag = false;
+            var oldWarn = Plottable._Util.Methods.warn;
+            Plottable._Util.Methods.warn = function (msg) {
+                if (msg.indexOf("domain") > -1) {
+                    flag = true;
+                }
+            };
+            var missingDomainData = [
+                { x: 1, y: 0, type: "c" }
+            ];
+            var dataset = new Plottable.Dataset(missingDomainData);
+            renderer.addDataset(dataset);
+            Plottable._Util.Methods.warn = oldWarn;
+            assert.isTrue(flag, "warning has been issued about differing domains");
             svg.remove();
         });
     });
@@ -5560,17 +5603,49 @@ describe("_Util.Text", function () {
             var height = 1;
             var textSelection = svg.append("text");
             var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
-            var results = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal");
+            var results = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal");
             assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "measurement mode: no width used");
             assert.equal(0, results.usedHeight, "measurement mode: no height used");
             var writeOptions = { g: svg, xAlign: "center", yAlign: "center" };
-            results = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal", writeOptions);
+            results = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal", writeOptions);
             assert.isFalse(results.textFits, "write mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "write mode: no width used");
             assert.equal(0, results.usedHeight, "write mode: no height used");
             textSelection.remove();
             assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
+            svg.remove();
+        });
+        it("behaves appropriately when text is in horizontal position", function () {
+            var svg = generateSVG();
+            var width = 100;
+            var height = 50;
+            var textSelection = svg.append("text");
+            var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
+            var measureResults = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal");
+            assert.isTrue(measureResults.textFits, "mesurement mode: text fits");
+            assert.operator(measureResults.usedHeight, "<=", measureResults.usedWidth, "mesurement mode: used more width than height");
+            var writeOptions = { g: svg, xAlign: "left", yAlign: "top" };
+            var writeResults = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal", writeOptions);
+            assert.isTrue(writeResults.textFits, "write mode: text fits");
+            assert.equal(measureResults.usedWidth, writeResults.usedWidth, "write mode: used the same width as measurement");
+            assert.equal(measureResults.usedHeight, writeResults.usedHeight, "write mode: used the same height as measurement");
+            svg.remove();
+        });
+        it("behaves appropriately when text is in vertical position", function () {
+            var svg = generateSVG();
+            var width = 100;
+            var height = 50;
+            var textSelection = svg.append("text");
+            var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
+            var measureResults = Plottable._Util.Text.writeText("abc", width, height, measure, "left");
+            assert.isTrue(measureResults.textFits, "mesurement mode: text fits");
+            assert.operator(measureResults.usedHeight, ">=", measureResults.usedWidth, "mesurement mode: used more height than width");
+            var writeOptions = { g: svg, xAlign: "left", yAlign: "top" };
+            var writeResults = Plottable._Util.Text.writeText("abc", width, height, measure, "left", writeOptions);
+            assert.isTrue(writeResults.textFits, "write mode: text fits");
+            assert.equal(measureResults.usedWidth, writeResults.usedWidth, "write mode: used the same width as measurement");
+            assert.equal(measureResults.usedHeight, writeResults.usedHeight, "write mode: used the same height as measurement");
             svg.remove();
         });
     });
@@ -5764,22 +5839,40 @@ describe("_Util.Methods", function () {
     it("max/min work as expected", function () {
         var alist = [1, 2, 3, 4, 5];
         var dbl = function (x) { return x * 2; };
+        var dblIndexOffset = function (x, i) { return x * 2 - i; };
+        var today = new Date();
+        var numToDate = function (x) {
+            var t = new Date();
+            t.setDate(today.getDate() + x);
+            return t;
+        };
         var max = Plottable._Util.Methods.max;
         var min = Plottable._Util.Methods.min;
-        assert.deepEqual(max(alist), 5, "max works as expected on plain array");
         assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
-        assert.deepEqual(max(alist, dbl), 10, "max applies function appropriately");
-        assert.deepEqual(max([]), 0, "default value zero by default");
+        assert.deepEqual(max(alist, dbl, 0), 10, "max applies function appropriately");
+        assert.deepEqual(max(alist, dblIndexOffset, 5), 6, "max applies function with index");
+        assert.deepEqual(max(alist, numToDate, today), numToDate(5), "max applies non-numeric function appropriately");
         assert.deepEqual(max([], 10), 10, "works as intended with default value");
-        assert.deepEqual(max([], dbl), 0, "default value zero as expected when fn provided");
         assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
+        assert.deepEqual(max([], numToDate, today), today, "default non-numeric value works with non-numeric function");
         assert.deepEqual(min(alist, 0), 1, "min works for basic list");
         assert.deepEqual(min(alist, dbl, 0), 2, "min works with function arg");
-        assert.deepEqual(min([]), 0, "min defaults to 0");
+        assert.deepEqual(min(alist, dblIndexOffset, 0), 2, "min works with function index arg");
+        assert.deepEqual(min(alist, numToDate, today), numToDate(1), "min works with non-numeric function arg");
         assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
+        assert.deepEqual(min([], numToDate, today), today, "min accepts non-numeric default and function");
         var strings = ["a", "bb", "ccc", "ddd"];
-        assert.deepEqual(max(strings, function (s) { return s.length; }), 3, "works on arrays of non-numbers with a function");
+        assert.deepEqual(max(strings, function (s) { return s.length; }, 0), 3, "works on arrays of non-numbers with a function");
         assert.deepEqual(max([], function (s) { return s.length; }, 5), 5, "defaults work even with non-number function type");
+        var tomorrow = new Date();
+        tomorrow.setDate(today.getDate() + 1);
+        var dayAfterTomorrow = new Date();
+        dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
+        var dates = [today, tomorrow, dayAfterTomorrow, null];
+        assert.deepEqual(min(dates, dayAfterTomorrow), today, "works on arrays of non-numeric values but comparable");
+        assert.deepEqual(max(dates, today), dayAfterTomorrow, "works on arrays of non-number values but comparable");
+        assert.deepEqual(max([null], today), undefined, "returns undefined from array of null values");
+        assert.deepEqual(max([], today), today, "correct default non-numeric value returned");
     });
     it("objEq works as expected", function () {
         assert.isTrue(Plottable._Util.Methods.objEq({}, {}));

@@ -30,6 +30,17 @@ export module Plot {
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
+    public _updateStackOffsets() {
+      var domainKeys = this._getDomainKeys();
+      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+      var keySets = this.datasets().map((dataset) => d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i).toString())).values());
+
+      if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
+        _Util.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
+      }
+      super._updateStackOffsets();
+    }
+
     public _additionalPaint() {
       var scaledBaseline = this._yScale.scale(this._baselineValue);
       var baselineAttr: any = {
