@@ -61,6 +61,10 @@ export module Plot {
       return attrToProjector;
     }
 
+    public _generateDrawSteps(): _Drawer.DrawStep[] {
+      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar")}];
+    }
+
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
       AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);

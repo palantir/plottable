@@ -7505,6 +7505,9 @@ var Plottable;
                 attrToProjector[primaryAttr] = function (d) { return _this._isVertical ? attrFunction(d) : attrFunction(d) - heightF(d); };
                 return attrToProjector;
             };
+            StackedBar.prototype._generateDrawSteps = function () {
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar") }];
+            };
             StackedBar.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 Plot.AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
