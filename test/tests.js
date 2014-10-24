@@ -2289,6 +2289,12 @@ describe("Plots", function () {
                 assert.closeTo(domain[1], 110, 0.1, "max extent accounted");
                 svg.remove();
             });
+            it("sensible bar width one datum", function () {
+                barPlot.removeDataset(dataset);
+                barPlot.addDataset([{ x: 10, y: 2 }]);
+                assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
+                svg.remove();
+            });
         });
         describe("Horizontal Bar Plot in Points Mode", function () {
             var svg;

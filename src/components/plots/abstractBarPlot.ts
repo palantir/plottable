@@ -317,9 +317,10 @@ export module Plot {
       } else {
         var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
         var datasetDataPairs = _Util.Methods.flatten(this.datasets().map((dataset) => d3.pairs(dataset.data())));
+        var barWidthDimension = this._isVertical ? this.width() : this.height();
         barPixelWidth = _Util.Methods.min(datasetDataPairs, (pair: any[], i: number) => {
           return Math.abs(barScale.scale(barAccessor(pair[1], i + 1)) - barScale.scale(barAccessor(pair[0], i)));
-        }, 1) * 0.95;
+        }, barWidthDimension * 0.4) * 0.95;
       }
       return barPixelWidth;
     }
