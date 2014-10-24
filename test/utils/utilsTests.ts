@@ -52,7 +52,11 @@ describe("_Util.Methods", () => {
       var alist = [1,2,3,4,5];
       var dbl = (x: number) => x * 2;
       var dblIndexOffset = (x: number, i: number) => x * 2 - i;
-      var numToDate = (x: number) => { var t = new Date(today.getTime()); t.setDate(today.getDate() + x); return t; };
+      var numToDate = (x: number) => {
+        var t = new Date(today.getTime());
+        t.setDate(today.getDate() + x);
+        return t;
+      };
 
       assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
       assert.deepEqual(max(alist, dbl, 0), 10, "max applies function appropriately");
