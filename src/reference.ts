@@ -6,6 +6,7 @@
 /// <reference path="utils/textUtils.ts" />
 /// <reference path="utils/wordWrapUtils.ts" />
 /// <reference path="utils/domUtils.ts" />
+/// <reference path="utils/color.ts" />
 
 /// <reference path="utils/formatters.ts" />
 
@@ -34,9 +35,11 @@
 /// <reference path="scales/tickGenerators.ts" />
 
 /// <reference path="drawers/abstractDrawer.ts" />
-/// <reference path="drawers/arcDrawer.ts" />
+/// <reference path="drawers/lineDrawer.ts" />
 /// <reference path="drawers/areaDrawer.ts" />
+/// <reference path="drawers/elementDrawer.ts" />
 /// <reference path="drawers/rectDrawer.ts" />
+/// <reference path="drawers/arcDrawer.ts" />
 
 /// <reference path="components/abstractComponent.ts" />
 /// <reference path="components/abstractComponentContainer.ts" />
@@ -85,6 +88,7 @@
 /// <reference path="interactions/drag/xDragBoxInteraction.ts" />
 /// <reference path="interactions/drag/xyDragBoxInteraction.ts" />
 /// <reference path="interactions/drag/yDragBoxInteraction.ts" />
+/// <reference path="interactions/hoverInteraction.ts" />
 
 /// <reference path="dispatchers/abstractDispatcher.ts" />
 /// <reference path="dispatchers/mouseDispatcher.ts" />

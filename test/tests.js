@@ -147,6 +147,23 @@ before(function () {
     else {
         window.Pixel_CloseTo_Requirement = 0.5;
     }
+    // Override setTimeout with a version that fires synchronously if time=0
+    // To make synchronous testing easier.
+    var oldSetTimeout = window.setTimeout;
+    window.setTimeout = function (f, t) {
+        if (t === void 0) { t = 0; }
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
+        if (t === 0) {
+            f();
+            return 0;
+        }
+        else {
+            return oldSetTimeout(f, t, args);
+        }
+    };
 });
 after(function () {
     var parent = getSVGParent();
@@ -161,6 +178,104 @@ after(function () {
     else {
         assert(d3.select("body").selectAll("svg").node() === null, "all svgs have been removed");
     }
+});
+
+///<reference path="../testReference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var MockAnimator = (function () {
+    function MockAnimator(time, callback) {
+        this.time = time;
+        this.callback = callback;
+    }
+    MockAnimator.prototype.getTiming = function (selection) {
+        return this.time;
+    };
+    MockAnimator.prototype.animate = function (selection, attrToProjector) {
+        if (this.callback) {
+            this.callback();
+        }
+        return selection;
+    };
+    return MockAnimator;
+})();
+var MockDrawer = (function (_super) {
+    __extends(MockDrawer, _super);
+    function MockDrawer() {
+        _super.apply(this, arguments);
+    }
+    MockDrawer.prototype._drawStep = function (step) {
+        step.animator.animate(this._renderArea, step.attrToProjector);
+    };
+    return MockDrawer;
+})(Plottable._Drawer.AbstractDrawer);
+describe("Drawers", function () {
+    describe("Abstract Drawer", function () {
+        var oldTimeout;
+        var timings = [];
+        var svg;
+        var drawer;
+        before(function () {
+            oldTimeout = window.setTimeout;
+            window.setTimeout = function (f, time) {
+                var args = [];
+                for (var _i = 2; _i < arguments.length; _i++) {
+                    args[_i - 2] = arguments[_i];
+                }
+                timings.push(time);
+                return oldTimeout(f, time, args);
+            };
+        });
+        after(function () {
+            window.setTimeout = oldTimeout;
+        });
+        beforeEach(function () {
+            timings = [];
+            svg = generateSVG();
+            drawer = new MockDrawer("foo");
+            drawer.setup(svg);
+        });
+        afterEach(function () {
+            svg.remove(); // no point keeping it around since we don't draw anything in it anyway
+        });
+        it("drawer timing works as expected for null animators", function () {
+            var a1 = new Plottable.Animator.Null();
+            var a2 = new Plottable.Animator.Null();
+            var ds1 = { attrToProjector: {}, animator: a1 };
+            var ds2 = { attrToProjector: {}, animator: a2 };
+            var steps = [ds1, ds2];
+            drawer.draw([], steps);
+            assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
+        });
+        it("drawer timing works for non-null animators", function (done) {
+            var callback1Called = false;
+            var callback2Called = false;
+            var callback1 = function () {
+                callback1Called = true;
+            };
+            var callback2 = function () {
+                assert.isTrue(callback1Called, "callback2 called after callback 1");
+                callback2Called = true;
+            };
+            var callback3 = function () {
+                assert.isTrue(callback2Called, "callback3 called after callback 2");
+                done();
+            };
+            var a1 = new MockAnimator(20, callback1);
+            var a2 = new MockAnimator(10, callback2);
+            var a3 = new MockAnimator(0, callback3);
+            var ds1 = { attrToProjector: {}, animator: a1 };
+            var ds2 = { attrToProjector: {}, animator: a2 };
+            var ds3 = { attrToProjector: {}, animator: a3 };
+            var steps = [ds1, ds2, ds3];
+            drawer.draw([], steps);
+            assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
+        });
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -1679,6 +1794,22 @@ describe("Plots", function () {
             assertDomainIsClose(scale1.domain(), [1, 3], "extent shrinks further if we project plot2 away");
             svg.remove();
         });
+        it("additionalPaint timing works properly", function () {
+            var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
+            var x = new Plottable.Scale.Linear();
+            var y = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.VerticalBar(x, y).addDataset([]).animate(true);
+            var recordedTime = -1;
+            var additionalPaint = function (x) {
+                recordedTime = Math.max(x, recordedTime);
+            };
+            plot._additionalPaint = additionalPaint;
+            plot.animator("bars", animator);
+            var svg = generateSVG();
+            plot.renderTo(svg);
+            svg.remove();
+            assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");
+        });
     });
 });
 
@@ -1816,7 +1947,7 @@ describe("Plots", function () {
         var oldWarn = Plottable._Util.Methods.warn;
         beforeEach(function () {
             p = new Plottable.Plot.AbstractPlot();
-            p._getDrawer = function (k) { return new Plottable._Drawer.Rect(k); };
+            p._getDrawer = function (k) { return new Plottable._Drawer.Element(k).svgElement("rect"); };
         });
         afterEach(function () {
             Plottable._Util.Methods.warn = oldWarn;
@@ -2356,6 +2487,78 @@ describe("Plots", function () {
                 svg.remove();
             });
         });
+        describe("Vertical Bar Plot With Bar Labels", function () {
+            var plot;
+            var data;
+            var dataset;
+            var xScale;
+            var yScale;
+            var svg;
+            beforeEach(function () {
+                svg = generateSVG();
+                data = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+                dataset = new Plottable.Dataset(data);
+                xScale = new Plottable.Scale.Ordinal();
+                yScale = new Plottable.Scale.Linear();
+                plot = new Plottable.Plot.VerticalBar(xScale, yScale);
+                plot.addDataset(dataset);
+            });
+            it("bar labels disabled by default", function () {
+                plot.renderTo(svg);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 0, "by default, no texts are drawn");
+                svg.remove();
+            });
+            it("bar labels render properly", function () {
+                plot.renderTo(svg);
+                plot.barLabelsEnabled(true);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 2, "both texts drawn");
+                assert.equal(texts[0], "640", "first label is 640");
+                assert.equal(texts[1], "12345", "first label is 12345");
+                svg.remove();
+            });
+            it("bar labels hide if bars too skinny", function () {
+                plot.barLabelsEnabled(true);
+                plot.renderTo(svg);
+                plot.barLabelFormatter(function (n) { return n.toString() + (n === 12345 ? "looong" : ""); });
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 0, "no text drawn");
+                svg.remove();
+            });
+            it("formatters are used properly", function () {
+                plot.barLabelsEnabled(true);
+                plot.barLabelFormatter(function (n) { return n.toString() + "%"; });
+                plot.renderTo(svg);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 2, "both texts drawn");
+                assert.equal(texts[0], "640%", "first label is 640%");
+                assert.equal(texts[1], "12345%", "first label is 12345%");
+                svg.remove();
+            });
+            it("bar labels are removed instantly on dataset change, even if animation is enabled", function (done) {
+                plot.barLabelsEnabled(true);
+                plot.animate(true);
+                plot.renderTo(svg);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 2, "both texts drawn");
+                var originalDrawLabels = plot._drawLabels;
+                var called = false;
+                plot._drawLabels = function () {
+                    if (!called) {
+                        originalDrawLabels.apply(plot);
+                        texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                        assert.lengthOf(texts, 2, "texts were repopulated by drawLabels after the update");
+                        svg.remove();
+                        called = true; // for some reason, in phantomJS, `done` was being called multiple times and this caused the test to fail.
+                        done();
+                    }
+                };
+                dataset.data(data);
+                texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 0, "texts were immediately removed");
+            });
+        });
     });
 });
 
@@ -2490,6 +2693,32 @@ describe("Plots", function () {
             assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
             assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");
             assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
+            svg.remove();
+        });
+        it("_getClosestStruckPoint()", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            xScale.domain([0, 400]);
+            yScale.domain([400, 0]);
+            var data1 = [
+                { x: 80, y: 200, r: 20 },
+                { x: 100, y: 200, r: 20 },
+                { x: 125, y: 200, r: 5 },
+                { x: 138, y: 200, r: 5 }
+            ];
+            var plot = new Plottable.Plot.Scatter(xScale, yScale);
+            plot.addDataset(data1);
+            plot.project("x", "x").project("y", "y").project("r", "r");
+            plot.renderTo(svg);
+            var twoOverlappingCirclesResult = plot._getClosestStruckPoint({ x: 85, y: 200 }, 10);
+            assert.strictEqual(twoOverlappingCirclesResult.data[0], data1[0], "returns closest circle among circles that the test point touches");
+            var overlapAndCloseToPointResult = plot._getClosestStruckPoint({ x: 118, y: 200 }, 10);
+            assert.strictEqual(overlapAndCloseToPointResult.data[0], data1[1], "returns closest circle that test point touches, even if non-touched circles are closer");
+            var twoPointsInRangeResult = plot._getClosestStruckPoint({ x: 130, y: 200 }, 10);
+            assert.strictEqual(twoPointsInRangeResult.data[0], data1[2], "returns closest circle within range if test point does not touch any circles");
+            var farFromAnyPointsResult = plot._getClosestStruckPoint({ x: 400, y: 400 }, 10);
+            assert.isNull(farFromAnyPointsResult.data, "returns no data if no circle were within range and test point does not touch any circles");
             svg.remove();
         });
         describe("Example ScatterPlot with quadratic series", function () {
@@ -2928,6 +3157,23 @@ describe("Plots", function () {
             dataset.data(data);
             renderer.renderTo(svg);
             assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound does not change");
+            svg.remove();
+        });
+        it("warning is thrown when datasets are updated with different domains", function () {
+            var flag = false;
+            var oldWarn = Plottable._Util.Methods.warn;
+            Plottable._Util.Methods.warn = function (msg) {
+                if (msg.indexOf("domain") > -1) {
+                    flag = true;
+                }
+            };
+            var missingDomainData = [
+                { x: 1, y: 0, type: "c" }
+            ];
+            var dataset = new Plottable.Dataset(missingDomainData);
+            renderer.addDataset(dataset);
+            Plottable._Util.Methods.warn = oldWarn;
+            assert.isTrue(flag, "warning has been issued about differing domains");
             svg.remove();
         });
     });
@@ -5587,17 +5833,49 @@ describe("_Util.Text", function () {
             var height = 1;
             var textSelection = svg.append("text");
             var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
-            var results = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal");
+            var results = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal");
             assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "measurement mode: no width used");
             assert.equal(0, results.usedHeight, "measurement mode: no height used");
             var writeOptions = { g: svg, xAlign: "center", yAlign: "center" };
-            results = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal", writeOptions);
+            results = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal", writeOptions);
             assert.isFalse(results.textFits, "write mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "write mode: no width used");
             assert.equal(0, results.usedHeight, "write mode: no height used");
             textSelection.remove();
             assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
+            svg.remove();
+        });
+        it("behaves appropriately when text is in horizontal position", function () {
+            var svg = generateSVG();
+            var width = 100;
+            var height = 50;
+            var textSelection = svg.append("text");
+            var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
+            var measureResults = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal");
+            assert.isTrue(measureResults.textFits, "mesurement mode: text fits");
+            assert.operator(measureResults.usedHeight, "<=", measureResults.usedWidth, "mesurement mode: used more width than height");
+            var writeOptions = { g: svg, xAlign: "left", yAlign: "top" };
+            var writeResults = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal", writeOptions);
+            assert.isTrue(writeResults.textFits, "write mode: text fits");
+            assert.equal(measureResults.usedWidth, writeResults.usedWidth, "write mode: used the same width as measurement");
+            assert.equal(measureResults.usedHeight, writeResults.usedHeight, "write mode: used the same height as measurement");
+            svg.remove();
+        });
+        it("behaves appropriately when text is in vertical position", function () {
+            var svg = generateSVG();
+            var width = 100;
+            var height = 50;
+            var textSelection = svg.append("text");
+            var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
+            var measureResults = Plottable._Util.Text.writeText("abc", width, height, measure, "left");
+            assert.isTrue(measureResults.textFits, "mesurement mode: text fits");
+            assert.operator(measureResults.usedHeight, ">=", measureResults.usedWidth, "mesurement mode: used more height than width");
+            var writeOptions = { g: svg, xAlign: "left", yAlign: "top" };
+            var writeResults = Plottable._Util.Text.writeText("abc", width, height, measure, "left", writeOptions);
+            assert.isTrue(writeResults.textFits, "write mode: text fits");
+            assert.equal(measureResults.usedWidth, writeResults.usedWidth, "write mode: used the same width as measurement");
+            assert.equal(measureResults.usedHeight, writeResults.usedHeight, "write mode: used the same height as measurement");
             svg.remove();
         });
     });
@@ -5788,25 +6066,49 @@ describe("_Util.Methods", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
         assert.deepEqual(Plottable._Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
     });
-    it("max/min work as expected", function () {
-        var alist = [1, 2, 3, 4, 5];
-        var dbl = function (x) { return x * 2; };
+    describe("min/max", function () {
         var max = Plottable._Util.Methods.max;
         var min = Plottable._Util.Methods.min;
-        assert.deepEqual(max(alist), 5, "max works as expected on plain array");
-        assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
-        assert.deepEqual(max(alist, dbl), 10, "max applies function appropriately");
-        assert.deepEqual(max([]), 0, "default value zero by default");
-        assert.deepEqual(max([], 10), 10, "works as intended with default value");
-        assert.deepEqual(max([], dbl), 0, "default value zero as expected when fn provided");
-        assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
-        assert.deepEqual(min(alist, 0), 1, "min works for basic list");
-        assert.deepEqual(min(alist, dbl, 0), 2, "min works with function arg");
-        assert.deepEqual(min([]), 0, "min defaults to 0");
-        assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
-        var strings = ["a", "bb", "ccc", "ddd"];
-        assert.deepEqual(max(strings, function (s) { return s.length; }), 3, "works on arrays of non-numbers with a function");
-        assert.deepEqual(max([], function (s) { return s.length; }, 5), 5, "defaults work even with non-number function type");
+        var today = new Date();
+        it("max/min work as expected", function () {
+            var alist = [1, 2, 3, 4, 5];
+            var dbl = function (x) { return x * 2; };
+            var dblIndexOffset = function (x, i) { return x * 2 - i; };
+            var numToDate = function (x) {
+                var t = new Date(today.getTime());
+                t.setDate(today.getDate() + x);
+                return t;
+            };
+            assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
+            assert.deepEqual(max(alist, dbl, 0), 10, "max applies function appropriately");
+            assert.deepEqual(max(alist, dblIndexOffset, 5), 6, "max applies function with index");
+            assert.deepEqual(max(alist, numToDate, today), numToDate(5), "max applies non-numeric function appropriately");
+            assert.deepEqual(max([], 10), 10, "works as intended with default value");
+            assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
+            assert.deepEqual(max([], numToDate, today), today, "default non-numeric value works with non-numeric function");
+            assert.deepEqual(min(alist, 0), 1, "min works for basic list");
+            assert.deepEqual(min(alist, dbl, 0), 2, "min works with function arg");
+            assert.deepEqual(min(alist, dblIndexOffset, 0), 2, "min works with function index arg");
+            assert.deepEqual(min(alist, numToDate, today), numToDate(1), "min works with non-numeric function arg");
+            assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
+            assert.deepEqual(min([], numToDate, today), today, "min accepts non-numeric default and function");
+        });
+        it("max/min works as expected on non-numeric values (strings)", function () {
+            var strings = ["a", "bb", "ccc", "ddd"];
+            assert.deepEqual(max(strings, function (s) { return s.length; }, 0), 3, "works on arrays of non-numbers with a function");
+            assert.deepEqual(max([], function (s) { return s.length; }, 5), 5, "defaults work even with non-number function type");
+        });
+        it("max/min works as expected on non-numeric values (dates)", function () {
+            var tomorrow = new Date(today.getTime());
+            tomorrow.setDate(today.getDate() + 1);
+            var dayAfterTomorrow = new Date(today.getTime());
+            dayAfterTomorrow.setDate(today.getDate() + 2);
+            var dates = [today, tomorrow, dayAfterTomorrow, null];
+            assert.deepEqual(min(dates, dayAfterTomorrow), today, "works on arrays of non-numeric values but comparable");
+            assert.deepEqual(max(dates, today), dayAfterTomorrow, "works on arrays of non-number values but comparable");
+            assert.deepEqual(max([null], today), undefined, "returns undefined from array of null values");
+            assert.deepEqual(max([], today), today, "correct default non-numeric value returned");
+        });
     });
     it("objEq works as expected", function () {
         assert.isTrue(Plottable._Util.Methods.objEq({}, {}));
@@ -5829,6 +6131,21 @@ describe("_Util.Methods", function () {
         var emptyKeys = [];
         var emptyMap = Plottable._Util.Methods.populateMap(emptyKeys, function (key) { return key + "Value"; });
         assert.isTrue(emptyMap.empty(), "no entries in map if no keys in input array");
+    });
+    it("copyMap works as expected", function () {
+        var oldMap = {};
+        oldMap["a"] = 1;
+        oldMap["b"] = 2;
+        oldMap["c"] = 3;
+        oldMap["undefined"] = undefined;
+        oldMap["null"] = null;
+        oldMap["fun"] = function (d) { return d; };
+        oldMap["NaN"] = 0 / 0;
+        oldMap["inf"] = 1 / 0;
+        var map = Plottable._Util.Methods.copyMap(oldMap);
+        assert.deepEqual(map, oldMap, "All values were copied.");
+        map = Plottable._Util.Methods.copyMap({});
+        assert.deepEqual(map, {}, "No values were added.");
     });
     it("range works as expected", function () {
         var start = 0;
@@ -6182,6 +6499,121 @@ describe("Interactions", function () {
             bhi.hoverMode("line");
             triggerFakeMouseEvent("mousemove", hitbox, 399, 250);
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var assert = chai.assert;
+var TestHoverable = (function (_super) {
+    __extends(TestHoverable, _super);
+    function TestHoverable() {
+        _super.apply(this, arguments);
+    }
+    TestHoverable.prototype._hoverOverComponent = function (p) {
+        // cast-override
+    };
+    TestHoverable.prototype._hoverOutComponent = function (p) {
+        // cast-override
+    };
+    TestHoverable.prototype._doHover = function (p) {
+        var data = [];
+        if (p.x < 250) {
+            data.push("left");
+        }
+        if (p.x > 150) {
+            data.push("right");
+        }
+        return {
+            data: data,
+            selection: this._element
+        };
+    };
+    return TestHoverable;
+})(Plottable.Component.AbstractComponent);
+describe("Interactions", function () {
+    describe("Hover", function () {
+        var svg;
+        var testTarget;
+        var hitbox;
+        var hoverInteraction;
+        var overData;
+        var overCallbackCalled = false;
+        var outData;
+        var outCallbackCalled = false;
+        beforeEach(function () {
+            svg = generateSVG();
+            testTarget = new TestHoverable();
+            testTarget.classed("test-hoverable", true);
+            testTarget.renderTo(svg);
+            hoverInteraction = new Plottable.Interaction.Hover();
+            overCallbackCalled = false;
+            hoverInteraction.onHoverOver(function (hd) {
+                overCallbackCalled = true;
+                overData = hd;
+            });
+            outCallbackCalled = false;
+            hoverInteraction.onHoverOut(function (hd) {
+                outCallbackCalled = true;
+                outData = hd;
+            });
+            testTarget.registerInteraction(hoverInteraction);
+            hitbox = testTarget._element.select(".hit-box");
+        });
+        it("correctly triggers onHoverOver() callbacks", function () {
+            overCallbackCalled = false;
+            triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
+            assert.isTrue(overCallbackCalled, "onHoverOver was called on mousing over a target area");
+            assert.deepEqual(overData.data, ["left"], "onHoverOver was called with the correct data (mouse onto left)");
+            overCallbackCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
+            assert.isFalse(overCallbackCalled, "onHoverOver isn't called if the hover data didn't change");
+            overCallbackCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
+            assert.isTrue(overCallbackCalled, "onHoverOver was called when mousing into a new region");
+            assert.deepEqual(overData.data, ["right"], "onHoverOver was called with the new data only (left --> center)");
+            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            overCallbackCalled = false;
+            triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
+            assert.deepEqual(overData.data, ["left", "right"], "onHoverOver is called with the correct data");
+            svg.remove();
+        });
+        it("correctly triggers onHoverOut() callbacks", function () {
+            triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
+            outCallbackCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
+            assert.isFalse(outCallbackCalled, "onHoverOut isn't called when mousing into a new region without leaving the old one");
+            outCallbackCalled = false;
+            triggerFakeMouseEvent("mousemove", hitbox, 300, 200);
+            assert.isTrue(outCallbackCalled, "onHoverOut was called when the hover data changes");
+            assert.deepEqual(outData.data, ["left"], "onHoverOut was called with the correct data (center --> right)");
+            outCallbackCalled = false;
+            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            assert.isTrue(outCallbackCalled, "onHoverOut is called on mousing out of the Component");
+            assert.deepEqual(outData.data, ["right"], "onHoverOut was called with the correct data");
+            outCallbackCalled = false;
+            triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
+            triggerFakeMouseEvent("mouseout", hitbox, 200, 400);
+            assert.deepEqual(outData.data, ["left", "right"], "onHoverOut is called with the correct data");
+            svg.remove();
+        });
+        it("getCurrentHoverData()", function () {
+            triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
+            var currentlyHovered = hoverInteraction.getCurrentHoverData();
+            assert.deepEqual(currentlyHovered.data, ["left"], "retrieves data corresponding to the current position");
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
+            currentlyHovered = hoverInteraction.getCurrentHoverData();
+            assert.deepEqual(currentlyHovered.data, ["left", "right"], "retrieves data corresponding to the current position");
+            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            currentlyHovered = hoverInteraction.getCurrentHoverData();
+            assert.isNull(currentlyHovered.data, "returns null if not currently hovering");
             svg.remove();
         });
     });
