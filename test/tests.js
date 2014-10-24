@@ -1675,14 +1675,14 @@ describe("Plots", function () {
         beforeEach(function () {
             svg = generateSVG(500, 500);
             simpleDataset = new Plottable.Dataset([{ a: -5, b: 6 }, { a: -2, b: 2 }, { a: 2, b: -2 }, { a: 5, b: -6 }]);
-            xScale = new Plottable.Scale.Linear().domain([-10, 10]);
-            yScale = new Plottable.Scale.Linear().domain([-10, 10]);
+            xScale = new Plottable.Scale.Linear();
+            yScale = new Plottable.Scale.Linear();
             plot = new Plottable.Plot.AbstractXYPlot(xScale, yScale);
             plot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).renderTo(svg);
         });
         it("plot auto domain scale to visible points", function () {
             xScale.domain([-3, 3]);
-            assert.deepEqual(yScale.domain(), [-10, 10], "domain has not been adjusted to visible points");
+            assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
             plot.automaticallyAdjustYScaleOverVisiblePoints(false);
@@ -1695,6 +1695,13 @@ describe("Plots", function () {
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             xScale.domain([-0.5, 0.5]);
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has been not been adjusted");
+            svg.remove();
+        });
+        it("automaticallyAdjustYScaleOverVisiblePoints disables autoDomain", function () {
+            xScale.domain([-2, 2]);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.renderTo(svg);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been been adjusted");
             svg.remove();
         });
         it("show all data", function () {

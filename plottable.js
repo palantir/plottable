@@ -6482,7 +6482,7 @@ var Plottable;
                         return;
                     }
                     adjustedDomain = toScaleQ.domainer().computeDomain([adjustedDomain], toScaleQ);
-                    toScaleQ._setDomain(adjustedDomain);
+                    toScaleQ.domain(adjustedDomain);
                 }
             };
             AbstractXYPlot.prototype.normalizeDatasets = function (fromX) {

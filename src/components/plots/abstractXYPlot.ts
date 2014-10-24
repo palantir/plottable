@@ -47,7 +47,7 @@ export module Plot {
       }
 
       if (attrToSet === "y" && scale) {
-       if (this._yScale) {
+        if (this._yScale) {
           this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this._plottableID);
         }
         this._yScale = scale;
@@ -157,7 +157,7 @@ export module Plot {
           return;
         }
         adjustedDomain = toScaleQ.domainer().computeDomain([adjustedDomain], toScaleQ);
-        toScaleQ._setDomain(adjustedDomain);
+        toScaleQ.domain(adjustedDomain);
       }
     }
 
