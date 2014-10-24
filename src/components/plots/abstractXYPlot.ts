@@ -57,8 +57,7 @@ export module Plot {
         var positionX = positionXFn(d, i);
         var positionY = positionYFn(d, i);
         return positionX != null && positionX === positionX &&
-               positionY != null && positionY === positionY &&
-               _Util.Methods.inRange(positionX, 0,this.width()) && _Util.Methods.inRange(positionY, this.height(), 0);
+               positionY != null && positionY === positionY;
       };
       return attrToProjector;
     }

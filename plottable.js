@@ -6399,14 +6399,13 @@ var Plottable;
                 return this;
             };
             AbstractXYPlot.prototype._generateAttrToProjector = function () {
-                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var positionXFn = attrToProjector["x"];
                 var positionYFn = attrToProjector["y"];
                 attrToProjector["defined"] = function (d, i) {
                     var positionX = positionXFn(d, i);
                     var positionY = positionYFn(d, i);
-                    return positionX != null && positionX === positionX && positionY != null && positionY === positionY && Plottable._Util.Methods.inRange(positionX, 0, _this.width()) && Plottable._Util.Methods.inRange(positionY, _this.height(), 0);
+                    return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
                 };
                 return attrToProjector;
             };
