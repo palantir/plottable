@@ -330,6 +330,7 @@ describe("Plots", () => {
     describe("Vertical Bar Plot With Bar Labels", () => {
       var plot: Plottable.Plot.VerticalBar<string>;
       var data: any[];
+      var dataset: Plottable.Dataset;
       var xScale: Plottable.Scale.Ordinal;
       var yScale: Plottable.Scale.Linear;
       var svg: D3.Selection;
@@ -337,10 +338,11 @@ describe("Plots", () => {
       beforeEach(() => {
         svg = generateSVG();
         data = [{x: "foo", y: 5}, {x: "bar", y: 640}, {x: "zoo", y: 12345}];
+        dataset = new Plottable.Dataset(data);
         xScale = new Plottable.Scale.Ordinal();
         yScale = new Plottable.Scale.Linear();
         plot = new Plottable.Plot.VerticalBar<string>(xScale, yScale);
-        plot.addDataset(data);
+        plot.addDataset(dataset);
       });
 
       it("bar labels disabled by default", () => {
@@ -379,6 +381,29 @@ describe("Plots", () => {
         assert.equal(texts[0], "640%", "first label is 640%");
         assert.equal(texts[1], "12345%", "first label is 12345%");
         svg.remove();
+      });
+
+      it("bar labels are removed instantly on dataset change, even if animation is enabled", (done) => {
+        plot.barLabelsEnabled(true);
+        plot.animate(true);
+        plot.renderTo(svg);
+        var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 2, "both texts drawn");
+        var originalDrawLabels = plot._drawLabels;
+        var called = false;
+        plot._drawLabels = () => {
+          if (!called) {
+            originalDrawLabels.apply(plot);
+            texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+            assert.lengthOf(texts, 2, "texts were repopulated by drawLabels after the update");
+            svg.remove();
+            called = true; // for some reason, in phantomJS, `done` was being called multiple times and this caused the test to fail.
+            done();
+          }
+        };
+        dataset.data(data);
+        texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 0, "texts were immediately removed");
       });
     });
   });

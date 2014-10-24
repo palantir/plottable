@@ -244,19 +244,20 @@ export module Plot {
 
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);
 
-      setTimeout(() => this._drawLabels(), time);
+      var drawers: _Drawer.Rect[] = <any> this._getDrawersInOrder();
+      drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
+      if (this._barLabelsEnabled) {
+        setTimeout(() => this._drawLabels(), time);
+      }
     }
 
     public _drawLabels() {
       var drawers: _Drawer.Rect[] = <any> this._getDrawersInOrder();
-      drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
-      if (this._barLabelsEnabled) {
-        var attrToProjector = this._generateAttrToProjector();
-        var dataToDraw = this._getDataToDraw();
-        this._datasetKeysInOrder.forEach((k, i) => drawers[i].drawText(dataToDraw.get(k), attrToProjector));
-        if (this.hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._someLabelsTooWide)) {
-          drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
-        }
+      var attrToProjector = this._generateAttrToProjector();
+      var dataToDraw = this._getDataToDraw();
+      this._datasetKeysInOrder.forEach((k, i) => drawers[i].drawText(dataToDraw.get(k), attrToProjector));
+      if (this.hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._someLabelsTooWide)) {
+        drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
       }
     }
 
