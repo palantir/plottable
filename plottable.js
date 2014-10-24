@@ -7657,13 +7657,16 @@ var Plottable;
             }
             StackedBar.prototype._getAnimator = function (key) {
                 if (this._animate && this._animateOnNextRender) {
-                    var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                    var scaledBaseline = primaryScale.scale(this._baselineValue);
-                    return new Plottable.Animator.MovingRect(scaledBaseline, this._isVertical);
+                    if (this._animators[key]) {
+                        return this._animators[key];
+                    }
+                    else if (key === "stacked-bar") {
+                        var primaryScale = this._isVertical ? this._yScale : this._xScale;
+                        var scaledBaseline = primaryScale.scale(this._baselineValue);
+                        return new Plottable.Animator.MovingRect(scaledBaseline, this._isVertical);
+                    }
                 }
-                else {
-                    return new Plottable.Animator.Null();
-                }
+                return new Plottable.Animator.Null();
             };
             StackedBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -7680,6 +7683,9 @@ var Plottable;
                 var attrFunction = function (d) { return +primaryAccessor(d) < 0 ? getStart(d) : getEnd(d); };
                 attrToProjector[primaryAttr] = function (d) { return _this._isVertical ? attrFunction(d) : attrFunction(d) - heightF(d); };
                 return attrToProjector;
+            };
+            StackedBar.prototype._generateDrawSteps = function () {
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar") }];
             };
             StackedBar.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
