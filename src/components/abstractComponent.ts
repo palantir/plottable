@@ -33,6 +33,7 @@ export module Component {
     private _yOffset = 0;
     private cssClasses: string[] = ["component"];
     private removed = false;
+    private autoResizeManualSetting: boolean;
 
     /**
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -91,7 +92,7 @@ export module Component {
       this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this.interactionsToRegister = null;
       if (this.isTopLevelComponent) {
-        this.autoResize(AbstractComponent.AUTORESIZE_BY_DEFAULT);
+        this.autoResize(this.autoResizeManualSetting != null ? this.autoResizeManualSetting : AbstractComponent.AUTORESIZE_BY_DEFAULT);
       }
       this._isSetup = true;
     }
@@ -244,6 +245,7 @@ export module Component {
       } else {
         Core.ResizeBroadcaster.deregister(this);
       }
+      this.autoResizeManualSetting = flag;
       return this;
     }
 

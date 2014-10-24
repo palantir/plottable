@@ -3578,7 +3578,7 @@ var Plottable;
                 this.interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
                 this.interactionsToRegister = null;
                 if (this.isTopLevelComponent) {
-                    this.autoResize(AbstractComponent.AUTORESIZE_BY_DEFAULT);
+                    this.autoResize(this.autoResizeManualSetting != null ? this.autoResizeManualSetting : AbstractComponent.AUTORESIZE_BY_DEFAULT);
                 }
                 this._isSetup = true;
             };
@@ -3717,6 +3717,7 @@ var Plottable;
                 else {
                     Plottable.Core.ResizeBroadcaster.deregister(this);
                 }
+                this.autoResizeManualSetting = flag;
                 return this;
             };
             /**
