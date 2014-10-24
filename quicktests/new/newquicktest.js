@@ -44,7 +44,6 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
   //x here is an array of test names
 
   var div = d3.select("#results");
-
   quickTestNames.forEach(function(q) { //for each quicktest 
     var name = q;
     d3.text("/quicktests/new/list/" + category + "/" + name + ".js", function(error, text) {
@@ -52,19 +51,18 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
         console.warn("Tried to load nonexistant quicktest " + name);
         return;
       }
+      var x = new Function(text);
       text = "(function(){" + text +
           "\nreturn {makeData: makeData, run: run};" +
                "})();" +
           "\n////# sourceURL=" + name + ".js\n";
-
       result = eval(text);
       var className = "quicktest " + name;
-      //div.append("<div class='" + name + "'> </div>"); //create specific div for a specific quicktest
+
       var div = d3.select("#results").append("div").attr("class", className).attr("width", newWidth).attr("height", newHeight);;
       var firstdiv = div.append("div").attr("class", "first");
       var seconddiv = div.append("div").attr("class", "second");
       var data = result.makeData();
-      debugger;
       runQuickTest(firstdiv, data, firstBranch ); //just runQuickTest twice here with same result
       runQuickTest(seconddiv, data, secondBranch); //just runQuickTest twice here with same result
 
@@ -79,7 +77,6 @@ function loadPlottableBranches(category, branchList){
   var listOfUrl = [];
   var branchName1 = branchList[0];
   var branchName2 = branchList[1];
-
 
   if (plottableBranches[branchName1] != null  && plottableBranches[branchName2] != null ) {
     return;
@@ -118,7 +115,6 @@ function loadPlottableBranches(category, branchList){
 
 //run a single quicktest
 function runQuickTest(div, data, branch){
-  debugger;
   result.run(div, data, plottableBranches[branch])
 };
 
