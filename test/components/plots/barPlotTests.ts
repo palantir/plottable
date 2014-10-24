@@ -41,8 +41,8 @@ describe("Plots", () => {
         assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
         assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
         assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
-        assert.equal(bar0.attr("x"), "150", "bar0 x is correct");
-        assert.equal(bar1.attr("x"), "450", "bar1 x is correct");
+        assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
+        assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
         assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
         assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
 
@@ -199,8 +199,8 @@ describe("Plots", () => {
         assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
         assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
         assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-        assert.equal(bar0.attr("y"), "300", "bar0 y is correct");
-        assert.equal(bar1.attr("y"), "100", "bar1 y is correct");
+        assert.equal(bar0.attr("y"), "295", "bar0 y is correct");
+        assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
         assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
         assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
 
