@@ -6874,18 +6874,19 @@ var Plottable;
                     "y2": this._isVertical ? scaledBaseline : this.height()
                 };
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
-                setTimeout(function () { return _this._drawLabels(); }, time);
-            };
-            AbstractBarPlot.prototype._drawLabels = function () {
                 var drawers = this._getDrawersInOrder();
                 drawers.forEach(function (d) { return d.removeLabels(); });
                 if (this._barLabelsEnabled) {
-                    var attrToProjector = this._generateAttrToProjector();
-                    var dataToDraw = this._getDataToDraw();
-                    this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector); });
-                    if (this.hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._someLabelsTooWide; })) {
-                        drawers.forEach(function (d) { return d.removeLabels(); });
-                    }
+                    setTimeout(function () { return _this._drawLabels(); }, time);
+                }
+            };
+            AbstractBarPlot.prototype._drawLabels = function () {
+                var drawers = this._getDrawersInOrder();
+                var attrToProjector = this._generateAttrToProjector();
+                var dataToDraw = this._getDataToDraw();
+                this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector); });
+                if (this.hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._someLabelsTooWide; })) {
+                    drawers.forEach(function (d) { return d.removeLabels(); });
                 }
             };
             AbstractBarPlot.prototype._generateDrawSteps = function () {

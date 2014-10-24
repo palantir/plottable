@@ -2466,16 +2466,18 @@ describe("Plots", function () {
         describe("Vertical Bar Plot With Bar Labels", function () {
             var plot;
             var data;
+            var dataset;
             var xScale;
             var yScale;
             var svg;
             beforeEach(function () {
                 svg = generateSVG();
                 data = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+                dataset = new Plottable.Dataset(data);
                 xScale = new Plottable.Scale.Ordinal();
                 yScale = new Plottable.Scale.Linear();
                 plot = new Plottable.Plot.VerticalBar(xScale, yScale);
-                plot.addDataset(data);
+                plot.addDataset(dataset);
             });
             it("bar labels disabled by default", function () {
                 plot.renderTo(svg);
@@ -2509,6 +2511,28 @@ describe("Plots", function () {
                 assert.equal(texts[0], "640%", "first label is 640%");
                 assert.equal(texts[1], "12345%", "first label is 12345%");
                 svg.remove();
+            });
+            it("bar labels are removed instantly on dataset change, even if animation is enabled", function (done) {
+                plot.barLabelsEnabled(true);
+                plot.animate(true);
+                plot.renderTo(svg);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 2, "both texts drawn");
+                var originalDrawLabels = plot._drawLabels;
+                var called = false;
+                plot._drawLabels = function () {
+                    if (!called) {
+                        originalDrawLabels.apply(plot);
+                        var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                        assert.lengthOf(texts, 2, "texts were repopulated by drawLabels after the update");
+                        svg.remove();
+                        called = true; // for some reason, in phantomJS, `done` was being called multiple times and this caused the test to fail.
+                        done();
+                    }
+                };
+                dataset.data(data);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 0, "texts were immediately removed");
             });
         });
     });
