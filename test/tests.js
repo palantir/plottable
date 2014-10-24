@@ -111,6 +111,26 @@ function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
     e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
     target.node().dispatchEvent(e);
 }
+function assertAreaPathCloseTo(actualPath, expectedPath, precision, msg) {
+    var actualAreaPathStrings = actualPath.split("Z");
+    var expectedAreaPathStrings = expectedPath.split("Z");
+    actualAreaPathStrings.pop();
+    expectedAreaPathStrings.pop();
+    var actualAreaPathPoints = actualAreaPathStrings.map(function (path) { return path.split(/[A-Z]/).map(function (point) { return point.split(","); }); });
+    actualAreaPathPoints.forEach(function (areaPathPoint) { return areaPathPoint.shift(); });
+    var expectedAreaPathPoints = expectedAreaPathStrings.map(function (path) { return path.split(/[A-Z]/).map(function (point) { return point.split(","); }); });
+    expectedAreaPathPoints.forEach(function (areaPathPoint) { return areaPathPoint.shift(); });
+    assert.lengthOf(actualAreaPathPoints, expectedAreaPathPoints.length, "number of broken area paths should be equal");
+    actualAreaPathPoints.forEach(function (actualAreaPoints, i) {
+        var expectedAreaPoints = expectedAreaPathPoints[i];
+        assert.lengthOf(actualAreaPoints, expectedAreaPoints.length, "number of points in path should be equal");
+        actualAreaPoints.forEach(function (actualAreaPoint, j) {
+            var expectedAreaPoint = expectedAreaPoints[j];
+            assert.closeTo(+actualAreaPoint[0], +expectedAreaPoint[0], 0.1, msg);
+            assert.closeTo(+actualAreaPoint[1], +expectedAreaPoint[1], 0.1, msg);
+        });
+    });
+}
 
 ///<reference path="testReference.ts" />
 before(function () {
@@ -2166,17 +2186,21 @@ describe("Plots", function () {
             var dataWithNaN = areaData.slice();
             dataWithNaN[2] = { foo: 0.4, bar: NaN };
             simpleDataset.data(dataWithNaN);
-            assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath, "area d was set correctly (y=NaN case)");
+            var areaPathString = normalizePath(areaPath.attr("d"));
+            assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=NaN case)");
             dataWithNaN[2] = { foo: NaN, bar: 0.4 };
             simpleDataset.data(dataWithNaN);
-            assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath, "area d was set correctly (x=NaN case)");
+            areaPathString = normalizePath(areaPath.attr("d"));
+            assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=NaN case)");
             var dataWithUndefined = areaData.slice();
             dataWithUndefined[2] = { foo: 0.4, bar: undefined };
             simpleDataset.data(dataWithUndefined);
-            assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath, "area d was set correctly (y=undefined case)");
+            areaPathString = normalizePath(areaPath.attr("d"));
+            assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=undefined case)");
             dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
             simpleDataset.data(dataWithUndefined);
-            assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath, "area d was set correctly (x=undefined case)");
+            areaPathString = normalizePath(areaPath.attr("d"));
+            assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=undefined case)");
             svg.remove();
         });
     });
@@ -4617,7 +4641,8 @@ describe("Domainer", function () {
     it("pad() works in general case", function () {
         scale._updateExtent("1", "x", [100, 200]);
         scale.domainer(new Plottable.Domainer().pad(0.2));
-        assert.deepEqual(scale.domain(), [90, 210]);
+        assert.closeTo(scale.domain()[0], 90, 0.1, "lower bound of domain correct");
+        assert.closeTo(scale.domain()[1], 210, 0.1, "upper bound of domain correct");
     });
     it("pad() works for date scales", function () {
         var timeScale = new Plottable.Scale.Time();
@@ -4894,10 +4919,12 @@ describe("Scales", function () {
             assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled3");
             scale._removeExtent("1", "x");
             assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled4");
-            assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
+            assert.closeTo(scale.domain()[0], -20, 0.1, "only the bar accessor is active");
+            assert.closeTo(scale.domain()[1], 1, 0.1, "only the bar accessor is active");
             scale._updateExtent("2", "x", d3.extent(data, function (e) { return e.foo; }));
             assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
-            assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
+            assert.closeTo(scale.domain()[0], 0, 0.1, "the bar accessor was overwritten");
+            assert.closeTo(scale.domain()[1], 5, 0.1, "the bar accessor was overwritten");
         });
         it("should resize when a plot is removed", function () {
             var svg = generateSVG(400, 400);
