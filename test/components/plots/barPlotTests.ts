@@ -188,31 +188,23 @@ describe("Plots", () => {
         barPlot.renderTo(svg);
       });
 
-      it("renders correctly", () => {
+      it("barPixelWidth calculated appropriately", () => {
+        assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+        svg.remove();
+      });
+
+      it("bar widths are equal to barPixelWidth", () => {
         var renderArea = barPlot._renderArea;
         var bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
+
+        var barPixelWidth = barPlot._getBarPixelWidth();
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
         var bar2 = d3.select(bars[0][2]);
-        assert.closeTo(numAttr(bar0, "width"), 150, 0.1, "bar0 width is correct");
-        assert.closeTo(numAttr(bar1, "width"), 150, 0.1, "bar1 width is correct");
-        assert.closeTo(numAttr(bar2, "width"), 150, 0.1, "bar2 width is correct");
-        assert.closeTo(numAttr(bar0, "height"), 100, 0.1, "bar0 height is correct");
-        assert.closeTo(numAttr(bar1, "height"), 150, 0.1, "bar1 height is correct");
-        assert.closeTo(numAttr(bar2, "height"), 100, 0.1, "bar2 height is correct");
-        assert.closeTo(numAttr(bar0, "x"), 14.3, 0.1, "bar0 x is correct");
-        assert.closeTo(numAttr(bar1, "x"), 164.3, 0.1, "bar1 x is correct");
-        assert.closeTo(numAttr(bar2, "x"), 435.7, 0.1, "bar2 x is correct");
-        assert.closeTo(numAttr(bar0, "y"), 100, 0.1, "bar0 y is correct");
-        assert.closeTo(numAttr(bar1, "y"), 200, 0.1, "bar1 y is correct");
-        assert.closeTo(numAttr(bar2, "y"), 100, 0.1, "bar2 y is correct");
-
-        var baseline = renderArea.select(".baseline");
-        assert.equal(baseline.attr("y1"), "200", "the baseline is in the correct vertical position");
-        assert.equal(baseline.attr("y2"), "200", "the baseline is in the correct vertical position");
-        assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
-        assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
+        assert.closeTo(numAttr(bar0, "width"), barPixelWidth, 0.1, "bar0 width is correct");
+        assert.closeTo(numAttr(bar1, "width"), barPixelWidth, 0.1, "bar1 width is correct");
+        assert.closeTo(numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
         svg.remove();
       });
 
@@ -222,6 +214,66 @@ describe("Plots", () => {
         var oldDomain = xScale.domain();
         assert.closeTo(oldDomain[0], 0, 0.1, "bar-min extent removed");
         assert.closeTo(oldDomain[1], 1, 0.1, "bar-max extent removed");
+        svg.remove();
+      });
+
+      it("extent updated to account for bar width", () => {
+        var domain = xScale.domain();
+        assert.closeTo(domain[0], 0.34, 0.1, "min extent accounted");
+        assert.closeTo(domain[1], 206.32, 0.1, "max extent accounted");
+        svg.remove();
+      });
+    });
+
+    describe("Vertical Bar Plot linear scale", () => {
+      var svg: D3.Selection;
+      var dataset: Plottable.Dataset;
+      var xScale: Plottable.Scale.Linear;
+      var yScale: Plottable.Scale.Linear;
+      var barPlot: Plottable.Plot.VerticalBar<number>;
+      var SVG_WIDTH = 600;
+      var SVG_HEIGHT = 400;
+
+      beforeEach(() => {
+        svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        xScale = new Plottable.Scale.Linear();
+        yScale = new Plottable.Scale.Linear();
+        var data = [
+          {x: 2, y: 1},
+          {x: 10, y: -1.5},
+          {x: 100, y: 1}
+        ];
+        dataset = new Plottable.Dataset(data);
+        barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+        barPlot.addDataset(dataset);
+        barPlot.baseline(0);
+        barPlot.renderTo(svg);
+      });
+
+      it("bar width takes an appropriate value", () => {
+        assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+        svg.remove();
+      });
+
+      it("bar widths are equal to barPixelWidth", () => {
+        var renderArea = barPlot._renderArea;
+        var bars = renderArea.selectAll("rect");
+        assert.lengthOf(bars[0], 3, "One bar was created per data point");
+
+        var barPixelWidth = barPlot._getBarPixelWidth();
+        var bar0 = d3.select(bars[0][0]);
+        var bar1 = d3.select(bars[0][1]);
+        var bar2 = d3.select(bars[0][2]);
+        assert.closeTo(numAttr(bar0, "width"), barPixelWidth, 0.1, "bar0 width is correct");
+        assert.closeTo(numAttr(bar1, "width"), barPixelWidth, 0.1, "bar1 width is correct");
+        assert.closeTo(numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
+        svg.remove();
+      });
+
+      it("extent updated to account for bar width", () => {
+        var domain = xScale.domain();
+        assert.closeTo(domain[0], -10, 0.1, "min extent accounted");
+        assert.closeTo(domain[1], 110, 0.1, "max extent accounted");
         svg.remove();
       });
     });

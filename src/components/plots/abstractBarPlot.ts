@@ -319,7 +319,7 @@ export module Plot {
         var datasetDataPairs = _Util.Methods.flatten(this.datasets().map((dataset) => d3.pairs(dataset.data())));
         barPixelWidth = _Util.Methods.min(datasetDataPairs, (pair: any[], i: number) => {
           return Math.abs(barScale.scale(barAccessor(pair[1], i + 1)) - barScale.scale(barAccessor(pair[0], i)));
-        }, 1);
+        }, 1) * 0.95;
       }
       return barPixelWidth;
     }

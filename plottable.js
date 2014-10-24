@@ -6828,7 +6828,7 @@ var Plottable;
                     var datasetDataPairs = Plottable._Util.Methods.flatten(this.datasets().map(function (dataset) { return d3.pairs(dataset.data()); }));
                     barPixelWidth = Plottable._Util.Methods.min(datasetDataPairs, function (pair, i) {
                         return Math.abs(barScale.scale(barAccessor(pair[1], i + 1)) - barScale.scale(barAccessor(pair[0], i)));
-                    }, 1);
+                    }, 1) * 0.95;
                 }
                 return barPixelWidth;
             };
