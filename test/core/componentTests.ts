@@ -408,15 +408,15 @@ it("components can be offset relative to their alignment, and throw errors if th
     before(() => {
       oldRegister = Plottable.Core.ResizeBroadcaster.register;
       oldDeregister = Plottable.Core.ResizeBroadcaster.deregister;
-      var fakeRegister = (c: Plottable.Component.AbstractComponent) => {
+      var mockRegister = (c: Plottable.Component.AbstractComponent) => {
         registeredComponents.add(c._plottableID);
       };
 
-      var fakeDeregister = (c: Plottable.Component.AbstractComponent) => {
+      var mockDeregister = (c: Plottable.Component.AbstractComponent) => {
         registeredComponents.remove(c._plottableID);
       };
-      Plottable.Core.ResizeBroadcaster.register = fakeRegister;
-      Plottable.Core.ResizeBroadcaster.deregister = fakeDeregister;
+      Plottable.Core.ResizeBroadcaster.register = mockRegister;
+      Plottable.Core.ResizeBroadcaster.deregister = mockDeregister;
     });
 
     after(() => {
@@ -455,6 +455,14 @@ it("components can be offset relative to their alignment, and throw errors if th
       c.renderTo(svg);
       c.autoResize(false);
       assert.isFalse(registeredComponents.has(id), "component was deregistered after rendering");
+    });
+
+    it("calling .remove deregisters a component", () => {
+      c.autoResize(true);
+      c.renderTo(svg);
+      assert.isTrue(registeredComponents.has(id), "component is registered");
+      c.remove();
+      assert.isFalse(registeredComponents.has(id), "component is deregistered after removal");
     });
   });
 });
