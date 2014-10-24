@@ -2209,8 +2209,7 @@ describe("Plots", function () {
                 barPlot.animate(false);
                 barPlot.baseline(0);
                 yScale.domain([-2, 2]);
-                //        var nAxis =
-                barPlot.merge(new Plottable.Axis.Numeric(xScale, "bottom")).renderTo(svg);
+                barPlot.renderTo(svg);
             });
             it("renders correctly", function () {
                 var renderArea = barPlot._renderArea;
@@ -2236,6 +2235,14 @@ describe("Plots", function () {
                 assert.equal(baseline.attr("y2"), "200", "the baseline is in the correct vertical position");
                 assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
                 assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
+                svg.remove();
+            });
+            it("bar-min, bar-max extents deregistered when old scale replaced", function () {
+                var newScale = new Plottable.Scale.ModifiedLog();
+                barPlot.project("x", "x", newScale);
+                var oldDomain = xScale.domain();
+                assert.closeTo(oldDomain[0], 0, 0.1, "bar-min extent removed");
+                assert.closeTo(oldDomain[1], 1, 0.1, "bar-max extent removed");
                 svg.remove();
             });
         });
