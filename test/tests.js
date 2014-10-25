@@ -147,23 +147,6 @@ before(function () {
     else {
         window.Pixel_CloseTo_Requirement = 0.5;
     }
-    // Override setTimeout with a version that fires synchronously if time=0
-    // To make synchronous testing easier.
-    var oldSetTimeout = window.setTimeout;
-    window.setTimeout = function (f, t) {
-        if (t === void 0) { t = 0; }
-        var args = [];
-        for (var _i = 2; _i < arguments.length; _i++) {
-            args[_i - 2] = arguments[_i];
-        }
-        if (t === 0) {
-            f();
-            return 0;
-        }
-        else {
-            return oldSetTimeout(f, t, args);
-        }
-    };
 });
 after(function () {
     var parent = getSVGParent();
@@ -220,8 +203,8 @@ describe("Drawers", function () {
         var svg;
         var drawer;
         before(function () {
-            oldTimeout = window.setTimeout;
-            window.setTimeout = function (f, time) {
+            oldTimeout = Plottable._Util.Methods.setTimeout;
+            Plottable._Util.Methods.setTimeout = function (f, time) {
                 var args = [];
                 for (var _i = 2; _i < arguments.length; _i++) {
                     args[_i - 2] = arguments[_i];
@@ -231,7 +214,7 @@ describe("Drawers", function () {
             };
         });
         after(function () {
-            window.setTimeout = oldTimeout;
+            Plottable._Util.Methods.setTimeout = oldTimeout;
         });
         beforeEach(function () {
             timings = [];
