@@ -180,7 +180,9 @@ module.exports = function(grunt) {
       options: {
         configuration: grunt.file.readJSON("tslint.json")
       },
-      files: ["src/**/*.ts", "test/**/*.ts"]
+      all: {
+        src: ["src/**/*.ts", "test/**/*.ts"]
+      }
     },
     jshint: {
       files: ['Gruntfile.js', 'quicktests/**/*.js'],
@@ -203,6 +205,11 @@ module.exports = function(grunt) {
           },
           "strict": true,
           "eqnull": true
+      }
+    },
+    parallelize: {
+      tslint: {
+        all: 4
       }
     },
     watch: {
@@ -338,7 +345,7 @@ module.exports = function(grunt) {
   grunt.registerTask("dist-compile", [
                                   "dev-compile",
                                   "blanket_mocha",
-                                  "tslint",
+                                  "parallelize:tslint",
                                   "ts:verify_d_ts",
                                   "uglify",
                                   "compress"
@@ -348,7 +355,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
-  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "tslint", "jshint", "ts:verify_d_ts"]);
+  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "parallelize:tslint", "jshint", "ts:verify_d_ts"]);
   // Disable saucelabs for external pull requests. Check if we can see the SAUCE_USERNAME
   var travisTests = ["test"];
   if (process.env.SAUCE_USERNAME) {
