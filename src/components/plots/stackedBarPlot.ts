@@ -19,7 +19,6 @@ export module Plot {
     constructor(xScale?: Scale.AbstractScale<X,number>, yScale?: Scale.AbstractScale<Y,number>, isVertical = true) {
       this._isVertical = isVertical; // Has to be set before super()
       this._baselineValue = 0;
-      this._barAlignmentFactor = 0.5;
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
@@ -28,13 +27,17 @@ export module Plot {
     }
 
     public _getAnimator(key: string): Animator.PlotAnimator {
-      if(this._animate && this._animateOnNextRender) {
-        var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-        var scaledBaseline = primaryScale.scale(this._baselineValue);
-        return new Animator.MovingRect(scaledBaseline, this._isVertical);
-      } else {
-        return new Animator.Null();
+      if (this._animate && this._animateOnNextRender) {
+        if (this._animators[key]) {
+          return this._animators[key];
+        } else if (key === "stacked-bar") {
+          var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+          var scaledBaseline = primaryScale.scale(this._baselineValue);
+          return new Animator.MovingRect(scaledBaseline, this._isVertical);
+        }
       }
+
+      return new Animator.Null();
     }
 
     public _generateAttrToProjector() {
@@ -54,6 +57,10 @@ export module Plot {
       var attrFunction = (d: any) => +primaryAccessor(d) < 0 ? getStart(d) : getEnd(d);
       attrToProjector[primaryAttr] = (d: any) => this._isVertical ? attrFunction(d) : attrFunction(d) - heightF(d);
       return attrToProjector;
+    }
+
+    public _generateDrawSteps(): _Drawer.DrawStep[] {
+      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar")}];
     }
 
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {

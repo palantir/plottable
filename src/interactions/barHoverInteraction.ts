@@ -13,6 +13,9 @@ export module Interaction {
 
     public _anchor(barPlot: Plot.AbstractBarPlot<any, any>, hitBox: D3.Selection) {
       super._anchor(barPlot, hitBox);
+
+      _Util.Methods.warn("Interaction.BarHover is deprecated; please use Interaction.Hover instead");
+
       this.plotIsVertical = this._componentToListenTo._isVertical;
       this.dispatcher = new Dispatcher.Mouse(this._hitBox);
 

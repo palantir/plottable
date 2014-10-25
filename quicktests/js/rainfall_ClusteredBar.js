@@ -25,6 +25,7 @@ function run(div, data, Plottable){
     .addDataset(data[2])
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
+    .project("label", "avg")
     .project("fill", "city", colorScale);
 
   var legend = new Plottable.Component.HorizontalLegend(colorScale);

@@ -8,7 +8,11 @@ export module Animator {
    * immediately set on the selection.
    */
   export class Null implements PlotAnimator {
-    public animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection {
+
+    public getTiming(selection: any) {
+      return 0;
+    }
+    public animate(selection: any, attrToProjector: AttributeToProjector): any {
       return selection.attr(attrToProjector);
     }
   }

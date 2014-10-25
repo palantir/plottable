@@ -32,7 +32,7 @@ export module _Drawer {
       delete attrToProjector["outer-radius"];
 
       attrToProjector["d"] = this.createArc(innerRadiusF, outerRadiusF);
-      super._drawStep({attrToProjector: attrToProjector, animator: step.animator});
+      return super._drawStep({attrToProjector: attrToProjector, animator: step.animator});
     }
 
     public draw(data: any[], drawSteps: DrawStep[]) {
@@ -42,7 +42,7 @@ export module _Drawer {
                           .value(valueAccessor)(data);
 
       drawSteps.forEach(s => delete s.attrToProjector["value"]);
-      super.draw(pie, drawSteps);
+      return super.draw(pie, drawSteps);
     }
   }
 }
