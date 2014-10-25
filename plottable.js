@@ -262,6 +262,27 @@ var Plottable;
                 return range;
             }
             Methods.range = range;
+            /** Is like setTimeout, but activates synchronously if time=0
+             * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
+             * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
+             * evaluating, the results are painted to the screen. As a result, if we want something to occur immediately but call setTimeout
+             * with time=0, then it is pushed to the call stack and rendered in the next frame, so the component that was rendered via
+             * setTimeout appears out-of-sync with the rest of the plot.
+             */
+            function setTimeout(f, time) {
+                var args = [];
+                for (var _i = 2; _i < arguments.length; _i++) {
+                    args[_i - 2] = arguments[_i];
+                }
+                if (time === 0) {
+                    f(args);
+                    return -1;
+                }
+                else {
+                    return window.setTimeout(f, time, args);
+                }
+            }
+            Methods.setTimeout = setTimeout;
         })(_Util.Methods || (_Util.Methods = {}));
         var Methods = _Util.Methods;
     })(Plottable._Util || (Plottable._Util = {}));
@@ -3161,7 +3182,7 @@ var Plottable;
                 var numberOfIterations = this._numberOfAnimationIterations(data);
                 var delay = 0;
                 drawSteps.forEach(function (drawStep, i) {
-                    setTimeout(function () { return _this._drawStep(drawStep); }, delay);
+                    Plottable._Util.Methods.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
                     delay += drawStep.animator.getTiming(numberOfIterations);
                 });
                 return delay;
@@ -6924,7 +6945,7 @@ var Plottable;
                 var drawers = this._getDrawersInOrder();
                 drawers.forEach(function (d) { return d.removeLabels(); });
                 if (this._barLabelsEnabled) {
-                    setTimeout(function () { return _this._drawLabels(); }, time);
+                    Plottable._Util.Methods.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
             };
             AbstractBarPlot.prototype._drawLabels = function () {

@@ -247,7 +247,7 @@ export module Plot {
       var drawers: _Drawer.Rect[] = <any> this._getDrawersInOrder();
       drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
       if (this._barLabelsEnabled) {
-        setTimeout(() => this._drawLabels(), time);
+        _Util.Methods.setTimeout(() => this._drawLabels(), time);
       }
     }
 
