@@ -84,7 +84,7 @@ export module _Drawer {
 
       var delay = 0;
       drawSteps.forEach((drawStep, i) => {
-        _Util.Methods.setTimeout(() => this._drawStep(drawStep), delay);
+        setTimeout(() => this._drawStep(drawStep), delay);
         delay += drawStep.animator.getTiming(numberOfIterations);
       });
 
