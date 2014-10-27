@@ -202,7 +202,7 @@ module Plottable {
       };
     }
 
-    export function timeString(format: string) {
+    export function multiTime(format: string) {
       return function(d: any) {
         return d3.time.format(format)(d);
       }
