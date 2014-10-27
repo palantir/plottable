@@ -5,8 +5,8 @@ var assert = chai.assert;
 describe("TimeAxis", () => {
     it("can not initialize vertical time axis", () => {
         var scale = new Plottable.Scale.Time();
-        assert.throws(() => new Plottable.Axis.Time(scale, "left"), "unsupported");
-        assert.throws(() => new Plottable.Axis.Time(scale, "right"), "unsupported");
+        assert.throws(() => new Plottable.Axis.Time(scale, "left"), "horizontal");
+        assert.throws(() => new Plottable.Axis.Time(scale, "right"), "horizontal");
     });
 
     it("major and minor intervals arrays are the same length", () => {
