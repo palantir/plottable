@@ -7347,7 +7347,7 @@ var Plottable;
             ClusteredBar.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 // the width is constant, so set the inner scale range to that
-                var innerScale = this.getInnerScale();
+                var innerScale = this.makeInnerScale();
                 var innerWidthF = function (d, i) { return innerScale.rangeBand(); };
                 var heightF = attrToProjector["height"];
                 attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
@@ -7360,7 +7360,7 @@ var Plottable;
             ClusteredBar.prototype._getDataToDraw = function () {
                 var _this = this;
                 var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                var innerScale = this.getInnerScale();
+                var innerScale = this.makeInnerScale();
                 var clusters = d3.map();
                 this._datasetKeysInOrder.forEach(function (key) {
                     var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
@@ -7375,7 +7375,7 @@ var Plottable;
                 });
                 return clusters;
             };
-            ClusteredBar.prototype.getInnerScale = function () {
+            ClusteredBar.prototype.makeInnerScale = function () {
                 var innerScale = new Plottable.Scale.Ordinal();
                 innerScale.domain(this._datasetKeysInOrder);
                 // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.

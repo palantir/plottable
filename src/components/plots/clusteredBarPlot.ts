@@ -23,7 +23,7 @@ export module Plot {
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       // the width is constant, so set the inner scale range to that
-      var innerScale = this.getInnerScale();
+      var innerScale = this.makeInnerScale();
       var innerWidthF = (d: any, i: number) => innerScale.rangeBand();
       var heightF = attrToProjector["height"];
       attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
@@ -38,7 +38,7 @@ export module Plot {
 
     public _getDataToDraw() {
       var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-      var innerScale = this.getInnerScale();
+      var innerScale = this.makeInnerScale();
       var clusters: D3.Map<any[]> = d3.map();
       this._datasetKeysInOrder.forEach((key: string) => {
         var data = this._key2DatasetDrawerKey.get(key).dataset.data();
@@ -55,7 +55,7 @@ export module Plot {
       return clusters;
     }
 
-    private getInnerScale(){
+    private makeInnerScale(){
       var innerScale = new Scale.Ordinal();
       innerScale.domain(this._datasetKeysInOrder);
       // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
