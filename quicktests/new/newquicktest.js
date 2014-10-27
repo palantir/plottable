@@ -126,8 +126,8 @@ function clearTests(){
 }
 
 function resetDisplayProperties(){
-  $("#result1, #result1 svg").css("display", "block");
-  $("#result2, #result2 svg").css("display", "block");
+  $(".first, .first svg").css("display", "block");
+  $(".second, .second svg").css("display", "block");
   $("#branch1").css("background-color", "white");
   $("#branch2").css("background-color", "white");
 }
@@ -136,34 +136,38 @@ window.onkeyup = function(e){
   var key = e.keyCode ? e.keyCode : e.which;
   //if 1 is pressed
   if(key == 49){
-    $(".first svg").css("display", "block");
-    $(".second svg").css("display", "none");
+    $(".quicktest").css("display", "inline-block")
+    $(".first, .first svg").css("display", "block");
+    $(".second, .second svg").css("display", "none");
     $("#branch1").css("background-color", "mediumaquamarine");
     $("#branch2").css("background-color", "white");
   }
   //if 2 is pressed
   if(key == 50){
-    $(".first svg").css("display", "none");
-    $(".second svg").css("display", "block");
+    $(".quicktest").css("display", "inline-block")
+    $(".first, .first svg").css("display", "none");
+    $(".second, .second svg").css("display", "block");
     $("#branch1").css("background-color", "white");
     $("#branch2").css("background-color", "mediumaquamarine");
 
   }
   //if 3 is pressed
   if(key == 51){
-    $(".first svg").css("display", "block");
-    $(".second svg").css("display", "block");
+    $(".quicktest").css("display", "inline-block")
+    $(".first, .first svg").css("display", "block");
+    $(".second, .second svg").css("display", "block");
     $("#branch1").css("background-color", "mediumaquamarine");
     $("#branch2").css("background-color", "mediumaquamarine");
 
   }
   //if 4 is pressed
   if(key == 52){
-    $(".first svg").css("display", "none");
-    $(".second svg").css("display", "none");
+    $(".quicktest").css("display", "none")
+
+    $(".first, .first svg").css("display", "none");
+    $(".second, .second svg").css("display", "none");
     $("#branch1").css("background-color", "white");
     $("#branch2").css("background-color", "white");
-
   }
 }
 

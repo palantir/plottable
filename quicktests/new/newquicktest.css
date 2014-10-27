@@ -15,7 +15,7 @@ svg{
 .quicktest{
   border: solid 1px black;
   position: relative;
-  float: left;
+  display: inline-block;
   padding: 10px;
   margin: 5px;
   width: 500px;
@@ -24,17 +24,21 @@ svg{
 
 .first{
   position: absolute;
+  display: block;
 }
+
 
 .second{
   position: absolute;
+  display: block;
 }
+
 
 #results{
   margin: 50px auto;
-  position: relative;
+  /*position: relative;
   height: 100%;
-  width: 100%;
+  width: 100%;*/
 
 }
 
