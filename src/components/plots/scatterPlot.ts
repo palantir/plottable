@@ -2,7 +2,8 @@
 
 module Plottable {
 export module Plot {
-  export class Scatter<X,Y> extends AbstractXYPlot<X,Y> {
+  export class Scatter<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
+    private closeDetectionRadius = 5;
 
     /**
      * Constructs a ScatterPlot.
@@ -59,6 +60,59 @@ export module Plot {
       drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("circles")});
       return drawSteps;
     }
+
+    public _getClosestStruckPoint(p: Point, range: number) {
+      var drawers = <_Drawer.Element[]> this._getDrawersInOrder();
+      var attrToProjector = this._generateAttrToProjector();
+
+      var getDistSq = (d: any, i: number) => {
+        var dx = attrToProjector["cx"](d, i) - p.x;
+        var dy = attrToProjector["cy"](d, i) - p.y;
+        return (dx * dx + dy * dy);
+      };
+
+      var overAPoint = false;
+      var closestElement: Element;
+      var minDistSq = range * range;
+
+      drawers.forEach((drawer) => {
+        drawer._getDrawSelection().each(function (d, i) {
+          var distSq = getDistSq(d, i);
+          var r = attrToProjector["r"](d, i);
+
+          if (distSq < r * r) { // cursor is over this point
+            if (!overAPoint || distSq < minDistSq) {
+              closestElement = this;
+              minDistSq = distSq;
+            }
+            overAPoint = true;
+          } else if (!overAPoint && distSq < minDistSq) {
+            closestElement = this;
+            minDistSq = distSq;
+          }
+        });
+      });
+
+      var closestSelection = d3.select(closestElement);
+      return {
+        selection: closestElement ? closestSelection : null,
+        data: closestElement ? closestSelection.data() : null
+      };
+    }
+
+    //===== Hover logic =====
+    public _hoverOverComponent(p: Point) {
+      // no-op
+    }
+
+    public _hoverOutComponent(p: Point) {
+      // no-op
+    }
+
+    public _doHover(p: Point): Interaction.HoverData {
+      return this._getClosestStruckPoint(p, this.closeDetectionRadius);
+    }
+    //===== /Hover logic =====
   }
 }
 }

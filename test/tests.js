@@ -111,6 +111,26 @@ function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
     e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
     target.node().dispatchEvent(e);
 }
+function assertAreaPathCloseTo(actualPath, expectedPath, precision, msg) {
+    var actualAreaPathStrings = actualPath.split("Z");
+    var expectedAreaPathStrings = expectedPath.split("Z");
+    actualAreaPathStrings.pop();
+    expectedAreaPathStrings.pop();
+    var actualAreaPathPoints = actualAreaPathStrings.map(function (path) { return path.split(/[A-Z]/).map(function (point) { return point.split(","); }); });
+    actualAreaPathPoints.forEach(function (areaPathPoint) { return areaPathPoint.shift(); });
+    var expectedAreaPathPoints = expectedAreaPathStrings.map(function (path) { return path.split(/[A-Z]/).map(function (point) { return point.split(","); }); });
+    expectedAreaPathPoints.forEach(function (areaPathPoint) { return areaPathPoint.shift(); });
+    assert.lengthOf(actualAreaPathPoints, expectedAreaPathPoints.length, "number of broken area paths should be equal");
+    actualAreaPathPoints.forEach(function (actualAreaPoints, i) {
+        var expectedAreaPoints = expectedAreaPathPoints[i];
+        assert.lengthOf(actualAreaPoints, expectedAreaPoints.length, "number of points in path should be equal");
+        actualAreaPoints.forEach(function (actualAreaPoint, j) {
+            var expectedAreaPoint = expectedAreaPoints[j];
+            assert.closeTo(+actualAreaPoint[0], +expectedAreaPoint[0], 0.1, msg);
+            assert.closeTo(+actualAreaPoint[1], +expectedAreaPoint[1], 0.1, msg);
+        });
+    });
+}
 
 ///<reference path="testReference.ts" />
 before(function () {
@@ -141,6 +161,104 @@ after(function () {
     else {
         assert(d3.select("body").selectAll("svg").node() === null, "all svgs have been removed");
     }
+});
+
+///<reference path="../testReference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var MockAnimator = (function () {
+    function MockAnimator(time, callback) {
+        this.time = time;
+        this.callback = callback;
+    }
+    MockAnimator.prototype.getTiming = function (selection) {
+        return this.time;
+    };
+    MockAnimator.prototype.animate = function (selection, attrToProjector) {
+        if (this.callback) {
+            this.callback();
+        }
+        return selection;
+    };
+    return MockAnimator;
+})();
+var MockDrawer = (function (_super) {
+    __extends(MockDrawer, _super);
+    function MockDrawer() {
+        _super.apply(this, arguments);
+    }
+    MockDrawer.prototype._drawStep = function (step) {
+        step.animator.animate(this._renderArea, step.attrToProjector);
+    };
+    return MockDrawer;
+})(Plottable._Drawer.AbstractDrawer);
+describe("Drawers", function () {
+    describe("Abstract Drawer", function () {
+        var oldTimeout;
+        var timings = [];
+        var svg;
+        var drawer;
+        before(function () {
+            oldTimeout = Plottable._Util.Methods.setTimeout;
+            Plottable._Util.Methods.setTimeout = function (f, time) {
+                var args = [];
+                for (var _i = 2; _i < arguments.length; _i++) {
+                    args[_i - 2] = arguments[_i];
+                }
+                timings.push(time);
+                return oldTimeout(f, time, args);
+            };
+        });
+        after(function () {
+            Plottable._Util.Methods.setTimeout = oldTimeout;
+        });
+        beforeEach(function () {
+            timings = [];
+            svg = generateSVG();
+            drawer = new MockDrawer("foo");
+            drawer.setup(svg);
+        });
+        afterEach(function () {
+            svg.remove(); // no point keeping it around since we don't draw anything in it anyway
+        });
+        it("drawer timing works as expected for null animators", function () {
+            var a1 = new Plottable.Animator.Null();
+            var a2 = new Plottable.Animator.Null();
+            var ds1 = { attrToProjector: {}, animator: a1 };
+            var ds2 = { attrToProjector: {}, animator: a2 };
+            var steps = [ds1, ds2];
+            drawer.draw([], steps);
+            assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
+        });
+        it("drawer timing works for non-null animators", function (done) {
+            var callback1Called = false;
+            var callback2Called = false;
+            var callback1 = function () {
+                callback1Called = true;
+            };
+            var callback2 = function () {
+                assert.isTrue(callback1Called, "callback2 called after callback 1");
+                callback2Called = true;
+            };
+            var callback3 = function () {
+                assert.isTrue(callback2Called, "callback3 called after callback 2");
+                done();
+            };
+            var a1 = new MockAnimator(20, callback1);
+            var a2 = new MockAnimator(10, callback2);
+            var a3 = new MockAnimator(0, callback3);
+            var ds1 = { attrToProjector: {}, animator: a1 };
+            var ds2 = { attrToProjector: {}, animator: a2 };
+            var ds3 = { attrToProjector: {}, animator: a3 };
+            var steps = [ds1, ds2, ds3];
+            drawer.draw([], steps);
+            assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
+        });
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -1659,6 +1777,22 @@ describe("Plots", function () {
             assertDomainIsClose(scale1.domain(), [1, 3], "extent shrinks further if we project plot2 away");
             svg.remove();
         });
+        it("additionalPaint timing works properly", function () {
+            var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
+            var x = new Plottable.Scale.Linear();
+            var y = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.VerticalBar(x, y).addDataset([]).animate(true);
+            var recordedTime = -1;
+            var additionalPaint = function (x) {
+                recordedTime = Math.max(x, recordedTime);
+            };
+            plot._additionalPaint = additionalPaint;
+            plot.animator("bars", animator);
+            var svg = generateSVG();
+            plot.renderTo(svg);
+            svg.remove();
+            assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");
+        });
     });
 });
 
@@ -2035,17 +2169,21 @@ describe("Plots", function () {
             var dataWithNaN = areaData.slice();
             dataWithNaN[2] = { foo: 0.4, bar: NaN };
             simpleDataset.data(dataWithNaN);
-            assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath, "area d was set correctly (y=NaN case)");
+            var areaPathString = normalizePath(areaPath.attr("d"));
+            assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=NaN case)");
             dataWithNaN[2] = { foo: NaN, bar: 0.4 };
             simpleDataset.data(dataWithNaN);
-            assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath, "area d was set correctly (x=NaN case)");
+            areaPathString = normalizePath(areaPath.attr("d"));
+            assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=NaN case)");
             var dataWithUndefined = areaData.slice();
             dataWithUndefined[2] = { foo: 0.4, bar: undefined };
             simpleDataset.data(dataWithUndefined);
-            assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath, "area d was set correctly (y=undefined case)");
+            areaPathString = normalizePath(areaPath.attr("d"));
+            assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=undefined case)");
             dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
             simpleDataset.data(dataWithUndefined);
-            assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath, "area d was set correctly (x=undefined case)");
+            areaPathString = normalizePath(areaPath.attr("d"));
+            assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=undefined case)");
             svg.remove();
         });
     });
@@ -2090,8 +2228,8 @@ describe("Plots", function () {
                 assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
                 assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
                 assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
-                assert.equal(bar0.attr("x"), "150", "bar0 x is correct");
-                assert.equal(bar1.attr("x"), "450", "bar1 x is correct");
+                assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
+                assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
                 assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
                 assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
                 var baseline = renderArea.select(".baseline");
@@ -2227,8 +2365,8 @@ describe("Plots", function () {
                 assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
                 assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
                 assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-                assert.equal(bar0.attr("y"), "300", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "100", "bar1 y is correct");
+                assert.equal(bar0.attr("y"), "295", "bar0 y is correct");
+                assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
                 assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
                 assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
                 var baseline = renderArea.select(".baseline");
@@ -2336,6 +2474,78 @@ describe("Plots", function () {
                 assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "bar0 ypos");
                 assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "bar1 ypos");
                 svg.remove();
+            });
+        });
+        describe("Vertical Bar Plot With Bar Labels", function () {
+            var plot;
+            var data;
+            var dataset;
+            var xScale;
+            var yScale;
+            var svg;
+            beforeEach(function () {
+                svg = generateSVG();
+                data = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+                dataset = new Plottable.Dataset(data);
+                xScale = new Plottable.Scale.Ordinal();
+                yScale = new Plottable.Scale.Linear();
+                plot = new Plottable.Plot.VerticalBar(xScale, yScale);
+                plot.addDataset(dataset);
+            });
+            it("bar labels disabled by default", function () {
+                plot.renderTo(svg);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 0, "by default, no texts are drawn");
+                svg.remove();
+            });
+            it("bar labels render properly", function () {
+                plot.renderTo(svg);
+                plot.barLabelsEnabled(true);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 2, "both texts drawn");
+                assert.equal(texts[0], "640", "first label is 640");
+                assert.equal(texts[1], "12345", "first label is 12345");
+                svg.remove();
+            });
+            it("bar labels hide if bars too skinny", function () {
+                plot.barLabelsEnabled(true);
+                plot.renderTo(svg);
+                plot.barLabelFormatter(function (n) { return n.toString() + (n === 12345 ? "looong" : ""); });
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 0, "no text drawn");
+                svg.remove();
+            });
+            it("formatters are used properly", function () {
+                plot.barLabelsEnabled(true);
+                plot.barLabelFormatter(function (n) { return n.toString() + "%"; });
+                plot.renderTo(svg);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 2, "both texts drawn");
+                assert.equal(texts[0], "640%", "first label is 640%");
+                assert.equal(texts[1], "12345%", "first label is 12345%");
+                svg.remove();
+            });
+            it("bar labels are removed instantly on dataset change, even if animation is enabled", function (done) {
+                plot.barLabelsEnabled(true);
+                plot.animate(true);
+                plot.renderTo(svg);
+                var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 2, "both texts drawn");
+                var originalDrawLabels = plot._drawLabels;
+                var called = false;
+                plot._drawLabels = function () {
+                    if (!called) {
+                        originalDrawLabels.apply(plot);
+                        texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                        assert.lengthOf(texts, 2, "texts were repopulated by drawLabels after the update");
+                        svg.remove();
+                        called = true; // for some reason, in phantomJS, `done` was being called multiple times and this caused the test to fail.
+                        done();
+                    }
+                };
+                dataset.data(data);
+                texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
+                assert.lengthOf(texts, 0, "texts were immediately removed");
             });
         });
     });
@@ -2472,6 +2682,32 @@ describe("Plots", function () {
             assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
             assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");
             assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
+            svg.remove();
+        });
+        it("_getClosestStruckPoint()", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            xScale.domain([0, 400]);
+            yScale.domain([400, 0]);
+            var data1 = [
+                { x: 80, y: 200, r: 20 },
+                { x: 100, y: 200, r: 20 },
+                { x: 125, y: 200, r: 5 },
+                { x: 138, y: 200, r: 5 }
+            ];
+            var plot = new Plottable.Plot.Scatter(xScale, yScale);
+            plot.addDataset(data1);
+            plot.project("x", "x").project("y", "y").project("r", "r");
+            plot.renderTo(svg);
+            var twoOverlappingCirclesResult = plot._getClosestStruckPoint({ x: 85, y: 200 }, 10);
+            assert.strictEqual(twoOverlappingCirclesResult.data[0], data1[0], "returns closest circle among circles that the test point touches");
+            var overlapAndCloseToPointResult = plot._getClosestStruckPoint({ x: 118, y: 200 }, 10);
+            assert.strictEqual(overlapAndCloseToPointResult.data[0], data1[1], "returns closest circle that test point touches, even if non-touched circles are closer");
+            var twoPointsInRangeResult = plot._getClosestStruckPoint({ x: 130, y: 200 }, 10);
+            assert.strictEqual(twoPointsInRangeResult.data[0], data1[2], "returns closest circle within range if test point does not touch any circles");
+            var farFromAnyPointsResult = plot._getClosestStruckPoint({ x: 400, y: 400 }, 10);
+            assert.isNull(farFromAnyPointsResult.data, "returns no data if no circle were within range and test point does not touch any circles");
             svg.remove();
         });
         describe("Example ScatterPlot with quadratic series", function () {
@@ -2910,6 +3146,23 @@ describe("Plots", function () {
             dataset.data(data);
             renderer.renderTo(svg);
             assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound does not change");
+            svg.remove();
+        });
+        it("warning is thrown when datasets are updated with different domains", function () {
+            var flag = false;
+            var oldWarn = Plottable._Util.Methods.warn;
+            Plottable._Util.Methods.warn = function (msg) {
+                if (msg.indexOf("domain") > -1) {
+                    flag = true;
+                }
+            };
+            var missingDomainData = [
+                { x: 1, y: 0, type: "c" }
+            ];
+            var dataset = new Plottable.Dataset(missingDomainData);
+            renderer.addDataset(dataset);
+            Plottable._Util.Methods.warn = oldWarn;
+            assert.isTrue(flag, "warning has been issued about differing domains");
             svg.remove();
         });
     });
@@ -4377,7 +4630,8 @@ describe("Domainer", function () {
     it("pad() works in general case", function () {
         scale._updateExtent("1", "x", [100, 200]);
         scale.domainer(new Plottable.Domainer().pad(0.2));
-        assert.deepEqual(scale.domain(), [90, 210]);
+        assert.closeTo(scale.domain()[0], 90, 0.1, "lower bound of domain correct");
+        assert.closeTo(scale.domain()[1], 210, 0.1, "upper bound of domain correct");
     });
     it("pad() works for date scales", function () {
         var timeScale = new Plottable.Scale.Time();
@@ -4654,10 +4908,12 @@ describe("Scales", function () {
             assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled3");
             scale._removeExtent("1", "x");
             assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled4");
-            assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
+            assert.closeTo(scale.domain()[0], -20, 0.1, "only the bar accessor is active");
+            assert.closeTo(scale.domain()[1], 1, 0.1, "only the bar accessor is active");
             scale._updateExtent("2", "x", d3.extent(data, function (e) { return e.foo; }));
             assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
-            assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
+            assert.closeTo(scale.domain()[0], 0, 0.1, "the bar accessor was overwritten");
+            assert.closeTo(scale.domain()[1], 5, 0.1, "the bar accessor was overwritten");
         });
         it("should resize when a plot is removed", function () {
             var svg = generateSVG(400, 400);
@@ -5566,17 +5822,49 @@ describe("_Util.Text", function () {
             var height = 1;
             var textSelection = svg.append("text");
             var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
-            var results = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal");
+            var results = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal");
             assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "measurement mode: no width used");
             assert.equal(0, results.usedHeight, "measurement mode: no height used");
             var writeOptions = { g: svg, xAlign: "center", yAlign: "center" };
-            results = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal", writeOptions);
+            results = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal", writeOptions);
             assert.isFalse(results.textFits, "write mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "write mode: no width used");
             assert.equal(0, results.usedHeight, "write mode: no height used");
             textSelection.remove();
             assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
+            svg.remove();
+        });
+        it("behaves appropriately when text is in horizontal position", function () {
+            var svg = generateSVG();
+            var width = 100;
+            var height = 50;
+            var textSelection = svg.append("text");
+            var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
+            var measureResults = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal");
+            assert.isTrue(measureResults.textFits, "mesurement mode: text fits");
+            assert.operator(measureResults.usedHeight, "<=", measureResults.usedWidth, "mesurement mode: used more width than height");
+            var writeOptions = { g: svg, xAlign: "left", yAlign: "top" };
+            var writeResults = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal", writeOptions);
+            assert.isTrue(writeResults.textFits, "write mode: text fits");
+            assert.equal(measureResults.usedWidth, writeResults.usedWidth, "write mode: used the same width as measurement");
+            assert.equal(measureResults.usedHeight, writeResults.usedHeight, "write mode: used the same height as measurement");
+            svg.remove();
+        });
+        it("behaves appropriately when text is in vertical position", function () {
+            var svg = generateSVG();
+            var width = 100;
+            var height = 50;
+            var textSelection = svg.append("text");
+            var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
+            var measureResults = Plottable._Util.Text.writeText("abc", width, height, measure, "left");
+            assert.isTrue(measureResults.textFits, "mesurement mode: text fits");
+            assert.operator(measureResults.usedHeight, ">=", measureResults.usedWidth, "mesurement mode: used more height than width");
+            var writeOptions = { g: svg, xAlign: "left", yAlign: "top" };
+            var writeResults = Plottable._Util.Text.writeText("abc", width, height, measure, "left", writeOptions);
+            assert.isTrue(writeResults.textFits, "write mode: text fits");
+            assert.equal(measureResults.usedWidth, writeResults.usedWidth, "write mode: used the same width as measurement");
+            assert.equal(measureResults.usedHeight, writeResults.usedHeight, "write mode: used the same height as measurement");
             svg.remove();
         });
     });
@@ -5767,25 +6055,49 @@ describe("_Util.Methods", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
         assert.deepEqual(Plottable._Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
     });
-    it("max/min work as expected", function () {
-        var alist = [1, 2, 3, 4, 5];
-        var dbl = function (x) { return x * 2; };
+    describe("min/max", function () {
         var max = Plottable._Util.Methods.max;
         var min = Plottable._Util.Methods.min;
-        assert.deepEqual(max(alist), 5, "max works as expected on plain array");
-        assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
-        assert.deepEqual(max(alist, dbl), 10, "max applies function appropriately");
-        assert.deepEqual(max([]), 0, "default value zero by default");
-        assert.deepEqual(max([], 10), 10, "works as intended with default value");
-        assert.deepEqual(max([], dbl), 0, "default value zero as expected when fn provided");
-        assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
-        assert.deepEqual(min(alist, 0), 1, "min works for basic list");
-        assert.deepEqual(min(alist, dbl, 0), 2, "min works with function arg");
-        assert.deepEqual(min([]), 0, "min defaults to 0");
-        assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
-        var strings = ["a", "bb", "ccc", "ddd"];
-        assert.deepEqual(max(strings, function (s) { return s.length; }), 3, "works on arrays of non-numbers with a function");
-        assert.deepEqual(max([], function (s) { return s.length; }, 5), 5, "defaults work even with non-number function type");
+        var today = new Date();
+        it("max/min work as expected", function () {
+            var alist = [1, 2, 3, 4, 5];
+            var dbl = function (x) { return x * 2; };
+            var dblIndexOffset = function (x, i) { return x * 2 - i; };
+            var numToDate = function (x) {
+                var t = new Date(today.getTime());
+                t.setDate(today.getDate() + x);
+                return t;
+            };
+            assert.deepEqual(max(alist, 99), 5, "max ignores default on non-empty array");
+            assert.deepEqual(max(alist, dbl, 0), 10, "max applies function appropriately");
+            assert.deepEqual(max(alist, dblIndexOffset, 5), 6, "max applies function with index");
+            assert.deepEqual(max(alist, numToDate, today), numToDate(5), "max applies non-numeric function appropriately");
+            assert.deepEqual(max([], 10), 10, "works as intended with default value");
+            assert.deepEqual(max([], dbl, 5), 5, "default value works with function");
+            assert.deepEqual(max([], numToDate, today), today, "default non-numeric value works with non-numeric function");
+            assert.deepEqual(min(alist, 0), 1, "min works for basic list");
+            assert.deepEqual(min(alist, dbl, 0), 2, "min works with function arg");
+            assert.deepEqual(min(alist, dblIndexOffset, 0), 2, "min works with function index arg");
+            assert.deepEqual(min(alist, numToDate, today), numToDate(1), "min works with non-numeric function arg");
+            assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
+            assert.deepEqual(min([], numToDate, today), today, "min accepts non-numeric default and function");
+        });
+        it("max/min works as expected on non-numeric values (strings)", function () {
+            var strings = ["a", "bb", "ccc", "ddd"];
+            assert.deepEqual(max(strings, function (s) { return s.length; }, 0), 3, "works on arrays of non-numbers with a function");
+            assert.deepEqual(max([], function (s) { return s.length; }, 5), 5, "defaults work even with non-number function type");
+        });
+        it("max/min works as expected on non-numeric values (dates)", function () {
+            var tomorrow = new Date(today.getTime());
+            tomorrow.setDate(today.getDate() + 1);
+            var dayAfterTomorrow = new Date(today.getTime());
+            dayAfterTomorrow.setDate(today.getDate() + 2);
+            var dates = [today, tomorrow, dayAfterTomorrow, null];
+            assert.deepEqual(min(dates, dayAfterTomorrow), today, "works on arrays of non-numeric values but comparable");
+            assert.deepEqual(max(dates, today), dayAfterTomorrow, "works on arrays of non-number values but comparable");
+            assert.deepEqual(max([null], today), undefined, "returns undefined from array of null values");
+            assert.deepEqual(max([], today), today, "correct default non-numeric value returned");
+        });
     });
     it("objEq works as expected", function () {
         assert.isTrue(Plottable._Util.Methods.objEq({}, {}));

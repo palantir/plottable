@@ -87,22 +87,28 @@ describe("Plots", () => {
       var dataWithNaN = areaData.slice();
       dataWithNaN[2] = { foo: 0.4, bar: NaN };
       simpleDataset.data(dataWithNaN);
-      assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath,
-                        "area d was set correctly (y=NaN case)");
+
+      var areaPathString = normalizePath(areaPath.attr("d"));
+      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=NaN case)");
+
       dataWithNaN[2] = { foo: NaN, bar: 0.4 };
       simpleDataset.data(dataWithNaN);
-      assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath,
-                        "area d was set correctly (x=NaN case)");
+
+      areaPathString = normalizePath(areaPath.attr("d"));
+      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=NaN case)");
 
       var dataWithUndefined = areaData.slice();
       dataWithUndefined[2] = { foo: 0.4, bar: undefined };
       simpleDataset.data(dataWithUndefined);
-      assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath,
-                        "area d was set correctly (y=undefined case)");
+
+      areaPathString = normalizePath(areaPath.attr("d"));
+      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=undefined case)");
+
       dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
       simpleDataset.data(dataWithUndefined);
-      assert.strictEqual(normalizePath(areaPath.attr("d")), expectedPath,
-                        "area d was set correctly (x=undefined case)");
+
+      areaPathString = normalizePath(areaPath.attr("d"));
+      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=undefined case)");
 
       svg.remove();
     });

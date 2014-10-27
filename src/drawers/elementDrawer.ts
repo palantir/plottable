@@ -32,7 +32,9 @@ export module _Drawer {
       super._enterData(data);
       var dataElements = this._getDrawSelection().data(data);
       dataElements.enter().append(this._svgElement);
-      dataElements.classed(this._className, true);
+      if (this._className != null) {
+        dataElements.classed(this._className, true);
+      }
       dataElements.exit().remove();
     }
 
