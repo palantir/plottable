@@ -7380,7 +7380,7 @@ var Plottable;
                 innerScale.domain(this._datasetKeysInOrder);
                 if (!this._projectors["width"]) {
                     var secondaryScale = this._isVertical ? this._xScale : this._yScale;
-                    var constantWidth = secondaryScale.rangeType() ? secondaryScale.rangeBand() : Plot.AbstractBarPlot._DEFAULT_WIDTH;
+                    var constantWidth = secondaryScale.rangeType() === "bands" ? secondaryScale.rangeBand() : Plot.AbstractBarPlot._DEFAULT_WIDTH;
                     innerScale.range([0, constantWidth]);
                 }
                 else {

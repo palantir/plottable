@@ -60,7 +60,7 @@ export module Plot {
       innerScale.domain(this._datasetKeysInOrder);
       if (!this._projectors["width"]) {
         var secondaryScale: Scale.Ordinal = this._isVertical ? <any>this._xScale : <any>this._yScale;
-        var constantWidth = secondaryScale.rangeType() ? secondaryScale.rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
+        var constantWidth = secondaryScale.rangeType() === "bands" ? secondaryScale.rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
         innerScale.range([0, constantWidth]);
       } else {
         var projector = this._projectors["width"];
