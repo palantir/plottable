@@ -7367,7 +7367,7 @@ var Plottable;
                     clusters.set(key, data.map(function (d, i) {
                         var val = accessor(d, i);
                         var primaryScale = _this._isVertical ? _this._xScale : _this._yScale;
-                        // HACKHACK we should not modify orignal data.
+                        // TODO: store position information in metadata.
                         var copyD = Plottable._Util.Methods.copyMap(d);
                         copyD["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + innerScale.scale(key);
                         return copyD;
