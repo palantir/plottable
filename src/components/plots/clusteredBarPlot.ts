@@ -55,12 +55,15 @@ export module Plot {
       return clusters;
     }
 
+    // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
     private getInnerScale(){
       var innerScale = new Scale.Ordinal();
       innerScale.domain(this._datasetKeysInOrder);
       if (!this._projectors["width"]) {
-        var secondaryScale: Scale.Ordinal = this._isVertical ? <any>this._xScale : <any>this._yScale;
-        var constantWidth = secondaryScale.rangeType() === "bands" ? secondaryScale.rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
+        var secondaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._xScale : this._yScale;
+        var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
+                      && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
+        var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
         innerScale.range([0, constantWidth]);
       } else {
         var projector = this._projectors["width"];
