@@ -4772,12 +4772,13 @@ var Plottable;
              */
             function Numeric(scale, orientation, formatter) {
                 if (formatter === void 0) { formatter = Plottable.Formatters.general(3, false); }
-                _super.call(this, scale, orientation, formatter);
-                this.tickLabelPositioning = "center";
-                // Whether or not first/last tick label will still be displayed even if
-                // the label is cut off.
+                if (!orientation) {
+                    throw new Error("An orientation is required for a Numeric Axis");
+                }
                 this.showFirstTickLabel = false;
                 this.showLastTickLabel = false;
+                this.tickLabelPositioning = "center";
+                _super.call(this, scale, orientation, formatter);
             }
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
