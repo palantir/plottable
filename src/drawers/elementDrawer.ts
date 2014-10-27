@@ -42,7 +42,7 @@ export module _Drawer {
       return definedFunction ? data.filter(definedFunction) : data;
     }
 
-    public draw(data: any[], drawSteps: DrawStep[]) {
+    public draw(data: any[], drawSteps: DrawStep[]): number {
       var modifiedDrawSteps: DrawStep[] = [];
       drawSteps.forEach((d: DrawStep, i: number) => {
         modifiedDrawSteps[i] = {animator: d.animator, attrToProjector: _Util.Methods.copyMap(d.attrToProjector)};
@@ -57,7 +57,7 @@ export module _Drawer {
         }
       });
 
-      super.draw(definedData, modifiedDrawSteps);
+      return super.draw(definedData, modifiedDrawSteps);
     }
   }
 }

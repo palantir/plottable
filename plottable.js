@@ -3391,7 +3391,7 @@ var Plottable;
                         delete d.attrToProjector["defined"];
                     }
                 });
-                _super.prototype.draw.call(this, definedData, modifiedDrawSteps);
+                return _super.prototype.draw.call(this, definedData, modifiedDrawSteps);
             };
             return Element;
         })(_Drawer.AbstractDrawer);

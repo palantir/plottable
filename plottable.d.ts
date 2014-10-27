@@ -1648,7 +1648,7 @@ declare module Plottable {
             _getDrawSelection(): D3.Selection;
             _drawStep(step: DrawStep): void;
             _enterData(data: any[]): void;
-            draw(data: any[], drawSteps: DrawStep[]): void;
+            draw(data: any[], drawSteps: DrawStep[]): number;
         }
     }
 }
