@@ -4286,6 +4286,55 @@ describe("Component behavior", function () {
         assert.deepEqual(transform.translate, [0, 0], "the element was not translated");
         svg.remove();
     });
+    describe("resizeBroadcaster testing", function () {
+        var oldRegister;
+        var oldDeregister;
+        var registeredComponents;
+        var id;
+        before(function () {
+            oldRegister = Plottable.Core.ResizeBroadcaster.register;
+            oldDeregister = Plottable.Core.ResizeBroadcaster.deregister;
+            var fakeRegister = function (c) {
+                registeredComponents.add(c._plottableID);
+            };
+            var fakeDeregister = function (c) {
+                registeredComponents.remove(c._plottableID);
+            };
+            Plottable.Core.ResizeBroadcaster.register = fakeRegister;
+            Plottable.Core.ResizeBroadcaster.deregister = fakeDeregister;
+        });
+        after(function () {
+            Plottable.Core.ResizeBroadcaster.register = oldRegister;
+            Plottable.Core.ResizeBroadcaster.deregister = oldDeregister;
+        });
+        beforeEach(function () {
+            registeredComponents = d3.set();
+            id = c._plottableID;
+        });
+        afterEach(function () {
+            svg.remove(); // svg contains no useful info
+        });
+        it("components can be removed from resizeBroadcaster before rendering", function () {
+            c.autoResize(false);
+            c.renderTo(svg);
+            assert.isFalse(registeredComponents.has(id), "component not registered to broadcaster");
+        });
+        it("components register by default", function () {
+            c.renderTo(svg);
+            assert.isTrue(registeredComponents.has(id), "component is registered");
+        });
+        it("component can be deregistered then registered before render", function () {
+            c.autoResize(false);
+            c.autoResize(true);
+            c.renderTo(svg);
+            assert.isTrue(registeredComponents.has(id), "component is registered");
+        });
+        it("component can be deregistered after rendering", function () {
+            c.renderTo(svg);
+            c.autoResize(false);
+            assert.isFalse(registeredComponents.has(id), "component was deregistered after rendering");
+        });
+    });
 });
 
 ///<reference path="../testReference.ts" />
