@@ -8,8 +8,9 @@ export module Axis {
    */
   export interface TimeInterval {
     timeUnit: D3.Time.Interval;
-    steps?: number[];
+    steps?: number[]; // possible steps for this time unit and formatter.
     formatter: Formatter;
+    nextTimeUnit?: D3.Time.Interval; // Determines what should be min time unit for next layer.
   };
 
   /*
@@ -17,6 +18,10 @@ export module Axis {
    * of interval which meets given time unit constraints.
    */
   function filterIntervals(intevals: TimeInterval[], minTimeUnit: any) {
+    if(minTimeUnit == null) {
+      return [];
+    }
+
     var compTimeUnit = (a: any, b: any) => {
         var now = new Date();
         return a.offset(now, 1) >= b.offset(now, 1);
@@ -34,22 +39,22 @@ export module Axis {
      * Default major time intervals
      */
     public _majorIntervals: TimeInterval[] = [
-      { timeUnit: d3.time.day,   formatter: multiTime("%B %e, %Y")},
-      { timeUnit: d3.time.month, formatter: multiTime("%B %Y")},
-      { timeUnit: d3.time.year,  formatter: multiTime("%Y")}
+      {timeUnit: d3.time.day,   formatter: multiTime("%B %e, %Y")},
+      {timeUnit: d3.time.month, formatter: multiTime("%B %Y")},
+      {timeUnit: d3.time.year,  formatter: multiTime("%Y")}
     ];
     
     /*
      * Default minor time intervals
      */
     public _minorIntervals: TimeInterval[] = [
-      {timeUnit: d3.time.second, steps: [1, 5, 10, 15, 30], formatter: timeString("%I:%M:%S %p")},
-      {timeUnit: d3.time.minute, steps: [1, 5, 10, 15, 30], formatter: timeString("%I:%M %p")},
-      {timeUnit: d3.time.hour,   steps: [1, 3, 6, 12],      formatter: timeString("%I %p")},
-      {timeUnit: d3.time.day,                               formatter: timeString("%a %e")},
-      {timeUnit: d3.time.day,                               formatter: timeString("%e")},
-      {timeUnit: d3.time.month,                             formatter: timeString("%B")},
-      {timeUnit: d3.time.month,  steps: [1, 3, 6],          formatter: timeString("%b")},
+      {timeUnit: d3.time.second, steps: [1, 5, 10, 15, 30], formatter: timeString("%I:%M:%S %p"), nextTimeUnit: d3.time.day},
+      {timeUnit: d3.time.minute, steps: [1, 5, 10, 15, 30], formatter: timeString("%I:%M %p"),    nextTimeUnit: d3.time.day},
+      {timeUnit: d3.time.hour,   steps: [1, 3, 6, 12],      formatter: timeString("%I %p"),       nextTimeUnit: d3.time.day},
+      {timeUnit: d3.time.day,                               formatter: timeString("%a %e"),       nextTimeUnit: d3.time.month},
+      {timeUnit: d3.time.day,                               formatter: timeString("%e"),          nextTimeUnit: d3.time.month},
+      {timeUnit: d3.time.month,                             formatter: timeString("%B"),          nextTimeUnit: d3.time.year},
+      {timeUnit: d3.time.month,  steps: [1, 3, 6],          formatter: timeString("%b"),          nextTimeUnit: d3.time.year},
       {timeUnit: d3.time.year,                              formatter: timeString("%Y")},
       {timeUnit: d3.time.year,                              formatter: timeString("%y")},
       {timeUnit: d3.time.year,   steps: [5, 25, 50, 100, 200, 500, 1000], formatter: timeString("%Y")},
@@ -92,12 +97,20 @@ export module Axis {
      * @returns {Axis} The calling Axis.
      */
     public majorTimeIntervals(intervals: TimeInterval[]): Time;
+
+    /**
+     * Sets the min major time interval on the axis.
+     *
+     * @param {D3.Time.Interval} minInterval The smallest time interval to generate major ticks. 
+     *
+     * @returns {Axis} The calling Axis.
+     */
     public majorTimeIntervals(minInterval: D3.Time.Interval): Time;
     public majorTimeIntervals(intervals?: TimeInterval[], minInterval?: D3.Time.Interval): any {
-      if(intervals == null && minInterval == null) {
+      if(!intervals && !minInterval) {
         return this._majorIntervals;
-      } else if (intervals == null) {
-
+      } else if (!intervals) {
+        return this.majorTimeIntervals(filterIntervals(this._majorIntervals, minInterval));
       } else {
         // Check if timeUnits and steps are in ascending order and major are bigger than associated minor
         this._majorIntervals = intervals;
@@ -121,9 +134,20 @@ export module Axis {
      * @returns {Axis} The calling Axis.
      */
     public minorTimeIntervals(intervals: TimeInterval[]): Time;
-    public minorTimeIntervals(intervals?: TimeInterval[]): any {
-      if(intervals === undefined) {
+
+    /**
+     * Sets the min minor time interval on the axis.
+     *
+     * @param {D3.Time.Interval} minInterval The smallest time interval to generate minor ticks. 
+     *
+     * @returns {Axis} The calling Axis.
+     */
+    public majorTimeIntervals(minInterval: D3.Time.Interval): Time;
+    public minorTimeIntervals(intervals?: TimeInterval[], minInterval?: D3.Time.Interval): any {
+      if(!intervals && !minInterval){
         return this._minorIntervals;
+      } else if (!intervals) {
+        return this.minorTimeIntervals(filterIntervals(this._minorIntervals, minInterval));
       } else {
         // Check if timeUnits and steps are in ascending order and major are bigger than associated minor
         this._minorIntervals = intervals;
@@ -161,38 +185,26 @@ export module Axis {
       return stepLength;
     }
 
-    private isEnoughSpace(container: D3.Selection, interval: TimeAxisInterval) {
+    private isEnoughSpace(container: D3.Selection, interval: TimeInterval) {
+      if(!interval) {
+        return true;
+      }
       var majorInterval = this.calculateMajor(interval);
-      var worstMinor = this.calculateWorstWidth(container, interval.minor) + 2 * this.tickLabelPadding();
+      var worstMinor = this.calculateWorstWidth(container, interval) + 2 * this.tickLabelPadding();
       var worstMajor = this.calculateWorstWidth(container, majorInterval) + 2 * this.tickLabelPadding();
-      var stepLengthMinor = Math.min(this.getIntervalLength(interval.minor), this.width());
+      var stepLengthMinor = Math.min(this.getIntervalLength(interval), this.width());
       var stepLengthMajor = Math.min(this.getIntervalLength(majorInterval), this.width());
       return worstMinor < stepLengthMinor && worstMajor < stepLengthMajor;
     }
 
     /*
-     * Determins major time interval based on provided axis time interval.
-     * If major interval is not present, then smallest from supported major interval, 
-     * but greater than given minor interval is returned.
-     * If non of supported major interval meet requirement than there is no major interval.
+     * Determins major time interval based on provided minor time interval.
+     * If minor interval does not provide nextTimeUnit, it means that's the only layer.
+     * If non of provided major interval meet requirement than there is no major interval.
      */
-    private calculateMajor(interval: TimeAxisInterval) {
-      if (interval.major) {
-        return interval.major;
-      } else {
-        var compTimeUnit = (a: any, b: any) => {
-          var now = new Date();
-          return a.offset(now, 1) > b.offset(now, 1);
-        };
-
-        for (var index = 0; index < supportedMajorIntervals.length; ++index) {
-          if (compTimeUnit(supportedMajorIntervals[index], interval.minor.timeUnit)) {
-            return  {timeUnit: supportedMajorIntervals[index], step: 1, foramtter: supportedMajorFormatters[index]};
-          }
-        }
-
-        return null;
-      }
+    private calculateMajorInterval(interval: TimeInterval) {
+      var intervals = filterIntervals(this.majorTimeIntervals, interval.nextTimeUnit);
+      return intervals.length > 0 ? intervals[0] : null;
     }
 
     public _setup() {
@@ -205,7 +217,8 @@ export module Axis {
     // returns a number to index into the major/minor intervals
     private getTickLevel(): number {
       for (var i = 0; i < Time._minorIntervals.length; i++) {
-        if (this.isEnoughSpace(this._minorTickLabels, Time._intervals[i])) {
+        if (this.isEnoughSpace(this._minorTickLabels, this._minorIntervals[i]) 
+          && this.isEnoughSpace(this._minorTickLabels, this.calculateMajorInterval(this._majorIntervals[i]))) {
           break;
         }
       }

@@ -202,6 +202,13 @@ module Plottable {
       };
     }
 
+    /**
+     * Creates a formatter that displays time/date using multiple time formats.
+     *
+     * @param {string} [format] The format of displayed time/date.
+     *
+     * @returns {Formatter} A formatter for time/date values.
+     */
     export function multiTime(format: string) {
       return function(d: any) {
         return d3.time.format(format)(d);
