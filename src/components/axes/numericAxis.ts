@@ -4,11 +4,11 @@ module Plottable {
 export module Axis {
   export class Numeric extends AbstractAxis {
     public _scale: Scale.AbstractQuantitative<number>;
-    private tickLabelPositioning = "center";
+    private tickLabelPositioning: string;
     // Whether or not first/last tick label will still be displayed even if
     // the label is cut off.
-    private showFirstTickLabel = false;
-    private showLastTickLabel = false;
+    private showFirstTickLabel: boolean;
+    private showLastTickLabel: boolean;
     private measurer: _Util.Text.TextMeasurer;
 
     /**
@@ -23,6 +23,12 @@ export module Axis {
      * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
      */
     constructor(scale: Scale.AbstractQuantitative<number>, orientation: string, formatter = Formatters.general(3, false)) {
+      if (!orientation) {
+        throw new Error("An orientation is required for a Numeric Axis");
+      }
+      this.showFirstTickLabel = false;
+      this.showLastTickLabel = false;
+      this.tickLabelPositioning = "center";
       super(scale, orientation, formatter);
     }
 
