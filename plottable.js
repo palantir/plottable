@@ -7375,10 +7375,10 @@ var Plottable;
                 });
                 return clusters;
             };
-            // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
             ClusteredBar.prototype.getInnerScale = function () {
                 var innerScale = new Plottable.Scale.Ordinal();
                 innerScale.domain(this._datasetKeysInOrder);
+                // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
                 if (!this._projectors["width"]) {
                     var secondaryScale = this._isVertical ? this._xScale : this._yScale;
                     var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
