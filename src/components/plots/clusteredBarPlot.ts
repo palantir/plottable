@@ -3,7 +3,6 @@
 module Plottable {
 export module Plot {
   export class ClusteredBar<X,Y> extends AbstractBarPlot<X,Y> {
-    private innerScale: Scale.Ordinal;
 
     /**
      * Creates a ClusteredBarPlot.
@@ -19,16 +18,13 @@ export module Plot {
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
       this._isVertical = isVertical; // Has to be set before super()
       super(xScale, yScale);
-      this.innerScale = new Scale.Ordinal();
     }
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       // the width is constant, so set the inner scale range to that
-      var widthF = attrToProjector["width"];
-      this.innerScale.range([0, widthF(null, 0)]);
-
-      var innerWidthF = (d: any, i: number) => this.innerScale.rangeBand();
+      var innerScale = this.getInnerScale();
+      var innerWidthF = (d: any, i: number) => innerScale.rangeBand();
       var heightF = attrToProjector["height"];
       attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
       attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
@@ -42,7 +38,7 @@ export module Plot {
 
     public _getDataToDraw() {
       var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-      this.innerScale.domain(this._datasetKeysInOrder);
+      var innerScale = this.getInnerScale();
       var clusters: D3.Map<any[]> = d3.map();
       this._datasetKeysInOrder.forEach((key: string) => {
         var data = this._key2DatasetDrawerKey.get(key).dataset.data();
@@ -50,11 +46,30 @@ export module Plot {
         clusters.set(key, data.map((d, i) => {
           var val = accessor(d, i);
           var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._xScale : this._yScale;
-          d["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + this.innerScale.scale(key);
-          return d;
+          // HACKHACK we should not modify orignal data.
+          var copyD = _Util.Methods.copyMap(d);
+          copyD["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + innerScale.scale(key);
+          return copyD;
         }));
       });
       return clusters;
+    }
+
+    private getInnerScale(){
+      var innerScale = new Scale.Ordinal();
+      innerScale.domain(this._datasetKeysInOrder);
+      if (!this._projectors["width"]) {
+        var secondaryScale: Scale.Ordinal = this._isVertical ? <any>this._xScale : <any>this._yScale;
+        var constantWidth = secondaryScale.rangeType() ? secondaryScale.rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
+        innerScale.range([0, constantWidth]);
+      } else {
+        var projector = this._projectors["width"];
+        var accessor = projector.accessor;
+        var scale = projector.scale;
+        var fn = scale ? (d: any, i: number) => scale.scale(accessor(d, i)) : accessor;
+        innerScale.range([0, fn(null, 0)]);
+      }
+      return innerScale;
     }
   }
 }
