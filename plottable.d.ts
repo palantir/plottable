@@ -149,6 +149,15 @@ declare module Plottable {
              */
             function verifyNotUndefined(reference: any, referenceName?: string, msg?: string): void;
             /**
+             * Throws an error if the reference is undefined.  Otherwise does nothing.
+             *
+             * @param {T} reference The reference to check
+             * @param {T[]} testArray The array to test against
+             * @param {string} referenceName The name of the reference (default = "reference")
+             * @param {string} msg If provided, the error message to use
+             */
+            function verifyOneOf<T>(reference: T, testArray: T[], referenceName?: string, msg?: string): void;
+            /**
              * Throws an error if the reference is not of the specified type.  Otherwise does nothing.
              *
              * @param {any} reference The reference to check
@@ -160,13 +169,18 @@ declare module Plottable {
             /**
              * Attempts to coerce the value of the reference to the specified type and returns the coerced value.
              *
-             * @param {any} reference The reference to check
-             * @param {string} classType The classType to check against
-             * @param {string} referenceName The name of the reference (default = "reference")
-             * @param {string} msg If provided, the error message to use
+             * @param {any} reference The reference to coerce
+             * @param {string} classType The classType to coerce to
              * @returns {any} The coerced value
              */
-            function coerceType(reference: any, classType: string, referenceName?: string, msg?: string): any;
+            function coerceType(reference: any, classType: string): any;
+            /**
+             * Sanitizes the string to a standard used in the codebase
+             *
+             * @param {string} reference The string to sanitize
+             * @returns {any} The sanitized string
+             */
+            function sanitizeString(reference: string): string;
         }
     }
 }

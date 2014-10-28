@@ -320,6 +320,21 @@ export module _Util {
     }
 
     /**
+     * Throws an error if the reference is undefined.  Otherwise does nothing.
+     *
+     * @param {T} reference The reference to check
+     * @param {T[]} testArray The array to test against
+     * @param {string} referenceName The name of the reference (default = "reference")
+     * @param {string} msg If provided, the error message to use
+     */
+    export function verifyOneOf<T>(reference: T, testArray: T[], referenceName = "reference", msg?: string) {
+      // Check if reference is one of the items in the testArray
+      // If reference is not in the array throw an error with msg as the error msg if provided
+      // If msg is not provided, throw an error with a default msg with the referenceName
+      // Otherwise do nothing
+    }
+
+    /**
      * Throws an error if the reference is not of the specified type.  Otherwise does nothing.
      *
      * @param {any} reference The reference to check
@@ -337,17 +352,26 @@ export module _Util {
     /**
      * Attempts to coerce the value of the reference to the specified type and returns the coerced value.
      *
-     * @param {any} reference The reference to check
-     * @param {string} classType The classType to check against
-     * @param {string} referenceName The name of the reference (default = "reference")
-     * @param {string} msg If provided, the error message to use
+     * @param {any} reference The reference to coerce
+     * @param {string} classType The classType to coerce to
      * @returns {any} The coerced value
      */
-    export function coerceType(reference: any, classType: string, referenceName = "reference", msg?: string): any {
+    export function coerceType(reference: any, classType: string): any {
       // Switch on the classType
       // If classType is number, coerce to number and return
       // If classType is string, coerce to string and return
       // ...
+    }
+
+    /**
+     * Sanitizes the string to a standard used in the codebase
+     *
+     * @param {string} reference The string to sanitize
+     * @returns {any} The sanitized string
+     */
+    export function sanitizeString(reference: string): string {
+      // return the string after lowercase + trim
+      throw Error("not implemented");
     }
   }
 }
