@@ -37,6 +37,28 @@ export module _Drawer {
       }
       dataElements.exit().remove();
     }
+
+    private filterDefinedData(data: any[], definedFunction: (d: any, i: number) => boolean): any[] {
+      return definedFunction ? data.filter(definedFunction) : data;
+    }
+
+    public draw(data: any[], drawSteps: DrawStep[]): number {
+      var modifiedDrawSteps: DrawStep[] = [];
+      drawSteps.forEach((d: DrawStep, i: number) => {
+        modifiedDrawSteps[i] = {animator: d.animator, attrToProjector: _Util.Methods.copyMap(d.attrToProjector)};
+      });
+
+      var definedData: any[] = modifiedDrawSteps.reduce((data: any[], drawStep: DrawStep) =>
+                                this.filterDefinedData(data, drawStep.attrToProjector["defined"]), data);
+
+      modifiedDrawSteps.forEach((d: DrawStep) => {
+        if (d.attrToProjector["defined"]) {
+          delete d.attrToProjector["defined"];
+        }
+      });
+
+      return super.draw(definedData, modifiedDrawSteps);
+    }
   }
 }
 }
