@@ -4519,9 +4519,6 @@ var Plottable;
                 this.tickLabelPadding(5);
             }
             Time.prototype.orient = function (s) {
-                // if (!s) {
-                //   return super.orient();
-                // }
                 if (s && (s.toLowerCase() === "right" || s.toLowerCase() === "left")) {
                     throw new Error(s + " is not a supported orientation for TimeAxis - only horizontal time axes are supported");
                 }

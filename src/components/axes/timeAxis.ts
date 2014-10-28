@@ -101,9 +101,6 @@ export module Axis {
     public orient(): string;
     public orient(newOrientation: string): Time;
     public orient(s?: string): any {
-      // if (!s) {
-      //   return super.orient();
-      // }
       if (s && (s.toLowerCase() === "right" || s.toLowerCase() === "left")) {
         throw new Error(s + " is not a supported orientation for TimeAxis - only horizontal time axes are supported");
       }
