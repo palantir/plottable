@@ -278,9 +278,9 @@ export module _Util {
     /*
      * Checks if given array is monothonic in given direction(asc/desc) using given comparison function.
      */
-    export function isInOrder<C>(arr: C[], ascendinf: boolean, compFn: (a: C, b: C) => number) {
-      var orderFn = r => ascending ? r >= 0 : r <= 0;
-      return arr.every((a: C, i: number) => i == 0 || orderFn(compFn(arr[i - 1], a)));
+    export function isInOrder<C>(arr: C[], ascending: boolean, compFn: (a: C, b: C) => number) {
+      var orderFn = (r: number) => ascending ? r >= 0 : r <= 0;
+      return arr.every((a: C, i: number) => i === 0 || orderFn(compFn(arr[i - 1], a)));
     }
   }
 }

@@ -262,6 +262,14 @@ var Plottable;
                 return range;
             }
             Methods.range = range;
+            /*
+             * Checks if given array is monothonic in given direction(asc/desc) using given comparison function.
+             */
+            function isInOrder(arr, ascending, compFn) {
+                var orderFn = function (r) { return ascending ? r >= 0 : r <= 0; };
+                return arr.every(function (a, i) { return i === 0 || orderFn(compFn(arr[i - 1], a)); });
+            }
+            Methods.isInOrder = isInOrder;
         })(_Util.Methods || (_Util.Methods = {}));
         var Methods = _Util.Methods;
     })(Plottable._Util || (Plottable._Util = {}));
@@ -1340,6 +1348,19 @@ var Plottable;
             };
         }
         Formatters.time = time;
+        /**
+         * Creates a formatter that displays time/date using multiple time formats.
+         *
+         * @param {string} [format] The format of displayed time/date.
+         *
+         * @returns {Formatter} A formatter for time/date values.
+         */
+        function multiTime(format) {
+            return function (d) {
+                return d3.time.format(format)(d);
+            };
+        }
+        Formatters.multiTime = multiTime;
         /**
          * Creates a formatter for relative dates.
          *
@@ -4502,6 +4523,19 @@ var Plottable;
 (function (Plottable) {
     (function (Axis) {
         ;
+        ;
+        /*
+         * For given sorted array of time intervals function returns subarray
+         * of interval which meets given time unit constraints.
+         */
+        function filterIntervals(intervals, minTimeUnit) {
+            var greaterTimeUnit = function (interval) {
+                var now = new Date();
+                return interval.timeUnit.offset(now, 1) >= minTimeUnit.offset(now, 1);
+            };
+            return intervals.filter(greaterTimeUnit);
+        }
+        var multiTime = Plottable.Formatters.multiTime;
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
@@ -4514,14 +4548,70 @@ var Plottable;
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             function Time(scale, orientation) {
+                _super.call(this, scale, orientation);
+                /*
+                 * Default major time intervals for axis.
+                 */
+                this._newMajorIntervals = [
+                    { timeUnit: d3.time.day, formatter: multiTime("%B %e, %Y") },
+                    { timeUnit: d3.time.month, formatter: multiTime("%B %Y") },
+                    { timeUnit: d3.time.year, formatter: multiTime("%Y") }
+                ];
+                /*
+                 * Default minor time intervals for axis.
+                 */
+                this._newMinorIntervals = [
+                    { timeUnit: d3.time.second, steps: [1, 5, 10, 15, 30], formatter: multiTime("%I:%M:%S %p"), nextTimeUnit: d3.time.day },
+                    { timeUnit: d3.time.minute, steps: [1, 5, 10, 15, 30], formatter: multiTime("%I:%M %p"), nextTimeUnit: d3.time.day },
+                    { timeUnit: d3.time.hour, steps: [1, 3, 6, 12], formatter: multiTime("%I %p"), nextTimeUnit: d3.time.day },
+                    { timeUnit: d3.time.day, formatter: multiTime("%a %e"), nextTimeUnit: d3.time.month },
+                    { timeUnit: d3.time.day, formatter: multiTime("%e"), nextTimeUnit: d3.time.month },
+                    { timeUnit: d3.time.month, formatter: multiTime("%B"), nextTimeUnit: d3.time.year },
+                    { timeUnit: d3.time.month, steps: [1, 3, 6], formatter: multiTime("%b"), nextTimeUnit: d3.time.year },
+                    { timeUnit: d3.time.year, formatter: multiTime("%Y") },
+                    { timeUnit: d3.time.year, formatter: multiTime("%y") },
+                    { timeUnit: d3.time.year, steps: [5, 25, 50, 100, 200, 500, 1000], formatter: multiTime("%Y") },
+                ];
                 orientation = orientation.toLowerCase();
                 if (orientation !== "top" && orientation !== "bottom") {
                     throw new Error("unsupported orientation: " + orientation);
                 }
-                _super.call(this, scale, orientation);
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
             }
+            Time.prototype.majorTimeIntervals = function (param) {
+                if (param == null) {
+                    return this._newMajorIntervals;
+                }
+                else if (param instanceof Array) {
+                    // Check if timeUnits and steps are in ascending order and major are bigger than associated minor
+                    this._newMajorIntervals = param;
+                    return this;
+                }
+                else {
+                    return this.majorTimeIntervals(filterIntervals(this._newMajorIntervals, param));
+                }
+            };
+            Time.prototype.minorTimeIntervals = function (param) {
+                if (param == null) {
+                    return this._newMinorIntervals;
+                }
+                else if (param instanceof Array) {
+                    // Check if timeUnits and steps are in ascending order and major are bigger than associated minor
+                    this._newMinorIntervals = param;
+                    return this;
+                }
+                else {
+                    return this.minorTimeIntervals(filterIntervals(this._newMinorIntervals, param));
+                }
+            };
+            Time.prototype.calculateBestTimeTickGenerators = function () {
+                // All possible time tick generators for minot and major.
+                // Only if minor interval has next time unit, we will create major time tick generator.
+                var allTimeTickGenerators = [];
+                var bestTimeTickGenerator = { minor: null, major: null };
+                return bestTimeTickGenerator;
+            };
             Time.prototype._computeHeight = function () {
                 if (this._computedHeight !== null) {
                     return this._computedHeight;
@@ -4660,6 +4750,9 @@ var Plottable;
                 this.adjustTickLength(this.tickLabelPadding(), Time._minorIntervals[index]);
             };
             Time.prototype._doRender = function () {
+                var bestTimeTickGenerators = this.calculateBestTimeTickGenerators();
+                this.minorTimeTickGenerator = bestTimeTickGenerators.minor;
+                this.majorTimeTickGenerator = bestTimeTickGenerators.major;
                 _super.prototype._doRender.call(this);
                 var index = this.getTickLevel();
                 this.renderTickLabels(this._minorTickLabels, Time._minorIntervals[index], 1);

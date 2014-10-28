@@ -124,6 +124,7 @@ declare module Plottable {
                 [x: string]: T;
             };
             function range(start: number, stop: number, step?: number): number[];
+            function isInOrder<C>(arr: C[], ascending: boolean, compFn: (a: C, b: C) => number): boolean;
         }
     }
 }
@@ -502,6 +503,14 @@ declare module Plottable {
          * @returns {Formatter} A formatter for time/date values.
          */
         function time(): (d: any) => string;
+        /**
+         * Creates a formatter that displays time/date using multiple time formats.
+         *
+         * @param {string} [format] The format of displayed time/date.
+         *
+         * @returns {Formatter} A formatter for time/date values.
+         */
+        function multiTime(format: string): (d: any) => string;
         /**
          * Creates a formatter for relative dates.
          *
@@ -2097,12 +2106,20 @@ declare module Plottable {
             step: number;
             formatString: string;
         }
+        interface TimeInterval {
+            timeUnit: D3.Time.Interval;
+            steps?: number[];
+            formatter: Formatter;
+            nextTimeUnit?: D3.Time.Interval;
+        }
         class Time extends AbstractAxis {
             _majorTickLabels: D3.Selection;
             _minorTickLabels: D3.Selection;
             _scale: Scale.Time;
             static _minorIntervals: _TimeInterval[];
             static _majorIntervals: _TimeInterval[];
+            _newMajorIntervals: TimeInterval[];
+            _newMinorIntervals: TimeInterval[];
             /**
              * Constructs a TimeAxis.
              *
@@ -2113,6 +2130,52 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             constructor(scale: Scale.Time, orientation: string);
+            /**
+             * Gets the current major time intervals on the axis. Tick marks and labels are generated
+             * based on the provided time intervals.
+             *
+             * @returns {TimeInterval[]} The current major time intervals.
+             */
+            majorTimeIntervals(): TimeInterval[];
+            /**
+             * Sets the current major time intervals on the axis.
+             *
+             * @param {TimeInterval[]} intervals Possible time intervals to generate major
+             * tick marks and labels.
+             * @returns {Axis} The calling Axis.
+             */
+            majorTimeIntervals(intervals: TimeInterval[]): Time;
+            /**
+             * Sets the min major time interval on the axis.
+             *
+             * @param {D3.Time.Interval} minInterval The smallest time interval to generate major ticks.
+             *
+             * @returns {Axis} The calling Axis.
+             */
+            majorTimeIntervals(minInterval: D3.Time.Interval): Time;
+            /**
+             * Gets the current minor time intervals on the axis. Tick marks and labels are generated
+             * based on the provided time intervals.
+             *
+             * @returns {TimeInterval[]} The current minor time intervals.
+             */
+            minorTimeIntervals(): TimeInterval[];
+            /**
+             * Sets the current minor time intervals on the axis.
+             *
+             * @param {TimeInterval[]} intervals Possible time intervals to generate minor
+             * tick marks and labels.
+             * @returns {Axis} The calling Axis.
+             */
+            minorTimeIntervals(intervals: TimeInterval[]): Time;
+            /**
+             * Sets the min minor time interval on the axis.
+             *
+             * @param {D3.Time.Interval} minInterval The smallest time interval to generate minor ticks.
+             *
+             * @returns {Axis} The calling Axis.
+             */
+            minorTimeIntervals(minInterval: D3.Time.Interval): Time;
             _computeHeight(): number;
             _setup(): void;
             _getTickIntervalValues(interval: _TimeInterval): any[];

@@ -212,7 +212,7 @@ module Plottable {
     export function multiTime(format: string) {
       return function(d: any) {
         return d3.time.format(format)(d);
-      }
+      };
     }
 
     /**
