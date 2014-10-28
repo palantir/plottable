@@ -93,13 +93,21 @@ export module Axis {
      * @param {string} orientation The orientation of the Axis (top/bottom)
      */
     constructor(scale: Scale.Time, orientation: string) {
-      orientation = orientation.toLowerCase();
-      if (orientation !== "top" && orientation !== "bottom") {
-        throw new Error ("unsupported orientation: " + orientation);
-      }
       super(scale, orientation);
       this.classed("time-axis", true);
       this.tickLabelPadding(5);
+    }
+
+    public orient(): string;
+    public orient(newOrientation: string): Time;
+    public orient(s?: string): any {
+      // if (!s) {
+      //   return super.orient();
+      // }
+      if (s && (s.toLowerCase() === "right" || s.toLowerCase() === "left")) {
+        throw new Error(s + " is not a supported orientation for TimeAxis - only horizontal time axes are supported");
+      }
+      return super.orient(s); // maintains getter-setter functionality
     }
 
     public _computeHeight() {

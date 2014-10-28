@@ -4514,14 +4514,19 @@ var Plottable;
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             function Time(scale, orientation) {
-                orientation = orientation.toLowerCase();
-                if (orientation !== "top" && orientation !== "bottom") {
-                    throw new Error("unsupported orientation: " + orientation);
-                }
                 _super.call(this, scale, orientation);
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
             }
+            Time.prototype.orient = function (s) {
+                // if (!s) {
+                //   return super.orient();
+                // }
+                if (s && (s.toLowerCase() === "right" || s.toLowerCase() === "left")) {
+                    throw new Error(s + " is not a supported orientation for TimeAxis - only horizontal time axes are supported");
+                }
+                return _super.prototype.orient.call(this, s); // maintains getter-setter functionality
+            };
             Time.prototype._computeHeight = function () {
                 if (this._computedHeight !== null) {
                     return this._computedHeight;

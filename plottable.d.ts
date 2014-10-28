@@ -2113,6 +2113,8 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             constructor(scale: Scale.Time, orientation: string);
+            orient(): string;
+            orient(newOrientation: string): Time;
             _computeHeight(): number;
             _setup(): void;
             _getTickIntervalValues(interval: _TimeInterval): any[];
