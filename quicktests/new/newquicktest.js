@@ -64,13 +64,8 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
       var seconddiv = div.append("div").attr("class", "second");
       var data = result.makeData();
 
-      setTimeout(function(){
         runQuickTest(firstdiv, data, firstBranch);
-      } , 3000); //just runQuickTest twice here with same result
-      setTimeout(function(){
         runQuickTest(seconddiv, data, secondBranch);
-      } , 4000); //just runQuickTest twice here with same result
-
     });
   });//forEach
     
@@ -123,8 +118,11 @@ function loadPlottableBranches(category, branchList){
 
 //run a single quicktest
 function runQuickTest(div, data, branch){
-  console.log(branch)
-  result.run(div, data, plottableBranches[branch])
+  try {
+    result.run(div, data, plottableBranches[branch])
+  } catch (err) {
+    setTimeout(function() {throw err;}, 0);
+  }
 };
 
 function clearTests(){
@@ -135,8 +133,8 @@ function clearTests(){
 }
 
 function resetDisplayProperties(){
-  $(".first, .first svg").css("display", "table");
-  $(".second, .second svg").css("display", "table");
+  $(".first, .first svg").css("display", "block");
+  $(".second, .second svg").css("display", "block");
   $("#branch1").css("background-color", "white");
   $("#branch2").css("background-color", "white");
 }
@@ -144,38 +142,46 @@ function resetDisplayProperties(){
 window.onkeyup = function(e){
   var key = e.keyCode ? e.keyCode : e.which;
   //if 1 is pressed
+  if(key < 52){
+    //$(".quicktest").css("display", "none")
+    console.log("< 52");
+    $(".first svg g").css("display", "none");
+    $(".second svg g").css("display", "none");
+    $("#branch1").css("background-color", "white");
+    $("#branch2").css("background-color", "white");
+  }
+
   if(key == 49){
-    debugger;
-    $(".quicktest").css("display", "inline-block")
-    $(".first svg").css("display", "table");
-    $(".second svg").css("display", "none");
+    //$(".quicktest").css("display", "inline-block")
+    $(".first svg g").css("display", "block");
+    $(".second svg g").css("display", "none");
     $("#branch1").css("background-color", "mediumaquamarine");
     $("#branch2").css("background-color", "white");
     return;
   }
   //if 2 is pressed
   if(key == 50){
-    $(".quicktest").css("display", "inline-block")
-    $(".first svg").css("display", "none");
-    $(".second svg").css("display", "table");
+    //$(".quicktest").css("display", "inline-block")
+    $(".first svg g").css("display", "none");
+    $(".second svg g").css("display", "block");
     $("#branch1").css("background-color", "white");
     $("#branch2").css("background-color", "mediumaquamarine");
     return;
   }
   //if 3 is pressed
   if(key == 51){
-    $(".quicktest").css("display", "inline-block")
-    $(".first, .first svg").css("display", "table");
-    $(".second, .second svg").css("display", "table");
+    //$(".quicktest").css("display", "inline-block")
+    $(".first, .first svg g").css("display", "block");
+    $(".second, .second svg g").css("display", "block");
     $("#branch1").css("background-color", "mediumaquamarine");
     $("#branch2").css("background-color", "mediumaquamarine");
     return;
   }
   //if 4 is pressed
   if(key == 52){
-    $(".quicktest").css("display", "none")
-    $(".first svg").css("display", "none");
-    $(".second svg").css("display", "none");
+    //$(".quicktest").css("display", "none")
+    $(".first svg g").css("display", "none");
+    $(".second svg g").css("display", "none");
     $("#branch1").css("background-color", "white");
     $("#branch2").css("background-color", "white");
     return;
