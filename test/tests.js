@@ -6406,31 +6406,29 @@ describe("Interactions", function () {
         });
     });
     describe("KeyInteraction", function () {
-        it("Triggers the callback only when the Component is moused over and appropriate key is pressed", function () {
+        it("Triggers appropriate callback for the key pressed", function () {
             var svg = generateSVG(400, 400);
-            // svg.attr("id", "key-interaction-test");
             var component = new Plottable.Component.AbstractComponent();
             component.renderTo(svg);
-            var code = 65; // "a" key
-            var ki = new Plottable.Interaction.Key(code);
-            var callbackCalled = false;
-            var callback = function () {
-                callbackCalled = true;
-            };
-            ki.callback(callback);
+            var ki = new Plottable.Interaction.Key();
+            var aCode = 65; // "a" key
+            var bCode = 66; // "b" key
+            var aCallbackCalled = false;
+            var aCallback = function () { return aCallbackCalled = true; };
+            var bCallbackCalled = false;
+            var bCallback = function () { return bCallbackCalled = true; };
+            ki.on(aCode, aCallback);
+            ki.on(bCode, bCallback);
             component.registerInteraction(ki);
             var $hitbox = $(component.hitBox.node());
-            $hitbox.simulate("keydown", { keyCode: code });
-            assert.isFalse(callbackCalled, "callback is not called if component does not have mouse focus (before mouseover)");
             $hitbox.simulate("mouseover");
-            $hitbox.simulate("keydown", { keyCode: code });
-            assert.isTrue(callbackCalled, "callback gets called if the appropriate key is pressed while the component has mouse focus");
-            callbackCalled = false;
-            $hitbox.simulate("keydown", { keyCode: (code + 1) });
-            assert.isFalse(callbackCalled, "callback is not called if the wrong key is pressed");
-            $hitbox.simulate("mouseout");
-            $hitbox.simulate("keydown", { keyCode: code });
-            assert.isFalse(callbackCalled, "callback is not called if component does not have mouse focus (after mouseout)");
+            $hitbox.simulate("keydown", { keyCode: aCode });
+            assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
+            assert.isFalse(bCallbackCalled, "callback for \"b\" was not called when \"a\" key was pressed");
+            aCallbackCalled = false;
+            $hitbox.simulate("keydown", { keyCode: bCode });
+            assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"b\" key was pressed");
+            assert.isTrue(bCallbackCalled, "callback for \"b\" was called when \"b\" key was pressed");
             svg.remove();
         });
     });
@@ -6749,6 +6747,31 @@ describe("Dispatchers", function () {
             assert.isTrue(mousemoveCalled, "mousemove callback was called");
             triggerFakeMouseEvent("mouseout", target, targetX, targetY);
             assert.isTrue(mouseoutCalled, "mouseout callback was called");
+            target.remove();
+        });
+    });
+    describe("Keypress Dispatcher", function () {
+        it("triggers the callback only when moused over the target", function () {
+            var target = generateSVG(400, 400);
+            var kpd = new Plottable.Dispatcher.Keypress(target);
+            var keyDownCalled = false;
+            var lastKeyCode;
+            kpd.onKeyDown(function (e) {
+                keyDownCalled = true;
+                lastKeyCode = e.keyCode;
+            });
+            kpd.connect();
+            var $target = $(target.node());
+            $target.simulate("keydown", { keyCode: 80 });
+            assert.isFalse(keyDownCalled, "didn't trigger callback if not moused over the target");
+            $target.simulate("mouseover");
+            $target.simulate("keydown", { keyCode: 80 });
+            assert.isTrue(keyDownCalled, "correctly triggers callback if moused over the target");
+            assert.strictEqual(lastKeyCode, 80, "correct event info was passed to the callback");
+            keyDownCalled = false;
+            $target.simulate("mouseout");
+            $target.simulate("keydown", { keyCode: 80 });
+            assert.isFalse(keyDownCalled, "didn't trigger callback after mousing out of the target");
             target.remove();
         });
     });
