@@ -1,17 +1,40 @@
 
-.plottable .colors-default {
-  color0: "#5279c7"; /* INDIGO */
-  color1: "#fd373e"; /* CORAL_RED */
-  color2: "#63c261"; /* FERN */
-  color3: "#fad419"; /* BRIGHT_SUN */
-  color4: "#2c2b6f"; /* JACARTA */
-  color5: "#ff7939"; /* BURNING_ORANGE */
-  color6: "#db2e65"; /* CERISE_RED */
-  color7: "#99ce50"; /* CONIFER */
-  color8: "#962565"; /* ROYAL_HEATH */
-  color9: "#06cccc"; /* ROBINS_EGG_BLUE */
+.plottable-colors-0 {
+  background-color: #5279c7; /* INDIGO */
 }
 
-.plottable .colors {
-  /* OVERWRITE COLORS */
+.plottable-colors-1 {
+  background-color: #fd373e; /* CORAL_RED */
+}
+
+.plottable-colors-2 {
+  background-color: #63c261; /* FERN */
+}
+
+.plottable-colors-3 {
+  background-color: #fad419; /* BRIGHT_SUN */
+}
+
+.plottable-colors-4 {
+  background-color: #2c2b6f; /* JACARTA */
+}
+
+.plottable-colors-5 {
+  background-color: #ff7939; /* BURNING_ORANGE */
+}
+
+.plottable-colors-6 {
+  background-color: #db2e65; /* CERISE_RED */
+}
+
+.plottable-colors-7 {
+  background-color: #99ce50; /* CONIFER */
+}
+
+.plottable-colors-8 {
+  background-color: #962565; /* ROYAL_HEATH */
+}
+
+.plottable-colors-9 {
+  background-color: #06cccc; /* ROBINS_EGG_BLUE */
 }
