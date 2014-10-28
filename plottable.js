@@ -4514,10 +4514,11 @@ var Plottable;
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             function Time(scale, orientation) {
-                _super.call(this, scale, orientation);
-                if (!this._isHorizontal()) {
-                    throw new Error("Only horizontal Time Axes are supported");
+                orientation = orientation.toLowerCase();
+                if (orientation !== "top" && orientation !== "bottom") {
+                    throw new Error("unsupported orientation: " + orientation);
                 }
+                _super.call(this, scale, orientation);
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
             }

@@ -461,8 +461,8 @@ var assert = chai.assert;
 describe("TimeAxis", function () {
     it("can not initialize vertical time axis", function () {
         var scale = new Plottable.Scale.Time();
-        assert.throws(function () { return new Plottable.Axis.Time(scale, "left"); }, "horizontal");
-        assert.throws(function () { return new Plottable.Axis.Time(scale, "right"); }, "horizontal");
+        assert.throws(function () { return new Plottable.Axis.Time(scale, "left"); }, "unsupported");
+        assert.throws(function () { return new Plottable.Axis.Time(scale, "right"); }, "unsupported");
     });
     it("major and minor intervals arrays are the same length", function () {
         assert.equal(Plottable.Axis.Time._majorIntervals.length, Plottable.Axis.Time._minorIntervals.length, "major and minor interval arrays must be same size");
