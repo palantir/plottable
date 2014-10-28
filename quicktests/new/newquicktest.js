@@ -63,8 +63,13 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
       var firstdiv = div.append("div").attr("class", "first");
       var seconddiv = div.append("div").attr("class", "second");
       var data = result.makeData();
-      runQuickTest(firstdiv, data, firstBranch ); //just runQuickTest twice here with same result
-      runQuickTest(seconddiv, data, secondBranch); //just runQuickTest twice here with same result
+
+      setTimeout(function(){
+        runQuickTest(firstdiv, data, firstBranch);
+      } , 3000); //just runQuickTest twice here with same result
+      setTimeout(function(){
+        runQuickTest(seconddiv, data, secondBranch);
+      } , 4000); //just runQuickTest twice here with same result
 
     });
   });//forEach
@@ -93,18 +98,21 @@ function loadPlottableBranches(category, branchList){
 
   $.getScript(listOfUrl[0], function(data, textStatus) { 
     if(textStatus === "success"){
-      console.log("success!");
+          console.log("success!");
+          console.log("Plottable version: " + Plottable.version);
       plottableBranches[branchName1] =  $.extend(true, {}, Plottable);
       Plottable = null;
 
       $.getScript(listOfUrl[1], function(data, testStatus){ //load second 
         if(textStatus === "success"){
+          console.log("success!");
+          console.log("Plottable version: " + Plottable.version);
+
           plottableBranches[branchName2] = $.extend(true, {}, Plottable);
           Plottable = null;
           filterQuickTests(category, branchList);
         }
       });
-      console.log("success!")
     }
     if(textStatus === "error"){
       console.log("errored!")
@@ -115,6 +123,7 @@ function loadPlottableBranches(category, branchList){
 
 //run a single quicktest
 function runQuickTest(div, data, branch){
+  console.log(branch)
   result.run(div, data, plottableBranches[branch])
 };
 
@@ -126,8 +135,8 @@ function clearTests(){
 }
 
 function resetDisplayProperties(){
-  $(".first, .first svg").css("display", "block");
-  $(".second, .second svg").css("display", "block");
+  $(".first, .first svg").css("display", "table");
+  $(".second, .second svg").css("display", "table");
   $("#branch1").css("background-color", "white");
   $("#branch2").css("background-color", "white");
 }
@@ -136,38 +145,40 @@ window.onkeyup = function(e){
   var key = e.keyCode ? e.keyCode : e.which;
   //if 1 is pressed
   if(key == 49){
+    debugger;
     $(".quicktest").css("display", "inline-block")
-    $(".first, .first svg").css("display", "block");
-    $(".second, .second svg").css("display", "none");
+    $(".first svg").css("display", "table");
+    $(".second svg").css("display", "none");
     $("#branch1").css("background-color", "mediumaquamarine");
     $("#branch2").css("background-color", "white");
+    return;
   }
   //if 2 is pressed
   if(key == 50){
     $(".quicktest").css("display", "inline-block")
-    $(".first, .first svg").css("display", "none");
-    $(".second, .second svg").css("display", "block");
+    $(".first svg").css("display", "none");
+    $(".second svg").css("display", "table");
     $("#branch1").css("background-color", "white");
     $("#branch2").css("background-color", "mediumaquamarine");
-
+    return;
   }
   //if 3 is pressed
   if(key == 51){
     $(".quicktest").css("display", "inline-block")
-    $(".first, .first svg").css("display", "block");
-    $(".second, .second svg").css("display", "block");
+    $(".first, .first svg").css("display", "table");
+    $(".second, .second svg").css("display", "table");
     $("#branch1").css("background-color", "mediumaquamarine");
     $("#branch2").css("background-color", "mediumaquamarine");
-
+    return;
   }
   //if 4 is pressed
   if(key == 52){
     $(".quicktest").css("display", "none")
-
-    $(".first, .first svg").css("display", "none");
-    $(".second, .second svg").css("display", "none");
+    $(".first svg").css("display", "none");
+    $(".second svg").css("display", "none");
     $("#branch1").css("background-color", "white");
     $("#branch2").css("background-color", "white");
+    return;
   }
 }
 
