@@ -18,7 +18,6 @@ export module Plot {
      * Constructs a VerticalBarPlot.
      *
      * @constructor
-     * @param {DatasetInterface | any} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */

@@ -41,8 +41,8 @@ describe("Plots", () => {
         assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
         assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
         assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
-        assert.equal(bar0.attr("x"), "150", "bar0 x is correct");
-        assert.equal(bar1.attr("x"), "450", "bar1 x is correct");
+        assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
+        assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
         assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
         assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
 
@@ -199,8 +199,8 @@ describe("Plots", () => {
         assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
         assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
         assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-        assert.equal(bar0.attr("y"), "300", "bar0 y is correct");
-        assert.equal(bar1.attr("y"), "100", "bar1 y is correct");
+        assert.equal(bar0.attr("y"), "295", "bar0 y is correct");
+        assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
         assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
         assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
 
@@ -324,6 +324,86 @@ describe("Plots", () => {
         assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "bar0 ypos");
         assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "bar1 ypos");
         svg.remove();
+      });
+    });
+
+    describe("Vertical Bar Plot With Bar Labels", () => {
+      var plot: Plottable.Plot.VerticalBar<string>;
+      var data: any[];
+      var dataset: Plottable.Dataset;
+      var xScale: Plottable.Scale.Ordinal;
+      var yScale: Plottable.Scale.Linear;
+      var svg: D3.Selection;
+
+      beforeEach(() => {
+        svg = generateSVG();
+        data = [{x: "foo", y: 5}, {x: "bar", y: 640}, {x: "zoo", y: 12345}];
+        dataset = new Plottable.Dataset(data);
+        xScale = new Plottable.Scale.Ordinal();
+        yScale = new Plottable.Scale.Linear();
+        plot = new Plottable.Plot.VerticalBar<string>(xScale, yScale);
+        plot.addDataset(dataset);
+      });
+
+      it("bar labels disabled by default", () => {
+        plot.renderTo(svg);
+        var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 0, "by default, no texts are drawn");
+        svg.remove();
+      });
+
+
+      it("bar labels render properly", () => {
+        plot.renderTo(svg);
+        plot.barLabelsEnabled(true);
+        var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 2, "both texts drawn");
+        assert.equal(texts[0], "640", "first label is 640");
+        assert.equal(texts[1], "12345", "first label is 12345");
+        svg.remove();
+      });
+
+      it("bar labels hide if bars too skinny", () => {
+        plot.barLabelsEnabled(true);
+        plot.renderTo(svg);
+        plot.barLabelFormatter((n: number) => n.toString() + (n === 12345 ? "looong" : ""));
+        var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 0, "no text drawn");
+        svg.remove();
+      });
+
+      it("formatters are used properly", () => {
+        plot.barLabelsEnabled(true);
+        plot.barLabelFormatter((n: number) => n.toString() + "%");
+        plot.renderTo(svg);
+        var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 2, "both texts drawn");
+        assert.equal(texts[0], "640%", "first label is 640%");
+        assert.equal(texts[1], "12345%", "first label is 12345%");
+        svg.remove();
+      });
+
+      it("bar labels are removed instantly on dataset change, even if animation is enabled", (done) => {
+        plot.barLabelsEnabled(true);
+        plot.animate(true);
+        plot.renderTo(svg);
+        var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 2, "both texts drawn");
+        var originalDrawLabels = plot._drawLabels;
+        var called = false;
+        plot._drawLabels = () => {
+          if (!called) {
+            originalDrawLabels.apply(plot);
+            texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+            assert.lengthOf(texts, 2, "texts were repopulated by drawLabels after the update");
+            svg.remove();
+            called = true; // for some reason, in phantomJS, `done` was being called multiple times and this caused the test to fail.
+            done();
+          }
+        };
+        dataset.data(data);
+        texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 0, "texts were immediately removed");
       });
     });
   });
