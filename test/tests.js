@@ -2323,6 +2323,12 @@ describe("Plots", function () {
                 assert.isNull(brandNew.selectBar(0, 0), "selects return empty after setup");
                 svg.remove();
             });
+            it("don't show points from outside of domain", function () {
+                xScale.domain(["C"]);
+                var bars = barPlot._renderArea.selectAll("rect");
+                assert.lengthOf(bars[0], 0, "no bars have been rendered");
+                svg.remove();
+            });
         });
         describe("Horizontal Bar Plot in Points Mode", function () {
             var svg;

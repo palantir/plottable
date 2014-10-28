@@ -1648,6 +1648,7 @@ declare module Plottable {
             _getDrawSelection(): D3.Selection;
             _drawStep(step: DrawStep): void;
             _enterData(data: any[]): void;
+            draw(data: any[], drawSteps: DrawStep[]): number;
         }
     }
 }
@@ -2754,6 +2755,7 @@ declare module Plottable {
              * x and y position in the Plot.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractXYPlot<X, Y>;
+            _generateAttrToProjector(): AttributeToProjector;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _updateXDomainer(): void;
             _updateYDomainer(): void;

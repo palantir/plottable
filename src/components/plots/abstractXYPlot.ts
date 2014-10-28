@@ -49,6 +49,19 @@ export module Plot {
       return this;
     }
 
+    public _generateAttrToProjector(): AttributeToProjector {
+      var attrToProjector: AttributeToProjector = super._generateAttrToProjector();
+      var positionXFn = attrToProjector["x"];
+      var positionYFn = attrToProjector["y"];
+      attrToProjector["defined"] = (d: any, i: number) => {
+        var positionX = positionXFn(d, i);
+        var positionY = positionYFn(d, i);
+        return positionX != null && positionX === positionX &&
+               positionY != null && positionY === positionY;
+      };
+      return attrToProjector;
+    }
+
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this._xScale.range([0, this.width()]);

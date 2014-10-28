@@ -3376,6 +3376,23 @@ var Plottable;
                 }
                 dataElements.exit().remove();
             };
+            Element.prototype.filterDefinedData = function (data, definedFunction) {
+                return definedFunction ? data.filter(definedFunction) : data;
+            };
+            Element.prototype.draw = function (data, drawSteps) {
+                var _this = this;
+                var modifiedDrawSteps = [];
+                drawSteps.forEach(function (d, i) {
+                    modifiedDrawSteps[i] = { animator: d.animator, attrToProjector: Plottable._Util.Methods.copyMap(d.attrToProjector) };
+                });
+                var definedData = modifiedDrawSteps.reduce(function (data, drawStep) { return _this.filterDefinedData(data, drawStep.attrToProjector["defined"]); }, data);
+                modifiedDrawSteps.forEach(function (d) {
+                    if (d.attrToProjector["defined"]) {
+                        delete d.attrToProjector["defined"];
+                    }
+                });
+                return _super.prototype.draw.call(this, definedData, modifiedDrawSteps);
+            };
             return Element;
         })(_Drawer.AbstractDrawer);
         _Drawer.Element = Element;
@@ -6538,6 +6555,17 @@ var Plottable;
                 }
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
+            };
+            AbstractXYPlot.prototype._generateAttrToProjector = function () {
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var positionXFn = attrToProjector["x"];
+                var positionYFn = attrToProjector["y"];
+                attrToProjector["defined"] = function (d, i) {
+                    var positionX = positionXFn(d, i);
+                    var positionY = positionYFn(d, i);
+                    return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+                };
+                return attrToProjector;
             };
             AbstractXYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
