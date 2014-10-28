@@ -290,6 +290,65 @@ export module _Util {
         return window.setTimeout(f, time, args);
       }
     }
+
+    /**
+     * Throws an error if the reference is null.  Otherwise does nothing.
+     *
+     * @param {any} reference The reference to check
+     * @param {string} referenceName The name of the reference (default = "reference")
+     * @param {string} msg If provided, the error message to use
+     */
+    export function verifyNotNull(reference: any, referenceName = "reference", msg?: string) {
+      // Check if reference is null
+      // If reference is null throw an error with msg as the error msg if provided
+      // If msg is not provided, throw an error with a default msg with the referenceName
+      // Otherwise do nothing
+    }
+
+    /**
+     * Throws an error if the reference is undefined.  Otherwise does nothing.
+     *
+     * @param {any} reference The reference to check
+     * @param {string} referenceName The name of the reference (default = "reference")
+     * @param {string} msg If provided, the error message to use
+     */
+    export function verifyNotUndefined(reference: any, referenceName = "reference", msg?: string) {
+      // Check if reference is undefined
+      // If reference is undefined throw an error with msg as the error msg if provided
+      // If msg is not provided, throw an error with a default msg with the referenceName
+      // Otherwise do nothing
+    }
+
+    /**
+     * Throws an error if the reference is not of the specified type.  Otherwise does nothing.
+     *
+     * @param {any} reference The reference to check
+     * @param {string} classType The classType to check against
+     * @param {string} referenceName The name of the reference (default = "reference")
+     * @param {string} msg If provided, the error message to use
+     */
+    export function verifyType(reference: any, classType: string, referenceName = "reference", msg?: string) {
+      // Check if reference is of the same type as classType
+      // If reference is undefined throw an error with msg as the error msg if provided
+      // If msg is not provided, throw an error with a default msg with the referenceName
+      // Otherwise do nothing
+    }
+
+    /**
+     * Attempts to coerce the value of the reference to the specified type and returns the coerced value.
+     *
+     * @param {any} reference The reference to check
+     * @param {string} classType The classType to check against
+     * @param {string} referenceName The name of the reference (default = "reference")
+     * @param {string} msg If provided, the error message to use
+     * @returns {any} The coerced value
+     */
+    export function coerceType(reference: any, classType: string, referenceName = "reference", msg?: string): any {
+      // Switch on the classType
+      // If classType is number, coerce to number and return
+      // If classType is string, coerce to string and return
+      // ...
+    }
   }
 }
 }

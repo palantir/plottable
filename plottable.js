@@ -283,6 +283,69 @@ var Plottable;
                 }
             }
             Methods.setTimeout = setTimeout;
+            /**
+             * Throws an error if the reference is null.  Otherwise does nothing.
+             *
+             * @param {any} reference The reference to check
+             * @param {string} referenceName The name of the reference (default = "reference")
+             * @param {string} msg If provided, the error message to use
+             */
+            function verifyNotNull(reference, referenceName, msg) {
+                if (referenceName === void 0) { referenceName = "reference"; }
+                // Check if reference is null
+                // If reference is null throw an error with msg as the error msg if provided
+                // If msg is not provided, throw an error with a default msg with the referenceName
+                // Otherwise do nothing
+            }
+            Methods.verifyNotNull = verifyNotNull;
+            /**
+             * Throws an error if the reference is undefined.  Otherwise does nothing.
+             *
+             * @param {any} reference The reference to check
+             * @param {string} referenceName The name of the reference (default = "reference")
+             * @param {string} msg If provided, the error message to use
+             */
+            function verifyNotUndefined(reference, referenceName, msg) {
+                if (referenceName === void 0) { referenceName = "reference"; }
+                // Check if reference is undefined
+                // If reference is undefined throw an error with msg as the error msg if provided
+                // If msg is not provided, throw an error with a default msg with the referenceName
+                // Otherwise do nothing
+            }
+            Methods.verifyNotUndefined = verifyNotUndefined;
+            /**
+             * Throws an error if the reference is not of the specified type.  Otherwise does nothing.
+             *
+             * @param {any} reference The reference to check
+             * @param {string} classType The classType to check against
+             * @param {string} referenceName The name of the reference (default = "reference")
+             * @param {string} msg If provided, the error message to use
+             */
+            function verifyType(reference, classType, referenceName, msg) {
+                if (referenceName === void 0) { referenceName = "reference"; }
+                // Check if reference is of the same type as classType
+                // If reference is undefined throw an error with msg as the error msg if provided
+                // If msg is not provided, throw an error with a default msg with the referenceName
+                // Otherwise do nothing
+            }
+            Methods.verifyType = verifyType;
+            /**
+             * Attempts to coerce the value of the reference to the specified type and returns the coerced value.
+             *
+             * @param {any} reference The reference to check
+             * @param {string} classType The classType to check against
+             * @param {string} referenceName The name of the reference (default = "reference")
+             * @param {string} msg If provided, the error message to use
+             * @returns {any} The coerced value
+             */
+            function coerceType(reference, classType, referenceName, msg) {
+                if (referenceName === void 0) { referenceName = "reference"; }
+                // Switch on the classType
+                // If classType is number, coerce to number and return
+                // If classType is string, coerce to string and return
+                // ...
+            }
+            Methods.coerceType = coerceType;
         })(_Util.Methods || (_Util.Methods = {}));
         var Methods = _Util.Methods;
     })(Plottable._Util || (Plottable._Util = {}));
