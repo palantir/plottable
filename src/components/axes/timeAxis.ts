@@ -9,49 +9,63 @@ export module Axis {
   };
 
   /*
-   * Represents possible time intervals to generate ticks (marks and labels).
-   * Time axis will choose the most convinient one and create TimeTickGenerator
-   * based on it.
+   * Defines time interval for axis.
+   * inteval - time interval used to calculate next tick.
+   * steps - array of steps between two ticks. It needs to be in ascending order (see Time Axis description). By default [1].
+   * formatter - formatter used to display labels.
+   * nextInterval - specifies interval for bigger step.
    */
-  export interface TimeInterval {
-    timeUnit: D3.Time.Interval;
-    steps?: number[]; // possible steps for this time unit and formatter. By default [1]
+  export interface TimeIntervalDefinition {
+    interval: D3.Time.Interval;
+    steps?: number[];
     formatter: Formatter;
-    nextTimeUnit?: D3.Time.Interval; // Determines what should be min time unit for next layer.
+    nextInterval?: D3.Time.Interval;
   };
 
   /**
-   * Time tick generator determines how ticks and labels will be shown.
+   * Time tick definition, which explicitly show how ticks needs to be generated.
    */
-  interface TimeTickGenerator {
-    timeUnit: D3.Time.Interval;
+  interface TimeTickDefinition {
+    interval: D3.Time.Interval;
     step: number;
     formatter: Formatter;
   }
 
   /**
-   * Time tick generator for axis: minor and major
+   * Time tick definitions for both layers of time axis.
    */
-  interface AxisTickGenerator {
-    minor: TimeTickGenerator;
-    major?: TimeTickGenerator;
+  interface AxisTickDefinition {
+    smallStep: TimeTickDefinition;
+    BigStep?: TimeTickDefinition;
   }
 
   /*
-   * For given sorted array of time intervals function returns subarray
-   * of interval which meets given time unit constraints.
+   * For given sorted array of time interval definitions function returns lower bound
+   * of definitions which has less accuracy than given interval.
    */
-  function filterIntervals(intervals: TimeInterval[], minTimeUnit: D3.Time.Interval) {
-    var greaterTimeUnit = (interval: TimeInterval) => {
+  function calculateLowerBoundDefinitions(definitions: TimeIntervalDefinition[], minIterval: D3.Time.Interval) {
+    var moreGeneralInterval = (definition: TimeIntervalDefinition) => {
       var now = new Date();
-      return interval.timeUnit.offset(now, 1) >= minTimeUnit.offset(now, 1);
+      return definition.interval.offset(now, 1) >= minIterval.offset(now, 1);
     };
 
-    return intervals.filter(greaterTimeUnit);
+    return definitions.filter(moreGeneralInterval);
   }
 
-  var multiTime = Plottable.Formatters.multiTime;
+  var timeFormatter = Plottable.Formatters.time;
 
+  /**
+   * Time Axis is designed to show time interval. It is two layer axis: small step and big step.
+   * Both layers show interval, but with different accuracy. Big step is designed to show less accurate intervals and
+   * wraps multiple intervals from small step.
+   * To prevent duplication of information on axis TimeIntervalDefinition expose nextInterval property, which will define
+   * explicitly the interval for less accurate layer. If it is not provided axis assumes, that less accurate layer is not needed.
+   * Based on data component will try to find proper TimeStepGenerator based on available TimeIntervalDefinitions.
+   * Label of each tick needs to fit in available space, so compoment will iterate through TimeIntervalDefinitions
+   * and will compute the most accurate interval, which meets requirements. This requires from user specifies custom
+   * TimeIntervalDefinitions for small and big step in order from most accurate to most general.
+   * For details how ticks are generated visit: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
+   */
   export class Time extends AbstractAxis {
 
     public _majorTickLabels: D3.Selection;
@@ -126,32 +140,31 @@ export module Axis {
     ];
 
     /*
-     * Default major time intervals for axis.
+     * Default big step time interval definitions.
      */
-    public _newMajorIntervals: TimeInterval[] = [
-      {timeUnit: d3.time.day,   formatter: multiTime("%B %e, %Y")},
-      {timeUnit: d3.time.month, formatter: multiTime("%B %Y")},
-      {timeUnit: d3.time.year,  formatter: multiTime("%Y")}
+    public _bigStepDefinitions: TimeIntervalDefinition[] = [
+      {interval: d3.time.day,   formatter: timeFormatter("%B %e, %Y")},
+      {interval: d3.time.month, formatter: timeFormatter("%B %Y")},
+      {interval: d3.time.year,  formatter: timeFormatter("%Y")}
     ];
 
     /*
-     * Default minor time intervals for axis.
+     * Default small step time interval definitions.
      */
-    public _newMinorIntervals: TimeInterval[] = [
-      {timeUnit: d3.time.second, steps: [1, 5, 10, 15, 30], formatter: multiTime("%I:%M:%S %p"), nextTimeUnit: d3.time.day},
-      {timeUnit: d3.time.minute, steps: [1, 5, 10, 15, 30], formatter: multiTime("%I:%M %p"),    nextTimeUnit: d3.time.day},
-      {timeUnit: d3.time.hour,   steps: [1, 3, 6, 12],      formatter: multiTime("%I %p"),       nextTimeUnit: d3.time.day},
-      {timeUnit: d3.time.day,                               formatter: multiTime("%a %e"),       nextTimeUnit: d3.time.month},
-      {timeUnit: d3.time.day,                               formatter: multiTime("%e"),          nextTimeUnit: d3.time.month},
-      {timeUnit: d3.time.month,                             formatter: multiTime("%B"),          nextTimeUnit: d3.time.year},
-      {timeUnit: d3.time.month,  steps: [1, 3, 6],          formatter: multiTime("%b"),          nextTimeUnit: d3.time.year},
-      {timeUnit: d3.time.year,                              formatter: multiTime("%Y")},
-      {timeUnit: d3.time.year,                              formatter: multiTime("%y")},
-      {timeUnit: d3.time.year,   steps: [5, 25, 50, 100, 200, 500, 1000], formatter: multiTime("%Y")},
+    public _smallStepDefinitions: TimeIntervalDefinition[] = [
+      {interval: d3.time.second, steps: [1, 5, 10, 15, 30], formatter: timeFormatter("%I:%M:%S %p"), nextInterval: d3.time.day},
+      {interval: d3.time.minute, steps: [1, 5, 10, 15, 30], formatter: timeFormatter("%I:%M %p"),    nextInterval: d3.time.day},
+      {interval: d3.time.hour,   steps: [1, 3, 6, 12],      formatter: timeFormatter("%I %p"),       nextInterval: d3.time.day},
+      {interval: d3.time.day,                               formatter: timeFormatter("%a %e"),       nextInterval: d3.time.month},
+      {interval: d3.time.day,                               formatter: timeFormatter("%e"),          nextInterval: d3.time.month},
+      {interval: d3.time.month,                             formatter: timeFormatter("%B"),          nextInterval: d3.time.year},
+      {interval: d3.time.month,  steps: [1, 3, 6],          formatter: timeFormatter("%b"),          nextInterval: d3.time.year},
+      {interval: d3.time.year,                              formatter: timeFormatter("%Y")},
+      {interval: d3.time.year,                              formatter: timeFormatter("%y")},
+      {interval: d3.time.year,   steps: [5, 25, 50, 100, 200, 500, 1000], formatter: timeFormatter("%Y")},
     ];
 
-    private minorTimeTickGenerator: TimeTickGenerator;
-    private majorTimeTickGenerator: TimeTickGenerator;
+    private axisTickDefinition: AxisTickDefinition;
 
     private measurer: _Util.Text.TextMeasurer;
 
@@ -175,81 +188,73 @@ export module Axis {
     }
 
     /**
-     * Gets the current major time intervals on the axis. Tick marks and labels are generated 
-     * based on the provided time intervals.
+     * Gets the current big step layer time interval definitions.
      *
-     * @returns {TimeInterval[]} The current major time intervals.
+     * @returns {TimeTickDefinition[]} The current major time intervals.
      */
-    public majorTimeIntervals(): TimeInterval[];
+    public bigStepTimeIntervalDefinitions(): TimeIntervalDefinition[];
     /**
-     * Sets the current major time intervals on the axis.
+     * Sets the new big step layer time interval definitions.
      *
-     * @param {TimeInterval[]} intervals Possible time intervals to generate major 
-     * tick marks and labels.
+     * @param {TimeInterval[]} definitions Possible time interval definitions to create TimeTickDefinition.
      * @returns {Axis} The calling Axis.
      */
-    public majorTimeIntervals(intervals: TimeInterval[]): Time;
+    public bigStepTimeIntervalDefinitions(definitions: TimeIntervalDefinition[]): Time;
     /**
-     * Sets the min major time interval on the axis.
+     * Sets the min interval for time interval definitions.
      *
-     * @param {D3.Time.Interval} minInterval The smallest time interval to generate major ticks. 
+     * @param {D3.Time.Interval} minInterval The smallest time interval to create TimeTickDefinition. 
      *
      * @returns {Axis} The calling Axis.
      */
-    public majorTimeIntervals(minInterval: D3.Time.Interval): Time;
-    public majorTimeIntervals(param?: any): any {
+    public bigStepTimeIntervalDefinitions(minInterval: D3.Time.Interval): Time;
+    public bigStepTimeIntervalDefinitions(param?: any): any {
       if(param == null) {
-        return this._newMajorIntervals;
+        return this._bigStepDefinitions;
       } else if (param instanceof Array) {
-        // Check if timeUnits and steps are in ascending order and major are bigger than associated minor
-        this._newMajorIntervals = param;
+        this._bigStepDefinitions = param;
         return this;
       } else {
-        return this.majorTimeIntervals(filterIntervals(this._newMajorIntervals, param));
+        return this.bigStepTimeIntervalDefinitions(calculateLowerBoundDefinitions(this._bigStepDefinitions, param));
       }
     }
 
     /**
-     * Gets the current minor time intervals on the axis. Tick marks and labels are generated 
-     * based on the provided time intervals.
+     * Gets the current small step layer time interval definitions.
      *
-     * @returns {TimeInterval[]} The current minor time intervals.
+     * @returns {TimeTickDefinition[]} The current major time intervals.
      */
-    public minorTimeIntervals(): TimeInterval[];
+    public smallStepTimeIntervalDefinitions(): TimeIntervalDefinition[];
     /**
-     * Sets the current minor time intervals on the axis.
+     * Sets the new small step layer time interval definitions.
      *
-     * @param {TimeInterval[]} intervals Possible time intervals to generate minor 
-     * tick marks and labels.
+     * @param {TimeInterval[]} definitions Possible time interval definitions to create TimeTickDefinition.
      * @returns {Axis} The calling Axis.
      */
-    public minorTimeIntervals(intervals: TimeInterval[]): Time;
+    public smallStepTimeIntervalDefinitions(definitions: TimeIntervalDefinition[]): Time;
     /**
-     * Sets the min minor time interval on the axis.
+     * Sets the min interval for time interval definitions.
      *
-     * @param {D3.Time.Interval} minInterval The smallest time interval to generate minor ticks. 
+     * @param {D3.Time.Interval} minInterval The smallest time interval to create TimeTickDefinition. 
      *
      * @returns {Axis} The calling Axis.
      */
-    public minorTimeIntervals(minInterval: D3.Time.Interval): Time;
-    public minorTimeIntervals(param?: any): any {
+    public smallStepTimeIntervalDefinitions(minInterval: D3.Time.Interval): Time;
+    public smallStepTimeIntervalDefinitions(param?: any): any {
       if(param == null){
-        return this._newMinorIntervals;
+        return this._smallStepDefinitions;
       } else if (param instanceof Array) {
-        // Check if timeUnits and steps are in ascending order and major are bigger than associated minor
-        this._newMinorIntervals = param;
+        this._smallStepDefinitions = param;
         return this;
       } else {
-        return this.minorTimeIntervals(filterIntervals(this._newMinorIntervals, param));
+        return this.smallStepTimeIntervalDefinitions(calculateLowerBoundDefinitions(this._smallStepDefinitions, param));
       }
     }
 
-    private calculateBestTimeTickGenerators(): AxisTickGenerator {
-      // All possible time tick generators for minot and major.
-      // Only if minor interval has next time unit, we will create major time tick generator.
-      var allTimeTickGenerators: AxisTickGenerator[] = [];
-      var bestTimeTickGenerator: AxisTickGenerator = {minor: null, major: null};
-      return bestTimeTickGenerator;
+    private calculateAxisTickDefinition(): AxisTickDefinition {
+      var possibleDifinitions: AxisTickDefinition[] = [];
+      var mostAccurateAxisTickDefinition: AxisTickDefinition = {smallStep: null, bigStep: null};
+      return mostAccurateAxisTickDefinition;
     }
 
     public _computeHeight() {
@@ -413,9 +418,7 @@ export module Axis {
     }
 
     public _doRender() {
-      var bestTimeTickGenerators = this.calculateBestTimeTickGenerators();
-      this.minorTimeTickGenerator = bestTimeTickGenerators.minor;
-      this.majorTimeTickGenerator = bestTimeTickGenerators.major;
+      this.axisTickDefinition = this.calculateAxisTickDefinition();
       super._doRender();
       var index = this.getTickLevel();
       this.renderTickLabels(this._minorTickLabels, Time._minorIntervals[index], 1);

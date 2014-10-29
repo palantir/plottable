@@ -1298,11 +1298,11 @@ var Plottable;
         }
         Formatters.siSuffix = siSuffix;
         /**
-         * Creates a formatter that displays dates.
+         * Creates a multi time formatter that displays dates.
          *
          * @returns {Formatter} A formatter for time/date values.
          */
-        function time() {
+        function multiTime() {
             var numFormats = 8;
             // these defaults were taken from d3
             // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
@@ -1347,20 +1347,23 @@ var Plottable;
                 }
             };
         }
-        Formatters.time = time;
+        Formatters.multiTime = multiTime;
         /**
-         * Creates a formatter that displays time/date using multiple time formats.
+         * Creates a time formatter that displays time/date using given specifier.
          *
-         * @param {string} [format] The format of displayed time/date.
+         * List of directives can be found on: https://github.com/mbostock/d3/wiki/Time-Formatting#format
+         *
+         * @param {string} [specifier] The specifier for the formatter.
          *
          * @returns {Formatter} A formatter for time/date values.
          */
-        function multiTime(format) {
+        function time(specifier) {
+            var format = d3.time.format(specifier);
             return function (d) {
-                return d3.time.format(format)(d);
+                return format(d);
             };
         }
-        Formatters.multiTime = multiTime;
+        Formatters.time = time;
         /**
          * Creates a formatter for relative dates.
          *
@@ -4525,17 +4528,29 @@ var Plottable;
         ;
         ;
         /*
-         * For given sorted array of time intervals function returns subarray
-         * of interval which meets given time unit constraints.
+         * For given sorted array of time interval definitions function returns lower bound
+         * of definitions which has less accuracy than given interval.
          */
-        function filterIntervals(intervals, minTimeUnit) {
-            var greaterTimeUnit = function (interval) {
+        function calculateLowerBoundDefinitions(definitions, minIterval) {
+            var moreGeneralInterval = function (definition) {
                 var now = new Date();
-                return interval.timeUnit.offset(now, 1) >= minTimeUnit.offset(now, 1);
+                return definition.interval.offset(now, 1) >= minIterval.offset(now, 1);
             };
-            return intervals.filter(greaterTimeUnit);
+            return definitions.filter(moreGeneralInterval);
         }
-        var multiTime = Plottable.Formatters.multiTime;
+        var timeFormatter = Plottable.Formatters.time;
+        /**
+         * Time Axis is designed to show time interval. It is two layer axis: small step and big step.
+         * Both layers show interval, but with different accuracy. Big step is designed to show less accurate intervals and
+         * wraps multiple intervals from small step.
+         * To prevent duplication of information on axis TimeIntervalDefinition expose nextInterval property, which will define
+         * explicitly the interval for less accurate layer. If it is not provided axis assumes, that less accurate layer is not needed.
+         * Based on data component will try to find proper TimeStepGenerator based on available TimeIntervalDefinitions.
+         * Label of each tick needs to fit in available space, so compoment will iterate through TimeIntervalDefinitions
+         * and will compute the most accurate interval, which meets requirements. This requires from user specifies custom
+         * TimeIntervalDefinitions for small and big step in order from most accurate to most general.
+         * For details how ticks are generated visit: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
+         */
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
@@ -4550,27 +4565,27 @@ var Plottable;
             function Time(scale, orientation) {
                 _super.call(this, scale, orientation);
                 /*
-                 * Default major time intervals for axis.
+                 * Default big step time interval definitions.
                  */
-                this._newMajorIntervals = [
-                    { timeUnit: d3.time.day, formatter: multiTime("%B %e, %Y") },
-                    { timeUnit: d3.time.month, formatter: multiTime("%B %Y") },
-                    { timeUnit: d3.time.year, formatter: multiTime("%Y") }
+                this._bigStepDefinitions = [
+                    { interval: d3.time.day, formatter: timeFormatter("%B %e, %Y") },
+                    { interval: d3.time.month, formatter: timeFormatter("%B %Y") },
+                    { interval: d3.time.year, formatter: timeFormatter("%Y") }
                 ];
                 /*
-                 * Default minor time intervals for axis.
+                 * Default small step time interval definitions.
                  */
-                this._newMinorIntervals = [
-                    { timeUnit: d3.time.second, steps: [1, 5, 10, 15, 30], formatter: multiTime("%I:%M:%S %p"), nextTimeUnit: d3.time.day },
-                    { timeUnit: d3.time.minute, steps: [1, 5, 10, 15, 30], formatter: multiTime("%I:%M %p"), nextTimeUnit: d3.time.day },
-                    { timeUnit: d3.time.hour, steps: [1, 3, 6, 12], formatter: multiTime("%I %p"), nextTimeUnit: d3.time.day },
-                    { timeUnit: d3.time.day, formatter: multiTime("%a %e"), nextTimeUnit: d3.time.month },
-                    { timeUnit: d3.time.day, formatter: multiTime("%e"), nextTimeUnit: d3.time.month },
-                    { timeUnit: d3.time.month, formatter: multiTime("%B"), nextTimeUnit: d3.time.year },
-                    { timeUnit: d3.time.month, steps: [1, 3, 6], formatter: multiTime("%b"), nextTimeUnit: d3.time.year },
-                    { timeUnit: d3.time.year, formatter: multiTime("%Y") },
-                    { timeUnit: d3.time.year, formatter: multiTime("%y") },
-                    { timeUnit: d3.time.year, steps: [5, 25, 50, 100, 200, 500, 1000], formatter: multiTime("%Y") },
+                this._smallStepDefinitions = [
+                    { interval: d3.time.second, steps: [1, 5, 10, 15, 30], formatter: timeFormatter("%I:%M:%S %p"), nextInterval: d3.time.day },
+                    { interval: d3.time.minute, steps: [1, 5, 10, 15, 30], formatter: timeFormatter("%I:%M %p"), nextInterval: d3.time.day },
+                    { interval: d3.time.hour, steps: [1, 3, 6, 12], formatter: timeFormatter("%I %p"), nextInterval: d3.time.day },
+                    { interval: d3.time.day, formatter: timeFormatter("%a %e"), nextInterval: d3.time.month },
+                    { interval: d3.time.day, formatter: timeFormatter("%e"), nextInterval: d3.time.month },
+                    { interval: d3.time.month, formatter: timeFormatter("%B"), nextInterval: d3.time.year },
+                    { interval: d3.time.month, steps: [1, 3, 6], formatter: timeFormatter("%b"), nextInterval: d3.time.year },
+                    { interval: d3.time.year, formatter: timeFormatter("%Y") },
+                    { interval: d3.time.year, formatter: timeFormatter("%y") },
+                    { interval: d3.time.year, steps: [5, 25, 50, 100, 200, 500, 1000], formatter: timeFormatter("%Y") },
                 ];
                 orientation = orientation.toLowerCase();
                 if (orientation !== "top" && orientation !== "bottom") {
@@ -4579,38 +4594,34 @@ var Plottable;
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
             }
-            Time.prototype.majorTimeIntervals = function (param) {
+            Time.prototype.bigStepTimeIntervalDefinitions = function (param) {
                 if (param == null) {
-                    return this._newMajorIntervals;
+                    return this._bigStepDefinitions;
                 }
                 else if (param instanceof Array) {
-                    // Check if timeUnits and steps are in ascending order and major are bigger than associated minor
-                    this._newMajorIntervals = param;
+                    this._bigStepDefinitions = param;
                     return this;
                 }
                 else {
-                    return this.majorTimeIntervals(filterIntervals(this._newMajorIntervals, param));
+                    return this.bigStepTimeIntervalDefinitions(calculateLowerBoundDefinitions(this._bigStepDefinitions, param));
                 }
             };
-            Time.prototype.minorTimeIntervals = function (param) {
+            Time.prototype.smallStepTimeIntervalDefinitions = function (param) {
                 if (param == null) {
-                    return this._newMinorIntervals;
+                    return this._smallStepDefinitions;
                 }
                 else if (param instanceof Array) {
-                    // Check if timeUnits and steps are in ascending order and major are bigger than associated minor
-                    this._newMinorIntervals = param;
+                    this._smallStepDefinitions = param;
                     return this;
                 }
                 else {
-                    return this.minorTimeIntervals(filterIntervals(this._newMinorIntervals, param));
+                    return this.smallStepTimeIntervalDefinitions(calculateLowerBoundDefinitions(this._smallStepDefinitions, param));
                 }
             };
-            Time.prototype.calculateBestTimeTickGenerators = function () {
-                // All possible time tick generators for minot and major.
-                // Only if minor interval has next time unit, we will create major time tick generator.
-                var allTimeTickGenerators = [];
-                var bestTimeTickGenerator = { minor: null, major: null };
-                return bestTimeTickGenerator;
+            Time.prototype.calculateAxisTickDefinition = function () {
+                var possibleDifinitions = [];
+                var mostAccurateAxisTickDefinition = { smallStep: null, bigStep: null };
+                return mostAccurateAxisTickDefinition;
             };
             Time.prototype._computeHeight = function () {
                 if (this._computedHeight !== null) {
@@ -4750,9 +4761,7 @@ var Plottable;
                 this.adjustTickLength(this.tickLabelPadding(), Time._minorIntervals[index]);
             };
             Time.prototype._doRender = function () {
-                var bestTimeTickGenerators = this.calculateBestTimeTickGenerators();
-                this.minorTimeTickGenerator = bestTimeTickGenerators.minor;
-                this.majorTimeTickGenerator = bestTimeTickGenerators.major;
+                this.axisTickDefinition = this.calculateAxisTickDefinition();
                 _super.prototype._doRender.call(this);
                 var index = this.getTickLevel();
                 this.renderTickLabels(this._minorTickLabels, Time._minorIntervals[index], 1);

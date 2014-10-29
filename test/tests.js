@@ -5492,7 +5492,7 @@ describe("Formatters", function () {
     });
     describe("time", function () {
         it("uses reasonable defaults", function () {
-            var timeFormatter = Plottable.Formatters.time();
+            var timeFormatter = Plottable.Formatters.multiTime();
             // year, month, day, hours, minutes, seconds, milliseconds
             var result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
             assert.strictEqual(result, "2000", "only the year was displayed");
@@ -5532,7 +5532,7 @@ describe("Formatters", function () {
     });
     describe("time", function () {
         it("uses reasonable defaults", function () {
-            var timeFormatter = Plottable.Formatters.time();
+            var timeFormatter = Plottable.Formatters.multiTime();
             // year, month, day, hours, minutes, seconds, milliseconds
             var result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
             assert.strictEqual(result, "2000", "only the year was displayed");

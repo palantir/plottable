@@ -498,19 +498,21 @@ declare module Plottable {
          */
         function siSuffix(precision?: number): (d: any) => string;
         /**
-         * Creates a formatter that displays dates.
+         * Creates a multi time formatter that displays dates.
          *
          * @returns {Formatter} A formatter for time/date values.
          */
-        function time(): (d: any) => string;
+        function multiTime(): (d: any) => string;
         /**
-         * Creates a formatter that displays time/date using multiple time formats.
+         * Creates a time formatter that displays time/date using given specifier.
          *
-         * @param {string} [format] The format of displayed time/date.
+         * List of directives can be found on: https://github.com/mbostock/d3/wiki/Time-Formatting#format
+         *
+         * @param {string} [specifier] The specifier for the formatter.
          *
          * @returns {Formatter} A formatter for time/date values.
          */
-        function multiTime(format: string): (d: any) => string;
+        function time(specifier: string): (d: any) => string;
         /**
          * Creates a formatter for relative dates.
          *
@@ -2106,20 +2108,32 @@ declare module Plottable {
             step: number;
             formatString: string;
         }
-        interface TimeInterval {
-            timeUnit: D3.Time.Interval;
+        interface TimeIntervalDefinition {
+            interval: D3.Time.Interval;
             steps?: number[];
             formatter: Formatter;
-            nextTimeUnit?: D3.Time.Interval;
+            nextInterval?: D3.Time.Interval;
         }
+        /**
+         * Time Axis is designed to show time interval. It is two layer axis: small step and big step.
+         * Both layers show interval, but with different accuracy. Big step is designed to show less accurate intervals and
+         * wraps multiple intervals from small step.
+         * To prevent duplication of information on axis TimeIntervalDefinition expose nextInterval property, which will define
+         * explicitly the interval for less accurate layer. If it is not provided axis assumes, that less accurate layer is not needed.
+         * Based on data component will try to find proper TimeStepGenerator based on available TimeIntervalDefinitions.
+         * Label of each tick needs to fit in available space, so compoment will iterate through TimeIntervalDefinitions
+         * and will compute the most accurate interval, which meets requirements. This requires from user specifies custom
+         * TimeIntervalDefinitions for small and big step in order from most accurate to most general.
+         * For details how ticks are generated visit: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
+         */
         class Time extends AbstractAxis {
             _majorTickLabels: D3.Selection;
             _minorTickLabels: D3.Selection;
             _scale: Scale.Time;
             static _minorIntervals: _TimeInterval[];
             static _majorIntervals: _TimeInterval[];
-            _newMajorIntervals: TimeInterval[];
-            _newMinorIntervals: TimeInterval[];
+            _bigStepDefinitions: TimeIntervalDefinition[];
+            _smallStepDefinitions: TimeIntervalDefinition[];
             /**
              * Constructs a TimeAxis.
              *
@@ -2131,51 +2145,47 @@ declare module Plottable {
              */
             constructor(scale: Scale.Time, orientation: string);
             /**
-             * Gets the current major time intervals on the axis. Tick marks and labels are generated
-             * based on the provided time intervals.
+             * Gets the current big step layer time interval definitions.
              *
-             * @returns {TimeInterval[]} The current major time intervals.
+             * @returns {TimeTickDefinition[]} The current major time intervals.
              */
-            majorTimeIntervals(): TimeInterval[];
+            bigStepTimeIntervalDefinitions(): TimeIntervalDefinition[];
             /**
-             * Sets the current major time intervals on the axis.
+             * Sets the new big step layer time interval definitions.
              *
-             * @param {TimeInterval[]} intervals Possible time intervals to generate major
-             * tick marks and labels.
+             * @param {TimeInterval[]} definitions Possible time interval definitions to create TimeTickDefinition.
              * @returns {Axis} The calling Axis.
              */
-            majorTimeIntervals(intervals: TimeInterval[]): Time;
+            bigStepTimeIntervalDefinitions(definitions: TimeIntervalDefinition[]): Time;
             /**
-             * Sets the min major time interval on the axis.
+             * Sets the min interval for time interval definitions.
              *
-             * @param {D3.Time.Interval} minInterval The smallest time interval to generate major ticks.
-             *
-             * @returns {Axis} The calling Axis.
-             */
-            majorTimeIntervals(minInterval: D3.Time.Interval): Time;
-            /**
-             * Gets the current minor time intervals on the axis. Tick marks and labels are generated
-             * based on the provided time intervals.
-             *
-             * @returns {TimeInterval[]} The current minor time intervals.
-             */
-            minorTimeIntervals(): TimeInterval[];
-            /**
-             * Sets the current minor time intervals on the axis.
-             *
-             * @param {TimeInterval[]} intervals Possible time intervals to generate minor
-             * tick marks and labels.
-             * @returns {Axis} The calling Axis.
-             */
-            minorTimeIntervals(intervals: TimeInterval[]): Time;
-            /**
-             * Sets the min minor time interval on the axis.
-             *
-             * @param {D3.Time.Interval} minInterval The smallest time interval to generate minor ticks.
+             * @param {D3.Time.Interval} minInterval The smallest time interval to create TimeTickDefinition.
              *
              * @returns {Axis} The calling Axis.
              */
-            minorTimeIntervals(minInterval: D3.Time.Interval): Time;
+            bigStepTimeIntervalDefinitions(minInterval: D3.Time.Interval): Time;
+            /**
+             * Gets the current small step layer time interval definitions.
+             *
+             * @returns {TimeTickDefinition[]} The current major time intervals.
+             */
+            smallStepTimeIntervalDefinitions(): TimeIntervalDefinition[];
+            /**
+             * Sets the new small step layer time interval definitions.
+             *
+             * @param {TimeInterval[]} definitions Possible time interval definitions to create TimeTickDefinition.
+             * @returns {Axis} The calling Axis.
+             */
+            smallStepTimeIntervalDefinitions(definitions: TimeIntervalDefinition[]): Time;
+            /**
+             * Sets the min interval for time interval definitions.
+             *
+             * @param {D3.Time.Interval} minInterval The smallest time interval to create TimeTickDefinition.
+             *
+             * @returns {Axis} The calling Axis.
+             */
+            smallStepTimeIntervalDefinitions(minInterval: D3.Time.Interval): Time;
             _computeHeight(): number;
             _setup(): void;
             _getTickIntervalValues(interval: _TimeInterval): any[];
