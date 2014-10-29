@@ -28,7 +28,7 @@ export module Plot {
       this._animators["bars-reset"] = new Animator.Null();
       this._animators["bars"] = new Animator.Base();
       this._animators["baseline"] = new Animator.Null();
-      this.baseline(this._baselineValue);
+//      this.baseline(this._baselineValue);
     }
 
     public _getDrawer(key: string) {
