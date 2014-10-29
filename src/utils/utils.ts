@@ -21,15 +21,17 @@ export module _Util {
      * @param {string} The warnings to print
      */
     export function warn(warning: string) {
-      /* tslint:disable:no-console */
-      if ((<any> window).console != null) {
-        if ((<any> window).console.warn != null) {
-          console.warn(warning);
-        } else if ((<any> window).console.log != null) {
-          console.log(warning);
+      if (SHOW_WARNINGS) {
+        /* tslint:disable:no-console */
+        if ((<any> window).console != null) {
+          if ((<any> window).console.warn != null) {
+            console.warn(warning);
+          } else if ((<any> window).console.log != null) {
+            console.log(warning);
+          }
         }
+        /* tslint:enable:no-console */
       }
-      /* tslint:enable:no-console */
     }
 
     /**

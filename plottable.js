@@ -4,12 +4,6 @@ Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
 
-/*!
-Plottable 0.34.0 (https://github.com/palantir/plottable)
-Copyright 2014 Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -32,16 +26,17 @@ var Plottable;
              * @param {string} The warnings to print
              */
             function warn(warning) {
-                /* tslint:disable:no-console */
-                if (window.console != null) {
-                    if (window.console.warn != null) {
-                        console.warn(warning);
-                    }
-                    else if (window.console.log != null) {
-                        console.log(warning);
+                if (Plottable.SHOW_WARNINGS) {
+                    /* tslint:disable:no-console */
+                    if (window.console != null) {
+                        if (window.console.warn != null) {
+                            console.warn(warning);
+                        }
+                        else if (window.console.log != null) {
+                            console.log(warning);
+                        }
                     }
                 }
-                /* tslint:enable:no-console */
             }
             Methods.warn = warn;
             /**
@@ -1401,6 +1396,13 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    /**
+     * Specifies if Plottable should show warnings.
+     */
+    Plottable.SHOW_WARNINGS = false;
+    /**
+     * Specifies the version of Plottable.
+     */
     Plottable.version = "0.34.0";
 })(Plottable || (Plottable = {}));
 

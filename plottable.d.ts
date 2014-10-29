@@ -525,6 +525,13 @@ declare module Plottable {
 
 
 declare module Plottable {
+    /**
+     * Specifies if Plottable should show warnings.
+     */
+    var SHOW_WARNINGS: boolean;
+    /**
+     * Specifies the version of Plottable.
+     */
     var version: string;
 }
 
