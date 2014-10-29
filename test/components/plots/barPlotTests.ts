@@ -300,6 +300,37 @@ describe("Plots", () => {
       });
     });
 
+    describe("Vertical Bar Plot time scale", () => {
+      var svg: D3.Selection;
+      var barPlot: Plottable.Plot.VerticalBar<number>;
+      var xScale: Plottable.Scale.Time;
+
+      beforeEach(() => {
+        svg = generateSVG(600, 400);
+        var data = [{ x: "12/01/92", y: 0, type: "a" },
+          { x: "12/01/93", y: 1, type: "a" },
+          { x: "12/01/94", y: 1, type: "a" },
+          { x: "12/01/95", y: 2, type: "a" },
+          { x: "12/01/96", y: 2, type: "a" },
+          { x: "12/01/97", y: 2, type: "a" }];
+        xScale = new Plottable.Scale.Time();
+        var yScale = new Plottable.Scale.Linear();
+        barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+        barPlot.addDataset(data)
+               .project("x", (d: any) => d3.time.format("%m/%d/%y").parse(d.x), xScale)
+               .project("y", "y", yScale)
+               .renderTo(svg);
+      });
+
+      it("bar width takes an appropriate value", () => {
+        var timeFormatter = d3.time.format("%m/%d/%y");
+        var expectedBarWidth = (xScale.scale(timeFormatter.parse("12/01/94")) - xScale.scale(timeFormatter.parse("12/01/93"))) * 0.95;
+        assert.closeTo(barPlot._getBarPixelWidth(), expectedBarWidth, 0.1, "width is difference between two dates");
+        svg.remove();
+      });
+
+    });
+
     describe("Horizontal Bar Plot in Points Mode", () => {
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;

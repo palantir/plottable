@@ -389,8 +389,8 @@ export module Plot {
       } else {
         var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
 
-        var barAccessorData = d3.set(_Util.Methods.flatten(this.datasets().map((dataset) => {
-          return dataset.data().map(barAccessor);
+        var barAccessorData: any[] = d3.set(_Util.Methods.flatten(this.datasets().map((dataset) => {
+          return dataset.data().map((d, i) => barAccessor(d, i).valueOf());
         }))).values().map((value) => +value);
 
         barAccessorData.sort((a, b) => a - b);
