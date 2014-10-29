@@ -41,6 +41,14 @@ export module Plot {
     }
 
     /**
+     * Gets the baseline value for the bars
+     *
+     * The baseline is the line that the bars are drawn from, defaulting to 0.
+     *
+     * @returns {number} The baseline value.
+     */
+    public baseline(): number;
+    /**
      * Sets the baseline for the bars to the specified value.
      *
      * The baseline is the line that the bars are drawn from, defaulting to 0.
@@ -48,7 +56,11 @@ export module Plot {
      * @param {number} value The value to position the baseline at.
      * @returns {AbstractBarPlot} The calling AbstractBarPlot.
      */
-    public baseline(value: number) {
+    public baseline(value: number): AbstractBarPlot<X, Y>;
+    public baseline(value?: number): any {
+      if (value == null) {
+        return this._baselineValue;
+      }
       this._baselineValue = value;
       this._updateXDomainer();
       this._updateYDomainer();

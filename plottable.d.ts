@@ -2849,6 +2849,14 @@ declare module Plottable {
             _getDrawer(key: string): _Drawer.Rect;
             _setup(): void;
             /**
+             * Gets the baseline value for the bars
+             *
+             * The baseline is the line that the bars are drawn from, defaulting to 0.
+             *
+             * @returns {number} The baseline value.
+             */
+            baseline(): number;
+            /**
              * Sets the baseline for the bars to the specified value.
              *
              * The baseline is the line that the bars are drawn from, defaulting to 0.
