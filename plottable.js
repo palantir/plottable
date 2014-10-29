@@ -26,17 +26,19 @@ var Plottable;
              * @param {string} The warnings to print
              */
             function warn(warning) {
-                if (Plottable.SHOW_WARNINGS) {
-                    /* tslint:disable:no-console */
-                    if (window.console != null) {
-                        if (window.console.warn != null) {
-                            console.warn(warning);
-                        }
-                        else if (window.console.log != null) {
-                            console.log(warning);
-                        }
+                if (!Plottable.SHOW_WARNINGS) {
+                    return;
+                }
+                /* tslint:disable:no-console */
+                if (window.console != null) {
+                    if (window.console.warn != null) {
+                        console.warn(warning);
+                    }
+                    else if (window.console.log != null) {
+                        console.log(warning);
                     }
                 }
+                /* tslint:enable:no-console */
             }
             Methods.warn = warn;
             /**
@@ -1399,10 +1401,12 @@ var Plottable;
     /**
      * Specifies if Plottable should show warnings.
      */
-    Plottable.SHOW_WARNINGS = false;
-    /**
-     * Specifies the version of Plottable.
-     */
+    Plottable.SHOW_WARNINGS = true;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     Plottable.version = "0.34.0";
 })(Plottable || (Plottable = {}));
 

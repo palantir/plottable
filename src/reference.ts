@@ -10,7 +10,8 @@
 
 /// <reference path="utils/formatters.ts" />
 
-/// <reference path="core/metadata.ts" />
+/// <reference path="core/configuration.ts" />
+/// <reference path="core/version.ts" />
 /// <reference path="core/colors.ts" />
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
