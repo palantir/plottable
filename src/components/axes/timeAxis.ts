@@ -9,50 +9,46 @@ export module Axis {
   };
 
   /*
-   * Defines time interval for axis.
+   * Defines time interval for tier.
    * inteval - time interval used to calculate next tick.
    * steps - array of steps between two ticks. It needs to be in ascending order (see Time Axis description). By default [1].
    * formatter - formatter used to display labels.
-   * nextInterval - specifies interval for bigger step.
    */
-  export interface TimeIntervalDefinition {
+  export interface TimeInterval {
     interval: D3.Time.Interval;
     steps?: number[];
     formatter: Formatter;
-    nextInterval?: D3.Time.Interval;
   };
 
+  export interface AxisTimeInterval {
+    tiers: TimeInterval[];
+  }
+
   /**
-   * Time tick definition, which explicitly show how ticks needs to be generated.
+   * Tick generator, which explicitly show how ticks needs to be generated on specific tier.
    */
-  interface TimeTickDefinition {
+  interface TickGenerator {
     interval: D3.Time.Interval;
     step: number;
     formatter: Formatter;
   }
 
-  /**
-   * Time tick definitions for both layers of time axis.
-   */
-  interface AxisTickDefinition {
-    smallStep: TimeTickDefinition;
-    BigStep?: TimeTickDefinition;
-  }
-
   /*
-   * For given sorted array of time interval definitions function returns lower bound
-   * of definitions which has less accuracy than given interval.
+   * For given sorted array of time intervals function returns lower bound
+   * of intervals which has less accuracy than given interval.
    */
-  function calculateLowerBoundDefinitions(definitions: TimeIntervalDefinition[], minIterval: D3.Time.Interval) {
-    var moreGeneralInterval = (definition: TimeIntervalDefinition) => {
+  function calculateLowerBoundDefinitions(intervals: AxisTimeInterval[], minIterval: D3.Time.Interval) {
+    var moreGeneralInterval = (interval: AxisTimeInterval) => {
       var now = new Date();
-      return definition.interval.offset(now, 1) >= minIterval.offset(now, 1);
+      var firstTier: TimeInterval = interval.tiers[0];
+      return firstTier.interval.offset(now, 1) >= minIterval.offset(now, 1);
     };
 
-    return definitions.filter(moreGeneralInterval);
+    return intervals.filter(moreGeneralInterval);
   }
 
-  var timeFormatter = Plottable.Formatters.time;
+  var tF = Plottable.Formatters.time;
+  var d3t = d3.time;
 
   /**
    * Time Axis is designed to show time interval. It is two layer axis: small step and big step.
@@ -140,31 +136,49 @@ export module Axis {
     ];
 
     /*
-     * Default big step time interval definitions.
+     * Default axis time intervals.
      */
-    public _bigStepDefinitions: TimeIntervalDefinition[] = [
-      {interval: d3.time.day,   formatter: timeFormatter("%B %e, %Y")},
-      {interval: d3.time.month, formatter: timeFormatter("%B %Y")},
-      {interval: d3.time.year,  formatter: timeFormatter("%Y")}
+    public _axisIntervals: AxisTimeInterval[] = [
+      {tiers: [
+        {interval: d3t.second, steps: [1, 5, 10, 15, 30], formatter: tF("%I:%M:%S %p")},
+        {interval: d3t.day, formatter: tF("%B %e, %Y")}
+        ]},
+      {tiers: [
+        {interval: d3t.minute, steps: [1, 5, 10, 15, 30], formatter: tF("%I:%M %p")},
+        {interval: d3t.day, formatter: tF("%B %e, %Y")}
+        ]},
+      {tiers: [
+        {interval: d3t.hour, steps: [1, 3, 6, 12], formatter: tF("%I %p")},
+        {interval: d3t.day, formatter: tF("%B %e, %Y")}
+        ]},
+      {tiers: [
+        {interval: d3t.day, formatter: tF("%a %e")},
+        {interval: d3t.month, formatter: tF("%B %Y")}
+        ]},
+      {tiers: [
+        {interval: d3t.day, formatter: tF("%e")},
+        {interval: d3t.month, formatter: tF("%B %Y")}
+        ]},
+      {tiers: [
+        {interval: d3t.month, formatter: tF("%B")},
+        {interval: d3t.year, formatter: tF("%Y")}
+        ]},
+      {tiers: [
+        {interval: d3t.month, steps: [1, 3, 6], formatter: tF("%b")},
+        {interval: d3t.year, formatter: tF("%Y")}
+        ]},
+      {tiers: [
+        {interval: d3t.year, formatter: tF("%Y")}
+        ]},
+      {tiers: [
+        {interval: d3t.year, formatter: tF("%y")}
+        ]},
+      {tiers: [
+        {interval: d3t.year, steps: [5, 25, 50, 100, 200, 500, 1000], formatter: tF("%Y")}
+        ]}
     ];
 
-    /*
-     * Default small step time interval definitions.
-     */
-    public _smallStepDefinitions: TimeIntervalDefinition[] = [
-      {interval: d3.time.second, steps: [1, 5, 10, 15, 30], formatter: timeFormatter("%I:%M:%S %p"), nextInterval: d3.time.day},
-      {interval: d3.time.minute, steps: [1, 5, 10, 15, 30], formatter: timeFormatter("%I:%M %p"),    nextInterval: d3.time.day},
-      {interval: d3.time.hour,   steps: [1, 3, 6, 12],      formatter: timeFormatter("%I %p"),       nextInterval: d3.time.day},
-      {interval: d3.time.day,                               formatter: timeFormatter("%a %e"),       nextInterval: d3.time.month},
-      {interval: d3.time.day,                               formatter: timeFormatter("%e"),          nextInterval: d3.time.month},
-      {interval: d3.time.month,                             formatter: timeFormatter("%B"),          nextInterval: d3.time.year},
-      {interval: d3.time.month,  steps: [1, 3, 6],          formatter: timeFormatter("%b"),          nextInterval: d3.time.year},
-      {interval: d3.time.year,                              formatter: timeFormatter("%Y")},
-      {interval: d3.time.year,                              formatter: timeFormatter("%y")},
-      {interval: d3.time.year,   steps: [5, 25, 50, 100, 200, 500, 1000], formatter: timeFormatter("%Y")},
-    ];
-
-    private axisTickDefinition: AxisTickDefinition;
+    public _mostAccurateInterval: AxisTimeInterval;
 
     private measurer: _Util.Text.TextMeasurer;
 
@@ -188,73 +202,41 @@ export module Axis {
     }
 
     /**
-     * Gets the current big step layer time interval definitions.
+     * Gets the current axis time intervals.
      *
-     * @returns {TimeTickDefinition[]} The current major time intervals.
+     * @returns {TimeTickDefinition[]} The current axis time intervals.
      */
-    public bigStepTimeIntervalDefinitions(): TimeIntervalDefinition[];
+    public axisTimeIntervals(): AxisTimeInterval[];
     /**
-     * Sets the new big step layer time interval definitions.
+     * Sets the new axis time intervals.
      *
-     * @param {TimeInterval[]} definitions Possible time interval definitions to create TimeTickDefinition.
+     * @param {AxisTimeInterval[]} intervals Possible time intervals to generate ticks.
      * @returns {Axis} The calling Axis.
      */
-    public bigStepTimeIntervalDefinitions(definitions: TimeIntervalDefinition[]): Time;
+    public axisTimeIntervals(intervals: AxisTimeInterval[]): Time;
     /**
-     * Sets the min interval for time interval definitions.
+     * Sets the min interval for axis time intervals.
      *
-     * @param {D3.Time.Interval} minInterval The smallest time interval to create TimeTickDefinition. 
-     *
+     * @param {D3.Time.Interval} minInterval The smallest time interval to generate ticks. 
      * @returns {Axis} The calling Axis.
      */
-    public bigStepTimeIntervalDefinitions(minInterval: D3.Time.Interval): Time;
-    public bigStepTimeIntervalDefinitions(param?: any): any {
-      if(param == null) {
-        return this._bigStepDefinitions;
-      } else if (param instanceof Array) {
-        this._bigStepDefinitions = param;
-        return this;
-      } else {
-        return this.bigStepTimeIntervalDefinitions(calculateLowerBoundDefinitions(this._bigStepDefinitions, param));
-      }
-    }
-
-    /**
-     * Gets the current small step layer time interval definitions.
-     *
-     * @returns {TimeTickDefinition[]} The current major time intervals.
-     */
-    public smallStepTimeIntervalDefinitions(): TimeIntervalDefinition[];
-    /**
-     * Sets the new small step layer time interval definitions.
-     *
-     * @param {TimeInterval[]} definitions Possible time interval definitions to create TimeTickDefinition.
-     * @returns {Axis} The calling Axis.
-     */
-    public smallStepTimeIntervalDefinitions(definitions: TimeIntervalDefinition[]): Time;
-    /**
-     * Sets the min interval for time interval definitions.
-     *
-     * @param {D3.Time.Interval} minInterval The smallest time interval to create TimeTickDefinition. 
-     *
-     * @returns {Axis} The calling Axis.
-     */
-    public smallStepTimeIntervalDefinitions(minInterval: D3.Time.Interval): Time;
-    public smallStepTimeIntervalDefinitions(param?: any): any {
+    public axisTimeIntervals(minInterval: D3.Time.Interval): Time;
+    public axisTimeIntervals(param?: any): any {
       if(param == null){
-        return this._smallStepDefinitions;
-      } else if (param instanceof Array) {
-        this._smallStepDefinitions = param;
-        return this;
-      } else {
-        return this.smallStepTimeIntervalDefinitions(calculateLowerBoundDefinitions(this._smallStepDefinitions, param));
+        return this._axisIntervals.map(t => t);
       }
+      var newIntervals: AxisTimeInterval[];
+      if (param instanceof Array) {
+        newIntervals = param;
+      } else {
+        newIntervals = calculateLowerBoundDefinitions(this._axisIntervals, param);
+      }
+      this._axisIntervals = param;
+      return this;
     }
 
-    private calculateAxisTickDefinition(): AxisTickDefinition {
-      var possibleDifinitions: AxisTickDefinition[] = [];
-      var mostAccurateAxisTickDefinition: AxisTickDefinition = {smallStep: null, bigStep: null};
-      return mostAccurateAxisTickDefinition;
+    private calculateMostAccurateAxisTimeInterval(): AxisTimeInterval {
+      return null;
     }
 
     public _computeHeight() {
@@ -418,7 +400,7 @@ export module Axis {
     }
 
     public _doRender() {
-      this.axisTickDefinition = this.calculateAxisTickDefinition();
+      this._mostAccurateInterval = this.calculateMostAccurateAxisTimeInterval();
       super._doRender();
       var index = this.getTickLevel();
       this.renderTickLabels(this._minorTickLabels, Time._minorIntervals[index], 1);

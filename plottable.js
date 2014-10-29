@@ -4528,17 +4528,19 @@ var Plottable;
         ;
         ;
         /*
-         * For given sorted array of time interval definitions function returns lower bound
-         * of definitions which has less accuracy than given interval.
+         * For given sorted array of time intervals function returns lower bound
+         * of intervals which has less accuracy than given interval.
          */
-        function calculateLowerBoundDefinitions(definitions, minIterval) {
-            var moreGeneralInterval = function (definition) {
+        function calculateLowerBoundDefinitions(intervals, minIterval) {
+            var moreGeneralInterval = function (interval) {
                 var now = new Date();
-                return definition.interval.offset(now, 1) >= minIterval.offset(now, 1);
+                var firstTier = interval.tiers[0];
+                return firstTier.interval.offset(now, 1) >= minIterval.offset(now, 1);
             };
-            return definitions.filter(moreGeneralInterval);
+            return intervals.filter(moreGeneralInterval);
         }
-        var timeFormatter = Plottable.Formatters.time;
+        var tF = Plottable.Formatters.time;
+        var d3t = d3.time;
         /**
          * Time Axis is designed to show time interval. It is two layer axis: small step and big step.
          * Both layers show interval, but with different accuracy. Big step is designed to show less accurate intervals and
@@ -4565,27 +4567,46 @@ var Plottable;
             function Time(scale, orientation) {
                 _super.call(this, scale, orientation);
                 /*
-                 * Default big step time interval definitions.
+                 * Default axis time intervals.
                  */
-                this._bigStepDefinitions = [
-                    { interval: d3.time.day, formatter: timeFormatter("%B %e, %Y") },
-                    { interval: d3.time.month, formatter: timeFormatter("%B %Y") },
-                    { interval: d3.time.year, formatter: timeFormatter("%Y") }
-                ];
-                /*
-                 * Default small step time interval definitions.
-                 */
-                this._smallStepDefinitions = [
-                    { interval: d3.time.second, steps: [1, 5, 10, 15, 30], formatter: timeFormatter("%I:%M:%S %p"), nextInterval: d3.time.day },
-                    { interval: d3.time.minute, steps: [1, 5, 10, 15, 30], formatter: timeFormatter("%I:%M %p"), nextInterval: d3.time.day },
-                    { interval: d3.time.hour, steps: [1, 3, 6, 12], formatter: timeFormatter("%I %p"), nextInterval: d3.time.day },
-                    { interval: d3.time.day, formatter: timeFormatter("%a %e"), nextInterval: d3.time.month },
-                    { interval: d3.time.day, formatter: timeFormatter("%e"), nextInterval: d3.time.month },
-                    { interval: d3.time.month, formatter: timeFormatter("%B"), nextInterval: d3.time.year },
-                    { interval: d3.time.month, steps: [1, 3, 6], formatter: timeFormatter("%b"), nextInterval: d3.time.year },
-                    { interval: d3.time.year, formatter: timeFormatter("%Y") },
-                    { interval: d3.time.year, formatter: timeFormatter("%y") },
-                    { interval: d3.time.year, steps: [5, 25, 50, 100, 200, 500, 1000], formatter: timeFormatter("%Y") },
+                this._axisIntervals = [
+                    { tiers: [
+                        { interval: d3t.second, steps: [1, 5, 10, 15, 30], formatter: tF("%I:%M:%S %p") },
+                        { interval: d3t.day, formatter: tF("%B %e, %Y") }
+                    ] },
+                    { tiers: [
+                        { interval: d3t.minute, steps: [1, 5, 10, 15, 30], formatter: tF("%I:%M %p") },
+                        { interval: d3t.day, formatter: tF("%B %e, %Y") }
+                    ] },
+                    { tiers: [
+                        { interval: d3t.hour, steps: [1, 3, 6, 12], formatter: tF("%I %p") },
+                        { interval: d3t.day, formatter: tF("%B %e, %Y") }
+                    ] },
+                    { tiers: [
+                        { interval: d3t.day, formatter: tF("%a %e") },
+                        { interval: d3t.month, formatter: tF("%B %Y") }
+                    ] },
+                    { tiers: [
+                        { interval: d3t.day, formatter: tF("%e") },
+                        { interval: d3t.month, formatter: tF("%B %Y") }
+                    ] },
+                    { tiers: [
+                        { interval: d3t.month, formatter: tF("%B") },
+                        { interval: d3t.year, formatter: tF("%Y") }
+                    ] },
+                    { tiers: [
+                        { interval: d3t.month, steps: [1, 3, 6], formatter: tF("%b") },
+                        { interval: d3t.year, formatter: tF("%Y") }
+                    ] },
+                    { tiers: [
+                        { interval: d3t.year, formatter: tF("%Y") }
+                    ] },
+                    { tiers: [
+                        { interval: d3t.year, formatter: tF("%y") }
+                    ] },
+                    { tiers: [
+                        { interval: d3t.year, steps: [5, 25, 50, 100, 200, 500, 1000], formatter: tF("%Y") }
+                    ] }
                 ];
                 orientation = orientation.toLowerCase();
                 if (orientation !== "top" && orientation !== "bottom") {
@@ -4594,34 +4615,22 @@ var Plottable;
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
             }
-            Time.prototype.bigStepTimeIntervalDefinitions = function (param) {
+            Time.prototype.axisTimeIntervals = function (param) {
                 if (param == null) {
-                    return this._bigStepDefinitions;
+                    return this._axisIntervals.map(function (t) { return t; });
                 }
-                else if (param instanceof Array) {
-                    this._bigStepDefinitions = param;
-                    return this;
+                var newIntervals;
+                if (param instanceof Array) {
+                    newIntervals = param;
                 }
                 else {
-                    return this.bigStepTimeIntervalDefinitions(calculateLowerBoundDefinitions(this._bigStepDefinitions, param));
+                    newIntervals = calculateLowerBoundDefinitions(this._axisIntervals, param);
                 }
+                this._axisIntervals = param;
+                return this;
             };
-            Time.prototype.smallStepTimeIntervalDefinitions = function (param) {
-                if (param == null) {
-                    return this._smallStepDefinitions;
-                }
-                else if (param instanceof Array) {
-                    this._smallStepDefinitions = param;
-                    return this;
-                }
-                else {
-                    return this.smallStepTimeIntervalDefinitions(calculateLowerBoundDefinitions(this._smallStepDefinitions, param));
-                }
-            };
-            Time.prototype.calculateAxisTickDefinition = function () {
-                var possibleDifinitions = [];
-                var mostAccurateAxisTickDefinition = { smallStep: null, bigStep: null };
-                return mostAccurateAxisTickDefinition;
+            Time.prototype.calculateMostAccurateAxisTimeInterval = function () {
+                return null;
             };
             Time.prototype._computeHeight = function () {
                 if (this._computedHeight !== null) {
@@ -4761,7 +4770,7 @@ var Plottable;
                 this.adjustTickLength(this.tickLabelPadding(), Time._minorIntervals[index]);
             };
             Time.prototype._doRender = function () {
-                this.axisTickDefinition = this.calculateAxisTickDefinition();
+                this._mostAccurateInterval = this.calculateMostAccurateAxisTimeInterval();
                 _super.prototype._doRender.call(this);
                 var index = this.getTickLevel();
                 this.renderTickLabels(this._minorTickLabels, Time._minorIntervals[index], 1);
