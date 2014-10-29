@@ -27,7 +27,7 @@ function run(div, data, Plottable) {
                                     .addDataset("d2", data[1])
                                     .addDataset("d3", data[2])
                                     .animate(true)
-                                    .barLabels(true);
+                                    .barLabelsEnabled(true);
 
   var center = stackedBarPlot.merge(new Plottable.Component.Legend(colorScale));
 
