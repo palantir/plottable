@@ -5463,6 +5463,28 @@ describe("Tick generators", function () {
             assert.throws(function () { return Plottable.Scale.TickGenerators.intervalTickGenerator(-2); }, "interval must be positive number");
         });
     });
+    describe("integer", function () {
+        it("normal case", function () {
+            var scale = new Plottable.Scale.Linear().domain([0, 4]);
+            var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
+            assert.deepEqual(ticks, [0, 1, 2, 3, 4], "only the integers are returned");
+        });
+        it("works across negative numbers", function () {
+            var scale = new Plottable.Scale.Linear().domain([-2, 1]);
+            var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
+            assert.deepEqual(ticks, [-2, -1, 0, 1], "only the integers are returned");
+        });
+        it("includes endticks", function () {
+            var scale = new Plottable.Scale.Linear().domain([-2.7, 1.5]);
+            var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
+            assert.deepEqual(ticks, [-2.5, -2, -1, 0, 1, 1.5], "end ticks are included");
+        });
+        it("all float ticks", function () {
+            var scale = new Plottable.Scale.Linear().domain([1.1, 1.5]);
+            var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
+            assert.deepEqual(ticks, [1.1, 1.5], "only the end ticks are returned");
+        });
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -5555,8 +5577,8 @@ describe("Formatters", function () {
             assert.strictEqual(result, "1.000", "defaults to three decimal places");
             result = fixed3(1.234);
             assert.strictEqual(result, "1.234", "shows three decimal places");
-            result = fixed3(1.2345);
-            assert.strictEqual(result, "", "changed values are not shown (get turned into empty strings)");
+            result = fixed3(1.2346);
+            assert.strictEqual(result, "1.235", "changed values are not shown (get turned into empty strings)");
         });
         it("precision can be changed", function () {
             var fixed2 = Plottable.Formatters.fixed(2);
@@ -5564,7 +5586,7 @@ describe("Formatters", function () {
             assert.strictEqual(result, "1.00", "formatter was changed to show only two decimal places");
         });
         it("can be set to show rounded values", function () {
-            var fixed3 = Plottable.Formatters.fixed(3, false);
+            var fixed3 = Plottable.Formatters.fixed(3);
             var result = fixed3(1.2349);
             assert.strictEqual(result, "1.235", "long values are rounded correctly");
         });
@@ -5577,7 +5599,7 @@ describe("Formatters", function () {
             result = general(1.234);
             assert.strictEqual(result, "1.234", "shows up to three decimal places");
             result = general(1.2345);
-            assert.strictEqual(result, "", "(changed) values with more than three decimal places are not shown");
+            assert.strictEqual(result, "1.235", "(changed) values with more than three decimal places are not shown");
         });
         it("stringifies non-number values", function () {
             var general = Plottable.Formatters.general();
@@ -5662,7 +5684,7 @@ describe("Formatters", function () {
             assert.strictEqual(result2, "0.35%", "works even if multiplying by 100 does not make it an integer");
         });
         it("onlyShowUnchanged set to false", function () {
-            var percentFormatter = Plottable.Formatters.percentage(0, false);
+            var percentFormatter = Plottable.Formatters.percentage(0);
             var result = percentFormatter(0.075);
             assert.strictEqual(result, "8%", "shows formatter changed value");
         });
