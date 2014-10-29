@@ -1,7 +1,7 @@
 function makeData() {
   "use strict";
 
-  var data1 = [{name: "jon", y: 1, type: "q1"}, {name: "dan", y: 2, type: "q1"}, {name: "zoo", y: 1, type: "q1"}];
+  var data1 = [{name: "jon", y: 0.5, type: "q1"}, {name: "dan", y: 2, type: "q1"}, {name: "zoo", y: 1, type: "q1"}];
   var data2 = [{name: "jon", y: 2, type: "q2"}, {name: "dan", y: 4, type: "q2"}, {name: "zoo", y: 2, type: "q2"}];
   var data3 = [{name: "jon", y: 4, type: "q3"}, {name: "dan", y: 15, type: "q3"}, {name: "zoo", y: 15, type: "q3"}];
   return [data1, data2, data3];
@@ -26,7 +26,8 @@ function run(div, data, Plottable) {
                                     .addDataset("d1", data[0])
                                     .addDataset("d2", data[1])
                                     .addDataset("d3", data[2])
-                                    .animate(true);
+                                    .animate(true)
+                                    .barLabelsEnabled(true);
 
   var center = stackedBarPlot.merge(new Plottable.Component.Legend(colorScale));
 

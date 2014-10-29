@@ -115,6 +115,11 @@
   },
 
   {
+    "name":"interaction_hover_scatter",
+    "categories":["Label", "Scatter Plot", "Hover Interaction"]
+  },
+
+  {
     "name":"interaction_panzoom",
     "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Gridlines", "Merge", "PanZoom Interaction"]
   },
@@ -162,11 +167,6 @@
   {
     "name":"missing_stacked_bar",
     "categories":["Linear Scale", "Numeric Axis", "Animate", "Legend", "Category Axis", "Linear Scale", "Vertical Bar Plot", "Stacked Plot"]
-  },
-
-  {
-    "name":"negative_stacked_bar",
-    "categories":["Linear Scale", "Numeric Axis", "Legend", "Category Axis", "Linear Scale", "Vertical Bar Plot", "Stacked Plot"]
   },
 
   {
@@ -252,7 +252,14 @@
   {
     "name":"stocks",
     "categories":["Integration", "Vertical Bar Plot", "Legend", "Layout", "PanZoom Interaction", "Key Interaction"]
-  }, {
+  },
+
+  {
+    "name":"domain_adjustment_algorithm",
+    "categories":["Linear Scale", "Numeric Axis", "Line Plot", "Adjustment", "Layout"]
+  }, 
+
+  {
     "name":"tick_generator",
     "categories":["Linear Scale", "Tick Generation", "Line Plot"]
   }

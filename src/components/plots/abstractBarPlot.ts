@@ -7,9 +7,12 @@ export module Plot {
     private static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
-    public _barAlignmentFactor = 0;
+    public _barAlignmentFactor = 0.5;
     public _isVertical: boolean;
+    private _barLabelFormatter: Formatter = Formatters.identity();
+    private _barLabelsEnabled = false;
     private _hoverMode = "point";
+    private hideBarsIfAnyAreTooWide = true;
 
     /**
      * Constructs a BarPlot.
@@ -29,7 +32,7 @@ export module Plot {
     }
 
     public _getDrawer(key: string) {
-      return new Plottable._Drawer.Element(key).svgElement("rect");
+      return new Plottable._Drawer.Rect(key, this._isVertical);
     }
 
     public _setup() {
@@ -38,6 +41,14 @@ export module Plot {
     }
 
     /**
+     * Gets the baseline value for the bars
+     *
+     * The baseline is the line that the bars are drawn from, defaulting to 0.
+     *
+     * @returns {number} The baseline value.
+     */
+    public baseline(): number;
+    /**
      * Sets the baseline for the bars to the specified value.
      *
      * The baseline is the line that the bars are drawn from, defaulting to 0.
@@ -45,7 +56,11 @@ export module Plot {
      * @param {number} value The value to position the baseline at.
      * @returns {AbstractBarPlot} The calling AbstractBarPlot.
      */
-    public baseline(value: number) {
+    public baseline(value: number): AbstractBarPlot<X, Y>;
+    public baseline(value?: number): any {
+      if (value == null) {
+        return this._baselineValue;
+      }
       this._baselineValue = value;
       this._updateXDomainer();
       this._updateYDomainer();
@@ -81,6 +96,52 @@ export module Plot {
         return <Extent> input;
       } else {
         throw new Error("input '" + input + "' can't be parsed as an Extent");
+      }
+    }
+
+    /**
+     * Get whether bar labels are enabled.
+     *
+     * @returns {boolean} Whether bars should display labels or not.
+     */
+    public barLabelsEnabled(): boolean;
+    /**
+     * Set whether bar labels are enabled.
+     * @param {boolean} Whether bars should display labels or not.
+     *
+     * @returns {AbstractBarPlot} The calling plot.
+     */
+    public barLabelsEnabled(enabled: boolean): AbstractBarPlot<X,Y>;
+    public barLabelsEnabled(enabled?: boolean): any {
+      if (enabled === undefined) {
+        return this._barLabelsEnabled;
+      } else {
+        this._barLabelsEnabled = enabled;
+        this._render();
+        return this;
+      }
+    }
+
+    /**
+     * Get the formatter for bar labels.
+     *
+     * @returns {Formatter} The formatting function for bar labels.
+     */
+    public barLabelFormatter(): Formatter;
+    /**
+     * Change the formatting function for bar labels.
+     * @param {Formatter} The formatting function for bar labels.
+     *
+     * @returns {AbstractBarPlot} The calling plot.
+     */
+    public barLabelFormatter(formatter: Formatter): AbstractBarPlot<X,Y>;
+    public barLabelFormatter(formatter?: Formatter): any {
+      if (formatter == null) {
+        return this._barLabelFormatter;
+      } else {
+        this._barLabelFormatter = formatter;
+        this._render();
+        return this;
       }
     }
 
@@ -182,7 +243,7 @@ export module Plot {
       }
     }
 
-    public _additionalPaint() {
+    public _additionalPaint(time: number) {
       var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 
@@ -194,6 +255,22 @@ export module Plot {
       };
 
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);
+
+      var drawers: _Drawer.Rect[] = <any> this._getDrawersInOrder();
+      drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
+      if (this._barLabelsEnabled) {
+        _Util.Methods.setTimeout(() => this._drawLabels(), time);
+      }
+    }
+
+    public _drawLabels() {
+      var drawers: _Drawer.Rect[] = <any> this._getDrawersInOrder();
+      var attrToProjector = this._generateAttrToProjector();
+      var dataToDraw = this._getDataToDraw();
+      this._datasetKeysInOrder.forEach((k, i) => drawers[i].drawText(dataToDraw.get(k), attrToProjector));
+      if (this.hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._someLabelsTooWide)) {
+        drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
+      }
     }
 
     public _generateDrawSteps(): _Drawer.DrawStep[] {
@@ -209,7 +286,6 @@ export module Plot {
         drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("bars-reset")});
       }
       drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("bars")});
-
       return drawSteps;
     }
 
@@ -250,7 +326,13 @@ export module Plot {
       attrToProjector["height"] = (d: any, i: number) => {
         return Math.abs(scaledBaseline - originalPositionFn(d, i));
       };
-
+      var primaryAccessor = this._projectors[primaryAttr].accessor;
+      if (this.barLabelsEnabled && this.barLabelFormatter) {
+        attrToProjector["label"] = (d: any, i: number) => {
+          return this._barLabelFormatter(primaryAccessor(d, i));
+        };
+        attrToProjector["positive"] = (d: any, i: number) => originalPositionFn(d, i) <= scaledBaseline;
+      }
       return attrToProjector;
     }
 

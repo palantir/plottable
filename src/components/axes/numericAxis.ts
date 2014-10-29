@@ -38,7 +38,7 @@ export module Axis {
         return this.measurer(formattedValue).width;
       });
 
-      var maxTextLength = _Util.Methods.max(textLengths);
+      var maxTextLength = _Util.Methods.max(textLengths, 0);
 
       if (this.tickLabelPositioning === "center") {
         this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
