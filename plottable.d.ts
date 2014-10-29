@@ -2114,7 +2114,7 @@ declare module Plottable {
              */
             constructor(scale: Scale.Time, orientation: string);
             orient(): string;
-            orient(newOrientation: string): Time;
+            orient(orientation: string): Time;
             _computeHeight(): number;
             _setup(): void;
             _getTickIntervalValues(interval: _TimeInterval): any[];

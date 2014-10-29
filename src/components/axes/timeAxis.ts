@@ -99,12 +99,12 @@ export module Axis {
     }
 
     public orient(): string;
-    public orient(newOrientation: string): Time;
-    public orient(s?: string): any {
-      if (s && (s.toLowerCase() === "right" || s.toLowerCase() === "left")) {
-        throw new Error(s + " is not a supported orientation for TimeAxis - only horizontal time axes are supported");
+    public orient(orientation: string): Time;
+    public orient(orientation?: string): any {
+      if (orientation && (orientation.toLowerCase() === "right" || orientation.toLowerCase() === "left")) {
+        throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
       }
-      return super.orient(s); // maintains getter-setter functionality
+      return super.orient(orientation); // maintains getter-setter functionality
     }
 
     public _computeHeight() {

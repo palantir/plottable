@@ -4518,11 +4518,11 @@ var Plottable;
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
             }
-            Time.prototype.orient = function (s) {
-                if (s && (s.toLowerCase() === "right" || s.toLowerCase() === "left")) {
-                    throw new Error(s + " is not a supported orientation for TimeAxis - only horizontal time axes are supported");
+            Time.prototype.orient = function (orientation) {
+                if (orientation && (orientation.toLowerCase() === "right" || orientation.toLowerCase() === "left")) {
+                    throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
                 }
-                return _super.prototype.orient.call(this, s); // maintains getter-setter functionality
+                return _super.prototype.orient.call(this, orientation); // maintains getter-setter functionality
             };
             Time.prototype._computeHeight = function () {
                 if (this._computedHeight !== null) {
