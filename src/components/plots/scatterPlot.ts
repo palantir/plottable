@@ -61,7 +61,7 @@ export module Plot {
       return drawSteps;
     }
 
-    public _getClosestStruckPoint(p: Point, range: number) {
+    public _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
       var drawers = <_Drawer.Element[]> this._getDrawersInOrder();
       var attrToProjector = this._generateAttrToProjector();
 
@@ -93,10 +93,24 @@ export module Plot {
         });
       });
 
+      if (!closestElement) {
+        return {
+          selection: null,
+          pixelPositions: null,
+          data: null
+        };
+      }
+
       var closestSelection = d3.select(closestElement);
+      var closestData = closestSelection.data();
+      var closestPoint = {
+        x: attrToProjector["cx"](closestData[0]),
+        y: attrToProjector["cy"](closestData[0])
+      };
       return {
-        selection: closestElement ? closestSelection : null,
-        data: closestElement ? closestSelection.data() : null
+        selection: closestSelection,
+        pixelPositions: [closestPoint],
+        data: closestSelection.data()
       };
     }
 

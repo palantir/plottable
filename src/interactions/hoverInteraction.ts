@@ -4,6 +4,7 @@ module Plottable {
 export module Interaction {
   export interface HoverData {
     data: any[];
+    pixelPositions: Point[];
     selection: D3.Selection;
   }
 
@@ -38,6 +39,7 @@ export module Interaction {
 
     private currentHoverData: HoverData = {
       data: null,
+      pixelPositions: null,
       selection: null
     };
 
@@ -55,6 +57,7 @@ export module Interaction {
         this.safeHoverOut(this.currentHoverData);
         this.currentHoverData = {
           data: null,
+          pixelPositions: null,
           selection: null
         };
       });
@@ -72,20 +75,29 @@ export module Interaction {
         return a;
       }
 
-      var notInB = (d: any) => b.data.indexOf(d) === -1;
+      var diffData: any[] = [];
+      var diffPoints: Point[] = [];
+      var diffElements: Element[] = [];
+      a.data.forEach((d: any, i: number) => {
+        if (b.data.indexOf(d) === -1) {
+          diffData.push(d);
+          diffPoints.push(a.pixelPositions[i]);
+          diffElements.push(a.selection[0][i]);
+        }
+      });
 
-      var diffData = a.data.filter(notInB);
       if (diffData.length === 0) {
         return {
           data: null,
+          pixelPositions: null,
           selection: null
         };
       }
 
-      var diffSelection = a.selection.filter(notInB);
       return {
         data: diffData,
-        selection: diffSelection
+        pixelPositions: diffPoints,
+        selection: d3.selectAll(diffElements)
       };
     }
 

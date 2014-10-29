@@ -6785,10 +6785,23 @@ var Plottable;
                         }
                     });
                 });
+                if (!closestElement) {
+                    return {
+                        selection: null,
+                        pixelPositions: null,
+                        data: null
+                    };
+                }
                 var closestSelection = d3.select(closestElement);
+                var closestData = closestSelection.data();
+                var closestPoint = {
+                    x: attrToProjector["cx"](closestData[0]),
+                    y: attrToProjector["cy"](closestData[0])
+                };
                 return {
-                    selection: closestElement ? closestSelection : null,
-                    data: closestElement ? closestSelection.data() : null
+                    selection: closestSelection,
+                    pixelPositions: [closestPoint],
+                    data: closestSelection.data()
                 };
             };
             //===== Hover logic =====
@@ -7191,9 +7204,23 @@ var Plottable;
                 }
                 else {
                     this.clearHoverSelection();
+                    return {
+                        data: null,
+                        pixelPositions: null,
+                        selection: null
+                    };
                 }
+                var points = [];
+                var projectors = this._generateAttrToProjector();
+                selectedBars.each(function (d, i) {
+                    points.push({
+                        x: projectors["x"](d, i) + projectors["width"](d, i) / 2,
+                        y: projectors["y"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["height"](d, i))
+                    });
+                });
                 return {
-                    data: selectedBars ? selectedBars.data() : null,
+                    data: selectedBars.data(),
+                    pixelPositions: points,
                     selection: selectedBars
                 };
             };
@@ -8967,6 +8994,7 @@ var Plottable;
                 _super.apply(this, arguments);
                 this.currentHoverData = {
                     data: null,
+                    pixelPositions: null,
                     selection: null
                 };
             }
@@ -8983,6 +9011,7 @@ var Plottable;
                     _this.safeHoverOut(_this.currentHoverData);
                     _this.currentHoverData = {
                         data: null,
+                        pixelPositions: null,
                         selection: null
                     };
                 });
@@ -8996,18 +9025,27 @@ var Plottable;
                 if (a.data == null || b.data == null) {
                     return a;
                 }
-                var notInB = function (d) { return b.data.indexOf(d) === -1; };
-                var diffData = a.data.filter(notInB);
+                var diffData = [];
+                var diffPoints = [];
+                var diffElements = [];
+                a.data.forEach(function (d, i) {
+                    if (b.data.indexOf(d) === -1) {
+                        diffData.push(d);
+                        diffPoints.push(a.pixelPositions[i]);
+                        diffElements.push(a.selection[0][i]);
+                    }
+                });
                 if (diffData.length === 0) {
                     return {
                         data: null,
+                        pixelPositions: null,
                         selection: null
                     };
                 }
-                var diffSelection = a.selection.filter(notInB);
                 return {
                     data: diffData,
-                    selection: diffSelection
+                    pixelPositions: diffPoints,
+                    selection: d3.selectAll(diffElements)
                 };
             };
             Hover.prototype.handleHoverOver = function (p) {
