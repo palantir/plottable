@@ -1794,6 +1794,98 @@ describe("Plots", function () {
             assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");
         });
     });
+    describe("Abstract XY Plot", function () {
+        var svg;
+        var xScale;
+        var yScale;
+        var xAccessor;
+        var yAccessor;
+        var simpleDataset;
+        var plot;
+        before(function () {
+            xAccessor = function (d) { return d.a; };
+            yAccessor = function (d) { return d.b; };
+        });
+        beforeEach(function () {
+            svg = generateSVG(500, 500);
+            simpleDataset = new Plottable.Dataset([{ a: -5, b: 6 }, { a: -2, b: 2 }, { a: 2, b: -2 }, { a: 5, b: -6 }]);
+            xScale = new Plottable.Scale.Linear();
+            yScale = new Plottable.Scale.Linear();
+            plot = new Plottable.Plot.AbstractXYPlot(xScale, yScale);
+            plot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).renderTo(svg);
+        });
+        it("plot auto domain scale to visible points", function () {
+            xScale.domain([-3, 3]);
+            assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
+            plot.automaticallyAdjustYScaleOverVisiblePoints(false);
+            plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+            yScale.domain([-6, 6]);
+            assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to visible points");
+            svg.remove();
+        });
+        it("no visible points", function () {
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            xScale.domain([-0.5, 0.5]);
+            assert.deepEqual(yScale.domain(), [-7, 7], "domain has been not been adjusted");
+            svg.remove();
+        });
+        it("automaticallyAdjustYScaleOverVisiblePoints disables autoDomain", function () {
+            xScale.domain([-2, 2]);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.renderTo(svg);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been been adjusted");
+            svg.remove();
+        });
+        it("show all data", function () {
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            xScale.domain([-0.5, 0.5]);
+            plot.showAllData();
+            assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
+            assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
+            svg.remove();
+        });
+        it("show all data without auto adjust domain", function () {
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            xScale.domain([-0.5, 0.5]);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(false);
+            plot.showAllData();
+            assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
+            assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
+            svg.remove();
+        });
+        it("no cycle in auto domain on plot", function () {
+            var zScale = new Plottable.Scale.Linear().domain([-10, 10]);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            var plot2 = new Plottable.Plot.AbstractXYPlot(zScale, yScale).automaticallyAdjustXScaleOverVisiblePoints(true).project("x", xAccessor, zScale).project("y", yAccessor, yScale).addDataset(simpleDataset);
+            var plot3 = new Plottable.Plot.AbstractXYPlot(zScale, xScale).automaticallyAdjustYScaleOverVisiblePoints(true).project("x", xAccessor, zScale).project("y", yAccessor, xScale).addDataset(simpleDataset);
+            plot2.renderTo(svg);
+            plot3.renderTo(svg);
+            xScale.domain([-2, 2]);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "y domain is adjusted by x domain using custom algorithm and domainer");
+            assert.deepEqual(zScale.domain(), [-2.5, 2.5], "z domain is adjusted by y domain using custom algorithm and domainer");
+            assert.deepEqual(xScale.domain(), [-2, 2], "x domain is not adjusted using custom algorithm and domainer");
+            svg.remove();
+        });
+        it("listeners are deregistered after removal", function () {
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.remove();
+            var key2callback = xScale.broadcaster.key2callback;
+            assert.isUndefined(key2callback.get("yDomainAdjustment" + plot._plottableID), "the plot is no longer attached to the xScale");
+            key2callback = yScale.broadcaster.key2callback;
+            assert.isUndefined(key2callback.get("xDomainAdjustment" + plot._plottableID), "the plot is no longer attached to the yScale");
+            svg.remove();
+        });
+        it("listeners are deregistered for changed scale", function () {
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            var newScale = new Plottable.Scale.Linear().domain([-10, 10]);
+            plot.project("x", xAccessor, newScale);
+            xScale.domain([-2, 2]);
+            assert.deepEqual(yScale.domain(), [-7, 7], "replaced xScale didn't adjust yScale");
+            svg.remove();
+        });
+    });
 });
 
 ///<reference path="../../testReference.ts" />
@@ -4300,14 +4392,14 @@ describe("Component behavior", function () {
         before(function () {
             oldRegister = Plottable.Core.ResizeBroadcaster.register;
             oldDeregister = Plottable.Core.ResizeBroadcaster.deregister;
-            var fakeRegister = function (c) {
+            var mockRegister = function (c) {
                 registeredComponents.add(c._plottableID);
             };
-            var fakeDeregister = function (c) {
+            var mockDeregister = function (c) {
                 registeredComponents.remove(c._plottableID);
             };
-            Plottable.Core.ResizeBroadcaster.register = fakeRegister;
-            Plottable.Core.ResizeBroadcaster.deregister = fakeDeregister;
+            Plottable.Core.ResizeBroadcaster.register = mockRegister;
+            Plottable.Core.ResizeBroadcaster.deregister = mockDeregister;
         });
         after(function () {
             Plottable.Core.ResizeBroadcaster.register = oldRegister;
@@ -4339,6 +4431,13 @@ describe("Component behavior", function () {
             c.renderTo(svg);
             c.autoResize(false);
             assert.isFalse(registeredComponents.has(id), "component was deregistered after rendering");
+        });
+        it("calling .remove deregisters a component", function () {
+            c.autoResize(true);
+            c.renderTo(svg);
+            assert.isTrue(registeredComponents.has(id), "component is registered");
+            c.remove();
+            assert.isFalse(registeredComponents.has(id), "component is deregistered after removal");
         });
     });
 });
