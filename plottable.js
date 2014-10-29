@@ -4,6 +4,12 @@ Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
 
+/*!
+Plottable 0.34.0 (https://github.com/palantir/plottable)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -6925,15 +6931,10 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
-            /**
-             * Sets the baseline for the bars to the specified value.
-             *
-             * The baseline is the line that the bars are drawn from, defaulting to 0.
-             *
-             * @param {number} value The value to position the baseline at.
-             * @returns {AbstractBarPlot} The calling AbstractBarPlot.
-             */
             AbstractBarPlot.prototype.baseline = function (value) {
+                if (value == null) {
+                    return this._baselineValue;
+                }
                 this._baselineValue = value;
                 this._updateXDomainer();
                 this._updateYDomainer();
