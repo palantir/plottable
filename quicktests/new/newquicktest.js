@@ -141,38 +141,43 @@ function resetDisplayProperties(){
 
 window.onkeyup = function(e){
   var key = e.keyCode ? e.keyCode : e.which;
-  //if 1 is pressed
-  if(key < 52){
-    //$(".quicktest").css("display", "none")
-    console.log("< 52");
-    $(".first svg g").css("display", "none");
-    $(".second svg g").css("display", "none");
-    $("#branch1").css("background-color", "white");
-    $("#branch2").css("background-color", "white");
-  }
+
+  var visibleQuickTests = $(".quicktest").toArray();
 
   if(key == 49){
-    //$(".quicktest").css("display", "inline-block")
-    $(".first svg g").css("display", "block");
-    $(".second svg g").css("display", "none");
+    visibleQuickTests.forEach(function(quicktest){
+      $(".first", quicktest).css("display", "block");
+      $(".second", quicktest).css("display", "none");
+      $(".second", quicktest).before($(".first", quicktest));
+    });
+
     $("#branch1").css("background-color", "mediumaquamarine");
     $("#branch2").css("background-color", "white");
+    
     return;
   }
   //if 2 is pressed
   if(key == 50){
     //$(".quicktest").css("display", "inline-block")
-    $(".first svg g").css("display", "none");
-    $(".second svg g").css("display", "block");
+    visibleQuickTests.forEach(function(quicktest){
+      $(".first", quicktest).css("display", "none");
+      $(".second", quicktest).css("display", "block");
+      $(".first", quicktest).before($(".second", quicktest));
+    });
+
     $("#branch1").css("background-color", "white");
     $("#branch2").css("background-color", "mediumaquamarine");
+    
     return;
   }
   //if 3 is pressed
   if(key == 51){
     //$(".quicktest").css("display", "inline-block")
-    $(".first, .first svg g").css("display", "block");
-    $(".second, .second svg g").css("display", "block");
+    visibleQuickTests.forEach(function(quicktest){
+      $(".first", quicktest).css("display", "block");
+      $(".second", quicktest).css("display", "block");
+      $(".first", quicktest).before($(".second", quicktest));
+    });
     $("#branch1").css("background-color", "mediumaquamarine");
     $("#branch2").css("background-color", "mediumaquamarine");
     return;
@@ -180,8 +185,11 @@ window.onkeyup = function(e){
   //if 4 is pressed
   if(key == 52){
     //$(".quicktest").css("display", "none")
-    $(".first svg g").css("display", "none");
-    $(".second svg g").css("display", "none");
+    visibleQuickTests.forEach(function(quicktest){
+      $(".first", quicktest).css("display", "none");
+      $(".second", quicktest).css("display", "none");
+      $(".first", quicktest).before($(".second", quicktest));
+    });
     $("#branch1").css("background-color", "white");
     $("#branch2").css("background-color", "white");
     return;
