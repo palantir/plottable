@@ -4,11 +4,9 @@ function makeData() {
   return makeRandomData(20);
 }
 
-function run(div, data, Plottable) {
+function run(svg, data, Plottable) {
   "use strict";
-
-  var svg = div.append("svg").attr("height", 500);
-
+  
   var xScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 

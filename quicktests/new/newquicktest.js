@@ -3,9 +3,8 @@ var qtestnames = [];
 var firstBranch;
 var secondBranch;
 var first = true; //boolean to set order
-var newWidth = Number($("#width").val());
-var newHeight = Number($("#height").val());
-
+var svgWidth;
+var svgHeight;
 
 function initialize(){
   var branches = [];
@@ -14,13 +13,16 @@ function initialize(){
 
   firstBranch = $("#branch1").val();
   secondBranch = $("#branch2").val();
-  newWidth = Number($("#width").val());
-  newHeight = Number($("#height").val());
+  svgWidth = Number($("#width").val());
+  svgHeight = Number($("#height").val());
+
+  setPlotDimensions(svgWidth, svgHeight);
 
   branches.push(firstBranch, secondBranch);
   clearTests();
 
   loadPlottableBranches(category, branches);
+
 }
 
 function filterQuickTests(category, branchList){
@@ -59,13 +61,13 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
       result = eval(text);
       var className = "quicktest " + name;
 
-      var div = d3.select("#results").append("div").attr("class", className).attr("width", newWidth).attr("height", newHeight);;
-      var firstdiv = div.append("div").attr("class", "first");
-      var seconddiv = div.append("div").attr("class", "second");
+      var div = d3.select("#results").append("div").attr("class", className);
+      var firstsvg = div.append("div").attr("class", "first").append("svg").attr("width", svgWidth).attr("height", svgHeight);;
+      var secondsvg = div.append("div").attr("class", "second").append("svg").attr("width", svgWidth).attr("height", svgHeight);;
       var data = result.makeData();
 
-        runQuickTest(firstdiv, data, firstBranch);
-        runQuickTest(seconddiv, data, secondBranch);
+      runQuickTest(firstsvg, data, firstBranch);
+      runQuickTest(secondsvg, data, secondBranch);
     });
   });//forEach
     
@@ -117,9 +119,11 @@ function loadPlottableBranches(category, branchList){
 }
 
 //run a single quicktest
-function runQuickTest(div, data, branch){
+function runQuickTest(svg, data, branch){
   try {
-    result.run(div, data, plottableBranches[branch])
+    result.run(svg, data, plottableBranches[branch])
+    setPlotDimensions();
+
   } catch (err) {
     setTimeout(function() {throw err;}, 0);
   }
@@ -142,9 +146,13 @@ function resetDisplayProperties(){
 window.onkeyup = function(e){
   var key = e.keyCode ? e.keyCode : e.which;
 
+  var inputActive = $("#branch1, #branch2, #width, #height").is(':focus');
+
+  if(inputActive){return;}
+
   var visibleQuickTests = $(".quicktest").toArray();
 
-  if(key == 49){
+  if (key == 49) {
     visibleQuickTests.forEach(function(quicktest){
       $(".first", quicktest).css("display", "block");
       $(".second", quicktest).css("display", "none");
@@ -157,7 +165,7 @@ window.onkeyup = function(e){
     return;
   }
   //if 2 is pressed
-  if(key == 50){
+  if (key == 50) {
     //$(".quicktest").css("display", "inline-block")
     visibleQuickTests.forEach(function(quicktest){
       $(".first", quicktest).css("display", "none");
@@ -167,11 +175,10 @@ window.onkeyup = function(e){
 
     $("#branch1").css("background-color", "white");
     $("#branch2").css("background-color", "mediumaquamarine");
-    
     return;
   }
   //if 3 is pressed
-  if(key == 51){
+  if (key == 51) {
     //$(".quicktest").css("display", "inline-block")
     visibleQuickTests.forEach(function(quicktest){
       $(".first", quicktest).css("display", "block");
@@ -183,7 +190,7 @@ window.onkeyup = function(e){
     return;
   }
   //if 4 is pressed
-  if(key == 52){
+  if (key == 52) {
     //$(".quicktest").css("display", "none")
     visibleQuickTests.forEach(function(quicktest){
       $(".first", quicktest).css("display", "none");
@@ -212,7 +219,7 @@ function showSizeControls(){
 }
 
 
-
-
-
-
+function setPlotDimensions(){
+  $(".quicktest").css("width", svgWidth);
+  $(".quicktest").css("height", svgHeight);
+}

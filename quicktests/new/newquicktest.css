@@ -1,15 +1,9 @@
 body{
-  font-family: Helvetica;
+  font-family: sans-serif;
 }
 
 h2{
-  font-family: Helvetica;
-}
-
-svg{
-  position: relative;
-  width: 500px;
-  height: 400px;
+  font-family: sans-serif;
 }
 
 .quicktest{
