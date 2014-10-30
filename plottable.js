@@ -26,7 +26,7 @@ var Plottable;
              * @param {string} The warnings to print
              */
             function warn(warning) {
-                if (!Plottable.SHOW_WARNINGS) {
+                if (!Plottable.Config.SHOW_WARNINGS) {
                     return;
                 }
                 /* tslint:disable:no-console */
@@ -1398,10 +1398,13 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    /**
-     * Specifies if Plottable should show warnings.
-     */
-    Plottable.SHOW_WARNINGS = true;
+    (function (Config) {
+        /**
+         * Specifies if Plottable should show warnings.
+         */
+        Config.SHOW_WARNINGS = true;
+    })(Plottable.Config || (Plottable.Config = {}));
+    var Config = Plottable.Config;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
