@@ -6929,7 +6929,6 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
-<<<<<<< HEAD
             AbstractBarPlot.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 // If a QuantitativeScale is used, the plot can easily extend outside the component boundary.
@@ -6957,16 +6956,6 @@ var Plottable;
                     return barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - _this._barAlignmentFactor));
                 }, barQScale);
             };
-            /**
-             * Sets the baseline for the bars to the specified value.
-             *
-             * The baseline is the line that the bars are drawn from, defaulting to 0.
-             *
-             * @param {number} value The value to position the baseline at.
-             * @returns {AbstractBarPlot} The calling AbstractBarPlot.
-             */
-=======
->>>>>>> develop
             AbstractBarPlot.prototype.baseline = function (value) {
                 if (value == null) {
                     return this._baselineValue;
@@ -7151,12 +7140,7 @@ var Plottable;
                 var secondaryAttr = this._isVertical ? "x" : "y";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
                 if (!attrToProjector["width"]) {
-<<<<<<< HEAD
                     attrToProjector["width"] = function () { return _this._getBarPixelWidth(); };
-=======
-                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
-                    attrToProjector["width"] = function (d, i) { return constantWidth; };
->>>>>>> develop
                 }
                 var positionF = attrToProjector[secondaryAttr];
                 var widthF = attrToProjector["width"];
@@ -7287,10 +7271,7 @@ var Plottable;
                 };
             };
             AbstractBarPlot._BarAlignmentToFactor = {};
-<<<<<<< HEAD
-=======
             AbstractBarPlot._DEFAULT_WIDTH = 10;
->>>>>>> develop
             return AbstractBarPlot;
         })(Plot.AbstractXYPlot);
         Plot.AbstractBarPlot = AbstractBarPlot;

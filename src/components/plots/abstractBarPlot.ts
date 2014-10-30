@@ -4,10 +4,7 @@ module Plottable {
 export module Plot {
   export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
-<<<<<<< HEAD
-=======
     public static _DEFAULT_WIDTH = 10;
->>>>>>> develop
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignmentFactor = 0.5;
@@ -334,12 +331,7 @@ export module Plot {
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       if (!attrToProjector["width"]) {
-<<<<<<< HEAD
         attrToProjector["width"] = () => this._getBarPixelWidth();
-=======
-        var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
-        attrToProjector["width"] = (d: any, i: number) => constantWidth;
->>>>>>> develop
       }
 
       var positionF = attrToProjector[secondaryAttr];
