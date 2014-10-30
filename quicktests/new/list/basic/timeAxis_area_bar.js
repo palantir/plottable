@@ -42,10 +42,9 @@ return [data1, data2, data3, data4, data5];
 
 }
 
-function run(div, data, Plottable) {
+function run(svg, data, Plottable) {
   "use strict";
 
-  var svg = div.append("svg").attr("height", 500);
   var formatter = d3.time.format("%Y");
   var xScale = new Plottable.Scale.Time().numTicks(5);
   var yScale1 = new Plottable.Scale.Linear();

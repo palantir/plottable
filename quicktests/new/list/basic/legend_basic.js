@@ -4,10 +4,8 @@ function makeData() {
   return [makeRandomData(50), makeRandomData(50)];
 }
 
-function run(div, data, Plottable) {
+function run(svg, data, Plottable) {
   "use strict";
-
-  var svg = div.append("svg").attr("height", 500);
 
   var dataseries1 = new Plottable.Dataset(data[0].slice(0, 20));
   dataseries1.metadata({name: "series1"});

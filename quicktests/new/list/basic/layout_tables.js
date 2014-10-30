@@ -4,10 +4,8 @@ function makeData() {
   return [makeRandomData(50), makeRandomData(50)];
 }
 
-function run(div, data, Plottable) {
+function run(svg, data, Plottable) {
   "use strict";
-
-  var svg = div.append("svg").attr("height", 500);
 
     var dataseries1 = makeRandomData(20);
     var dataseries2 = makeRandomData(50);

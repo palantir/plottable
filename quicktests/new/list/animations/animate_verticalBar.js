@@ -4,10 +4,8 @@ function makeData() {
   return makeRandomData(6);
 }
 
-function run(div, data, Plottable) {
+function run(svg, data, Plottable) {
   "use strict";
-
-  var svg = div.append("svg").attr("height", 500);
 
   var doAnimate = true;
 

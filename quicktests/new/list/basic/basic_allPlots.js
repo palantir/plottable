@@ -4,9 +4,8 @@ function makeData() {
   return makeRandomData(8);
 }
 
-function run(div, data, Plottable) {
+function run(svg, data, Plottable) {
   "use strict";
-  var svg = div.append("svg").attr("height", 500);
     //Axis
     var xScale = new Plottable.Scale.Linear();
     var yScale = new Plottable.Scale.Linear();

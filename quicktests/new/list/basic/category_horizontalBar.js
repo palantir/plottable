@@ -10,10 +10,9 @@ function makeData() {
       ];
 }
 
-function run(div, data, Plottable) {
+function run(svg, data, Plottable) {
   "use strict";
 
-    var svg = div.append("svg").attr("height", 500);
     var ds = new Plottable.Dataset(data);
     var yScale = new Plottable.Scale.Ordinal();
     var yAxis = new Plottable.Axis.Category(yScale, "left");
