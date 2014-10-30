@@ -4630,9 +4630,10 @@ var Plottable;
                 return this;
             };
             /**
-             * Based on possbile axis tier intervals component finds most accurate, which fits in available width.
+             * Based on possbile axis tier intervals component finds most accurate tier tick configurations,
+             * which fits in available width.
              */
-            Time.prototype.calculateTiersConfiguration = function () {
+            Time.prototype.calculateTierTickConfigurations = function () {
                 return [];
             };
             Time.prototype._computeHeight = function () {
@@ -4773,7 +4774,7 @@ var Plottable;
                 this.adjustTickLength(this.tickLabelPadding(), Time._minorIntervals[index]);
             };
             Time.prototype._doRender = function () {
-                this.tiersConfiguration = this.calculateTiersConfiguration();
+                this.tierTickConfigurations = this.calculateTierTickConfigurations();
                 _super.prototype._doRender.call(this);
                 var index = this.getTickLevel();
                 this.renderTickLabels(this._minorTickLabels, Time._minorIntervals[index], 1);

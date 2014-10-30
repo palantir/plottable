@@ -21,7 +21,7 @@ export module Axis {
   };
 
   /**
-   * Defines Axis tier intervals, which is set of tiers, which will be shown together.
+   * Defines Axis tier intervals, which is an array of tiers, which will be shown together.
    * Right now we support up to two tiers.
    */
   export interface AxisTierIntervals {
@@ -29,9 +29,9 @@ export module Axis {
   }
 
   /**
-   * Tier configuration, which explicitly show how ticks needs to be generated on specific tier.
+   * Tier tick configuration, which explicitly show how ticks needs to be generated on specific tier.
    */
-  interface TierConfiguration {
+  interface TierTickConfiguration {
     interval: D3.Time.Interval;
     step: number;
     formatter: Formatter;
@@ -182,7 +182,7 @@ export module Axis {
         ]}
     ];
 
-    private tiersConfiguration: TierConfiguration[];
+    private tierTickConfigurations: TierTickConfiguration[];
 
     private measurer: _Util.Text.TextMeasurer;
 
@@ -206,9 +206,9 @@ export module Axis {
     }
 
     /**
-     * Gets the copy of current possible axis tiers intervals.
+     * Gets the copy of the current possible axis tiers intervals.
      *
-     * @returns {AxisTierIntervals[]} The copy of current possible axis tier intervals.
+     * @returns {AxisTierIntervals[]} The copy of the current possible axis tier intervals.
      */
     public axisTierIntervals(): AxisTierIntervals[];
     /**
@@ -240,9 +240,10 @@ export module Axis {
     }
 
     /**
-     * Based on possbile axis tier intervals component finds most accurate, which fits in available width.
+     * Based on possbile axis tier intervals component finds most accurate tier tick configurations, 
+     * which fits in available width.
      */
-    private calculateTiersConfiguration(): TierConfiguration[] {
+    private calculateTierTickConfigurations(): TierTickConfiguration[] {
       return [];
     }
 
@@ -407,7 +408,7 @@ export module Axis {
     }
 
     public _doRender() {
-      this.tiersConfiguration = this.calculateTiersConfiguration();
+      this.tierTickConfigurations = this.calculateTierTickConfigurations();
       super._doRender();
       var index = this.getTickLevel();
       this.renderTickLabels(this._minorTickLabels, Time._minorIntervals[index], 1);

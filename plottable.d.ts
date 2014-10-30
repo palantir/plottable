@@ -2120,7 +2120,7 @@ declare module Plottable {
             formatter: Formatter;
         }
         /**
-         * Defines Axis tier intervals, which is set of tiers, which will be shown together.
+         * Defines Axis tier intervals, which is an array of tiers, which will be shown together.
          * Right now we support up to two tiers.
          */
         interface AxisTierIntervals {
@@ -2156,9 +2156,9 @@ declare module Plottable {
              */
             constructor(scale: Scale.Time, orientation: string);
             /**
-             * Gets the copy of current possible axis tiers intervals.
+             * Gets the copy of the current possible axis tiers intervals.
              *
-             * @returns {AxisTierIntervals[]} The copy of current possible axis tier intervals.
+             * @returns {AxisTierIntervals[]} The copy of the current possible axis tier intervals.
              */
             axisTierIntervals(): AxisTierIntervals[];
             /**
