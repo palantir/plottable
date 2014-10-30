@@ -26,6 +26,9 @@ var Plottable;
              * @param {string} The warnings to print
              */
             function warn(warning) {
+                if (!Plottable.Config.SHOW_WARNINGS) {
+                    return;
+                }
                 /* tslint:disable:no-console */
                 if (window.console != null) {
                     if (window.console.warn != null) {
@@ -1365,6 +1368,18 @@ var Plottable;
         }
     })(Plottable.Formatters || (Plottable.Formatters = {}));
     var Formatters = Plottable.Formatters;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Config) {
+        /**
+         * Specifies if Plottable should show warnings.
+         */
+        Config.SHOW_WARNINGS = true;
+    })(Plottable.Config || (Plottable.Config = {}));
+    var Config = Plottable.Config;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />

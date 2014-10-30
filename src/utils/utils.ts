@@ -21,6 +21,9 @@ export module _Util {
      * @param {string} The warnings to print
      */
     export function warn(warning: string) {
+      if (!Config.SHOW_WARNINGS) {
+        return;
+      }
       /* tslint:disable:no-console */
       if ((<any> window).console != null) {
         if ((<any> window).console.warn != null) {
