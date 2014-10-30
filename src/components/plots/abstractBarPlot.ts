@@ -65,10 +65,16 @@ export module Plot {
 
       var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       this.project("bar-min", (d: any, i: number) => {
-        return Math.floor(barQScale.invert(barQScale.scale(barAccessor(d, i)) - pixelWidthF(d, i) * this._barAlignmentFactor));
+        if (pixelWidthF(d, i) === 0) {
+          return barAccessor(d, i);
+        }
+        return barQScale.invert(barQScale.scale(barAccessor(d, i)) - pixelWidthF(d, i) * this._barAlignmentFactor);
       }, barQScale);
       this.project("bar-max", (d: any, i: number) => {
-        return Math.ceil(barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - this._barAlignmentFactor)));
+        if (pixelWidthF(d, i) === 0) {
+          return barAccessor(d, i);
+        }
+        return barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - this._barAlignmentFactor));
       }, barQScale);
     }
 
