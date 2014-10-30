@@ -11,9 +11,15 @@ export module _Drawer {
     }
 
     public setup(area: D3.Selection) {
-      area.append("path").classed("line", true);
+      // area.append("path").classed("line", true);
+      this.pathSelection = area.append("path")
+                               .classed("line", true)
+                               .style({
+                                 "fill": "none",
+                                 "vector-effect": "non-scaling-stroke"
+                               });
       super.setup(area);
-      this.pathSelection = this._renderArea.select(".line");
+      // this.pathSelection = this._renderArea.select(".line");
     }
 
     private createLine(xFunction: AppliedAccessor, yFunction: AppliedAccessor, definedFunction: (d: any, i: number) => boolean) {
