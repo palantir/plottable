@@ -226,8 +226,8 @@ describe("Plots", () => {
 
       it("extent updated to account for bar width", () => {
         var domain = xScale.domain();
-        assert.closeTo(domain[0], 0.34, 0.1, "min extent accounted");
-        assert.closeTo(domain[1], 206.32, 0.1, "max extent accounted");
+        assert.closeTo(domain[0], 0.77, 0.1, "min extent accounted");
+        assert.closeTo(domain[1], 205.14, 0.1, "max extent accounted");
         svg.remove();
       });
     });
