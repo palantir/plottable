@@ -69,7 +69,6 @@ export module Plot {
       this.project("bar-max", (d: any, i: number) => {
         return barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - this._barAlignmentFactor));
       }, barQScale);
-      this._render();
     }
 
     /**

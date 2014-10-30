@@ -6799,7 +6799,6 @@ var Plottable;
                 this.project("bar-max", function (d, i) {
                     return barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - _this._barAlignmentFactor));
                 }, barQScale);
-                this._render();
             };
             /**
              * Sets the baseline for the bars to the specified value.
