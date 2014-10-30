@@ -16,7 +16,7 @@ function initialize(){
   svgWidth = Number($("#width").val());
   svgHeight = Number($("#height").val());
 
-  setPlotDimensions(svgWidth, svgHeight);
+  setTestBoxDimensions(svgWidth, svgHeight);
 
   branches.push(firstBranch, secondBranch);
   clearTests();
@@ -116,7 +116,7 @@ function loadPlottableBranches(category, branchList){
 function runQuickTest(svg, data, branch){
   try {
     result.run(svg, data, plottableBranches[branch]);
-    setPlotDimensions();
+    setTestBoxDimensions();
 
   } catch (err) {
     setTimeout(function() {throw err;}, 0);
@@ -212,7 +212,7 @@ function showSizeControls(){
 }
 
 
-function setPlotDimensions(){
-  $(".quicktest").css("width", svgWidth);
-  $(".quicktest").css("height", svgHeight);
+function setTestBoxDimensions(){
+  $(".quicktest").css("width", svgWidth + 20);
+  $(".quicktest").css("height", svgHeight + 20);
 }
