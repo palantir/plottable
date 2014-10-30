@@ -6780,7 +6780,6 @@ var Plottable;
                 if ((this._isVertical && attrToSet === "x") || (!this._isVertical && attrToSet === "y") || attrToSet === "width") {
                     this.updateBarScaleExtents();
                 }
-                this._render();
                 return this;
             };
             AbstractBarPlot.prototype.updateBarScaleExtents = function () {
@@ -6800,6 +6799,7 @@ var Plottable;
                 this.project("bar-max", function (d, i) {
                     return barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - _this._barAlignmentFactor));
                 }, barQScale);
+                this._render();
             };
             /**
              * Sets the baseline for the bars to the specified value.
