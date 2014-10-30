@@ -6,24 +6,21 @@ var first = true; //boolean to set order
 var svgWidth;
 var svgHeight;
 
-function initialize(){
-  var branches = [];
-  var dropdown = $("#category")[0];
-  var category = dropdown.options[dropdown.selectedIndex].value;
-
-  firstBranch = $("#branch1").val();
-  secondBranch = $("#branch2").val();
-  svgWidth = Number($("#width").val());
-  svgHeight = Number($("#height").val());
-
-  setTestBoxDimensions(svgWidth, svgHeight);
-
-  branches.push(firstBranch, secondBranch);
-  clearTests();
-
-  loadPlottableBranches(category, branches);
-
+function setTestBoxDimensions(){
+  $(".quicktest").css("width", svgWidth + 20); //20 needed to make up for taken up space for quicktest label
+  $(".quicktest").css("height", svgHeight + 20);
 }
+
+//run a single quicktest
+function runQuickTest(svg, data, branch){
+  try {
+    result.run(svg, data, plottableBranches[branch]);
+    setTestBoxDimensions();
+
+  } catch (err) {
+    setTimeout(function() {throw err;}, 0);
+  }
+};
 
 function filterQuickTests(category, branchList){
   //filter list of quicktests to list of quicktest names to pass to doSomething
@@ -112,16 +109,28 @@ function loadPlottableBranches(category, branchList){
   });
 }
 
-//run a single quicktest
-function runQuickTest(svg, data, branch){
-  try {
-    result.run(svg, data, plottableBranches[branch]);
-    setTestBoxDimensions();
+function resetDisplayProperties(){
+  $(".first, .first svg").css("display", "block");
+  $(".second, .second svg").css("display", "block");
+  $("#branch1").css("background-color", "white");
+  $("#branch2").css("background-color", "white");
+}
 
-  } catch (err) {
-    setTimeout(function() {throw err;}, 0);
+//show svg width & height setting
+function showSizeControls(){
+  var buttonstatus = $("#expand").val()
+  if (buttonstatus === "+"){
+    $( ".size-controls" ).slideDown( 300, function() {
+      $(this).focus();
+      $("#expand").val("-");
+    }); 
   }
-};
+  else{
+    $( ".size-controls" ).slideUp( 300, function() {
+      $("#expand").val("+");
+    });
+  }
+}
 
 function clearTests(){
   plottableBranches = [];
@@ -130,11 +139,23 @@ function clearTests(){
   d3.selectAll(".quicktest").remove();
 }
 
-function resetDisplayProperties(){
-  $(".first, .first svg").css("display", "block");
-  $(".second, .second svg").css("display", "block");
-  $("#branch1").css("background-color", "white");
-  $("#branch2").css("background-color", "white");
+function initialize(){
+  var branches = [];
+  var dropdown = $("#category")[0];
+  var category = dropdown.options[dropdown.selectedIndex].value;
+
+  firstBranch = $("#branch1").val();
+  secondBranch = $("#branch2").val();
+  svgWidth = Number($("#width").val());
+  svgHeight = Number($("#height").val());
+
+  setTestBoxDimensions(svgWidth, svgHeight);
+
+  branches.push(firstBranch, secondBranch);
+  clearTests();
+
+  loadPlottableBranches(category, branches);
+
 }
 
 window.onkeyup = function(e){
@@ -194,26 +215,4 @@ window.onkeyup = function(e){
     $("#branch2").css("background-color", "white");
     return;
   }
-}
-
-//show svg width & height setting
-function showSizeControls(){
-  var buttonstatus = $("#expand").val()
-  if (buttonstatus == "+"){
-    $( ".size-controls" ).slideDown( 300, function() {
-      $(this).focus();
-      $("#expand").val("-");
-    }); 
-  }
-  else{
-    $( ".size-controls" ).slideUp( 300, function() {
-      $("#expand").val("+");
-    });
-  }
-}
-
-
-function setTestBoxDimensions(){
-  $(".quicktest").css("width", svgWidth + 20); //20 needed to make up for taken up space for quicktest label
-  $(".quicktest").css("height", svgHeight + 20);
 }
