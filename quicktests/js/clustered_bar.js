@@ -26,7 +26,7 @@ function run(div, data, Plottable) {
     .attr("fill", "type", colorScale)
     .attr("type", "type")
     .attr("yval", "y")
-    .barLabels(true);
+    .barLabelsEnabled(true);
 
   var center = clusteredBarRenderer.merge(new Plottable.Component.Legend(colorScale));
 

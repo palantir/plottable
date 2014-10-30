@@ -4,7 +4,7 @@ module Plottable {
 export module Plot {
   export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
-    private static DEFAULT_WIDTH = 10;
+    public static _DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignmentFactor = 0.5;
@@ -41,6 +41,14 @@ export module Plot {
     }
 
     /**
+     * Gets the baseline value for the bars
+     *
+     * The baseline is the line that the bars are drawn from, defaulting to 0.
+     *
+     * @returns {number} The baseline value.
+     */
+    public baseline(): number;
+    /**
      * Sets the baseline for the bars to the specified value.
      *
      * The baseline is the line that the bars are drawn from, defaulting to 0.
@@ -48,7 +56,11 @@ export module Plot {
      * @param {number} value The value to position the baseline at.
      * @returns {AbstractBarPlot} The calling AbstractBarPlot.
      */
-    public baseline(value: number) {
+    public baseline(value: number): AbstractBarPlot<X, Y>;
+    public baseline(value?: number): any {
+      if (value == null) {
+        return this._baselineValue;
+      }
       this._baselineValue = value;
       this._updateXDomainer();
       this._updateYDomainer();
@@ -289,7 +301,7 @@ export module Plot {
                       && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       if (!attrToProjector["width"]) {
-        var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : AbstractBarPlot.DEFAULT_WIDTH;
+        var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
         attrToProjector["width"] = (d: any, i: number) => constantWidth;
       }
 

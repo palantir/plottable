@@ -8,6 +8,7 @@ export module Scale {
     public broadcaster = new Plottable.Core.Broadcaster(this);
     public _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     public _typeCoercer: (d: any) => any = (d: any) => d;
+    public _domainModificationInProgress: boolean = false;
     /**
      * Constructs a new Scale.
      *
@@ -100,8 +101,12 @@ export module Scale {
     }
 
     public _setDomain(values: D[]) {
-      this._d3Scale.domain(values);
-      this.broadcaster.broadcast();
+      if(!this._domainModificationInProgress) {
+        this._domainModificationInProgress = true;
+        this._d3Scale.domain(values);
+        this.broadcaster.broadcast();
+        this._domainModificationInProgress = false;
+      }
     }
 
     /**

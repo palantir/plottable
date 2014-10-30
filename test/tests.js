@@ -1794,6 +1794,98 @@ describe("Plots", function () {
             assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");
         });
     });
+    describe("Abstract XY Plot", function () {
+        var svg;
+        var xScale;
+        var yScale;
+        var xAccessor;
+        var yAccessor;
+        var simpleDataset;
+        var plot;
+        before(function () {
+            xAccessor = function (d) { return d.a; };
+            yAccessor = function (d) { return d.b; };
+        });
+        beforeEach(function () {
+            svg = generateSVG(500, 500);
+            simpleDataset = new Plottable.Dataset([{ a: -5, b: 6 }, { a: -2, b: 2 }, { a: 2, b: -2 }, { a: 5, b: -6 }]);
+            xScale = new Plottable.Scale.Linear();
+            yScale = new Plottable.Scale.Linear();
+            plot = new Plottable.Plot.AbstractXYPlot(xScale, yScale);
+            plot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).renderTo(svg);
+        });
+        it("plot auto domain scale to visible points", function () {
+            xScale.domain([-3, 3]);
+            assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
+            plot.automaticallyAdjustYScaleOverVisiblePoints(false);
+            plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+            yScale.domain([-6, 6]);
+            assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to visible points");
+            svg.remove();
+        });
+        it("no visible points", function () {
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            xScale.domain([-0.5, 0.5]);
+            assert.deepEqual(yScale.domain(), [-7, 7], "domain has been not been adjusted");
+            svg.remove();
+        });
+        it("automaticallyAdjustYScaleOverVisiblePoints disables autoDomain", function () {
+            xScale.domain([-2, 2]);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.renderTo(svg);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been been adjusted");
+            svg.remove();
+        });
+        it("show all data", function () {
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            xScale.domain([-0.5, 0.5]);
+            plot.showAllData();
+            assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
+            assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
+            svg.remove();
+        });
+        it("show all data without auto adjust domain", function () {
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            xScale.domain([-0.5, 0.5]);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(false);
+            plot.showAllData();
+            assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
+            assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
+            svg.remove();
+        });
+        it("no cycle in auto domain on plot", function () {
+            var zScale = new Plottable.Scale.Linear().domain([-10, 10]);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            var plot2 = new Plottable.Plot.AbstractXYPlot(zScale, yScale).automaticallyAdjustXScaleOverVisiblePoints(true).project("x", xAccessor, zScale).project("y", yAccessor, yScale).addDataset(simpleDataset);
+            var plot3 = new Plottable.Plot.AbstractXYPlot(zScale, xScale).automaticallyAdjustYScaleOverVisiblePoints(true).project("x", xAccessor, zScale).project("y", yAccessor, xScale).addDataset(simpleDataset);
+            plot2.renderTo(svg);
+            plot3.renderTo(svg);
+            xScale.domain([-2, 2]);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "y domain is adjusted by x domain using custom algorithm and domainer");
+            assert.deepEqual(zScale.domain(), [-2.5, 2.5], "z domain is adjusted by y domain using custom algorithm and domainer");
+            assert.deepEqual(xScale.domain(), [-2, 2], "x domain is not adjusted using custom algorithm and domainer");
+            svg.remove();
+        });
+        it("listeners are deregistered after removal", function () {
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.remove();
+            var key2callback = xScale.broadcaster.key2callback;
+            assert.isUndefined(key2callback.get("yDomainAdjustment" + plot._plottableID), "the plot is no longer attached to the xScale");
+            key2callback = yScale.broadcaster.key2callback;
+            assert.isUndefined(key2callback.get("xDomainAdjustment" + plot._plottableID), "the plot is no longer attached to the yScale");
+            svg.remove();
+        });
+        it("listeners are deregistered for changed scale", function () {
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            var newScale = new Plottable.Scale.Linear().domain([-10, 10]);
+            plot.project("x", xAccessor, newScale);
+            xScale.domain([-2, 2]);
+            assert.deepEqual(yScale.domain(), [-7, 7], "replaced xScale didn't adjust yScale");
+            svg.remove();
+        });
+    });
 });
 
 ///<reference path="../../testReference.ts" />
@@ -2321,6 +2413,12 @@ describe("Plots", function () {
                 brandNew._anchor(d3.select(document.createElement("svg"))); // calls `_setup()`
                 assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
                 assert.isNull(brandNew.selectBar(0, 0), "selects return empty after setup");
+                svg.remove();
+            });
+            it("don't show points from outside of domain", function () {
+                xScale.domain(["C"]);
+                var bars = barPlot._renderArea.selectAll("rect");
+                assert.lengthOf(bars[0], 0, "no bars have been rendered");
                 svg.remove();
             });
         });
@@ -3515,7 +3613,7 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight), 0.01, "height is correct for bar2");
             assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
             // check that clustering is correct
-            var off = renderer.innerScale.scale("_0");
+            var off = renderer.makeInnerScale().scale("_0");
             assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) + bandWidth / 2 - off, 0.01, "x pos correct for bar0");
             assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2 - off, 0.01, "x pos correct for bar1");
             assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2 + off, 0.01, "x pos correct for bar2");
@@ -3579,7 +3677,7 @@ describe("Plots", function () {
             var bar2Y = bar2.data()[0].y;
             var bar3Y = bar3.data()[0].y;
             // check that clustering is correct
-            var off = renderer.innerScale.scale("_0");
+            var off = renderer.makeInnerScale().scale("_0");
             assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar0");
             assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar1");
             assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + bandWidth / 2 + off, 0.01, "y pos correct for bar2");
@@ -4294,14 +4392,14 @@ describe("Component behavior", function () {
         before(function () {
             oldRegister = Plottable.Core.ResizeBroadcaster.register;
             oldDeregister = Plottable.Core.ResizeBroadcaster.deregister;
-            var fakeRegister = function (c) {
+            var mockRegister = function (c) {
                 registeredComponents.add(c._plottableID);
             };
-            var fakeDeregister = function (c) {
+            var mockDeregister = function (c) {
                 registeredComponents.remove(c._plottableID);
             };
-            Plottable.Core.ResizeBroadcaster.register = fakeRegister;
-            Plottable.Core.ResizeBroadcaster.deregister = fakeDeregister;
+            Plottable.Core.ResizeBroadcaster.register = mockRegister;
+            Plottable.Core.ResizeBroadcaster.deregister = mockDeregister;
         });
         after(function () {
             Plottable.Core.ResizeBroadcaster.register = oldRegister;
@@ -4333,6 +4431,13 @@ describe("Component behavior", function () {
             c.renderTo(svg);
             c.autoResize(false);
             assert.isFalse(registeredComponents.has(id), "component was deregistered after rendering");
+        });
+        it("calling .remove deregisters a component", function () {
+            c.autoResize(true);
+            c.renderTo(svg);
+            assert.isTrue(registeredComponents.has(id), "component is registered");
+            c.remove();
+            assert.isFalse(registeredComponents.has(id), "component is deregistered after removal");
         });
     });
 });
@@ -5358,6 +5463,28 @@ describe("Tick generators", function () {
             assert.throws(function () { return Plottable.Scale.TickGenerators.intervalTickGenerator(-2); }, "interval must be positive number");
         });
     });
+    describe("integer", function () {
+        it("normal case", function () {
+            var scale = new Plottable.Scale.Linear().domain([0, 4]);
+            var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
+            assert.deepEqual(ticks, [0, 1, 2, 3, 4], "only the integers are returned");
+        });
+        it("works across negative numbers", function () {
+            var scale = new Plottable.Scale.Linear().domain([-2, 1]);
+            var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
+            assert.deepEqual(ticks, [-2, -1, 0, 1], "only the integers are returned");
+        });
+        it("includes endticks", function () {
+            var scale = new Plottable.Scale.Linear().domain([-2.7, 1.5]);
+            var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
+            assert.deepEqual(ticks, [-2.5, -2, -1, 0, 1, 1.5], "end ticks are included");
+        });
+        it("all float ticks", function () {
+            var scale = new Plottable.Scale.Linear().domain([1.1, 1.5]);
+            var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
+            assert.deepEqual(ticks, [1.1, 1.5], "only the end ticks are returned");
+        });
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -5450,8 +5577,8 @@ describe("Formatters", function () {
             assert.strictEqual(result, "1.000", "defaults to three decimal places");
             result = fixed3(1.234);
             assert.strictEqual(result, "1.234", "shows three decimal places");
-            result = fixed3(1.2345);
-            assert.strictEqual(result, "", "changed values are not shown (get turned into empty strings)");
+            result = fixed3(1.2346);
+            assert.strictEqual(result, "1.235", "changed values are not shown (get turned into empty strings)");
         });
         it("precision can be changed", function () {
             var fixed2 = Plottable.Formatters.fixed(2);
@@ -5459,7 +5586,7 @@ describe("Formatters", function () {
             assert.strictEqual(result, "1.00", "formatter was changed to show only two decimal places");
         });
         it("can be set to show rounded values", function () {
-            var fixed3 = Plottable.Formatters.fixed(3, false);
+            var fixed3 = Plottable.Formatters.fixed(3);
             var result = fixed3(1.2349);
             assert.strictEqual(result, "1.235", "long values are rounded correctly");
         });
@@ -5472,7 +5599,7 @@ describe("Formatters", function () {
             result = general(1.234);
             assert.strictEqual(result, "1.234", "shows up to three decimal places");
             result = general(1.2345);
-            assert.strictEqual(result, "", "(changed) values with more than three decimal places are not shown");
+            assert.strictEqual(result, "1.235", "(changed) values with more than three decimal places are not shown");
         });
         it("stringifies non-number values", function () {
             var general = Plottable.Formatters.general();
@@ -5557,7 +5684,7 @@ describe("Formatters", function () {
             assert.strictEqual(result2, "0.35%", "works even if multiplying by 100 does not make it an integer");
         });
         it("onlyShowUnchanged set to false", function () {
-            var percentFormatter = Plottable.Formatters.percentage(0, false);
+            var percentFormatter = Plottable.Formatters.percentage(0);
             var result = percentFormatter(0.075);
             assert.strictEqual(result, "8%", "shows formatter changed value");
         });

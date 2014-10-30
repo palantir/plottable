@@ -459,7 +459,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter for currency values.
          */
-        function currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
+        function currency(precision?: number, symbol?: string, prefix?: boolean): (d: any) => string;
         /**
          * Creates a formatter that displays exactly [precision] decimal places.
          *
@@ -468,7 +468,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
          */
-        function fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function fixed(precision?: number): (d: any) => string;
         /**
          * Creates a formatter that formats numbers to show no more than
          * [precision] decimal places. All other values are stringified.
@@ -478,7 +478,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter for general values.
          */
-        function general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function general(precision?: number): (d: any) => string;
         /**
          * Creates a formatter that stringifies its input.
          *
@@ -494,7 +494,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter for percentage values.
          */
-        function percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function percentage(precision?: number): (d: any) => string;
         /**
          * Creates a formatter for values that displays [precision] significant figures
          * and puts SI notation.
@@ -520,6 +520,16 @@ declare module Plottable {
          * @returns {Formatter} A formatter for time/date values.
          */
         function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
+    }
+}
+
+
+declare module Plottable {
+    module Config {
+        /**
+         * Specifies if Plottable should show warnings.
+         */
+        var SHOW_WARNINGS: boolean;
     }
 }
 
@@ -1013,6 +1023,7 @@ declare module Plottable {
                 [x: string]: D[];
             };
             _typeCoercer: (d: any) => any;
+            _domainModificationInProgress: boolean;
             /**
              * Constructs a new Scale.
              *
@@ -1543,6 +1554,14 @@ declare module Plottable {
              * @returns {TickGenerator} A tick generator using the specified interval.
              */
             function intervalTickGenerator(interval: number): TickGenerator<number>;
+            /**
+             * Creates a tick generator that will filter for only the integers in defaultTicks and return them.
+             *
+             * Will also include the end ticks.
+             *
+             * @returns {TickGenerator} A tick generator returning only integer ticks.
+             */
+            function integerTickGenerator(): TickGenerator<number>;
         }
     }
 }
@@ -1648,6 +1667,7 @@ declare module Plottable {
             _getDrawSelection(): D3.Selection;
             _drawStep(step: DrawStep): void;
             _enterData(data: any[]): void;
+            draw(data: any[], drawSteps: DrawStep[]): number;
         }
     }
 }
@@ -2145,7 +2165,7 @@ declare module Plottable {
              * @constructor
              * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
              * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-             * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
+             * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
              */
             constructor(scale: Scale.AbstractQuantitative<number>, orientation: string, formatter?: (d: any) => string);
             _setup(): void;
@@ -2737,6 +2757,8 @@ declare module Plottable {
         class AbstractXYPlot<X, Y> extends AbstractPlot {
             _xScale: Scale.AbstractScale<X, number>;
             _yScale: Scale.AbstractScale<Y, number>;
+            _autoAdjustXScaleDomain: boolean;
+            _autoAdjustYScaleDomain: boolean;
             /**
              * Constructs an XYPlot.
              *
@@ -2754,9 +2776,35 @@ declare module Plottable {
              * x and y position in the Plot.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractXYPlot<X, Y>;
+            remove(): AbstractXYPlot<X, Y>;
+            /**
+             * Sets the automatic domain adjustment over visible points for y scale.
+             *
+             * If autoAdjustment is true adjustment is immediately performend.
+             *
+             * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
+             * @returns {AbstractXYPlot} The calling AbstractXYPlot.
+             */
+            automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y>;
+            /**
+             * Sets the automatic domain adjustment over visible points for x scale.
+             *
+             * If autoAdjustment is true adjustment is immediately performend.
+             *
+             * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
+             * @returns {AbstractXYPlot} The calling AbstractXYPlot.
+             */
+            automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y>;
+            _generateAttrToProjector(): AttributeToProjector;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _updateXDomainer(): void;
             _updateYDomainer(): void;
+            /**
+             * Adjusts both domains' extents to show all datasets.
+             *
+             * This call does not override auto domain adjustment behavior over visible points.
+             */
+            showAllData(): void;
         }
     }
 }
@@ -2834,6 +2882,7 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
+            static _DEFAULT_WIDTH: number;
             _baseline: D3.Selection;
             _baselineValue: number;
             _barAlignmentFactor: number;
@@ -2848,6 +2897,14 @@ declare module Plottable {
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
             _getDrawer(key: string): _Drawer.Rect;
             _setup(): void;
+            /**
+             * Gets the baseline value for the bars
+             *
+             * The baseline is the line that the bars are drawn from, defaulting to 0.
+             *
+             * @returns {number} The baseline value.
+             */
+            baseline(): number;
             /**
              * Sets the baseline for the bars to the specified value.
              *

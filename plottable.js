@@ -26,6 +26,9 @@ var Plottable;
              * @param {string} The warnings to print
              */
             function warn(warning) {
+                if (!Plottable.Config.SHOW_WARNINGS) {
+                    return;
+                }
                 /* tslint:disable:no-console */
                 if (window.console != null) {
                     if (window.console.warn != null) {
@@ -1178,17 +1181,13 @@ var Plottable;
          *
          * @returns {Formatter} A formatter for currency values.
          */
-        function currency(precision, symbol, prefix, onlyShowUnchanged) {
+        function currency(precision, symbol, prefix) {
             if (precision === void 0) { precision = 2; }
             if (symbol === void 0) { symbol = "$"; }
             if (prefix === void 0) { prefix = true; }
-            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
             var fixedFormatter = Formatters.fixed(precision);
             return function (d) {
                 var formattedValue = fixedFormatter(Math.abs(d));
-                if (onlyShowUnchanged && valueChanged(Math.abs(d), formattedValue)) {
-                    return "";
-                }
                 if (formattedValue !== "") {
                     if (prefix) {
                         formattedValue = symbol + formattedValue;
@@ -1212,16 +1211,11 @@ var Plottable;
          *
          * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
          */
-        function fixed(precision, onlyShowUnchanged) {
+        function fixed(precision) {
             if (precision === void 0) { precision = 3; }
-            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
             verifyPrecision(precision);
             return function (d) {
-                var formattedValue = d.toFixed(precision);
-                if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
-                    return "";
-                }
-                return formattedValue;
+                return d.toFixed(precision);
             };
         }
         Formatters.fixed = fixed;
@@ -1234,18 +1228,13 @@ var Plottable;
          *
          * @returns {Formatter} A formatter for general values.
          */
-        function general(precision, onlyShowUnchanged) {
+        function general(precision) {
             if (precision === void 0) { precision = 3; }
-            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
             verifyPrecision(precision);
             return function (d) {
                 if (typeof d === "number") {
                     var multiplier = Math.pow(10, precision);
-                    var formattedValue = String(Math.round(d * multiplier) / multiplier);
-                    if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
-                        return "";
-                    }
-                    return formattedValue;
+                    return String(Math.round(d * multiplier) / multiplier);
                 }
                 else {
                     return String(d);
@@ -1273,24 +1262,16 @@ var Plottable;
          *
          * @returns {Formatter} A formatter for percentage values.
          */
-        function percentage(precision, onlyShowUnchanged) {
+        function percentage(precision) {
             if (precision === void 0) { precision = 0; }
-            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
-            var fixedFormatter = Formatters.fixed(precision, onlyShowUnchanged);
+            var fixedFormatter = Formatters.fixed(precision);
             return function (d) {
                 var valToFormat = d * 100;
                 // Account for float imprecision
                 var valString = d.toString();
                 var integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
                 valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
-                var formattedValue = fixedFormatter(valToFormat);
-                if (onlyShowUnchanged && valueChanged(valToFormat, formattedValue)) {
-                    return "";
-                }
-                if (formattedValue !== "") {
-                    formattedValue += "%";
-                }
-                return formattedValue;
+                return fixedFormatter(valToFormat) + "%";
             };
         }
         Formatters.percentage = percentage;
@@ -1385,11 +1366,20 @@ var Plottable;
                 throw new RangeError("Formatter precision must be between 0 and 20");
             }
         }
-        function valueChanged(d, formattedValue) {
-            return d !== parseFloat(formattedValue);
-        }
     })(Plottable.Formatters || (Plottable.Formatters = {}));
     var Formatters = Plottable.Formatters;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Config) {
+        /**
+         * Specifies if Plottable should show warnings.
+         */
+        Config.SHOW_WARNINGS = true;
+    })(Plottable.Config || (Plottable.Config = {}));
+    var Config = Plottable.Config;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2132,6 +2122,7 @@ var Plottable;
                 this.broadcaster = new Plottable.Core.Broadcaster(this);
                 this._rendererAttrID2Extent = {};
                 this._typeCoercer = function (d) { return d; };
+                this._domainModificationInProgress = false;
                 this._d3Scale = scale;
             }
             AbstractScale.prototype._getAllExtents = function () {
@@ -2189,8 +2180,12 @@ var Plottable;
                 return this._d3Scale.domain();
             };
             AbstractScale.prototype._setDomain = function (values) {
-                this._d3Scale.domain(values);
-                this.broadcaster.broadcast();
+                if (!this._domainModificationInProgress) {
+                    this._domainModificationInProgress = true;
+                    this._d3Scale.domain(values);
+                    this.broadcaster.broadcast();
+                    this._domainModificationInProgress = false;
+                }
             };
             AbstractScale.prototype.range = function (values) {
                 if (values == null) {
@@ -3111,6 +3106,20 @@ var Plottable;
                 };
             }
             TickGenerators.intervalTickGenerator = intervalTickGenerator;
+            /**
+             * Creates a tick generator that will filter for only the integers in defaultTicks and return them.
+             *
+             * Will also include the end ticks.
+             *
+             * @returns {TickGenerator} A tick generator returning only integer ticks.
+             */
+            function integerTickGenerator() {
+                return function (s) {
+                    var defaultTicks = s.getDefaultTicks();
+                    return defaultTicks.filter(function (tick, i) { return (tick % 1 === 0) || (i === 0) || (i === defaultTicks.length - 1); });
+                };
+            }
+            TickGenerators.integerTickGenerator = integerTickGenerator;
         })(Scale.TickGenerators || (Scale.TickGenerators = {}));
         var TickGenerators = Scale.TickGenerators;
     })(Plottable.Scale || (Plottable.Scale = {}));
@@ -3375,6 +3384,23 @@ var Plottable;
                     dataElements.classed(this._className, true);
                 }
                 dataElements.exit().remove();
+            };
+            Element.prototype.filterDefinedData = function (data, definedFunction) {
+                return definedFunction ? data.filter(definedFunction) : data;
+            };
+            Element.prototype.draw = function (data, drawSteps) {
+                var _this = this;
+                var modifiedDrawSteps = [];
+                drawSteps.forEach(function (d, i) {
+                    modifiedDrawSteps[i] = { animator: d.animator, attrToProjector: Plottable._Util.Methods.copyMap(d.attrToProjector) };
+                });
+                var definedData = modifiedDrawSteps.reduce(function (data, drawStep) { return _this.filterDefinedData(data, drawStep.attrToProjector["defined"]); }, data);
+                modifiedDrawSteps.forEach(function (d) {
+                    if (d.attrToProjector["defined"]) {
+                        delete d.attrToProjector["defined"];
+                    }
+                });
+                return _super.prototype.draw.call(this, definedData, modifiedDrawSteps);
             };
             return Element;
         })(_Drawer.AbstractDrawer);
@@ -4791,10 +4817,10 @@ var Plottable;
              * @constructor
              * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
              * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-             * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
+             * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
              */
             function Numeric(scale, orientation, formatter) {
-                if (formatter === void 0) { formatter = Plottable.Formatters.general(3, false); }
+                if (formatter === void 0) { formatter = Plottable.Formatters.general(); }
                 _super.call(this, scale, orientation, formatter);
                 this.tickLabelPositioning = "center";
                 // Whether or not first/last tick label will still be displayed even if
@@ -6514,6 +6540,8 @@ var Plottable;
              */
             function AbstractXYPlot(xScale, yScale) {
                 _super.call(this);
+                this._autoAdjustXScaleDomain = false;
+                this._autoAdjustYScaleDomain = false;
                 if (xScale == null || yScale == null) {
                     throw new Error("XYPlots require an xScale and yScale");
                 }
@@ -6526,18 +6554,74 @@ var Plottable;
              * x and y position in the Plot.
              */
             AbstractXYPlot.prototype.project = function (attrToSet, accessor, scale) {
+                var _this = this;
                 // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
                 // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
                 if (attrToSet === "x" && scale) {
+                    if (this._xScale) {
+                        this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this._plottableID);
+                    }
                     this._xScale = scale;
                     this._updateXDomainer();
+                    scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this.adjustYDomainOnChangeFromX(); });
                 }
                 if (attrToSet === "y" && scale) {
+                    if (this._yScale) {
+                        this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this._plottableID);
+                    }
                     this._yScale = scale;
                     this._updateYDomainer();
+                    scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this.adjustXDomainOnChangeFromY(); });
                 }
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
+            };
+            AbstractXYPlot.prototype.remove = function () {
+                _super.prototype.remove.call(this);
+                if (this._xScale) {
+                    this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this._plottableID);
+                }
+                if (this._yScale) {
+                    this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this._plottableID);
+                }
+                return this;
+            };
+            /**
+             * Sets the automatic domain adjustment over visible points for y scale.
+             *
+             * If autoAdjustment is true adjustment is immediately performend.
+             *
+             * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
+             * @returns {AbstractXYPlot} The calling AbstractXYPlot.
+             */
+            AbstractXYPlot.prototype.automaticallyAdjustYScaleOverVisiblePoints = function (autoAdjustment) {
+                this._autoAdjustYScaleDomain = autoAdjustment;
+                this.adjustYDomainOnChangeFromX();
+                return this;
+            };
+            /**
+             * Sets the automatic domain adjustment over visible points for x scale.
+             *
+             * If autoAdjustment is true adjustment is immediately performend.
+             *
+             * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
+             * @returns {AbstractXYPlot} The calling AbstractXYPlot.
+             */
+            AbstractXYPlot.prototype.automaticallyAdjustXScaleOverVisiblePoints = function (autoAdjustment) {
+                this._autoAdjustXScaleDomain = autoAdjustment;
+                this.adjustXDomainOnChangeFromY();
+                return this;
+            };
+            AbstractXYPlot.prototype._generateAttrToProjector = function () {
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var positionXFn = attrToProjector["x"];
+                var positionYFn = attrToProjector["y"];
+                attrToProjector["defined"] = function (d, i) {
+                    var positionX = positionXFn(d, i);
+                    var positionY = positionYFn(d, i);
+                    return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+                };
+                return attrToProjector;
             };
             AbstractXYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
@@ -6559,6 +6643,55 @@ var Plottable;
                         scale.domainer().pad().nice();
                     }
                 }
+            };
+            /**
+             * Adjusts both domains' extents to show all datasets.
+             *
+             * This call does not override auto domain adjustment behavior over visible points.
+             */
+            AbstractXYPlot.prototype.showAllData = function () {
+                this._xScale.autoDomain();
+                if (!this._autoAdjustYScaleDomain) {
+                    this._yScale.autoDomain();
+                }
+            };
+            AbstractXYPlot.prototype.adjustYDomainOnChangeFromX = function () {
+                if (this._autoAdjustYScaleDomain) {
+                    this.adjustDomainToVisiblePoints(this._xScale, this._yScale, true);
+                }
+            };
+            AbstractXYPlot.prototype.adjustXDomainOnChangeFromY = function () {
+                if (this._autoAdjustXScaleDomain) {
+                    this.adjustDomainToVisiblePoints(this._yScale, this._xScale, false);
+                }
+            };
+            AbstractXYPlot.prototype.adjustDomainToVisiblePoints = function (fromScale, toScale, fromX) {
+                if (toScale instanceof Plottable.Scale.AbstractQuantitative) {
+                    var toScaleQ = toScale;
+                    var normalizedData = this.normalizeDatasets(fromX);
+                    var adjustedDomain = this.adjustDomainOverVisiblePoints(normalizedData, fromScale.domain());
+                    if (adjustedDomain.length === 0) {
+                        return;
+                    }
+                    adjustedDomain = toScaleQ.domainer().computeDomain([adjustedDomain], toScaleQ);
+                    toScaleQ.domain(adjustedDomain);
+                }
+            };
+            AbstractXYPlot.prototype.normalizeDatasets = function (fromX) {
+                var flattenDatasets = Plottable._Util.Methods.flatten(this.datasets().map(function (d) { return d.data(); }));
+                var aAccessor = this._projectors[fromX ? "x" : "y"].accessor;
+                var bAccessor = this._projectors[fromX ? "y" : "x"].accessor;
+                return flattenDatasets.map(function (d, i) {
+                    return { a: aAccessor(d, i), b: bAccessor(d, i) };
+                });
+            };
+            AbstractXYPlot.prototype.adjustDomainOverVisiblePoints = function (values, fromDomain) {
+                var bVals = values.filter(function (v) { return fromDomain[0] <= v.a && v.a <= fromDomain[1]; }).map(function (v) { return v.b; });
+                var retVal = [];
+                if (bVals.length !== 0) {
+                    retVal = [Plottable._Util.Methods.min(bVals, null), Plottable._Util.Methods.max(bVals, null)];
+                }
+                return retVal;
             };
             return AbstractXYPlot;
         })(Plot.AbstractPlot);
@@ -6796,15 +6929,10 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
-            /**
-             * Sets the baseline for the bars to the specified value.
-             *
-             * The baseline is the line that the bars are drawn from, defaulting to 0.
-             *
-             * @param {number} value The value to position the baseline at.
-             * @returns {AbstractBarPlot} The calling AbstractBarPlot.
-             */
             AbstractBarPlot.prototype.baseline = function (value) {
+                if (value == null) {
+                    return this._baselineValue;
+                }
                 this._baselineValue = value;
                 this._updateXDomainer();
                 this._updateYDomainer();
@@ -6986,7 +7114,7 @@ var Plottable;
                 var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
                 if (!attrToProjector["width"]) {
-                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : AbstractBarPlot.DEFAULT_WIDTH;
+                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
                     attrToProjector["width"] = function (d, i) { return constantWidth; };
                 }
                 var positionF = attrToProjector[secondaryAttr];
@@ -7069,7 +7197,7 @@ var Plottable;
                 };
             };
             AbstractBarPlot._BarAlignmentToFactor = {};
-            AbstractBarPlot.DEFAULT_WIDTH = 10;
+            AbstractBarPlot._DEFAULT_WIDTH = 10;
             return AbstractBarPlot;
         })(Plot.AbstractXYPlot);
         Plot.AbstractBarPlot = AbstractBarPlot;
@@ -7366,15 +7494,12 @@ var Plottable;
                 if (isVertical === void 0) { isVertical = true; }
                 this._isVertical = isVertical; // Has to be set before super()
                 _super.call(this, xScale, yScale);
-                this.innerScale = new Plottable.Scale.Ordinal();
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
-                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 // the width is constant, so set the inner scale range to that
-                var widthF = attrToProjector["width"];
-                this.innerScale.range([0, widthF(null, 0)]);
-                var innerWidthF = function (d, i) { return _this.innerScale.rangeBand(); };
+                var innerScale = this.makeInnerScale();
+                var innerWidthF = function (d, i) { return innerScale.rangeBand(); };
                 var heightF = attrToProjector["height"];
                 attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
                 attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
@@ -7386,18 +7511,39 @@ var Plottable;
             ClusteredBar.prototype._getDataToDraw = function () {
                 var _this = this;
                 var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                this.innerScale.domain(this._datasetKeysInOrder);
+                var innerScale = this.makeInnerScale();
                 var clusters = d3.map();
                 this._datasetKeysInOrder.forEach(function (key) {
                     var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
                     clusters.set(key, data.map(function (d, i) {
                         var val = accessor(d, i);
                         var primaryScale = _this._isVertical ? _this._xScale : _this._yScale;
-                        d["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + _this.innerScale.scale(key);
-                        return d;
+                        // TODO: store position information in metadata.
+                        var copyD = Plottable._Util.Methods.copyMap(d);
+                        copyD["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + innerScale.scale(key);
+                        return copyD;
                     }));
                 });
                 return clusters;
+            };
+            ClusteredBar.prototype.makeInnerScale = function () {
+                var innerScale = new Plottable.Scale.Ordinal();
+                innerScale.domain(this._datasetKeysInOrder);
+                // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
+                if (!this._projectors["width"]) {
+                    var secondaryScale = this._isVertical ? this._xScale : this._yScale;
+                    var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
+                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : Plot.AbstractBarPlot._DEFAULT_WIDTH;
+                    innerScale.range([0, constantWidth]);
+                }
+                else {
+                    var projector = this._projectors["width"];
+                    var accessor = projector.accessor;
+                    var scale = projector.scale;
+                    var fn = scale ? function (d, i) { return scale.scale(accessor(d, i)); } : accessor;
+                    innerScale.range([0, fn(null, 0)]);
+                }
+                return innerScale;
             };
             return ClusteredBar;
         })(Plot.AbstractBarPlot);
