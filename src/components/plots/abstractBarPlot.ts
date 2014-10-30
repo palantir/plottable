@@ -4,6 +4,10 @@ module Plottable {
 export module Plot {
   export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
+<<<<<<< HEAD
+=======
+    public static _DEFAULT_WIDTH = 10;
+>>>>>>> develop
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignmentFactor = 0.5;
@@ -72,6 +76,14 @@ export module Plot {
     }
 
     /**
+     * Gets the baseline value for the bars
+     *
+     * The baseline is the line that the bars are drawn from, defaulting to 0.
+     *
+     * @returns {number} The baseline value.
+     */
+    public baseline(): number;
+    /**
      * Sets the baseline for the bars to the specified value.
      *
      * The baseline is the line that the bars are drawn from, defaulting to 0.
@@ -79,7 +91,11 @@ export module Plot {
      * @param {number} value The value to position the baseline at.
      * @returns {AbstractBarPlot} The calling AbstractBarPlot.
      */
-    public baseline(value: number) {
+    public baseline(value: number): AbstractBarPlot<X, Y>;
+    public baseline(value?: number): any {
+      if (value == null) {
+        return this._baselineValue;
+      }
       this._baselineValue = value;
       this._updateXDomainer();
       this._updateYDomainer();
@@ -278,7 +294,7 @@ export module Plot {
       var drawers: _Drawer.Rect[] = <any> this._getDrawersInOrder();
       drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
       if (this._barLabelsEnabled) {
-        setTimeout(() => this._drawLabels(), time);
+        _Util.Methods.setTimeout(() => this._drawLabels(), time);
       }
     }
 
@@ -318,7 +334,12 @@ export module Plot {
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       if (!attrToProjector["width"]) {
+<<<<<<< HEAD
         attrToProjector["width"] = () => this._getBarPixelWidth();
+=======
+        var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
+        attrToProjector["width"] = (d: any, i: number) => constantWidth;
+>>>>>>> develop
       }
 
       var positionF = attrToProjector[secondaryAttr];

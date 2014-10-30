@@ -159,6 +159,13 @@ describe("Plots", () => {
 
         svg.remove();
       });
+
+      it("don't show points from outside of domain", () => {
+        xScale.domain(["C"]);
+        var bars =  barPlot._renderArea.selectAll("rect");
+        assert.lengthOf(bars[0], 0, "no bars have been rendered");
+        svg.remove();
+      });
     });
 
     describe("Vertical Bar Plot modified log scale", () => {

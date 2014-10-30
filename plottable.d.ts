@@ -124,6 +124,14 @@ declare module Plottable {
                 [x: string]: T;
             };
             function range(start: number, stop: number, step?: number): number[];
+            /** Is like setTimeout, but activates synchronously if time=0
+             * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
+             * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
+             * evaluating, the results are painted to the screen. As a result, if we want something to occur immediately but call setTimeout
+             * with time=0, then it is pushed to the call stack and rendered in the next frame, so the component that was rendered via
+             * setTimeout appears out-of-sync with the rest of the plot.
+             */
+            function setTimeout(f: Function, time: number, ...args: any[]): number;
         }
     }
 }
@@ -451,7 +459,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter for currency values.
          */
-        function currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
+        function currency(precision?: number, symbol?: string, prefix?: boolean): (d: any) => string;
         /**
          * Creates a formatter that displays exactly [precision] decimal places.
          *
@@ -460,7 +468,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
          */
-        function fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function fixed(precision?: number): (d: any) => string;
         /**
          * Creates a formatter that formats numbers to show no more than
          * [precision] decimal places. All other values are stringified.
@@ -470,7 +478,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter for general values.
          */
-        function general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function general(precision?: number): (d: any) => string;
         /**
          * Creates a formatter that stringifies its input.
          *
@@ -486,7 +494,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter for percentage values.
          */
-        function percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        function percentage(precision?: number): (d: any) => string;
         /**
          * Creates a formatter for values that displays [precision] significant figures
          * and puts SI notation.
@@ -512,6 +520,16 @@ declare module Plottable {
          * @returns {Formatter} A formatter for time/date values.
          */
         function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
+    }
+}
+
+
+declare module Plottable {
+    module Config {
+        /**
+         * Specifies if Plottable should show warnings.
+         */
+        var SHOW_WARNINGS: boolean;
     }
 }
 
@@ -1005,6 +1023,7 @@ declare module Plottable {
                 [x: string]: D[];
             };
             _typeCoercer: (d: any) => any;
+            _domainModificationInProgress: boolean;
             /**
              * Constructs a new Scale.
              *
@@ -1535,6 +1554,14 @@ declare module Plottable {
              * @returns {TickGenerator} A tick generator using the specified interval.
              */
             function intervalTickGenerator(interval: number): TickGenerator<number>;
+            /**
+             * Creates a tick generator that will filter for only the integers in defaultTicks and return them.
+             *
+             * Will also include the end ticks.
+             *
+             * @returns {TickGenerator} A tick generator returning only integer ticks.
+             */
+            function integerTickGenerator(): TickGenerator<number>;
         }
     }
 }
@@ -1640,6 +1667,7 @@ declare module Plottable {
             _getDrawSelection(): D3.Selection;
             _drawStep(step: DrawStep): void;
             _enterData(data: any[]): void;
+            draw(data: any[], drawSteps: DrawStep[]): number;
         }
     }
 }
@@ -2137,7 +2165,7 @@ declare module Plottable {
              * @constructor
              * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
              * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-             * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
+             * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
              */
             constructor(scale: Scale.AbstractQuantitative<number>, orientation: string, formatter?: (d: any) => string);
             _setup(): void;
@@ -2729,6 +2757,8 @@ declare module Plottable {
         class AbstractXYPlot<X, Y> extends AbstractPlot {
             _xScale: Scale.AbstractScale<X, number>;
             _yScale: Scale.AbstractScale<Y, number>;
+            _autoAdjustXScaleDomain: boolean;
+            _autoAdjustYScaleDomain: boolean;
             /**
              * Constructs an XYPlot.
              *
@@ -2746,9 +2776,35 @@ declare module Plottable {
              * x and y position in the Plot.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractXYPlot<X, Y>;
+            remove(): AbstractXYPlot<X, Y>;
+            /**
+             * Sets the automatic domain adjustment over visible points for y scale.
+             *
+             * If autoAdjustment is true adjustment is immediately performend.
+             *
+             * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
+             * @returns {AbstractXYPlot} The calling AbstractXYPlot.
+             */
+            automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y>;
+            /**
+             * Sets the automatic domain adjustment over visible points for x scale.
+             *
+             * If autoAdjustment is true adjustment is immediately performend.
+             *
+             * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
+             * @returns {AbstractXYPlot} The calling AbstractXYPlot.
+             */
+            automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y>;
+            _generateAttrToProjector(): AttributeToProjector;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _updateXDomainer(): void;
             _updateYDomainer(): void;
+            /**
+             * Adjusts both domains' extents to show all datasets.
+             *
+             * This call does not override auto domain adjustment behavior over visible points.
+             */
+            showAllData(): void;
         }
     }
 }
@@ -2826,6 +2882,7 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
+            static _DEFAULT_WIDTH: number;
             _baseline: D3.Selection;
             _baselineValue: number;
             _barAlignmentFactor: number;
@@ -2841,6 +2898,14 @@ declare module Plottable {
             _getDrawer(key: string): _Drawer.Rect;
             _setup(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractBarPlot<X, Y>;
+            /**
+             * Gets the baseline value for the bars
+             *
+             * The baseline is the line that the bars are drawn from, defaulting to 0.
+             *
+             * @returns {number} The baseline value.
+             */
+            baseline(): number;
             /**
              * Sets the baseline for the bars to the specified value.
              *
@@ -3361,30 +3426,134 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Core {
-        /**
-         * A function to be called when an event occurs. The argument is the d3 event
-         * generated by the event.
-         */
-        interface KeyEventListenerCallback {
-            (e: D3.D3Event): any;
-        }
-        /**
-         * A module for listening to keypresses on the document.
-         */
-        module KeyEventListener {
+    module Dispatcher {
+        class AbstractDispatcher extends Core.PlottableObject {
+            _target: D3.Selection;
+            _event2Callback: {
+                [x: string]: () => any;
+            };
             /**
-             * Turns on key listening.
-             */
-            function initialize(): void;
-            /**
-             * When a key event occurs with the key corresponding te keyCod, call cb.
+             * Constructs a Dispatcher with the specified target.
              *
-             * @param {number} keyCode The javascript key code to call cb on.
-             * @param {IKeyEventListener} cb Will be called when keyCode key event
-             * occurs.
+             * @constructor
+             * @param {D3.Selection} [target] The selection to listen for events on.
              */
-            function addCallback(keyCode: number, cb: KeyEventListenerCallback): void;
+            constructor(target?: D3.Selection);
+            /**
+             * Gets the target of the Dispatcher.
+             *
+             * @returns {D3.Selection} The Dispatcher's current target.
+             */
+            target(): D3.Selection;
+            /**
+             * Sets the target of the Dispatcher.
+             *
+             * @param {D3.Selection} target The element to listen for updates on.
+             * @returns {Dispatcher} The calling Dispatcher.
+             */
+            target(targetElement: D3.Selection): AbstractDispatcher;
+            /**
+             * Gets a namespaced version of the event name.
+             */
+            _getEventString(eventName: string): string;
+            /**
+             * Attaches the Dispatcher's listeners to the Dispatcher's target element.
+             *
+             * @returns {Dispatcher} The calling Dispatcher.
+             */
+            connect(): AbstractDispatcher;
+            /**
+             * Detaches the Dispatcher's listeners from the Dispatchers' target element.
+             *
+             * @returns {Dispatcher} The calling Dispatcher.
+             */
+            disconnect(): AbstractDispatcher;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Dispatcher {
+        class Mouse extends AbstractDispatcher {
+            /**
+             * Constructs a Mouse Dispatcher with the specified target.
+             *
+             * @param {D3.Selection} target The selection to listen for events on.
+             */
+            constructor(target: D3.Selection);
+            /**
+             * Gets the current callback to be called on mouseover.
+             *
+             * @return {(location: Point) => any} The current mouseover callback.
+             */
+            mouseover(): (location: Point) => any;
+            /**
+             * Attaches a callback to be called on mouseover.
+             *
+             * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+             *                                            Pass in null to remove the callback.
+             * @return {Mouse} The calling Mouse Handler.
+             */
+            mouseover(callback: (location: Point) => any): Mouse;
+            /**
+             * Gets the current callback to be called on mousemove.
+             *
+             * @return {(location: Point) => any} The current mousemove callback.
+             */
+            mousemove(): (location: Point) => any;
+            /**
+             * Attaches a callback to be called on mousemove.
+             *
+             * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+             *                                            Pass in null to remove the callback.
+             * @return {Mouse} The calling Mouse Handler.
+             */
+            mousemove(callback: (location: Point) => any): Mouse;
+            /**
+             * Gets the current callback to be called on mouseout.
+             *
+             * @return {(location: Point) => any} The current mouseout callback.
+             */
+            mouseout(): (location: Point) => any;
+            /**
+             * Attaches a callback to be called on mouseout.
+             *
+             * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+             *                                            Pass in null to remove the callback.
+             * @return {Mouse} The calling Mouse Handler.
+             */
+            mouseout(callback: (location: Point) => any): Mouse;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Dispatcher {
+        class Keypress extends AbstractDispatcher {
+            /**
+             * Constructs a Keypress Dispatcher with the specified target.
+             *
+             * @constructor
+             * @param {D3.Selection} [target] The selection to listen for events on.
+             */
+            constructor(target?: D3.Selection);
+            connect(): Keypress;
+            disconnect(): Keypress;
+            /**
+             * Gets the callback to be called when a key is pressed.
+             *
+             * @return {(e: D3.D3Event) => void} The current keydown callback.
+             */
+            onKeyDown(): (e: D3.D3Event) => void;
+            /**
+             * Sets a callback to be called when a key is pressed.
+             *
+             * @param {(e: D3.D3Event) => void} A callback that takes in a D3Event.
+             * @return {Keypress} The calling Dispatcher.Keypress.
+             */
+            onKeyDown(callback: (e: D3.D3Event) => void): Keypress;
         }
     }
 }
@@ -3437,18 +3606,18 @@ declare module Plottable {
              * moused over.
              *
              * @constructor
-             * @param {number} keyCode The key code to listen for.
              */
-            constructor(keyCode: number);
+            constructor();
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
             /**
-             * Sets a callback to be called when the designated key is pressed and the
-             * user is moused over the component.
+             * Sets a callback to be called when the key with the given keyCode is
+             * pressed and the user is moused over the Component.
              *
-             * @param {() => any} cb Callback to be called.
-             * @returns The calling Key.
+             * @param {number} keyCode The key code associated with the key.
+             * @param {() => void} callback Callback to be called.
+             * @returns The calling Interaction.Key.
              */
-            callback(cb: () => any): Key;
+            on(keyCode: number, callback: () => void): Key;
         }
     }
 }
@@ -3715,105 +3884,6 @@ declare module Plottable {
              *                     the user is currently hovering over.
              */
             getCurrentHoverData(): HoverData;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Dispatcher {
-        class AbstractDispatcher extends Core.PlottableObject {
-            _target: D3.Selection;
-            _event2Callback: {
-                [x: string]: () => any;
-            };
-            /**
-             * Constructs a Dispatcher with the specified target.
-             *
-             * @param {D3.Selection} target The selection to listen for events on.
-             */
-            constructor(target: D3.Selection);
-            /**
-             * Gets the target of the Dispatcher.
-             *
-             * @returns {D3.Selection} The Dispatcher's current target.
-             */
-            target(): D3.Selection;
-            /**
-             * Sets the target of the Dispatcher.
-             *
-             * @param {D3.Selection} target The element to listen for updates on.
-             * @returns {Dispatcher} The calling Dispatcher.
-             */
-            target(targetElement: D3.Selection): AbstractDispatcher;
-            /**
-             * Attaches the Dispatcher's listeners to the Dispatcher's target element.
-             *
-             * @returns {Dispatcher} The calling Dispatcher.
-             */
-            connect(): AbstractDispatcher;
-            /**
-             * Detaches the Dispatcher's listeners from the Dispatchers' target element.
-             *
-             * @returns {Dispatcher} The calling Dispatcher.
-             */
-            disconnect(): AbstractDispatcher;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Dispatcher {
-        class Mouse extends AbstractDispatcher {
-            /**
-             * Constructs a Mouse Dispatcher with the specified target.
-             *
-             * @param {D3.Selection} target The selection to listen for events on.
-             */
-            constructor(target: D3.Selection);
-            /**
-             * Gets the current callback to be called on mouseover.
-             *
-             * @return {(location: Point) => any} The current mouseover callback.
-             */
-            mouseover(): (location: Point) => any;
-            /**
-             * Attaches a callback to be called on mouseover.
-             *
-             * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
-             *                                            Pass in null to remove the callback.
-             * @return {Mouse} The calling Mouse Handler.
-             */
-            mouseover(callback: (location: Point) => any): Mouse;
-            /**
-             * Gets the current callback to be called on mousemove.
-             *
-             * @return {(location: Point) => any} The current mousemove callback.
-             */
-            mousemove(): (location: Point) => any;
-            /**
-             * Attaches a callback to be called on mousemove.
-             *
-             * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
-             *                                            Pass in null to remove the callback.
-             * @return {Mouse} The calling Mouse Handler.
-             */
-            mousemove(callback: (location: Point) => any): Mouse;
-            /**
-             * Gets the current callback to be called on mouseout.
-             *
-             * @return {(location: Point) => any} The current mouseout callback.
-             */
-            mouseout(): (location: Point) => any;
-            /**
-             * Attaches a callback to be called on mouseout.
-             *
-             * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
-             *                                            Pass in null to remove the callback.
-             * @return {Mouse} The calling Mouse Handler.
-             */
-            mouseout(callback: (location: Point) => any): Mouse;
         }
     }
 }

@@ -10,6 +10,7 @@
 
 /// <reference path="utils/formatters.ts" />
 
+/// <reference path="core/config.ts" />
 /// <reference path="core/version.ts" />
 /// <reference path="core/colors.ts" />
 /// <reference path="core/plottableObject.ts" />
@@ -77,7 +78,10 @@
 /// <reference path="animators/rectAnimator.ts" />
 /// <reference path="animators/movingRectAnimator.ts" />
 
-/// <reference path="interactions/keyEventListener.ts" />
+/// <reference path="dispatchers/abstractDispatcher.ts" />
+/// <reference path="dispatchers/mouseDispatcher.ts" />
+/// <reference path="dispatchers/keypressDispatcher.ts" />
+
 /// <reference path="interactions/abstractInteraction.ts" />
 /// <reference path="interactions/clickInteraction.ts" />
 /// <reference path="interactions/keyInteraction.ts" />
@@ -89,6 +93,3 @@
 /// <reference path="interactions/drag/xyDragBoxInteraction.ts" />
 /// <reference path="interactions/drag/yDragBoxInteraction.ts" />
 /// <reference path="interactions/hoverInteraction.ts" />
-
-/// <reference path="dispatchers/abstractDispatcher.ts" />
-/// <reference path="dispatchers/mouseDispatcher.ts" />

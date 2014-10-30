@@ -1,5 +1,5 @@
 /*!
-Plottable 0.33.1 (https://github.com/palantir/plottable)
+Plottable 0.34.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -26,6 +26,9 @@ var Plottable;
              * @param {string} The warnings to print
              */
             function warn(warning) {
+                if (!Plottable.Config.SHOW_WARNINGS) {
+                    return;
+                }
                 /* tslint:disable:no-console */
                 if (window.console != null) {
                     if (window.console.warn != null) {
@@ -262,6 +265,27 @@ var Plottable;
                 return range;
             }
             Methods.range = range;
+            /** Is like setTimeout, but activates synchronously if time=0
+             * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
+             * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
+             * evaluating, the results are painted to the screen. As a result, if we want something to occur immediately but call setTimeout
+             * with time=0, then it is pushed to the call stack and rendered in the next frame, so the component that was rendered via
+             * setTimeout appears out-of-sync with the rest of the plot.
+             */
+            function setTimeout(f, time) {
+                var args = [];
+                for (var _i = 2; _i < arguments.length; _i++) {
+                    args[_i - 2] = arguments[_i];
+                }
+                if (time === 0) {
+                    f(args);
+                    return -1;
+                }
+                else {
+                    return window.setTimeout(f, time, args);
+                }
+            }
+            Methods.setTimeout = setTimeout;
         })(_Util.Methods || (_Util.Methods = {}));
         var Methods = _Util.Methods;
     })(Plottable._Util || (Plottable._Util = {}));
@@ -1157,17 +1181,13 @@ var Plottable;
          *
          * @returns {Formatter} A formatter for currency values.
          */
-        function currency(precision, symbol, prefix, onlyShowUnchanged) {
+        function currency(precision, symbol, prefix) {
             if (precision === void 0) { precision = 2; }
             if (symbol === void 0) { symbol = "$"; }
             if (prefix === void 0) { prefix = true; }
-            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
             var fixedFormatter = Formatters.fixed(precision);
             return function (d) {
                 var formattedValue = fixedFormatter(Math.abs(d));
-                if (onlyShowUnchanged && valueChanged(Math.abs(d), formattedValue)) {
-                    return "";
-                }
                 if (formattedValue !== "") {
                     if (prefix) {
                         formattedValue = symbol + formattedValue;
@@ -1191,16 +1211,11 @@ var Plottable;
          *
          * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
          */
-        function fixed(precision, onlyShowUnchanged) {
+        function fixed(precision) {
             if (precision === void 0) { precision = 3; }
-            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
             verifyPrecision(precision);
             return function (d) {
-                var formattedValue = d.toFixed(precision);
-                if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
-                    return "";
-                }
-                return formattedValue;
+                return d.toFixed(precision);
             };
         }
         Formatters.fixed = fixed;
@@ -1213,18 +1228,13 @@ var Plottable;
          *
          * @returns {Formatter} A formatter for general values.
          */
-        function general(precision, onlyShowUnchanged) {
+        function general(precision) {
             if (precision === void 0) { precision = 3; }
-            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
             verifyPrecision(precision);
             return function (d) {
                 if (typeof d === "number") {
                     var multiplier = Math.pow(10, precision);
-                    var formattedValue = String(Math.round(d * multiplier) / multiplier);
-                    if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
-                        return "";
-                    }
-                    return formattedValue;
+                    return String(Math.round(d * multiplier) / multiplier);
                 }
                 else {
                     return String(d);
@@ -1252,24 +1262,16 @@ var Plottable;
          *
          * @returns {Formatter} A formatter for percentage values.
          */
-        function percentage(precision, onlyShowUnchanged) {
+        function percentage(precision) {
             if (precision === void 0) { precision = 0; }
-            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
-            var fixedFormatter = Formatters.fixed(precision, onlyShowUnchanged);
+            var fixedFormatter = Formatters.fixed(precision);
             return function (d) {
                 var valToFormat = d * 100;
                 // Account for float imprecision
                 var valString = d.toString();
                 var integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
                 valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
-                var formattedValue = fixedFormatter(valToFormat);
-                if (onlyShowUnchanged && valueChanged(valToFormat, formattedValue)) {
-                    return "";
-                }
-                if (formattedValue !== "") {
-                    formattedValue += "%";
-                }
-                return formattedValue;
+                return fixedFormatter(valToFormat) + "%";
             };
         }
         Formatters.percentage = percentage;
@@ -1364,9 +1366,6 @@ var Plottable;
                 throw new RangeError("Formatter precision must be between 0 and 20");
             }
         }
-        function valueChanged(d, formattedValue) {
-            return d !== parseFloat(formattedValue);
-        }
     })(Plottable.Formatters || (Plottable.Formatters = {}));
     var Formatters = Plottable.Formatters;
 })(Plottable || (Plottable = {}));
@@ -1374,7 +1373,19 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.33.1";
+    (function (Config) {
+        /**
+         * Specifies if Plottable should show warnings.
+         */
+        Config.SHOW_WARNINGS = true;
+    })(Plottable.Config || (Plottable.Config = {}));
+    var Config = Plottable.Config;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    Plottable.version = "0.34.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2111,6 +2122,7 @@ var Plottable;
                 this.broadcaster = new Plottable.Core.Broadcaster(this);
                 this._rendererAttrID2Extent = {};
                 this._typeCoercer = function (d) { return d; };
+                this._domainModificationInProgress = false;
                 this._d3Scale = scale;
             }
             AbstractScale.prototype._getAllExtents = function () {
@@ -2168,8 +2180,12 @@ var Plottable;
                 return this._d3Scale.domain();
             };
             AbstractScale.prototype._setDomain = function (values) {
-                this._d3Scale.domain(values);
-                this.broadcaster.broadcast();
+                if (!this._domainModificationInProgress) {
+                    this._domainModificationInProgress = true;
+                    this._d3Scale.domain(values);
+                    this.broadcaster.broadcast();
+                    this._domainModificationInProgress = false;
+                }
             };
             AbstractScale.prototype.range = function (values) {
                 if (values == null) {
@@ -3090,6 +3106,20 @@ var Plottable;
                 };
             }
             TickGenerators.intervalTickGenerator = intervalTickGenerator;
+            /**
+             * Creates a tick generator that will filter for only the integers in defaultTicks and return them.
+             *
+             * Will also include the end ticks.
+             *
+             * @returns {TickGenerator} A tick generator returning only integer ticks.
+             */
+            function integerTickGenerator() {
+                return function (s) {
+                    var defaultTicks = s.getDefaultTicks();
+                    return defaultTicks.filter(function (tick, i) { return (tick % 1 === 0) || (i === 0) || (i === defaultTicks.length - 1); });
+                };
+            }
+            TickGenerators.integerTickGenerator = integerTickGenerator;
         })(Scale.TickGenerators || (Scale.TickGenerators = {}));
         var TickGenerators = Scale.TickGenerators;
     })(Plottable.Scale || (Plottable.Scale = {}));
@@ -3161,7 +3191,7 @@ var Plottable;
                 var numberOfIterations = this._numberOfAnimationIterations(data);
                 var delay = 0;
                 drawSteps.forEach(function (drawStep, i) {
-                    setTimeout(function () { return _this._drawStep(drawStep); }, delay);
+                    Plottable._Util.Methods.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
                     delay += drawStep.animator.getTiming(numberOfIterations);
                 });
                 return delay;
@@ -3355,6 +3385,23 @@ var Plottable;
                 }
                 dataElements.exit().remove();
             };
+            Element.prototype.filterDefinedData = function (data, definedFunction) {
+                return definedFunction ? data.filter(definedFunction) : data;
+            };
+            Element.prototype.draw = function (data, drawSteps) {
+                var _this = this;
+                var modifiedDrawSteps = [];
+                drawSteps.forEach(function (d, i) {
+                    modifiedDrawSteps[i] = { animator: d.animator, attrToProjector: Plottable._Util.Methods.copyMap(d.attrToProjector) };
+                });
+                var definedData = modifiedDrawSteps.reduce(function (data, drawStep) { return _this.filterDefinedData(data, drawStep.attrToProjector["defined"]); }, data);
+                modifiedDrawSteps.forEach(function (d) {
+                    if (d.attrToProjector["defined"]) {
+                        delete d.attrToProjector["defined"];
+                    }
+                });
+                return _super.prototype.draw.call(this, definedData, modifiedDrawSteps);
+            };
             return Element;
         })(_Drawer.AbstractDrawer);
         _Drawer.Element = Element;
@@ -3524,6 +3571,7 @@ var Plottable;
                 this._yOffset = 0;
                 this.cssClasses = ["component"];
                 this.removed = false;
+                this._autoResize = AbstractComponent.AUTORESIZE_BY_DEFAULT;
             }
             /**
              * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -3578,7 +3626,7 @@ var Plottable;
                 this.interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
                 this.interactionsToRegister = null;
                 if (this.isTopLevelComponent) {
-                    this.autoResize(AbstractComponent.AUTORESIZE_BY_DEFAULT);
+                    this.autoResize(this._autoResize);
                 }
                 this._isSetup = true;
             };
@@ -3717,6 +3765,7 @@ var Plottable;
                 else {
                     Plottable.Core.ResizeBroadcaster.deregister(this);
                 }
+                this._autoResize = flag; // if _setup were called by constructor, this var could be removed #591
                 return this;
             };
             /**
@@ -4768,10 +4817,10 @@ var Plottable;
              * @constructor
              * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
              * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-             * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
+             * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
              */
             function Numeric(scale, orientation, formatter) {
-                if (formatter === void 0) { formatter = Plottable.Formatters.general(3, false); }
+                if (formatter === void 0) { formatter = Plottable.Formatters.general(); }
                 _super.call(this, scale, orientation, formatter);
                 this.tickLabelPositioning = "center";
                 // Whether or not first/last tick label will still be displayed even if
@@ -6491,6 +6540,8 @@ var Plottable;
              */
             function AbstractXYPlot(xScale, yScale) {
                 _super.call(this);
+                this._autoAdjustXScaleDomain = false;
+                this._autoAdjustYScaleDomain = false;
                 if (xScale == null || yScale == null) {
                     throw new Error("XYPlots require an xScale and yScale");
                 }
@@ -6503,18 +6554,74 @@ var Plottable;
              * x and y position in the Plot.
              */
             AbstractXYPlot.prototype.project = function (attrToSet, accessor, scale) {
+                var _this = this;
                 // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
                 // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
                 if (attrToSet === "x" && scale) {
+                    if (this._xScale) {
+                        this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this._plottableID);
+                    }
                     this._xScale = scale;
                     this._updateXDomainer();
+                    scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this.adjustYDomainOnChangeFromX(); });
                 }
                 if (attrToSet === "y" && scale) {
+                    if (this._yScale) {
+                        this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this._plottableID);
+                    }
                     this._yScale = scale;
                     this._updateYDomainer();
+                    scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this.adjustXDomainOnChangeFromY(); });
                 }
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
+            };
+            AbstractXYPlot.prototype.remove = function () {
+                _super.prototype.remove.call(this);
+                if (this._xScale) {
+                    this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this._plottableID);
+                }
+                if (this._yScale) {
+                    this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this._plottableID);
+                }
+                return this;
+            };
+            /**
+             * Sets the automatic domain adjustment over visible points for y scale.
+             *
+             * If autoAdjustment is true adjustment is immediately performend.
+             *
+             * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
+             * @returns {AbstractXYPlot} The calling AbstractXYPlot.
+             */
+            AbstractXYPlot.prototype.automaticallyAdjustYScaleOverVisiblePoints = function (autoAdjustment) {
+                this._autoAdjustYScaleDomain = autoAdjustment;
+                this.adjustYDomainOnChangeFromX();
+                return this;
+            };
+            /**
+             * Sets the automatic domain adjustment over visible points for x scale.
+             *
+             * If autoAdjustment is true adjustment is immediately performend.
+             *
+             * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
+             * @returns {AbstractXYPlot} The calling AbstractXYPlot.
+             */
+            AbstractXYPlot.prototype.automaticallyAdjustXScaleOverVisiblePoints = function (autoAdjustment) {
+                this._autoAdjustXScaleDomain = autoAdjustment;
+                this.adjustXDomainOnChangeFromY();
+                return this;
+            };
+            AbstractXYPlot.prototype._generateAttrToProjector = function () {
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var positionXFn = attrToProjector["x"];
+                var positionYFn = attrToProjector["y"];
+                attrToProjector["defined"] = function (d, i) {
+                    var positionX = positionXFn(d, i);
+                    var positionY = positionYFn(d, i);
+                    return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+                };
+                return attrToProjector;
             };
             AbstractXYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
@@ -6536,6 +6643,55 @@ var Plottable;
                         scale.domainer().pad().nice();
                     }
                 }
+            };
+            /**
+             * Adjusts both domains' extents to show all datasets.
+             *
+             * This call does not override auto domain adjustment behavior over visible points.
+             */
+            AbstractXYPlot.prototype.showAllData = function () {
+                this._xScale.autoDomain();
+                if (!this._autoAdjustYScaleDomain) {
+                    this._yScale.autoDomain();
+                }
+            };
+            AbstractXYPlot.prototype.adjustYDomainOnChangeFromX = function () {
+                if (this._autoAdjustYScaleDomain) {
+                    this.adjustDomainToVisiblePoints(this._xScale, this._yScale, true);
+                }
+            };
+            AbstractXYPlot.prototype.adjustXDomainOnChangeFromY = function () {
+                if (this._autoAdjustXScaleDomain) {
+                    this.adjustDomainToVisiblePoints(this._yScale, this._xScale, false);
+                }
+            };
+            AbstractXYPlot.prototype.adjustDomainToVisiblePoints = function (fromScale, toScale, fromX) {
+                if (toScale instanceof Plottable.Scale.AbstractQuantitative) {
+                    var toScaleQ = toScale;
+                    var normalizedData = this.normalizeDatasets(fromX);
+                    var adjustedDomain = this.adjustDomainOverVisiblePoints(normalizedData, fromScale.domain());
+                    if (adjustedDomain.length === 0) {
+                        return;
+                    }
+                    adjustedDomain = toScaleQ.domainer().computeDomain([adjustedDomain], toScaleQ);
+                    toScaleQ.domain(adjustedDomain);
+                }
+            };
+            AbstractXYPlot.prototype.normalizeDatasets = function (fromX) {
+                var flattenDatasets = Plottable._Util.Methods.flatten(this.datasets().map(function (d) { return d.data(); }));
+                var aAccessor = this._projectors[fromX ? "x" : "y"].accessor;
+                var bAccessor = this._projectors[fromX ? "y" : "x"].accessor;
+                return flattenDatasets.map(function (d, i) {
+                    return { a: aAccessor(d, i), b: bAccessor(d, i) };
+                });
+            };
+            AbstractXYPlot.prototype.adjustDomainOverVisiblePoints = function (values, fromDomain) {
+                var bVals = values.filter(function (v) { return fromDomain[0] <= v.a && v.a <= fromDomain[1]; }).map(function (v) { return v.b; });
+                var retVal = [];
+                if (bVals.length !== 0) {
+                    retVal = [Plottable._Util.Methods.min(bVals, null), Plottable._Util.Methods.max(bVals, null)];
+                }
+                return retVal;
             };
             return AbstractXYPlot;
         })(Plot.AbstractPlot);
@@ -6773,6 +6929,7 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
+<<<<<<< HEAD
             AbstractBarPlot.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 // If a QuantitativeScale is used, the plot can easily extend outside the component boundary.
@@ -6808,7 +6965,12 @@ var Plottable;
              * @param {number} value The value to position the baseline at.
              * @returns {AbstractBarPlot} The calling AbstractBarPlot.
              */
+=======
+>>>>>>> develop
             AbstractBarPlot.prototype.baseline = function (value) {
+                if (value == null) {
+                    return this._baselineValue;
+                }
                 this._baselineValue = value;
                 this._updateXDomainer();
                 this._updateYDomainer();
@@ -6951,7 +7113,7 @@ var Plottable;
                 var drawers = this._getDrawersInOrder();
                 drawers.forEach(function (d) { return d.removeLabels(); });
                 if (this._barLabelsEnabled) {
-                    setTimeout(function () { return _this._drawLabels(); }, time);
+                    Plottable._Util.Methods.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
             };
             AbstractBarPlot.prototype._drawLabels = function () {
@@ -6989,7 +7151,12 @@ var Plottable;
                 var secondaryAttr = this._isVertical ? "x" : "y";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
                 if (!attrToProjector["width"]) {
+<<<<<<< HEAD
                     attrToProjector["width"] = function () { return _this._getBarPixelWidth(); };
+=======
+                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
+                    attrToProjector["width"] = function (d, i) { return constantWidth; };
+>>>>>>> develop
                 }
                 var positionF = attrToProjector[secondaryAttr];
                 var widthF = attrToProjector["width"];
@@ -7120,6 +7287,10 @@ var Plottable;
                 };
             };
             AbstractBarPlot._BarAlignmentToFactor = {};
+<<<<<<< HEAD
+=======
+            AbstractBarPlot._DEFAULT_WIDTH = 10;
+>>>>>>> develop
             return AbstractBarPlot;
         })(Plot.AbstractXYPlot);
         Plot.AbstractBarPlot = AbstractBarPlot;
@@ -7416,15 +7587,12 @@ var Plottable;
                 if (isVertical === void 0) { isVertical = true; }
                 this._isVertical = isVertical; // Has to be set before super()
                 _super.call(this, xScale, yScale);
-                this.innerScale = new Plottable.Scale.Ordinal();
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
-                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 // the width is constant, so set the inner scale range to that
-                var widthF = attrToProjector["width"];
-                this.innerScale.range([0, widthF(null, 0)]);
-                var innerWidthF = function (d, i) { return _this.innerScale.rangeBand(); };
+                var innerScale = this.makeInnerScale();
+                var innerWidthF = function (d, i) { return innerScale.rangeBand(); };
                 var heightF = attrToProjector["height"];
                 attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
                 attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
@@ -7436,18 +7604,39 @@ var Plottable;
             ClusteredBar.prototype._getDataToDraw = function () {
                 var _this = this;
                 var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                this.innerScale.domain(this._datasetKeysInOrder);
+                var innerScale = this.makeInnerScale();
                 var clusters = d3.map();
                 this._datasetKeysInOrder.forEach(function (key) {
                     var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
                     clusters.set(key, data.map(function (d, i) {
                         var val = accessor(d, i);
                         var primaryScale = _this._isVertical ? _this._xScale : _this._yScale;
-                        d["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + _this.innerScale.scale(key);
-                        return d;
+                        // TODO: store position information in metadata.
+                        var copyD = Plottable._Util.Methods.copyMap(d);
+                        copyD["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + innerScale.scale(key);
+                        return copyD;
                     }));
                 });
                 return clusters;
+            };
+            ClusteredBar.prototype.makeInnerScale = function () {
+                var innerScale = new Plottable.Scale.Ordinal();
+                innerScale.domain(this._datasetKeysInOrder);
+                // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
+                if (!this._projectors["width"]) {
+                    var secondaryScale = this._isVertical ? this._xScale : this._yScale;
+                    var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
+                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : Plot.AbstractBarPlot._DEFAULT_WIDTH;
+                    innerScale.range([0, constantWidth]);
+                }
+                else {
+                    var projector = this._projectors["width"];
+                    var accessor = projector.accessor;
+                    var scale = projector.scale;
+                    var fn = scale ? function (d, i) { return scale.scale(accessor(d, i)); } : accessor;
+                    innerScale.range([0, fn(null, 0)]);
+                }
+                return innerScale;
             };
             return ClusteredBar;
         })(Plot.AbstractBarPlot);
@@ -8034,55 +8223,220 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var Plottable;
 (function (Plottable) {
-    (function (Core) {
-        /**
-         * A module for listening to keypresses on the document.
-         */
-        (function (KeyEventListener) {
-            var _initialized = false;
-            var _callbacks = [];
+    (function (Dispatcher) {
+        var AbstractDispatcher = (function (_super) {
+            __extends(AbstractDispatcher, _super);
             /**
-             * Turns on key listening.
-             */
-            function initialize() {
-                if (_initialized) {
-                    return;
-                }
-                d3.select(document).on("keydown", processEvent);
-                _initialized = true;
-            }
-            KeyEventListener.initialize = initialize;
-            /**
-             * When a key event occurs with the key corresponding te keyCod, call cb.
+             * Constructs a Dispatcher with the specified target.
              *
-             * @param {number} keyCode The javascript key code to call cb on.
-             * @param {IKeyEventListener} cb Will be called when keyCode key event
-             * occurs.
+             * @constructor
+             * @param {D3.Selection} [target] The selection to listen for events on.
              */
-            function addCallback(keyCode, cb) {
-                if (!_initialized) {
-                    initialize();
-                }
-                if (_callbacks[keyCode] == null) {
-                    _callbacks[keyCode] = [];
-                }
-                _callbacks[keyCode].push(cb);
+            function AbstractDispatcher(target) {
+                _super.call(this);
+                this._event2Callback = {};
+                this.connected = false;
+                this._target = target;
             }
-            KeyEventListener.addCallback = addCallback;
-            function processEvent() {
-                if (_callbacks[d3.event.keyCode] == null) {
-                    return;
+            AbstractDispatcher.prototype.target = function (targetElement) {
+                if (targetElement == null) {
+                    return this._target;
                 }
-                _callbacks[d3.event.keyCode].forEach(function (cb) {
-                    cb(d3.event);
+                var wasConnected = this.connected;
+                this.disconnect();
+                this._target = targetElement;
+                if (wasConnected) {
+                    // re-connect to the new target
+                    this.connect();
+                }
+                return this;
+            };
+            /**
+             * Gets a namespaced version of the event name.
+             */
+            AbstractDispatcher.prototype._getEventString = function (eventName) {
+                return eventName + ".dispatcher" + this._plottableID;
+            };
+            /**
+             * Attaches the Dispatcher's listeners to the Dispatcher's target element.
+             *
+             * @returns {Dispatcher} The calling Dispatcher.
+             */
+            AbstractDispatcher.prototype.connect = function () {
+                var _this = this;
+                if (this.connected) {
+                    throw new Error("Can't connect dispatcher twice!");
+                }
+                if (this._target) {
+                    this.connected = true;
+                    Object.keys(this._event2Callback).forEach(function (event) {
+                        var callback = _this._event2Callback[event];
+                        _this._target.on(_this._getEventString(event), callback);
+                    });
+                }
+                return this;
+            };
+            /**
+             * Detaches the Dispatcher's listeners from the Dispatchers' target element.
+             *
+             * @returns {Dispatcher} The calling Dispatcher.
+             */
+            AbstractDispatcher.prototype.disconnect = function () {
+                var _this = this;
+                this.connected = false;
+                if (this._target) {
+                    Object.keys(this._event2Callback).forEach(function (event) {
+                        _this._target.on(_this._getEventString(event), null);
+                    });
+                }
+                return this;
+            };
+            return AbstractDispatcher;
+        })(Plottable.Core.PlottableObject);
+        Dispatcher.AbstractDispatcher = AbstractDispatcher;
+    })(Plottable.Dispatcher || (Plottable.Dispatcher = {}));
+    var Dispatcher = Plottable.Dispatcher;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Dispatcher) {
+        var Mouse = (function (_super) {
+            __extends(Mouse, _super);
+            /**
+             * Constructs a Mouse Dispatcher with the specified target.
+             *
+             * @param {D3.Selection} target The selection to listen for events on.
+             */
+            function Mouse(target) {
+                var _this = this;
+                _super.call(this, target);
+                this._event2Callback["mouseover"] = function () {
+                    if (_this._mouseover != null) {
+                        _this._mouseover(_this.getMousePosition());
+                    }
+                };
+                this._event2Callback["mousemove"] = function () {
+                    if (_this._mousemove != null) {
+                        _this._mousemove(_this.getMousePosition());
+                    }
+                };
+                this._event2Callback["mouseout"] = function () {
+                    if (_this._mouseout != null) {
+                        _this._mouseout(_this.getMousePosition());
+                    }
+                };
+            }
+            Mouse.prototype.getMousePosition = function () {
+                var xy = d3.mouse(this._target.node());
+                return {
+                    x: xy[0],
+                    y: xy[1]
+                };
+            };
+            Mouse.prototype.mouseover = function (callback) {
+                if (callback === undefined) {
+                    return this._mouseover;
+                }
+                this._mouseover = callback;
+                return this;
+            };
+            Mouse.prototype.mousemove = function (callback) {
+                if (callback === undefined) {
+                    return this._mousemove;
+                }
+                this._mousemove = callback;
+                return this;
+            };
+            Mouse.prototype.mouseout = function (callback) {
+                if (callback === undefined) {
+                    return this._mouseout;
+                }
+                this._mouseout = callback;
+                return this;
+            };
+            return Mouse;
+        })(Dispatcher.AbstractDispatcher);
+        Dispatcher.Mouse = Mouse;
+    })(Plottable.Dispatcher || (Plottable.Dispatcher = {}));
+    var Dispatcher = Plottable.Dispatcher;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Dispatcher) {
+        var Keypress = (function (_super) {
+            __extends(Keypress, _super);
+            /**
+             * Constructs a Keypress Dispatcher with the specified target.
+             *
+             * @constructor
+             * @param {D3.Selection} [target] The selection to listen for events on.
+             */
+            function Keypress(target) {
+                var _this = this;
+                _super.call(this, target);
+                this.mousedOverTarget = false;
+                // Can't attach the key listener to the target (a sub-svg element)
+                // because "focusable" is only in SVG 1.2 / 2, which most browsers don't
+                // yet implement
+                this.keydownListenerTarget = d3.select(document);
+                this._event2Callback["mouseover"] = function () {
+                    _this.mousedOverTarget = true;
+                };
+                this._event2Callback["mouseout"] = function () {
+                    _this.mousedOverTarget = false;
+                };
+            }
+            Keypress.prototype.connect = function () {
+                var _this = this;
+                _super.prototype.connect.call(this);
+                this.keydownListenerTarget.on(this._getEventString("keydown"), function () {
+                    if (_this.mousedOverTarget && _this._onKeyDown) {
+                        _this._onKeyDown(d3.event);
+                    }
                 });
-            }
-        })(Core.KeyEventListener || (Core.KeyEventListener = {}));
-        var KeyEventListener = Core.KeyEventListener;
-    })(Plottable.Core || (Plottable.Core = {}));
-    var Core = Plottable.Core;
+                return this;
+            };
+            Keypress.prototype.disconnect = function () {
+                _super.prototype.disconnect.call(this);
+                this.keydownListenerTarget.on(this._getEventString("keydown"), null);
+                return this;
+            };
+            Keypress.prototype.onKeyDown = function (callback) {
+                if (callback === undefined) {
+                    return this._onKeyDown;
+                }
+                this._onKeyDown = callback;
+                return this;
+            };
+            return Keypress;
+        })(Dispatcher.AbstractDispatcher);
+        Dispatcher.Keypress = Keypress;
+    })(Plottable.Dispatcher || (Plottable.Dispatcher = {}));
+    var Dispatcher = Plottable.Dispatcher;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8185,37 +8539,34 @@ var Plottable;
              * moused over.
              *
              * @constructor
-             * @param {number} keyCode The key code to listen for.
              */
-            function Key(keyCode) {
+            function Key() {
                 _super.call(this);
                 this.activated = false;
-                this.keyCode = keyCode;
+                this.keyCode2Callback = {};
+                this.dispatcher = new Plottable.Dispatcher.Keypress();
             }
             Key.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
-                hitBox.on("mouseover", function () {
-                    _this.activated = true;
-                });
-                hitBox.on("mouseout", function () {
-                    _this.activated = false;
-                });
-                Plottable.Core.KeyEventListener.addCallback(this.keyCode, function (e) {
-                    if (_this.activated && _this._callback != null) {
-                        _this._callback();
+                this.dispatcher.target(this._hitBox);
+                this.dispatcher.onKeyDown(function (e) {
+                    if (_this.keyCode2Callback[e.keyCode]) {
+                        _this.keyCode2Callback[e.keyCode]();
                     }
                 });
+                this.dispatcher.connect();
             };
             /**
-             * Sets a callback to be called when the designated key is pressed and the
-             * user is moused over the component.
+             * Sets a callback to be called when the key with the given keyCode is
+             * pressed and the user is moused over the Component.
              *
-             * @param {() => any} cb Callback to be called.
-             * @returns The calling Key.
+             * @param {number} keyCode The key code associated with the key.
+             * @param {() => void} callback Callback to be called.
+             * @returns The calling Interaction.Key.
              */
-            Key.prototype.callback = function (cb) {
-                this._callback = cb;
+            Key.prototype.on = function (keyCode, callback) {
+                this.keyCode2Callback[keyCode] = callback;
                 return this;
             };
             return Key;
@@ -8828,154 +9179,4 @@ var Plottable;
         Interaction.Hover = Hover;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Dispatcher) {
-        var AbstractDispatcher = (function (_super) {
-            __extends(AbstractDispatcher, _super);
-            /**
-             * Constructs a Dispatcher with the specified target.
-             *
-             * @param {D3.Selection} target The selection to listen for events on.
-             */
-            function AbstractDispatcher(target) {
-                _super.call(this);
-                this._event2Callback = {};
-                this.connected = false;
-                this._target = target;
-            }
-            AbstractDispatcher.prototype.target = function (targetElement) {
-                if (targetElement == null) {
-                    return this._target;
-                }
-                var wasConnected = this.connected;
-                this.disconnect();
-                this._target = targetElement;
-                if (wasConnected) {
-                    // re-connect to the new target
-                    this.connect();
-                }
-                return this;
-            };
-            /**
-             * Gets a namespaced version of the event name.
-             */
-            AbstractDispatcher.prototype.getEventString = function (eventName) {
-                return eventName + ".dispatcher" + this._plottableID;
-            };
-            /**
-             * Attaches the Dispatcher's listeners to the Dispatcher's target element.
-             *
-             * @returns {Dispatcher} The calling Dispatcher.
-             */
-            AbstractDispatcher.prototype.connect = function () {
-                var _this = this;
-                if (this.connected) {
-                    throw new Error("Can't connect dispatcher twice!");
-                }
-                this.connected = true;
-                Object.keys(this._event2Callback).forEach(function (event) {
-                    var callback = _this._event2Callback[event];
-                    _this._target.on(_this.getEventString(event), callback);
-                });
-                return this;
-            };
-            /**
-             * Detaches the Dispatcher's listeners from the Dispatchers' target element.
-             *
-             * @returns {Dispatcher} The calling Dispatcher.
-             */
-            AbstractDispatcher.prototype.disconnect = function () {
-                var _this = this;
-                this.connected = false;
-                Object.keys(this._event2Callback).forEach(function (event) {
-                    _this._target.on(_this.getEventString(event), null);
-                });
-                return this;
-            };
-            return AbstractDispatcher;
-        })(Plottable.Core.PlottableObject);
-        Dispatcher.AbstractDispatcher = AbstractDispatcher;
-    })(Plottable.Dispatcher || (Plottable.Dispatcher = {}));
-    var Dispatcher = Plottable.Dispatcher;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Dispatcher) {
-        var Mouse = (function (_super) {
-            __extends(Mouse, _super);
-            /**
-             * Constructs a Mouse Dispatcher with the specified target.
-             *
-             * @param {D3.Selection} target The selection to listen for events on.
-             */
-            function Mouse(target) {
-                var _this = this;
-                _super.call(this, target);
-                this._event2Callback["mouseover"] = function () {
-                    if (_this._mouseover != null) {
-                        _this._mouseover(_this.getMousePosition());
-                    }
-                };
-                this._event2Callback["mousemove"] = function () {
-                    if (_this._mousemove != null) {
-                        _this._mousemove(_this.getMousePosition());
-                    }
-                };
-                this._event2Callback["mouseout"] = function () {
-                    if (_this._mouseout != null) {
-                        _this._mouseout(_this.getMousePosition());
-                    }
-                };
-            }
-            Mouse.prototype.getMousePosition = function () {
-                var xy = d3.mouse(this._target.node());
-                return {
-                    x: xy[0],
-                    y: xy[1]
-                };
-            };
-            Mouse.prototype.mouseover = function (callback) {
-                if (callback === undefined) {
-                    return this._mouseover;
-                }
-                this._mouseover = callback;
-                return this;
-            };
-            Mouse.prototype.mousemove = function (callback) {
-                if (callback === undefined) {
-                    return this._mousemove;
-                }
-                this._mousemove = callback;
-                return this;
-            };
-            Mouse.prototype.mouseout = function (callback) {
-                if (callback === undefined) {
-                    return this._mouseout;
-                }
-                this._mouseout = callback;
-                return this;
-            };
-            return Mouse;
-        })(Dispatcher.AbstractDispatcher);
-        Dispatcher.Mouse = Mouse;
-    })(Plottable.Dispatcher || (Plottable.Dispatcher = {}));
-    var Dispatcher = Plottable.Dispatcher;
 })(Plottable || (Plottable = {}));
