@@ -33,8 +33,7 @@ function filterQuickTests(category, branchList){
 
       if (-1 !== path.indexOf("list/" + category)){
         var name = path.replace(/.*\/|\.js/g, '');
-        //quickTestNames.push(name);
-        qtestnames.push(name)
+        qtestnames.push(name);
       }
 
     });
@@ -43,7 +42,6 @@ function filterQuickTests(category, branchList){
 }
 
 function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondBranch){
-  //x here is an array of test names
 
   var div = d3.select("#results");
   quickTestNames.forEach(function(q) { //for each quicktest 
@@ -62,9 +60,9 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
       var className = "quicktest " + name;
 
       var div = d3.select("#results").append("div").attr("class", className);
-      div.insert("span").text(name)
-      var firstsvg = div.append("div").attr("class", "first").append("svg").attr("width", svgWidth).attr("height", svgHeight);;
-      var secondsvg = div.append("div").attr("class", "second").append("svg").attr("width", svgWidth).attr("height", svgHeight);;
+      div.insert("label").text(name);
+      var firstsvg = div.append("div").attr("class", "first").append("svg").attr("width", svgWidth).attr("height", svgHeight);
+      var secondsvg = div.append("div").attr("class", "second").append("svg").attr("width", svgWidth).attr("height", svgHeight);
       var data = result.makeData();
 
       runQuickTest(firstsvg, data, firstBranch);
@@ -92,20 +90,15 @@ function loadPlottableBranches(category, branchList){
       listOfUrl.push("/plottable.js"); //load local version
     }
 
-  })
+  });
 
   $.getScript(listOfUrl[0], function(data, textStatus) { 
     if(textStatus === "success"){
-          console.log("success!");
-          console.log("Plottable version: " + Plottable.version);
       plottableBranches[branchName1] =  $.extend(true, {}, Plottable);
       Plottable = null;
 
       $.getScript(listOfUrl[1], function(data, testStatus){ //load second 
         if(textStatus === "success"){
-          console.log("success!");
-          console.log("Plottable version: " + Plottable.version);
-
           plottableBranches[branchName2] = $.extend(true, {}, Plottable);
           Plottable = null;
           filterQuickTests(category, branchList);
@@ -122,7 +115,7 @@ function loadPlottableBranches(category, branchList){
 //run a single quicktest
 function runQuickTest(svg, data, branch){
   try {
-    result.run(svg, data, plottableBranches[branch])
+    result.run(svg, data, plottableBranches[branch]);
     setPlotDimensions();
 
   } catch (err) {
@@ -153,51 +146,50 @@ window.onkeyup = function(e){
 
   var visibleQuickTests = $(".quicktest").toArray();
 
-  if (key == 49) {
+  if (key === 49) {
     visibleQuickTests.forEach(function(quicktest){
       $(".first", quicktest).css("display", "block");
       $(".second", quicktest).css("display", "none");
       $(".second", quicktest).before($(".first", quicktest));
     });
-
+    $(".quicktest").css("display", "inline-block");
     $("#branch1").css("background-color", "mediumaquamarine");
     $("#branch2").css("background-color", "white");
     
     return;
   }
   //if 2 is pressed
-  if (key == 50) {
-    //$(".quicktest").css("display", "inline-block")
+  if (key === 50) {
     visibleQuickTests.forEach(function(quicktest){
       $(".first", quicktest).css("display", "none");
       $(".second", quicktest).css("display", "block");
       $(".first", quicktest).before($(".second", quicktest));
     });
-
+    $(".quicktest").css("display", "inline-block");
     $("#branch1").css("background-color", "white");
     $("#branch2").css("background-color", "mediumaquamarine");
     return;
   }
   //if 3 is pressed
-  if (key == 51) {
-    //$(".quicktest").css("display", "inline-block")
+  if (key === 51) {
     visibleQuickTests.forEach(function(quicktest){
       $(".first", quicktest).css("display", "block");
       $(".second", quicktest).css("display", "block");
       $(".first", quicktest).before($(".second", quicktest));
     });
+    $(".quicktest").css("display", "inline-block");
     $("#branch1").css("background-color", "mediumaquamarine");
     $("#branch2").css("background-color", "mediumaquamarine");
     return;
   }
   //if 4 is pressed
-  if (key == 52) {
-    //$(".quicktest").css("display", "none")
+  if (key === 52) {
     visibleQuickTests.forEach(function(quicktest){
       $(".first", quicktest).css("display", "none");
       $(".second", quicktest).css("display", "none");
       $(".first", quicktest).before($(".second", quicktest));
     });
+    $(".quicktest").css("display", "none");
     $("#branch1").css("background-color", "white");
     $("#branch2").css("background-color", "white");
     return;
