@@ -32,15 +32,29 @@ function run(div, data, Plottable) {
 
   chart.renderTo(svg);
 
+  var hoverCircle = plot._foregroundContainer.append("circle")
+                                            .attr({
+                                              "stroke": "black",
+                                              "fill": "none",
+                                              "r": 15
+                                            })
+                                            .style("visibility", "hidden");
+
   var hover = new Plottable.Interaction.Hover();
   hover.onHoverOver(function(hoverData) {
     var color = hoverData.data[0].color.toUpperCase();
     var xString = hoverData.data[0].x.toFixed(2);
     var yString = hoverData.data[0].y.toFixed(2);
     title.text(color + ": [ " + xString + ", " + yString + " ]");
+
+    hoverCircle.attr({
+      "cx": hoverData.pixelPositions[0].x,
+      "cy": hoverData.pixelPositions[0].y
+    }).style("visibility", "visible");
   });
   hover.onHoverOut(function(hoverData) {
     title.text("Hover over points");
+    hoverCircle.style("visibility", "hidden");
   });
   plot.registerInteraction(hover);
 }
