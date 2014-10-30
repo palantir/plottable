@@ -2882,6 +2882,7 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
+            static _DEFAULT_WIDTH: number;
             _baseline: D3.Selection;
             _baselineValue: number;
             _barAlignmentFactor: number;

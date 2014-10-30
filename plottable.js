@@ -7114,7 +7114,7 @@ var Plottable;
                 var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
                 if (!attrToProjector["width"]) {
-                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : AbstractBarPlot.DEFAULT_WIDTH;
+                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
                     attrToProjector["width"] = function (d, i) { return constantWidth; };
                 }
                 var positionF = attrToProjector[secondaryAttr];
@@ -7197,7 +7197,7 @@ var Plottable;
                 };
             };
             AbstractBarPlot._BarAlignmentToFactor = {};
-            AbstractBarPlot.DEFAULT_WIDTH = 10;
+            AbstractBarPlot._DEFAULT_WIDTH = 10;
             return AbstractBarPlot;
         })(Plot.AbstractXYPlot);
         Plot.AbstractBarPlot = AbstractBarPlot;
@@ -7494,15 +7494,12 @@ var Plottable;
                 if (isVertical === void 0) { isVertical = true; }
                 this._isVertical = isVertical; // Has to be set before super()
                 _super.call(this, xScale, yScale);
-                this.innerScale = new Plottable.Scale.Ordinal();
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
-                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 // the width is constant, so set the inner scale range to that
-                var widthF = attrToProjector["width"];
-                this.innerScale.range([0, widthF(null, 0)]);
-                var innerWidthF = function (d, i) { return _this.innerScale.rangeBand(); };
+                var innerScale = this.makeInnerScale();
+                var innerWidthF = function (d, i) { return innerScale.rangeBand(); };
                 var heightF = attrToProjector["height"];
                 attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
                 attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
@@ -7514,18 +7511,39 @@ var Plottable;
             ClusteredBar.prototype._getDataToDraw = function () {
                 var _this = this;
                 var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                this.innerScale.domain(this._datasetKeysInOrder);
+                var innerScale = this.makeInnerScale();
                 var clusters = d3.map();
                 this._datasetKeysInOrder.forEach(function (key) {
                     var data = _this._key2DatasetDrawerKey.get(key).dataset.data();
                     clusters.set(key, data.map(function (d, i) {
                         var val = accessor(d, i);
                         var primaryScale = _this._isVertical ? _this._xScale : _this._yScale;
-                        d["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + _this.innerScale.scale(key);
-                        return d;
+                        // TODO: store position information in metadata.
+                        var copyD = Plottable._Util.Methods.copyMap(d);
+                        copyD["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + innerScale.scale(key);
+                        return copyD;
                     }));
                 });
                 return clusters;
+            };
+            ClusteredBar.prototype.makeInnerScale = function () {
+                var innerScale = new Plottable.Scale.Ordinal();
+                innerScale.domain(this._datasetKeysInOrder);
+                // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
+                if (!this._projectors["width"]) {
+                    var secondaryScale = this._isVertical ? this._xScale : this._yScale;
+                    var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
+                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : Plot.AbstractBarPlot._DEFAULT_WIDTH;
+                    innerScale.range([0, constantWidth]);
+                }
+                else {
+                    var projector = this._projectors["width"];
+                    var accessor = projector.accessor;
+                    var scale = projector.scale;
+                    var fn = scale ? function (d, i) { return scale.scale(accessor(d, i)); } : accessor;
+                    innerScale.range([0, fn(null, 0)]);
+                }
+                return innerScale;
             };
             return ClusteredBar;
         })(Plot.AbstractBarPlot);
