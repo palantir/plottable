@@ -31,6 +31,11 @@ export module Plot {
       this.baseline(this._baselineValue);
     }
 
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
+      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+      this.updateBarScaleExtents();
+    }
+
     public _getDrawer(key: string) {
       return new Plottable._Drawer.Rect(key, this._isVertical);
     }
