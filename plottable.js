@@ -7053,10 +7053,16 @@ var Plottable;
                 else {
                     var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                     var barAccessorData = d3.set(Plottable._Util.Methods.flatten(this.datasets().map(function (dataset) {
+                        return dataset.data().map(function (d, i) { return barAccessor(d, i); });
+                    }))).values();
+                    if (barAccessorData.some(function (datum) { return datum === "undefined"; })) {
+                        return -1;
+                    }
+                    var numberBarAccessorData = d3.set(Plottable._Util.Methods.flatten(this.datasets().map(function (dataset) {
                         return dataset.data().map(function (d, i) { return barAccessor(d, i).valueOf(); });
                     }))).values().map(function (value) { return +value; });
-                    barAccessorData.sort(function (a, b) { return a - b; });
-                    var barAccessorDataPairs = d3.pairs(barAccessorData);
+                    numberBarAccessorData.sort(function (a, b) { return a - b; });
+                    var barAccessorDataPairs = d3.pairs(numberBarAccessorData);
                     var barWidthDimension = this._isVertical ? this.width() : this.height();
                     barPixelWidth = Plottable._Util.Methods.min(barAccessorDataPairs, function (pair, i) {
                         return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));

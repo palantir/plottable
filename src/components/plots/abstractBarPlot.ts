@@ -390,12 +390,18 @@ export module Plot {
         var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
 
         var barAccessorData = d3.set(_Util.Methods.flatten(this.datasets().map((dataset) => {
+          return dataset.data().map((d, i) => barAccessor(d, i));
+        }))).values();
+
+        if (barAccessorData.some((datum) => datum === "undefined")) { return -1; }
+
+        var numberBarAccessorData = d3.set(_Util.Methods.flatten(this.datasets().map((dataset) => {
           return dataset.data().map((d, i) => barAccessor(d, i).valueOf());
         }))).values().map((value) => +value);
 
-        barAccessorData.sort((a, b) => a - b);
+        numberBarAccessorData.sort((a, b) => a - b);
 
-        var barAccessorDataPairs = d3.pairs(barAccessorData);
+        var barAccessorDataPairs = d3.pairs(numberBarAccessorData);
         var barWidthDimension = this._isVertical ? this.width() : this.height();
 
         barPixelWidth = _Util.Methods.min(barAccessorDataPairs, (pair: any[], i: number) => {
