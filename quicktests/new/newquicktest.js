@@ -196,6 +196,7 @@ window.onkeyup = function(e){
   }
 }
 
+//show svg width & height setting
 function showSizeControls(){
   var buttonstatus = $("#expand").val()
   if (buttonstatus == "+"){
@@ -213,6 +214,6 @@ function showSizeControls(){
 
 
 function setTestBoxDimensions(){
-  $(".quicktest").css("width", svgWidth + 20);
+  $(".quicktest").css("width", svgWidth + 20); //20 needed to make up for taken up space for quicktest label
   $(".quicktest").css("height", svgHeight + 20);
 }
