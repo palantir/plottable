@@ -26,13 +26,16 @@ export module _Drawer {
     }
 
     public setup(area: D3.Selection) {
-      area.append("path").classed("area", true);
+      // area.append("path").classed("area", true);
+      this.areaSelection = area.append("path")
+                               .classed("area", true)
+                               .style({ "stroke": "none" });
       if (this._drawLine) {
         super.setup(area);
       } else {
         AbstractDrawer.prototype.setup.call(this, area);
       }
-      this.areaSelection = this._renderArea.select(".area");
+      // this.areaSelection = this._renderArea.select(".area");
     }
 
     private createArea(xFunction: AppliedAccessor,
