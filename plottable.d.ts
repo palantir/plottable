@@ -2895,7 +2895,6 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _getDrawer(key: string): _Drawer.Rect;
             _setup(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractBarPlot<X, Y>;

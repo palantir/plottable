@@ -6922,10 +6922,6 @@ var Plottable;
                 this._animators["baseline"] = new Plottable.Animator.Null();
                 this.baseline(this._baselineValue);
             }
-            AbstractBarPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                this.updateBarScaleExtents();
-            };
             AbstractBarPlot.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Rect(key, this._isVertical);
             };
