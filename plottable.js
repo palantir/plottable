@@ -3214,9 +3214,11 @@ var Plottable;
                 this.pathSelection.datum(data);
             };
             Line.prototype.setup = function (area) {
-                area.append("path").classed("line", true);
+                this.pathSelection = area.append("path").classed("line", true).style({
+                    "fill": "none",
+                    "vector-effect": "non-scaling-stroke"
+                });
                 _super.prototype.setup.call(this, area);
-                this.pathSelection = this._renderArea.select(".line");
             };
             Line.prototype.createLine = function (xFunction, yFunction, definedFunction) {
                 if (!definedFunction) {
@@ -3286,14 +3288,13 @@ var Plottable;
                 return this;
             };
             Area.prototype.setup = function (area) {
-                area.append("path").classed("area", true);
+                this.areaSelection = area.append("path").classed("area", true).style({ "stroke": "none" });
                 if (this._drawLine) {
                     _super.prototype.setup.call(this, area);
                 }
                 else {
                     _Drawer.AbstractDrawer.prototype.setup.call(this, area);
                 }
-                this.areaSelection = this._renderArea.select(".area");
             };
             Area.prototype.createArea = function (xFunction, y0Function, y1Function, definedFunction) {
                 if (!definedFunction) {
