@@ -6950,10 +6950,10 @@ var Plottable;
                 };
                 var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 this.project("bar-min", function (d, i) {
-                    return barQScale.invert(barQScale.scale(barAccessor(d, i)) - pixelWidthF(d, i) * _this._barAlignmentFactor);
+                    return Math.floor(barQScale.invert(barQScale.scale(barAccessor(d, i)) - pixelWidthF(d, i) * _this._barAlignmentFactor));
                 }, barQScale);
                 this.project("bar-max", function (d, i) {
-                    return barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - _this._barAlignmentFactor));
+                    return Math.ceil(barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - _this._barAlignmentFactor)));
                 }, barQScale);
             };
             AbstractBarPlot.prototype.baseline = function (value) {
