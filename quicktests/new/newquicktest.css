@@ -12,8 +12,6 @@ h2{
   display: inline-block;
   padding: 10px;
   margin: 5px;
-  width: 500px;
-  height: 400px;
 }
 
 .first{
@@ -30,10 +28,6 @@ h2{
 
 #results{
   margin: 50px auto;
-  /*position: relative;
-  height: 100%;
-  width: 100%;*/
-
 }
 
 .controls{

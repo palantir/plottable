@@ -62,6 +62,7 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
       var className = "quicktest " + name;
 
       var div = d3.select("#results").append("div").attr("class", className);
+      div.insert("span").text(name)
       var firstsvg = div.append("div").attr("class", "first").append("svg").attr("width", svgWidth).attr("height", svgHeight);;
       var secondsvg = div.append("div").attr("class", "second").append("svg").attr("width", svgWidth).attr("height", svgHeight);;
       var data = result.makeData();
