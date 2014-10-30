@@ -7184,6 +7184,7 @@ var Plottable;
                 this.clearHoverSelection();
             };
             AbstractBarPlot.prototype._doHover = function (p) {
+                var _this = this;
                 var xPositionOrExtent = p.x;
                 var yPositionOrExtent = p.y;
                 if (this._hoverMode === "line") {
@@ -7213,10 +7214,18 @@ var Plottable;
                 var points = [];
                 var projectors = this._generateAttrToProjector();
                 selectedBars.each(function (d, i) {
-                    points.push({
-                        x: projectors["x"](d, i) + projectors["width"](d, i) / 2,
-                        y: projectors["y"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["height"](d, i))
-                    });
+                    if (_this._isVertical) {
+                        points.push({
+                            x: projectors["x"](d, i) + projectors["width"](d, i) / 2,
+                            y: projectors["y"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["height"](d, i))
+                        });
+                    }
+                    else {
+                        points.push({
+                            x: projectors["x"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["width"](d, i)),
+                            y: projectors["y"](d, i) + projectors["height"](d, i) / 2
+                        });
+                    }
                 });
                 return {
                     data: selectedBars.data(),
@@ -9051,11 +9060,11 @@ var Plottable;
             Hover.prototype.handleHoverOver = function (p) {
                 var lastHoverData = this.currentHoverData;
                 var newHoverData = this._componentToListenTo._doHover(p);
+                this.currentHoverData = newHoverData;
                 var outData = Hover.diffHoverData(lastHoverData, newHoverData);
                 this.safeHoverOut(outData);
                 var overData = Hover.diffHoverData(newHoverData, lastHoverData);
                 this.safeHoverOver(overData);
-                this.currentHoverData = newHoverData;
             };
             Hover.prototype.safeHoverOut = function (outData) {
                 if (this.hoverOutCallback && outData.data) {

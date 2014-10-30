@@ -105,13 +105,13 @@ export module Interaction {
       var lastHoverData = this.currentHoverData;
       var newHoverData = this._componentToListenTo._doHover(p);
 
+      this.currentHoverData = newHoverData;
+
       var outData = Hover.diffHoverData(lastHoverData, newHoverData);
       this.safeHoverOut(outData);
 
       var overData = Hover.diffHoverData(newHoverData, lastHoverData);
       this.safeHoverOver(overData);
-
-      this.currentHoverData = newHoverData;
     }
 
     private safeHoverOut(outData: HoverData) {
