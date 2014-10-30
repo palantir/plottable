@@ -4527,18 +4527,6 @@ var Plottable;
     (function (Axis) {
         ;
         ;
-        /*
-         * For given sorted array of time intervals function returns lower bound
-         * of intervals which has less accuracy than given interval.
-         */
-        function calculateLowerBoundDefinitions(intervals, minIterval) {
-            var moreGeneralInterval = function (interval) {
-                var now = new Date();
-                var firstTier = interval.tiers[0];
-                return firstTier.interval.offset(now, 1) >= minIterval.offset(now, 1);
-            };
-            return intervals.filter(moreGeneralInterval);
-        }
         var tF = Plottable.Formatters.time;
         var d3t = d3.time;
         /**
@@ -4569,7 +4557,7 @@ var Plottable;
                 /*
                  * Default axis time intervals.
                  */
-                this._axisIntervals = [
+                this._possibleAxisTierIntervals = [
                     { tiers: [
                         { interval: d3t.second, steps: [1, 5, 10, 15, 30], formatter: tF("%I:%M:%S %p") },
                         { interval: d3t.day, formatter: tF("%B %e, %Y") }
@@ -4615,22 +4603,37 @@ var Plottable;
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
             }
-            Time.prototype.axisTimeIntervals = function (param) {
+            /*
+           * For given sorted array of time intervals function returns lower bound
+           * of intervals which has less accuracy than given interval.
+           */
+            Time.calculateLowerBoundDefinitions = function (intervals, minIterval) {
+                var moreGeneralInterval = function (interval) {
+                    var now = new Date();
+                    var firstTier = interval.tiers[0];
+                    return firstTier.interval.offset(now, 1) >= minIterval.offset(now, 1);
+                };
+                return intervals.filter(moreGeneralInterval);
+            };
+            Time.prototype.axisTierIntervals = function (param) {
                 if (param == null) {
-                    return this._axisIntervals.map(function (t) { return t; });
+                    return this._possibleAxisTierIntervals.slice();
                 }
                 var newIntervals;
                 if (param instanceof Array) {
                     newIntervals = param;
                 }
                 else {
-                    newIntervals = calculateLowerBoundDefinitions(this._axisIntervals, param);
+                    newIntervals = Time.calculateLowerBoundDefinitions(this._possibleAxisTierIntervals, param);
                 }
-                this._axisIntervals = param;
+                this._possibleAxisTierIntervals = newIntervals;
                 return this;
             };
-            Time.prototype.calculateMostAccurateAxisTimeInterval = function () {
-                return null;
+            /**
+             * Based on possbile axis tier intervals component finds most accurate, which fits in available width.
+             */
+            Time.prototype.calculateTiersConfiguration = function () {
+                return [];
             };
             Time.prototype._computeHeight = function () {
                 if (this._computedHeight !== null) {
@@ -4770,7 +4773,7 @@ var Plottable;
                 this.adjustTickLength(this.tickLabelPadding(), Time._minorIntervals[index]);
             };
             Time.prototype._doRender = function () {
-                this._mostAccurateInterval = this.calculateMostAccurateAxisTimeInterval();
+                this.tiersConfiguration = this.calculateTiersConfiguration();
                 _super.prototype._doRender.call(this);
                 var index = this.getTickLevel();
                 this.renderTickLabels(this._minorTickLabels, Time._minorIntervals[index], 1);

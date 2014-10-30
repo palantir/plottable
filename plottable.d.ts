@@ -2108,13 +2108,23 @@ declare module Plottable {
             step: number;
             formatString: string;
         }
-        interface TimeInterval {
+        /**
+         * Defines time interval for tier.
+         * interval - time interval used to calculate next tick.
+         * steps - array of steps between two ticks. It needs to be in ascending order (see Time Axis description). By default [1].
+         * formatter - formatter used to display labels.
+         */
+        interface TierInterval {
             interval: D3.Time.Interval;
             steps?: number[];
             formatter: Formatter;
         }
-        interface AxisTimeInterval {
-            tiers: TimeInterval[];
+        /**
+         * Defines Axis tier intervals, which is set of tiers, which will be shown together.
+         * Right now we support up to two tiers.
+         */
+        interface AxisTierIntervals {
+            tiers: TierInterval[];
         }
         /**
          * Time Axis is designed to show time interval. It is two layer axis: small step and big step.
@@ -2134,8 +2144,7 @@ declare module Plottable {
             _scale: Scale.Time;
             static _minorIntervals: _TimeInterval[];
             static _majorIntervals: _TimeInterval[];
-            _axisIntervals: AxisTimeInterval[];
-            _mostAccurateInterval: AxisTimeInterval;
+            _possibleAxisTierIntervals: AxisTierIntervals[];
             /**
              * Constructs a TimeAxis.
              *
@@ -2147,25 +2156,25 @@ declare module Plottable {
              */
             constructor(scale: Scale.Time, orientation: string);
             /**
-             * Gets the current axis time intervals.
+             * Gets the copy of current possible axis tiers intervals.
              *
-             * @returns {TimeTickDefinition[]} The current axis time intervals.
+             * @returns {AxisTierIntervals[]} The copy of current possible axis tier intervals.
              */
-            axisTimeIntervals(): AxisTimeInterval[];
+            axisTierIntervals(): AxisTierIntervals[];
             /**
-             * Sets the new axis time intervals.
+             * Sets the new possible axis tier intervals.
              *
-             * @param {AxisTimeInterval[]} intervals Possible time intervals to generate ticks.
+             * @param {AxisTierIntervals[]} tiers Possible axis tiers intervals.
              * @returns {Axis} The calling Axis.
              */
-            axisTimeIntervals(intervals: AxisTimeInterval[]): Time;
+            axisTierIntervals(tiers: AxisTierIntervals[]): Time;
             /**
-             * Sets the min interval for axis time intervals.
+             * Sets the min interval for axis tier intervals.
              *
              * @param {D3.Time.Interval} minInterval The smallest time interval to generate ticks.
              * @returns {Axis} The calling Axis.
              */
-            axisTimeIntervals(minInterval: D3.Time.Interval): Time;
+            axisTierIntervals(minInterval: D3.Time.Interval): Time;
             _computeHeight(): number;
             _setup(): void;
             _getTickIntervalValues(interval: _TimeInterval): any[];

@@ -8,43 +8,33 @@ export module Axis {
       formatString: string;
   };
 
-  /*
+  /**
    * Defines time interval for tier.
-   * inteval - time interval used to calculate next tick.
+   * interval - time interval used to calculate next tick.
    * steps - array of steps between two ticks. It needs to be in ascending order (see Time Axis description). By default [1].
    * formatter - formatter used to display labels.
    */
-  export interface TimeInterval {
+  export interface TierInterval {
     interval: D3.Time.Interval;
     steps?: number[];
     formatter: Formatter;
   };
 
-  export interface AxisTimeInterval {
-    tiers: TimeInterval[];
+  /**
+   * Defines Axis tier intervals, which is set of tiers, which will be shown together.
+   * Right now we support up to two tiers.
+   */
+  export interface AxisTierIntervals {
+    tiers: TierInterval[];
   }
 
   /**
-   * Tick generator, which explicitly show how ticks needs to be generated on specific tier.
+   * Tier configuration, which explicitly show how ticks needs to be generated on specific tier.
    */
-  interface TickGenerator {
+  interface TierConfiguration {
     interval: D3.Time.Interval;
     step: number;
     formatter: Formatter;
-  }
-
-  /*
-   * For given sorted array of time intervals function returns lower bound
-   * of intervals which has less accuracy than given interval.
-   */
-  function calculateLowerBoundDefinitions(intervals: AxisTimeInterval[], minIterval: D3.Time.Interval) {
-    var moreGeneralInterval = (interval: AxisTimeInterval) => {
-      var now = new Date();
-      var firstTier: TimeInterval = interval.tiers[0];
-      return firstTier.interval.offset(now, 1) >= minIterval.offset(now, 1);
-    };
-
-    return intervals.filter(moreGeneralInterval);
   }
 
   var tF = Plottable.Formatters.time;
@@ -136,9 +126,23 @@ export module Axis {
     ];
 
     /*
+   * For given sorted array of time intervals function returns lower bound
+   * of intervals which has less accuracy than given interval.
+   */
+  private static calculateLowerBoundDefinitions(intervals: AxisTierIntervals[], minIterval: D3.Time.Interval) {
+    var moreGeneralInterval = (interval: AxisTierIntervals) => {
+      var now = new Date();
+      var firstTier: TierInterval = interval.tiers[0];
+      return firstTier.interval.offset(now, 1) >= minIterval.offset(now, 1);
+    };
+
+    return intervals.filter(moreGeneralInterval);
+  }
+
+    /*
      * Default axis time intervals.
      */
-    public _axisIntervals: AxisTimeInterval[] = [
+    public _possibleAxisTierIntervals: AxisTierIntervals[] = [
       {tiers: [
         {interval: d3t.second, steps: [1, 5, 10, 15, 30], formatter: tF("%I:%M:%S %p")},
         {interval: d3t.day, formatter: tF("%B %e, %Y")}
@@ -178,7 +182,7 @@ export module Axis {
         ]}
     ];
 
-    public _mostAccurateInterval: AxisTimeInterval;
+    private tiersConfiguration: TierConfiguration[];
 
     private measurer: _Util.Text.TextMeasurer;
 
@@ -202,41 +206,44 @@ export module Axis {
     }
 
     /**
-     * Gets the current axis time intervals.
+     * Gets the copy of current possible axis tiers intervals.
      *
-     * @returns {TimeTickDefinition[]} The current axis time intervals.
+     * @returns {AxisTierIntervals[]} The copy of current possible axis tier intervals.
      */
-    public axisTimeIntervals(): AxisTimeInterval[];
+    public axisTierIntervals(): AxisTierIntervals[];
     /**
-     * Sets the new axis time intervals.
+     * Sets the new possible axis tier intervals.
      *
-     * @param {AxisTimeInterval[]} intervals Possible time intervals to generate ticks.
+     * @param {AxisTierIntervals[]} tiers Possible axis tiers intervals.
      * @returns {Axis} The calling Axis.
      */
-    public axisTimeIntervals(intervals: AxisTimeInterval[]): Time;
+    public axisTierIntervals(tiers: AxisTierIntervals[]): Time;
     /**
-     * Sets the min interval for axis time intervals.
+     * Sets the min interval for axis tier intervals.
      *
      * @param {D3.Time.Interval} minInterval The smallest time interval to generate ticks. 
      * @returns {Axis} The calling Axis.
      */
-    public axisTimeIntervals(minInterval: D3.Time.Interval): Time;
-    public axisTimeIntervals(param?: any): any {
+    public axisTierIntervals(minInterval: D3.Time.Interval): Time;
+    public axisTierIntervals(param?: any): any {
       if(param == null){
-        return this._axisIntervals.map(t => t);
+        return this._possibleAxisTierIntervals.slice();
       }
-      var newIntervals: AxisTimeInterval[];
+      var newIntervals: AxisTierIntervals[];
       if (param instanceof Array) {
         newIntervals = param;
       } else {
-        newIntervals = calculateLowerBoundDefinitions(this._axisIntervals, param);
+        newIntervals = Time.calculateLowerBoundDefinitions(this._possibleAxisTierIntervals, param);
       }
-      this._axisIntervals = param;
+      this._possibleAxisTierIntervals = newIntervals;
       return this;
     }
 
-    private calculateMostAccurateAxisTimeInterval(): AxisTimeInterval {
-      return null;
+    /**
+     * Based on possbile axis tier intervals component finds most accurate, which fits in available width.
+     */
+    private calculateTiersConfiguration(): TierConfiguration[] {
+      return [];
     }
 
     public _computeHeight() {
@@ -400,7 +407,7 @@ export module Axis {
     }
 
     public _doRender() {
-      this._mostAccurateInterval = this.calculateMostAccurateAxisTimeInterval();
+      this.tiersConfiguration = this.calculateTiersConfiguration();
       super._doRender();
       var index = this.getTickLevel();
       this.renderTickLabels(this._minorTickLabels, Time._minorIntervals[index], 1);
