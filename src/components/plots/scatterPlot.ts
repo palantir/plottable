@@ -73,6 +73,7 @@ export module Plot {
 
       var overAPoint = false;
       var closestElement: Element;
+      var closestIndex: number;
       var minDistSq = range * range;
 
       drawers.forEach((drawer) => {
@@ -83,11 +84,13 @@ export module Plot {
           if (distSq < r * r) { // cursor is over this point
             if (!overAPoint || distSq < minDistSq) {
               closestElement = this;
+              closestIndex = i;
               minDistSq = distSq;
             }
             overAPoint = true;
           } else if (!overAPoint && distSq < minDistSq) {
             closestElement = this;
+            closestIndex = i;
             minDistSq = distSq;
           }
         });
@@ -104,13 +107,13 @@ export module Plot {
       var closestSelection = d3.select(closestElement);
       var closestData = closestSelection.data();
       var closestPoint = {
-        x: attrToProjector["cx"](closestData[0]),
-        y: attrToProjector["cy"](closestData[0])
+        x: attrToProjector["cx"](closestData[0], closestIndex),
+        y: attrToProjector["cy"](closestData[0], closestIndex)
       };
       return {
         selection: closestSelection,
         pixelPositions: [closestPoint],
-        data: closestSelection.data()
+        data: closestData
       };
     }
 

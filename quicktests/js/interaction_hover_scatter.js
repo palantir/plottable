@@ -33,12 +33,12 @@ function run(div, data, Plottable) {
   chart.renderTo(svg);
 
   var hoverCircle = plot._foregroundContainer.append("circle")
-                                            .attr({
-                                              "stroke": "black",
-                                              "fill": "none",
-                                              "r": 15
-                                            })
-                                            .style("visibility", "hidden");
+                                             .attr({
+                                               "stroke": "black",
+                                               "fill": "none",
+                                               "r": 15
+                                             })
+                                             .style("visibility", "hidden");
 
   var hover = new Plottable.Interaction.Hover();
   hover.onHoverOver(function(hoverData) {

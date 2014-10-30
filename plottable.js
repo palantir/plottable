@@ -6767,6 +6767,7 @@ var Plottable;
                 };
                 var overAPoint = false;
                 var closestElement;
+                var closestIndex;
                 var minDistSq = range * range;
                 drawers.forEach(function (drawer) {
                     drawer._getDrawSelection().each(function (d, i) {
@@ -6775,12 +6776,14 @@ var Plottable;
                         if (distSq < r * r) {
                             if (!overAPoint || distSq < minDistSq) {
                                 closestElement = this;
+                                closestIndex = i;
                                 minDistSq = distSq;
                             }
                             overAPoint = true;
                         }
                         else if (!overAPoint && distSq < minDistSq) {
                             closestElement = this;
+                            closestIndex = i;
                             minDistSq = distSq;
                         }
                     });
@@ -6795,13 +6798,13 @@ var Plottable;
                 var closestSelection = d3.select(closestElement);
                 var closestData = closestSelection.data();
                 var closestPoint = {
-                    x: attrToProjector["cx"](closestData[0]),
-                    y: attrToProjector["cy"](closestData[0])
+                    x: attrToProjector["cx"](closestData[0], closestIndex),
+                    y: attrToProjector["cy"](closestData[0], closestIndex)
                 };
                 return {
                     selection: closestSelection,
                     pixelPositions: [closestPoint],
-                    data: closestSelection.data()
+                    data: closestData
                 };
             };
             //===== Hover logic =====
