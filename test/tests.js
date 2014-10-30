@@ -1898,7 +1898,7 @@ describe("Plots", function () {
             it("sectors are filled in according to defaults", function () {
                 var arcPaths = renderArea.selectAll(".arc");
                 var arcPath0 = d3.select(arcPaths[0][0]);
-                assert.strictEqual(arcPath0.attr("fill"), Plottable.Core.Colors.PLOTTABLE_COLORS[0], "first sector filled appropriately");
+                assert.strictEqual(arcPath0.attr("fill"), "rgb(82, 121, 199)", "first sector filled appropriately");
                 var arcPath1 = d3.select(arcPaths[0][1]);
                 assert.strictEqual(arcPath1.attr("fill"), Plottable.Core.Colors.PLOTTABLE_COLORS[1], "second sector filled appropriately");
                 svg.remove();

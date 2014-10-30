@@ -16,7 +16,7 @@ export module Scale {
       switch (scaleType) {
         case null:
         case undefined:
-          scale = d3.scale.ordinal().range(Core.Colors.PLOTTABLE_COLORS);
+          scale = d3.scale.ordinal().range(Color.getPlottableColors());
           break;
         case "Category10":
         case "category10":
@@ -52,6 +52,17 @@ export module Scale {
         concatenatedExtents = concatenatedExtents.concat(e);
       });
       return _Util.Methods.uniq(concatenatedExtents);
+    }
+
+    private static getPlottableColors(): string[] {
+      var plottableDefaultColors: string[] = [];
+      var defaultNumColors = 10;
+      for (var i = 0; i < defaultNumColors; i++) {
+        var colorTester = d3.select("body").append("div").classed("plottable-colors-" + i, true);
+        plottableDefaultColors.push(colorTester.style("color"));
+        colorTester.remove();
+      }
+      return plottableDefaultColors;
     }
   }
 }

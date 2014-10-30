@@ -2765,7 +2765,7 @@ var Plottable;
                 switch (scaleType) {
                     case null:
                     case undefined:
-                        scale = d3.scale.ordinal().range(Plottable.Core.Colors.PLOTTABLE_COLORS);
+                        scale = d3.scale.ordinal().range(Color.getPlottableColors());
                         break;
                     case "Category10":
                     case "category10":
@@ -2800,6 +2800,16 @@ var Plottable;
                     concatenatedExtents = concatenatedExtents.concat(e);
                 });
                 return Plottable._Util.Methods.uniq(concatenatedExtents);
+            };
+            Color.getPlottableColors = function () {
+                var plottableDefaultColors = [];
+                var defaultNumColors = 10;
+                for (var i = 0; i < defaultNumColors; i++) {
+                    var colorTester = d3.select("body").append("div").classed("plottable-colors-" + i, true);
+                    plottableDefaultColors.push(colorTester.style("color"));
+                    colorTester.remove();
+                }
+                return plottableDefaultColors;
             };
             return Color;
         })(Scale.AbstractScale);
@@ -6451,6 +6461,7 @@ var Plottable;
              */
             function Pie() {
                 _super.call(this);
+                this.colorScale = new Plottable.Scale.Color();
                 this.classed("pie-plot", true);
             }
             Pie.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
@@ -6465,11 +6476,12 @@ var Plottable;
                 _super.prototype._addDataset.call(this, key, dataset);
             };
             Pie.prototype._generateAttrToProjector = function () {
+                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
                 attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
                 if (attrToProjector["fill"] == null) {
-                    attrToProjector["fill"] = function (d, i) { return Pie.DEFAULT_COLOR_SCALE.scale(String(i)); };
+                    attrToProjector["fill"] = function (d, i) { return _this.colorScale.scale(String(i)); };
                 }
                 var defaultAccessor = function (d) { return d.value; };
                 var valueProjector = this._projectors["value"];
@@ -6479,7 +6491,6 @@ var Plottable;
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Arc(key).setClass("arc");
             };
-            Pie.DEFAULT_COLOR_SCALE = new Plottable.Scale.Color();
             return Pie;
         })(Plot.AbstractPlot);
         Plot.Pie = Pie;
