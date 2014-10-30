@@ -1,18 +1,43 @@
+//show svg width & height setting
+function showSizeControls(){
+
+  "use strict";
+
+  var buttonstatus = $("#expand").val();
+  if (buttonstatus === "+"){
+    $( ".size-controls" ).slideDown( 300, function() {
+      $(this).focus();
+      $("#expand").val("-");
+    }); 
+  }
+  else{
+    $( ".size-controls" ).slideUp( 300, function() {
+      $("#expand").val("+");
+    });
+  }
+}
+
+(function iife(){
+
+"use strict";
+
 var plottableBranches=[];
 var qtestnames = [];
 var firstBranch;
 var secondBranch;
-var first = true; //boolean to set order
 var svgWidth;
 var svgHeight;
 
+//METHODS
+
 function setTestBoxDimensions(){
+  //quicktest class is the black border container div for all svgs
   $(".quicktest").css("width", svgWidth + 20); //20 needed to make up for taken up space for quicktest label
   $(".quicktest").css("height", svgHeight + 20);
 }
 
 //run a single quicktest
-function runQuickTest(svg, data, branch){
+function runQuickTest(result, svg, data, branch){
   try {
     result.run(svg, data, plottableBranches[branch]);
     setTestBoxDimensions();
@@ -20,8 +45,41 @@ function runQuickTest(svg, data, branch){
   } catch (err) {
     setTimeout(function() {throw err;}, 0);
   }
-};
+}
 
+//load each quicktest locally, eval it, then run quicktest
+function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondBranch){
+
+  var div = d3.select("#results");
+  quickTestNames.forEach(function(q) { //for each quicktest 
+    var name = q;
+    d3.text("/quicktests/new/list/" + category + "/" + name + ".js", function(error, text) {
+      if (error !== null) {
+        console.warn("Tried to load nonexistant quicktest " + name);
+        return;
+      }
+      var x = new Function(text);
+      text = "(function(){" + text +
+          "\nreturn {makeData: makeData, run: run};" +
+               "})();" +
+          "\n////# sourceURL=" + name + ".js\n";
+      var result = eval(text);
+      var className = "quicktest " + name;
+
+      var div = d3.select("#results").append("div").attr("class", className);
+      div.insert("label").text(name);
+      var firstsvg = div.append("div").attr("class", "first").append("svg").attr("width", svgWidth).attr("height", svgHeight);
+      var secondsvg = div.append("div").attr("class", "second").append("svg").attr("width", svgWidth).attr("height", svgHeight);
+      var data = result.makeData();
+
+      runQuickTest(result, firstsvg, data, firstBranch);
+      runQuickTest(result, secondsvg, data, secondBranch);
+    });
+  });//forEach
+    
+} //loadQuickTestCategory
+
+//filter all quicktests by category from list_of_quicktests.json
 function filterQuickTests(category, branchList){
   //filter list of quicktests to list of quicktest names to pass to doSomething
   d3.json("list_of_quicktests.json", function (data){
@@ -38,39 +96,7 @@ function filterQuickTests(category, branchList){
   });
 }
 
-function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondBranch){
-
-  var div = d3.select("#results");
-  quickTestNames.forEach(function(q) { //for each quicktest 
-    var name = q;
-    d3.text("/quicktests/new/list/" + category + "/" + name + ".js", function(error, text) {
-      if (error !== null) {
-        console.warn("Tried to load nonexistant quicktest " + name);
-        return;
-      }
-      var x = new Function(text);
-      text = "(function(){" + text +
-          "\nreturn {makeData: makeData, run: run};" +
-               "})();" +
-          "\n////# sourceURL=" + name + ".js\n";
-      result = eval(text);
-      var className = "quicktest " + name;
-
-      var div = d3.select("#results").append("div").attr("class", className);
-      div.insert("label").text(name);
-      var firstsvg = div.append("div").attr("class", "first").append("svg").attr("width", svgWidth).attr("height", svgHeight);
-      var secondsvg = div.append("div").attr("class", "second").append("svg").attr("width", svgWidth).attr("height", svgHeight);
-      var data = result.makeData();
-
-      runQuickTest(firstsvg, data, firstBranch);
-      runQuickTest(secondsvg, data, secondBranch);
-    });
-  });//forEach
-    
-} //loadQuickTestCategory
-
-//METHODS
-
+//retrieve different plottable objects then push to array
 function loadPlottableBranches(category, branchList){
   var listOfUrl = [];
   var branchName1 = branchList[0];
@@ -103,33 +129,17 @@ function loadPlottableBranches(category, branchList){
       });
     }
     if(textStatus === "error"){
-      console.log("errored!")
+      console.log("errored!");
     }
 
   });
 }
 
 function resetDisplayProperties(){
-  $(".first, .first svg").css("display", "block");
-  $(".second, .second svg").css("display", "block");
+  $(".first").css("display", "block");
+  $(".second").css("display", "block");
   $("#branch1").css("background-color", "white");
   $("#branch2").css("background-color", "white");
-}
-
-//show svg width & height setting
-function showSizeControls(){
-  var buttonstatus = $("#expand").val()
-  if (buttonstatus === "+"){
-    $( ".size-controls" ).slideDown( 300, function() {
-      $(this).focus();
-      $("#expand").val("-");
-    }); 
-  }
-  else{
-    $( ".size-controls" ).slideUp( 300, function() {
-      $("#expand").val("+");
-    });
-  }
 }
 
 function clearTests(){
@@ -158,6 +168,7 @@ function initialize(){
 
 }
 
+// show/hide according to hotkey events
 window.onkeyup = function(e){
   var key = e.keyCode ? e.keyCode : e.which;
 
@@ -171,7 +182,7 @@ window.onkeyup = function(e){
     visibleQuickTests.forEach(function(quicktest){
       $(".first", quicktest).css("display", "block");
       $(".second", quicktest).css("display", "none");
-      $(".second", quicktest).before($(".first", quicktest));
+      $(".second", quicktest).before($(".first", quicktest)); //hacky, but changing DOM order so interactions work properly
     });
     $(".quicktest").css("display", "inline-block");
     $("#branch1").css("background-color", "mediumaquamarine");
@@ -215,4 +226,11 @@ window.onkeyup = function(e){
     $("#branch2").css("background-color", "white");
     return;
   }
-}
+};
+
+var button = document.getElementById("render");
+button.onclick = initialize;
+
+})();
+
+
