@@ -61,17 +61,17 @@ export module Scale {
         var colorTester = d3.select("body").append("div").classed("plottable-colors-" + i, true);
         var rgbString = colorTester.style("color");
         var rgb = rgbString.split("(")[1].split(")")[0].split(",");
-        rgb = rgb.map((colorNumber: string) => Scale.Color.toHex(+colorNumber));
+        rgb = rgb.map((colorNumber: string) => Scale.Color.toDoubleDigitHex(+colorNumber));
         plottableDefaultColors.push("#" + rgb.join(""));
         colorTester.remove();
       }
       return plottableDefaultColors;
     }
 
-    private static toHex(value: number): string {
-      if (value === 0) { return ""; }
-      var baseValue = value % 16;
-      return Scale.Color.toHex(Math.floor(value / 16)) + Scale.Color.toHexDigit(baseValue);
+    private static toDoubleDigitHex(value: number): string {
+      var baseValue = Scale.Color.toHexDigit(value % 16);
+      var remainingValue = Scale.Color.toHexDigit(Math.floor(value / 16));
+      return remainingValue + baseValue;
     }
 
     private static toHexDigit(value: number): string {

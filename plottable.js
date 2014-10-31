@@ -4,6 +4,12 @@ Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
 
+/*!
+Plottable 0.34.0 (https://github.com/palantir/plottable)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -2808,18 +2814,16 @@ var Plottable;
                     var colorTester = d3.select("body").append("div").classed("plottable-colors-" + i, true);
                     var rgbString = colorTester.style("color");
                     var rgb = rgbString.split("(")[1].split(")")[0].split(",");
-                    rgb = rgb.map(function (colorNumber) { return Scale.Color.toHex(+colorNumber); });
+                    rgb = rgb.map(function (colorNumber) { return Scale.Color.toDoubleDigitHex(+colorNumber); });
                     plottableDefaultColors.push("#" + rgb.join(""));
                     colorTester.remove();
                 }
                 return plottableDefaultColors;
             };
-            Color.toHex = function (value) {
-                if (value === 0) {
-                    return "";
-                }
-                var baseValue = value % 16;
-                return Scale.Color.toHex(Math.floor(value / 16)) + Scale.Color.toHexDigit(baseValue);
+            Color.toDoubleDigitHex = function (value) {
+                var baseValue = Scale.Color.toHexDigit(value % 16);
+                var remainingValue = Scale.Color.toHexDigit(Math.floor(value / 16));
+                return remainingValue + baseValue;
             };
             Color.toHexDigit = function (value) {
                 switch (value) {
