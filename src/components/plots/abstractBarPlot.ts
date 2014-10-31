@@ -40,51 +40,6 @@ export module Plot {
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
-      super.project(attrToSet, accessor, scale);
-
-      // If a QuantitativeScale is used, the plot can easily extend outside the component boundary.
-      // Thus, the extent must be updated to account for the possible extension
-      if ((this._isVertical && attrToSet === "x") || (!this._isVertical && attrToSet === "y") || attrToSet === "width") {
-        this.updateBarScaleExtents();
-      }
-
-      return this;
-    }
-
-    public _onDatasetUpdate() {
-      super._onDatasetUpdate();
-      this.updateBarScaleExtents();
-    }
-
-    private updateBarScaleExtents() {
-      var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
-      if (!(barScale instanceof Plottable.Scale.AbstractQuantitative)) {
-        return;
-      }
-      var barQScale = <Plottable.Scale.AbstractQuantitative<any>> barScale;
-
-      var pixelWidthF = (d: any, i: number) => {
-        return this._projectors["width"] ? this._projectors["width"].accessor(d, i) : this._getBarPixelWidth();
-      };
-
-      var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-      this._key2DatasetDrawerKey.forEach((key, ddk) => {
-        var minBarAccessor = (d: any, i: number) => barQScale.invert(barQScale.scale(barAccessor(d, i)) - pixelWidthF(d, i) * this._barAlignmentFactor);
-        var maxBarAccessor = (d: any, i: number) => barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - this._barAlignmentFactor));
-        var minBarExtent = ddk.dataset._getExtent(minBarAccessor, barQScale._typeCoercer);
-        var maxBarExtent = ddk.dataset._getExtent(maxBarAccessor, barQScale._typeCoercer);
-        var extent = [minBarExtent[0], maxBarExtent[1]];
-        var scaleKey = this._plottableID.toString() + "_" + key;
-        if (extent.length === 0 || !this._isAnchored) {
-          barQScale._removeExtent(scaleKey, "barz");
-        } else {
-          barQScale._updateExtent(scaleKey, "barz", extent);
-        }
-      });
-
-    }
-
     /**
      * Gets the baseline value for the bars
      *

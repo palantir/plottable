@@ -2464,20 +2464,6 @@ describe("Plots", function () {
                 assert.closeTo(numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
                 svg.remove();
             });
-            it("bar-min, bar-max extents deregistered when old scale replaced", function () {
-                var newScale = new Plottable.Scale.ModifiedLog();
-                barPlot.project("x", "x", newScale);
-                var oldDomain = xScale.domain();
-                assert.closeTo(oldDomain[0], 0, 0.1, "bar-min extent removed");
-                assert.closeTo(oldDomain[1], 1, 0.1, "bar-max extent removed");
-                svg.remove();
-            });
-            it("extent updated to account for bar width", function () {
-                var domain = xScale.domain();
-                assert.closeTo(domain[0], 0.34, 0.1, "min extent accounted");
-                assert.closeTo(domain[1], 206.32, 0.1, "max extent accounted");
-                svg.remove();
-            });
         });
         describe("Vertical Bar Plot linear scale", function () {
             var svg;
@@ -2517,12 +2503,6 @@ describe("Plots", function () {
                 assert.closeTo(numAttr(bar0, "width"), barPixelWidth, 0.1, "bar0 width is correct");
                 assert.closeTo(numAttr(bar1, "width"), barPixelWidth, 0.1, "bar1 width is correct");
                 assert.closeTo(numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
-                svg.remove();
-            });
-            it("extent updated to account for bar width", function () {
-                var domain = xScale.domain();
-                assert.closeTo(domain[0], -10, 0.1, "min extent accounted");
-                assert.closeTo(domain[1], 110, 0.1, "max extent accounted");
                 svg.remove();
             });
             it("sensible bar width one datum", function () {

@@ -6929,45 +6929,6 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
-            AbstractBarPlot.prototype.project = function (attrToSet, accessor, scale) {
-                _super.prototype.project.call(this, attrToSet, accessor, scale);
-                // If a QuantitativeScale is used, the plot can easily extend outside the component boundary.
-                // Thus, the extent must be updated to account for the possible extension
-                if ((this._isVertical && attrToSet === "x") || (!this._isVertical && attrToSet === "y") || attrToSet === "width") {
-                    this.updateBarScaleExtents();
-                }
-                return this;
-            };
-            AbstractBarPlot.prototype._onDatasetUpdate = function () {
-                _super.prototype._onDatasetUpdate.call(this);
-                this.updateBarScaleExtents();
-            };
-            AbstractBarPlot.prototype.updateBarScaleExtents = function () {
-                var _this = this;
-                var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
-                if (!(barScale instanceof Plottable.Scale.AbstractQuantitative)) {
-                    return;
-                }
-                var barQScale = barScale;
-                var pixelWidthF = function (d, i) {
-                    return _this._projectors["width"] ? _this._projectors["width"].accessor(d, i) : _this._getBarPixelWidth();
-                };
-                var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                this._key2DatasetDrawerKey.forEach(function (key, ddk) {
-                    var minBarAccessor = function (d, i) { return barQScale.invert(barQScale.scale(barAccessor(d, i)) - pixelWidthF(d, i) * _this._barAlignmentFactor); };
-                    var maxBarAccessor = function (d, i) { return barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - _this._barAlignmentFactor)); };
-                    var minBarExtent = ddk.dataset._getExtent(minBarAccessor, barQScale._typeCoercer);
-                    var maxBarExtent = ddk.dataset._getExtent(maxBarAccessor, barQScale._typeCoercer);
-                    var extent = [minBarExtent[0], maxBarExtent[1]];
-                    var scaleKey = _this._plottableID.toString() + "_" + key;
-                    if (extent.length === 0 || !_this._isAnchored) {
-                        barQScale._removeExtent(scaleKey, "barz");
-                    }
-                    else {
-                        barQScale._updateExtent(scaleKey, "barz", extent);
-                    }
-                });
-            };
             AbstractBarPlot.prototype.baseline = function (value) {
                 if (value == null) {
                     return this._baselineValue;
