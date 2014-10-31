@@ -7130,14 +7130,13 @@ var Plottable;
                 var secondaryScale = this._isVertical ? this._xScale : this._yScale;
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var secondaryAttr = this._isVertical ? "x" : "y";
-                var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
                 if (!attrToProjector["width"]) {
-                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
-                    attrToProjector["width"] = function (d, i) { return constantWidth; };
+                    attrToProjector["width"] = function () { return _this._getBarPixelWidth(); };
                 }
                 var positionF = attrToProjector[secondaryAttr];
                 var widthF = attrToProjector["width"];
+                var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                 if (!bandsMode) {
                     attrToProjector[secondaryAttr] = function (d, i) { return positionF(d, i) - widthF(d, i) * _this._barAlignmentFactor; };
                 }
@@ -7164,6 +7163,52 @@ var Plottable;
                     attrToProjector["positive"] = function (d, i) { return originalPositionFn(d, i) <= scaledBaseline; };
                 }
                 return attrToProjector;
+            };
+            /**
+             * Computes the barPixelWidth of all the bars in the plot.
+             *
+             * If the position scale of the plot is an OrdinalScale and in bands mode, then the rangeBands function will be used.
+             * If the position scale of the plot is an OrdinalScale and in points mode, then
+             *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
+             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             */
+            AbstractBarPlot.prototype._getBarPixelWidth = function () {
+                var barPixelWidth;
+                var barScale = this._isVertical ? this._xScale : this._yScale;
+                if (barScale instanceof Plottable.Scale.Ordinal) {
+                    var ordScale = barScale;
+                    if (ordScale.rangeType() === "bands") {
+                        barPixelWidth = ordScale.rangeBand();
+                    }
+                    else {
+                        // padding is defined as 2 * the ordinal scale's _outerPadding variable
+                        // HACKHACK need to use _outerPadding for formula as above
+                        var padding = ordScale._outerPadding * 2;
+                        // step is defined as the range_interval / (padding + number of bars)
+                        var secondaryDimension = this._isVertical ? this.width() : this.height();
+                        var step = secondaryDimension / (padding + ordScale.domain().length - 1);
+                        barPixelWidth = step * padding * 0.5;
+                    }
+                }
+                else {
+                    var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                    var barAccessorData = d3.set(Plottable._Util.Methods.flatten(this.datasets().map(function (dataset) {
+                        return dataset.data().map(function (d, i) { return barAccessor(d, i); });
+                    }))).values();
+                    if (barAccessorData.some(function (datum) { return datum === "undefined"; })) {
+                        return -1;
+                    }
+                    var numberBarAccessorData = d3.set(Plottable._Util.Methods.flatten(this.datasets().map(function (dataset) {
+                        return dataset.data().map(function (d, i) { return barAccessor(d, i).valueOf(); });
+                    }))).values().map(function (value) { return +value; });
+                    numberBarAccessorData.sort(function (a, b) { return a - b; });
+                    var barAccessorDataPairs = d3.pairs(numberBarAccessorData);
+                    var barWidthDimension = this._isVertical ? this.width() : this.height();
+                    barPixelWidth = Plottable._Util.Methods.min(barAccessorDataPairs, function (pair, i) {
+                        return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
+                    }, barWidthDimension * 0.4) * 0.95;
+                }
+                return barPixelWidth;
             };
             AbstractBarPlot.prototype.hoverMode = function (mode) {
                 if (mode == null) {
@@ -7930,6 +7975,10 @@ var Plottable;
             };
             StackedBar.prototype._valueAccessor = function () {
                 return Plot.AbstractStacked.prototype._valueAccessor.call(this);
+            };
+            //===== /Stack logic =====
+            StackedBar.prototype._getBarPixelWidth = function () {
+                return Plot.AbstractBarPlot.prototype._getBarPixelWidth.apply(this);
             };
             return StackedBar;
         })(Plot.AbstractBarPlot);
