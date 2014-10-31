@@ -59,8 +59,8 @@ export module Scale {
       var defaultNumColors = 10;
       for (var i = 0; i < defaultNumColors; i++) {
         var colorTester = d3.select("body").append("div").classed("plottable-colors-" + i, true);
-        var rgbString = colorTester.style("color");
-        var rgb = rgbString.split("(")[1].split(")")[0].split(",");
+        // Use regex to get the text inside the rgb parentheses
+        var rgb = /\((.+)\)/.exec(colorTester.style("color"))[1].split(",");
         rgb = rgb.map((colorNumber: string) => Scale.Color.toDoubleDigitHex(+colorNumber));
         plottableDefaultColors.push("#" + rgb.join(""));
         colorTester.remove();
