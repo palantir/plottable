@@ -442,18 +442,26 @@ describe("BaseAxis", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("TimeAxis", function () {
+    var scale;
+    var axis;
+    beforeEach(function () {
+        scale = new Plottable.Scale.Time();
+        axis = new Plottable.Axis.Time(scale, "bottom");
+    });
     it("can not initialize vertical time axis", function () {
-        var scale = new Plottable.Scale.Time();
-        assert.throws(function () { return new Plottable.Axis.Time(scale, "left"); }, "unsupported");
-        assert.throws(function () { return new Plottable.Axis.Time(scale, "right"); }, "unsupported");
+        assert.throws(function () { return new Plottable.Axis.Time(scale, "left"); }, "horizontal");
+        assert.throws(function () { return new Plottable.Axis.Time(scale, "right"); }, "horizontal");
+    });
+    it("cannot change time axis orientation to vertical", function () {
+        assert.throws(function () { return axis.orient("left"); }, "horizontal");
+        assert.throws(function () { return axis.orient("right"); }, "horizontal");
+        assert.equal(axis.orient(), "bottom", "orientation unchanged");
     });
     it("major and minor intervals arrays are the same length", function () {
         assert.equal(Plottable.Axis.Time._majorIntervals.length, Plottable.Axis.Time._minorIntervals.length, "major and minor interval arrays must be same size");
     });
     it("Computing the default ticks doesn't error out for edge cases", function () {
         var svg = generateSVG(400, 100);
-        var scale = new Plottable.Scale.Time();
-        var axis = new Plottable.Axis.Time(scale, "bottom");
         scale.range([0, 400]);
         // very large time span
         assert.doesNotThrow(function () { return scale.domain([new Date(0, 0, 1, 0, 0, 0, 0), new Date(50000, 0, 1, 0, 0, 0, 0)]); });
@@ -465,9 +473,7 @@ describe("TimeAxis", function () {
     });
     it("Tick labels don't overlap", function () {
         var svg = generateSVG(400, 100);
-        var scale = new Plottable.Scale.Time();
         scale.range([0, 400]);
-        var axis = new Plottable.Axis.Time(scale, "bottom");
         function checkDomain(domain) {
             scale.domain(domain);
             axis.renderTo(svg);
