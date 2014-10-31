@@ -159,7 +159,7 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
-it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
+  it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
     fixComponentSize(c, 100, 100);
     c._anchor(svg);
     c.xOffset(20).yOffset(20);
@@ -398,6 +398,27 @@ it("components can be offset relative to their alignment, and throw errors if th
 
     var transform = d3.transform(c._element.attr("transform"));
     assert.deepEqual(transform.translate, [0, 0], "the element was not translated");
+    svg.remove();
+  });
+
+  it("components do not render unless allocated space", () => {
+    var renderFlag = false;
+    var c: any = new Plottable.Component.AbstractComponent();
+    c._doRender = () => renderFlag = true;
+    c._isAnchored = true;
+    c._isSetup = true;
+    c._render();
+    assert.isFalse(renderFlag, "no render until width/height set to nonzero");
+
+    c._width = 10;
+    c._height = 0;
+    c._render();
+    assert.isFalse(renderFlag, "render still doesn't occur if one of width/height is zero");
+
+    c._height = 10;
+    c._render();
+    assert.isTrue(renderFlag, "render occurs if width and height are positive");
+
     svg.remove();
   });
 });
