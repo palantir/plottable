@@ -52,6 +52,11 @@ export module Plot {
       return this;
     }
 
+    public _onDatasetUpdate() {
+      super._onDatasetUpdate();
+      this.updateBarScaleExtents();
+    }
+
     private updateBarScaleExtents() {
       var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
       if (!(barScale instanceof Plottable.Scale.AbstractQuantitative)) {
@@ -64,18 +69,20 @@ export module Plot {
       };
 
       var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-      this.project("bar-min", (d: any, i: number) => {
-        if (pixelWidthF(d, i) === 0) {
-          return barAccessor(d, i);
+      this._key2DatasetDrawerKey.forEach((key, ddk) => {
+        var minBarAccessor = (d: any, i: number) => barQScale.invert(barQScale.scale(barAccessor(d, i)) - pixelWidthF(d, i) * this._barAlignmentFactor);
+        var maxBarAccessor = (d: any, i: number) => barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - this._barAlignmentFactor));
+        var minBarExtent = ddk.dataset._getExtent(minBarAccessor, barQScale._typeCoercer);
+        var maxBarExtent = ddk.dataset._getExtent(maxBarAccessor, barQScale._typeCoercer);
+        var extent = [minBarExtent[0], maxBarExtent[1]];
+        var scaleKey = this._plottableID.toString() + "_" + key;
+        if (extent.length === 0 || !this._isAnchored) {
+          barQScale._removeExtent(scaleKey, "barz");
+        } else {
+          barQScale._updateExtent(scaleKey, "barz", extent);
         }
-        return barQScale.invert(barQScale.scale(barAccessor(d, i)) - pixelWidthF(d, i) * this._barAlignmentFactor);
-      }, barQScale);
-      this.project("bar-max", (d: any, i: number) => {
-        if (pixelWidthF(d, i) === 0) {
-          return barAccessor(d, i);
-        }
-        return barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - this._barAlignmentFactor));
-      }, barQScale);
+      });
+
     }
 
     /**

@@ -6938,6 +6938,10 @@ var Plottable;
                 }
                 return this;
             };
+            AbstractBarPlot.prototype._onDatasetUpdate = function () {
+                _super.prototype._onDatasetUpdate.call(this);
+                this.updateBarScaleExtents();
+            };
             AbstractBarPlot.prototype.updateBarScaleExtents = function () {
                 var _this = this;
                 var barScale = this._isVertical ? this._projectors["x"].scale : this._projectors["y"].scale;
@@ -6949,18 +6953,20 @@ var Plottable;
                     return _this._projectors["width"] ? _this._projectors["width"].accessor(d, i) : _this._getBarPixelWidth();
                 };
                 var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-                this.project("bar-min", function (d, i) {
-                    if (pixelWidthF(d, i) === 0) {
-                        return barAccessor(d, i);
+                this._key2DatasetDrawerKey.forEach(function (key, ddk) {
+                    var minBarAccessor = function (d, i) { return barQScale.invert(barQScale.scale(barAccessor(d, i)) - pixelWidthF(d, i) * _this._barAlignmentFactor); };
+                    var maxBarAccessor = function (d, i) { return barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - _this._barAlignmentFactor)); };
+                    var minBarExtent = ddk.dataset._getExtent(minBarAccessor, barQScale._typeCoercer);
+                    var maxBarExtent = ddk.dataset._getExtent(maxBarAccessor, barQScale._typeCoercer);
+                    var extent = [minBarExtent[0], maxBarExtent[1]];
+                    var scaleKey = _this._plottableID.toString() + "_" + key;
+                    if (extent.length === 0 || !_this._isAnchored) {
+                        barQScale._removeExtent(scaleKey, "barz");
                     }
-                    return barQScale.invert(barQScale.scale(barAccessor(d, i)) - pixelWidthF(d, i) * _this._barAlignmentFactor);
-                }, barQScale);
-                this.project("bar-max", function (d, i) {
-                    if (pixelWidthF(d, i) === 0) {
-                        return barAccessor(d, i);
+                    else {
+                        barQScale._updateExtent(scaleKey, "barz", extent);
                     }
-                    return barQScale.invert(barQScale.scale(barAccessor(d, i)) + pixelWidthF(d, i) * (1 - _this._barAlignmentFactor));
-                }, barQScale);
+                });
             };
             AbstractBarPlot.prototype.baseline = function (value) {
                 if (value == null) {

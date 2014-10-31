@@ -2898,6 +2898,7 @@ declare module Plottable {
             _getDrawer(key: string): _Drawer.Rect;
             _setup(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractBarPlot<X, Y>;
+            _onDatasetUpdate(): void;
             /**
              * Gets the baseline value for the bars
              *
