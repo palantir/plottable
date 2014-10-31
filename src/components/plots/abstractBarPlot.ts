@@ -333,10 +333,6 @@ export module Plot {
         };
         attrToProjector["positive"] = (d: any, i: number) => originalPositionFn(d, i) <= scaledBaseline;
       }
-
-      delete attrToProjector["bar-min"];
-      delete attrToProjector["bar-max"];
-
       return attrToProjector;
     }
 

@@ -7143,8 +7143,6 @@ var Plottable;
                     };
                     attrToProjector["positive"] = function (d, i) { return originalPositionFn(d, i) <= scaledBaseline; };
                 }
-                delete attrToProjector["bar-min"];
-                delete attrToProjector["bar-max"];
                 return attrToProjector;
             };
             /**
