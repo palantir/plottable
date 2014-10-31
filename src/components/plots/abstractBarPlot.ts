@@ -400,9 +400,32 @@ export module Plot {
         selectedBars.classed({ "hovered": true, "not-hovered": false });
       } else {
         this.clearHoverSelection();
+        return {
+          data: null,
+          pixelPositions: null,
+          selection: null
+        };
       }
+
+      var points: Point[] = [];
+      var projectors = this._generateAttrToProjector();
+      selectedBars.each((d, i) => {
+        if (this._isVertical) {
+          points.push({
+            x: projectors["x"](d, i) + projectors["width"](d, i)/2,
+            y: projectors["y"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["height"](d, i))
+          });
+        } else {
+          points.push({
+            x: projectors["x"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["width"](d, i)),
+            y: projectors["y"](d, i) + projectors["height"](d, i)/2
+          });
+        }
+      });
+
       return {
-        data: selectedBars ? selectedBars.data() : null,
+        data: selectedBars.data(),
+        pixelPositions: points,
         selection: selectedBars
       };
     }

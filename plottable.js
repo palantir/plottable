@@ -6774,6 +6774,7 @@ var Plottable;
                 };
                 var overAPoint = false;
                 var closestElement;
+                var closestIndex;
                 var minDistSq = range * range;
                 drawers.forEach(function (drawer) {
                     drawer._getDrawSelection().each(function (d, i) {
@@ -6782,20 +6783,35 @@ var Plottable;
                         if (distSq < r * r) {
                             if (!overAPoint || distSq < minDistSq) {
                                 closestElement = this;
+                                closestIndex = i;
                                 minDistSq = distSq;
                             }
                             overAPoint = true;
                         }
                         else if (!overAPoint && distSq < minDistSq) {
                             closestElement = this;
+                            closestIndex = i;
                             minDistSq = distSq;
                         }
                     });
                 });
+                if (!closestElement) {
+                    return {
+                        selection: null,
+                        pixelPositions: null,
+                        data: null
+                    };
+                }
                 var closestSelection = d3.select(closestElement);
+                var closestData = closestSelection.data();
+                var closestPoint = {
+                    x: attrToProjector["cx"](closestData[0], closestIndex),
+                    y: attrToProjector["cy"](closestData[0], closestIndex)
+                };
                 return {
-                    selection: closestElement ? closestSelection : null,
-                    data: closestElement ? closestSelection.data() : null
+                    selection: closestSelection,
+                    pixelPositions: [closestPoint],
+                    data: closestData
                 };
             };
             //===== Hover logic =====
@@ -7173,6 +7189,7 @@ var Plottable;
                 this.clearHoverSelection();
             };
             AbstractBarPlot.prototype._doHover = function (p) {
+                var _this = this;
                 var xPositionOrExtent = p.x;
                 var yPositionOrExtent = p.y;
                 if (this._hoverMode === "line") {
@@ -7193,9 +7210,31 @@ var Plottable;
                 }
                 else {
                     this.clearHoverSelection();
+                    return {
+                        data: null,
+                        pixelPositions: null,
+                        selection: null
+                    };
                 }
+                var points = [];
+                var projectors = this._generateAttrToProjector();
+                selectedBars.each(function (d, i) {
+                    if (_this._isVertical) {
+                        points.push({
+                            x: projectors["x"](d, i) + projectors["width"](d, i) / 2,
+                            y: projectors["y"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["height"](d, i))
+                        });
+                    }
+                    else {
+                        points.push({
+                            x: projectors["x"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["width"](d, i)),
+                            y: projectors["y"](d, i) + projectors["height"](d, i) / 2
+                        });
+                    }
+                });
                 return {
-                    data: selectedBars ? selectedBars.data() : null,
+                    data: selectedBars.data(),
+                    pixelPositions: points,
                     selection: selectedBars
                 };
             };
@@ -8987,6 +9026,7 @@ var Plottable;
                 _super.apply(this, arguments);
                 this.currentHoverData = {
                     data: null,
+                    pixelPositions: null,
                     selection: null
                 };
             }
@@ -9003,6 +9043,7 @@ var Plottable;
                     _this.safeHoverOut(_this.currentHoverData);
                     _this.currentHoverData = {
                         data: null,
+                        pixelPositions: null,
                         selection: null
                     };
                 });
@@ -9016,28 +9057,37 @@ var Plottable;
                 if (a.data == null || b.data == null) {
                     return a;
                 }
-                var notInB = function (d) { return b.data.indexOf(d) === -1; };
-                var diffData = a.data.filter(notInB);
+                var diffData = [];
+                var diffPoints = [];
+                var diffElements = [];
+                a.data.forEach(function (d, i) {
+                    if (b.data.indexOf(d) === -1) {
+                        diffData.push(d);
+                        diffPoints.push(a.pixelPositions[i]);
+                        diffElements.push(a.selection[0][i]);
+                    }
+                });
                 if (diffData.length === 0) {
                     return {
                         data: null,
+                        pixelPositions: null,
                         selection: null
                     };
                 }
-                var diffSelection = a.selection.filter(notInB);
                 return {
                     data: diffData,
-                    selection: diffSelection
+                    pixelPositions: diffPoints,
+                    selection: d3.selectAll(diffElements)
                 };
             };
             Hover.prototype.handleHoverOver = function (p) {
                 var lastHoverData = this.currentHoverData;
                 var newHoverData = this._componentToListenTo._doHover(p);
+                this.currentHoverData = newHoverData;
                 var outData = Hover.diffHoverData(lastHoverData, newHoverData);
                 this.safeHoverOut(outData);
                 var overData = Hover.diffHoverData(newHoverData, lastHoverData);
                 this.safeHoverOver(overData);
-                this.currentHoverData = newHoverData;
             };
             Hover.prototype.safeHoverOut = function (outData) {
                 if (this.hoverOutCallback && outData.data) {
