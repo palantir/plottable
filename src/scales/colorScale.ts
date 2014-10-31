@@ -59,10 +59,38 @@ export module Scale {
       var defaultNumColors = 10;
       for (var i = 0; i < defaultNumColors; i++) {
         var colorTester = d3.select("body").append("div").classed("plottable-colors-" + i, true);
-        plottableDefaultColors.push(colorTester.style("color"));
+        var rgbString = colorTester.style("color");
+        var rgb = rgbString.split("(")[1].split(")")[0].split(",");
+        rgb = rgb.map((colorNumber: string) => Scale.Color.toHex(+colorNumber));
+        plottableDefaultColors.push("#" + rgb.join(""));
         colorTester.remove();
       }
       return plottableDefaultColors;
+    }
+
+    private static toHex(value: number): string {
+      if (value === 0) { return ""; }
+      var baseValue = value % 16;
+      return Scale.Color.toHex(Math.floor(value / 16)) + Scale.Color.toHexDigit(baseValue);
+    }
+
+    private static toHexDigit(value: number): string {
+      switch (value) {
+        case 10:
+          return "a";
+        case 11:
+          return "b";
+        case 12:
+          return "c";
+        case 13:
+          return "d";
+        case 14:
+          return "e";
+        case 15:
+          return "f";
+        default:
+          return String(value);
+      }
     }
   }
 }
