@@ -2,12 +2,6 @@
 
 module Plottable {
 export module Axis {
-  export interface _TimeInterval {
-      timeUnit: D3.Time.Interval;
-      step: number;
-      formatString: string;
-  };
-
   /**
    * Defines time interval for tier.
    * interval - time interval used to calculate next tick.
@@ -31,7 +25,7 @@ export module Axis {
   /**
    * Tier tick configuration, which explicitly show how ticks needs to be generated on specific tier.
    */
-  interface TierTickConfiguration {
+  export interface TierTickConfiguration {
     interval: D3.Time.Interval;
     step: number;
     formatter: Formatter;
@@ -54,90 +48,22 @@ export module Axis {
    */
   export class Time extends AbstractAxis {
 
-    public _majorTickLabels: D3.Selection;
-    public _minorTickLabels: D3.Selection;
+    public _tierLabelContainers: D3.Selection[];
     public _scale: Scale.Time;
 
-    // default intervals
-    // these are for minor tick labels
-    public static _minorIntervals: _TimeInterval[] = [
-      {timeUnit: d3.time.second, step: 1,      formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 5,      formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 10,     formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 15,     formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 30,     formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.minute, step: 1,      formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 5,      formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 10,     formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 15,     formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 30,     formatString: "%I:%M %p"},
-      {timeUnit: d3.time.hour,   step: 1,      formatString: "%I %p"},
-      {timeUnit: d3.time.hour,   step: 3,      formatString: "%I %p"},
-      {timeUnit: d3.time.hour,   step: 6,      formatString: "%I %p"},
-      {timeUnit: d3.time.hour,   step: 12,     formatString: "%I %p"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%a %e"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%e"},
-      {timeUnit: d3.time.month,  step: 1,      formatString: "%B"},
-      {timeUnit: d3.time.month,  step: 1,      formatString: "%b"},
-      {timeUnit: d3.time.month,  step: 3,      formatString: "%B"},
-      {timeUnit: d3.time.month,  step: 6,      formatString: "%B"},
-      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 1,      formatString: "%y"},
-      {timeUnit: d3.time.year,   step: 5,      formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 25,     formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 50,     formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 100,    formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 200,    formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 500,    formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 1000,   formatString: "%Y"}
-    ];
+    /**
+     * For given sorted array of time intervals function returns lower bound
+     * of intervals which has less accuracy than given interval.
+     */
+    private static calculateLowerBoundDefinitions(intervals: AxisTierIntervals[], minIterval: D3.Time.Interval) {
+      var moreGeneralInterval = (interval: AxisTierIntervals) => {
+        var now = new Date();
+        var firstTier: TierInterval = interval.tiers[0];
+        return firstTier.interval.offset(now, 1) >= minIterval.offset(now, 1);
+      };
 
-    // these are for major tick labels
-    public static _majorIntervals: _TimeInterval[] = [
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.month,  step: 1,      formatString: "%B %Y"},
-      {timeUnit: d3.time.month,  step: 1,      formatString: "%B %Y"},
-      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""}, // this is essentially blank
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,   step: 100000, formatString: ""}
-    ];
-
-    /*
-   * For given sorted array of time intervals function returns lower bound
-   * of intervals which has less accuracy than given interval.
-   */
-  private static calculateLowerBoundDefinitions(intervals: AxisTierIntervals[], minIterval: D3.Time.Interval) {
-    var moreGeneralInterval = (interval: AxisTierIntervals) => {
-      var now = new Date();
-      var firstTier: TierInterval = interval.tiers[0];
-      return firstTier.interval.offset(now, 1) >= minIterval.offset(now, 1);
-    };
-
-    return intervals.filter(moreGeneralInterval);
-  }
+      return intervals.filter(moreGeneralInterval);
+    }
 
     /*
      * Default axis time intervals.
@@ -183,8 +109,10 @@ export module Axis {
     ];
 
     private tierTickConfigurations: TierTickConfiguration[];
+    private static LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
 
     private measurer: _Util.Text.TextMeasurer;
+    private noTiers = 2;
 
     /**
      * Constructs a TimeAxis.
@@ -244,30 +172,36 @@ export module Axis {
      * which fits in available width.
      */
     private calculateTierTickConfigurations(): TierTickConfiguration[] {
-      return [];
+      var mostAccurateTierTickConfigurations: TierTickConfiguration[] = [];
+      for(var i = 0; i < this._possibleAxisTierIntervals.length; ++i) {
+        mostAccurateTierTickConfigurations = this._possibleAxisTierIntervals[i].tiers.map(
+          tier => this.getMostAccurateTierTickConfiguration(tier)
+        );
+        if(mostAccurateTierTickConfigurations.every(config => config != null)) {
+          return mostAccurateTierTickConfigurations;
+        }
+      }
+
+      _Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
+      return this._possibleAxisTierIntervals[this._possibleAxisTierIntervals.length - 1].tiers.map(
+        tier => this.getMostAccurateTierTickConfiguration(tier, true)
+      );
     }
 
     public _computeHeight() {
       if (this._computedHeight !== null) {
         return this._computedHeight;
       }
-      var textHeight = this._measureTextHeight(this._majorTickLabels) + this._measureTextHeight(this._minorTickLabels);
+      var textHeight = this._measureTextHeight() * 2;
       this.tickLength(textHeight);
       this.endTickLength(textHeight);
       this._computedHeight = this._maxLabelTickLength() + 2 * this.tickLabelPadding();
       return this._computedHeight;
     }
 
-    private calculateWorstWidth(container: D3.Selection, format: string): number {
-      // returns the worst case width for a format
-      // September 29, 9999 at 12:59.9999 PM Wednesday
-      var longDate = new Date(9999, 8, 29, 12, 59, 9999);
-      return this.measurer(d3.time.format(format)(longDate)).width;
-    }
-
-    private getIntervalLength(interval: _TimeInterval) {
+    private getIntervalLength(config: TierTickConfiguration) {
       var startDate = this._scale.domain()[0];
-      var endDate = interval.timeUnit.offset(startDate, interval.step);
+      var endDate = config.interval.offset(startDate, config.step);
       if (endDate > this._scale.domain()[1]) {
         // this offset is too large, so just return available width
         return this.width();
@@ -277,61 +211,59 @@ export module Axis {
       return stepLength;
     }
 
-    private isEnoughSpace(container: D3.Selection, interval: _TimeInterval) {
+    private calculateDateMaxWidthForInterval(interval: TierInterval): number {
+      return this.measurer(interval.formatter(Time.LONG_DATE)).width;
+    }
+
+    private getMostAccurateTierTickConfiguration(tierInterval: TierInterval, returnLastIfNotFound: boolean = false): TierTickConfiguration {
       // compute number of ticks
       // if less than a certain threshold
-      var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
-      var stepLength = Math.min(this.getIntervalLength(interval), this.width());
-      return worst < stepLength;
+      var worstWidth = this.calculateDateMaxWidthForInterval(tierInterval) + 2 * this.tickLabelPadding();
+      var stepLength: number;
+      var config = {
+        interval: tierInterval.interval,
+        step: 0,
+        formatter: tierInterval.formatter
+      };
+      var steps = tierInterval.steps || [1];
+      for(var i = 0; i < steps.length; ++i) {
+        config.step = steps[i];
+        if(Math.min(this.getIntervalLength(config), this.width()) >= worstWidth) {
+          return config;
+        }
+      }
+      return returnLastIfNotFound ? config : null;
     }
 
     public _setup() {
       super._setup();
-      this._majorTickLabels = this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
-      this._minorTickLabels = this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
-      this.measurer = _Util.Text.getTextMeasurer(this._majorTickLabels.append("text"));
+      this._tierLabelContainers = [];
+      for(var i = 0; i < this.noTiers; ++i) {
+        this._tierLabelContainers.push(this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true));
+      }
+      this.measurer = _Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
     }
 
-    // returns a number to index into the major/minor intervals
-    private getTickLevel(): number {
-      for (var i = 0; i < Time._minorIntervals.length; i++) {
-        if (this.isEnoughSpace(this._minorTickLabels, Time._minorIntervals[i])
-            && this.isEnoughSpace(this._majorTickLabels, Time._majorIntervals[i])) {
-          break;
-        }
-      }
-      if (i >= Time._minorIntervals.length) {
-        _Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
-        i = Time._minorIntervals.length - 1;
-      }
-      return i;
-    }
-
-    public _getTickIntervalValues(interval: _TimeInterval): any[] {
-      return this._scale._tickInterval(interval.timeUnit, interval.step);
+    public _getTickIntervalValues(config: TierTickConfiguration): any[] {
+      return this._scale._tickInterval(config.interval, config.step);
     }
 
     public _getTickValues(): any[] {
-      var index = this.getTickLevel();
-      var minorTicks = this._getTickIntervalValues(Time._minorIntervals[index]);
-      var majorTicks = this._getTickIntervalValues(Time._majorIntervals[index]);
-      return minorTicks.concat(majorTicks);
+      return this.tierTickConfigurations.reduce((ticks: any[], config: TierTickConfiguration) =>
+        ticks.concat(this._getTickIntervalValues(config)), []);
     }
 
-    public _measureTextHeight(container: D3.Selection): number {
-      var fakeTickLabel = container.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
-      var textHeight = this.measurer(_Util.Text.HEIGHT_TEXT).height;
-      fakeTickLabel.remove();
-      return textHeight;
+    // TODO: Maybe remove
+    public _measureTextHeight(): number {
+      return this.measurer(_Util.Text.HEIGHT_TEXT).height;
     }
 
-    private renderTickLabels(container: D3.Selection, interval: _TimeInterval, height: number) {
+    private renderTierLabels(container: D3.Selection, config: TierTickConfiguration, height: number) {
       container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
-      var tickPos = this._scale._tickInterval(interval.timeUnit,
-                                              interval.step);
+      var tickPos = this._scale._tickInterval(config.interval, config.step);
       tickPos.splice(0, 0, this._scale.domain()[0]);
       tickPos.push(this._scale.domain()[1]);
-      var shouldCenterText = interval.step === 1;
+      var shouldCenterText = config.step === 1;
       // only center when the label should span the whole interval
       var labelPos: Date[] = [];
       if (shouldCenterText) {
@@ -345,7 +277,7 @@ export module Axis {
         labelPos = tickPos;
       }
       labelPos = labelPos.filter((d: any) =>
-        this.canFitLabelFilter(container, d, d3.time.format(interval.formatString)(d), shouldCenterText));
+        this.canFitLabelFilter(container, d, config.formatter(d), shouldCenterText));
       var tickLabels = container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
       var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
@@ -359,8 +291,7 @@ export module Axis {
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
       var anchor = shouldCenterText ? "middle" : "start";
-      tickLabels.selectAll("text").text((d: any) => d3.time.format(interval.formatString)(d))
-                                  .style("text-anchor", anchor);
+      tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
     }
 
     private canFitLabelFilter(container: D3.Selection, position: Date, label: string, isCentered: boolean): boolean {
@@ -378,8 +309,8 @@ export module Axis {
       return endPosition < this.width() && startPosition > 0;
     }
 
-    private adjustTickLength(height: number, interval: _TimeInterval) {
-      var tickValues = this._getTickIntervalValues(interval);
+    private adjustTickLength(config: TierTickConfiguration, height: number) {
+      var tickValues: any[] = this._getTickIntervalValues(config);
       var selection = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).filter((d: Date) =>
         // we want to check if d is in tickValues
         // however, if two dates a, b, have the same date, it may not be true that a === b.
@@ -392,36 +323,56 @@ export module Axis {
       selection.attr("y2", height);
     }
 
-    private generateLabellessTicks(index: number) {
-      if (index < 0) {
+    private findMoreAccurateConfiguration(config: TierTickConfiguration): TierTickConfiguration {
+      var moreAccurateConfig = config;
+      for(var i = 0; i < this._possibleAxisTierIntervals.length; ++i) {
+        var tier = this._possibleAxisTierIntervals[i].tiers[0];
+        moreAccurateConfig.interval = tier.interval;
+        var steps = tier.steps || [1];
+        for(var j = 0; j < steps.length; ++j) {
+          if(steps[j] === config.step && tier.interval === config.interval) {
+            return moreAccurateConfig;
+          } else {
+            moreAccurateConfig.step = steps[j];
+          }
+        }
+      }
+
+      return null;
+    }
+
+    private generateLabellessTicks(config: TierTickConfiguration) {
+      var moreAccurateConfig = this.findMoreAccurateConfiguration(config);
+      if(moreAccurateConfig.interval === config.interval && moreAccurateConfig.step === config.step) {
         return;
       }
 
-      var smallTicks = this._getTickIntervalValues(Time._minorIntervals[index]);
+      var smallTicks = this._getTickIntervalValues(moreAccurateConfig);
       var allTicks = this._getTickValues().concat(smallTicks);
 
       var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(allTicks);
       tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
       tickMarks.exit().remove();
-      this.adjustTickLength(this.tickLabelPadding(), Time._minorIntervals[index]);
+      this.adjustTickLength(this.tierTickConfigurations[0], this.tickLabelPadding());
     }
 
     public _doRender() {
       this.tierTickConfigurations = this.calculateTierTickConfigurations();
       super._doRender();
-      var index = this.getTickLevel();
-      this.renderTickLabels(this._minorTickLabels, Time._minorIntervals[index], 1);
-      this.renderTickLabels(this._majorTickLabels, Time._majorIntervals[index], 2);
+
+      this.tierTickConfigurations.forEach((config: TierTickConfiguration, i: number) =>
+        this.renderTierLabels(this._tierLabelContainers[i], config, i + 1)
+      );
+
       var domain = this._scale.domain();
       var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
-      if (this.getIntervalLength(Time._minorIntervals[index]) * 1.5 >= totalLength) {
-        this.generateLabellessTicks(index - 1);
+      if (this.getIntervalLength(this.tierTickConfigurations[0]) * 1.5 >= totalLength) {
+        this.generateLabellessTicks(this.tierTickConfigurations[0]);
       }
-      // make minor ticks shorter
-      this.adjustTickLength(this._maxLabelTickLength() / 2, Time._minorIntervals[index]);
-      // however, we need to make major ticks longer, since they may have overlapped with some minor ticks
-      this.adjustTickLength(this._maxLabelTickLength(), Time._majorIntervals[index]);
+      this.tierTickConfigurations.forEach((config: TierTickConfiguration, i: number) =>
+        this.adjustTickLength(config, this._maxLabelTickLength() * (i + 1) / this.noTiers)
+      );
       return this;
     }
   }

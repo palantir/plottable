@@ -9,11 +9,6 @@ describe("TimeAxis", () => {
         assert.throws(() => new Plottable.Axis.Time(scale, "right"), "unsupported");
     });
 
-    it("major and minor intervals arrays are the same length", () => {
-        assert.equal(Plottable.Axis.Time._majorIntervals.length, Plottable.Axis.Time._minorIntervals.length,
-                "major and minor interval arrays must be same size");
-    });
-
     it("Computing the default ticks doesn't error out for edge cases", () => {
       var svg = generateSVG(400, 100);
       var scale = new Plottable.Scale.Time();
@@ -60,8 +55,7 @@ describe("TimeAxis", () => {
         }
       }
 
-      checkLabelsForContainer(axis._minorTickLabels);
-      checkLabelsForContainer(axis._majorTickLabels);
+      axis._tierLabelContainers.forEach(checkLabelsForContainer);
     }
     // 100 year span
     checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);

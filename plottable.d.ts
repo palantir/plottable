@@ -2103,11 +2103,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Axis {
-        interface _TimeInterval {
-            timeUnit: D3.Time.Interval;
-            step: number;
-            formatString: string;
-        }
         /**
          * Defines time interval for tier.
          * interval - time interval used to calculate next tick.
@@ -2127,6 +2122,14 @@ declare module Plottable {
             tiers: TierInterval[];
         }
         /**
+         * Tier tick configuration, which explicitly show how ticks needs to be generated on specific tier.
+         */
+        interface TierTickConfiguration {
+            interval: D3.Time.Interval;
+            step: number;
+            formatter: Formatter;
+        }
+        /**
          * Time Axis is designed to show time interval. It is two layer axis: small step and big step.
          * Both layers show interval, but with different accuracy. Big step is designed to show less accurate intervals and
          * wraps multiple intervals from small step.
@@ -2139,11 +2142,8 @@ declare module Plottable {
          * For details how ticks are generated visit: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
          */
         class Time extends AbstractAxis {
-            _majorTickLabels: D3.Selection;
-            _minorTickLabels: D3.Selection;
+            _tierLabelContainers: D3.Selection[];
             _scale: Scale.Time;
-            static _minorIntervals: _TimeInterval[];
-            static _majorIntervals: _TimeInterval[];
             _possibleAxisTierIntervals: AxisTierIntervals[];
             /**
              * Constructs a TimeAxis.
@@ -2177,9 +2177,9 @@ declare module Plottable {
             axisTierIntervals(minInterval: D3.Time.Interval): Time;
             _computeHeight(): number;
             _setup(): void;
-            _getTickIntervalValues(interval: _TimeInterval): any[];
+            _getTickIntervalValues(config: TierTickConfiguration): any[];
             _getTickValues(): any[];
-            _measureTextHeight(container: D3.Selection): number;
+            _measureTextHeight(): number;
             _doRender(): Time;
         }
     }
