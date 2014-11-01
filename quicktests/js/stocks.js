@@ -102,9 +102,14 @@ function run(div, data, Plottable) {
           var svg = div.append("svg").attr("height", 480);
           table.renderTo(svg);
 
-          plotArea.registerInteraction(new Plottable.Interaction.PanZoom(xScale, null));
+          var pzi = new Plottable.Interaction.PanZoom(xScale, null);
+          plotArea.registerInteraction(pzi);
           plotArea.registerInteraction(
-            new Plottable.Interaction.Key(65).callback(function() { xScale.autoDomain(); })
+            new Plottable.Interaction.Key()
+                                     .on(65, function() {
+                                       xScale.autoDomain();
+                                       pzi.resetZoom();
+                                     })
           );
 
         });

@@ -25,13 +25,10 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for currency values.
      */
-    export function currency(precision = 2, symbol = "$", prefix = true, onlyShowUnchanged = true) {
+    export function currency(precision = 2, symbol = "$", prefix = true) {
       var fixedFormatter = Formatters.fixed(precision);
       return function(d: any) {
         var formattedValue = fixedFormatter(Math.abs(d));
-        if (onlyShowUnchanged && valueChanged(Math.abs(d), formattedValue)) {
-          return "";
-        }
         if (formattedValue !== "") {
           if (prefix) {
             formattedValue = symbol + formattedValue;
@@ -55,14 +52,10 @@ module Plottable {
      *
      * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
      */
-    export function fixed(precision = 3, onlyShowUnchanged = true) {
+    export function fixed(precision = 3) {
       verifyPrecision(precision);
       return function(d: any) {
-        var formattedValue = (<number> d).toFixed(precision);
-        if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
-          return "";
-        }
-        return formattedValue;
+        return (<number> d).toFixed(precision);
       };
     }
 
@@ -75,16 +68,12 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for general values.
      */
-    export function general(precision = 3, onlyShowUnchanged = true) {
+    export function general(precision = 3) {
       verifyPrecision(precision);
       return function(d: any) {
         if (typeof d === "number") {
           var multiplier = Math.pow(10, precision);
-          var formattedValue = String(Math.round(d * multiplier) / multiplier);
-          if (onlyShowUnchanged && valueChanged(d, formattedValue)) {
-            return "";
-          }
-          return formattedValue;
+          return String(Math.round(d * multiplier) / multiplier);
         } else {
           return String(d);
         }
@@ -111,8 +100,8 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for percentage values.
      */
-    export function percentage(precision = 0, onlyShowUnchanged = true) {
-      var fixedFormatter = Formatters.fixed(precision, onlyShowUnchanged);
+    export function percentage(precision = 0) {
+      var fixedFormatter = Formatters.fixed(precision);
       return function(d: any) {
         var valToFormat = d * 100;
 
@@ -121,14 +110,7 @@ module Plottable {
         var integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
         valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
 
-        var formattedValue = fixedFormatter(valToFormat);
-        if (onlyShowUnchanged && valueChanged(valToFormat, formattedValue)) {
-          return "";
-        }
-        if (formattedValue !== "") {
-          formattedValue += "%";
-        }
-        return formattedValue;
+        return fixedFormatter(valToFormat) + "%";
       };
     }
 
@@ -238,10 +220,6 @@ module Plottable {
       if (precision < 0 || precision > 20) {
         throw new RangeError("Formatter precision must be between 0 and 20");
       }
-    }
-
-    function valueChanged(d: any, formattedValue: string) {
-      return d !== parseFloat(formattedValue);
     }
 
   }

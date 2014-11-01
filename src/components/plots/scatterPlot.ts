@@ -61,7 +61,7 @@ export module Plot {
       return drawSteps;
     }
 
-    public _getClosestStruckPoint(p: Point, range: number) {
+    public _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
       var drawers = <_Drawer.Element[]> this._getDrawersInOrder();
       var attrToProjector = this._generateAttrToProjector();
 
@@ -73,6 +73,7 @@ export module Plot {
 
       var overAPoint = false;
       var closestElement: Element;
+      var closestIndex: number;
       var minDistSq = range * range;
 
       drawers.forEach((drawer) => {
@@ -83,20 +84,36 @@ export module Plot {
           if (distSq < r * r) { // cursor is over this point
             if (!overAPoint || distSq < minDistSq) {
               closestElement = this;
+              closestIndex = i;
               minDistSq = distSq;
             }
             overAPoint = true;
           } else if (!overAPoint && distSq < minDistSq) {
             closestElement = this;
+            closestIndex = i;
             minDistSq = distSq;
           }
         });
       });
 
+      if (!closestElement) {
+        return {
+          selection: null,
+          pixelPositions: null,
+          data: null
+        };
+      }
+
       var closestSelection = d3.select(closestElement);
+      var closestData = closestSelection.data();
+      var closestPoint = {
+        x: attrToProjector["cx"](closestData[0], closestIndex),
+        y: attrToProjector["cy"](closestData[0], closestIndex)
+      };
       return {
-        selection: closestElement ? closestSelection : null,
-        data: closestElement ? closestSelection.data() : null
+        selection: closestSelection,
+        pixelPositions: [closestPoint],
+        data: closestData
       };
     }
 

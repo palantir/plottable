@@ -3,16 +3,25 @@
 var assert = chai.assert;
 
 describe("TimeAxis", () => {
+  var scale: Plottable.Scale.Time;
+  var axis: Plottable.Axis.Time;
+  beforeEach(() => {
+    scale = new Plottable.Scale.Time();
+    axis = new Plottable.Axis.Time(scale, "bottom");
+  });
     it("can not initialize vertical time axis", () => {
-        var scale = new Plottable.Scale.Time();
-        assert.throws(() => new Plottable.Axis.Time(scale, "left"), "unsupported");
-        assert.throws(() => new Plottable.Axis.Time(scale, "right"), "unsupported");
+        assert.throws(() => new Plottable.Axis.Time(scale, "left"), "horizontal");
+        assert.throws(() => new Plottable.Axis.Time(scale, "right"), "horizontal");
+    });
+
+    it("cannot change time axis orientation to vertical", () => {
+        assert.throws(() => axis.orient("left"), "horizontal");
+        assert.throws(() => axis.orient("right"), "horizontal");
+        assert.equal(axis.orient(), "bottom", "orientation unchanged");
     });
 
     it("Computing the default ticks doesn't error out for edge cases", () => {
       var svg = generateSVG(400, 100);
-      var scale = new Plottable.Scale.Time();
-      var axis = new Plottable.Axis.Time(scale, "bottom");
       scale.range([0, 400]);
 
       // very large time span
@@ -28,9 +37,7 @@ describe("TimeAxis", () => {
 
   it("Tick labels don't overlap", () => {
     var svg = generateSVG(400, 100);
-    var scale = new Plottable.Scale.Time();
     scale.range([0, 400]);
-    var axis = new Plottable.Axis.Time(scale, "bottom");
 
     function checkDomain(domain: any[]) {
       scale.domain(domain);
@@ -72,7 +79,7 @@ describe("TimeAxis", () => {
     // 1 second span
     checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 0, 1, 0)]);
 
-      svg.remove();
+    svg.remove();
   });
 
   it.skip("min interval on time Axis", () => {

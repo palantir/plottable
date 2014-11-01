@@ -34,6 +34,20 @@ module Plottable {
           return lowTicks.concat(middleTicks).concat(highTicks);
         };
       }
+
+      /**
+       * Creates a tick generator that will filter for only the integers in defaultTicks and return them.
+       *
+       * Will also include the end ticks.
+       *
+       * @returns {TickGenerator} A tick generator returning only integer ticks.
+       */
+      export function integerTickGenerator(): TickGenerator<number> {
+        return function(s: Scale.AbstractQuantitative<number>) {
+          var defaultTicks = s.getDefaultTicks();
+          return defaultTicks.filter((tick, i) => (tick % 1 === 0) || (i === 0) || (i === defaultTicks.length - 1));
+        };
+      }
     }
 }
 }
