@@ -37,12 +37,12 @@ describe("Plots", () => {
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
-        assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
+        assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
+        assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
         assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
         assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
-        assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
-        assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
+        assert.equal(bar0.attr("x"), "75", "bar0 x is correct");
+        assert.equal(bar1.attr("x"), "375", "bar1 x is correct");
         assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
         assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
 
@@ -80,20 +80,20 @@ describe("Plots", () => {
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
-        assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
-        assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
-        assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
+        assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
+        assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
+        assert.equal(numAttr(bar0, "x"), 75, "bar0 x is correct");
+        assert.equal(numAttr(bar1, "x"), 375, "bar1 x is correct");
 
         barPlot.barAlignment("right");
         renderArea = barPlot._renderArea;
         bars = renderArea.selectAll("rect");
         bar0 = d3.select(bars[0][0]);
         bar1 = d3.select(bars[0][1]);
-        assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
-        assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
-        assert.equal(bar0.attr("x"), "140", "bar0 x is correct");
-        assert.equal(bar1.attr("x"), "440", "bar1 x is correct");
+        assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
+        assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
+        assert.equal(numAttr(bar0, "x"), 0, "bar0 x is correct");
+        assert.equal(numAttr(bar1, "x"), 300, "bar1 x is correct");
 
         assert.throws(() => barPlot.barAlignment("blargh"), Error);
         assert.equal(barPlot._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
@@ -159,6 +159,160 @@ describe("Plots", () => {
 
         svg.remove();
       });
+
+      it("don't show points from outside of domain", () => {
+        xScale.domain(["C"]);
+        var bars =  barPlot._renderArea.selectAll("rect");
+        assert.lengthOf(bars[0], 0, "no bars have been rendered");
+        svg.remove();
+      });
+    });
+
+    describe("Vertical Bar Plot modified log scale", () => {
+      var svg: D3.Selection;
+      var dataset: Plottable.Dataset;
+      var xScale: Plottable.Scale.ModifiedLog;
+      var yScale: Plottable.Scale.Linear;
+      var barPlot: Plottable.Plot.VerticalBar<number>;
+      var SVG_WIDTH = 600;
+      var SVG_HEIGHT = 400;
+
+      beforeEach(() => {
+        svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        xScale = new Plottable.Scale.ModifiedLog();
+        yScale = new Plottable.Scale.Linear();
+        var data = [
+          {x: 2, y: 1},
+          {x: 10, y: -1.5},
+          {x: 100, y: 1}
+        ];
+        dataset = new Plottable.Dataset(data);
+        barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+        barPlot.addDataset(dataset);
+        barPlot.animate(false);
+        barPlot.baseline(0);
+        yScale.domain([-2, 2]);
+        barPlot.renderTo(svg);
+      });
+
+      it("barPixelWidth calculated appropriately", () => {
+        assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+        svg.remove();
+      });
+
+      it("bar widths are equal to barPixelWidth", () => {
+        var renderArea = barPlot._renderArea;
+        var bars = renderArea.selectAll("rect");
+        assert.lengthOf(bars[0], 3, "One bar was created per data point");
+
+        var barPixelWidth = barPlot._getBarPixelWidth();
+        var bar0 = d3.select(bars[0][0]);
+        var bar1 = d3.select(bars[0][1]);
+        var bar2 = d3.select(bars[0][2]);
+        assert.closeTo(numAttr(bar0, "width"), barPixelWidth, 0.1, "bar0 width is correct");
+        assert.closeTo(numAttr(bar1, "width"), barPixelWidth, 0.1, "bar1 width is correct");
+        assert.closeTo(numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
+        svg.remove();
+      });
+    });
+
+    describe("Vertical Bar Plot linear scale", () => {
+      var svg: D3.Selection;
+      var dataset: Plottable.Dataset;
+      var xScale: Plottable.Scale.Linear;
+      var yScale: Plottable.Scale.Linear;
+      var barPlot: Plottable.Plot.VerticalBar<number>;
+      var SVG_WIDTH = 600;
+      var SVG_HEIGHT = 400;
+
+      beforeEach(() => {
+        svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        xScale = new Plottable.Scale.Linear();
+        yScale = new Plottable.Scale.Linear();
+        var data = [
+          {x: 2, y: 1},
+          {x: 10, y: -1.5},
+          {x: 100, y: 1}
+        ];
+        dataset = new Plottable.Dataset(data);
+        barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+        barPlot.addDataset(dataset);
+        barPlot.baseline(0);
+        barPlot.renderTo(svg);
+      });
+
+      it("bar width takes an appropriate value", () => {
+        assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+        svg.remove();
+      });
+
+      it("bar widths are equal to barPixelWidth", () => {
+        var renderArea = barPlot._renderArea;
+        var bars = renderArea.selectAll("rect");
+        assert.lengthOf(bars[0], 3, "One bar was created per data point");
+
+        var barPixelWidth = barPlot._getBarPixelWidth();
+        var bar0 = d3.select(bars[0][0]);
+        var bar1 = d3.select(bars[0][1]);
+        var bar2 = d3.select(bars[0][2]);
+        assert.closeTo(numAttr(bar0, "width"), barPixelWidth, 0.1, "bar0 width is correct");
+        assert.closeTo(numAttr(bar1, "width"), barPixelWidth, 0.1, "bar1 width is correct");
+        assert.closeTo(numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
+        svg.remove();
+      });
+
+      it("sensible bar width one datum", () => {
+        barPlot.removeDataset(dataset);
+        barPlot.addDataset([{x: 10, y: 2}]);
+        assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
+        svg.remove();
+      });
+
+      it("sensible bar width same datum", () => {
+        barPlot.removeDataset(dataset);
+        barPlot.addDataset([{x: 10, y: 2}, {x: 10, y: 2}]);
+        assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "uses the width sensible for one datum");
+        svg.remove();
+      });
+
+      it("sensible bar width unsorted data", () => {
+        barPlot.removeDataset(dataset);
+        barPlot.addDataset([{x: 2, y: 2}, {x: 20, y: 2}, {x: 5, y: 2}]);
+        var expectedBarPixelWidth = (xScale.scale(5) - xScale.scale(2)) * 0.95;
+        assert.closeTo(barPlot._getBarPixelWidth(), expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
+        svg.remove();
+      });
+    });
+
+    describe("Vertical Bar Plot time scale", () => {
+      var svg: D3.Selection;
+      var barPlot: Plottable.Plot.VerticalBar<number>;
+      var xScale: Plottable.Scale.Time;
+
+      beforeEach(() => {
+        svg = generateSVG(600, 400);
+        var data = [{ x: "12/01/92", y: 0, type: "a" },
+          { x: "12/01/93", y: 1, type: "a" },
+          { x: "12/01/94", y: 1, type: "a" },
+          { x: "12/01/95", y: 2, type: "a" },
+          { x: "12/01/96", y: 2, type: "a" },
+          { x: "12/01/97", y: 2, type: "a" }];
+        xScale = new Plottable.Scale.Time();
+        var yScale = new Plottable.Scale.Linear();
+        barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+        barPlot.addDataset(data)
+               .project("x", (d: any) => d3.time.format("%m/%d/%y").parse(d.x), xScale)
+               .project("y", "y", yScale)
+               .renderTo(svg);
+      });
+
+      it("bar width takes an appropriate value", () => {
+        var timeFormatter = d3.time.format("%m/%d/%y");
+        var expectedBarWidth = (xScale.scale(timeFormatter.parse("12/01/94")) - xScale.scale(timeFormatter.parse("12/01/93"))) * 0.95;
+        assert.closeTo(barPlot._getBarPixelWidth(), expectedBarWidth, 0.1, "width is difference between two dates");
+        svg.remove();
+      });
+
     });
 
     describe("Horizontal Bar Plot in Points Mode", () => {
@@ -195,12 +349,12 @@ describe("Plots", () => {
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
-        assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
+        assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
+        assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
         assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
         assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-        assert.equal(bar0.attr("y"), "295", "bar0 y is correct");
-        assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
+        assert.equal(bar0.attr("y"), "250", "bar0 y is correct");
+        assert.equal(bar1.attr("y"), "50", "bar1 y is correct");
         assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
         assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
 
@@ -238,20 +392,20 @@ describe("Plots", () => {
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
-        assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
-        assert.equal(bar0.attr("y"), "295", "bar0 y is correct");
-        assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
+        assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
+        assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
+        assert.equal(numAttr(bar0, "y"), 250, "bar0 y is correct");
+        assert.equal(numAttr(bar1, "y"), 50, "bar1 y is correct");
 
         barPlot.barAlignment("bottom");
         renderArea = barPlot._renderArea;
         bars = renderArea.selectAll("rect");
         bar0 = d3.select(bars[0][0]);
         bar1 = d3.select(bars[0][1]);
-        assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
-        assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
-        assert.equal(bar0.attr("y"), "290", "bar0 y is correct");
-        assert.equal(bar1.attr("y"), "90", "bar1 y is correct");
+        assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
+        assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
+        assert.equal(numAttr(bar0, "y"), 200, "bar0 y is correct");
+        assert.equal(numAttr(bar1, "y"), 0, "bar1 y is correct");
 
         assert.throws(() => barPlot.barAlignment("blargh"), Error);
 

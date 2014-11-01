@@ -26,8 +26,9 @@ function run(div, data, Plottable) {
   var pzi = new Plottable.Interaction.PanZoom(xScale, yScale);
   scatterPlot.registerInteraction(pzi);
 
-  var ki = new Plottable.Interaction.Key(65);
-  ki.callback(function() {
+  var ki = new Plottable.Interaction.Key();
+  // press "a" (keycode 65) to reset
+  ki.on(65, function() {
     xScale.autoDomain();
     yScale.autoDomain();
     pzi.resetZoom();

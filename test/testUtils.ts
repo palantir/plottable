@@ -137,3 +137,27 @@ function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: nu
                     1, null);
   target.node().dispatchEvent(e);
 }
+
+function assertAreaPathCloseTo(actualPath: string, expectedPath: string, precision: number, msg: string) {
+  var actualAreaPathStrings = actualPath.split("Z");
+  var expectedAreaPathStrings = expectedPath.split("Z");
+
+  actualAreaPathStrings.pop();
+  expectedAreaPathStrings.pop();
+
+  var actualAreaPathPoints = actualAreaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
+  actualAreaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
+  var expectedAreaPathPoints = expectedAreaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
+  expectedAreaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
+
+  assert.lengthOf(actualAreaPathPoints, expectedAreaPathPoints.length, "number of broken area paths should be equal");
+  actualAreaPathPoints.forEach((actualAreaPoints, i) => {
+    var expectedAreaPoints = expectedAreaPathPoints[i];
+    assert.lengthOf(actualAreaPoints, expectedAreaPoints.length, "number of points in path should be equal");
+    actualAreaPoints.forEach((actualAreaPoint, j) => {
+      var expectedAreaPoint = expectedAreaPoints[j];
+      assert.closeTo(+actualAreaPoint[0], +expectedAreaPoint[0], 0.1, msg);
+      assert.closeTo(+actualAreaPoint[1], +expectedAreaPoint[1], 0.1, msg);
+    });
+  });
+}
