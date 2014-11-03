@@ -3,9 +3,10 @@
 module Plottable {
 export module Axis {
   /**
-   * Defines time interval for tier.
+   * Defines time interval for tier. 
+   * For details how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
    * interval - time interval used to calculate next tick.
-   * steps - array of steps between two ticks. It needs to be in ascending order (see Time Axis description). By default [1].
+   * steps - array of steps between two ticks. It needs to be in ascending order. By default [1].
    * formatter - formatter used to display labels.
    */
   export interface TierInterval {
@@ -16,6 +17,7 @@ export module Axis {
 
   /**
    * Defines Axis tier intervals, which is an array of tiers, which will be shown together.
+   * Axis will find the most accurate intervals, which satisfy width threshold and make all labels visible. 
    * Right now we support up to two tiers.
    */
   export interface AxisTierIntervals {
@@ -25,7 +27,7 @@ export module Axis {
   /**
    * Tier tick configuration, which explicitly show how ticks needs to be generated on specific tier.
    */
-  export interface TierTickConfiguration {
+  interface TierTickConfiguration {
     interval: D3.Time.Interval;
     step: number;
     formatter: Formatter;
@@ -34,18 +36,6 @@ export module Axis {
   var tF = Plottable.Formatters.time;
   var d3t = d3.time;
 
-  /**
-   * Time Axis is designed to show time interval. It is two layer axis: small step and big step.
-   * Both layers show interval, but with different accuracy. Big step is designed to show less accurate intervals and
-   * wraps multiple intervals from small step.
-   * To prevent duplication of information on axis TimeIntervalDefinition expose nextInterval property, which will define
-   * explicitly the interval for less accurate layer. If it is not provided axis assumes, that less accurate layer is not needed.
-   * Based on data component will try to find proper TimeStepGenerator based on available TimeIntervalDefinitions.
-   * Label of each tick needs to fit in available space, so compoment will iterate through TimeIntervalDefinitions
-   * and will compute the most accurate interval, which meets requirements. This requires from user specifies custom
-   * TimeIntervalDefinitions for small and big step in order from most accurate to most general.
-   * For details how ticks are generated visit: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
-   */
   export class Time extends AbstractAxis {
 
     public _tierLabelContainers: D3.Selection[];
@@ -68,7 +58,7 @@ export module Axis {
     /*
      * Default axis time intervals.
      */
-    public _possibleAxisTierIntervals: AxisTierIntervals[] = [
+    private possibleAxisTierIntervals: AxisTierIntervals[] = [
       {tiers: [
         {interval: d3t.second, steps: [1, 5, 10, 15, 30], formatter: tF("%I:%M:%S %p")},
         {interval: d3t.day, formatter: tF("%B %e, %Y")}
@@ -112,6 +102,10 @@ export module Axis {
     private static LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
 
     private measurer: _Util.Text.TextMeasurer;
+
+    /**
+     * Number of possible tiers in axis.
+     */
     private noTiers = 2;
 
     /**
@@ -151,26 +145,27 @@ export module Axis {
     public axisTierIntervals(minInterval: D3.Time.Interval): Time;
     public axisTierIntervals(param?: any): any {
       if(param == null){
-        return this._possibleAxisTierIntervals.slice();
+        return this.possibleAxisTierIntervals.slice();
       }
       var newIntervals: AxisTierIntervals[];
       if (param instanceof Array) {
         newIntervals = param;
       } else {
-        newIntervals = Time.calculateLowerBoundDefinitions(this._possibleAxisTierIntervals, param);
+        newIntervals = Time.calculateLowerBoundDefinitions(this.possibleAxisTierIntervals, param);
       }
-      this._possibleAxisTierIntervals = newIntervals;
+      this.possibleAxisTierIntervals = newIntervals;
+      this._invalidateLayout();
       return this;
     }
 
     /**
      * Based on possbile axis tier intervals component finds most accurate tier tick configurations, 
-     * which fits in available width.
+     * which satisfy width threshold.
      */
     private calculateTierTickConfigurations(): TierTickConfiguration[] {
       var mostAccurateTierTickConfigurations: TierTickConfiguration[] = [];
-      for(var i = 0; i < this._possibleAxisTierIntervals.length; ++i) {
-        mostAccurateTierTickConfigurations = this._possibleAxisTierIntervals[i].tiers.map(
+      for(var i = 0; i < this.possibleAxisTierIntervals.length; ++i) {
+        mostAccurateTierTickConfigurations = this.possibleAxisTierIntervals[i].tiers.map(
           tier => this.getMostAccurateTierTickConfiguration(tier)
         );
         if(mostAccurateTierTickConfigurations.every(config => config != null)) {
@@ -179,7 +174,7 @@ export module Axis {
       }
 
       _Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
-      return this._possibleAxisTierIntervals[this._possibleAxisTierIntervals.length - 1].tiers.map(
+      return this.possibleAxisTierIntervals[this.possibleAxisTierIntervals.length - 1].tiers.map(
         tier => this.getMostAccurateTierTickConfiguration(tier, true)
       );
     }
@@ -220,9 +215,11 @@ export module Axis {
       return this.measurer(interval.formatter(Time.LONG_DATE)).width;
     }
 
+    /**
+     * Gets the most accurate tier tick configuration based on provided interval, which satisfy width threshold.
+     * Method returns null if there is no such configuration and returnLastIfNotFound is set to false.
+     */
     private getMostAccurateTierTickConfiguration(tierInterval: TierInterval, returnLastIfNotFound: boolean = false): TierTickConfiguration {
-      // compute number of ticks
-      // if less than a certain threshold
       var worstWidth = this.calculateDateMaxWidthForInterval(tierInterval) + 2 * this.tickLabelPadding();
       var stepLength: number;
       var config = {
@@ -230,6 +227,7 @@ export module Axis {
         step: 0,
         formatter: tierInterval.formatter
       };
+
       var steps = tierInterval.steps || [1];
       for(var i = 0; i < steps.length; ++i) {
         config.step = steps[i];
@@ -249,16 +247,15 @@ export module Axis {
       this.measurer = _Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
     }
 
-    public _getTickIntervalValues(config: TierTickConfiguration): any[] {
+    private getTickIntervalValues(config: TierTickConfiguration): any[] {
       return this._scale._tickInterval(config.interval, config.step);
     }
 
     public _getTickValues(): any[] {
       return this.tierTickConfigurations.reduce((ticks: any[], config: TierTickConfiguration) =>
-        ticks.concat(this._getTickIntervalValues(config)), []);
+        ticks.concat(this.getTickIntervalValues(config)), []);
     }
 
-    // TODO: Maybe remove
     public _measureTextHeight(): number {
       return this.measurer(_Util.Text.HEIGHT_TEXT).height;
     }
@@ -315,7 +312,7 @@ export module Axis {
     }
 
     private adjustTickLength(config: TierTickConfiguration, height: number) {
-      var tickValues: any[] = this._getTickIntervalValues(config);
+      var tickValues: any[] = this.getTickIntervalValues(config);
       var selection = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).filter((d: Date) =>
         // we want to check if d is in tickValues
         // however, if two dates a, b, have the same date, it may not be true that a === b.
@@ -328,17 +325,25 @@ export module Axis {
       selection.attr("y2", height);
     }
 
-    private findMoreAccurateConfiguration(config: TierTickConfiguration): TierTickConfiguration {
-      var moreAccurateConfig = config;
-      for(var i = 0; i < this._possibleAxisTierIntervals.length; ++i) {
-        var tier = this._possibleAxisTierIntervals[i].tiers[0];
-        moreAccurateConfig.interval = tier.interval;
+    /**
+     * Gets more accurate tier tick configuration from first tier than the provided one.
+     */
+    private getMoreAccurateTierTickConfiguration(config: TierTickConfiguration): TierTickConfiguration {
+      var moreAccurateConfig: TierTickConfiguration = {
+              interval: undefined,
+              step: undefined,
+              formatter: undefined
+            };;
+
+      for (var i = 0; i < this.possibleAxisTierIntervals.length; ++i) {
+        var tier = this.possibleAxisTierIntervals[i].tiers[0];
         var steps = tier.steps || [1];
-        for(var j = 0; j < steps.length; ++j) {
-          if(steps[j] === config.step && tier.interval === config.interval) {
+        for (var j = 0; j < steps.length; ++j) {
+          if (steps[j] === config.step && tier.interval === config.interval) {
             return moreAccurateConfig;
           } else {
             moreAccurateConfig.step = steps[j];
+            moreAccurateConfig.interval = tier.interval;
           }
         }
       }
@@ -347,19 +352,19 @@ export module Axis {
     }
 
     private generateLabellessTicks(config: TierTickConfiguration) {
-      var moreAccurateConfig = this.findMoreAccurateConfiguration(config);
-      if(moreAccurateConfig.interval === config.interval && moreAccurateConfig.step === config.step) {
+      var moreAccurateConfig = this.getMoreAccurateTierTickConfiguration(config);
+      if(!(moreAccurateConfig && moreAccurateConfig.interval)) {
         return;
       }
 
-      var smallTicks = this._getTickIntervalValues(moreAccurateConfig);
+      var smallTicks = this.getTickIntervalValues(moreAccurateConfig);
       var allTicks = this._getTickValues().concat(smallTicks);
 
       var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(allTicks);
       tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
       tickMarks.exit().remove();
-      this.adjustTickLength(this.tierTickConfigurations[0], this.tickLabelPadding());
+      this.adjustTickLength(moreAccurateConfig, this.tickLabelPadding());
     }
 
     public _doRender() {
@@ -378,6 +383,7 @@ export module Axis {
       this.tierTickConfigurations.forEach((config: TierTickConfiguration, i: number) =>
         this.adjustTickLength(config, this._maxLabelTickLength() * (i + 1) / this.noTiers)
       );
+
       return this;
     }
   }

@@ -4578,18 +4578,6 @@ var Plottable;
         ;
         var tF = Plottable.Formatters.time;
         var d3t = d3.time;
-        /**
-         * Time Axis is designed to show time interval. It is two layer axis: small step and big step.
-         * Both layers show interval, but with different accuracy. Big step is designed to show less accurate intervals and
-         * wraps multiple intervals from small step.
-         * To prevent duplication of information on axis TimeIntervalDefinition expose nextInterval property, which will define
-         * explicitly the interval for less accurate layer. If it is not provided axis assumes, that less accurate layer is not needed.
-         * Based on data component will try to find proper TimeStepGenerator based on available TimeIntervalDefinitions.
-         * Label of each tick needs to fit in available space, so compoment will iterate through TimeIntervalDefinitions
-         * and will compute the most accurate interval, which meets requirements. This requires from user specifies custom
-         * TimeIntervalDefinitions for small and big step in order from most accurate to most general.
-         * For details how ticks are generated visit: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
-         */
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
@@ -4606,7 +4594,7 @@ var Plottable;
                 /*
                  * Default axis time intervals.
                  */
-                this._possibleAxisTierIntervals = [
+                this.possibleAxisTierIntervals = [
                     { tiers: [
                         { interval: d3t.second, steps: [1, 5, 10, 15, 30], formatter: tF("%I:%M:%S %p") },
                         { interval: d3t.day, formatter: tF("%B %e, %Y") }
@@ -4645,6 +4633,9 @@ var Plottable;
                         { interval: d3t.year, steps: [5, 25, 50, 100, 200, 500, 1000], formatter: tF("%Y") }
                     ] }
                 ];
+                /**
+                 * Number of possible tiers in axis.
+                 */
                 this.noTiers = 2;
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
@@ -4663,33 +4654,34 @@ var Plottable;
             };
             Time.prototype.axisTierIntervals = function (param) {
                 if (param == null) {
-                    return this._possibleAxisTierIntervals.slice();
+                    return this.possibleAxisTierIntervals.slice();
                 }
                 var newIntervals;
                 if (param instanceof Array) {
                     newIntervals = param;
                 }
                 else {
-                    newIntervals = Time.calculateLowerBoundDefinitions(this._possibleAxisTierIntervals, param);
+                    newIntervals = Time.calculateLowerBoundDefinitions(this.possibleAxisTierIntervals, param);
                 }
-                this._possibleAxisTierIntervals = newIntervals;
+                this.possibleAxisTierIntervals = newIntervals;
+                this._invalidateLayout();
                 return this;
             };
             /**
              * Based on possbile axis tier intervals component finds most accurate tier tick configurations,
-             * which fits in available width.
+             * which satisfy width threshold.
              */
             Time.prototype.calculateTierTickConfigurations = function () {
                 var _this = this;
                 var mostAccurateTierTickConfigurations = [];
-                for (var i = 0; i < this._possibleAxisTierIntervals.length; ++i) {
-                    mostAccurateTierTickConfigurations = this._possibleAxisTierIntervals[i].tiers.map(function (tier) { return _this.getMostAccurateTierTickConfiguration(tier); });
+                for (var i = 0; i < this.possibleAxisTierIntervals.length; ++i) {
+                    mostAccurateTierTickConfigurations = this.possibleAxisTierIntervals[i].tiers.map(function (tier) { return _this.getMostAccurateTierTickConfiguration(tier); });
                     if (mostAccurateTierTickConfigurations.every(function (config) { return config != null; })) {
                         return mostAccurateTierTickConfigurations;
                     }
                 }
                 Plottable._Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
-                return this._possibleAxisTierIntervals[this._possibleAxisTierIntervals.length - 1].tiers.map(function (tier) { return _this.getMostAccurateTierTickConfiguration(tier, true); });
+                return this.possibleAxisTierIntervals[this.possibleAxisTierIntervals.length - 1].tiers.map(function (tier) { return _this.getMostAccurateTierTickConfiguration(tier, true); });
             };
             Time.prototype.orient = function (orientation) {
                 if (orientation && (orientation.toLowerCase() === "right" || orientation.toLowerCase() === "left")) {
@@ -4721,10 +4713,12 @@ var Plottable;
             Time.prototype.calculateDateMaxWidthForInterval = function (interval) {
                 return this.measurer(interval.formatter(Time.LONG_DATE)).width;
             };
+            /**
+             * Gets the most accurate tier tick configuration based on provided interval, which satisfy width threshold.
+             * Method returns null if there is no such configuration and returnLastIfNotFound is set to false.
+             */
             Time.prototype.getMostAccurateTierTickConfiguration = function (tierInterval, returnLastIfNotFound) {
                 if (returnLastIfNotFound === void 0) { returnLastIfNotFound = false; }
-                // compute number of ticks
-                // if less than a certain threshold
                 var worstWidth = this.calculateDateMaxWidthForInterval(tierInterval) + 2 * this.tickLabelPadding();
                 var stepLength;
                 var config = {
@@ -4749,14 +4743,13 @@ var Plottable;
                 }
                 this.measurer = Plottable._Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
             };
-            Time.prototype._getTickIntervalValues = function (config) {
+            Time.prototype.getTickIntervalValues = function (config) {
                 return this._scale._tickInterval(config.interval, config.step);
             };
             Time.prototype._getTickValues = function () {
                 var _this = this;
-                return this.tierTickConfigurations.reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
+                return this.tierTickConfigurations.reduce(function (ticks, config) { return ticks.concat(_this.getTickIntervalValues(config)); }, []);
             };
-            // TODO: Maybe remove
             Time.prototype._measureTextHeight = function () {
                 return this.measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
             };
@@ -4810,18 +4803,25 @@ var Plottable;
                 return endPosition < this.width() && startPosition > 0;
             };
             Time.prototype.adjustTickLength = function (config, height) {
-                var tickValues = this._getTickIntervalValues(config);
+                var tickValues = this.getTickIntervalValues(config);
                 var selection = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).filter(function (d) { return tickValues.map(function (x) { return x.valueOf(); }).indexOf(d.valueOf()) >= 0; });
                 if (this._orientation === "top") {
                     height = this.height() - height;
                 }
                 selection.attr("y2", height);
             };
-            Time.prototype.findMoreAccurateConfiguration = function (config) {
-                var moreAccurateConfig = config;
-                for (var i = 0; i < this._possibleAxisTierIntervals.length; ++i) {
-                    var tier = this._possibleAxisTierIntervals[i].tiers[0];
-                    moreAccurateConfig.interval = tier.interval;
+            /**
+             * Gets more accurate tier tick configuration from first tier than the provided one.
+             */
+            Time.prototype.getMoreAccurateTierTickConfiguration = function (config) {
+                var moreAccurateConfig = {
+                    interval: undefined,
+                    step: undefined,
+                    formatter: undefined
+                };
+                ;
+                for (var i = 0; i < this.possibleAxisTierIntervals.length; ++i) {
+                    var tier = this.possibleAxisTierIntervals[i].tiers[0];
                     var steps = tier.steps || [1];
                     for (var j = 0; j < steps.length; ++j) {
                         if (steps[j] === config.step && tier.interval === config.interval) {
@@ -4829,23 +4829,24 @@ var Plottable;
                         }
                         else {
                             moreAccurateConfig.step = steps[j];
+                            moreAccurateConfig.interval = tier.interval;
                         }
                     }
                 }
                 return null;
             };
             Time.prototype.generateLabellessTicks = function (config) {
-                var moreAccurateConfig = this.findMoreAccurateConfiguration(config);
-                if (moreAccurateConfig.interval === config.interval && moreAccurateConfig.step === config.step) {
+                var moreAccurateConfig = this.getMoreAccurateTierTickConfiguration(config);
+                if (!(moreAccurateConfig && moreAccurateConfig.interval)) {
                     return;
                 }
-                var smallTicks = this._getTickIntervalValues(moreAccurateConfig);
+                var smallTicks = this.getTickIntervalValues(moreAccurateConfig);
                 var allTicks = this._getTickValues().concat(smallTicks);
                 var tickMarks = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).data(allTicks);
                 tickMarks.enter().append("line").classed(Axis.AbstractAxis.TICK_MARK_CLASS, true);
                 tickMarks.attr(this._generateTickMarkAttrHash());
                 tickMarks.exit().remove();
-                this.adjustTickLength(this.tierTickConfigurations[0], this.tickLabelPadding());
+                this.adjustTickLength(moreAccurateConfig, this.tickLabelPadding());
             };
             Time.prototype._doRender = function () {
                 var _this = this;

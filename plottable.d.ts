@@ -2133,8 +2133,9 @@ declare module Plottable {
     module Axis {
         /**
          * Defines time interval for tier.
+         * For details how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
          * interval - time interval used to calculate next tick.
-         * steps - array of steps between two ticks. It needs to be in ascending order (see Time Axis description). By default [1].
+         * steps - array of steps between two ticks. It needs to be in ascending order. By default [1].
          * formatter - formatter used to display labels.
          */
         interface TierInterval {
@@ -2144,35 +2145,15 @@ declare module Plottable {
         }
         /**
          * Defines Axis tier intervals, which is an array of tiers, which will be shown together.
+         * Axis will find the most accurate intervals, which satisfy width threshold and make all labels visible.
          * Right now we support up to two tiers.
          */
         interface AxisTierIntervals {
             tiers: TierInterval[];
         }
-        /**
-         * Tier tick configuration, which explicitly show how ticks needs to be generated on specific tier.
-         */
-        interface TierTickConfiguration {
-            interval: D3.Time.Interval;
-            step: number;
-            formatter: Formatter;
-        }
-        /**
-         * Time Axis is designed to show time interval. It is two layer axis: small step and big step.
-         * Both layers show interval, but with different accuracy. Big step is designed to show less accurate intervals and
-         * wraps multiple intervals from small step.
-         * To prevent duplication of information on axis TimeIntervalDefinition expose nextInterval property, which will define
-         * explicitly the interval for less accurate layer. If it is not provided axis assumes, that less accurate layer is not needed.
-         * Based on data component will try to find proper TimeStepGenerator based on available TimeIntervalDefinitions.
-         * Label of each tick needs to fit in available space, so compoment will iterate through TimeIntervalDefinitions
-         * and will compute the most accurate interval, which meets requirements. This requires from user specifies custom
-         * TimeIntervalDefinitions for small and big step in order from most accurate to most general.
-         * For details how ticks are generated visit: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
-         */
         class Time extends AbstractAxis {
             _tierLabelContainers: D3.Selection[];
             _scale: Scale.Time;
-            _possibleAxisTierIntervals: AxisTierIntervals[];
             /**
              * Constructs a TimeAxis.
              *
@@ -2207,7 +2188,6 @@ declare module Plottable {
             orient(orientation: string): Time;
             _computeHeight(): number;
             _setup(): void;
-            _getTickIntervalValues(config: TierTickConfiguration): any[];
             _getTickValues(): any[];
             _measureTextHeight(): number;
             _doRender(): Time;
