@@ -1,8 +1,4 @@
 
-svg.plottable {
-  display : block; /* SVGs must be block elements for width/height calculations to work in Firefox. */
-}
-
 .plottable-colors-0 {
   color: #5279c7; /* INDIGO */
 }
@@ -41,6 +37,10 @@ svg.plottable {
 
 .plottable-colors-9 {
   color: #06cccc; /* ROBINS_EGG_BLUE */
+}
+
+svg.plottable {
+  display : block; /* SVGs must be block elements for width/height calculations to work in Firefox. */
 }
 
 .plottable .bounding-box {
