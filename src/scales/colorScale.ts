@@ -3,6 +3,9 @@
 module Plottable {
 export module Scale {
   export class Color extends AbstractScale<string, string> {
+
+    public static DEFAULT_PLOTTABLE_COLORS_LENGTH = 10;
+
     /**
      * Constructs a ColorScale.
      *
@@ -56,8 +59,7 @@ export module Scale {
 
     private static getPlottableColors(): string[] {
       var plottableDefaultColors: string[] = [];
-      var defaultNumColors = 10;
-      for (var i = 0; i < defaultNumColors; i++) {
+      for (var i = 0; i < Color.DEFAULT_PLOTTABLE_COLORS_LENGTH; i++) {
         var colorTester = d3.select("body").append("div").classed("plottable-colors-" + i, true);
         // Use regex to get the text inside the rgb parentheses
         var rgb = /\((.+)\)/.exec(colorTester.style("color"))[1].split(",");

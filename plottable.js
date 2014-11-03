@@ -2803,8 +2803,7 @@ var Plottable;
             };
             Color.getPlottableColors = function () {
                 var plottableDefaultColors = [];
-                var defaultNumColors = 10;
-                for (var i = 0; i < defaultNumColors; i++) {
+                for (var i = 0; i < Color.DEFAULT_PLOTTABLE_COLORS_LENGTH; i++) {
                     var colorTester = d3.select("body").append("div").classed("plottable-colors-" + i, true);
                     // Use regex to get the text inside the rgb parentheses
                     var rgb = /\((.+)\)/.exec(colorTester.style("color"))[1].split(",");
@@ -2819,6 +2818,7 @@ var Plottable;
                 var remainingValue = Math.floor(value / 16).toString(16);
                 return remainingValue + baseValue;
             };
+            Color.DEFAULT_PLOTTABLE_COLORS_LENGTH = 10;
             return Color;
         })(Scale.AbstractScale);
         Scale.Color = Color;
