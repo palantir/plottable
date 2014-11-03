@@ -5075,6 +5075,13 @@ describe("Scales", function () {
             var colorArray = ["#5279c7", "#fd373e", "#63c261", "#fad419", "#2c2b6f", "#ff7939", "#db2e65", "#99ce50", "#962565", "#06cccc"];
             assert.deepEqual(scale.range(), colorArray);
         });
+        it("number of colors returned can be modified", function () {
+            Plottable.Scale.Color.DEFAULT_PLOTTABLE_COLORS_LENGTH = 6;
+            var scale = new Plottable.Scale.Color();
+            var colorArray = ["#5279c7", "#fd373e", "#63c261", "#fad419", "#2c2b6f", "#ff7939"];
+            assert.deepEqual(scale.range(), colorArray);
+            Plottable.Scale.Color.DEFAULT_PLOTTABLE_COLORS_LENGTH = 10;
+        });
     });
     describe("Interpolated Color Scales", function () {
         it("default scale uses reds and a linear scale type", function () {
