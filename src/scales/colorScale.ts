@@ -69,28 +69,9 @@ export module Scale {
     }
 
     private static toDoubleDigitHex(value: number): string {
-      var baseValue = Scale.Color.toHexDigit(value % 16);
-      var remainingValue = Scale.Color.toHexDigit(Math.floor(value / 16));
+      var baseValue = (value % 16).toString(16);
+      var remainingValue = Math.floor(value / 16).toString(16);
       return remainingValue + baseValue;
-    }
-
-    private static toHexDigit(value: number): string {
-      switch (value) {
-        case 10:
-          return "a";
-        case 11:
-          return "b";
-        case 12:
-          return "c";
-        case 13:
-          return "d";
-        case 14:
-          return "e";
-        case 15:
-          return "f";
-        default:
-          return String(value);
-      }
     }
   }
 }
