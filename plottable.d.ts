@@ -124,7 +124,6 @@ declare module Plottable {
                 [x: string]: T;
             };
             function range(start: number, stop: number, step?: number): number[];
-            function isInOrder<C>(arr: C[], ascending: boolean, compFn: (a: C, b: C) => number): boolean;
             /** Is like setTimeout, but activates synchronously if time=0
              * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
              * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
@@ -2152,7 +2151,6 @@ declare module Plottable {
             tiers: TierInterval[];
         }
         class Time extends AbstractAxis {
-            _tierLabelContainers: D3.Selection[];
             _scale: Scale.Time;
             /**
              * Constructs a TimeAxis.
@@ -2177,13 +2175,6 @@ declare module Plottable {
              * @returns {Axis} The calling Axis.
              */
             axisTierIntervals(tiers: AxisTierIntervals[]): Time;
-            /**
-             * Sets the min interval for axis tier intervals.
-             *
-             * @param {D3.Time.Interval} minInterval The smallest time interval to generate ticks.
-             * @returns {Axis} The calling Axis.
-             */
-            axisTierIntervals(minInterval: D3.Time.Interval): Time;
             orient(): string;
             orient(orientation: string): Time;
             _computeHeight(): number;

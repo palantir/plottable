@@ -38,22 +38,7 @@ export module Axis {
 
   export class Time extends AbstractAxis {
 
-    public _tierLabelContainers: D3.Selection[];
     public _scale: Scale.Time;
-
-    /**
-     * For given sorted array of time intervals function returns lower bound
-     * of intervals which has less accuracy than given interval.
-     */
-    private static calculateLowerBoundDefinitions(intervals: AxisTierIntervals[], minIterval: D3.Time.Interval) {
-      var moreGeneralInterval = (interval: AxisTierIntervals) => {
-        var now = new Date();
-        var firstTier: TierInterval = interval.tiers[0];
-        return firstTier.interval.offset(now, 1) >= minIterval.offset(now, 1);
-      };
-
-      return intervals.filter(moreGeneralInterval);
-    }
 
     /*
      * Default axis time intervals.
@@ -99,14 +84,14 @@ export module Axis {
     ];
 
     private tierTickConfigurations: TierTickConfiguration[];
-    private static LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
-
+    private tierLabelContainers: D3.Selection[];
     private measurer: _Util.Text.TextMeasurer;
 
+    private static LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
     /**
      * Number of possible tiers in axis.
      */
-    private noTiers = 2;
+    private static NO_TIERS = 2;
 
     /**
      * Constructs a TimeAxis.
@@ -136,30 +121,17 @@ export module Axis {
      * @returns {Axis} The calling Axis.
      */
     public axisTierIntervals(tiers: AxisTierIntervals[]): Time;
-    /**
-     * Sets the min interval for axis tier intervals.
-     *
-     * @param {D3.Time.Interval} minInterval The smallest time interval to generate ticks. 
-     * @returns {Axis} The calling Axis.
-     */
-    public axisTierIntervals(minInterval: D3.Time.Interval): Time;
-    public axisTierIntervals(param?: any): any {
-      if(param == null){
+    public axisTierIntervals(tiers?: any): any {
+      if(tiers == null){
         return this.possibleAxisTierIntervals.slice();
       }
-      var newIntervals: AxisTierIntervals[];
-      if (param instanceof Array) {
-        newIntervals = param;
-      } else {
-        newIntervals = Time.calculateLowerBoundDefinitions(this.possibleAxisTierIntervals, param);
-      }
-      this.possibleAxisTierIntervals = newIntervals;
+      this.possibleAxisTierIntervals = tiers;
       this._invalidateLayout();
       return this;
     }
 
     /**
-     * Based on possbile axis tier intervals component finds most accurate tier tick configurations, 
+     * Based on possible axis tier intervals component finds most accurate tier tick configurations, 
      * which satisfy width threshold.
      */
     private calculateTierTickConfigurations(): TierTickConfiguration[] {
@@ -211,7 +183,7 @@ export module Axis {
       return stepLength;
     }
 
-    private calculateDateMaxWidthForInterval(interval: TierInterval): number {
+    private maxWidthForInterval(interval: TierInterval): number {
       return this.measurer(interval.formatter(Time.LONG_DATE)).width;
     }
 
@@ -220,7 +192,7 @@ export module Axis {
      * Method returns null if there is no such configuration and returnLastIfNotFound is set to false.
      */
     private getMostAccurateTierTickConfiguration(tierInterval: TierInterval, returnLastIfNotFound: boolean = false): TierTickConfiguration {
-      var worstWidth = this.calculateDateMaxWidthForInterval(tierInterval) + 2 * this.tickLabelPadding();
+      var worstWidth = this.maxWidthForInterval(tierInterval) + 2 * this.tickLabelPadding();
       var stepLength: number;
       var config = {
         interval: tierInterval.interval,
@@ -240,11 +212,11 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this._tierLabelContainers = [];
-      for(var i = 0; i < this.noTiers; ++i) {
-        this._tierLabelContainers.push(this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true));
+      this.tierLabelContainers = [];
+      for(var i = 0; i < Time.NO_TIERS; ++i) {
+        this.tierLabelContainers.push(this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true));
       }
-      this.measurer = _Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
+      this.measurer = _Util.Text.getTextMeasurer(this.tierLabelContainers[0].append("text"));
     }
 
     private getTickIntervalValues(config: TierTickConfiguration): any[] {
@@ -372,7 +344,7 @@ export module Axis {
       super._doRender();
 
       this.tierTickConfigurations.forEach((config: TierTickConfiguration, i: number) =>
-        this.renderTierLabels(this._tierLabelContainers[i], config, i + 1)
+        this.renderTierLabels(this.tierLabelContainers[i], config, i + 1)
       );
 
       var domain = this._scale.domain();
@@ -381,7 +353,7 @@ export module Axis {
         this.generateLabellessTicks(this.tierTickConfigurations[0]);
       }
       this.tierTickConfigurations.forEach((config: TierTickConfiguration, i: number) =>
-        this.adjustTickLength(config, this._maxLabelTickLength() * (i + 1) / this.noTiers)
+        this.adjustTickLength(config, this._maxLabelTickLength() * (i + 1) / Time.NO_TIERS)
       );
 
       return this;

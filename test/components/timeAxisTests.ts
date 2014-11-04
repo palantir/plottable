@@ -63,7 +63,7 @@ describe("TimeAxis", () => {
         }
       }
 
-      axis._tierLabelContainers.forEach(checkLabelsForContainer);
+      (<any>axis).tierLabelContainers.forEach(checkLabelsForContainer);
     }
     // 100 year span
     checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
@@ -80,24 +80,6 @@ describe("TimeAxis", () => {
     // 1 second span
     checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 0, 1, 0)]);
 
-    svg.remove();
-  });
-
-  it("min interval on time Axis", () => {
-    var svg = generateSVG(800, 100);
-    var scale = new Plottable.Scale.Time();
-    var axis = new Plottable.Axis.Time(scale, "bottom");
-    var now = new Date();
-    var fourDaysBefore = new Date(now.getTime());
-    fourDaysBefore.setDate(now.getDate() - 4);
-    scale.domain([fourDaysBefore, now]);
-    scale.range([0, 600]);
-    axis.renderTo(svg);
-    var configs = (<any> axis).tierTickConfigurations;
-    assert.deepEqual(configs[0].interval, d3.time.hour, "hour interval satisfy width threshold");
-    axis.axisTierIntervals(d3.time.day);
-    configs = (<any> axis).tierTickConfigurations;
-    assert.deepEqual(configs[0].interval, d3.time.day, "day interval is the min possible interval for tier tick config");
     svg.remove();
   });
 

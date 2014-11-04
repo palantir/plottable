@@ -278,14 +278,6 @@ export module _Util {
       return range;
     }
 
-    /*
-     * Checks if given array is monothonic in given direction(asc/desc) using given comparison function.
-     */
-    export function isInOrder<C>(arr: C[], ascending: boolean, compFn: (a: C, b: C) => number) {
-      var orderFn = (r: number) => ascending ? r >= 0 : r <= 0;
-      return arr.every((a: C, i: number) => i === 0 || orderFn(compFn(arr[i - 1], a)));
-    }
-
     /** Is like setTimeout, but activates synchronously if time=0
      * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
      * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes

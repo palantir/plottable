@@ -265,14 +265,6 @@ var Plottable;
                 return range;
             }
             Methods.range = range;
-            /*
-             * Checks if given array is monothonic in given direction(asc/desc) using given comparison function.
-             */
-            function isInOrder(arr, ascending, compFn) {
-                var orderFn = function (r) { return ascending ? r >= 0 : r <= 0; };
-                return arr.every(function (a, i) { return i === 0 || orderFn(compFn(arr[i - 1], a)); });
-            }
-            Methods.isInOrder = isInOrder;
             /** Is like setTimeout, but activates synchronously if time=0
              * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
              * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
@@ -4633,42 +4625,19 @@ var Plottable;
                         { interval: d3t.year, steps: [5, 25, 50, 100, 200, 500, 1000], formatter: tF("%Y") }
                     ] }
                 ];
-                /**
-                 * Number of possible tiers in axis.
-                 */
-                this.noTiers = 2;
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
             }
-            /**
-             * For given sorted array of time intervals function returns lower bound
-             * of intervals which has less accuracy than given interval.
-             */
-            Time.calculateLowerBoundDefinitions = function (intervals, minIterval) {
-                var moreGeneralInterval = function (interval) {
-                    var now = new Date();
-                    var firstTier = interval.tiers[0];
-                    return firstTier.interval.offset(now, 1) >= minIterval.offset(now, 1);
-                };
-                return intervals.filter(moreGeneralInterval);
-            };
-            Time.prototype.axisTierIntervals = function (param) {
-                if (param == null) {
+            Time.prototype.axisTierIntervals = function (tiers) {
+                if (tiers == null) {
                     return this.possibleAxisTierIntervals.slice();
                 }
-                var newIntervals;
-                if (param instanceof Array) {
-                    newIntervals = param;
-                }
-                else {
-                    newIntervals = Time.calculateLowerBoundDefinitions(this.possibleAxisTierIntervals, param);
-                }
-                this.possibleAxisTierIntervals = newIntervals;
+                this.possibleAxisTierIntervals = tiers;
                 this._invalidateLayout();
                 return this;
             };
             /**
-             * Based on possbile axis tier intervals component finds most accurate tier tick configurations,
+             * Based on possible axis tier intervals component finds most accurate tier tick configurations,
              * which satisfy width threshold.
              */
             Time.prototype.calculateTierTickConfigurations = function () {
@@ -4710,7 +4679,7 @@ var Plottable;
                 var stepLength = Math.abs(this._scale.scale(endDate) - this._scale.scale(startDate));
                 return stepLength;
             };
-            Time.prototype.calculateDateMaxWidthForInterval = function (interval) {
+            Time.prototype.maxWidthForInterval = function (interval) {
                 return this.measurer(interval.formatter(Time.LONG_DATE)).width;
             };
             /**
@@ -4719,7 +4688,7 @@ var Plottable;
              */
             Time.prototype.getMostAccurateTierTickConfiguration = function (tierInterval, returnLastIfNotFound) {
                 if (returnLastIfNotFound === void 0) { returnLastIfNotFound = false; }
-                var worstWidth = this.calculateDateMaxWidthForInterval(tierInterval) + 2 * this.tickLabelPadding();
+                var worstWidth = this.maxWidthForInterval(tierInterval) + 2 * this.tickLabelPadding();
                 var stepLength;
                 var config = {
                     interval: tierInterval.interval,
@@ -4737,11 +4706,11 @@ var Plottable;
             };
             Time.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._tierLabelContainers = [];
-                for (var i = 0; i < this.noTiers; ++i) {
-                    this._tierLabelContainers.push(this._content.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
+                this.tierLabelContainers = [];
+                for (var i = 0; i < Time.NO_TIERS; ++i) {
+                    this.tierLabelContainers.push(this._content.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
                 }
-                this.measurer = Plottable._Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
+                this.measurer = Plottable._Util.Text.getTextMeasurer(this.tierLabelContainers[0].append("text"));
             };
             Time.prototype.getTickIntervalValues = function (config) {
                 return this._scale._tickInterval(config.interval, config.step);
@@ -4852,16 +4821,20 @@ var Plottable;
                 var _this = this;
                 this.tierTickConfigurations = this.calculateTierTickConfigurations();
                 _super.prototype._doRender.call(this);
-                this.tierTickConfigurations.forEach(function (config, i) { return _this.renderTierLabels(_this._tierLabelContainers[i], config, i + 1); });
+                this.tierTickConfigurations.forEach(function (config, i) { return _this.renderTierLabels(_this.tierLabelContainers[i], config, i + 1); });
                 var domain = this._scale.domain();
                 var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
                 if (this.getIntervalLength(this.tierTickConfigurations[0]) * 1.5 >= totalLength) {
                     this.generateLabellessTicks(this.tierTickConfigurations[0]);
                 }
-                this.tierTickConfigurations.forEach(function (config, i) { return _this.adjustTickLength(config, _this._maxLabelTickLength() * (i + 1) / _this.noTiers); });
+                this.tierTickConfigurations.forEach(function (config, i) { return _this.adjustTickLength(config, _this._maxLabelTickLength() * (i + 1) / Time.NO_TIERS); });
                 return this;
             };
             Time.LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
+            /**
+             * Number of possible tiers in axis.
+             */
+            Time.NO_TIERS = 2;
             return Time;
         })(Axis.AbstractAxis);
         Axis.Time = Time;
