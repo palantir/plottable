@@ -212,6 +212,10 @@ export module Component {
       var legendEnter = legend.enter()
           .append("g").classed(Legend.SUBELEMENT_CLASS, true);
 
+      legendEnter.each(function(d: String) {
+        d3.select(this).classed(d.replace(" ", "-"), true);
+      });
+
       legendEnter.append("circle");
       legendEnter.append("g").classed("text-container", true);
 
