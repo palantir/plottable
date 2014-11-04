@@ -131,16 +131,16 @@ export module Component {
     }
 
     /**
-     * Gets the amount of padding around the Label.
+     * Gets the amount of padding in pixel values around the Label.
      *
      * @returns {number} the current padding amount.
      */
     public padding(): number;
     /**
-     * Sets the amount of padding around the Label.
+     * Sets the amount of padding in pixel values around the Label.
      * Also retriggers a layout calculation to calculate the appropriate layout.
      *
-     * @param {number} padAmount The desired padding amount
+     * @param {number} padAmount The desired padding amount in pixel values
      * @returns {Label} The calling Label.
      */
     public padding(padAmount: number): Label;
