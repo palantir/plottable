@@ -1,5 +1,5 @@
 /*!
-Plottable 0.35.0 (https://github.com/palantir/plottable)
+Plottable 0.35.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1385,7 +1385,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.35.0";
+    Plottable.version = "0.35.1";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
