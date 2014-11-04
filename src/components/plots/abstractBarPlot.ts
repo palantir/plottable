@@ -6,7 +6,7 @@ export module Plot {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     private static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
-    public _baselineValue = 0;
+    public _baselineValue: number;
     public _barAlignmentFactor = 0.5;
     public _isVertical: boolean;
     private _barLabelFormatter: Formatter = Formatters.identity();
@@ -28,6 +28,7 @@ export module Plot {
       this._animators["bars-reset"] = new Animator.Null();
       this._animators["bars"] = new Animator.Base();
       this._animators["baseline"] = new Animator.Null();
+      this.baseline(0);
     }
 
     public _getDrawer(key: string) {
