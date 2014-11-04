@@ -130,6 +130,25 @@ export module Component {
       }
     }
 
+    /**
+     * Gets the amount of padding around the Label.
+     *
+     * @returns {number} the current padding amount.
+     */
+    public padding(): number;
+    /**
+     * Sets the amount of padding around the Label.
+     * Also retriggers a layout calculation to calculate the appropriate layout.
+     *
+     * @param {number} padAmount The desired padding amount
+     * @returns {Label} The calling Label.
+     */
+    public padding(padAmount: number): Label;
+    public padding(padAmount?: number): any {
+      // If padAmount is null return the padAmount
+      // Otherwise store the new value and invalidate the layout
+    }
+
     public _doRender() {
       super._doRender();
       this.textContainer.text("");

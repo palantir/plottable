@@ -5289,6 +5289,10 @@ var Plottable;
                     return this;
                 }
             };
+            Label.prototype.padding = function (padAmount) {
+                // If padAmount is null return the padAmount
+                // Otherwise store the new value and invalidate the layout
+            };
             Label.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
                 this.textContainer.text("");
