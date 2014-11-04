@@ -2807,18 +2807,16 @@ var Plottable;
                 for (var i = 0; i < Color.DEFAULT_PLOTTABLE_COLORS_LENGTH; i++) {
                     colorTester.classed("plottable-colors-" + i, true);
                     // Use regex to get the text inside the rgb parentheses
-                    var rgb = /\((.+)\)/.exec(colorTester.style("color"))[1].split(",");
-                    rgb = rgb.map(function (colorNumber) { return Scale.Color.toDoubleDigitHex(+colorNumber); });
+                    var rgb = /\((.+)\)/.exec(colorTester.style("color"))[1].split(",").map(function (colorValue) {
+                        var colorNumber = +colorValue;
+                        var hexValue = colorNumber.toString(16);
+                        return colorNumber < 16 ? "0" + hexValue : hexValue;
+                    });
                     plottableDefaultColors.push("#" + rgb.join(""));
                     colorTester.classed("plottable-colors-" + i, false);
                 }
                 colorTester.remove();
                 return plottableDefaultColors;
-            };
-            Color.toDoubleDigitHex = function (value) {
-                var baseValue = (value % 16).toString(16);
-                var remainingValue = Math.floor(value / 16).toString(16);
-                return remainingValue + baseValue;
             };
             Color.DEFAULT_PLOTTABLE_COLORS_LENGTH = 10;
             return Color;
