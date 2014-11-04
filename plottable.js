@@ -6934,7 +6934,6 @@ var Plottable;
              */
             function AbstractBarPlot(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this._baselineValue = 0;
                 this._barAlignmentFactor = 0.5;
                 this._barLabelFormatter = Plottable.Formatters.identity();
                 this._barLabelsEnabled = false;
@@ -6945,7 +6944,7 @@ var Plottable;
                 this._animators["bars-reset"] = new Plottable.Animator.Null();
                 this._animators["bars"] = new Plottable.Animator.Base();
                 this._animators["baseline"] = new Plottable.Animator.Null();
-                this.baseline(this._baselineValue);
+                this.baseline(0);
             }
             AbstractBarPlot.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Rect(key, this._isVertical);
