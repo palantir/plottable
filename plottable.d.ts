@@ -2137,18 +2137,18 @@ declare module Plottable {
          * step - number of intervals between each tick.
          * formatter - formatter used to format tick labels.
          */
-        interface TierTickConfiguration {
+        interface TierConfiguration {
             interval: D3.Time.Interval;
             step: number;
             formatter: Formatter;
         }
         /**
-         * Defines Axis tier intervals, which is an array of tiers, which will be shown together.
-         * Axis will find the most accurate intervals, which satisfy width threshold and make all labels visible.
-         * Right now we support up to two tiers.
+         * An array of linked TierConfigurations.
+         * Each configuration will be shown on a different tier.
+         * Currently, up to two tiers are supported.
          */
-        interface AxisTierIntervals {
-            tiers: TierTickConfiguration[];
+        interface AxisConfiguration {
+            tierConfigurations: TierConfiguration[];
         }
         class Time extends AbstractAxis {
             _scale: Scale.Time;
@@ -2163,18 +2163,20 @@ declare module Plottable {
              */
             constructor(scale: Scale.Time, orientation: string);
             /**
-             * Gets the copy of the current possible axis tiers intervals.
+             * Gets the possible Axis configurations.
              *
-             * @returns {AxisTierIntervals[]} The copy of the current possible axis tier intervals.
+             * @returns {AxisConfiguration[]} The possible tier configurations.
              */
-            axisTierIntervals(): AxisTierIntervals[];
+            axisConfigurations(): AxisConfiguration[];
             /**
-             * Sets the new possible axis tier intervals.
+             * Sets possible Axis configurations.
+             * The axis will choose the most precise configuration that will display in
+             * its current width.
              *
-             * @param {AxisTierIntervals[]} tiers Possible axis tiers intervals.
-             * @returns {Axis} The calling Axis.
+             * @param {AxisConfiguration[]} configurations Possible axis configurations.
+             * @returns {Axis.Time} The calling Axis.Time.
              */
-            axisTierIntervals(tiers: AxisTierIntervals[]): Time;
+            axisConfigurations(configurations: AxisConfiguration[]): Time;
             orient(): string;
             orient(orientation: string): Time;
             _computeHeight(): number;

@@ -83,25 +83,26 @@ describe("TimeAxis", () => {
     svg.remove();
   });
 
-  it("custom intervals on time Axis", () => {
+  it("custom possible axis configurations", () => {
     var svg = generateSVG(800, 100);
     var scale = new Plottable.Scale.Time();
     var axis = new Plottable.Axis.Time(scale, "bottom");
-    var intervals = axis.axisTierIntervals();
-    var onlySecondIntervals = intervals.slice(0, 1);
-    onlySecondIntervals[0].tiers = onlySecondIntervals[0].tiers.slice(0, 1);
-    onlySecondIntervals[0].tiers[0].step = 20;
-    axis.axisTierIntervals(onlySecondIntervals);
+    var configurations = axis.axisConfigurations();
+    var newPossibleConfigurations = configurations.slice(0, 3);
+    newPossibleConfigurations.forEach(axisConfig => axisConfig.tierConfigurations.forEach(tierConfig => {
+      tierConfig.interval = d3.time.minute;
+      tierConfig.step += 3;
+    }));
+    axis.axisConfigurations(newPossibleConfigurations);
     var now = new Date();
     var twoMinutesBefore = new Date(now.getTime());
     twoMinutesBefore.setMinutes(now.getMinutes() - 2);
     scale.domain([twoMinutesBefore, now]);
     scale.range([0, 800]);
     axis.renderTo(svg);
-    var configs = intervals[(<any> axis).axisTierIntervalIndex].tiers;
-    assert.lengthOf(configs, 1, "only one tier is specify");
-    assert.deepEqual(configs[0].interval, d3.time.second, "time axis used custom interval");
-    assert.deepEqual(configs[0].step, 20, "time axis used custom step");
+    var configs = newPossibleConfigurations[(<any> axis).mostPreciseConfigIndex].tierConfigurations;
+    assert.deepEqual(configs[0].interval, d3.time.minute, "axis used new time unit");
+    assert.deepEqual(configs[0].step, 4, "axis used new step");
     svg.remove();
   });
 });
