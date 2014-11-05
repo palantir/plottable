@@ -9,6 +9,7 @@ export module Component {
     private measurer: _Util.Text.TextMeasurer;
     private xAlignment: string;
     private yAlignment: string;
+    private _padding: number;
 
     /**
      * Creates a Label.
@@ -28,6 +29,7 @@ export module Component {
       this.xAlign("center").yAlign("center");
       this._fixedHeightFlag = true;
       this._fixedWidthFlag = true;
+      this._padding = 0;
     }
 
     /**
@@ -60,8 +62,8 @@ export module Component {
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var desiredWH = this.measurer(this._text);
-      var desiredWidth  = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height);
-      var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
+      var desiredWidth  = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+      var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
       return {
         width : desiredWidth,
@@ -145,20 +147,27 @@ export module Component {
      */
     public padding(padAmount: number): Label;
     public padding(padAmount?: number): any {
-      // If padAmount is null return the padAmount
-      // Otherwise store the new value and invalidate the layout
+      if (padAmount == null) {
+        return this._padding;
+      } else {
+        this._padding = padAmount;
+        this._invalidateLayout();
+        return this;
+      }
     }
 
     public _doRender() {
       super._doRender();
+      var labelPadding = this.padding();
+      this.textContainer.attr("transform", "translate(" + labelPadding + "," + labelPadding + ")");
       this.textContainer.text("");
       var dimension = this.orientation === "horizontal" ? this.width() : this.height();
       var truncatedText = _Util.Text.getTruncatedText(this._text, dimension, this.measurer);
       if (this.orientation === "horizontal") {
-        _Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.width(), this.height(),
+        _Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.width() - 2 * this.padding(), this.height() - 2 * this.padding(),
                                         this.xAlignment, this.yAlignment);
       } else {
-        _Util.Text.writeLineVertically(truncatedText, this.textContainer, this.width(), this.height(),
+        _Util.Text.writeLineVertically(truncatedText, this.textContainer, this.width() - 2 * this.padding(), this.height() - 2 * this.padding(),
                                         this.xAlignment, this.yAlignment, this.orientation);
       }
     }
