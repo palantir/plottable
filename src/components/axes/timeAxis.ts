@@ -3,15 +3,15 @@
 module Plottable {
 export module Axis {
   /**
-   * Defines time interval for tier. 
+   * Defines a configuration for a tier.
    * For details how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
-   * interval - time interval used to calculate next tick.
-   * steps - array of steps between two ticks. It needs to be in ascending order. By default [1].
-   * formatter - formatter used to display labels.
+   * interval - A time unit associated with this configuration (seconds, minutes, hours, etc).
+   * step - number of intervals between each tick.
+   * formatter - formatter used to format tick labels.
    */
-  export interface TierInterval {
+  export interface TierTickConfiguration {
     interval: D3.Time.Interval;
-    steps?: number[];
+    step: number;
     formatter: Formatter;
   };
 
@@ -21,20 +21,8 @@ export module Axis {
    * Right now we support up to two tiers.
    */
   export interface AxisTierIntervals {
-    tiers: TierInterval[];
+    tiers: TierTickConfiguration[];
   }
-
-  /**
-   * Tier tick configuration, which explicitly show how ticks needs to be generated on specific tier.
-   */
-  interface TierTickConfiguration {
-    interval: D3.Time.Interval;
-    step: number;
-    formatter: Formatter;
-  }
-
-  var tF = Plottable.Formatters.time;
-  var d3t = d3.time;
 
   export class Time extends AbstractAxis {
 
@@ -45,53 +33,125 @@ export module Axis {
      */
     private possibleAxisTierIntervals: AxisTierIntervals[] = [
       {tiers: [
-        {interval: d3t.second, steps: [1, 5, 10, 15, 30], formatter: tF("%I:%M:%S %p")},
-        {interval: d3t.day, formatter: tF("%B %e, %Y")}
+        {interval: d3.time.second, step: 1, formatter: Formatters.time("%I:%M:%S %p")},
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.second, step: 5, formatter: Formatters.time("%I:%M:%S %p")},
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.second, step: 10, formatter: Formatters.time("%I:%M:%S %p")},
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+      ]},
+        {tiers: [
+        {interval: d3.time.second, step: 15, formatter: Formatters.time("%I:%M:%S %p")},
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.second, step: 30, formatter: Formatters.time("%I:%M:%S %p")},
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.minute, step: 1, formatter: Formatters.time("%I:%M %p")},
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.minute, step: 5, formatter: Formatters.time("%I:%M %p")},
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.minute, step: 10, formatter: Formatters.time("%I:%M %p")},
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.minute, step: 15, formatter: Formatters.time("%I:%M %p")},
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.minute, step: 30, formatter: Formatters.time("%I:%M %p")},
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.hour, step: 1, formatter: Formatters.time("%I %p")},
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.hour, step: 3, formatter: Formatters.time("%I %p")},
+        {interval: d3.time.day, step: 1,formatter: Formatters.time("%B %e, %Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.hour, step: 6, formatter: Formatters.time("%I %p")},
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.hour, step: 12, formatter: Formatters.time("%I %p")},
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%a %e")},
+        {interval: d3.time.month, step: 1, formatter: Formatters.time("%B %Y")}
         ]},
       {tiers: [
-        {interval: d3t.minute, steps: [1, 5, 10, 15, 30], formatter: tF("%I:%M %p")},
-        {interval: d3t.day, formatter: tF("%B %e, %Y")}
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%e")},
+        {interval: d3.time.month, step: 1, formatter: Formatters.time("%B %Y")}
         ]},
       {tiers: [
-        {interval: d3t.hour, steps: [1, 3, 6, 12], formatter: tF("%I %p")},
-        {interval: d3t.day, formatter: tF("%B %e, %Y")}
-        ]},
+        {interval: d3.time.month, step: 1, formatter: Formatters.time("%B")},
+        {interval: d3.time.year, step: 1, formatter: Formatters.time("%Y")}
+      ]},
       {tiers: [
-        {interval: d3t.day, formatter: tF("%a %e")},
-        {interval: d3t.month, formatter: tF("%B %Y")}
-        ]},
+        {interval: d3.time.month, step: 1, formatter: Formatters.time("%b")},
+        {interval: d3.time.year, step: 1, formatter: Formatters.time("%Y")}
+      ]},
       {tiers: [
-        {interval: d3t.day, formatter: tF("%e")},
-        {interval: d3t.month, formatter: tF("%B %Y")}
-        ]},
+        {interval: d3.time.month, step: 3, formatter: Formatters.time("%b")},
+        {interval: d3.time.year, step: 1, formatter: Formatters.time("%Y")}
+      ]},
       {tiers: [
-        {interval: d3t.month, formatter: tF("%B")},
-        {interval: d3t.year, formatter: tF("%Y")}
-        ]},
+        {interval: d3.time.month, step: 6, formatter: Formatters.time("%b")},
+        {interval: d3.time.year, step: 1, formatter: Formatters.time("%Y")}
+      ]},
       {tiers: [
-        {interval: d3t.month, steps: [1, 3, 6], formatter: tF("%b")},
-        {interval: d3t.year, formatter: tF("%Y")}
-        ]},
+        {interval: d3.time.year, step: 1, formatter: Formatters.time("%Y")}
+      ]},
       {tiers: [
-        {interval: d3t.year, formatter: tF("%Y")}
-        ]},
+        {interval: d3.time.year, step: 1, formatter: Formatters.time("%y")}
+      ]},
       {tiers: [
-        {interval: d3t.year, formatter: tF("%y")}
-        ]},
+        {interval: d3.time.year, step: 5, formatter: Formatters.time("%Y")}
+      ]},
       {tiers: [
-        {interval: d3t.year, steps: [5, 25, 50, 100, 200, 500, 1000], formatter: tF("%Y")}
-        ]}
+        {interval: d3.time.year, step: 25, formatter: Formatters.time("%Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.year, step: 50, formatter: Formatters.time("%Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.year, step: 100, formatter: Formatters.time("%Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.year, step: 200, formatter: Formatters.time("%Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.year, step: 500, formatter: Formatters.time("%Y")}
+      ]},
+      {tiers: [
+        {interval: d3.time.year, step: 1000, formatter: Formatters.time("%Y")}
+      ]}
     ];
 
-    private tierTickConfigurations: TierTickConfiguration[];
     private tierLabelContainers: D3.Selection[];
     private measurer: _Util.Text.TextMeasurer;
 
+    private axisTierIntervalIndex: number;
+
     private static LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
+
     /**
      * Number of possible tiers in axis.
      */
-    private static NO_TIERS = 2;
+    private static NUM_TIERS = 2;
 
     /**
      * Constructs a TimeAxis.
@@ -134,21 +194,20 @@ export module Axis {
      * Based on possible axis tier intervals component finds most accurate tier tick configurations, 
      * which satisfy width threshold.
      */
-    private calculateTierTickConfigurations(): TierTickConfiguration[] {
-      var mostAccurateTierTickConfigurations: TierTickConfiguration[] = [];
-      for(var i = 0; i < this.possibleAxisTierIntervals.length; ++i) {
-        mostAccurateTierTickConfigurations = this.possibleAxisTierIntervals[i].tiers.map(
-          tier => this.getMostAccurateTierTickConfiguration(tier)
-        );
-        if(mostAccurateTierTickConfigurations.every(config => config != null)) {
-          return mostAccurateTierTickConfigurations;
+    private calculateTierTickConfigurations(): number {
+      var mostAccurateIndex = this.possibleAxisTierIntervals.length;
+      this.possibleAxisTierIntervals.forEach((interval: AxisTierIntervals, index: number) => {
+        if (index < mostAccurateIndex && interval.tiers.every((tier: TierTickConfiguration) => this.checkTierTickConfig(tier))) {
+          mostAccurateIndex = index;
         }
+      });
+
+      if (mostAccurateIndex === this.possibleAxisTierIntervals.length) {
+        _Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
+        --mostAccurateIndex;
       }
 
-      _Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
-      return this.possibleAxisTierIntervals[this.possibleAxisTierIntervals.length - 1].tiers.map(
-        tier => this.getMostAccurateTierTickConfiguration(tier, true)
-      );
+      return mostAccurateIndex;
     }
 
     public orient(): string;
@@ -183,37 +242,22 @@ export module Axis {
       return stepLength;
     }
 
-    private maxWidthForInterval(interval: TierInterval): number {
-      return this.measurer(interval.formatter(Time.LONG_DATE)).width;
+    private maxWidthForInterval(config: TierTickConfiguration): number {
+      return this.measurer(config.formatter(Time.LONG_DATE)).width;
     }
 
     /**
-     * Gets the most accurate tier tick configuration based on provided interval, which satisfy width threshold.
-     * Method returns null if there is no such configuration and returnLastIfNotFound is set to false.
+     * Check if tier tick configuration satisfies width threshold.
      */
-    private getMostAccurateTierTickConfiguration(tierInterval: TierInterval, returnLastIfNotFound: boolean = false): TierTickConfiguration {
-      var worstWidth = this.maxWidthForInterval(tierInterval) + 2 * this.tickLabelPadding();
-      var stepLength: number;
-      var config = {
-        interval: tierInterval.interval,
-        step: 0,
-        formatter: tierInterval.formatter
-      };
-
-      var steps = tierInterval.steps || [1];
-      for(var i = 0; i < steps.length; ++i) {
-        config.step = steps[i];
-        if(Math.min(this.getIntervalLength(config), this.width()) >= worstWidth) {
-          return config;
-        }
-      }
-      return returnLastIfNotFound ? config : null;
+    private checkTierTickConfig(config: TierTickConfiguration): boolean {
+      var worstWidth = this.maxWidthForInterval(config) + 2 * this.tickLabelPadding();
+      return Math.min(this.getIntervalLength(config), this.width()) >= worstWidth;
     }
 
     public _setup() {
       super._setup();
       this.tierLabelContainers = [];
-      for(var i = 0; i < Time.NO_TIERS; ++i) {
+      for(var i = 0; i < Time.NUM_TIERS; ++i) {
         this.tierLabelContainers.push(this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true));
       }
       this.measurer = _Util.Text.getTextMeasurer(this.tierLabelContainers[0].append("text"));
@@ -224,7 +268,7 @@ export module Axis {
     }
 
     public _getTickValues(): any[] {
-      return this.tierTickConfigurations.reduce((ticks: any[], config: TierTickConfiguration) =>
+      return this.possibleAxisTierIntervals[this.axisTierIntervalIndex].tiers.reduce((ticks: any[], config: TierTickConfiguration) =>
         ticks.concat(this.getTickIntervalValues(config)), []);
     }
 
@@ -297,63 +341,40 @@ export module Axis {
       selection.attr("y2", height);
     }
 
-    /**
-     * Gets more accurate tier tick configuration from first tier than the provided one.
-     */
-    private getMoreAccurateTierTickConfiguration(config: TierTickConfiguration): TierTickConfiguration {
-      var moreAccurateConfig: TierTickConfiguration = {
-              interval: undefined,
-              step: undefined,
-              formatter: undefined
-            };;
-
-      for (var i = 0; i < this.possibleAxisTierIntervals.length; ++i) {
-        var tier = this.possibleAxisTierIntervals[i].tiers[0];
-        var steps = tier.steps || [1];
-        for (var j = 0; j < steps.length; ++j) {
-          if (steps[j] === config.step && tier.interval === config.interval) {
-            return moreAccurateConfig;
-          } else {
-            moreAccurateConfig.step = steps[j];
-            moreAccurateConfig.interval = tier.interval;
-          }
-        }
-      }
-
-      return null;
-    }
-
-    private generateLabellessTicks(config: TierTickConfiguration) {
-      var moreAccurateConfig = this.getMoreAccurateTierTickConfiguration(config);
-      if(!(moreAccurateConfig && moreAccurateConfig.interval)) {
+    private generateLabellessTicks() {
+      if (this.axisTierIntervalIndex < 1) {
         return;
       }
 
-      var smallTicks = this.getTickIntervalValues(moreAccurateConfig);
+      var moreAccurateFirstTierConfig = this.possibleAxisTierIntervals[this.axisTierIntervalIndex - 1].tiers[0];
+
+      var smallTicks = this.getTickIntervalValues(moreAccurateFirstTierConfig);
       var allTicks = this._getTickValues().concat(smallTicks);
 
       var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(allTicks);
       tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
       tickMarks.exit().remove();
-      this.adjustTickLength(moreAccurateConfig, this.tickLabelPadding());
+      this.adjustTickLength(moreAccurateFirstTierConfig, this.tickLabelPadding());
     }
 
     public _doRender() {
-      this.tierTickConfigurations = this.calculateTierTickConfigurations();
+      this.axisTierIntervalIndex = this.calculateTierTickConfigurations();
       super._doRender();
 
-      this.tierTickConfigurations.forEach((config: TierTickConfiguration, i: number) =>
+      var tierConfigs = this.possibleAxisTierIntervals[this.axisTierIntervalIndex].tiers;
+
+      tierConfigs.forEach((config: TierTickConfiguration, i: number) =>
         this.renderTierLabels(this.tierLabelContainers[i], config, i + 1)
       );
 
       var domain = this._scale.domain();
       var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
-      if (this.getIntervalLength(this.tierTickConfigurations[0]) * 1.5 >= totalLength) {
-        this.generateLabellessTicks(this.tierTickConfigurations[0]);
+      if (this.getIntervalLength(tierConfigs[0]) * 1.5 >= totalLength) {
+        this.generateLabellessTicks();
       }
-      this.tierTickConfigurations.forEach((config: TierTickConfiguration, i: number) =>
-        this.adjustTickLength(config, this._maxLabelTickLength() * (i + 1) / Time.NO_TIERS)
+      tierConfigs.forEach((config: TierTickConfiguration, i: number) =>
+        this.adjustTickLength(config, this._maxLabelTickLength() * (i + 1) / Time.NUM_TIERS)
       );
 
       return this;

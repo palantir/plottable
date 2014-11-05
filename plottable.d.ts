@@ -2131,15 +2131,15 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         /**
-         * Defines time interval for tier.
+         * Defines a configuration for a tier.
          * For details how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
-         * interval - time interval used to calculate next tick.
-         * steps - array of steps between two ticks. It needs to be in ascending order. By default [1].
-         * formatter - formatter used to display labels.
+         * interval - A time unit associated with this configuration (seconds, minutes, hours, etc).
+         * step - number of intervals between each tick.
+         * formatter - formatter used to format tick labels.
          */
-        interface TierInterval {
+        interface TierTickConfiguration {
             interval: D3.Time.Interval;
-            steps?: number[];
+            step: number;
             formatter: Formatter;
         }
         /**
@@ -2148,7 +2148,7 @@ declare module Plottable {
          * Right now we support up to two tiers.
          */
         interface AxisTierIntervals {
-            tiers: TierInterval[];
+            tiers: TierTickConfiguration[];
         }
         class Time extends AbstractAxis {
             _scale: Scale.Time;

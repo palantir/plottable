@@ -514,7 +514,7 @@ describe("TimeAxis", function () {
         var intervals = axis.axisTierIntervals();
         var onlySecondIntervals = intervals.slice(0, 1);
         onlySecondIntervals[0].tiers = onlySecondIntervals[0].tiers.slice(0, 1);
-        onlySecondIntervals[0].tiers[0].steps = [20];
+        onlySecondIntervals[0].tiers[0].step = 20;
         axis.axisTierIntervals(onlySecondIntervals);
         var now = new Date();
         var twoMinutesBefore = new Date(now.getTime());
@@ -522,7 +522,7 @@ describe("TimeAxis", function () {
         scale.domain([twoMinutesBefore, now]);
         scale.range([0, 800]);
         axis.renderTo(svg);
-        var configs = axis.tierTickConfigurations;
+        var configs = intervals[axis.axisTierIntervalIndex].tiers;
         assert.lengthOf(configs, 1, "only one tier is specify");
         assert.deepEqual(configs[0].interval, d3.time.second, "time axis used custom interval");
         assert.deepEqual(configs[0].step, 20, "time axis used custom step");
