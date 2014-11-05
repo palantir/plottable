@@ -173,13 +173,13 @@ function processKeyEvent(key, visibleQuickTests){
   var fourPressed = (key === 52 || key === 100);
 
   if(onePressed || twoPressed || threePressed || fourPressed) {
-    var firstBranchDisplay = (onePressed||threePressed ? "block" : "none");
-    var secondBranchDisplay = (twoPressed||threePressed ? "block" : "none");
-    var branchClassBehind = (onePressed ? ".second" : ".first");
-    var branchClassFront = (onePressed ? ".first" : ".second");
-    var quicktestDisplay = (fourPressed ? "none" : "inline-block");
-    var firstBranchInputColor = (onePressed||threePressed ? "mediumaquamarine" : "white");
-    var secondBranchInputColor = (twoPressed||threePressed ? "mediumaquamarine" : "white");
+    var firstBranchDisplay = onePressed || threePressed ? "block" : "none";
+    var secondBranchDisplay = twoPressed || threePressed ? "block" : "none";
+    var branchClassBehind = onePressed ? ".second" : ".first";
+    var branchClassFront = onePressed ? ".first" : ".second";
+    var quicktestDisplay = fourPressed ? "none" : "inline-block";
+    var firstBranchInputColor = onePressed || threePressed ? "mediumaquamarine" : "white";
+    var secondBranchInputColor = twoPressed || threePressed ? "mediumaquamarine" : "white";
 
     for(var i = 0; i < visibleQuickTests.length; i++){
       var quicktest = visibleQuickTests[i];

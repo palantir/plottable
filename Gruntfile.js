@@ -225,7 +225,7 @@ module.exports = function(grunt) {
         "files": ["test/**/*.ts"]
       },
       "quicktests": {
-        "tasks": ["load-qt"],
+        "tasks": ["update-qt"],
         "files": ["quicktests/overlaying/tests/**/*.js"]
       }
     },
@@ -373,17 +373,17 @@ module.exports = function(grunt) {
                                   "sed:sublime",
                                   ]);
 
-  var loadQuickTests = function() {
+  var updateQuickTestsJSON = function() {
     var qtJSON = [];
     var rawtests = grunt.file.expand("quicktests/overlaying/tests/**/*.js");
     rawtests.forEach(function(value, index, array){
       qtJSON.push({path: value});
     });
     qtJSON = JSON.stringify(qtJSON);
-    qtJSON = qtJSON.split(",").join(",\n");
+    qtJSON = qtJSON.split(",").join(",\n") + "\n";
     grunt.file.write("quicktests/overlaying/list_of_quicktests.json", qtJSON);
   };
 
-  grunt.registerTask("load-qt", loadQuickTests);
+  grunt.registerTask("update-qt", updateQuickTestsJSON);
 
 };
