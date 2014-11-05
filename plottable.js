@@ -3196,6 +3196,25 @@ var Plottable;
                 });
                 return delay;
             };
+            AbstractDrawer.prototype.applyMetadata = function (attrToProjector, userMetadata, plotMetadata) {
+                var modifiedAttrToProjector = {};
+                d3.keys(attrToProjector).forEach(function (attr) {
+                    modifiedAttrToProjector[attr] = function (datum, index) { return attrToProjector[attr](datum, index, userMetadata, plotMetadata); };
+                });
+                return modifiedAttrToProjector;
+            };
+            AbstractDrawer.prototype.newDraw = function (data, drawSteps, userMetadata, plotMetadata) {
+                var _this = this;
+                if (userMetadata === void 0) { userMetadata = {}; }
+                if (plotMetadata === void 0) { plotMetadata = {}; }
+                var modifiedDrawSteps = drawSteps.map(function (dr) {
+                    return {
+                        attrToProjector: _this.applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
+                        animator: dr.animator
+                    };
+                });
+                return this.draw(data, modifiedDrawSteps);
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
@@ -6444,11 +6463,17 @@ var Plottable;
                 });
                 return datasets;
             };
+            AbstractPlot.prototype.getPlotMetadata = function () {
+                return {};
+            };
             AbstractPlot.prototype.paint = function () {
+                var _this = this;
                 var drawSteps = this._generateDrawSteps();
                 var dataToDraw = this._getDataToDraw();
                 var drawers = this._getDrawersInOrder();
-                var times = this._datasetKeysInOrder.map(function (k, i) { return drawers[i].draw(dataToDraw.get(k), drawSteps); });
+                var plotMetadata = this.getPlotMetadata();
+                // It might be more simpler, because maybe we get rid of _getDataToDraw 
+                var times = this._datasetKeysInOrder.map(function (k, i) { return drawers[i].newDraw(dataToDraw.get(k), drawSteps, _this._key2DatasetDrawerKey.get(k).dataset.metadata(), plotMetadata); });
                 var maxTime = Plottable._Util.Methods.max(times, 0);
                 this._additionalPaint(maxTime);
             };

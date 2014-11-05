@@ -375,11 +375,19 @@ export module Plot {
       return datasets;
     }
 
+    public getPlotMetadata(): any {
+      return {};
+    }
+
     private paint() {
       var drawSteps = this._generateDrawSteps();
       var dataToDraw = this._getDataToDraw();
       var drawers = this._getDrawersInOrder();
-      var times = this._datasetKeysInOrder.map((k, i) => drawers[i].draw(dataToDraw.get(k), drawSteps));
+      var plotMetadata = this.getPlotMetadata();
+
+      // It might be more simpler, because maybe we get rid of _getDataToDraw 
+      var times = this._datasetKeysInOrder.map((k, i) =>
+        drawers[i].newDraw(dataToDraw.get(k), drawSteps, this._key2DatasetDrawerKey.get(k).dataset.metadata(), plotMetadata));
       var maxTime = _Util.Methods.max(times, 0);
       this._additionalPaint(maxTime);
     }

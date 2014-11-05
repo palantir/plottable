@@ -848,7 +848,7 @@ declare module Plottable {
      * Index, if used, will be the index of the datum in the array.
      */
     interface AppliedAccessor {
-        (datum?: any, index?: number): any;
+        (datum?: any, index?: number, userMetadata?: any, plotMetadata?: any): any;
     }
     interface _Projector {
         accessor: _Accessor;
@@ -1620,6 +1620,7 @@ declare module Plottable {
              * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
              */
             draw(data: any[], drawSteps: DrawStep[]): number;
+            newDraw(data: any[], drawSteps: DrawStep[], userMetadata?: any, plotMetadata?: any): number;
         }
     }
 }
@@ -2731,6 +2732,7 @@ declare module Plottable {
             _generateDrawSteps(): _Drawer.DrawStep[];
             _additionalPaint(time: number): void;
             _getDataToDraw(): D3.Map<any[]>;
+            getPlotMetadata(): any;
         }
     }
 }

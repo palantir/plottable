@@ -90,6 +90,27 @@ export module _Drawer {
 
       return delay;
     }
+
+    private applyMetadata(attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: any) {
+      var modifiedAttrToProjector: AttributeToProjector = {};
+      d3.keys(attrToProjector).forEach((attr: string) => {
+        modifiedAttrToProjector[attr] =
+          (datum: any, index: number) => attrToProjector[attr](datum, index, userMetadata, plotMetadata);
+      });
+      return modifiedAttrToProjector;
+    }
+
+    public newDraw(data: any[], drawSteps: DrawStep[], userMetadata: any = {}, plotMetadata: any = {}) {
+      var modifiedDrawSteps = drawSteps.map((dr: DrawStep) => {
+        return {
+          attrToProjector: this.applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
+          animator: dr.animator
+        };
+      });
+      return this.draw(data, modifiedDrawSteps);
+    }
+
+
   }
 }
 }
