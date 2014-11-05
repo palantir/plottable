@@ -138,21 +138,21 @@ describe("Labels", () => {
     var textRect0 = testLabel._element.select("text").node().getBoundingClientRect();
     var textRect1 = label1._element.select("text").node().getBoundingClientRect();
 
-    assert.closeTo(textRect0.left, textRect1.left + 30, 1, "left difference by padding amount");
+    assert.closeTo(textRect0.left, textRect1.left + 30, 2, "left difference by padding amount");
 
     testLabel.xAlign("right");
 
     textRect0 = testLabel._element.select("text").node().getBoundingClientRect();
     textRect1 = label1._element.select("text").node().getBoundingClientRect();
 
-    assert.closeTo(textRect0.right, textRect1.right - 30, 1, "right difference by padding amount");
+    assert.closeTo(textRect0.right, textRect1.right - 30, 2, "right difference by padding amount");
 
     testLabel.yAlign("bottom");
 
     textRect0 = testLabel._element.select("text").node().getBoundingClientRect();
     textRect1 = label1._element.select("text").node().getBoundingClientRect();
 
-    assert.closeTo(textRect0.bottom, textRect1.top - 30, 1, "vertical difference by padding amount");
+    assert.closeTo(textRect0.bottom, textRect1.top - 30, 2, "vertical difference by padding amount");
 
     testLabel.yAlign("top");
 
@@ -160,7 +160,7 @@ describe("Labels", () => {
     textRect1 = label1._element.select("text").node().getBoundingClientRect();
     var textRect2 = label2._element.select("text").node().getBoundingClientRect();
 
-    assert.closeTo(textRect0.top, textRect2.bottom + 30, 1, "vertical difference by padding amount");
+    assert.closeTo(textRect0.top, textRect2.bottom + 30, 2, "vertical difference by padding amount");
     svg.remove();
   });
 });
