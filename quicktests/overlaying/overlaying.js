@@ -1,16 +1,3 @@
-$("#help").hover(function(){
-  $("#instructions")
-          .fadeIn('fast');
-  }, function() {
-          // Hover out code
-          $("#instructions").css("display", "none");
-  }).mousemove(function(e) {
-          var mousex = e.pageX; //Get X coordinates
-          var mousey = e.pageY; //Get Y coordinates
-          $("#instructions")
-          .css({ top: mousey + 20, left: mousex - 330 })
-  });
-
 //show svg width & height setting
 function showSizeControls(){
 
@@ -203,57 +190,68 @@ window.onkeyup = function(e){
   var twoPressed = (key === 50 || key === 98);
   var threePressed = (key === 51 || key === 99);
   var fourPressed = (key === 52 || key === 100);
-
+  var cssConfig = {};
   //if 1 is pressed
   if (onePressed) {
-    var cssConfig = { firstBranchDisplay: "block",
-                      secondBranchDisplay: "none",
-                      branchClassBehind: ".second",
-                      branchClassFront: ".first",
-                      quicktestDisplay: "inline-block",
-                      firstBranchInputColor: "mediumaquamarine",
-                      secondBranchInputColor: "white" }
+    cssConfig = { firstBranchDisplay: "block",
+                  secondBranchDisplay: "none",
+                  branchClassBehind: ".second",
+                  branchClassFront: ".first",
+                  quicktestDisplay: "inline-block",
+                  firstBranchInputColor: "mediumaquamarine",
+                  secondBranchInputColor: "white" };
     hotKeyHandler(visibleQuickTests, cssConfig);
     return;
   }
   //if 2 is pressed
   if (twoPressed) {
-    var cssConfig = { firstBranchDisplay: "none",
-                      secondBranchDisplay: "block",
-                      branchClassBehind: ".first",
-                      branchClassFront: ".second",
-                      quicktestDisplay: "inline-block",
-                      firstBranchInputColor: "white",
-                      secondBranchInputColor: "mediumaquamarine" }
+    cssConfig = { firstBranchDisplay: "none",
+                  secondBranchDisplay: "block",
+                  branchClassBehind: ".first",
+                  branchClassFront: ".second",
+                  quicktestDisplay: "inline-block",
+                  firstBranchInputColor: "white",
+                  secondBranchInputColor: "mediumaquamarine" };
     hotKeyHandler(visibleQuickTests, cssConfig);
     return;
   }
   //if 3 is pressed
   if (threePressed) {
-    var cssConfig = { firstBranchDisplay: "block",
-                      secondBranchDisplay: "block",
-                      branchClassBehind: ".first",
-                      branchClassFront: ".second",
-                      quicktestDisplay: "inline-block",
-                      firstBranchInputColor: "mediumaquamarine",
-                      secondBranchInputColor: "mediumaquamarine" }
+    cssConfig = { firstBranchDisplay: "block",
+                  secondBranchDisplay: "block",
+                  branchClassBehind: ".first",
+                  branchClassFront: ".second",
+                  quicktestDisplay: "inline-block",
+                  firstBranchInputColor: "mediumaquamarine",
+                  secondBranchInputColor: "mediumaquamarine" };
     hotKeyHandler(visibleQuickTests, cssConfig);
     return;
   }
   //if 4 is pressed
   if (fourPressed) {
-    var cssConfig = { firstBranchDisplay: "none",
-                      secondBranchDisplay: "none",
-                      branchClassBehind: ".second",
-                      branchClassFront: ".first",
-                      quicktestDisplay: "none",
-                      firstBranchInputColor: "white",
-                      secondBranchInputColor: "white" }
+    cssConfig = { firstBranchDisplay: "none",
+                  secondBranchDisplay: "none",
+                  branchClassBehind: ".second",
+                  branchClassFront: ".first",
+                  quicktestDisplay: "none",
+                  firstBranchInputColor: "white",
+                  secondBranchInputColor: "white" };
     hotKeyHandler(visibleQuickTests, cssConfig);
     return;
   }
 
 };
+
+$("#help").hover(function(){
+  $("#instructions").fadeIn('fast');
+}, function() {
+    // Hover out code
+    $("#instructions").css("display", "none");
+}).mousemove(function(e) {
+    var mousex = e.pageX; //Get X coordinates
+    var mousey = e.pageY; //Get Y coordinates
+    $("#instructions").css({ top: mousey + 20, left: mousex - 330 });
+});
 
 var button = document.getElementById("render");
 button.onclick = initialize;
