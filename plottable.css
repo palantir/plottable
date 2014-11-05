@@ -83,6 +83,15 @@ svg.plottable {
 
 }
 
+.plottable .interaction.crosshair circle {
+  fill: white;
+  stroke: #32313F;
+}
+
+.plottable .interaction.crosshair line {
+  stroke: #32313F;
+}
+
 .plottable .legend text {
   font-family: "Helvetica Neue", sans-serif;
   font-size: 12px;
