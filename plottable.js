@@ -1352,10 +1352,7 @@ var Plottable;
          * @returns {Formatter} A formatter for time/date values.
          */
         function time(specifier) {
-            var format = d3.time.format(specifier);
-            return function (d) {
-                return format(d);
-            };
+            return d3.time.format(specifier);
         }
         Formatters.time = time;
         /**

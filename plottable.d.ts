@@ -519,7 +519,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter for time/date values.
          */
-        function time(specifier: string): (d: any) => string;
+        function time(specifier: string): D3.Time.TimeFormat;
         /**
          * Creates a formatter for relative dates.
          *

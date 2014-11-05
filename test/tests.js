@@ -5794,7 +5794,7 @@ describe("Formatters", function () {
             assert.strictEqual(result.charAt(result.length - 1), "c", "The specified currency symbol was appended");
         });
     });
-    describe("time", function () {
+    describe("mutliTime", function () {
         it("uses reasonable defaults", function () {
             var timeFormatter = Plottable.Formatters.multiTime();
             // year, month, day, hours, minutes, seconds, milliseconds
