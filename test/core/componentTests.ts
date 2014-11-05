@@ -405,8 +405,8 @@ describe("Component behavior", () => {
     var renderFlag = false;
     var c: any = new Plottable.Component.AbstractComponent();
     c._doRender = () => renderFlag = true;
-    c._isAnchored = true;
-    c._isSetup = true;
+    c._anchor(svg);
+    c._setup();
     c._render();
     assert.isFalse(renderFlag, "no render until width/height set to nonzero");
 
