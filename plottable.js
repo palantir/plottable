@@ -5302,13 +5302,15 @@ var Plottable;
             };
             Label.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
-                var labelPadding = this.padding();
-                this.textContainer.attr("transform", "translate(" + labelPadding + "," + labelPadding + ")");
+                var textMeasurement = this.measurer(this._text);
+                var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
+                var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
+                this.textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
                 this.textContainer.text("");
                 var dimension = this.orientation === "horizontal" ? this.width() : this.height();
                 var truncatedText = Plottable._Util.Text.getTruncatedText(this._text, dimension, this.measurer);
-                var writeWidth = this.width() - 2 * labelPadding;
-                var writeHeight = this.height() - 2 * labelPadding;
+                var writeWidth = this.width() - 2 * widthPadding;
+                var writeHeight = this.height() - 2 * heightPadding;
                 if (this.orientation === "horizontal") {
                     Plottable._Util.Text.writeLineHorizontally(truncatedText, this.textContainer, writeWidth, writeHeight, this.xAlignment, this.yAlignment);
                 }
