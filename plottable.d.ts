@@ -667,7 +667,7 @@ declare module Plottable {
          */
         constructor(data?: any[], metadata?: any);
         /**
-         * Gets the data.
+         * Gets a shallow copy of the data.
          *
          * @returns {DataSource|any[]} The calling DataSource, or the current data.
          */

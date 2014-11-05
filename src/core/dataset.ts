@@ -29,7 +29,7 @@ module Plottable {
     }
 
     /**
-     * Gets the data.
+     * Gets a shallow copy of the data.
      *
      * @returns {DataSource|any[]} The calling DataSource, or the current data.
      */
@@ -43,7 +43,7 @@ module Plottable {
     public data(data: any[]): Dataset;
     public data(data?: any[]): any {
       if (data == null) {
-        return this._data;
+        return this._data.slice(0);
       } else {
         this._data = data;
         this.accessor2cachedExtent = new _Util.StrictEqualityAssociativeArray();

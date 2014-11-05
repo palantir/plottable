@@ -1563,7 +1563,7 @@ var Plottable;
         }
         Dataset.prototype.data = function (data) {
             if (data == null) {
-                return this._data;
+                return this._data.slice(0);
             }
             else {
                 this._data = data;
