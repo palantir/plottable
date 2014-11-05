@@ -1,4 +1,4 @@
-function makeData() {
+sfunction makeData() {
   "use strict";
 
   return makeRandomData(20);
