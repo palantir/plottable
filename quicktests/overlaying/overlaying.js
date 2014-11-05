@@ -1,3 +1,16 @@
+$("#help").hover(function(){
+  $("#instructions")
+          .fadeIn('fast');
+  }, function() {
+          // Hover out code
+          $("#instructions").css("display", "none");
+  }).mousemove(function(e) {
+          var mousex = e.pageX; //Get X coordinates
+          var mousey = e.pageY; //Get Y coordinates
+          $("#instructions")
+          .css({ top: mousey + 20, left: mousex - 330 })
+  });
+
 //show svg width & height setting
 function showSizeControls(){
 
@@ -41,7 +54,6 @@ function runQuickTest(result, svg, data, branch){
   try {
     result.run(svg, data, plottableBranches[branch]);
     setTestBoxDimensions();
-
   } catch (err) {
     setTimeout(function() {throw err;}, 0);
   }
@@ -53,7 +65,7 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
   var div = d3.select("#results");
   quickTestNames.forEach(function(q) { //for each quicktest 
     var name = q;
-    d3.text("/quicktests/new/list/" + category + "/" + name + ".js", function(error, text) {
+    d3.text("/quicktests/overlaying/tests/" + category + "/" + name + ".js", function(error, text) {
       if (error !== null) {
         console.warn("Tried to load nonexistant quicktest " + name);
         return;
@@ -86,7 +98,7 @@ function filterQuickTests(category, branchList){
     data.forEach(function(quicktestobj){
       var path = quicktestobj.path;
 
-      if (-1 !== path.indexOf("list/" + category)){
+      if (-1 !== path.indexOf("tests/" + category)){
         var name = path.replace(/.*\/|\.js/g, '');
         qtestnames.push(name);
       }
@@ -165,7 +177,18 @@ function initialize(){
   clearTests();
 
   loadPlottableBranches(category, branches);
+}
 
+function hotKeyHandler(visibleQuickTests, cssConfig){
+  for(var i = 0; i < visibleQuickTests.length; i++){
+    var quicktest = visibleQuickTests[i];
+    $(".first", quicktest).css("display", cssConfig.firstBranchDisplay);
+    $(".second", quicktest).css("display", cssConfig.secondBranchDisplay);
+    $(cssConfig.branchClassBehind, quicktest).before($(cssConfig.branchClassFront, quicktest));
+  }
+    $(".quicktest").css("display", cssConfig.quicktestDisplay);
+    $("#branch1").css("background-color", cssConfig.firstBranchInputColor);
+    $("#branch2").css("background-color", cssConfig.secondBranchInputColor);
 }
 
 // show/hide according to hotkey events
@@ -173,59 +196,63 @@ window.onkeyup = function(e){
   var key = e.keyCode ? e.keyCode : e.which;
 
   var inputActive = $("#branch1, #branch2, #width, #height").is(':focus');
-
   if(inputActive){return;}
 
   var visibleQuickTests = $(".quicktest").toArray();
+  var onePressed = (key === 49 || key === 97); //regular & numpad keys
+  var twoPressed = (key === 50 || key === 98);
+  var threePressed = (key === 51 || key === 99);
+  var fourPressed = (key === 52 || key === 100);
 
-  if (key === 49) {
-    visibleQuickTests.forEach(function(quicktest){
-      $(".first", quicktest).css("display", "block");
-      $(".second", quicktest).css("display", "none");
-      $(".second", quicktest).before($(".first", quicktest)); //hacky, but changing DOM order so interactions work properly
-    });
-    $(".quicktest").css("display", "inline-block");
-    $("#branch1").css("background-color", "mediumaquamarine");
-    $("#branch2").css("background-color", "white");
-    
+  //if 1 is pressed
+  if (onePressed) {
+    var cssConfig = { firstBranchDisplay: "block",
+                      secondBranchDisplay: "none",
+                      branchClassBehind: ".second",
+                      branchClassFront: ".first",
+                      quicktestDisplay: "inline-block",
+                      firstBranchInputColor: "mediumaquamarine",
+                      secondBranchInputColor: "white" }
+    hotKeyHandler(visibleQuickTests, cssConfig);
     return;
   }
   //if 2 is pressed
-  if (key === 50) {
-    visibleQuickTests.forEach(function(quicktest){
-      $(".first", quicktest).css("display", "none");
-      $(".second", quicktest).css("display", "block");
-      $(".first", quicktest).before($(".second", quicktest));
-    });
-    $(".quicktest").css("display", "inline-block");
-    $("#branch1").css("background-color", "white");
-    $("#branch2").css("background-color", "mediumaquamarine");
+  if (twoPressed) {
+    var cssConfig = { firstBranchDisplay: "none",
+                      secondBranchDisplay: "block",
+                      branchClassBehind: ".first",
+                      branchClassFront: ".second",
+                      quicktestDisplay: "inline-block",
+                      firstBranchInputColor: "white",
+                      secondBranchInputColor: "mediumaquamarine" }
+    hotKeyHandler(visibleQuickTests, cssConfig);
     return;
   }
   //if 3 is pressed
-  if (key === 51) {
-    visibleQuickTests.forEach(function(quicktest){
-      $(".first", quicktest).css("display", "block");
-      $(".second", quicktest).css("display", "block");
-      $(".first", quicktest).before($(".second", quicktest));
-    });
-    $(".quicktest").css("display", "inline-block");
-    $("#branch1").css("background-color", "mediumaquamarine");
-    $("#branch2").css("background-color", "mediumaquamarine");
+  if (threePressed) {
+    var cssConfig = { firstBranchDisplay: "block",
+                      secondBranchDisplay: "block",
+                      branchClassBehind: ".first",
+                      branchClassFront: ".second",
+                      quicktestDisplay: "inline-block",
+                      firstBranchInputColor: "mediumaquamarine",
+                      secondBranchInputColor: "mediumaquamarine" }
+    hotKeyHandler(visibleQuickTests, cssConfig);
     return;
   }
   //if 4 is pressed
-  if (key === 52) {
-    visibleQuickTests.forEach(function(quicktest){
-      $(".first", quicktest).css("display", "none");
-      $(".second", quicktest).css("display", "none");
-      $(".first", quicktest).before($(".second", quicktest));
-    });
-    $(".quicktest").css("display", "none");
-    $("#branch1").css("background-color", "white");
-    $("#branch2").css("background-color", "white");
+  if (fourPressed) {
+    var cssConfig = { firstBranchDisplay: "none",
+                      secondBranchDisplay: "none",
+                      branchClassBehind: ".second",
+                      branchClassFront: ".first",
+                      quicktestDisplay: "none",
+                      firstBranchInputColor: "white",
+                      secondBranchInputColor: "white" }
+    hotKeyHandler(visibleQuickTests, cssConfig);
     return;
   }
+
 };
 
 var button = document.getElementById("render");

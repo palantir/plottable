@@ -5,11 +5,10 @@
   <script src="/bower_components/lodash/dist/lodash.js"></script>
   <script src="/quicktests/exampleUtil.js"></script>
   <link rel="stylesheet" type="text/css" href="/plottable.css">
-  <link rel="stylesheet" type="text/css" href="/plottable_testing.css">
-  <link rel="stylesheet" type="text/css" href="newquicktest.css">
-  <script src="/quicktests/new/newquicktest.js" defer> </script>
+  <link rel="stylesheet" type="text/css" href="/quicktests/overlaying/overlaying.css">
+  <script src="/quicktests/overlaying/overlaying.js" defer> </script>
 
-  <title>Overlay Plottable QuickTest</title>
+  <title>Overlaying Plottable QuickTests</title>
 </head>
 
 <body>
@@ -21,7 +20,7 @@
       <option value="basic">Basic</option>
       <option value="animations">Animations</option>
       <option value="interactions">Interactions</option>
-      <option value="datatype">Data Types</option>
+      <option value="functional">Functional</option>
       <option value="realistic">Realistic</option>
     </select>
 
@@ -32,6 +31,7 @@
     <input id="render" type="submit" class="button" value="Compare!">
 
     <input id="expand" type="button" class="button" value="+" onclick="showSizeControls();">
+    <input id="help" type="button" class="button" value="?">
       
   </div>
 </div>
@@ -45,7 +45,13 @@
 </div>
 
 <div id="results">
-
+  <div id="instructions">
+    <p>Basic: Quicktests That Show Basic Components & Basic Plots under Different Scales</p>
+    <p>Animation: Single Plots with Animations</p>
+    <p>Interaction: Single Plots with Interactions</p>
+    <p>Functional: Quicktests that Showcase Specific Functionalities (ex. intervalGenerator, Formatters)</p>
+    <p>Realistic: Quicktests that Demonstrate Realistic Usages</p>
+  </div>
 </div>
 
 </body>

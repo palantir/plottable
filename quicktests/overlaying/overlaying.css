@@ -19,7 +19,6 @@ h2{
   display: block;
 }
 
-
 .second{
   position: absolute;
   display: block;
@@ -89,4 +88,28 @@ input, select{
   width: 25px;
   height: 25px;
   text-align: center;
+}
+
+#help{
+  width: 30px;
+  height: 30px;
+  float: right;
+  margin-right: 10px;
+}
+
+#instructions{
+  width: 300px;
+  display: none;
+  position: absolute;
+  z-index: 2;
+  border:1px solid #333;
+  background-color:#161616;
+  border-radius:5px;
+  padding:10px;
+  color:#fff;
+}
+
+#instructions p {
+  font-size: 13px;
+  font-weight: lighter;
 }
