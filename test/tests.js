@@ -1046,7 +1046,7 @@ describe("Labels", function () {
         assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "label is in vertical position");
         svg.remove();
     });
-    it("padding API", function () {
+    it("padding puts space between the label and other components", function () {
         var svg = generateSVG(400, 200);
         var testLabel = new Plottable.Component.Label("testing label").padding(30).xAlign("left");
         var label1 = new Plottable.Component.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlign("left");
