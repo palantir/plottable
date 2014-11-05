@@ -223,6 +223,10 @@ module.exports = function(grunt) {
       "tests": {
         "tasks": ["test-compile"],
         "files": ["test/**/*.ts"]
+      },
+      "quicktests": {
+        "tasks": ["load-qt"],
+        "files": ["quicktests/overlaying/tests/**/*.js"]
       }
     },
     blanket_mocha: {
@@ -376,9 +380,10 @@ module.exports = function(grunt) {
       qtJSON.push({path: value});
     });
     qtJSON = JSON.stringify(qtJSON);
+    qtJSON = qtJSON.split(",").join(",\n");
     grunt.file.write("quicktests/overlaying/list_of_quicktests.json", qtJSON);
   };
 
-  grunt.registerTask("lq", loadQuickTests);
+  grunt.registerTask("load-qt", loadQuickTests);
 
 };

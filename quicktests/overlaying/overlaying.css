@@ -48,11 +48,14 @@ h2{
   font-size: 13px;
 }
 
+#category{
+  padding-top: 6px;
+}
 input, select{
   position: relative;
   border: solid 1px;
+  border-radius: 5px;
   border-color: white;
-  border-radius: 5;
   width: auto;
   height: 30px;
   font-family: sans-serif;

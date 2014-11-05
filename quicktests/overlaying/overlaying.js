@@ -166,17 +166,36 @@ function initialize(){
   loadPlottableBranches(category, branches);
 }
 
-function hotKeyHandler(visibleQuickTests, cssConfig){
-  for(var i = 0; i < visibleQuickTests.length; i++){
-    var quicktest = visibleQuickTests[i];
-    $(".first", quicktest).css("display", cssConfig.firstBranchDisplay);
-    $(".second", quicktest).css("display", cssConfig.secondBranchDisplay);
-    $(cssConfig.branchClassBehind, quicktest).before($(cssConfig.branchClassFront, quicktest));
+function processKeyEvent(key, visibleQuickTests){
+  var onePressed = (key === 49 || key === 97); //regular & numpad keys
+  var twoPressed = (key === 50 || key === 98);
+  var threePressed = (key === 51 || key === 99);
+  var fourPressed = (key === 52 || key === 100);
+
+  if(onePressed || twoPressed || threePressed || fourPressed) {
+    var firstBranchDisplay = (onePressed||threePressed ? "block" : "none");
+    var secondBranchDisplay = (twoPressed||threePressed ? "block" : "none");
+    var branchClassBehind = (onePressed ? ".second" : ".first");
+    var branchClassFront = (onePressed ? ".first" : ".second");
+    var quicktestDisplay = (fourPressed ? "none" : "inline-block");
+    var firstBranchInputColor = (onePressed||threePressed ? "mediumaquamarine" : "white");
+    var secondBranchInputColor = (twoPressed||threePressed ? "mediumaquamarine" : "white");
+
+    for(var i = 0; i < visibleQuickTests.length; i++){
+      var quicktest = visibleQuickTests[i];
+      $(".first", quicktest).css("display", firstBranchDisplay);
+      $(".second", quicktest).css("display", secondBranchDisplay);
+      $(branchClassBehind, quicktest).before($(branchClassFront, quicktest));
+    }
+
+    $(".quicktest").css("display", quicktestDisplay);
+    $("#branch1").css("background-color", firstBranchInputColor);
+    $("#branch2").css("background-color", secondBranchInputColor);
   }
-    $(".quicktest").css("display", cssConfig.quicktestDisplay);
-    $("#branch1").css("background-color", cssConfig.firstBranchInputColor);
-    $("#branch2").css("background-color", cssConfig.secondBranchInputColor);
+
+  return;
 }
+
 
 // show/hide according to hotkey events
 window.onkeyup = function(e){
@@ -186,60 +205,8 @@ window.onkeyup = function(e){
   if(inputActive){return;}
 
   var visibleQuickTests = $(".quicktest").toArray();
-  var onePressed = (key === 49 || key === 97); //regular & numpad keys
-  var twoPressed = (key === 50 || key === 98);
-  var threePressed = (key === 51 || key === 99);
-  var fourPressed = (key === 52 || key === 100);
-  var cssConfig = {};
-  //if 1 is pressed
-  if (onePressed) {
-    cssConfig = { firstBranchDisplay: "block",
-                  secondBranchDisplay: "none",
-                  branchClassBehind: ".second",
-                  branchClassFront: ".first",
-                  quicktestDisplay: "inline-block",
-                  firstBranchInputColor: "mediumaquamarine",
-                  secondBranchInputColor: "white" };
-    hotKeyHandler(visibleQuickTests, cssConfig);
-    return;
-  }
-  //if 2 is pressed
-  if (twoPressed) {
-    cssConfig = { firstBranchDisplay: "none",
-                  secondBranchDisplay: "block",
-                  branchClassBehind: ".first",
-                  branchClassFront: ".second",
-                  quicktestDisplay: "inline-block",
-                  firstBranchInputColor: "white",
-                  secondBranchInputColor: "mediumaquamarine" };
-    hotKeyHandler(visibleQuickTests, cssConfig);
-    return;
-  }
-  //if 3 is pressed
-  if (threePressed) {
-    cssConfig = { firstBranchDisplay: "block",
-                  secondBranchDisplay: "block",
-                  branchClassBehind: ".first",
-                  branchClassFront: ".second",
-                  quicktestDisplay: "inline-block",
-                  firstBranchInputColor: "mediumaquamarine",
-                  secondBranchInputColor: "mediumaquamarine" };
-    hotKeyHandler(visibleQuickTests, cssConfig);
-    return;
-  }
-  //if 4 is pressed
-  if (fourPressed) {
-    cssConfig = { firstBranchDisplay: "none",
-                  secondBranchDisplay: "none",
-                  branchClassBehind: ".second",
-                  branchClassFront: ".first",
-                  quicktestDisplay: "none",
-                  firstBranchInputColor: "white",
-                  secondBranchInputColor: "white" };
-    hotKeyHandler(visibleQuickTests, cssConfig);
-    return;
-  }
 
+  processKeyEvent(key, visibleQuickTests);
 };
 
 $("#help").hover(function(){
@@ -248,14 +215,12 @@ $("#help").hover(function(){
     // Hover out code
     $("#instructions").css("display", "none");
 }).mousemove(function(e) {
-    var mousex = e.pageX; //Get X coordinates
-    var mousey = e.pageY; //Get Y coordinates
-    $("#instructions").css({ top: mousey + 20, left: mousex - 330 });
+    var mouseX = e.pageX; //Get X coordinates
+    var mouseY = e.pageY; //Get Y coordinates
+    $("#instructions").css({ top: mouseY + 20, left: mouseX - 330 });
 });
 
 var button = document.getElementById("render");
 button.onclick = initialize;
 
 })();
-
-
