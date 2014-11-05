@@ -3860,6 +3860,9 @@ declare module Plottable {
         class Hover extends AbstractInteraction {
             _componentToListenTo: Hoverable;
             _anchor(component: Hoverable, hitBox: D3.Selection): void;
+            _handleHoverBegin(p: Point): void;
+            _handleHoverOver(p: Point): void;
+            _handleHoverEnd(p: Point): void;
             /**
              * Attaches an callback to be called when the user mouses over an element.
              *
@@ -3883,6 +3886,30 @@ declare module Plottable {
              *                     the user is currently hovering over.
              */
             getCurrentHoverData(): HoverData;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
+        class Crosshair extends Hover {
+            _anchor(component: Hoverable, hitBox: D3.Selection): void;
+            /**
+             * Gets the crosshair icon radius.
+             *
+             * @return {number} The crosshair icon radius.
+             */
+            iconRadius(): number;
+            /**
+             * Sets the crosshair icon radius.
+             *
+             * @param {number} r The desired crosshair icon radius.
+             * @return {Crosshair} The calling Interaction.Crosshair.
+             */
+            iconRadius(r: number): Crosshair;
+            _handleHoverOver(p: Point): void;
+            _handleHoverEnd(p: Point): void;
         }
     }
 }

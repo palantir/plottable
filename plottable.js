@@ -9089,20 +9089,9 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this.dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
-                this.dispatcher.mouseover(function (p) {
-                    _this._componentToListenTo._hoverOverComponent(p);
-                    _this.handleHoverOver(p);
-                });
-                this.dispatcher.mouseout(function (p) {
-                    _this._componentToListenTo._hoverOutComponent(p);
-                    _this.safeHoverOut(_this.currentHoverData);
-                    _this.currentHoverData = {
-                        data: null,
-                        pixelPositions: null,
-                        selection: null
-                    };
-                });
-                this.dispatcher.mousemove(function (p) { return _this.handleHoverOver(p); });
+                this.dispatcher.mouseover(function (p) { return _this._handleHoverBegin(p); });
+                this.dispatcher.mouseout(function (p) { return _this._handleHoverEnd(p); });
+                this.dispatcher.mousemove(function (p) { return _this._handleHoverOver(p); });
                 this.dispatcher.connect();
             };
             /**
@@ -9135,15 +9124,6 @@ var Plottable;
                     selection: d3.selectAll(diffElements)
                 };
             };
-            Hover.prototype.handleHoverOver = function (p) {
-                var lastHoverData = this.currentHoverData;
-                var newHoverData = this._componentToListenTo._doHover(p);
-                this.currentHoverData = newHoverData;
-                var outData = Hover.diffHoverData(lastHoverData, newHoverData);
-                this.safeHoverOut(outData);
-                var overData = Hover.diffHoverData(newHoverData, lastHoverData);
-                this.safeHoverOver(overData);
-            };
             Hover.prototype.safeHoverOut = function (outData) {
                 if (this.hoverOutCallback && outData.data) {
                     this.hoverOutCallback(outData);
@@ -9153,6 +9133,28 @@ var Plottable;
                 if (this.hoverOverCallback && overData.data) {
                     this.hoverOverCallback(overData);
                 }
+            };
+            Hover.prototype._handleHoverBegin = function (p) {
+                this._componentToListenTo._hoverOverComponent(p);
+                this._handleHoverOver(p);
+            };
+            Hover.prototype._handleHoverOver = function (p) {
+                var lastHoverData = this.currentHoverData;
+                var newHoverData = this._componentToListenTo._doHover(p);
+                this.currentHoverData = newHoverData;
+                var outData = Hover.diffHoverData(lastHoverData, newHoverData);
+                this.safeHoverOut(outData);
+                var overData = Hover.diffHoverData(newHoverData, lastHoverData);
+                this.safeHoverOver(overData);
+            };
+            Hover.prototype._handleHoverEnd = function (p) {
+                this._componentToListenTo._hoverOutComponent(p);
+                this.safeHoverOut(this.currentHoverData);
+                this.currentHoverData = {
+                    data: null,
+                    pixelPositions: null,
+                    selection: null
+                };
             };
             /**
              * Attaches an callback to be called when the user mouses over an element.
@@ -9188,6 +9190,82 @@ var Plottable;
             return Hover;
         })(Interaction.AbstractInteraction);
         Interaction.Hover = Hover;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Interaction) {
+        var Crosshair = (function (_super) {
+            __extends(Crosshair, _super);
+            function Crosshair() {
+                _super.apply(this, arguments);
+                this._iconRadius = 3;
+            }
+            Crosshair.prototype._anchor = function (component, hitBox) {
+                _super.prototype._anchor.call(this, component, hitBox);
+                this.crosshairContainer = this._componentToListenTo._foregroundContainer.append("g").style("visibility", "hidden").classed({
+                    "interaction": true,
+                    "crosshair": true
+                });
+                this.verticalLine = this.crosshairContainer.append("line").classed("vertical", true);
+                this.horizontalLine = this.crosshairContainer.append("line").classed("horizontal", true);
+            };
+            Crosshair.prototype.drawCrosshair = function (points) {
+                var circles = this.crosshairContainer.selectAll("circle").data(points);
+                circles.enter().append("circle");
+                circles.exit().remove();
+                circles.attr({
+                    "r": this._iconRadius,
+                    "cx": function (p) { return p.x; },
+                    "cy": function (p) { return p.y; }
+                });
+                this.verticalLine.attr({
+                    x1: points[0].x,
+                    y1: 0,
+                    x2: points[0].x,
+                    y2: this._componentToListenTo.height()
+                });
+                this.horizontalLine.attr({
+                    x1: 0,
+                    y1: points[0].y,
+                    x2: this._componentToListenTo.width(),
+                    y2: points[0].y
+                });
+            };
+            Crosshair.prototype.iconRadius = function (r) {
+                if (r == null) {
+                    return this._iconRadius;
+                }
+                this._iconRadius = r;
+                return this;
+            };
+            Crosshair.prototype._handleHoverOver = function (p) {
+                _super.prototype._handleHoverOver.call(this, p);
+                var currentHoverData = this.getCurrentHoverData();
+                if (currentHoverData.pixelPositions != null) {
+                    this.crosshairContainer.style("visibility", "visible");
+                    this.drawCrosshair(currentHoverData.pixelPositions);
+                }
+                else {
+                    this.crosshairContainer.style("visibility", "hidden");
+                }
+            };
+            Crosshair.prototype._handleHoverEnd = function (p) {
+                _super.prototype._handleHoverEnd.call(this, p);
+                this.crosshairContainer.style("visibility", "hidden");
+            };
+            return Crosshair;
+        })(Interaction.Hover);
+        Interaction.Crosshair = Crosshair;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
