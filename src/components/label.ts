@@ -162,8 +162,8 @@ export module Component {
       this.textContainer.text("");
       var dimension = this.orientation === "horizontal" ? this.width() : this.height();
       var truncatedText = _Util.Text.getTruncatedText(this._text, dimension, this.measurer);
-      var writeWidth = this.width() - 2 * this.padding();
-      var writeHeight = this.height() - 2 * this.padding();
+      var writeWidth = this.width() - 2 * labelPadding;
+      var writeHeight = this.height() - 2 * labelPadding;
       if (this.orientation === "horizontal") {
         _Util.Text.writeLineHorizontally(truncatedText, this.textContainer, writeWidth, writeHeight,
                                         this.xAlignment, this.yAlignment);
