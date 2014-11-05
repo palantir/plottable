@@ -1046,6 +1046,30 @@ describe("Labels", function () {
         assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "label is in vertical position");
         svg.remove();
     });
+    it("padding API", function () {
+        var svg = generateSVG(400, 200);
+        var testLabel = new Plottable.Component.Label("testing label").padding(30).xAlign("left");
+        var label1 = new Plottable.Component.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlign("left");
+        var label2 = new Plottable.Component.Label("label").yAlign("bottom");
+        new Plottable.Component.Table([[label2], [testLabel], [label1]]).renderTo(svg);
+        var textRect0 = testLabel._element.select("text").node().getBoundingClientRect();
+        var textRect1 = label1._element.select("text").node().getBoundingClientRect();
+        assert.closeTo(textRect0.left, textRect1.left + 30, 1, "left difference by padding amount");
+        testLabel.xAlign("right");
+        textRect0 = testLabel._element.select("text").node().getBoundingClientRect();
+        textRect1 = label1._element.select("text").node().getBoundingClientRect();
+        assert.closeTo(textRect0.right, textRect1.right - 30, 1, "right difference by padding amount");
+        testLabel.yAlign("bottom");
+        textRect0 = testLabel._element.select("text").node().getBoundingClientRect();
+        textRect1 = label1._element.select("text").node().getBoundingClientRect();
+        assert.closeTo(textRect0.bottom, textRect1.top - 30, 1, "vertical difference by padding amount");
+        testLabel.yAlign("top");
+        textRect0 = testLabel._element.select("text").node().getBoundingClientRect();
+        textRect1 = label1._element.select("text").node().getBoundingClientRect();
+        var textRect2 = label2._element.select("text").node().getBoundingClientRect();
+        assert.closeTo(textRect0.top, textRect2.bottom + 30, 1, "vertical difference by padding amount");
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
