@@ -5307,11 +5307,13 @@ var Plottable;
                 this.textContainer.text("");
                 var dimension = this.orientation === "horizontal" ? this.width() : this.height();
                 var truncatedText = Plottable._Util.Text.getTruncatedText(this._text, dimension, this.measurer);
+                var writeWidth = this.width() - 2 * this.padding();
+                var writeHeight = this.height() - 2 * this.padding();
                 if (this.orientation === "horizontal") {
-                    Plottable._Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.width() - 2 * this.padding(), this.height() - 2 * this.padding(), this.xAlignment, this.yAlignment);
+                    Plottable._Util.Text.writeLineHorizontally(truncatedText, this.textContainer, writeWidth, writeHeight, this.xAlignment, this.yAlignment);
                 }
                 else {
-                    Plottable._Util.Text.writeLineVertically(truncatedText, this.textContainer, this.width() - 2 * this.padding(), this.height() - 2 * this.padding(), this.xAlignment, this.yAlignment, this.orientation);
+                    Plottable._Util.Text.writeLineVertically(truncatedText, this.textContainer, writeWidth, writeHeight, this.xAlignment, this.yAlignment, this.orientation);
                 }
             };
             Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
