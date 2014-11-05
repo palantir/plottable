@@ -7413,12 +7413,17 @@ var Plottable;
              */
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
+                this.closeDetectionRadius = 15;
                 this.classed("line-plot", true);
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
                 this.project("stroke-width", function () { return "2px"; }); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
+            Line.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this.fakeHoverTarget = this._foregroundContainer.append("circle").classed("fake-hover-target", true).style("visibility", "hidden");
+            };
             Line.prototype._rejectNullsAndNaNs = function (d, i, projector) {
                 var value = projector(d, i);
                 return value != null && value === value;
@@ -7464,6 +7469,68 @@ var Plottable;
             };
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
+            };
+            Line.prototype._getClosestByXThenY = function (p, range) {
+                if (range === void 0) { range = Infinity; }
+                var datasets = this.datasets();
+                var attrToProjector = this._generateAttrToProjector();
+                var xProjector = attrToProjector["x"];
+                var yProjector = attrToProjector["y"];
+                var getDistSq = function (d, i) {
+                    var dx = xProjector(d, i) - p.x;
+                    var dy = yProjector(d, i) - p.y;
+                    return (dx * dx + dy * dy);
+                };
+                var closestOverall;
+                var closestDistSq = range * range;
+                datasets.forEach(function (dataset) {
+                    var data = dataset.data();
+                    var index = Plottable._Util.OpenSource.sortedIndex(p.x, data, xProjector);
+                    var before = data[index - 1];
+                    var beforeDistSq = (before !== undefined) ? getDistSq(before, index - 1) : Infinity;
+                    var after = data[index];
+                    var afterDistSq = (after !== undefined) ? getDistSq(after, index) : Infinity;
+                    if (beforeDistSq < closestDistSq) {
+                        closestOverall = before;
+                        closestDistSq = beforeDistSq;
+                    }
+                    if (afterDistSq < closestDistSq) {
+                        closestOverall = after;
+                        closestDistSq = afterDistSq;
+                    }
+                });
+                return closestOverall;
+            };
+            //===== Hover logic =====
+            Line.prototype._hoverOverComponent = function (p) {
+                // no-op
+            };
+            Line.prototype._hoverOutComponent = function (p) {
+                // no-op
+            };
+            Line.prototype._doHover = function (p) {
+                var closestValue = this._getClosestByXThenY(p, this.closeDetectionRadius);
+                if (closestValue === undefined) {
+                    return {
+                        data: null,
+                        pixelPositions: null,
+                        selection: null
+                    };
+                }
+                var attrToProjector = this._generateAttrToProjector();
+                var closestPoint = {
+                    x: attrToProjector["x"](closestValue),
+                    y: attrToProjector["y"](closestValue)
+                };
+                this.fakeHoverTarget.attr({
+                    "cx": closestPoint.x,
+                    "cy": closestPoint.y
+                });
+                return {
+                    data: [closestValue],
+                    pixelPositions: [closestPoint],
+                    selection: this.fakeHoverTarget
+                };
             };
             return Line;
         })(Plot.AbstractXYPlot);
