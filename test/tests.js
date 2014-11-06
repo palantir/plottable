@@ -2466,7 +2466,7 @@ describe("Plots", function () {
                 ];
                 dataset = new Plottable.Dataset(data);
                 barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
-                barPlot.addDataset(dataset);
+                barPlot.addDataset("d1", dataset);
                 barPlot.baseline(0);
                 barPlot.renderTo(svg);
             });
@@ -2488,19 +2488,19 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("sensible bar width one datum", function () {
-                barPlot.removeDataset(dataset);
+                barPlot.removeDataset("d1");
                 barPlot.addDataset([{ x: 10, y: 2 }]);
                 assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
                 svg.remove();
             });
             it("sensible bar width same datum", function () {
-                barPlot.removeDataset(dataset);
+                barPlot.removeDataset("d1");
                 barPlot.addDataset([{ x: 10, y: 2 }, { x: 10, y: 2 }]);
                 assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "uses the width sensible for one datum");
                 svg.remove();
             });
             it("sensible bar width unsorted data", function () {
-                barPlot.removeDataset(dataset);
+                barPlot.removeDataset("d1");
                 barPlot.addDataset([{ x: 2, y: 2 }, { x: 20, y: 2 }, { x: 5, y: 2 }]);
                 var expectedBarPixelWidth = (xScale.scale(5) - xScale.scale(2)) * 0.95;
                 assert.closeTo(barPlot._getBarPixelWidth(), expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
