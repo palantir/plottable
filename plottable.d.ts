@@ -3082,7 +3082,10 @@ declare module Plottable {
             _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
             _wholeDatumAttributes(): string[];
-            _getClosestByXThenY(p: Point, range?: number): any;
+            _getClosestByXThenY(p: Point, range?: number): {
+                closestValue: any;
+                closestPoint: Point;
+            };
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;

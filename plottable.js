@@ -7413,7 +7413,7 @@ var Plottable;
              */
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this.closeDetectionRadius = 15;
+                this.hoverDetectionRadius = 15;
                 this.classed("line-plot", true);
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
                 this.project("stroke-width", function () { return "2px"; }); // default
@@ -7482,24 +7482,40 @@ var Plottable;
                     return (dx * dx + dy * dy);
                 };
                 var closestOverall;
+                var closestPoint;
                 var closestDistSq = range * range;
                 datasets.forEach(function (dataset) {
                     var data = dataset.data();
                     var index = Plottable._Util.OpenSource.sortedIndex(p.x, data, xProjector);
                     var before = data[index - 1];
-                    var beforeDistSq = (before !== undefined) ? getDistSq(before, index - 1) : Infinity;
-                    var after = data[index];
-                    var afterDistSq = (after !== undefined) ? getDistSq(after, index) : Infinity;
-                    if (beforeDistSq < closestDistSq) {
-                        closestOverall = before;
-                        closestDistSq = beforeDistSq;
+                    if (before !== undefined) {
+                        var beforeDistSq = getDistSq(before, index - 1);
+                        if (beforeDistSq < closestDistSq) {
+                            closestOverall = before;
+                            closestPoint = {
+                                x: xProjector(before, index - 1),
+                                y: yProjector(before, index - 1)
+                            };
+                            closestDistSq = beforeDistSq;
+                        }
                     }
-                    if (afterDistSq < closestDistSq) {
-                        closestOverall = after;
-                        closestDistSq = afterDistSq;
+                    var after = data[index];
+                    if (after !== undefined) {
+                        var afterDistSq = getDistSq(after, index);
+                        if (afterDistSq < closestDistSq) {
+                            closestOverall = after;
+                            closestPoint = {
+                                x: xProjector(after, index),
+                                y: yProjector(after, index)
+                            };
+                            closestDistSq = afterDistSq;
+                        }
                     }
                 });
-                return closestOverall;
+                return {
+                    closestValue: closestOverall,
+                    closestPoint: closestPoint
+                };
             };
             //===== Hover logic =====
             Line.prototype._hoverOverComponent = function (p) {
@@ -7509,7 +7525,8 @@ var Plottable;
                 // no-op
             };
             Line.prototype._doHover = function (p) {
-                var closestValue = this._getClosestByXThenY(p, this.closeDetectionRadius);
+                var closestInfo = this._getClosestByXThenY(p, this.hoverDetectionRadius);
+                var closestValue = closestInfo.closestValue;
                 if (closestValue === undefined) {
                     return {
                         data: null,
@@ -7517,14 +7534,10 @@ var Plottable;
                         selection: null
                     };
                 }
-                var attrToProjector = this._generateAttrToProjector();
-                var closestPoint = {
-                    x: attrToProjector["x"](closestValue),
-                    y: attrToProjector["y"](closestValue)
-                };
+                var closestPoint = closestInfo.closestPoint;
                 this.fakeHoverTarget.attr({
-                    "cx": closestPoint.x,
-                    "cy": closestPoint.y
+                    "cx": closestInfo.closestPoint.x,
+                    "cy": closestInfo.closestPoint.y
                 });
                 return {
                     data: [closestValue],

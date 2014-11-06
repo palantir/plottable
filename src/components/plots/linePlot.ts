@@ -3,7 +3,7 @@
 module Plottable {
 export module Plot {
   export class Line<X> extends AbstractXYPlot<X,number> implements Interaction.Hoverable {
-    private closeDetectionRadius = 15;
+    private hoverDetectionRadius = 15;
     private fakeHoverTarget: D3.Selection;
 
     public _yScale: Scale.AbstractQuantitative<number>;
@@ -100,27 +100,44 @@ export module Plot {
       };
 
       var closestOverall: any;
+      var closestPoint: Point;
       var closestDistSq = range * range;
 
       datasets.forEach((dataset) => {
         var data = dataset.data();
         var index = _Util.OpenSource.sortedIndex(p.x, data, xProjector);
-        var before = data[index - 1];
-        var beforeDistSq = (before !== undefined) ? getDistSq(before, index - 1) : Infinity;
-        var after = data[index];
-        var afterDistSq = (after !== undefined) ? getDistSq(after, index) : Infinity;
 
-        if (beforeDistSq < closestDistSq) {
-          closestOverall = before;
-          closestDistSq = beforeDistSq;
+        var before = data[index - 1];
+        if (before !== undefined) {
+          var beforeDistSq = getDistSq(before, index - 1);
+          if (beforeDistSq < closestDistSq) {
+            closestOverall = before;
+            closestPoint = {
+              x: xProjector(before, index - 1),
+              y: yProjector(before, index - 1)
+            };
+            closestDistSq = beforeDistSq;
+          }
         }
-        if (afterDistSq < closestDistSq) {
-          closestOverall = after;
-          closestDistSq = afterDistSq;
+
+        var after = data[index];
+        if (after !== undefined) {
+          var afterDistSq = getDistSq(after, index);
+          if (afterDistSq < closestDistSq) {
+            closestOverall = after;
+            closestPoint = {
+              x: xProjector(after, index),
+              y: yProjector(after, index)
+            };
+            closestDistSq = afterDistSq;
+          }
         }
       });
 
-      return closestOverall;
+      return {
+        closestValue: closestOverall,
+        closestPoint: closestPoint
+      };
     }
 
     //===== Hover logic =====
@@ -133,7 +150,8 @@ export module Plot {
     }
 
     public _doHover(p: Point): Interaction.HoverData {
-      var closestValue = this._getClosestByXThenY(p, this.closeDetectionRadius);
+      var closestInfo = this._getClosestByXThenY(p, this.hoverDetectionRadius);
+      var closestValue = closestInfo.closestValue;
       if (closestValue === undefined) {
         return {
           data: null,
@@ -142,15 +160,10 @@ export module Plot {
         };
       }
 
-      var attrToProjector = this._generateAttrToProjector();
-      var closestPoint: Point = {
-        x: attrToProjector["x"](closestValue),
-        y: attrToProjector["y"](closestValue)
-      };
-
+      var closestPoint = closestInfo.closestPoint;
       this.fakeHoverTarget.attr({
-        "cx": closestPoint.x,
-        "cy": closestPoint.y
+        "cx": closestInfo.closestPoint.x,
+        "cy": closestInfo.closestPoint.y
       });
 
       return {
