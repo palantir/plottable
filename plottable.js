@@ -6635,7 +6635,12 @@ var Plottable;
             AbstractXYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 this._xScale.range([0, this.width()]);
-                this._yScale.range([this.height(), 0]);
+                if (this._yScale instanceof Plottable.Scale.Ordinal) {
+                    this._yScale.range([0, this.height()]);
+                }
+                else {
+                    this._yScale.range([this.height(), 0]);
+                }
             };
             AbstractXYPlot.prototype._updateXDomainer = function () {
                 if (this._xScale instanceof Plottable.Scale.AbstractQuantitative) {
