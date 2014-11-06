@@ -43,7 +43,7 @@ module Plottable {
     public data(data: any[]): Dataset;
     public data(data?: any[]): any {
       if (data == null) {
-        return this._data.slice(0);
+        return this._data.slice();
       } else {
         this._data = data;
         this.accessor2cachedExtent = new _Util.StrictEqualityAssociativeArray();
