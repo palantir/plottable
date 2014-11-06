@@ -372,7 +372,7 @@ describe("Interactions", () => {
       var hitbox = barPlot._element.select(".hit-box");
 
       triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
-      assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
+      assert.deepEqual(barDatum, dataset[1], "the first bar was selected (point mode)");
       barDatum = null;
       triggerFakeMouseEvent("mousemove", hitbox, 201, 250);
       assert.isNull(barDatum, "hover callback isn't called if the hovered bar didn't change");
@@ -395,7 +395,7 @@ describe("Interactions", () => {
 
       bhi.hoverMode("line");
       triggerFakeMouseEvent("mousemove", hitbox, 399, 250);
-      assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
+      assert.deepEqual(barDatum, dataset[1], "the first bar was selected (line mode)");
 
       svg.remove();
     });
