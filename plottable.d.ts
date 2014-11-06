@@ -831,12 +831,21 @@ declare module Plottable {
 }
 
 declare module Plottable {
+    /**
+     * Access specific datum property.
+     */
     interface _Accessor {
         (datum: any, index?: number, userMetadata?: any, plotMetadata?: any): any;
     }
+    /**
+     * Retrieves scalled datum property.
+     */
     interface _Projector {
         (datum?: any, index?: number, userMetadata?: any, plotMetadata?: any): any;
     }
+    /**
+     * Defines a way how specific attribute needs be retrieved before rendering.
+     */
     interface _Projection {
         accessor: _Accessor;
         scale?: Scale.AbstractScale<any, any>;
@@ -891,15 +900,6 @@ declare module Plottable {
     interface Point {
         x: number;
         y: number;
-    }
-    /**
-     * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
-     */
-    interface PlotDatasetKey {
-        dataset: Dataset;
-        drawer: _Drawer.AbstractDrawer;
-        plotMetadata: any;
-        key: string;
     }
 }
 
@@ -2580,6 +2580,18 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        /**
+         * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
+         */
+        interface PlotDatasetKey {
+            dataset: Dataset;
+            drawer: _Drawer.AbstractDrawer;
+            plotMetadata: PlotMetadata;
+            key: string;
+        }
+        interface PlotMetadata {
+            datasetKey: string;
+        }
         class AbstractPlot extends Component.AbstractComponent {
             _dataChanged: boolean;
             _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
@@ -2729,7 +2741,7 @@ declare module Plottable {
              *
              * @param {string} key The key of new dataset
              */
-            _getPlotMetadataForDataset(key: string): any;
+            _getPlotMetadataForDataset(key: string): PlotMetadata;
         }
     }
 }

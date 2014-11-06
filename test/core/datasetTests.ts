@@ -37,7 +37,7 @@ describe("Dataset", () => {
     assert.isTrue(callbackCalled, "callback was called when the metadata was changed");
   });
 
-  it("_getExtent works as expected", () => {
+  it("_getExtent works as expected with user metadata", () => {
     var data = [1, 2, 3, 4, 1];
     var metadata = {foo: 11};
     var id = (d: any) => d;

@@ -1,12 +1,21 @@
 module Plottable {
+  /**
+   * Access specific datum property.
+   */
   export interface _Accessor {
     (datum: any, index?: number, userMetadata?: any, plotMetadata?: any): any;
   };
 
+  /**
+   * Retrieves scalled datum property.
+   */
   export interface _Projector {
     (datum?: any, index?: number, userMetadata?: any, plotMetadata?: any) : any;
   }
 
+  /**
+   * Defines a way how specific attribute needs be retrieved before rendering.
+   */
   export interface _Projection {
     accessor: _Accessor;
     scale?: Scale.AbstractScale<any, any>;
@@ -67,15 +76,5 @@ module Plottable {
   export interface Point {
     x: number;
     y: number;
-  }
-
-  /**
-   * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
-   */
-  export interface PlotDatasetKey {
-    dataset: Dataset;
-    drawer: _Drawer.AbstractDrawer;
-    plotMetadata: any;
-    key: string;
   }
 }

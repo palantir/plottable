@@ -3402,6 +3402,7 @@ var Plottable;
             Element.prototype.filterDefinedData = function (data, definedFunction) {
                 return definedFunction ? data.filter(definedFunction) : data;
             };
+            // HACKHACK To prevent populating undesired attribute to d3, we delete them here.
             Element.prototype._prepareDrawSteps = function (drawSteps) {
                 _super.prototype._prepareDrawSteps.call(this, drawSteps);
                 drawSteps.forEach(function (d) {

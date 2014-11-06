@@ -2,6 +2,20 @@
 
 module Plottable {
 export module Plot {
+  /**
+   * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
+   */
+  export interface PlotDatasetKey {
+    dataset: Dataset;
+    drawer: _Drawer.AbstractDrawer;
+    plotMetadata: PlotMetadata;
+    key: string;
+  }
+
+  export interface PlotMetadata {
+    datasetKey: string
+  }
+
   export class AbstractPlot extends Component.AbstractComponent {
     public _dataChanged = false;
     public _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
@@ -381,7 +395,7 @@ export module Plot {
      *
      * @param {string} key The key of new dataset
      */
-    public _getPlotMetadataForDataset(key: string): any {
+    public _getPlotMetadataForDataset(key: string): PlotMetadata {
       return {
         datasetKey: key
       };

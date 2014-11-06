@@ -42,7 +42,8 @@ export module _Drawer {
       return definedFunction ? data.filter(definedFunction) : data;
     }
 
-     public _prepareDrawSteps(drawSteps: DrawStep[]) {
+    // HACKHACK To prevent populating undesired attribute to d3, we delete them here.
+    public _prepareDrawSteps(drawSteps: DrawStep[]) {
       super._prepareDrawSteps(drawSteps);
       drawSteps.forEach((d: DrawStep) => {
         if (d.attrToProjector["defined"]) {
