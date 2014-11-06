@@ -147,7 +147,7 @@ describe("Plots", () => {
                                 .addDataset("d2", [])
                                 .addDataset([]);
       r._datasetKeysInOrder.forEach((key: string) => {
-        var plotMetadata = r._key2PlotDatasetKey.get(key).metadata;
+        var plotMetadata = r._key2PlotDatasetKey.get(key).plotMetadata;
         assert.property(plotMetadata, "datasetKey", "metadata has dataset key");
         assert.propertyVal(plotMetadata, "datasetKey", key, "metadata has correct dataset key");
       });

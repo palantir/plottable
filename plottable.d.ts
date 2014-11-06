@@ -898,7 +898,7 @@ declare module Plottable {
     interface PlotDatasetKey {
         dataset: Dataset;
         drawer: _Drawer.AbstractDrawer;
-        metadata: any;
+        plotMetadata: any;
         key: string;
     }
 }

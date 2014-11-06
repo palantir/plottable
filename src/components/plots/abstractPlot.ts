@@ -97,9 +97,9 @@ export module Plot {
       };
       var drawer = this._getDrawer(key);
       var metadata = this._getPlotMetadataForDataset(key);
-      var ddk = {drawer: drawer, dataset: dataset, key: key, metadata: metadata};
+      var pdk = {drawer: drawer, dataset: dataset, key: key, plotMetadata: metadata};
       this._datasetKeysInOrder.push(key);
-      this._key2PlotDatasetKey.set(key, ddk);
+      this._key2PlotDatasetKey.set(key, pdk);
 
       if (this._isSetup) {
         drawer.setup(this._renderArea.append("g"));
@@ -172,8 +172,8 @@ export module Plot {
       if (scale) {
         scale.broadcaster.registerListener(this, () => this._render());
       }
-      var activatedAccessor = _Util.Methods.accessorize(accessor);
-      this._projections[attrToSet] = {accessor: activatedAccessor, scale: scale, attribute: attrToSet};
+      accessor = _Util.Methods.accessorize(accessor);
+      this._projections[attrToSet] = {accessor: accessor, scale: scale, attribute: attrToSet};
       this._updateScaleExtent(attrToSet);
       this._render(); // queue a re-render upon changing projector
       return this;
@@ -227,8 +227,8 @@ export module Plot {
     public _updateScaleExtent(attr: string) {
       var projector = this._projections[attr];
       if (projector.scale) {
-        this._key2PlotDatasetKey.forEach((key, ddk) => {
-          var extent = ddk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer, ddk.metadata);
+        this._key2PlotDatasetKey.forEach((key, pdk) => {
+          var extent = pdk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer, pdk.plotMetadata);
           var scaleKey = this._plottableID.toString() + "_" + key;
           if (extent.length === 0 || !this._isAnchored) {
             projector.scale._removeExtent(scaleKey, attr);
@@ -333,8 +333,8 @@ export module Plot {
 
     public _removeDataset(key: string): AbstractPlot {
       if (key != null && this._key2PlotDatasetKey.has(key)) {
-        var ddk = this._key2PlotDatasetKey.get(key);
-        ddk.drawer.remove();
+        var pdk = this._key2PlotDatasetKey.get(key);
+        pdk.drawer.remove();
 
         var projectors = d3.values(this._projections);
         var scaleKey = this._plottableID.toString() + "_" + key;
@@ -344,7 +344,7 @@ export module Plot {
           }
         });
 
-        ddk.dataset.broadcaster.deregisterListener(this);
+        pdk.dataset.broadcaster.deregisterListener(this);
         this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
         this._key2PlotDatasetKey.remove(key);
         this._onDatasetUpdate();
@@ -392,13 +392,13 @@ export module Plot {
       var dataToDraw = this._getDataToDraw();
       var drawers = this._getDrawersInOrder();
 
-      // TODO: Use metadata instead of dataToDraw
+      // TODO: Use metadata instead of dataToDraw #1297.
       var times = this._datasetKeysInOrder.map((k, i) =>
         drawers[i].draw(
           dataToDraw.get(k),
           drawSteps,
           this._key2PlotDatasetKey.get(k).dataset.metadata(),
-          this._key2PlotDatasetKey.get(k).metadata
+          this._key2PlotDatasetKey.get(k).plotMetadata
         ));
       var maxTime = _Util.Methods.max(times, 0);
       this._additionalPaint(maxTime);

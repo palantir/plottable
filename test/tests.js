@@ -1688,7 +1688,7 @@ describe("Plots", function () {
             var d1 = new Plottable.Dataset();
             var r = new Plottable.Plot.AbstractPlot().addDataset("d1", d1).addDataset(d1).addDataset("d2", []).addDataset([]);
             r._datasetKeysInOrder.forEach(function (key) {
-                var plotMetadata = r._key2PlotDatasetKey.get(key).metadata;
+                var plotMetadata = r._key2PlotDatasetKey.get(key).plotMetadata;
                 assert.property(plotMetadata, "datasetKey", "metadata has dataset key");
                 assert.propertyVal(plotMetadata, "datasetKey", key, "metadata has correct dataset key");
             });

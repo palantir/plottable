@@ -6242,9 +6242,9 @@ var Plottable;
                 ;
                 var drawer = this._getDrawer(key);
                 var metadata = this._getPlotMetadataForDataset(key);
-                var ddk = { drawer: drawer, dataset: dataset, key: key, metadata: metadata };
+                var pdk = { drawer: drawer, dataset: dataset, key: key, plotMetadata: metadata };
                 this._datasetKeysInOrder.push(key);
-                this._key2PlotDatasetKey.set(key, ddk);
+                this._key2PlotDatasetKey.set(key, pdk);
                 if (this._isSetup) {
                     drawer.setup(this._renderArea.append("g"));
                 }
@@ -6311,8 +6311,8 @@ var Plottable;
                 if (scale) {
                     scale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
-                var activatedAccessor = Plottable._Util.Methods.accessorize(accessor);
-                this._projections[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
+                accessor = Plottable._Util.Methods.accessorize(accessor);
+                this._projections[attrToSet] = { accessor: accessor, scale: scale, attribute: attrToSet };
                 this._updateScaleExtent(attrToSet);
                 this._render(); // queue a re-render upon changing projector
                 return this;
@@ -6367,8 +6367,8 @@ var Plottable;
                 var _this = this;
                 var projector = this._projections[attr];
                 if (projector.scale) {
-                    this._key2PlotDatasetKey.forEach(function (key, ddk) {
-                        var extent = ddk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer, ddk.metadata);
+                    this._key2PlotDatasetKey.forEach(function (key, pdk) {
+                        var extent = pdk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer, pdk.plotMetadata);
                         var scaleKey = _this._plottableID.toString() + "_" + key;
                         if (extent.length === 0 || !_this._isAnchored) {
                             projector.scale._removeExtent(scaleKey, attr);
@@ -6422,8 +6422,8 @@ var Plottable;
             };
             AbstractPlot.prototype._removeDataset = function (key) {
                 if (key != null && this._key2PlotDatasetKey.has(key)) {
-                    var ddk = this._key2PlotDatasetKey.get(key);
-                    ddk.drawer.remove();
+                    var pdk = this._key2PlotDatasetKey.get(key);
+                    pdk.drawer.remove();
                     var projectors = d3.values(this._projections);
                     var scaleKey = this._plottableID.toString() + "_" + key;
                     projectors.forEach(function (p) {
@@ -6431,7 +6431,7 @@ var Plottable;
                             p.scale._removeExtent(scaleKey, p.attribute);
                         }
                     });
-                    ddk.dataset.broadcaster.deregisterListener(this);
+                    pdk.dataset.broadcaster.deregisterListener(this);
                     this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
                     this._key2PlotDatasetKey.remove(key);
                     this._onDatasetUpdate();
@@ -6475,8 +6475,8 @@ var Plottable;
                 var drawSteps = this._generateDrawSteps();
                 var dataToDraw = this._getDataToDraw();
                 var drawers = this._getDrawersInOrder();
-                // TODO: Use metadata instead of dataToDraw
-                var times = this._datasetKeysInOrder.map(function (k, i) { return drawers[i].draw(dataToDraw.get(k), drawSteps, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).metadata); });
+                // TODO: Use metadata instead of dataToDraw #1297.
+                var times = this._datasetKeysInOrder.map(function (k, i) { return drawers[i].draw(dataToDraw.get(k), drawSteps, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).plotMetadata); });
                 var maxTime = Plottable._Util.Methods.max(times, 0);
                 this._additionalPaint(maxTime);
             };
