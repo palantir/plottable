@@ -72,25 +72,6 @@ export module _Drawer {
       return data.length;
     }
 
-    /**
-     * Draws the data into the renderArea using the spefic steps
-     *
-     * @param{any[]} data The data to be drawn
-     * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-     */
-    public draw(data: any[], drawSteps: DrawStep[]): number {
-      this._enterData(data);
-      var numberOfIterations = this._numberOfAnimationIterations(data);
-
-      var delay = 0;
-      drawSteps.forEach((drawStep, i) => {
-        _Util.Methods.setTimeout(() => this._drawStep(drawStep), delay);
-        delay += drawStep.animator.getTiming(numberOfIterations);
-      });
-
-      return delay;
-    }
-
     private applyMetadata(attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: any) {
       var modifiedAttrToProjector: AttributeToProjector = {};
       d3.keys(attrToProjector).forEach((attr: string) => {
@@ -100,14 +81,32 @@ export module _Drawer {
       return modifiedAttrToProjector;
     }
 
-    public newDraw(data: any[], drawSteps: DrawStep[], userMetadata: any = {}, plotMetadata: any = {}) {
+    /**
+     * Draws the data into the renderArea using the spefic steps and metadata
+     *
+     * @param{any[]} data The data to be drawn
+     * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
+     * @param{any} userMetadata The metadata provided by user
+     * @param{any} plotMetadata The metadata provided by plot
+     */
+    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any = {}, plotMetadata: any = {}) {
       var modifiedDrawSteps = drawSteps.map((dr: DrawStep) => {
         return {
           attrToProjector: this.applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
           animator: dr.animator
         };
       });
-      return this.draw(data, modifiedDrawSteps);
+
+      this._enterData(data);
+      var numberOfIterations = this._numberOfAnimationIterations(data);
+
+      var delay = 0;
+      modifiedDrawSteps.forEach((drawStep, i) => {
+        _Util.Methods.setTimeout(() => this._drawStep(drawStep), delay);
+        delay += drawStep.animator.getTiming(numberOfIterations);
+      });
+
+      return delay;
     }
 
 

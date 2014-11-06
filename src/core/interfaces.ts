@@ -77,11 +77,12 @@ module Plottable {
   }
 
   /**
-   * A key that is also coupled with a dataset and a drawer.
+   * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
    */
-  export interface DatasetDrawerKey {
+  export interface PlotDatasetKey {
     dataset: Dataset;
     drawer: _Drawer.AbstractDrawer;
+    metadata: any;
     key: string;
   }
 }

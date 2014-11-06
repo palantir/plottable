@@ -41,7 +41,7 @@ export module Plot {
       var innerScale = this.makeInnerScale();
       var clusters: D3.Map<any[]> = d3.map();
       this._datasetKeysInOrder.forEach((key: string) => {
-        var data = this._key2DatasetDrawerKey.get(key).dataset.data();
+        var data = this._key2PlotDatasetKey.get(key).dataset.data();
 
         clusters.set(key, data.map((d, i) => {
           var val = accessor(d, i);

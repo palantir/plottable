@@ -906,11 +906,12 @@ declare module Plottable {
         y: number;
     }
     /**
-     * A key that is also coupled with a dataset and a drawer.
+     * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
      */
-    interface DatasetDrawerKey {
+    interface PlotDatasetKey {
         dataset: Dataset;
         drawer: _Drawer.AbstractDrawer;
+        metadata: any;
         key: string;
     }
 }
@@ -1614,13 +1615,14 @@ declare module Plottable {
             _drawStep(step: DrawStep): void;
             _numberOfAnimationIterations(data: any[]): number;
             /**
-             * Draws the data into the renderArea using the spefic steps
+             * Draws the data into the renderArea using the spefic steps and metadata
              *
              * @param{any[]} data The data to be drawn
              * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
+             * @param{any} userMetadata The metadata provided by user
+             * @param{any} plotMetadata The metadata provided by plot
              */
-            draw(data: any[], drawSteps: DrawStep[]): number;
-            newDraw(data: any[], drawSteps: DrawStep[], userMetadata?: any, plotMetadata?: any): number;
+            draw(data: any[], drawSteps: DrawStep[], userMetadata?: any, plotMetadata?: any): number;
         }
     }
 }
@@ -2590,7 +2592,7 @@ declare module Plottable {
     module Plot {
         class AbstractPlot extends Component.AbstractComponent {
             _dataChanged: boolean;
-            _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
+            _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
             _datasetKeysInOrder: string[];
             _renderArea: D3.Selection;
             _projectors: {
@@ -2732,7 +2734,12 @@ declare module Plottable {
             _generateDrawSteps(): _Drawer.DrawStep[];
             _additionalPaint(time: number): void;
             _getDataToDraw(): D3.Map<any[]>;
-            getPlotMetadata(): any;
+            /**
+             * Gets the new plot metadata for new dataset with provided key
+             *
+             * @param {string} key The key of new dataset
+             */
+            _getPlotMetadataForDataset(key: string): any;
         }
     }
 }
