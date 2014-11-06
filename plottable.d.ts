@@ -2817,10 +2817,7 @@ declare module Plottable {
             _getDrawer(key: string): _Drawer.Element;
             _generateAttrToProjector(): AttributeToProjector;
             _generateDrawSteps(): _Drawer.DrawStep[];
-            _getClosestStruckPoint(p: Point, range: number): {
-                selection: D3.Selection;
-                data: any[];
-            };
+            _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
@@ -2964,10 +2961,14 @@ declare module Plottable {
             _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
             /**
-             * Gets the current hover mode.
+             * Computes the barPixelWidth of all the bars in the plot.
              *
-             * @return {string} The current hover mode.
+             * If the position scale of the plot is an OrdinalScale and in bands mode, then the rangeBands function will be used.
+             * If the position scale of the plot is an OrdinalScale and in points mode, then
+             *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
+             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
+            _getBarPixelWidth(): number;
             hoverMode(): string;
             /**
              * Sets the hover mode for hover interactions. There are two modes:
@@ -3205,6 +3206,7 @@ declare module Plottable {
             _updateScaleExtents(): void;
             _keyAccessor(): AppliedAccessor;
             _valueAccessor(): AppliedAccessor;
+            _getBarPixelWidth(): any;
         }
     }
 }
@@ -3815,6 +3817,7 @@ declare module Plottable {
     module Interaction {
         interface HoverData {
             data: any[];
+            pixelPositions: Point[];
             selection: D3.Selection;
         }
         interface Hoverable extends Component.AbstractComponent {
