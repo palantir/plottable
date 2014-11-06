@@ -56,4 +56,11 @@ describe("Dataset", () => {
     var coerce = (d: any) => +d;
     assert.deepEqual(dataset._getExtent(a_toString, coerce), [3, 6], "type coercion works as expected");
   });
+
+  it("calling data getter does not return a reference to the underlying array", () => {
+    var data = [1, 2, 3, 4, 1];
+    var dataset = new Plottable.Dataset(data);
+    dataset.data().push(6);
+    assert.deepEqual(dataset.data(), data, "underlying data did not get modified");
+  });
 });

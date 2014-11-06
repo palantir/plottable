@@ -667,7 +667,7 @@ declare module Plottable {
          */
         constructor(data?: any[], metadata?: any);
         /**
-         * Gets the data.
+         * Gets a shallow copy of the data.
          *
          * @returns {DataSource|any[]} The calling DataSource, or the current data.
          */
@@ -2711,21 +2711,6 @@ declare module Plottable {
              * @return {Plot} The calling Plot.
              */
             removeDataset(key: string): AbstractPlot;
-            /**
-             * Remove a dataset given the dataset itself
-             *
-             * @param {Dataset} dataset The dataset to remove
-             * @return {Plot} The calling Plot.
-             */
-            removeDataset(dataset: Dataset): AbstractPlot;
-            /**
-             * Remove a dataset given the underlying data array
-             *
-             * @param {any[]} dataArray The data to remove
-             * @return {Plot} The calling Plot.
-             */
-            removeDataset(dataArray: any[]): AbstractPlot;
-            _removeDataset(key: string): AbstractPlot;
             datasets(): Dataset[];
             _getDrawersInOrder(): _Drawer.AbstractDrawer[];
             _generateDrawSteps(): _Drawer.DrawStep[];

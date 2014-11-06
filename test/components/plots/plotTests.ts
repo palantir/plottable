@@ -166,30 +166,8 @@ describe("Plots", () => {
         assert.deepEqual(plot.datasets(), [], "all datasets removed");
       });
 
-      it("removeDataset can work on datasets", () => {
-        plot.removeDataset(d2);
-        assert.deepEqual(plot.datasets(), [d1], "second dataset removed");
-        plot.removeDataset(d1);
-        assert.deepEqual(plot.datasets(), [], "all datasets removed");
-      });
-
       it("removeDataset ignores inputs that do not correspond to a dataset", () => {
-        var d3 = new Plottable.Dataset();
-        plot.removeDataset(d3);
         plot.removeDataset("bad key");
-        assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
-      });
-
-      it("removeDataset functions on inputs that are data arrays, not datasets", () => {
-        var a1 = ["foo", "bar"];
-        var a2 = [1,2,3];
-        plot.addDataset(a1);
-        plot.addDataset(a2);
-        assert.lengthOf(plot.datasets(), 4, "there are four datasets");
-        assert.equal(plot.datasets()[3].data(), a2, "second array dataset correct");
-        assert.equal(plot.datasets()[2].data(), a1, "first array dataset correct");
-        plot.removeDataset(a2);
-        plot.removeDataset(a1);
         assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
       });
 
@@ -199,10 +177,6 @@ describe("Plots", () => {
         assert.lengthOf(plot.datasets(), 3, "there are three datasets initially");
         plot.removeDataset("foofoofoofoofoofoofoofoo");
         assert.lengthOf(plot.datasets(), 3, "there are three datasets after bad key removal");
-        plot.removeDataset(undefined);
-        assert.lengthOf(plot.datasets(), 3, "there are three datasets after removing `undefined`");
-        plot.removeDataset([94,93,92]);
-        assert.lengthOf(plot.datasets(), 3, "there are three datasets after removing random dataset");
         plot.removeDataset("undefined");
         assert.lengthOf(plot.datasets(), 2, "the dataset called 'undefined' could be removed");
       });
@@ -246,10 +220,10 @@ describe("Plots", () => {
       plot2.addDataset(d2);
       assertDomainIsClose(scale1.domain(), [1, 999], "scale extent includes plot1 and plot2");
 
-      plot2.addDataset(d3);
+      plot2.addDataset("d3", d3);
       assertDomainIsClose(scale1.domain(), [-3, 999], "extent widens further if we add more data to plot2");
 
-      plot2.removeDataset(d3);
+      plot2.removeDataset("d3");
       assertDomainIsClose(scale1.domain(), [1, 999], "extent shrinks if we remove dataset");
 
       plot2.attr("null", id, scale2);

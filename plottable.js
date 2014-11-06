@@ -1563,7 +1563,7 @@ var Plottable;
         }
         Dataset.prototype.data = function (data) {
             if (data == null) {
-                return this._data;
+                return this._data.slice();
             }
             else {
                 this._data = data;
@@ -6390,21 +6390,13 @@ var Plottable;
                 }
                 return this;
             };
-            AbstractPlot.prototype.removeDataset = function (datasetOrKeyOrArray) {
-                var key;
-                if (typeof (datasetOrKeyOrArray) === "string") {
-                    key = datasetOrKeyOrArray;
-                }
-                else if (datasetOrKeyOrArray instanceof Plottable.Dataset || datasetOrKeyOrArray instanceof Array) {
-                    var array = (datasetOrKeyOrArray instanceof Plottable.Dataset) ? this.datasets() : this.datasets().map(function (d) { return d.data(); });
-                    var idx = array.indexOf(datasetOrKeyOrArray);
-                    if (idx !== -1) {
-                        key = this._datasetKeysInOrder[idx];
-                    }
-                }
-                return this._removeDataset(key);
-            };
-            AbstractPlot.prototype._removeDataset = function (key) {
+            /**
+             * Removes a dataset by string key
+             *
+             * @param {string} key The key of the dataset
+             * @return {Plot} The calling Plot.
+             */
+            AbstractPlot.prototype.removeDataset = function (key) {
                 if (key != null && this._key2DatasetDrawerKey.has(key)) {
                     var ddk = this._key2DatasetDrawerKey.get(key);
                     ddk.drawer.remove();
