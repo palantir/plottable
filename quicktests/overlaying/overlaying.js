@@ -57,7 +57,6 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
         console.warn("Tried to load nonexistant quicktest " + name);
         return;
       }
-      var x = new Function(text);
       text = "(function(){" + text +
           "\nreturn {makeData: makeData, run: run};" +
                "})();" +
@@ -74,9 +73,9 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
       runQuickTest(result, firstsvg, data, firstBranch);
       runQuickTest(result, secondsvg, data, secondBranch);
     });
-  });//forEach
+  });
     
-} //loadQuickTestCategory
+}
 
 //filter all quicktests by category from list_of_quicktests.json
 function filterQuickTests(category, branchList){
@@ -111,7 +110,6 @@ function loadPlottableBranches(category, branchList){
     } else {
       listOfUrl.push("/plottable.js"); //load local version
     }
-
   });
 
   $.getScript(listOfUrl[0], function(data, textStatus) { 
@@ -127,8 +125,8 @@ function loadPlottableBranches(category, branchList){
         }
       });
     }
-    if(textStatus === "error"){
-      console.log("errored!");
+    else if(textStatus === "error"){
+      console.log("could not retrieve Plottable branch, check if branch name " + branch + " is correct!");
     }
 
   });
@@ -210,14 +208,14 @@ window.onkeyup = function(e){
 };
 
 $("#help").hover(function(){
-  $("#instructions").fadeIn('fast');
+  $("#test-category-descriptions").fadeIn('fast');
 }, function() {
     // Hover out code
-    $("#instructions").css("display", "none");
+    $("#test-category-descriptions").css("display", "none");
 }).mousemove(function(e) {
     var mouseX = e.pageX; //Get X coordinates
     var mouseY = e.pageY; //Get Y coordinates
-    $("#instructions").css({ top: mouseY + 20, left: mouseX - 330 });
+    $("#test-category-descriptions").css({ top: mouseY + 20, left: mouseX - 330 });
 });
 
 var button = document.getElementById("render");

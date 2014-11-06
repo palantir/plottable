@@ -48,9 +48,6 @@ h2{
   font-size: 13px;
 }
 
-#category{
-  padding-top: 6px;
-}
 input, select{
   position: relative;
   border: solid 1px;
@@ -62,6 +59,12 @@ input, select{
   font-weight: 100;
   font-size: 13px;
   text-align: center;
+}
+
+#category{
+    -moz-appearance: none;
+    text-indent: 0.01px;
+    text-overflow: '';
 }
 
 .button{
@@ -100,7 +103,7 @@ input, select{
   margin-right: 10px;
 }
 
-#instructions{
+#test-category-descriptions{
   width: 300px;
   display: none;
   position: absolute;
@@ -110,10 +113,8 @@ input, select{
   border-radius:5px;
   padding:10px;
   color:#fff;
-}
-
-#instructions p {
   font-size: 13px;
   font-weight: lighter;
+
 }
 
