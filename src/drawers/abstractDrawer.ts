@@ -81,6 +81,14 @@ export module _Drawer {
       return modifiedAttrToProjector;
     }
 
+    public _prepareDrawSteps(drawSteps: DrawStep[]) {
+      // no-op
+    }
+
+    public _prepareData(data: any[], drawSteps: DrawStep[]) {
+      return data;
+    }
+
     /**
      * Draws the data into the renderArea using the spefic steps and metadata
      *
@@ -90,18 +98,22 @@ export module _Drawer {
      * @param{any} plotMetadata The metadata provided by plot
      */
     public draw(data: any[], drawSteps: DrawStep[], userMetadata: any = {}, plotMetadata: any = {}) {
-      var modifiedDrawSteps = drawSteps.map((dr: DrawStep) => {
+      var appliedDrawSteps = drawSteps.map((dr: DrawStep) => {
         return {
           attrToProjector: this.applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
           animator: dr.animator
         };
       });
 
-      this._enterData(data);
-      var numberOfIterations = this._numberOfAnimationIterations(data);
+      var preparedData = this._prepareData(data, appliedDrawSteps);
+
+      this._prepareDrawSteps(appliedDrawSteps);
+
+      this._enterData(preparedData);
+      var numberOfIterations = this._numberOfAnimationIterations(preparedData);
 
       var delay = 0;
-      modifiedDrawSteps.forEach((drawStep, i) => {
+      appliedDrawSteps.forEach((drawStep, i) => {
         _Util.Methods.setTimeout(() => this._drawStep(drawStep), delay);
         delay += drawStep.animator.getTiming(numberOfIterations);
       });

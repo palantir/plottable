@@ -37,7 +37,7 @@ export module Plot {
     }
 
     public _getDataToDraw() {
-      var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+      var accessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
       var innerScale = this.makeInnerScale();
       var clusters: D3.Map<any[]> = d3.map();
       this._datasetKeysInOrder.forEach((key: string) => {
@@ -59,14 +59,14 @@ export module Plot {
       var innerScale = new Scale.Ordinal();
       innerScale.domain(this._datasetKeysInOrder);
       // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
-      if (!this._projectors["width"]) {
+      if (!this._projections["width"]) {
         var secondaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._xScale : this._yScale;
         var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
                       && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
         var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
         innerScale.range([0, constantWidth]);
       } else {
-        var projector = this._projectors["width"];
+        var projector = this._projections["width"];
         var accessor = projector.accessor;
         var scale = projector.scale;
         var fn = scale ? (d: any, i: number) => scale.scale(accessor(d, i)) : accessor;

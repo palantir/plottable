@@ -92,21 +92,6 @@ var Plottable;
             }
             Methods.accessorize = accessorize;
             /**
-             * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata.
-             * Temporarily always grabs the metadata of the first dataset.
-             * HACKHACK #1089 - The accessor currently only grabs the first dataset's metadata
-             */
-            function _applyAccessor(accessor, plot) {
-                var activatedAccessor = accessorize(accessor);
-                return function (d, i) {
-                    var datasets = plot.datasets();
-                    var dataset = datasets.length > 0 ? datasets[0] : null;
-                    var metadata = dataset ? dataset.metadata() : null;
-                    return activatedAccessor(d, i, metadata);
-                };
-            }
-            Methods._applyAccessor = _applyAccessor;
-            /**
              * Takes two sets and returns the union
              *
              * Due to the fact that D3.Sets store strings internally, return type is always a string set
@@ -1583,16 +1568,19 @@ var Plottable;
                 return this;
             }
         };
-        Dataset.prototype._getExtent = function (accessor, typeCoercer) {
+        Dataset.prototype._getExtent = function (accessor, typeCoercer, plotMetadata) {
+            if (plotMetadata === void 0) { plotMetadata = {}; }
             var cachedExtent = this.accessor2cachedExtent.get(accessor);
             if (cachedExtent === undefined) {
-                cachedExtent = this.computeExtent(accessor, typeCoercer);
+                cachedExtent = this.computeExtent(accessor, typeCoercer, plotMetadata);
                 this.accessor2cachedExtent.set(accessor, cachedExtent);
             }
             return cachedExtent;
         };
-        Dataset.prototype.computeExtent = function (accessor, typeCoercer) {
-            var mappedData = this._data.map(accessor).map(typeCoercer);
+        Dataset.prototype.computeExtent = function (accessor, typeCoercer, plotMetadata) {
+            var _this = this;
+            var appliedAccessor = function (d, i) { return accessor(d, i, _this._metadata, plotMetadata); };
+            var mappedData = this._data.map(appliedAccessor).map(typeCoercer);
             if (mappedData.length === 0) {
                 return [];
             }
@@ -3186,6 +3174,12 @@ var Plottable;
                 });
                 return modifiedAttrToProjector;
             };
+            AbstractDrawer.prototype._prepareDrawSteps = function (drawSteps) {
+                // no-op
+            };
+            AbstractDrawer.prototype._prepareData = function (data, drawSteps) {
+                return data;
+            };
             /**
              * Draws the data into the renderArea using the spefic steps and metadata
              *
@@ -3198,16 +3192,18 @@ var Plottable;
                 var _this = this;
                 if (userMetadata === void 0) { userMetadata = {}; }
                 if (plotMetadata === void 0) { plotMetadata = {}; }
-                var modifiedDrawSteps = drawSteps.map(function (dr) {
+                var appliedDrawSteps = drawSteps.map(function (dr) {
                     return {
                         attrToProjector: _this.applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
                         animator: dr.animator
                     };
                 });
-                this._enterData(data);
-                var numberOfIterations = this._numberOfAnimationIterations(data);
+                var preparedData = this._prepareData(data, appliedDrawSteps);
+                this._prepareDrawSteps(appliedDrawSteps);
+                this._enterData(preparedData);
+                var numberOfIterations = this._numberOfAnimationIterations(preparedData);
                 var delay = 0;
-                modifiedDrawSteps.forEach(function (drawStep, i) {
+                appliedDrawSteps.forEach(function (drawStep, i) {
                     Plottable._Util.Methods.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
                     delay += drawStep.animator.getTiming(numberOfIterations);
                 });
@@ -3406,19 +3402,17 @@ var Plottable;
             Element.prototype.filterDefinedData = function (data, definedFunction) {
                 return definedFunction ? data.filter(definedFunction) : data;
             };
-            Element.prototype.draw = function (data, drawSteps) {
-                var _this = this;
-                var modifiedDrawSteps = [];
-                drawSteps.forEach(function (d, i) {
-                    modifiedDrawSteps[i] = { animator: d.animator, attrToProjector: Plottable._Util.Methods.copyMap(d.attrToProjector) };
-                });
-                var definedData = modifiedDrawSteps.reduce(function (data, drawStep) { return _this.filterDefinedData(data, drawStep.attrToProjector["defined"]); }, data);
-                modifiedDrawSteps.forEach(function (d) {
+            Element.prototype._prepareDrawSteps = function (drawSteps) {
+                _super.prototype._prepareDrawSteps.call(this, drawSteps);
+                drawSteps.forEach(function (d) {
                     if (d.attrToProjector["defined"]) {
                         delete d.attrToProjector["defined"];
                     }
                 });
-                return _super.prototype.draw.call(this, definedData, modifiedDrawSteps);
+            };
+            Element.prototype._prepareData = function (data, drawSteps) {
+                var _this = this;
+                return drawSteps.reduce(function (data, drawStep) { return _this.filterDefinedData(data, drawStep.attrToProjector["defined"]); }, _super.prototype._prepareData.call(this, data, drawSteps));
             };
             return Element;
         })(_Drawer.AbstractDrawer);
@@ -6190,7 +6184,7 @@ var Plottable;
             function AbstractPlot() {
                 _super.call(this);
                 this._dataChanged = false;
-                this._projectors = {};
+                this._projections = {};
                 this._animate = false;
                 this._animators = {};
                 this._ANIMATION_DURATION = 250; // milliseconds
@@ -6219,9 +6213,9 @@ var Plottable;
                 _super.prototype.remove.call(this);
                 this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
                 // deregister from all scales
-                var properties = Object.keys(this._projectors);
+                var properties = Object.keys(this._projections);
                 properties.forEach(function (property) {
-                    var projector = _this._projectors[property];
+                    var projector = _this._projections[property];
                     if (projector.scale) {
                         projector.scale.broadcaster.deregisterListener(_this);
                     }
@@ -6306,7 +6300,7 @@ var Plottable;
             AbstractPlot.prototype.project = function (attrToSet, accessor, scale) {
                 var _this = this;
                 attrToSet = attrToSet.toLowerCase();
-                var currentProjection = this._projectors[attrToSet];
+                var currentProjection = this._projections[attrToSet];
                 var existingScale = currentProjection && currentProjection.scale;
                 if (existingScale) {
                     this._datasetKeysInOrder.forEach(function (key) {
@@ -6317,8 +6311,8 @@ var Plottable;
                 if (scale) {
                     scale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
-                var activatedAccessor = Plottable._Util.Methods._applyAccessor(accessor, this);
-                this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
+                var activatedAccessor = Plottable._Util.Methods.accessorize(accessor);
+                this._projections[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
                 this._updateScaleExtent(attrToSet);
                 this._render(); // queue a re-render upon changing projector
                 return this;
@@ -6326,11 +6320,15 @@ var Plottable;
             AbstractPlot.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var h = {};
-                d3.keys(this._projectors).forEach(function (a) {
-                    var projector = _this._projectors[a];
-                    var accessor = projector.accessor;
-                    var scale = projector.scale;
-                    var fn = scale ? function (d, i) { return scale.scale(accessor(d, i)); } : accessor;
+                d3.keys(this._projections).forEach(function (a) {
+                    var projection = _this._projections[a];
+                    var accessor = projection.accessor;
+                    var scale = projection.scale;
+                    var fn = scale ? function (d, i, u, m) {
+                        if (u === void 0) { u = {}; }
+                        if (m === void 0) { m = {}; }
+                        return scale.scale(accessor(d, i, u, m));
+                    } : accessor;
                     h[a] = fn;
                 });
                 return h;
@@ -6358,19 +6356,19 @@ var Plottable;
                 return this;
             };
             /**
-             * This function makes sure that all of the scales in this._projectors
+             * This function makes sure that all of the scales in this._projections
              * have an extent that includes all the data that is projected onto them.
              */
             AbstractPlot.prototype._updateScaleExtents = function () {
                 var _this = this;
-                d3.keys(this._projectors).forEach(function (attr) { return _this._updateScaleExtent(attr); });
+                d3.keys(this._projections).forEach(function (attr) { return _this._updateScaleExtent(attr); });
             };
             AbstractPlot.prototype._updateScaleExtent = function (attr) {
                 var _this = this;
-                var projector = this._projectors[attr];
+                var projector = this._projections[attr];
                 if (projector.scale) {
                     this._key2PlotDatasetKey.forEach(function (key, ddk) {
-                        var extent = ddk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer);
+                        var extent = ddk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer, ddk.metadata);
                         var scaleKey = _this._plottableID.toString() + "_" + key;
                         if (extent.length === 0 || !_this._isAnchored) {
                             projector.scale._removeExtent(scaleKey, attr);
@@ -6426,7 +6424,7 @@ var Plottable;
                 if (key != null && this._key2PlotDatasetKey.has(key)) {
                     var ddk = this._key2PlotDatasetKey.get(key);
                     ddk.drawer.remove();
-                    var projectors = d3.values(this._projectors);
+                    var projectors = d3.values(this._projections);
                     var scaleKey = this._plottableID.toString() + "_" + key;
                     projectors.forEach(function (p) {
                         if (p.scale != null) {
@@ -6539,7 +6537,7 @@ var Plottable;
                     attrToProjector["fill"] = function (d, i) { return Pie.DEFAULT_COLOR_SCALE.scale(String(i)); };
                 }
                 var defaultAccessor = function (d) { return d.value; };
-                var valueProjector = this._projectors["value"];
+                var valueProjector = this._projections["value"];
                 attrToProjector["value"] = valueProjector ? valueProjector.accessor : defaultAccessor;
                 return attrToProjector;
             };
@@ -6655,9 +6653,9 @@ var Plottable;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var positionXFn = attrToProjector["x"];
                 var positionYFn = attrToProjector["y"];
-                attrToProjector["defined"] = function (d, i) {
-                    var positionX = positionXFn(d, i);
-                    var positionY = positionYFn(d, i);
+                attrToProjector["defined"] = function (d, i, u, m) {
+                    var positionX = positionXFn(d, i, u, m);
+                    var positionY = positionYFn(d, i, u, m);
                     return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
                 };
                 return attrToProjector;
@@ -6718,8 +6716,8 @@ var Plottable;
             };
             AbstractXYPlot.prototype.normalizeDatasets = function (fromX) {
                 var flattenDatasets = Plottable._Util.Methods.flatten(this.datasets().map(function (d) { return d.data(); }));
-                var aAccessor = this._projectors[fromX ? "x" : "y"].accessor;
-                var bAccessor = this._projectors[fromX ? "y" : "x"].accessor;
+                var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
+                var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
                 return flattenDatasets.map(function (d, i) {
                     return { a: aAccessor(d, i), b: bAccessor(d, i) };
                 });
@@ -6921,7 +6919,7 @@ var Plottable;
             Grid.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 if (attrToSet === "fill") {
-                    this._colorScale = this._projectors["fill"].scale;
+                    this._colorScale = this._projections["fill"].scale;
                 }
                 return this;
             };
@@ -7190,7 +7188,7 @@ var Plottable;
                 attrToProjector["height"] = function (d, i) {
                     return Math.abs(scaledBaseline - originalPositionFn(d, i));
                 };
-                var primaryAccessor = this._projectors[primaryAttr].accessor;
+                var primaryAccessor = this._projections[primaryAttr].accessor;
                 if (this.barLabelsEnabled && this.barLabelFormatter) {
                     attrToProjector["label"] = function (d, i) {
                         return _this._barLabelFormatter(primaryAccessor(d, i));
@@ -7226,7 +7224,7 @@ var Plottable;
                     }
                 }
                 else {
-                    var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                    var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
                     var barAccessorData = d3.set(Plottable._Util.Methods.flatten(this.datasets().map(function (dataset) {
                         return dataset.data().map(function (d, i) { return barAccessor(d, i); });
                     }))).values();
@@ -7448,8 +7446,8 @@ var Plottable;
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
-            Line.prototype._rejectNullsAndNaNs = function (d, i, projector) {
-                var value = projector(d, i);
+            Line.prototype._rejectNullsAndNaNs = function (d, i, userMetdata, plotMetadata, accessor) {
+                var value = accessor(d, i, userMetdata, plotMetadata);
                 return value != null && value === value;
             };
             Line.prototype._getDrawer = function (key) {
@@ -7484,11 +7482,11 @@ var Plottable;
                 var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
                 singleDatumAttributes.forEach(function (attribute) {
                     var projector = attrToProjector[attribute];
-                    attrToProjector[attribute] = function (data, i) { return data.length > 0 ? projector(data[0], i) : null; };
+                    attrToProjector[attribute] = function (data, i, u, m) { return data.length > 0 ? projector(data[0], i, u, m) : null; };
                 });
                 var xFunction = attrToProjector["x"];
                 var yFunction = attrToProjector["y"];
-                attrToProjector["defined"] = function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); };
+                attrToProjector["defined"] = function (d, i, u, m) { return _this._rejectNullsAndNaNs(d, i, u, m, xFunction) && _this._rejectNullsAndNaNs(d, i, u, m, yFunction); };
                 return attrToProjector;
             };
             Line.prototype._wholeDatumAttributes = function () {
@@ -7546,7 +7544,7 @@ var Plottable;
                 var _this = this;
                 _super.prototype._updateYDomainer.call(this);
                 var constantBaseline;
-                var y0Projector = this._projectors["y0"];
+                var y0Projector = this._projections["y0"];
                 var y0Accessor = y0Projector && y0Projector.accessor;
                 if (y0Accessor != null) {
                     var extents = this.datasets().map(function (d) { return d._getExtent(y0Accessor, _this._yScale._typeCoercer); });
@@ -7632,7 +7630,7 @@ var Plottable;
             };
             ClusteredBar.prototype._getDataToDraw = function () {
                 var _this = this;
-                var accessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                var accessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
                 var innerScale = this.makeInnerScale();
                 var clusters = d3.map();
                 this._datasetKeysInOrder.forEach(function (key) {
@@ -7652,14 +7650,14 @@ var Plottable;
                 var innerScale = new Plottable.Scale.Ordinal();
                 innerScale.domain(this._datasetKeysInOrder);
                 // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
-                if (!this._projectors["width"]) {
+                if (!this._projections["width"]) {
                     var secondaryScale = this._isVertical ? this._xScale : this._yScale;
                     var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                     var constantWidth = bandsMode ? secondaryScale.rangeBand() : Plot.AbstractBarPlot._DEFAULT_WIDTH;
                     innerScale.range([0, constantWidth]);
                 }
                 else {
-                    var projector = this._projectors["width"];
+                    var projector = this._projections["width"];
                     var accessor = projector.accessor;
                     var scale = projector.scale;
                     var fn = scale ? function (d, i) { return scale.scale(accessor(d, i)); } : accessor;
@@ -7692,7 +7690,7 @@ var Plottable;
             }
             AbstractStacked.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
-                if (this._projectors["x"] && this._projectors["y"] && (attrToSet === "x" || attrToSet === "y")) {
+                if (this._projections["x"] && this._projections["y"] && (attrToSet === "x" || attrToSet === "y")) {
                     this._updateStackOffsets();
                 }
                 return this;
@@ -7700,7 +7698,7 @@ var Plottable;
             AbstractStacked.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
                 // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
-                if (this._datasetKeysInOrder && this._projectors["x"] && this._projectors["y"]) {
+                if (this._datasetKeysInOrder && this._projections["x"] && this._projections["y"]) {
                     this._updateStackOffsets();
                 }
             };
@@ -7815,10 +7813,10 @@ var Plottable;
                 }
             };
             AbstractStacked.prototype._keyAccessor = function () {
-                return this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                return this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
             };
             AbstractStacked.prototype._valueAccessor = function () {
-                return this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+                return this._isVertical ? this._projections["y"].accessor : this._projections["x"].accessor;
             };
             return AbstractStacked;
         })(Plot.AbstractXYPlot);
@@ -7862,7 +7860,7 @@ var Plottable;
             };
             StackedArea.prototype._updateStackOffsets = function () {
                 var domainKeys = this._getDomainKeys();
-                var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                var keyAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
                 var keySets = this.datasets().map(function (dataset) { return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i).toString(); })).values(); });
                 if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
                     Plottable._Util.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
@@ -7895,7 +7893,7 @@ var Plottable;
             StackedArea.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var yAccessor = this._projectors["y"].accessor;
+                var yAccessor = this._projections["y"].accessor;
                 attrToProjector["y"] = function (d) { return _this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 attrToProjector["y0"] = function (d) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 // Align fill with first index
@@ -7959,7 +7957,7 @@ var Plottable;
                 var attrToProjector = Plot.AbstractBarPlot.prototype._generateAttrToProjector.apply(this);
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                var primaryAccessor = this._projectors[primaryAttr].accessor;
+                var primaryAccessor = this._projections[primaryAttr].accessor;
                 var getStart = function (d) { return primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 var getEnd = function (d) { return primaryScale.scale(+primaryAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 var heightF = function (d) { return Math.abs(getEnd(d) - getStart(d)); };

@@ -36,9 +36,9 @@ export module _Drawer {
       }
     }
 
-    private createArea(xFunction: AppliedAccessor,
-                       y0Function: AppliedAccessor,
-                       y1Function: AppliedAccessor,
+    private createArea(xFunction: _Projector,
+                       y0Function: _Projector,
+                       y1Function: _Projector,
                        definedFunction: (d: any, i: number) => boolean) {
       if(!definedFunction) {
         definedFunction = () => true;

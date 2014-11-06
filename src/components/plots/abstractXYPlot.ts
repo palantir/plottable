@@ -103,9 +103,9 @@ export module Plot {
       var attrToProjector: AttributeToProjector = super._generateAttrToProjector();
       var positionXFn = attrToProjector["x"];
       var positionYFn = attrToProjector["y"];
-      attrToProjector["defined"] = (d: any, i: number) => {
-        var positionX = positionXFn(d, i);
-        var positionY = positionYFn(d, i);
+      attrToProjector["defined"] = (d: any, i: number, u: any, m: any) => {
+        var positionX = positionXFn(d, i, u, m);
+        var positionY = positionYFn(d, i, u, m);
         return positionX != null && positionX === positionX &&
                positionY != null && positionY === positionY;
       };
@@ -176,8 +176,8 @@ export module Plot {
 
     private normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
       var flattenDatasets = _Util.Methods.flatten(this.datasets().map(d => d.data()));
-      var aAccessor: (d: any, i: number) => A = this._projectors[fromX ? "x" : "y"].accessor;
-      var bAccessor: (d: any, i: number) => B = this._projectors[fromX ? "y" : "x"].accessor;
+      var aAccessor: (d: any, i: number) => A = this._projections[fromX ? "x" : "y"].accessor;
+      var bAccessor: (d: any, i: number) => B = this._projections[fromX ? "y" : "x"].accessor;
       return flattenDatasets.map((d, i) => { return { a: aAccessor(d, i), b: bAccessor(d, i) }; });
     }
 

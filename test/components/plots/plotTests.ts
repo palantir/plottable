@@ -85,9 +85,6 @@ describe("Plots", () => {
       assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
       assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
-      var metaProjector = r._generateAttrToProjector()["meta"];
-      assert.equal(metaProjector(null, 0), "bar", "plot projector used the right metadata");
-
       var d2 = new Plottable.Dataset([{x: 7, y: 8}], {cssClass: "boo"});
       r.removeDataset("d1");
       r.addDataset(d2);
@@ -101,9 +98,6 @@ describe("Plots", () => {
       d2.broadcaster.broadcast();
       assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
       assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
-
-      metaProjector = r._generateAttrToProjector()["meta"];
-      assert.equal(metaProjector(null, 0), "boo", "plot projector used the right metadata");
 
     });
 

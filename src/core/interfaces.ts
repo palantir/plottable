@@ -1,20 +1,13 @@
 module Plottable {
   export interface _Accessor {
-    (datum: any, index?: number, metadata?: any): any;
+    (datum: any, index?: number, userMetadata?: any, plotMetadata?: any): any;
   };
 
-  /**
-   * A function to map across the data in a DataSource. For example, if your
-   * data looked like `{foo: 5, bar: 6}`, then a popular function might be
-   * `function(d) { return d.foo; }`.
-   *
-   * Index, if used, will be the index of the datum in the array.
-   */
-  export interface AppliedAccessor {
+  export interface _Projector {
     (datum?: any, index?: number, userMetadata?: any, plotMetadata?: any) : any;
   }
 
-  export interface _Projector {
+  export interface _Projection {
     accessor: _Accessor;
     scale?: Scale.AbstractScale<any, any>;
     attribute: string;
@@ -29,7 +22,7 @@ module Plottable {
    * function(d) { return foo + bar; }`.
    */
   export interface AttributeToProjector {
-    [attrToSet: string]: AppliedAccessor;
+    [attrToSet: string]: _Projector;
   }
 
   /**

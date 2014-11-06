@@ -45,7 +45,7 @@ export module Plot {
 
       var primaryAttr = this._isVertical ? "y" : "x";
       var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-      var primaryAccessor = this._projectors[primaryAttr].accessor;
+      var primaryAccessor = this._projections[primaryAttr].accessor;
       var getStart = (d: any) => primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
       var getEnd = (d: any) => primaryScale.scale(+primaryAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
@@ -104,11 +104,11 @@ export module Plot {
       AbstractStacked.prototype._updateScaleExtents.call(this);
     }
 
-    public _keyAccessor(): AppliedAccessor {
+    public _keyAccessor(): _Accessor {
       return AbstractStacked.prototype._keyAccessor.call(this);
     }
 
-    public _valueAccessor(): AppliedAccessor {
+    public _valueAccessor(): _Accessor {
       return AbstractStacked.prototype._valueAccessor.call(this);
     }
     //===== /Stack logic =====

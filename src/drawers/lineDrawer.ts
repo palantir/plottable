@@ -20,7 +20,7 @@ export module _Drawer {
       super.setup(area);
     }
 
-    private createLine(xFunction: AppliedAccessor, yFunction: AppliedAccessor, definedFunction: (d: any, i: number) => boolean) {
+    private createLine(xFunction: _Projector, yFunction: _Projector, definedFunction: (d: any, i: number) => boolean) {
       if(!definedFunction) {
         definedFunction = () => true;
       }

@@ -40,12 +40,6 @@ declare module Plottable {
              */
             function accessorize(accessor: any): _Accessor;
             /**
-             * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata.
-             * Temporarily always grabs the metadata of the first dataset.
-             * HACKHACK #1089 - The accessor currently only grabs the first dataset's metadata
-             */
-            function _applyAccessor(accessor: _Accessor, plot: Plot.AbstractPlot): (d: any, i: number) => any;
-            /**
              * Takes two sets and returns the union
              *
              * Due to the fact that D3.Sets store strings internally, return type is always a string set
@@ -693,7 +687,7 @@ declare module Plottable {
          * @returns {Dataset} The calling Dataset.
          */
         metadata(metadata: any): Dataset;
-        _getExtent(accessor: _Accessor, typeCoercer: (d: any) => any): any[];
+        _getExtent(accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata?: any): any[];
     }
 }
 
@@ -838,19 +832,12 @@ declare module Plottable {
 
 declare module Plottable {
     interface _Accessor {
-        (datum: any, index?: number, metadata?: any): any;
-    }
-    /**
-     * A function to map across the data in a DataSource. For example, if your
-     * data looked like `{foo: 5, bar: 6}`, then a popular function might be
-     * `function(d) { return d.foo; }`.
-     *
-     * Index, if used, will be the index of the datum in the array.
-     */
-    interface AppliedAccessor {
-        (datum?: any, index?: number, userMetadata?: any, plotMetadata?: any): any;
+        (datum: any, index?: number, userMetadata?: any, plotMetadata?: any): any;
     }
     interface _Projector {
+        (datum?: any, index?: number, userMetadata?: any, plotMetadata?: any): any;
+    }
+    interface _Projection {
         accessor: _Accessor;
         scale?: Scale.AbstractScale<any, any>;
         attribute: string;
@@ -864,7 +851,7 @@ declare module Plottable {
      * function(d) { return foo + bar; }`.
      */
     interface AttributeToProjector {
-        [attrToSet: string]: AppliedAccessor;
+        [attrToSet: string]: _Projector;
     }
     /**
      * A simple bounding box.
@@ -1614,6 +1601,8 @@ declare module Plottable {
              */
             _drawStep(step: DrawStep): void;
             _numberOfAnimationIterations(data: any[]): number;
+            _prepareDrawSteps(drawSteps: DrawStep[]): void;
+            _prepareData(data: any[], drawSteps: DrawStep[]): any[];
             /**
              * Draws the data into the renderArea using the spefic steps and metadata
              *
@@ -1670,7 +1659,8 @@ declare module Plottable {
             _getDrawSelection(): D3.Selection;
             _drawStep(step: DrawStep): void;
             _enterData(data: any[]): void;
-            draw(data: any[], drawSteps: DrawStep[]): number;
+            _prepareDrawSteps(drawSteps: DrawStep[]): void;
+            _prepareData(data: any[], drawSteps: DrawStep[]): any[];
         }
     }
 }
@@ -2595,8 +2585,8 @@ declare module Plottable {
             _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
             _datasetKeysInOrder: string[];
             _renderArea: D3.Selection;
-            _projectors: {
-                [x: string]: _Projector;
+            _projections: {
+                [x: string]: _Projection;
             };
             _animate: boolean;
             _animators: Animator.PlotAnimatorMap;
@@ -2672,7 +2662,7 @@ declare module Plottable {
             animate(enabled: boolean): AbstractPlot;
             detach(): AbstractPlot;
             /**
-             * This function makes sure that all of the scales in this._projectors
+             * This function makes sure that all of the scales in this._projections
              * have an extent that includes all the data that is projected onto them.
              */
             _updateScaleExtents(): void;
@@ -3084,7 +3074,7 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
-            _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor): boolean;
+            _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
             _getDrawer(key: string): _Drawer.Line;
             _getResetYFunction(): (d: any, i: number) => number;
             _generateDrawSteps(): _Drawer.DrawStep[];
@@ -3113,7 +3103,7 @@ declare module Plottable {
             _getDrawer(key: string): _Drawer.Area;
             _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Area<X>;
-            _getResetYFunction(): AppliedAccessor;
+            _getResetYFunction(): _Projector;
             _wholeDatumAttributes(): string[];
         }
     }
@@ -3168,8 +3158,8 @@ declare module Plottable {
             _getDomainKeys(): string[];
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             _updateScaleExtents(): void;
-            _keyAccessor(): AppliedAccessor;
-            _valueAccessor(): AppliedAccessor;
+            _keyAccessor(): _Accessor;
+            _valueAccessor(): _Accessor;
         }
     }
 }
@@ -3228,8 +3218,8 @@ declare module Plottable {
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             _updateScaleExtents(): void;
-            _keyAccessor(): AppliedAccessor;
-            _valueAccessor(): AppliedAccessor;
+            _keyAccessor(): _Accessor;
+            _valueAccessor(): _Accessor;
             _getBarPixelWidth(): any;
         }
     }
@@ -3402,7 +3392,7 @@ declare module Plottable {
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
             animate(selection: any, attrToProjector: AttributeToProjector): any;
-            _startMovingProjector(attrToProjector: AttributeToProjector): AppliedAccessor;
+            _startMovingProjector(attrToProjector: AttributeToProjector): _Projector;
         }
     }
 }

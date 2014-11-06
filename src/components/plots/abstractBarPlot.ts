@@ -326,7 +326,7 @@ export module Plot {
         return Math.abs(scaledBaseline - originalPositionFn(d, i));
       };
 
-      var primaryAccessor = this._projectors[primaryAttr].accessor;
+      var primaryAccessor = this._projections[primaryAttr].accessor;
       if (this.barLabelsEnabled && this.barLabelFormatter) {
         attrToProjector["label"] = (d: any, i: number) => {
           return this._barLabelFormatter(primaryAccessor(d, i));
@@ -363,7 +363,7 @@ export module Plot {
           barPixelWidth = step * padding * 0.5;
         }
       } else {
-        var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+        var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
 
         var barAccessorData = d3.set(_Util.Methods.flatten(this.datasets().map((dataset) => {
           return dataset.data().map((d, i) => barAccessor(d, i));

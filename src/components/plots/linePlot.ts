@@ -24,8 +24,8 @@ export module Plot {
                                             .easing("exp-in-out");
     }
 
-    public _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor) {
-      var value = projector(d, i);
+    public _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor) {
+      var value = accessor(d, i, userMetdata, plotMetadata);
       return value != null && value === value;
     }
 
@@ -65,12 +65,15 @@ export module Plot {
       var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
       singleDatumAttributes.forEach((attribute: string) => {
         var projector = attrToProjector[attribute];
-        attrToProjector[attribute] = (data: any[], i: number) => data.length > 0 ? projector(data[0], i) : null;
+        attrToProjector[attribute] = (data: any[], i: number, u: any, m: any) =>
+          data.length > 0 ? projector(data[0], i, u, m) : null;
       });
 
       var xFunction       = attrToProjector["x"];
       var yFunction       = attrToProjector["y"];
-      attrToProjector["defined"] = (d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction);
+      attrToProjector["defined"] =
+        (d: any, i: number, u: any, m: any) =>
+          this._rejectNullsAndNaNs(d, i, u, m, xFunction) && this._rejectNullsAndNaNs(d, i, u, m, yFunction);
       return attrToProjector;
     }
 

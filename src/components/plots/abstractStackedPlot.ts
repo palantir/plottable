@@ -14,7 +14,7 @@ export module Plot {
 
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
-      if (this._projectors["x"] && this._projectors["y"] && (attrToSet === "x" || attrToSet === "y")) {
+      if (this._projections["x"] && this._projections["y"] && (attrToSet === "x" || attrToSet === "y")) {
         this._updateStackOffsets();
       }
       return this;
@@ -23,7 +23,7 @@ export module Plot {
     public _onDatasetUpdate() {
       super._onDatasetUpdate();
       // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
-      if (this._datasetKeysInOrder && this._projectors["x"]  && this._projectors["y"]) {
+      if (this._datasetKeysInOrder && this._projections["x"]  && this._projections["y"]) {
         this._updateStackOffsets();
       }
     }
@@ -161,12 +161,12 @@ export module Plot {
       }
     }
 
-    public _keyAccessor(): AppliedAccessor {
-       return this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+    public _keyAccessor(): _Accessor {
+       return this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
     }
 
-    public _valueAccessor(): AppliedAccessor {
-       return this._isVertical ? this._projectors["y"].accessor : this._projectors["x"].accessor;
+    public _valueAccessor(): _Accessor {
+       return this._isVertical ? this._projections["y"].accessor : this._projections["x"].accessor;
     }
   }
 }

@@ -9,7 +9,7 @@ export module _Drawer {
       this._svgElement = "path";
     }
 
-    private createArc(innerRadiusF: AppliedAccessor, outerRadiusF: AppliedAccessor) {
+    private createArc(innerRadiusF: _Projector, outerRadiusF: _Projector) {
       return d3.svg.arc()
                    .innerRadius(innerRadiusF)
                    .outerRadius(outerRadiusF);

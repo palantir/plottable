@@ -8,7 +8,7 @@ export module Plot {
     public _datasetKeysInOrder: string[];
 
     public _renderArea: D3.Selection;
-    public _projectors: { [attrToSet: string]: _Projector; } = {};
+    public _projections: { [attrToSet: string]: _Projection; } = {};
 
     public _animate: boolean = false;
     public _animators: Animator.PlotAnimatorMap = {};
@@ -54,9 +54,9 @@ export module Plot {
       super.remove();
       this._datasetKeysInOrder.forEach((k) => this.removeDataset(k));
       // deregister from all scales
-      var properties = Object.keys(this._projectors);
+      var properties = Object.keys(this._projections);
       properties.forEach((property) => {
-        var projector = this._projectors[property];
+        var projector = this._projections[property];
         if (projector.scale) {
           projector.scale.broadcaster.deregisterListener(this);
         }
@@ -159,7 +159,7 @@ export module Plot {
      */
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
-      var currentProjection = this._projectors[attrToSet];
+      var currentProjection = this._projections[attrToSet];
       var existingScale = currentProjection && currentProjection.scale;
 
       if (existingScale) {
@@ -172,8 +172,8 @@ export module Plot {
       if (scale) {
         scale.broadcaster.registerListener(this, () => this._render());
       }
-      var activatedAccessor = _Util.Methods._applyAccessor(accessor, this);
-      this._projectors[attrToSet] = {accessor: activatedAccessor, scale: scale, attribute: attrToSet};
+      var activatedAccessor = _Util.Methods.accessorize(accessor);
+      this._projections[attrToSet] = {accessor: activatedAccessor, scale: scale, attribute: attrToSet};
       this._updateScaleExtent(attrToSet);
       this._render(); // queue a re-render upon changing projector
       return this;
@@ -181,11 +181,11 @@ export module Plot {
 
     public _generateAttrToProjector(): AttributeToProjector {
       var h: AttributeToProjector = {};
-      d3.keys(this._projectors).forEach((a) => {
-        var projector = this._projectors[a];
-        var accessor = projector.accessor;
-        var scale = projector.scale;
-        var fn = scale ? (d: any, i: number) => scale.scale(accessor(d, i)) : accessor;
+      d3.keys(this._projections).forEach((a) => {
+        var projection = this._projections[a];
+        var accessor = projection.accessor;
+        var scale = projection.scale;
+        var fn = scale ? (d: any, i: number, u: any = {}, m: any = {}) => scale.scale(accessor(d, i, u, m)) : accessor;
         h[a] = fn;
       });
       return h;
@@ -217,18 +217,18 @@ export module Plot {
     }
 
     /**
-     * This function makes sure that all of the scales in this._projectors
+     * This function makes sure that all of the scales in this._projections
      * have an extent that includes all the data that is projected onto them.
      */
     public _updateScaleExtents() {
-      d3.keys(this._projectors).forEach((attr: string) => this._updateScaleExtent(attr));
+      d3.keys(this._projections).forEach((attr: string) => this._updateScaleExtent(attr));
     }
 
     public _updateScaleExtent(attr: string) {
-      var projector = this._projectors[attr];
+      var projector = this._projections[attr];
       if (projector.scale) {
         this._key2PlotDatasetKey.forEach((key, ddk) => {
-          var extent = ddk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer);
+          var extent = ddk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer, ddk.metadata);
           var scaleKey = this._plottableID.toString() + "_" + key;
           if (extent.length === 0 || !this._isAnchored) {
             projector.scale._removeExtent(scaleKey, attr);
@@ -336,7 +336,7 @@ export module Plot {
         var ddk = this._key2PlotDatasetKey.get(key);
         ddk.drawer.remove();
 
-        var projectors = d3.values(this._projectors);
+        var projectors = d3.values(this._projections);
         var scaleKey = this._plottableID.toString() + "_" + key;
         projectors.forEach((p) => {
           if (p.scale != null) {

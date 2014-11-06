@@ -32,7 +32,7 @@ export module Plot {
 
     public _updateStackOffsets() {
       var domainKeys = this._getDomainKeys();
-      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+      var keyAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
       var keySets = this.datasets().map((dataset) => d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i).toString())).values());
 
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
@@ -70,13 +70,13 @@ export module Plot {
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      var yAccessor = this._projectors["y"].accessor;
+      var yAccessor = this._projections["y"].accessor;
       attrToProjector["y"] = (d: any) => this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
       attrToProjector["y0"] = (d: any) => this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
       // Align fill with first index
       var fillProjector = attrToProjector["fill"];
-      attrToProjector["fill"] = (d, i) => (d && d[0]) ? fillProjector(d[0], i) : null;
+      attrToProjector["fill"] = (d: any, i: number) => (d && d[0]) ? fillProjector(d[0], i) : null;
 
       return attrToProjector;
     }
