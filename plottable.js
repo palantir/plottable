@@ -7898,7 +7898,7 @@ var Plottable;
                 attrToProjector["y0"] = function (d) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 // Align fill with first index
                 var fillProjector = attrToProjector["fill"];
-                attrToProjector["fill"] = function (d, i) { return (d && d[0]) ? fillProjector(d[0], i) : null; };
+                attrToProjector["fill"] = function (d, i, u, m) { return (d && d[0]) ? fillProjector(d[0], i, u, m) : null; };
                 return attrToProjector;
             };
             return StackedArea;
