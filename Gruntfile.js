@@ -337,7 +337,8 @@ module.exports = function(grunt) {
       "test-compile",
       "concat:plottable_multifile",
       "sed:plottable_multifile",
-      "clean:tscommand"
+      "clean:tscommand",
+      "update-qt"
   ];
 
   grunt.registerTask("dev-compile", compile_task);
@@ -357,7 +358,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
 
-  grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
+  grunt.registerTask("launch", ["connect", "dev-compile", "watch", "update-qt"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
   grunt.registerTask("test", ["dev-compile", "blanket_mocha", "parallelize:tslint", "jshint", "ts:verify_d_ts"]);
   // Disable saucelabs for external pull requests. Check if we can see the SAUCE_USERNAME

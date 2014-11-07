@@ -66,8 +66,8 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
 
       var div = d3.select("#results").append("div").attr("class", className);
       div.insert("label").text(name);
-      var firstsvg = div.append("div").attr("class", "first").append("svg").attr("width", svgWidth).attr("height", svgHeight);
-      var secondsvg = div.append("div").attr("class", "second").append("svg").attr("width", svgWidth).attr("height", svgHeight);
+      var firstsvg = div.append("div").attr("class", "first").append("svg").attr({width: svgWidth, height: svgHeight});
+      var secondsvg = div.append("div").attr("class", "second").append("svg").attr({width: svgWidth, height: svgHeight});
       var data = result.makeData();
 
       runQuickTest(result, firstsvg, data, firstBranch);
@@ -81,15 +81,9 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
 function filterQuickTests(category, branchList){
   //filter list of quicktests to list of quicktest names to pass to doSomething
   d3.json("list_of_quicktests.json", function (data){
-    data.forEach(function(quicktestobj){
-      var path = quicktestobj.path;
-
-      if (-1 !== path.indexOf("tests/" + category)){
-        var name = path.replace(/.*\/|\.js/g, '');
-        qtestnames.push(name);
-      }
-
-    });
+    var paths = data.map(function(quickTestObj) {return quickTestObj.path;});
+    var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1;});
+    qtestnames = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, '');});
     loadQuickTestsInCategory(qtestnames, category, branchList[0], branchList[1]);
   });
 }
@@ -179,12 +173,11 @@ function processKeyEvent(key, visibleQuickTests){
     var firstBranchInputColor = onePressed || threePressed ? "mediumaquamarine" : "white";
     var secondBranchInputColor = twoPressed || threePressed ? "mediumaquamarine" : "white";
 
-    for(var i = 0; i < visibleQuickTests.length; i++){
-      var quicktest = visibleQuickTests[i];
+    visibleQuickTests.map(function(quicktest){
       $(".first", quicktest).css("display", firstBranchDisplay);
       $(".second", quicktest).css("display", secondBranchDisplay);
       $(branchClassBehind, quicktest).before($(branchClassFront, quicktest));
-    }
+    });
 
     $(".quicktest").css("display", quicktestDisplay);
     $("#branch1").css("background-color", firstBranchInputColor);
