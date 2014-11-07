@@ -111,7 +111,7 @@ export module Plot {
             closestPoint = {
               x: xProjector(d, i),
               y: yProjector(d, i)
-            }
+            };
           }
         });
       });
