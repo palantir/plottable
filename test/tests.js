@@ -1823,7 +1823,7 @@ describe("Plots", function () {
         });
         it("plot auto domain scale to visible points", function () {
             xScale.domain([-3, 3]);
-            assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to viible points");
+            assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
             plot.automaticallyAdjustYScaleOverVisiblePoints(false);
