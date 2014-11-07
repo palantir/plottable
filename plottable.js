@@ -3872,7 +3872,8 @@ var Plottable;
                 // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
                 // They don't need the current URL in the clip path reference.
                 var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-                this._element.attr("clip-path", "url(" + prefix + "#clipPath" + this._plottableID + ")");
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this._plottableID + "\")");
                 var clipPathParent = this.boxContainer.append("clipPath").attr("id", "clipPath" + this._plottableID);
                 this.addBox("clip-rect", clipPathParent);
             };
@@ -6951,7 +6952,6 @@ var Plottable;
              */
             function AbstractBarPlot(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this._baselineValue = 0;
                 this._barAlignmentFactor = 0.5;
                 this._barLabelFormatter = Plottable.Formatters.identity();
                 this._barLabelsEnabled = false;
@@ -6962,7 +6962,7 @@ var Plottable;
                 this._animators["bars-reset"] = new Plottable.Animator.Null();
                 this._animators["bars"] = new Plottable.Animator.Base();
                 this._animators["baseline"] = new Plottable.Animator.Null();
-                this.baseline(this._baselineValue);
+                this.baseline(0);
             }
             AbstractBarPlot.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Rect(key, this._isVertical);
