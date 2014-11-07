@@ -147,18 +147,15 @@ describe("Plots", () => {
       var expectedDatum = twoPointData[1];
       assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
       var hoverTarget = hoverData.selection;
-      var bbox = (<any> hoverTarget.node()).getBBox();
-      assert.strictEqual(bbox, {}, "travis logging BBox");
-      assert.strictEqual(bbox.x, xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
-      assert.strictEqual(bbox.y, yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
+      assert.strictEqual(parseFloat(hoverTarget.attr("cx")), xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
+      assert.strictEqual(parseFloat(hoverTarget.attr("cy")), yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
 
       hoverData = linePlot._doHover({ x: 0, y: 0 });
       expectedDatum = dataset2[0];
       assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
       hoverTarget = hoverData.selection;
-      bbox = (<any> hoverTarget.node()).getBBox();
-      assert.strictEqual(bbox.x, xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
-      assert.strictEqual(bbox.y, yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
+      assert.strictEqual(parseFloat(hoverTarget.attr("cx")), xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
+      assert.strictEqual(parseFloat(hoverTarget.attr("cy")), yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
 
       svg.remove();
     });
