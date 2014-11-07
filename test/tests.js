@@ -1073,8 +1073,9 @@ describe("Labels", function () {
         var svg = generateSVG(400, 200);
         var testLabel = new Plottable.Component.Label("testing label").padding(30);
         testLabel.renderTo(svg);
-        assert.closeTo(testLabel.width(), 168, 1, "width incorporates the padding");
-        assert.closeTo(testLabel.height(), 84, 1, "height incorporates the padding");
+        var measure = Plottable._Util.Text.getTextMeasurer(svg.append("text"))("testing label");
+        assert.closeTo(testLabel.width(), measure.width + 2 * testLabel.padding(), 1, "width incorporates the padding");
+        assert.closeTo(testLabel.height(), measure.height + 2 * testLabel.padding(), 1, "height incorporates the padding");
         svg.remove();
     });
 });
