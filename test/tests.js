@@ -6748,7 +6748,7 @@ describe("Interactions", function () {
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
             svg.remove();
         });
-        it("correctly triggers callbacks (hoizontal)", function () {
+        it("correctly triggers callbacks (horizontal)", function () {
             var svg = generateSVG(400, 400);
             var barPlot = new Plottable.Plot.HorizontalBar(linearScale, ordinalScale).addDataset(dataset);
             barPlot.project("y", "name", ordinalScale).project("x", "value", linearScale);
@@ -6764,10 +6764,10 @@ describe("Interactions", function () {
             barPlot.renderTo(svg);
             barPlot.registerInteraction(bhi);
             var hitbox = barPlot._element.select(".hit-box");
-            triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
-            assert.deepEqual(barDatum, dataset[1], "the first bar was selected (point mode)");
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 150);
+            assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
             barDatum = null;
-            triggerFakeMouseEvent("mousemove", hitbox, 201, 250);
+            triggerFakeMouseEvent("mousemove", hitbox, 201, 150);
             assert.isNull(barDatum, "hover callback isn't called if the hovered bar didn't change");
             triggerFakeMouseEvent("mousemove", hitbox, 10, 10);
             assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing away from a bar");
@@ -6782,8 +6782,8 @@ describe("Interactions", function () {
             triggerFakeMouseEvent("mousemove", hitbox, 200, 100);
             assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing from one bar to another");
             bhi.hoverMode("line");
-            triggerFakeMouseEvent("mousemove", hitbox, 399, 250);
-            assert.deepEqual(barDatum, dataset[1], "the first bar was selected (line mode)");
+            triggerFakeMouseEvent("mousemove", hitbox, 399, 150);
+            assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
             svg.remove();
         });
     });
