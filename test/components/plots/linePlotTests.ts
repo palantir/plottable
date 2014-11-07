@@ -156,7 +156,8 @@ describe("Plots", () => {
       assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
       hoverTarget = hoverData.selection;
       bbox = (<any> hoverTarget.node()).getBBox();
-      assert.strictEqual(bbox.x, 0, "hover target was positioned correctly (x)");
+      assert.strictEqual(bbox, {}, "travis logging BBox");
+      assert.strictEqual(bbox.x, xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
       assert.strictEqual(bbox.y, yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
 
       svg.remove();
