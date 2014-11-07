@@ -4,7 +4,7 @@ module Plottable {
 export module Plot {
   export class Line<X> extends AbstractXYPlot<X,number> implements Interaction.Hoverable {
     private hoverDetectionRadius = 15;
-    private fakeHoverTarget: D3.Selection;
+    private hoverTarget: D3.Selection;
 
     public _yScale: Scale.AbstractQuantitative<number>;
 
@@ -28,8 +28,8 @@ export module Plot {
 
     public _setup() {
       super._setup();
-      this.fakeHoverTarget = this._foregroundContainer.append("circle")
-                                          .classed("fake-hover-target", true)
+      this.hoverTarget = this._foregroundContainer.append("circle")
+                                          .classed("hover-target", true)
                                           .style("visibility", "hidden");
     }
 
@@ -143,7 +143,7 @@ export module Plot {
       }
 
       var closestPoint = closestInfo.closestPoint;
-      this.fakeHoverTarget.attr({
+      this.hoverTarget.attr({
         "cx": closestInfo.closestPoint.x,
         "cy": closestInfo.closestPoint.y
       });
@@ -151,7 +151,7 @@ export module Plot {
       return {
         data: [closestValue],
         pixelPositions: [closestPoint],
-        selection: this.fakeHoverTarget
+        selection: this.hoverTarget
       };
     }
     //===== /Hover logic =====

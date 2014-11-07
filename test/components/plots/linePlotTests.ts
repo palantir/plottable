@@ -119,7 +119,6 @@ describe("Plots", () => {
         { foo: 0, bar: 1 },
         { foo: 1, bar: 0.95 }
       ];
-
       linePlot.addDataset(dataset2);
 
       var closestData = linePlot._getClosestWithinRange({ x: 500, y: 0 }, 5);
@@ -133,6 +132,32 @@ describe("Plots", () => {
 
       closestData = linePlot._getClosestWithinRange({ x: 500, y: 50}, 50);
       assert.strictEqual(closestData.closestValue, dataset2[1], "returns the closest point within range");
+
+      svg.remove();
+    });
+
+    it("_doHover()", () => {
+      var dataset2 = [
+        { foo: 0, bar: 1 },
+        { foo: 1, bar: 0.95 }
+      ];
+      linePlot.addDataset(dataset2);
+
+      var hoverData = linePlot._doHover({ x: 495, y: 0 });
+      var expectedDatum = twoPointData[1];
+      assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
+      var hoverTarget = hoverData.selection;
+      var bbox = (<any> hoverTarget.node()).getBBox();
+      assert.strictEqual(bbox.x, xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
+      assert.strictEqual(bbox.y, yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
+
+      hoverData = linePlot._doHover({ x: 0, y: 0 });
+      expectedDatum = dataset2[0];
+      assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
+      hoverTarget = hoverData.selection;
+      bbox = (<any> hoverTarget.node()).getBBox();
+      assert.strictEqual(bbox.x, xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
+      assert.strictEqual(bbox.y, yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
 
       svg.remove();
     });

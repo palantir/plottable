@@ -7422,7 +7422,7 @@ var Plottable;
             }
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this.fakeHoverTarget = this._foregroundContainer.append("circle").classed("fake-hover-target", true).style("visibility", "hidden");
+                this.hoverTarget = this._foregroundContainer.append("circle").classed("hover-target", true).style("visibility", "hidden");
             };
             Line.prototype._rejectNullsAndNaNs = function (d, i, projector) {
                 var value = projector(d, i);
@@ -7518,14 +7518,14 @@ var Plottable;
                     };
                 }
                 var closestPoint = closestInfo.closestPoint;
-                this.fakeHoverTarget.attr({
+                this.hoverTarget.attr({
                     "cx": closestInfo.closestPoint.x,
                     "cy": closestInfo.closestPoint.y
                 });
                 return {
                     data: [closestValue],
                     pixelPositions: [closestPoint],
-                    selection: this.fakeHoverTarget
+                    selection: this.hoverTarget
                 };
             };
             return Line;
