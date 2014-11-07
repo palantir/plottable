@@ -87,7 +87,7 @@ export module Plot {
       return ["x", "y"];
     }
 
-    public _getClosestByXThenY(p: Point, range = Infinity) {
+    public _getClosestWithinRange(p: Point, range: number) {
       var datasets = this.datasets();
       var attrToProjector = this._generateAttrToProjector();
       var xProjector = attrToProjector["x"];
@@ -104,34 +104,16 @@ export module Plot {
       var closestDistSq = range * range;
 
       datasets.forEach((dataset) => {
-        var data = dataset.data();
-        var index = _Util.OpenSource.sortedIndex(p.x, data, xProjector);
-
-        var before = data[index - 1];
-        if (before !== undefined) {
-          var beforeDistSq = getDistSq(before, index - 1);
-          if (beforeDistSq < closestDistSq) {
-            closestOverall = before;
+        dataset.data().forEach((d: any, i: number) => {
+          var distSq = getDistSq(d, i);
+          if (distSq < closestDistSq) {
+            closestOverall = d;
             closestPoint = {
-              x: xProjector(before, index - 1),
-              y: yProjector(before, index - 1)
-            };
-            closestDistSq = beforeDistSq;
+              x: xProjector(d, i),
+              y: yProjector(d, i)
+            }
           }
-        }
-
-        var after = data[index];
-        if (after !== undefined) {
-          var afterDistSq = getDistSq(after, index);
-          if (afterDistSq < closestDistSq) {
-            closestOverall = after;
-            closestPoint = {
-              x: xProjector(after, index),
-              y: yProjector(after, index)
-            };
-            closestDistSq = afterDistSq;
-          }
-        }
+        });
       });
 
       return {
@@ -150,7 +132,7 @@ export module Plot {
     }
 
     public _doHover(p: Point): Interaction.HoverData {
-      var closestInfo = this._getClosestByXThenY(p, this.hoverDetectionRadius);
+      var closestInfo = this._getClosestWithinRange(p, this.hoverDetectionRadius);
       var closestValue = closestInfo.closestValue;
       if (closestValue === undefined) {
         return {

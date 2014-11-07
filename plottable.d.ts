@@ -3082,7 +3082,7 @@ declare module Plottable {
             _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
             _wholeDatumAttributes(): string[];
-            _getClosestByXThenY(p: Point, range?: number): {
+            _getClosestWithinRange(p: Point, range: number): {
                 closestValue: any;
                 closestPoint: Point;
             };

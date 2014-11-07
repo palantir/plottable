@@ -7470,8 +7470,7 @@ var Plottable;
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
             };
-            Line.prototype._getClosestByXThenY = function (p, range) {
-                if (range === void 0) { range = Infinity; }
+            Line.prototype._getClosestWithinRange = function (p, range) {
                 var datasets = this.datasets();
                 var attrToProjector = this._generateAttrToProjector();
                 var xProjector = attrToProjector["x"];
@@ -7485,32 +7484,16 @@ var Plottable;
                 var closestPoint;
                 var closestDistSq = range * range;
                 datasets.forEach(function (dataset) {
-                    var data = dataset.data();
-                    var index = Plottable._Util.OpenSource.sortedIndex(p.x, data, xProjector);
-                    var before = data[index - 1];
-                    if (before !== undefined) {
-                        var beforeDistSq = getDistSq(before, index - 1);
-                        if (beforeDistSq < closestDistSq) {
-                            closestOverall = before;
+                    dataset.data().forEach(function (d, i) {
+                        var distSq = getDistSq(d, i);
+                        if (distSq < closestDistSq) {
+                            closestOverall = d;
                             closestPoint = {
-                                x: xProjector(before, index - 1),
-                                y: yProjector(before, index - 1)
+                                x: xProjector(d, i),
+                                y: yProjector(d, i)
                             };
-                            closestDistSq = beforeDistSq;
                         }
-                    }
-                    var after = data[index];
-                    if (after !== undefined) {
-                        var afterDistSq = getDistSq(after, index);
-                        if (afterDistSq < closestDistSq) {
-                            closestOverall = after;
-                            closestPoint = {
-                                x: xProjector(after, index),
-                                y: yProjector(after, index)
-                            };
-                            closestDistSq = afterDistSq;
-                        }
-                    }
+                    });
                 });
                 return {
                     closestValue: closestOverall,
@@ -7525,7 +7508,7 @@ var Plottable;
                 // no-op
             };
             Line.prototype._doHover = function (p) {
-                var closestInfo = this._getClosestByXThenY(p, this.hoverDetectionRadius);
+                var closestInfo = this._getClosestWithinRange(p, this.hoverDetectionRadius);
                 var closestValue = closestInfo.closestValue;
                 if (closestValue === undefined) {
                     return {
