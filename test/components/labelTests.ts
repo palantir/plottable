@@ -169,8 +169,8 @@ describe("Labels", () => {
     testLabel.renderTo(svg);
 
     var measure = Plottable._Util.Text.getTextMeasurer(svg.append("text"))("testing label");
-    assert.closeTo(testLabel.width(), measure.width + 2 * testLabel.padding(), 1, "width incorporates the padding");
-    assert.closeTo(testLabel.height(), measure.height + 2 * testLabel.padding(), 1, "height incorporates the padding");
+    assert.closeTo(testLabel.width(), measure.width + 2 * testLabel.padding(), 5, "width incorporates the padding");
+    assert.closeTo(testLabel.height(), measure.height + 2 * testLabel.padding(), 5, "height incorporates the padding");
     svg.remove();
   });
 });
