@@ -2,39 +2,35 @@
 
 module Plottable {
 export module Plot {
-  export class Line<X> extends Abstract.XYPlot<X,number> {
-    private linePath: D3.Selection;
+  export class Line<X> extends AbstractXYPlot<X,number> {
 
-    public _yScale: Abstract.QuantitativeScale<number>;
-    public _animators: Animator.IPlotAnimatorMap = {
-      "line-reset" : new Animator.Null(),
-      "line"       : new Animator.Base()
-        .duration(600)
-        .easing("exp-in-out")
-    };
+    public _yScale: Scale.AbstractQuantitative<number>;
 
     /**
      * Constructs a LinePlot.
      *
      * @constructor
-     * @param {any | IDataset} dataset The dataset to render.
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.QuantitativeScale<X>, yScale: Abstract.QuantitativeScale<number>) {
-      super(dataset, xScale, yScale);
+    constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
+      super(xScale, yScale);
       this.classed("line-plot", true);
       this.project("stroke", () => Core.Colors.INDIGO); // default
       this.project("stroke-width", () => "2px"); // default
+      this._animators["reset"] = new Animator.Null();
+      this._animators["main"] = new Animator.Base()
+                                            .duration(600)
+                                            .easing("exp-in-out");
     }
 
-    public _setup() {
-      super._setup();
-      this._appendPath();
+    public _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor) {
+      var value = projector(d, i);
+      return value != null && value === value;
     }
 
-    public _appendPath() {
-      this.linePath = this._renderArea.append("path").classed("line", true);
+     public _getDrawer(key: string) {
+      return new Plottable._Drawer.Line(key);
     }
 
     public _getResetYFunction() {
@@ -44,58 +40,38 @@ export module Plot {
       var domainMin = Math.min(yDomain[0], yDomain[1]);
       // start from zero, or the closest domain value to zero
       // avoids lines zooming on from offscreen.
-      var startValue = 0;
-      if (domainMax < 0) {
-        startValue = domainMax;
-      } else if (domainMin > 0) {
-        startValue = domainMin;
-      }
+      var startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
       var scaledStartValue = this._yScale.scale(startValue);
       return (d: any, i: number) => scaledStartValue;
+    }
+
+    public _generateDrawSteps(): _Drawer.DrawStep[] {
+      var drawSteps: _Drawer.DrawStep[] = [];
+      if (this._dataChanged) {
+        var attrToProjector = this._generateAttrToProjector();
+        attrToProjector["y"] = this._getResetYFunction();
+        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
+      }
+
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main")});
+
+      return drawSteps;
     }
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       var wholeDatumAttributes = this._wholeDatumAttributes();
-      function singleDatumAttributeFilter(attr: string) {
-        return wholeDatumAttributes.indexOf(attr) === -1;
-      }
-      var singleDatumAttributes = d3.keys(attrToProjector).filter(singleDatumAttributeFilter);
+      var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
+      var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
       singleDatumAttributes.forEach((attribute: string) => {
         var projector = attrToProjector[attribute];
-        attrToProjector[attribute] = (data: any[], i: number) => {
-          if (data.length > 0) {
-            return projector(data[0], i);
-          } else {
-            return null;
-          }
-        };
+        attrToProjector[attribute] = (data: any[], i: number) => data.length > 0 ? projector(data[0], i) : null;
       });
-      return attrToProjector;
-    }
 
-    public _paint() {
-      super._paint();
-      var attrToProjector = this._generateAttrToProjector();
       var xFunction       = attrToProjector["x"];
       var yFunction       = attrToProjector["y"];
-      delete attrToProjector["x"];
-      delete attrToProjector["y"];
-
-      this.linePath.datum(this._dataset.data());
-
-      if (this._dataChanged) {
-
-        attrToProjector["d"] = d3.svg.line()
-          .x(xFunction)
-          .y(this._getResetYFunction());
-        this._applyAnimatedAttributes(this.linePath, "line-reset", attrToProjector);
-      }
-
-      attrToProjector["d"] = d3.svg.line()
-        .x(xFunction)
-        .y(yFunction);
-      this._applyAnimatedAttributes(this.linePath, "line", attrToProjector);
+      attrToProjector["defined"] = (d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction);
+      return attrToProjector;
     }
 
     public _wholeDatumAttributes() {

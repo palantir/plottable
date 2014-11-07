@@ -1,7 +1,7 @@
 
 function makeData() {
   "use strict";
-  return [makeRandomData(50), makeRandomData(50)];
+  return makeRandomData(25);
 }
 
 function run(div, data, Plottable) {
@@ -14,7 +14,7 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var scatterPlot = new Plottable.Plot.Scatter(data[0].slice(0, 20), xScale, yScale);
+  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data);
   var explanation = new Plottable.Component.TitleLabel("Press 'a' to reset domain");
 
   var basicTable = new Plottable.Component.Table([[null, explanation],
@@ -26,8 +26,9 @@ function run(div, data, Plottable) {
   var pzi = new Plottable.Interaction.PanZoom(xScale, yScale);
   scatterPlot.registerInteraction(pzi);
 
-  var ki = new Plottable.Interaction.Key(65);
-  ki.callback(function() {
+  var ki = new Plottable.Interaction.Key();
+  // press "a" (keycode 65) to reset
+  ki.on(65, function() {
     xScale.autoDomain();
     yScale.autoDomain();
     pzi.resetZoom();

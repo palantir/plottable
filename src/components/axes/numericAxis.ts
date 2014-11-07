@@ -2,8 +2,8 @@
 
 module Plottable {
 export module Axis {
-  export class Numeric extends Abstract.Axis {
-    public _scale: Abstract.QuantitativeScale<number>;
+  export class Numeric extends AbstractAxis {
+    public _scale: Scale.AbstractQuantitative<number>;
     private tickLabelPositioning = "center";
     // Whether or not first/last tick label will still be displayed even if
     // the label is cut off.
@@ -20,15 +20,15 @@ export module Axis {
      * @constructor
      * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
      * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-     * @param {Formatter} formatter A function to format tick labels (default Formatters.general(3, false)).
+     * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
      */
-    constructor(scale: Abstract.QuantitativeScale<number>, orientation: string, formatter = Formatters.general(3, false)) {
+    constructor(scale: Scale.AbstractQuantitative<number>, orientation: string, formatter = Formatters.general()) {
       super(scale, orientation, formatter);
     }
 
     public _setup() {
       super._setup();
-      this.measurer = _Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true));
+      this.measurer = _Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(AbstractAxis.TICK_LABEL_CLASS, true));
     }
 
     public _computeWidth() {
@@ -38,7 +38,7 @@ export module Axis {
         return this.measurer(formattedValue).width;
       });
 
-      var maxTextLength = _Util.Methods.max(textLengths);
+      var maxTextLength = _Util.Methods.max(textLengths, 0);
 
       if (this.tickLabelPositioning === "center") {
         this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
@@ -163,9 +163,9 @@ export module Axis {
 
       var tickLabelValues = this._getTickValues();
       var tickLabels = this._tickLabelContainer
-                           .selectAll("." + Abstract.Axis.TICK_LABEL_CLASS)
+                           .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
                            .data(tickLabelValues);
-      tickLabels.enter().append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      tickLabels.enter().append("text").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       tickLabels.exit().remove();
 
       tickLabels.style("text-anchor", tickLabelTextAnchor)

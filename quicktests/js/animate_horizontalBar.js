@@ -1,7 +1,7 @@
 function makeData() {
   "use strict";
 
-  return [makeRandomData(50), makeRandomData(50)];
+  return makeRandomData(6);
 }
 
 function run(div, data, Plottable) {
@@ -17,7 +17,9 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var hBarRenderer = new Plottable.Plot.HorizontalBar(data[0].slice(0, 6), xScale, yScale);
+  var dataset = new Plottable.Dataset(data);
+
+  var hBarRenderer = new Plottable.Plot.HorizontalBar(xScale, yScale).addDataset(dataset);
   hBarRenderer.attr("opacity", 0.75);
   hBarRenderer.animate(doAnimate);
 
@@ -26,8 +28,8 @@ function run(div, data, Plottable) {
   hBarChart.renderTo(svg);
 
   var cb = function(x, y){
-    var d = hBarRenderer.dataset().data();
-    hBarRenderer.dataset().data(d);
+    var d = dataset.data();
+    dataset.data(d);
   };
 
   hBarRenderer.registerInteraction(

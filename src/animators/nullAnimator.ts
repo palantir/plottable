@@ -7,8 +7,12 @@ export module Animator {
    * An animator implementation with no animation. The attributes are
    * immediately set on the selection.
    */
-  export class Null implements IPlotAnimator {
-    public animate(selection: any, attrToProjector: IAttributeToProjector): D3.Selection {
+  export class Null implements PlotAnimator {
+
+    public getTiming(selection: any) {
+      return 0;
+    }
+    public animate(selection: any, attrToProjector: AttributeToProjector): any {
       return selection.attr(attrToProjector);
     }
   }

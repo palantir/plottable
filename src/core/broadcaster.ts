@@ -8,10 +8,10 @@ export module Core {
    * on it.
    *
    * e.g.:
-   * listenable: Plottable.IListenable;
+   * listenable: Plottable.Listenable;
    * listenable.broadcaster.registerListener(callbackToCallOnBroadcast)
    */
-  export interface IListenable {
+  export interface Listenable {
     broadcaster: Broadcaster;
   }
 
@@ -24,30 +24,30 @@ export module Core {
    * The Listenable is passed as the first argument so that it is easy for the callback to reference the
    * current state of the Listenable in the resolution logic.
    */
-  export interface IBroadcasterCallback {
-    (listenable: IListenable, ...args: any[]): any;
+  export interface BroadcasterCallback {
+    (listenable: Listenable, ...args: any[]): any;
   }
 
 
   /**
-   * The Broadcaster class is owned by an IListenable. Third parties can register and deregister listeners
+   * The Broadcaster class is owned by an Listenable. Third parties can register and deregister listeners
    * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
    * called. The registered callbacks are called with the registered Listenable that the broadcaster is attached
    * to, along with optional arguments passed to the `broadcast` method.
    *
    * The listeners are called synchronously.
    */
-  export class Broadcaster extends Abstract.PlottableObject {
+  export class Broadcaster extends Core.PlottableObject {
     private key2callback = new _Util.StrictEqualityAssociativeArray();
-    public listenable: IListenable;
+    public listenable: Listenable;
 
     /**
      * Constructs a broadcaster, taking the Listenable that the broadcaster will be attached to.
      *
      * @constructor
-     * @param {IListenable} listenable The Listenable-object that this broadcaster is attached to.
+     * @param {Listenable} listenable The Listenable-object that this broadcaster is attached to.
      */
-    constructor(listenable: IListenable) {
+    constructor(listenable: Listenable) {
       super();
       this.listenable = listenable;
     }
@@ -58,10 +58,10 @@ export module Core {
      * If there is already a callback associated with that key, then the callback will be replaced.
      *
      * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-     * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
+     * @param {BroadcasterCallback} callback A callback to be called when the Scale's domain changes.
      * @returns {Broadcaster} this object
      */
-    public registerListener(key: any, callback: IBroadcasterCallback) {
+    public registerListener(key: any, callback: BroadcasterCallback) {
       this.key2callback.set(key, callback);
       return this;
     }

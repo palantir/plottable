@@ -6,7 +6,7 @@ describe("Dispatchers", () => {
   it("correctly registers for and deregisters from events", () => {
     var target = generateSVG();
 
-    var dispatcher = new Plottable.Abstract.Dispatcher(target);
+    var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target);
     var callbackWasCalled = false;
     dispatcher._event2Callback["click"] = function() { callbackWasCalled = true; };
 
@@ -29,7 +29,7 @@ describe("Dispatchers", () => {
     var target1 = generateSVG();
     var target2 = generateSVG();
 
-    var dispatcher = new Plottable.Abstract.Dispatcher(target1);
+    var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target1);
     var callbackWasCalled = false;
     dispatcher._event2Callback["click"] = () => callbackWasCalled = true;
 
@@ -52,12 +52,12 @@ describe("Dispatchers", () => {
   it("multiple dispatchers can be attached to the same target", () => {
     var target = generateSVG();
 
-    var dispatcher1 = new Plottable.Abstract.Dispatcher(target);
+    var dispatcher1 = new Plottable.Dispatcher.AbstractDispatcher(target);
     var called1 = false;
     dispatcher1._event2Callback["click"] = () => called1 = true;
     dispatcher1.connect();
 
-    var dispatcher2 = new Plottable.Abstract.Dispatcher(target);
+    var dispatcher2 = new Plottable.Dispatcher.AbstractDispatcher(target);
     var called2 = false;
     dispatcher2._event2Callback["click"] = () => called2 = true;
     dispatcher2.connect();
@@ -72,7 +72,7 @@ describe("Dispatchers", () => {
   it("can't double-connect", () => {
     var target = generateSVG();
 
-    var dispatcher = new Plottable.Abstract.Dispatcher(target);
+    var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target);
     dispatcher.connect();
     assert.throws(() => dispatcher.connect(), "connect");
 
@@ -119,6 +119,38 @@ describe("Dispatchers", () => {
       assert.isTrue(mousemoveCalled, "mousemove callback was called");
       triggerFakeMouseEvent("mouseout", target, targetX, targetY);
       assert.isTrue(mouseoutCalled, "mouseout callback was called");
+
+      target.remove();
+    });
+  });
+
+  describe("Keypress Dispatcher", () => {
+    it("triggers the callback only when moused over the target", () => {
+      var target = generateSVG(400, 400);
+
+      var kpd = new Plottable.Dispatcher.Keypress(target);
+      var keyDownCalled = false;
+      var lastKeyCode: number;
+      kpd.onKeyDown((e: D3.D3Event) => {
+        keyDownCalled = true;
+        lastKeyCode = e.keyCode;
+      });
+      kpd.connect();
+
+      var $target = $(target.node());
+
+      $target.simulate("keydown", { keyCode: 80 });
+      assert.isFalse(keyDownCalled, "didn't trigger callback if not moused over the target");
+
+      $target.simulate("mouseover");
+      $target.simulate("keydown", { keyCode: 80 });
+      assert.isTrue(keyDownCalled, "correctly triggers callback if moused over the target");
+      assert.strictEqual(lastKeyCode, 80, "correct event info was passed to the callback");
+
+      keyDownCalled = false;
+      $target.simulate("mouseout");
+      $target.simulate("keydown", { keyCode: 80 });
+      assert.isFalse(keyDownCalled, "didn't trigger callback after mousing out of the target");
 
       target.remove();
     });

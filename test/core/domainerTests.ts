@@ -13,7 +13,8 @@ describe("Domainer", () => {
   it("pad() works in general case", () => {
     scale._updateExtent("1", "x", [100, 200]);
     scale.domainer(new Plottable.Domainer().pad(0.2));
-    assert.deepEqual(scale.domain(), [90, 210]);
+    assert.closeTo(scale.domain()[0], 90, 0.1, "lower bound of domain correct");
+    assert.closeTo(scale.domain()[1], 210, 0.1, "upper bound of domain correct");
   });
 
   it("pad() works for date scales", () => {
@@ -164,7 +165,9 @@ describe("Domainer", () => {
     var yScale = new Plottable.Scale.Linear();
     var domainer = yScale.domainer();
     var data = [{x: 0, y: 0, y0: 0}, {x: 5, y: 5, y0: 5}];
-    var r = new Plottable.Plot.Area(data, xScale, yScale);
+    var dataset = new Plottable.Dataset(data);
+    var r = new Plottable.Plot.Area(xScale, yScale);
+    r.addDataset(dataset);
     var svg = generateSVG();
     r.project("x", "x", xScale);
     r.project("y", "y", yScale);
@@ -193,7 +196,7 @@ describe("Domainer", () => {
     assert.deepEqual(getExceptions(), [5], "projecting a different constant y0 removed the old exception and added a new one");
     r.project("y0", "y0", yScale);
     assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
-    r.dataset().data([{x: 0, y: 0, y0: 0}, {x: 5, y: 5, y0: 0}]);
+    dataset.data([{x: 0, y: 0, y0: 0}, {x: 5, y: 5, y0: 0}]);
     assert.deepEqual(getExceptions(), [0], "changing to constant values via change in datasource adds exception");
     svg.remove();
   });

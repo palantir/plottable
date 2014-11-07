@@ -13,7 +13,7 @@ export module Scale {
    *
    * By default it generates a linear scale internally.
    */
-  export class InterpolatedColor extends Abstract.Scale<number, string> {
+  export class InterpolatedColor extends AbstractScale<number, string> {
     private static COLOR_SCALES: ColorGroups = {
       reds : [
         "#FFFFFF", // white
@@ -211,7 +211,7 @@ export module Scale {
       // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
       var extents = this._getAllExtents();
       if (extents.length > 0) {
-        this._setDomain([_Util.Methods.min(extents, (x) => x[0]), _Util.Methods.max(extents, (x) => x[1])]);
+        this._setDomain([_Util.Methods.min(extents, (x) => x[0], 0), _Util.Methods.max(extents, (x) => x[1], 0)]);
       }
       return this;
     }

@@ -6,7 +6,7 @@ describe("Broadcasters", () => {
   var b: Plottable.Core.Broadcaster;
   var called: boolean;
   var cb: any;
-  var listenable: Plottable.Core.IListenable = {broadcaster: null};
+  var listenable: Plottable.Core.Listenable = {broadcaster: null};
 
   beforeEach(() => {
     b = new Plottable.Core.Broadcaster(listenable);
@@ -54,7 +54,7 @@ describe("Broadcasters", () => {
   it("arguments are passed through to callback", () => {
     var g2 = {};
     var g3 = "foo";
-    var cb = (a1: Plottable.Core.IListenable, rest: any[]) => {
+    var cb = (a1: Plottable.Core.Listenable, rest: any[]) => {
       assert.equal(listenable, a1, "broadcaster passed through");
       assert.equal(g2, rest[0], "arg1 passed through");
       assert.equal(g3, rest[1], "arg2 passed through");

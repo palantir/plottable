@@ -55,7 +55,7 @@ export module _Util {
         var whs = s.trim().split("").map(tm);
         return {
           width: d3.sum(whs, (wh) => wh.width),
-          height: _Util.Methods.max(whs, (wh) => wh.height)
+          height: _Util.Methods.max(whs, (wh) => wh.height, 0)
         };
       };
     }
@@ -83,7 +83,7 @@ export module _Util {
           });
           return {
             width: d3.sum(whs, (x) => x.width),
-            height: _Util.Methods.max(whs, (x) => x.height)
+            height: _Util.Methods.max(whs, (x) => x.height, 0)
           };
         } else {
           return tm(s);
@@ -212,8 +212,9 @@ export module _Util {
       xForm.rotate = rotation === "right" ? 90 : -90;
       xForm.translate = [isRight ? width : 0, isRight ? 0 : height];
       innerG.attr("transform", xForm.toString());
+      innerG.classed("rotated-" + rotation, true);
 
-      return wh;
+      return {width: wh.height, height: wh.width};
     }
 
     function writeTextHorizontally(brokenText: string[], g: D3.Selection,
@@ -278,10 +279,13 @@ export module _Util {
      * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
      */
     export function writeText(text: string, width: number, height: number, tm: TextMeasurer,
-                              horizontally?: boolean,
+                              orientation = "horizontal",
                               write?: IWriteOptions): IWriteTextResult {
 
-      var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
+      if (["left", "right", "horizontal"].indexOf(orientation) === -1) {
+        throw new Error("Unrecognized orientation to writeText: " + orientation);
+      }
+      var orientHorizontally = orientation === "horizontal";
       var primaryDimension = orientHorizontally ? width : height;
       var secondaryDimension = orientHorizontally ? height : width;
       var wrappedText = _Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
@@ -294,14 +298,17 @@ export module _Util {
       if (write == null) {
         var widthFn = orientHorizontally ? _Util.Methods.max : d3.sum;
         var heightFn = orientHorizontally ? d3.sum : _Util.Methods.max;
-        usedWidth = widthFn(wrappedText.lines, (line: string) => tm(line).width);
-        usedHeight = heightFn(wrappedText.lines, (line: string) => tm(line).height);
+        var heightAcc = (line: string) => orientHorizontally ? tm(line).height : tm(line).width;
+        var widthAcc = (line: string) => orientHorizontally ? tm(line).width : tm(line).height;
+
+        usedWidth = widthFn(wrappedText.lines, widthAcc, 0);
+        usedHeight = heightFn(wrappedText.lines, heightAcc, 0);
       } else {
         var innerG = write.g.append("g").classed("writeText-inner-g", true); // unleash your inner G
         // the outerG contains general transforms for positining the whole block, the inner g
         // will contain transforms specific to orienting the text properly within the block.
         var writeTextFn = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-        var wh = writeTextFn(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
+        var wh = writeTextFn.call(this, wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign, orientation);
         usedWidth = wh.width;
         usedHeight = wh.height;
       }

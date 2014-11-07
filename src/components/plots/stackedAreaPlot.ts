@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class StackedArea<X> extends Abstract.Stacked<X, number> {
+  export class StackedArea<X> extends AbstractStacked<X, number> {
 
     public _baseline: D3.Selection;
     public _baselineValue = 0;
@@ -14,7 +14,7 @@ export module Plot {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: Abstract.QuantitativeScale<X>, yScale: Abstract.QuantitativeScale<number>) {
+    constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this.project("fill", () => Core.Colors.INDIGO);
@@ -22,7 +22,7 @@ export module Plot {
     }
 
     public _getDrawer(key: string) {
-      return new Plottable._Drawer.Area(key);
+      return new Plottable._Drawer.Area(key).drawLine(false);
     }
 
     public _setup() {
@@ -30,8 +30,18 @@ export module Plot {
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
-    public _paint() {
-      super._paint();
+    public _updateStackOffsets() {
+      var domainKeys = this._getDomainKeys();
+      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+      var keySets = this.datasets().map((dataset) => d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i).toString())).values());
+
+      if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
+        _Util.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
+      }
+      super._updateStackOffsets();
+    }
+
+    public _additionalPaint() {
       var scaledBaseline = this._yScale.scale(this._baselineValue);
       var baselineAttr: any = {
         "x1": 0,
@@ -39,13 +49,13 @@ export module Plot {
         "x2": this.width(),
         "y2": scaledBaseline
       };
-      this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
 
+      this._getAnimator("baseline").animate(this._baseline, baselineAttr);
     }
 
     public _updateYDomainer() {
       super._updateYDomainer();
-      var scale = <Abstract.QuantitativeScale<any>> this._yScale;
+      var scale = <Scale.AbstractQuantitative<any>> this._yScale;
       if (!scale._userSetDomainer) {
         scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
@@ -60,22 +70,13 @@ export module Plot {
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      var xFunction = attrToProjector["x"];
-      var yFunction = (d: any) => this._yScale.scale(d.y + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      var y0Function = (d: any) => this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-
-      delete attrToProjector["x"];
-      delete attrToProjector["y0"];
-      delete attrToProjector["y"];
-
-      attrToProjector["d"] = d3.svg.area()
-                                    .x(xFunction)
-                                    .y0(y0Function)
-                                    .y1(yFunction);
+      var yAccessor = this._projectors["y"].accessor;
+      attrToProjector["y"] = (d: any) => this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      attrToProjector["y0"] = (d: any) => this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
       // Align fill with first index
       var fillProjector = attrToProjector["fill"];
-      attrToProjector["fill"] = (d, i) => fillProjector(d[0], i);
+      attrToProjector["fill"] = (d, i) => (d && d[0]) ? fillProjector(d[0], i) : null;
 
       return attrToProjector;
     }

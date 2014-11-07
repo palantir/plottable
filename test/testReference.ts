@@ -8,6 +8,7 @@
 
 ///<reference path="globalInitialization.ts" />
 
+///<reference path="drawers/drawerTests.ts" />
 ///<reference path="components/baseAxisTests.ts" />
 ///<reference path="components/timeAxisTests.ts" />
 ///<reference path="components/numericAxisTests.ts" />
@@ -23,6 +24,7 @@
 ///<reference path="components/plots/barPlotTests.ts" />
 ///<reference path="components/plots/gridPlotTests.ts" />
 ///<reference path="components/plots/scatterPlotTests.ts" />
+///<reference path="components/plots/stackedPlotTests.ts" />
 ///<reference path="components/plots/stackedAreaPlotTests.ts" />
 ///<reference path="components/plots/stackedBarPlotTests.ts" />
 ///<reference path="components/plots/clusteredBarPlotTests.ts" />
@@ -38,6 +40,7 @@
 ///<reference path="scales/coordinatorTests.ts" />
 ///<reference path="scales/scaleTests.ts" />
 ///<reference path="scales/timeScaleTests.ts" />
+///<reference path="scales/tickGeneratorsTests.ts" />
 
 ///<reference path="utils/domUtilsTests.ts" />
 ///<reference path="utils/formattersTests.ts" />
@@ -49,5 +52,6 @@
 ///<reference path="utils/utilsTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />
+///<reference path="interactions/hoverInteractionTests.ts" />
 
 ///<reference path="dispatchers/dispatcherTests.ts" />

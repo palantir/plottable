@@ -16,14 +16,14 @@ function getSVGParent(): D3.Selection {
   }
 }
 
-function verifySpaceRequest(sr: Plottable._ISpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
+function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
   assert.equal(sr.width,  w, "width requested is as expected #"  + id);
   assert.equal(sr.height, h, "height requested is as expected #" + id);
   assert.equal(sr.wantsWidth , ww, "needs more width is as expected #"  + id);
   assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
 }
 
-function fixComponentSize(c: Plottable.Abstract.Component, fixedWidth?: number, fixedHeight?: number) {
+function fixComponentSize(c: Plottable.Component.AbstractComponent, fixedWidth?: number, fixedHeight?: number) {
   c._requestedSpace = function(w, h) {
     return {
       width:  fixedWidth  == null ? 0 : fixedWidth,
@@ -38,7 +38,7 @@ function fixComponentSize(c: Plottable.Abstract.Component, fixedWidth?: number, 
 }
 
 function makeFixedSizeComponent(fixedWidth?: number, fixedHeight?: number) {
-  return fixComponentSize(new Plottable.Abstract.Component(), fixedWidth, fixedHeight);
+  return fixComponentSize(new Plottable.Component.AbstractComponent(), fixedWidth, fixedHeight);
 }
 
 function getTranslate(element: D3.Selection) {
@@ -63,6 +63,22 @@ function assertBBoxInclusion(outerEl: D3.Selection, innerEl: D3.Selection) {
           "bounding rect right included");
   assert.operator(Math.ceil(outerBox.bottom) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.bottom),
           "bounding rect bottom included");
+}
+
+function assertBBoxNonIntersection(firstEl: D3.Selection, secondEl: D3.Selection) {
+  var firstBox = firstEl.node().getBoundingClientRect();
+  var secondBox = secondEl.node().getBoundingClientRect();
+
+  var intersectionBox = {
+    left: Math.max(firstBox.left, secondBox.left),
+    right: Math.min(firstBox.right, secondBox.right),
+    bottom: Math.min(firstBox.bottom, secondBox.bottom),
+    top: Math.max(firstBox.top, secondBox.top)
+  };
+
+  // +1 for inaccuracy in IE
+  assert.isTrue(intersectionBox.left + 1 >= intersectionBox.right || intersectionBox.bottom + 1 >= intersectionBox.top,
+          "bounding rects are not intersecting");
 }
 
 function assertXY(el: D3.Selection, xExpected: number, yExpected: number, message: string) {
@@ -94,23 +110,13 @@ function makeQuadraticSeries(n: number): {x: number; y: number;}[] {
   return d3.range(n).map(makeQuadraticPoint);
 }
 
-class MultiTestVerifier {
-  public passed = true;
-  private temp: boolean;
-
-  public start() {
-    this.temp = this.passed;
-    this.passed = false;
-  }
-
-  public end() {
-    this.passed = this.temp;
-  }
-}
-
 // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
 function normalizePath(pathString: string) {
   return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
+}
+
+function numAttr(s: D3.Selection, a: string) {
+  return parseFloat(s.attr(a));
 }
 
 function triggerFakeUIEvent(type: string, target: D3.Selection) {
@@ -130,4 +136,28 @@ function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: nu
                     false, false, false, false,
                     1, null);
   target.node().dispatchEvent(e);
+}
+
+function assertAreaPathCloseTo(actualPath: string, expectedPath: string, precision: number, msg: string) {
+  var actualAreaPathStrings = actualPath.split("Z");
+  var expectedAreaPathStrings = expectedPath.split("Z");
+
+  actualAreaPathStrings.pop();
+  expectedAreaPathStrings.pop();
+
+  var actualAreaPathPoints = actualAreaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
+  actualAreaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
+  var expectedAreaPathPoints = expectedAreaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
+  expectedAreaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
+
+  assert.lengthOf(actualAreaPathPoints, expectedAreaPathPoints.length, "number of broken area paths should be equal");
+  actualAreaPathPoints.forEach((actualAreaPoints, i) => {
+    var expectedAreaPoints = expectedAreaPathPoints[i];
+    assert.lengthOf(actualAreaPoints, expectedAreaPoints.length, "number of points in path should be equal");
+    actualAreaPoints.forEach((actualAreaPoint, j) => {
+      var expectedAreaPoint = expectedAreaPoints[j];
+      assert.closeTo(+actualAreaPoint[0], +expectedAreaPoint[0], 0.1, msg);
+      assert.closeTo(+actualAreaPoint[1], +expectedAreaPoint[1], 0.1, msg);
+    });
+  });
 }

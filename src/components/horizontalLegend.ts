@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Component {
-  export class HorizontalLegend extends Abstract.Component {
+  export class HorizontalLegend extends AbstractComponent {
     /**
      * The css class applied to each legend row
      */
@@ -73,13 +73,13 @@ export module Component {
       };
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var estimatedLayout = this.calculateLayoutInfo(offeredWidth, offeredHeight);
 
       var rowLengths = estimatedLayout.rows.map((row: string[]) => {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
       });
-      var longestRowLength = _Util.Methods.max(rowLengths);
+      var longestRowLength = _Util.Methods.max(rowLengths, 0);
       longestRowLength = longestRowLength === undefined ? 0 : longestRowLength; // HACKHACK: #843
       var desiredWidth = this.padding + longestRowLength;
 

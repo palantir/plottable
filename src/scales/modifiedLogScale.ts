@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scale {
-  export class ModifiedLog extends Abstract.QuantitativeScale<number> {
+  export class ModifiedLog extends AbstractQuantitative<number> {
     private base: number;
     private pivot: number;
     private untransformedDomain: number[];
@@ -104,8 +104,8 @@ export module Scale {
       // then we're going to draw negative log ticks from -100 to -10,
       // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
       var middle = (x: number, y: number, z: number) => [x, y, z].sort((a, b) => a - b)[1];
-      var min = _Util.Methods.min(this.untransformedDomain);
-      var max = _Util.Methods.max(this.untransformedDomain);
+      var min = _Util.Methods.min(this.untransformedDomain, 0);
+      var max = _Util.Methods.max(this.untransformedDomain, 0);
       var negativeLower = min;
       var negativeUpper = middle(min, max, -this.pivot);
       var positiveLower = middle(min, max, this.pivot);
@@ -165,8 +165,8 @@ export module Scale {
      * distance when plotted.
      */
     private howManyTicks(lower: number, upper: number): number {
-      var adjustedMin = this.adjustedLog(_Util.Methods.min(this.untransformedDomain));
-      var adjustedMax = this.adjustedLog(_Util.Methods.max(this.untransformedDomain));
+      var adjustedMin = this.adjustedLog(_Util.Methods.min(this.untransformedDomain, 0));
+      var adjustedMax = this.adjustedLog(_Util.Methods.max(this.untransformedDomain, 0));
       var adjustedLower = this.adjustedLog(lower);
       var adjustedUpper = this.adjustedLog(upper);
       var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);

@@ -19,8 +19,8 @@ export module Animator {
       this.isReverse = isReverse;
     }
 
-    public animate(selection: any, attrToProjector: IAttributeToProjector): any {
-      var startAttrToProjector: IAttributeToProjector = {};
+    public animate(selection: any, attrToProjector: AttributeToProjector) {
+      var startAttrToProjector: AttributeToProjector = {};
       Rect.ANIMATED_ATTRIBUTES.forEach((attr: string) => startAttrToProjector[attr] = attrToProjector[attr]);
 
       startAttrToProjector[this.getMovingAttr()] = this._startMovingProjector(attrToProjector);
@@ -30,7 +30,7 @@ export module Animator {
       return super.animate(selection, attrToProjector);
     }
 
-    public _startMovingProjector(attrToProjector: IAttributeToProjector) {
+    public _startMovingProjector(attrToProjector: AttributeToProjector) {
       if (this.isVertical === this.isReverse) {
         return attrToProjector[this.getMovingAttr()];
       }

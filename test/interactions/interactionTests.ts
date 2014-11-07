@@ -44,16 +44,16 @@ describe("Interactions", () => {
 
       var svg = generateSVG();
       var dataset = makeLinearSeries(11);
-      var renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
-      renderer.renderTo(svg);
+      var plot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataset);
+      plot.renderTo(svg);
 
       var xDomainBefore = xScale.domain();
       var yDomainBefore = yScale.domain();
 
       var interaction = new Plottable.Interaction.PanZoom(xScale, yScale);
-      renderer.registerInteraction(interaction);
+      plot.registerInteraction(interaction);
 
-      var hb = renderer._element.select(".hit-box").node();
+      var hb = plot._element.select(".hit-box").node();
       var dragDistancePixelX = 10;
       var dragDistancePixelY = 20;
       $(hb).simulate("drag", {
@@ -88,9 +88,9 @@ describe("Interactions", () => {
     var svgHeight = 400;
     var svg: D3.Selection;
     var dataset: Plottable.Dataset;
-    var xScale: Plottable.Abstract.QuantitativeScale<number>;
-    var yScale: Plottable.Abstract.QuantitativeScale<number>;
-    var renderer: Plottable.Abstract.XYPlot<number,number>;
+    var xScale: Plottable.Scale.AbstractQuantitative<number>;
+    var yScale: Plottable.Scale.AbstractQuantitative<number>;
+    var plot: Plottable.Plot.AbstractXYPlot<number,number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
     var dragstartX = 20;
@@ -105,10 +105,11 @@ describe("Interactions", () => {
       dataset = new Plottable.Dataset(makeLinearSeries(10));
       xScale = new Plottable.Scale.Linear();
       yScale = new Plottable.Scale.Linear();
-      renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
-      renderer.renderTo(svg);
+      plot = new Plottable.Plot.Scatter(xScale, yScale);
+      plot.addDataset(dataset);
+      plot.renderTo(svg);
       interaction = new Plottable.Interaction.XYDragBox();
-      renderer.registerInteraction(interaction);
+      plot.registerInteraction(interaction);
     });
 
     afterEach(() => {
@@ -149,7 +150,7 @@ describe("Interactions", () => {
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox).CLASS_DRAG_BOX;
-      var dragBox = renderer._backgroundContainer.select(dragBoxClass);
+      var dragBox = plot._backgroundContainer.select(dragBoxClass);
       assert.isNotNull(dragBox, "the dragbox was created");
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};
       var expectedStartPosition = {x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY)};
@@ -267,9 +268,9 @@ describe("Interactions", () => {
     var svgHeight = 400;
     var svg: D3.Selection;
     var dataset: Plottable.Dataset;
-    var xScale: Plottable.Abstract.QuantitativeScale<number>;
-    var yScale: Plottable.Abstract.QuantitativeScale<number>;
-    var renderer: Plottable.Abstract.XYPlot<number,number>;
+    var xScale: Plottable.Scale.AbstractQuantitative<number>;
+    var yScale: Plottable.Scale.AbstractQuantitative<number>;
+    var plot: Plottable.Plot.AbstractXYPlot<number,number>;
     var interaction: Plottable.Interaction.XYDragBox;
 
     var dragstartX = 20;
@@ -284,10 +285,11 @@ describe("Interactions", () => {
       dataset = new Plottable.Dataset(makeLinearSeries(10));
       xScale = new Plottable.Scale.Linear();
       yScale = new Plottable.Scale.Linear();
-      renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
-      renderer.renderTo(svg);
+      plot = new Plottable.Plot.Scatter(xScale, yScale);
+      plot.addDataset(dataset);
+      plot.renderTo(svg);
       interaction = new Plottable.Interaction.YDragBox();
-      renderer.registerInteraction(interaction);
+      plot.registerInteraction(interaction);
     });
 
     afterEach(() => {
@@ -322,7 +324,7 @@ describe("Interactions", () => {
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox).CLASS_DRAG_BOX;
-      var dragBox = renderer._backgroundContainer.select(dragBoxClass);
+      var dragBox = plot._backgroundContainer.select(dragBoxClass);
       assert.isNotNull(dragBox, "the dragbox was created");
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};
       var expectedStartPosition = {x: 0, y: Math.min(dragstartY, dragendY)};
@@ -401,42 +403,36 @@ describe("Interactions", () => {
   });
 
   describe("KeyInteraction", () => {
-    it("Triggers the callback only when the Component is moused over and appropriate key is pressed", () => {
+    it("Triggers appropriate callback for the key pressed", () => {
       var svg = generateSVG(400, 400);
-      // svg.attr("id", "key-interaction-test");
-      var component = new Plottable.Abstract.Component();
+      var component = new Plottable.Component.AbstractComponent();
       component.renderTo(svg);
 
-      var code = 65; // "a" key
-      var ki = new Plottable.Interaction.Key(code);
+      var ki = new Plottable.Interaction.Key();
 
-      var callbackCalled = false;
-      var callback = () => {
-        callbackCalled = true;
-      };
+      var aCode = 65; // "a" key
+      var bCode = 66; // "b" key
 
-      ki.callback(callback);
+      var aCallbackCalled = false;
+      var aCallback = () => aCallbackCalled = true;
+      var bCallbackCalled = false;
+      var bCallback = () => bCallbackCalled = true;
+
+      ki.on(aCode, aCallback);
+      ki.on(bCode, bCallback);
       component.registerInteraction(ki);
 
       var $hitbox = $((<any> component).hitBox.node());
 
-      $hitbox.simulate("keydown", { keyCode: code });
-      assert.isFalse(callbackCalled, "callback is not called if component does not have mouse focus (before mouseover)");
-
       $hitbox.simulate("mouseover");
+      $hitbox.simulate("keydown", { keyCode: aCode });
+      assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
+      assert.isFalse(bCallbackCalled, "callback for \"b\" was not called when \"a\" key was pressed");
 
-      $hitbox.simulate("keydown", { keyCode: code });
-      assert.isTrue(callbackCalled, "callback gets called if the appropriate key is pressed while the component has mouse focus");
-
-      callbackCalled = false;
-      $hitbox.simulate("keydown", { keyCode: (code + 1) });
-      assert.isFalse(callbackCalled, "callback is not called if the wrong key is pressed");
-
-      $hitbox.simulate("mouseout");
-
-      $hitbox.simulate("keydown", { keyCode: code });
-      assert.isFalse(callbackCalled, "callback is not called if component does not have mouse focus (after mouseout)");
-
+      aCallbackCalled = false;
+      $hitbox.simulate("keydown", { keyCode: bCode });
+      assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"b\" key was pressed");
+      assert.isTrue(bCallbackCalled, "callback for \"b\" was called when \"b\" key was pressed");
       svg.remove();
     });
   });
@@ -456,7 +452,7 @@ describe("Interactions", () => {
     });
 
     it("hoverMode()", () => {
-      var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
+      var barPlot = new Plottable.Plot.VerticalBar(ordinalScale, linearScale).addDataset(dataset);
       var bhi = new Plottable.Interaction.BarHover();
 
       bhi.hoverMode("line");
@@ -467,7 +463,7 @@ describe("Interactions", () => {
 
     it("correctly triggers callbacks (vertical)", () => {
       var svg = generateSVG(400, 400);
-      var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
+      var barPlot = new Plottable.Plot.VerticalBar(ordinalScale, linearScale).addDataset(dataset);
       barPlot.project("x", "name", ordinalScale).project("y", "value", linearScale);
       var bhi = new Plottable.Interaction.BarHover();
 
@@ -522,7 +518,7 @@ describe("Interactions", () => {
 
     it("correctly triggers callbacks (hoizontal)", () => {
       var svg = generateSVG(400, 400);
-      var barPlot = new Plottable.Plot.HorizontalBar(dataset, linearScale, ordinalScale);
+      var barPlot = new Plottable.Plot.HorizontalBar(linearScale, ordinalScale).addDataset(dataset);
       barPlot.project("y", "name", ordinalScale).project("x", "value", linearScale);
       var bhi = new Plottable.Interaction.BarHover();
 

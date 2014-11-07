@@ -2,7 +2,8 @@
 
 module Plottable {
 export module Interaction {
-  export class Drag extends Abstract.Interaction {
+  export class Drag extends AbstractInteraction {
+    private dragInitialized = false;
     private dragBehavior: D3.Behavior.Drag;
     public      _origin = [0,0];
     public    _location = [0,0];
@@ -134,7 +135,7 @@ export module Interaction {
       }
     }
 
-    public _anchor(component: Abstract.Component, hitBox: D3.Selection) {
+    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       hitBox.call(this.dragBehavior);
       return this;
@@ -148,7 +149,7 @@ export module Interaction {
      * @param {QuantitativeScale} yScale The scale along the y-axis.
      * @returns {Drag} The calling Drag.
      */
-    public setupZoomCallback(xScale?: Abstract.QuantitativeScale<any>, yScale?: Abstract.QuantitativeScale<any>) {
+    public setupZoomCallback(xScale?: Scale.AbstractQuantitative<any>, yScale?: Scale.AbstractQuantitative<any>) {
       var xDomainOriginal = xScale != null ? xScale.domain() : null;
       var yDomainOriginal = yScale != null ? yScale.domain() : null;
       var resetOnNextClick = false;

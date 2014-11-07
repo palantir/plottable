@@ -2,13 +2,13 @@
 
 module Plottable {
 export module Axis {
-  export interface _ITimeInterval {
+  export interface _TimeInterval {
       timeUnit: D3.Time.Interval;
       step: number;
       formatString: string;
   };
 
-  export class Time extends Abstract.Axis {
+  export class Time extends AbstractAxis {
 
     public _majorTickLabels: D3.Selection;
     public _minorTickLabels: D3.Selection;
@@ -16,7 +16,7 @@ export module Axis {
 
     // default intervals
     // these are for minor tick labels
-    public static _minorIntervals: _ITimeInterval[] = [
+    public static _minorIntervals: _TimeInterval[] = [
       {timeUnit: d3.time.second, step: 1,      formatString: "%I:%M:%S %p"},
       {timeUnit: d3.time.second, step: 5,      formatString: "%I:%M:%S %p"},
       {timeUnit: d3.time.second, step: 10,     formatString: "%I:%M:%S %p"},
@@ -49,7 +49,7 @@ export module Axis {
     ];
 
     // these are for major tick labels
-    public static _majorIntervals: _ITimeInterval[] = [
+    public static _majorIntervals: _TimeInterval[] = [
       {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
       {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
       {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
@@ -93,13 +93,18 @@ export module Axis {
      * @param {string} orientation The orientation of the Axis (top/bottom)
      */
     constructor(scale: Scale.Time, orientation: string) {
-      orientation = orientation.toLowerCase();
-      if (orientation !== "top" && orientation !== "bottom") {
-        throw new Error ("unsupported orientation: " + orientation);
-      }
       super(scale, orientation);
       this.classed("time-axis", true);
       this.tickLabelPadding(5);
+    }
+
+    public orient(): string;
+    public orient(orientation: string): Time;
+    public orient(orientation?: string): any {
+      if (orientation && (orientation.toLowerCase() === "right" || orientation.toLowerCase() === "left")) {
+        throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
+      }
+      return super.orient(orientation); // maintains getter-setter functionality
     }
 
     public _computeHeight() {
@@ -120,7 +125,7 @@ export module Axis {
       return this.measurer(d3.time.format(format)(longDate)).width;
     }
 
-    private getIntervalLength(interval: _ITimeInterval) {
+    private getIntervalLength(interval: _TimeInterval) {
       var startDate = this._scale.domain()[0];
       var endDate = interval.timeUnit.offset(startDate, interval.step);
       if (endDate > this._scale.domain()[1]) {
@@ -132,7 +137,7 @@ export module Axis {
       return stepLength;
     }
 
-    private isEnoughSpace(container: D3.Selection, interval: _ITimeInterval) {
+    private isEnoughSpace(container: D3.Selection, interval: _TimeInterval) {
       // compute number of ticks
       // if less than a certain threshold
       var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
@@ -142,8 +147,8 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this._majorTickLabels = this._content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      this._minorTickLabels = this._content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      this._majorTickLabels = this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
+      this._minorTickLabels = this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       this.measurer = _Util.Text.getTextMeasurer(this._majorTickLabels.append("text"));
     }
 
@@ -162,7 +167,7 @@ export module Axis {
       return i;
     }
 
-    public _getTickIntervalValues(interval: _ITimeInterval): any[] {
+    public _getTickIntervalValues(interval: _TimeInterval): any[] {
       return this._scale._tickInterval(interval.timeUnit, interval.step);
     }
 
@@ -174,14 +179,14 @@ export module Axis {
     }
 
     public _measureTextHeight(container: D3.Selection): number {
-      var fakeTickLabel = container.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      var fakeTickLabel = container.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       var textHeight = this.measurer(_Util.Text.HEIGHT_TEXT).height;
       fakeTickLabel.remove();
       return textHeight;
     }
 
-    private renderTickLabels(container: D3.Selection, interval: _ITimeInterval, height: number) {
-      container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).remove();
+    private renderTickLabels(container: D3.Selection, interval: _TimeInterval, height: number) {
+      container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
       var tickPos = this._scale._tickInterval(interval.timeUnit,
                                               interval.step);
       tickPos.splice(0, 0, this._scale.domain()[0]);
@@ -201,8 +206,8 @@ export module Axis {
       }
       labelPos = labelPos.filter((d: any) =>
         this.canFitLabelFilter(container, d, d3.time.format(interval.formatString)(d), shouldCenterText));
-      var tickLabels = container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
-      var tickLabelsEnter = tickLabels.enter().append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      var tickLabels = container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
+      var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
       var yTranslate = (this._orientation === "bottom" ? (this._maxLabelTickLength() / 2 * height) :
@@ -233,9 +238,9 @@ export module Axis {
       return endPosition < this.width() && startPosition > 0;
     }
 
-    private adjustTickLength(height: number, interval: _ITimeInterval) {
+    private adjustTickLength(height: number, interval: _TimeInterval) {
       var tickValues = this._getTickIntervalValues(interval);
-      var selection = this._tickMarkContainer.selectAll("." + Abstract.Axis.TICK_MARK_CLASS).filter((d: Date) =>
+      var selection = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).filter((d: Date) =>
         // we want to check if d is in tickValues
         // however, if two dates a, b, have the same date, it may not be true that a === b.
         // thus, we convert them to values first, then do the comparison
@@ -255,8 +260,8 @@ export module Axis {
       var smallTicks = this._getTickIntervalValues(Time._minorIntervals[index]);
       var allTicks = this._getTickValues().concat(smallTicks);
 
-      var tickMarks = this._tickMarkContainer.selectAll("." + Abstract.Axis.TICK_MARK_CLASS).data(allTicks);
-      tickMarks.enter().append("line").classed(Abstract.Axis.TICK_MARK_CLASS, true);
+      var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(allTicks);
+      tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
       tickMarks.exit().remove();
       this.adjustTickLength(this.tickLabelPadding(), Time._minorIntervals[index]);

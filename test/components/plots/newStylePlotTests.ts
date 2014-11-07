@@ -3,14 +3,12 @@
 var assert = chai.assert;
 describe("Plots", () => {
   describe("New Style Plots", () => {
-    var p: Plottable.Abstract.NewStylePlot<number,number>;
+    var p: Plottable.Plot.AbstractPlot;
     var oldWarn = Plottable._Util.Methods.warn;
 
     beforeEach(() => {
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
-      p = new Plottable.Abstract.NewStylePlot(xScale, yScale);
-      p._getDrawer = (k: string) => new Plottable._Drawer.Rect(k);
+      p = new Plottable.Plot.AbstractPlot();
+      p._getDrawer = (k: string) => new Plottable._Drawer.Element(k).svgElement("rect");
     });
 
     afterEach(() => {
@@ -26,7 +24,7 @@ describe("Plots", () => {
       p.addDataset(d4);
 
       assert.deepEqual(p._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
-      var datasets = p._getDatasetsInOrder();
+      var datasets = p.datasets();
       assert.deepEqual(datasets[0].data(), [1,2,3]);
       assert.equal(datasets[1], d2);
       assert.deepEqual(datasets[2].data(), [7,8,9]);
@@ -36,7 +34,7 @@ describe("Plots", () => {
       p.removeDataset("_0");
 
       assert.deepEqual(p._datasetKeysInOrder, ["bar", "_1"]);
-      assert.lengthOf(p._getDatasetsInOrder(), 2);
+      assert.lengthOf(p.datasets(), 2);
     });
 
     it("Datasets are listened to appropriately", () => {

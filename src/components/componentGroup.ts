@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Component {
-  export class Group extends Abstract.ComponentContainer {
+  export class Group extends AbstractComponentContainer {
 
     /**
      * Constructs a GroupComponent.
@@ -14,23 +14,23 @@ export module Component {
      * @constructor
      * @param {Component[]} components The Components in the Group (default = []).
      */
-    constructor(components: Abstract.Component[] = []){
+    constructor(components: AbstractComponent[] = []){
       super();
       this.classed("component-group", true);
-      components.forEach((c: Abstract.Component) => this._addComponent(c));
+      components.forEach((c: AbstractComponent) => this._addComponent(c));
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _ISpaceRequest {
-      var requests = this._components.map((c: Abstract.Component) => c._requestedSpace(offeredWidth, offeredHeight));
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+      var requests = this._components.map((c: AbstractComponent) => c._requestedSpace(offeredWidth, offeredHeight));
       return {
-        width : _Util.Methods.max(requests, (request: _ISpaceRequest) => request.width ),
-        height: _Util.Methods.max(requests, (request: _ISpaceRequest) => request.height),
-        wantsWidth : requests.map((r: _ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
-        wantsHeight: requests.map((r: _ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
+        width : _Util.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.width, 0),
+        height: _Util.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.height, 0),
+        wantsWidth : requests.map((r: _SpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
+        wantsHeight: requests.map((r: _SpaceRequest) => r.wantsHeight).some((x: boolean) => x)
       };
     }
 
-    public merge(c: Abstract.Component): Group {
+    public merge(c: AbstractComponent): Group {
       this._addComponent(c);
       return this;
     }
