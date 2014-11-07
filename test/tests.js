@@ -1046,7 +1046,7 @@ describe("Labels", function () {
         assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "label is in vertical position");
         svg.remove();
     });
-    it("padding puts space between the label and other components", function () {
+    it("padding reacts well under align", function () {
         var svg = generateSVG(400, 200);
         var testLabel = new Plottable.Component.Label("testing label").padding(30).xAlign("left");
         var longLabel = new Plottable.Component.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlign("left");
@@ -1067,6 +1067,14 @@ describe("Labels", function () {
         testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
         var topTextRect = topLabel._element.select("text").node().getBoundingClientRect();
         assert.closeTo(testTextRect.top, topTextRect.bottom + 30, 2, "vertical difference by padding amount");
+        svg.remove();
+    });
+    it("padding puts space around the label", function () {
+        var svg = generateSVG(400, 200);
+        var testLabel = new Plottable.Component.Label("testing label").padding(30);
+        testLabel.renderTo(svg);
+        assert.closeTo(testLabel.width(), 168, 1, "width incorporates the padding");
+        assert.closeTo(testLabel.height(), 84, 1, "height incorporates the padding");
         svg.remove();
     });
 });
