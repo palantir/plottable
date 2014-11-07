@@ -125,6 +125,9 @@ export module Component {
 
       var entries = rows.selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).data((d) => d);
       var entriesEnter = entries.enter().append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
+      entries.each(function(d: string) {
+        d3.select(this).classed(d.replace(" ", "-"), true);
+      });
       entriesEnter.append("circle");
       entriesEnter.append("g").classed("text-container", true);
       entries.exit().remove();

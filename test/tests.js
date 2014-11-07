@@ -442,18 +442,26 @@ describe("BaseAxis", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("TimeAxis", function () {
+    var scale;
+    var axis;
+    beforeEach(function () {
+        scale = new Plottable.Scale.Time();
+        axis = new Plottable.Axis.Time(scale, "bottom");
+    });
     it("can not initialize vertical time axis", function () {
-        var scale = new Plottable.Scale.Time();
-        assert.throws(function () { return new Plottable.Axis.Time(scale, "left"); }, "unsupported");
-        assert.throws(function () { return new Plottable.Axis.Time(scale, "right"); }, "unsupported");
+        assert.throws(function () { return new Plottable.Axis.Time(scale, "left"); }, "horizontal");
+        assert.throws(function () { return new Plottable.Axis.Time(scale, "right"); }, "horizontal");
+    });
+    it("cannot change time axis orientation to vertical", function () {
+        assert.throws(function () { return axis.orient("left"); }, "horizontal");
+        assert.throws(function () { return axis.orient("right"); }, "horizontal");
+        assert.equal(axis.orient(), "bottom", "orientation unchanged");
     });
     it("major and minor intervals arrays are the same length", function () {
         assert.equal(Plottable.Axis.Time._majorIntervals.length, Plottable.Axis.Time._minorIntervals.length, "major and minor interval arrays must be same size");
     });
     it("Computing the default ticks doesn't error out for edge cases", function () {
         var svg = generateSVG(400, 100);
-        var scale = new Plottable.Scale.Time();
-        var axis = new Plottable.Axis.Time(scale, "bottom");
         scale.range([0, 400]);
         // very large time span
         assert.doesNotThrow(function () { return scale.domain([new Date(0, 0, 1, 0, 0, 0, 0), new Date(50000, 0, 1, 0, 0, 0, 0)]); });
@@ -465,9 +473,7 @@ describe("TimeAxis", function () {
     });
     it("Tick labels don't overlap", function () {
         var svg = generateSVG(400, 100);
-        var scale = new Plottable.Scale.Time();
         scale.range([0, 400]);
-        var axis = new Plottable.Axis.Time(scale, "bottom");
         function checkDomain(domain) {
             scale.domain(domain);
             axis.renderTo(svg);
@@ -1094,7 +1100,8 @@ describe("Legends", function () {
         assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
         svg.remove();
     });
-    it("a legend with a long label does not overflow horizontally", function () {
+    // Test is flaky under SauceLabs for firefox version 30
+    it.skip("a legend with a long label does not overflow horizontally", function () {
         color.domain(["foooboooloonoogoorooboopoo"]);
         svg.attr("width", 100);
         legend.renderTo(svg);
@@ -2316,12 +2323,12 @@ describe("Plots", function () {
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
-                assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
+                assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
+                assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
                 assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
                 assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
-                assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
-                assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
+                assert.equal(bar0.attr("x"), "75", "bar0 x is correct");
+                assert.equal(bar1.attr("x"), "375", "bar1 x is correct");
                 assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
                 assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
                 var baseline = renderArea.select(".baseline");
@@ -2354,19 +2361,19 @@ describe("Plots", function () {
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
-                assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
-                assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
-                assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
+                assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
+                assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
+                assert.equal(numAttr(bar0, "x"), 75, "bar0 x is correct");
+                assert.equal(numAttr(bar1, "x"), 375, "bar1 x is correct");
                 barPlot.barAlignment("right");
                 renderArea = barPlot._renderArea;
                 bars = renderArea.selectAll("rect");
                 bar0 = d3.select(bars[0][0]);
                 bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
-                assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
-                assert.equal(bar0.attr("x"), "140", "bar0 x is correct");
-                assert.equal(bar1.attr("x"), "440", "bar1 x is correct");
+                assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
+                assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
+                assert.equal(numAttr(bar0, "x"), 0, "bar0 x is correct");
+                assert.equal(numAttr(bar1, "x"), 300, "bar1 x is correct");
                 assert.throws(function () { return barPlot.barAlignment("blargh"); }, Error);
                 assert.equal(barPlot._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
                 svg.remove();
@@ -2422,6 +2429,128 @@ describe("Plots", function () {
                 svg.remove();
             });
         });
+        describe("Vertical Bar Plot modified log scale", function () {
+            var svg;
+            var dataset;
+            var xScale;
+            var yScale;
+            var barPlot;
+            var SVG_WIDTH = 600;
+            var SVG_HEIGHT = 400;
+            beforeEach(function () {
+                svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                xScale = new Plottable.Scale.ModifiedLog();
+                yScale = new Plottable.Scale.Linear();
+                var data = [
+                    { x: 2, y: 1 },
+                    { x: 10, y: -1.5 },
+                    { x: 100, y: 1 }
+                ];
+                dataset = new Plottable.Dataset(data);
+                barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+                barPlot.addDataset(dataset);
+                barPlot.animate(false);
+                barPlot.baseline(0);
+                yScale.domain([-2, 2]);
+                barPlot.renderTo(svg);
+            });
+            it("barPixelWidth calculated appropriately", function () {
+                assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+                svg.remove();
+            });
+            it("bar widths are equal to barPixelWidth", function () {
+                var renderArea = barPlot._renderArea;
+                var bars = renderArea.selectAll("rect");
+                assert.lengthOf(bars[0], 3, "One bar was created per data point");
+                var barPixelWidth = barPlot._getBarPixelWidth();
+                var bar0 = d3.select(bars[0][0]);
+                var bar1 = d3.select(bars[0][1]);
+                var bar2 = d3.select(bars[0][2]);
+                assert.closeTo(numAttr(bar0, "width"), barPixelWidth, 0.1, "bar0 width is correct");
+                assert.closeTo(numAttr(bar1, "width"), barPixelWidth, 0.1, "bar1 width is correct");
+                assert.closeTo(numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
+                svg.remove();
+            });
+        });
+        describe("Vertical Bar Plot linear scale", function () {
+            var svg;
+            var dataset;
+            var xScale;
+            var yScale;
+            var barPlot;
+            var SVG_WIDTH = 600;
+            var SVG_HEIGHT = 400;
+            beforeEach(function () {
+                svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                xScale = new Plottable.Scale.Linear();
+                yScale = new Plottable.Scale.Linear();
+                var data = [
+                    { x: 2, y: 1 },
+                    { x: 10, y: -1.5 },
+                    { x: 100, y: 1 }
+                ];
+                dataset = new Plottable.Dataset(data);
+                barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+                barPlot.addDataset(dataset);
+                barPlot.baseline(0);
+                barPlot.renderTo(svg);
+            });
+            it("bar width takes an appropriate value", function () {
+                assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+                svg.remove();
+            });
+            it("bar widths are equal to barPixelWidth", function () {
+                var renderArea = barPlot._renderArea;
+                var bars = renderArea.selectAll("rect");
+                assert.lengthOf(bars[0], 3, "One bar was created per data point");
+                var barPixelWidth = barPlot._getBarPixelWidth();
+                var bar0 = d3.select(bars[0][0]);
+                var bar1 = d3.select(bars[0][1]);
+                var bar2 = d3.select(bars[0][2]);
+                assert.closeTo(numAttr(bar0, "width"), barPixelWidth, 0.1, "bar0 width is correct");
+                assert.closeTo(numAttr(bar1, "width"), barPixelWidth, 0.1, "bar1 width is correct");
+                assert.closeTo(numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
+                svg.remove();
+            });
+            it("sensible bar width one datum", function () {
+                barPlot.removeDataset(dataset);
+                barPlot.addDataset([{ x: 10, y: 2 }]);
+                assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
+                svg.remove();
+            });
+            it("sensible bar width same datum", function () {
+                barPlot.removeDataset(dataset);
+                barPlot.addDataset([{ x: 10, y: 2 }, { x: 10, y: 2 }]);
+                assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "uses the width sensible for one datum");
+                svg.remove();
+            });
+            it("sensible bar width unsorted data", function () {
+                barPlot.removeDataset(dataset);
+                barPlot.addDataset([{ x: 2, y: 2 }, { x: 20, y: 2 }, { x: 5, y: 2 }]);
+                var expectedBarPixelWidth = (xScale.scale(5) - xScale.scale(2)) * 0.95;
+                assert.closeTo(barPlot._getBarPixelWidth(), expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
+                svg.remove();
+            });
+        });
+        describe("Vertical Bar Plot time scale", function () {
+            var svg;
+            var barPlot;
+            var xScale;
+            beforeEach(function () {
+                svg = generateSVG(600, 400);
+                var data = [{ x: "12/01/92", y: 0, type: "a" }, { x: "12/01/93", y: 1, type: "a" }, { x: "12/01/94", y: 1, type: "a" }, { x: "12/01/95", y: 2, type: "a" }, { x: "12/01/96", y: 2, type: "a" }, { x: "12/01/97", y: 2, type: "a" }];
+                xScale = new Plottable.Scale.Time();
+                var yScale = new Plottable.Scale.Linear();
+                barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+                barPlot.addDataset(data).project("x", function (d) { return d3.time.format("%m/%d/%y").parse(d.x); }, xScale).project("y", "y", yScale).renderTo(svg);
+            });
+            it("bar width takes an appropriate value", function () {
+                var timeFormatter = d3.time.format("%m/%d/%y");
+                var expectedBarWidth = (xScale.scale(timeFormatter.parse("12/01/94")) - xScale.scale(timeFormatter.parse("12/01/93"))) * 0.95;
+                assert.closeTo(barPlot._getBarPixelWidth(), expectedBarWidth, 0.1, "width is difference between two dates");
+                svg.remove();
+            });
+        });
         describe("Horizontal Bar Plot in Points Mode", function () {
             var svg;
             var dataset;
@@ -2453,12 +2582,12 @@ describe("Plots", function () {
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
-                assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
+                assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
+                assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
                 assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
                 assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-                assert.equal(bar0.attr("y"), "295", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
+                assert.equal(bar0.attr("y"), "250", "bar0 y is correct");
+                assert.equal(bar1.attr("y"), "50", "bar1 y is correct");
                 assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
                 assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
                 var baseline = renderArea.select(".baseline");
@@ -2491,19 +2620,19 @@ describe("Plots", function () {
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
-                assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
-                assert.equal(bar0.attr("y"), "295", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
+                assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
+                assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
+                assert.equal(numAttr(bar0, "y"), 250, "bar0 y is correct");
+                assert.equal(numAttr(bar1, "y"), 50, "bar1 y is correct");
                 barPlot.barAlignment("bottom");
                 renderArea = barPlot._renderArea;
                 bars = renderArea.selectAll("rect");
                 bar0 = d3.select(bars[0][0]);
                 bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
-                assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
-                assert.equal(bar0.attr("y"), "290", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "90", "bar1 y is correct");
+                assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
+                assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
+                assert.equal(numAttr(bar0, "y"), 200, "bar0 y is correct");
+                assert.equal(numAttr(bar1, "y"), 0, "bar1 y is correct");
                 assert.throws(function () { return barPlot.barAlignment("blargh"); }, Error);
                 svg.remove();
             });
@@ -6673,6 +6802,8 @@ var TestHoverable = (function (_super) {
     __extends(TestHoverable, _super);
     function TestHoverable() {
         _super.apply(this, arguments);
+        this.leftPoint = { x: 100, y: 200 };
+        this.rightPoint = { x: 300, y: 200 };
     }
     TestHoverable.prototype._hoverOverComponent = function (p) {
         // cast-override
@@ -6682,14 +6813,18 @@ var TestHoverable = (function (_super) {
     };
     TestHoverable.prototype._doHover = function (p) {
         var data = [];
+        var points = [];
         if (p.x < 250) {
             data.push("left");
+            points.push(this.leftPoint);
         }
         if (p.x > 150) {
             data.push("right");
+            points.push(this.rightPoint);
         }
         return {
             data: data,
+            pixelPositions: points,
             selection: this._element
         };
     };
@@ -6728,6 +6863,7 @@ describe("Interactions", function () {
             overCallbackCalled = false;
             triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
             assert.isTrue(overCallbackCalled, "onHoverOver was called on mousing over a target area");
+            assert.deepEqual(overData.pixelPositions, [testTarget.leftPoint], "onHoverOver was called with the correct pixel position (mouse onto left)");
             assert.deepEqual(overData.data, ["left"], "onHoverOver was called with the correct data (mouse onto left)");
             overCallbackCalled = false;
             triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
@@ -6735,10 +6871,12 @@ describe("Interactions", function () {
             overCallbackCalled = false;
             triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
             assert.isTrue(overCallbackCalled, "onHoverOver was called when mousing into a new region");
+            assert.deepEqual(overData.pixelPositions, [testTarget.rightPoint], "onHoverOver was called with the correct pixel position (left --> center)");
             assert.deepEqual(overData.data, ["right"], "onHoverOver was called with the new data only (left --> center)");
             triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
             overCallbackCalled = false;
             triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
+            assert.deepEqual(overData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint], "onHoverOver was called with the correct pixel positions");
             assert.deepEqual(overData.data, ["left", "right"], "onHoverOver is called with the correct data");
             svg.remove();
         });
@@ -6750,23 +6888,28 @@ describe("Interactions", function () {
             outCallbackCalled = false;
             triggerFakeMouseEvent("mousemove", hitbox, 300, 200);
             assert.isTrue(outCallbackCalled, "onHoverOut was called when the hover data changes");
+            assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint], "onHoverOut was called with the correct pixel position (center --> right)");
             assert.deepEqual(outData.data, ["left"], "onHoverOut was called with the correct data (center --> right)");
             outCallbackCalled = false;
             triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
             assert.isTrue(outCallbackCalled, "onHoverOut is called on mousing out of the Component");
+            assert.deepEqual(outData.pixelPositions, [testTarget.rightPoint], "onHoverOut was called with the correct pixel position");
             assert.deepEqual(outData.data, ["right"], "onHoverOut was called with the correct data");
             outCallbackCalled = false;
             triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
             triggerFakeMouseEvent("mouseout", hitbox, 200, 400);
+            assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint], "onHoverOut was called with the correct pixel positions");
             assert.deepEqual(outData.data, ["left", "right"], "onHoverOut is called with the correct data");
             svg.remove();
         });
         it("getCurrentHoverData()", function () {
             triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
             var currentlyHovered = hoverInteraction.getCurrentHoverData();
+            assert.deepEqual(currentlyHovered.pixelPositions, [testTarget.leftPoint], "retrieves pixel positions corresponding to the current position");
             assert.deepEqual(currentlyHovered.data, ["left"], "retrieves data corresponding to the current position");
             triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
             currentlyHovered = hoverInteraction.getCurrentHoverData();
+            assert.deepEqual(currentlyHovered.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint], "retrieves pixel positions corresponding to the current position");
             assert.deepEqual(currentlyHovered.data, ["left", "right"], "retrieves data corresponding to the current position");
             triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
             currentlyHovered = hoverInteraction.getCurrentHoverData();

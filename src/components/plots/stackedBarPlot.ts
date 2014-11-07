@@ -112,6 +112,10 @@ export module Plot {
       return AbstractStacked.prototype._valueAccessor.call(this);
     }
     //===== /Stack logic =====
+
+    public _getBarPixelWidth() {
+      return AbstractBarPlot.prototype._getBarPixelWidth.apply(this);
+    }
   }
 }
 }

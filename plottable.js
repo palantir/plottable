@@ -1,5 +1,5 @@
 /*!
-Plottable 0.34.0 (https://github.com/palantir/plottable)
+Plottable 0.35.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1385,7 +1385,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.34.0";
+    Plottable.version = "0.35.1";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3223,9 +3223,11 @@ var Plottable;
                 this.pathSelection.datum(data);
             };
             Line.prototype.setup = function (area) {
-                area.append("path").classed("line", true);
+                this.pathSelection = area.append("path").classed("line", true).style({
+                    "fill": "none",
+                    "vector-effect": "non-scaling-stroke"
+                });
                 _super.prototype.setup.call(this, area);
-                this.pathSelection = this._renderArea.select(".line");
             };
             Line.prototype.createLine = function (xFunction, yFunction, definedFunction) {
                 if (!definedFunction) {
@@ -3295,14 +3297,13 @@ var Plottable;
                 return this;
             };
             Area.prototype.setup = function (area) {
-                area.append("path").classed("area", true);
+                this.areaSelection = area.append("path").classed("area", true).style({ "stroke": "none" });
                 if (this._drawLine) {
                     _super.prototype.setup.call(this, area);
                 }
                 else {
                     _Drawer.AbstractDrawer.prototype.setup.call(this, area);
                 }
-                this.areaSelection = this._renderArea.select(".area");
             };
             Area.prototype.createArea = function (xFunction, y0Function, y1Function, definedFunction) {
                 if (!definedFunction) {
@@ -3871,7 +3872,8 @@ var Plottable;
                 // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
                 // They don't need the current URL in the clip path reference.
                 var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-                this._element.attr("clip-path", "url(" + prefix + "#clipPath" + this._plottableID + ")");
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this._plottableID + "\")");
                 var clipPathParent = this.boxContainer.append("clipPath").attr("id", "clipPath" + this._plottableID);
                 this.addBox("clip-rect", clipPathParent);
             };
@@ -4563,14 +4565,16 @@ var Plottable;
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             function Time(scale, orientation) {
-                orientation = orientation.toLowerCase();
-                if (orientation !== "top" && orientation !== "bottom") {
-                    throw new Error("unsupported orientation: " + orientation);
-                }
                 _super.call(this, scale, orientation);
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
             }
+            Time.prototype.orient = function (orientation) {
+                if (orientation && (orientation.toLowerCase() === "right" || orientation.toLowerCase() === "left")) {
+                    throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
+                }
+                return _super.prototype.orient.call(this, orientation); // maintains getter-setter functionality
+            };
             Time.prototype._computeHeight = function () {
                 if (this._computedHeight !== null) {
                     return this._computedHeight;
@@ -5467,6 +5471,9 @@ var Plottable;
                 var r = textHeight * 0.3;
                 var legend = this._content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, function (d) { return d; });
                 var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true);
+                legendEnter.each(function (d) {
+                    d3.select(this).classed(d.replace(" ", "-"), true);
+                });
                 legendEnter.append("circle");
                 legendEnter.append("g").classed("text-container", true);
                 legend.exit().remove();
@@ -5665,6 +5672,9 @@ var Plottable;
                 rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this.padding) + ")"; });
                 var entries = rows.selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
                 var entriesEnter = entries.enter().append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
+                entries.each(function (d) {
+                    d3.select(this).classed(d.replace(" ", "-"), true);
+                });
                 entriesEnter.append("circle");
                 entriesEnter.append("g").classed("text-container", true);
                 entries.exit().remove();
@@ -6771,6 +6781,7 @@ var Plottable;
                 };
                 var overAPoint = false;
                 var closestElement;
+                var closestIndex;
                 var minDistSq = range * range;
                 drawers.forEach(function (drawer) {
                     drawer._getDrawSelection().each(function (d, i) {
@@ -6779,20 +6790,35 @@ var Plottable;
                         if (distSq < r * r) {
                             if (!overAPoint || distSq < minDistSq) {
                                 closestElement = this;
+                                closestIndex = i;
                                 minDistSq = distSq;
                             }
                             overAPoint = true;
                         }
                         else if (!overAPoint && distSq < minDistSq) {
                             closestElement = this;
+                            closestIndex = i;
                             minDistSq = distSq;
                         }
                     });
                 });
+                if (!closestElement) {
+                    return {
+                        selection: null,
+                        pixelPositions: null,
+                        data: null
+                    };
+                }
                 var closestSelection = d3.select(closestElement);
+                var closestData = closestSelection.data();
+                var closestPoint = {
+                    x: attrToProjector["cx"](closestData[0], closestIndex),
+                    y: attrToProjector["cy"](closestData[0], closestIndex)
+                };
                 return {
-                    selection: closestElement ? closestSelection : null,
-                    data: closestElement ? closestSelection.data() : null
+                    selection: closestSelection,
+                    pixelPositions: [closestPoint],
+                    data: closestData
                 };
             };
             //===== Hover logic =====
@@ -6909,7 +6935,6 @@ var Plottable;
              */
             function AbstractBarPlot(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this._baselineValue = 0;
                 this._barAlignmentFactor = 0.5;
                 this._barLabelFormatter = Plottable.Formatters.identity();
                 this._barLabelsEnabled = false;
@@ -6920,7 +6945,7 @@ var Plottable;
                 this._animators["bars-reset"] = new Plottable.Animator.Null();
                 this._animators["bars"] = new Plottable.Animator.Base();
                 this._animators["baseline"] = new Plottable.Animator.Null();
-                this.baseline(this._baselineValue);
+                this.baseline(0);
             }
             AbstractBarPlot.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Rect(key, this._isVertical);
@@ -7111,14 +7136,13 @@ var Plottable;
                 var secondaryScale = this._isVertical ? this._xScale : this._yScale;
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var secondaryAttr = this._isVertical ? "x" : "y";
-                var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
                 if (!attrToProjector["width"]) {
-                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
-                    attrToProjector["width"] = function (d, i) { return constantWidth; };
+                    attrToProjector["width"] = function () { return _this._getBarPixelWidth(); };
                 }
                 var positionF = attrToProjector[secondaryAttr];
                 var widthF = attrToProjector["width"];
+                var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                 if (!bandsMode) {
                     attrToProjector[secondaryAttr] = function (d, i) { return positionF(d, i) - widthF(d, i) * _this._barAlignmentFactor; };
                 }
@@ -7146,6 +7170,52 @@ var Plottable;
                 }
                 return attrToProjector;
             };
+            /**
+             * Computes the barPixelWidth of all the bars in the plot.
+             *
+             * If the position scale of the plot is an OrdinalScale and in bands mode, then the rangeBands function will be used.
+             * If the position scale of the plot is an OrdinalScale and in points mode, then
+             *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
+             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             */
+            AbstractBarPlot.prototype._getBarPixelWidth = function () {
+                var barPixelWidth;
+                var barScale = this._isVertical ? this._xScale : this._yScale;
+                if (barScale instanceof Plottable.Scale.Ordinal) {
+                    var ordScale = barScale;
+                    if (ordScale.rangeType() === "bands") {
+                        barPixelWidth = ordScale.rangeBand();
+                    }
+                    else {
+                        // padding is defined as 2 * the ordinal scale's _outerPadding variable
+                        // HACKHACK need to use _outerPadding for formula as above
+                        var padding = ordScale._outerPadding * 2;
+                        // step is defined as the range_interval / (padding + number of bars)
+                        var secondaryDimension = this._isVertical ? this.width() : this.height();
+                        var step = secondaryDimension / (padding + ordScale.domain().length - 1);
+                        barPixelWidth = step * padding * 0.5;
+                    }
+                }
+                else {
+                    var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+                    var barAccessorData = d3.set(Plottable._Util.Methods.flatten(this.datasets().map(function (dataset) {
+                        return dataset.data().map(function (d, i) { return barAccessor(d, i); });
+                    }))).values();
+                    if (barAccessorData.some(function (datum) { return datum === "undefined"; })) {
+                        return -1;
+                    }
+                    var numberBarAccessorData = d3.set(Plottable._Util.Methods.flatten(this.datasets().map(function (dataset) {
+                        return dataset.data().map(function (d, i) { return barAccessor(d, i).valueOf(); });
+                    }))).values().map(function (value) { return +value; });
+                    numberBarAccessorData.sort(function (a, b) { return a - b; });
+                    var barAccessorDataPairs = d3.pairs(numberBarAccessorData);
+                    var barWidthDimension = this._isVertical ? this.width() : this.height();
+                    barPixelWidth = Plottable._Util.Methods.min(barAccessorDataPairs, function (pair, i) {
+                        return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
+                    }, barWidthDimension * 0.4) * 0.95;
+                }
+                return barPixelWidth;
+            };
             AbstractBarPlot.prototype.hoverMode = function (mode) {
                 if (mode == null) {
                     return this._hoverMode;
@@ -7170,6 +7240,7 @@ var Plottable;
                 this.clearHoverSelection();
             };
             AbstractBarPlot.prototype._doHover = function (p) {
+                var _this = this;
                 var xPositionOrExtent = p.x;
                 var yPositionOrExtent = p.y;
                 if (this._hoverMode === "line") {
@@ -7190,9 +7261,31 @@ var Plottable;
                 }
                 else {
                     this.clearHoverSelection();
+                    return {
+                        data: null,
+                        pixelPositions: null,
+                        selection: null
+                    };
                 }
+                var points = [];
+                var projectors = this._generateAttrToProjector();
+                selectedBars.each(function (d, i) {
+                    if (_this._isVertical) {
+                        points.push({
+                            x: projectors["x"](d, i) + projectors["width"](d, i) / 2,
+                            y: projectors["y"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["height"](d, i))
+                        });
+                    }
+                    else {
+                        points.push({
+                            x: projectors["x"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["width"](d, i)),
+                            y: projectors["y"](d, i) + projectors["height"](d, i) / 2
+                        });
+                    }
+                });
                 return {
-                    data: selectedBars ? selectedBars.data() : null,
+                    data: selectedBars.data(),
+                    pixelPositions: points,
                     selection: selectedBars
                 };
             };
@@ -7888,6 +7981,10 @@ var Plottable;
             };
             StackedBar.prototype._valueAccessor = function () {
                 return Plot.AbstractStacked.prototype._valueAccessor.call(this);
+            };
+            //===== /Stack logic =====
+            StackedBar.prototype._getBarPixelWidth = function () {
+                return Plot.AbstractBarPlot.prototype._getBarPixelWidth.apply(this);
             };
             return StackedBar;
         })(Plot.AbstractBarPlot);
@@ -8984,6 +9081,7 @@ var Plottable;
                 _super.apply(this, arguments);
                 this.currentHoverData = {
                     data: null,
+                    pixelPositions: null,
                     selection: null
                 };
             }
@@ -9000,6 +9098,7 @@ var Plottable;
                     _this.safeHoverOut(_this.currentHoverData);
                     _this.currentHoverData = {
                         data: null,
+                        pixelPositions: null,
                         selection: null
                     };
                 });
@@ -9013,28 +9112,37 @@ var Plottable;
                 if (a.data == null || b.data == null) {
                     return a;
                 }
-                var notInB = function (d) { return b.data.indexOf(d) === -1; };
-                var diffData = a.data.filter(notInB);
+                var diffData = [];
+                var diffPoints = [];
+                var diffElements = [];
+                a.data.forEach(function (d, i) {
+                    if (b.data.indexOf(d) === -1) {
+                        diffData.push(d);
+                        diffPoints.push(a.pixelPositions[i]);
+                        diffElements.push(a.selection[0][i]);
+                    }
+                });
                 if (diffData.length === 0) {
                     return {
                         data: null,
+                        pixelPositions: null,
                         selection: null
                     };
                 }
-                var diffSelection = a.selection.filter(notInB);
                 return {
                     data: diffData,
-                    selection: diffSelection
+                    pixelPositions: diffPoints,
+                    selection: d3.selectAll(diffElements)
                 };
             };
             Hover.prototype.handleHoverOver = function (p) {
                 var lastHoverData = this.currentHoverData;
                 var newHoverData = this._componentToListenTo._doHover(p);
+                this.currentHoverData = newHoverData;
                 var outData = Hover.diffHoverData(lastHoverData, newHoverData);
                 this.safeHoverOut(outData);
                 var overData = Hover.diffHoverData(newHoverData, lastHoverData);
                 this.safeHoverOver(overData);
-                this.currentHoverData = newHoverData;
             };
             Hover.prototype.safeHoverOut = function (outData) {
                 if (this.hoverOutCallback && outData.data) {
