@@ -22,7 +22,6 @@ function showSizeControls(){
 "use strict";
 
 var plottableBranches=[];
-var qtestnames = [];
 var firstBranch;
 var secondBranch;
 var svgWidth;
@@ -83,7 +82,7 @@ function filterQuickTests(category, branchList){
   d3.json("list_of_quicktests.json", function (data){
     var paths = data.map(function(quickTestObj) {return quickTestObj.path;});
     var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1;});
-    qtestnames = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, '');});
+    var qtestnames = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, '');});
     loadQuickTestsInCategory(qtestnames, category, branchList[0], branchList[1]);
   });
 }
@@ -135,7 +134,6 @@ function resetDisplayProperties(){
 
 function clearTests(){
   plottableBranches = [];
-  qtestnames= [];
   resetDisplayProperties();
   d3.selectAll(".quicktest").remove();
 }
@@ -173,7 +171,7 @@ function processKeyEvent(key, visibleQuickTests){
     var firstBranchInputColor = onePressed || threePressed ? "mediumaquamarine" : "white";
     var secondBranchInputColor = twoPressed || threePressed ? "mediumaquamarine" : "white";
 
-    visibleQuickTests.map(function(quicktest){
+    visibleQuickTests.forEach(function(quicktest){
       $(".first", quicktest).css("display", firstBranchDisplay);
       $(".second", quicktest).css("display", secondBranchDisplay);
       $(branchClassBehind, quicktest).before($(branchClassFront, quicktest));
