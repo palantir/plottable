@@ -400,7 +400,6 @@ describe("Component behavior", () => {
     assert.deepEqual(transform.translate, [0, 0], "the element was not translated");
     svg.remove();
   });
-<<<<<<< HEAD
 
   it("components do not render unless allocated space", () => {
     var renderFlag = false;
@@ -421,7 +420,8 @@ describe("Component behavior", () => {
     assert.isTrue(renderFlag, "render occurs if width and height are positive");
 
     svg.remove();
-=======
+  });
+
   describe("resizeBroadcaster testing", () => {
     var oldRegister: any;
     var oldDeregister: any;
@@ -486,6 +486,5 @@ describe("Component behavior", () => {
       c.remove();
       assert.isFalse(registeredComponents.has(id), "component is deregistered after removal");
     });
->>>>>>> develop
   });
 });
