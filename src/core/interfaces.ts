@@ -3,14 +3,21 @@ module Plottable {
    * Access specific datum property.
    */
   export interface _Accessor {
-    (datum: any, index?: number, userMetadata?: any, plotMetadata?: any): any;
+    (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plot.PlotMetadata): any;
   };
 
   /**
    * Retrieves scalled datum property.
    */
   export interface _Projector {
-    (datum?: any, index?: number, userMetadata?: any, plotMetadata?: any) : any;
+    (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata) : any;
+  }
+
+  /**
+   * Projector with applied user and plot metadata
+   */
+  export interface _AppliedProjector {
+    (datum: any, index: number) : any;
   }
 
   /**
@@ -32,6 +39,10 @@ module Plottable {
    */
   export interface AttributeToProjector {
     [attrToSet: string]: _Projector;
+  }
+
+  export interface _AttributeToAppliedProjector {
+    [attrToSet: string]: _AppliedProjector;
   }
 
   /**

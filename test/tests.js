@@ -231,7 +231,7 @@ describe("Drawers", function () {
             var ds1 = { attrToProjector: {}, animator: a1 };
             var ds2 = { attrToProjector: {}, animator: a2 };
             var steps = [ds1, ds2];
-            drawer.draw([], steps);
+            drawer.draw([], steps, null, null);
             assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
         });
         it("drawer timing works for non-null animators", function (done) {
@@ -255,7 +255,7 @@ describe("Drawers", function () {
             var ds2 = { attrToProjector: {}, animator: a2 };
             var ds3 = { attrToProjector: {}, animator: a3 };
             var steps = [ds1, ds2, ds3];
-            drawer.draw([], steps);
+            drawer.draw([], steps, null, null);
             assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
         });
     });
@@ -1668,7 +1668,7 @@ describe("Plots", function () {
             r.project("attr", "a", s);
             var attrToProjector = r._generateAttrToProjector();
             var projector = attrToProjector["attr"];
-            assert.equal(projector({ "a": 0.5 }, 0), 5, "projector works as intended");
+            assert.equal(projector({ "a": 0.5 }, 0, null, null), 5, "projector works as intended");
         });
         it("Changing Plot.dataset().data to [] causes scale to contract", function () {
             var ds1 = new Plottable.Dataset([0, 1, 2]);

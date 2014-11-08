@@ -3159,7 +3159,7 @@ var Plottable;
             /**
              * Draws data using one step
              *
-             * @param{DataStep} step The step, how data should be drawn.
+             * @param{AppliedDrawStep} step The step, how data should be drawn.
              */
             AbstractDrawer.prototype._drawStep = function (step) {
                 // no-op
@@ -3190,8 +3190,6 @@ var Plottable;
              */
             AbstractDrawer.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
                 var _this = this;
-                if (userMetadata === void 0) { userMetadata = {}; }
-                if (plotMetadata === void 0) { plotMetadata = {}; }
                 var appliedDrawSteps = drawSteps.map(function (dr) {
                     return {
                         attrToProjector: _this.applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
@@ -3244,7 +3242,7 @@ var Plottable;
             };
             Line.prototype.createLine = function (xFunction, yFunction, definedFunction) {
                 if (!definedFunction) {
-                    definedFunction = function () { return true; };
+                    definedFunction = function (d, i) { return true; };
                 }
                 return d3.svg.line().x(xFunction).y(yFunction).defined(definedFunction);
             };
@@ -3259,10 +3257,10 @@ var Plottable;
                 var definedFunction = attrToProjector["defined"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
-                attrToProjector["d"] = this.createLine(xFunction, yFunction, attrToProjector["defined"]);
                 if (attrToProjector["defined"]) {
                     delete attrToProjector["defined"];
                 }
+                attrToProjector["d"] = this.createLine(xFunction, yFunction, definedFunction);
                 if (attrToProjector["fill"]) {
                     this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
@@ -3320,7 +3318,7 @@ var Plottable;
             };
             Area.prototype.createArea = function (xFunction, y0Function, y1Function, definedFunction) {
                 if (!definedFunction) {
-                    definedFunction = function () { return true; };
+                    definedFunction = function (d, i) { return true; };
                 }
                 return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(definedFunction);
             };
@@ -3339,10 +3337,10 @@ var Plottable;
                 delete attrToProjector["x"];
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
-                attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function, attrToProjector["defined"]);
                 if (attrToProjector["defined"]) {
                     delete attrToProjector["defined"];
                 }
+                attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function, definedFunction);
                 if (attrToProjector["fill"]) {
                     this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
@@ -3451,17 +3449,17 @@ var Plottable;
             Rect.prototype.removeLabels = function () {
                 this.textArea.selectAll("g").remove();
             };
-            Rect.prototype.drawText = function (data, attrToProjector) {
+            Rect.prototype.drawText = function (data, attrToProjector, userMetadata, plotMetadata) {
                 var _this = this;
                 var labelTooWide = data.map(function (d, i) {
-                    var text = attrToProjector["label"](d, i).toString();
-                    var w = attrToProjector["width"](d, i);
-                    var h = attrToProjector["height"](d, i);
-                    var x = attrToProjector["x"](d, i);
-                    var y = attrToProjector["y"](d, i);
-                    var positive = attrToProjector["positive"](d, i);
+                    var text = attrToProjector["label"](d, i, userMetadata, plotMetadata).toString();
+                    var w = attrToProjector["width"](d, i, userMetadata, plotMetadata);
+                    var h = attrToProjector["height"](d, i, userMetadata, plotMetadata);
+                    var x = attrToProjector["x"](d, i, userMetadata, plotMetadata);
+                    var y = attrToProjector["y"](d, i, userMetadata, plotMetadata);
+                    var positive = attrToProjector["positive"](d, i, userMetadata, plotMetadata);
                     var measurement = _this.measurer(text);
-                    var color = attrToProjector["fill"](d, i);
+                    var color = attrToProjector["fill"](d, i, userMetadata, plotMetadata);
                     var dark = Plottable._Util.Color.contrast("white", color) * 1.6 < Plottable._Util.Color.contrast("black", color);
                     var primary = _this._isVertical ? h : w;
                     var primarySpace = _this._isVertical ? measurement.height : measurement.width;
@@ -3541,11 +3539,12 @@ var Plottable;
                 attrToProjector["d"] = this.createArc(innerRadiusF, outerRadiusF);
                 return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
             };
-            Arc.prototype.draw = function (data, drawSteps) {
-                var valueAccessor = drawSteps[0].attrToProjector["value"];
+            Arc.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
+                // HACKHACK Applying metadata should be done in base class
+                var valueAccessor = function (d, i) { return drawSteps[0].attrToProjector["value"](d, i, userMetadata, plotMetadata); };
                 var pie = d3.layout.pie().sort(null).value(valueAccessor)(data);
                 drawSteps.forEach(function (s) { return delete s.attrToProjector["value"]; });
-                return _super.prototype.draw.call(this, pie, drawSteps);
+                return _super.prototype.draw.call(this, pie, drawSteps, userMetadata, plotMetadata);
             };
             return Arc;
         })(_Drawer.Element);
@@ -6325,11 +6324,7 @@ var Plottable;
                     var projection = _this._projections[a];
                     var accessor = projection.accessor;
                     var scale = projection.scale;
-                    var fn = scale ? function (d, i, u, m) {
-                        if (u === void 0) { u = {}; }
-                        if (m === void 0) { m = {}; }
-                        return scale.scale(accessor(d, i, u, m));
-                    } : accessor;
+                    var fn = scale ? function (d, i, u, m) { return scale.scale(accessor(d, i, u, m)); } : accessor;
                     h[a] = fn;
                 });
                 return h;
@@ -6799,12 +6794,13 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("circles") });
                 return drawSteps;
             };
+            // HACKHACK User and plot metada should be applied - #1306.
             Scatter.prototype._getClosestStruckPoint = function (p, range) {
                 var drawers = this._getDrawersInOrder();
                 var attrToProjector = this._generateAttrToProjector();
                 var getDistSq = function (d, i) {
-                    var dx = attrToProjector["cx"](d, i) - p.x;
-                    var dy = attrToProjector["cy"](d, i) - p.y;
+                    var dx = attrToProjector["cx"](d, i, null, null) - p.x;
+                    var dy = attrToProjector["cy"](d, i, null, null) - p.y;
                     return (dx * dx + dy * dy);
                 };
                 var overAPoint = false;
@@ -6814,7 +6810,7 @@ var Plottable;
                 drawers.forEach(function (drawer) {
                     drawer._getDrawSelection().each(function (d, i) {
                         var distSq = getDistSq(d, i);
-                        var r = attrToProjector["r"](d, i);
+                        var r = attrToProjector["r"](d, i, null, null);
                         if (distSq < r * r) {
                             if (!overAPoint || distSq < minDistSq) {
                                 closestElement = this;
@@ -6840,8 +6836,8 @@ var Plottable;
                 var closestSelection = d3.select(closestElement);
                 var closestData = closestSelection.data();
                 var closestPoint = {
-                    x: attrToProjector["cx"](closestData[0], closestIndex),
-                    y: attrToProjector["cy"](closestData[0], closestIndex)
+                    x: attrToProjector["cx"](closestData[0], closestIndex, null, null),
+                    y: attrToProjector["cy"](closestData[0], closestIndex, null, null)
                 };
                 return {
                     selection: closestSelection,
@@ -7132,10 +7128,11 @@ var Plottable;
                 }
             };
             AbstractBarPlot.prototype._drawLabels = function () {
+                var _this = this;
                 var drawers = this._getDrawersInOrder();
                 var attrToProjector = this._generateAttrToProjector();
                 var dataToDraw = this._getDataToDraw();
-                this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector); });
+                this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).plotMetadata); });
                 if (this.hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._someLabelsTooWide; })) {
                     drawers.forEach(function (d) { return d.removeLabels(); });
                 }
@@ -7172,29 +7169,29 @@ var Plottable;
                 var widthF = attrToProjector["width"];
                 var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                 if (!bandsMode) {
-                    attrToProjector[secondaryAttr] = function (d, i) { return positionF(d, i) - widthF(d, i) * _this._barAlignmentFactor; };
+                    attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) * _this._barAlignmentFactor; };
                 }
                 else {
                     var bandWidth = secondaryScale.rangeBand();
-                    attrToProjector[secondaryAttr] = function (d, i) { return positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2; };
+                    attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) / 2 + bandWidth / 2; };
                 }
                 var originalPositionFn = attrToProjector[primaryAttr];
-                attrToProjector[primaryAttr] = function (d, i) {
-                    var originalPos = originalPositionFn(d, i);
+                attrToProjector[primaryAttr] = function (d, i, u, m) {
+                    var originalPos = originalPositionFn(d, i, u, m);
                     // If it is past the baseline, it should start at the baselin then width/height
                     // carries it over. If it's not past the baseline, leave it at original position and
                     // then width/height carries it to baseline
                     return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
                 };
-                attrToProjector["height"] = function (d, i) {
-                    return Math.abs(scaledBaseline - originalPositionFn(d, i));
+                attrToProjector["height"] = function (d, i, u, m) {
+                    return Math.abs(scaledBaseline - originalPositionFn(d, i, u, m));
                 };
                 var primaryAccessor = this._projections[primaryAttr].accessor;
                 if (this.barLabelsEnabled && this.barLabelFormatter) {
-                    attrToProjector["label"] = function (d, i) {
-                        return _this._barLabelFormatter(primaryAccessor(d, i));
+                    attrToProjector["label"] = function (d, i, u, m) {
+                        return _this._barLabelFormatter(primaryAccessor(d, i, u, m));
                     };
-                    attrToProjector["positive"] = function (d, i) { return originalPositionFn(d, i) <= scaledBaseline; };
+                    attrToProjector["positive"] = function (d, i, u, m) { return originalPositionFn(d, i, u, m) <= scaledBaseline; };
                 }
                 return attrToProjector;
             };
@@ -7267,6 +7264,7 @@ var Plottable;
             AbstractBarPlot.prototype._hoverOutComponent = function (p) {
                 this.clearHoverSelection();
             };
+            // HACKHACK User and plot metada should be applied here - #1306.
             AbstractBarPlot.prototype._doHover = function (p) {
                 var _this = this;
                 var xPositionOrExtent = p.x;
@@ -7300,14 +7298,14 @@ var Plottable;
                 selectedBars.each(function (d, i) {
                     if (_this._isVertical) {
                         points.push({
-                            x: projectors["x"](d, i) + projectors["width"](d, i) / 2,
-                            y: projectors["y"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["height"](d, i))
+                            x: projectors["x"](d, i, null, null) + projectors["width"](d, i, null, null) / 2,
+                            y: projectors["y"](d, i, null, null) + (projectors["positive"](d, i, null, null) ? 0 : projectors["height"](d, i, null, null))
                         });
                     }
                     else {
                         points.push({
-                            x: projectors["x"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["width"](d, i)),
-                            y: projectors["y"](d, i) + projectors["height"](d, i) / 2
+                            x: projectors["x"](d, i, null, null) + (projectors["positive"](d, i, null, null) ? 0 : projectors["width"](d, i, null, null)),
+                            y: projectors["y"](d, i, null, null) + projectors["height"](d, i, null, null) / 2
                         });
                     }
                 });
@@ -7463,7 +7461,7 @@ var Plottable;
                 // avoids lines zooming on from offscreen.
                 var startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
                 var scaledStartValue = this._yScale.scale(startValue);
-                return function (d, i) { return scaledStartValue; };
+                return function (d, i, u, m) { return scaledStartValue; };
             };
             Line.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
@@ -8197,7 +8195,7 @@ var Plottable;
                 }
                 var movingAttrProjector = attrToProjector[this.getMovingAttr()];
                 var growingAttrProjector = attrToProjector[this.getGrowingAttr()];
-                return function (d, i) { return movingAttrProjector(d, i) + growingAttrProjector(d, i); };
+                return function (d, i, u, m) { return movingAttrProjector(d, i, u, m) + growingAttrProjector(d, i, u, m); };
             };
             Rect.prototype.getGrowingAttr = function () {
                 return this.isVertical ? "height" : "width";

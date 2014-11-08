@@ -199,7 +199,7 @@ export module Plot {
         var projection = this._projections[a];
         var accessor = projection.accessor;
         var scale = projection.scale;
-        var fn = scale ? (d: any, i: number, u: any = {}, m: any = {}) => scale.scale(accessor(d, i, u, m)) : accessor;
+        var fn = scale ? (d: any, i: number, u: any, m: PlotMetadata) => scale.scale(accessor(d, i, u, m)) : accessor;
         h[a] = fn;
       });
       return h;

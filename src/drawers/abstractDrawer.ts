@@ -12,6 +12,11 @@ export module _Drawer {
     animator: Animator.PlotAnimator;
   }
 
+  export interface AppliedDrawStep {
+    attrToProjector: _AttributeToAppliedProjector;
+    animator: Animator.PlotAnimator;
+  }
+
   export class AbstractDrawer {
     public _renderArea: D3.Selection;
     public _className: string;
@@ -62,9 +67,9 @@ export module _Drawer {
     /**
      * Draws data using one step
      *
-     * @param{DataStep} step The step, how data should be drawn.
+     * @param{AppliedDrawStep} step The step, how data should be drawn.
      */
-    public _drawStep(step: DrawStep) {
+    public _drawStep(step: AppliedDrawStep) {
       // no-op
     }
 
@@ -72,20 +77,23 @@ export module _Drawer {
       return data.length;
     }
 
-    private applyMetadata(attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: any) {
-      var modifiedAttrToProjector: AttributeToProjector = {};
+    private applyMetadata(attrToProjector: AttributeToProjector,
+                          userMetadata: any,
+                          plotMetadata: Plot.PlotMetadata): _AttributeToAppliedProjector {
+      var modifiedAttrToProjector: _AttributeToAppliedProjector = {};
       d3.keys(attrToProjector).forEach((attr: string) => {
         modifiedAttrToProjector[attr] =
           (datum: any, index: number) => attrToProjector[attr](datum, index, userMetadata, plotMetadata);
       });
+
       return modifiedAttrToProjector;
     }
 
-    public _prepareDrawSteps(drawSteps: DrawStep[]) {
+    public _prepareDrawSteps(drawSteps: AppliedDrawStep[]) {
       // no-op
     }
 
-    public _prepareData(data: any[], drawSteps: DrawStep[]) {
+    public _prepareData(data: any[], drawSteps: AppliedDrawStep[]) {
       return data;
     }
 
@@ -97,8 +105,8 @@ export module _Drawer {
      * @param{any} userMetadata The metadata provided by user
      * @param{any} plotMetadata The metadata provided by plot
      */
-    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any = {}, plotMetadata: any = {}) {
-      var appliedDrawSteps = drawSteps.map((dr: DrawStep) => {
+    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata) {
+      var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
         return {
           attrToProjector: this.applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
           animator: dr.animator

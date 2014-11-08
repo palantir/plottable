@@ -36,12 +36,12 @@ export module _Drawer {
       }
     }
 
-    private createArea(xFunction: _Projector,
-                       y0Function: _Projector,
-                       y1Function: _Projector,
-                       definedFunction: (d: any, i: number) => boolean) {
+    private createArea(xFunction: _AppliedProjector,
+                       y0Function: _AppliedProjector,
+                       y1Function: _AppliedProjector,
+                       definedFunction: _AppliedProjector) {
       if(!definedFunction) {
-        definedFunction = () => true;
+        definedFunction = (d, i) => true;
       }
 
       return d3.svg.area()
@@ -51,14 +51,13 @@ export module _Drawer {
                    .defined(definedFunction);
     }
 
-    public _drawStep(step: DrawStep) {
+    public _drawStep(step: AppliedDrawStep) {
       if (this._drawLine) {
         super._drawStep(step);
       } else {
         AbstractDrawer.prototype._drawStep.call(this, step);
       }
-
-      var attrToProjector = <AttributeToProjector>_Util.Methods.copyMap(step.attrToProjector);
+      var attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
       var xFunction       = attrToProjector["x"];
       var y0Function      = attrToProjector["y0"];
       var y1Function      = attrToProjector["y"];
@@ -66,11 +65,11 @@ export module _Drawer {
       delete attrToProjector["x"];
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
-
-      attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function, attrToProjector["defined"]);
       if (attrToProjector["defined"]) {
         delete attrToProjector["defined"];
       }
+
+      attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function, definedFunction);
 
       if (attrToProjector["fill"]) {
         this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate

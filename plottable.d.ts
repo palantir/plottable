@@ -835,13 +835,19 @@ declare module Plottable {
      * Access specific datum property.
      */
     interface _Accessor {
-        (datum: any, index?: number, userMetadata?: any, plotMetadata?: any): any;
+        (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plot.PlotMetadata): any;
     }
     /**
      * Retrieves scalled datum property.
      */
     interface _Projector {
-        (datum?: any, index?: number, userMetadata?: any, plotMetadata?: any): any;
+        (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata): any;
+    }
+    /**
+     * Projector with applied user and plot metadata
+     */
+    interface _AppliedProjector {
+        (datum: any, index: number): any;
     }
     /**
      * Defines a way how specific attribute needs be retrieved before rendering.
@@ -861,6 +867,9 @@ declare module Plottable {
      */
     interface AttributeToProjector {
         [attrToSet: string]: _Projector;
+    }
+    interface _AttributeToAppliedProjector {
+        [attrToSet: string]: _AppliedProjector;
     }
     /**
      * A simple bounding box.
@@ -1566,6 +1575,10 @@ declare module Plottable {
             attrToProjector: AttributeToProjector;
             animator: Animator.PlotAnimator;
         }
+        interface AppliedDrawStep {
+            attrToProjector: _AttributeToAppliedProjector;
+            animator: Animator.PlotAnimator;
+        }
         class AbstractDrawer {
             _renderArea: D3.Selection;
             _className: string;
@@ -1597,12 +1610,12 @@ declare module Plottable {
             /**
              * Draws data using one step
              *
-             * @param{DataStep} step The step, how data should be drawn.
+             * @param{AppliedDrawStep} step The step, how data should be drawn.
              */
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: AppliedDrawStep): void;
             _numberOfAnimationIterations(data: any[]): number;
-            _prepareDrawSteps(drawSteps: DrawStep[]): void;
-            _prepareData(data: any[], drawSteps: DrawStep[]): any[];
+            _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
+            _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             /**
              * Draws the data into the renderArea using the spefic steps and metadata
              *
@@ -1611,7 +1624,7 @@ declare module Plottable {
              * @param{any} userMetadata The metadata provided by user
              * @param{any} plotMetadata The metadata provided by plot
              */
-            draw(data: any[], drawSteps: DrawStep[], userMetadata?: any, plotMetadata?: any): number;
+            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
         }
     }
 }
@@ -1623,7 +1636,7 @@ declare module Plottable {
             _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
             _numberOfAnimationIterations(data: any[]): number;
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: AppliedDrawStep): void;
         }
     }
 }
@@ -1640,7 +1653,7 @@ declare module Plottable {
              */
             drawLine(draw: boolean): Area;
             setup(area: D3.Selection): void;
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: AppliedDrawStep): void;
         }
     }
 }
@@ -1657,10 +1670,10 @@ declare module Plottable {
              */
             svgElement(tag: string): Element;
             _getDrawSelection(): D3.Selection;
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: AppliedDrawStep): void;
             _enterData(data: any[]): void;
-            _prepareDrawSteps(drawSteps: DrawStep[]): void;
-            _prepareData(data: any[], drawSteps: DrawStep[]): any[];
+            _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
+            _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
         }
     }
 }
@@ -1674,7 +1687,7 @@ declare module Plottable {
             constructor(key: string, isVertical: boolean);
             setup(area: D3.Selection): void;
             removeLabels(): void;
-            drawText(data: any[], attrToProjector: AttributeToProjector): void;
+            drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
         }
     }
 }
@@ -1684,8 +1697,8 @@ declare module Plottable {
     module _Drawer {
         class Arc extends Element {
             constructor(key: string);
-            _drawStep(step: DrawStep): void;
-            draw(data: any[], drawSteps: DrawStep[]): number;
+            _drawStep(step: AppliedDrawStep): void;
+            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
         }
     }
 }
@@ -3088,7 +3101,7 @@ declare module Plottable {
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
             _getDrawer(key: string): _Drawer.Line;
-            _getResetYFunction(): (d: any, i: number) => number;
+            _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
             _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
             _wholeDatumAttributes(): string[];

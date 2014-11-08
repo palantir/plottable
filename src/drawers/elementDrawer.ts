@@ -19,7 +19,7 @@ export module _Drawer {
       return this._renderArea.selectAll(this._svgElement);
     }
 
-    public _drawStep(step: DrawStep) {
+    public _drawStep(step: AppliedDrawStep) {
       super._drawStep(step);
       var drawSelection = this._getDrawSelection();
       if (step.attrToProjector["fill"]) {
@@ -43,7 +43,7 @@ export module _Drawer {
     }
 
     // HACKHACK To prevent populating undesired attribute to d3, we delete them here.
-    public _prepareDrawSteps(drawSteps: DrawStep[]) {
+    public _prepareDrawSteps(drawSteps: AppliedDrawStep[]) {
       super._prepareDrawSteps(drawSteps);
       drawSteps.forEach((d: DrawStep) => {
         if (d.attrToProjector["defined"]) {
@@ -52,8 +52,8 @@ export module _Drawer {
       });
     }
 
-     public _prepareData(data: any[], drawSteps: DrawStep[]) {
-      return drawSteps.reduce((data: any[], drawStep: DrawStep) =>
+     public _prepareData(data: any[], drawSteps: AppliedDrawStep[]) {
+      return drawSteps.reduce((data: any[], drawStep: AppliedDrawStep) =>
               this.filterDefinedData(data, drawStep.attrToProjector["defined"]), super._prepareData(data, drawSteps));
     }
   }

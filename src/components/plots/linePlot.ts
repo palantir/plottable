@@ -42,7 +42,7 @@ export module Plot {
       // avoids lines zooming on from offscreen.
       var startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
       var scaledStartValue = this._yScale.scale(startValue);
-      return (d: any, i: number) => scaledStartValue;
+      return (d: any, i: number, u: any, m: PlotMetadata) => scaledStartValue;
     }
 
     public _generateDrawSteps(): _Drawer.DrawStep[] {

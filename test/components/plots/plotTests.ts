@@ -115,7 +115,7 @@ describe("Plots", () => {
       r.project("attr", "a", s);
       var attrToProjector = r._generateAttrToProjector();
       var projector = attrToProjector["attr"];
-      assert.equal(projector({"a": 0.5}, 0), 5, "projector works as intended");
+      assert.equal(projector({"a": 0.5}, 0, null, null), 5, "projector works as intended");
     });
 
     it("Changing Plot.dataset().data to [] causes scale to contract", () => {
