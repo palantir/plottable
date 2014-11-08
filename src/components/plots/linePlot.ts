@@ -112,6 +112,7 @@ export module Plot {
               x: xProjector(d, i),
               y: yProjector(d, i)
             };
+            closestDistSq = distSq;
           }
         });
       });
