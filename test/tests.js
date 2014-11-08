@@ -2586,8 +2586,8 @@ describe("Plots", function () {
                 assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
                 assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
                 assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-                assert.equal(bar0.attr("y"), "250", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "50", "bar1 y is correct");
+                assert.equal(bar0.attr("y"), "50", "bar0 y is correct");
+                assert.equal(bar1.attr("y"), "250", "bar1 y is correct");
                 assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
                 assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
                 var baseline = renderArea.select(".baseline");
@@ -2622,8 +2622,8 @@ describe("Plots", function () {
                 var bar1 = d3.select(bars[0][1]);
                 assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
                 assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
-                assert.equal(numAttr(bar0, "y"), 250, "bar0 y is correct");
-                assert.equal(numAttr(bar1, "y"), 50, "bar1 y is correct");
+                assert.equal(numAttr(bar0, "y"), 50, "bar0 y is correct");
+                assert.equal(numAttr(bar1, "y"), 250, "bar1 y is correct");
                 barPlot.barAlignment("bottom");
                 renderArea = barPlot._renderArea;
                 bars = renderArea.selectAll("rect");
@@ -2631,8 +2631,8 @@ describe("Plots", function () {
                 bar1 = d3.select(bars[0][1]);
                 assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
                 assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
-                assert.equal(numAttr(bar0, "y"), 200, "bar0 y is correct");
-                assert.equal(numAttr(bar1, "y"), 0, "bar1 y is correct");
+                assert.equal(numAttr(bar0, "y"), 0, "bar0 y is correct");
+                assert.equal(numAttr(bar1, "y"), 200, "bar1 y is correct");
                 assert.throws(function () { return barPlot.barAlignment("blargh"); }, Error);
                 svg.remove();
             });
@@ -2793,22 +2793,22 @@ describe("Plots", function () {
             assert.equal(cellAU.attr("height"), "100", "cell 'AU' height is correct");
             assert.equal(cellAU.attr("width"), "200", "cell 'AU' width is correct");
             assert.equal(cellAU.attr("x"), "0", "cell 'AU' x coord is correct");
-            assert.equal(cellAU.attr("y"), "100", "cell 'AU' x coord is correct");
+            assert.equal(cellAU.attr("y"), "0", "cell 'AU' y coord is correct");
             assert.equal(cellAU.attr("fill"), "#000000", "cell 'AU' color is correct");
             assert.equal(cellBU.attr("height"), "100", "cell 'BU' height is correct");
             assert.equal(cellBU.attr("width"), "200", "cell 'BU' width is correct");
             assert.equal(cellBU.attr("x"), "200", "cell 'BU' x coord is correct");
-            assert.equal(cellBU.attr("y"), "100", "cell 'BU' x coord is correct");
+            assert.equal(cellBU.attr("y"), "0", "cell 'BU' y coord is correct");
             assert.equal(cellBU.attr("fill"), "#212121", "cell 'BU' color is correct");
             assert.equal(cellAV.attr("height"), "100", "cell 'AV' height is correct");
             assert.equal(cellAV.attr("width"), "200", "cell 'AV' width is correct");
             assert.equal(cellAV.attr("x"), "0", "cell 'AV' x coord is correct");
-            assert.equal(cellAV.attr("y"), "0", "cell 'AV' x coord is correct");
+            assert.equal(cellAV.attr("y"), "100", "cell 'AV' y coord is correct");
             assert.equal(cellAV.attr("fill"), "#ffffff", "cell 'AV' color is correct");
             assert.equal(cellBV.attr("height"), "100", "cell 'BV' height is correct");
             assert.equal(cellBV.attr("width"), "200", "cell 'BV' width is correct");
             assert.equal(cellBV.attr("x"), "200", "cell 'BV' x coord is correct");
-            assert.equal(cellBV.attr("y"), "0", "cell 'BV' x coord is correct");
+            assert.equal(cellBV.attr("y"), "100", "cell 'BV' y coord is correct");
             assert.equal(cellBV.attr("fill"), "#777777", "cell 'BV' color is correct");
         };
         it("renders correctly", function () {
@@ -6749,7 +6749,7 @@ describe("Interactions", function () {
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
             svg.remove();
         });
-        it("correctly triggers callbacks (hoizontal)", function () {
+        it("correctly triggers callbacks (horizontal)", function () {
             var svg = generateSVG(400, 400);
             var barPlot = new Plottable.Plot.HorizontalBar(linearScale, ordinalScale).addDataset(dataset);
             barPlot.project("y", "name", ordinalScale).project("x", "value", linearScale);
@@ -6765,10 +6765,10 @@ describe("Interactions", function () {
             barPlot.renderTo(svg);
             barPlot.registerInteraction(bhi);
             var hitbox = barPlot._element.select(".hit-box");
-            triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 150);
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
             barDatum = null;
-            triggerFakeMouseEvent("mousemove", hitbox, 201, 250);
+            triggerFakeMouseEvent("mousemove", hitbox, 201, 150);
             assert.isNull(barDatum, "hover callback isn't called if the hovered bar didn't change");
             triggerFakeMouseEvent("mousemove", hitbox, 10, 10);
             assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing away from a bar");
@@ -6783,7 +6783,7 @@ describe("Interactions", function () {
             triggerFakeMouseEvent("mousemove", hitbox, 200, 100);
             assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing from one bar to another");
             bhi.hoverMode("line");
-            triggerFakeMouseEvent("mousemove", hitbox, 399, 250);
+            triggerFakeMouseEvent("mousemove", hitbox, 399, 150);
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
             svg.remove();
         });
