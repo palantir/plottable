@@ -123,4 +123,36 @@ describe("Dispatchers", () => {
       target.remove();
     });
   });
+
+  describe("Keypress Dispatcher", () => {
+    it("triggers the callback only when moused over the target", () => {
+      var target = generateSVG(400, 400);
+
+      var kpd = new Plottable.Dispatcher.Keypress(target);
+      var keyDownCalled = false;
+      var lastKeyCode: number;
+      kpd.onKeyDown((e: D3.D3Event) => {
+        keyDownCalled = true;
+        lastKeyCode = e.keyCode;
+      });
+      kpd.connect();
+
+      var $target = $(target.node());
+
+      $target.simulate("keydown", { keyCode: 80 });
+      assert.isFalse(keyDownCalled, "didn't trigger callback if not moused over the target");
+
+      $target.simulate("mouseover");
+      $target.simulate("keydown", { keyCode: 80 });
+      assert.isTrue(keyDownCalled, "correctly triggers callback if moused over the target");
+      assert.strictEqual(lastKeyCode, 80, "correct event info was passed to the callback");
+
+      keyDownCalled = false;
+      $target.simulate("mouseout");
+      $target.simulate("keydown", { keyCode: 80 });
+      assert.isFalse(keyDownCalled, "didn't trigger callback after mousing out of the target");
+
+      target.remove();
+    });
+  });
 });

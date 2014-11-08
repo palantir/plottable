@@ -130,15 +130,6 @@ svg.plottable {
   line-height: normal;
 }
 
-.plottable .line-plot path.line {
-  fill: none;
-  vector-effect: non-scaling-stroke;
-}
-
-.plottable .area-plot path.area {
-  stroke: none;
-}
-
 .plottable .legend .toggled-off circle {
   fill: #d3d3d3;
 }

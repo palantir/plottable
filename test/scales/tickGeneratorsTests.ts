@@ -38,4 +38,30 @@ describe("Tick generators", () => {
       assert.throws(() => Plottable.Scale.TickGenerators.intervalTickGenerator(-2), "interval must be positive number");
     });
   });
+
+  describe("integer", () => {
+    it("normal case", () => {
+      var scale = new Plottable.Scale.Linear().domain([0, 4]);
+      var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
+      assert.deepEqual(ticks, [0, 1, 2, 3, 4], "only the integers are returned");
+    });
+
+    it("works across negative numbers", () => {
+      var scale = new Plottable.Scale.Linear().domain([-2, 1]);
+      var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
+      assert.deepEqual(ticks, [-2, -1, 0, 1], "only the integers are returned");
+    });
+
+    it("includes endticks", () => {
+      var scale = new Plottable.Scale.Linear().domain([-2.7, 1.5]);
+      var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
+      assert.deepEqual(ticks, [-2.5, -2, -1, 0, 1, 1.5], "end ticks are included");
+    });
+
+    it("all float ticks", () => {
+      var scale = new Plottable.Scale.Linear().domain([1.1, 1.5]);
+      var ticks = Plottable.Scale.TickGenerators.integerTickGenerator()(scale);
+      assert.deepEqual(ticks, [1.1, 1.5], "only the end ticks are returned");
+    });
+  });
 });
