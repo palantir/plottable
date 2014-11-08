@@ -4774,9 +4774,11 @@ var Plottable;
             Time.prototype._measureTextHeight = function () {
                 return this.measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
             };
+            Time.prototype.cleanContainer = function (container) {
+                container.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
+            };
             Time.prototype.renderTierLabels = function (container, config, height) {
                 var _this = this;
-                container.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
                 var tickPos = this._scale._tickInterval(config.interval, config.step);
                 tickPos.splice(0, 0, this._scale.domain()[0]);
                 tickPos.push(this._scale.domain()[1]);
@@ -4794,7 +4796,7 @@ var Plottable;
                 else {
                     labelPos = tickPos;
                 }
-                labelPos = labelPos.filter(function (d) { return _this.canFitLabelFilter(container, d, config.formatter(d), shouldCenterText); });
+                labelPos = labelPos.filter(function (d, i) { return _this.canFitLabelFilter(container, d, tickPos.slice(i, i + 2), config.formatter(d), shouldCenterText); });
                 var tickLabels = container.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(labelPos, function (d) { return d.valueOf(); });
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
@@ -4809,10 +4811,12 @@ var Plottable;
                 var anchor = shouldCenterText ? "middle" : "start";
                 tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
             };
-            Time.prototype.canFitLabelFilter = function (container, position, label, isCentered) {
+            Time.prototype.canFitLabelFilter = function (container, position, bounds, label, isCentered) {
                 var endPosition;
                 var startPosition;
                 var width = this.measurer(label).width + this.tickLabelPadding();
+                var leftBound = this._scale.scale(bounds[0]);
+                var rightBound = this._scale.scale(bounds[1]);
                 if (isCentered) {
                     endPosition = this._scale.scale(position) + width / 2;
                     startPosition = this._scale.scale(position) - width / 2;
@@ -4821,7 +4825,7 @@ var Plottable;
                     endPosition = this._scale.scale(position) + width;
                     startPosition = this._scale.scale(position);
                 }
-                return endPosition < this.width() && startPosition > 0;
+                return endPosition <= rightBound && startPosition >= leftBound;
             };
             Time.prototype.adjustTickLength = function (config, height) {
                 var tickValues = this.getTickIntervalValues(config);
@@ -4849,6 +4853,7 @@ var Plottable;
                 this.mostPreciseConfigIndex = this.getIndexOfMostPreciseAxisConfiguration();
                 _super.prototype._doRender.call(this);
                 var tierConfigs = this.possibleAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations;
+                this.tierLabelContainers.forEach(this.cleanContainer);
                 tierConfigs.forEach(function (config, i) { return _this.renderTierLabels(_this.tierLabelContainers[i], config, i + 1); });
                 var domain = this._scale.domain();
                 var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);

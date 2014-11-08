@@ -279,8 +279,11 @@ export module Axis {
       return this.measurer(_Util.Text.HEIGHT_TEXT).height;
     }
 
-    private renderTierLabels(container: D3.Selection, config: TierConfiguration, height: number) {
+    private cleanContainer(container: D3.Selection) {
       container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
+    }
+
+    private renderTierLabels(container: D3.Selection, config: TierConfiguration, height: number) {
       var tickPos = this._scale._tickInterval(config.interval, config.step);
       tickPos.splice(0, 0, this._scale.domain()[0]);
       tickPos.push(this._scale.domain()[1]);
@@ -297,8 +300,8 @@ export module Axis {
       } else {
         labelPos = tickPos;
       }
-      labelPos = labelPos.filter((d: any) =>
-        this.canFitLabelFilter(container, d, config.formatter(d), shouldCenterText));
+      labelPos = labelPos.filter((d: any, i: number) =>
+        this.canFitLabelFilter(container, d, tickPos.slice(i, i + 2), config.formatter(d), shouldCenterText));
       var tickLabels = container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
       var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
@@ -315,10 +318,12 @@ export module Axis {
       tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
     }
 
-    private canFitLabelFilter(container: D3.Selection, position: Date, label: string, isCentered: boolean): boolean {
+    private canFitLabelFilter(container: D3.Selection, position: Date, bounds: Date[], label: string, isCentered: boolean): boolean {
       var endPosition: number;
       var startPosition: number;
       var width = this.measurer(label).width + this.tickLabelPadding();
+      var leftBound = this._scale.scale(bounds[0]);
+      var rightBound = this._scale.scale(bounds[1]);
       if (isCentered) {
           endPosition = this._scale.scale(position) + width / 2;
           startPosition = this._scale.scale(position) - width / 2;
@@ -327,7 +332,7 @@ export module Axis {
           startPosition = this._scale.scale(position);
       }
 
-      return endPosition < this.width() && startPosition > 0;
+      return endPosition <= rightBound && startPosition >= leftBound;
     }
 
     private adjustTickLength(config: TierConfiguration, height: number) {
@@ -367,6 +372,7 @@ export module Axis {
 
       var tierConfigs = this.possibleAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations;
 
+      this.tierLabelContainers.forEach(this.cleanContainer);
       tierConfigs.forEach((config: TierConfiguration, i: number) =>
         this.renderTierLabels(this.tierLabelContainers[i], config, i + 1)
       );
@@ -376,6 +382,7 @@ export module Axis {
       if (this.getIntervalLength(tierConfigs[0]) * 1.5 >= totalLength) {
         this.generateLabellessTicks();
       }
+
       tierConfigs.forEach((config: TierConfiguration, i: number) =>
         this.adjustTickLength(config, this._maxLabelTickLength() * (i + 1) / Time.NUM_TIERS)
       );
