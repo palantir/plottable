@@ -61,17 +61,8 @@ export module Scale {
       var plottableDefaultColors: string[] = [];
       var colorTester = d3.select("body").append("div");
       for (var i = 0; i < Color.DEFAULT_PLOTTABLE_COLORS_LENGTH; i++) {
-        colorTester.classed("plottable-colors-" + i, true);
-        // Use regex to get the text inside the rgb parentheses
-        var rgb = /\((.+)\)/.exec(colorTester.style("color"))[1]
-                            .split(",")
-                            .map((colorValue: string) => {
-                              var colorNumber = +colorValue;
-                              var hexValue = colorNumber.toString(16);
-                              return colorNumber < 16 ? "0" + hexValue : hexValue;
-                            });
-        plottableDefaultColors.push("#" + rgb.join(""));
-        colorTester.classed("plottable-colors-" + i, false);
+        var colorHex = _Util.Methods.colorTest(colorTester, "plottable-colors-" + i);
+        plottableDefaultColors.push(colorHex);
       }
       colorTester.remove();
       return plottableDefaultColors;

@@ -283,6 +283,19 @@ var Plottable;
                 }
             }
             Methods.setTimeout = setTimeout;
+            function colorTest(colorTester, className) {
+                colorTester.classed(className, true);
+                // Use regex to get the text inside the rgb parentheses
+                var rgb = /\((.+)\)/.exec(colorTester.style("color"))[1].split(",").map(function (colorValue) {
+                    var colorNumber = +colorValue;
+                    var hexValue = colorNumber.toString(16);
+                    return colorNumber < 16 ? "0" + hexValue : hexValue;
+                });
+                var hexCode = "#" + rgb.join("");
+                colorTester.classed(className, false);
+                return hexCode;
+            }
+            Methods.colorTest = colorTest;
         })(_Util.Methods || (_Util.Methods = {}));
         var Methods = _Util.Methods;
     })(Plottable._Util || (Plottable._Util = {}));
@@ -2805,15 +2818,8 @@ var Plottable;
                 var plottableDefaultColors = [];
                 var colorTester = d3.select("body").append("div");
                 for (var i = 0; i < Color.DEFAULT_PLOTTABLE_COLORS_LENGTH; i++) {
-                    colorTester.classed("plottable-colors-" + i, true);
-                    // Use regex to get the text inside the rgb parentheses
-                    var rgb = /\((.+)\)/.exec(colorTester.style("color"))[1].split(",").map(function (colorValue) {
-                        var colorNumber = +colorValue;
-                        var hexValue = colorNumber.toString(16);
-                        return colorNumber < 16 ? "0" + hexValue : hexValue;
-                    });
-                    plottableDefaultColors.push("#" + rgb.join(""));
-                    colorTester.classed("plottable-colors-" + i, false);
+                    var colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i);
+                    plottableDefaultColors.push(colorHex);
                 }
                 colorTester.remove();
                 return plottableDefaultColors;

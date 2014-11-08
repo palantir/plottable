@@ -290,6 +290,21 @@ export module _Util {
         return window.setTimeout(f, time, args);
       }
     }
+
+    export function colorTest(colorTester: D3.Selection, className: string) {
+      colorTester.classed(className, true);
+      // Use regex to get the text inside the rgb parentheses
+      var rgb = /\((.+)\)/.exec(colorTester.style("color"))[1]
+                          .split(",")
+                          .map((colorValue: string) => {
+                            var colorNumber = +colorValue;
+                            var hexValue = colorNumber.toString(16);
+                            return colorNumber < 16 ? "0" + hexValue : hexValue;
+                          });
+      var hexCode = "#" + rgb.join("");
+      colorTester.classed(className, false);
+      return hexCode;
+    }
   }
 }
 }
