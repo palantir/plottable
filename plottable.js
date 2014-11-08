@@ -1,5 +1,5 @@
 /*!
-Plottable 0.34.1 (https://github.com/palantir/plottable)
+Plottable 0.35.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1398,7 +1398,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.34.1";
+    Plottable.version = "0.35.1";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3885,7 +3885,8 @@ var Plottable;
                 // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
                 // They don't need the current URL in the clip path reference.
                 var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-                this._element.attr("clip-path", "url(" + prefix + "#clipPath" + this._plottableID + ")");
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this._plottableID + "\")");
                 var clipPathParent = this.boxContainer.append("clipPath").attr("id", "clipPath" + this._plottableID);
                 this.addBox("clip-rect", clipPathParent);
             };
@@ -5540,6 +5541,9 @@ var Plottable;
                 var r = textHeight * 0.3;
                 var legend = this._content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, function (d) { return d; });
                 var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true);
+                legendEnter.each(function (d) {
+                    d3.select(this).classed(d.replace(" ", "-"), true);
+                });
                 legendEnter.append("circle");
                 legendEnter.append("g").classed("text-container", true);
                 legend.exit().remove();
@@ -5738,6 +5742,9 @@ var Plottable;
                 rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this.padding) + ")"; });
                 var entries = rows.selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
                 var entriesEnter = entries.enter().append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
+                entries.each(function (d) {
+                    d3.select(this).classed(d.replace(" ", "-"), true);
+                });
                 entriesEnter.append("circle");
                 entriesEnter.append("g").classed("text-container", true);
                 entries.exit().remove();
@@ -6998,7 +7005,6 @@ var Plottable;
              */
             function AbstractBarPlot(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this._baselineValue = 0;
                 this._barAlignmentFactor = 0.5;
                 this._barLabelFormatter = Plottable.Formatters.identity();
                 this._barLabelsEnabled = false;
@@ -7009,7 +7015,7 @@ var Plottable;
                 this._animators["bars-reset"] = new Plottable.Animator.Null();
                 this._animators["bars"] = new Plottable.Animator.Base();
                 this._animators["baseline"] = new Plottable.Animator.Null();
-                this.baseline(this._baselineValue);
+                this.baseline(0);
             }
             AbstractBarPlot.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Rect(key, this._isVertical);
