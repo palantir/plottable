@@ -79,7 +79,7 @@ export module Component {
       var rowLengths = estimatedLayout.rows.map((row: string[]) => {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
       });
-      var longestRowLength = _Util.Methods.max(rowLengths);
+      var longestRowLength = _Util.Methods.max(rowLengths, 0);
       longestRowLength = longestRowLength === undefined ? 0 : longestRowLength; // HACKHACK: #843
       var desiredWidth = this.padding + longestRowLength;
 
@@ -125,6 +125,9 @@ export module Component {
 
       var entries = rows.selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).data((d) => d);
       var entriesEnter = entries.enter().append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
+      entries.each(function(d: string) {
+        d3.select(this).classed(d.replace(" ", "-"), true);
+      });
       entriesEnter.append("circle");
       entriesEnter.append("g").classed("text-container", true);
       entries.exit().remove();

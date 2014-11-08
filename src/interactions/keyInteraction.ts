@@ -3,9 +3,10 @@
 module Plottable {
 export module Interaction {
   export class Key extends AbstractInteraction {
-    private _callback: () => any;
     private activated = false;
     private keyCode: number;
+    private dispatcher: Plottable.Dispatcher.Keypress;
+    private keyCode2Callback: { [keyCode: string]: () => void; } = {};
 
     /**
      * Creates a KeyInteraction.
@@ -14,38 +15,35 @@ export module Interaction {
      * moused over.
      *
      * @constructor
-     * @param {number} keyCode The key code to listen for.
      */
-    constructor(keyCode: number) {
+    constructor() {
       super();
-      this.keyCode = keyCode;
+      this.dispatcher = new Plottable.Dispatcher.Keypress();
     }
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
-      hitBox.on("mouseover", () => {
-        this.activated = true;
-      });
-      hitBox.on("mouseout", () => {
-        this.activated = false;
-      });
 
-      Core.KeyEventListener.addCallback(this.keyCode, (e: D3.D3Event) => {
-        if (this.activated && this._callback != null) {
-          this._callback();
+      this.dispatcher.target(this._hitBox);
+
+      this.dispatcher.onKeyDown((e: D3.D3Event) => {
+        if (this.keyCode2Callback[e.keyCode]) {
+          this.keyCode2Callback[e.keyCode]();
         }
       });
+      this.dispatcher.connect();
     }
 
     /**
-     * Sets a callback to be called when the designated key is pressed and the
-     * user is moused over the component.
+     * Sets a callback to be called when the key with the given keyCode is
+     * pressed and the user is moused over the Component.
      *
-     * @param {() => any} cb Callback to be called.
-     * @returns The calling Key.
+     * @param {number} keyCode The key code associated with the key.
+     * @param {() => void} callback Callback to be called.
+     * @returns The calling Interaction.Key.
      */
-    public callback(cb: () => any): Key {
-      this._callback = cb;
+    public on(keyCode: number, callback: () => void): Key {
+      this.keyCode2Callback[keyCode] = callback;
       return this;
     }
   }

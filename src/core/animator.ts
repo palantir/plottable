@@ -15,6 +15,13 @@ export module Animator {
      *     animators.
      */
     animate(selection: any, attrToProjector: AttributeToProjector): any;
+
+    /**
+     * Given the number of elements, return the total time the animation requires
+     * @param number numberofIterations The number of elements that will be drawn
+     * @returns {any} The time required for the animation
+     */
+    getTiming(numberOfIterations: number): number;
   }
 
   export interface PlotAnimatorMap {

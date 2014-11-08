@@ -91,18 +91,60 @@ describe("_Util.Text", () => {
       var height = 1;
       var textSelection = svg.append("text");
       var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
-      var results = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal");
+      var results = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal");
       assert.isFalse(results.textFits,    "measurement mode: text doesn't fit");
       assert.equal(0, results.usedWidth,  "measurement mode: no width used");
       assert.equal(0, results.usedHeight, "measurement mode: no height used");
 
       var writeOptions = {g: svg, xAlign: "center", yAlign: "center"};
-      results = Plottable._Util.Text.writeText("hello world", width, height, measure, "horizontal", writeOptions);
+      results = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal", writeOptions);
       assert.isFalse(results.textFits,    "write mode: text doesn't fit");
       assert.equal(0, results.usedWidth,  "write mode: no width used");
       assert.equal(0, results.usedHeight, "write mode: no height used");
       textSelection.remove();
       assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
+      svg.remove();
+    });
+
+    it("behaves appropriately when text is in horizontal position", () => {
+      var svg = generateSVG();
+      var width = 100;
+      var height = 50;
+      var textSelection = svg.append("text");
+      var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
+      var measureResults = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal");
+      assert.isTrue(measureResults.textFits, "mesurement mode: text fits");
+      assert.operator(measureResults.usedHeight,
+                       "<=",
+                       measureResults.usedWidth,
+                       "mesurement mode: used more width than height");
+
+      var writeOptions = {g: svg, xAlign: "left", yAlign: "top"};
+      var writeResults = Plottable._Util.Text.writeText("abc", width, height, measure, "horizontal", writeOptions);
+      assert.isTrue(writeResults.textFits, "write mode: text fits");
+      assert.equal(measureResults.usedWidth, writeResults.usedWidth,  "write mode: used the same width as measurement");
+      assert.equal(measureResults.usedHeight, writeResults.usedHeight, "write mode: used the same height as measurement");
+      svg.remove();
+    });
+
+    it("behaves appropriately when text is in vertical position", () => {
+      var svg = generateSVG();
+      var width = 100;
+      var height = 50;
+      var textSelection = svg.append("text");
+      var measure = Plottable._Util.Text.getTextMeasurer(textSelection);
+      var measureResults = Plottable._Util.Text.writeText("abc", width, height, measure, "left");
+      assert.isTrue(measureResults.textFits, "mesurement mode: text fits");
+      assert.operator(measureResults.usedHeight,
+                       ">=",
+                       measureResults.usedWidth,
+                       "mesurement mode: used more height than width");
+
+      var writeOptions = {g: svg, xAlign: "left", yAlign: "top"};
+      var writeResults = Plottable._Util.Text.writeText("abc", width, height, measure, "left", writeOptions);
+      assert.isTrue(writeResults.textFits, "write mode: text fits");
+      assert.equal(measureResults.usedWidth, writeResults.usedWidth,  "write mode: used the same width as measurement");
+      assert.equal(measureResults.usedHeight, writeResults.usedHeight, "write mode: used the same height as measurement");
       svg.remove();
     });
   });

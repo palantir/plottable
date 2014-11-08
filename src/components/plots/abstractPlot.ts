@@ -363,7 +363,7 @@ export module Plot {
       return [{attrToProjector: this._generateAttrToProjector(), animator: new Animator.Null()}];
     }
 
-    public _additionalPaint() {
+    public _additionalPaint(time: number) {
       // no-op
     }
 
@@ -379,8 +379,9 @@ export module Plot {
       var drawSteps = this._generateDrawSteps();
       var dataToDraw = this._getDataToDraw();
       var drawers = this._getDrawersInOrder();
-      this._datasetKeysInOrder.forEach((k, i) => drawers[i].draw(dataToDraw.get(k), drawSteps));
-      this._additionalPaint();
+      var times = this._datasetKeysInOrder.map((k, i) => drawers[i].draw(dataToDraw.get(k), drawSteps));
+      var maxTime = _Util.Methods.max(times, 0);
+      this._additionalPaint(maxTime);
     }
   }
 }

@@ -33,6 +33,7 @@ export module Component {
     private _yOffset = 0;
     private cssClasses: string[] = ["component"];
     private removed = false;
+    private _autoResize = AbstractComponent.AUTORESIZE_BY_DEFAULT;
 
     /**
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -91,7 +92,7 @@ export module Component {
       this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this.interactionsToRegister = null;
       if (this.isTopLevelComponent) {
-        this.autoResize(AbstractComponent.AUTORESIZE_BY_DEFAULT);
+        this.autoResize(this._autoResize);
       }
       this._isSetup = true;
     }
@@ -244,6 +245,7 @@ export module Component {
       } else {
         Core.ResizeBroadcaster.deregister(this);
       }
+      this._autoResize = flag; // if _setup were called by constructor, this var could be removed #591
       return this;
     }
 
@@ -347,7 +349,8 @@ export module Component {
       // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
       // They don't need the current URL in the clip path reference.
       var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-      this._element.attr("clip-path", "url(" + prefix + "#clipPath" + this._plottableID + ")");
+      prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+      this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this._plottableID + "\")");
       var clipPathParent = this.boxContainer.append("clipPath")
                                       .attr("id", "clipPath" + this._plottableID);
       this.addBox("clip-rect", clipPathParent);

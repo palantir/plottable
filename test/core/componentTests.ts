@@ -400,6 +400,7 @@ describe("Component behavior", () => {
     assert.deepEqual(transform.translate, [0, 0], "the element was not translated");
     svg.remove();
   });
+<<<<<<< HEAD
 
   it("components do not render unless allocated space", () => {
     var renderFlag = false;
@@ -420,5 +421,71 @@ describe("Component behavior", () => {
     assert.isTrue(renderFlag, "render occurs if width and height are positive");
 
     svg.remove();
+=======
+  describe("resizeBroadcaster testing", () => {
+    var oldRegister: any;
+    var oldDeregister: any;
+    var registeredComponents: D3.Set<number>;
+    var id: number;
+    before(() => {
+      oldRegister = Plottable.Core.ResizeBroadcaster.register;
+      oldDeregister = Plottable.Core.ResizeBroadcaster.deregister;
+      var mockRegister = (c: Plottable.Component.AbstractComponent) => {
+        registeredComponents.add(c._plottableID);
+      };
+
+      var mockDeregister = (c: Plottable.Component.AbstractComponent) => {
+        registeredComponents.remove(c._plottableID);
+      };
+      Plottable.Core.ResizeBroadcaster.register = mockRegister;
+      Plottable.Core.ResizeBroadcaster.deregister = mockDeregister;
+    });
+
+    after(() => {
+      Plottable.Core.ResizeBroadcaster.register = oldRegister;
+      Plottable.Core.ResizeBroadcaster.deregister = oldDeregister;
+    });
+
+    beforeEach(() => {
+      registeredComponents = d3.set();
+      id = c._plottableID;
+    });
+
+    afterEach(() => {
+      svg.remove(); // svg contains no useful info
+    });
+
+    it("components can be removed from resizeBroadcaster before rendering", () => {
+      c.autoResize(false);
+      c.renderTo(svg);
+      assert.isFalse(registeredComponents.has(id), "component not registered to broadcaster");
+    });
+
+    it("components register by default", () => {
+      c.renderTo(svg);
+      assert.isTrue(registeredComponents.has(id), "component is registered");
+    });
+
+    it("component can be deregistered then registered before render", () => {
+      c.autoResize(false);
+      c.autoResize(true);
+      c.renderTo(svg);
+      assert.isTrue(registeredComponents.has(id), "component is registered");
+    });
+
+    it("component can be deregistered after rendering", () => {
+      c.renderTo(svg);
+      c.autoResize(false);
+      assert.isFalse(registeredComponents.has(id), "component was deregistered after rendering");
+    });
+
+    it("calling .remove deregisters a component", () => {
+      c.autoResize(true);
+      c.renderTo(svg);
+      assert.isTrue(registeredComponents.has(id), "component is registered");
+      c.remove();
+      assert.isFalse(registeredComponents.has(id), "component is deregistered after removal");
+    });
+>>>>>>> develop
   });
 });

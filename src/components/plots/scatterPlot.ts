@@ -2,7 +2,8 @@
 
 module Plottable {
 export module Plot {
-  export class Scatter<X,Y> extends AbstractXYPlot<X,Y> {
+  export class Scatter<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
+    private closeDetectionRadius = 5;
 
     /**
      * Constructs a ScatterPlot.
@@ -59,6 +60,76 @@ export module Plot {
       drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("circles")});
       return drawSteps;
     }
+
+    public _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
+      var drawers = <_Drawer.Element[]> this._getDrawersInOrder();
+      var attrToProjector = this._generateAttrToProjector();
+
+      var getDistSq = (d: any, i: number) => {
+        var dx = attrToProjector["cx"](d, i) - p.x;
+        var dy = attrToProjector["cy"](d, i) - p.y;
+        return (dx * dx + dy * dy);
+      };
+
+      var overAPoint = false;
+      var closestElement: Element;
+      var closestIndex: number;
+      var minDistSq = range * range;
+
+      drawers.forEach((drawer) => {
+        drawer._getDrawSelection().each(function (d, i) {
+          var distSq = getDistSq(d, i);
+          var r = attrToProjector["r"](d, i);
+
+          if (distSq < r * r) { // cursor is over this point
+            if (!overAPoint || distSq < minDistSq) {
+              closestElement = this;
+              closestIndex = i;
+              minDistSq = distSq;
+            }
+            overAPoint = true;
+          } else if (!overAPoint && distSq < minDistSq) {
+            closestElement = this;
+            closestIndex = i;
+            minDistSq = distSq;
+          }
+        });
+      });
+
+      if (!closestElement) {
+        return {
+          selection: null,
+          pixelPositions: null,
+          data: null
+        };
+      }
+
+      var closestSelection = d3.select(closestElement);
+      var closestData = closestSelection.data();
+      var closestPoint = {
+        x: attrToProjector["cx"](closestData[0], closestIndex),
+        y: attrToProjector["cy"](closestData[0], closestIndex)
+      };
+      return {
+        selection: closestSelection,
+        pixelPositions: [closestPoint],
+        data: closestData
+      };
+    }
+
+    //===== Hover logic =====
+    public _hoverOverComponent(p: Point) {
+      // no-op
+    }
+
+    public _hoverOutComponent(p: Point) {
+      // no-op
+    }
+
+    public _doHover(p: Point): Interaction.HoverData {
+      return this._getClosestStruckPoint(p, this.closeDetectionRadius);
+    }
+    //===== /Hover logic =====
   }
 }
 }

@@ -177,7 +177,7 @@ export module Component {
       var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend.MARGIN) / textHeight));
       var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var measure = _Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
-      var maxWidth = _Util.Methods.max(this.colorScale.domain(), (d: string) => measure(d).width);
+      var maxWidth = _Util.Methods.max<string, number>(this.colorScale.domain(), (d: string) => measure(d).width, 0);
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
       var desiredWidth  = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;
@@ -211,6 +211,10 @@ export module Component {
       var legend: D3.UpdateSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, (d) => d);
       var legendEnter = legend.enter()
           .append("g").classed(Legend.SUBELEMENT_CLASS, true);
+
+      legendEnter.each(function(d: String) {
+        d3.select(this).classed(d.replace(" ", "-"), true);
+      });
 
       legendEnter.append("circle");
       legendEnter.append("g").classed("text-container", true);

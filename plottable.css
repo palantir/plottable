@@ -14,6 +14,19 @@ svg.plottable {
   fill: #32313F;
 }
 
+.plottable .bar-label-text-area text {
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 14px;
+}
+
+.plottable .light-label text {
+  fill: white;
+}
+
+.plottable .dark-label text {
+  fill: #32313F;
+}
+
 .plottable .axis-label text {
   font-size: 10px;
   font-weight: bold;
@@ -75,15 +88,6 @@ svg.plottable {
   font-size: 12px;
   font-weight: bold;
   line-height: normal;
-}
-
-.plottable .line-plot path.line {
-  fill: none;
-  vector-effect: non-scaling-stroke;
-}
-
-.plottable .area-plot path.area {
-  stroke: none;
 }
 
 .plottable .legend .toggled-off circle {
