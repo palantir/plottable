@@ -4796,7 +4796,14 @@ var Plottable;
                 else {
                     labelPos = tickPos;
                 }
-                labelPos = labelPos.filter(function (d, i) { return _this.canFitLabelFilter(container, d, tickPos.slice(i, i + 2), config.formatter(d), shouldCenterText); });
+                var filteredTicks = [];
+                labelPos = labelPos.filter(function (d, i) {
+                    var fits = _this.canFitLabelFilter(container, d, tickPos.slice(i, i + 2), config.formatter(d), shouldCenterText);
+                    if (fits) {
+                        filteredTicks.push(tickPos[i]);
+                    }
+                    return fits;
+                });
                 var tickLabels = container.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(labelPos, function (d) { return d.valueOf(); });
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
@@ -4810,6 +4817,7 @@ var Plottable;
                 tickLabels.attr("transform", function (d) { return "translate(" + _this._scale.scale(d) + ",0)"; });
                 var anchor = shouldCenterText ? "middle" : "start";
                 tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
+                return filteredTicks;
             };
             Time.prototype.canFitLabelFilter = function (container, position, bounds, label, isCentered) {
                 var endPosition;
@@ -4827,8 +4835,7 @@ var Plottable;
                 }
                 return endPosition <= rightBound && startPosition >= leftBound;
             };
-            Time.prototype.adjustTickLength = function (config, height) {
-                var tickValues = this.getTickIntervalValues(config);
+            Time.prototype.adjustTickLength = function (tickValues, height) {
                 var selection = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).filter(function (d) { return tickValues.map(function (x) { return x.valueOf(); }).indexOf(d.valueOf()) >= 0; });
                 if (this._orientation === "top") {
                     height = this.height() - height;
@@ -4837,16 +4844,15 @@ var Plottable;
             };
             Time.prototype.generateLabellessTicks = function () {
                 if (this.mostPreciseConfigIndex < 1) {
-                    return;
+                    return [];
                 }
-                var morePreciseFirstTierConfig = this.possibleAxisConfigurations[this.mostPreciseConfigIndex - 1].tierConfigurations[0];
-                var smallTicks = this.getTickIntervalValues(morePreciseFirstTierConfig);
-                var allTicks = this._getTickValues().concat(smallTicks);
-                var tickMarks = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).data(allTicks);
+                return this.getTickIntervalValues(this.possibleAxisConfigurations[this.mostPreciseConfigIndex - 1].tierConfigurations[0]);
+            };
+            Time.prototype.createTickMarks = function (ticks) {
+                var tickMarks = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).data(ticks);
                 tickMarks.enter().append("line").classed(Axis.AbstractAxis.TICK_MARK_CLASS, true);
                 tickMarks.attr(this._generateTickMarkAttrHash());
                 tickMarks.exit().remove();
-                this.adjustTickLength(morePreciseFirstTierConfig, this.tickLabelPadding());
             };
             Time.prototype._doRender = function () {
                 var _this = this;
@@ -4854,13 +4860,18 @@ var Plottable;
                 _super.prototype._doRender.call(this);
                 var tierConfigs = this.possibleAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations;
                 this.tierLabelContainers.forEach(this.cleanContainer);
-                tierConfigs.forEach(function (config, i) { return _this.renderTierLabels(_this.tierLabelContainers[i], config, i + 1); });
+                var tierTicks = tierConfigs.map(function (config, i) { return _this.renderTierLabels(_this.tierLabelContainers[i], config, i + 1); });
+                var ticks = tierTicks.slice();
+                var labelLessTicks = [];
                 var domain = this._scale.domain();
                 var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
                 if (this.getIntervalLength(tierConfigs[0]) * 1.5 >= totalLength) {
-                    this.generateLabellessTicks();
+                    labelLessTicks = this.generateLabellessTicks();
                 }
-                tierConfigs.forEach(function (config, i) { return _this.adjustTickLength(config, _this._maxLabelTickLength() * (i + 1) / Time.NUM_TIERS); });
+                ticks.push(labelLessTicks);
+                this.createTickMarks(Plottable._Util.Methods.flatten(ticks));
+                this.adjustTickLength(labelLessTicks, this.tickLabelPadding());
+                tierConfigs.forEach(function (config, i) { return _this.adjustTickLength(tierTicks[i], _this._maxLabelTickLength() * (i + 1) / Time.NUM_TIERS); });
                 return this;
             };
             Time.LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);

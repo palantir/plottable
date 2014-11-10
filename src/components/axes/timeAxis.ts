@@ -300,8 +300,15 @@ export module Axis {
       } else {
         labelPos = tickPos;
       }
-      labelPos = labelPos.filter((d: any, i: number) =>
-        this.canFitLabelFilter(container, d, tickPos.slice(i, i + 2), config.formatter(d), shouldCenterText));
+      var filteredTicks: Date[] = [];
+      labelPos = labelPos.filter((d: any, i: number) => {
+        var fits = this.canFitLabelFilter(container, d, tickPos.slice(i, i + 2), config.formatter(d), shouldCenterText);
+        if (fits) {
+          filteredTicks.push(tickPos[i]);
+        }
+        return fits;
+      });
+
       var tickLabels = container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
       var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
@@ -316,6 +323,8 @@ export module Axis {
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
       var anchor = shouldCenterText ? "middle" : "start";
       tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
+
+      return filteredTicks;
     }
 
     private canFitLabelFilter(container: D3.Selection, position: Date, bounds: Date[], label: string, isCentered: boolean): boolean {
@@ -335,8 +344,7 @@ export module Axis {
       return endPosition <= rightBound && startPosition >= leftBound;
     }
 
-    private adjustTickLength(config: TierConfiguration, height: number) {
-      var tickValues: any[] = this.getTickIntervalValues(config);
+    private adjustTickLength(tickValues: Date[], height: number) {
       var selection = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).filter((d: Date) =>
         // we want to check if d is in tickValues
         // however, if two dates a, b, have the same date, it may not be true that a === b.
@@ -351,19 +359,18 @@ export module Axis {
 
     private generateLabellessTicks() {
       if (this.mostPreciseConfigIndex < 1) {
-        return;
+        return [];
       }
 
-      var morePreciseFirstTierConfig = this.possibleAxisConfigurations[this.mostPreciseConfigIndex - 1].tierConfigurations[0];
+      return this.getTickIntervalValues(this.possibleAxisConfigurations[this.mostPreciseConfigIndex - 1].
+                                            tierConfigurations[0]);
+    }
 
-      var smallTicks = this.getTickIntervalValues(morePreciseFirstTierConfig);
-      var allTicks = this._getTickValues().concat(smallTicks);
-
-      var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(allTicks);
+    private createTickMarks(ticks: Date[]) {
+      var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(ticks);
       tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
       tickMarks.exit().remove();
-      this.adjustTickLength(morePreciseFirstTierConfig, this.tickLabelPadding());
     }
 
     public _doRender() {
@@ -373,18 +380,25 @@ export module Axis {
       var tierConfigs = this.possibleAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations;
 
       this.tierLabelContainers.forEach(this.cleanContainer);
-      tierConfigs.forEach((config: TierConfiguration, i: number) =>
+
+      var tierTicks = tierConfigs.map((config: TierConfiguration, i: number) =>
         this.renderTierLabels(this.tierLabelContainers[i], config, i + 1)
       );
 
+      var ticks = tierTicks.slice();
+      var labelLessTicks: Date[] = [];
       var domain = this._scale.domain();
       var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
       if (this.getIntervalLength(tierConfigs[0]) * 1.5 >= totalLength) {
-        this.generateLabellessTicks();
+        labelLessTicks = this.generateLabellessTicks();
       }
+      ticks.push(labelLessTicks);
+
+      this.createTickMarks(_Util.Methods.flatten(ticks));
+      this.adjustTickLength(labelLessTicks, this.tickLabelPadding());
 
       tierConfigs.forEach((config: TierConfiguration, i: number) =>
-        this.adjustTickLength(config, this._maxLabelTickLength() * (i + 1) / Time.NUM_TIERS)
+        this.adjustTickLength(tierTicks[i], this._maxLabelTickLength() * (i + 1) / Time.NUM_TIERS)
       );
 
       return this;
