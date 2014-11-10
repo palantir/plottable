@@ -6471,9 +6471,8 @@ describe("_Util.Methods", function () {
         style.text(".plottable-colors-2 { background-color: #13EADF; }");
         var hexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-2");
         assert.strictEqual(hexcode, "#13eadf", "hexcode for blue returned");
-        style.text(".plottable-colors-3 {}");
-        var hexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-3");
-        assert.strictEqual(hexcode, null, "null hexcode returned");
+        var nullHexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-11");
+        assert.strictEqual(nullHexcode, null, "null hexcode returned");
         colorTester.remove();
     });
 });
