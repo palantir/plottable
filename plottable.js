@@ -289,11 +289,18 @@ var Plottable;
             function colorTest(colorTester, className) {
                 colorTester.classed(className, true);
                 // Use regex to get the text inside the rgb parentheses
-                var rgb = /\((.+)\)/.exec(colorTester.style("color"))[1].split(",").map(function (colorValue) {
+                var colorStyle = colorTester.style("background-color");
+                if (colorStyle === "transparent") {
+                    return null;
+                }
+                var rgb = /\((.+)\)/.exec(colorStyle)[1].split(",").map(function (colorValue) {
                     var colorNumber = +colorValue;
                     var hexValue = colorNumber.toString(16);
                     return colorNumber < 16 ? "0" + hexValue : hexValue;
                 });
+                if (rgb.length === 4 && rgb[3] === "00") {
+                    return null;
+                }
                 var hexCode = "#" + rgb.join("");
                 colorTester.classed(className, false);
                 return hexCode;
@@ -2812,14 +2819,15 @@ var Plottable;
             Color.getPlottableColors = function () {
                 var plottableDefaultColors = [];
                 var colorTester = d3.select("body").append("div");
-                for (var i = 0; i < Color.DEFAULT_PLOTTABLE_COLORS_LENGTH; i++) {
-                    var colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i);
+                var i = 0;
+                var colorHex;
+                while ((colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
                     plottableDefaultColors.push(colorHex);
+                    i++;
                 }
                 colorTester.remove();
                 return plottableDefaultColors;
             };
-            Color.DEFAULT_PLOTTABLE_COLORS_LENGTH = 10;
             return Color;
         })(Scale.AbstractScale);
         Scale.Color = Color;

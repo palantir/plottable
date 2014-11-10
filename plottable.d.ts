@@ -1425,7 +1425,6 @@ declare module Plottable {
 declare module Plottable {
     module Scale {
         class Color extends AbstractScale<string, string> {
-            static DEFAULT_PLOTTABLE_COLORS_LENGTH: number;
             /**
              * Constructs a ColorScale.
              *

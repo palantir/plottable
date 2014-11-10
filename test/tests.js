@@ -5358,13 +5358,6 @@ describe("Scales", function () {
             var colorArray = ["#5279c7", "#fd373e", "#63c261", "#fad419", "#2c2b6f", "#ff7939", "#db2e65", "#99ce50", "#962565", "#06cccc"];
             assert.deepEqual(scale.range(), colorArray);
         });
-        it("number of colors returned can be modified", function () {
-            Plottable.Scale.Color.DEFAULT_PLOTTABLE_COLORS_LENGTH = 6;
-            var scale = new Plottable.Scale.Color();
-            var colorArray = ["#5279c7", "#fd373e", "#63c261", "#fad419", "#2c2b6f", "#ff7939"];
-            assert.deepEqual(scale.range(), colorArray);
-            Plottable.Scale.Color.DEFAULT_PLOTTABLE_COLORS_LENGTH = 10;
-        });
     });
     describe("Interpolated Color Scales", function () {
         it("default scale uses reds and a linear scale type", function () {
@@ -6469,15 +6462,18 @@ describe("_Util.Methods", function () {
         assert.deepEqual(range, [0.6, 1.1, 1.6, 2.1], "all entries has been generated with float step");
     });
     it("colorTest works as expected", function () {
-        var colorTester = d3.select("body").append("div");
+        var colorTester = d3.select("body").append("div").classed("color-tester", true);
         var style = colorTester.append("style");
         style.attr("type", "text/css");
-        style.text(".plottable-colors-0 { color: blue; }");
+        style.text(".plottable-colors-0 { background-color: blue; }");
         var blueHexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-0");
         assert.strictEqual(blueHexcode, "#0000ff", "hexcode for blue returned");
-        style.text(".plottable-colors-2 { color: #13EADF; }");
+        style.text(".plottable-colors-2 { background-color: #13EADF; }");
         var hexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-2");
         assert.strictEqual(hexcode, "#13eadf", "hexcode for blue returned");
+        style.text(".plottable-colors-3 {}");
+        var hexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-3");
+        assert.strictEqual(hexcode, null, "null hexcode returned");
         colorTester.remove();
     });
 });

@@ -4,8 +4,6 @@ module Plottable {
 export module Scale {
   export class Color extends AbstractScale<string, string> {
 
-    public static DEFAULT_PLOTTABLE_COLORS_LENGTH = 10;
-
     /**
      * Constructs a ColorScale.
      *
@@ -60,9 +58,11 @@ export module Scale {
     private static getPlottableColors(): string[] {
       var plottableDefaultColors: string[] = [];
       var colorTester = d3.select("body").append("div");
-      for (var i = 0; i < Color.DEFAULT_PLOTTABLE_COLORS_LENGTH; i++) {
-        var colorHex = _Util.Methods.colorTest(colorTester, "plottable-colors-" + i);
+      var i = 0;
+      var colorHex: string;
+      while ((colorHex = _Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
         plottableDefaultColors.push(colorHex);
+        i++;
       }
       colorTester.remove();
       return plottableDefaultColors;
