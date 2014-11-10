@@ -32,11 +32,11 @@
 }
 
 .plottable-colors-8 {
-  .background-color: #962565; /* ROYAL_HEATH */
+  background-color: #962565; /* ROYAL_HEATH */
 }
 
 .plottable-colors-9 {
-  .background-color: #06cccc; /* ROBINS_EGG_BLUE */
+  background-color: #06cccc; /* ROBINS_EGG_BLUE */
 }
 
 svg.plottable {
