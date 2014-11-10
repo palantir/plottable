@@ -537,9 +537,8 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("bar labels are removed instantly on dataset change, even if animation is enabled", (done) => {
+      it("bar labels are removed instantly on dataset change", (done) => {
         plot.barLabelsEnabled(true);
-        plot.animate(true);
         plot.renderTo(svg);
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both texts drawn");

@@ -2746,9 +2746,8 @@ describe("Plots", function () {
                 assert.equal(texts[1], "12345%", "first label is 12345%");
                 svg.remove();
             });
-            it("bar labels are removed instantly on dataset change, even if animation is enabled", function (done) {
+            it("bar labels are removed instantly on dataset change", function (done) {
                 plot.barLabelsEnabled(true);
-                plot.animate(true);
                 plot.renderTo(svg);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");
