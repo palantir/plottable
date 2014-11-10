@@ -19,7 +19,7 @@ export module Plot {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this.project("y0", 0, yScale); // default
-      this.project("fill", () => Core.Colors.INDIGO); // default
+      this.project("fill", () => new Scale.Color().range()); // default
       this.project("fill-opacity", () => 0.25); // default
       this.project("stroke", () => Core.Colors.INDIGO); // default
       this._animators["reset"] = new Animator.Null();

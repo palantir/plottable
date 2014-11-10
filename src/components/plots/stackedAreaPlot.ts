@@ -17,7 +17,7 @@ export module Plot {
     constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
-      this.project("fill", () => Core.Colors.INDIGO);
+      this.project("fill", () => new Scale.Color().range()[0]);
       this._isVertical = true;
     }
 
