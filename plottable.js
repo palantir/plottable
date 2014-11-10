@@ -5296,6 +5296,10 @@ var Plottable;
                     return this._padding;
                 }
                 else {
+                    padAmount = +padAmount;
+                    if (padAmount < 0) {
+                        throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
+                    }
                     this._padding = padAmount;
                     this._invalidateLayout();
                     return this;
