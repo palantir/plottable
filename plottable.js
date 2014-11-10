@@ -7531,7 +7531,7 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.classed("area-plot", true);
                 this.project("y0", 0, yScale); // default
-                this.project("fill", function () { return new Plottable.Scale.Color().range(); }); // default
+                this.project("fill", function () { return new Plottable.Scale.Color().range()[0]; }); // default
                 this.project("fill-opacity", function () { return 0.25; }); // default
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
