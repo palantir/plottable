@@ -3065,7 +3065,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Line<X> extends AbstractXYPlot<X, number> {
+        class Line<X> extends AbstractXYPlot<X, number> implements Interaction.Hoverable {
             _yScale: Scale.AbstractQuantitative<number>;
             /**
              * Constructs a LinePlot.
@@ -3075,12 +3075,20 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
+            _setup(): void;
             _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor): boolean;
             _getDrawer(key: string): _Drawer.Line;
             _getResetYFunction(): (d: any, i: number) => number;
             _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
             _wholeDatumAttributes(): string[];
+            _getClosestWithinRange(p: Point, range: number): {
+                closestValue: any;
+                closestPoint: Point;
+            };
+            _hoverOverComponent(p: Point): void;
+            _hoverOutComponent(p: Point): void;
+            _doHover(p: Point): Interaction.HoverData;
         }
     }
 }

@@ -7418,12 +7418,17 @@ var Plottable;
              */
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
+                this.hoverDetectionRadius = 15;
                 this.classed("line-plot", true);
                 this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
                 this.project("stroke-width", function () { return "2px"; }); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
+            Line.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this.hoverTarget = this._foregroundContainer.append("circle").classed("hover-target", true).style("visibility", "hidden");
+            };
             Line.prototype._rejectNullsAndNaNs = function (d, i, projector) {
                 var value = projector(d, i);
                 return value != null && value === value;
@@ -7469,6 +7474,64 @@ var Plottable;
             };
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
+            };
+            Line.prototype._getClosestWithinRange = function (p, range) {
+                var attrToProjector = this._generateAttrToProjector();
+                var xProjector = attrToProjector["x"];
+                var yProjector = attrToProjector["y"];
+                var getDistSq = function (d, i) {
+                    var dx = +xProjector(d, i) - p.x;
+                    var dy = +yProjector(d, i) - p.y;
+                    return (dx * dx + dy * dy);
+                };
+                var closestOverall;
+                var closestPoint;
+                var closestDistSq = range * range;
+                this.datasets().forEach(function (dataset) {
+                    dataset.data().forEach(function (d, i) {
+                        var distSq = getDistSq(d, i);
+                        if (distSq < closestDistSq) {
+                            closestOverall = d;
+                            closestPoint = {
+                                x: xProjector(d, i),
+                                y: yProjector(d, i)
+                            };
+                            closestDistSq = distSq;
+                        }
+                    });
+                });
+                return {
+                    closestValue: closestOverall,
+                    closestPoint: closestPoint
+                };
+            };
+            //===== Hover logic =====
+            Line.prototype._hoverOverComponent = function (p) {
+                // no-op
+            };
+            Line.prototype._hoverOutComponent = function (p) {
+                // no-op
+            };
+            Line.prototype._doHover = function (p) {
+                var closestInfo = this._getClosestWithinRange(p, this.hoverDetectionRadius);
+                var closestValue = closestInfo.closestValue;
+                if (closestValue === undefined) {
+                    return {
+                        data: null,
+                        pixelPositions: null,
+                        selection: null
+                    };
+                }
+                var closestPoint = closestInfo.closestPoint;
+                this.hoverTarget.attr({
+                    "cx": closestInfo.closestPoint.x,
+                    "cy": closestInfo.closestPoint.y
+                });
+                return {
+                    data: [closestValue],
+                    pixelPositions: [closestPoint],
+                    selection: this.hoverTarget
+                };
             };
             return Line;
         })(Plot.AbstractXYPlot);

@@ -2143,7 +2143,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("attributes can be changed by projecting attribute accessor (sets to first datum attribute)", function () {
-            var data = simpleDataset.data();
+            var data = JSON.parse(JSON.stringify(twoPointData)); // deep copy to not affect other tests
             data.forEach(function (d) {
                 d.stroke = "pink";
             });
@@ -2190,6 +2190,44 @@ describe("Plots", function () {
             dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
             simpleDataset.data(dataWithUndefined);
             assertCorrectPathSplitting("x=undefined");
+            svg.remove();
+        });
+        it("_getClosestWithinRange", function () {
+            var dataset2 = [
+                { foo: 0, bar: 1 },
+                { foo: 1, bar: 0.95 }
+            ];
+            linePlot.addDataset(dataset2);
+            var closestData = linePlot._getClosestWithinRange({ x: 500, y: 0 }, 5);
+            assert.strictEqual(closestData.closestValue, twoPointData[1], "got closest point from first dataset");
+            closestData = linePlot._getClosestWithinRange({ x: 500, y: 25 }, 5);
+            assert.strictEqual(closestData.closestValue, dataset2[1], "got closest point from second dataset");
+            closestData = linePlot._getClosestWithinRange({ x: 500, y: 10 }, 5);
+            assert.isUndefined(closestData.closestValue, "returns nothing if no points are within range");
+            closestData = linePlot._getClosestWithinRange({ x: 500, y: 10 }, 25);
+            assert.strictEqual(closestData.closestValue, twoPointData[1], "returns the closest point within range");
+            closestData = linePlot._getClosestWithinRange({ x: 500, y: 20 }, 25);
+            assert.strictEqual(closestData.closestValue, dataset2[1], "returns the closest point within range");
+            svg.remove();
+        });
+        it("_doHover()", function () {
+            var dataset2 = [
+                { foo: 0, bar: 1 },
+                { foo: 1, bar: 0.95 }
+            ];
+            linePlot.addDataset(dataset2);
+            var hoverData = linePlot._doHover({ x: 495, y: 0 });
+            var expectedDatum = twoPointData[1];
+            assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
+            var hoverTarget = hoverData.selection;
+            assert.strictEqual(parseFloat(hoverTarget.attr("cx")), xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
+            assert.strictEqual(parseFloat(hoverTarget.attr("cy")), yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
+            hoverData = linePlot._doHover({ x: 0, y: 0 });
+            expectedDatum = dataset2[0];
+            assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
+            hoverTarget = hoverData.selection;
+            assert.strictEqual(parseFloat(hoverTarget.attr("cx")), xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
+            assert.strictEqual(parseFloat(hoverTarget.attr("cy")), yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
             svg.remove();
         });
     });
