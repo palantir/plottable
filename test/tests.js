@@ -2202,9 +2202,11 @@ describe("Plots", function () {
             assert.strictEqual(closestData.closestValue, twoPointData[1], "got closest point from first dataset");
             closestData = linePlot._getClosestWithinRange({ x: 500, y: 25 }, 5);
             assert.strictEqual(closestData.closestValue, dataset2[1], "got closest point from second dataset");
-            closestData = linePlot._getClosestWithinRange({ x: 500, y: 50 }, 5);
+            closestData = linePlot._getClosestWithinRange({ x: 500, y: 10 }, 5);
             assert.isUndefined(closestData.closestValue, "returns nothing if no points are within range");
-            closestData = linePlot._getClosestWithinRange({ x: 500, y: 50 }, 50);
+            closestData = linePlot._getClosestWithinRange({ x: 500, y: 10 }, 25);
+            assert.strictEqual(closestData.closestValue, twoPointData[1], "returns the closest point within range");
+            closestData = linePlot._getClosestWithinRange({ x: 500, y: 20 }, 25);
             assert.strictEqual(closestData.closestValue, dataset2[1], "returns the closest point within range");
             svg.remove();
         });

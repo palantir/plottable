@@ -88,14 +88,13 @@ export module Plot {
     }
 
     public _getClosestWithinRange(p: Point, range: number) {
-      var datasets = this.datasets();
       var attrToProjector = this._generateAttrToProjector();
       var xProjector = attrToProjector["x"];
       var yProjector = attrToProjector["y"];
 
       var getDistSq = (d: any, i: number) => {
-        var dx = xProjector(d, i) - p.x;
-        var dy = yProjector(d, i) - p.y;
+        var dx = +xProjector(d, i) - p.x;
+        var dy = +yProjector(d, i) - p.y;
         return (dx * dx + dy * dy);
       };
 
@@ -103,7 +102,7 @@ export module Plot {
       var closestPoint: Point;
       var closestDistSq = range * range;
 
-      datasets.forEach((dataset) => {
+      this.datasets().forEach((dataset) => {
         dataset.data().forEach((d: any, i: number) => {
           var distSq = getDistSq(d, i);
           if (distSq < closestDistSq) {

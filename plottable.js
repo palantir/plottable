@@ -7471,19 +7471,18 @@ var Plottable;
                 return ["x", "y"];
             };
             Line.prototype._getClosestWithinRange = function (p, range) {
-                var datasets = this.datasets();
                 var attrToProjector = this._generateAttrToProjector();
                 var xProjector = attrToProjector["x"];
                 var yProjector = attrToProjector["y"];
                 var getDistSq = function (d, i) {
-                    var dx = xProjector(d, i) - p.x;
-                    var dy = yProjector(d, i) - p.y;
+                    var dx = +xProjector(d, i) - p.x;
+                    var dy = +yProjector(d, i) - p.y;
                     return (dx * dx + dy * dy);
                 };
                 var closestOverall;
                 var closestPoint;
                 var closestDistSq = range * range;
-                datasets.forEach(function (dataset) {
+                this.datasets().forEach(function (dataset) {
                     dataset.data().forEach(function (d, i) {
                         var distSq = getDistSq(d, i);
                         if (distSq < closestDistSq) {
