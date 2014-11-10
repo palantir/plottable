@@ -1080,6 +1080,10 @@ describe("Labels", function () {
         assert.operator(testLabel.height(), ">=", measure.height + 2 * testLabel.padding(), "height at most incorporates full padding amount");
         svg.remove();
     });
+    it("negative padding throws an error", function () {
+        var testLabel = new Plottable.Component.Label("testing label");
+        assert.throws(function () { return testLabel.padding(-10); }, Error, "Cannot be less than 0");
+    });
 });
 
 ///<reference path="../testReference.ts" />

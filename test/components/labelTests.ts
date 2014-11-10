@@ -175,4 +175,9 @@ describe("Labels", () => {
     assert.operator(testLabel.height(), ">=", measure.height + 2 * testLabel.padding(), "height at most incorporates full padding amount");
     svg.remove();
   });
+
+  it("negative padding throws an error", () => {
+    var testLabel = new Plottable.Component.Label("testing label");
+    assert.throws(() => testLabel.padding(-10), Error, "Cannot be less than 0");
+  });
 });
