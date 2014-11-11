@@ -5220,6 +5220,7 @@ var Plottable;
                 this.xAlign("center").yAlign("center");
                 this._fixedHeightFlag = true;
                 this._fixedWidthFlag = true;
+                this._padding = 0;
             }
             /**
              * Sets the horizontal side the label will go to given the label is given more space that it needs
@@ -5249,8 +5250,8 @@ var Plottable;
             };
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var desiredWH = this.measurer(this._text);
-                var desiredWidth = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height);
-                var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
+                var desiredWidth = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+                var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
                 return {
                     width: desiredWidth,
                     height: desiredHeight,
@@ -5290,16 +5291,36 @@ var Plottable;
                     return this;
                 }
             };
+            Label.prototype.padding = function (padAmount) {
+                if (padAmount == null) {
+                    return this._padding;
+                }
+                else {
+                    padAmount = +padAmount;
+                    if (padAmount < 0) {
+                        throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
+                    }
+                    this._padding = padAmount;
+                    this._invalidateLayout();
+                    return this;
+                }
+            };
             Label.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
+                var textMeasurement = this.measurer(this._text);
+                var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
+                var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
+                this.textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
                 this.textContainer.text("");
                 var dimension = this.orientation === "horizontal" ? this.width() : this.height();
                 var truncatedText = Plottable._Util.Text.getTruncatedText(this._text, dimension, this.measurer);
+                var writeWidth = this.width() - 2 * widthPadding;
+                var writeHeight = this.height() - 2 * heightPadding;
                 if (this.orientation === "horizontal") {
-                    Plottable._Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.width(), this.height(), this.xAlignment, this.yAlignment);
+                    Plottable._Util.Text.writeLineHorizontally(truncatedText, this.textContainer, writeWidth, writeHeight, this.xAlignment, this.yAlignment);
                 }
                 else {
-                    Plottable._Util.Text.writeLineVertically(truncatedText, this.textContainer, this.width(), this.height(), this.xAlignment, this.yAlignment, this.orientation);
+                    Plottable._Util.Text.writeLineVertically(truncatedText, this.textContainer, writeWidth, writeHeight, this.xAlignment, this.yAlignment, this.orientation);
                 }
             };
             Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {

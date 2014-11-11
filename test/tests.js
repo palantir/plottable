@@ -1046,6 +1046,44 @@ describe("Labels", function () {
         assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "label is in vertical position");
         svg.remove();
     });
+    it("padding reacts well under align", function () {
+        var svg = generateSVG(400, 200);
+        var testLabel = new Plottable.Component.Label("testing label").padding(30).xAlign("left");
+        var longLabel = new Plottable.Component.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlign("left");
+        var topLabel = new Plottable.Component.Label("label").yAlign("bottom");
+        new Plottable.Component.Table([[topLabel], [testLabel], [longLabel]]).renderTo(svg);
+        var testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
+        var longTextRect = longLabel._element.select("text").node().getBoundingClientRect();
+        assert.closeTo(testTextRect.left, longTextRect.left + 30, 2, "left difference by padding amount");
+        testLabel.xAlign("right");
+        testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
+        longTextRect = longLabel._element.select("text").node().getBoundingClientRect();
+        assert.closeTo(testTextRect.right, longTextRect.right - 30, 2, "right difference by padding amount");
+        testLabel.yAlign("bottom");
+        testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
+        longTextRect = longLabel._element.select("text").node().getBoundingClientRect();
+        assert.closeTo(testTextRect.bottom, longTextRect.top - 30, 2, "vertical difference by padding amount");
+        testLabel.yAlign("top");
+        testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
+        var topTextRect = topLabel._element.select("text").node().getBoundingClientRect();
+        assert.closeTo(testTextRect.top, topTextRect.bottom + 30, 2, "vertical difference by padding amount");
+        svg.remove();
+    });
+    it("padding puts space around the label", function () {
+        var svg = generateSVG(400, 200);
+        var testLabel = new Plottable.Component.Label("testing label").padding(30);
+        testLabel.renderTo(svg);
+        var measure = Plottable._Util.Text.getTextMeasurer(svg.append("text"))("testing label");
+        assert.operator(testLabel.width(), ">", measure.width, "padding increases size of the component");
+        assert.operator(testLabel.width(), "<=", measure.width + 2 * testLabel.padding(), "width at most incorporates full padding amount");
+        assert.operator(testLabel.height(), ">", measure.height, "padding increases size of the component");
+        assert.operator(testLabel.height(), ">=", measure.height + 2 * testLabel.padding(), "height at most incorporates full padding amount");
+        svg.remove();
+    });
+    it("negative padding throws an error", function () {
+        var testLabel = new Plottable.Component.Label("testing label");
+        assert.throws(function () { return testLabel.padding(-10); }, Error, "Cannot be less than 0");
+    });
 });
 
 ///<reference path="../testReference.ts" />

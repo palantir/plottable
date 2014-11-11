@@ -2322,6 +2322,19 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             orient(newOrientation: string): Label;
+            /**
+             * Gets the amount of padding in pixels around the Label.
+             *
+             * @returns {number} the current padding amount.
+             */
+            padding(): number;
+            /**
+             * Sets the amount of padding in pixels around the Label.
+             *
+             * @param {number} padAmount The desired padding amount in pixel values
+             * @returns {Label} The calling Label.
+             */
+            padding(padAmount: number): Label;
             _doRender(): void;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
         }
