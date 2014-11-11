@@ -3693,8 +3693,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Drag extends AbstractInteraction {
-            _origin: number[];
-            _location: number[];
             _isDragging: boolean;
             _constrainX: (n: number) => number;
             _constrainY: (n: number) => number;
@@ -3715,6 +3713,10 @@ declare module Plottable {
              * @returns {Drag} The calling Drag.
              */
             dragstart(cb: (start: Point) => any): Drag;
+            _setOrigin(x: number, y: number): void;
+            _getOrigin(): number[];
+            _setLocation(x: number, y: number): void;
+            _getLocation(): number[];
             /**
              * Gets the callback that is called during dragging.
              *
@@ -3855,8 +3857,8 @@ declare module Plottable {
     module Interaction {
         class XDragBox extends DragBox {
             static _canResizeY: boolean;
-            _drag(): void;
-            setBox(x0: number, x1: number): XDragBox;
+            _setOrigin(x: number, y: number): void;
+            _setLocation(x: number, y: number): void;
         }
     }
 }
@@ -3865,7 +3867,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XYDragBox extends DragBox {
-            _drag(): void;
         }
     }
 }
@@ -3875,8 +3876,8 @@ declare module Plottable {
     module Interaction {
         class YDragBox extends DragBox {
             static _canResizeX: boolean;
-            _drag(): void;
-            setBox(y0: number, y1: number): YDragBox;
+            _setOrigin(x: number, y: number): void;
+            _setLocation(x: number, y: number): void;
         }
     }
 }

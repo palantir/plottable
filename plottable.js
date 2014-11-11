@@ -8774,8 +8774,8 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this.dragInitialized = false;
-                this._origin = [0, 0];
-                this._location = [0, 0];
+                this.origin = [0, 0];
+                this.location = [0, 0];
                 this._isDragging = false;
                 this.dragBehavior = d3.behavior.drag();
                 this.dragBehavior.on("dragstart", function () { return _this._dragstart(); });
@@ -8790,6 +8790,21 @@ var Plottable;
                     this.ondragstart = cb;
                     return this;
                 }
+            };
+            // we access origin and location through setOrigin and setLocation so that on XDragBox and YDragBox we can overwrite so that
+            // we always have the uncontrolled dimension of the box extending across the entire component
+            // this ensures that the callback values are synchronized with the actual box being drawn
+            Drag.prototype._setOrigin = function (x, y) {
+                this.origin = [x, y];
+            };
+            Drag.prototype._getOrigin = function () {
+                return this.origin.slice();
+            };
+            Drag.prototype._setLocation = function (x, y) {
+                this.location = [x, y];
+            };
+            Drag.prototype._getLocation = function () {
+                return this.location.slice();
             };
             Drag.prototype.drag = function (cb) {
                 if (cb === undefined) {
@@ -8817,22 +8832,23 @@ var Plottable;
                 var constraintFunction = function (min, max) { return function (x) { return Math.min(Math.max(x, min), max); }; };
                 this._constrainX = constraintFunction(0, width);
                 this._constrainY = constraintFunction(0, height);
-                this._origin = d3.mouse(this._hitBox[0][0].parentNode);
+                var origin = d3.mouse(this._hitBox[0][0].parentNode);
+                this._setOrigin(origin[0], origin[1]);
                 this._doDragstart();
             };
             Drag.prototype._doDragstart = function () {
                 if (this.ondragstart != null) {
-                    this.ondragstart({ x: this._origin[0], y: this._origin[1] });
+                    this.ondragstart({ x: this._getOrigin()[0], y: this._getOrigin()[1] });
                 }
             };
             Drag.prototype._drag = function () {
-                this._location = [this._constrainX(d3.event.x), this._constrainY(d3.event.y)];
+                this._setLocation(this._constrainX(d3.event.x), this._constrainY(d3.event.y));
                 this._doDrag();
             };
             Drag.prototype._doDrag = function () {
                 if (this.ondrag != null) {
-                    var start = { x: this._origin[0], y: this._origin[1] };
-                    var end = { x: this._location[0], y: this._location[1] };
+                    var start = { x: this._getOrigin()[0], y: this._getOrigin()[1] };
+                    var end = { x: this._getLocation()[0], y: this._getLocation()[1] };
                     this.ondrag(start, end);
                 }
             };
@@ -8842,8 +8858,8 @@ var Plottable;
             };
             Drag.prototype._doDragend = function () {
                 if (this.ondragend != null) {
-                    var start = { x: this._origin[0], y: this._origin[1] };
-                    var end = { x: this._location[0], y: this._location[1] };
+                    var start = { x: this._getOrigin()[0], y: this._getOrigin()[1] };
+                    var end = { x: this._getLocation()[0], y: this._getLocation()[1] };
                     this.ondragend(start, end);
                 }
             };
@@ -9002,24 +9018,24 @@ var Plottable;
                 this._isResizingY = false;
                 if (this._resizeXEnabled && this.isInsideBox(yPosition, yStart, yEnd)) {
                     if (this._isCloseEnoughLeft(xPosition, xStart, width)) {
-                        this.xResizeOrigin = this._origin[0] < this._location[0];
+                        this.xResizeOrigin = this._getOrigin()[0] < this._getLocation()[0];
                         this.resizeStartDiff[0] = xStart - xPosition;
                         this._isResizingX = true;
                     }
                     else if (this._isCloseEnoughRight(xPosition, xEnd, width)) {
-                        this.xResizeOrigin = this._origin[0] > this._location[0];
+                        this.xResizeOrigin = this._getOrigin()[0] > this._getLocation()[0];
                         this.resizeStartDiff[0] = xEnd - xPosition;
                         this._isResizingX = true;
                     }
                 }
                 if (this._resizeYEnabled && this.isInsideBox(xPosition, xStart, xEnd)) {
                     if (this._isCloseEnoughLeft(yPosition, yStart, height)) {
-                        this.yResizeOrigin = this._origin[1] < this._location[1];
+                        this.yResizeOrigin = this._getOrigin()[1] < this._getLocation()[1];
                         this.resizeStartDiff[1] = yStart - yPosition;
                         this._isResizingY = true;
                     }
                     else if (this._isCloseEnoughRight(yPosition, yEnd, height)) {
-                        this.yResizeOrigin = this._origin[1] > this._location[1];
+                        this.yResizeOrigin = this._getOrigin()[1] > this._getLocation()[1];
                         this.resizeStartDiff[1] = yEnd - yPosition;
                         this._isResizingY = true;
                     }
@@ -9043,8 +9059,12 @@ var Plottable;
                             x += diffX;
                             this.resizeStartDiff[0] += diffX > 0 ? -1 : 1;
                         }
-                        var xToOverwrite = this.xResizeOrigin ? this._origin : this._location;
-                        xToOverwrite[0] = this._constrainX(x);
+                        if (this.xResizeOrigin) {
+                            this._setOrigin(this._constrainX(x), this._getOrigin()[1]);
+                        }
+                        else {
+                            this._setLocation(this._constrainX(x), this._getLocation()[1]);
+                        }
                     }
                     if (this.isResizingY()) {
                         var diffY = this.resizeStartDiff[1];
@@ -9053,14 +9073,19 @@ var Plottable;
                             y += diffY;
                             this.resizeStartDiff[1] += diffY > 0 ? -1 : 1;
                         }
-                        var yToOverwrite = this.yResizeOrigin ? this._origin : this._location;
-                        yToOverwrite[1] = this._constrainY(y);
+                        if (this.yResizeOrigin) {
+                            this._setOrigin(this._getOrigin()[0], this._constrainY(y));
+                        }
+                        else {
+                            this._setLocation(this._getLocation()[0], this._constrainY(y));
+                        }
                     }
                     this._doDrag();
                 }
                 else {
                     _super.prototype._drag.call(this);
                 }
+                this.setBox(this._getOrigin()[0], this._getLocation()[0], this._getOrigin()[1], this._getLocation()[1]);
             };
             DragBox.prototype._dragend = function () {
                 this._isResizingX = false;
@@ -9187,13 +9212,11 @@ var Plottable;
             function XDragBox() {
                 _super.apply(this, arguments);
             }
-            XDragBox.prototype._drag = function () {
-                _super.prototype._drag.call(this);
-                this.setBox(this._origin[0], this._location[0]);
+            XDragBox.prototype._setOrigin = function (x, y) {
+                _super.prototype._setOrigin.call(this, x, 0);
             };
-            XDragBox.prototype.setBox = function (x0, x1) {
-                _super.prototype.setBox.call(this, x0, x1, 0, this._componentToListenTo.height());
-                return this;
+            XDragBox.prototype._setLocation = function (x, y) {
+                _super.prototype._setLocation.call(this, x, this._componentToListenTo.height());
             };
             XDragBox._canResizeY = false;
             return XDragBox;
@@ -9218,10 +9241,6 @@ var Plottable;
             function XYDragBox() {
                 _super.apply(this, arguments);
             }
-            XYDragBox.prototype._drag = function () {
-                _super.prototype._drag.call(this);
-                this.setBox(this._origin[0], this._location[0], this._origin[1], this._location[1]);
-            };
             return XYDragBox;
         })(Interaction.DragBox);
         Interaction.XYDragBox = XYDragBox;
@@ -9244,13 +9263,11 @@ var Plottable;
             function YDragBox() {
                 _super.apply(this, arguments);
             }
-            YDragBox.prototype._drag = function () {
-                _super.prototype._drag.call(this);
-                this.setBox(this._origin[1], this._location[1]);
+            YDragBox.prototype._setOrigin = function (x, y) {
+                _super.prototype._setOrigin.call(this, 0, y);
             };
-            YDragBox.prototype.setBox = function (y0, y1) {
-                _super.prototype.setBox.call(this, 0, this._componentToListenTo.width(), y0, y1);
-                return this;
+            YDragBox.prototype._setLocation = function (x, y) {
+                _super.prototype._setLocation.call(this, this._componentToListenTo.width(), y);
             };
             YDragBox._canResizeX = false;
             return YDragBox;

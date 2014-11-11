@@ -6608,8 +6608,14 @@ describe("Interactions", function () {
                 fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
                 interaction.dragend(function (start, end) {
                     timesCalled++;
-                    assert.deepEqual(start, { x: dragstartX2, y: dragstartY2 }, "starting point given correctly");
-                    assert.deepEqual(end, { x: dragmidX, y: dragmidY }, "ending point given correctly");
+                    var xMinObserved = Math.min(start.x, end.x);
+                    var xMaxObserved = Math.max(start.x, end.x);
+                    var yMinObserved = Math.min(start.y, end.y);
+                    var yMaxObserved = Math.max(start.y, end.y);
+                    assert.equal(xMinObserved, expectedSelection.xMin, "xMin as expected");
+                    assert.equal(xMaxObserved, expectedSelection.xMax, "xMax as expected");
+                    assert.equal(yMinObserved, expectedSelection.yMin, "yMin as expected");
+                    assert.equal(yMaxObserved, expectedSelection.yMax, "yMax as expected");
                     assert.deepEqual(interaction.selection, expectedSelection, "selection updated correctly");
                 });
                 // fake another drag event to resize the box.

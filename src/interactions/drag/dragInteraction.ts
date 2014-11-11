@@ -5,8 +5,8 @@ export module Interaction {
   export class Drag extends AbstractInteraction {
     private dragInitialized = false;
     private dragBehavior: D3.Behavior.Drag;
-    public      _origin = [0,0];
-    public    _location = [0,0];
+    private      origin = [0,0];
+    private    location = [0,0];
     public  _isDragging = false;
     public  _constrainX: (n: number) => number;
     public  _constrainY: (n: number) => number;
@@ -45,6 +45,22 @@ export module Interaction {
         this.ondragstart = cb;
         return this;
       }
+    }
+
+    // we access origin and location through setOrigin and setLocation so that on XDragBox and YDragBox we can overwrite so that
+    // we always have the uncontrolled dimension of the box extending across the entire component
+    // this ensures that the callback values are synchronized with the actual box being drawn
+    public _setOrigin(x: number, y: number) {
+      this.origin = [x, y];
+    }
+    public _getOrigin(): number[] {
+      return this.origin.slice();
+    }
+    public _setLocation(x: number, y: number) {
+      this.location = [x, y];
+    }
+    public _getLocation(): number[] {
+      return this.location.slice();
     }
 
     /**
@@ -99,25 +115,26 @@ export module Interaction {
       var constraintFunction = (min: number, max: number) => (x: number) => Math.min(Math.max(x, min), max);
       this._constrainX = constraintFunction(0, width );
       this._constrainY = constraintFunction(0, height);
-      this._origin = d3.mouse(this._hitBox[0][0].parentNode);
+      var origin = d3.mouse(this._hitBox[0][0].parentNode);
+      this._setOrigin(origin[0], origin[1]);
       this._doDragstart();
     }
 
     public _doDragstart() {
       if (this.ondragstart != null) {
-        this.ondragstart({x: this._origin[0], y: this._origin[1]});
+        this.ondragstart({x: this._getOrigin()[0], y: this._getOrigin()[1]});
       }
     }
 
     public _drag(){
-      this._location = [this._constrainX(d3.event.x), this._constrainY(d3.event.y)];
+      this._setLocation(this._constrainX(d3.event.x), this._constrainY(d3.event.y));
       this._doDrag();
     }
 
     public _doDrag() {
       if (this.ondrag != null) {
-        var start = {x: this._origin[0], y: this._origin[1]};
-        var end = {x: this._location[0], y: this._location[1]};
+        var start = {x: this._getOrigin()[0]  , y: this._getOrigin()[1]};
+        var end   = {x: this._getLocation()[0], y: this._getLocation()[1]};
         this.ondrag(start, end);
       }
     }
@@ -129,8 +146,8 @@ export module Interaction {
 
     public _doDragend() {
       if (this.ondragend != null) {
-        var start = {x: this._origin[0], y: this._origin[1]};
-        var end = {x: this._location[0], y: this._location[1]};
+        var start = {x: this._getOrigin()[0], y: this._getOrigin()[1]};
+        var end = {x: this._getLocation()[0], y: this._getLocation()[1]};
         this.ondragend(start, end);
       }
     }

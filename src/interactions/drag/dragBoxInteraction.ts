@@ -128,22 +128,22 @@ export module Interaction {
 
       if (this._resizeXEnabled && this.isInsideBox(yPosition, yStart, yEnd)) {
         if (this._isCloseEnoughLeft(xPosition, xStart, width)) {
-          this.xResizeOrigin = this._origin[0] < this._location[0];
+          this.xResizeOrigin = this._getOrigin()[0] < this._getLocation()[0];
           this.resizeStartDiff[0] = xStart - xPosition;
           this._isResizingX = true;
         } else if (this._isCloseEnoughRight(xPosition, xEnd, width)) {
-          this.xResizeOrigin = this._origin[0] > this._location[0];
+          this.xResizeOrigin = this._getOrigin()[0] > this._getLocation()[0];
           this.resizeStartDiff[0] = xEnd - xPosition;
           this._isResizingX = true;
         }
       }
       if (this._resizeYEnabled && this.isInsideBox(xPosition, xStart, xEnd)) {
         if (this._isCloseEnoughLeft(yPosition, yStart, height)) {
-          this.yResizeOrigin = this._origin[1] < this._location[1];
+          this.yResizeOrigin = this._getOrigin()[1] < this._getLocation()[1];
           this.resizeStartDiff[1] = yStart - yPosition;
           this._isResizingY = true;
         } else if (this._isCloseEnoughRight(yPosition, yEnd, height)) {
-          this.yResizeOrigin = this._origin[1] > this._location[1];
+          this.yResizeOrigin = this._getOrigin()[1] > this._getLocation()[1];
           this.resizeStartDiff[1] = yEnd - yPosition;
           this._isResizingY = true;
         }
@@ -170,8 +170,11 @@ export module Interaction {
             x += diffX;
             this.resizeStartDiff[0] += diffX > 0 ? -1 : 1;
           }
-          var xToOverwrite = this.xResizeOrigin ? this._origin : this._location;
-          xToOverwrite[0] = this._constrainX(x);
+          if (this.xResizeOrigin) {
+            this._setOrigin(this._constrainX(x), this._getOrigin()[1]);
+          } else {
+            this._setLocation(this._constrainX(x), this._getLocation()[1]);
+          }
         }
 
         if (this.isResizingY()) {
@@ -181,14 +184,18 @@ export module Interaction {
             y += diffY;
             this.resizeStartDiff[1] += diffY > 0 ? -1 : 1;
           }
-          var yToOverwrite = this.yResizeOrigin ? this._origin : this._location;
-          yToOverwrite[1] = this._constrainY(y);
+          if (this.yResizeOrigin) {
+            this._setOrigin(this._getOrigin()[0], this._constrainY(y));
+          } else {
+            this._setLocation(this._getLocation()[0], this._constrainY(y));
+          }
         }
 
         this._doDrag();
       } else {
         super._drag();
       }
+      this.setBox(this._getOrigin()[0], this._getLocation()[0], this._getOrigin()[1], this._getLocation()[1]);
     }
 
     public _dragend() {
