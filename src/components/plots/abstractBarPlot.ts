@@ -6,7 +6,7 @@ export module Plot {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public static _DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
-    public _baselineValue = 0;
+    public _baselineValue: number;
     public _barAlignmentFactor = 0.5;
     public _isVertical: boolean;
     private _barLabelFormatter: Formatter = Formatters.identity();
@@ -24,11 +24,12 @@ export module Plot {
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
-      this.project("fill", () => Core.Colors.INDIGO);
+      var defaultColor = new Scale.Color().range()[0];
+      this.project("fill", () => defaultColor);
       this._animators["bars-reset"] = new Animator.Null();
       this._animators["bars"] = new Animator.Base();
       this._animators["baseline"] = new Animator.Null();
-      this.baseline(this._baselineValue);
+      this.baseline(0);
     }
 
     public _getDrawer(key: string) {

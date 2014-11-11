@@ -350,7 +350,7 @@ describe("Interactions", () => {
       svg.remove();
     });
 
-    it("correctly triggers callbacks (hoizontal)", () => {
+    it("correctly triggers callbacks (horizontal)", () => {
       var svg = generateSVG(400, 400);
       var barPlot = new Plottable.Plot.HorizontalBar(linearScale, ordinalScale).addDataset(dataset);
       barPlot.project("y", "name", ordinalScale).project("x", "value", linearScale);
@@ -371,10 +371,10 @@ describe("Interactions", () => {
 
       var hitbox = barPlot._element.select(".hit-box");
 
-      triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
+      triggerFakeMouseEvent("mousemove", hitbox, 200, 150);
       assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
       barDatum = null;
-      triggerFakeMouseEvent("mousemove", hitbox, 201, 250);
+      triggerFakeMouseEvent("mousemove", hitbox, 201, 150);
       assert.isNull(barDatum, "hover callback isn't called if the hovered bar didn't change");
 
       triggerFakeMouseEvent("mousemove", hitbox, 10, 10);
@@ -394,7 +394,7 @@ describe("Interactions", () => {
 
 
       bhi.hoverMode("line");
-      triggerFakeMouseEvent("mousemove", hitbox, 399, 250);
+      triggerFakeMouseEvent("mousemove", hitbox, 399, 150);
       assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
 
       svg.remove();

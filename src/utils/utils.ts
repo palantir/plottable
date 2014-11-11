@@ -293,6 +293,28 @@ export module _Util {
         return window.setTimeout(f, time, args);
       }
     }
+
+    export function colorTest(colorTester: D3.Selection, className: string) {
+      colorTester.classed(className, true);
+      // Use regex to get the text inside the rgb parentheses
+      var colorStyle = colorTester.style("background-color");
+      if (colorStyle === "transparent") {
+        return null;
+      }
+      var rgb = /\((.+)\)/.exec(colorStyle)[1]
+                          .split(",")
+                          .map((colorValue: string) => {
+                            var colorNumber = +colorValue;
+                            var hexValue = colorNumber.toString(16);
+                            return colorNumber < 16 ? "0" + hexValue : hexValue;
+                          });
+      if (rgb.length === 4 && rgb[3] === "00") {
+        return null;
+      }
+      var hexCode = "#" + rgb.join("");
+      colorTester.classed(className, false);
+      return hexCode;
+    }
   }
 }
 }

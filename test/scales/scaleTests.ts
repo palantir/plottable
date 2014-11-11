@@ -290,6 +290,14 @@ describe("Scales", () => {
       assert.equal("#ff7f0e", scale.scale("no"));
       assert.equal("#2ca02c", scale.scale("maybe"));
     });
+
+    it("default colors are generated", () => {
+      var scale = new Plottable.Scale.Color();
+      var colorArray = ["#5279c7", "#fd373e", "#63c261",
+                        "#fad419", "#2c2b6f", "#ff7939",
+                        "#db2e65", "#99ce50", "#962565", "#06cccc"];
+      assert.deepEqual(scale.range(), colorArray);
+    });
   });
 
   describe("Interpolated Color Scales", () => {
