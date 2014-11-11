@@ -14,7 +14,7 @@ export module Plot {
    */
   export class Pie extends AbstractPlot {
 
-    private static DEFAULT_COLOR_SCALE = new Scale.Color();
+    private colorScale: Scale.Color;
 
     /**
      * Constructs a PiePlot.
@@ -23,6 +23,7 @@ export module Plot {
      */
     constructor() {
       super();
+      this.colorScale = new Scale.Color();
       this.classed("pie-plot", true);
     }
 
@@ -46,7 +47,7 @@ export module Plot {
       attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
 
       if (attrToProjector["fill"] == null) {
-        attrToProjector["fill"] = (d: any, i: number) => Pie.DEFAULT_COLOR_SCALE.scale(String(i));
+        attrToProjector["fill"] = (d: any, i: number) => this.colorScale.scale(String(i));
       }
 
       var defaultAccessor = (d: any) => d.value;

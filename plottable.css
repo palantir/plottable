@@ -1,4 +1,44 @@
 
+.plottable-colors-0 {
+  background-color: #5279c7; /* INDIGO */
+}
+
+.plottable-colors-1 {
+  background-color: #fd373e; /* CORAL_RED */
+}
+
+.plottable-colors-2 {
+  background-color: #63c261; /* FERN */
+}
+
+.plottable-colors-3 {
+  background-color: #fad419; /* BRIGHT_SUN */
+}
+
+.plottable-colors-4 {
+  background-color: #2c2b6f; /* JACARTA */
+}
+
+.plottable-colors-5 {
+  background-color: #ff7939; /* BURNING_ORANGE */
+}
+
+.plottable-colors-6 {
+  background-color: #db2e65; /* CERISE_RED */
+}
+
+.plottable-colors-7 {
+  background-color: #99ce50; /* CONIFER */
+}
+
+.plottable-colors-8 {
+  background-color: #962565; /* ROYAL_HEATH */
+}
+
+.plottable-colors-9 {
+  background-color: #06cccc; /* ROBINS_EGG_BLUE */
+}
+
 svg.plottable {
   display : block; /* SVGs must be block elements for width/height calculations to work in Firefox. */
 }

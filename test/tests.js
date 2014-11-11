@@ -2035,9 +2035,9 @@ describe("Plots", function () {
             it("sectors are filled in according to defaults", function () {
                 var arcPaths = renderArea.selectAll(".arc");
                 var arcPath0 = d3.select(arcPaths[0][0]);
-                assert.strictEqual(arcPath0.attr("fill"), Plottable.Core.Colors.PLOTTABLE_COLORS[0], "first sector filled appropriately");
+                assert.strictEqual(arcPath0.attr("fill"), "#5279c7", "first sector filled appropriately");
                 var arcPath1 = d3.select(arcPaths[0][1]);
-                assert.strictEqual(arcPath1.attr("fill"), Plottable.Core.Colors.PLOTTABLE_COLORS[1], "second sector filled appropriately");
+                assert.strictEqual(arcPath1.attr("fill"), "#fd373e", "second sector filled appropriately");
                 svg.remove();
             });
             it("project fill", function () {
@@ -5429,6 +5429,11 @@ describe("Scales", function () {
             assert.equal("#ff7f0e", scale.scale("no"));
             assert.equal("#2ca02c", scale.scale("maybe"));
         });
+        it("default colors are generated", function () {
+            var scale = new Plottable.Scale.Color();
+            var colorArray = ["#5279c7", "#fd373e", "#63c261", "#fad419", "#2c2b6f", "#ff7939", "#db2e65", "#99ce50", "#962565", "#06cccc"];
+            assert.deepEqual(scale.range(), colorArray);
+        });
     });
     describe("Interpolated Color Scales", function () {
         it("default scale uses reds and a linear scale type", function () {
@@ -6531,6 +6536,20 @@ describe("_Util.Methods", function () {
         assert.deepEqual(range, [0.2, 1.2, 2.2, 3.2], "all entries has been generated with float start");
         range = Plottable._Util.Methods.range(0.6, 2.2, 0.5);
         assert.deepEqual(range, [0.6, 1.1, 1.6, 2.1], "all entries has been generated with float step");
+    });
+    it("colorTest works as expected", function () {
+        var colorTester = d3.select("body").append("div").classed("color-tester", true);
+        var style = colorTester.append("style");
+        style.attr("type", "text/css");
+        style.text(".plottable-colors-0 { background-color: blue; }");
+        var blueHexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-0");
+        assert.strictEqual(blueHexcode, "#0000ff", "hexcode for blue returned");
+        style.text(".plottable-colors-2 { background-color: #13EADF; }");
+        var hexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-2");
+        assert.strictEqual(hexcode, "#13eadf", "hexcode for blue returned");
+        var nullHexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-11");
+        assert.strictEqual(nullHexcode, null, "null hexcode returned");
+        colorTester.remove();
     });
 });
 
