@@ -3770,6 +3770,8 @@ declare module Plottable {
          */
         class DragBox extends Drag {
             static RESIZE_PADDING: number;
+            static _canResizeX: boolean;
+            static _canResizeY: boolean;
             /**
              * The DOM element of the box that is drawn. When no box is drawn, it is
              * null.
@@ -3822,9 +3824,9 @@ declare module Plottable {
              * @returns {boolean}
              */
             isResizing(): boolean;
-            _doDragstart(): void;
+            _dragstart(): void;
             _drag(): void;
-            _doDragend(): void;
+            _dragend(): void;
             /**
              * Clears the highlighted drag-selection box drawn by the DragBox.
              *
@@ -3852,7 +3854,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XDragBox extends DragBox {
-            static _canResizeX: boolean;
+            static _canResizeY: boolean;
             _drag(): void;
             setBox(x0: number, x1: number): XDragBox;
         }
@@ -3863,8 +3865,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XYDragBox extends DragBox {
-            static _canResizeX: boolean;
-            static _canResizeY: boolean;
             _drag(): void;
         }
     }
@@ -3874,7 +3874,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class YDragBox extends DragBox {
-            static _canResizeY: boolean;
+            static _canResizeX: boolean;
             _drag(): void;
             setBox(y0: number, y1: number): YDragBox;
         }
