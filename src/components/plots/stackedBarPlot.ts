@@ -21,7 +21,10 @@ export module Plot {
       this._baselineValue = 0;
       super(xScale, yScale);
       this.classed("bar-plot", true);
-      this.project("fill", () => new Scale.Color().range()[0]);
+
+      var defaultColor = new Scale.Color().range()[0];
+      this.project("fill", () => defaultColor);
+
       this.baseline(this._baselineValue);
       this._isVertical = isVertical;
     }
