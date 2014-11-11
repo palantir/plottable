@@ -16,6 +16,35 @@ function getSVGParent() {
         return d3.select("body");
     }
 }
+function makeFakeEvent(x, y) {
+    return {
+        dx: 0,
+        dy: 0,
+        clientX: x,
+        clientY: y,
+        translate: [x, y],
+        scale: 1,
+        sourceEvent: null,
+        x: x,
+        y: y,
+        keyCode: 0,
+        altKey: false
+    };
+}
+function fakeDragSequence(anyedInteraction, startX, startY, endX, endY) {
+    var originalD3Mouse = d3.mouse;
+    d3.mouse = function () {
+        return [startX, startY];
+    };
+    anyedInteraction._dragstart();
+    d3.mouse = originalD3Mouse;
+    d3.event = makeFakeEvent(startX, startY);
+    anyedInteraction._drag();
+    d3.event = makeFakeEvent(endX, endY);
+    anyedInteraction._drag();
+    anyedInteraction._dragend();
+    d3.event = null;
+}
 function verifySpaceRequest(sr, w, h, ww, wh, id) {
     assert.equal(sr.width, w, "width requested is as expected #" + id);
     assert.equal(sr.height, h, "height requested is as expected #" + id);
@@ -6460,35 +6489,6 @@ describe("_Util.Methods", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-function makeFakeEvent(x, y) {
-    return {
-        dx: 0,
-        dy: 0,
-        clientX: x,
-        clientY: y,
-        translate: [x, y],
-        scale: 1,
-        sourceEvent: null,
-        x: x,
-        y: y,
-        keyCode: 0,
-        altKey: false
-    };
-}
-function fakeDragSequence(anyedInteraction, startX, startY, endX, endY) {
-    var originalD3Mouse = d3.mouse;
-    d3.mouse = function () {
-        return [startX, startY];
-    };
-    anyedInteraction._dragstart();
-    d3.mouse = originalD3Mouse;
-    d3.event = makeFakeEvent(startX, startY);
-    anyedInteraction._drag();
-    d3.event = makeFakeEvent(endX, endY);
-    anyedInteraction._drag();
-    anyedInteraction._dragend();
-    d3.event = null;
-}
 describe("Interactions", function () {
     describe("PanZoomInteraction", function () {
         it("Pans properly", function () {
@@ -6525,289 +6525,6 @@ describe("Interactions", function () {
             var expectedYDragChange = -dragDistancePixelY * getSlope(yScale);
             assert.closeTo(xDomainAfter[0] - xDomainBefore[0], expectedXDragChange, 1, "x domain changed by the correct amount");
             assert.closeTo(yDomainAfter[0] - yDomainBefore[0], expectedYDragChange, 1, "y domain changed by the correct amount");
-            svg.remove();
-        });
-    });
-    describe("XYDragBoxInteraction", function () {
-        var svgWidth = 400;
-        var svgHeight = 400;
-        var svg;
-        var dataset;
-        var xScale;
-        var yScale;
-        var plot;
-        var interaction;
-        var dragstartX = 20;
-        var dragstartY = svgHeight - 100;
-        var dragendX = 100;
-        var dragendY = svgHeight - 20;
-        var draghalfwidth = Math.round((dragendX - dragstartX) / 2);
-        var draghalfheight = Math.round((dragendY - dragstartY) / 2);
-        before(function () {
-            svg = generateSVG(svgWidth, svgHeight);
-            dataset = new Plottable.Dataset(makeLinearSeries(10));
-            xScale = new Plottable.Scale.Linear();
-            yScale = new Plottable.Scale.Linear();
-            plot = new Plottable.Plot.Scatter(xScale, yScale);
-            plot.addDataset(dataset);
-            plot.renderTo(svg);
-            interaction = new Plottable.Interaction.XYDragBox();
-            plot.registerInteraction(interaction);
-        });
-        afterEach(function () {
-            interaction.dragstart(null);
-            interaction.drag(null);
-            interaction.dragend(null);
-            interaction.clearBox();
-        });
-        it("All callbacks are notified with appropriate data on drag", function () {
-            var dragStartCalled = 0, dragEndCalled = 0;
-            interaction.dragstart(function (a) {
-                dragStartCalled++;
-                var expectedStartLocation = { x: dragstartX, y: dragstartY };
-                assert.deepEqual(a, expectedStartLocation, "areaCallback called with null arg on dragstart");
-            });
-            interaction.dragend(function (a, b) {
-                dragEndCalled++;
-                var expectedStart = {
-                    x: dragstartX,
-                    y: dragstartY
-                };
-                var expectedEnd = {
-                    x: dragendX,
-                    y: dragendY
-                };
-                assert.deepEqual(a, expectedStart, "areaCallback was passed the correct starting point");
-                assert.deepEqual(b, expectedEnd, "areaCallback was passed the correct ending point");
-            });
-            // fake a drag event
-            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            assert.equal(dragStartCalled, 1, "dragstart callback is called once");
-            assert.equal(dragEndCalled, 1, "dragend callback is called once");
-        });
-        it("Highlights and un-highlights areas appropriately", function () {
-            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
-            var dragBox = plot._backgroundContainer.select(dragBoxClass);
-            assert.isNotNull(dragBox, "the dragbox was created");
-            var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
-            var expectedStartPosition = { x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY) };
-            assert.deepEqual(actualStartPosition, expectedStartPosition, "highlighted box is positioned correctly");
-            assert.equal(parseFloat(dragBox.attr("width")), Math.abs(dragstartX - dragendX), "highlighted box has correct width");
-            assert.equal(parseFloat(dragBox.attr("height")), Math.abs(dragstartY - dragendY), "highlighted box has correct height");
-            interaction.clearBox();
-            var boxGone = dragBox.attr("width") === "0" && dragBox.attr("height") === "0";
-            assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
-        });
-        describe("resize enabled", function () {
-            var dragmidX = dragstartX + draghalfwidth;
-            var dragmidY = dragstartY + draghalfheight;
-            function test(dragstartX2, dragstartY2, expectedSelection) {
-                var timesCalled = 0;
-                // fake a drag event
-                fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-                interaction.dragend(function (start, end) {
-                    timesCalled++;
-                    var xMinObserved = Math.min(start.x, end.x);
-                    var xMaxObserved = Math.max(start.x, end.x);
-                    var yMinObserved = Math.min(start.y, end.y);
-                    var yMaxObserved = Math.max(start.y, end.y);
-                    assert.equal(xMinObserved, expectedSelection.xMin, "xMin as expected");
-                    assert.equal(xMaxObserved, expectedSelection.xMax, "xMax as expected");
-                    assert.equal(yMinObserved, expectedSelection.yMin, "yMin as expected");
-                    assert.equal(yMaxObserved, expectedSelection.yMax, "yMax as expected");
-                    assert.deepEqual(interaction.selection, expectedSelection, "selection updated correctly");
-                });
-                // fake another drag event to resize the box.
-                interaction.resizeEnabled(true);
-                fakeDragSequence(interaction, dragstartX2, dragstartY2, dragmidX, dragmidY);
-                assert.equal(timesCalled, 1, "drag callback not called once");
-            }
-            it("from the top left", function () {
-                test(dragstartX, dragendY, {
-                    xMin: dragmidX,
-                    yMin: dragstartY,
-                    xMax: dragendX,
-                    yMax: dragmidY
-                });
-            });
-            it("from the top", function () {
-                test(dragmidX, dragendY, {
-                    xMin: dragstartX,
-                    yMin: dragstartY,
-                    xMax: dragendX,
-                    yMax: dragmidY
-                });
-            });
-            it("from the top right", function () {
-                test(dragendX, dragendY, {
-                    xMin: dragstartX,
-                    yMin: dragstartY,
-                    xMax: dragmidX,
-                    yMax: dragmidY
-                });
-            });
-            it("from the right", function () {
-                test(dragendX, dragmidY, {
-                    xMin: dragstartX,
-                    yMin: dragstartY,
-                    xMax: dragmidX,
-                    yMax: dragendY
-                });
-            });
-            it("from the bottom right", function () {
-                test(dragendX, dragstartY, {
-                    xMin: dragstartX,
-                    yMin: dragmidY,
-                    xMax: dragmidX,
-                    yMax: dragendY
-                });
-            });
-            it("from the bottom", function () {
-                test(dragmidX, dragstartY, {
-                    xMin: dragstartX,
-                    yMin: dragmidY,
-                    xMax: dragendX,
-                    yMax: dragendY
-                });
-            });
-            it("from the bottom left", function () {
-                test(dragstartX, dragstartY, {
-                    xMin: dragmidX,
-                    yMin: dragmidY,
-                    xMax: dragendX,
-                    yMax: dragendY
-                });
-            });
-            it("from the left", function () {
-                test(dragstartX, dragmidY, {
-                    xMin: dragmidX,
-                    yMin: dragstartY,
-                    xMax: dragendX,
-                    yMax: dragendY
-                });
-            });
-        });
-        after(function () {
-            svg.remove();
-        });
-    });
-    describe("YDragBoxInteraction", function () {
-        var svgWidth = 400;
-        var svgHeight = 400;
-        var svg;
-        var dataset;
-        var xScale;
-        var yScale;
-        var plot;
-        var interaction;
-        var dragstartX = 20;
-        var dragstartY = svgHeight - 100;
-        var dragendX = 100;
-        var dragendY = svgHeight - 20;
-        var dragwidth = dragendX - dragstartX;
-        var dragheight = dragendY - dragstartY;
-        before(function () {
-            svg = generateSVG(svgWidth, svgHeight);
-            dataset = new Plottable.Dataset(makeLinearSeries(10));
-            xScale = new Plottable.Scale.Linear();
-            yScale = new Plottable.Scale.Linear();
-            plot = new Plottable.Plot.Scatter(xScale, yScale);
-            plot.addDataset(dataset);
-            plot.renderTo(svg);
-            interaction = new Plottable.Interaction.YDragBox();
-            plot.registerInteraction(interaction);
-        });
-        afterEach(function () {
-            interaction.dragstart(null);
-            interaction.drag(null);
-            interaction.dragend(null);
-            interaction.clearBox();
-        });
-        it("All callbacks are notified with appropriate data when a drag finishes", function () {
-            var dragStartCalled = 0, dragEndCalled = 0;
-            interaction.dragstart(function (a) {
-                dragStartCalled++;
-                var expectedY = dragstartY;
-                assert.deepEqual(a.y, expectedY, "areaCallback called with null arg on dragstart");
-            });
-            interaction.dragend(function (a, b) {
-                dragEndCalled++;
-                var expectedStartY = dragstartY;
-                var expectedEndY = dragendY;
-                assert.deepEqual(a.y, expectedStartY);
-                assert.deepEqual(b.y, expectedEndY);
-            });
-            // fake a drag event
-            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            assert.equal(dragStartCalled, 1, "dragstart callback is called once");
-            assert.equal(dragEndCalled, 1, "dragend callback is called once");
-        });
-        it("Highlights and un-highlights areas appropriately", function () {
-            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
-            var dragBox = plot._backgroundContainer.select(dragBoxClass);
-            assert.isNotNull(dragBox, "the dragbox was created");
-            var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
-            var expectedStartPosition = { x: 0, y: Math.min(dragstartY, dragendY) };
-            assert.deepEqual(actualStartPosition, expectedStartPosition, "highlighted box is positioned correctly");
-            assert.equal(parseFloat(dragBox.attr("width")), svgWidth, "highlighted box has correct width");
-            assert.equal(parseFloat(dragBox.attr("height")), Math.abs(dragstartY - dragendY), "highlighted box has correct height");
-            interaction.clearBox();
-            var boxGone = dragBox.attr("width") === "0" && dragBox.attr("height") === "0";
-            assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
-        });
-        describe("resizing enabled", function () {
-            it("from the top", function () {
-                var timesCalled = 0;
-                // fake a drag event
-                fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-                var dragstartX2 = dragstartX + Math.round(dragwidth / 2);
-                var dragstartY2 = dragstartY;
-                var dragendX2 = dragstartX2;
-                var dragendY2 = dragstartY + Math.round(dragheight / 2);
-                interaction.dragend(function (start, end) {
-                    timesCalled++;
-                    assert.deepEqual(start, { x: dragstartX2, y: dragstartY2 });
-                    assert.deepEqual(end, { x: dragendX2, y: dragendY2 });
-                    assert.deepEqual(interaction.selection, {
-                        xMin: 0,
-                        xMax: svgWidth,
-                        yMin: dragendY2,
-                        yMax: dragendY
-                    });
-                });
-                // fake another drag event to resize the box.
-                interaction.resizeEnabled(true);
-                fakeDragSequence(interaction, dragstartX2, dragstartY2, dragendX2, dragendY2);
-                assert.equal(timesCalled, 1, "drag callback called");
-            });
-            it("from the bottom", function () {
-                var timesCalled = 0;
-                // fake a drag event
-                fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-                var dragstartX2 = dragstartX + Math.round(dragwidth / 2);
-                var dragstartY2 = dragendY;
-                var dragendX2 = dragstartX2;
-                var dragendY2 = dragstartY2 - Math.round(dragheight / 2);
-                interaction.dragend(function (start, end) {
-                    timesCalled++;
-                    assert.deepEqual(start, { x: dragstartX2, y: dragstartY2 });
-                    assert.deepEqual(end, { x: dragendX2, y: dragendY2 });
-                    assert.deepEqual(interaction.selection, {
-                        xMin: 0,
-                        xMax: svgWidth,
-                        yMin: dragstartY,
-                        yMax: dragendY2
-                    });
-                });
-                // fake another drag event to resize the box.
-                interaction.resizeEnabled(true);
-                fakeDragSequence(interaction, dragstartX2, dragstartY2, dragendX2, dragendY2);
-                assert.equal(timesCalled, 1, "drag callback called");
-            });
-        });
-        after(function () {
             svg.remove();
         });
     });
@@ -6935,6 +6652,281 @@ describe("Interactions", function () {
             bhi.hoverMode("line");
             triggerFakeMouseEvent("mousemove", hitbox, 399, 250);
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("DragBoxInteractions", function () {
+    var svgWidth = 400;
+    var svgHeight = 400;
+    var svg;
+    var dataset;
+    var xScale;
+    var yScale;
+    var plot;
+    var interaction;
+    var dragstartX = 20;
+    var dragstartY = svgHeight - 100;
+    var dragendX = 100;
+    var dragendY = svgHeight - 20;
+    var draghalfwidth = Math.round((dragendX - dragstartX) / 2);
+    var draghalfheight = Math.round((dragendY - dragstartY) / 2);
+    var dragwidth = dragendX - dragstartX;
+    var dragheight = dragendY - dragstartY;
+    var dragmidX = dragstartX + draghalfwidth;
+    var dragmidY = dragstartY + draghalfheight;
+    function testResize(resizeXStart, resizeYStart, expectedSelection) {
+        var timesCalled = 0;
+        fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY); // initial dragbox to resize from
+        interaction.dragend(function (start, end) {
+            timesCalled++;
+            var xMinObserved = Math.min(start.x, end.x);
+            var xMaxObserved = Math.max(start.x, end.x);
+            var yMinObserved = Math.min(start.y, end.y);
+            var yMaxObserved = Math.max(start.y, end.y);
+            assert.equal(xMinObserved, expectedSelection.xMin, "xMin as expected");
+            assert.equal(xMaxObserved, expectedSelection.xMax, "xMax as expected");
+            assert.equal(yMinObserved, expectedSelection.yMin, "yMin as expected");
+            assert.equal(yMaxObserved, expectedSelection.yMax, "yMax as expected");
+            assert.deepEqual(interaction.selection, expectedSelection, "selection updated correctly");
+        });
+        // fake another drag event to resize the box.
+        interaction.resizeEnabled(true);
+        fakeDragSequence(interaction, resizeXStart, resizeYStart, dragmidX, dragmidY);
+        assert.equal(timesCalled, 1, "drag callback not called once");
+    }
+    describe("XYDragBoxInteraction", function () {
+        before(function () {
+            svg = generateSVG(svgWidth, svgHeight);
+            dataset = new Plottable.Dataset(makeLinearSeries(10));
+            xScale = new Plottable.Scale.Linear();
+            yScale = new Plottable.Scale.Linear();
+            plot = new Plottable.Plot.Scatter(xScale, yScale);
+            plot.addDataset(dataset);
+            plot.renderTo(svg);
+            interaction = new Plottable.Interaction.DragBox();
+            plot.registerInteraction(interaction);
+        });
+        afterEach(function () {
+            interaction.dragstart(null);
+            interaction.drag(null);
+            interaction.dragend(null);
+            interaction.clearBox();
+        });
+        it("All callbacks are notified with appropriate data on drag", function () {
+            var dragStartCalled = 0, dragEndCalled = 0;
+            interaction.dragstart(function (a) {
+                dragStartCalled++;
+                var expectedStartLocation = { x: dragstartX, y: dragstartY };
+                assert.deepEqual(a, expectedStartLocation, "areaCallback called with null arg on dragstart");
+            });
+            interaction.dragend(function (a, b) {
+                dragEndCalled++;
+                var expectedStart = {
+                    x: dragstartX,
+                    y: dragstartY
+                };
+                var expectedEnd = {
+                    x: dragendX,
+                    y: dragendY
+                };
+                assert.deepEqual(a, expectedStart, "areaCallback was passed the correct starting point");
+                assert.deepEqual(b, expectedEnd, "areaCallback was passed the correct ending point");
+            });
+            // fake a drag event
+            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
+            assert.equal(dragStartCalled, 1, "dragstart callback is called once");
+            assert.equal(dragEndCalled, 1, "dragend callback is called once");
+        });
+        it("Highlights and un-highlights areas appropriately", function () {
+            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
+            var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
+            var dragBox = plot._backgroundContainer.select(dragBoxClass);
+            assert.isNotNull(dragBox, "the dragbox was created");
+            var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
+            var expectedStartPosition = { x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY) };
+            assert.deepEqual(actualStartPosition, expectedStartPosition, "highlighted box is positioned correctly");
+            assert.equal(parseFloat(dragBox.attr("width")), Math.abs(dragstartX - dragendX), "highlighted box has correct width");
+            assert.equal(parseFloat(dragBox.attr("height")), Math.abs(dragstartY - dragendY), "highlighted box has correct height");
+            interaction.clearBox();
+            var boxGone = dragBox.attr("width") === "0" && dragBox.attr("height") === "0";
+            assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
+        });
+        describe("resize enabled", function () {
+            it("from the top left", function () {
+                testResize(dragstartX, dragendY, {
+                    xMin: dragmidX,
+                    yMin: dragstartY,
+                    xMax: dragendX,
+                    yMax: dragmidY
+                });
+            });
+            it("from the top", function () {
+                testResize(dragmidX, dragendY, {
+                    xMin: dragstartX,
+                    yMin: dragstartY,
+                    xMax: dragendX,
+                    yMax: dragmidY
+                });
+            });
+            it("from the top right", function () {
+                testResize(dragendX, dragendY, {
+                    xMin: dragstartX,
+                    yMin: dragstartY,
+                    xMax: dragmidX,
+                    yMax: dragmidY
+                });
+            });
+            it("from the right", function () {
+                testResize(dragendX, dragmidY, {
+                    xMin: dragstartX,
+                    yMin: dragstartY,
+                    xMax: dragmidX,
+                    yMax: dragendY
+                });
+            });
+            it("from the bottom right", function () {
+                testResize(dragendX, dragstartY, {
+                    xMin: dragstartX,
+                    yMin: dragmidY,
+                    xMax: dragmidX,
+                    yMax: dragendY
+                });
+            });
+            it("from the bottom", function () {
+                testResize(dragmidX, dragstartY, {
+                    xMin: dragstartX,
+                    yMin: dragmidY,
+                    xMax: dragendX,
+                    yMax: dragendY
+                });
+            });
+            it("from the bottom left", function () {
+                testResize(dragstartX, dragstartY, {
+                    xMin: dragmidX,
+                    yMin: dragmidY,
+                    xMax: dragendX,
+                    yMax: dragendY
+                });
+            });
+            it("from the left", function () {
+                testResize(dragstartX, dragmidY, {
+                    xMin: dragmidX,
+                    yMin: dragstartY,
+                    xMax: dragendX,
+                    yMax: dragendY
+                });
+            });
+        });
+        after(function () {
+            svg.remove();
+        });
+    });
+    describe("YDragBoxInteraction", function () {
+        before(function () {
+            svg = generateSVG(svgWidth, svgHeight);
+            dataset = new Plottable.Dataset(makeLinearSeries(10));
+            xScale = new Plottable.Scale.Linear();
+            yScale = new Plottable.Scale.Linear();
+            plot = new Plottable.Plot.Scatter(xScale, yScale);
+            plot.addDataset(dataset);
+            plot.renderTo(svg);
+            interaction = new Plottable.Interaction.YDragBox();
+            plot.registerInteraction(interaction);
+        });
+        afterEach(function () {
+            interaction.dragstart(null);
+            interaction.drag(null);
+            interaction.dragend(null);
+            interaction.clearBox();
+        });
+        it("All callbacks are notified with appropriate data when a drag finishes", function () {
+            var dragStartCalled = 0, dragEndCalled = 0;
+            interaction.dragstart(function (a) {
+                dragStartCalled++;
+                var expectedY = dragstartY;
+                assert.deepEqual(a.y, expectedY, "areaCallback called with null arg on dragstart");
+            });
+            interaction.dragend(function (a, b) {
+                dragEndCalled++;
+                var expectedStartY = dragstartY;
+                var expectedEndY = dragendY;
+                assert.deepEqual(a.y, expectedStartY);
+                assert.deepEqual(b.y, expectedEndY);
+            });
+            // fake a drag event
+            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
+            assert.equal(dragStartCalled, 1, "dragstart callback is called once");
+            assert.equal(dragEndCalled, 1, "dragend callback is called once");
+        });
+        it("Highlights and un-highlights areas appropriately", function () {
+            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
+            var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
+            var dragBox = plot._backgroundContainer.select(dragBoxClass);
+            assert.isNotNull(dragBox, "the dragbox was created");
+            var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
+            var expectedStartPosition = { x: 0, y: Math.min(dragstartY, dragendY) };
+            assert.deepEqual(actualStartPosition, expectedStartPosition, "highlighted box is positioned correctly");
+            assert.equal(parseFloat(dragBox.attr("width")), svgWidth, "highlighted box has correct width");
+            assert.equal(parseFloat(dragBox.attr("height")), Math.abs(dragstartY - dragendY), "highlighted box has correct height");
+            interaction.clearBox();
+            var boxGone = dragBox.attr("width") === "0" && dragBox.attr("height") === "0";
+            assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
+        });
+        describe("resize enabled", function () {
+            it("from the top left", function () {
+                testResize(dragstartX, dragendY, {
+                    xMin: 0,
+                    yMin: dragstartY,
+                    xMax: svgWidth,
+                    yMax: dragmidY
+                });
+            });
+            it("from the top", function () {
+                testResize(dragmidX, dragendY, {
+                    xMin: 0,
+                    yMin: dragstartY,
+                    xMax: svgWidth,
+                    yMax: dragmidY
+                });
+            });
+            it("from the top right", function () {
+                testResize(dragendX, dragendY, {
+                    xMin: 0,
+                    yMin: dragstartY,
+                    xMax: svgWidth,
+                    yMax: dragmidY
+                });
+            });
+            it("from the bottom right", function () {
+                testResize(dragendX, dragstartY, {
+                    xMin: 0,
+                    yMin: dragmidY,
+                    xMax: svgWidth,
+                    yMax: dragendY
+                });
+            });
+            it("from the bottom", function () {
+                testResize(dragmidX, dragstartY, {
+                    xMin: 0,
+                    yMin: dragmidY,
+                    xMax: svgWidth,
+                    yMax: dragendY
+                });
+            });
+            it("from the bottom left", function () {
+                testResize(dragstartX, dragstartY, {
+                    xMin: 0,
+                    yMin: dragmidY,
+                    xMax: svgWidth,
+                    yMax: dragendY
+                });
+            });
+        });
+        after(function () {
             svg.remove();
         });
     });

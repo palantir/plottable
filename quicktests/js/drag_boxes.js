@@ -1,11 +1,9 @@
 
 function makeData() {
   "use strict";
-
   return [makeRandomData(50), makeRandomData(50), makeRandomData(50)];
 
 }
-
 
 function makeVerifyingDragBox(dragBox, plot) {
   "use strict";
@@ -13,14 +11,9 @@ function makeVerifyingDragBox(dragBox, plot) {
   var c1 = plot._foregroundContainer.append("circle").attr("r", 5).attr("fill", "green");
   var c2 = plot._foregroundContainer.append("circle").attr("r", 5).attr("fill", "red");
   var cb_drag = function(start, end) {
-    if (start.x !== start.x || start.y !== start.y || end.x !== end.x || end.y !== end.y) {
-      debugger;
-    }
-    console.log("X:", dragBox.isResizingX())
-    console.log("Y:", dragBox.isResizingY())
     c1.attr({"cx": start.x, "cy": start.y});
     c2.attr({"cx": end.x, "cy": end.y});
-  }
+  };
   dragBox.drag(cb_drag);
   plot.registerInteraction(dragBox);
 }
@@ -39,9 +32,8 @@ function run(div, data, Plottable) {
 
   var table = new Plottable.Component.Table([[plot1, plot2, plot3]]);
 
-  table.renderTo(svg)
+  table.renderTo(svg);
   makeVerifyingDragBox(new Plottable.Interaction.XYDragBox(), plot1);
   makeVerifyingDragBox(new Plottable.Interaction.XDragBox() , plot2);
   makeVerifyingDragBox(new Plottable.Interaction.YDragBox() , plot3);
-
 }
