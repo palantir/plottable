@@ -24,7 +24,8 @@ export module Plot {
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
-      this.project("fill", () => new Scale.Color().range()[0]);
+      var defaultColor = new Scale.Color().range()[0];
+      this.project("fill", () => defaultColor);
       this._animators["bars-reset"] = new Animator.Null();
       this._animators["bars"] = new Animator.Base();
       this._animators["baseline"] = new Animator.Null();
