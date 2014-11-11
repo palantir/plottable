@@ -7447,7 +7447,7 @@ var Plottable;
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this.classed("line-plot", true);
-                this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
+                this.project("stroke", function () { return new Plottable.Scale.Color().range()[0]; }); // default
                 this.project("stroke-width", function () { return "2px"; }); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
@@ -7533,7 +7533,7 @@ var Plottable;
                 this.project("y0", 0, yScale); // default
                 this.project("fill", function () { return new Plottable.Scale.Color().range()[0]; }); // default
                 this.project("fill-opacity", function () { return 0.25; }); // default
-                this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
+                this.project("stroke", function () { return new Plottable.Scale.Color().range()[0]; }); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }

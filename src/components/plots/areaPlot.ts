@@ -21,7 +21,7 @@ export module Plot {
       this.project("y0", 0, yScale); // default
       this.project("fill", () => new Scale.Color().range()[0]); // default
       this.project("fill-opacity", () => 0.25); // default
-      this.project("stroke", () => Core.Colors.INDIGO); // default
+      this.project("stroke", () => new Scale.Color().range()[0]); // default
       this._animators["reset"] = new Animator.Null();
       this._animators["main"]  = new Animator.Base()
                                              .duration(600)
