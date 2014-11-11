@@ -519,7 +519,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter for time/date values.
          */
-        function time(specifier: string): D3.Time.TimeFormat;
+        function time(specifier: string): Formatter;
         /**
          * Creates a formatter for relative dates.
          *
@@ -2131,24 +2131,24 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         /**
-         * Defines a configuration for a tier.
+         * Defines a configuration for a time axis tier.
          * For details how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
          * interval - A time unit associated with this configuration (seconds, minutes, hours, etc).
          * step - number of intervals between each tick.
          * formatter - formatter used to format tick labels.
          */
-        interface TierConfiguration {
+        interface TimeAxisTierConfiguration {
             interval: D3.Time.Interval;
             step: number;
             formatter: Formatter;
         }
         /**
-         * An array of linked TierConfigurations.
+         * An array of linked TimeAxisTierConfigurations.
          * Each configuration will be shown on a different tier.
          * Currently, up to two tiers are supported.
          */
-        interface AxisConfiguration {
-            tierConfigurations: TierConfiguration[];
+        interface TimeAxisConfiguration {
+            tierConfigurations: TimeAxisTierConfiguration[];
         }
         class Time extends AbstractAxis {
             _scale: Scale.Time;
@@ -2165,18 +2165,18 @@ declare module Plottable {
             /**
              * Gets the possible Axis configurations.
              *
-             * @returns {AxisConfiguration[]} The possible tier configurations.
+             * @returns {TimeAxisConfiguration[]} The possible tier configurations.
              */
-            axisConfigurations(): AxisConfiguration[];
+            axisConfigurations(): TimeAxisConfiguration[];
             /**
              * Sets possible Axis configurations.
              * The axis will choose the most precise configuration that will display in
              * its current width.
              *
-             * @param {AxisConfiguration[]} configurations Possible axis configurations.
+             * @param {TimeAxisConfiguration[]} configurations Possible axis configurations.
              * @returns {Axis.Time} The calling Axis.Time.
              */
-            axisConfigurations(configurations: AxisConfiguration[]): Time;
+            axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
             orient(): string;
             orient(orientation: string): Time;
             _computeHeight(): number;

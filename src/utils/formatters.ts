@@ -193,7 +193,7 @@ module Plottable {
      *
      * @returns {Formatter} A formatter for time/date values.
      */
-    export function time(specifier: string) {
+    export function time(specifier: string): Formatter {
       return d3.time.format(specifier);
     }
 

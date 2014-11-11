@@ -4582,7 +4582,7 @@ var Plottable;
                 /*
                  * Default possible axis configurations.
                  */
-                this.possibleAxisConfigurations = [
+                this.possibleTimeAxisConfigurations = [
                     { tierConfigurations: [
                         { interval: d3.time.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
@@ -4696,28 +4696,28 @@ var Plottable;
             }
             Time.prototype.axisConfigurations = function (configurations) {
                 if (configurations == null) {
-                    return this.possibleAxisConfigurations.slice();
+                    return this.possibleTimeAxisConfigurations.slice();
                 }
-                this.possibleAxisConfigurations = configurations;
+                this.possibleTimeAxisConfigurations = configurations;
                 this._invalidateLayout();
                 return this;
             };
             /**
-             * Gets the index of the most precise AxisConfiguration that will fit in the current width.
+             * Gets the index of the most precise TimeAxisConfiguration that will fit in the current width.
              */
-            Time.prototype.getIndexOfMostPreciseAxisConfiguration = function () {
+            Time.prototype.getIndexOfMostPreciseTimeAxisConfiguration = function () {
                 var _this = this;
-                var mostPreicseIndex = this.possibleAxisConfigurations.length;
-                this.possibleAxisConfigurations.forEach(function (interval, index) {
-                    if (index < mostPreicseIndex && interval.tierConfigurations.every(function (tier) { return _this.checkTierConfiguration(tier); })) {
-                        mostPreicseIndex = index;
+                var mostPreciseIndex = this.possibleTimeAxisConfigurations.length;
+                this.possibleTimeAxisConfigurations.forEach(function (interval, index) {
+                    if (index < mostPreciseIndex && interval.tierConfigurations.every(function (tier) { return _this.checkTimeAxisTierConfigurationWidth(tier); })) {
+                        mostPreciseIndex = index;
                     }
                 });
-                if (mostPreicseIndex === this.possibleAxisConfigurations.length) {
+                if (mostPreciseIndex === this.possibleTimeAxisConfigurations.length) {
                     Plottable._Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
-                    --mostPreicseIndex;
+                    --mostPreciseIndex;
                 }
-                return mostPreicseIndex;
+                return mostPreciseIndex;
             };
             Time.prototype.orient = function (orientation) {
                 if (orientation && (orientation.toLowerCase() === "right" || orientation.toLowerCase() === "left")) {
@@ -4752,7 +4752,7 @@ var Plottable;
             /**
              * Check if tier configuration fits in the current width.
              */
-            Time.prototype.checkTierConfiguration = function (config) {
+            Time.prototype.checkTimeAxisTierConfigurationWidth = function (config) {
                 var worstWidth = this.maxWidthForInterval(config) + 2 * this.tickLabelPadding();
                 return Math.min(this.getIntervalLength(config), this.width()) >= worstWidth;
             };
@@ -4769,7 +4769,7 @@ var Plottable;
             };
             Time.prototype._getTickValues = function () {
                 var _this = this;
-                return this.possibleAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations.reduce(function (ticks, config) { return ticks.concat(_this.getTickIntervalValues(config)); }, []);
+                return this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations.reduce(function (ticks, config) { return ticks.concat(_this.getTickIntervalValues(config)); }, []);
             };
             Time.prototype._measureTextHeight = function () {
                 return this.measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
@@ -4846,7 +4846,7 @@ var Plottable;
                 if (this.mostPreciseConfigIndex < 1) {
                     return [];
                 }
-                return this.getTickIntervalValues(this.possibleAxisConfigurations[this.mostPreciseConfigIndex - 1].tierConfigurations[0]);
+                return this.getTickIntervalValues(this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex - 1].tierConfigurations[0]);
             };
             Time.prototype.createTickMarks = function (ticks) {
                 var tickMarks = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).data(ticks);
@@ -4856,9 +4856,9 @@ var Plottable;
             };
             Time.prototype._doRender = function () {
                 var _this = this;
-                this.mostPreciseConfigIndex = this.getIndexOfMostPreciseAxisConfiguration();
+                this.mostPreciseConfigIndex = this.getIndexOfMostPreciseTimeAxisConfiguration();
                 _super.prototype._doRender.call(this);
-                var tierConfigs = this.possibleAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations;
+                var tierConfigs = this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations;
                 this.tierLabelContainers.forEach(this.cleanContainer);
                 var tierTicks = tierConfigs.map(function (config, i) { return _this.renderTierLabels(_this.tierLabelContainers[i], config, i + 1); });
                 var ticks = tierTicks.slice();
