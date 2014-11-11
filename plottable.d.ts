@@ -3867,6 +3867,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XYDragBox extends DragBox {
+            constructor();
         }
     }
 }

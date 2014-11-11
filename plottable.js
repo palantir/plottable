@@ -9239,7 +9239,8 @@ var Plottable;
         var XYDragBox = (function (_super) {
             __extends(XYDragBox, _super);
             function XYDragBox() {
-                _super.apply(this, arguments);
+                Plottable._Util.Methods.warn("XYDragBox is deprecated; use DragBox instead");
+                _super.call(this);
             }
             return XYDragBox;
         })(Interaction.DragBox);
