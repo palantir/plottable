@@ -6794,7 +6794,8 @@ var Plottable;
                 this.classed("scatter-plot", true);
                 this.project("r", 3); // default
                 this.project("opacity", 0.6); // default
-                this.project("fill", function () { return new Plottable.Scale.Color().range()[0]; }); // default
+                var defaultColor = new Plottable.Scale.Color().range()[0];
+                this.project("fill", function () { return defaultColor; }); // default
                 this._animators["circles-reset"] = new Plottable.Animator.Null();
                 this._animators["circles"] = new Plottable.Animator.Base().duration(250).delay(5);
             }
@@ -7000,7 +7001,8 @@ var Plottable;
                 this._hoverMode = "point";
                 this.hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
-                this.project("fill", function () { return new Plottable.Scale.Color().range()[0]; });
+                var defaultColor = new Plottable.Scale.Color().range()[0];
+                this.project("fill", function () { return defaultColor; });
                 this._animators["bars-reset"] = new Plottable.Animator.Null();
                 this._animators["bars"] = new Plottable.Animator.Base();
                 this._animators["baseline"] = new Plottable.Animator.Null();
@@ -7474,7 +7476,8 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.hoverDetectionRadius = 15;
                 this.classed("line-plot", true);
-                this.project("stroke", function () { return new Plottable.Scale.Color().range()[0]; }); // default
+                var defaultColor = new Plottable.Scale.Color().range()[0];
+                this.project("stroke", function () { return defaultColor; }); // default
                 this.project("stroke-width", function () { return "2px"; }); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
@@ -7620,9 +7623,10 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.classed("area-plot", true);
                 this.project("y0", 0, yScale); // default
-                this.project("fill", function () { return new Plottable.Scale.Color().range()[0]; }); // default
                 this.project("fill-opacity", function () { return 0.25; }); // default
-                this.project("stroke", function () { return new Plottable.Scale.Color().range()[0]; }); // default
+                var defaultColor = new Plottable.Scale.Color().range()[0];
+                this.project("fill", function () { return defaultColor; }); // default
+                this.project("stroke", function () { return defaultColor; }); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
@@ -7943,7 +7947,8 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
                 this.classed("area-plot", true);
-                this.project("fill", function () { return new Plottable.Scale.Color().range()[0]; });
+                var defaultColor = new Plottable.Scale.Color().range()[0];
+                this.project("fill", function () { return defaultColor; });
                 this._isVertical = true;
             }
             StackedArea.prototype._getDrawer = function (key) {
@@ -8030,7 +8035,8 @@ var Plottable;
                 this._baselineValue = 0;
                 _super.call(this, xScale, yScale);
                 this.classed("bar-plot", true);
-                this.project("fill", function () { return new Plottable.Scale.Color().range()[0]; });
+                var defaultColor = new Plottable.Scale.Color().range()[0];
+                this.project("fill", function () { return defaultColor; });
                 this.baseline(this._baselineValue);
                 this._isVertical = isVertical;
             }

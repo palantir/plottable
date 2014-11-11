@@ -17,7 +17,10 @@ export module Plot {
       this.classed("scatter-plot", true);
       this.project("r", 3); // default
       this.project("opacity", 0.6); // default
-      this.project("fill", () => new Scale.Color().range()[0]); // default
+
+      var defaultColor = new Scale.Color().range()[0];
+      this.project("fill", () => defaultColor); // default
+
       this._animators["circles-reset"] = new Animator.Null();
       this._animators["circles"] = new Animator.Base()
                                                .duration(250)
