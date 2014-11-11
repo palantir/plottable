@@ -1435,6 +1435,7 @@ declare module Plottable {
              */
             constructor(scaleType?: string);
             _getExtent(): string[];
+            scale(value: string): string;
         }
     }
 }

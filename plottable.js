@@ -2806,6 +2806,7 @@ var Plottable;
                         throw new Error("Unsupported ColorScale type");
                 }
                 _super.call(this, scale);
+                this.defaultColorLength = scale.range().length;
             }
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
@@ -2827,6 +2828,9 @@ var Plottable;
                 }
                 colorTester.remove();
                 return plottableDefaultColors;
+            };
+            Color.prototype.scale = function (value) {
+                return "haha";
             };
             return Color;
         })(Scale.AbstractScale);

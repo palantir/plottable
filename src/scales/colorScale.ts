@@ -4,6 +4,8 @@ module Plottable {
 export module Scale {
   export class Color extends AbstractScale<string, string> {
 
+    private defaultColorLength: number;
+
     /**
      * Constructs a ColorScale.
      *
@@ -43,6 +45,7 @@ export module Scale {
           throw new Error("Unsupported ColorScale type");
       }
       super(scale);
+      this.defaultColorLength = scale.range().length;
     }
 
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
@@ -66,6 +69,20 @@ export module Scale {
       }
       colorTester.remove();
       return plottableDefaultColors;
+    }
+
+    // Modifying the original scale method so that colors that are looped are darkened according
+    // to how many times they are looped.
+    public scale(value: string): string {
+      var oldLength = this.domain().length;
+      var color = super.scale(value);
+      var newLength = this.domain().length;
+      if (newLength > oldLength) {
+        var modifyFactor = newLength / this.defaultColorLength;
+        return _Util.Methods.darkenColor(color, modifyFactor);
+      } else {
+        return color;
+      }
     }
   }
 }

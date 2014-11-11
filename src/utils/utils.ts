@@ -315,6 +315,10 @@ export module _Util {
       colorTester.classed(className, false);
       return hexCode;
     }
+
+    export function darkenColor(color: string, factor: number) {
+      throw new Error("not implemented");
+    }
   }
 }
 }
