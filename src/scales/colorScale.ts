@@ -76,7 +76,7 @@ export module Scale {
       var color = super.scale(value);
       var index = this.domain().indexOf(value);
       var modifyFactor = Math.floor(index / this.range().length);
-      return _Util.Methods.darkenColor(color, modifyFactor);
+      return _Util.Methods.lightenColor(color, modifyFactor);;
     }
   }
 }

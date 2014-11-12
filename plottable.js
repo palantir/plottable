@@ -307,13 +307,29 @@ var Plottable;
             }
             Methods.colorTest = colorTest;
             // Code adapted from https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+            function lightenColor(color, factor) {
+                var r = parseInt(color.substring(1, 3), 16);
+                var g = parseInt(color.substring(3, 5), 16);
+                var b = parseInt(color.substring(5, 7), 16);
+                var hsl = _Util.Color.rgbToHsl(r, g, b);
+                var newL = Math.min(hsl[2] + 0.12 * factor, 1);
+                var newRgb = _Util.Color.hslToRgb(hsl[0], hsl[1], newL);
+                var rHex = newRgb[0].toString(16);
+                var gHex = newRgb[1].toString(16);
+                var bHex = newRgb[2].toString(16);
+                rHex = rHex.length < 2 ? "0" + rHex : rHex;
+                gHex = gHex.length < 2 ? "0" + gHex : gHex;
+                bHex = bHex.length < 2 ? "0" + bHex : bHex;
+                return "#" + rHex + gHex + bHex;
+            }
+            Methods.lightenColor = lightenColor;
+            // Code adapted from https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
             function darkenColor(color, factor) {
                 var r = parseInt(color.substring(1, 3), 16);
                 var g = parseInt(color.substring(3, 5), 16);
                 var b = parseInt(color.substring(5, 7), 16);
                 var hsl = _Util.Color.rgbToHsl(r, g, b);
-                var newL = hsl[2] + 0.1 * factor;
-                newL = newL < 0 ? 0 : newL;
+                var newL = Math.max(hsl[2] - 0.12 * factor, 0);
                 var newRgb = _Util.Color.hslToRgb(hsl[0], hsl[1], newL);
                 var rHex = newRgb[0].toString(16);
                 var gHex = newRgb[1].toString(16);
@@ -2940,7 +2956,8 @@ var Plottable;
                 var color = _super.prototype.scale.call(this, value);
                 var index = this.domain().indexOf(value);
                 var modifyFactor = Math.floor(index / this.range().length);
-                return Plottable._Util.Methods.darkenColor(color, modifyFactor);
+                return Plottable._Util.Methods.lightenColor(color, modifyFactor);
+                ;
             };
             Color.HEX_SCALE_FACTOR = 20;
             return Color;

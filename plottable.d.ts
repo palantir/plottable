@@ -133,6 +133,7 @@ declare module Plottable {
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
             function colorTest(colorTester: D3.Selection, className: string): string;
+            function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number): string;
         }
     }
