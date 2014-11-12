@@ -147,26 +147,25 @@ export module Plot {
     }
 
     /**
-     * Selects the bar under the given pixel position (if [xValOrExtent]
+     * Gets the bar under the given pixel position (if [xValOrExtent]
      * and [yValOrExtent] are {number}s), under a given line (if only one
      * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
      * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
      *
      * @param {any} xValOrExtent The pixel x position, or range of x values.
      * @param {any} yValOrExtent The pixel y position, or range of y values.
-     * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
      * @returns {D3.Selection} The selected bar, or null if no bar was selected.
      */
-    public selectBar(xValOrExtent: Extent, yValOrExtent: Extent, select?: boolean): D3.Selection;
-    public selectBar(xValOrExtent: number, yValOrExtent: Extent, select?: boolean): D3.Selection;
-    public selectBar(xValOrExtent: Extent, yValOrExtent: number, select?: boolean): D3.Selection;
-    public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
-    public selectBar(xValOrExtent: any, yValOrExtent: any, select = true): D3.Selection {
+    public getBar(xValOrExtent: Extent, yValOrExtent: Extent): D3.Selection;
+    public getBar(xValOrExtent: number, yValOrExtent: Extent): D3.Selection;
+    public getBar(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
+    public getBar(xValOrExtent: number, yValOrExtent: number): D3.Selection;
+    public getBar(xValOrExtent: any, yValOrExtent: any): D3.Selection {
       if (!this._isSetup) {
         return null;
       }
 
-      var selectedBars: any[] = [];
+      var bars: any[] = [];
 
       var xExtent: Extent = this.parseExtent(xValOrExtent);
       var yExtent: Extent = this.parseExtent(yValOrExtent);
@@ -183,18 +182,32 @@ export module Plot {
           var bbox = this.getBBox();
           if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
               bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
-            selectedBars.push(this);
+            bars.push(this);
           }
         });
       });
 
-      if (selectedBars.length > 0) {
-        var selection: D3.Selection = d3.selectAll(selectedBars);
-        selection.classed("selected", select);
-        return selection;
-      } else {
-        return null;
-      }
+      return d3.selectAll(bars);
+    }
+
+    /**
+     * Selects the bar under the given pixel position (if [xValOrExtent]
+     * and [yValOrExtent] are {number}s), under a given line (if only one
+     * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
+     * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
+     *
+     * @param {any} xValOrExtent The pixel x position, or range of x values.
+     * @param {any} yValOrExtent The pixel y position, or range of y values.
+     * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
+     * @returns {D3.Selection} The selected bar, or null if no bar was selected.
+     */
+    public selectBar(xValOrExtent: Extent, yValOrExtent: Extent, select?: boolean): AbstractBarPlot<X,Y>;
+    public selectBar(xValOrExtent: number, yValOrExtent: Extent, select?: boolean): AbstractBarPlot<X,Y>;
+    public selectBar(xValOrExtent: Extent, yValOrExtent: number, select?: boolean): AbstractBarPlot<X,Y>;
+    public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): AbstractBarPlot<X,Y>;
+    public selectBar(xValOrExtent: any, yValOrExtent: any, select = true): AbstractBarPlot<X,Y> {
+      this.getBar(xValOrExtent, yValOrExtent).classed("selected", select);
+      return this;
     }
 
     /**
@@ -443,13 +456,13 @@ export module Plot {
           xPositionOrExtent = maxExtent;
         }
       }
-      var selectedBars = this.selectBar(xPositionOrExtent, yPositionOrExtent, false);
+      var bars = this.getBar(xPositionOrExtent, yPositionOrExtent);
 
-      if (selectedBars) {
+      if (bars) {
         this._getDrawersInOrder().forEach((d, i) => {
           d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
         });
-        selectedBars.classed({ "hovered": true, "not-hovered": false });
+        bars.classed({ "hovered": true, "not-hovered": false });
       } else {
         this.clearHoverSelection();
         return {
@@ -461,7 +474,7 @@ export module Plot {
 
       var points: Point[] = [];
       var projectors = this._generateAttrToProjector();
-      selectedBars.each((d, i) => {
+      bars.each((d, i) => {
         if (this._isVertical) {
           points.push({
             x: projectors["x"](d, i) + projectors["width"](d, i)/2,
@@ -476,9 +489,9 @@ export module Plot {
       });
 
       return {
-        data: selectedBars.data(),
+        data: bars.data(),
         pixelPositions: points,
-        selection: selectedBars
+        selection: bars
       };
     }
     //===== /Hover logic =====
