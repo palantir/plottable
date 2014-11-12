@@ -94,7 +94,7 @@ export module Interaction {
     /**
      * Adds a callback to be called when the dragging ends.
      *
-     * @param {(start: Point, end: Point) => any} cb If provided, the function to be called. Takes in a SelectionArea in pixels.
+     * @param {(start: Point, end: Point) => any} cb If provided, the function to be called. Takes in points in pixels.
      * @returns {Drag} The calling Drag.
      */
     public dragend(cb: (start: Point, end: Point) => any): Drag;
