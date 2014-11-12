@@ -8619,11 +8619,18 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 hitBox.on(this._listenTo(), function () {
+                    var clickableComponent = _this._componentToListenTo;
                     var xy = d3.mouse(hitBox.node());
-                    var x = xy[0];
-                    var y = xy[1];
-                    _this._callback({ x: x, y: y });
+                    var p = { x: xy[0], y: xy[1] };
+                    clickableComponent._clickComponent(p);
+                    var clickData = clickableComponent._getClickData(p);
+                    _this.safeClick(clickData);
                 });
+            };
+            Click.prototype.safeClick = function (clickData) {
+                if (this.clickCallback && clickData.data) {
+                    this.clickCallback(clickData);
+                }
             };
             Click.prototype._listenTo = function () {
                 return "click";
@@ -8633,8 +8640,8 @@ var Plottable;
              *
              * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
              */
-            Click.prototype.callback = function (cb) {
-                this._callback = cb;
+            Click.prototype.onClick = function (callback) {
+                this.clickCallback = callback;
                 return this;
             };
             return Click;

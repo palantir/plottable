@@ -3600,15 +3600,36 @@ declare module Plottable {
 
 declare module Plottable {
     module Interaction {
+        interface ClickData {
+            data: any[];
+            pixelPositions: Point[];
+            selection: D3.Selection;
+        }
+        interface Clickable extends Component.AbstractComponent {
+            /**
+             * Called when the user clicks onto the Component.
+             *
+             * @param {Point} The cursor's position relative to the Component's origin.
+             */
+            _clickComponent(p: Point): void;
+            /**
+             * Returns the ClickData associated with the given position, and performs
+             * any visual changes associated with hovering inside a Component.
+             *
+             * @param {Point} The cursor's position relative to the Component's origin.
+             * @return {ClickData} The ClickData associated with the given position.
+             */
+            _getClickData(p: Point): ClickData;
+        }
         class Click extends AbstractInteraction {
-            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _anchor(component: Clickable, hitBox: D3.Selection): void;
             _listenTo(): string;
             /**
              * Sets a callback to be called when a click is received.
              *
              * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
              */
-            callback(cb: (p: Point) => any): Click;
+            onClick(callback: (clickData: ClickData) => any): Click;
         }
         class DoubleClick extends Click {
             _listenTo(): string;
