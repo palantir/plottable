@@ -3613,8 +3613,7 @@ declare module Plottable {
              */
             _clickComponent(p: Point): void;
             /**
-             * Returns the ClickData associated with the given position, and performs
-             * any visual changes associated with hovering inside a Component.
+             * Returns the ClickData associated with the given position.
              *
              * @param {Point} The cursor's position relative to the Component's origin.
              * @return {ClickData} The ClickData associated with the given position.
