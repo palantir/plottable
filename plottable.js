@@ -7074,12 +7074,11 @@ var Plottable;
                     return this;
                 }
             };
-            AbstractBarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
-                if (select === void 0) { select = true; }
+            AbstractBarPlot.prototype.getBar = function (xValOrExtent, yValOrExtent) {
                 if (!this._isSetup) {
                     return null;
                 }
-                var selectedBars = [];
+                var bars = [];
                 var xExtent = this.parseExtent(xValOrExtent);
                 var yExtent = this.parseExtent(yValOrExtent);
                 // the SVGRects are positioned with sub-pixel accuracy (the default unit
@@ -7092,18 +7091,16 @@ var Plottable;
                     d._renderArea.selectAll("rect").each(function (d) {
                         var bbox = this.getBBox();
                         if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
-                            selectedBars.push(this);
+                            bars.push(this);
                         }
                     });
                 });
-                if (selectedBars.length > 0) {
-                    var selection = d3.selectAll(selectedBars);
-                    selection.classed("selected", select);
-                    return selection;
-                }
-                else {
-                    return null;
-                }
+                return d3.selectAll(bars);
+            };
+            AbstractBarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
+                if (select === void 0) { select = true; }
+                this.getBar(xValOrExtent, yValOrExtent).classed("selected", select);
+                return this;
             };
             /**
              * Deselects all bars.
@@ -7313,12 +7310,12 @@ var Plottable;
                         xPositionOrExtent = maxExtent;
                     }
                 }
-                var selectedBars = this.selectBar(xPositionOrExtent, yPositionOrExtent, false);
-                if (selectedBars) {
+                var bars = this.getBar(xPositionOrExtent, yPositionOrExtent);
+                if (bars) {
                     this._getDrawersInOrder().forEach(function (d, i) {
                         d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
                     });
-                    selectedBars.classed({ "hovered": true, "not-hovered": false });
+                    bars.classed({ "hovered": true, "not-hovered": false });
                 }
                 else {
                     this.clearHoverSelection();
@@ -7330,7 +7327,7 @@ var Plottable;
                 }
                 var points = [];
                 var projectors = this._generateAttrToProjector();
-                selectedBars.each(function (d, i) {
+                bars.each(function (d, i) {
                     if (_this._isVertical) {
                         points.push({
                             x: projectors["x"](d, i) + projectors["width"](d, i) / 2,
@@ -7345,9 +7342,9 @@ var Plottable;
                     }
                 });
                 return {
-                    data: selectedBars.data(),
+                    data: bars.data(),
                     pixelPositions: points,
-                    selection: selectedBars
+                    selection: bars
                 };
             };
             AbstractBarPlot._BarAlignmentToFactor = {};
