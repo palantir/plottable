@@ -7074,7 +7074,7 @@ var Plottable;
                     return this;
                 }
             };
-            AbstractBarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
+            AbstractBarPlot.prototype.selectBars = function (xValOrExtent, yValOrExtent, select) {
                 if (select === void 0) { select = true; }
                 if (!this._isSetup) {
                     return null;
@@ -7313,7 +7313,7 @@ var Plottable;
                         xPositionOrExtent = maxExtent;
                     }
                 }
-                var selectedBars = this.selectBar(xPositionOrExtent, yPositionOrExtent, false);
+                var selectedBars = this.selectBars(xPositionOrExtent, yPositionOrExtent, false);
                 if (selectedBars) {
                     this._getDrawersInOrder().forEach(function (d, i) {
                         d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });

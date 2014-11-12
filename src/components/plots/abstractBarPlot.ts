@@ -157,11 +157,11 @@ export module Plot {
      * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
      * @returns {D3.Selection} The selected bar, or null if no bar was selected.
      */
-    public selectBar(xValOrExtent: Extent, yValOrExtent: Extent, select?: boolean): D3.Selection;
-    public selectBar(xValOrExtent: number, yValOrExtent: Extent, select?: boolean): D3.Selection;
-    public selectBar(xValOrExtent: Extent, yValOrExtent: number, select?: boolean): D3.Selection;
-    public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
-    public selectBar(xValOrExtent: any, yValOrExtent: any, select = true): D3.Selection {
+    public selectBars(xValOrExtent: Extent, yValOrExtent: Extent, select?: boolean): D3.Selection;
+    public selectBars(xValOrExtent: number, yValOrExtent: Extent, select?: boolean): D3.Selection;
+    public selectBars(xValOrExtent: Extent, yValOrExtent: number, select?: boolean): D3.Selection;
+    public selectBars(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
+    public selectBars(xValOrExtent: any, yValOrExtent: any, select = true): D3.Selection {
       if (!this._isSetup) {
         return null;
       }
@@ -443,7 +443,7 @@ export module Plot {
           xPositionOrExtent = maxExtent;
         }
       }
-      var selectedBars = this.selectBar(xPositionOrExtent, yPositionOrExtent, false);
+      var selectedBars = this.selectBars(xPositionOrExtent, yPositionOrExtent, false);
 
       if (selectedBars) {
         this._getDrawersInOrder().forEach((d, i) => {
