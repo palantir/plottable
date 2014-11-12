@@ -2972,10 +2972,10 @@ declare module Plottable {
              * @param {any} yValOrExtent The pixel y position, or range of y values.
              * @returns {D3.Selection} The selected bar, or null if no bar was selected.
              */
-            getBar(xValOrExtent: Extent, yValOrExtent: Extent): D3.Selection;
-            getBar(xValOrExtent: number, yValOrExtent: Extent): D3.Selection;
-            getBar(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
-            getBar(xValOrExtent: number, yValOrExtent: number): D3.Selection;
+            getBars(xValOrExtent: Extent, yValOrExtent: Extent): D3.Selection;
+            getBars(xValOrExtent: number, yValOrExtent: Extent): D3.Selection;
+            getBars(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
+            getBars(xValOrExtent: number, yValOrExtent: number): D3.Selection;
             /**
              * Selects the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one

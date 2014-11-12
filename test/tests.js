@@ -2455,22 +2455,22 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("getBar()", function () {
-                var bar = barPlot.getBar(155, 150); // in the middle of bar 0
+                var bar = barPlot.getBars(155, 150); // in the middle of bar 0
                 assert.lengthOf(bar[0], 1, "getBar returns a bar");
                 assert.equal(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
-                bar = barPlot.getBar(-1, -1); // no bars here
+                bar = barPlot.getBars(-1, -1); // no bars here
                 assert.lengthOf(bar[0], 0, "returns null if no bar was selected");
-                bar = barPlot.getBar(200, 50); // between the two bars
+                bar = barPlot.getBars(200, 50); // between the two bars
                 assert.lengthOf(bar[0], 0, "returns null if no bar was selected");
-                bar = barPlot.getBar(155, 10); // above bar 0
+                bar = barPlot.getBars(155, 10); // above bar 0
                 assert.lengthOf(bar[0], 0, "returns null if no bar was selected");
                 // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
                 // origin is at the top left!
-                bar = barPlot.getBar({ min: 155, max: 455 }, { min: 150, max: 150 });
+                bar = barPlot.getBars({ min: 155, max: 455 }, { min: 150, max: 150 });
                 assert.lengthOf(bar.data(), 2, "selected 2 bars (not the negative one)");
                 assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
                 assert.equal(bar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
-                bar = barPlot.getBar({ min: 155, max: 455 }, { min: 150, max: 350 });
+                bar = barPlot.getBars({ min: 155, max: 455 }, { min: 150, max: 350 });
                 assert.lengthOf(bar.data(), 3, "selected all the bars");
                 assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
                 assert.equal(bar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
@@ -2479,15 +2479,15 @@ describe("Plots", function () {
             });
             it("can select and deselect bars", function () {
                 barPlot.selectBar(155, 150);
-                assert.isTrue(barPlot.getBar(155, 150).classed("selected"), "the bar was classed \"selected\"");
+                assert.isTrue(barPlot.getBars(155, 150).classed("selected"), "the bar was classed \"selected\"");
                 barPlot.deselectAll();
-                assert.isFalse(barPlot.getBar(155, 150).classed("selected"), "the bar is no longer selected");
+                assert.isFalse(barPlot.getBars(155, 150).classed("selected"), "the bar is no longer selected");
                 // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
                 // origin is at the top left!
                 barPlot.selectBar({ min: 155, max: 455 }, { min: 150, max: 150 });
-                assert.isTrue(barPlot.getBar({ min: 155, max: 455 }, { min: 150, max: 150 }).classed("selected"), "the bar was classed \"selected\"");
+                assert.isTrue(barPlot.getBars({ min: 155, max: 455 }, { min: 150, max: 150 }).classed("selected"), "the bar was classed \"selected\"");
                 barPlot.selectBar({ min: 155, max: 455 }, { min: 150, max: 350 });
-                assert.isTrue(barPlot.getBar({ min: 155, max: 455 }, { min: 150, max: 350 }).classed("selected"), "the bar was classed \"selected\"");
+                assert.isTrue(barPlot.getBars({ min: 155, max: 455 }, { min: 150, max: 350 }).classed("selected"), "the bar was classed \"selected\"");
                 // the runtime parameter validation should be strict, so no strings or
                 // mangled objects
                 assert.throws(function () { return barPlot.selectBar("blargh", 150); }, Error);
@@ -2498,10 +2498,10 @@ describe("Plots", function () {
                 var brandNew = new Plottable.Plot.VerticalBar(xScale, yScale);
                 brandNew.addDataset(dataset);
                 assert.isNotNull(brandNew.deselectAll(), "deselects return self");
-                assert.isNull(brandNew.getBar(0, 0), "selects return empty");
+                assert.isNull(brandNew.getBars(0, 0), "selects return empty");
                 brandNew._anchor(d3.select(document.createElement("svg"))); // calls `_setup()`
                 assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
-                assert.lengthOf(brandNew.getBar(0, 0)[0], 0, "selects return empty after setup");
+                assert.lengthOf(brandNew.getBars(0, 0)[0], 0, "selects return empty after setup");
                 svg.remove();
             });
             it("don't show points from outside of domain", function () {

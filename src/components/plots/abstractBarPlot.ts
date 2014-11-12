@@ -156,11 +156,11 @@ export module Plot {
      * @param {any} yValOrExtent The pixel y position, or range of y values.
      * @returns {D3.Selection} The selected bar, or null if no bar was selected.
      */
-    public getBar(xValOrExtent: Extent, yValOrExtent: Extent): D3.Selection;
-    public getBar(xValOrExtent: number, yValOrExtent: Extent): D3.Selection;
-    public getBar(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
-    public getBar(xValOrExtent: number, yValOrExtent: number): D3.Selection;
-    public getBar(xValOrExtent: any, yValOrExtent: any): D3.Selection {
+    public getBars(xValOrExtent: Extent, yValOrExtent: Extent): D3.Selection;
+    public getBars(xValOrExtent: number, yValOrExtent: Extent): D3.Selection;
+    public getBars(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
+    public getBars(xValOrExtent: number, yValOrExtent: number): D3.Selection;
+    public getBars(xValOrExtent: any, yValOrExtent: any): D3.Selection {
       if (!this._isSetup) {
         return null;
       }
@@ -206,7 +206,7 @@ export module Plot {
     public selectBar(xValOrExtent: Extent, yValOrExtent: number, select?: boolean): AbstractBarPlot<X,Y>;
     public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): AbstractBarPlot<X,Y>;
     public selectBar(xValOrExtent: any, yValOrExtent: any, select = true): AbstractBarPlot<X,Y> {
-      this.getBar(xValOrExtent, yValOrExtent).classed("selected", select);
+      this.getBars(xValOrExtent, yValOrExtent).classed("selected", select);
       return this;
     }
 
@@ -456,7 +456,7 @@ export module Plot {
           xPositionOrExtent = maxExtent;
         }
       }
-      var bars = this.getBar(xPositionOrExtent, yPositionOrExtent);
+      var bars = this.getBars(xPositionOrExtent, yPositionOrExtent);
 
       if (bars) {
         this._getDrawersInOrder().forEach((d, i) => {
