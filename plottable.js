@@ -2912,7 +2912,6 @@ var Plottable;
                         throw new Error("Unsupported ColorScale type");
                 }
                 _super.call(this, scale);
-                this.defaultColorLength = scale.range().length;
             }
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
@@ -2940,7 +2939,7 @@ var Plottable;
             Color.prototype.scale = function (value) {
                 var color = _super.prototype.scale.call(this, value);
                 var index = this.domain().indexOf(value);
-                var modifyFactor = Math.floor(index / this.defaultColorLength);
+                var modifyFactor = Math.floor(index / this.range().length);
                 return Plottable._Util.Methods.darkenColor(color, modifyFactor);
             };
             Color.HEX_SCALE_FACTOR = 20;

@@ -6,8 +6,6 @@ export module Scale {
 
     private static HEX_SCALE_FACTOR = 20;
 
-    private defaultColorLength: number;
-
     /**
      * Constructs a ColorScale.
      *
@@ -47,7 +45,6 @@ export module Scale {
           throw new Error("Unsupported ColorScale type");
       }
       super(scale);
-      this.defaultColorLength = scale.range().length;
     }
 
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
@@ -78,7 +75,7 @@ export module Scale {
     public scale(value: string): string {
       var color = super.scale(value);
       var index = this.domain().indexOf(value);
-      var modifyFactor = Math.floor(index / this.defaultColorLength);
+      var modifyFactor = Math.floor(index / this.range().length);
       return _Util.Methods.darkenColor(color, modifyFactor);
     }
   }
