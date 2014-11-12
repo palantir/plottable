@@ -2973,10 +2973,10 @@ declare module Plottable {
              * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
              * @returns {D3.Selection} The selected bar, or null if no bar was selected.
              */
-            selectBar(xValOrExtent: Extent, yValOrExtent: Extent, select?: boolean): D3.Selection;
-            selectBar(xValOrExtent: number, yValOrExtent: Extent, select?: boolean): D3.Selection;
-            selectBar(xValOrExtent: Extent, yValOrExtent: number, select?: boolean): D3.Selection;
-            selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
+            selectBars(xValOrExtent: Extent, yValOrExtent: Extent, select?: boolean): D3.Selection;
+            selectBars(xValOrExtent: number, yValOrExtent: Extent, select?: boolean): D3.Selection;
+            selectBars(xValOrExtent: Extent, yValOrExtent: number, select?: boolean): D3.Selection;
+            selectBars(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
             /**
              * Deselects all bars.
              * @returns {AbstractBarPlot} The calling AbstractBarPlot.
