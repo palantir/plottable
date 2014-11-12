@@ -3208,6 +3208,7 @@ declare module Plottable {
             _updateYDomainer(): void;
             _onDatasetUpdate(): void;
             _generateAttrToProjector(): AttributeToProjector;
+            _wholeDatumAttributes(): string[];
         }
     }
 }

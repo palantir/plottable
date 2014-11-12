@@ -7993,13 +7993,20 @@ var Plottable;
             StackedArea.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var wholeDatumAttributes = this._wholeDatumAttributes();
+                var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
+                var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
+                singleDatumAttributes.forEach(function (attribute) {
+                    var projector = attrToProjector[attribute];
+                    attrToProjector[attribute] = function (data, i) { return data.length > 0 ? projector(data[0], i) : null; };
+                });
                 var yAccessor = this._projectors["y"].accessor;
                 attrToProjector["y"] = function (d) { return _this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 attrToProjector["y0"] = function (d) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                // Align fill with first index
-                var fillProjector = attrToProjector["fill"];
-                attrToProjector["fill"] = function (d, i) { return (d && d[0]) ? fillProjector(d[0], i) : null; };
                 return attrToProjector;
+            };
+            StackedArea.prototype._wholeDatumAttributes = function () {
+                return ["x", "y", "defined"];
             };
             return StackedArea;
         })(Plot.AbstractStacked);
