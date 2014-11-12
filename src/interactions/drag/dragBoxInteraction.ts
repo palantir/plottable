@@ -247,9 +247,9 @@ export module Interaction {
         return "nwse-resize";
       } else if (top && right || bottom && left) {
         return "nesw-resize";
-      } else if ((left || right)) {
+      } else if (left || right) {
         return "ew-resize";
-      } else if ((top || bottom)) {
+      } else if (top || bottom) {
         return "ns-resize";
       } else {
         return "";
