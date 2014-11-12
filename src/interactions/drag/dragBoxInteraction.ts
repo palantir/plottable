@@ -30,7 +30,7 @@ export module Interaction {
     public _boxIsDrawn = false;
     public _resizeXEnabled = false;
     public _resizeYEnabled = false;
-    private resizing: ResizeInfo;
+    private resizing: ResizeInfo = {xResizing: null, yResizing: null};
     private cursorStyle = "";
 
     /**
@@ -61,7 +61,7 @@ export module Interaction {
      * @returns {boolean}
      */
     public isResizingX(): boolean {
-      return !!(this.resizing && this.resizing.xResizing);
+      return !!this.resizing.xResizing;
     }
 
     /**
@@ -70,7 +70,7 @@ export module Interaction {
      * @returns {boolean}
      */
     public isResizingY(): boolean {
-      return !!(this.resizing && this.resizing.yResizing);
+      return !!this.resizing.yResizing;
     }
 
     /**
@@ -180,7 +180,7 @@ export module Interaction {
     }
 
     public _dragend() {
-      this.resizing = null;
+      this.resizing = {xResizing: null, yResizing: null};
       super._dragend();
     }
 

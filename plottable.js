@@ -8931,6 +8931,7 @@ var Plottable;
                 this._boxIsDrawn = false;
                 this._resizeXEnabled = false;
                 this._resizeYEnabled = false;
+                this.resizing = { xResizing: null, yResizing: null };
                 this.cursorStyle = "";
             }
             DragBox.prototype.resizeEnabled = function (enabled) {
@@ -8949,7 +8950,7 @@ var Plottable;
              * @returns {boolean}
              */
             DragBox.prototype.isResizingX = function () {
-                return !!(this.resizing && this.resizing.xResizing);
+                return !!this.resizing.xResizing;
             };
             /**
              * Return true if box is resizing on the Y dimension.
@@ -8957,7 +8958,7 @@ var Plottable;
              * @returns {boolean}
              */
             DragBox.prototype.isResizingY = function () {
-                return !!(this.resizing && this.resizing.yResizing);
+                return !!this.resizing.yResizing;
             };
             /**
              * Whether or not dragBox has been rendered in a visible area.
@@ -9058,7 +9059,7 @@ var Plottable;
                 this.setBox(this._getOrigin()[0], this._getLocation()[0], this._getOrigin()[1], this._getLocation()[1]);
             };
             DragBox.prototype._dragend = function () {
-                this.resizing = null;
+                this.resizing = { xResizing: null, yResizing: null };
                 _super.prototype._dragend.call(this);
             };
             /**
