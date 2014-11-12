@@ -2957,7 +2957,6 @@ var Plottable;
                 var index = this.domain().indexOf(value);
                 var modifyFactor = Math.floor(index / this.range().length);
                 return Plottable._Util.Methods.lightenColor(color, modifyFactor);
-                ;
             };
             Color.HEX_SCALE_FACTOR = 20;
             return Color;
