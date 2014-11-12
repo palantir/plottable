@@ -7074,6 +7074,14 @@ var Plottable;
                     return this;
                 }
             };
+            /**
+             * Selects all the bars in the bar plot
+             *
+             * @returns {D3.Selection} All of the bars in the bar plot.
+             */
+            AbstractBarPlot.prototype.getBars = function () {
+                return this._renderArea.selectAll("rect");
+            };
             AbstractBarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
                 if (select === void 0) { select = true; }
                 if (!this._isSetup) {
