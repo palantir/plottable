@@ -8869,7 +8869,7 @@ var Plottable;
                 return this;
             };
             /**
-             * Sets up so that the xScale and yScale that area passed have their
+             * Sets up so that the xScale and yScale that are passed have their
              * domains automatically changed as you zoom.
              *
              * @param {QuantitativeScale} xScale The scale along the x-axis.
@@ -8981,10 +8981,8 @@ var Plottable;
                     // we are resizing; don't clear the box, don't call the dragstart callback
                     return;
                 }
-                else {
-                    _super.prototype._dragstart.call(this);
-                    this.clearBox();
-                }
+                _super.prototype._dragstart.call(this);
+                this.clearBox();
             };
             DragBox.prototype.getResizeInfo = function (xPosition, yPosition) {
                 var xResizing = null;
@@ -9094,8 +9092,7 @@ var Plottable;
                 var h = Math.abs(y0 - y1);
                 var xo = Math.min(x0, x1);
                 var yo = Math.min(y0, y1);
-                var newProps = { x: xo, y: yo, width: w, height: h };
-                this.dragBox.attr(newProps);
+                this.dragBox.attr({ x: xo, y: yo, width: w, height: h });
                 this._boxIsDrawn = (w > 0 && h > 0);
                 return this;
             };

@@ -97,10 +97,9 @@ export module Interaction {
       if (this.boxIsDrawn() && (this.resizing = this.getResizeInfo(mouse[0], mouse[1])) && this.isResizing()) {
         // we are resizing; don't clear the box, don't call the dragstart callback
         return;
-      } else {
-        super._dragstart();
-        this.clearBox();
       }
+      super._dragstart();
+      this.clearBox();
     }
 
     private getResizeInfo(xPosition: number, yPosition: number) {
@@ -124,19 +123,19 @@ export module Interaction {
         var max = Math.max(origin, destination);
         var interiorPadding = Math.min(padding, (max-min)/2);
         if (min - padding < position && position < min + interiorPadding) {
-          return {offset: position - min, positive: false, origin: origin === min}
+          return {offset: position - min, positive: false, origin: origin === min};
         }
         if (max - interiorPadding < position && position < max + padding) {
-          return {offset: position - max, positive: true, origin: origin === max}
+          return {offset: position - max, positive: true, origin: origin === max};
         }
         return null;
       }
 
       if (this._resizeXEnabled && inPaddedRange(yPosition, yStart, yEnd, padding)) {
-        xResizing = getResizeDimension(xStart, xEnd, xPosition, padding)
+        xResizing = getResizeDimension(xStart, xEnd, xPosition, padding);
       }
       if (this._resizeYEnabled && inPaddedRange(xPosition, xStart, xEnd, padding)) {
-        yResizing = getResizeDimension(yStart, yEnd, yPosition, padding)
+        yResizing = getResizeDimension(yStart, yEnd, yPosition, padding);
       }
       return {xResizing: xResizing, yResizing: yResizing};
     }
@@ -213,8 +212,7 @@ export module Interaction {
       var h  = Math.abs(y0 - y1);
       var xo = Math.min(x0, x1);
       var yo = Math.min(y0, y1);
-      var newProps: SVGRect = {x: xo, y: yo, width: w, height: h};
-      this.dragBox.attr(newProps);
+      this.dragBox.attr({x: xo, y: yo, width: w, height: h});
       this._boxIsDrawn = (w > 0 && h > 0);
       return this;
     }
