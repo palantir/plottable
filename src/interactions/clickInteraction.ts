@@ -2,17 +2,47 @@
 
 module Plottable {
 export module Interaction {
-  export class Click extends AbstractInteraction {
-    private _callback: (p: Point) => any;
 
-    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
+  export interface ClickData {
+    data: any[];
+    pixelPositions: Point[];
+    selection: D3.Selection;
+  }
+
+  export interface Clickable extends Component.AbstractComponent {
+    /**
+     * Called when the user clicks onto the Component.
+     *
+     * @param {Point} The cursor's position relative to the Component's origin.
+     */
+    _clickComponent(p: Point): void;
+    /**
+     * Returns the ClickData associated with the given position.
+     *
+     * @param {Point} The cursor's position relative to the Component's origin.
+     * @return {ClickData} The ClickData associated with the given position.
+     */
+    _getClickData(p: Point): ClickData;
+  }
+
+  export class Click extends AbstractInteraction {
+    private clickCallback: (clickData: ClickData) => any;
+
+    public _anchor(component: Clickable, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       hitBox.on(this._listenTo(), () => {
         var xy = d3.mouse(hitBox.node());
-        var x = xy[0];
-        var y = xy[1];
-        this._callback({x: x, y: y});
+        var p = {x: xy[0], y: xy[1]};
+        component._clickComponent(p);
+        var clickData = component._getClickData(p);
+        this.safeClick(clickData);
       });
+    }
+
+    private safeClick(clickData: ClickData) {
+      if (this.clickCallback && clickData.data) {
+        this.clickCallback(clickData);
+      }
     }
 
     public _listenTo(): string {
@@ -24,8 +54,8 @@ export module Interaction {
      *
      * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
      */
-    public callback(cb: (p: Point) => any): Click {
-      this._callback = cb;
+    public onClick(callback: (clickData: ClickData) => any): Click {
+      this.clickCallback = callback;
       return this;
     }
   }
