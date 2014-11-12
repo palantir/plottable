@@ -73,15 +73,23 @@ export module Plot {
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
+      var wholeDatumAttributes = this._wholeDatumAttributes();
+      var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
+      var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
+      singleDatumAttributes.forEach((attribute: string) => {
+        var projector = attrToProjector[attribute];
+        attrToProjector[attribute] = (data: any[], i: number) => data.length > 0 ? projector(data[0], i) : null;
+      });
+
       var yAccessor = this._projectors["y"].accessor;
       attrToProjector["y"] = (d: any) => this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
       attrToProjector["y0"] = (d: any) => this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
-      // Align fill with first index
-      var fillProjector = attrToProjector["fill"];
-      attrToProjector["fill"] = (d, i) => (d && d[0]) ? fillProjector(d[0], i) : null;
-
       return attrToProjector;
+    }
+
+    public _wholeDatumAttributes() {
+      return ["x", "y", "defined"];
     }
   }
 }
