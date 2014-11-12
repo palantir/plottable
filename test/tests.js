@@ -2454,6 +2454,29 @@ describe("Plots", function () {
                 assert.equal(barPlot._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
                 svg.remove();
             });
+            it("getBar()", function () {
+                var bar = barPlot.getBar(155, 150); // in the middle of bar 0
+                assert.lengthOf(bar[0], 1, "getBar returns a bar");
+                assert.equal(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
+                bar = barPlot.getBar(-1, -1); // no bars here
+                assert.lengthOf(bar[0], 0, "returns null if no bar was selected");
+                bar = barPlot.getBar(200, 50); // between the two bars
+                assert.lengthOf(bar[0], 0, "returns null if no bar was selected");
+                bar = barPlot.getBar(155, 10); // above bar 0
+                assert.lengthOf(bar[0], 0, "returns null if no bar was selected");
+                // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
+                // origin is at the top left!
+                bar = barPlot.getBar({ min: 155, max: 455 }, { min: 150, max: 150 });
+                assert.lengthOf(bar.data(), 2, "selected 2 bars (not the negative one)");
+                assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+                assert.equal(bar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
+                bar = barPlot.getBar({ min: 155, max: 455 }, { min: 150, max: 350 });
+                assert.lengthOf(bar.data(), 3, "selected all the bars");
+                assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+                assert.equal(bar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
+                assert.equal(bar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
+                svg.remove();
+            });
             it("can select and deselect bars", function () {
                 var selectedBar = barPlot.getBar(155, 150); // in the middle of bar 0
                 assert.isNotNull(selectedBar, "clicked on a bar");
