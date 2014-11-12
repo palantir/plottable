@@ -3318,7 +3318,7 @@ var Plottable;
             };
             Area.prototype.createArea = function (xFunction, y0Function, y1Function, definedFunction) {
                 if (!definedFunction) {
-                    definedFunction = function (d, i) { return true; };
+                    definedFunction = function () { return true; };
                 }
                 return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(definedFunction);
             };
@@ -7265,7 +7265,7 @@ var Plottable;
             AbstractBarPlot.prototype._hoverOutComponent = function (p) {
                 this.clearHoverSelection();
             };
-            // HACKHACK User and plot metada should be applied here - #1306.
+            // HACKHACK User and plot metadata should be applied here - #1306.
             AbstractBarPlot.prototype._doHover = function (p) {
                 var _this = this;
                 var xPositionOrExtent = p.x;

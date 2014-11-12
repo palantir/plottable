@@ -41,7 +41,7 @@ export module _Drawer {
                        y1Function: _AppliedProjector,
                        definedFunction: _AppliedProjector) {
       if(!definedFunction) {
-        definedFunction = (d, i) => true;
+        definedFunction = () => true;
       }
 
       return d3.svg.area()

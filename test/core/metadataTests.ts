@@ -30,8 +30,8 @@ describe("Metadata", () => {
   it("user metadata is applied", () => {
     var svg = generateSVG(400, 400);
     var metadata = {foo: 10, bar: 20};
-    var xAccessor = (d: any, i?: number, u?: any) => d.x + i * u.foo;
-    var yAccessor = (d: any, i?: number, u?: any) => u.bar;
+    var xAccessor = (d: any, i: number, u: any) => d.x + i * u.foo;
+    var yAccessor = (d: any, i: number, u: any) => u.bar;
     var dataset = new Plottable.Dataset(data1, metadata);
     var plot = new Plottable.Plot.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
@@ -60,7 +60,7 @@ describe("Metadata", () => {
     var svg = generateSVG(400, 400);
     var metadata1 = {foo: 10};
     var metadata2 = {foo: 30};
-    var xAccessor = (d: any, i?: number, u?: any) => d.x + (i + 1) * u.foo;
+    var xAccessor = (d: any, i: number, u: any) => d.x + (i + 1) * u.foo;
     var yAccessor = () => 0;
     var dataset1 = new Plottable.Dataset(data1, metadata1);
     var dataset2 = new Plottable.Dataset(data2, metadata2);
@@ -83,9 +83,9 @@ describe("Metadata", () => {
     svg.remove();
   });
 
-it("plot metadata is applied", () => {
+  it("plot metadata is applied", () => {
     var svg = generateSVG(400, 400);
-    var xAccessor = (d: any, i?: number, u?: any, m?: any) => d.x + (i + 1) * m.foo;
+    var xAccessor = (d: any, i: number, u: any, m: any) => d.x + (i + 1) * m.foo;
     var yAccessor = () => 0;
     var plot = new Plottable.Plot.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
@@ -114,7 +114,7 @@ it("plot metadata is applied", () => {
 
   it("plot metadata is per plot", () => {
     var svg = generateSVG(400, 400);
-    var xAccessor = (d: any, i?: number, u?: any, m?: any) => d.x + (i + 1) * m.foo;
+    var xAccessor = (d: any, i: number, u: any, m: any) => d.x + (i + 1) * m.foo;
     var yAccessor = () => 0;
     var plot1 = new Plottable.Plot.Scatter(xScale, yScale)
                                 .project("x", xAccessor)

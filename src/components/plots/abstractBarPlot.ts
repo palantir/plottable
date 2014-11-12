@@ -438,7 +438,7 @@ export module Plot {
       this.clearHoverSelection();
     }
 
-    // HACKHACK User and plot metada should be applied here - #1306.
+    // HACKHACK User and plot metadata should be applied here - #1306.
     public _doHover(p: Point): Interaction.HoverData {
       var xPositionOrExtent: any = p.x;
       var yPositionOrExtent: any = p.y;

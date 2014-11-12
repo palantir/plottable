@@ -103,7 +103,7 @@ export module Plot {
       var attrToProjector: AttributeToProjector = super._generateAttrToProjector();
       var positionXFn = attrToProjector["x"];
       var positionYFn = attrToProjector["y"];
-      attrToProjector["defined"] = (d: any, i: number, u: any, m: any) => {
+      attrToProjector["defined"] = (d: any, i: number, u: any, m: PlotMetadata) => {
         var positionX = positionXFn(d, i, u, m);
         var positionY = positionYFn(d, i, u, m);
         return positionX != null && positionX === positionX &&
