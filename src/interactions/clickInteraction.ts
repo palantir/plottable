@@ -17,8 +17,7 @@ export module Interaction {
      */
     _clickComponent(p: Point): void;
     /**
-     * Returns the ClickData associated with the given position, and performs
-     * any visual changes associated with hovering inside a Component.
+     * Returns the ClickData associated with the given position.
      *
      * @param {Point} The cursor's position relative to the Component's origin.
      * @return {ClickData} The ClickData associated with the given position.
@@ -32,11 +31,10 @@ export module Interaction {
     public _anchor(component: Clickable, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       hitBox.on(this._listenTo(), () => {
-        var clickableComponent = <Clickable> this._componentToListenTo;
         var xy = d3.mouse(hitBox.node());
         var p = {x: xy[0], y: xy[1]};
-        clickableComponent._clickComponent(p);
-        var clickData = clickableComponent._getClickData(p);
+        component._clickComponent(p);
+        var clickData = component._getClickData(p);
         this.safeClick(clickData);
       });
     }

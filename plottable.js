@@ -8483,11 +8483,10 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 hitBox.on(this._listenTo(), function () {
-                    var clickableComponent = _this._componentToListenTo;
                     var xy = d3.mouse(hitBox.node());
                     var p = { x: xy[0], y: xy[1] };
-                    clickableComponent._clickComponent(p);
-                    var clickData = clickableComponent._getClickData(p);
+                    component._clickComponent(p);
+                    var clickData = component._getClickData(p);
                     _this.safeClick(clickData);
                 });
             };
