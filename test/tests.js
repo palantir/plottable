@@ -6691,7 +6691,13 @@ describe("DragBoxInteractions", function () {
             assert.equal(xMaxObserved, expectedSelection.xMax, "xMax as expected");
             assert.equal(yMinObserved, expectedSelection.yMin, "yMin as expected");
             assert.equal(yMaxObserved, expectedSelection.yMax, "yMax as expected");
-            assert.deepEqual(interaction.selection, expectedSelection, "selection updated correctly");
+            var interactionSelection = {
+                xMin: +interaction.dragBox.attr("x"),
+                yMin: +interaction.dragBox.attr("y"),
+                xMax: +interaction.dragBox.attr("x") + (+interaction.dragBox.attr("width")),
+                yMax: +interaction.dragBox.attr("y") + (+interaction.dragBox.attr("height"))
+            };
+            assert.deepEqual(interactionSelection, expectedSelection, "selection updated correctly");
         });
         // fake another drag event to resize the box.
         interaction.resizeEnabled(true);

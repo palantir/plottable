@@ -3766,10 +3766,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Interaction {
-        /**
-         * A DragBox is an interaction that automatically draws a box across the
-         * element you attach it to when you drag.
-         */
         class DragBox extends Drag {
             static RESIZE_PADDING: number;
             static _canResizeX: boolean;
@@ -3779,17 +3775,9 @@ declare module Plottable {
              * null.
              */
             dragBox: D3.Selection;
-            /**
-             * The currently selected area, which can be different from the are the user has dragged.
-             */
-            selection: SelectionArea;
             _boxIsDrawn: boolean;
-            _selectionOrigin: number[];
             _resizeXEnabled: boolean;
             _resizeYEnabled: boolean;
-            _dragBoxAttr: SVGRect;
-            _isCloseEnoughLeft(val: number, position: number, len: number): boolean;
-            _isCloseEnoughRight(val: number, position: number, len: number): boolean;
             /**
              * Gets whether resizing is enabled or not.
              *
