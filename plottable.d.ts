@@ -2132,7 +2132,7 @@ declare module Plottable {
     module Axis {
         /**
          * Defines a configuration for a time axis tier.
-         * For details how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
+         * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
          * interval - A time unit associated with this configuration (seconds, minutes, hours, etc).
          * step - number of intervals between each tick.
          * formatter - formatter used to format tick labels.
