@@ -316,8 +316,27 @@ export module _Util {
       return hexCode;
     }
 
+    // Code adapted from https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
     export function darkenColor(color: string, factor: number) {
-      throw new Error("not implemented");
+      var r = parseInt(color.substring(1, 3), 16);
+      var g = parseInt(color.substring(3, 5), 16);
+      var b = parseInt(color.substring(5, 7), 16);
+
+      var hsl = _Util.Color.rgbToHsl(r, g, b);
+
+      var newL = hsl[2] + 0.1 * factor;
+      newL = newL < 0 ? 0 : newL;
+
+      var newRgb = _Util.Color.hslToRgb(hsl[0], hsl[1], newL);
+      var rHex = newRgb[0].toString(16);
+      var gHex = newRgb[1].toString(16);
+      var bHex = newRgb[2].toString(16);
+
+      rHex = rHex.length < 2 ? "0" + rHex : rHex;
+      gHex = gHex.length < 2 ? "0" + gHex : gHex;
+      bHex = bHex.length < 2 ? "0" + bHex : bHex;
+
+      return "#" + rHex + gHex + bHex;
     }
   }
 }

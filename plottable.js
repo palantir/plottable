@@ -306,6 +306,24 @@ var Plottable;
                 return hexCode;
             }
             Methods.colorTest = colorTest;
+            // Code adapted from https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+            function darkenColor(color, factor) {
+                var r = parseInt(color.substring(1, 3), 16);
+                var g = parseInt(color.substring(3, 5), 16);
+                var b = parseInt(color.substring(5, 7), 16);
+                var hsl = _Util.Color.rgbToHsl(r, g, b);
+                var newL = hsl[2] + 0.1 * factor;
+                newL = newL < 0 ? 0 : newL;
+                var newRgb = _Util.Color.hslToRgb(hsl[0], hsl[1], newL);
+                var rHex = newRgb[0].toString(16);
+                var gHex = newRgb[1].toString(16);
+                var bHex = newRgb[2].toString(16);
+                rHex = rHex.length < 2 ? "0" + rHex : rHex;
+                gHex = gHex.length < 2 ? "0" + gHex : gHex;
+                bHex = bHex.length < 2 ? "0" + bHex : bHex;
+                return "#" + rHex + gHex + bHex;
+            }
+            Methods.darkenColor = darkenColor;
         })(_Util.Methods || (_Util.Methods = {}));
         var Methods = _Util.Methods;
     })(Plottable._Util || (Plottable._Util = {}));
@@ -1180,6 +1198,94 @@ var Plottable;
                 return l1 > l2 ? l1 / l2 : l2 / l1;
             }
             Color.contrast = contrast;
+            /**
+             * Converts an RGB color value to HSL. Conversion formula
+             * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+             * Assumes r, g, and b are contained in the set [0, 255] and
+             * returns h, s, and l in the set [0, 1].
+             * Source: https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
+             *
+             * @param   Number  r       The red color value
+             * @param   Number  g       The green color value
+             * @param   Number  b       The blue color value
+             * @return  Array           The HSL representation
+             */
+            function rgbToHsl(r, g, b) {
+                r /= 255, g /= 255, b /= 255;
+                var max = Math.max(r, g, b);
+                var min = Math.min(r, g, b);
+                var h;
+                var s;
+                var l = (max + min) / 2;
+                if (max === min) {
+                    h = s = 0; // achromatic
+                }
+                else {
+                    var d = max - min;
+                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                    switch (max) {
+                        case r:
+                            h = (g - b) / d + (g < b ? 6 : 0);
+                            break;
+                        case g:
+                            h = (b - r) / d + 2;
+                            break;
+                        case b:
+                            h = (r - g) / d + 4;
+                            break;
+                    }
+                    h /= 6;
+                }
+                return [h, s, l];
+            }
+            Color.rgbToHsl = rgbToHsl;
+            /**
+             * Converts an HSL color value to RGB. Conversion formula
+             * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+             * Assumes h, s, and l are contained in the set [0, 1] and
+             * returns r, g, and b in the set [0, 255].
+             * Source: https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
+             *
+             * @param   Number  h       The hue
+             * @param   Number  s       The saturation
+             * @param   Number  l       The lightness
+             * @return  Array           The RGB representation
+             */
+            function hslToRgb(h, s, l) {
+                var r;
+                var g;
+                var b;
+                if (s === 0) {
+                    r = g = b = l; // achromatic
+                }
+                else {
+                    function hue2rgb(p, q, t) {
+                        if (t < 0) {
+                            t += 1;
+                        }
+                        if (t > 1) {
+                            t -= 1;
+                        }
+                        if (t < 1 / 6) {
+                            return p + (q - p) * 6 * t;
+                        }
+                        if (t < 1 / 2) {
+                            return q;
+                        }
+                        if (t < 2 / 3) {
+                            return p + (q - p) * (2 / 3 - t) * 6;
+                        }
+                        return p;
+                    }
+                    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                    var p = 2 * l - q;
+                    r = hue2rgb(p, q, h + 1 / 3);
+                    g = hue2rgb(p, q, h);
+                    b = hue2rgb(p, q, h - 1 / 3);
+                }
+                return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+            }
+            Color.hslToRgb = hslToRgb;
         })(_Util.Color || (_Util.Color = {}));
         var Color = _Util.Color;
     })(Plottable._Util || (Plottable._Util = {}));
@@ -2829,9 +2935,15 @@ var Plottable;
                 colorTester.remove();
                 return plottableDefaultColors;
             };
+            // Modifying the original scale method so that colors that are looped are darkened according
+            // to how many times they are looped.
             Color.prototype.scale = function (value) {
-                return "haha";
+                var color = _super.prototype.scale.call(this, value);
+                var index = this.domain().indexOf(value);
+                var modifyFactor = Math.floor(index / this.defaultColorLength);
+                return Plottable._Util.Methods.darkenColor(color, modifyFactor);
             };
+            Color.HEX_SCALE_FACTOR = 20;
             return Color;
         })(Scale.AbstractScale);
         Scale.Color = Color;

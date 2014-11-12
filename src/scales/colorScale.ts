@@ -4,6 +4,8 @@ module Plottable {
 export module Scale {
   export class Color extends AbstractScale<string, string> {
 
+    private static HEX_SCALE_FACTOR = 20;
+
     private defaultColorLength: number;
 
     /**
@@ -74,15 +76,10 @@ export module Scale {
     // Modifying the original scale method so that colors that are looped are darkened according
     // to how many times they are looped.
     public scale(value: string): string {
-      var oldLength = this.domain().length;
       var color = super.scale(value);
-      var newLength = this.domain().length;
-      if (newLength > oldLength) {
-        var modifyFactor = newLength / this.defaultColorLength;
-        return _Util.Methods.darkenColor(color, modifyFactor);
-      } else {
-        return color;
-      }
+      var index = this.domain().indexOf(value);
+      var modifyFactor = Math.floor(index / this.defaultColorLength);
+      return _Util.Methods.darkenColor(color, modifyFactor);
     }
   }
 }
