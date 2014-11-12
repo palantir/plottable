@@ -195,7 +195,7 @@ export module Axis {
     /**
      * Gets the index of the most precise TimeAxisConfiguration that will fit in the current width.
      */
-    private getIndexOfMostPreciseTimeAxisConfiguration(): number {
+    private getMostPreciseConfigurationIndex(): number {
       var mostPreciseIndex = this.possibleTimeAxisConfigurations.length;
       this.possibleTimeAxisConfigurations.forEach((interval: TimeAxisConfiguration, index: number) => {
         if (index < mostPreciseIndex && interval.tierConfigurations.every((tier: TimeAxisTierConfiguration) =>
@@ -375,7 +375,7 @@ export module Axis {
     }
 
     public _doRender() {
-      this.mostPreciseConfigIndex = this.getIndexOfMostPreciseTimeAxisConfiguration();
+      this.mostPreciseConfigIndex = this.getMostPreciseConfigurationIndex();
       super._doRender();
 
       var tierConfigs = this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations;

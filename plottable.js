@@ -4705,7 +4705,7 @@ var Plottable;
             /**
              * Gets the index of the most precise TimeAxisConfiguration that will fit in the current width.
              */
-            Time.prototype.getIndexOfMostPreciseTimeAxisConfiguration = function () {
+            Time.prototype.getMostPreciseConfigurationIndex = function () {
                 var _this = this;
                 var mostPreciseIndex = this.possibleTimeAxisConfigurations.length;
                 this.possibleTimeAxisConfigurations.forEach(function (interval, index) {
@@ -4856,7 +4856,7 @@ var Plottable;
             };
             Time.prototype._doRender = function () {
                 var _this = this;
-                this.mostPreciseConfigIndex = this.getIndexOfMostPreciseTimeAxisConfiguration();
+                this.mostPreciseConfigIndex = this.getMostPreciseConfigurationIndex();
                 _super.prototype._doRender.call(this);
                 var tierConfigs = this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations;
                 this.tierLabelContainers.forEach(this.cleanContainer);
