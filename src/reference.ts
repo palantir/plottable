@@ -86,7 +86,6 @@
 /// <reference path="interactions/clickInteraction.ts" />
 /// <reference path="interactions/keyInteraction.ts" />
 /// <reference path="interactions/panZoomInteraction.ts" />
-/// <reference path="interactions/barHoverInteraction.ts" />
 /// <reference path="interactions/drag/dragInteraction.ts" />
 /// <reference path="interactions/drag/dragBoxInteraction.ts" />
 /// <reference path="interactions/drag/xDragBoxInteraction.ts" />

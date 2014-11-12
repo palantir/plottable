@@ -3671,49 +3671,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Interaction {
-        class BarHover extends AbstractInteraction {
-            _componentToListenTo: Plot.AbstractBarPlot<any, any>;
-            _anchor(barPlot: Plot.AbstractBarPlot<any, any>, hitBox: D3.Selection): void;
-            /**
-             * Gets the current hover mode.
-             *
-             * @return {string} The current hover mode.
-             */
-            hoverMode(): string;
-            /**
-             * Sets the hover mode for the interaction. There are two modes:
-             *     - "point": Selects the bar under the mouse cursor (default).
-             *     - "line" : Selects any bar that would be hit by a line extending
-             *                in the same direction as the bar and passing through
-             *                the cursor.
-             *
-             * @param {string} mode If provided, the desired hover mode.
-             * @return {BarHover} The calling BarHover.
-             */
-            hoverMode(mode: string): BarHover;
-            /**
-             * Attaches an callback to be called when the user mouses over a bar.
-             *
-             * @param {(datum: any, bar: D3.Selection) => any} callback The callback to be called.
-             *      The callback will be passed the data from the hovered-over bar.
-             * @return {BarHover} The calling BarHover.
-             */
-            onHover(callback: (datum: any, bar: D3.Selection) => any): BarHover;
-            /**
-             * Attaches a callback to be called when the user mouses off of a bar.
-             *
-             * @param {(datum: any, bar: D3.Selection) => any} callback The callback to be called.
-             *      The callback will be passed the data from the last-hovered bar.
-             * @return {BarHover} The calling BarHover.
-             */
-            onUnhover(callback: (datum: any, bar: D3.Selection) => any): BarHover;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
         class Drag extends AbstractInteraction {
             _origin: number[];
             _location: number[];
