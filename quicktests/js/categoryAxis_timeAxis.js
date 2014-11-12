@@ -2,10 +2,10 @@
 function makeData() {
   "use strict";
   return [
-    {x: "5/2/2014", y: "category4"},
-    {x: "2/24/2017", y: "category3"},
-    {x: "8/8/2020", y: "category2"},
-    {x: "1/23/2025", y: "category1"}
+    {x: "5/2/2014", y: "category1"},
+    {x: "2/24/2017", y: "category2"},
+    {x: "8/8/2020", y: "category3"},
+    {x: "1/23/2025", y: "category4"}
   ];
 }
 

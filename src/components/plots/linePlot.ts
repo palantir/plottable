@@ -2,7 +2,9 @@
 
 module Plottable {
 export module Plot {
-  export class Line<X> extends AbstractXYPlot<X,number> {
+  export class Line<X> extends AbstractXYPlot<X,number> implements Interaction.Hoverable {
+    private hoverDetectionRadius = 15;
+    private hoverTarget: D3.Selection;
 
     public _yScale: Scale.AbstractQuantitative<number>;
 
@@ -16,12 +18,22 @@ export module Plot {
     constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
       super(xScale, yScale);
       this.classed("line-plot", true);
-      this.project("stroke", () => Core.Colors.INDIGO); // default
+
+      var defaultColor = new Scale.Color().range()[0];
+      this.project("stroke", () => defaultColor); // default
+
       this.project("stroke-width", () => "2px"); // default
       this._animators["reset"] = new Animator.Null();
       this._animators["main"] = new Animator.Base()
                                             .duration(600)
                                             .easing("exp-in-out");
+    }
+
+    public _setup() {
+      super._setup();
+      this.hoverTarget = this._foregroundContainer.append("circle")
+                                          .classed("hover-target", true)
+                                          .style("visibility", "hidden");
     }
 
     public _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor) {
@@ -77,6 +89,75 @@ export module Plot {
     public _wholeDatumAttributes() {
       return ["x", "y"];
     }
+
+    public _getClosestWithinRange(p: Point, range: number) {
+      var attrToProjector = this._generateAttrToProjector();
+      var xProjector = attrToProjector["x"];
+      var yProjector = attrToProjector["y"];
+
+      var getDistSq = (d: any, i: number) => {
+        var dx = +xProjector(d, i) - p.x;
+        var dy = +yProjector(d, i) - p.y;
+        return (dx * dx + dy * dy);
+      };
+
+      var closestOverall: any;
+      var closestPoint: Point;
+      var closestDistSq = range * range;
+
+      this.datasets().forEach((dataset) => {
+        dataset.data().forEach((d: any, i: number) => {
+          var distSq = getDistSq(d, i);
+          if (distSq < closestDistSq) {
+            closestOverall = d;
+            closestPoint = {
+              x: xProjector(d, i),
+              y: yProjector(d, i)
+            };
+            closestDistSq = distSq;
+          }
+        });
+      });
+
+      return {
+        closestValue: closestOverall,
+        closestPoint: closestPoint
+      };
+    }
+
+    //===== Hover logic =====
+    public _hoverOverComponent(p: Point) {
+      // no-op
+    }
+
+    public _hoverOutComponent(p: Point) {
+      // no-op
+    }
+
+    public _doHover(p: Point): Interaction.HoverData {
+      var closestInfo = this._getClosestWithinRange(p, this.hoverDetectionRadius);
+      var closestValue = closestInfo.closestValue;
+      if (closestValue === undefined) {
+        return {
+          data: null,
+          pixelPositions: null,
+          selection: null
+        };
+      }
+
+      var closestPoint = closestInfo.closestPoint;
+      this.hoverTarget.attr({
+        "cx": closestInfo.closestPoint.x,
+        "cy": closestInfo.closestPoint.y
+      });
+
+      return {
+        data: [closestValue],
+        pixelPositions: [closestPoint],
+        selection: this.hoverTarget
+      };
+    }
+    //===== /Hover logic =====
   }
 }
 }

@@ -1,5 +1,5 @@
 /*!
-Plottable 0.35.1 (https://github.com/palantir/plottable)
+Plottable 0.36.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -286,6 +286,26 @@ var Plottable;
                 }
             }
             Methods.setTimeout = setTimeout;
+            function colorTest(colorTester, className) {
+                colorTester.classed(className, true);
+                // Use regex to get the text inside the rgb parentheses
+                var colorStyle = colorTester.style("background-color");
+                if (colorStyle === "transparent") {
+                    return null;
+                }
+                var rgb = /\((.+)\)/.exec(colorStyle)[1].split(",").map(function (colorValue) {
+                    var colorNumber = +colorValue;
+                    var hexValue = colorNumber.toString(16);
+                    return colorNumber < 16 ? "0" + hexValue : hexValue;
+                });
+                if (rgb.length === 4 && rgb[3] === "00") {
+                    return null;
+                }
+                var hexCode = "#" + rgb.join("");
+                colorTester.classed(className, false);
+                return hexCode;
+            }
+            Methods.colorTest = colorTest;
         })(_Util.Methods || (_Util.Methods = {}));
         var Methods = _Util.Methods;
     })(Plottable._Util || (Plottable._Util = {}));
@@ -1385,7 +1405,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.35.1";
+    Plottable.version = "0.36.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2760,7 +2780,7 @@ var Plottable;
                 switch (scaleType) {
                     case null:
                     case undefined:
-                        scale = d3.scale.ordinal().range(Plottable.Core.Colors.PLOTTABLE_COLORS);
+                        scale = d3.scale.ordinal().range(Color.getPlottableColors());
                         break;
                     case "Category10":
                     case "category10":
@@ -2795,6 +2815,18 @@ var Plottable;
                     concatenatedExtents = concatenatedExtents.concat(e);
                 });
                 return Plottable._Util.Methods.uniq(concatenatedExtents);
+            };
+            Color.getPlottableColors = function () {
+                var plottableDefaultColors = [];
+                var colorTester = d3.select("body").append("div");
+                var i = 0;
+                var colorHex;
+                while ((colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
+                    plottableDefaultColors.push(colorHex);
+                    i++;
+                }
+                colorTester.remove();
+                return plottableDefaultColors;
             };
             return Color;
         })(Scale.AbstractScale);
@@ -5220,6 +5252,7 @@ var Plottable;
                 this.xAlign("center").yAlign("center");
                 this._fixedHeightFlag = true;
                 this._fixedWidthFlag = true;
+                this._padding = 0;
             }
             /**
              * Sets the horizontal side the label will go to given the label is given more space that it needs
@@ -5249,8 +5282,8 @@ var Plottable;
             };
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var desiredWH = this.measurer(this._text);
-                var desiredWidth = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height);
-                var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
+                var desiredWidth = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+                var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
                 return {
                     width: desiredWidth,
                     height: desiredHeight,
@@ -5290,16 +5323,36 @@ var Plottable;
                     return this;
                 }
             };
+            Label.prototype.padding = function (padAmount) {
+                if (padAmount == null) {
+                    return this._padding;
+                }
+                else {
+                    padAmount = +padAmount;
+                    if (padAmount < 0) {
+                        throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
+                    }
+                    this._padding = padAmount;
+                    this._invalidateLayout();
+                    return this;
+                }
+            };
             Label.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
+                var textMeasurement = this.measurer(this._text);
+                var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
+                var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
+                this.textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
                 this.textContainer.text("");
                 var dimension = this.orientation === "horizontal" ? this.width() : this.height();
                 var truncatedText = Plottable._Util.Text.getTruncatedText(this._text, dimension, this.measurer);
+                var writeWidth = this.width() - 2 * widthPadding;
+                var writeHeight = this.height() - 2 * heightPadding;
                 if (this.orientation === "horizontal") {
-                    Plottable._Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.width(), this.height(), this.xAlignment, this.yAlignment);
+                    Plottable._Util.Text.writeLineHorizontally(truncatedText, this.textContainer, writeWidth, writeHeight, this.xAlignment, this.yAlignment);
                 }
                 else {
-                    Plottable._Util.Text.writeLineVertically(truncatedText, this.textContainer, this.width(), this.height(), this.xAlignment, this.yAlignment, this.orientation);
+                    Plottable._Util.Text.writeLineVertically(truncatedText, this.textContainer, writeWidth, writeHeight, this.xAlignment, this.yAlignment, this.orientation);
                 }
             };
             Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
@@ -6489,6 +6542,7 @@ var Plottable;
              */
             function Pie() {
                 _super.call(this);
+                this.colorScale = new Plottable.Scale.Color();
                 this.classed("pie-plot", true);
             }
             Pie.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
@@ -6503,11 +6557,12 @@ var Plottable;
                 _super.prototype._addDataset.call(this, key, dataset);
             };
             Pie.prototype._generateAttrToProjector = function () {
+                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
                 attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
                 if (attrToProjector["fill"] == null) {
-                    attrToProjector["fill"] = function (d, i) { return Pie.DEFAULT_COLOR_SCALE.scale(String(i)); };
+                    attrToProjector["fill"] = function (d, i) { return _this.colorScale.scale(String(i)); };
                 }
                 var defaultAccessor = function (d) { return d.value; };
                 var valueProjector = this._projectors["value"];
@@ -6517,7 +6572,6 @@ var Plottable;
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Arc(key).setClass("arc");
             };
-            Pie.DEFAULT_COLOR_SCALE = new Plottable.Scale.Color();
             return Pie;
         })(Plot.AbstractPlot);
         Plot.Pie = Pie;
@@ -6636,7 +6690,12 @@ var Plottable;
             AbstractXYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 this._xScale.range([0, this.width()]);
-                this._yScale.range([this.height(), 0]);
+                if (this._yScale instanceof Plottable.Scale.Ordinal) {
+                    this._yScale.range([0, this.height()]);
+                }
+                else {
+                    this._yScale.range([this.height(), 0]);
+                }
             };
             AbstractXYPlot.prototype._updateXDomainer = function () {
                 if (this._xScale instanceof Plottable.Scale.AbstractQuantitative) {
@@ -6735,7 +6794,8 @@ var Plottable;
                 this.classed("scatter-plot", true);
                 this.project("r", 3); // default
                 this.project("opacity", 0.6); // default
-                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; }); // default
+                var defaultColor = new Plottable.Scale.Color().range()[0];
+                this.project("fill", function () { return defaultColor; }); // default
                 this._animators["circles-reset"] = new Plottable.Animator.Null();
                 this._animators["circles"] = new Plottable.Animator.Base().duration(250).delay(5);
             }
@@ -6941,7 +7001,8 @@ var Plottable;
                 this._hoverMode = "point";
                 this.hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
-                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
+                var defaultColor = new Plottable.Scale.Color().range()[0];
+                this.project("fill", function () { return defaultColor; });
                 this._animators["bars-reset"] = new Plottable.Animator.Null();
                 this._animators["bars"] = new Plottable.Animator.Base();
                 this._animators["baseline"] = new Plottable.Animator.Null();
@@ -7413,12 +7474,18 @@ var Plottable;
              */
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
+                this.hoverDetectionRadius = 15;
                 this.classed("line-plot", true);
-                this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
+                var defaultColor = new Plottable.Scale.Color().range()[0];
+                this.project("stroke", function () { return defaultColor; }); // default
                 this.project("stroke-width", function () { return "2px"; }); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
+            Line.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this.hoverTarget = this._foregroundContainer.append("circle").classed("hover-target", true).style("visibility", "hidden");
+            };
             Line.prototype._rejectNullsAndNaNs = function (d, i, projector) {
                 var value = projector(d, i);
                 return value != null && value === value;
@@ -7465,6 +7532,64 @@ var Plottable;
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
             };
+            Line.prototype._getClosestWithinRange = function (p, range) {
+                var attrToProjector = this._generateAttrToProjector();
+                var xProjector = attrToProjector["x"];
+                var yProjector = attrToProjector["y"];
+                var getDistSq = function (d, i) {
+                    var dx = +xProjector(d, i) - p.x;
+                    var dy = +yProjector(d, i) - p.y;
+                    return (dx * dx + dy * dy);
+                };
+                var closestOverall;
+                var closestPoint;
+                var closestDistSq = range * range;
+                this.datasets().forEach(function (dataset) {
+                    dataset.data().forEach(function (d, i) {
+                        var distSq = getDistSq(d, i);
+                        if (distSq < closestDistSq) {
+                            closestOverall = d;
+                            closestPoint = {
+                                x: xProjector(d, i),
+                                y: yProjector(d, i)
+                            };
+                            closestDistSq = distSq;
+                        }
+                    });
+                });
+                return {
+                    closestValue: closestOverall,
+                    closestPoint: closestPoint
+                };
+            };
+            //===== Hover logic =====
+            Line.prototype._hoverOverComponent = function (p) {
+                // no-op
+            };
+            Line.prototype._hoverOutComponent = function (p) {
+                // no-op
+            };
+            Line.prototype._doHover = function (p) {
+                var closestInfo = this._getClosestWithinRange(p, this.hoverDetectionRadius);
+                var closestValue = closestInfo.closestValue;
+                if (closestValue === undefined) {
+                    return {
+                        data: null,
+                        pixelPositions: null,
+                        selection: null
+                    };
+                }
+                var closestPoint = closestInfo.closestPoint;
+                this.hoverTarget.attr({
+                    "cx": closestInfo.closestPoint.x,
+                    "cy": closestInfo.closestPoint.y
+                });
+                return {
+                    data: [closestValue],
+                    pixelPositions: [closestPoint],
+                    selection: this.hoverTarget
+                };
+            };
             return Line;
         })(Plot.AbstractXYPlot);
         Plot.Line = Line;
@@ -7498,9 +7623,10 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.classed("area-plot", true);
                 this.project("y0", 0, yScale); // default
-                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; }); // default
                 this.project("fill-opacity", function () { return 0.25; }); // default
-                this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; }); // default
+                var defaultColor = new Plottable.Scale.Color().range()[0];
+                this.project("fill", function () { return defaultColor; }); // default
+                this.project("stroke", function () { return defaultColor; }); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
@@ -7821,7 +7947,8 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
                 this.classed("area-plot", true);
-                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
+                var defaultColor = new Plottable.Scale.Color().range()[0];
+                this.project("fill", function () { return defaultColor; });
                 this._isVertical = true;
             }
             StackedArea.prototype._getDrawer = function (key) {
@@ -7908,7 +8035,8 @@ var Plottable;
                 this._baselineValue = 0;
                 _super.call(this, xScale, yScale);
                 this.classed("bar-plot", true);
-                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
+                var defaultColor = new Plottable.Scale.Color().range()[0];
+                this.project("fill", function () { return defaultColor; });
                 this.baseline(this._baselineValue);
                 this._isVertical = isVertical;
             }
