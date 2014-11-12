@@ -2967,7 +2967,7 @@ declare module Plottable {
              *
              * @returns {D3.Selection} All of the bars in the bar plot.
              */
-            getBars(): D3.Selection;
+            getAllBars(): D3.Selection;
             /**
              * Selects the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one

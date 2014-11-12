@@ -2845,7 +2845,7 @@ describe("Plots", function () {
                 assert.lengthOf(texts, 0, "texts were immediately removed");
             });
         });
-        describe("getBars()", function () {
+        describe("getAllBars()", function () {
             var verticalBarPlot;
             var dataset;
             var svg;
@@ -2856,18 +2856,18 @@ describe("Plots", function () {
                 var yScale = new Plottable.Scale.Linear();
                 verticalBarPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
             });
-            it("getBars works in the normal case", function () {
+            it("getAllBars works in the normal case", function () {
                 dataset.data([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
                 verticalBarPlot.addDataset(dataset);
                 verticalBarPlot.renderTo(svg);
-                var bars = verticalBarPlot.getBars();
+                var bars = verticalBarPlot.getAllBars();
                 assert.lengthOf(bars[0], 3, "three bars in the bar plot");
                 svg.remove();
             });
-            it("getBars returns 0 bars if there are no bars", function () {
+            it("getAllBars returns 0 bars if there are no bars", function () {
                 verticalBarPlot.addDataset(dataset);
                 verticalBarPlot.renderTo(svg);
-                var bars = verticalBarPlot.getBars();
+                var bars = verticalBarPlot.getAllBars();
                 assert.lengthOf(bars[0], 0, "zero bars in the bar plot");
                 svg.remove();
             });

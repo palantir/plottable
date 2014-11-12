@@ -7079,7 +7079,7 @@ var Plottable;
              *
              * @returns {D3.Selection} All of the bars in the bar plot.
              */
-            AbstractBarPlot.prototype.getBars = function () {
+            AbstractBarPlot.prototype.getAllBars = function () {
                 return this._renderArea.selectAll("rect");
             };
             AbstractBarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {

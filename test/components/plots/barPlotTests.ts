@@ -561,7 +561,7 @@ describe("Plots", () => {
       });
     });
 
-    describe("getBars()", () => {
+    describe("getAllBars()", () => {
       var verticalBarPlot: Plottable.Plot.VerticalBar<string>;
       var dataset: Plottable.Dataset;
       var svg: D3.Selection;
@@ -574,20 +574,20 @@ describe("Plots", () => {
         verticalBarPlot = new Plottable.Plot.VerticalBar<string>(xScale, yScale);
       });
 
-      it("getBars works in the normal case", () => {
+      it("getAllBars works in the normal case", () => {
         dataset.data([{x: "foo", y: 5}, {x: "bar", y: 640}, {x: "zoo", y: 12345}]);
         verticalBarPlot.addDataset(dataset);
         verticalBarPlot.renderTo(svg);
-        var bars = verticalBarPlot.getBars();
+        var bars = verticalBarPlot.getAllBars();
         assert.lengthOf(bars[0], 3, "three bars in the bar plot");
         svg.remove();
       });
 
 
-      it("getBars returns 0 bars if there are no bars", () => {
+      it("getAllBars returns 0 bars if there are no bars", () => {
         verticalBarPlot.addDataset(dataset);
         verticalBarPlot.renderTo(svg);
-        var bars = verticalBarPlot.getBars();
+        var bars = verticalBarPlot.getAllBars();
         assert.lengthOf(bars[0], 0, "zero bars in the bar plot");
         svg.remove();
       });

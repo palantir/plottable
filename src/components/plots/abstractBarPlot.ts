@@ -151,7 +151,7 @@ export module Plot {
      *
      * @returns {D3.Selection} All of the bars in the bar plot.
      */
-    public getBars(): D3.Selection {
+    public getAllBars(): D3.Selection {
       return this._renderArea.selectAll("rect");
     }
 
