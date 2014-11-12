@@ -173,4 +173,22 @@ describe("_Util.Methods", () => {
     range = Plottable._Util.Methods.range(0.6, 2.2, 0.5);
     assert.deepEqual(range, [0.6, 1.1, 1.6, 2.1], "all entries has been generated with float step");
   });
+
+  it("colorTest works as expected", () => {
+    var colorTester = d3.select("body").append("div").classed("color-tester", true);
+    var style = colorTester.append("style");
+    style.attr("type", "text/css");
+
+    style.text(".plottable-colors-0 { background-color: blue; }");
+    var blueHexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-0");
+    assert.strictEqual(blueHexcode, "#0000ff", "hexcode for blue returned");
+
+    style.text(".plottable-colors-2 { background-color: #13EADF; }");
+    var hexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-2");
+    assert.strictEqual(hexcode, "#13eadf", "hexcode for blue returned");
+
+    var nullHexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-11");
+    assert.strictEqual(nullHexcode, null, "null hexcode returned");
+    colorTester.remove();
+  });
 });

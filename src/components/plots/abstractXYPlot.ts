@@ -115,7 +115,11 @@ export module Plot {
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this._xScale.range([0, this.width()]);
-      this._yScale.range([this.height(), 0]);
+      if (this._yScale instanceof Scale.Ordinal) {
+        this._yScale.range([0, this.height()]);
+      } else {
+        this._yScale.range([this.height(), 0]);
+      }
     }
 
     public _updateXDomainer() {

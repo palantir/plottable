@@ -353,8 +353,8 @@ describe("Plots", () => {
         assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
         assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
         assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-        assert.equal(bar0.attr("y"), "250", "bar0 y is correct");
-        assert.equal(bar1.attr("y"), "50", "bar1 y is correct");
+        assert.equal(bar0.attr("y"), "50", "bar0 y is correct");
+        assert.equal(bar1.attr("y"), "250", "bar1 y is correct");
         assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
         assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
 
@@ -394,8 +394,8 @@ describe("Plots", () => {
         var bar1 = d3.select(bars[0][1]);
         assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
         assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
-        assert.equal(numAttr(bar0, "y"), 250, "bar0 y is correct");
-        assert.equal(numAttr(bar1, "y"), 50, "bar1 y is correct");
+        assert.equal(numAttr(bar0, "y"), 50, "bar0 y is correct");
+        assert.equal(numAttr(bar1, "y"), 250, "bar1 y is correct");
 
         barPlot.barAlignment("bottom");
         renderArea = barPlot._renderArea;
@@ -404,8 +404,8 @@ describe("Plots", () => {
         bar1 = d3.select(bars[0][1]);
         assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
         assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
-        assert.equal(numAttr(bar0, "y"), 200, "bar0 y is correct");
-        assert.equal(numAttr(bar1, "y"), 0, "bar1 y is correct");
+        assert.equal(numAttr(bar0, "y"), 0, "bar0 y is correct");
+        assert.equal(numAttr(bar1, "y"), 200, "bar1 y is correct");
 
         assert.throws(() => barPlot.barAlignment("blargh"), Error);
 

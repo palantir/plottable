@@ -126,6 +126,7 @@ declare module Plottable {
              * setTimeout appears out-of-sync with the rest of the plot.
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
+            function colorTest(colorTester: D3.Selection, className: string): string;
         }
     }
 }
@@ -2328,6 +2329,19 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             orient(newOrientation: string): Label;
+            /**
+             * Gets the amount of padding in pixels around the Label.
+             *
+             * @returns {number} the current padding amount.
+             */
+            padding(): number;
+            /**
+             * Sets the amount of padding in pixels around the Label.
+             *
+             * @param {number} padAmount The desired padding amount in pixel values
+             * @returns {Label} The calling Label.
+             */
+            padding(padAmount: number): Label;
             _doRender(): void;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
         }
@@ -3089,7 +3103,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Line<X> extends AbstractXYPlot<X, number> {
+        class Line<X> extends AbstractXYPlot<X, number> implements Interaction.Hoverable {
             _yScale: Scale.AbstractQuantitative<number>;
             /**
              * Constructs a LinePlot.
@@ -3099,12 +3113,20 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
+            _setup(): void;
             _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
             _getDrawer(key: string): _Drawer.Line;
             _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
             _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
             _wholeDatumAttributes(): string[];
+            _getClosestWithinRange(p: Point, range: number): {
+                closestValue: any;
+                closestPoint: Point;
+            };
+            _hoverOverComponent(p: Point): void;
+            _hoverOutComponent(p: Point): void;
+            _doHover(p: Point): Interaction.HoverData;
         }
     }
 }

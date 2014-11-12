@@ -9,6 +9,7 @@ export module Component {
     private measurer: _Util.Text.TextMeasurer;
     private xAlignment: string;
     private yAlignment: string;
+    private _padding: number;
 
     /**
      * Creates a Label.
@@ -28,6 +29,7 @@ export module Component {
       this.xAlign("center").yAlign("center");
       this._fixedHeightFlag = true;
       this._fixedWidthFlag = true;
+      this._padding = 0;
     }
 
     /**
@@ -60,8 +62,8 @@ export module Component {
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var desiredWH = this.measurer(this._text);
-      var desiredWidth  = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height);
-      var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
+      var desiredWidth  = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+      var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
       return {
         width : desiredWidth,
@@ -130,16 +132,49 @@ export module Component {
       }
     }
 
+    /**
+     * Gets the amount of padding in pixels around the Label.
+     *
+     * @returns {number} the current padding amount.
+     */
+    public padding(): number;
+    /**
+     * Sets the amount of padding in pixels around the Label.
+     *
+     * @param {number} padAmount The desired padding amount in pixel values
+     * @returns {Label} The calling Label.
+     */
+    public padding(padAmount: number): Label;
+    public padding(padAmount?: number): any {
+      if (padAmount == null) {
+        return this._padding;
+      } else {
+        padAmount = +padAmount;
+        if (padAmount < 0) {
+          throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
+        }
+        this._padding = padAmount;
+        this._invalidateLayout();
+        return this;
+      }
+    }
+
     public _doRender() {
       super._doRender();
+      var textMeasurement = this.measurer(this._text);
+      var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
+      var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
+      this.textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
       this.textContainer.text("");
       var dimension = this.orientation === "horizontal" ? this.width() : this.height();
       var truncatedText = _Util.Text.getTruncatedText(this._text, dimension, this.measurer);
+      var writeWidth = this.width() - 2 * widthPadding;
+      var writeHeight = this.height() - 2 * heightPadding;
       if (this.orientation === "horizontal") {
-        _Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.width(), this.height(),
+        _Util.Text.writeLineHorizontally(truncatedText, this.textContainer, writeWidth, writeHeight,
                                         this.xAlignment, this.yAlignment);
       } else {
-        _Util.Text.writeLineVertically(truncatedText, this.textContainer, this.width(), this.height(),
+        _Util.Text.writeLineVertically(truncatedText, this.textContainer, writeWidth, writeHeight,
                                         this.xAlignment, this.yAlignment, this.orientation);
       }
     }

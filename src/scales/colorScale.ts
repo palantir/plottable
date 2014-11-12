@@ -3,6 +3,7 @@
 module Plottable {
 export module Scale {
   export class Color extends AbstractScale<string, string> {
+
     /**
      * Constructs a ColorScale.
      *
@@ -16,7 +17,7 @@ export module Scale {
       switch (scaleType) {
         case null:
         case undefined:
-          scale = d3.scale.ordinal().range(Core.Colors.PLOTTABLE_COLORS);
+          scale = d3.scale.ordinal().range(Color.getPlottableColors());
           break;
         case "Category10":
         case "category10":
@@ -52,6 +53,19 @@ export module Scale {
         concatenatedExtents = concatenatedExtents.concat(e);
       });
       return _Util.Methods.uniq(concatenatedExtents);
+    }
+
+    private static getPlottableColors(): string[] {
+      var plottableDefaultColors: string[] = [];
+      var colorTester = d3.select("body").append("div");
+      var i = 0;
+      var colorHex: string;
+      while ((colorHex = _Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
+        plottableDefaultColors.push(colorHex);
+        i++;
+      }
+      colorTester.remove();
+      return plottableDefaultColors;
     }
   }
 }

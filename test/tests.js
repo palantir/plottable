@@ -1046,6 +1046,44 @@ describe("Labels", function () {
         assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "label is in vertical position");
         svg.remove();
     });
+    it("padding reacts well under align", function () {
+        var svg = generateSVG(400, 200);
+        var testLabel = new Plottable.Component.Label("testing label").padding(30).xAlign("left");
+        var longLabel = new Plottable.Component.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlign("left");
+        var topLabel = new Plottable.Component.Label("label").yAlign("bottom");
+        new Plottable.Component.Table([[topLabel], [testLabel], [longLabel]]).renderTo(svg);
+        var testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
+        var longTextRect = longLabel._element.select("text").node().getBoundingClientRect();
+        assert.closeTo(testTextRect.left, longTextRect.left + 30, 2, "left difference by padding amount");
+        testLabel.xAlign("right");
+        testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
+        longTextRect = longLabel._element.select("text").node().getBoundingClientRect();
+        assert.closeTo(testTextRect.right, longTextRect.right - 30, 2, "right difference by padding amount");
+        testLabel.yAlign("bottom");
+        testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
+        longTextRect = longLabel._element.select("text").node().getBoundingClientRect();
+        assert.closeTo(testTextRect.bottom, longTextRect.top - 30, 2, "vertical difference by padding amount");
+        testLabel.yAlign("top");
+        testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
+        var topTextRect = topLabel._element.select("text").node().getBoundingClientRect();
+        assert.closeTo(testTextRect.top, topTextRect.bottom + 30, 2, "vertical difference by padding amount");
+        svg.remove();
+    });
+    it("padding puts space around the label", function () {
+        var svg = generateSVG(400, 200);
+        var testLabel = new Plottable.Component.Label("testing label").padding(30);
+        testLabel.renderTo(svg);
+        var measure = Plottable._Util.Text.getTextMeasurer(svg.append("text"))("testing label");
+        assert.operator(testLabel.width(), ">", measure.width, "padding increases size of the component");
+        assert.operator(testLabel.width(), "<=", measure.width + 2 * testLabel.padding(), "width at most incorporates full padding amount");
+        assert.operator(testLabel.height(), ">", measure.height, "padding increases size of the component");
+        assert.operator(testLabel.height(), ">=", measure.height + 2 * testLabel.padding(), "height at most incorporates full padding amount");
+        svg.remove();
+    });
+    it("negative padding throws an error", function () {
+        var testLabel = new Plottable.Component.Label("testing label");
+        assert.throws(function () { return testLabel.padding(-10); }, Error, "Cannot be less than 0");
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -1993,9 +2031,9 @@ describe("Plots", function () {
             it("sectors are filled in according to defaults", function () {
                 var arcPaths = renderArea.selectAll(".arc");
                 var arcPath0 = d3.select(arcPaths[0][0]);
-                assert.strictEqual(arcPath0.attr("fill"), Plottable.Core.Colors.PLOTTABLE_COLORS[0], "first sector filled appropriately");
+                assert.strictEqual(arcPath0.attr("fill"), "#5279c7", "first sector filled appropriately");
                 var arcPath1 = d3.select(arcPaths[0][1]);
-                assert.strictEqual(arcPath1.attr("fill"), Plottable.Core.Colors.PLOTTABLE_COLORS[1], "second sector filled appropriately");
+                assert.strictEqual(arcPath1.attr("fill"), "#fd373e", "second sector filled appropriately");
                 svg.remove();
             });
             it("project fill", function () {
@@ -2139,7 +2177,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("attributes can be changed by projecting attribute accessor (sets to first datum attribute)", function () {
-            var data = simpleDataset.data();
+            var data = JSON.parse(JSON.stringify(twoPointData)); // deep copy to not affect other tests
             data.forEach(function (d) {
                 d.stroke = "pink";
             });
@@ -2186,6 +2224,44 @@ describe("Plots", function () {
             dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
             simpleDataset.data(dataWithUndefined);
             assertCorrectPathSplitting("x=undefined");
+            svg.remove();
+        });
+        it("_getClosestWithinRange", function () {
+            var dataset2 = [
+                { foo: 0, bar: 1 },
+                { foo: 1, bar: 0.95 }
+            ];
+            linePlot.addDataset(dataset2);
+            var closestData = linePlot._getClosestWithinRange({ x: 500, y: 0 }, 5);
+            assert.strictEqual(closestData.closestValue, twoPointData[1], "got closest point from first dataset");
+            closestData = linePlot._getClosestWithinRange({ x: 500, y: 25 }, 5);
+            assert.strictEqual(closestData.closestValue, dataset2[1], "got closest point from second dataset");
+            closestData = linePlot._getClosestWithinRange({ x: 500, y: 10 }, 5);
+            assert.isUndefined(closestData.closestValue, "returns nothing if no points are within range");
+            closestData = linePlot._getClosestWithinRange({ x: 500, y: 10 }, 25);
+            assert.strictEqual(closestData.closestValue, twoPointData[1], "returns the closest point within range");
+            closestData = linePlot._getClosestWithinRange({ x: 500, y: 20 }, 25);
+            assert.strictEqual(closestData.closestValue, dataset2[1], "returns the closest point within range");
+            svg.remove();
+        });
+        it("_doHover()", function () {
+            var dataset2 = [
+                { foo: 0, bar: 1 },
+                { foo: 1, bar: 0.95 }
+            ];
+            linePlot.addDataset(dataset2);
+            var hoverData = linePlot._doHover({ x: 495, y: 0 });
+            var expectedDatum = twoPointData[1];
+            assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
+            var hoverTarget = hoverData.selection;
+            assert.strictEqual(parseFloat(hoverTarget.attr("cx")), xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
+            assert.strictEqual(parseFloat(hoverTarget.attr("cy")), yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
+            hoverData = linePlot._doHover({ x: 0, y: 0 });
+            expectedDatum = dataset2[0];
+            assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
+            hoverTarget = hoverData.selection;
+            assert.strictEqual(parseFloat(hoverTarget.attr("cx")), xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
+            assert.strictEqual(parseFloat(hoverTarget.attr("cy")), yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
             svg.remove();
         });
     });
@@ -2582,8 +2658,8 @@ describe("Plots", function () {
                 assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
                 assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
                 assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-                assert.equal(bar0.attr("y"), "250", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "50", "bar1 y is correct");
+                assert.equal(bar0.attr("y"), "50", "bar0 y is correct");
+                assert.equal(bar1.attr("y"), "250", "bar1 y is correct");
                 assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
                 assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
                 var baseline = renderArea.select(".baseline");
@@ -2618,8 +2694,8 @@ describe("Plots", function () {
                 var bar1 = d3.select(bars[0][1]);
                 assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
                 assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
-                assert.equal(numAttr(bar0, "y"), 250, "bar0 y is correct");
-                assert.equal(numAttr(bar1, "y"), 50, "bar1 y is correct");
+                assert.equal(numAttr(bar0, "y"), 50, "bar0 y is correct");
+                assert.equal(numAttr(bar1, "y"), 250, "bar1 y is correct");
                 barPlot.barAlignment("bottom");
                 renderArea = barPlot._renderArea;
                 bars = renderArea.selectAll("rect");
@@ -2627,8 +2703,8 @@ describe("Plots", function () {
                 bar1 = d3.select(bars[0][1]);
                 assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
                 assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
-                assert.equal(numAttr(bar0, "y"), 200, "bar0 y is correct");
-                assert.equal(numAttr(bar1, "y"), 0, "bar1 y is correct");
+                assert.equal(numAttr(bar0, "y"), 0, "bar0 y is correct");
+                assert.equal(numAttr(bar1, "y"), 200, "bar1 y is correct");
                 assert.throws(function () { return barPlot.barAlignment("blargh"); }, Error);
                 svg.remove();
             });
@@ -2789,22 +2865,22 @@ describe("Plots", function () {
             assert.equal(cellAU.attr("height"), "100", "cell 'AU' height is correct");
             assert.equal(cellAU.attr("width"), "200", "cell 'AU' width is correct");
             assert.equal(cellAU.attr("x"), "0", "cell 'AU' x coord is correct");
-            assert.equal(cellAU.attr("y"), "100", "cell 'AU' x coord is correct");
+            assert.equal(cellAU.attr("y"), "0", "cell 'AU' y coord is correct");
             assert.equal(cellAU.attr("fill"), "#000000", "cell 'AU' color is correct");
             assert.equal(cellBU.attr("height"), "100", "cell 'BU' height is correct");
             assert.equal(cellBU.attr("width"), "200", "cell 'BU' width is correct");
             assert.equal(cellBU.attr("x"), "200", "cell 'BU' x coord is correct");
-            assert.equal(cellBU.attr("y"), "100", "cell 'BU' x coord is correct");
+            assert.equal(cellBU.attr("y"), "0", "cell 'BU' y coord is correct");
             assert.equal(cellBU.attr("fill"), "#212121", "cell 'BU' color is correct");
             assert.equal(cellAV.attr("height"), "100", "cell 'AV' height is correct");
             assert.equal(cellAV.attr("width"), "200", "cell 'AV' width is correct");
             assert.equal(cellAV.attr("x"), "0", "cell 'AV' x coord is correct");
-            assert.equal(cellAV.attr("y"), "0", "cell 'AV' x coord is correct");
+            assert.equal(cellAV.attr("y"), "100", "cell 'AV' y coord is correct");
             assert.equal(cellAV.attr("fill"), "#ffffff", "cell 'AV' color is correct");
             assert.equal(cellBV.attr("height"), "100", "cell 'BV' height is correct");
             assert.equal(cellBV.attr("width"), "200", "cell 'BV' width is correct");
             assert.equal(cellBV.attr("x"), "200", "cell 'BV' x coord is correct");
-            assert.equal(cellBV.attr("y"), "0", "cell 'BV' x coord is correct");
+            assert.equal(cellBV.attr("y"), "100", "cell 'BV' y coord is correct");
             assert.equal(cellBV.attr("fill"), "#777777", "cell 'BV' color is correct");
         };
         it("renders correctly", function () {
@@ -5507,6 +5583,11 @@ describe("Scales", function () {
             assert.equal("#ff7f0e", scale.scale("no"));
             assert.equal("#2ca02c", scale.scale("maybe"));
         });
+        it("default colors are generated", function () {
+            var scale = new Plottable.Scale.Color();
+            var colorArray = ["#5279c7", "#fd373e", "#63c261", "#fad419", "#2c2b6f", "#ff7939", "#db2e65", "#99ce50", "#962565", "#06cccc"];
+            assert.deepEqual(scale.range(), colorArray);
+        });
     });
     describe("Interpolated Color Scales", function () {
         it("default scale uses reds and a linear scale type", function () {
@@ -6610,6 +6691,20 @@ describe("_Util.Methods", function () {
         range = Plottable._Util.Methods.range(0.6, 2.2, 0.5);
         assert.deepEqual(range, [0.6, 1.1, 1.6, 2.1], "all entries has been generated with float step");
     });
+    it("colorTest works as expected", function () {
+        var colorTester = d3.select("body").append("div").classed("color-tester", true);
+        var style = colorTester.append("style");
+        style.attr("type", "text/css");
+        style.text(".plottable-colors-0 { background-color: blue; }");
+        var blueHexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-0");
+        assert.strictEqual(blueHexcode, "#0000ff", "hexcode for blue returned");
+        style.text(".plottable-colors-2 { background-color: #13EADF; }");
+        var hexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-2");
+        assert.strictEqual(hexcode, "#13eadf", "hexcode for blue returned");
+        var nullHexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-11");
+        assert.strictEqual(nullHexcode, null, "null hexcode returned");
+        colorTester.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -6903,7 +6998,7 @@ describe("Interactions", function () {
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
             svg.remove();
         });
-        it("correctly triggers callbacks (hoizontal)", function () {
+        it("correctly triggers callbacks (horizontal)", function () {
             var svg = generateSVG(400, 400);
             var barPlot = new Plottable.Plot.HorizontalBar(linearScale, ordinalScale).addDataset(dataset);
             barPlot.project("y", "name", ordinalScale).project("x", "value", linearScale);
@@ -6919,10 +7014,10 @@ describe("Interactions", function () {
             barPlot.renderTo(svg);
             barPlot.registerInteraction(bhi);
             var hitbox = barPlot._element.select(".hit-box");
-            triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
+            triggerFakeMouseEvent("mousemove", hitbox, 200, 150);
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
             barDatum = null;
-            triggerFakeMouseEvent("mousemove", hitbox, 201, 250);
+            triggerFakeMouseEvent("mousemove", hitbox, 201, 150);
             assert.isNull(barDatum, "hover callback isn't called if the hovered bar didn't change");
             triggerFakeMouseEvent("mousemove", hitbox, 10, 10);
             assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing away from a bar");
@@ -6937,7 +7032,7 @@ describe("Interactions", function () {
             triggerFakeMouseEvent("mousemove", hitbox, 200, 100);
             assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing from one bar to another");
             bhi.hoverMode("line");
-            triggerFakeMouseEvent("mousemove", hitbox, 399, 250);
+            triggerFakeMouseEvent("mousemove", hitbox, 399, 150);
             assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
             svg.remove();
         });
