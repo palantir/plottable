@@ -348,5 +348,16 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("project works correctly", () => {
+      renderer.project("check", "type");
+      var areas = renderer._renderArea.selectAll(".area");
+      var area0 = d3.select(areas[0][0]);
+      assert.strictEqual(area0.attr("check"), "a", "projector has been applied to first area");
+
+      var area1 = d3.select(areas[0][1]);
+      assert.strictEqual(area1.attr("check"), "b", "projector has been applied to second area");
+      svg.remove();
+    });
+
   });
 });
