@@ -107,13 +107,13 @@ describe("Plots", () => {
         assert.equal(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
 
         bar = barPlot.getBars(-1, -1); // no bars here
-        assert.lengthOf(bar[0], 0, "returns null if no bar was selected");
+        assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
 
         bar = barPlot.getBars(200, 50); // between the two bars
-        assert.lengthOf(bar[0], 0, "returns null if no bar was selected");
+        assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
 
         bar = barPlot.getBars(155, 10); // above bar 0
-        assert.lengthOf(bar[0], 0, "returns null if no bar was selected");
+        assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
 
         // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
         // origin is at the top left!
@@ -161,12 +161,12 @@ describe("Plots", () => {
         brandNew.addDataset(dataset);
 
         assert.isNotNull(brandNew.deselectAll(), "deselects return self");
-        assert.isNull(brandNew.getBars(0, 0), "selects return empty");
+        assert.isTrue(brandNew.getBars(0, 0).empty(), "getBars returns empty selection");
 
         brandNew._anchor(d3.select(document.createElement("svg"))); // calls `_setup()`
 
         assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
-        assert.lengthOf(brandNew.getBars(0, 0)[0], 0, "selects return empty after setup");
+        assert.isTrue(brandNew.getBars(0, 0).empty(), "getBars returns empty selection after setup");
 
         svg.remove();
       });

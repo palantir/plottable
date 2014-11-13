@@ -7076,7 +7076,7 @@ var Plottable;
             };
             AbstractBarPlot.prototype.getBars = function (xValOrExtent, yValOrExtent) {
                 if (!this._isSetup) {
-                    return null;
+                    return d3.select(null);
                 }
                 var bars = [];
                 var xExtent = this.parseExtent(xValOrExtent);
