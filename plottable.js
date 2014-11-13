@@ -1139,6 +1139,33 @@ var Plottable;
                 return true;
             }
             DOM.boxesOverlap = boxesOverlap;
+            /**
+             * Makes a string safe to use as a CSS class name:
+             *   - Whitespace trimmed from string
+             *   - Spaces replaced by "-"
+             *   - If not at least 2 characters long, pads out the front with "_"
+             *   - If the name doesn't start with a letter or "_", prepends "_"
+             */
+            function sanitizeCssClass(name) {
+                if (name == null) {
+                    return "";
+                }
+                name = name.trim();
+                if (name === "") {
+                    return name;
+                }
+                name = name.replace(" ", "-");
+                while (name.length < 2) {
+                    name = "_" + name;
+                }
+                // CSS names must start with underscores or letters
+                var re = new RegExp("[_a-zA-Z]");
+                if (name.match(re) == null) {
+                    name = "_" + name;
+                }
+                return name;
+            }
+            DOM.sanitizeCssClass = sanitizeCssClass;
         })(_Util.DOM || (_Util.DOM = {}));
         var DOM = _Util.DOM;
     })(Plottable._Util || (Plottable._Util = {}));
@@ -5525,7 +5552,7 @@ var Plottable;
                 var legend = this._content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, function (d) { return d; });
                 var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 legendEnter.each(function (d) {
-                    d3.select(this).classed(d.replace(" ", "-"), true);
+                    d3.select(this).classed(Plottable._Util.DOM.sanitizeCssClass(d), true);
                 });
                 legendEnter.append("circle");
                 legendEnter.append("g").classed("text-container", true);
@@ -5726,7 +5753,7 @@ var Plottable;
                 var entries = rows.selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
                 var entriesEnter = entries.enter().append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
                 entries.each(function (d) {
-                    d3.select(this).classed(d.replace(" ", "-"), true);
+                    d3.select(this).classed(Plottable._Util.DOM.sanitizeCssClass(d), true);
                 });
                 entriesEnter.append("circle");
                 entriesEnter.append("g").classed("text-container", true);

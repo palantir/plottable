@@ -1236,6 +1236,17 @@ describe("Legends", function () {
         verifyCircleHeight();
         svg.remove();
     });
+    it("attaches CSS class to each row", function () {
+        var domain = ["foo", "1", "hello world"];
+        color.domain(domain);
+        legend.renderTo(svg);
+        var rows = legend._element.selectAll("." + Plottable.Component.Legend.SUBELEMENT_CLASS);
+        rows.each(function (d, i) {
+            var row = d3.select(this);
+            assert.isTrue(row.classed(Plottable._Util.DOM.sanitizeCssClass(domain[i])), "(sanitized) row name was applied as a CSS class to the row");
+        });
+        svg.remove();
+    });
     describe("Legend toggle tests", function () {
         var toggleLegend;
         beforeEach(function () {
@@ -1599,6 +1610,18 @@ describe("HorizontalLegend", function () {
         horizLegend._invalidateLayout();
         var smallCircleHeight = verifyCircleHeight();
         assert.operator(smallCircleHeight, "<", origCircleHeight, "icon size decreased with font size");
+        svg.remove();
+    });
+    it("attaches CSS class to each entry", function () {
+        var domain = ["foo", "1", "hello world"];
+        colorScale.domain(domain);
+        var svg = generateSVG(400, 100);
+        horizLegend.renderTo(svg);
+        var entries = horizLegend._element.selectAll(entrySelector);
+        entries.each(function (d, i) {
+            var entry = d3.select(this);
+            assert.isTrue(entry.classed(Plottable._Util.DOM.sanitizeCssClass(domain[i])), "(sanitized) entry name was applied as a CSS class to the entry");
+        });
         svg.remove();
     });
 });
@@ -5783,6 +5806,14 @@ describe("_Util.DOM", function () {
             parent.style("height", "auto");
             child.remove();
         });
+    });
+    it("sanitizeCssClass()", function () {
+        assert.strictEqual(Plottable._Util.DOM.sanitizeCssClass(null), "", "null inputs turn into empty strings");
+        assert.strictEqual(Plottable._Util.DOM.sanitizeCssClass("      "), "", "all-whitespace inputs turn into empty strings");
+        assert.strictEqual(Plottable._Util.DOM.sanitizeCssClass("a"), "_a", "short names are padded out with '_'");
+        assert.strictEqual(Plottable._Util.DOM.sanitizeCssClass("123"), "_123", "names starting with numbers get prefixed with '_'");
+        assert.strictEqual(Plottable._Util.DOM.sanitizeCssClass("hello world"), "hello-world", "spaces get replaced with '-'");
+        assert.strictEqual(Plottable._Util.DOM.sanitizeCssClass("Blargh"), "Blargh", "valid class name stay unchanged");
     });
 });
 

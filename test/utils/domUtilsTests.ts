@@ -93,4 +93,19 @@ describe("_Util.DOM", () => {
       child.remove();
     });
   });
+
+  it("sanitizeCssClass()", () => {
+    assert.strictEqual(Plottable._Util.DOM.sanitizeCssClass(null), "",
+      "null inputs turn into empty strings");
+    assert.strictEqual(Plottable._Util.DOM.sanitizeCssClass("      "), "",
+      "all-whitespace inputs turn into empty strings");
+    assert.strictEqual(Plottable._Util.DOM.sanitizeCssClass("a"), "_a",
+      "short names are padded out with '_'");
+    assert.strictEqual(Plottable._Util.DOM.sanitizeCssClass("123"), "_123",
+      "names starting with numbers get prefixed with '_'");
+    assert.strictEqual(Plottable._Util.DOM.sanitizeCssClass("hello world"), "hello-world",
+      "spaces get replaced with '-'");
+    assert.strictEqual(Plottable._Util.DOM.sanitizeCssClass("Blargh"), "Blargh",
+      "valid class name stay unchanged");
+  });
 });
