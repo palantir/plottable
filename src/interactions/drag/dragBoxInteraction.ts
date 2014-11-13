@@ -16,8 +16,8 @@ export module Interaction {
 
     private static CLASS_DRAG_BOX = "drag-box";
     public static RESIZE_PADDING = 10;
-    public static CAN_RESIZE_X = true;
-    public static CAN_RESIZE_Y  = true;
+    public static _CAN_RESIZE_X = true;
+    public static _CAN_RESIZE_Y  = true;
     /**
      * The DOM element of the box that is drawn. When no box is drawn, it is
      * null.
@@ -46,8 +46,8 @@ export module Interaction {
       if (enabled == null) {
         return this._resizeXEnabled || this._resizeYEnabled;
       } else {
-        this._resizeXEnabled = enabled && (<typeof DragBox> this.constructor).CAN_RESIZE_X;
-        this._resizeYEnabled = enabled && (<typeof DragBox> this.constructor).CAN_RESIZE_Y ;
+        this._resizeXEnabled = enabled && (<typeof DragBox> this.constructor)._CAN_RESIZE_X;
+        this._resizeYEnabled = enabled && (<typeof DragBox> this.constructor)._CAN_RESIZE_Y;
         return this;
       }
     }

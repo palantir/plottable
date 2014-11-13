@@ -3790,8 +3790,8 @@ declare module Plottable {
     module Interaction {
         class DragBox extends Drag {
             static RESIZE_PADDING: number;
-            static CAN_RESIZE_X: boolean;
-            static CAN_RESIZE_Y: boolean;
+            static _CAN_RESIZE_X: boolean;
+            static _CAN_RESIZE_Y: boolean;
             /**
              * The DOM element of the box that is drawn. When no box is drawn, it is
              * null.
@@ -3866,7 +3866,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XDragBox extends DragBox {
-            static CAN_RESIZE_Y: boolean;
+            static _CAN_RESIZE_Y: boolean;
             _setOrigin(x: number, y: number): void;
             _setLocation(x: number, y: number): void;
         }
@@ -3886,7 +3886,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class YDragBox extends DragBox {
-            static CAN_RESIZE_X: boolean;
+            static _CAN_RESIZE_X: boolean;
             _setOrigin(x: number, y: number): void;
             _setLocation(x: number, y: number): void;
         }
