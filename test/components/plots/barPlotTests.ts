@@ -132,30 +132,6 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("can select and deselect bars", () => {
-        barPlot.selectBar(155, 150);
-        assert.isTrue(barPlot.getBars(155, 150).classed("selected"), "the bar was classed \"selected\"");
-
-        barPlot.deselectAll();
-        assert.isFalse(barPlot.getBars(155, 150).classed("selected"), "the bar is no longer selected");
-
-        // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
-        // origin is at the top left!
-
-        barPlot.selectBar({min: 155, max: 455}, {min: 150, max: 150});
-        assert.isTrue(barPlot.getBars({min: 155, max: 455}, {min: 150, max: 150}).classed("selected"), "the bar was classed \"selected\"");
-
-        barPlot.selectBar({min: 155, max: 455}, {min: 150, max: 350});
-        assert.isTrue(barPlot.getBars({min: 155, max: 455}, {min: 150, max: 350}).classed("selected"), "the bar was classed \"selected\"");
-
-        // the runtime parameter validation should be strict, so no strings or
-        // mangled objects
-        assert.throws(() => barPlot.selectBar(<any> "blargh", <any> 150), Error);
-        assert.throws(() => barPlot.selectBar(<any> {min: 150}, <any> 150), Error);
-
-        svg.remove();
-      });
-
       it("shouldn't blow up if members called before the first render", () => {
         var brandNew = new Plottable.Plot.VerticalBar(xScale, yScale);
         brandNew.addDataset(dataset);

@@ -7097,11 +7097,6 @@ var Plottable;
                 });
                 return d3.selectAll(bars);
             };
-            AbstractBarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
-                if (select === void 0) { select = true; }
-                this.getBars(xValOrExtent, yValOrExtent).classed("selected", select);
-                return this;
-            };
             /**
              * Deselects all bars.
              * @returns {AbstractBarPlot} The calling AbstractBarPlot.

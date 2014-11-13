@@ -2977,21 +2977,6 @@ declare module Plottable {
             getBars(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
             getBars(xValOrExtent: number, yValOrExtent: number): D3.Selection;
             /**
-             * Selects the bar under the given pixel position (if [xValOrExtent]
-             * and [yValOrExtent] are {number}s), under a given line (if only one
-             * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
-             * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
-             *
-             * @param {any} xValOrExtent The pixel x position, or range of x values.
-             * @param {any} yValOrExtent The pixel y position, or range of y values.
-             * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
-             * @returns {D3.Selection} The selected bar, or null if no bar was selected.
-             */
-            selectBar(xValOrExtent: Extent, yValOrExtent: Extent, select?: boolean): AbstractBarPlot<X, Y>;
-            selectBar(xValOrExtent: number, yValOrExtent: Extent, select?: boolean): AbstractBarPlot<X, Y>;
-            selectBar(xValOrExtent: Extent, yValOrExtent: number, select?: boolean): AbstractBarPlot<X, Y>;
-            selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): AbstractBarPlot<X, Y>;
-            /**
              * Deselects all bars.
              * @returns {AbstractBarPlot} The calling AbstractBarPlot.
              */
