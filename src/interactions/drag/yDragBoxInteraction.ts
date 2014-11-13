@@ -3,7 +3,7 @@
 module Plottable {
 export module Interaction {
   export class YDragBox extends DragBox {
-    public static _canResizeX = false;
+    public static CAN_RESIZE_X = false;
     public _setOrigin(x: number, y: number) {
       super._setOrigin(0, y);
     }

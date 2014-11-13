@@ -12,16 +12,12 @@ export module Interaction {
     positive: boolean; // whether the resize is on the positive edge or the negative edge of the dragbox
   }
 
-  interface ResizeInfo {
-    xResizing: ResizeDimension; // null if x not resizing
-    yResizing: ResizeDimension; // null if y not resizing
-  }
   export class DragBox extends Drag {
 
     private static CLASS_DRAG_BOX = "drag-box";
     public static RESIZE_PADDING = 10;
-    public static _canResizeX = true;
-    public static _canResizeY = true;
+    public static CAN_RESIZE_X = true;
+    public static CAN_RESIZE_Y  = true;
     /**
      * The DOM element of the box that is drawn. When no box is drawn, it is
      * null.
@@ -30,7 +26,8 @@ export module Interaction {
     public _boxIsDrawn = false;
     public _resizeXEnabled = false;
     public _resizeYEnabled = false;
-    private resizing: ResizeInfo = {xResizing: null, yResizing: null};
+    private xResizing: ResizeDimension;
+    private yResizing: ResizeDimension;
     private cursorStyle = "";
 
     /**
@@ -49,8 +46,8 @@ export module Interaction {
       if (enabled == null) {
         return this._resizeXEnabled || this._resizeYEnabled;
       } else {
-        this._resizeXEnabled = enabled && (<typeof DragBox> this.constructor)._canResizeX;
-        this._resizeYEnabled = enabled && (<typeof DragBox> this.constructor)._canResizeY;
+        this._resizeXEnabled = enabled && (<typeof DragBox> this.constructor).CAN_RESIZE_X;
+        this._resizeYEnabled = enabled && (<typeof DragBox> this.constructor).CAN_RESIZE_Y ;
         return this;
       }
     }
@@ -61,7 +58,7 @@ export module Interaction {
      * @returns {boolean}
      */
     public isResizingX(): boolean {
-      return !!this.resizing.xResizing;
+      return !!this.xResizing;
     }
 
     /**
@@ -70,7 +67,7 @@ export module Interaction {
      * @returns {boolean}
      */
     public isResizingY(): boolean {
-      return !!this.resizing.yResizing;
+      return !!this.yResizing;
     }
 
     /**
@@ -94,10 +91,16 @@ export module Interaction {
     public _dragstart() {
       var mouse = d3.mouse(this._hitBox[0][0].parentNode);
 
-      if (this.boxIsDrawn() && (this.resizing = this.getResizeInfo(mouse[0], mouse[1])) && this.isResizing()) {
-        // we are resizing; don't clear the box, don't call the dragstart callback
-        return;
+      if (this.boxIsDrawn()) {
+        var resizeInfo = this.getResizeInfo(mouse[0], mouse[1]);
+        this.xResizing = resizeInfo.xResizing;
+        this.yResizing = resizeInfo.yResizing;
+        if (this.isResizing()) {
+          // we are resizing; don't clear the box, don't call the dragstart callback
+          return;
+        }
       }
+
       super._dragstart();
       this.clearBox();
     }
@@ -106,10 +109,10 @@ export module Interaction {
       var xResizing: ResizeDimension = null;
       var yResizing: ResizeDimension = null;
       var xStart = this._getOrigin()[0];
+
       var yStart = this._getOrigin()[1];
       var xEnd = this._getLocation()[0];
       var yEnd = this._getLocation()[1];
-      var padding = DragBox.RESIZE_PADDING;
 
       function inPaddedRange(position: number, start: number, end: number, padding: number) {
         return Math.min(start, end) - padding <= position && position <= Math.max(start, end) + padding;
@@ -131,11 +134,11 @@ export module Interaction {
         return null;
       }
 
-      if (this._resizeXEnabled && inPaddedRange(yPosition, yStart, yEnd, padding)) {
-        xResizing = getResizeDimension(xStart, xEnd, xPosition, padding);
+      if (this._resizeXEnabled && inPaddedRange(yPosition, yStart, yEnd, DragBox.RESIZE_PADDING)) {
+        xResizing = getResizeDimension(xStart, xEnd, xPosition, DragBox.RESIZE_PADDING);
       }
-      if (this._resizeYEnabled && inPaddedRange(xPosition, xStart, xEnd, padding)) {
-        yResizing = getResizeDimension(yStart, yEnd, yPosition, padding);
+      if (this._resizeYEnabled && inPaddedRange(xPosition, xStart, xEnd, DragBox.RESIZE_PADDING)) {
+        yResizing = getResizeDimension(yStart, yEnd, yPosition, DragBox.RESIZE_PADDING);
       }
       return {xResizing: xResizing, yResizing: yResizing};
     }
@@ -146,13 +149,13 @@ export module Interaction {
         // Eases the mouse into the center of the dragging line, in case dragging started with the mouse
         // away from the center due to `DragBox.RESIZE_PADDING`.
         if (this.isResizingX()) {
-          var diffX = this.resizing.xResizing.offset;
+          var diffX = this.xResizing.offset;
           var x = d3.event.x;
           if (diffX !== 0) {
             x += diffX;
-            this.resizing.xResizing.offset += diffX > 0 ? -1 : 1;
+            this.xResizing.offset += diffX > 0 ? -1 : 1;
           }
-          if (this.resizing.xResizing.origin) {
+          if (this.xResizing.origin) {
             this._setOrigin(this._constrainX(x), this._getOrigin()[1]);
           } else {
             this._setLocation(this._constrainX(x), this._getLocation()[1]);
@@ -160,13 +163,13 @@ export module Interaction {
         }
 
         if (this.isResizingY()) {
-          var diffY = this.resizing.yResizing.offset;
+          var diffY = this.yResizing.offset;
           var y = d3.event.y;
           if (diffY !== 0) {
             y += diffY;
-            this.resizing.yResizing.offset += diffY > 0 ? -1 : 1;
+            this.yResizing.offset += diffY > 0 ? -1 : 1;
           }
-          if (this.resizing.yResizing.origin) {
+          if (this.yResizing.origin) {
             this._setOrigin(this._getOrigin()[0], this._constrainY(y));
           } else {
             this._setLocation(this._getLocation()[0], this._constrainY(y));
@@ -180,7 +183,8 @@ export module Interaction {
     }
 
     public _dragend() {
-      this.resizing = {xResizing: null, yResizing: null};
+      this.xResizing = null;
+      this.yResizing = null;
       super._dragend();
     }
 
