@@ -7347,6 +7347,57 @@ var Plottable;
                     selection: bars
                 };
             };
+            //===== /Hover logic =====
+            //===== Click logic =====
+            AbstractBarPlot.prototype._clickComponent = function (p) {
+                var bars = this.getBar(p.x, p.y);
+                if (bars) {
+                    this._getDrawersInOrder().forEach(function (d, i) {
+                        d._renderArea.selectAll("rect").classed({ "clicked": false, "not-clicked": true });
+                    });
+                    bars.classed({ "clicked": true, "not-clicked": false });
+                }
+                else {
+                    this.clearHoverSelection();
+                }
+            };
+            AbstractBarPlot.prototype._getClickData = function (p) {
+                var _this = this;
+                var bars = this.getBar(p.x, p.y);
+                if (!bars) {
+                    return {
+                        data: null,
+                        pixelPositions: null,
+                        selection: null
+                    };
+                }
+                var points = [];
+                var projectors = this._generateAttrToProjector();
+                bars.each(function (d, i) {
+                    if (_this._isVertical) {
+                        points.push({
+                            x: projectors["x"](d, i) + projectors["width"](d, i) / 2,
+                            y: projectors["y"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["height"](d, i))
+                        });
+                    }
+                    else {
+                        points.push({
+                            x: projectors["x"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["width"](d, i)),
+                            y: projectors["y"](d, i) + projectors["height"](d, i) / 2
+                        });
+                    }
+                });
+                return {
+                    data: bars.data(),
+                    pixelPositions: points,
+                    selection: bars
+                };
+            };
+            AbstractBarPlot.prototype.clearClickSelection = function () {
+                this._getDrawersInOrder().forEach(function (d, i) {
+                    d._renderArea.selectAll("rect").classed("not-clicked clicked", false);
+                });
+            };
             AbstractBarPlot._BarAlignmentToFactor = {};
             AbstractBarPlot._DEFAULT_WIDTH = 10;
             return AbstractBarPlot;

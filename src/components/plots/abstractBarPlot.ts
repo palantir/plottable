@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
+  export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable, Interaction.Clickable {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public static _DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
@@ -495,6 +495,60 @@ export module Plot {
       };
     }
     //===== /Hover logic =====
+
+    //===== Click logic =====
+    public _clickComponent(p: Point) {
+      var bars = this.getBar(p.x, p.y);
+      if (bars) {
+        this._getDrawersInOrder().forEach((d, i) => {
+          d._renderArea.selectAll("rect").classed({ "clicked": false, "not-clicked": true });
+        });
+        bars.classed({ "clicked": true, "not-clicked": false });
+      } else {
+        this.clearHoverSelection();
+      }
+    }
+
+    public _getClickData(p: Point): Interaction.ClickData {
+      var bars = this.getBar(p.x, p.y);
+
+      if (!bars) {
+        return {
+          data: null,
+          pixelPositions: null,
+          selection: null
+        };
+      }
+
+      var points: Point[] = [];
+      var projectors = this._generateAttrToProjector();
+      bars.each((d, i) => {
+        if (this._isVertical) {
+          points.push({
+            x: projectors["x"](d, i) + projectors["width"](d, i)/2,
+            y: projectors["y"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["height"](d, i))
+          });
+        } else {
+          points.push({
+            x: projectors["x"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["width"](d, i)),
+            y: projectors["y"](d, i) + projectors["height"](d, i)/2
+          });
+        }
+      });
+
+      return {
+        data: bars.data(),
+        pixelPositions: points,
+        selection: bars
+      };
+    }
+
+    private clearClickSelection() {
+      this._getDrawersInOrder().forEach((d, i) => {
+        d._renderArea.selectAll("rect").classed("not-clicked clicked", false);
+      });
+    }
+    //===== /Click logic =====
   }
 }
 }

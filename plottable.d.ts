@@ -2891,7 +2891,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class AbstractBarPlot<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
+        class AbstractBarPlot<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable, Interaction.Clickable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
@@ -3027,6 +3027,8 @@ declare module Plottable {
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
+            _clickComponent(p: Point): void;
+            _getClickData(p: Point): Interaction.ClickData;
         }
     }
 }
