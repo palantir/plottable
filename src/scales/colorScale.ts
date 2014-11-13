@@ -70,7 +70,7 @@ export module Scale {
       return plottableDefaultColors;
     }
 
-    // Modifying the original scale method so that colors that are looped are darkened according
+    // Modifying the original scale method so that colors that are looped are lightened according
     // to how many times they are looped.
     public scale(value: string): string {
       var color = super.scale(value);

@@ -2950,7 +2950,7 @@ var Plottable;
                 colorTester.remove();
                 return plottableDefaultColors;
             };
-            // Modifying the original scale method so that colors that are looped are darkened according
+            // Modifying the original scale method so that colors that are looped are lightened according
             // to how many times they are looped.
             Color.prototype.scale = function (value) {
                 var color = _super.prototype.scale.call(this, value);
