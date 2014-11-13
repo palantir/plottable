@@ -4696,7 +4696,7 @@ var Plottable;
             }
             Time.prototype.axisConfigurations = function (configurations) {
                 if (configurations == null) {
-                    return this.possibleTimeAxisConfigurations.slice();
+                    return this.possibleTimeAxisConfigurations;
                 }
                 this.possibleTimeAxisConfigurations = configurations;
                 this._invalidateLayout();

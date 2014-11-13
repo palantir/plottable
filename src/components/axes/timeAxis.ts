@@ -185,7 +185,7 @@ export module Axis {
     public axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
     public axisConfigurations(configurations?: any): any {
       if(configurations == null){
-        return this.possibleTimeAxisConfigurations.slice();
+        return this.possibleTimeAxisConfigurations;
       }
       this.possibleTimeAxisConfigurations = configurations;
       this._invalidateLayout();
