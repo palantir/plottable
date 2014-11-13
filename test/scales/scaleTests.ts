@@ -298,6 +298,13 @@ describe("Scales", () => {
                         "#db2e65", "#99ce50", "#962565", "#06cccc"];
       assert.deepEqual(scale.range(), colorArray);
     });
+
+    it("colors outside the range length are not exactly the looped version", () => {
+      var scale = new Plottable.Scale.Color();
+      scale.range(["#5279c7", "#fd373e"]);
+      scale.domain(["a", "b", "c"]);
+      assert.notEqual(scale.scale("c"), "#5279c7");
+    });
   });
 
   describe("Interpolated Color Scales", () => {
