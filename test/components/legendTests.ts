@@ -185,7 +185,7 @@ describe("Legends", () => {
       var row = d3.select(this);
       assert.isTrue(row.classed(Plottable._Util.DOM.sanitizeCssClass(domain[i])),
         "(sanitized) row name was applied as a CSS class to the row");
-    })
+    });
     svg.remove();
   });
 
@@ -652,7 +652,7 @@ describe("HorizontalLegend", () => {
       var entry = d3.select(this);
       assert.isTrue(entry.classed(Plottable._Util.DOM.sanitizeCssClass(domain[i])),
         "(sanitized) entry name was applied as a CSS class to the entry");
-    })
+    });
     svg.remove();
   });
 });
