@@ -212,8 +212,8 @@ export module Component {
       var legendEnter = legend.enter()
           .append("g").classed(Legend.SUBELEMENT_CLASS, true);
 
-      legendEnter.each(function(d: String) {
-        d3.select(this).classed(d.replace(" ", "-"), true);
+      legendEnter.each(function(d: string) {
+        d3.select(this).classed(Plottable._Util.DOM.sanitizeCssClass(d), true);
       });
 
       legendEnter.append("circle");

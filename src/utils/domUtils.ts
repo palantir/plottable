@@ -107,6 +107,38 @@ export module _Util {
       if (boxA.top > boxB.bottom) { return false; }
       return true;
     }
+
+    /**
+     * Makes a string safe to use as a CSS class name:
+     *   - Whitespace trimmed from string
+     *   - Spaces replaced by "-"
+     *   - If not at least 2 characters long, pads out the front with "_"
+     *   - If the name doesn't start with a letter or "_", prepends "_"
+     */
+    export function sanitizeCssClass(name: string): string {
+      if (name == null) {
+        return "";
+      }
+      name = name.trim();
+      if (name === "") {
+        return name;
+      }
+
+      name = name.replace(" ", "-");
+
+      // CSS names must be at least 2 long
+      while (name.length < 2) {
+        name = "_" + name;
+      }
+
+      // CSS names must start with underscores or letters
+      var re = new RegExp("[_a-zA-Z]");
+      if (name.match(re) == null) {
+        name = "_" + name;
+      }
+
+      return name;
+    }
   }
 }
 }

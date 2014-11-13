@@ -423,6 +423,14 @@ declare module Plottable {
             function getSVGPixelWidth(svg: D3.Selection): number;
             function translate(s: D3.Selection, x?: number, y?: number): any;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
+            /**
+             * Makes a string safe to use as a CSS class name:
+             *   - Whitespace trimmed from string
+             *   - Spaces replaced by "-"
+             *   - If not at least 2 characters long, pads out the front with "_"
+             *   - If the name doesn't start with a letter or "_", prepends "_"
+             */
+            function sanitizeCssClass(name: string): string;
         }
     }
 }

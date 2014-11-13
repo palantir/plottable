@@ -175,6 +175,20 @@ describe("Legends", () => {
     svg.remove();
   });
 
+  it("attaches CSS class to each row", () => {
+    var domain = ["foo", "1", "hello world"];
+    color.domain(domain);
+    legend.renderTo(svg);
+
+    var rows = legend._element.selectAll("." + Plottable.Component.Legend.SUBELEMENT_CLASS);
+    rows.each(function(d: any, i: number) {
+      var row = d3.select(this);
+      assert.isTrue(row.classed(Plottable._Util.DOM.sanitizeCssClass(domain[i])),
+        "(sanitized) row name was applied as a CSS class to the row");
+    });
+    svg.remove();
+  });
+
   describe("Legend toggle tests", () => {
     var toggleLegend: Plottable.Component.Legend;
 
@@ -624,6 +638,21 @@ describe("HorizontalLegend", () => {
     var smallCircleHeight = verifyCircleHeight();
     assert.operator(smallCircleHeight, "<", origCircleHeight, "icon size decreased with font size");
 
+    svg.remove();
+  });
+
+  it("attaches CSS class to each entry", () => {
+    var domain = ["foo", "1", "hello world"];
+    colorScale.domain(domain);
+    var svg = generateSVG(400, 100);
+    horizLegend.renderTo(svg);
+
+    var entries = horizLegend._element.selectAll(entrySelector);
+    entries.each(function(d: any, i: number) {
+      var entry = d3.select(this);
+      assert.isTrue(entry.classed(Plottable._Util.DOM.sanitizeCssClass(domain[i])),
+        "(sanitized) entry name was applied as a CSS class to the entry");
+    });
     svg.remove();
   });
 });
