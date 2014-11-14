@@ -262,5 +262,10 @@
   {
     "name":"tick_generator",
     "categories":["Linear Scale", "Tick Generation", "Line Plot"]
+  },
+
+  {
+    "name":"metdata",
+    "categories":["Color Scale", "User metadata", "Line Plot", "Plot metadata"]
   }
 ]
