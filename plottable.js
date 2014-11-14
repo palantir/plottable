@@ -6611,8 +6611,6 @@ var Plottable;
                     throw new Error("XYPlots require an xScale and yScale");
                 }
                 this.classed("xy-plot", true);
-                //      this.project("x", "x", xScale); // default accessor
-                //      this.project("y", "y", yScale); // default accessor
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._updateXDomainer();
