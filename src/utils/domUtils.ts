@@ -40,7 +40,7 @@ export module _Util {
 
     export function isSelectionRemovedFromSVG(selection: D3.Selection) {
       var n = (<Node> selection.node());
-      while (n !== null && n.nodeName !== "svg") {
+      while (n !== null && isSvg(selection)) {
         n = n.parentNode;
       }
       return (n == null);
@@ -106,6 +106,11 @@ export module _Util {
       if (boxA.bottom < boxB.top) { return false; }
       if (boxA.top > boxB.bottom) { return false; }
       return true;
+    }
+
+    export function isSvg(selection: D3.Selection) {
+      var n = (<Node> selection.node());
+      return n.nodeName.toLowerCase() === "svg" ? true : false;
     }
   }
 }

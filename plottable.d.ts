@@ -423,6 +423,7 @@ declare module Plottable {
             function getSVGPixelWidth(svg: D3.Selection): number;
             function translate(s: D3.Selection, x?: number, y?: number): any;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
+            function isSvg(selection: D3.Selection): boolean;
         }
     }
 }
@@ -3866,3 +3867,11 @@ declare module Plottable {
         }
     }
 }
+
+
+
+declare var module: any;
+declare var define: any;
+declare var window: Window;
+declare var document: Document;
+declare var navigator: Navigator;
