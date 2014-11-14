@@ -162,7 +162,7 @@ export module Plot {
     public getBars(xValOrExtent: number, yValOrExtent: number): D3.Selection;
     public getBars(xValOrExtent: any, yValOrExtent: any): D3.Selection {
       if (!this._isSetup) {
-        return d3.select(null);
+        return d3.select();
       }
 
       var bars: any[] = [];
