@@ -1,5 +1,5 @@
 /*!
-Plottable 0.36.0 (https://github.com/palantir/plottable)
+Plottable 0.36.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1390,7 +1390,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.36.0";
+    Plottable.version = "0.36.1";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8021,13 +8021,20 @@ var Plottable;
             StackedArea.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var wholeDatumAttributes = this._wholeDatumAttributes();
+                var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
+                var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
+                singleDatumAttributes.forEach(function (attribute) {
+                    var projector = attrToProjector[attribute];
+                    attrToProjector[attribute] = function (data, i, u, m) { return data.length > 0 ? projector(data[0], i, u, m) : null; };
+                });
                 var yAccessor = this._projections["y"].accessor;
                 attrToProjector["y"] = function (d) { return _this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 attrToProjector["y0"] = function (d) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                // Align fill with first index
-                var fillProjector = attrToProjector["fill"];
-                attrToProjector["fill"] = function (d, i, u, m) { return (d && d[0]) ? fillProjector(d[0], i, u, m) : null; };
                 return attrToProjector;
+            };
+            StackedArea.prototype._wholeDatumAttributes = function () {
+                return ["x", "y", "defined"];
             };
             return StackedArea;
         })(Plot.AbstractStacked);
@@ -8797,116 +8804,6 @@ var Plottable;
             return PanZoom;
         })(Interaction.AbstractInteraction);
         Interaction.PanZoom = PanZoom;
-    })(Plottable.Interaction || (Plottable.Interaction = {}));
-    var Interaction = Plottable.Interaction;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Interaction) {
-        var BarHover = (function (_super) {
-            __extends(BarHover, _super);
-            function BarHover() {
-                _super.apply(this, arguments);
-                this.currentBar = null;
-                this._hoverMode = "point";
-            }
-            BarHover.prototype._anchor = function (barPlot, hitBox) {
-                var _this = this;
-                _super.prototype._anchor.call(this, barPlot, hitBox);
-                Plottable._Util.Methods.warn("Interaction.BarHover is deprecated; please use Interaction.Hover instead");
-                this.plotIsVertical = this._componentToListenTo._isVertical;
-                this.dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
-                this.dispatcher.mousemove(function (p) {
-                    var selectedBar = _this.getHoveredBar(p);
-                    if (selectedBar == null) {
-                        _this._hoverOut();
-                    }
-                    else {
-                        if (_this.currentBar != null) {
-                            if (_this.currentBar.node() === selectedBar.node()) {
-                                return; // no message if bar is the same
-                            }
-                            else {
-                                _this._hoverOut();
-                            }
-                        }
-                        _this.getBars().classed("not-hovered", true).classed("hovered", false);
-                        selectedBar.classed("not-hovered", false).classed("hovered", true);
-                        if (_this.hoverCallback != null) {
-                            _this.hoverCallback(selectedBar.data()[0], selectedBar);
-                        }
-                    }
-                    _this.currentBar = selectedBar;
-                });
-                this.dispatcher.mouseout(function (p) { return _this._hoverOut(); });
-                this.dispatcher.connect();
-            };
-            BarHover.prototype.getBars = function () {
-                return this._componentToListenTo._renderArea.selectAll("rect");
-            };
-            BarHover.prototype._hoverOut = function () {
-                this.getBars().classed("not-hovered hovered", false);
-                if (this.unhoverCallback != null && this.currentBar != null) {
-                    this.unhoverCallback(this.currentBar.data()[0], this.currentBar); // last known information
-                }
-                this.currentBar = null;
-            };
-            BarHover.prototype.getHoveredBar = function (p) {
-                if (this._hoverMode === "point") {
-                    return this._componentToListenTo.selectBar(p.x, p.y, false);
-                }
-                var maxExtent = { min: -Infinity, max: Infinity };
-                if (this.plotIsVertical) {
-                    return this._componentToListenTo.selectBar(p.x, maxExtent, false);
-                }
-                else {
-                    return this._componentToListenTo.selectBar(maxExtent, p.y, false);
-                }
-            };
-            BarHover.prototype.hoverMode = function (mode) {
-                if (mode == null) {
-                    return this._hoverMode;
-                }
-                var modeLC = mode.toLowerCase();
-                if (modeLC !== "point" && modeLC !== "line") {
-                    throw new Error(mode + " is not a valid hover mode for Interaction.BarHover");
-                }
-                this._hoverMode = modeLC;
-                return this;
-            };
-            /**
-             * Attaches an callback to be called when the user mouses over a bar.
-             *
-             * @param {(datum: any, bar: D3.Selection) => any} callback The callback to be called.
-             *      The callback will be passed the data from the hovered-over bar.
-             * @return {BarHover} The calling BarHover.
-             */
-            BarHover.prototype.onHover = function (callback) {
-                this.hoverCallback = callback;
-                return this;
-            };
-            /**
-             * Attaches a callback to be called when the user mouses off of a bar.
-             *
-             * @param {(datum: any, bar: D3.Selection) => any} callback The callback to be called.
-             *      The callback will be passed the data from the last-hovered bar.
-             * @return {BarHover} The calling BarHover.
-             */
-            BarHover.prototype.onUnhover = function (callback) {
-                this.unhoverCallback = callback;
-                return this;
-            };
-            return BarHover;
-        })(Interaction.AbstractInteraction);
-        Interaction.BarHover = BarHover;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
