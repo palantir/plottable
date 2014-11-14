@@ -10,17 +10,21 @@ declare module D3 {
         */
         select: {
             /**
+            * Returns the empty selection
+            */
+            (): Selection;
+            /**
             * Selects the first element that matches the specified selector string
             *
             * @param selector Selection String to match
             */
-            (selector?: string): Selection;
+            (selector: string): Selection;
             /**
             * Selects the specified node
             *
             * @param element Node element to select
             */
-            (element?: EventTarget): Selection;
+            (element: EventTarget): Selection;
         };
 
         /**
