@@ -10,6 +10,7 @@ module.exports = function(grunt) {
       outDir: "build/src/",
       options: {
         target: 'es5',
+        module: 'commonjs',
         noImplicitAny: true,
         sourceMap: false,
         declaration: true,
