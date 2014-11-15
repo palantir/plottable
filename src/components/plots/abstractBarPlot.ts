@@ -438,7 +438,7 @@ export module Plot {
       }
       var bars = this.getBars(xPositionOrExtent, yPositionOrExtent);
 
-      if (bars.empty()) {
+      if (!bars.empty()) {
         this._getDrawersInOrder().forEach((d, i) => {
           d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
         });

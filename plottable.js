@@ -7306,7 +7306,7 @@ var Plottable;
                     }
                 }
                 var bars = this.getBars(xPositionOrExtent, yPositionOrExtent);
-                if (bars.empty()) {
+                if (!bars.empty()) {
                     this._getDrawersInOrder().forEach(function (d, i) {
                         d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
                     });
