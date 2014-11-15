@@ -6792,10 +6792,7 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.closeDetectionRadius = 5;
                 this.classed("scatter-plot", true);
-                this.project("r", 3); // default
-                this.project("opacity", 0.6); // default
-                var defaultColor = new Plottable.Scale.Color().range()[0];
-                this.project("fill", function () { return defaultColor; }); // default
+                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
                 this._animators["circles-reset"] = new Plottable.Animator.Null();
                 this._animators["circles"] = new Plottable.Animator.Base().duration(250).delay(5);
             }
@@ -6814,11 +6811,21 @@ var Plottable;
                 return new Plottable._Drawer.Element(key).svgElement("circle");
             };
             Scatter.prototype._generateAttrToProjector = function () {
+                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 attrToProjector["cx"] = attrToProjector["x"];
                 delete attrToProjector["x"];
                 attrToProjector["cy"] = attrToProjector["y"];
                 delete attrToProjector["y"];
+                if (attrToProjector["r"] == null) {
+                    attrToProjector["r"] = function () { return 3; };
+                }
+                if (attrToProjector["opacity"] == null) {
+                    attrToProjector["opacity"] = function () { return 0.6; };
+                }
+                if (attrToProjector["fill"] == null) {
+                    attrToProjector["fill"] = function () { return _this.defaultFillColor; };
+                }
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {
@@ -7001,8 +7008,7 @@ var Plottable;
                 this._hoverMode = "point";
                 this.hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
-                var defaultColor = new Plottable.Scale.Color().range()[0];
-                this.project("fill", function () { return defaultColor; });
+                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
                 this._animators["bars-reset"] = new Plottable.Animator.Null();
                 this._animators["bars"] = new Plottable.Animator.Base();
                 this._animators["baseline"] = new Plottable.Animator.Null();
@@ -7228,6 +7234,9 @@ var Plottable;
                         return _this._barLabelFormatter(primaryAccessor(d, i));
                     };
                     attrToProjector["positive"] = function (d, i) { return originalPositionFn(d, i) <= scaledBaseline; };
+                }
+                if (attrToProjector["fill"] == null) {
+                    attrToProjector["fill"] = function () { return _this.defaultFillColor; };
                 }
                 return attrToProjector;
             };
@@ -7477,8 +7486,6 @@ var Plottable;
                 this.hoverDetectionRadius = 15;
                 this.classed("line-plot", true);
                 var defaultColor = new Plottable.Scale.Color().range()[0];
-                this.project("stroke", function () { return defaultColor; }); // default
-                this.project("stroke-width", function () { return "2px"; }); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
             }
@@ -7527,6 +7534,12 @@ var Plottable;
                 var xFunction = attrToProjector["x"];
                 var yFunction = attrToProjector["y"];
                 attrToProjector["defined"] = function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); };
+                if (attrToProjector["stroke"] == null) {
+                    attrToProjector["stroke"] = function () { return _this.defaultStrokeColor; };
+                }
+                if (attrToProjector["stroke-width"] == null) {
+                    attrToProjector["stroke-width"] = function () { return "2px"; };
+                }
                 return attrToProjector;
             };
             Line.prototype._wholeDatumAttributes = function () {
@@ -7623,12 +7636,9 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.classed("area-plot", true);
                 this.project("y0", 0, yScale); // default
-                this.project("fill-opacity", function () { return 0.25; }); // default
-                var defaultColor = new Plottable.Scale.Color().range()[0];
-                this.project("fill", function () { return defaultColor; }); // default
-                this.project("stroke", function () { return defaultColor; }); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
+                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
             }
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
@@ -7678,6 +7688,20 @@ var Plottable;
                 var wholeDatumAttributes = _super.prototype._wholeDatumAttributes.call(this);
                 wholeDatumAttributes.push("y0");
                 return wholeDatumAttributes;
+            };
+            Area.prototype._generateAttrToProjector = function () {
+                var _this = this;
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                if (attrToProjector["fill-opacity"] == null) {
+                    attrToProjector["fill-opacity"] = function () { return 0.25; };
+                }
+                if (attrToProjector["fill"] == null) {
+                    attrToProjector["fill"] = function () { return _this.defaultFillColor; };
+                }
+                if (attrToProjector["stroke"] == null) {
+                    attrToProjector["stroke"] = function () { return _this.defaultFillColor; };
+                }
+                return attrToProjector;
             };
             return Area;
         })(Plot.Line);
@@ -7947,9 +7971,8 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
                 this.classed("area-plot", true);
-                var defaultColor = new Plottable.Scale.Color().range()[0];
-                this.project("fill", function () { return defaultColor; });
                 this._isVertical = true;
+                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
             }
             StackedArea.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Area(key).drawLine(false);
@@ -8003,6 +8026,9 @@ var Plottable;
                 var yAccessor = this._projectors["y"].accessor;
                 attrToProjector["y"] = function (d) { return _this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 attrToProjector["y0"] = function (d) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                if (attrToProjector["fill"] == null) {
+                    attrToProjector["fill"] = function () { return _this.defaultFillColor; };
+                }
                 return attrToProjector;
             };
             StackedArea.prototype._wholeDatumAttributes = function () {
@@ -8042,8 +8068,6 @@ var Plottable;
                 this._baselineValue = 0;
                 _super.call(this, xScale, yScale);
                 this.classed("bar-plot", true);
-                var defaultColor = new Plottable.Scale.Color().range()[0];
-                this.project("fill", function () { return defaultColor; });
                 this.baseline(this._baselineValue);
                 this._isVertical = isVertical;
             }

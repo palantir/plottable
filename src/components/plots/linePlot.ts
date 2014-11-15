@@ -5,6 +5,7 @@ export module Plot {
   export class Line<X> extends AbstractXYPlot<X,number> implements Interaction.Hoverable {
     private hoverDetectionRadius = 15;
     private hoverTarget: D3.Selection;
+    private defaultStrokeColor: string;
 
     public _yScale: Scale.AbstractQuantitative<number>;
 
@@ -20,9 +21,6 @@ export module Plot {
       this.classed("line-plot", true);
 
       var defaultColor = new Scale.Color().range()[0];
-      this.project("stroke", () => defaultColor); // default
-
-      this.project("stroke-width", () => "2px"); // default
       this._animators["reset"] = new Animator.Null();
       this._animators["main"] = new Animator.Base()
                                             .duration(600)
@@ -83,6 +81,8 @@ export module Plot {
       var xFunction       = attrToProjector["x"];
       var yFunction       = attrToProjector["y"];
       attrToProjector["defined"] = (d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction);
+      if (attrToProjector["stroke"] == null) { attrToProjector["stroke"] = () => this.defaultStrokeColor; }
+      if (attrToProjector["stroke-width"] == null) { attrToProjector["stroke-width"] = () => "2px"; }
       return attrToProjector;
     }
 

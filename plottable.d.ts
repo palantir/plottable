@@ -3128,6 +3128,7 @@ declare module Plottable {
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Area<X>;
             _getResetYFunction(): AppliedAccessor;
             _wholeDatumAttributes(): string[];
+            _generateAttrToProjector(): AttributeToProjector;
         }
     }
 }
