@@ -6682,9 +6682,6 @@ var Plottable;
                 return this;
             };
             AbstractXYPlot.prototype._generateAttrToProjector = function () {
-                if (!this.projectorsReady()) {
-                    alert("hi");
-                }
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var positionXFn = attrToProjector["x"];
                 var positionYFn = attrToProjector["y"];

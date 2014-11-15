@@ -104,7 +104,6 @@ export module Plot {
     }
 
     public _generateAttrToProjector(): AttributeToProjector {
-      if (!this.projectorsReady()) { alert("hi"); }
       var attrToProjector: AttributeToProjector = super._generateAttrToProjector();
       var positionXFn = attrToProjector["x"];
       var positionYFn = attrToProjector["y"];
