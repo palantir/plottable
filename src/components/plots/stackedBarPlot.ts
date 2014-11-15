@@ -49,16 +49,20 @@ export module Plot {
       var primaryAttr = this._isVertical ? "y" : "x";
       var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var primaryAccessor = this._projections[primaryAttr].accessor;
-      var getStart = (d: any) => primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      var getEnd = (d: any) => primaryScale.scale(+primaryAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var getStart = (d: any, i: number, u: any, m: PlotMetadata) =>
+        primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var getEnd = (d: any, i: number, u: any, m: PlotMetadata) =>
+        primaryScale.scale(+primaryAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
-      var heightF = (d: any) => Math.abs(getEnd(d) - getStart(d));
+      var heightF = (d: any, i: number, u: any, m: PlotMetadata) => Math.abs(getEnd(d, i, u, m) - getStart(d, i, u, m));
       var widthF = attrToProjector["width"];
       attrToProjector["height"] = this._isVertical ? heightF : widthF;
       attrToProjector["width"] = this._isVertical ? widthF : heightF;
 
-      var attrFunction = (d: any) => +primaryAccessor(d) < 0 ? getStart(d) : getEnd(d);
-      attrToProjector[primaryAttr] = (d: any) => this._isVertical ? attrFunction(d) : attrFunction(d) - heightF(d);
+      var attrFunction = (d: any, i: number, u: any, m: PlotMetadata) =>
+        +primaryAccessor(d, i, u, m) < 0 ? getStart(d, i, u, m) : getEnd(d, i, u, m);
+      attrToProjector[primaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
+        this._isVertical ? attrFunction(d, i, u, m) : attrFunction(d, i, u, m) - heightF(d, i, u, m);
       return attrToProjector;
     }
 

@@ -51,15 +51,19 @@ export module Plot {
     public _updateStackExtents() {
       var datasets = this.datasets();
       var valueAccessor = this._valueAccessor();
-      var maxStackExtent = _Util.Methods.max<Dataset, number>(datasets, (dataset: Dataset) => {
-        return _Util.Methods.max<any, number>(dataset.data(), (datum: any) => {
-          return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+      var maxStackExtent = _Util.Methods.max<string, number>(this._datasetKeysInOrder, (k: string) => {
+        var dataset = this._key2PlotDatasetKey.get(k).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+        return _Util.Methods.max<any, number>(dataset.data(), (datum: any, i: number) => {
+          return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
         }, 0);
       }, 0);
 
-      var minStackExtent = _Util.Methods.min<Dataset, number>(datasets, (dataset: Dataset) => {
-        return _Util.Methods.min<any, number>(dataset.data(), (datum: any) => {
-          return +valueAccessor(datum) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+      var minStackExtent = _Util.Methods.min<string, number>(this._datasetKeysInOrder, (k: string) => {
+        var dataset = this._key2PlotDatasetKey.get(k).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+        return _Util.Methods.min<any, number>(dataset.data(), (datum: any, i: number) => {
+          return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
         }, 0);
       }, 0);
 
@@ -92,16 +96,18 @@ export module Plot {
       var keyAccessor = this._keyAccessor();
       var valueAccessor = this._valueAccessor();
 
-      this.datasets().forEach((dataset, datasetIndex) => {
-        var positiveDataMap = positiveDataMapArray[datasetIndex];
-        var negativeDataMap = negativeDataMapArray[datasetIndex];
-        var isAllNegativeValues = dataset.data().every((datum) => valueAccessor(datum) <= 0);
+      this._datasetKeysInOrder.forEach((k, index) => {
+        var dataset = this._key2PlotDatasetKey.get(k).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+        var positiveDataMap = positiveDataMapArray[index];
+        var negativeDataMap = negativeDataMapArray[index];
+        var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset.metadata(), plotMetadata) <= 0);
 
         dataset.data().forEach((datum: any, datumIndex: number) => {
-          var positiveOffset = positiveDataMap.get(keyAccessor(datum)).offset;
-          var negativeOffset = negativeDataMap.get(keyAccessor(datum)).offset;
+          var positiveOffset = positiveDataMap.get(keyAccessor(datum, datumIndex, dataset.metadata(), plotMetadata)).offset;
+          var negativeOffset = negativeDataMap.get(keyAccessor(datum, datumIndex, dataset.metadata(), plotMetadata)).offset;
 
-          var value = valueAccessor(datum);
+          var value = valueAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
           if (value === 0) {
             datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = isAllNegativeValues ? negativeOffset : positiveOffset;
           } else {
@@ -116,9 +122,11 @@ export module Plot {
       var domainKeys = d3.set();
       var datasets = this.datasets();
 
-      datasets.forEach((dataset) => {
-        dataset.data().forEach((datum) => {
-          domainKeys.add(keyAccessor(datum));
+      this._datasetKeysInOrder.forEach((k) => {
+        var dataset = this._key2PlotDatasetKey.get(k).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+        dataset.data().forEach((datum, index) => {
+          domainKeys.add(keyAccessor(datum, index, dataset.metadata(), plotMetadata));
         });
       });
 
@@ -137,10 +145,12 @@ export module Plot {
         });
       });
 
-      datasets.forEach((dataset, datasetIndex) => {
-        dataset.data().forEach((datum) => {
-          var key = keyAccessor(datum);
-          var value = valueAccessor(datum);
+      this._datasetKeysInOrder.forEach((k, datasetIndex) => {
+        var dataset = this._key2PlotDatasetKey.get(k).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+        dataset.data().forEach((datum, index) => {
+          var key = keyAccessor(datum, index, dataset.metadata(), plotMetadata);
+          var value = valueAccessor(datum, index, dataset.metadata(), plotMetadata);
           dataMapArray[datasetIndex].set(key, {key: key, value: value});
         });
       });

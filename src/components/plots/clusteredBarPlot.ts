@@ -41,10 +41,11 @@ export module Plot {
       var innerScale = this.makeInnerScale();
       var clusters: D3.Map<any[]> = d3.map();
       this._datasetKeysInOrder.forEach((key: string) => {
-        var data = this._key2PlotDatasetKey.get(key).dataset.data();
+        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
 
-        clusters.set(key, data.map((d, i) => {
-          var val = accessor(d, i);
+        clusters.set(key, dataset.data().map((d, i) => {
+          var val = accessor(d, i, dataset.metadata(), plotMetadata);
           var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._xScale : this._yScale;
           // TODO: store position information in metadata.
           var copyD = _Util.Methods.copyMap(d);
@@ -66,11 +67,12 @@ export module Plot {
         var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
         innerScale.range([0, constantWidth]);
       } else {
-        var projector = this._projections["width"];
-        var accessor = projector.accessor;
-        var scale = projector.scale;
-        var fn = scale ? (d: any, i: number) => scale.scale(accessor(d, i)) : accessor;
-        innerScale.range([0, fn(null, 0)]);
+        var projection = this._projections["width"];
+        var accessor = projection.accessor;
+        var scale = projection.scale;
+        // HACKHACK Metadata should be passed
+        var fn = scale ? (d: any, i: number, u: any, m: PlotMetadata) => scale.scale(accessor(d, i, u, m)) : accessor;
+        innerScale.range([0, fn(null, 0, null, null)]);
       }
       return innerScale;
     }

@@ -36,7 +36,11 @@ export module Plot {
     public _updateStackOffsets() {
       var domainKeys = this._getDomainKeys();
       var keyAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
-      var keySets = this.datasets().map((dataset) => d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i).toString())).values());
+      var keySets = this._datasetKeysInOrder.map((k) => {
+        var dataset = this._key2PlotDatasetKey.get(k).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+        return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset.metadata(), plotMetadata).toString())).values();
+      });
 
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
         _Util.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
@@ -84,8 +88,10 @@ export module Plot {
       });
 
       var yAccessor = this._projections["y"].accessor;
-      attrToProjector["y"] = (d: any) => this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      attrToProjector["y0"] = (d: any) => this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      attrToProjector["y"] = (d: any, i: number, u: any, m: PlotMetadata) =>
+        this._yScale.scale(+yAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      attrToProjector["y0"] = (d: any, i: number, u: any, m: PlotMetadata) =>
+        this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
       return attrToProjector;
     }

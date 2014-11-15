@@ -183,4 +183,31 @@ describe("Metadata", () => {
     assert.deepEqual(dataset._getExtent(a, id), [5, 6], "plot metadata is reflected in extent results after change user metadata");
     svg.remove();
   });
+
+  it("metadata is populated on every plot", () => {
+    var svg = generateSVG(400, 400);
+    var metadata = {foo: 11};
+    var dataset1 = new Plottable.Dataset(data1, metadata);
+    var dataset2 = new Plottable.Dataset(data2, metadata);
+
+    var checkPlot = (plot: Plottable.Plot.AbstractPlot) => {
+      plot.addDataset("ds1", dataset1)
+          .addDataset("ds2", dataset2)
+          .project("x", (d: any, i: number, u: any, m: Plottable.Plot.PlotMetadata) => d.x + u.foo + m.datasetKey.length)
+          .project("y", (d: any, i: number, u: any, m: Plottable.Plot.PlotMetadata) => d.y + u.foo - m.datasetKey.length)
+          .renderTo(svg);
+      plot.remove();
+    };
+
+    checkPlot(new Plottable.Plot.Area(xScale, yScale));
+    checkPlot(new Plottable.Plot.StackedArea(xScale, yScale));
+    checkPlot(new Plottable.Plot.VerticalBar(xScale, yScale));
+    checkPlot(new Plottable.Plot.StackedBar(xScale, yScale));
+    checkPlot(new Plottable.Plot.StackedBar(yScale, xScale, false));
+    checkPlot(new Plottable.Plot.ClusteredBar(xScale, yScale));
+    checkPlot(new Plottable.Plot.Pie().project("value", "x"));
+    checkPlot(new Plottable.Plot.HorizontalBar(xScale, yScale));
+    checkPlot(new Plottable.Plot.Scatter(xScale, yScale));
+    svg.remove();
+  });
 });
