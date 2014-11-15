@@ -18,11 +18,11 @@ function run(div, data, Plottable) {
     }
 
     //rendering
-    var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data);
-    var linePlot = new Plottable.Plot.Line(xScale, yScale).addDataset(data);
-    var areaPlot = new Plottable.Plot.Area(xScale, yScale).addDataset(data);
-    var vbarPlot = new Plottable.Plot.VerticalBar(xScale, yScale).addDataset(data);
-    var hbarPlot = new Plottable.Plot.HorizontalBar(xScale, yScale).addDataset(data);
+    var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
+    var linePlot = new Plottable.Plot.Line(xScale, yScale).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
+    var areaPlot = new Plottable.Plot.Area(xScale, yScale).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
+    var vbarPlot = new Plottable.Plot.VerticalBar(xScale, yScale).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
+    var hbarPlot = new Plottable.Plot.HorizontalBar(xScale, yScale).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
 
     //title + legend
 

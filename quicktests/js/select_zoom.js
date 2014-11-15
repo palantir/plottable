@@ -23,7 +23,8 @@ function run(div, data, Plottable) {
 
   for (var i=0; i<numRenderers; i++) {
     var d = data[0].slice(i*10, i*10 + 10);
-    var renderer = new Plottable.Plot.Scatter(xScale, yScale).addDataset(d);
+    var renderer = new Plottable.Plot.Scatter(xScale, yScale).addDataset(d)
+    renderer.project("x", "x", xScale).project("y", "y", yScale);
     renderers.push(renderer);
   }
 
