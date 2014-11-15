@@ -30,7 +30,7 @@ function run(div, data, Plottable) {
                                             [null,  xAxis]]).renderTo(svg);
 
   //callbacks
-  var dragBox = new Plottable.Interaction.XYDragBox();
+  var dragBox = new Plottable.Interaction.XYDragBox().resizeEnabled(true);
   var cb_drag = function(start, end) {
     var minX = Math.min(start.x, end.x);
     var maxX = Math.max(start.x, end.x);

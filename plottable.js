@@ -8791,8 +8791,9 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this.dragInitialized = false;
-                this._origin = [0, 0];
-                this._location = [0, 0];
+                this.origin = [0, 0];
+                this.location = [0, 0];
+                this._isDragging = false;
                 this.dragBehavior = d3.behavior.drag();
                 this.dragBehavior.on("dragstart", function () { return _this._dragstart(); });
                 this.dragBehavior.on("drag", function () { return _this._drag(); });
@@ -8806,6 +8807,21 @@ var Plottable;
                     this.ondragstart = cb;
                     return this;
                 }
+            };
+            // we access origin and location through setOrigin and setLocation so that on XDragBox and YDragBox we can overwrite so that
+            // we always have the uncontrolled dimension of the box extending across the entire component
+            // this ensures that the callback values are synchronized with the actual box being drawn
+            Drag.prototype._setOrigin = function (x, y) {
+                this.origin = [x, y];
+            };
+            Drag.prototype._getOrigin = function () {
+                return this.origin.slice();
+            };
+            Drag.prototype._setLocation = function (x, y) {
+                this.location = [x, y];
+            };
+            Drag.prototype._getLocation = function () {
+                return this.location.slice();
             };
             Drag.prototype.drag = function (cb) {
                 if (cb === undefined) {
@@ -8826,46 +8842,42 @@ var Plottable;
                 }
             };
             Drag.prototype._dragstart = function () {
+                this._isDragging = true;
                 var width = this._componentToListenTo.width();
                 var height = this._componentToListenTo.height();
                 // the constraint functions ensure that the selection rectangle will not exceed the hit box
                 var constraintFunction = function (min, max) { return function (x) { return Math.min(Math.max(x, min), max); }; };
-                this.constrainX = constraintFunction(0, width);
-                this.constrainY = constraintFunction(0, height);
+                this._constrainX = constraintFunction(0, width);
+                this._constrainY = constraintFunction(0, height);
+                var origin = d3.mouse(this._hitBox[0][0].parentNode);
+                this._setOrigin(origin[0], origin[1]);
+                this._doDragstart();
             };
             Drag.prototype._doDragstart = function () {
                 if (this.ondragstart != null) {
-                    this.ondragstart({ x: this._origin[0], y: this._origin[1] });
+                    this.ondragstart({ x: this._getOrigin()[0], y: this._getOrigin()[1] });
                 }
             };
             Drag.prototype._drag = function () {
-                if (!this.dragInitialized) {
-                    this._origin = [d3.event.x, d3.event.y];
-                    this.dragInitialized = true;
-                    this._doDragstart();
-                }
-                this._location = [this.constrainX(d3.event.x), this.constrainY(d3.event.y)];
+                this._setLocation(this._constrainX(d3.event.x), this._constrainY(d3.event.y));
                 this._doDrag();
             };
             Drag.prototype._doDrag = function () {
                 if (this.ondrag != null) {
-                    var startLocation = { x: this._origin[0], y: this._origin[1] };
-                    var endLocation = { x: this._location[0], y: this._location[1] };
-                    this.ondrag(startLocation, endLocation);
+                    var start = { x: this._getOrigin()[0], y: this._getOrigin()[1] };
+                    var end = { x: this._getLocation()[0], y: this._getLocation()[1] };
+                    this.ondrag(start, end);
                 }
             };
             Drag.prototype._dragend = function () {
-                if (!this.dragInitialized) {
-                    return;
-                }
-                this.dragInitialized = false;
+                this._isDragging = false;
                 this._doDragend();
             };
             Drag.prototype._doDragend = function () {
                 if (this.ondragend != null) {
-                    var startLocation = { x: this._origin[0], y: this._origin[1] };
-                    var endLocation = { x: this._location[0], y: this._location[1] };
-                    this.ondragend(startLocation, endLocation);
+                    var start = { x: this._getOrigin()[0], y: this._getOrigin()[1] };
+                    var end = { x: this._getLocation()[0], y: this._getLocation()[1] };
+                    this.ondragend(start, end);
                 }
             };
             Drag.prototype._anchor = function (component, hitBox) {
@@ -8929,22 +8941,147 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Interaction) {
-        /**
-         * A DragBox is an interaction that automatically draws a box across the
-         * element you attach it to when you drag.
-         */
         var DragBox = (function (_super) {
             __extends(DragBox, _super);
             function DragBox() {
                 _super.apply(this, arguments);
-                /**
-                 * Whether or not dragBox has been rendered in a visible area.
-                 */
-                this.boxIsDrawn = false;
+                this._boxIsDrawn = false;
+                this._resizeXEnabled = false;
+                this._resizeYEnabled = false;
+                this.cursorStyle = "";
             }
+            DragBox.prototype.resizeEnabled = function (enabled) {
+                if (enabled == null) {
+                    return this._resizeXEnabled || this._resizeYEnabled;
+                }
+                else {
+                    this._resizeXEnabled = enabled && this.constructor._CAN_RESIZE_X;
+                    this._resizeYEnabled = enabled && this.constructor._CAN_RESIZE_Y;
+                    return this;
+                }
+            };
+            /**
+             * Return true if box is resizing on the X dimension.
+             *
+             * @returns {boolean}
+             */
+            DragBox.prototype.isResizingX = function () {
+                return !!this.xResizing;
+            };
+            /**
+             * Return true if box is resizing on the Y dimension.
+             *
+             * @returns {boolean}
+             */
+            DragBox.prototype.isResizingY = function () {
+                return !!this.yResizing;
+            };
+            /**
+             * Whether or not dragBox has been rendered in a visible area.
+             *
+             * @returns {boolean}
+             */
+            DragBox.prototype.boxIsDrawn = function () {
+                return this._boxIsDrawn;
+            };
+            /**
+             * Return true if box is resizing.
+             *
+             * @returns {boolean}
+             */
+            DragBox.prototype.isResizing = function () {
+                return this.isResizingX() || this.isResizingY();
+            };
             DragBox.prototype._dragstart = function () {
+                var mouse = d3.mouse(this._hitBox[0][0].parentNode);
+                if (this.boxIsDrawn()) {
+                    var resizeInfo = this.getResizeInfo(mouse[0], mouse[1]);
+                    this.xResizing = resizeInfo.xResizing;
+                    this.yResizing = resizeInfo.yResizing;
+                    if (this.isResizing()) {
+                        // we are resizing; don't clear the box, don't call the dragstart callback
+                        return;
+                    }
+                }
                 _super.prototype._dragstart.call(this);
                 this.clearBox();
+            };
+            DragBox.prototype.getResizeInfo = function (xPosition, yPosition) {
+                var xResizing = null;
+                var yResizing = null;
+                var xStart = this._getOrigin()[0];
+                var yStart = this._getOrigin()[1];
+                var xEnd = this._getLocation()[0];
+                var yEnd = this._getLocation()[1];
+                function inPaddedRange(position, start, end, padding) {
+                    return Math.min(start, end) - padding <= position && position <= Math.max(start, end) + padding;
+                }
+                function getResizeDimension(origin, destination, position, padding) {
+                    // origin: where the drag began
+                    // destination: where the drag ended
+                    // position: where the cursor currently is (possibly the start of a resize)
+                    var min = Math.min(origin, destination);
+                    var max = Math.max(origin, destination);
+                    var interiorPadding = Math.min(padding, (max - min) / 2);
+                    if (min - padding < position && position < min + interiorPadding) {
+                        return { offset: position - min, positive: false, origin: origin === min };
+                    }
+                    if (max - interiorPadding < position && position < max + padding) {
+                        return { offset: position - max, positive: true, origin: origin === max };
+                    }
+                    return null;
+                }
+                if (this._resizeXEnabled && inPaddedRange(yPosition, yStart, yEnd, DragBox.RESIZE_PADDING)) {
+                    xResizing = getResizeDimension(xStart, xEnd, xPosition, DragBox.RESIZE_PADDING);
+                }
+                if (this._resizeYEnabled && inPaddedRange(xPosition, xStart, xEnd, DragBox.RESIZE_PADDING)) {
+                    yResizing = getResizeDimension(yStart, yEnd, yPosition, DragBox.RESIZE_PADDING);
+                }
+                return { xResizing: xResizing, yResizing: yResizing };
+            };
+            DragBox.prototype._drag = function () {
+                if (this.isResizing()) {
+                    // Eases the mouse into the center of the dragging line, in case dragging started with the mouse
+                    // away from the center due to `DragBox.RESIZE_PADDING`.
+                    if (this.isResizingX()) {
+                        var diffX = this.xResizing.offset;
+                        var x = d3.event.x;
+                        if (diffX !== 0) {
+                            x += diffX;
+                            this.xResizing.offset += diffX > 0 ? -1 : 1;
+                        }
+                        if (this.xResizing.origin) {
+                            this._setOrigin(this._constrainX(x), this._getOrigin()[1]);
+                        }
+                        else {
+                            this._setLocation(this._constrainX(x), this._getLocation()[1]);
+                        }
+                    }
+                    if (this.isResizingY()) {
+                        var diffY = this.yResizing.offset;
+                        var y = d3.event.y;
+                        if (diffY !== 0) {
+                            y += diffY;
+                            this.yResizing.offset += diffY > 0 ? -1 : 1;
+                        }
+                        if (this.yResizing.origin) {
+                            this._setOrigin(this._getOrigin()[0], this._constrainY(y));
+                        }
+                        else {
+                            this._setLocation(this._getLocation()[0], this._constrainY(y));
+                        }
+                    }
+                    this._doDrag();
+                }
+                else {
+                    _super.prototype._drag.call(this);
+                }
+                this.setBox(this._getOrigin()[0], this._getLocation()[0], this._getOrigin()[1], this._getLocation()[1]);
+            };
+            DragBox.prototype._dragend = function () {
+                this.xResizing = null;
+                this.yResizing = null;
+                _super.prototype._dragend.call(this);
             };
             /**
              * Clears the highlighted drag-selection box drawn by the DragBox.
@@ -8956,7 +9093,7 @@ var Plottable;
                     return;
                 } // HACKHACK #593
                 this.dragBox.attr("height", 0).attr("width", 0);
-                this.boxIsDrawn = false;
+                this._boxIsDrawn = false;
                 return this;
             };
             /**
@@ -8978,17 +9115,54 @@ var Plottable;
                 var xo = Math.min(x0, x1);
                 var yo = Math.min(y0, y1);
                 this.dragBox.attr({ x: xo, y: yo, width: w, height: h });
-                this.boxIsDrawn = (w > 0 && h > 0);
+                this._boxIsDrawn = (w > 0 && h > 0);
                 return this;
             };
             DragBox.prototype._anchor = function (component, hitBox) {
+                var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 var cname = DragBox.CLASS_DRAG_BOX;
                 var background = this._componentToListenTo._backgroundContainer;
                 this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
+                hitBox.on("mousemove", function () { return _this._hover(); });
                 return this;
             };
+            DragBox.prototype._hover = function () {
+                if (this.resizeEnabled() && !this._isDragging && this._boxIsDrawn) {
+                    var position = d3.mouse(this._hitBox[0][0].parentNode);
+                    this.cursorStyle = this.getCursorStyle(position[0], position[1]);
+                }
+                else if (!this._boxIsDrawn) {
+                    this.cursorStyle = "";
+                }
+                this._hitBox.style("cursor", this.cursorStyle);
+            };
+            DragBox.prototype.getCursorStyle = function (xOrigin, yOrigin) {
+                var resizeInfo = this.getResizeInfo(xOrigin, yOrigin);
+                var left = resizeInfo.xResizing && !resizeInfo.xResizing.positive;
+                var right = resizeInfo.xResizing && resizeInfo.xResizing.positive;
+                var top = resizeInfo.yResizing && !resizeInfo.yResizing.positive;
+                var bottom = resizeInfo.yResizing && resizeInfo.yResizing.positive;
+                if (left && top || bottom && right) {
+                    return "nwse-resize";
+                }
+                else if (top && right || bottom && left) {
+                    return "nesw-resize";
+                }
+                else if (left || right) {
+                    return "ew-resize";
+                }
+                else if (top || bottom) {
+                    return "ns-resize";
+                }
+                else {
+                    return "";
+                }
+            };
             DragBox.CLASS_DRAG_BOX = "drag-box";
+            DragBox.RESIZE_PADDING = 10;
+            DragBox._CAN_RESIZE_X = true;
+            DragBox._CAN_RESIZE_Y = true;
             return DragBox;
         })(Interaction.Drag);
         Interaction.DragBox = DragBox;
@@ -9011,14 +9185,13 @@ var Plottable;
             function XDragBox() {
                 _super.apply(this, arguments);
             }
-            XDragBox.prototype._drag = function () {
-                _super.prototype._drag.call(this);
-                this.setBox(this._origin[0], this._location[0]);
+            XDragBox.prototype._setOrigin = function (x, y) {
+                _super.prototype._setOrigin.call(this, x, 0);
             };
-            XDragBox.prototype.setBox = function (x0, x1) {
-                _super.prototype.setBox.call(this, x0, x1, 0, this._componentToListenTo.height());
-                return this;
+            XDragBox.prototype._setLocation = function (x, y) {
+                _super.prototype._setLocation.call(this, x, this._componentToListenTo.height());
             };
+            XDragBox._CAN_RESIZE_Y = false;
             return XDragBox;
         })(Interaction.DragBox);
         Interaction.XDragBox = XDragBox;
@@ -9039,12 +9212,9 @@ var Plottable;
         var XYDragBox = (function (_super) {
             __extends(XYDragBox, _super);
             function XYDragBox() {
-                _super.apply(this, arguments);
+                Plottable._Util.Methods.warn("XYDragBox is deprecated; use DragBox instead");
+                _super.call(this);
             }
-            XYDragBox.prototype._drag = function () {
-                _super.prototype._drag.call(this);
-                this.setBox(this._origin[0], this._location[0], this._origin[1], this._location[1]);
-            };
             return XYDragBox;
         })(Interaction.DragBox);
         Interaction.XYDragBox = XYDragBox;
@@ -9067,14 +9237,13 @@ var Plottable;
             function YDragBox() {
                 _super.apply(this, arguments);
             }
-            YDragBox.prototype._drag = function () {
-                _super.prototype._drag.call(this);
-                this.setBox(this._origin[1], this._location[1]);
+            YDragBox.prototype._setOrigin = function (x, y) {
+                _super.prototype._setOrigin.call(this, 0, y);
             };
-            YDragBox.prototype.setBox = function (y0, y1) {
-                _super.prototype.setBox.call(this, 0, this._componentToListenTo.width(), y0, y1);
-                return this;
+            YDragBox.prototype._setLocation = function (x, y) {
+                _super.prototype._setLocation.call(this, this._componentToListenTo.width(), y);
             };
+            YDragBox._CAN_RESIZE_X = false;
             return YDragBox;
         })(Interaction.DragBox);
         Interaction.YDragBox = YDragBox;
