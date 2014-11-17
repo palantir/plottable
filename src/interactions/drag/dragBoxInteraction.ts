@@ -6,21 +6,186 @@ export module Interaction {
    * A DragBox is an interaction that automatically draws a box across the
    * element you attach it to when you drag.
    */
+  interface ResizeDimension {
+    offset: number; // px offset between where the resize drag started and the edge of the box (<= RESIZE_PADDING)
+    origin: boolean; // whether we are resizing the origin coordinate or the location coordinate
+    positive: boolean; // whether the resize is on the positive edge or the negative edge of the dragbox
+  }
+
   export class DragBox extends Drag {
+
     private static CLASS_DRAG_BOX = "drag-box";
+    public static RESIZE_PADDING = 10;
+    public static _CAN_RESIZE_X = true;
+    public static _CAN_RESIZE_Y  = true;
     /**
      * The DOM element of the box that is drawn. When no box is drawn, it is
      * null.
      */
     public dragBox: D3.Selection;
+    public _boxIsDrawn = false;
+    public _resizeXEnabled = false;
+    public _resizeYEnabled = false;
+    private xResizing: ResizeDimension;
+    private yResizing: ResizeDimension;
+    private cursorStyle = "";
+
+    /**
+     * Gets whether resizing is enabled or not.
+     *
+     * @returns {boolean}
+     */
+    public resizeEnabled(): boolean;
+    /**
+     * Enables or disables resizing.
+     *
+     * @param {boolean} enabled
+     */
+    public resizeEnabled(enabled: boolean): DragBox;
+    public resizeEnabled(enabled?: boolean): any {
+      if (enabled == null) {
+        return this._resizeXEnabled || this._resizeYEnabled;
+      } else {
+        this._resizeXEnabled = enabled && (<typeof DragBox> this.constructor)._CAN_RESIZE_X;
+        this._resizeYEnabled = enabled && (<typeof DragBox> this.constructor)._CAN_RESIZE_Y;
+        return this;
+      }
+    }
+
+    /**
+     * Return true if box is resizing on the X dimension.
+     *
+     * @returns {boolean}
+     */
+    public isResizingX(): boolean {
+      return !!this.xResizing;
+    }
+
+    /**
+     * Return true if box is resizing on the Y dimension.
+     *
+     * @returns {boolean}
+     */
+    public isResizingY(): boolean {
+      return !!this.yResizing;
+    }
+
     /**
      * Whether or not dragBox has been rendered in a visible area.
+     *
+     * @returns {boolean}
      */
-    public boxIsDrawn = false;
+    public boxIsDrawn(): boolean {
+      return this._boxIsDrawn;
+    }
+
+    /**
+     * Return true if box is resizing.
+     *
+     * @returns {boolean}
+     */
+    public isResizing(): boolean {
+      return this.isResizingX() || this.isResizingY();
+    }
 
     public _dragstart() {
+      var mouse = d3.mouse(this._hitBox[0][0].parentNode);
+
+      if (this.boxIsDrawn()) {
+        var resizeInfo = this.getResizeInfo(mouse[0], mouse[1]);
+        this.xResizing = resizeInfo.xResizing;
+        this.yResizing = resizeInfo.yResizing;
+        if (this.isResizing()) {
+          // we are resizing; don't clear the box, don't call the dragstart callback
+          return;
+        }
+      }
+
       super._dragstart();
       this.clearBox();
+    }
+
+    private getResizeInfo(xPosition: number, yPosition: number) {
+      var xResizing: ResizeDimension = null;
+      var yResizing: ResizeDimension = null;
+      var xStart = this._getOrigin()[0];
+
+      var yStart = this._getOrigin()[1];
+      var xEnd = this._getLocation()[0];
+      var yEnd = this._getLocation()[1];
+
+      function inPaddedRange(position: number, start: number, end: number, padding: number) {
+        return Math.min(start, end) - padding <= position && position <= Math.max(start, end) + padding;
+      }
+
+      function getResizeDimension(origin: number, destination: number, position: number, padding: number): ResizeDimension {
+        // origin: where the drag began
+        // destination: where the drag ended
+        // position: where the cursor currently is (possibly the start of a resize)
+        var min = Math.min(origin, destination);
+        var max = Math.max(origin, destination);
+        var interiorPadding = Math.min(padding, (max-min)/2);
+        if (min - padding < position && position < min + interiorPadding) {
+          return {offset: position - min, positive: false, origin: origin === min};
+        }
+        if (max - interiorPadding < position && position < max + padding) {
+          return {offset: position - max, positive: true, origin: origin === max};
+        }
+        return null;
+      }
+
+      if (this._resizeXEnabled && inPaddedRange(yPosition, yStart, yEnd, DragBox.RESIZE_PADDING)) {
+        xResizing = getResizeDimension(xStart, xEnd, xPosition, DragBox.RESIZE_PADDING);
+      }
+      if (this._resizeYEnabled && inPaddedRange(xPosition, xStart, xEnd, DragBox.RESIZE_PADDING)) {
+        yResizing = getResizeDimension(yStart, yEnd, yPosition, DragBox.RESIZE_PADDING);
+      }
+      return {xResizing: xResizing, yResizing: yResizing};
+    }
+
+
+    public _drag() {
+      if (this.isResizing()) {
+        // Eases the mouse into the center of the dragging line, in case dragging started with the mouse
+        // away from the center due to `DragBox.RESIZE_PADDING`.
+        if (this.isResizingX()) {
+          var diffX = this.xResizing.offset;
+          var x = d3.event.x;
+          if (diffX !== 0) {
+            x += diffX;
+            this.xResizing.offset += diffX > 0 ? -1 : 1;
+          }
+          if (this.xResizing.origin) {
+            this._setOrigin(this._constrainX(x), this._getOrigin()[1]);
+          } else {
+            this._setLocation(this._constrainX(x), this._getLocation()[1]);
+          }
+        }
+
+        if (this.isResizingY()) {
+          var diffY = this.yResizing.offset;
+          var y = d3.event.y;
+          if (diffY !== 0) {
+            y += diffY;
+            this.yResizing.offset += diffY > 0 ? -1 : 1;
+          }
+          if (this.yResizing.origin) {
+            this._setOrigin(this._getOrigin()[0], this._constrainY(y));
+          } else {
+            this._setLocation(this._getLocation()[0], this._constrainY(y));
+          }
+        }
+        this._doDrag();
+      } else {
+        super._drag();
+      }
+      this.setBox(this._getOrigin()[0], this._getLocation()[0], this._getOrigin()[1], this._getLocation()[1]);
+    }
+
+    public _dragend() {
+      this.xResizing = null;
+      this.yResizing = null;
+      super._dragend();
     }
 
     /**
@@ -31,7 +196,7 @@ export module Interaction {
     public clearBox() {
       if (this.dragBox == null) {return;} // HACKHACK #593
       this.dragBox.attr("height", 0).attr("width", 0);
-      this.boxIsDrawn = false;
+      this._boxIsDrawn = false;
       return this;
     }
 
@@ -47,12 +212,12 @@ export module Interaction {
      */
     public setBox(x0: number, x1: number, y0: number, y1: number) {
       if (this.dragBox == null) {return;} // HACKHACK #593
-      var w = Math.abs(x0 - x1);
-      var h = Math.abs(y0 - y1);
+      var w  = Math.abs(x0 - x1);
+      var h  = Math.abs(y0 - y1);
       var xo = Math.min(x0, x1);
       var yo = Math.min(y0, y1);
       this.dragBox.attr({x: xo, y: yo, width: w, height: h});
-      this.boxIsDrawn = (w > 0 && h > 0);
+      this._boxIsDrawn = (w > 0 && h > 0);
       return this;
     }
 
@@ -61,7 +226,38 @@ export module Interaction {
       var cname = DragBox.CLASS_DRAG_BOX;
       var background = this._componentToListenTo._backgroundContainer;
       this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
+      hitBox.on("mousemove", () => this._hover());
       return this;
+    }
+
+    public _hover() {
+      if (this.resizeEnabled() && !this._isDragging && this._boxIsDrawn) {
+        var position = d3.mouse(this._hitBox[0][0].parentNode);
+        this.cursorStyle = this.getCursorStyle(position[0], position[1]);
+      } else if (!this._boxIsDrawn) {
+        this.cursorStyle = "";
+      }
+      this._hitBox.style("cursor", this.cursorStyle);
+    }
+
+    private getCursorStyle(xOrigin: number, yOrigin: number): string {
+      var resizeInfo = this.getResizeInfo(xOrigin, yOrigin);
+      var left   = resizeInfo.xResizing && !resizeInfo.xResizing.positive;
+      var right  = resizeInfo.xResizing &&  resizeInfo.xResizing.positive;
+      var top    = resizeInfo.yResizing && !resizeInfo.yResizing.positive;
+      var bottom = resizeInfo.yResizing &&  resizeInfo.yResizing.positive;
+
+      if (left && top || bottom && right) {
+        return "nwse-resize";
+      } else if (top && right || bottom && left) {
+        return "nesw-resize";
+      } else if (left || right) {
+        return "ew-resize";
+      } else if (top || bottom) {
+        return "ns-resize";
+      } else {
+        return "";
+      }
     }
   }
 }
