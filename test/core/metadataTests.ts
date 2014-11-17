@@ -184,7 +184,7 @@ describe("Metadata", () => {
     svg.remove();
   });
 
-  it("metadata is populated on every plot", () => {
+  it("each plot passes metadata to projectors", () => {
     var svg = generateSVG(400, 400);
     var metadata = {foo: 11};
     var dataset1 = new Plottable.Dataset(data1, metadata);

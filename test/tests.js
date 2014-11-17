@@ -4165,7 +4165,7 @@ describe("Metadata", function () {
         assert.deepEqual(dataset._getExtent(a, id), [5, 6], "plot metadata is reflected in extent results after change user metadata");
         svg.remove();
     });
-    it("metadata is populated on every plot", function () {
+    it("each plot passes metadata to projectors", function () {
         var svg = generateSVG(400, 400);
         var metadata = { foo: 11 };
         var dataset1 = new Plottable.Dataset(data1, metadata);
