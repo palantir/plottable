@@ -7,7 +7,7 @@ module Plottable {
   };
 
   /**
-   * Retrieves scalled datum property.
+   * Retrieves scaled datum property.
    */
   export interface _Projector {
     (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata) : any;

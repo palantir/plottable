@@ -194,8 +194,10 @@ describe("Metadata", () => {
       plot.addDataset("ds1", dataset1)
           .addDataset("ds2", dataset2)
           .project("x", (d: any, i: number, u: any, m: Plottable.Plot.PlotMetadata) => d.x + u.foo + m.datasetKey.length)
-          .project("y", (d: any, i: number, u: any, m: Plottable.Plot.PlotMetadata) => d.y + u.foo - m.datasetKey.length)
-          .renderTo(svg);
+          .project("y", (d: any, i: number, u: any, m: Plottable.Plot.PlotMetadata) => d.y + u.foo - m.datasetKey.length);
+
+      // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
+      plot.renderTo(svg);
       plot.remove();
     };
 

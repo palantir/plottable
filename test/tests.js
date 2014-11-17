@@ -4200,7 +4200,9 @@ describe("Metadata", function () {
         var dataset1 = new Plottable.Dataset(data1, metadata);
         var dataset2 = new Plottable.Dataset(data2, metadata);
         var checkPlot = function (plot) {
-            plot.addDataset("ds1", dataset1).addDataset("ds2", dataset2).project("x", function (d, i, u, m) { return d.x + u.foo + m.datasetKey.length; }).project("y", function (d, i, u, m) { return d.y + u.foo - m.datasetKey.length; }).renderTo(svg);
+            plot.addDataset("ds1", dataset1).addDataset("ds2", dataset2).project("x", function (d, i, u, m) { return d.x + u.foo + m.datasetKey.length; }).project("y", function (d, i, u, m) { return d.y + u.foo - m.datasetKey.length; });
+            // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
+            plot.renderTo(svg);
             plot.remove();
         };
         checkPlot(new Plottable.Plot.Area(xScale, yScale));
