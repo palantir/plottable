@@ -6932,7 +6932,6 @@ var Plottable;
                 this._xScale.rangeType("bands", 0, 0);
                 this._yScale.rangeType("bands", 0, 0);
                 this._colorScale = colorScale;
-                this.project("fill", "value", colorScale); // default
                 this._animators["cells"] = new Plottable.Animator.Null();
             }
             Grid.prototype._addDataset = function (key, dataset) {

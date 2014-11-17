@@ -32,7 +32,6 @@ export module Plot {
       this._yScale.rangeType("bands", 0, 0);
 
       this._colorScale = colorScale;
-      this.project("fill", "value", colorScale); // default
       this._animators["cells"] = new Animator.Null();
     }
 
