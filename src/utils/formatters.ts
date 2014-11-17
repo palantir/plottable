@@ -130,11 +130,11 @@ module Plottable {
     }
 
     /**
-     * Creates a formatter that displays dates.
+     * Creates a multi time formatter that displays dates.
      *
      * @returns {Formatter} A formatter for time/date values.
      */
-    export function time() {
+    export function multiTime() {
 
       var numFormats = 8;
 
@@ -182,6 +182,19 @@ module Plottable {
           }
         }
       };
+    }
+
+    /**
+     * Creates a time formatter that displays time/date using given specifier.
+     *
+     * List of directives can be found on: https://github.com/mbostock/d3/wiki/Time-Formatting#format
+     *
+     * @param {string} [specifier] The specifier for the formatter.
+     *
+     * @returns {Formatter} A formatter for time/date values.
+     */
+    export function time(specifier: string): Formatter {
+      return d3.time.format(specifier);
     }
 
     /**

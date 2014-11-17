@@ -506,11 +506,21 @@ declare module Plottable {
          */
         function siSuffix(precision?: number): (d: any) => string;
         /**
-         * Creates a formatter that displays dates.
+         * Creates a multi time formatter that displays dates.
          *
          * @returns {Formatter} A formatter for time/date values.
          */
-        function time(): (d: any) => string;
+        function multiTime(): (d: any) => string;
+        /**
+         * Creates a time formatter that displays time/date using given specifier.
+         *
+         * List of directives can be found on: https://github.com/mbostock/d3/wiki/Time-Formatting#format
+         *
+         * @param {string} [specifier] The specifier for the formatter.
+         *
+         * @returns {Formatter} A formatter for time/date values.
+         */
+        function time(specifier: string): Formatter;
         /**
          * Creates a formatter for relative dates.
          *
@@ -2121,17 +2131,28 @@ declare module Plottable {
 
 declare module Plottable {
     module Axis {
-        interface _TimeInterval {
-            timeUnit: D3.Time.Interval;
+        /**
+         * Defines a configuration for a time axis tier.
+         * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
+         * interval - A time unit associated with this configuration (seconds, minutes, hours, etc).
+         * step - number of intervals between each tick.
+         * formatter - formatter used to format tick labels.
+         */
+        interface TimeAxisTierConfiguration {
+            interval: D3.Time.Interval;
             step: number;
-            formatString: string;
+            formatter: Formatter;
+        }
+        /**
+         * An array of linked TimeAxisTierConfigurations.
+         * Each configuration will be shown on a different tier.
+         * Currently, up to two tiers are supported.
+         */
+        interface TimeAxisConfiguration {
+            tierConfigurations: TimeAxisTierConfiguration[];
         }
         class Time extends AbstractAxis {
-            _majorTickLabels: D3.Selection;
-            _minorTickLabels: D3.Selection;
             _scale: Scale.Time;
-            static _minorIntervals: _TimeInterval[];
-            static _majorIntervals: _TimeInterval[];
             /**
              * Constructs a TimeAxis.
              *
@@ -2142,13 +2163,27 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             constructor(scale: Scale.Time, orientation: string);
+            /**
+             * Gets the possible Axis configurations.
+             *
+             * @returns {TimeAxisConfiguration[]} The possible tier configurations.
+             */
+            axisConfigurations(): TimeAxisConfiguration[];
+            /**
+             * Sets possible Axis configurations.
+             * The axis will choose the most precise configuration that will display in
+             * its current width.
+             *
+             * @param {TimeAxisConfiguration[]} configurations Possible axis configurations.
+             * @returns {Axis.Time} The calling Axis.Time.
+             */
+            axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
             orient(): string;
             orient(orientation: string): Time;
             _computeHeight(): number;
             _setup(): void;
-            _getTickIntervalValues(interval: _TimeInterval): any[];
             _getTickValues(): any[];
-            _measureTextHeight(container: D3.Selection): number;
+            _measureTextHeight(): number;
             _doRender(): Time;
         }
     }

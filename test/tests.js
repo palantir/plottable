@@ -486,9 +486,6 @@ describe("TimeAxis", function () {
         assert.throws(function () { return axis.orient("right"); }, "horizontal");
         assert.equal(axis.orient(), "bottom", "orientation unchanged");
     });
-    it("major and minor intervals arrays are the same length", function () {
-        assert.equal(Plottable.Axis.Time._majorIntervals.length, Plottable.Axis.Time._minorIntervals.length, "major and minor interval arrays must be same size");
-    });
     it("Computing the default ticks doesn't error out for edge cases", function () {
         var svg = generateSVG(400, 100);
         scale.range([0, 400]);
@@ -521,8 +518,7 @@ describe("TimeAxis", function () {
                     }
                 }
             }
-            checkLabelsForContainer(axis._minorTickLabels);
-            checkLabelsForContainer(axis._majorTickLabels);
+            axis.tierLabelContainers.forEach(checkLabelsForContainer);
         }
         // 100 year span
         checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
@@ -538,6 +534,28 @@ describe("TimeAxis", function () {
         checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
         // 1 second span
         checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 0, 1, 0)]);
+        svg.remove();
+    });
+    it("custom possible axis configurations", function () {
+        var svg = generateSVG(800, 100);
+        var scale = new Plottable.Scale.Time();
+        var axis = new Plottable.Axis.Time(scale, "bottom");
+        var configurations = axis.axisConfigurations();
+        var newPossibleConfigurations = configurations.slice(0, 3);
+        newPossibleConfigurations.forEach(function (axisConfig) { return axisConfig.tierConfigurations.forEach(function (tierConfig) {
+            tierConfig.interval = d3.time.minute;
+            tierConfig.step += 3;
+        }); });
+        axis.axisConfigurations(newPossibleConfigurations);
+        var now = new Date();
+        var twoMinutesBefore = new Date(now.getTime());
+        twoMinutesBefore.setMinutes(now.getMinutes() - 2);
+        scale.domain([twoMinutesBefore, now]);
+        scale.range([0, 800]);
+        axis.renderTo(svg);
+        var configs = newPossibleConfigurations[axis.mostPreciseConfigIndex].tierConfigurations;
+        assert.deepEqual(configs[0].interval, d3.time.minute, "axis used new time unit");
+        assert.deepEqual(configs[0].step, 4, "axis used new step");
         svg.remove();
     });
 });
@@ -5897,9 +5915,9 @@ describe("Formatters", function () {
             assert.strictEqual(result.charAt(result.length - 1), "c", "The specified currency symbol was appended");
         });
     });
-    describe("time", function () {
+    describe("mutliTime", function () {
         it("uses reasonable defaults", function () {
-            var timeFormatter = Plottable.Formatters.time();
+            var timeFormatter = Plottable.Formatters.multiTime();
             // year, month, day, hours, minutes, seconds, milliseconds
             var result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
             assert.strictEqual(result, "2000", "only the year was displayed");
@@ -5937,9 +5955,9 @@ describe("Formatters", function () {
             assert.strictEqual(result, "8%", "shows formatter changed value");
         });
     });
-    describe("time", function () {
+    describe("multiTime", function () {
         it("uses reasonable defaults", function () {
-            var timeFormatter = Plottable.Formatters.time();
+            var timeFormatter = Plottable.Formatters.multiTime();
             // year, month, day, hours, minutes, seconds, milliseconds
             var result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
             assert.strictEqual(result, "2000", "only the year was displayed");
