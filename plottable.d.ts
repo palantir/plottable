@@ -2998,6 +2998,12 @@ declare module Plottable {
              */
             barLabelFormatter(formatter: Formatter): AbstractBarPlot<X, Y>;
             /**
+             * Selects all the bars in the bar plot
+             *
+             * @returns {D3.Selection} All of the bars in the bar plot.
+             */
+            getAllBars(): D3.Selection;
+            /**
              * Selects the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one
              * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
