@@ -28,6 +28,8 @@ describe("Plots", () => {
         barPlot.animate(false);
         barPlot.baseline(0);
         yScale.domain([-2, 2]);
+        barPlot.project("x", "x", xScale);
+        barPlot.project("y", "y", yScale);
         barPlot.renderTo(svg);
       });
 
@@ -192,6 +194,8 @@ describe("Plots", () => {
         barPlot.animate(false);
         barPlot.baseline(0);
         yScale.domain([-2, 2]);
+        barPlot.project("x", "x", xScale);
+        barPlot.project("y", "y", yScale);
         barPlot.renderTo(svg);
       });
 
@@ -238,6 +242,8 @@ describe("Plots", () => {
         barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
         barPlot.addDataset(dataset);
         barPlot.baseline(0);
+        barPlot.project("x", "x", xScale);
+        barPlot.project("y", "y", yScale);
         barPlot.renderTo(svg);
       });
 
@@ -340,6 +346,8 @@ describe("Plots", () => {
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
+        barPlot.project("x", "x", xScale);
+        barPlot.project("y", "y", yScale);
         barPlot.renderTo(svg);
       });
 
@@ -440,7 +448,9 @@ describe("Plots", () => {
         barPlot.baseline(0);
         barPlot.animate(false);
         var yAxis = new Plottable.Axis.Category(yScale, "left");
-        var table = new Plottable.Component.Table([[yAxis, barPlot]]).renderTo(svg);
+        barPlot.project("x", "x", xScale);
+        barPlot.project("y", "y", yScale);
+        new Plottable.Component.Table([[yAxis, barPlot]]).renderTo(svg);
         axisWidth = yAxis.width();
         bandWidth = yScale.rangeBand();
         xScale.domainer(xScale.domainer().pad(0));
@@ -497,6 +507,8 @@ describe("Plots", () => {
         yScale = new Plottable.Scale.Linear();
         plot = new Plottable.Plot.VerticalBar<string>(xScale, yScale);
         plot.addDataset(dataset);
+        plot.project("x", "x", xScale);
+        plot.project("y", "y", yScale);
       });
 
       it("bar labels disabled by default", () => {

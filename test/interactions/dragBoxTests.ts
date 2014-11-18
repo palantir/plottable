@@ -61,6 +61,8 @@ describe("DragBoxInteractions", () => {
       yScale = new Plottable.Scale.Linear();
       plot = new Plottable.Plot.Scatter(xScale, yScale);
       plot.addDataset(dataset);
+      plot.project("x", "x", xScale);
+      plot.project("y", "y", yScale);
       plot.renderTo(svg);
 
       interaction = new Plottable.Interaction.DragBox();
@@ -205,6 +207,8 @@ describe("DragBoxInteractions", () => {
       yScale = new Plottable.Scale.Linear();
       plot = new Plottable.Plot.Scatter(xScale, yScale);
       plot.addDataset(dataset);
+      plot.project("x", "x", xScale);
+      plot.project("y", "y", yScale);
       plot.renderTo(svg);
 
       interaction = new Plottable.Interaction.YDragBox();
