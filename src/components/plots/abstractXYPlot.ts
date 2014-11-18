@@ -179,10 +179,15 @@ export module Plot {
     }
 
     private normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
-      var flattenDatasets = _Util.Methods.flatten(this.datasets().map(d => d.data()));
-      var aAccessor: (d: any, i: number) => A = this._projections[fromX ? "x" : "y"].accessor;
-      var bAccessor: (d: any, i: number) => B = this._projections[fromX ? "y" : "x"].accessor;
-      return flattenDatasets.map((d, i) => { return { a: aAccessor(d, i), b: bAccessor(d, i) }; });
+      var aAccessor: (d: any, i: number, u: any, m: PlotMetadata) => A = this._projections[fromX ? "x" : "y"].accessor;
+      var bAccessor: (d: any, i: number, u: any, m: PlotMetadata) => B = this._projections[fromX ? "y" : "x"].accessor;
+      return _Util.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
+        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
+        return dataset.data().map((d, i) => {
+          return { a: aAccessor(d, i, dataset.metadata(), plotMetadata), b: bAccessor(d, i, dataset.metadata(), plotMetadata) };
+        });
+      }));
     }
 
     private adjustDomainOverVisiblePoints<A,B>(values: {a: A; b: B}[], fromDomain: A[]): B[] {

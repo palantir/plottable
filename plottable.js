@@ -6771,12 +6771,16 @@ var Plottable;
                 }
             };
             AbstractXYPlot.prototype.normalizeDatasets = function (fromX) {
-                var flattenDatasets = Plottable._Util.Methods.flatten(this.datasets().map(function (d) { return d.data(); }));
+                var _this = this;
                 var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
                 var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
-                return flattenDatasets.map(function (d, i) {
-                    return { a: aAccessor(d, i), b: bAccessor(d, i) };
-                });
+                return Plottable._Util.Methods.flatten(this._datasetKeysInOrder.map(function (key) {
+                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                    var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
+                    return dataset.data().map(function (d, i) {
+                        return { a: aAccessor(d, i, dataset.metadata(), plotMetadata), b: bAccessor(d, i, dataset.metadata(), plotMetadata) };
+                    });
+                }));
             };
             AbstractXYPlot.prototype.adjustDomainOverVisiblePoints = function (values, fromDomain) {
                 var bVals = values.filter(function (v) { return fromDomain[0] <= v.a && v.a <= fromDomain[1]; }).map(function (v) { return v.b; });

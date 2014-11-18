@@ -1873,12 +1873,12 @@ describe("Plots", function () {
         var simpleDataset;
         var plot;
         before(function () {
-            xAccessor = function (d) { return d.a; };
-            yAccessor = function (d) { return d.b; };
+            xAccessor = function (d, i, u) { return d.a + u.foo; };
+            yAccessor = function (d, i, u) { return d.b + u.foo; };
         });
         beforeEach(function () {
             svg = generateSVG(500, 500);
-            simpleDataset = new Plottable.Dataset([{ a: -5, b: 6 }, { a: -2, b: 2 }, { a: 2, b: -2 }, { a: 5, b: -6 }]);
+            simpleDataset = new Plottable.Dataset([{ a: -5, b: 6 }, { a: -2, b: 2 }, { a: 2, b: -2 }, { a: 5, b: -6 }], { foo: 0 });
             xScale = new Plottable.Scale.Linear();
             yScale = new Plottable.Scale.Linear();
             plot = new Plottable.Plot.AbstractXYPlot(xScale, yScale);
