@@ -37,19 +37,18 @@ describe("Dataset", () => {
     assert.isTrue(callbackCalled, "callback was called when the metadata was changed");
   });
 
-  it("_getExtent works as expected", () => {
+  it("_getExtent works as expected with user metadata", () => {
     var data = [1, 2, 3, 4, 1];
     var metadata = {foo: 11};
     var id = (d: any) => d;
     var dataset = new Plottable.Dataset(data, metadata);
     var plot = new Plottable.Plot.AbstractPlot().addDataset(dataset);
-    var apply = (a: any) => Plottable._Util.Methods._applyAccessor(a, plot);
     var a1 = (d: number, i: number, m: any) => d + i - 2;
     assert.deepEqual(dataset._getExtent(a1, id), [-1, 5], "extent for numerical data works properly");
     var a2 = (d: number, i: number, m: any) => d + m.foo;
-    assert.deepEqual(dataset._getExtent(apply(a2), id), [12, 15], "extent uses metadata appropriately");
+    assert.deepEqual(dataset._getExtent(a2, id), [12, 15], "extent uses metadata appropriately");
     dataset.metadata({foo: -1});
-    assert.deepEqual(dataset._getExtent(apply(a2), id), [0, 3], "metadata change is reflected in extent results");
+    assert.deepEqual(dataset._getExtent(a2, id), [0, 3], "metadata change is reflected in extent results");
     var a3 = (d: number, i: number, m: any) => "_" + d;
     assert.deepEqual(dataset._getExtent(a3, id), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
     var a_toString = (d: any) => (d + 2).toString();

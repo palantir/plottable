@@ -40,12 +40,6 @@ declare module Plottable {
              */
             function accessorize(accessor: any): _Accessor;
             /**
-             * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata.
-             * Temporarily always grabs the metadata of the first dataset.
-             * HACKHACK #1089 - The accessor currently only grabs the first dataset's metadata
-             */
-            function _applyAccessor(accessor: _Accessor, plot: Plot.AbstractPlot): (d: any, i: number) => any;
-            /**
              * Takes two sets and returns the union
              *
              * Due to the fact that D3.Sets store strings internally, return type is always a string set
@@ -704,7 +698,7 @@ declare module Plottable {
          * @returns {Dataset} The calling Dataset.
          */
         metadata(metadata: any): Dataset;
-        _getExtent(accessor: _Accessor, typeCoercer: (d: any) => any): any[];
+        _getExtent(accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata?: any): any[];
     }
 }
 
@@ -848,20 +842,28 @@ declare module Plottable {
 }
 
 declare module Plottable {
+    /**
+     * Access specific datum property.
+     */
     interface _Accessor {
-        (datum: any, index?: number, metadata?: any): any;
+        (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plot.PlotMetadata): any;
     }
     /**
-     * A function to map across the data in a DataSource. For example, if your
-     * data looked like `{foo: 5, bar: 6}`, then a popular function might be
-     * `function(d) { return d.foo; }`.
-     *
-     * Index, if used, will be the index of the datum in the array.
+     * Retrieves scaled datum property.
      */
-    interface AppliedAccessor {
-        (datum?: any, index?: number): any;
-    }
     interface _Projector {
+        (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata): any;
+    }
+    /**
+     * Projector with applied user and plot metadata
+     */
+    interface _AppliedProjector {
+        (datum: any, index: number): any;
+    }
+    /**
+     * Defines a way how specific attribute needs be retrieved before rendering.
+     */
+    interface _Projection {
         accessor: _Accessor;
         scale?: Scale.AbstractScale<any, any>;
         attribute: string;
@@ -875,7 +877,10 @@ declare module Plottable {
      * function(d) { return foo + bar; }`.
      */
     interface AttributeToProjector {
-        [attrToSet: string]: AppliedAccessor;
+        [attrToSet: string]: _Projector;
+    }
+    interface _AttributeToAppliedProjector {
+        [attrToSet: string]: _AppliedProjector;
     }
     /**
      * A simple bounding box.
@@ -915,14 +920,6 @@ declare module Plottable {
     interface Point {
         x: number;
         y: number;
-    }
-    /**
-     * A key that is also coupled with a dataset and a drawer.
-     */
-    interface DatasetDrawerKey {
-        dataset: Dataset;
-        drawer: _Drawer.AbstractDrawer;
-        key: string;
     }
 }
 
@@ -1589,6 +1586,10 @@ declare module Plottable {
             attrToProjector: AttributeToProjector;
             animator: Animator.PlotAnimator;
         }
+        interface AppliedDrawStep {
+            attrToProjector: _AttributeToAppliedProjector;
+            animator: Animator.PlotAnimator;
+        }
         class AbstractDrawer {
             _renderArea: D3.Selection;
             _className: string;
@@ -1620,17 +1621,21 @@ declare module Plottable {
             /**
              * Draws data using one step
              *
-             * @param{DataStep} step The step, how data should be drawn.
+             * @param{AppliedDrawStep} step The step, how data should be drawn.
              */
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: AppliedDrawStep): void;
             _numberOfAnimationIterations(data: any[]): number;
+            _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
+            _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             /**
-             * Draws the data into the renderArea using the spefic steps
+             * Draws the data into the renderArea using the spefic steps and metadata
              *
              * @param{any[]} data The data to be drawn
              * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
+             * @param{any} userMetadata The metadata provided by user
+             * @param{any} plotMetadata The metadata provided by plot
              */
-            draw(data: any[], drawSteps: DrawStep[]): number;
+            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
         }
     }
 }
@@ -1642,7 +1647,7 @@ declare module Plottable {
             _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
             _numberOfAnimationIterations(data: any[]): number;
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: AppliedDrawStep): void;
         }
     }
 }
@@ -1659,7 +1664,7 @@ declare module Plottable {
              */
             drawLine(draw: boolean): Area;
             setup(area: D3.Selection): void;
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: AppliedDrawStep): void;
         }
     }
 }
@@ -1676,9 +1681,10 @@ declare module Plottable {
              */
             svgElement(tag: string): Element;
             _getDrawSelection(): D3.Selection;
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: AppliedDrawStep): void;
             _enterData(data: any[]): void;
-            draw(data: any[], drawSteps: DrawStep[]): number;
+            _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
+            _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
         }
     }
 }
@@ -1692,7 +1698,7 @@ declare module Plottable {
             constructor(key: string, isVertical: boolean);
             setup(area: D3.Selection): void;
             removeLabels(): void;
-            drawText(data: any[], attrToProjector: AttributeToProjector): void;
+            drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
         }
     }
 }
@@ -1702,8 +1708,8 @@ declare module Plottable {
     module _Drawer {
         class Arc extends Element {
             constructor(key: string);
-            _drawStep(step: DrawStep): void;
-            draw(data: any[], drawSteps: DrawStep[]): number;
+            _drawStep(step: AppliedDrawStep): void;
+            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
         }
     }
 }
@@ -2636,13 +2642,25 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        /**
+         * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
+         */
+        interface PlotDatasetKey {
+            dataset: Dataset;
+            drawer: _Drawer.AbstractDrawer;
+            plotMetadata: PlotMetadata;
+            key: string;
+        }
+        interface PlotMetadata {
+            datasetKey: string;
+        }
         class AbstractPlot extends Component.AbstractComponent {
             _dataChanged: boolean;
-            _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
+            _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
             _datasetKeysInOrder: string[];
             _renderArea: D3.Selection;
-            _projectors: {
-                [x: string]: _Projector;
+            _projections: {
+                [x: string]: _Projection;
             };
             _animate: boolean;
             _animators: Animator.PlotAnimatorMap;
@@ -2718,7 +2736,7 @@ declare module Plottable {
             animate(enabled: boolean): AbstractPlot;
             detach(): AbstractPlot;
             /**
-             * This function makes sure that all of the scales in this._projectors
+             * This function makes sure that all of the scales in this._projections
              * have an extent that includes all the data that is projected onto them.
              */
             _updateScaleExtents(): void;
@@ -2780,6 +2798,12 @@ declare module Plottable {
             _generateDrawSteps(): _Drawer.DrawStep[];
             _additionalPaint(time: number): void;
             _getDataToDraw(): D3.Map<any[]>;
+            /**
+             * Gets the new plot metadata for new dataset with provided key
+             *
+             * @param {string} key The key of new dataset
+             */
+            _getPlotMetadataForDataset(key: string): PlotMetadata;
         }
     }
 }
@@ -3131,9 +3155,9 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _setup(): void;
-            _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor): boolean;
+            _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
             _getDrawer(key: string): _Drawer.Line;
-            _getResetYFunction(): (d: any, i: number) => number;
+            _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
             _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
             _wholeDatumAttributes(): string[];
@@ -3167,7 +3191,7 @@ declare module Plottable {
             _getDrawer(key: string): _Drawer.Area;
             _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Area<X>;
-            _getResetYFunction(): AppliedAccessor;
+            _getResetYFunction(): _Projector;
             _wholeDatumAttributes(): string[];
         }
     }
@@ -3222,8 +3246,8 @@ declare module Plottable {
             _getDomainKeys(): string[];
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             _updateScaleExtents(): void;
-            _keyAccessor(): AppliedAccessor;
-            _valueAccessor(): AppliedAccessor;
+            _keyAccessor(): _Accessor;
+            _valueAccessor(): _Accessor;
         }
     }
 }
@@ -3283,8 +3307,8 @@ declare module Plottable {
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             _updateScaleExtents(): void;
-            _keyAccessor(): AppliedAccessor;
-            _valueAccessor(): AppliedAccessor;
+            _keyAccessor(): _Accessor;
+            _valueAccessor(): _Accessor;
             _getBarPixelWidth(): any;
         }
     }
@@ -3457,7 +3481,7 @@ declare module Plottable {
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
             animate(selection: any, attrToProjector: AttributeToProjector): any;
-            _startMovingProjector(attrToProjector: AttributeToProjector): AppliedAccessor;
+            _startMovingProjector(attrToProjector: AttributeToProjector): _Projector;
         }
     }
 }

@@ -51,7 +51,7 @@ export module Plot {
       }
 
       var defaultAccessor = (d: any) => d.value;
-      var valueProjector = this._projectors["value"];
+      var valueProjector = this._projections["value"];
       attrToProjector["value"] = valueProjector ? valueProjector.accessor : defaultAccessor;
 
       return attrToProjector;
