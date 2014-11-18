@@ -547,5 +547,38 @@ describe("Plots", () => {
         assert.lengthOf(texts, 0, "texts were immediately removed");
       });
     });
+
+    describe("getAllBars()", () => {
+      var verticalBarPlot: Plottable.Plot.VerticalBar<string>;
+      var dataset: Plottable.Dataset;
+      var svg: D3.Selection;
+
+      beforeEach(() => {
+        svg = generateSVG();
+        dataset = new Plottable.Dataset();
+        var xScale = new Plottable.Scale.Ordinal();
+        var yScale = new Plottable.Scale.Linear();
+        verticalBarPlot = new Plottable.Plot.VerticalBar<string>(xScale, yScale);
+      });
+
+      it("getAllBars works in the normal case", () => {
+        dataset.data([{x: "foo", y: 5}, {x: "bar", y: 640}, {x: "zoo", y: 12345}]);
+        verticalBarPlot.addDataset(dataset);
+        verticalBarPlot.renderTo(svg);
+        var bars = verticalBarPlot.getAllBars();
+        assert.lengthOf(bars[0], 3, "three bars in the bar plot");
+        svg.remove();
+      });
+
+
+      it("getAllBars returns 0 bars if there are no bars", () => {
+        verticalBarPlot.addDataset(dataset);
+        verticalBarPlot.renderTo(svg);
+        var bars = verticalBarPlot.getAllBars();
+        assert.lengthOf(bars[0], 0, "zero bars in the bar plot");
+        svg.remove();
+      });
+
+    });
   });
 });

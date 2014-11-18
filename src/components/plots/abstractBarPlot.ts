@@ -147,6 +147,15 @@ export module Plot {
     }
 
     /**
+     * Gets all the bars in the bar plot
+     *
+     * @returns {D3.Selection} All of the bars in the bar plot.
+     */
+    public getAllBars(): D3.Selection {
+      return this._renderArea.selectAll("rect");
+    }
+
+    /**
      * Gets the bar under the given pixel position (if [xValOrExtent]
      * and [yValOrExtent] are {number}s), under a given line (if only one
      * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
@@ -261,7 +270,11 @@ export module Plot {
       var drawers: _Drawer.Rect[] = <any> this._getDrawersInOrder();
       var attrToProjector = this._generateAttrToProjector();
       var dataToDraw = this._getDataToDraw();
-      this._datasetKeysInOrder.forEach((k, i) => drawers[i].drawText(dataToDraw.get(k), attrToProjector));
+      this._datasetKeysInOrder.forEach((k, i) =>
+        drawers[i].drawText(dataToDraw.get(k),
+                            attrToProjector,
+                            this._key2PlotDatasetKey.get(k).dataset.metadata(),
+                            this._key2PlotDatasetKey.get(k).plotMetadata));
       if (this.hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._someLabelsTooWide)) {
         drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
       }
@@ -301,31 +314,34 @@ export module Plot {
       var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
                       && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
       if (!bandsMode) {
-        attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) * this._barAlignmentFactor;
+        attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
+          positionF(d, i, u, m) - widthF(d, i, u, m) * this._barAlignmentFactor;
       } else {
         var bandWidth = (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeBand();
-        attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2;
+        attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
+          positionF(d, i, u, m) - widthF(d, i, u, m) / 2 + bandWidth / 2;
       }
 
       var originalPositionFn = attrToProjector[primaryAttr];
-      attrToProjector[primaryAttr] = (d: any, i: number) => {
-        var originalPos = originalPositionFn(d, i);
+      attrToProjector[primaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) => {
+        var originalPos = originalPositionFn(d, i, u, m);
         // If it is past the baseline, it should start at the baselin then width/height
         // carries it over. If it's not past the baseline, leave it at original position and
         // then width/height carries it to baseline
         return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
       };
 
-      attrToProjector["height"] = (d: any, i: number) => {
-        return Math.abs(scaledBaseline - originalPositionFn(d, i));
+      attrToProjector["height"] = (d: any, i: number, u: any, m: PlotMetadata) => {
+        return Math.abs(scaledBaseline - originalPositionFn(d, i, u, m));
       };
 
-      var primaryAccessor = this._projectors[primaryAttr].accessor;
+      var primaryAccessor = this._projections[primaryAttr].accessor;
       if (this.barLabelsEnabled && this.barLabelFormatter) {
-        attrToProjector["label"] = (d: any, i: number) => {
-          return this._barLabelFormatter(primaryAccessor(d, i));
+        attrToProjector["label"] = (d: any, i: number, u: any, m: PlotMetadata) => {
+          return this._barLabelFormatter(primaryAccessor(d, i, u, m));
         };
-        attrToProjector["positive"] = (d: any, i: number) => originalPositionFn(d, i) <= scaledBaseline;
+        attrToProjector["positive"] = (d: any, i: number, u: any, m: PlotMetadata) =>
+          originalPositionFn(d, i, u, m) <= scaledBaseline;
       }
       return attrToProjector;
     }
@@ -357,16 +373,20 @@ export module Plot {
           barPixelWidth = step * padding * 0.5;
         }
       } else {
-        var barAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
+        var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
 
-        var barAccessorData = d3.set(_Util.Methods.flatten(this.datasets().map((dataset) => {
-          return dataset.data().map((d, i) => barAccessor(d, i));
+        var barAccessorData = d3.set(_Util.Methods.flatten(this._datasetKeysInOrder.map((k) => {
+          var dataset = this._key2PlotDatasetKey.get(k).dataset;
+          var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+          return dataset.data().map((d, i) => barAccessor(d, i, dataset.metadata(), plotMetadata));
         }))).values();
 
         if (barAccessorData.some((datum) => datum === "undefined")) { return -1; }
 
-        var numberBarAccessorData = d3.set(_Util.Methods.flatten(this.datasets().map((dataset) => {
-          return dataset.data().map((d, i) => barAccessor(d, i).valueOf());
+        var numberBarAccessorData = d3.set(_Util.Methods.flatten(this._datasetKeysInOrder.map((k) => {
+          var dataset = this._key2PlotDatasetKey.get(k).dataset;
+          var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+          return dataset.data().map((d, i) => barAccessor(d, i, dataset.metadata(), plotMetadata).valueOf());
         }))).values().map((value) => +value);
 
         numberBarAccessorData.sort((a, b) => a - b);
@@ -425,6 +445,7 @@ export module Plot {
       this.clearHoverSelection();
     }
 
+    // HACKHACK User and plot metadata should be applied here - #1306.
     public _doHover(p: Point): Interaction.HoverData {
       var xPositionOrExtent: any = p.x;
       var yPositionOrExtent: any = p.y;
@@ -457,13 +478,13 @@ export module Plot {
       bars.each((d, i) => {
         if (this._isVertical) {
           points.push({
-            x: projectors["x"](d, i) + projectors["width"](d, i)/2,
-            y: projectors["y"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["height"](d, i))
+            x: projectors["x"](d, i, null, null) + projectors["width"](d, i, null, null)/2,
+            y: projectors["y"](d, i, null, null) + (projectors["positive"](d, i, null, null) ? 0 : projectors["height"](d, i, null, null))
           });
         } else {
           points.push({
-            x: projectors["x"](d, i) + (projectors["positive"](d, i) ? 0 : projectors["width"](d, i)),
-            y: projectors["y"](d, i) + projectors["height"](d, i)/2
+            x: projectors["x"](d, i, null, null) + (projectors["positive"](d, i, null, null) ? 0 : projectors["width"](d, i, null, null)),
+            y: projectors["y"](d, i, null, null) + projectors["height"](d, i, null, null)/2
           });
         }
       });

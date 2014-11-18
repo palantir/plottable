@@ -35,8 +35,12 @@ export module Plot {
 
     public _updateStackOffsets() {
       var domainKeys = this._getDomainKeys();
-      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-      var keySets = this.datasets().map((dataset) => d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i).toString())).values());
+      var keyAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+      var keySets = this._datasetKeysInOrder.map((k) => {
+        var dataset = this._key2PlotDatasetKey.get(k).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+        return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset.metadata(), plotMetadata).toString())).values();
+      });
 
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
         _Util.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
@@ -73,17 +77,21 @@ export module Plot {
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
+
       var wholeDatumAttributes = this._wholeDatumAttributes();
       var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
       var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
       singleDatumAttributes.forEach((attribute: string) => {
         var projector = attrToProjector[attribute];
-        attrToProjector[attribute] = (data: any[], i: number) => data.length > 0 ? projector(data[0], i) : null;
+        attrToProjector[attribute] = (data: any[], i: number, u: any, m: PlotMetadata) =>
+                                        data.length > 0 ? projector(data[0], i, u, m) : null;
       });
 
-      var yAccessor = this._projectors["y"].accessor;
-      attrToProjector["y"] = (d: any) => this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      attrToProjector["y0"] = (d: any) => this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var yAccessor = this._projections["y"].accessor;
+      attrToProjector["y"] = (d: any, i: number, u: any, m: PlotMetadata) =>
+        this._yScale.scale(+yAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      attrToProjector["y0"] = (d: any, i: number, u: any, m: PlotMetadata) =>
+        this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
       return attrToProjector;
     }
