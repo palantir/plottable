@@ -1,9 +1,7 @@
 function makeData() {
   "use strict";
   var blueSet = makeRandomData(20);
-  blueSet.forEach(function(d) { d.color = "blue"; });
   var redSet = makeRandomData(20);
-  redSet.forEach(function(d) { d.color = "red"; });
   return [blueSet, redSet];
 }
 
@@ -17,12 +15,15 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
   var title = new Plottable.Component.TitleLabel("Hover over points");
 
+  var ds1 = new Plottable.Dataset(data[0], { color: "blue", r: 10, shift: 0.2 });
+  var ds2 = new Plottable.Dataset(data[1], { color: "red", r: 15, shift: 0 });
+
   var plot = new Plottable.Plot.Scatter(xScale, yScale)
-    .addDataset(data[0])
-    .addDataset(data[1])
-    .project("r", 10)
-    .project("fill", "color")
-    .project("x", "x", xScale)
+    .addDataset(ds1)
+    .addDataset(ds2)
+    .project("r", function(d, i, u) { return u.r; })
+    .project("fill", function(d, i, u) { return u.color; })
+    .project("x", function(d, i, u) { return d.x + u.shift; }, xScale)
     .project("y", "y", yScale);
 
   var chart = new Plottable.Component.Table([
@@ -42,10 +43,9 @@ function run(div, data, Plottable) {
 
   var hover = new Plottable.Interaction.Hover();
   hover.onHoverOver(function(hoverData) {
-    var color = hoverData.data[0].color.toUpperCase();
     var xString = hoverData.data[0].x.toFixed(2);
     var yString = hoverData.data[0].y.toFixed(2);
-    title.text(color + ": [ " + xString + ", " + yString + " ]");
+    title.text("[ " + xString + ", " + yString + " ]");
 
     hoverCircle.attr({
       "cx": hoverData.pixelPositions[0].x,

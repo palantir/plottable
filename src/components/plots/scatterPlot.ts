@@ -76,6 +76,8 @@ export module Plot {
 
       var overAPoint = false;
       var closestElement: Element;
+      var closestElementUserMedata: any;
+      var closestElementPlotMedata: any;
       var closestIndex: number;
       var minDistSq = range * range;
 
@@ -92,12 +94,16 @@ export module Plot {
               closestElement = this;
               closestIndex = i;
               minDistSq = distSq;
+              closestElementUserMedata = dataset.metadata();
+              closestElementPlotMedata = plotMetadata;
             }
             overAPoint = true;
           } else if (!overAPoint && distSq < minDistSq) {
             closestElement = this;
             closestIndex = i;
             minDistSq = distSq;
+            closestElementUserMedata = dataset.metadata();
+            closestElementPlotMedata = plotMetadata;
           }
         });
       });
@@ -113,8 +119,8 @@ export module Plot {
       var closestSelection = d3.select(closestElement);
       var closestData = closestSelection.data();
       var closestPoint = {
-        x: attrToProjector["cx"](closestData[0], closestIndex, null, null),
-        y: attrToProjector["cy"](closestData[0], closestIndex, null, null)
+        x: attrToProjector["cx"](closestData[0], closestIndex, closestElementUserMedata, closestElementPlotMedata),
+        y: attrToProjector["cy"](closestData[0], closestIndex, closestElementUserMedata, closestElementPlotMedata)
       };
       return {
         selection: closestSelection,
