@@ -33,6 +33,7 @@ export module Plot {
     }
 
     public _updateStackOffsets() {
+      if (!this._projectorsReady()) { return; }
       var domainKeys = this._getDomainKeys();
       var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
       var keySets = this.datasets().map((dataset) => d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i).toString())).values());

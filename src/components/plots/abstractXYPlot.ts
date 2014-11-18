@@ -157,13 +157,13 @@ export module Plot {
     }
 
     private adjustYDomainOnChangeFromX() {
-      if (!this.projectorsReady()) { return; }
+      if (!this._projectorsReady()) { return; }
       if(this._autoAdjustYScaleDomain) {
         this.adjustDomainToVisiblePoints<X,Y>(this._xScale, this._yScale, true);
       }
     }
     private adjustXDomainOnChangeFromY() {
-      if (!this.projectorsReady()) { return; }
+      if (!this._projectorsReady()) { return; }
       if(this._autoAdjustXScaleDomain) {
         this.adjustDomainToVisiblePoints<Y,X>(this._yScale, this._xScale, false);
       }
@@ -200,7 +200,7 @@ export module Plot {
       return retVal;
     }
 
-    private projectorsReady() {
+    public _projectorsReady() {
       return this._projectors["x"] && this._projectors["y"];
     }
   }

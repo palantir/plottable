@@ -6730,7 +6730,7 @@ var Plottable;
                 }
             };
             AbstractXYPlot.prototype.adjustYDomainOnChangeFromX = function () {
-                if (!this.projectorsReady()) {
+                if (!this._projectorsReady()) {
                     return;
                 }
                 if (this._autoAdjustYScaleDomain) {
@@ -6738,7 +6738,7 @@ var Plottable;
                 }
             };
             AbstractXYPlot.prototype.adjustXDomainOnChangeFromY = function () {
-                if (!this.projectorsReady()) {
+                if (!this._projectorsReady()) {
                     return;
                 }
                 if (this._autoAdjustXScaleDomain) {
@@ -6773,7 +6773,7 @@ var Plottable;
                 }
                 return retVal;
             };
-            AbstractXYPlot.prototype.projectorsReady = function () {
+            AbstractXYPlot.prototype._projectorsReady = function () {
                 return this._projectors["x"] && this._projectors["y"];
             };
             return AbstractXYPlot;
@@ -7975,6 +7975,9 @@ var Plottable;
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
             StackedArea.prototype._updateStackOffsets = function () {
+                if (!this._projectorsReady()) {
+                    return;
+                }
                 var domainKeys = this._getDomainKeys();
                 var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
                 var keySets = this.datasets().map(function (dataset) { return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i).toString(); })).values(); });
