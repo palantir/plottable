@@ -46,9 +46,9 @@ export module Plot {
       delete attrToProjector["x"];
       attrToProjector["cy"] = attrToProjector["y"];
       delete attrToProjector["y"];
-      if (attrToProjector["r"] == null) { attrToProjector["r"] = () => 3; }
-      if (attrToProjector["opacity"] == null) { attrToProjector["opacity"] = () => 0.6; }
-      if (attrToProjector["fill"] == null) { attrToProjector["fill"] = () => this.defaultFillColor; }
+      attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
+      attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
       return attrToProjector;
     }
 

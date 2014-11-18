@@ -85,9 +85,9 @@ export module Plot {
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      if (attrToProjector["fill-opacity"] == null) { attrToProjector["fill-opacity"] = () => 0.25; }
-      if (attrToProjector["fill"] == null) { attrToProjector["fill"] = () => this.defaultFillColor; }
-      if (attrToProjector["stroke"] == null) { attrToProjector["stroke"] = () => this.defaultFillColor; }
+      attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultFillColor);
       return attrToProjector;
     }
   }

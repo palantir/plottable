@@ -84,7 +84,7 @@ export module Plot {
       attrToProjector["y"] = (d: any) => this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
       attrToProjector["y0"] = (d: any) => this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
-      if (attrToProjector["fill"] == null) { attrToProjector["fill"] = () => this.defaultFillColor; }
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
 
       return attrToProjector;
     }

@@ -81,8 +81,8 @@ export module Plot {
       var xFunction       = attrToProjector["x"];
       var yFunction       = attrToProjector["y"];
       attrToProjector["defined"] = (d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction);
-      if (attrToProjector["stroke"] == null) { attrToProjector["stroke"] = () => this.defaultStrokeColor; }
-      if (attrToProjector["stroke-width"] == null) { attrToProjector["stroke-width"] = () => "2px"; }
+      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultStrokeColor);
+      attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
       return attrToProjector;
     }
 

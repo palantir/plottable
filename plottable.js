@@ -6811,21 +6811,14 @@ var Plottable;
                 return new Plottable._Drawer.Element(key).svgElement("circle");
             };
             Scatter.prototype._generateAttrToProjector = function () {
-                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 attrToProjector["cx"] = attrToProjector["x"];
                 delete attrToProjector["x"];
                 attrToProjector["cy"] = attrToProjector["y"];
                 delete attrToProjector["y"];
-                if (attrToProjector["r"] == null) {
-                    attrToProjector["r"] = function () { return 3; };
-                }
-                if (attrToProjector["opacity"] == null) {
-                    attrToProjector["opacity"] = function () { return 0.6; };
-                }
-                if (attrToProjector["fill"] == null) {
-                    attrToProjector["fill"] = function () { return _this.defaultFillColor; };
-                }
+                attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
+                attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {
@@ -7235,9 +7228,7 @@ var Plottable;
                     };
                     attrToProjector["positive"] = function (d, i) { return originalPositionFn(d, i) <= scaledBaseline; };
                 }
-                if (attrToProjector["fill"] == null) {
-                    attrToProjector["fill"] = function () { return _this.defaultFillColor; };
-                }
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
                 return attrToProjector;
             };
             /**
@@ -7534,12 +7525,8 @@ var Plottable;
                 var xFunction = attrToProjector["x"];
                 var yFunction = attrToProjector["y"];
                 attrToProjector["defined"] = function (d, i) { return _this._rejectNullsAndNaNs(d, i, xFunction) && _this._rejectNullsAndNaNs(d, i, yFunction); };
-                if (attrToProjector["stroke"] == null) {
-                    attrToProjector["stroke"] = function () { return _this.defaultStrokeColor; };
-                }
-                if (attrToProjector["stroke-width"] == null) {
-                    attrToProjector["stroke-width"] = function () { return "2px"; };
-                }
+                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultStrokeColor);
+                attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
                 return attrToProjector;
             };
             Line.prototype._wholeDatumAttributes = function () {
@@ -7690,17 +7677,10 @@ var Plottable;
                 return wholeDatumAttributes;
             };
             Area.prototype._generateAttrToProjector = function () {
-                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                if (attrToProjector["fill-opacity"] == null) {
-                    attrToProjector["fill-opacity"] = function () { return 0.25; };
-                }
-                if (attrToProjector["fill"] == null) {
-                    attrToProjector["fill"] = function () { return _this.defaultFillColor; };
-                }
-                if (attrToProjector["stroke"] == null) {
-                    attrToProjector["stroke"] = function () { return _this.defaultFillColor; };
-                }
+                attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultFillColor);
                 return attrToProjector;
             };
             return Area;
@@ -8026,9 +8006,7 @@ var Plottable;
                 var yAccessor = this._projectors["y"].accessor;
                 attrToProjector["y"] = function (d) { return _this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 attrToProjector["y0"] = function (d) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                if (attrToProjector["fill"] == null) {
-                    attrToProjector["fill"] = function () { return _this.defaultFillColor; };
-                }
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
                 return attrToProjector;
             };
             StackedArea.prototype._wholeDatumAttributes = function () {

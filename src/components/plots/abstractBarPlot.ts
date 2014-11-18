@@ -335,7 +335,7 @@ export module Plot {
         attrToProjector["positive"] = (d: any, i: number) => originalPositionFn(d, i) <= scaledBaseline;
       }
 
-      if (attrToProjector["fill"] == null) { attrToProjector["fill"] = () => this.defaultFillColor; }
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
       return attrToProjector;
     }
 
