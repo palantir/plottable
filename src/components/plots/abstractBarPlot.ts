@@ -13,6 +13,7 @@ export module Plot {
     private _barLabelsEnabled = false;
     private _hoverMode = "point";
     private hideBarsIfAnyAreTooWide = true;
+    private defaultFillColor: string;
 
     /**
      * Constructs a BarPlot.
@@ -24,8 +25,7 @@ export module Plot {
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
-      var defaultColor = new Scale.Color().range()[0];
-      this.project("fill", () => defaultColor);
+      this.defaultFillColor = new Scale.Color().range()[0];
       this._animators["bars-reset"] = new Animator.Null();
       this._animators["bars"] = new Animator.Base();
       this._animators["baseline"] = new Animator.Null();
@@ -334,6 +334,8 @@ export module Plot {
         };
         attrToProjector["positive"] = (d: any, i: number) => originalPositionFn(d, i) <= scaledBaseline;
       }
+
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
       return attrToProjector;
     }
 

@@ -22,9 +22,6 @@ export module Plot {
       super(xScale, yScale);
       this.classed("bar-plot", true);
 
-      var defaultColor = new Scale.Color().range()[0];
-      this.project("fill", () => defaultColor);
-
       this.baseline(this._baselineValue);
       this._isVertical = isVertical;
     }
@@ -59,6 +56,7 @@ export module Plot {
 
       var attrFunction = (d: any) => +primaryAccessor(d) < 0 ? getStart(d) : getEnd(d);
       attrToProjector[primaryAttr] = (d: any) => this._isVertical ? attrFunction(d) : attrFunction(d) - heightF(d);
+
       return attrToProjector;
     }
 
