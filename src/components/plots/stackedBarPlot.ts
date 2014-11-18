@@ -44,7 +44,7 @@ export module Plot {
     }
 
     public _generateAttrToProjector() {
-      var attrToProjector = AbstractBarPlot.prototype._generateAttrToProjector.apply(this);
+      var attrToProjector = super._generateAttrToProjector();
 
       var primaryAttr = this._isVertical ? "y" : "x";
       var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
@@ -119,10 +119,6 @@ export module Plot {
       return AbstractStacked.prototype._valueAccessor.call(this);
     }
     //===== /Stack logic =====
-
-    public _getBarPixelWidth() {
-      return AbstractBarPlot.prototype._getBarPixelWidth.apply(this);
-    }
   }
 }
 }

@@ -8204,7 +8204,7 @@ var Plottable;
             };
             StackedBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
-                var attrToProjector = Plot.AbstractBarPlot.prototype._generateAttrToProjector.apply(this);
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 var primaryAccessor = this._projections[primaryAttr].accessor;
@@ -8258,10 +8258,6 @@ var Plottable;
             };
             StackedBar.prototype._valueAccessor = function () {
                 return Plot.AbstractStacked.prototype._valueAccessor.call(this);
-            };
-            //===== /Stack logic =====
-            StackedBar.prototype._getBarPixelWidth = function () {
-                return Plot.AbstractBarPlot.prototype._getBarPixelWidth.apply(this);
             };
             return StackedBar;
         })(Plot.AbstractBarPlot);
