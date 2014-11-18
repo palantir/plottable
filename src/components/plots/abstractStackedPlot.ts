@@ -2,10 +2,13 @@
 
 module Plottable {
 export module Plot {
+  export interface StackedPlotMetadata extends PlotMetadata {
+    offsets: (datasetKey: string) => number;
+  }
+
   export interface StackedDatum {
     key: any;
     value: number;
-    offset?: number;
   }
 
   export class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
@@ -133,25 +136,25 @@ export module Plot {
       return domainKeys.values();
     }
 
-    public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
+    public _generateDefaultMapArray(): D3.Map<D3.Map<StackedDatum>> {
       var keyAccessor = this._keyAccessor();
       var valueAccessor = this._valueAccessor();
       var datasets = this.datasets();
       var domainKeys = this._getDomainKeys();
 
-      var dataMapArray = datasets.map(() => {
+      var dataMap = _Util.Methods.populateMap(this._datasetKeysInOrder, (k) => {
         return _Util.Methods.populateMap(domainKeys, (domainKey) => {
           return {key: domainKey, value: 0};
         });
       });
 
-      this._datasetKeysInOrder.forEach((k, datasetIndex) => {
+      this._datasetKeysInOrder.forEach((k) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
         dataset.data().forEach((datum, index) => {
           var key = keyAccessor(datum, index, dataset.metadata(), plotMetadata);
           var value = valueAccessor(datum, index, dataset.metadata(), plotMetadata);
-          dataMapArray[datasetIndex].set(key, {key: key, value: value});
+          dataMap[k].set(key, {key: key, value: value});
         });
       });
 
