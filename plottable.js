@@ -6671,12 +6671,10 @@ var Plottable;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
                 attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
-                if (attrToProjector["fill"] == null) {
-                    attrToProjector["fill"] = function (d, i) { return _this.colorScale.scale(String(i)); };
-                }
+                var defaultFillFunction = function (d, i) { return _this.colorScale.scale(String(i)); };
+                attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
                 var defaultAccessor = function (d) { return d.value; };
-                var valueProjector = this._projections["value"];
-                attrToProjector["value"] = valueProjector ? valueProjector.accessor : defaultAccessor;
+                attrToProjector["value"] = attrToProjector["value"] || defaultAccessor;
                 return attrToProjector;
             };
             Pie.prototype._getDrawer = function (key) {
