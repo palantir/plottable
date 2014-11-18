@@ -64,13 +64,13 @@ export module Plot {
       return drawSteps;
     }
 
-    // HACKHACK User and plot metada should be applied - #1306.
     public _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
-      var drawers = <_Drawer.Element[]> this._getDrawersInOrder();
       var attrToProjector = this._generateAttrToProjector();
-      var getDistSq = (d: any, i: number) => {
-        var dx = attrToProjector["cx"](d, i, null, null) - p.x;
-        var dy = attrToProjector["cy"](d, i, null, null) - p.y;
+      var xProjector = attrToProjector["x"];
+      var yProjector = attrToProjector["y"];
+      var getDistSq = (d: any, i: number, userMetdata: any, plotMetadata: PlotMetadata) => {
+        var dx = attrToProjector["cx"](d, i, userMetdata, plotMetadata) - p.x;
+        var dy = attrToProjector["cy"](d, i, userMetdata, plotMetadata) - p.y;
         return (dx * dx + dy * dy);
       };
 
@@ -79,10 +79,13 @@ export module Plot {
       var closestIndex: number;
       var minDistSq = range * range;
 
-      drawers.forEach((drawer) => {
+       this._datasetKeysInOrder.forEach((key: string) => {
+        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
+        var drawer = <_Drawer.Element>this._key2PlotDatasetKey.get(key).drawer;
         drawer._getDrawSelection().each(function (d, i) {
-          var distSq = getDistSq(d, i);
-          var r = attrToProjector["r"](d, i, null, null);
+          var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
+          var r = attrToProjector["r"](d, i, dataset.metadata(), plotMetadata);
 
           if (distSq < r * r) { // cursor is over this point
             if (!overAPoint || distSq < minDistSq) {

@@ -6945,23 +6945,27 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("circles") });
                 return drawSteps;
             };
-            // HACKHACK User and plot metada should be applied - #1306.
             Scatter.prototype._getClosestStruckPoint = function (p, range) {
-                var drawers = this._getDrawersInOrder();
+                var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
-                var getDistSq = function (d, i) {
-                    var dx = attrToProjector["cx"](d, i, null, null) - p.x;
-                    var dy = attrToProjector["cy"](d, i, null, null) - p.y;
+                var xProjector = attrToProjector["x"];
+                var yProjector = attrToProjector["y"];
+                var getDistSq = function (d, i, userMetdata, plotMetadata) {
+                    var dx = attrToProjector["cx"](d, i, userMetdata, plotMetadata) - p.x;
+                    var dy = attrToProjector["cy"](d, i, userMetdata, plotMetadata) - p.y;
                     return (dx * dx + dy * dy);
                 };
                 var overAPoint = false;
                 var closestElement;
                 var closestIndex;
                 var minDistSq = range * range;
-                drawers.forEach(function (drawer) {
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                    var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
+                    var drawer = _this._key2PlotDatasetKey.get(key).drawer;
                     drawer._getDrawSelection().each(function (d, i) {
-                        var distSq = getDistSq(d, i);
-                        var r = attrToProjector["r"](d, i, null, null);
+                        var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
+                        var r = attrToProjector["r"](d, i, dataset.metadata(), plotMetadata);
                         if (distSq < r * r) {
                             if (!overAPoint || distSq < minDistSq) {
                                 closestElement = this;
@@ -7662,27 +7666,29 @@ var Plottable;
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
             };
-            // HACKHACK User and plot metadata should be applied here - #1306.
             Line.prototype._getClosestWithinRange = function (p, range) {
+                var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
                 var xProjector = attrToProjector["x"];
                 var yProjector = attrToProjector["y"];
-                var getDistSq = function (d, i) {
-                    var dx = +xProjector(d, i, null, null) - p.x;
-                    var dy = +yProjector(d, i, null, null) - p.y;
+                var getDistSq = function (d, i, userMetdata, plotMetadata) {
+                    var dx = +xProjector(d, i, userMetdata, plotMetadata) - p.x;
+                    var dy = +yProjector(d, i, userMetdata, plotMetadata) - p.y;
                     return (dx * dx + dy * dy);
                 };
                 var closestOverall;
                 var closestPoint;
                 var closestDistSq = range * range;
-                this.datasets().forEach(function (dataset) {
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                    var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
                     dataset.data().forEach(function (d, i) {
-                        var distSq = getDistSq(d, i);
+                        var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
                         if (distSq < closestDistSq) {
                             closestOverall = d;
                             closestPoint = {
-                                x: xProjector(d, i, null, null),
-                                y: yProjector(d, i, null, null)
+                                x: xProjector(d, i, dataset.metadata(), plotMetadata),
+                                y: yProjector(d, i, dataset.metadata(), plotMetadata)
                             };
                             closestDistSq = distSq;
                         }
