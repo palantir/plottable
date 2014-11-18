@@ -6730,7 +6730,7 @@ var Plottable;
                 }
             };
             AbstractXYPlot.prototype.adjustYDomainOnChangeFromX = function () {
-                if (!this.projectorsReady()) {
+                if (!this._projectorsReady()) {
                     return;
                 }
                 if (this._autoAdjustYScaleDomain) {
@@ -6738,7 +6738,7 @@ var Plottable;
                 }
             };
             AbstractXYPlot.prototype.adjustXDomainOnChangeFromY = function () {
-                if (!this.projectorsReady()) {
+                if (!this._projectorsReady()) {
                     return;
                 }
                 if (this._autoAdjustXScaleDomain) {
@@ -6773,7 +6773,7 @@ var Plottable;
                 }
                 return retVal;
             };
-            AbstractXYPlot.prototype.projectorsReady = function () {
+            AbstractXYPlot.prototype._projectorsReady = function () {
                 return this._projectors["x"] && this._projectors["y"];
             };
             return AbstractXYPlot;

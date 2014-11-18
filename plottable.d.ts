@@ -2821,6 +2821,7 @@ declare module Plottable {
              * This call does not override auto domain adjustment behavior over visible points.
              */
             showAllData(): void;
+            _projectorsReady(): _Projector;
         }
     }
 }
