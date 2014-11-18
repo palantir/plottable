@@ -3295,7 +3295,7 @@ declare module Plottable {
              */
             constructor(xScale?: Scale.AbstractScale<X, number>, yScale?: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             _getAnimator(key: string): Animator.PlotAnimator;
-            _generateAttrToProjector(): any;
+            _generateAttrToProjector(): AttributeToProjector;
             _generateDrawSteps(): _Drawer.DrawStep[];
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedBar<X, Y>;
             _onDatasetUpdate(): StackedBar<X, Y>;
@@ -3308,7 +3308,6 @@ declare module Plottable {
             _updateScaleExtents(): void;
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
-            _getBarPixelWidth(): any;
         }
     }
 }
