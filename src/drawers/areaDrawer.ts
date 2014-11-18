@@ -19,7 +19,7 @@ export module _Drawer {
     /**
      * Sets the value determining if line should be drawn.
      *
-     * @param{boolean} draw The value determing if line should be drawn.
+     * @param{boolean} draw The value determining if line should be drawn.
      */
     public drawLine(draw: boolean): Area {
       this._drawLine = draw;
