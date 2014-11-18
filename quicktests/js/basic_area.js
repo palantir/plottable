@@ -29,8 +29,8 @@ function run(div, data, Plottable) {
 
   var y0Accessor = function(d, i) { return dataseries[i].y; };
 
-  var areaPlot1 = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries);
-  var areaPlot2 = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries_top).attr("y0", y0Accessor, yScale);
+  var areaPlot1 = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries).project("x", "x", xScale).project("y", "y", yScale);
+  var areaPlot2 = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries_top).attr("y0", y0Accessor, yScale).project("x", "x", xScale).project("y", "y", yScale);
 
   var fillAccessor = function() { return "steelblue"; };
   var fillAccessorTop = function() { return "pink"; };

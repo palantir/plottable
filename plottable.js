@@ -6603,6 +6603,7 @@ var Plottable;
              * @param {Scale} yScale The y scale to use.
              */
             function AbstractXYPlot(xScale, yScale) {
+                var _this = this;
                 _super.call(this);
                 this._autoAdjustXScaleDomain = false;
                 this._autoAdjustYScaleDomain = false;
@@ -6610,8 +6611,12 @@ var Plottable;
                     throw new Error("XYPlots require an xScale and yScale");
                 }
                 this.classed("xy-plot", true);
-                this.project("x", "x", xScale); // default accessor
-                this.project("y", "y", yScale); // default accessor
+                this._xScale = xScale;
+                this._yScale = yScale;
+                this._updateXDomainer();
+                xScale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this.adjustYDomainOnChangeFromX(); });
+                this._updateYDomainer();
+                yScale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this.adjustXDomainOnChangeFromY(); });
             }
             /**
              * @param {string} attrToSet One of ["x", "y"] which determines the point's
@@ -6725,11 +6730,17 @@ var Plottable;
                 }
             };
             AbstractXYPlot.prototype.adjustYDomainOnChangeFromX = function () {
+                if (!this.projectorsReady()) {
+                    return;
+                }
                 if (this._autoAdjustYScaleDomain) {
                     this.adjustDomainToVisiblePoints(this._xScale, this._yScale, true);
                 }
             };
             AbstractXYPlot.prototype.adjustXDomainOnChangeFromY = function () {
+                if (!this.projectorsReady()) {
+                    return;
+                }
                 if (this._autoAdjustXScaleDomain) {
                     this.adjustDomainToVisiblePoints(this._yScale, this._xScale, false);
                 }
@@ -6761,6 +6772,9 @@ var Plottable;
                     retVal = [Plottable._Util.Methods.min(bVals, null), Plottable._Util.Methods.max(bVals, null)];
                 }
                 return retVal;
+            };
+            AbstractXYPlot.prototype.projectorsReady = function () {
+                return this._projectors["x"] && this._projectors["y"];
             };
             return AbstractXYPlot;
         })(Plot.AbstractPlot);

@@ -34,6 +34,8 @@ describe("Plots", () => {
       renderer = new Plottable.Plot.StackedBar(xScale, yScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
+      renderer.project("x", "x", xScale);
+      renderer.project("y", "y", yScale);
       renderer.baseline(0);
       var xAxis = new Plottable.Axis.Category(xScale, "bottom");
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
@@ -112,6 +114,8 @@ describe("Plots", () => {
       plot.addDataset(data2);
       plot.addDataset(data3);
       plot.addDataset(data4);
+      plot.project("x", "x", xScale);
+      plot.project("y", "y", yScale);
       plot.baseline(0);
       var xAxis = new Plottable.Axis.Category(xScale, "bottom");
       var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
@@ -252,6 +256,8 @@ describe("Plots", () => {
       plot.addDataset(data1);
       plot.addDataset(data2);
       plot.addDataset(data3);
+      plot.project("x", "x", xScale);
+      plot.project("y", "y", yScale);
       var xAxis = new Plottable.Axis.Category(xScale, "bottom");
       var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
     });
