@@ -1,5 +1,5 @@
 /*!
-Plottable 0.36.1 (https://github.com/palantir/plottable)
+Plottable 0.37.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1403,7 +1403,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.36.1";
+    Plottable.version = "0.37.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8212,7 +8212,7 @@ var Plottable;
             };
             StackedBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
-                var attrToProjector = Plot.AbstractBarPlot.prototype._generateAttrToProjector.apply(this);
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var valueAttr = this._isVertical ? "y" : "x";
                 var keyAttr = this._isVertical ? "x" : "y";
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
@@ -8271,10 +8271,6 @@ var Plottable;
             };
             StackedBar.prototype._valueAccessor = function () {
                 return Plot.AbstractStacked.prototype._valueAccessor.call(this);
-            };
-            //===== /Stack logic =====
-            StackedBar.prototype._getBarPixelWidth = function () {
-                return Plot.AbstractBarPlot.prototype._getBarPixelWidth.apply(this);
             };
             return StackedBar;
         })(Plot.AbstractBarPlot);
@@ -9033,6 +9029,8 @@ var Plottable;
                 }
             };
             Drag.prototype._dragend = function () {
+                var location = d3.mouse(this._hitBox[0][0].parentNode);
+                this._setLocation(location[0], location[1]);
                 this._isDragging = false;
                 this._doDragend();
             };

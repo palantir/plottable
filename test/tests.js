@@ -42,8 +42,12 @@ function fakeDragSequence(anyedInteraction, startX, startY, endX, endY) {
     anyedInteraction._drag();
     d3.event = makeFakeEvent(endX, endY);
     anyedInteraction._drag();
+    d3.mouse = function () {
+        return [endX, endY];
+    };
     anyedInteraction._dragend();
     d3.event = null;
+    d3.mouse = originalD3Mouse;
 }
 function verifySpaceRequest(sr, w, h, ww, wh, id) {
     assert.equal(sr.width, w, "width requested is as expected #" + id);
@@ -6907,14 +6911,6 @@ describe("DragBoxInteractions", function () {
         fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY); // initial dragbox to resize from
         interaction.dragend(function (start, end) {
             timesCalled++;
-            var xMinObserved = Math.min(start.x, end.x);
-            var xMaxObserved = Math.max(start.x, end.x);
-            var yMinObserved = Math.min(start.y, end.y);
-            var yMaxObserved = Math.max(start.y, end.y);
-            assert.equal(xMinObserved, expectedSelection.xMin, "xMin as expected");
-            assert.equal(xMaxObserved, expectedSelection.xMax, "xMax as expected");
-            assert.equal(yMinObserved, expectedSelection.yMin, "yMin as expected");
-            assert.equal(yMaxObserved, expectedSelection.yMax, "yMax as expected");
             var interactionSelection = {
                 xMin: +interaction.dragBox.attr("x"),
                 yMin: +interaction.dragBox.attr("y"),
