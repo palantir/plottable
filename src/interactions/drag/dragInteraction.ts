@@ -5,13 +5,14 @@ export module Interaction {
   export class Drag extends AbstractInteraction {
     private dragInitialized = false;
     private dragBehavior: D3.Behavior.Drag;
-    public _origin = [0,0];
-    public _location = [0,0];
-    private  constrainX: (n: number) => number;
-    private  constrainY: (n: number) => number;
-    private ondragstart: (startLocation: Point) => void;
-    private      ondrag: (startLocation: Point, endLocation: Point) => void;
-    private   ondragend: (startLocation: Point, endLocation: Point) => void;
+    private      origin = [0,0];
+    private    location = [0,0];
+    public  _isDragging = false;
+    public  _constrainX: (n: number) => number;
+    public  _constrainY: (n: number) => number;
+    private ondragstart: (start: Point) => void;
+    private      ondrag: (start: Point, end: Point) => void;
+    private   ondragend: (start: Point, end: Point) => void;
 
     /**
      * Constructs a Drag. A Drag will signal its callbacks on mouse drag.
@@ -27,17 +28,17 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging starts.
      *
-     * @returns {(startLocation: Point) => void} The callback called when dragging starts.
+     * @returns {(start: Point) => void} The callback called when dragging starts.
      */
-    public dragstart(): (startLocation: Point) => void;
+    public dragstart(): (start: Point) => void;
     /**
      * Sets the callback to be called when dragging starts.
      *
-     * @param {(startLocation: Point) => any} cb If provided, the function to be called. Takes in a Point in pixels.
+     * @param {(start: Point) => any} cb If provided, the function to be called. Takes in a Point in pixels.
      * @returns {Drag} The calling Drag.
      */
-    public dragstart(cb: (startLocation: Point) => any): Drag;
-    public dragstart(cb?: (startLocation: Point) => any): any {
+    public dragstart(cb: (start: Point) => any): Drag;
+    public dragstart(cb?: (start: Point) => any): any {
       if (cb === undefined) {
         return this.ondragstart;
       } else {
@@ -46,20 +47,36 @@ export module Interaction {
       }
     }
 
+    // we access origin and location through setOrigin and setLocation so that on XDragBox and YDragBox we can overwrite so that
+    // we always have the uncontrolled dimension of the box extending across the entire component
+    // this ensures that the callback values are synchronized with the actual box being drawn
+    public _setOrigin(x: number, y: number) {
+      this.origin = [x, y];
+    }
+    public _getOrigin(): number[] {
+      return this.origin.slice();
+    }
+    public _setLocation(x: number, y: number) {
+      this.location = [x, y];
+    }
+    public _getLocation(): number[] {
+      return this.location.slice();
+    }
+
     /**
      * Gets the callback that is called during dragging.
      *
-     * @returns {(startLocation: Point, endLocation: Point) => void} The callback called during dragging.
+     * @returns {(start: Point, end: Point) => void} The callback called during dragging.
      */
-    public drag(): (startLocation: Point, endLocation: Point) => void;
+    public drag(): (start: Point, end: Point) => void;
     /**
      * Adds a callback to be called during dragging.
      *
-     * @param {(startLocation: Point, endLocation: Point) => any} cb If provided, the function to be called. Takes in Points in pixels.
+     * @param {(start: Point, end: Point) => any} cb If provided, the function to be called. Takes in Points in pixels.
      * @returns {Drag} The calling Drag.
      */
-    public drag(cb: (startLocation: Point, endLocation: Point) => any): Drag;
-    public drag(cb?: (startLocation: Point, endLocation: Point) => any): any {
+    public drag(cb: (start: Point, end: Point) => any): Drag;
+    public drag(cb?: (start: Point, end: Point) => any): any {
       if (cb === undefined) {
         return this.ondrag;
       } else {
@@ -71,17 +88,17 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging ends.
      *
-     * @returns {(startLocation: Point, endLocation: Point) => void} The callback called when dragging ends.
+     * @returns {(start: Point, end: Point) => void} The callback called when dragging ends.
      */
-    public dragend(): (startLocation: Point, endLocation: Point) => void;
+    public dragend(): (start: Point, end: Point) => void;
     /**
      * Adds a callback to be called when the dragging ends.
      *
-     * @param {(startLocation: Point, endLocation: Point) => any} cb If provided, the function to be called. Takes in Points in pixels.
+     * @param {(start: Point, end: Point) => any} cb If provided, the function to be called. Takes in points in pixels.
      * @returns {Drag} The calling Drag.
      */
-    public dragend(cb: (startLocation: Point, endLocation: Point) => any): Drag;
-    public dragend(cb?: (startLocation: Point, endLocation: Point) => any): any {
+    public dragend(cb: (start: Point, end: Point) => any): Drag;
+    public dragend(cb?: (start: Point, end: Point) => any): any {
       if (cb === undefined) {
         return this.ondragend;
       } else {
@@ -91,52 +108,49 @@ export module Interaction {
     }
 
     public _dragstart(){
+      this._isDragging = true;
       var width  = this._componentToListenTo.width();
       var height = this._componentToListenTo.height();
       // the constraint functions ensure that the selection rectangle will not exceed the hit box
       var constraintFunction = (min: number, max: number) => (x: number) => Math.min(Math.max(x, min), max);
-      this.constrainX = constraintFunction(0, width );
-      this.constrainY = constraintFunction(0, height);
+      this._constrainX = constraintFunction(0, width );
+      this._constrainY = constraintFunction(0, height);
+      var origin = d3.mouse(this._hitBox[0][0].parentNode);
+      this._setOrigin(origin[0], origin[1]);
+      this._doDragstart();
     }
 
     public _doDragstart() {
       if (this.ondragstart != null) {
-        this.ondragstart({x: this._origin[0], y: this._origin[1]});
+        this.ondragstart({x: this._getOrigin()[0], y: this._getOrigin()[1]});
       }
     }
 
     public _drag(){
-      if (!this.dragInitialized) {
-        this._origin = [d3.event.x, d3.event.y];
-        this.dragInitialized = true;
-        this._doDragstart();
-      }
-
-      this._location = [this.constrainX(d3.event.x), this.constrainY(d3.event.y)];
+      this._setLocation(this._constrainX(d3.event.x), this._constrainY(d3.event.y));
       this._doDrag();
     }
 
     public _doDrag() {
       if (this.ondrag != null) {
-        var startLocation = {x: this._origin[0], y: this._origin[1]};
-        var endLocation = {x: this._location[0], y: this._location[1]};
-        this.ondrag(startLocation, endLocation);
+        var start = {x: this._getOrigin()[0]  , y: this._getOrigin()[1]};
+        var end   = {x: this._getLocation()[0], y: this._getLocation()[1]};
+        this.ondrag(start, end);
       }
     }
 
     public _dragend(){
-      if (!this.dragInitialized) {
-        return;
-      }
-      this.dragInitialized = false;
+      var location = d3.mouse(this._hitBox[0][0].parentNode);
+      this._setLocation(location[0], location[1]);
+      this._isDragging = false;
       this._doDragend();
     }
 
     public _doDragend() {
       if (this.ondragend != null) {
-        var startLocation = {x: this._origin[0], y: this._origin[1]};
-        var endLocation = {x: this._location[0], y: this._location[1]};
-        this.ondragend(startLocation, endLocation);
+        var start = {x: this._getOrigin()[0], y: this._getOrigin()[1]};
+        var end = {x: this._getLocation()[0], y: this._getLocation()[1]};
+        this.ondragend(start, end);
       }
     }
 

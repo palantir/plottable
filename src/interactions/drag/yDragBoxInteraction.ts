@@ -3,14 +3,12 @@
 module Plottable {
 export module Interaction {
   export class YDragBox extends DragBox {
-    public _drag(){
-      super._drag();
-      this.setBox(this._origin[1], this._location[1]);
+    public static _CAN_RESIZE_X = false;
+    public _setOrigin(x: number, y: number) {
+      super._setOrigin(0, y);
     }
-
-    public setBox(y0: number, y1: number) {
-      super.setBox(0, this._componentToListenTo.width(), y0, y1);
-      return this;
+    public _setLocation(x: number, y: number) {
+      super._setLocation(this._componentToListenTo.width(), y);
     }
   }
 }

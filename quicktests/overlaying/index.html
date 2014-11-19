@@ -1,0 +1,59 @@
+<html>
+<head>
+  <script src="/bower_components/jQuery/dist/jquery.js" charset="utf-8"></script>
+  <script src="/bower_components/d3/d3.js" charset="utf-8"></script>
+  <script src="/bower_components/lodash/dist/lodash.js"></script>
+  <script src="/quicktests/exampleUtil.js"></script>
+  <link rel="stylesheet" type="text/css" href="/plottable.css">
+  <link rel="stylesheet" type="text/css" href="/quicktests/overlaying/overlaying.css">
+  <script src="/quicktests/overlaying/overlaying.js" defer> </script>
+
+  <title>Overlaying Plottable QuickTests</title>
+</head>
+
+<body>
+
+<div class="controls">
+  <div class="control-knobs">
+    <label>Category:</label>
+     <select type="text" id="category" name="category">
+      <option value="basic">Basic</option>
+      <option value="animations">Animations</option>
+      <option value="interactions">Interactions</option>
+      <option value="functional">Functional</option>
+      <option value="realistic">Realistic</option>
+    </select>
+
+    <input type="text" id="branch1" name="branch1" value="master" placeholder="1st branch (ex. master)">
+
+    <input type="text" id="branch2" name="branch2" value="develop" placeholder="2nd branch (ex. develop)">
+    
+    <input id="render" type="submit" class="button" value="Compare!">
+
+    <input id="expand" type="button" class="button" value="+" onclick="showSizeControls();">
+    <input id="help" type="button" class="button" value="?">
+      
+  </div>
+</div>
+
+<div class="size-controls">
+  <div class="control-knobs">
+    <input type="text" id="width" name="width" value="500" placeholder="svg width">
+
+    <input type="text" id="height" name="height" value="400" placeholder="svg height">
+  </div>
+</div>
+
+<div id="test-category-descriptions">
+  <p>Basic: Quicktests That Show Basic Components & Basic Plots under Different Scales</p>
+  <p>Animation: Single Plots with Animations</p>
+  <p>Interaction: Single Plots with Interactions</p>
+  <p>Functional: Quicktests that Showcase Specific Functionalities (ex. TickGenerators, Formatters)</p>
+  <p>Realistic: Quicktests that Demonstrate Realistic Usages</p>
+</div>
+
+<div id="results">
+</div>
+
+</body>
+</html>
