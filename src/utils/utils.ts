@@ -324,6 +324,7 @@ export module _Util {
 
       var hsl = _Util.Color.rgbToHsl(r, g, b);
 
+      var lightenConstant = 0.12;
       var newL = Math.min(hsl[2] + 0.12 * factor, 1);
 
       var newRgb = _Util.Color.hslToRgb(hsl[0], hsl[1], newL);
@@ -346,7 +347,8 @@ export module _Util {
 
       var hsl = _Util.Color.rgbToHsl(r, g, b);
 
-      var newL = Math.max(hsl[2] - 0.12 * factor, 0);
+      var darkenConstant = 0.12;
+      var newL = Math.max(hsl[2] - darkenConstant * factor, 0);
 
       var newRgb = _Util.Color.hslToRgb(hsl[0], hsl[1], newL);
       var rHex = newRgb[0].toString(16);
