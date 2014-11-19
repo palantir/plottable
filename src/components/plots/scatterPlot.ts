@@ -54,7 +54,7 @@ export module Plot {
 
     public _generateDrawSteps(): _Drawer.DrawStep[] {
       var drawSteps: _Drawer.DrawStep[] = [];
-      if (this._dataChanged) {
+      if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
         resetAttrToProjector["r"] = () => 0;
         drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("circles-reset")});
