@@ -88,10 +88,11 @@ export module Plot {
       });
 
       var yAccessor = this._projections["y"].accessor;
-      attrToProjector["y"] = (d: any, i: number, u: any, m: PlotMetadata) =>
-        this._yScale.scale(+yAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      attrToProjector["y0"] = (d: any, i: number, u: any, m: PlotMetadata) =>
-        this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var xAccessor = this._projections["x"].accessor;
+      attrToProjector["y"] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
+        this._yScale.scale(+yAccessor(d, i, u, m) + m.offsets.get(xAccessor(d, i, u, m)));
+      attrToProjector["y0"] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
+        this._yScale.scale(m.offsets.get(xAccessor(d, i, u, m)));
 
       return attrToProjector;
     }

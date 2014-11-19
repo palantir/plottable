@@ -46,22 +46,24 @@ export module Plot {
     public _generateAttrToProjector() {
       var attrToProjector = AbstractBarPlot.prototype._generateAttrToProjector.apply(this);
 
-      var primaryAttr = this._isVertical ? "y" : "x";
+      var valueAttr = this._isVertical ? "y" : "x";
+      var keyAttr = this._isVertical ? "x" : "y";
       var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-      var primaryAccessor = this._projections[primaryAttr].accessor;
-      var getStart = (d: any, i: number, u: any, m: PlotMetadata) =>
-        primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      var getEnd = (d: any, i: number, u: any, m: PlotMetadata) =>
-        primaryScale.scale(+primaryAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var primaryAccessor = this._projections[valueAttr].accessor;
+      var keyAccessor = this._projections[keyAttr].accessor;
+      var getStart = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
+        primaryScale.scale(m.offsets.get(keyAccessor(d, i, u, m)));
+      var getEnd = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
+        primaryScale.scale(+primaryAccessor(d, i, u, m) + m.offsets.get(keyAccessor(d, i, u, m)));
 
-      var heightF = (d: any, i: number, u: any, m: PlotMetadata) => Math.abs(getEnd(d, i, u, m) - getStart(d, i, u, m));
+      var heightF = (d: any, i: number, u: any, m: StackedPlotMetadata) => Math.abs(getEnd(d, i, u, m) - getStart(d, i, u, m));
       var widthF = attrToProjector["width"];
       attrToProjector["height"] = this._isVertical ? heightF : widthF;
       attrToProjector["width"] = this._isVertical ? widthF : heightF;
 
-      var attrFunction = (d: any, i: number, u: any, m: PlotMetadata) =>
+      var attrFunction = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
         +primaryAccessor(d, i, u, m) < 0 ? getStart(d, i, u, m) : getEnd(d, i, u, m);
-      attrToProjector[primaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
+      attrToProjector[valueAttr] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
         this._isVertical ? attrFunction(d, i, u, m) : attrFunction(d, i, u, m) - heightF(d, i, u, m);
       return attrToProjector;
     }
@@ -80,6 +82,10 @@ export module Plot {
       super._onDatasetUpdate();
       AbstractStacked.prototype._onDatasetUpdate.apply(this);
       return this;
+    }
+
+    public _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
+      return AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
     }
 
     //===== Stack logic from AbstractStackedPlot =====

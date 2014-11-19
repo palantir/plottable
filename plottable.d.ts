@@ -3221,6 +3221,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        interface StackedPlotMetadata extends PlotMetadata {
+            offsets: D3.Map<number>;
+        }
         interface StackedDatum {
             key: any;
             value: number;
@@ -3228,6 +3231,7 @@ declare module Plottable {
         }
         class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
             _isVertical: boolean;
+            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractStacked<X, Y>;
             _onDatasetUpdate(): void;
             _updateStackOffsets(): void;
@@ -3299,6 +3303,7 @@ declare module Plottable {
             _generateDrawSteps(): _Drawer.DrawStep[];
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedBar<X, Y>;
             _onDatasetUpdate(): StackedBar<X, Y>;
+            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
             _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];

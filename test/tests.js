@@ -3183,13 +3183,15 @@ describe("Plots", function () {
                 { x: 1, y: 0 },
                 { x: 3, y: 1 }
             ];
-            stackedPlot.addDataset(data1);
-            stackedPlot.addDataset(data2);
-            stackedPlot.addDataset(data3);
-            stackedPlot.addDataset(data4);
-            stackedPlot.addDataset(data5);
-            assert.strictEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 1, "positive offset was used");
-            assert.strictEqual(data5[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 2, "positive offset was used");
+            stackedPlot.addDataset("d1", data1);
+            stackedPlot.addDataset("d2", data2);
+            stackedPlot.addDataset("d3", data3);
+            stackedPlot.addDataset("d4", data4);
+            stackedPlot.addDataset("d5", data5);
+            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
+            var ds5PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d5").plotMetadata;
+            assert.strictEqual(ds2PlotMetadata.offsets.get("1"), 1, "positive offset was used");
+            assert.strictEqual(ds5PlotMetadata.offsets.get("1"), 2, "positive offset was used");
         });
         it("uses negative offset on stacking the 0 value on all negative/0 valued data", function () {
             var data1 = [
@@ -3204,12 +3206,14 @@ describe("Plots", function () {
             var data4 = [
                 { x: 1, y: 0 }
             ];
-            stackedPlot.addDataset(data1);
-            stackedPlot.addDataset(data2);
-            stackedPlot.addDataset(data3);
-            stackedPlot.addDataset(data4);
-            assert.strictEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -2, "positive offset was used");
-            assert.strictEqual(data4[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "positive offset was used");
+            stackedPlot.addDataset("d1", data1);
+            stackedPlot.addDataset("d2", data2);
+            stackedPlot.addDataset("d3", data3);
+            stackedPlot.addDataset("d4", data4);
+            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
+            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d4").plotMetadata;
+            assert.strictEqual(ds2PlotMetadata.offsets.get("1"), -2, "positive offset was used");
+            assert.strictEqual(ds4PlotMetadata.offsets.get("1"), -3, "positive offset was used");
         });
         it("project can be called after addDataset", function () {
             var data1 = [
@@ -3218,12 +3222,14 @@ describe("Plots", function () {
             var data2 = [
                 { a: 1, b: 4 }
             ];
-            stackedPlot.addDataset(data1);
-            stackedPlot.addDataset(data2);
-            assert.isTrue(isNaN(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]), "stacking is initially incorrect");
+            stackedPlot.addDataset("d1", data1);
+            stackedPlot.addDataset("d2", data2);
+            var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d1").plotMetadata;
+            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
+            assert.isTrue(isNaN(ds1PlotMetadata.offsets.get("1")), "stacking is initially incorrect");
             stackedPlot.project("x", "a");
             stackedPlot.project("y", "b");
-            assert.strictEqual(data2[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 2, "stacking was done correctly");
+            assert.strictEqual(ds2PlotMetadata.offsets.get("1"), 2, "stacking was done correctly");
         });
         it("strings are coerced to numbers for stacking", function () {
             var data1 = [
@@ -3244,16 +3250,20 @@ describe("Plots", function () {
             var data6 = [
                 { x: 1, y: "-1" }
             ];
-            stackedPlot.addDataset(data1);
-            stackedPlot.addDataset(data2);
-            stackedPlot.addDataset(data3);
-            stackedPlot.addDataset(data4);
-            stackedPlot.addDataset(data5);
-            stackedPlot.addDataset(data6);
-            assert.strictEqual(data3[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -2, "stacking on data1 numerical y value");
-            assert.strictEqual(data4[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 3, "stacking on data2 numerical y value");
-            assert.strictEqual(data5[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], 8, "stacking on data1 + data3 numerical y values");
-            assert.strictEqual(data6[0]["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"], -3, "stacking on data2 + data4 numerical y values");
+            stackedPlot.addDataset("d1", data1);
+            stackedPlot.addDataset("d2", data2);
+            stackedPlot.addDataset("d3", data3);
+            stackedPlot.addDataset("d4", data4);
+            stackedPlot.addDataset("d5", data5);
+            stackedPlot.addDataset("d6", data6);
+            var ds3PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d3").plotMetadata;
+            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d4").plotMetadata;
+            var ds5PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d5").plotMetadata;
+            var ds6PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d6").plotMetadata;
+            assert.strictEqual(ds3PlotMetadata.offsets.get("1"), -2, "stacking on data1 numerical y value");
+            assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 3, "stacking on data2 numerical y value");
+            assert.strictEqual(ds5PlotMetadata.offsets.get("1"), 8, "stacking on data1 + data3 numerical y values");
+            assert.strictEqual(ds6PlotMetadata.offsets.get("1"), -3, "stacking on data2 + data4 numerical y values");
             assert.deepEqual(stackedPlot.stackedExtent, [-4, 9], "stacked extent is as normal");
         });
         it("stacks correctly on empty data", function () {

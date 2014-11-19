@@ -7910,6 +7910,11 @@ var Plottable;
                 _super.apply(this, arguments);
                 this.stackedExtent = [0, 0];
             }
+            AbstractStacked.prototype._getPlotMetadataForDataset = function (key) {
+                var metadata = _super.prototype._getPlotMetadataForDataset.call(this, key);
+                metadata.offsets = d3.map();
+                return metadata;
+            };
             AbstractStacked.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 if (this._projections["x"] && this._projections["y"] && (attrToSet === "x" || attrToSet === "y")) {
@@ -7944,18 +7949,19 @@ var Plottable;
                 var _this = this;
                 var datasets = this.datasets();
                 var valueAccessor = this._valueAccessor();
+                var keyAccessor = this._keyAccessor();
                 var maxStackExtent = Plottable._Util.Methods.max(this._datasetKeysInOrder, function (k) {
                     var dataset = _this._key2PlotDatasetKey.get(k).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
                     return Plottable._Util.Methods.max(dataset.data(), function (datum, i) {
-                        return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                        return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
                     }, 0);
                 }, 0);
                 var minStackExtent = Plottable._Util.Methods.min(this._datasetKeysInOrder, function (k) {
                     var dataset = _this._key2PlotDatasetKey.get(k).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
                     return Plottable._Util.Methods.min(dataset.data(), function (datum, i) {
-                        return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                        return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
                     }, 0);
                 }, 0);
                 this.stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
@@ -7987,15 +7993,18 @@ var Plottable;
                     var negativeDataMap = negativeDataMapArray[index];
                     var isAllNegativeValues = dataset.data().every(function (datum, i) { return valueAccessor(datum, i, dataset.metadata(), plotMetadata) <= 0; });
                     dataset.data().forEach(function (datum, datumIndex) {
-                        var positiveOffset = positiveDataMap.get(keyAccessor(datum, datumIndex, dataset.metadata(), plotMetadata)).offset;
-                        var negativeOffset = negativeDataMap.get(keyAccessor(datum, datumIndex, dataset.metadata(), plotMetadata)).offset;
+                        var key = keyAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
+                        var positiveOffset = positiveDataMap.get(key).offset;
+                        var negativeOffset = negativeDataMap.get(key).offset;
                         var value = valueAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
+                        var offset;
                         if (value === 0) {
-                            datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = isAllNegativeValues ? negativeOffset : positiveOffset;
+                            offset = isAllNegativeValues ? negativeOffset : positiveOffset;
                         }
                         else {
-                            datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = value > 0 ? positiveOffset : negativeOffset;
+                            offset = value > 0 ? positiveOffset : negativeOffset;
                         }
+                        plotMetadata.offsets.set(key, offset);
                     });
                 });
             };
@@ -8003,7 +8012,6 @@ var Plottable;
                 var _this = this;
                 var keyAccessor = this._keyAccessor();
                 var domainKeys = d3.set();
-                var datasets = this.datasets();
                 this._datasetKeysInOrder.forEach(function (k) {
                     var dataset = _this._key2PlotDatasetKey.get(k).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
@@ -8017,9 +8025,8 @@ var Plottable;
                 var _this = this;
                 var keyAccessor = this._keyAccessor();
                 var valueAccessor = this._valueAccessor();
-                var datasets = this.datasets();
                 var domainKeys = this._getDomainKeys();
-                var dataMapArray = datasets.map(function () {
+                var dataMapArray = this._datasetKeysInOrder.map(function () {
                     return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: 0 };
                     });
@@ -8143,8 +8150,9 @@ var Plottable;
                     attrToProjector[attribute] = function (data, i, u, m) { return data.length > 0 ? projector(data[0], i, u, m) : null; };
                 });
                 var yAccessor = this._projections["y"].accessor;
-                attrToProjector["y"] = function (d, i, u, m) { return _this._yScale.scale(+yAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                attrToProjector["y0"] = function (d, i, u, m) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                var xAccessor = this._projections["x"].accessor;
+                attrToProjector["y"] = function (d, i, u, m) { return _this._yScale.scale(+yAccessor(d, i, u, m) + m.offsets.get(xAccessor(d, i, u, m))); };
+                attrToProjector["y0"] = function (d, i, u, m) { return _this._yScale.scale(m.offsets.get(xAccessor(d, i, u, m))); };
                 return attrToProjector;
             };
             StackedArea.prototype._wholeDatumAttributes = function () {
@@ -8205,17 +8213,19 @@ var Plottable;
             StackedBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = Plot.AbstractBarPlot.prototype._generateAttrToProjector.apply(this);
-                var primaryAttr = this._isVertical ? "y" : "x";
+                var valueAttr = this._isVertical ? "y" : "x";
+                var keyAttr = this._isVertical ? "x" : "y";
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                var primaryAccessor = this._projections[primaryAttr].accessor;
-                var getStart = function (d, i, u, m) { return primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                var getEnd = function (d, i, u, m) { return primaryScale.scale(+primaryAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                var primaryAccessor = this._projections[valueAttr].accessor;
+                var keyAccessor = this._projections[keyAttr].accessor;
+                var getStart = function (d, i, u, m) { return primaryScale.scale(m.offsets.get(keyAccessor(d, i, u, m))); };
+                var getEnd = function (d, i, u, m) { return primaryScale.scale(+primaryAccessor(d, i, u, m) + m.offsets.get(keyAccessor(d, i, u, m))); };
                 var heightF = function (d, i, u, m) { return Math.abs(getEnd(d, i, u, m) - getStart(d, i, u, m)); };
                 var widthF = attrToProjector["width"];
                 attrToProjector["height"] = this._isVertical ? heightF : widthF;
                 attrToProjector["width"] = this._isVertical ? widthF : heightF;
                 var attrFunction = function (d, i, u, m) { return +primaryAccessor(d, i, u, m) < 0 ? getStart(d, i, u, m) : getEnd(d, i, u, m); };
-                attrToProjector[primaryAttr] = function (d, i, u, m) { return _this._isVertical ? attrFunction(d, i, u, m) : attrFunction(d, i, u, m) - heightF(d, i, u, m); };
+                attrToProjector[valueAttr] = function (d, i, u, m) { return _this._isVertical ? attrFunction(d, i, u, m) : attrFunction(d, i, u, m) - heightF(d, i, u, m); };
                 return attrToProjector;
             };
             StackedBar.prototype._generateDrawSteps = function () {
@@ -8230,6 +8240,9 @@ var Plottable;
                 _super.prototype._onDatasetUpdate.call(this);
                 Plot.AbstractStacked.prototype._onDatasetUpdate.apply(this);
                 return this;
+            };
+            StackedBar.prototype._getPlotMetadataForDataset = function (key) {
+                return Plot.AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
             };
             //===== Stack logic from AbstractStackedPlot =====
             StackedBar.prototype._updateStackOffsets = function () {
