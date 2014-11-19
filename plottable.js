@@ -1,5 +1,5 @@
 /*!
-Plottable 0.36.1 (https://github.com/palantir/plottable)
+Plottable 0.37.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1403,7 +1403,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.36.1";
+    Plottable.version = "0.37.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -9016,6 +9016,8 @@ var Plottable;
                 }
             };
             Drag.prototype._dragend = function () {
+                var location = d3.mouse(this._hitBox[0][0].parentNode);
+                this._setLocation(location[0], location[1]);
                 this._isDragging = false;
                 this._doDragend();
             };
