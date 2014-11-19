@@ -6673,8 +6673,6 @@ var Plottable;
                 attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
                 var defaultFillFunction = function (d, i) { return _this.colorScale.scale(String(i)); };
                 attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
-                var defaultAccessor = function (d) { return d.value; };
-                attrToProjector["value"] = attrToProjector["value"] || defaultAccessor;
                 return attrToProjector;
             };
             Pie.prototype._getDrawer = function (key) {

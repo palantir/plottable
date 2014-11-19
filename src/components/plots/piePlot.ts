@@ -49,9 +49,6 @@ export module Plot {
       var defaultFillFunction = (d: any, i: number) => this.colorScale.scale(String(i));
       attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
 
-      var defaultAccessor = (d: any) => d.value;
-      attrToProjector["value"] = attrToProjector["value"] || defaultAccessor;
-
       return attrToProjector;
     }
 
