@@ -29,15 +29,6 @@ describe("DragBoxInteractions", () => {
 
     interaction.dragend(function(start: Plottable.Point, end: Plottable.Point) {
       timesCalled++;
-      var xMinObserved = Math.min(start.x, end.x);
-      var xMaxObserved = Math.max(start.x, end.x);
-      var yMinObserved = Math.min(start.y, end.y);
-      var yMaxObserved = Math.max(start.y, end.y);
-
-      assert.equal(xMinObserved, expectedSelection.xMin, "xMin as expected");
-      assert.equal(xMaxObserved, expectedSelection.xMax, "xMax as expected");
-      assert.equal(yMinObserved, expectedSelection.yMin, "yMin as expected");
-      assert.equal(yMaxObserved, expectedSelection.yMax, "yMax as expected");
       var interactionSelection = {
         xMin: +interaction.dragBox.attr("x"),
         yMin: +interaction.dragBox.attr("y"),

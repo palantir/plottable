@@ -43,6 +43,9 @@ function fakeDragSequence(anyedInteraction: any, startX: number, startY: number,
   anyedInteraction._drag();
   d3.event = makeFakeEvent(endX, endY);
   anyedInteraction._drag();
+  d3.mouse = function() {
+    return [endX, endY];
+  };
   anyedInteraction._dragend();
   d3.event = null;
 }
