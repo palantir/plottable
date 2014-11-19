@@ -8113,6 +8113,9 @@ var Plottable;
             };
             StackedArea.prototype._updateStackOffsets = function () {
                 var _this = this;
+                if (!this._projectorsReady()) {
+                    return;
+                }
                 var domainKeys = this._getDomainKeys();
                 var keyAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
                 var keySets = this._datasetKeysInOrder.map(function (k) {
