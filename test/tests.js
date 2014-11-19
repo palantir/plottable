@@ -47,6 +47,7 @@ function fakeDragSequence(anyedInteraction, startX, startY, endX, endY) {
     };
     anyedInteraction._dragend();
     d3.event = null;
+    d3.mouse = originalD3Mouse;
 }
 function verifySpaceRequest(sr, w, h, ww, wh, id) {
     assert.equal(sr.width, w, "width requested is as expected #" + id);

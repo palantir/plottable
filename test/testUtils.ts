@@ -48,6 +48,7 @@ function fakeDragSequence(anyedInteraction: any, startX: number, startY: number,
   };
   anyedInteraction._dragend();
   d3.event = null;
+  d3.mouse = originalD3Mouse;
 }
 
 function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {

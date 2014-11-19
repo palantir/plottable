@@ -140,8 +140,8 @@ export module Interaction {
     }
 
     public _dragend(){
-      var origin = d3.mouse(this._hitBox[0][0].parentNode);
-      this._setLocation(origin[0], origin[1]);
+      var location = d3.mouse(this._hitBox[0][0].parentNode);
+      this._setLocation(location[0], location[1]);
       this._isDragging = false;
       this._doDragend();
     }
