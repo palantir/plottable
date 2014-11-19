@@ -7609,9 +7609,9 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.hoverDetectionRadius = 15;
                 this.classed("line-plot", true);
-                var defaultColor = new Plottable.Scale.Color().range()[0];
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
+                this.defaultStrokeColor = new Plottable.Scale.Color().range()[0];
             }
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
