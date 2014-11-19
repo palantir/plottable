@@ -13,7 +13,7 @@ module.exports = function(grunt) {
         noImplicitAny: true,
         sourceMap: false,
         declaration: true,
-        compiler: "./node_modules/grunt-ts/customcompiler/tsc",
+        compiler: "./node_modules/typescript/bin/tsc",
         removeComments: false
       }
     },
@@ -26,7 +26,7 @@ module.exports = function(grunt) {
         sourceMap: false,
         noImplicitAny: true,
         declaration: false,
-        compiler: "./node_modules/grunt-ts/customcompiler/tsc",
+        compiler: "./node_modules/typescript/bin/tsc",
         removeComments: false
       }
     },
