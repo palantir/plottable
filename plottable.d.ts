@@ -40,12 +40,6 @@ declare module Plottable {
              */
             function accessorize(accessor: any): _Accessor;
             /**
-             * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata.
-             * Temporarily always grabs the metadata of the first dataset.
-             * HACKHACK #1089 - The accessor currently only grabs the first dataset's metadata
-             */
-            function _applyAccessor(accessor: _Accessor, plot: Plot.AbstractPlot): (d: any, i: number) => any;
-            /**
              * Takes two sets and returns the union
              *
              * Due to the fact that D3.Sets store strings internally, return type is always a string set
@@ -506,11 +500,21 @@ declare module Plottable {
          */
         function siSuffix(precision?: number): (d: any) => string;
         /**
-         * Creates a formatter that displays dates.
+         * Creates a multi time formatter that displays dates.
          *
          * @returns {Formatter} A formatter for time/date values.
          */
-        function time(): (d: any) => string;
+        function multiTime(): (d: any) => string;
+        /**
+         * Creates a time formatter that displays time/date using given specifier.
+         *
+         * List of directives can be found on: https://github.com/mbostock/d3/wiki/Time-Formatting#format
+         *
+         * @param {string} [specifier] The specifier for the formatter.
+         *
+         * @returns {Formatter} A formatter for time/date values.
+         */
+        function time(specifier: string): Formatter;
         /**
          * Creates a formatter for relative dates.
          *
@@ -694,7 +698,7 @@ declare module Plottable {
          * @returns {Dataset} The calling Dataset.
          */
         metadata(metadata: any): Dataset;
-        _getExtent(accessor: _Accessor, typeCoercer: (d: any) => any): any[];
+        _getExtent(accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata?: any): any[];
     }
 }
 
@@ -838,20 +842,28 @@ declare module Plottable {
 }
 
 declare module Plottable {
+    /**
+     * Access specific datum property.
+     */
     interface _Accessor {
-        (datum: any, index?: number, metadata?: any): any;
+        (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plot.PlotMetadata): any;
     }
     /**
-     * A function to map across the data in a DataSource. For example, if your
-     * data looked like `{foo: 5, bar: 6}`, then a popular function might be
-     * `function(d) { return d.foo; }`.
-     *
-     * Index, if used, will be the index of the datum in the array.
+     * Retrieves scaled datum property.
      */
-    interface AppliedAccessor {
-        (datum?: any, index?: number): any;
-    }
     interface _Projector {
+        (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata): any;
+    }
+    /**
+     * Projector with applied user and plot metadata
+     */
+    interface _AppliedProjector {
+        (datum: any, index: number): any;
+    }
+    /**
+     * Defines a way how specific attribute needs be retrieved before rendering.
+     */
+    interface _Projection {
         accessor: _Accessor;
         scale?: Scale.AbstractScale<any, any>;
         attribute: string;
@@ -865,7 +877,10 @@ declare module Plottable {
      * function(d) { return foo + bar; }`.
      */
     interface AttributeToProjector {
-        [attrToSet: string]: AppliedAccessor;
+        [attrToSet: string]: _Projector;
+    }
+    interface _AttributeToAppliedProjector {
+        [attrToSet: string]: _AppliedProjector;
     }
     /**
      * A simple bounding box.
@@ -905,14 +920,6 @@ declare module Plottable {
     interface Point {
         x: number;
         y: number;
-    }
-    /**
-     * A key that is also coupled with a dataset and a drawer.
-     */
-    interface DatasetDrawerKey {
-        dataset: Dataset;
-        drawer: _Drawer.AbstractDrawer;
-        key: string;
     }
 }
 
@@ -1579,6 +1586,10 @@ declare module Plottable {
             attrToProjector: AttributeToProjector;
             animator: Animator.PlotAnimator;
         }
+        interface AppliedDrawStep {
+            attrToProjector: _AttributeToAppliedProjector;
+            animator: Animator.PlotAnimator;
+        }
         class AbstractDrawer {
             _renderArea: D3.Selection;
             _className: string;
@@ -1610,17 +1621,21 @@ declare module Plottable {
             /**
              * Draws data using one step
              *
-             * @param{DataStep} step The step, how data should be drawn.
+             * @param{AppliedDrawStep} step The step, how data should be drawn.
              */
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: AppliedDrawStep): void;
             _numberOfAnimationIterations(data: any[]): number;
+            _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
+            _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             /**
-             * Draws the data into the renderArea using the spefic steps
+             * Draws the data into the renderArea using the spefic steps and metadata
              *
              * @param{any[]} data The data to be drawn
              * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
+             * @param{any} userMetadata The metadata provided by user
+             * @param{any} plotMetadata The metadata provided by plot
              */
-            draw(data: any[], drawSteps: DrawStep[]): number;
+            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
         }
     }
 }
@@ -1632,7 +1647,7 @@ declare module Plottable {
             _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
             _numberOfAnimationIterations(data: any[]): number;
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: AppliedDrawStep): void;
         }
     }
 }
@@ -1649,7 +1664,7 @@ declare module Plottable {
              */
             drawLine(draw: boolean): Area;
             setup(area: D3.Selection): void;
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: AppliedDrawStep): void;
         }
     }
 }
@@ -1666,9 +1681,10 @@ declare module Plottable {
              */
             svgElement(tag: string): Element;
             _getDrawSelection(): D3.Selection;
-            _drawStep(step: DrawStep): void;
+            _drawStep(step: AppliedDrawStep): void;
             _enterData(data: any[]): void;
-            draw(data: any[], drawSteps: DrawStep[]): number;
+            _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
+            _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
         }
     }
 }
@@ -1682,7 +1698,7 @@ declare module Plottable {
             constructor(key: string, isVertical: boolean);
             setup(area: D3.Selection): void;
             removeLabels(): void;
-            drawText(data: any[], attrToProjector: AttributeToProjector): void;
+            drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
         }
     }
 }
@@ -1692,8 +1708,8 @@ declare module Plottable {
     module _Drawer {
         class Arc extends Element {
             constructor(key: string);
-            _drawStep(step: DrawStep): void;
-            draw(data: any[], drawSteps: DrawStep[]): number;
+            _drawStep(step: AppliedDrawStep): void;
+            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
         }
     }
 }
@@ -2121,17 +2137,28 @@ declare module Plottable {
 
 declare module Plottable {
     module Axis {
-        interface _TimeInterval {
-            timeUnit: D3.Time.Interval;
+        /**
+         * Defines a configuration for a time axis tier.
+         * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
+         * interval - A time unit associated with this configuration (seconds, minutes, hours, etc).
+         * step - number of intervals between each tick.
+         * formatter - formatter used to format tick labels.
+         */
+        interface TimeAxisTierConfiguration {
+            interval: D3.Time.Interval;
             step: number;
-            formatString: string;
+            formatter: Formatter;
+        }
+        /**
+         * An array of linked TimeAxisTierConfigurations.
+         * Each configuration will be shown on a different tier.
+         * Currently, up to two tiers are supported.
+         */
+        interface TimeAxisConfiguration {
+            tierConfigurations: TimeAxisTierConfiguration[];
         }
         class Time extends AbstractAxis {
-            _majorTickLabels: D3.Selection;
-            _minorTickLabels: D3.Selection;
             _scale: Scale.Time;
-            static _minorIntervals: _TimeInterval[];
-            static _majorIntervals: _TimeInterval[];
             /**
              * Constructs a TimeAxis.
              *
@@ -2142,13 +2169,27 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             constructor(scale: Scale.Time, orientation: string);
+            /**
+             * Gets the possible Axis configurations.
+             *
+             * @returns {TimeAxisConfiguration[]} The possible tier configurations.
+             */
+            axisConfigurations(): TimeAxisConfiguration[];
+            /**
+             * Sets possible Axis configurations.
+             * The axis will choose the most precise configuration that will display in
+             * its current width.
+             *
+             * @param {TimeAxisConfiguration[]} configurations Possible axis configurations.
+             * @returns {Axis.Time} The calling Axis.Time.
+             */
+            axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
             orient(): string;
             orient(orientation: string): Time;
             _computeHeight(): number;
             _setup(): void;
-            _getTickIntervalValues(interval: _TimeInterval): any[];
             _getTickValues(): any[];
-            _measureTextHeight(container: D3.Selection): number;
+            _measureTextHeight(): number;
             _doRender(): Time;
         }
     }
@@ -2601,13 +2642,25 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        /**
+         * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
+         */
+        interface PlotDatasetKey {
+            dataset: Dataset;
+            drawer: _Drawer.AbstractDrawer;
+            plotMetadata: PlotMetadata;
+            key: string;
+        }
+        interface PlotMetadata {
+            datasetKey: string;
+        }
         class AbstractPlot extends Component.AbstractComponent {
             _dataChanged: boolean;
-            _key2DatasetDrawerKey: D3.Map<DatasetDrawerKey>;
+            _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
             _datasetKeysInOrder: string[];
             _renderArea: D3.Selection;
-            _projectors: {
-                [x: string]: _Projector;
+            _projections: {
+                [x: string]: _Projection;
             };
             _animate: boolean;
             _animators: Animator.PlotAnimatorMap;
@@ -2683,7 +2736,7 @@ declare module Plottable {
             animate(enabled: boolean): AbstractPlot;
             detach(): AbstractPlot;
             /**
-             * This function makes sure that all of the scales in this._projectors
+             * This function makes sure that all of the scales in this._projections
              * have an extent that includes all the data that is projected onto them.
              */
             _updateScaleExtents(): void;
@@ -2745,6 +2798,12 @@ declare module Plottable {
             _generateDrawSteps(): _Drawer.DrawStep[];
             _additionalPaint(time: number): void;
             _getDataToDraw(): D3.Map<any[]>;
+            /**
+             * Gets the new plot metadata for new dataset with provided key
+             *
+             * @param {string} key The key of new dataset
+             */
+            _getPlotMetadataForDataset(key: string): PlotMetadata;
         }
     }
 }
@@ -2821,7 +2880,7 @@ declare module Plottable {
              * This call does not override auto domain adjustment behavior over visible points.
              */
             showAllData(): void;
-            _projectorsReady(): _Projector;
+            _projectorsReady(): _Projection;
         }
     }
 }
@@ -2964,20 +3023,25 @@ declare module Plottable {
              */
             barLabelFormatter(formatter: Formatter): AbstractBarPlot<X, Y>;
             /**
-             * Selects the bar under the given pixel position (if [xValOrExtent]
+             * Gets all the bars in the bar plot
+             *
+             * @returns {D3.Selection} All of the bars in the bar plot.
+             */
+            getAllBars(): D3.Selection;
+            /**
+             * Gets the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one
              * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
              * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
              *
              * @param {any} xValOrExtent The pixel x position, or range of x values.
              * @param {any} yValOrExtent The pixel y position, or range of y values.
-             * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
              * @returns {D3.Selection} The selected bar, or null if no bar was selected.
              */
-            selectBar(xValOrExtent: Extent, yValOrExtent: Extent, select?: boolean): D3.Selection;
-            selectBar(xValOrExtent: number, yValOrExtent: Extent, select?: boolean): D3.Selection;
-            selectBar(xValOrExtent: Extent, yValOrExtent: number, select?: boolean): D3.Selection;
-            selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
+            getBars(xValOrExtent: Extent, yValOrExtent: Extent): D3.Selection;
+            getBars(xValOrExtent: number, yValOrExtent: Extent): D3.Selection;
+            getBars(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
+            getBars(xValOrExtent: number, yValOrExtent: number): D3.Selection;
             /**
              * Deselects all bars.
              * @returns {AbstractBarPlot} The calling AbstractBarPlot.
@@ -3091,9 +3155,9 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _setup(): void;
-            _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor): boolean;
+            _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
             _getDrawer(key: string): _Drawer.Line;
-            _getResetYFunction(): (d: any, i: number) => number;
+            _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
             _generateDrawSteps(): _Drawer.DrawStep[];
             _generateAttrToProjector(): AttributeToProjector;
             _wholeDatumAttributes(): string[];
@@ -3127,7 +3191,7 @@ declare module Plottable {
             _getDrawer(key: string): _Drawer.Area;
             _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Area<X>;
-            _getResetYFunction(): AppliedAccessor;
+            _getResetYFunction(): _Projector;
             _wholeDatumAttributes(): string[];
             _generateAttrToProjector(): AttributeToProjector;
         }
@@ -3183,8 +3247,8 @@ declare module Plottable {
             _getDomainKeys(): string[];
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             _updateScaleExtents(): void;
-            _keyAccessor(): AppliedAccessor;
-            _valueAccessor(): AppliedAccessor;
+            _keyAccessor(): _Accessor;
+            _valueAccessor(): _Accessor;
         }
     }
 }
@@ -3233,7 +3297,7 @@ declare module Plottable {
              */
             constructor(xScale?: Scale.AbstractScale<X, number>, yScale?: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             _getAnimator(key: string): Animator.PlotAnimator;
-            _generateAttrToProjector(): any;
+            _generateAttrToProjector(): AttributeToProjector;
             _generateDrawSteps(): _Drawer.DrawStep[];
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedBar<X, Y>;
             _onDatasetUpdate(): StackedBar<X, Y>;
@@ -3244,9 +3308,8 @@ declare module Plottable {
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             _updateScaleExtents(): void;
-            _keyAccessor(): AppliedAccessor;
-            _valueAccessor(): AppliedAccessor;
-            _getBarPixelWidth(): any;
+            _keyAccessor(): _Accessor;
+            _valueAccessor(): _Accessor;
         }
     }
 }
@@ -3418,7 +3481,7 @@ declare module Plottable {
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
             animate(selection: any, attrToProjector: AttributeToProjector): any;
-            _startMovingProjector(attrToProjector: AttributeToProjector): AppliedAccessor;
+            _startMovingProjector(attrToProjector: AttributeToProjector): _Projector;
         }
     }
 }

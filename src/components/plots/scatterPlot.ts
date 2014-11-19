@@ -64,13 +64,13 @@ export module Plot {
       return drawSteps;
     }
 
+    // HACKHACK User and plot metada should be applied - #1306.
     public _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
       var drawers = <_Drawer.Element[]> this._getDrawersInOrder();
       var attrToProjector = this._generateAttrToProjector();
-
       var getDistSq = (d: any, i: number) => {
-        var dx = attrToProjector["cx"](d, i) - p.x;
-        var dy = attrToProjector["cy"](d, i) - p.y;
+        var dx = attrToProjector["cx"](d, i, null, null) - p.x;
+        var dy = attrToProjector["cy"](d, i, null, null) - p.y;
         return (dx * dx + dy * dy);
       };
 
@@ -82,7 +82,7 @@ export module Plot {
       drawers.forEach((drawer) => {
         drawer._getDrawSelection().each(function (d, i) {
           var distSq = getDistSq(d, i);
-          var r = attrToProjector["r"](d, i);
+          var r = attrToProjector["r"](d, i, null, null);
 
           if (distSq < r * r) { // cursor is over this point
             if (!overAPoint || distSq < minDistSq) {
@@ -110,8 +110,8 @@ export module Plot {
       var closestSelection = d3.select(closestElement);
       var closestData = closestSelection.data();
       var closestPoint = {
-        x: attrToProjector["cx"](closestData[0], closestIndex),
-        y: attrToProjector["cy"](closestData[0], closestIndex)
+        x: attrToProjector["cx"](closestData[0], closestIndex, null, null),
+        y: attrToProjector["cy"](closestData[0], closestIndex, null, null)
       };
       return {
         selection: closestSelection,

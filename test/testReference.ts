@@ -30,6 +30,7 @@
 ///<reference path="components/plots/clusteredBarPlotTests.ts" />
 
 ///<reference path="core/broadcasterTests.ts" />
+///<reference path="core/metadataTests.ts" />
 ///<reference path="core/componentContainerTests.ts" />
 ///<reference path="core/componentGroupTests.ts" />
 ///<reference path="core/componentTests.ts" />

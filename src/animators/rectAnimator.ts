@@ -36,7 +36,7 @@ export module Animator {
       }
       var movingAttrProjector = attrToProjector[this.getMovingAttr()];
       var growingAttrProjector = attrToProjector[this.getGrowingAttr()];
-      return (d: any, i: number) => movingAttrProjector(d, i) + growingAttrProjector(d, i);
+      return (d: any, i: number, u: any, m: Plot.PlotMetadata) => movingAttrProjector(d, i, u, m) + growingAttrProjector(d, i, u, m);
     }
 
     private getGrowingAttr() {

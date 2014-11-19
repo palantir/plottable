@@ -42,8 +42,12 @@ function fakeDragSequence(anyedInteraction, startX, startY, endX, endY) {
     anyedInteraction._drag();
     d3.event = makeFakeEvent(endX, endY);
     anyedInteraction._drag();
+    d3.mouse = function () {
+        return [endX, endY];
+    };
     anyedInteraction._dragend();
     d3.event = null;
+    d3.mouse = originalD3Mouse;
 }
 function verifySpaceRequest(sr, w, h, ww, wh, id) {
     assert.equal(sr.width, w, "width requested is as expected #" + id);
@@ -260,7 +264,7 @@ describe("Drawers", function () {
             var ds1 = { attrToProjector: {}, animator: a1 };
             var ds2 = { attrToProjector: {}, animator: a2 };
             var steps = [ds1, ds2];
-            drawer.draw([], steps);
+            drawer.draw([], steps, null, null);
             assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
         });
         it("drawer timing works for non-null animators", function (done) {
@@ -284,7 +288,7 @@ describe("Drawers", function () {
             var ds2 = { attrToProjector: {}, animator: a2 };
             var ds3 = { attrToProjector: {}, animator: a3 };
             var steps = [ds1, ds2, ds3];
-            drawer.draw([], steps);
+            drawer.draw([], steps, null, null);
             assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
         });
     });
@@ -486,9 +490,6 @@ describe("TimeAxis", function () {
         assert.throws(function () { return axis.orient("right"); }, "horizontal");
         assert.equal(axis.orient(), "bottom", "orientation unchanged");
     });
-    it("major and minor intervals arrays are the same length", function () {
-        assert.equal(Plottable.Axis.Time._majorIntervals.length, Plottable.Axis.Time._minorIntervals.length, "major and minor interval arrays must be same size");
-    });
     it("Computing the default ticks doesn't error out for edge cases", function () {
         var svg = generateSVG(400, 100);
         scale.range([0, 400]);
@@ -521,8 +522,7 @@ describe("TimeAxis", function () {
                     }
                 }
             }
-            checkLabelsForContainer(axis._minorTickLabels);
-            checkLabelsForContainer(axis._majorTickLabels);
+            axis.tierLabelContainers.forEach(checkLabelsForContainer);
         }
         // 100 year span
         checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
@@ -538,6 +538,28 @@ describe("TimeAxis", function () {
         checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
         // 1 second span
         checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 0, 1, 0)]);
+        svg.remove();
+    });
+    it("custom possible axis configurations", function () {
+        var svg = generateSVG(800, 100);
+        var scale = new Plottable.Scale.Time();
+        var axis = new Plottable.Axis.Time(scale, "bottom");
+        var configurations = axis.axisConfigurations();
+        var newPossibleConfigurations = configurations.slice(0, 3);
+        newPossibleConfigurations.forEach(function (axisConfig) { return axisConfig.tierConfigurations.forEach(function (tierConfig) {
+            tierConfig.interval = d3.time.minute;
+            tierConfig.step += 3;
+        }); });
+        axis.axisConfigurations(newPossibleConfigurations);
+        var now = new Date();
+        var twoMinutesBefore = new Date(now.getTime());
+        twoMinutesBefore.setMinutes(now.getMinutes() - 2);
+        scale.domain([twoMinutesBefore, now]);
+        scale.range([0, 800]);
+        axis.renderTo(svg);
+        var configs = newPossibleConfigurations[axis.mostPreciseConfigIndex].tierConfigurations;
+        assert.deepEqual(configs[0].interval, d3.time.minute, "axis used new time unit");
+        assert.deepEqual(configs[0].step, 4, "axis used new step");
         svg.remove();
     });
 });
@@ -1711,8 +1733,6 @@ describe("Plots", function () {
             d1.broadcaster.broadcast();
             assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
             assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
-            var metaProjector = r._generateAttrToProjector()["meta"];
-            assert.equal(metaProjector(null, 0), "bar", "plot projector used the right metadata");
             var d2 = new Plottable.Dataset([{ x: 7, y: 8 }], { cssClass: "boo" });
             r.removeDataset("d1");
             r.addDataset(d2);
@@ -1724,8 +1744,6 @@ describe("Plots", function () {
             d2.broadcaster.broadcast();
             assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
             assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
-            metaProjector = r._generateAttrToProjector()["meta"];
-            assert.equal(metaProjector(null, 0), "boo", "plot projector used the right metadata");
         });
         it("Plot automatically generates a Dataset if only data is provided", function () {
             var data = ["foo", "bar"];
@@ -1740,7 +1758,7 @@ describe("Plots", function () {
             r.project("attr", "a", s);
             var attrToProjector = r._generateAttrToProjector();
             var projector = attrToProjector["attr"];
-            assert.equal(projector({ "a": 0.5 }, 0), 5, "projector works as intended");
+            assert.equal(projector({ "a": 0.5 }, 0, null, null), 5, "projector works as intended");
         });
         it("Changing Plot.dataset().data to [] causes scale to contract", function () {
             var ds1 = new Plottable.Dataset([0, 1, 2]);
@@ -1879,12 +1897,12 @@ describe("Plots", function () {
         var simpleDataset;
         var plot;
         before(function () {
-            xAccessor = function (d) { return d.a; };
-            yAccessor = function (d) { return d.b; };
+            xAccessor = function (d, i, u) { return d.a + u.foo; };
+            yAccessor = function (d, i, u) { return d.b + u.foo; };
         });
         beforeEach(function () {
             svg = generateSVG(500, 500);
-            simpleDataset = new Plottable.Dataset([{ a: -5, b: 6 }, { a: -2, b: 2 }, { a: 2, b: -2 }, { a: 5, b: -6 }]);
+            simpleDataset = new Plottable.Dataset([{ a: -5, b: 6 }, { a: -2, b: 2 }, { a: 2, b: -2 }, { a: 5, b: -6 }], { foo: 0 });
             xScale = new Plottable.Scale.Linear();
             yScale = new Plottable.Scale.Linear();
             plot = new Plottable.Plot.AbstractXYPlot(xScale, yScale);
@@ -2487,48 +2505,37 @@ describe("Plots", function () {
                 assert.equal(barPlot._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
                 svg.remove();
             });
-            it("can select and deselect bars", function () {
-                var selectedBar = barPlot.selectBar(155, 150); // in the middle of bar 0
-                assert.isNotNull(selectedBar, "clicked on a bar");
-                assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
-                assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
-                barPlot.deselectAll();
-                assert.isFalse(selectedBar.classed("selected"), "the bar is no longer selected");
-                selectedBar = barPlot.selectBar(-1, -1); // no bars here
-                assert.isNull(selectedBar, "returns null if no bar was selected");
-                selectedBar = barPlot.selectBar(200, 50); // between the two bars
-                assert.isNull(selectedBar, "returns null if no bar was selected");
-                selectedBar = barPlot.selectBar(155, 10); // above bar 0
-                assert.isNull(selectedBar, "returns null if no bar was selected");
+            it("getBar()", function () {
+                var bar = barPlot.getBars(155, 150); // in the middle of bar 0
+                assert.lengthOf(bar[0], 1, "getBar returns a bar");
+                assert.equal(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
+                bar = barPlot.getBars(-1, -1); // no bars here
+                assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
+                bar = barPlot.getBars(200, 50); // between the two bars
+                assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
+                bar = barPlot.getBars(155, 10); // above bar 0
+                assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
                 // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
                 // origin is at the top left!
-                selectedBar = barPlot.selectBar({ min: 155, max: 455 }, { min: 150, max: 150 }, true);
-                assert.isNotNull(selectedBar, "line between middle of two bars");
-                assert.lengthOf(selectedBar.data(), 2, "selected 2 bars (not the negative one)");
-                assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
-                assert.equal(selectedBar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
-                assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
-                selectedBar = barPlot.selectBar({ min: 155, max: 455 }, { min: 150, max: 350 }, true);
-                assert.isNotNull(selectedBar, "square between middle of two bars, & over the whole area");
-                assert.lengthOf(selectedBar.data(), 3, "selected all the bars");
-                assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
-                assert.equal(selectedBar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
-                assert.equal(selectedBar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
-                assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
-                // the runtime parameter validation should be strict, so no strings or
-                // mangled objects
-                assert.throws(function () { return barPlot.selectBar("blargh", 150); }, Error);
-                assert.throws(function () { return barPlot.selectBar({ min: 150 }, 150); }, Error);
+                bar = barPlot.getBars({ min: 155, max: 455 }, { min: 150, max: 150 });
+                assert.lengthOf(bar.data(), 2, "selected 2 bars (not the negative one)");
+                assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+                assert.equal(bar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
+                bar = barPlot.getBars({ min: 155, max: 455 }, { min: 150, max: 350 });
+                assert.lengthOf(bar.data(), 3, "selected all the bars");
+                assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+                assert.equal(bar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
+                assert.equal(bar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
                 svg.remove();
             });
             it("shouldn't blow up if members called before the first render", function () {
                 var brandNew = new Plottable.Plot.VerticalBar(xScale, yScale);
                 brandNew.addDataset(dataset);
                 assert.isNotNull(brandNew.deselectAll(), "deselects return self");
-                assert.isNull(brandNew.selectBar(0, 0), "selects return empty");
+                assert.isTrue(brandNew.getBars(0, 0).empty(), "getBars returns empty selection");
                 brandNew._anchor(d3.select(document.createElement("svg"))); // calls `_setup()`
                 assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
-                assert.isNull(brandNew.selectBar(0, 0), "selects return empty after setup");
+                assert.isTrue(brandNew.getBars(0, 0).empty(), "getBars returns empty selection after setup");
                 svg.remove();
             });
             it("don't show points from outside of domain", function () {
@@ -2886,6 +2893,35 @@ describe("Plots", function () {
                 dataset.data(data);
                 texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 0, "texts were immediately removed");
+            });
+        });
+        describe("getAllBars()", function () {
+            var verticalBarPlot;
+            var dataset;
+            var svg;
+            beforeEach(function () {
+                svg = generateSVG();
+                dataset = new Plottable.Dataset();
+                var xScale = new Plottable.Scale.Ordinal();
+                var yScale = new Plottable.Scale.Linear();
+                verticalBarPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+                verticalBarPlot.project("x", "x", xScale);
+                verticalBarPlot.project("y", "y", yScale);
+            });
+            it("getAllBars works in the normal case", function () {
+                dataset.data([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
+                verticalBarPlot.addDataset(dataset);
+                verticalBarPlot.renderTo(svg);
+                var bars = verticalBarPlot.getAllBars();
+                assert.lengthOf(bars[0], 3, "three bars in the bar plot");
+                svg.remove();
+            });
+            it("getAllBars returns 0 bars if there are no bars", function () {
+                verticalBarPlot.addDataset(dataset);
+                verticalBarPlot.renderTo(svg);
+                var bars = verticalBarPlot.getAllBars();
+                assert.lengthOf(bars[0], 0, "zero bars in the bar plot");
+                svg.remove();
             });
         });
     });
@@ -4084,6 +4120,187 @@ describe("Broadcasters", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("Metadata", function () {
+    var xScale;
+    var yScale;
+    var data1 = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+    var data2 = [{ x: 2, y: 2 }, { x: 3, y: 3 }];
+    before(function () {
+        xScale = new Plottable.Scale.Linear();
+        yScale = new Plottable.Scale.Linear();
+        xScale.domain([0, 400]);
+        yScale.domain([400, 0]);
+    });
+    it("plot metadata is set properly", function () {
+        var d1 = new Plottable.Dataset();
+        var r = new Plottable.Plot.AbstractPlot().addDataset("d1", d1).addDataset(d1).addDataset("d2", []).addDataset([]);
+        r._datasetKeysInOrder.forEach(function (key) {
+            var plotMetadata = r._key2PlotDatasetKey.get(key).plotMetadata;
+            assert.propertyVal(plotMetadata, "datasetKey", key, "metadata has correct dataset key");
+        });
+    });
+    it("user metadata is applied", function () {
+        var svg = generateSVG(400, 400);
+        var metadata = { foo: 10, bar: 20 };
+        var xAccessor = function (d, i, u) { return d.x + i * u.foo; };
+        var yAccessor = function (d, i, u) { return u.bar; };
+        var dataset = new Plottable.Dataset(data1, metadata);
+        var plot = new Plottable.Plot.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
+        plot.addDataset(dataset);
+        plot.renderTo(svg);
+        var circles = plot._renderArea.selectAll("circle");
+        var c1 = d3.select(circles[0][0]);
+        var c2 = d3.select(circles[0][1]);
+        assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
+        assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct");
+        assert.closeTo(parseFloat(c2.attr("cx")), 11, 0.01, "second circle cx is correct");
+        assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct");
+        metadata = { foo: 0, bar: 0 };
+        dataset.metadata(metadata);
+        assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct after metadata change");
+        assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
+        assert.closeTo(parseFloat(c2.attr("cx")), 1, 0.01, "second circle cx is correct after metadata change");
+        assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
+        svg.remove();
+    });
+    it("user metadata is applied to associated dataset", function () {
+        var svg = generateSVG(400, 400);
+        var metadata1 = { foo: 10 };
+        var metadata2 = { foo: 30 };
+        var xAccessor = function (d, i, u) { return d.x + (i + 1) * u.foo; };
+        var yAccessor = function () { return 0; };
+        var dataset1 = new Plottable.Dataset(data1, metadata1);
+        var dataset2 = new Plottable.Dataset(data2, metadata2);
+        var plot = new Plottable.Plot.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
+        plot.addDataset(dataset1);
+        plot.addDataset(dataset2);
+        plot.renderTo(svg);
+        var circles = plot._renderArea.selectAll("circle");
+        var c1 = d3.select(circles[0][0]);
+        var c2 = d3.select(circles[0][1]);
+        var c3 = d3.select(circles[0][2]);
+        var c4 = d3.select(circles[0][3]);
+        assert.closeTo(parseFloat(c1.attr("cx")), 10, 0.01, "first circle is correct");
+        assert.closeTo(parseFloat(c2.attr("cx")), 21, 0.01, "second circle is correct");
+        assert.closeTo(parseFloat(c3.attr("cx")), 32, 0.01, "third circle is correct");
+        assert.closeTo(parseFloat(c4.attr("cx")), 63, 0.01, "fourth circle is correct");
+        svg.remove();
+    });
+    it("plot metadata is applied", function () {
+        var svg = generateSVG(400, 400);
+        var xAccessor = function (d, i, u, m) { return d.x + (i + 1) * m.foo; };
+        var yAccessor = function () { return 0; };
+        var plot = new Plottable.Plot.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
+        plot._getPlotMetadataForDataset = function (key) {
+            return {
+                datasetKey: key,
+                foo: 10
+            };
+        };
+        plot.addDataset(data1);
+        plot.addDataset(data2);
+        plot.renderTo(svg);
+        var circles = plot._renderArea.selectAll("circle");
+        var c1 = d3.select(circles[0][0]);
+        var c2 = d3.select(circles[0][1]);
+        var c3 = d3.select(circles[0][2]);
+        var c4 = d3.select(circles[0][3]);
+        assert.closeTo(parseFloat(c1.attr("cx")), 10, 0.01, "first circle is correct");
+        assert.closeTo(parseFloat(c2.attr("cx")), 21, 0.01, "second circle is correct");
+        assert.closeTo(parseFloat(c3.attr("cx")), 12, 0.01, "third circle is correct");
+        assert.closeTo(parseFloat(c4.attr("cx")), 23, 0.01, "fourth circle is correct");
+        svg.remove();
+    });
+    it("plot metadata is per plot", function () {
+        var svg = generateSVG(400, 400);
+        var xAccessor = function (d, i, u, m) { return d.x + (i + 1) * m.foo; };
+        var yAccessor = function () { return 0; };
+        var plot1 = new Plottable.Plot.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
+        plot1._getPlotMetadataForDataset = function (key) {
+            return {
+                datasetKey: key,
+                foo: 10
+            };
+        };
+        plot1.addDataset(data1);
+        plot1.addDataset(data2);
+        var plot2 = new Plottable.Plot.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
+        plot2._getPlotMetadataForDataset = function (key) {
+            return {
+                datasetKey: key,
+                foo: 20
+            };
+        };
+        plot2.addDataset(data1);
+        plot2.addDataset(data2);
+        plot1.renderTo(svg);
+        plot2.renderTo(svg);
+        var circles = plot1._renderArea.selectAll("circle");
+        var c1 = d3.select(circles[0][0]);
+        var c2 = d3.select(circles[0][1]);
+        var c3 = d3.select(circles[0][2]);
+        var c4 = d3.select(circles[0][3]);
+        assert.closeTo(parseFloat(c1.attr("cx")), 10, 0.01, "first circle is correct for first plot");
+        assert.closeTo(parseFloat(c2.attr("cx")), 21, 0.01, "second circle is correct for first plot");
+        assert.closeTo(parseFloat(c3.attr("cx")), 12, 0.01, "third circle is correct for first plot");
+        assert.closeTo(parseFloat(c4.attr("cx")), 23, 0.01, "fourth circle is correct for first plot");
+        circles = plot2._renderArea.selectAll("circle");
+        c1 = d3.select(circles[0][0]);
+        c2 = d3.select(circles[0][1]);
+        c3 = d3.select(circles[0][2]);
+        c4 = d3.select(circles[0][3]);
+        assert.closeTo(parseFloat(c1.attr("cx")), 20, 0.01, "first circle is correct for second plot");
+        assert.closeTo(parseFloat(c2.attr("cx")), 41, 0.01, "second circle is correct for second plot");
+        assert.closeTo(parseFloat(c3.attr("cx")), 22, 0.01, "third circle is correct for second plot");
+        assert.closeTo(parseFloat(c4.attr("cx")), 43, 0.01, "fourth circle is correct for second plot");
+        svg.remove();
+    });
+    it("_getExtent works as expected with plot metadata", function () {
+        var svg = generateSVG(400, 400);
+        var metadata = { foo: 11 };
+        var id = function (d) { return d; };
+        var dataset = new Plottable.Dataset(data1, metadata);
+        var a = function (d, i, u, m) { return d.x + u.foo + m.foo; };
+        var plot = new Plottable.Plot.AbstractPlot().project("a", a, xScale);
+        plot._getPlotMetadataForDataset = function (key) {
+            return {
+                datasetKey: key,
+                foo: 5
+            };
+        };
+        plot.addDataset(dataset);
+        plot.renderTo(svg);
+        assert.deepEqual(dataset._getExtent(a, id), [16, 17], "plot metadata is reflected in extent results");
+        dataset.metadata({ foo: 0 });
+        assert.deepEqual(dataset._getExtent(a, id), [5, 6], "plot metadata is reflected in extent results after change user metadata");
+        svg.remove();
+    });
+    it("each plot passes metadata to projectors", function () {
+        var svg = generateSVG(400, 400);
+        var metadata = { foo: 11 };
+        var dataset1 = new Plottable.Dataset(data1, metadata);
+        var dataset2 = new Plottable.Dataset(data2, metadata);
+        var checkPlot = function (plot) {
+            plot.addDataset("ds1", dataset1).addDataset("ds2", dataset2).project("x", function (d, i, u, m) { return d.x + u.foo + m.datasetKey.length; }).project("y", function (d, i, u, m) { return d.y + u.foo - m.datasetKey.length; });
+            // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
+            plot.renderTo(svg);
+            plot.remove();
+        };
+        checkPlot(new Plottable.Plot.Area(xScale, yScale));
+        checkPlot(new Plottable.Plot.StackedArea(xScale, yScale));
+        checkPlot(new Plottable.Plot.VerticalBar(xScale, yScale));
+        checkPlot(new Plottable.Plot.StackedBar(xScale, yScale));
+        checkPlot(new Plottable.Plot.StackedBar(yScale, xScale, false));
+        checkPlot(new Plottable.Plot.ClusteredBar(xScale, yScale));
+        checkPlot(new Plottable.Plot.Pie().project("value", "x"));
+        checkPlot(new Plottable.Plot.HorizontalBar(xScale, yScale));
+        checkPlot(new Plottable.Plot.Scatter(xScale, yScale));
+        svg.remove();
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("ComponentContainer", function () {
     it("_addComponent()", function () {
         var container = new Plottable.Component.AbstractComponentContainer();
@@ -4755,19 +4972,18 @@ describe("Dataset", function () {
         ds.metadata(newMetadata);
         assert.isTrue(callbackCalled, "callback was called when the metadata was changed");
     });
-    it("_getExtent works as expected", function () {
+    it("_getExtent works as expected with user metadata", function () {
         var data = [1, 2, 3, 4, 1];
         var metadata = { foo: 11 };
         var id = function (d) { return d; };
         var dataset = new Plottable.Dataset(data, metadata);
         var plot = new Plottable.Plot.AbstractPlot().addDataset(dataset);
-        var apply = function (a) { return Plottable._Util.Methods._applyAccessor(a, plot); };
         var a1 = function (d, i, m) { return d + i - 2; };
         assert.deepEqual(dataset._getExtent(a1, id), [-1, 5], "extent for numerical data works properly");
         var a2 = function (d, i, m) { return d + m.foo; };
-        assert.deepEqual(dataset._getExtent(apply(a2), id), [12, 15], "extent uses metadata appropriately");
+        assert.deepEqual(dataset._getExtent(a2, id), [12, 15], "extent uses metadata appropriately");
         dataset.metadata({ foo: -1 });
-        assert.deepEqual(dataset._getExtent(apply(a2), id), [0, 3], "metadata change is reflected in extent results");
+        assert.deepEqual(dataset._getExtent(a2, id), [0, 3], "metadata change is reflected in extent results");
         var a3 = function (d, i, m) { return "_" + d; };
         assert.deepEqual(dataset._getExtent(a3, id), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
         var a_toString = function (d) { return (d + 2).toString(); };
@@ -5944,9 +6160,9 @@ describe("Formatters", function () {
             assert.strictEqual(result.charAt(result.length - 1), "c", "The specified currency symbol was appended");
         });
     });
-    describe("time", function () {
+    describe("mutliTime", function () {
         it("uses reasonable defaults", function () {
-            var timeFormatter = Plottable.Formatters.time();
+            var timeFormatter = Plottable.Formatters.multiTime();
             // year, month, day, hours, minutes, seconds, milliseconds
             var result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
             assert.strictEqual(result, "2000", "only the year was displayed");
@@ -5984,9 +6200,9 @@ describe("Formatters", function () {
             assert.strictEqual(result, "8%", "shows formatter changed value");
         });
     });
-    describe("time", function () {
+    describe("multiTime", function () {
         it("uses reasonable defaults", function () {
-            var timeFormatter = Plottable.Formatters.time();
+            var timeFormatter = Plottable.Formatters.multiTime();
             // year, month, day, hours, minutes, seconds, milliseconds
             var result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
             assert.strictEqual(result, "2000", "only the year was displayed");
@@ -6736,14 +6952,6 @@ describe("DragBoxInteractions", function () {
         fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY); // initial dragbox to resize from
         interaction.dragend(function (start, end) {
             timesCalled++;
-            var xMinObserved = Math.min(start.x, end.x);
-            var xMaxObserved = Math.max(start.x, end.x);
-            var yMinObserved = Math.min(start.y, end.y);
-            var yMaxObserved = Math.max(start.y, end.y);
-            assert.equal(xMinObserved, expectedSelection.xMin, "xMin as expected");
-            assert.equal(xMaxObserved, expectedSelection.xMax, "xMax as expected");
-            assert.equal(yMinObserved, expectedSelection.yMin, "yMin as expected");
-            assert.equal(yMaxObserved, expectedSelection.yMax, "yMax as expected");
             var interactionSelection = {
                 xMin: +interaction.dragBox.attr("x"),
                 yMin: +interaction.dragBox.attr("y"),

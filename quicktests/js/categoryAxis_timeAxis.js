@@ -21,7 +21,7 @@ function run(div, data, Plottable) {
     .attr("x", function (d) { return d3.time.format("%x").parse(d.x); }, xScale)
     .project("y", "y", yScale);
 
-  var xAxis = new Plottable.Axis.Time(xScale, "bottom", Plottable.Formatters.time());
+  var xAxis = new Plottable.Axis.Time(xScale, "bottom", Plottable.Formatters.multiTime());
   var yAxis = new Plottable.Axis.Category(yScale, "left");
 
   var gridlines = new Plottable.Component.Gridlines(xScale, null);

@@ -34,8 +34,8 @@ export module Plot {
                                           .style("visibility", "hidden");
     }
 
-    public _rejectNullsAndNaNs(d: any, i: number, projector: AppliedAccessor) {
-      var value = projector(d, i);
+    public _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor) {
+      var value = accessor(d, i, userMetdata, plotMetadata);
       return value != null && value === value;
     }
 
@@ -52,7 +52,7 @@ export module Plot {
       // avoids lines zooming on from offscreen.
       var startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
       var scaledStartValue = this._yScale.scale(startValue);
-      return (d: any, i: number) => scaledStartValue;
+      return (d: any, i: number, u: any, m: PlotMetadata) => scaledStartValue;
     }
 
     public _generateDrawSteps(): _Drawer.DrawStep[] {
@@ -75,14 +75,18 @@ export module Plot {
       var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
       singleDatumAttributes.forEach((attribute: string) => {
         var projector = attrToProjector[attribute];
-        attrToProjector[attribute] = (data: any[], i: number) => data.length > 0 ? projector(data[0], i) : null;
+        attrToProjector[attribute] = (data: any[], i: number, u: any, m: any) =>
+          data.length > 0 ? projector(data[0], i, u, m) : null;
       });
 
       var xFunction       = attrToProjector["x"];
       var yFunction       = attrToProjector["y"];
-      attrToProjector["defined"] = (d, i) => this._rejectNullsAndNaNs(d, i, xFunction) && this._rejectNullsAndNaNs(d, i, yFunction);
+
+      attrToProjector["defined"] = (d: any, i: number, u: any, m: any) =>
+          this._rejectNullsAndNaNs(d, i, u, m, xFunction) && this._rejectNullsAndNaNs(d, i, u, m, yFunction);
       attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultStrokeColor);
       attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
+
       return attrToProjector;
     }
 
@@ -90,14 +94,15 @@ export module Plot {
       return ["x", "y"];
     }
 
+    // HACKHACK User and plot metadata should be applied here - #1306.
     public _getClosestWithinRange(p: Point, range: number) {
       var attrToProjector = this._generateAttrToProjector();
       var xProjector = attrToProjector["x"];
       var yProjector = attrToProjector["y"];
 
       var getDistSq = (d: any, i: number) => {
-        var dx = +xProjector(d, i) - p.x;
-        var dy = +yProjector(d, i) - p.y;
+        var dx = +xProjector(d, i, null, null) - p.x;
+        var dy = +yProjector(d, i, null, null) - p.y;
         return (dx * dx + dy * dy);
       };
 
@@ -111,8 +116,8 @@ export module Plot {
           if (distSq < closestDistSq) {
             closestOverall = d;
             closestPoint = {
-              x: xProjector(d, i),
-              y: yProjector(d, i)
+              x: xProjector(d, i, null, null),
+              y: yProjector(d, i, null, null)
             };
             closestDistSq = distSq;
           }

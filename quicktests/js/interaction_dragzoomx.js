@@ -34,6 +34,9 @@ function run(div, data, Plottable) {
   var xDrag = new Plottable.Interaction.XDragBox();
   xDrag.dragend(function(start, end) {
     xDrag.clearBox();
+    if (start.x === end.x) {
+      return;
+    }
     var scaledStartX = xScale.invert(start.x);
     var scaledEndX = xScale.invert(end.x);
 

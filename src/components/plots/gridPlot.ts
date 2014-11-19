@@ -54,7 +54,7 @@ export module Plot {
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "fill") {
-        this._colorScale = this._projectors["fill"].scale;
+        this._colorScale = this._projections["fill"].scale;
       }
       return this;
     }

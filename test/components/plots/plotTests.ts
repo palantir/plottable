@@ -85,9 +85,6 @@ describe("Plots", () => {
       assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
       assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
-      var metaProjector = r._generateAttrToProjector()["meta"];
-      assert.equal(metaProjector(null, 0), "bar", "plot projector used the right metadata");
-
       var d2 = new Plottable.Dataset([{x: 7, y: 8}], {cssClass: "boo"});
       r.removeDataset("d1");
       r.addDataset(d2);
@@ -101,9 +98,6 @@ describe("Plots", () => {
       d2.broadcaster.broadcast();
       assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
       assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
-
-      metaProjector = r._generateAttrToProjector()["meta"];
-      assert.equal(metaProjector(null, 0), "boo", "plot projector used the right metadata");
 
     });
 
@@ -121,7 +115,7 @@ describe("Plots", () => {
       r.project("attr", "a", s);
       var attrToProjector = r._generateAttrToProjector();
       var projector = attrToProjector["attr"];
-      assert.equal(projector({"a": 0.5}, 0), 5, "projector works as intended");
+      assert.equal(projector({"a": 0.5}, 0, null, null), 5, "projector works as intended");
     });
 
     it("Changing Plot.dataset().data to [] causes scale to contract", () => {
@@ -288,13 +282,13 @@ describe("Plots", () => {
     var plot: Plottable.Plot.AbstractXYPlot<number, number>;
 
     before(() => {
-      xAccessor = (d: any) => d.a;
-      yAccessor = (d: any) => d.b;
+      xAccessor = (d: any, i: number, u: any) => d.a + u.foo;
+      yAccessor = (d: any, i: number, u: any) => d.b + u.foo;
     });
 
     beforeEach(() => {
       svg = generateSVG(500, 500);
-      simpleDataset = new Plottable.Dataset([{a: -5, b: 6}, {a: -2, b: 2}, {a: 2, b: -2}, {a: 5, b: -6}]);
+      simpleDataset = new Plottable.Dataset([{a: -5, b: 6}, {a: -2, b: 2}, {a: 2, b: -2}, {a: 5, b: -6}], {foo: 0});
       xScale = new Plottable.Scale.Linear();
       yScale = new Plottable.Scale.Linear();
       plot = new Plottable.Plot.AbstractXYPlot(xScale, yScale);
