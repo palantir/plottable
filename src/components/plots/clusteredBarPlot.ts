@@ -2,6 +2,10 @@
 
 module Plottable {
 export module Plot {
+  export interface ClusteredPlotMetadata extends PlotMetadata {
+    position: number;
+  }
+
   export class ClusteredBar<X,Y> extends AbstractBarPlot<X,Y> {
 
     /**
@@ -29,34 +33,26 @@ export module Plot {
       attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
       attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
 
-      var positionF = (d: any) => d._PLOTTABLE_PROTECTED_FIELD_POSITION;
-      attrToProjector["x"] = this._isVertical ? positionF : attrToProjector["x"];
-      attrToProjector["y"] = this._isVertical ? attrToProjector["y"] : positionF;
+      var positionF = (d: any, i: number, u: any, m: ClusteredPlotMetadata) => m.position;
+      var xAttr = attrToProjector["x"];
+      var yAttr = attrToProjector["y"];
+      attrToProjector["x"] = (d: any, i: number, u: any, m: ClusteredPlotMetadata) =>
+        xAttr(d, i, u, m) + (this._isVertical ? positionF(d, i, u, m) : 0);
+      attrToProjector["y"] = (d: any, i: number, u: any, m: ClusteredPlotMetadata) =>
+        yAttr(d, i, u, m) + (this._isVertical ? 0 : positionF(d, i, u, m));
 
       return attrToProjector;
     }
 
-    public _getDataToDraw() {
-      var accessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+    public _updateClusterPosition() {
       var innerScale = this.makeInnerScale();
-      var clusters: D3.Map<any[]> = d3.map();
       this._datasetKeysInOrder.forEach((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
-
-        clusters.set(key, dataset.data().map((d, i) => {
-          var val = accessor(d, i, dataset.metadata(), plotMetadata);
-          var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._xScale : this._yScale;
-          // TODO: store position information in metadata.
-          var copyD = _Util.Methods.copyMap(d);
-          copyD["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + innerScale.scale(key);
-          return copyD;
-        }));
+        var plotMetadata = <ClusteredPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
+        plotMetadata.position = innerScale.scale(key);
       });
-      return clusters;
     }
 
-    private makeInnerScale(){
+    private makeInnerScale() {
       var innerScale = new Scale.Ordinal();
       innerScale.domain(this._datasetKeysInOrder);
       // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
@@ -75,6 +71,17 @@ export module Plot {
         innerScale.range([0, fn(null, 0, null, null)]);
       }
       return innerScale;
+    }
+
+    public _getDataToDraw() {
+      this._updateClusterPosition();
+      return super._getDataToDraw();
+    }
+
+    public _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata {
+      var metadata = <ClusteredPlotMetadata>super._getPlotMetadataForDataset(key);
+      metadata.position = 0;
+      return metadata;
     }
   }
 }

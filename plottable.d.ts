@@ -3199,6 +3199,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        interface ClusteredPlotMetadata extends PlotMetadata {
+            position: number;
+        }
         class ClusteredBar<X, Y> extends AbstractBarPlot<X, Y> {
             /**
              * Creates a ClusteredBarPlot.
@@ -3213,7 +3216,9 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             _generateAttrToProjector(): AttributeToProjector;
+            _updateClusterPosition(): void;
             _getDataToDraw(): D3.Map<any[]>;
+            _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata;
         }
     }
 }
