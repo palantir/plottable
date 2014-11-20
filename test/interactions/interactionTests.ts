@@ -21,7 +21,7 @@ describe("Interactions", () => {
       var interaction = new Plottable.Interaction.PanZoom(xScale, yScale);
       plot.registerInteraction(interaction);
 
-      var hb = plot._element.select(".hit-box").node();
+      var hb = (<any> plot)._element.select(".hit-box").node();
       var dragDistancePixelX = 10;
       var dragDistancePixelY = 20;
       $(hb).simulate("drag", {
