@@ -29,8 +29,8 @@ export module Plot {
                                             .easing("exp-in-out");
     }
 
-    public _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this.hoverTarget = this._foregroundContainer.append("circle")
                                           .classed("hover-target", true)
                                           .style("visibility", "hidden");

@@ -28,8 +28,8 @@ export module Plot {
       return new Plottable._Drawer.Area(key).drawLine(false);
     }
 
-    public _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 

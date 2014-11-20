@@ -59,7 +59,7 @@ export module Component {
         element.node().appendChild(this._element.node());
       } else {
         this._element = element.append("g");
-        this._setup();
+        this.setup();
       }
       this._isAnchored = true;
     }
@@ -69,7 +69,7 @@ export module Component {
      * Called during _anchor() if the Component's element has not been created yet.
      * Override in subclasses to provide additional functionality.
      */
-    public _setup() {
+    protected setup() {
       if (this._isSetup) {
         return;
       }

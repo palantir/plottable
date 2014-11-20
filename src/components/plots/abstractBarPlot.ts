@@ -36,8 +36,8 @@ export module Plot {
       return new Plottable._Drawer.Rect(key, this._isVertical);
     }
 
-    public _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 

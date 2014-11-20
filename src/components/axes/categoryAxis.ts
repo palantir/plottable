@@ -24,8 +24,8 @@ export module Axis {
       this.classed("category-axis", true);
     }
 
-    public _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this.measurer = new _Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
     }
 
