@@ -1,3 +1,6 @@
+body{
+  margin: 0;
+}
 svg{
   float: left;
 }
@@ -44,3 +47,28 @@ input{
 #render:active{
   background-color: white;
 }
+
+.content{
+  left: 0px;
+  margin: 0 auto;
+  position: absolute;
+}
+
+.sidebar{
+  width: 0px;
+  height: 100%;
+  background-color: darkgrey;
+  position: absolute;
+  display: hidden;
+}
+
+#expand-sidebar{
+  float: left;
+  top: 10px;
+  color: white;
+  margin: 10 0 0 10;
+  font-size: 1.3rem;
+}
+
+
+
