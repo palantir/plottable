@@ -66,7 +66,7 @@ export module Axis {
     }
 
     public _rescale() {
-      if (!this._isSetup) {
+      if (!this.isSetup) {
         return;
       }
 

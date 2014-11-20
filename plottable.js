@@ -3618,7 +3618,7 @@ var Plottable;
                 this._yAlignProportion = 0;
                 this._fixedHeightFlag = false;
                 this._fixedWidthFlag = false;
-                this._isSetup = false;
+                this.isSetup = false;
                 this._isAnchored = false;
                 this.interactionsToRegister = [];
                 this.boxes = [];
@@ -3665,7 +3665,7 @@ var Plottable;
              */
             AbstractComponent.prototype.setup = function () {
                 var _this = this;
-                if (this._isSetup) {
+                if (this.isSetup) {
                     return;
                 }
                 this.cssClasses.forEach(function (cssClass) {
@@ -3686,7 +3686,7 @@ var Plottable;
                 if (this.isTopLevelComponent) {
                     this.autoResize(this._autoResize);
                 }
-                this._isSetup = true;
+                this.isSetup = true;
             };
             AbstractComponent.prototype._requestedSpace = function (availableWidth, availableHeight) {
                 return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
@@ -3741,19 +3741,19 @@ var Plottable;
                 this.boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             };
             AbstractComponent.prototype._render = function () {
-                if (this._isAnchored && this._isSetup) {
+                if (this._isAnchored && this.isSetup) {
                     Plottable.Core.RenderController.registerToRender(this);
                 }
             };
             AbstractComponent.prototype._scheduleComputeLayout = function () {
-                if (this._isAnchored && this._isSetup) {
+                if (this._isAnchored && this.isSetup) {
                     Plottable.Core.RenderController.registerToComputeLayout(this);
                 }
             };
             AbstractComponent.prototype._doRender = function () {
             };
             AbstractComponent.prototype._invalidateLayout = function () {
-                if (this._isAnchored && this._isSetup) {
+                if (this._isAnchored && this.isSetup) {
                     if (this.isTopLevelComponent) {
                         this._scheduleComputeLayout();
                     }
@@ -4020,7 +4020,7 @@ var Plottable;
              */
             AbstractComponent.prototype.merge = function (c) {
                 var cg;
-                if (this._isSetup || this._isAnchored) {
+                if (this.isSetup || this._isAnchored) {
                     throw new Error("Can't presently merge a component that's already been anchored");
                 }
                 if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
@@ -4996,7 +4996,7 @@ var Plottable;
                 return this._scale.ticks();
             };
             Numeric.prototype._rescale = function () {
-                if (!this._isSetup) {
+                if (!this.isSetup) {
                     return;
                 }
                 if (!this._isHorizontal()) {
@@ -5644,7 +5644,7 @@ var Plottable;
             };
             Legend.prototype.updateListeners = function () {
                 var _this = this;
-                if (!this._isSetup) {
+                if (!this.isSetup) {
                     return;
                 }
                 var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
@@ -5684,7 +5684,7 @@ var Plottable;
             };
             Legend.prototype.updateClasses = function () {
                 var _this = this;
-                if (!this._isSetup) {
+                if (!this.isSetup) {
                     return;
                 }
                 var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
@@ -6386,7 +6386,7 @@ var Plottable;
                 var pdk = { drawer: drawer, dataset: dataset, key: key, plotMetadata: metadata };
                 this._datasetKeysInOrder.push(key);
                 this._key2PlotDatasetKey.set(key, pdk);
-                if (this._isSetup) {
+                if (this.isSetup) {
                     drawer.setup(this._renderArea.append("g"));
                 }
                 dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
@@ -7197,7 +7197,7 @@ var Plottable;
                 return this._renderArea.selectAll("rect");
             };
             AbstractBarPlot.prototype.getBars = function (xValOrExtent, yValOrExtent) {
-                if (!this._isSetup) {
+                if (!this.isSetup) {
                     return d3.select();
                 }
                 var bars = [];
@@ -7224,7 +7224,7 @@ var Plottable;
              * @returns {AbstractBarPlot} The calling AbstractBarPlot.
              */
             AbstractBarPlot.prototype.deselectAll = function () {
-                if (this._isSetup) {
+                if (this.isSetup) {
                     this._getDrawersInOrder().forEach(function (d) { return d._renderArea.selectAll("rect").classed("selected", false); });
                 }
                 return this;
