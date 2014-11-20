@@ -487,11 +487,20 @@ export module Axis {
                                       return d3.select(this).style("visibility") === "visible";
                                     });
       var lastLabelClientRect: ClientRect;
+      var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
+      var isInsideBBox = (tickBox: ClientRect) =>
+         (
+          Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
+          Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
+          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.width()) &&
+          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.height())
+        );
 
       visibleTickLabels.each(function (d: any) {
         var clientRect = this.getBoundingClientRect();
         var tickLabel = d3.select(this);
-        if (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
+        if ((lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) ||
+            !isInsideBBox(clientRect)) {
           tickLabel.style("visibility", "hidden");
         } else {
           lastLabelClientRect = clientRect;

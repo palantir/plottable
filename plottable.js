@@ -4563,14 +4563,17 @@ var Plottable;
                 }
             };
             AbstractAxis.prototype._hideOverlappingTickLabels = function () {
+                var _this = this;
                 var visibleTickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
                     return d3.select(this).style("visibility") === "visible";
                 });
                 var lastLabelClientRect;
+                var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
+                var isInsideBBox = function (tickBox) { return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.width()) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.height())); };
                 visibleTickLabels.each(function (d) {
                     var clientRect = this.getBoundingClientRect();
                     var tickLabel = d3.select(this);
-                    if (lastLabelClientRect != null && Plottable._Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
+                    if ((lastLabelClientRect != null && Plottable._Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) || !isInsideBBox(clientRect)) {
                         tickLabel.style("visibility", "hidden");
                     }
                     else {
