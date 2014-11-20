@@ -52,8 +52,8 @@ export module Axis {
       return {
         width : textResult.usedWidth  + widthRequiredByTicks,
         height: textResult.usedHeight + heightRequiredByTicks,
-        wantsWidth : !textResult.textFits,
-        wantsHeight: !textResult.textFits
+        wantsWidth : !textResult.textFits || textResult.usedWidth  + widthRequiredByTicks > offeredWidth,
+        wantsHeight: !textResult.textFits || textResult.usedHeight  + heightRequiredByTicks > offeredHeight
       };
     }
 

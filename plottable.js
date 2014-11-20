@@ -5199,8 +5199,8 @@ var Plottable;
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
                     height: textResult.usedHeight + heightRequiredByTicks,
-                    wantsWidth: !textResult.textFits,
-                    wantsHeight: !textResult.textFits
+                    wantsWidth: !textResult.textFits || textResult.usedWidth + widthRequiredByTicks > offeredWidth,
+                    wantsHeight: !textResult.textFits || textResult.usedHeight + heightRequiredByTicks > offeredHeight
                 };
             };
             Category.prototype._getTickValues = function () {
@@ -6116,8 +6116,8 @@ var Plottable;
                     colProportionalSpace = Table.calcProportionalSpace(xWeights, freeWidth);
                     rowProportionalSpace = Table.calcProportionalSpace(yWeights, freeHeight);
                     nIterations++;
-                    var canImproveWidthAllocation = freeWidth > 0 && wantsWidth && freeWidth !== lastFreeWidth;
-                    var canImproveHeightAllocation = freeHeight > 0 && wantsHeight && freeHeight !== lastFreeHeight;
+                    var canImproveWidthAllocation = freeWidth > 0 && freeWidth !== lastFreeWidth;
+                    var canImproveHeightAllocation = freeHeight > 0 && freeHeight !== lastFreeHeight;
                     if (!(canImproveWidthAllocation || canImproveHeightAllocation)) {
                         break;
                     }

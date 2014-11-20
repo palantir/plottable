@@ -185,8 +185,8 @@ export module Component {
         rowProportionalSpace = Table.calcProportionalSpace(yWeights, freeHeight);
         nIterations++;
 
-        var canImproveWidthAllocation  = freeWidth  > 0 && wantsWidth  && freeWidth  !== lastFreeWidth;
-        var canImproveHeightAllocation = freeHeight > 0 && wantsHeight && freeHeight !== lastFreeHeight;
+        var canImproveWidthAllocation  = freeWidth  > 0 && freeWidth  !== lastFreeWidth;
+        var canImproveHeightAllocation = freeHeight > 0 && freeHeight !== lastFreeHeight;
 
         if (!(canImproveWidthAllocation || canImproveHeightAllocation)) {
           break;
