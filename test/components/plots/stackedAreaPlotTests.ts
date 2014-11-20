@@ -33,6 +33,8 @@ describe("Plots", () => {
       renderer = new Plottable.Plot.StackedArea(xScale, yScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
+      renderer.project("x", "x", xScale);
+      renderer.project("y", "y", yScale);
       renderer.project("fill", "type", colorScale);
       var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
@@ -81,6 +83,8 @@ describe("Plots", () => {
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
+      renderer.project("x", "x", xScale);
+      renderer.project("y", "y", yScale);
       new Plottable.Component.Table([[renderer]]).renderTo(svg);
     });
 
@@ -125,6 +129,8 @@ describe("Plots", () => {
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
+      renderer.project("x", "x", xScale);
+      renderer.project("y", "y", yScale);
       renderer.renderTo(svg);
     });
 
@@ -196,6 +202,8 @@ describe("Plots", () => {
         {x: 3, y: 1, type: "e"}
       ];
       renderer.addDataset("c", new Plottable.Dataset(data));
+      renderer.project("x", "x", xScale);
+      renderer.project("y", "y", yScale);
 
       renderer.renderTo(svg);
 
@@ -236,6 +244,8 @@ describe("Plots", () => {
       ];
       var dataset = new Plottable.Dataset(data);
       renderer.addDataset(dataset);
+      renderer.project("x", "x", xScale);
+      renderer.project("y", "y", yScale);
       renderer.renderTo(svg);
 
       assert.strictEqual(oldLowerBound, yScale.domain()[0], "lower bound doesn't change with 0 added");
@@ -323,6 +333,7 @@ describe("Plots", () => {
 
       renderer = new Plottable.Plot.StackedArea(xScale, yScale);
       renderer.project("y", "yTest", yScale);
+      renderer.project("x", "x", xScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);

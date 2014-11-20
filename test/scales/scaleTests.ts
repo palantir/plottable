@@ -122,8 +122,12 @@ describe("Scales", () => {
       var yAxis = new Plottable.Axis.Numeric(yScale, "left");
       var renderAreaD1 = new Plottable.Plot.Line(xScale, yScale);
       renderAreaD1.addDataset(ds1);
+      renderAreaD1.project("x", "x", xScale);
+      renderAreaD1.project("y", "y", yScale);
       var renderAreaD2 = new Plottable.Plot.Line(xScale, yScale);
       renderAreaD2.addDataset(ds2);
+      renderAreaD2.project("x", "x", xScale);
+      renderAreaD2.project("y", "y", yScale);
       var renderAreas = renderAreaD1.merge(renderAreaD2);
       renderAreas.renderTo(svg);
       assert.deepEqual(xScale.domain(), [0, 2]);
@@ -261,6 +265,8 @@ describe("Scales", () => {
     var dC = {x: "C", y: 2};
     var dataset = new Plottable.Dataset([dA, dB]);
     var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale).addDataset(dataset);
+    barPlot.project("x", "x", xScale);
+    barPlot.project("y", "y", yScale);
     var svg = generateSVG();
     assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
     barPlot.renderTo(svg);

@@ -13,6 +13,8 @@ describe("Plots", () => {
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       stackedPlot = new Plottable.Plot.AbstractStacked(xScale, yScale);
+      stackedPlot.project("x", "x", xScale);
+      stackedPlot.project("y", "y", yScale);
 
       (<any> stackedPlot)._getDrawer = (key: string) => new Plottable._Drawer.AbstractDrawer(key);
       stackedPlot._isVertical = true;

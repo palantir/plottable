@@ -28,11 +28,15 @@ function run(div, data, Plottable) {
 
 
     var renderAreaD0 = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries1);
+    renderAreaD0.project("x", "x", xScale).project("y", "y", yScale);
     var renderAreaD1 = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries2)
                                       .attr( "stroke", d3.functor("red"));
+    renderAreaD1.project("x", "x", xScale).project("y", "y", yScale);
     var renderAreaD2 = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries1);
+    renderAreaD2.project("x", "x", xScale).project("y", "y", yScale);
     var renderAreaD3 = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries2)
                                       .attr( "fill", d3.functor("red"));
+    renderAreaD3.project("x", "x", xScale).project("y", "y", yScale);
 
 
     //test merge:

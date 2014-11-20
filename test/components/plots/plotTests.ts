@@ -264,6 +264,8 @@ describe("Plots", () => {
       plot._additionalPaint = additionalPaint;
       plot.animator("bars", animator);
       var svg = generateSVG();
+      plot.project("x", "x", x);
+      plot.project("y", "y", y);
       plot.renderTo(svg);
       svg.remove();
       assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");

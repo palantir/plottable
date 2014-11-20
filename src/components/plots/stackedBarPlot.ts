@@ -22,9 +22,6 @@ export module Plot {
       super(xScale, yScale);
       this.classed("bar-plot", true);
 
-      var defaultColor = new Scale.Color().range()[0];
-      this.project("fill", () => defaultColor);
-
       this.baseline(this._baselineValue);
       this._isVertical = isVertical;
     }
@@ -65,6 +62,7 @@ export module Plot {
         +primaryAccessor(d, i, u, m) < 0 ? getStart(d, i, u, m) : getEnd(d, i, u, m);
       attrToProjector[valueAttr] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
         this._isVertical ? attrFunction(d, i, u, m) : attrFunction(d, i, u, m) - heightF(d, i, u, m);
+
       return attrToProjector;
     }
 
