@@ -4207,7 +4207,7 @@ var Plottable;
                 components.forEach(function (c) { return _this._addComponent(c); });
             }
             Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var requests = this._components.map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
+                var requests = this.components().map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
                 return {
                     width: Plottable._Util.Methods.max(requests, function (request) { return request.width; }, 0),
                     height: Plottable._Util.Methods.max(requests, function (request) { return request.height; }, 0),
@@ -4222,16 +4222,16 @@ var Plottable;
             Group.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
                 var _this = this;
                 _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
-                this._components.forEach(function (c) {
+                this.components().forEach(function (c) {
                     c._computeLayout(0, 0, _this.width(), _this.height());
                 });
                 return this;
             };
             Group.prototype._isFixedWidth = function () {
-                return this._components.every(function (c) { return c._isFixedWidth(); });
+                return this.components().every(function (c) { return c._isFixedWidth(); });
             };
             Group.prototype._isFixedHeight = function () {
-                return this._components.every(function (c) { return c._isFixedHeight(); });
+                return this.components().every(function (c) { return c._isFixedHeight(); });
             };
             return Group;
         })(Component.AbstractComponentContainer);
