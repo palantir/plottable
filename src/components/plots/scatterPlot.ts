@@ -4,6 +4,7 @@ module Plottable {
 export module Plot {
   export class Scatter<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
     private closeDetectionRadius = 5;
+    private defaultFillColor: string;
 
     /**
      * Constructs a ScatterPlot.
@@ -15,11 +16,7 @@ export module Plot {
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
       super(xScale, yScale);
       this.classed("scatter-plot", true);
-      this.project("r", 3); // default
-      this.project("opacity", 0.6); // default
-
-      var defaultColor = new Scale.Color().range()[0];
-      this.project("fill", () => defaultColor); // default
+      this.defaultFillColor = new Scale.Color().range()[0];
 
       this._animators["circles-reset"] = new Animator.Null();
       this._animators["circles"] = new Animator.Base()
@@ -49,6 +46,9 @@ export module Plot {
       delete attrToProjector["x"];
       attrToProjector["cy"] = attrToProjector["y"];
       delete attrToProjector["y"];
+      attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
+      attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
       return attrToProjector;
     }
 

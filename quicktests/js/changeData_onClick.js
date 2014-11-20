@@ -23,12 +23,16 @@ function run(div, data, Plottable) {
 
     var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale)
         .addDataset(dataseries1)
-        .animate(true);
+        .animate(true)
+        .project("x", "x", xScale)
+        .project("y", "y", yScale);
 
     var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale)
         .addDataset(dataseries1)
         .attr("fill", function() { return "purple"; })
-        .animate(true);
+        .animate(true)
+        .project("x", "x", xScale)
+        .project("y", "y", yScale);
 
     var renderGroup = barPlot.merge(scatterPlot);
 
