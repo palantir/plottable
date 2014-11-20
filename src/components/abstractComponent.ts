@@ -5,8 +5,8 @@ export module Component {
   export class AbstractComponent extends Core.PlottableObject {
     public static AUTORESIZE_BY_DEFAULT = true;
 
-    public _element: D3.Selection;
-    public _content: D3.Selection;
+    protected _element: D3.Selection;
+    protected _content: D3.Selection;
     public _backgroundContainer: D3.Selection;
     public _foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
@@ -14,10 +14,10 @@ export module Component {
     private yOrigin: number;
 
     public _parent: AbstractComponentContainer;
-    public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
-    public _yAlignProportion = 0;
-    public _fixedHeightFlag = false;
-    public _fixedWidthFlag = false;
+    private _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
+    private _yAlignProportion = 0;
+    protected _fixedHeightFlag = false;
+    protected _fixedWidthFlag = false;
     protected _isSetup = false;
     protected _isAnchored = false;
 
