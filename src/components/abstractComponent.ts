@@ -19,7 +19,7 @@ export module Component {
     public _fixedHeightFlag = false;
     public _fixedWidthFlag = false;
     protected isSetup = false;
-    public _isAnchored = false;
+    protected _isAnchored = false;
 
     private hitBox: D3.Selection;
     private interactionsToRegister: Interaction.AbstractInteraction[] = [];
