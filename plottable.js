@@ -1574,10 +1574,10 @@ var Plottable;
             if (data === void 0) { data = []; }
             if (metadata === void 0) { metadata = {}; }
             _super.call(this);
-            this.broadcaster = new Plottable.Core.Broadcaster(this);
             this._data = data;
             this._metadata = metadata;
             this.accessor2cachedExtent = new Plottable._Util.StrictEqualityAssociativeArray();
+            this.broadcaster = new Plottable.Core.Broadcaster(this);
         }
         Dataset.prototype.data = function (data) {
             if (data == null) {
@@ -2141,11 +2141,11 @@ var Plottable;
             function AbstractScale(scale) {
                 _super.call(this);
                 this._autoDomainAutomatically = true;
-                this.broadcaster = new Plottable.Core.Broadcaster(this);
                 this._rendererAttrID2Extent = {};
                 this._typeCoercer = function (d) { return d; };
                 this._domainModificationInProgress = false;
                 this._d3Scale = scale;
+                this.broadcaster = new Plottable.Core.Broadcaster(this);
             }
             AbstractScale.prototype._getAllExtents = function () {
                 return d3.values(this._rendererAttrID2Extent);
@@ -3912,7 +3912,7 @@ var Plottable;
                 if (this._element == null) {
                     throw new Error("Adding boxes before anchoring is currently disallowed");
                 }
-                var parentElement = parentElement == null ? this.boxContainer : parentElement;
+                parentElement = parentElement == null ? this.boxContainer : parentElement;
                 var box = parentElement.append("rect");
                 if (className != null) {
                     box.classed(className, true);
@@ -6371,7 +6371,7 @@ var Plottable;
                 }
                 var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
                 var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
-                var dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
+                dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
                 this._addDataset(key, dataset);
                 return this;
             };
