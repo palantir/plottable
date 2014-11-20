@@ -115,7 +115,7 @@ export module Plot {
       this._datasetKeysInOrder.push(key);
       this._key2PlotDatasetKey.set(key, pdk);
 
-      if (this.isSetup) {
+      if (this._isSetup) {
         drawer.setup(this._renderArea.append("g"));
       }
       dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());

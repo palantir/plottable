@@ -246,7 +246,7 @@ export module Component {
     }
 
     private updateListeners() {
-      if (!this.isSetup) {
+      if (!this._isSetup) {
         return;
       }
       var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
@@ -284,7 +284,7 @@ export module Component {
     }
 
     private updateClasses() {
-      if (!this.isSetup) {
+      if (!this._isSetup) {
         return;
       }
       var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);

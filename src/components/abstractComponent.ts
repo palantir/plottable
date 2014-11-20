@@ -18,7 +18,7 @@ export module Component {
     public _yAlignProportion = 0;
     public _fixedHeightFlag = false;
     public _fixedWidthFlag = false;
-    protected isSetup = false;
+    protected _isSetup = false;
     protected _isAnchored = false;
 
     private hitBox: D3.Selection;
@@ -70,7 +70,7 @@ export module Component {
      * Override in subclasses to provide additional functionality.
      */
     protected setup() {
-      if (this.isSetup) {
+      if (this._isSetup) {
         return;
       }
       this.cssClasses.forEach((cssClass: string) => {
@@ -94,7 +94,7 @@ export module Component {
       if (this.isTopLevelComponent) {
         this.autoResize(this._autoResize);
       }
-      this.isSetup = true;
+      this._isSetup = true;
     }
 
     public _requestedSpace(availableWidth : number, availableHeight: number): _SpaceRequest {
@@ -153,13 +153,13 @@ export module Component {
     }
 
     public _render() {
-      if (this._isAnchored && this.isSetup) {
+      if (this._isAnchored && this._isSetup) {
         Core.RenderController.registerToRender(this);
       }
     }
 
     public _scheduleComputeLayout() {
-      if (this._isAnchored && this.isSetup) {
+      if (this._isAnchored && this._isSetup) {
         Core.RenderController.registerToComputeLayout(this);
       }
     }
@@ -167,7 +167,7 @@ export module Component {
     public _doRender() {/* overwrite */}
 
     public _invalidateLayout() {
-      if (this._isAnchored && this.isSetup) {
+      if (this._isAnchored && this._isSetup) {
         if (this.isTopLevelComponent) {
           this._scheduleComputeLayout();
         } else {
@@ -450,7 +450,7 @@ export module Component {
      */
     public merge(c: AbstractComponent): Component.Group {
       var cg: Component.Group;
-      if (this.isSetup || this._isAnchored) {
+      if (this._isSetup || this._isAnchored) {
         throw new Error("Can't presently merge a component that's already been anchored");
       }
       if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {

@@ -170,7 +170,7 @@ export module Plot {
     public getBars(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
     public getBars(xValOrExtent: number, yValOrExtent: number): D3.Selection;
     public getBars(xValOrExtent: any, yValOrExtent: any): D3.Selection {
-      if (!this.isSetup) {
+      if (!this._isSetup) {
         return d3.select();
       }
 
@@ -204,7 +204,7 @@ export module Plot {
      * @returns {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public deselectAll() {
-      if (this.isSetup) {
+      if (this._isSetup) {
         this._getDrawersInOrder().forEach((d) => d._renderArea.selectAll("rect").classed("selected", false));
       }
       return this;
