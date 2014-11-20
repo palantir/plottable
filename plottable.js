@@ -6845,7 +6845,7 @@ var Plottable;
             AbstractXYPlot.prototype.adjustDomainToVisiblePoints = function (fromScale, toScale, fromX) {
                 if (toScale instanceof Plottable.Scale.AbstractQuantitative) {
                     var toScaleQ = toScale;
-                    var normalizedData = this.normalizeDatasets(fromX);
+                    var normalizedData = this._normalizeDatasets(fromX);
                     var adjustedDomain = this.adjustDomainOverVisiblePoints(normalizedData, fromScale.domain());
                     if (adjustedDomain.length === 0) {
                         return;
@@ -6854,7 +6854,7 @@ var Plottable;
                     toScaleQ.domain(adjustedDomain);
                 }
             };
-            AbstractXYPlot.prototype.normalizeDatasets = function (fromX) {
+            AbstractXYPlot.prototype._normalizeDatasets = function (fromX) {
                 var _this = this;
                 var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
                 var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
@@ -8055,6 +8055,23 @@ var Plottable;
                     primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
             };
+            AbstractStacked.prototype._normalizeDatasets = function (fromX) {
+                var _this = this;
+                var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
+                var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
+                var aStackedAccessor = function (d, i, u, m) { return aAccessor(d, i, u, m) + ((_this._isVertical ? !fromX : fromX) ? m.offsets.get(bAccessor(d, i, u, m)) : 0); };
+                var bStackedAccessor = function (d, i, u, m) { return bAccessor(d, i, u, m) + ((_this._isVertical ? fromX : !fromX) ? m.offsets.get(aAccessor(d, i, u, m)) : 0); };
+                return Plottable._Util.Methods.flatten(this._datasetKeysInOrder.map(function (key) {
+                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                    var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
+                    return dataset.data().map(function (d, i) {
+                        return {
+                            a: aStackedAccessor(d, i, dataset.metadata(), plotMetadata),
+                            b: bStackedAccessor(d, i, dataset.metadata(), plotMetadata)
+                        };
+                    });
+                }));
+            };
             AbstractStacked.prototype._keyAccessor = function () {
                 return this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
             };
@@ -8243,6 +8260,9 @@ var Plottable;
             };
             StackedBar.prototype._getPlotMetadataForDataset = function (key) {
                 return Plot.AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
+            };
+            StackedBar.prototype._normalizeDatasets = function (fromX) {
+                return Plot.AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
             };
             //===== Stack logic from AbstractStackedPlot =====
             StackedBar.prototype._updateStackOffsets = function () {

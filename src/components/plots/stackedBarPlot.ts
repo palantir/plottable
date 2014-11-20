@@ -88,6 +88,10 @@ export module Plot {
       return AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
     }
 
+    public _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
+      return AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
+    }
+
     //===== Stack logic from AbstractStackedPlot =====
     public _updateStackOffsets() {
       AbstractStacked.prototype._updateStackOffsets.call(this);

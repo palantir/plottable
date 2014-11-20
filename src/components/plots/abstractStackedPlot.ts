@@ -185,6 +185,25 @@ export module Plot {
       }
     }
 
+    public _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
+      var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
+      var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
+      var aStackedAccessor = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
+        aAccessor(d, i, u, m) + ((this._isVertical ? !fromX : fromX) ? m.offsets.get(bAccessor(d, i, u, m)) : 0);
+      var bStackedAccessor = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
+        bAccessor(d, i, u, m) + ((this._isVertical ? fromX : !fromX) ? m.offsets.get(aAccessor(d, i, u, m)) : 0);
+      return _Util.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
+        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+        var plotMetadata = <StackedPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
+        return dataset.data().map((d, i) => {
+          return {
+            a: aStackedAccessor(d, i, dataset.metadata(), plotMetadata),
+            b: bStackedAccessor(d, i, dataset.metadata(), plotMetadata)
+          };
+        });
+      }));
+    }
+
     public _keyAccessor(): _Accessor {
        return this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
     }

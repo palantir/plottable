@@ -2880,6 +2880,10 @@ declare module Plottable {
              * This call does not override auto domain adjustment behavior over visible points.
              */
             showAllData(): void;
+            _normalizeDatasets<A, B>(fromX: boolean): {
+                a: A;
+                b: B;
+            }[];
         }
     }
 }
@@ -3249,6 +3253,10 @@ declare module Plottable {
             _getDomainKeys(): string[];
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             _updateScaleExtents(): void;
+            _normalizeDatasets<A, B>(fromX: boolean): {
+                a: A;
+                b: B;
+            }[];
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
         }
@@ -3304,6 +3312,10 @@ declare module Plottable {
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedBar<X, Y>;
             _onDatasetUpdate(): StackedBar<X, Y>;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
+            _normalizeDatasets<A, B>(fromX: boolean): {
+                a: A;
+                b: B;
+            }[];
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
             _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
