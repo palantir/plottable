@@ -1719,18 +1719,16 @@ declare module Plottable {
     module Component {
         class AbstractComponent extends Core.PlottableObject {
             static AUTORESIZE_BY_DEFAULT: boolean;
-            _element: D3.Selection;
-            _content: D3.Selection;
+            protected _element: D3.Selection;
+            protected _content: D3.Selection;
             _backgroundContainer: D3.Selection;
             _foregroundContainer: D3.Selection;
             clipPathEnabled: boolean;
             _parent: AbstractComponentContainer;
-            _xAlignProportion: number;
-            _yAlignProportion: number;
-            _fixedHeightFlag: boolean;
-            _fixedWidthFlag: boolean;
-            _isSetup: boolean;
-            _isAnchored: boolean;
+            protected _fixedHeightFlag: boolean;
+            protected _fixedWidthFlag: boolean;
+            protected _isSetup: boolean;
+            protected _isAnchored: boolean;
             /**
              * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
              *
@@ -1742,7 +1740,7 @@ declare module Plottable {
              * Called during _anchor() if the Component's element has not been created yet.
              * Override in subclasses to provide additional functionality.
              */
-            _setup(): void;
+            protected setup(): void;
             _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
             /**
              * Computes the size, position, and alignment from the specified values.
@@ -2007,7 +2005,7 @@ declare module Plottable {
             _isFixedWidth(): boolean;
             _rescale(): void;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
-            _setup(): void;
+            protected setup(): void;
             _getTickValues(): any[];
             _doRender(): void;
             _generateBaselineAttrHash(): {
@@ -2187,7 +2185,7 @@ declare module Plottable {
             orient(): string;
             orient(orientation: string): Time;
             _computeHeight(): number;
-            _setup(): void;
+            protected setup(): void;
             _getTickValues(): any[];
             _measureTextHeight(): number;
             _doRender(): Time;
@@ -2212,7 +2210,7 @@ declare module Plottable {
              * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
              */
             constructor(scale: Scale.AbstractQuantitative<number>, orientation: string, formatter?: (d: any) => string);
-            _setup(): void;
+            protected setup(): void;
             _computeWidth(): number;
             _computeHeight(): number;
             _getTickValues(): any[];
@@ -2280,7 +2278,7 @@ declare module Plottable {
              * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
              */
             constructor(scale: Scale.Ordinal, orientation?: string, formatter?: (d: any) => string);
-            _setup(): void;
+            protected setup(): void;
             _rescale(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _getTickValues(): string[];
@@ -2336,7 +2334,7 @@ declare module Plottable {
              */
             yAlign(alignment: string): Label;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _setup(): void;
+            protected setup(): void;
             /**
              * Gets the current text on the Label.
              *
@@ -2534,7 +2532,7 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<any>, yScale: Scale.AbstractQuantitative<any>);
             remove(): Gridlines;
-            _setup(): void;
+            protected setup(): void;
             _doRender(): void;
         }
     }
@@ -2679,7 +2677,7 @@ declare module Plottable {
              */
             constructor();
             _anchor(element: D3.Selection): void;
-            _setup(): void;
+            protected setup(): void;
             remove(): void;
             /**
              * Adds a dataset to this plot. Identify this dataset with a key.
@@ -2968,7 +2966,7 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
             _getDrawer(key: string): _Drawer.Rect;
-            _setup(): void;
+            protected setup(): void;
             /**
              * Gets the baseline value for the bars
              *
@@ -3153,7 +3151,7 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
-            _setup(): void;
+            protected setup(): void;
             _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
             _getDrawer(key: string): _Drawer.Line;
             _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
@@ -3266,7 +3264,7 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _getDrawer(key: string): _Drawer.Area;
-            _setup(): void;
+            protected setup(): void;
             _updateStackOffsets(): void;
             _additionalPaint(): void;
             _updateYDomainer(): void;
