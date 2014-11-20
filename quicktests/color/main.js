@@ -1,3 +1,32 @@
+//show svg width & height setting
+function expandSidebar(){
+
+  "use strict";
+
+  var content = $(".content");
+  var sidebar = $(".sidebar");
+
+  if(sidebar.position().left !== 0){
+    sidebar.css("visibility", "visible");
+    sidebar.animate({
+      left: 0,
+    });
+    content.animate({
+      left: 300
+    });
+  }
+  else{
+    sidebar.animate({
+      left: -300,
+    });
+    content.animate({
+      left: 0
+    }, function(){
+      sidebar.css("visibility", "hidden");
+    });
+  }
+}
+
 (function iife(){
 
 "use strict";

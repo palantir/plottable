@@ -15,10 +15,14 @@
 
 <body>
 <div class="sidebar">
+  <div class ="sidebar-quicktest"><input type="checkbox">quicktest1</div>
+  <div class ="sidebar-quicktest"><input type="checkbox">quicktest2</div>
+  <div class ="sidebar-quicktest"><input type="checkbox">quicktest3</div>
+  <div class ="sidebar-quicktest"><input type="checkbox">quicktest4</div>
 </div>
 <div class="content">
   <div class="navigation">
-      <div id="expand-sidebar">&#9776;</div>
+      <a id="expand-sidebar" onclick="expandSidebar()" href="#">&#9776;</a>
       <input id="series" type="text" placeholder="# of Series < 50">
       <input id="width" type="text" placeholder="Plot Width in Pixels">
       <input id="height" type="text" placeholder="Plot Height in Pixels">
