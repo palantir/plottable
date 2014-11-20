@@ -5,7 +5,7 @@ export module Scale {
   export class AbstractScale<D,R> extends Core.PlottableObject implements Core.Listenable {
     public _d3Scale: D3.Scale.Scale;
     public _autoDomainAutomatically = true;
-    public broadcaster = new Plottable.Core.Broadcaster(this);
+    public broadcaster: Core.Broadcaster;
     public _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     public _typeCoercer: (d: any) => any = (d: any) => d;
     public _domainModificationInProgress: boolean = false;
@@ -22,6 +22,7 @@ export module Scale {
     constructor(scale: D3.Scale.Scale) {
       super();
       this._d3Scale = scale;
+      this.broadcaster = new Core.Broadcaster(this);
     }
 
     public _getAllExtents(): D[][] {

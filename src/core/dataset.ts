@@ -9,7 +9,7 @@ module Plottable {
     private _data: any[];
     private _metadata: any;
     private accessor2cachedExtent: _Util.StrictEqualityAssociativeArray;
-    public broadcaster = new Core.Broadcaster(this);
+    public broadcaster: Core.Broadcaster;
 
     /**
      * Constructs a new set.
@@ -26,6 +26,7 @@ module Plottable {
       this._data = data;
       this._metadata = metadata;
       this.accessor2cachedExtent = new _Util.StrictEqualityAssociativeArray();
+      this.broadcaster = new Core.Broadcaster(this);
     }
 
     /**
