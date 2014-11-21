@@ -659,7 +659,7 @@ declare module Plottable {
 
 declare module Plottable {
     class Dataset extends Core.PlottableObject implements Core.Listenable {
-        broadcaster: any;
+        broadcaster: Core.Broadcaster;
         /**
          * Constructs a new set.
          *
@@ -1026,7 +1026,7 @@ declare module Plottable {
         class AbstractScale<D, R> extends Core.PlottableObject implements Core.Listenable {
             _d3Scale: D3.Scale.Scale;
             _autoDomainAutomatically: boolean;
-            broadcaster: any;
+            broadcaster: Core.Broadcaster;
             _rendererAttrID2Extent: {
                 [x: string]: D[];
             };
