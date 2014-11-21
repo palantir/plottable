@@ -6914,9 +6914,9 @@ var Plottable;
              */
             function Scatter(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this.closeDetectionRadius = 5;
+                this._closeDetectionRadius = 5;
                 this.classed("scatter-plot", true);
-                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
+                this._defaultFillColor = new Plottable.Scale.Color().range()[0];
                 this._animators["circles-reset"] = new Plottable.Animator.Null();
                 this._animators["circles"] = new Plottable.Animator.Base().duration(250).delay(5);
             }
@@ -6942,7 +6942,7 @@ var Plottable;
                 delete attrToProjector["y"];
                 attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
-                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {
@@ -7014,7 +7014,7 @@ var Plottable;
                 // no-op
             };
             Scatter.prototype._doHover = function (p) {
-                return this._getClosestStruckPoint(p, this.closeDetectionRadius);
+                return this._getClosestStruckPoint(p, this._closeDetectionRadius);
             };
             return Scatter;
         })(Plot.AbstractXYPlot);
