@@ -7605,15 +7605,15 @@ var Plottable;
              */
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this.hoverDetectionRadius = 15;
+                this._hoverDetectionRadius = 15;
                 this.classed("line-plot", true);
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
-                this.defaultStrokeColor = new Plottable.Scale.Color().range()[0];
+                this._defaultStrokeColor = new Plottable.Scale.Color().range()[0];
             }
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this.hoverTarget = this._foregroundContainer.append("circle").classed("hover-target", true).style("visibility", "hidden");
+                this._hoverTarget = this._foregroundContainer.append("circle").classed("hover-target", true).style("visibility", "hidden");
             };
             Line.prototype._rejectNullsAndNaNs = function (d, i, userMetdata, plotMetadata, accessor) {
                 var value = accessor(d, i, userMetdata, plotMetadata);
@@ -7656,7 +7656,7 @@ var Plottable;
                 var xFunction = attrToProjector["x"];
                 var yFunction = attrToProjector["y"];
                 attrToProjector["defined"] = function (d, i, u, m) { return _this._rejectNullsAndNaNs(d, i, u, m, xFunction) && _this._rejectNullsAndNaNs(d, i, u, m, yFunction); };
-                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultStrokeColor);
+                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
                 attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
                 return attrToProjector;
             };
@@ -7702,7 +7702,7 @@ var Plottable;
                 // no-op
             };
             Line.prototype._doHover = function (p) {
-                var closestInfo = this._getClosestWithinRange(p, this.hoverDetectionRadius);
+                var closestInfo = this._getClosestWithinRange(p, this._hoverDetectionRadius);
                 var closestValue = closestInfo.closestValue;
                 if (closestValue === undefined) {
                     return {
@@ -7712,14 +7712,14 @@ var Plottable;
                     };
                 }
                 var closestPoint = closestInfo.closestPoint;
-                this.hoverTarget.attr({
+                this._hoverTarget.attr({
                     "cx": closestInfo.closestPoint.x,
                     "cy": closestInfo.closestPoint.y
                 });
                 return {
                     data: [closestValue],
                     pixelPositions: [closestPoint],
-                    selection: this.hoverTarget
+                    selection: this._hoverTarget
                 };
             };
             return Line;

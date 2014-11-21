@@ -3,9 +3,9 @@
 module Plottable {
 export module Plot {
   export class Line<X> extends AbstractXYPlot<X,number> implements Interaction.Hoverable {
-    private hoverDetectionRadius = 15;
-    private hoverTarget: D3.Selection;
-    private defaultStrokeColor: string;
+    private _hoverDetectionRadius = 15;
+    private _hoverTarget: D3.Selection;
+    private _defaultStrokeColor: string;
 
     public _yScale: Scale.AbstractQuantitative<number>;
 
@@ -24,12 +24,12 @@ export module Plot {
                                             .duration(600)
                                             .easing("exp-in-out");
 
-      this.defaultStrokeColor = new Scale.Color().range()[0];
+      this._defaultStrokeColor = new Scale.Color().range()[0];
     }
 
     public _setup() {
       super._setup();
-      this.hoverTarget = this._foregroundContainer.append("circle")
+      this._hoverTarget = this._foregroundContainer.append("circle")
                                           .classed("hover-target", true)
                                           .style("visibility", "hidden");
     }
@@ -84,7 +84,7 @@ export module Plot {
 
       attrToProjector["defined"] = (d: any, i: number, u: any, m: any) =>
           this._rejectNullsAndNaNs(d, i, u, m, xFunction) && this._rejectNullsAndNaNs(d, i, u, m, yFunction);
-      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultStrokeColor);
+      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
       attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
 
       return attrToProjector;
@@ -140,7 +140,7 @@ export module Plot {
     }
 
     public _doHover(p: Point): Interaction.HoverData {
-      var closestInfo = this._getClosestWithinRange(p, this.hoverDetectionRadius);
+      var closestInfo = this._getClosestWithinRange(p, this._hoverDetectionRadius);
       var closestValue = closestInfo.closestValue;
       if (closestValue === undefined) {
         return {
@@ -151,7 +151,7 @@ export module Plot {
       }
 
       var closestPoint = closestInfo.closestPoint;
-      this.hoverTarget.attr({
+      this._hoverTarget.attr({
         "cx": closestInfo.closestPoint.x,
         "cy": closestInfo.closestPoint.y
       });
@@ -159,7 +159,7 @@ export module Plot {
       return {
         data: [closestValue],
         pixelPositions: [closestPoint],
-        selection: this.hoverTarget
+        selection: this._hoverTarget
       };
     }
     //===== /Hover logic =====
