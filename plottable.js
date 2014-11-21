@@ -1,5 +1,5 @@
 /*!
-Plottable 0.36.1 (https://github.com/palantir/plottable)
+Plottable 0.37.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1403,7 +1403,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.36.1";
+    Plottable.version = "0.37.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3911,7 +3911,7 @@ var Plottable;
                 if (this._element == null) {
                     throw new Error("Adding boxes before anchoring is currently disallowed");
                 }
-                var parentElement = parentElement == null ? this.boxContainer : parentElement;
+                parentElement = parentElement == null ? this.boxContainer : parentElement;
                 var box = parentElement.append("rect");
                 if (className != null) {
                     box.classed(className, true);
@@ -6370,7 +6370,7 @@ var Plottable;
                 }
                 var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
                 var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
-                var dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
+                dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
                 this._addDataset(key, dataset);
                 return this;
             };
@@ -6673,8 +6673,6 @@ var Plottable;
                 attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
                 var defaultFillFunction = function (d, i) { return _this.colorScale.scale(String(i)); };
                 attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
-                var defaultAccessor = function (d) { return d.value; };
-                attrToProjector["value"] = attrToProjector["value"] || defaultAccessor;
                 return attrToProjector;
             };
             Pie.prototype._getDrawer = function (key) {
@@ -6711,6 +6709,7 @@ var Plottable;
              * @param {Scale} yScale The y scale to use.
              */
             function AbstractXYPlot(xScale, yScale) {
+                var _this = this;
                 _super.call(this);
                 this._autoAdjustXScaleDomain = false;
                 this._autoAdjustYScaleDomain = false;
@@ -6718,8 +6717,12 @@ var Plottable;
                     throw new Error("XYPlots require an xScale and yScale");
                 }
                 this.classed("xy-plot", true);
-                this.project("x", "x", xScale); // default accessor
-                this.project("y", "y", yScale); // default accessor
+                this._xScale = xScale;
+                this._yScale = yScale;
+                this._updateXDomainer();
+                xScale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this.adjustYDomainOnChangeFromX(); });
+                this._updateYDomainer();
+                yScale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this.adjustXDomainOnChangeFromY(); });
             }
             /**
              * @param {string} attrToSet One of ["x", "y"] which determines the point's
@@ -6833,11 +6836,17 @@ var Plottable;
                 }
             };
             AbstractXYPlot.prototype.adjustYDomainOnChangeFromX = function () {
+                if (!this._projectorsReady()) {
+                    return;
+                }
                 if (this._autoAdjustYScaleDomain) {
                     this.adjustDomainToVisiblePoints(this._xScale, this._yScale, true);
                 }
             };
             AbstractXYPlot.prototype.adjustXDomainOnChangeFromY = function () {
+                if (!this._projectorsReady()) {
+                    return;
+                }
                 if (this._autoAdjustXScaleDomain) {
                     this.adjustDomainToVisiblePoints(this._yScale, this._xScale, false);
                 }
@@ -6874,6 +6883,9 @@ var Plottable;
                 }
                 return retVal;
             };
+            AbstractXYPlot.prototype._projectorsReady = function () {
+                return this._projections["x"] && this._projections["y"];
+            };
             return AbstractXYPlot;
         })(Plot.AbstractPlot);
         Plot.AbstractXYPlot = AbstractXYPlot;
@@ -6904,10 +6916,7 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.closeDetectionRadius = 5;
                 this.classed("scatter-plot", true);
-                this.project("r", 3); // default
-                this.project("opacity", 0.6); // default
-                var defaultColor = new Plottable.Scale.Color().range()[0];
-                this.project("fill", function () { return defaultColor; }); // default
+                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
                 this._animators["circles-reset"] = new Plottable.Animator.Null();
                 this._animators["circles"] = new Plottable.Animator.Base().duration(250).delay(5);
             }
@@ -6931,11 +6940,14 @@ var Plottable;
                 delete attrToProjector["x"];
                 attrToProjector["cy"] = attrToProjector["y"];
                 delete attrToProjector["y"];
+                attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
+                attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                if (this._dataChanged) {
+                if (this._dataChanged && this._animate) {
                     var resetAttrToProjector = this._generateAttrToProjector();
                     resetAttrToProjector["r"] = function () { return 0; };
                     drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("circles-reset") });
@@ -7055,7 +7067,6 @@ var Plottable;
                 this._xScale.rangeType("bands", 0, 0);
                 this._yScale.rangeType("bands", 0, 0);
                 this._colorScale = colorScale;
-                this.project("fill", "value", colorScale); // default
                 this._animators["cells"] = new Plottable.Animator.Null();
             }
             Grid.prototype._addDataset = function (key, dataset) {
@@ -7124,8 +7135,7 @@ var Plottable;
                 this._hoverMode = "point";
                 this.hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
-                var defaultColor = new Plottable.Scale.Color().range()[0];
-                this.project("fill", function () { return defaultColor; });
+                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
                 this._animators["bars-reset"] = new Plottable.Animator.Null();
                 this._animators["bars"] = new Plottable.Animator.Base();
                 this._animators["baseline"] = new Plottable.Animator.Null();
@@ -7357,6 +7367,7 @@ var Plottable;
                     };
                     attrToProjector["positive"] = function (d, i, u, m) { return originalPositionFn(d, i, u, m) <= scaledBaseline; };
                 }
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
                 return attrToProjector;
             };
             /**
@@ -7618,11 +7629,9 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.hoverDetectionRadius = 15;
                 this.classed("line-plot", true);
-                var defaultColor = new Plottable.Scale.Color().range()[0];
-                this.project("stroke", function () { return defaultColor; }); // default
-                this.project("stroke-width", function () { return "2px"; }); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
+                this.defaultStrokeColor = new Plottable.Scale.Color().range()[0];
             }
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -7648,7 +7657,7 @@ var Plottable;
             };
             Line.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                if (this._dataChanged) {
+                if (this._dataChanged && this._animate) {
                     var attrToProjector = this._generateAttrToProjector();
                     attrToProjector["y"] = this._getResetYFunction();
                     drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator("reset") });
@@ -7669,6 +7678,8 @@ var Plottable;
                 var xFunction = attrToProjector["x"];
                 var yFunction = attrToProjector["y"];
                 attrToProjector["defined"] = function (d, i, u, m) { return _this._rejectNullsAndNaNs(d, i, u, m, xFunction) && _this._rejectNullsAndNaNs(d, i, u, m, yFunction); };
+                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultStrokeColor);
+                attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
                 return attrToProjector;
             };
             Line.prototype._wholeDatumAttributes = function () {
@@ -7768,12 +7779,9 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.classed("area-plot", true);
                 this.project("y0", 0, yScale); // default
-                this.project("fill-opacity", function () { return 0.25; }); // default
-                var defaultColor = new Plottable.Scale.Color().range()[0];
-                this.project("fill", function () { return defaultColor; }); // default
-                this.project("stroke", function () { return defaultColor; }); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
+                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
             }
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
@@ -7823,6 +7831,13 @@ var Plottable;
                 var wholeDatumAttributes = _super.prototype._wholeDatumAttributes.call(this);
                 wholeDatumAttributes.push("y0");
                 return wholeDatumAttributes;
+            };
+            Area.prototype._generateAttrToProjector = function () {
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultFillColor);
+                return attrToProjector;
             };
             return Area;
         })(Plot.Line);
@@ -8108,9 +8123,8 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
                 this.classed("area-plot", true);
-                var defaultColor = new Plottable.Scale.Color().range()[0];
-                this.project("fill", function () { return defaultColor; });
                 this._isVertical = true;
+                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
             }
             StackedArea.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Area(key).drawLine(false);
@@ -8121,6 +8135,9 @@ var Plottable;
             };
             StackedArea.prototype._updateStackOffsets = function () {
                 var _this = this;
+                if (!this._projectorsReady()) {
+                    return;
+                }
                 var domainKeys = this._getDomainKeys();
                 var keyAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
                 var keySets = this._datasetKeysInOrder.map(function (k) {
@@ -8169,6 +8186,7 @@ var Plottable;
                 var yAccessor = this._projections["y"].accessor;
                 attrToProjector["y"] = function (d, i, u, m) { return _this._yScale.scale(+yAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 attrToProjector["y0"] = function (d, i, u, m) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
                 return attrToProjector;
             };
             StackedArea.prototype._wholeDatumAttributes = function () {
@@ -8208,8 +8226,6 @@ var Plottable;
                 this._baselineValue = 0;
                 _super.call(this, xScale, yScale);
                 this.classed("bar-plot", true);
-                var defaultColor = new Plottable.Scale.Color().range()[0];
-                this.project("fill", function () { return defaultColor; });
                 this.baseline(this._baselineValue);
                 this._isVertical = isVertical;
             }
@@ -8228,7 +8244,7 @@ var Plottable;
             };
             StackedBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
-                var attrToProjector = Plot.AbstractBarPlot.prototype._generateAttrToProjector.apply(this);
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 var primaryAccessor = this._projections[primaryAttr].accessor;
@@ -8282,10 +8298,6 @@ var Plottable;
             };
             StackedBar.prototype._valueAccessor = function () {
                 return Plot.AbstractStacked.prototype._valueAccessor.call(this);
-            };
-            //===== /Stack logic =====
-            StackedBar.prototype._getBarPixelWidth = function () {
-                return Plot.AbstractBarPlot.prototype._getBarPixelWidth.apply(this);
             };
             return StackedBar;
         })(Plot.AbstractBarPlot);
@@ -9044,6 +9056,8 @@ var Plottable;
                 }
             };
             Drag.prototype._dragend = function () {
+                var location = d3.mouse(this._hitBox[0][0].parentNode);
+                this._setLocation(location[0], location[1]);
                 this._isDragging = false;
                 this._doDragend();
             };

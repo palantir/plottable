@@ -22,9 +22,6 @@ export module Plot {
       super(xScale, yScale);
       this.classed("bar-plot", true);
 
-      var defaultColor = new Scale.Color().range()[0];
-      this.project("fill", () => defaultColor);
-
       this.baseline(this._baselineValue);
       this._isVertical = isVertical;
     }
@@ -44,7 +41,7 @@ export module Plot {
     }
 
     public _generateAttrToProjector() {
-      var attrToProjector = AbstractBarPlot.prototype._generateAttrToProjector.apply(this);
+      var attrToProjector = super._generateAttrToProjector();
 
       var primaryAttr = this._isVertical ? "y" : "x";
       var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
@@ -63,6 +60,7 @@ export module Plot {
         +primaryAccessor(d, i, u, m) < 0 ? getStart(d, i, u, m) : getEnd(d, i, u, m);
       attrToProjector[primaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
         this._isVertical ? attrFunction(d, i, u, m) : attrFunction(d, i, u, m) - heightF(d, i, u, m);
+
       return attrToProjector;
     }
 
@@ -119,10 +117,6 @@ export module Plot {
       return AbstractStacked.prototype._valueAccessor.call(this);
     }
     //===== /Stack logic =====
-
-    public _getBarPixelWidth() {
-      return AbstractBarPlot.prototype._getBarPixelWidth.apply(this);
-    }
   }
 }
 }

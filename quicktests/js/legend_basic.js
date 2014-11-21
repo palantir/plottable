@@ -26,7 +26,9 @@ function run(div, data, Plottable) {
   };
 
   var renderAreaD1 = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries1);
+  renderAreaD1.project("x", "x", xScale).project("y", "y", yScale);
   var renderAreaD2 = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries2);
+  renderAreaD2.project("x", "x", xScale).project("y", "y", yScale);
   renderAreaD1.attr("fill", colorProjector);
   renderAreaD2.attr("stroke", colorProjector);
   var renderAreas = renderAreaD1.merge(renderAreaD2);
