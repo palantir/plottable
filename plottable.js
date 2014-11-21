@@ -6333,7 +6333,7 @@ var Plottable;
                 this.classed("plot", true);
                 this._key2PlotDatasetKey = d3.map();
                 this._datasetKeysInOrder = [];
-                this.nextSeriesIndex = 0;
+                this._nextSeriesIndex = 0;
             }
             AbstractPlot.prototype._anchor = function (element) {
                 _super.prototype._anchor.call(this, element);
@@ -6368,7 +6368,7 @@ var Plottable;
                 if (typeof (keyOrDataset) === "string" && keyOrDataset[0] === "_") {
                     Plottable._Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
                 }
-                var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
+                var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this._nextSeriesIndex++;
                 var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
                 dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
                 this._addDataset(key, dataset);
@@ -6471,7 +6471,7 @@ var Plottable;
             };
             AbstractPlot.prototype._doRender = function () {
                 if (this._isAnchored) {
-                    this.paint();
+                    this._paint();
                     this._dataChanged = false;
                     this._animateOnNextRender = false;
                 }
@@ -6606,7 +6606,7 @@ var Plottable;
                     datasetKey: key
                 };
             };
-            AbstractPlot.prototype.paint = function () {
+            AbstractPlot.prototype._paint = function () {
                 var _this = this;
                 var drawSteps = this._generateDrawSteps();
                 var dataToDraw = this._getDataToDraw();
