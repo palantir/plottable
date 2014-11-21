@@ -4368,9 +4368,9 @@ describe("ComponentGroups", function () {
         var cg = new Plottable.Component.Group([c1, c2, c3]);
         var svg = generateSVG(400, 400);
         cg._anchor(svg);
-        c1.addBox("test-box1");
-        c2.addBox("test-box2");
-        c3.addBox("test-box3");
+        c1._addBox("test-box1");
+        c2._addBox("test-box2");
+        c3._addBox("test-box3");
         cg._computeLayout()._render();
         var t1 = svg.select(".test-box1");
         var t2 = svg.select(".test-box2");
@@ -4387,15 +4387,15 @@ describe("ComponentGroups", function () {
         var cg = new Plottable.Component.Group([c1]);
         var svg = generateSVG(400, 400);
         cg.merge(c2)._anchor(svg);
-        c1.addBox("test-box1");
-        c2.addBox("test-box2");
+        c1._addBox("test-box1");
+        c2._addBox("test-box2");
         cg._computeLayout()._render();
         var t1 = svg.select(".test-box1");
         var t2 = svg.select(".test-box2");
         assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
         assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
         cg.merge(c3);
-        c3.addBox("test-box3");
+        c3._addBox("test-box3");
         cg._computeLayout()._render();
         var t3 = svg.select(".test-box3");
         assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
@@ -4738,9 +4738,9 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("boxes work as expected", function () {
-        assert.throws(function () { return c.addBox("pre-anchor"); }, Error, "Adding boxes before anchoring is currently disallowed");
+        assert.throws(function () { return c._addBox("pre-anchor"); }, Error, "Adding boxes before anchoring is currently disallowed");
         c.renderTo(svg);
-        c.addBox("post-anchor");
+        c._addBox("post-anchor");
         var e = c._element;
         var boxContainer = e.select(".box-container");
         var boxStrings = [".bounding-box", ".post-anchor"];

@@ -84,10 +84,10 @@ export module Component {
       this._boxContainer = this._element.append("g").classed("box-container", true);
 
       if (this.clipPathEnabled) {
-        this.generateClipPath();
+        this._generateClipPath();
       };
 
-      this.addBox("bounding-box");
+      this._addBox("bounding-box");
 
       this._interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this._interactionsToRegister = null;
@@ -329,7 +329,7 @@ export module Component {
       return this;
     }
 
-    private addBox(className?: string, parentElement?: D3.Selection) {
+    private _addBox(className?: string, parentElement?: D3.Selection) {
       if (this._element == null) {
         throw new Error("Adding boxes before anchoring is currently disallowed");
       }
@@ -344,7 +344,7 @@ export module Component {
       return box;
     }
 
-    private generateClipPath() {
+    private _generateClipPath() {
       // The clip path will prevent content from overflowing its component space.
       // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
       // They don't need the current URL in the clip path reference.
@@ -353,7 +353,7 @@ export module Component {
       this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this._plottableID + "\")");
       var clipPathParent = this._boxContainer.append("clipPath")
                                       .attr("id", "clipPath" + this._plottableID);
-      this.addBox("clip-rect", clipPathParent);
+      this._addBox("clip-rect", clipPathParent);
     }
 
     /**
@@ -368,7 +368,7 @@ export module Component {
       // registered immediately
       if (this._element) {
         if (!this._hitBox) {
-            this._hitBox = this.addBox("hit-box");
+            this._hitBox = this._addBox("hit-box");
             this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
         }
         interaction._anchor(this, this._hitBox);

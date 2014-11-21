@@ -227,9 +227,9 @@ it("components can be offset relative to their alignment, and throw errors if th
   });
 
   it("boxes work as expected", () => {
-    assert.throws(() => (<any> c).addBox("pre-anchor"), Error, "Adding boxes before anchoring is currently disallowed");
+    assert.throws(() => (<any> c)._addBox("pre-anchor"), Error, "Adding boxes before anchoring is currently disallowed");
     c.renderTo(svg);
-    (<any> c).addBox("post-anchor");
+    (<any> c)._addBox("post-anchor");
     var e = c._element;
     var boxContainer = e.select(".box-container");
     var boxStrings = [".bounding-box", ".post-anchor"];

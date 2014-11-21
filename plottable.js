@@ -3676,10 +3676,10 @@ var Plottable;
                 this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
                 this._boxContainer = this._element.append("g").classed("box-container", true);
                 if (this.clipPathEnabled) {
-                    this.generateClipPath();
+                    this._generateClipPath();
                 }
                 ;
-                this.addBox("bounding-box");
+                this._addBox("bounding-box");
                 this._interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
                 this._interactionsToRegister = null;
                 if (this._isTopLevelComponent) {
@@ -3907,7 +3907,7 @@ var Plottable;
                 this._invalidateLayout();
                 return this;
             };
-            AbstractComponent.prototype.addBox = function (className, parentElement) {
+            AbstractComponent.prototype._addBox = function (className, parentElement) {
                 if (this._element == null) {
                     throw new Error("Adding boxes before anchoring is currently disallowed");
                 }
@@ -3923,7 +3923,7 @@ var Plottable;
                 }
                 return box;
             };
-            AbstractComponent.prototype.generateClipPath = function () {
+            AbstractComponent.prototype._generateClipPath = function () {
                 // The clip path will prevent content from overflowing its component space.
                 // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
                 // They don't need the current URL in the clip path reference.
@@ -3931,7 +3931,7 @@ var Plottable;
                 prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
                 this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this._plottableID + "\")");
                 var clipPathParent = this._boxContainer.append("clipPath").attr("id", "clipPath" + this._plottableID);
-                this.addBox("clip-rect", clipPathParent);
+                this._addBox("clip-rect", clipPathParent);
             };
             /**
              * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
@@ -3945,7 +3945,7 @@ var Plottable;
                 // registered immediately
                 if (this._element) {
                     if (!this._hitBox) {
-                        this._hitBox = this.addBox("hit-box");
+                        this._hitBox = this._addBox("hit-box");
                         this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
                     }
                     interaction._anchor(this, this._hitBox);
