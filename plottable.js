@@ -5526,14 +5526,14 @@ var Plottable;
             }
             Legend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                if (this.colorScale != null) {
-                    this.colorScale.broadcaster.deregisterListener(this);
+                if (this._colorScale != null) {
+                    this._colorScale.broadcaster.deregisterListener(this);
                 }
             };
             Legend.prototype.toggleCallback = function (callback) {
                 if (callback !== undefined) {
                     this._toggleCallback = callback;
-                    this.isOff = d3.set();
+                    this._isOff = d3.set();
                     this.updateListeners();
                     this.updateClasses();
                     return this;
@@ -5545,7 +5545,7 @@ var Plottable;
             Legend.prototype.hoverCallback = function (callback) {
                 if (callback !== undefined) {
                     this._hoverCallback = callback;
-                    this.datumCurrentlyFocusedOn = undefined;
+                    this._datumCurrentlyFocusedOn = undefined;
                     this.updateListeners();
                     this.updateClasses();
                     return this;
@@ -5557,44 +5557,44 @@ var Plottable;
             Legend.prototype.scale = function (scale) {
                 var _this = this;
                 if (scale != null) {
-                    if (this.colorScale != null) {
-                        this.colorScale.broadcaster.deregisterListener(this);
+                    if (this._colorScale != null) {
+                        this._colorScale.broadcaster.deregisterListener(this);
                     }
-                    this.colorScale = scale;
-                    this.colorScale.broadcaster.registerListener(this, function () { return _this.updateDomain(); });
+                    this._colorScale = scale;
+                    this._colorScale.broadcaster.registerListener(this, function () { return _this.updateDomain(); });
                     this.updateDomain();
                     return this;
                 }
                 else {
-                    return this.colorScale;
+                    return this._colorScale;
                 }
             };
             Legend.prototype.updateDomain = function () {
                 if (this._toggleCallback != null) {
-                    this.isOff = Plottable._Util.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
+                    this._isOff = Plottable._Util.Methods.intersection(this._isOff, d3.set(this.scale().domain()));
                 }
                 if (this._hoverCallback != null) {
-                    this.datumCurrentlyFocusedOn = this.scale().domain().indexOf(this.datumCurrentlyFocusedOn) >= 0 ? this.datumCurrentlyFocusedOn : undefined;
+                    this._datumCurrentlyFocusedOn = this.scale().domain().indexOf(this._datumCurrentlyFocusedOn) >= 0 ? this._datumCurrentlyFocusedOn : undefined;
                 }
                 this._invalidateLayout();
             };
             Legend.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
                 var textHeight = this.measureTextHeight();
-                var totalNumRows = this.colorScale.domain().length;
-                this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.height() / textHeight));
+                var totalNumRows = this._colorScale.domain().length;
+                this._nRowsDrawn = Math.min(totalNumRows, Math.floor(this.height() / textHeight));
             };
             Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var textHeight = this.measureTextHeight();
-                var totalNumRows = this.colorScale.domain().length;
-                var rowsICanFit = Math.min(totalNumRows, Math.floor((offeredHeight - 2 * Legend.MARGIN) / textHeight));
+                var totalNumRows = this._colorScale.domain().length;
+                var rowsICanFit = Math.min(totalNumRows, Math.floor((offeredHeight - 2 * Legend._MARGIN) / textHeight));
                 var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
-                var maxWidth = Plottable._Util.Methods.max(this.colorScale.domain(), function (d) { return measure(d).width; }, 0);
+                var maxWidth = Plottable._Util.Methods.max(this._colorScale.domain(), function (d) { return measure(d).width; }, 0);
                 fakeLegendEl.remove();
                 maxWidth = maxWidth === undefined ? 0 : maxWidth;
-                var desiredWidth = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;
-                var desiredHeight = rowsICanFit === 0 ? 0 : totalNumRows * textHeight + 2 * Legend.MARGIN;
+                var desiredWidth = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend._MARGIN;
+                var desiredHeight = rowsICanFit === 0 ? 0 : totalNumRows * textHeight + 2 * Legend._MARGIN;
                 return {
                     width: desiredWidth,
                     height: desiredHeight,
@@ -5615,9 +5615,9 @@ var Plottable;
             };
             Legend.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
-                var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
+                var domain = this._colorScale.domain().slice(0, this._nRowsDrawn);
                 var textHeight = this.measureTextHeight();
-                var availableWidth = this.width() - textHeight - Legend.MARGIN;
+                var availableWidth = this.width() - textHeight - Legend._MARGIN;
                 var r = textHeight * 0.3;
                 var legend = this._content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, function (d) { return d; });
                 var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true);
@@ -5627,7 +5627,7 @@ var Plottable;
                 legendEnter.append("circle");
                 legendEnter.append("g").classed("text-container", true);
                 legend.exit().remove();
-                legend.selectAll("circle").attr("cx", textHeight / 2).attr("cy", textHeight / 2).attr("r", r).attr("fill", this.colorScale._d3Scale);
+                legend.selectAll("circle").attr("cx", textHeight / 2).attr("cy", textHeight / 2).attr("r", r).attr("fill", this._colorScale._d3Scale);
                 legend.selectAll("g.text-container").text("").attr("transform", "translate(" + textHeight + ", 0)").each(function (d) {
                     var d3this = d3.select(this);
                     var measure = Plottable._Util.Text.getTextMeasurer(d3this.append("text"));
@@ -5636,7 +5636,7 @@ var Plottable;
                     Plottable._Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
                 });
                 legend.attr("transform", function (d) {
-                    return "translate(" + Legend.MARGIN + "," + (domain.indexOf(d) * textHeight + Legend.MARGIN) + ")";
+                    return "translate(" + Legend._MARGIN + "," + (domain.indexOf(d) * textHeight + Legend._MARGIN) + ")";
                 });
                 this.updateClasses();
                 this.updateListeners();
@@ -5651,8 +5651,8 @@ var Plottable;
                     // tag the element that is being hovered over with the class "focus"
                     // this callback will trigger with the specific element being hovered over.
                     var hoverRow = function (mouseover) { return function (datum) {
-                        _this.datumCurrentlyFocusedOn = mouseover ? datum : undefined;
-                        _this._hoverCallback(_this.datumCurrentlyFocusedOn);
+                        _this._datumCurrentlyFocusedOn = mouseover ? datum : undefined;
+                        _this._hoverCallback(_this._datumCurrentlyFocusedOn);
                         _this.updateClasses();
                     }; };
                     dataSelection.on("mouseover", hoverRow(true));
@@ -5665,12 +5665,12 @@ var Plottable;
                 }
                 if (this._toggleCallback != null) {
                     dataSelection.on("click", function (datum) {
-                        var turningOn = _this.isOff.has(datum);
+                        var turningOn = _this._isOff.has(datum);
                         if (turningOn) {
-                            _this.isOff.remove(datum);
+                            _this._isOff.remove(datum);
                         }
                         else {
-                            _this.isOff.add(datum);
+                            _this._isOff.add(datum);
                         }
                         _this._toggleCallback(datum, turningOn);
                         _this.updateClasses();
@@ -5688,16 +5688,16 @@ var Plottable;
                 }
                 var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
                 if (this._hoverCallback != null) {
-                    dataSelection.classed("focus", function (d) { return _this.datumCurrentlyFocusedOn === d; });
-                    dataSelection.classed("hover", this.datumCurrentlyFocusedOn !== undefined);
+                    dataSelection.classed("focus", function (d) { return _this._datumCurrentlyFocusedOn === d; });
+                    dataSelection.classed("hover", this._datumCurrentlyFocusedOn !== undefined);
                 }
                 else {
                     dataSelection.classed("hover", false);
                     dataSelection.classed("focus", false);
                 }
                 if (this._toggleCallback != null) {
-                    dataSelection.classed("toggled-on", function (d) { return !_this.isOff.has(d); });
-                    dataSelection.classed("toggled-off", function (d) { return _this.isOff.has(d); });
+                    dataSelection.classed("toggled-on", function (d) { return !_this._isOff.has(d); });
+                    dataSelection.classed("toggled-off", function (d) { return _this._isOff.has(d); });
                 }
                 else {
                     dataSelection.classed("toggled-on", false);
@@ -5708,7 +5708,7 @@ var Plottable;
              * The css class applied to each legend row
              */
             Legend.SUBELEMENT_CLASS = "legend-row";
-            Legend.MARGIN = 5;
+            Legend._MARGIN = 5;
             return Legend;
         })(Component.AbstractComponent);
         Component.Legend = Legend;
