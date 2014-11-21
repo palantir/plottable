@@ -17,7 +17,7 @@ export module Plot {
     public _isVertical: boolean;
 
     public _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
-      var metadata = <StackedPlotMetadata>super._getPlotMetadataForDataset(key);
+      var metadata = <StackedPlotMetadata> super._getPlotMetadataForDataset(key);
       metadata.offsets = d3.map();
       return metadata;
     }
