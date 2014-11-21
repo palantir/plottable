@@ -130,6 +130,8 @@ describe("Plots", () => {
         circlePlot = new Plottable.Plot.Scatter(xScale, yScale);
         circlePlot.addDataset(quadraticDataset);
         circlePlot.project("fill", colorAccessor);
+        circlePlot.project("x", "x", xScale);
+        circlePlot.project("y", "y", yScale);
         circlePlot.renderTo(svg);
       });
 

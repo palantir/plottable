@@ -28,6 +28,8 @@ function run(div, data, Plottable) {
   var renderAreaD1 = new Plottable.Plot.VerticalBar(xScale, yScale)
                                   .addDataset(dataseries1)
                                   .attr("width", widthProjector)
+                                  .project("x", "x", xScale)
+                                  .project("y", "y", yScale)
                                   .animate(true);
 
   //title + legend

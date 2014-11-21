@@ -38,6 +38,7 @@ function run(div, data, Plottable) {
   var yAxisTable2 = new Plottable.Component.Table([[yAxisTop2, yAxisMiddle2, yAxisBottom2]]);
 
   var renderAreaD1 = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries);
+  renderAreaD1.project("x", "x", xScale).project("y", "y", yScale);
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
 
   var basicTable = new Plottable.Component.Table([[null, xAxisTable2, null],

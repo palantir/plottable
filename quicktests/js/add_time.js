@@ -16,7 +16,8 @@ function run(div, data, Plottable) {
   var parse = function(d) {return d3.time.format("%x").parse(d.x);};
   var plot = new Plottable.Plot.VerticalBar(xScale, yScale)
                       .addDataset(ds)
-                      .attr("x", parse, xScale);
+                      .attr("x", parse, xScale)
+                      .project("y", "y", yScale);
 
   var xAxis = new Plottable.Axis.Time(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");

@@ -5,6 +5,7 @@ export module Plot {
   export class Line<X> extends AbstractXYPlot<X,number> implements Interaction.Hoverable {
     private hoverDetectionRadius = 15;
     private hoverTarget: D3.Selection;
+    private defaultStrokeColor: string;
 
     public _yScale: Scale.AbstractQuantitative<number>;
 
@@ -18,15 +19,12 @@ export module Plot {
     constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
       super(xScale, yScale);
       this.classed("line-plot", true);
-
-      var defaultColor = new Scale.Color().range()[0];
-      this.project("stroke", () => defaultColor); // default
-
-      this.project("stroke-width", () => "2px"); // default
       this._animators["reset"] = new Animator.Null();
       this._animators["main"] = new Animator.Base()
                                             .duration(600)
                                             .easing("exp-in-out");
+
+      this.defaultStrokeColor = new Scale.Color().range()[0];
     }
 
     protected setup() {
@@ -83,9 +81,12 @@ export module Plot {
 
       var xFunction       = attrToProjector["x"];
       var yFunction       = attrToProjector["y"];
-      attrToProjector["defined"] =
-        (d: any, i: number, u: any, m: any) =>
+
+      attrToProjector["defined"] = (d: any, i: number, u: any, m: any) =>
           this._rejectNullsAndNaNs(d, i, u, m, xFunction) && this._rejectNullsAndNaNs(d, i, u, m, yFunction);
+      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultStrokeColor);
+      attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
+
       return attrToProjector;
     }
 
