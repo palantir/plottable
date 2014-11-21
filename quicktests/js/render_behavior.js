@@ -27,7 +27,7 @@ function run(div, data, Plottable) {
   var label3  = new Plottable.Component.Label("remove + renderTo", "horizontal");
   var label4  = new Plottable.Component.Label("_render()", "horizontal");
 
-  var basicTable = new Plottable.Component.Table([[yAxis, barPlot],
+  var basicTable = new Plottable.Component.Table([[yAxis, areaPlot],
    [null, xAxis],
    [null, label1],
    [null, label2],
