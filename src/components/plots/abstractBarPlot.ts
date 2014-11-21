@@ -471,21 +471,23 @@ export module Plot {
       var projectors = this._generateAttrToProjector();
 
       this._datasetKeysInOrder.forEach((key: string) => {
-        var userMetadata = this._key2PlotDatasetKey.get(key).dataset.metadata();
+        var dataset = this._key2PlotDatasetKey.get(key).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
         var barsFromDataset = this.getBarsFromDataset(key, xExtent, yExtent);
         d3.selectAll(barsFromDataset).each((d, i) => {
           if (this._isVertical) {
             points.push({
-              x: projectors["x"](d, i, userMetadata, plotMetadata) + projectors["width"](d, i, userMetadata, plotMetadata)/2,
-              y: projectors["y"](d, i, userMetadata, plotMetadata) +
-                (projectors["positive"](d, i, userMetadata, plotMetadata) ? 0 : projectors["height"](d, i, userMetadata, plotMetadata))
+              x: projectors["x"](d, i, dataset.metadata(), plotMetadata) + projectors["width"](d, i, dataset.metadata(), plotMetadata) / 2,
+              y: projectors["y"](d, i, dataset.metadata(), plotMetadata) +
+                (projectors["positive"](d, i, dataset.metadata(), plotMetadata) ?
+                  0 : projectors["height"](d, i, dataset.metadata(), plotMetadata))
             });
           } else {
             points.push({
-              x: projectors["x"](d, i, userMetadata, plotMetadata) + projectors["height"](d, i, userMetadata, plotMetadata)/2,
-              y: projectors["y"](d, i, userMetadata, plotMetadata) +
-                (projectors["positive"](d, i, userMetadata, plotMetadata) ? 0 : projectors["width"](d, i, userMetadata, plotMetadata))
+              x: projectors["x"](d, i, dataset.metadata(), plotMetadata) + projectors["height"](d, i, dataset.metadata(), plotMetadata) / 2,
+              y: projectors["y"](d, i, dataset.metadata(), plotMetadata) +
+                (projectors["positive"](d, i, dataset.metadata(), plotMetadata) ?
+                  0 : projectors["width"](d, i, dataset.metadata(), plotMetadata))
             });
           }
         });

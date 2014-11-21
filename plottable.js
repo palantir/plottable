@@ -6955,8 +6955,8 @@ var Plottable;
                 };
                 var overAPoint = false;
                 var closestElement;
-                var closestElementUserMedata;
-                var closestElementPlotMedata;
+                var closestElementUserMetadata;
+                var closestElementPlotMetadata;
                 var closestIndex;
                 var minDistSq = range * range;
                 this._datasetKeysInOrder.forEach(function (key) {
@@ -6971,8 +6971,8 @@ var Plottable;
                                 closestElement = this;
                                 closestIndex = i;
                                 minDistSq = distSq;
-                                closestElementUserMedata = dataset.metadata();
-                                closestElementPlotMedata = plotMetadata;
+                                closestElementUserMetadata = dataset.metadata();
+                                closestElementPlotMetadata = plotMetadata;
                             }
                             overAPoint = true;
                         }
@@ -6980,8 +6980,8 @@ var Plottable;
                             closestElement = this;
                             closestIndex = i;
                             minDistSq = distSq;
-                            closestElementUserMedata = dataset.metadata();
-                            closestElementPlotMedata = plotMetadata;
+                            closestElementUserMetadata = dataset.metadata();
+                            closestElementPlotMetadata = plotMetadata;
                         }
                     });
                 });
@@ -6995,8 +6995,8 @@ var Plottable;
                 var closestSelection = d3.select(closestElement);
                 var closestData = closestSelection.data();
                 var closestPoint = {
-                    x: attrToProjector["cx"](closestData[0], closestIndex, closestElementUserMedata, closestElementPlotMedata),
-                    y: attrToProjector["cy"](closestData[0], closestIndex, closestElementUserMedata, closestElementPlotMedata)
+                    x: attrToProjector["cx"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata),
+                    y: attrToProjector["cy"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata)
                 };
                 return {
                     selection: closestSelection,
@@ -7452,20 +7452,20 @@ var Plottable;
                 var points = [];
                 var projectors = this._generateAttrToProjector();
                 this._datasetKeysInOrder.forEach(function (key) {
-                    var userMetadata = _this._key2PlotDatasetKey.get(key).dataset.metadata();
+                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
                     var barsFromDataset = _this.getBarsFromDataset(key, xExtent, yExtent);
                     d3.selectAll(barsFromDataset).each(function (d, i) {
                         if (_this._isVertical) {
                             points.push({
-                                x: projectors["x"](d, i, userMetadata, plotMetadata) + projectors["width"](d, i, userMetadata, plotMetadata) / 2,
-                                y: projectors["y"](d, i, userMetadata, plotMetadata) + (projectors["positive"](d, i, userMetadata, plotMetadata) ? 0 : projectors["height"](d, i, userMetadata, plotMetadata))
+                                x: projectors["x"](d, i, dataset.metadata(), plotMetadata) + projectors["width"](d, i, dataset.metadata(), plotMetadata) / 2,
+                                y: projectors["y"](d, i, dataset.metadata(), plotMetadata) + (projectors["positive"](d, i, dataset.metadata(), plotMetadata) ? 0 : projectors["height"](d, i, dataset.metadata(), plotMetadata))
                             });
                         }
                         else {
                             points.push({
-                                x: projectors["x"](d, i, userMetadata, plotMetadata) + projectors["height"](d, i, userMetadata, plotMetadata) / 2,
-                                y: projectors["y"](d, i, userMetadata, plotMetadata) + (projectors["positive"](d, i, userMetadata, plotMetadata) ? 0 : projectors["width"](d, i, userMetadata, plotMetadata))
+                                x: projectors["x"](d, i, dataset.metadata(), plotMetadata) + projectors["height"](d, i, dataset.metadata(), plotMetadata) / 2,
+                                y: projectors["y"](d, i, dataset.metadata(), plotMetadata) + (projectors["positive"](d, i, dataset.metadata(), plotMetadata) ? 0 : projectors["width"](d, i, dataset.metadata(), plotMetadata))
                             });
                         }
                     });

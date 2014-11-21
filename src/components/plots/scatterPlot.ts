@@ -76,8 +76,8 @@ export module Plot {
 
       var overAPoint = false;
       var closestElement: Element;
-      var closestElementUserMedata: any;
-      var closestElementPlotMedata: any;
+      var closestElementUserMetadata: any;
+      var closestElementPlotMetadata: any;
       var closestIndex: number;
       var minDistSq = range * range;
 
@@ -94,16 +94,16 @@ export module Plot {
               closestElement = this;
               closestIndex = i;
               minDistSq = distSq;
-              closestElementUserMedata = dataset.metadata();
-              closestElementPlotMedata = plotMetadata;
+              closestElementUserMetadata = dataset.metadata();
+              closestElementPlotMetadata = plotMetadata;
             }
             overAPoint = true;
           } else if (!overAPoint && distSq < minDistSq) {
             closestElement = this;
             closestIndex = i;
             minDistSq = distSq;
-            closestElementUserMedata = dataset.metadata();
-            closestElementPlotMedata = plotMetadata;
+            closestElementUserMetadata = dataset.metadata();
+            closestElementPlotMetadata = plotMetadata;
           }
         });
       });
@@ -119,8 +119,8 @@ export module Plot {
       var closestSelection = d3.select(closestElement);
       var closestData = closestSelection.data();
       var closestPoint = {
-        x: attrToProjector["cx"](closestData[0], closestIndex, closestElementUserMedata, closestElementPlotMedata),
-        y: attrToProjector["cy"](closestData[0], closestIndex, closestElementUserMedata, closestElementPlotMedata)
+        x: attrToProjector["cx"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata),
+        y: attrToProjector["cy"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata)
       };
       return {
         selection: closestSelection,
