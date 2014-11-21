@@ -31,7 +31,7 @@ export module Axis {
     /*
      * Default possible axis configurations.
      */
-    private possibleTimeAxisConfigurations: TimeAxisConfiguration[] = [
+    private _possibleTimeAxisConfigurations: TimeAxisConfiguration[] = [
       {tierConfigurations: [
         {interval: d3.time.second, step: 1, formatter: Formatters.time("%I:%M:%S %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
@@ -141,17 +141,17 @@ export module Axis {
       ]}
     ];
 
-    private tierLabelContainers: D3.Selection[];
-    private measurer: _Util.Text.TextMeasurer;
+    private _tierLabelContainers: D3.Selection[];
+    private _measurer: _Util.Text.TextMeasurer;
 
-    private mostPreciseConfigIndex: number;
+    private _mostPreciseConfigIndex: number;
 
-    private static LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
+    private static _LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
 
     /**
      * Number of possible tiers.
      */
-    private static NUM_TIERS = 2;
+    private static _NUM_TIERS = 2;
 
     /**
      * Constructs a TimeAxis.
@@ -185,9 +185,9 @@ export module Axis {
     public axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
     public axisConfigurations(configurations?: any): any {
       if(configurations == null){
-        return this.possibleTimeAxisConfigurations;
+        return this._possibleTimeAxisConfigurations;
       }
-      this.possibleTimeAxisConfigurations = configurations;
+      this._possibleTimeAxisConfigurations = configurations;
       this._invalidateLayout();
       return this;
     }
@@ -196,15 +196,15 @@ export module Axis {
      * Gets the index of the most precise TimeAxisConfiguration that will fit in the current width.
      */
     private getMostPreciseConfigurationIndex(): number {
-      var mostPreciseIndex = this.possibleTimeAxisConfigurations.length;
-      this.possibleTimeAxisConfigurations.forEach((interval: TimeAxisConfiguration, index: number) => {
+      var mostPreciseIndex = this._possibleTimeAxisConfigurations.length;
+      this._possibleTimeAxisConfigurations.forEach((interval: TimeAxisConfiguration, index: number) => {
         if (index < mostPreciseIndex && interval.tierConfigurations.every((tier: TimeAxisTierConfiguration) =>
           this.checkTimeAxisTierConfigurationWidth(tier))) {
           mostPreciseIndex = index;
         }
       });
 
-      if (mostPreciseIndex === this.possibleTimeAxisConfigurations.length) {
+      if (mostPreciseIndex === this._possibleTimeAxisConfigurations.length) {
         _Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
         --mostPreciseIndex;
       }
@@ -245,7 +245,7 @@ export module Axis {
     }
 
     private maxWidthForInterval(config: TimeAxisTierConfiguration): number {
-      return this.measurer(config.formatter(Time.LONG_DATE)).width;
+      return this._measurer(config.formatter(Time._LONG_DATE)).width;
     }
 
     /**
@@ -258,11 +258,11 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this.tierLabelContainers = [];
-      for(var i = 0; i < Time.NUM_TIERS; ++i) {
-        this.tierLabelContainers.push(this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true));
+      this._tierLabelContainers = [];
+      for(var i = 0; i < Time._NUM_TIERS; ++i) {
+        this._tierLabelContainers.push(this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true));
       }
-      this.measurer = _Util.Text.getTextMeasurer(this.tierLabelContainers[0].append("text"));
+      this._measurer = _Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
     }
 
     private getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
@@ -270,14 +270,14 @@ export module Axis {
     }
 
     public _getTickValues(): any[] {
-      return this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations.reduce(
+      return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations.reduce(
           (ticks: any[], config: TimeAxisTierConfiguration) => ticks.concat(this.getTickIntervalValues(config)),
           []
         );
     }
 
     public _measureTextHeight(): number {
-      return this.measurer(_Util.Text.HEIGHT_TEXT).height;
+      return this._measurer(_Util.Text.HEIGHT_TEXT).height;
     }
 
     private cleanContainer(container: D3.Selection) {
@@ -331,7 +331,7 @@ export module Axis {
     private canFitLabelFilter(container: D3.Selection, position: Date, bounds: Date[], label: string, isCentered: boolean): boolean {
       var endPosition: number;
       var startPosition: number;
-      var width = this.measurer(label).width + this.tickLabelPadding();
+      var width = this._measurer(label).width + this.tickLabelPadding();
       var leftBound = this._scale.scale(bounds[0]);
       var rightBound = this._scale.scale(bounds[1]);
       if (isCentered) {
@@ -359,11 +359,11 @@ export module Axis {
     }
 
     private generateLabellessTicks() {
-      if (this.mostPreciseConfigIndex < 1) {
+      if (this._mostPreciseConfigIndex < 1) {
         return [];
       }
 
-      return this.getTickIntervalValues(this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex - 1].
+      return this.getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1].
                                             tierConfigurations[0]);
     }
 
@@ -375,15 +375,15 @@ export module Axis {
     }
 
     public _doRender() {
-      this.mostPreciseConfigIndex = this.getMostPreciseConfigurationIndex();
+      this._mostPreciseConfigIndex = this.getMostPreciseConfigurationIndex();
       super._doRender();
 
-      var tierConfigs = this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations;
+      var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations;
 
-      this.tierLabelContainers.forEach(this.cleanContainer);
+      this._tierLabelContainers.forEach(this.cleanContainer);
 
       var tierTicks = tierConfigs.map((config: TimeAxisTierConfiguration, i: number) =>
-        this.renderTierLabels(this.tierLabelContainers[i], config, i + 1)
+        this.renderTierLabels(this._tierLabelContainers[i], config, i + 1)
       );
 
       var ticks = tierTicks.slice();
@@ -399,7 +399,7 @@ export module Axis {
       this.adjustTickLength(labelLessTicks, this.tickLabelPadding());
 
       tierConfigs.forEach((config: TimeAxisTierConfiguration, i: number) =>
-        this.adjustTickLength(tierTicks[i], this._maxLabelTickLength() * (i + 1) / Time.NUM_TIERS)
+        this.adjustTickLength(tierTicks[i], this._maxLabelTickLength() * (i + 1) / Time._NUM_TIERS)
       );
 
       return this;

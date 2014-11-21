@@ -4,12 +4,12 @@ module Plottable {
 export module Axis {
   export class Numeric extends AbstractAxis {
     public _scale: Scale.AbstractQuantitative<number>;
-    private tickLabelPositioning = "center";
+    private _tickLabelPositioning = "center";
     // Whether or not first/last tick label will still be displayed even if
     // the label is cut off.
-    private showFirstTickLabel = false;
-    private showLastTickLabel = false;
-    private measurer: _Util.Text.TextMeasurer;
+    private _showFirstTickLabel = false;
+    private _showLastTickLabel = false;
+    private _measurer: _Util.Text.TextMeasurer;
 
     /**
      * Constructs a NumericAxis.
@@ -28,19 +28,19 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this.measurer = _Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(AbstractAxis.TICK_LABEL_CLASS, true));
+      this._measurer = _Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(AbstractAxis.TICK_LABEL_CLASS, true));
     }
 
     public _computeWidth() {
       var tickValues = this._getTickValues();
       var textLengths = tickValues.map((v: any) => {
         var formattedValue = this._formatter(v);
-        return this.measurer(formattedValue).width;
+        return this._measurer(formattedValue).width;
       });
 
       var maxTextLength = _Util.Methods.max(textLengths, 0);
 
-      if (this.tickLabelPositioning === "center") {
+      if (this._tickLabelPositioning === "center") {
         this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
       } else {
         this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextLength);
@@ -50,9 +50,9 @@ export module Axis {
     }
 
     public _computeHeight() {
-      var textHeight = this.measurer(_Util.Text.HEIGHT_TEXT).height;
+      var textHeight = this._measurer(_Util.Text.HEIGHT_TEXT).height;
 
-      if (this.tickLabelPositioning === "center") {
+      if (this._tickLabelPositioning === "center") {
         this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
       } else {
         this._computedHeight = Math.max(this._maxLabelTickLength(), this.tickLabelPadding()+ textHeight);
@@ -101,7 +101,7 @@ export module Axis {
       var labelGroupShiftX = 0;
       var labelGroupShiftY = 0;
       if (this._isHorizontal()) {
-        switch(this.tickLabelPositioning) {
+        switch(this._tickLabelPositioning) {
           case "left":
             tickLabelTextAnchor = "end";
             labelGroupTransformX = -tickLabelPadding;
@@ -117,7 +117,7 @@ export module Axis {
             break;
         }
       } else {
-        switch(this.tickLabelPositioning) {
+        switch(this._tickLabelPositioning) {
           case "top":
             tickLabelAttrHash["dy"] = "-0.3em";
             labelGroupShiftX = tickLabelPadding;
@@ -201,7 +201,7 @@ export module Axis {
     public tickLabelPosition(position: string): Numeric;
     public tickLabelPosition(position?: string): any {
       if (position == null) {
-        return this.tickLabelPositioning;
+        return this._tickLabelPositioning;
       } else {
         var positionLC = position.toLowerCase();
         if (this._isHorizontal()) {
@@ -213,7 +213,7 @@ export module Axis {
             throw new Error(positionLC + " is not a valid tick label position for a vertical NumericAxis");
           }
         }
-        this.tickLabelPositioning = positionLC;
+        this._tickLabelPositioning = positionLC;
         this._invalidateLayout();
         return this;
       }
@@ -247,18 +247,18 @@ export module Axis {
       if ((this._isHorizontal() && orientation === "left") ||
           (!this._isHorizontal() && orientation === "bottom")) {
         if (show === undefined) {
-          return this.showFirstTickLabel;
+          return this._showFirstTickLabel;
         } else {
-          this.showFirstTickLabel = show;
+          this._showFirstTickLabel = show;
           this._render();
           return this;
         }
       } else if ((this._isHorizontal() && orientation === "right") ||
                  (!this._isHorizontal() && orientation === "top")) {
         if (show === undefined) {
-          return this.showLastTickLabel;
+          return this._showLastTickLabel;
         } else {
-          this.showLastTickLabel = show;
+          this._showLastTickLabel = show;
           this._render();
           return this;
         }
