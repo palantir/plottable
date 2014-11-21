@@ -5740,17 +5740,17 @@ var Plottable;
             function HorizontalLegend(colorScale) {
                 var _this = this;
                 _super.call(this);
-                this.padding = 5;
+                this._padding = 5;
                 this.classed("legend", true);
-                this.scale = colorScale;
-                this.scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
+                this._scale = colorScale;
+                this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
                 this.xAlign("left").yAlign("center");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
             }
             HorizontalLegend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                this.scale.broadcaster.deregisterListener(this);
+                this._scale.broadcaster.deregisterListener(this);
             };
             HorizontalLegend.prototype.calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
@@ -5758,16 +5758,16 @@ var Plottable;
                 var fakeLegendEntry = fakeLegendRow.append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
                 var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendRow.append("text"));
                 var textHeight = measure(Plottable._Util.Text.HEIGHT_TEXT).height;
-                var availableWidthForEntries = Math.max(0, (availableWidth - this.padding));
+                var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
                 var measureEntry = function (entryText) {
-                    var originalEntryLength = (textHeight + measure(entryText).width + _this.padding);
+                    var originalEntryLength = (textHeight + measure(entryText).width + _this._padding);
                     return Math.min(originalEntryLength, availableWidthForEntries);
                 };
-                var entries = this.scale.domain();
+                var entries = this._scale.domain();
                 var entryLengths = Plottable._Util.Methods.populateMap(entries, measureEntry);
                 fakeLegendRow.remove();
                 var rows = this.packRows(availableWidthForEntries, entries, entryLengths);
-                var rowsAvailable = Math.floor((availableHeight - 2 * this.padding) / textHeight);
+                var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
                 if (rowsAvailable !== rowsAvailable) {
                     rowsAvailable = 0;
                 }
@@ -5785,9 +5785,9 @@ var Plottable;
                 });
                 var longestRowLength = Plottable._Util.Methods.max(rowLengths, 0);
                 longestRowLength = longestRowLength === undefined ? 0 : longestRowLength; // HACKHACK: #843
-                var desiredWidth = this.padding + longestRowLength;
-                var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this.padding;
-                var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this.padding;
+                var desiredWidth = this._padding + longestRowLength;
+                var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
+                var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
                 return {
                     width: desiredWidth,
                     height: acceptableHeight,
@@ -5819,7 +5819,7 @@ var Plottable;
                 var rows = this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).data(rowsToDraw);
                 rows.enter().append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
                 rows.exit().remove();
-                rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this.padding) + ")"; });
+                rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this._padding) + ")"; });
                 var entries = rows.selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
                 var entriesEnter = entries.enter().append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
                 entries.each(function (d) {
@@ -5828,7 +5828,7 @@ var Plottable;
                 entriesEnter.append("circle");
                 entriesEnter.append("g").classed("text-container", true);
                 entries.exit().remove();
-                var legendPadding = this.padding;
+                var legendPadding = this._padding;
                 rows.each(function (values) {
                     var xShift = legendPadding;
                     var entriesInRow = d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS);
@@ -5838,8 +5838,8 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("circle").attr("cx", layout.textHeight / 2).attr("cy", layout.textHeight / 2).attr("r", layout.textHeight * 0.3).attr("fill", function (value) { return _this.scale.scale(value); });
-                var padding = this.padding;
+                entries.select("circle").attr("cx", layout.textHeight / 2).attr("cy", layout.textHeight / 2).attr("r", layout.textHeight * 0.3).attr("fill", function (value) { return _this._scale.scale(value); });
+                var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
                 textContainers.append("title").text(function (value) { return value; });
