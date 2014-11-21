@@ -7,7 +7,7 @@ export module Component {
    * It will not do anything if instantiated directly.
    */
   export class AbstractComponentContainer extends AbstractComponent {
-    public _components: AbstractComponent[] = [];
+    private _components: AbstractComponent[] = [];
 
     public _anchor(element: D3.Selection) {
       super._anchor(element);

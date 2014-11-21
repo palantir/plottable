@@ -5,8 +5,8 @@ export module Component {
   export class AbstractComponent extends Core.PlottableObject {
     public static AUTORESIZE_BY_DEFAULT = true;
 
-    public _element: D3.Selection;
-    public _content: D3.Selection;
+    protected _element: D3.Selection;
+    protected _content: D3.Selection;
     public _backgroundContainer: D3.Selection;
     public _foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
@@ -16,10 +16,10 @@ export module Component {
     public _parent: AbstractComponentContainer;
     private _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
     private _yAlignProportion = 0;
-    public _fixedHeightFlag = false;
-    public _fixedWidthFlag = false;
-    public _isSetup = false;
-    public _isAnchored = false;
+    protected _fixedHeightFlag = false;
+    protected _fixedWidthFlag = false;
+    protected _isSetup = false;
+    protected _isAnchored = false;
 
     private hitBox: D3.Selection;
     private interactionsToRegister: Interaction.AbstractInteraction[] = [];
@@ -59,7 +59,7 @@ export module Component {
         element.node().appendChild(this._element.node());
       } else {
         this._element = element.append("g");
-        this._setup();
+        this.setup();
       }
       this._isAnchored = true;
     }
@@ -69,7 +69,7 @@ export module Component {
      * Called during _anchor() if the Component's element has not been created yet.
      * Override in subclasses to provide additional functionality.
      */
-    public _setup() {
+    protected setup() {
       if (this._isSetup) {
         return;
       }
