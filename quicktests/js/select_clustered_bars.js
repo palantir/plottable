@@ -23,7 +23,8 @@ function run(div, data, Plottable) {
                                   .addDataset(data[0])
                                   .addDataset(data[1])
                                   .addDataset(data[2])
-                                  .project("x", "name", xScale);
+                                  .project("x", "name", xScale)
+                                  .project("y", "y", yScale);
 
   var chart = new Plottable.Component.Table([
                                             [yAxis, barPlot],

@@ -99,7 +99,7 @@ export module Plot {
       }
       var key  = typeof(keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
       var data = typeof(keyOrDataset) !== "string" ? keyOrDataset : dataset;
-      var dataset = (data instanceof Dataset) ? data : new Dataset(data);
+      dataset = (data instanceof Dataset) ? data : new Dataset(data);
 
       this._addDataset(key, dataset);
       return this;

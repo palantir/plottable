@@ -2880,6 +2880,7 @@ declare module Plottable {
              * This call does not override auto domain adjustment behavior over visible points.
              */
             showAllData(): void;
+            _projectorsReady(): _Projection;
         }
     }
 }
@@ -3192,6 +3193,7 @@ declare module Plottable {
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Area<X>;
             _getResetYFunction(): _Projector;
             _wholeDatumAttributes(): string[];
+            _generateAttrToProjector(): AttributeToProjector;
         }
     }
 }

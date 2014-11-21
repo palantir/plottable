@@ -14,6 +14,7 @@ describe("Plots", () => {
       simpleDataset = new Plottable.Dataset([{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}]);
       piePlot = new Plottable.Plot.Pie();
       piePlot.addDataset(simpleDataset);
+      piePlot.project("value", "value");
       piePlot.renderTo(svg);
       renderArea = piePlot._renderArea;
     });

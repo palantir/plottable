@@ -26,8 +26,12 @@ export module Plot {
       }
       this.classed("xy-plot", true);
 
-      this.project("x", "x", xScale); // default accessor
-      this.project("y", "y", yScale); // default accessor
+      this._xScale = xScale;
+      this._yScale = yScale;
+      this._updateXDomainer();
+      xScale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, () => this.adjustYDomainOnChangeFromX());
+      this._updateYDomainer();
+      yScale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, () => this.adjustXDomainOnChangeFromY());
     }
 
     /**
@@ -153,11 +157,13 @@ export module Plot {
     }
 
     private adjustYDomainOnChangeFromX() {
+      if (!this._projectorsReady()) { return; }
       if(this._autoAdjustYScaleDomain) {
         this.adjustDomainToVisiblePoints<X,Y>(this._xScale, this._yScale, true);
       }
     }
     private adjustXDomainOnChangeFromY() {
+      if (!this._projectorsReady()) { return; }
       if(this._autoAdjustXScaleDomain) {
         this.adjustDomainToVisiblePoints<Y,X>(this._yScale, this._xScale, false);
       }
@@ -197,6 +203,10 @@ export module Plot {
         retVal = [_Util.Methods.min<B>(bVals, null), _Util.Methods.max<B>(bVals, null)];
       }
       return retVal;
+    }
+
+    public _projectorsReady() {
+      return this._projections["x"] && this._projections["y"];
     }
   }
 }
