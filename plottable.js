@@ -8100,7 +8100,7 @@ var Plottable;
                 this._baselineValue = 0;
                 this.classed("area-plot", true);
                 this._isVertical = true;
-                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
+                this._defaultFillColor = new Plottable.Scale.Color().range()[0];
             }
             StackedArea.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Area(key).drawLine(false);
@@ -8162,7 +8162,7 @@ var Plottable;
                 var yAccessor = this._projections["y"].accessor;
                 attrToProjector["y"] = function (d, i, u, m) { return _this._yScale.scale(+yAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 attrToProjector["y0"] = function (d, i, u, m) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
                 return attrToProjector;
             };
             StackedArea.prototype._wholeDatumAttributes = function () {
