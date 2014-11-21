@@ -14,8 +14,8 @@ export module Component {
     private yOrigin: number;
 
     public _parent: AbstractComponentContainer;
-    public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
-    public _yAlignProportion = 0;
+    private _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
+    private _yAlignProportion = 0;
     public _fixedHeightFlag = false;
     public _fixedWidthFlag = false;
     public _isSetup = false;

@@ -1725,8 +1725,6 @@ declare module Plottable {
             _foregroundContainer: D3.Selection;
             clipPathEnabled: boolean;
             _parent: AbstractComponentContainer;
-            _xAlignProportion: number;
-            _yAlignProportion: number;
             _fixedHeightFlag: boolean;
             _fixedWidthFlag: boolean;
             _isSetup: boolean;
