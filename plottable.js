@@ -5752,7 +5752,7 @@ var Plottable;
                 _super.prototype.remove.call(this);
                 this._scale.broadcaster.deregisterListener(this);
             };
-            HorizontalLegend.prototype.calculateLayoutInfo = function (availableWidth, availableHeight) {
+            HorizontalLegend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
                 var fakeLegendRow = this._content.append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
                 var fakeLegendEntry = fakeLegendRow.append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
@@ -5766,7 +5766,7 @@ var Plottable;
                 var entries = this._scale.domain();
                 var entryLengths = Plottable._Util.Methods.populateMap(entries, measureEntry);
                 fakeLegendRow.remove();
-                var rows = this.packRows(availableWidthForEntries, entries, entryLengths);
+                var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
                 var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
                 if (rowsAvailable !== rowsAvailable) {
                     rowsAvailable = 0;
@@ -5779,7 +5779,7 @@ var Plottable;
                 };
             };
             HorizontalLegend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var estimatedLayout = this.calculateLayoutInfo(offeredWidth, offeredHeight);
+                var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
                 var rowLengths = estimatedLayout.rows.map(function (row) {
                     return d3.sum(row, function (entry) { return estimatedLayout.entryLengths.get(entry); });
                 });
@@ -5795,7 +5795,7 @@ var Plottable;
                     wantsHeight: offeredHeight < desiredHeight
                 };
             };
-            HorizontalLegend.prototype.packRows = function (availableWidth, entries, entryLengths) {
+            HorizontalLegend.prototype._packRows = function (availableWidth, entries, entryLengths) {
                 var rows = [[]];
                 var currentRow = rows[0];
                 var spaceLeft = availableWidth;
@@ -5814,7 +5814,7 @@ var Plottable;
             HorizontalLegend.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
-                var layout = this.calculateLayoutInfo(this.width(), this.height());
+                var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
                 var rows = this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).data(rowsToDraw);
                 rows.enter().append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);

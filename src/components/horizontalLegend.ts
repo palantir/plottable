@@ -41,7 +41,7 @@ export module Component {
       this._scale.broadcaster.deregisterListener(this);
     }
 
-    private calculateLayoutInfo(availableWidth: number, availableHeight: number) {
+    private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {
       var fakeLegendRow = this._content.append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
       var fakeLegendEntry = fakeLegendRow.append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
       var measure = _Util.Text.getTextMeasurer(fakeLegendRow.append("text"));
@@ -58,7 +58,7 @@ export module Component {
       var entryLengths = _Util.Methods.populateMap(entries, measureEntry);
       fakeLegendRow.remove();
 
-      var rows = this.packRows(availableWidthForEntries, entries, entryLengths);
+      var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
 
       var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
       if (rowsAvailable !== rowsAvailable) { // rowsAvailable can be NaN if this.textHeight = 0
@@ -74,7 +74,7 @@ export module Component {
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var estimatedLayout = this.calculateLayoutInfo(offeredWidth, offeredHeight);
+      var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
 
       var rowLengths = estimatedLayout.rows.map((row: string[]) => {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
@@ -94,7 +94,7 @@ export module Component {
       };
     }
 
-    private packRows(availableWidth: number, entries: string[], entryLengths: D3.Map<number>) {
+    private _packRows(availableWidth: number, entries: string[], entryLengths: D3.Map<number>) {
       var rows: string[][] = [[]];
       var currentRow = rows[0];
       var spaceLeft = availableWidth;
@@ -114,7 +114,7 @@ export module Component {
     public _doRender() {
       super._doRender();
 
-      var layout = this.calculateLayoutInfo(this.width(), this.height());
+      var layout = this._calculateLayoutInfo(this.width(), this.height());
 
       var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
       var rows = this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).data(rowsToDraw);
