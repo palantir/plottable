@@ -5017,15 +5017,15 @@ describe("Tables", function () {
     });
     it("padTableToSize works properly", function () {
         var t = new Plottable.Component.Table();
-        assert.deepEqual(t.rows, [], "the table rows is an empty list");
-        t.padTableToSize(1, 1);
-        var rows = t.rows;
+        assert.deepEqual(t._rows, [], "the table rows is an empty list");
+        t._padTableToSize(1, 1);
+        var rows = t._rows;
         var row = rows[0];
         var firstComponent = row[0];
         assert.lengthOf(rows, 1, "there is one row");
         assert.lengthOf(row, 1, "the row has one element");
         assert.isNull(firstComponent, "the row only has a null component");
-        t.padTableToSize(5, 2);
+        t._padTableToSize(5, 2);
         assert.lengthOf(rows, 5, "there are five rows");
         rows.forEach(function (r) { return assert.lengthOf(r, 2, "there are two columsn per row"); });
         assert.equal(rows[0][0], firstComponent, "the first component is unchanged");
@@ -5035,10 +5035,10 @@ describe("Tables", function () {
         var row1 = [null, c0];
         var row2 = [new Plottable.Component.AbstractComponent(), null];
         var table = new Plottable.Component.Table([row1, row2]);
-        assert.equal(table.rows[0][1], c0, "the component is in the right spot");
+        assert.equal(table._rows[0][1], c0, "the component is in the right spot");
         var c1 = new Plottable.Component.AbstractComponent();
         table.addComponent(2, 2, c1);
-        assert.equal(table.rows[2][2], c1, "the inserted component went to the right spot");
+        assert.equal(table._rows[2][2], c1, "the inserted component went to the right spot");
     });
     it("tables can be constructed by adding components in matrix style", function () {
         var table = new Plottable.Component.Table();
@@ -5046,7 +5046,7 @@ describe("Tables", function () {
         var c2 = new Plottable.Component.AbstractComponent();
         table.addComponent(0, 0, c1);
         table.addComponent(1, 1, c2);
-        var rows = table.rows;
+        var rows = table._rows;
         assert.lengthOf(rows, 2, "there are two rows");
         assert.lengthOf(rows[0], 2, "two cols in first row");
         assert.lengthOf(rows[1], 2, "two cols in second row");
@@ -5175,7 +5175,7 @@ describe("Tables", function () {
         spaceRequest = table._requestedSpace(200, 200);
         verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
     });
-    describe("table.iterateLayout works properly", function () {
+    describe("table._iterateLayout works properly", function () {
         // This test battery would have caught #405
         function verifyLayoutResult(result, cPS, rPS, gW, gH, wW, wH, id) {
             assert.deepEqual(result.colProportionalSpace, cPS, "colProportionalSpace:" + id);
@@ -5196,12 +5196,12 @@ describe("Tables", function () {
         it("iterateLayout works in the easy case where there is plenty of space and everything is satisfied on first go", function () {
             fixComponentSize(c1, 50, 50);
             fixComponentSize(c4, 20, 10);
-            var result = table.iterateLayout(500, 500);
+            var result = table._iterateLayout(500, 500);
             verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "");
         });
         it.skip("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", function () {
             fixComponentSize(c1, 490, 50);
-            var result = table.iterateLayout(500, 500);
+            var result = table._iterateLayout(500, 500);
             verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "");
         });
         it("iterateLayout works in the case where all components are fixed-size", function () {
@@ -5209,11 +5209,11 @@ describe("Tables", function () {
             fixComponentSize(c2, 50, 50);
             fixComponentSize(c3, 50, 50);
             fixComponentSize(c4, 50, 50);
-            var result = table.iterateLayout(100, 100);
+            var result = table._iterateLayout(100, 100);
             verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's exactly enough space");
-            result = table.iterateLayout(80, 80);
+            result = table._iterateLayout(80, 80);
             verifyLayoutResult(result, [0, 0], [0, 0], [40, 40], [40, 40], true, true, "..when there's not enough space");
-            result = table.iterateLayout(120, 120);
+            result = table._iterateLayout(120, 120);
             // If there is extra space in a fixed-size table, the extra space should not be allocated to proportional space
             verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's extra space");
         });
@@ -5228,9 +5228,9 @@ describe("Tables", function () {
                     wantsHeight: h < 200
                 };
             };
-            var result = table.iterateLayout(200, 200);
+            var result = table._iterateLayout(200, 200);
             verifyLayoutResult(result, [0, 0], [0], [0, 200], [200], false, false, "when there's sufficient space");
-            result = table.iterateLayout(150, 200);
+            result = table._iterateLayout(150, 200);
             verifyLayoutResult(result, [150, 0], [0], [0, 0], [200], true, false, "when there's insufficient space");
         });
     });
@@ -5245,24 +5245,24 @@ describe("Tables", function () {
         it("table._removeComponent works in basic case", function () {
             table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
             table._removeComponent(c4);
-            assert.deepEqual(table.rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
+            assert.deepEqual(table._rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
         });
         it("table._removeComponent does nothing when component is not found", function () {
             table = new Plottable.Component.Table([[c1, c2], [c3, c4]]);
             table._removeComponent(c5);
-            assert.deepEqual(table.rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
+            assert.deepEqual(table._rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
         });
         it("table._removeComponent removing component twice should have same effect as removing it once", function () {
             table = new Plottable.Component.Table([[c1, c2, c3], [c4, c5, c6]]);
             table._removeComponent(c1);
-            assert.deepEqual(table.rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
+            assert.deepEqual(table._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
             table._removeComponent(c1);
-            assert.deepEqual(table.rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
+            assert.deepEqual(table._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
         });
         it("table._removeComponent doesn't do anything weird when called with null", function () {
             table = new Plottable.Component.Table([[c1, null], [c2, c3]]);
             table._removeComponent(null);
-            assert.deepEqual(table.rows, [[c1, null], [c2, c3]]);
+            assert.deepEqual(table._rows, [[c1, null], [c2, c3]]);
         });
     });
 });
