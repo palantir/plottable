@@ -4346,16 +4346,6 @@ describe("ComponentContainer", function () {
         container.detachAll();
         assert.deepEqual(container.components(), [], "container was cleared of components");
     });
-    it("components() returns a shallow copy", function () {
-        var container = new Plottable.Component.AbstractComponentContainer();
-        var c1 = new Plottable.Component.AbstractComponent();
-        var c2 = new Plottable.Component.AbstractComponent();
-        container._addComponent(c1);
-        container._addComponent(c2);
-        var componentList = container.components();
-        componentList.pop();
-        assert.deepEqual(container.components(), [c1, c2], "internal list of components was not changed");
-    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -4509,7 +4499,7 @@ describe("ComponentGroups", function () {
         var c4 = new Plottable.Component.AbstractComponent();
         it("Component.merge works as expected (Component.merge Component)", function () {
             var cg = c1.merge(c2);
-            var innerComponents = cg._components;
+            var innerComponents = cg.components();
             assert.lengthOf(innerComponents, 2, "There are two components");
             assert.equal(innerComponents[0], c1, "first component correct");
             assert.equal(innerComponents[1], c2, "second component correct");
@@ -4518,7 +4508,7 @@ describe("ComponentGroups", function () {
             var cg = new Plottable.Component.Group([c2, c3, c4]);
             var cg2 = c1.merge(cg);
             assert.equal(cg, cg2, "c.merge(cg) returns cg");
-            var components = cg._components;
+            var components = cg.components();
             assert.lengthOf(components, 4, "four components");
             assert.equal(components[0], c1, "first component in front");
             assert.equal(components[1], c2, "second component is second");
@@ -4527,7 +4517,7 @@ describe("ComponentGroups", function () {
             var cg = new Plottable.Component.Group([c1, c2, c3]);
             var cg2 = cg.merge(c4);
             assert.equal(cg, cg2, "cg.merge(c) returns cg");
-            var components = cg._components;
+            var components = cg.components();
             assert.lengthOf(components, 4, "there are four components");
             assert.equal(components[0], c1, "first is first");
             assert.equal(components[3], c4, "fourth is fourth");
@@ -4538,7 +4528,7 @@ describe("ComponentGroups", function () {
             var cg = cg1.merge(cg2);
             assert.equal(cg, cg1, "merged == cg1");
             assert.notEqual(cg, cg2, "merged != cg2");
-            var components = cg._components;
+            var components = cg.components();
             assert.lengthOf(components, 3, "there are three inner components");
             assert.equal(components[0], c1, "components are inside");
             assert.equal(components[1], c2, "components are inside");

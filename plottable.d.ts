@@ -1909,7 +1909,6 @@ declare module Plottable {
 declare module Plottable {
     module Component {
         class AbstractComponentContainer extends AbstractComponent {
-            _components: AbstractComponent[];
             _anchor(element: D3.Selection): void;
             _render(): void;
             _removeComponent(c: AbstractComponent): void;
