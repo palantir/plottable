@@ -6720,9 +6720,9 @@ var Plottable;
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._updateXDomainer();
-                xScale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this.adjustYDomainOnChangeFromX(); });
+                xScale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this._adjustYDomainOnChangeFromX(); });
                 this._updateYDomainer();
-                yScale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this.adjustXDomainOnChangeFromY(); });
+                yScale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this._adjustXDomainOnChangeFromY(); });
             }
             /**
              * @param {string} attrToSet One of ["x", "y"] which determines the point's
@@ -6738,7 +6738,7 @@ var Plottable;
                     }
                     this._xScale = scale;
                     this._updateXDomainer();
-                    scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this.adjustYDomainOnChangeFromX(); });
+                    scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this._adjustYDomainOnChangeFromX(); });
                 }
                 if (attrToSet === "y" && scale) {
                     if (this._yScale) {
@@ -6746,7 +6746,7 @@ var Plottable;
                     }
                     this._yScale = scale;
                     this._updateYDomainer();
-                    scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this.adjustXDomainOnChangeFromY(); });
+                    scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this._adjustXDomainOnChangeFromY(); });
                 }
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
@@ -6771,7 +6771,7 @@ var Plottable;
              */
             AbstractXYPlot.prototype.automaticallyAdjustYScaleOverVisiblePoints = function (autoAdjustment) {
                 this._autoAdjustYScaleDomain = autoAdjustment;
-                this.adjustYDomainOnChangeFromX();
+                this._adjustYDomainOnChangeFromX();
                 return this;
             };
             /**
@@ -6784,7 +6784,7 @@ var Plottable;
              */
             AbstractXYPlot.prototype.automaticallyAdjustXScaleOverVisiblePoints = function (autoAdjustment) {
                 this._autoAdjustXScaleDomain = autoAdjustment;
-                this.adjustXDomainOnChangeFromY();
+                this._adjustXDomainOnChangeFromY();
                 return this;
             };
             AbstractXYPlot.prototype._generateAttrToProjector = function () {
@@ -6835,27 +6835,27 @@ var Plottable;
                     this._yScale.autoDomain();
                 }
             };
-            AbstractXYPlot.prototype.adjustYDomainOnChangeFromX = function () {
+            AbstractXYPlot.prototype._adjustYDomainOnChangeFromX = function () {
                 if (!this._projectorsReady()) {
                     return;
                 }
                 if (this._autoAdjustYScaleDomain) {
-                    this.adjustDomainToVisiblePoints(this._xScale, this._yScale, true);
+                    this._adjustDomainToVisiblePoints(this._xScale, this._yScale, true);
                 }
             };
-            AbstractXYPlot.prototype.adjustXDomainOnChangeFromY = function () {
+            AbstractXYPlot.prototype._adjustXDomainOnChangeFromY = function () {
                 if (!this._projectorsReady()) {
                     return;
                 }
                 if (this._autoAdjustXScaleDomain) {
-                    this.adjustDomainToVisiblePoints(this._yScale, this._xScale, false);
+                    this._adjustDomainToVisiblePoints(this._yScale, this._xScale, false);
                 }
             };
-            AbstractXYPlot.prototype.adjustDomainToVisiblePoints = function (fromScale, toScale, fromX) {
+            AbstractXYPlot.prototype._adjustDomainToVisiblePoints = function (fromScale, toScale, fromX) {
                 if (toScale instanceof Plottable.Scale.AbstractQuantitative) {
                     var toScaleQ = toScale;
-                    var normalizedData = this.normalizeDatasets(fromX);
-                    var adjustedDomain = this.adjustDomainOverVisiblePoints(normalizedData, fromScale.domain());
+                    var normalizedData = this._normalizeDatasets(fromX);
+                    var adjustedDomain = this._adjustDomainOverVisiblePoints(normalizedData, fromScale.domain());
                     if (adjustedDomain.length === 0) {
                         return;
                     }
@@ -6863,7 +6863,7 @@ var Plottable;
                     toScaleQ.domain(adjustedDomain);
                 }
             };
-            AbstractXYPlot.prototype.normalizeDatasets = function (fromX) {
+            AbstractXYPlot.prototype._normalizeDatasets = function (fromX) {
                 var _this = this;
                 var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
                 var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
@@ -6875,7 +6875,7 @@ var Plottable;
                     });
                 }));
             };
-            AbstractXYPlot.prototype.adjustDomainOverVisiblePoints = function (values, fromDomain) {
+            AbstractXYPlot.prototype._adjustDomainOverVisiblePoints = function (values, fromDomain) {
                 var bVals = values.filter(function (v) { return fromDomain[0] <= v.a && v.a <= fromDomain[1]; }).map(function (v) { return v.b; });
                 var retVal = [];
                 if (bVals.length !== 0) {
