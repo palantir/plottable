@@ -144,7 +144,7 @@ describe("Plots", () => {
     });
 
     it("stacked extent is set correctly", () => {
-      assert.deepEqual((<any> plot).stackedExtent, [-8, 8], "stacked extent is updated accordingly");
+      assert.deepEqual((<any> plot)._stackedExtent, [-8, 8], "stacked extent is updated accordingly");
       svg.remove();
     });
   });

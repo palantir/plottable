@@ -7923,7 +7923,7 @@ var Plottable;
             __extends(AbstractStacked, _super);
             function AbstractStacked() {
                 _super.apply(this, arguments);
-                this.stackedExtent = [0, 0];
+                this._stackedExtent = [0, 0];
             }
             AbstractStacked.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
@@ -7973,7 +7973,7 @@ var Plottable;
                         return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                     }, 0);
                 }, 0);
-                this.stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
+                this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
             };
             /**
              * Feeds the data through d3's stack layout function which will calculate
@@ -8056,8 +8056,8 @@ var Plottable;
                 if (!primaryScale) {
                     return;
                 }
-                if (this._isAnchored && this.stackedExtent.length > 0) {
-                    primaryScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+                if (this._isAnchored && this._stackedExtent.length > 0) {
+                    primaryScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
                 }
                 else {
                     primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
