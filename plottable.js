@@ -4625,7 +4625,7 @@ var Plottable;
                 /*
                  * Default possible axis configurations.
                  */
-                this.possibleTimeAxisConfigurations = [
+                this._possibleTimeAxisConfigurations = [
                     { tierConfigurations: [
                         { interval: d3.time.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
@@ -4739,9 +4739,9 @@ var Plottable;
             }
             Time.prototype.axisConfigurations = function (configurations) {
                 if (configurations == null) {
-                    return this.possibleTimeAxisConfigurations;
+                    return this._possibleTimeAxisConfigurations;
                 }
-                this.possibleTimeAxisConfigurations = configurations;
+                this._possibleTimeAxisConfigurations = configurations;
                 this._invalidateLayout();
                 return this;
             };
@@ -4750,13 +4750,13 @@ var Plottable;
              */
             Time.prototype.getMostPreciseConfigurationIndex = function () {
                 var _this = this;
-                var mostPreciseIndex = this.possibleTimeAxisConfigurations.length;
-                this.possibleTimeAxisConfigurations.forEach(function (interval, index) {
+                var mostPreciseIndex = this._possibleTimeAxisConfigurations.length;
+                this._possibleTimeAxisConfigurations.forEach(function (interval, index) {
                     if (index < mostPreciseIndex && interval.tierConfigurations.every(function (tier) { return _this.checkTimeAxisTierConfigurationWidth(tier); })) {
                         mostPreciseIndex = index;
                     }
                 });
-                if (mostPreciseIndex === this.possibleTimeAxisConfigurations.length) {
+                if (mostPreciseIndex === this._possibleTimeAxisConfigurations.length) {
                     Plottable._Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
                     --mostPreciseIndex;
                 }
@@ -4790,7 +4790,7 @@ var Plottable;
                 return stepLength;
             };
             Time.prototype.maxWidthForInterval = function (config) {
-                return this.measurer(config.formatter(Time.LONG_DATE)).width;
+                return this._measurer(config.formatter(Time._LONG_DATE)).width;
             };
             /**
              * Check if tier configuration fits in the current width.
@@ -4801,21 +4801,21 @@ var Plottable;
             };
             Time.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this.tierLabelContainers = [];
-                for (var i = 0; i < Time.NUM_TIERS; ++i) {
-                    this.tierLabelContainers.push(this._content.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
+                this._tierLabelContainers = [];
+                for (var i = 0; i < Time._NUM_TIERS; ++i) {
+                    this._tierLabelContainers.push(this._content.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
                 }
-                this.measurer = Plottable._Util.Text.getTextMeasurer(this.tierLabelContainers[0].append("text"));
+                this._measurer = Plottable._Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
             };
             Time.prototype.getTickIntervalValues = function (config) {
                 return this._scale._tickInterval(config.interval, config.step);
             };
             Time.prototype._getTickValues = function () {
                 var _this = this;
-                return this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations.reduce(function (ticks, config) { return ticks.concat(_this.getTickIntervalValues(config)); }, []);
+                return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations.reduce(function (ticks, config) { return ticks.concat(_this.getTickIntervalValues(config)); }, []);
             };
             Time.prototype._measureTextHeight = function () {
-                return this.measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
+                return this._measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
             };
             Time.prototype.cleanContainer = function (container) {
                 container.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
@@ -4865,7 +4865,7 @@ var Plottable;
             Time.prototype.canFitLabelFilter = function (container, position, bounds, label, isCentered) {
                 var endPosition;
                 var startPosition;
-                var width = this.measurer(label).width + this.tickLabelPadding();
+                var width = this._measurer(label).width + this.tickLabelPadding();
                 var leftBound = this._scale.scale(bounds[0]);
                 var rightBound = this._scale.scale(bounds[1]);
                 if (isCentered) {
@@ -4886,10 +4886,10 @@ var Plottable;
                 selection.attr("y2", height);
             };
             Time.prototype.generateLabellessTicks = function () {
-                if (this.mostPreciseConfigIndex < 1) {
+                if (this._mostPreciseConfigIndex < 1) {
                     return [];
                 }
-                return this.getTickIntervalValues(this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex - 1].tierConfigurations[0]);
+                return this.getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1].tierConfigurations[0]);
             };
             Time.prototype.createTickMarks = function (ticks) {
                 var tickMarks = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).data(ticks);
@@ -4899,11 +4899,11 @@ var Plottable;
             };
             Time.prototype._doRender = function () {
                 var _this = this;
-                this.mostPreciseConfigIndex = this.getMostPreciseConfigurationIndex();
+                this._mostPreciseConfigIndex = this.getMostPreciseConfigurationIndex();
                 _super.prototype._doRender.call(this);
-                var tierConfigs = this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations;
-                this.tierLabelContainers.forEach(this.cleanContainer);
-                var tierTicks = tierConfigs.map(function (config, i) { return _this.renderTierLabels(_this.tierLabelContainers[i], config, i + 1); });
+                var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations;
+                this._tierLabelContainers.forEach(this.cleanContainer);
+                var tierTicks = tierConfigs.map(function (config, i) { return _this.renderTierLabels(_this._tierLabelContainers[i], config, i + 1); });
                 var ticks = tierTicks.slice();
                 var labelLessTicks = [];
                 var domain = this._scale.domain();
@@ -4914,14 +4914,14 @@ var Plottable;
                 ticks.push(labelLessTicks);
                 this.createTickMarks(Plottable._Util.Methods.flatten(ticks));
                 this.adjustTickLength(labelLessTicks, this.tickLabelPadding());
-                tierConfigs.forEach(function (config, i) { return _this.adjustTickLength(tierTicks[i], _this._maxLabelTickLength() * (i + 1) / Time.NUM_TIERS); });
+                tierConfigs.forEach(function (config, i) { return _this.adjustTickLength(tierTicks[i], _this._maxLabelTickLength() * (i + 1) / Time._NUM_TIERS); });
                 return this;
             };
-            Time.LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
+            Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
             /**
              * Number of possible tiers.
              */
-            Time.NUM_TIERS = 2;
+            Time._NUM_TIERS = 2;
             return Time;
         })(Axis.AbstractAxis);
         Axis.Time = Time;
@@ -4955,25 +4955,25 @@ var Plottable;
             function Numeric(scale, orientation, formatter) {
                 if (formatter === void 0) { formatter = Plottable.Formatters.general(); }
                 _super.call(this, scale, orientation, formatter);
-                this.tickLabelPositioning = "center";
+                this._tickLabelPositioning = "center";
                 // Whether or not first/last tick label will still be displayed even if
                 // the label is cut off.
-                this.showFirstTickLabel = false;
-                this.showLastTickLabel = false;
+                this._showFirstTickLabel = false;
+                this._showLastTickLabel = false;
             }
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this.measurer = Plottable._Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
+                this._measurer = Plottable._Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
             };
             Numeric.prototype._computeWidth = function () {
                 var _this = this;
                 var tickValues = this._getTickValues();
                 var textLengths = tickValues.map(function (v) {
                     var formattedValue = _this._formatter(v);
-                    return _this.measurer(formattedValue).width;
+                    return _this._measurer(formattedValue).width;
                 });
                 var maxTextLength = Plottable._Util.Methods.max(textLengths, 0);
-                if (this.tickLabelPositioning === "center") {
+                if (this._tickLabelPositioning === "center") {
                     this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
                 }
                 else {
@@ -4982,8 +4982,8 @@ var Plottable;
                 return this._computedWidth;
             };
             Numeric.prototype._computeHeight = function () {
-                var textHeight = this.measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
-                if (this.tickLabelPositioning === "center") {
+                var textHeight = this._measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
+                if (this._tickLabelPositioning === "center") {
                     this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
                 }
                 else {
@@ -5023,7 +5023,7 @@ var Plottable;
                 var labelGroupShiftX = 0;
                 var labelGroupShiftY = 0;
                 if (this._isHorizontal()) {
-                    switch (this.tickLabelPositioning) {
+                    switch (this._tickLabelPositioning) {
                         case "left":
                             tickLabelTextAnchor = "end";
                             labelGroupTransformX = -tickLabelPadding;
@@ -5040,7 +5040,7 @@ var Plottable;
                     }
                 }
                 else {
-                    switch (this.tickLabelPositioning) {
+                    switch (this._tickLabelPositioning) {
                         case "top":
                             tickLabelAttrHash["dy"] = "-0.3em";
                             labelGroupShiftX = tickLabelPadding;
@@ -5093,7 +5093,7 @@ var Plottable;
             };
             Numeric.prototype.tickLabelPosition = function (position) {
                 if (position == null) {
-                    return this.tickLabelPositioning;
+                    return this._tickLabelPositioning;
                 }
                 else {
                     var positionLC = position.toLowerCase();
@@ -5107,7 +5107,7 @@ var Plottable;
                             throw new Error(positionLC + " is not a valid tick label position for a vertical NumericAxis");
                         }
                     }
-                    this.tickLabelPositioning = positionLC;
+                    this._tickLabelPositioning = positionLC;
                     this._invalidateLayout();
                     return this;
                 }
@@ -5115,20 +5115,20 @@ var Plottable;
             Numeric.prototype.showEndTickLabel = function (orientation, show) {
                 if ((this._isHorizontal() && orientation === "left") || (!this._isHorizontal() && orientation === "bottom")) {
                     if (show === undefined) {
-                        return this.showFirstTickLabel;
+                        return this._showFirstTickLabel;
                     }
                     else {
-                        this.showFirstTickLabel = show;
+                        this._showFirstTickLabel = show;
                         this._render();
                         return this;
                     }
                 }
                 else if ((this._isHorizontal() && orientation === "right") || (!this._isHorizontal() && orientation === "top")) {
                     if (show === undefined) {
-                        return this.showLastTickLabel;
+                        return this._showLastTickLabel;
                     }
                     else {
-                        this.showLastTickLabel = show;
+                        this._showLastTickLabel = show;
                         this._render();
                         return this;
                     }
@@ -5177,7 +5177,7 @@ var Plottable;
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this.measurer = new Plottable._Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
+                this._measurer = new Plottable._Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
             };
             Category.prototype._rescale = function () {
                 return this._invalidateLayout();
@@ -5195,7 +5195,7 @@ var Plottable;
                 else {
                     fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
+                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
                     height: textResult.usedHeight + heightRequiredByTicks,
@@ -5217,7 +5217,7 @@ var Plottable;
                 this._invalidateLayout();
                 return this;
             };
-            Category.prototype.tickLabelOrientation = function () {
+            Category.prototype._tickLabelOrientation = function () {
                 switch (this._tickLabelAngle) {
                     case 0:
                         return "horizontal";
@@ -5233,8 +5233,8 @@ var Plottable;
              * Measures the size of the ticks while also writing them to the DOM.
              * @param {D3.Selection} ticks The tick elements to be written to.
              */
-            Category.prototype.drawTicks = function (axisWidth, axisHeight, scale, ticks) {
-                return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, true);
+            Category.prototype._drawTicks = function (axisWidth, axisHeight, scale, ticks) {
+                return this._drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, true);
             };
             /**
              * Measures the size of the ticks without making any (permanent) DOM
@@ -5242,13 +5242,13 @@ var Plottable;
              *
              * @param {string[]} ticks The strings that will be printed on the ticks.
              */
-            Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, ticks) {
-                return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, false);
+            Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, ticks) {
+                return this._drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, false);
             };
-            Category.prototype.drawOrMeasureTicks = function (axisWidth, axisHeight, scale, dataOrTicks, draw) {
+            Category.prototype._drawOrMeasureTicks = function (axisWidth, axisHeight, scale, dataOrTicks, draw) {
                 var self = this;
                 var textWriteResults = [];
-                var tm = function (s) { return self.measurer.measure(s); };
+                var tm = function (s) { return self._measurer.measure(s); };
                 var iterator = draw ? function (f) { return dataOrTicks.each(f); } : function (f) { return dataOrTicks.forEach(f); };
                 iterator(function (d) {
                     var bandWidth = scale.fullBandStartAndWidth(d)[1];
@@ -5260,14 +5260,14 @@ var Plottable;
                         var d3this = d3.select(this);
                         var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                         var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation(), {
+                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self._tickLabelOrientation(), {
                             g: d3this,
                             xAlign: xAlign[self._orientation],
                             yAlign: yAlign[self._orientation]
                         });
                     }
                     else {
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation());
+                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self._tickLabelOrientation());
                     }
                     textWriteResults.push(textWriteResult);
                 });
@@ -5295,7 +5295,7 @@ var Plottable;
                 tickLabels.attr("transform", getTickLabelTransform);
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this.drawTicks(this.width(), this.height(), this._scale, tickLabels);
+                this._drawTicks(this.width(), this.height(), this._scale, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
                 var xTranslate = this._orientation === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this._orientation === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
@@ -5307,7 +5307,7 @@ var Plottable;
                 // When anyone calls _invalidateLayout, _computeLayout will be called
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
-                this.measurer.clear();
+                this._measurer.clear();
                 return _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
             };
             return Category;
@@ -8447,23 +8447,23 @@ var Plottable;
             Rect.prototype.animate = function (selection, attrToProjector) {
                 var startAttrToProjector = {};
                 Rect.ANIMATED_ATTRIBUTES.forEach(function (attr) { return startAttrToProjector[attr] = attrToProjector[attr]; });
-                startAttrToProjector[this.getMovingAttr()] = this._startMovingProjector(attrToProjector);
-                startAttrToProjector[this.getGrowingAttr()] = function () { return 0; };
+                startAttrToProjector[this._getMovingAttr()] = this._startMovingProjector(attrToProjector);
+                startAttrToProjector[this._getGrowingAttr()] = function () { return 0; };
                 selection.attr(startAttrToProjector);
                 return _super.prototype.animate.call(this, selection, attrToProjector);
             };
             Rect.prototype._startMovingProjector = function (attrToProjector) {
                 if (this.isVertical === this.isReverse) {
-                    return attrToProjector[this.getMovingAttr()];
+                    return attrToProjector[this._getMovingAttr()];
                 }
-                var movingAttrProjector = attrToProjector[this.getMovingAttr()];
-                var growingAttrProjector = attrToProjector[this.getGrowingAttr()];
+                var movingAttrProjector = attrToProjector[this._getMovingAttr()];
+                var growingAttrProjector = attrToProjector[this._getGrowingAttr()];
                 return function (d, i, u, m) { return movingAttrProjector(d, i, u, m) + growingAttrProjector(d, i, u, m); };
             };
-            Rect.prototype.getGrowingAttr = function () {
+            Rect.prototype._getGrowingAttr = function () {
                 return this.isVertical ? "height" : "width";
             };
-            Rect.prototype.getMovingAttr = function () {
+            Rect.prototype._getMovingAttr = function () {
                 return this.isVertical ? "y" : "x";
             };
             Rect.ANIMATED_ATTRIBUTES = ["height", "width", "x", "y", "fill"];
