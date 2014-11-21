@@ -7,6 +7,7 @@ export module Plot {
    */
   export class Area<X> extends Line<X> {
     private areaPath: D3.Selection;
+    private defaultFillColor: string;
 
     /**
      * Constructs an AreaPlot.
@@ -19,16 +20,12 @@ export module Plot {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this.project("y0", 0, yScale); // default
-      this.project("fill-opacity", () => 0.25); // default
-
-      var defaultColor = new Scale.Color().range()[0];
-      this.project("fill", () => defaultColor); // default
-      this.project("stroke", () => defaultColor); // default
 
       this._animators["reset"] = new Animator.Null();
       this._animators["main"]  = new Animator.Base()
                                              .duration(600)
                                              .easing("exp-in-out");
+      this.defaultFillColor = new Scale.Color().range()[0];
     }
 
     public _onDatasetUpdate() {
@@ -84,6 +81,14 @@ export module Plot {
       var wholeDatumAttributes = super._wholeDatumAttributes();
       wholeDatumAttributes.push("y0");
       return wholeDatumAttributes;
+    }
+
+    public _generateAttrToProjector() {
+      var attrToProjector = super._generateAttrToProjector();
+      attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultFillColor);
+      return attrToProjector;
     }
   }
 }
