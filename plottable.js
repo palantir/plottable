@@ -7757,7 +7757,7 @@ var Plottable;
                 this.project("y0", 0, yScale); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
-                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
+                this._defaultFillColor = new Plottable.Scale.Color().range()[0];
             }
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
@@ -7811,8 +7811,8 @@ var Plottable;
             Area.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
-                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
-                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultFillColor);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultFillColor);
                 return attrToProjector;
             };
             return Area;
