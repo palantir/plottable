@@ -5897,29 +5897,29 @@ var Plottable;
                 }
                 _super.call(this);
                 this.classed("gridlines", true);
-                this.xScale = xScale;
-                this.yScale = yScale;
-                if (this.xScale) {
-                    this.xScale.broadcaster.registerListener(this, function () { return _this._render(); });
+                this._xScale = xScale;
+                this._yScale = yScale;
+                if (this._xScale) {
+                    this._xScale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
-                if (this.yScale) {
-                    this.yScale.broadcaster.registerListener(this, function () { return _this._render(); });
+                if (this._yScale) {
+                    this._yScale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
             }
             Gridlines.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                if (this.xScale) {
-                    this.xScale.broadcaster.deregisterListener(this);
+                if (this._xScale) {
+                    this._xScale.broadcaster.deregisterListener(this);
                 }
-                if (this.yScale) {
-                    this.yScale.broadcaster.deregisterListener(this);
+                if (this._yScale) {
+                    this._yScale.broadcaster.deregisterListener(this);
                 }
                 return this;
             };
             Gridlines.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this.xLinesContainer = this._content.append("g").classed("x-gridlines", true);
-                this.yLinesContainer = this._content.append("g").classed("y-gridlines", true);
+                this._xLinesContainer = this._content.append("g").classed("x-gridlines", true);
+                this._yLinesContainer = this._content.append("g").classed("y-gridlines", true);
             };
             Gridlines.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
@@ -5928,10 +5928,10 @@ var Plottable;
             };
             Gridlines.prototype.redrawXLines = function () {
                 var _this = this;
-                if (this.xScale) {
-                    var xTicks = this.xScale.ticks();
-                    var getScaledXValue = function (tickVal) { return _this.xScale.scale(tickVal); };
-                    var xLines = this.xLinesContainer.selectAll("line").data(xTicks);
+                if (this._xScale) {
+                    var xTicks = this._xScale.ticks();
+                    var getScaledXValue = function (tickVal) { return _this._xScale.scale(tickVal); };
+                    var xLines = this._xLinesContainer.selectAll("line").data(xTicks);
                     xLines.enter().append("line");
                     xLines.attr("x1", getScaledXValue).attr("y1", 0).attr("x2", getScaledXValue).attr("y2", this.height()).classed("zeroline", function (t) { return t === 0; });
                     xLines.exit().remove();
@@ -5939,10 +5939,10 @@ var Plottable;
             };
             Gridlines.prototype.redrawYLines = function () {
                 var _this = this;
-                if (this.yScale) {
-                    var yTicks = this.yScale.ticks();
-                    var getScaledYValue = function (tickVal) { return _this.yScale.scale(tickVal); };
-                    var yLines = this.yLinesContainer.selectAll("line").data(yTicks);
+                if (this._yScale) {
+                    var yTicks = this._yScale.ticks();
+                    var getScaledYValue = function (tickVal) { return _this._yScale.scale(tickVal); };
+                    var yLines = this._yLinesContainer.selectAll("line").data(yTicks);
                     yLines.enter().append("line");
                     yLines.attr("x1", 0).attr("y1", getScaledYValue).attr("x2", this.width()).attr("y2", getScaledYValue).classed("zeroline", function (t) { return t === 0; });
                     yLines.exit().remove();
