@@ -7123,9 +7123,9 @@ var Plottable;
                 this._barLabelFormatter = Plottable.Formatters.identity();
                 this._barLabelsEnabled = false;
                 this._hoverMode = "point";
-                this.hideBarsIfAnyAreTooWide = true;
+                this._hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
-                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
+                this._defaultFillColor = new Plottable.Scale.Color().range()[0];
                 this._animators["bars-reset"] = new Plottable.Animator.Null();
                 this._animators["bars"] = new Plottable.Animator.Base();
                 this._animators["baseline"] = new Plottable.Animator.Null();
@@ -7166,7 +7166,7 @@ var Plottable;
                 this._render();
                 return this;
             };
-            AbstractBarPlot.prototype.parseExtent = function (input) {
+            AbstractBarPlot.prototype._parseExtent = function (input) {
                 if (typeof (input) === "number") {
                     return { min: input, max: input };
                 }
@@ -7210,8 +7210,8 @@ var Plottable;
                     return d3.select();
                 }
                 var bars = [];
-                var xExtent = this.parseExtent(xValOrExtent);
-                var yExtent = this.parseExtent(yValOrExtent);
+                var xExtent = this._parseExtent(xValOrExtent);
+                var yExtent = this._parseExtent(yValOrExtent);
                 // the SVGRects are positioned with sub-pixel accuracy (the default unit
                 // for the x, y, height & width attributes), but user selections (e.g. via
                 // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
@@ -7293,7 +7293,7 @@ var Plottable;
                 var attrToProjector = this._generateAttrToProjector();
                 var dataToDraw = this._getDataToDraw();
                 this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).plotMetadata); });
-                if (this.hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._someLabelsTooWide; })) {
+                if (this._hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._someLabelsTooWide; })) {
                     drawers.forEach(function (d) { return d.removeLabels(); });
                 }
             };
@@ -7353,7 +7353,7 @@ var Plottable;
                     };
                     attrToProjector["positive"] = function (d, i, u, m) { return originalPositionFn(d, i, u, m) <= scaledBaseline; };
                 }
-                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
                 return attrToProjector;
             };
             /**
@@ -7418,7 +7418,7 @@ var Plottable;
                 this._hoverMode = modeLC;
                 return this;
             };
-            AbstractBarPlot.prototype.clearHoverSelection = function () {
+            AbstractBarPlot.prototype._clearHoverSelection = function () {
                 this._getDrawersInOrder().forEach(function (d, i) {
                     d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
                 });
@@ -7428,7 +7428,7 @@ var Plottable;
                 // no-op
             };
             AbstractBarPlot.prototype._hoverOutComponent = function (p) {
-                this.clearHoverSelection();
+                this._clearHoverSelection();
             };
             // HACKHACK User and plot metadata should be applied here - #1306.
             AbstractBarPlot.prototype._doHover = function (p) {
@@ -7452,7 +7452,7 @@ var Plottable;
                     bars.classed({ "hovered": true, "not-hovered": false });
                 }
                 else {
-                    this.clearHoverSelection();
+                    this._clearHoverSelection();
                     return {
                         data: null,
                         pixelPositions: null,
