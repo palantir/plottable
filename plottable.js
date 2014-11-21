@@ -5379,8 +5379,8 @@ var Plottable;
             };
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var desiredWH = this.measurer(this._text);
-                var desiredWidth = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
-                var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
+                var desiredWidth = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+                var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
                 return {
                     width: desiredWidth,
                     height: desiredHeight,
@@ -5390,8 +5390,8 @@ var Plottable;
             };
             Label.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this.textContainer = this._content.append("g");
-                this.measurer = Plottable._Util.Text.getTextMeasurer(this.textContainer.append("text"));
+                this._textContainer = this._content.append("g");
+                this.measurer = Plottable._Util.Text.getTextMeasurer(this._textContainer.append("text"));
                 this.text(this._text);
             };
             Label.prototype.text = function (displayText) {
@@ -5406,12 +5406,12 @@ var Plottable;
             };
             Label.prototype.orient = function (newOrientation) {
                 if (newOrientation == null) {
-                    return this.orientation;
+                    return this._orientation;
                 }
                 else {
                     newOrientation = newOrientation.toLowerCase();
                     if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
-                        this.orientation = newOrientation;
+                        this._orientation = newOrientation;
                     }
                     else {
                         throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
@@ -5439,21 +5439,21 @@ var Plottable;
                 var textMeasurement = this.measurer(this._text);
                 var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
                 var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
-                this.textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
-                this.textContainer.text("");
-                var dimension = this.orientation === "horizontal" ? this.width() : this.height();
+                this._textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
+                this._textContainer.text("");
+                var dimension = this.orient() === "horizontal" ? this.width() : this.height();
                 var truncatedText = Plottable._Util.Text.getTruncatedText(this._text, dimension, this.measurer);
                 var writeWidth = this.width() - 2 * widthPadding;
                 var writeHeight = this.height() - 2 * heightPadding;
-                if (this.orientation === "horizontal") {
-                    Plottable._Util.Text.writeLineHorizontally(truncatedText, this.textContainer, writeWidth, writeHeight, this.xAlignment, this.yAlignment);
+                if (this.orient() === "horizontal") {
+                    Plottable._Util.Text.writeLineHorizontally(truncatedText, this._textContainer, writeWidth, writeHeight, this.xAlignment, this.yAlignment);
                 }
                 else {
-                    Plottable._Util.Text.writeLineVertically(truncatedText, this.textContainer, writeWidth, writeHeight, this.xAlignment, this.yAlignment, this.orientation);
+                    Plottable._Util.Text.writeLineVertically(truncatedText, this._textContainer, writeWidth, writeHeight, this.xAlignment, this.yAlignment, this.orient());
                 }
             };
             Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                this.measurer = Plottable._Util.Text.getTextMeasurer(this.textContainer.append("text")); // reset it in case fonts have changed
+                this.measurer = Plottable._Util.Text.getTextMeasurer(this._textContainer.append("text")); // reset it in case fonts have changed
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 return this;
             };
