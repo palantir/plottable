@@ -5534,8 +5534,8 @@ var Plottable;
                 if (callback !== undefined) {
                     this._toggleCallback = callback;
                     this._isOff = d3.set();
-                    this.updateListeners();
-                    this.updateClasses();
+                    this._updateListeners();
+                    this._updateClasses();
                     return this;
                 }
                 else {
@@ -5546,8 +5546,8 @@ var Plottable;
                 if (callback !== undefined) {
                     this._hoverCallback = callback;
                     this._datumCurrentlyFocusedOn = undefined;
-                    this.updateListeners();
-                    this.updateClasses();
+                    this._updateListeners();
+                    this._updateClasses();
                     return this;
                 }
                 else {
@@ -5561,15 +5561,15 @@ var Plottable;
                         this._colorScale.broadcaster.deregisterListener(this);
                     }
                     this._colorScale = scale;
-                    this._colorScale.broadcaster.registerListener(this, function () { return _this.updateDomain(); });
-                    this.updateDomain();
+                    this._colorScale.broadcaster.registerListener(this, function () { return _this._updateDomain(); });
+                    this._updateDomain();
                     return this;
                 }
                 else {
                     return this._colorScale;
                 }
             };
-            Legend.prototype.updateDomain = function () {
+            Legend.prototype._updateDomain = function () {
                 if (this._toggleCallback != null) {
                     this._isOff = Plottable._Util.Methods.intersection(this._isOff, d3.set(this.scale().domain()));
                 }
@@ -5580,12 +5580,12 @@ var Plottable;
             };
             Legend.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
-                var textHeight = this.measureTextHeight();
+                var textHeight = this._measureTextHeight();
                 var totalNumRows = this._colorScale.domain().length;
                 this._nRowsDrawn = Math.min(totalNumRows, Math.floor(this.height() / textHeight));
             };
             Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var textHeight = this.measureTextHeight();
+                var textHeight = this._measureTextHeight();
                 var totalNumRows = this._colorScale.domain().length;
                 var rowsICanFit = Math.min(totalNumRows, Math.floor((offeredHeight - 2 * Legend._MARGIN) / textHeight));
                 var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
@@ -5602,7 +5602,7 @@ var Plottable;
                     wantsHeight: offeredHeight < desiredHeight
                 };
             };
-            Legend.prototype.measureTextHeight = function () {
+            Legend.prototype._measureTextHeight = function () {
                 // note: can't be called before anchoring atm
                 var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 var textHeight = Plottable._Util.Text.getTextMeasurer(fakeLegendEl.append("text"))(Plottable._Util.Text.HEIGHT_TEXT).height;
@@ -5616,7 +5616,7 @@ var Plottable;
             Legend.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
                 var domain = this._colorScale.domain().slice(0, this._nRowsDrawn);
-                var textHeight = this.measureTextHeight();
+                var textHeight = this._measureTextHeight();
                 var availableWidth = this.width() - textHeight - Legend._MARGIN;
                 var r = textHeight * 0.3;
                 var legend = this._content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, function (d) { return d; });
@@ -5638,10 +5638,10 @@ var Plottable;
                 legend.attr("transform", function (d) {
                     return "translate(" + Legend._MARGIN + "," + (domain.indexOf(d) * textHeight + Legend._MARGIN) + ")";
                 });
-                this.updateClasses();
-                this.updateListeners();
+                this._updateClasses();
+                this._updateListeners();
             };
-            Legend.prototype.updateListeners = function () {
+            Legend.prototype._updateListeners = function () {
                 var _this = this;
                 if (!this._isSetup) {
                     return;
@@ -5653,7 +5653,7 @@ var Plottable;
                     var hoverRow = function (mouseover) { return function (datum) {
                         _this._datumCurrentlyFocusedOn = mouseover ? datum : undefined;
                         _this._hoverCallback(_this._datumCurrentlyFocusedOn);
-                        _this.updateClasses();
+                        _this._updateClasses();
                     }; };
                     dataSelection.on("mouseover", hoverRow(true));
                     dataSelection.on("mouseout", hoverRow(false));
@@ -5673,7 +5673,7 @@ var Plottable;
                             _this._isOff.add(datum);
                         }
                         _this._toggleCallback(datum, turningOn);
-                        _this.updateClasses();
+                        _this._updateClasses();
                     });
                 }
                 else {
@@ -5681,7 +5681,7 @@ var Plottable;
                     dataSelection.on("click", null);
                 }
             };
-            Legend.prototype.updateClasses = function () {
+            Legend.prototype._updateClasses = function () {
                 var _this = this;
                 if (!this._isSetup) {
                     return;

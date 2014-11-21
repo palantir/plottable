@@ -82,8 +82,8 @@ export module Component {
       if (callback !== undefined) {
         this._toggleCallback = callback;
         this._isOff = d3.set();
-        this.updateListeners();
-        this.updateClasses();
+        this._updateListeners();
+        this._updateClasses();
         return this;
       } else {
         return this._toggleCallback;
@@ -117,8 +117,8 @@ export module Component {
       if (callback !== undefined) {
         this._hoverCallback = callback;
         this._datumCurrentlyFocusedOn = undefined;
-        this.updateListeners();
-        this.updateClasses();
+        this._updateListeners();
+        this._updateClasses();
         return this;
       } else {
         return this._hoverCallback;
@@ -144,15 +144,15 @@ export module Component {
           this._colorScale.broadcaster.deregisterListener(this);
         }
         this._colorScale = scale;
-        this._colorScale.broadcaster.registerListener(this, () => this.updateDomain());
-        this.updateDomain();
+        this._colorScale.broadcaster.registerListener(this, () => this._updateDomain());
+        this._updateDomain();
         return this;
       } else {
         return this._colorScale;
       }
     }
 
-    private updateDomain() {
+    private _updateDomain() {
       if (this._toggleCallback != null) {
         this._isOff = _Util.Methods.intersection(this._isOff, d3.set(this.scale().domain()));
       }
@@ -165,13 +165,13 @@ export module Component {
 
     public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
-      var textHeight = this.measureTextHeight();
+      var textHeight = this._measureTextHeight();
       var totalNumRows = this._colorScale.domain().length;
       this._nRowsDrawn = Math.min(totalNumRows, Math.floor(this.height() / textHeight));
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var textHeight = this.measureTextHeight();
+      var textHeight = this._measureTextHeight();
       var totalNumRows = this._colorScale.domain().length;
       var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend._MARGIN) / textHeight));
       var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
@@ -189,7 +189,7 @@ export module Component {
       };
     }
 
-    private measureTextHeight(): number {
+    private _measureTextHeight(): number {
       // note: can't be called before anchoring atm
       var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var textHeight = _Util.Text.getTextMeasurer(fakeLegendEl.append("text"))(_Util.Text.HEIGHT_TEXT).height;
@@ -204,7 +204,7 @@ export module Component {
     public _doRender() {
       super._doRender();
       var domain = this._colorScale.domain().slice(0, this._nRowsDrawn);
-      var textHeight = this.measureTextHeight();
+      var textHeight = this._measureTextHeight();
       var availableWidth  = this.width()  - textHeight - Legend._MARGIN;
       var r = textHeight * 0.3;
       var legend: D3.UpdateSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, (d) => d);
@@ -240,11 +240,11 @@ export module Component {
         return "translate(" + Legend._MARGIN + "," + (domain.indexOf(d) * textHeight + Legend._MARGIN) + ")";
       });
 
-      this.updateClasses();
-      this.updateListeners();
+      this._updateClasses();
+      this._updateListeners();
     }
 
-    private updateListeners() {
+    private _updateListeners() {
       if (!this._isSetup) {
         return;
       }
@@ -255,7 +255,7 @@ export module Component {
         var hoverRow = (mouseover: boolean) => (datum: string) => {
           this._datumCurrentlyFocusedOn = mouseover ? datum : undefined;
           this._hoverCallback(this._datumCurrentlyFocusedOn);
-          this.updateClasses();
+          this._updateClasses();
         };
         dataSelection.on("mouseover", hoverRow(true));
         dataSelection.on("mouseout", hoverRow(false));
@@ -274,7 +274,7 @@ export module Component {
             this._isOff.add(datum);
           }
           this._toggleCallback(datum, turningOn);
-          this.updateClasses();
+          this._updateClasses();
         });
       } else {
         // remove all click listeners
@@ -282,7 +282,7 @@ export module Component {
       }
     }
 
-    private updateClasses() {
+    private _updateClasses() {
       if (!this._isSetup) {
         return;
       }
