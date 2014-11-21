@@ -5923,10 +5923,10 @@ var Plottable;
             };
             Gridlines.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
-                this.redrawXLines();
-                this.redrawYLines();
+                this._redrawXLines();
+                this._redrawYLines();
             };
-            Gridlines.prototype.redrawXLines = function () {
+            Gridlines.prototype._redrawXLines = function () {
                 var _this = this;
                 if (this._xScale) {
                     var xTicks = this._xScale.ticks();
@@ -5937,7 +5937,7 @@ var Plottable;
                     xLines.exit().remove();
                 }
             };
-            Gridlines.prototype.redrawYLines = function () {
+            Gridlines.prototype._redrawYLines = function () {
                 var _this = this;
                 if (this._yScale) {
                     var yTicks = this._yScale.ticks();

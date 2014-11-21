@@ -53,11 +53,11 @@ export module Component {
 
     public _doRender() {
       super._doRender();
-      this.redrawXLines();
-      this.redrawYLines();
+      this._redrawXLines();
+      this._redrawYLines();
     }
 
-    private redrawXLines() {
+    private _redrawXLines() {
       if (this._xScale) {
         var xTicks = this._xScale.ticks();
         var getScaledXValue = (tickVal: number) => this._xScale.scale(tickVal);
@@ -72,7 +72,7 @@ export module Component {
       }
     }
 
-    private redrawYLines() {
+    private _redrawYLines() {
       if (this._yScale) {
         var yTicks = this._yScale.ticks();
         var getScaledYValue = (tickVal: number) => this._yScale.scale(tickVal);
