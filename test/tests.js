@@ -4589,14 +4589,14 @@ describe("Component behavior", function () {
             c._computeLayout();
             assert.equal(c.width(), SVG_WIDTH, "computeLayout defaulted width to svg width");
             assert.equal(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
-            assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
-            assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
+            assert.equal(c._xOrigin, 0, "xOrigin defaulted to 0");
+            assert.equal(c._yOrigin, 0, "yOrigin defaulted to 0");
             svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
             c._computeLayout();
             assert.equal(c.width(), 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
             assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
-            assert.equal(c.xOrigin, 0, "xOrigin is still 0");
-            assert.equal(c.yOrigin, 0, "yOrigin is still 0");
+            assert.equal(c._xOrigin, 0, "xOrigin is still 0");
+            assert.equal(c._yOrigin, 0, "yOrigin is still 0");
             svg.remove();
         });
         it("computeLayout works with CSS layouts", function () {
@@ -4610,20 +4610,20 @@ describe("Component behavior", function () {
             c._computeLayout();
             assert.equal(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
             assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
-            assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
-            assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
+            assert.equal(c._xOrigin, 0, "xOrigin defaulted to 0");
+            assert.equal(c._yOrigin, 0, "yOrigin defaulted to 0");
             svg.style("width", "50%").style("height", "50%");
             c._computeLayout();
             assert.equal(c.width(), 200, "computeLayout defaulted width to svg width");
             assert.equal(c.height(), 100, "computeLayout defaulted height to svg height");
-            assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
-            assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
+            assert.equal(c._xOrigin, 0, "xOrigin defaulted to 0");
+            assert.equal(c._yOrigin, 0, "yOrigin defaulted to 0");
             svg.style("width", "25%").style("height", "25%");
             c._computeLayout();
             assert.equal(c.width(), 100, "computeLayout updated width to new svg width");
             assert.equal(c.height(), 50, "computeLayout updated height to new svg height");
-            assert.equal(c.xOrigin, 0, "xOrigin is still 0");
-            assert.equal(c.yOrigin, 0, "yOrigin is still 0");
+            assert.equal(c._xOrigin, 0, "xOrigin is still 0");
+            assert.equal(c._yOrigin, 0, "yOrigin is still 0");
             // reset test page DOM
             parent.style("width", "auto");
             parent.style("height", "auto");
@@ -4724,7 +4724,7 @@ describe("Component behavior", function () {
         // IE 9 has clipPath like 'url("#clipPath")', must accomodate
         var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
         assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
-        var clipRect = c.boxContainer.select(".clip-rect");
+        var clipRect = c._boxContainer.select(".clip-rect");
         assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
         assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");
         svg.remove();
@@ -4755,7 +4755,7 @@ describe("Component behavior", function () {
     });
     it("hitboxes are created iff there are registered interactions", function () {
         function verifyHitbox(component) {
-            var hitBox = component.hitBox;
+            var hitBox = component._hitBox;
             assert.isNotNull(hitBox, "the hitbox was created");
             var hitBoxFill = hitBox.style("fill");
             var hitBoxFilled = hitBoxFill === "#ffffff" || hitBoxFill === "rgb(255, 255, 255)";
@@ -4763,7 +4763,7 @@ describe("Component behavior", function () {
             assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
         }
         c._anchor(svg);
-        assert.isUndefined(c.hitBox, "no hitBox was created when there were no registered interactions");
+        assert.isUndefined(c._hitBox, "no hitBox was created when there were no registered interactions");
         svg.remove();
         svg = generateSVG();
         c = new Plottable.Component.AbstractComponent();
@@ -4788,7 +4788,7 @@ describe("Component behavior", function () {
         c.registerInteraction(interaction1);
         c.renderTo(svg);
         c.registerInteraction(interaction2);
-        var hitNode = c.hitBox.node();
+        var hitNode = c._hitBox.node();
         assert.equal(hitBox1, hitNode, "hitBox1 was registerd");
         assert.equal(hitBox2, hitNode, "hitBox2 was registerd");
         svg.remove();
@@ -4868,7 +4868,7 @@ describe("Component behavior", function () {
         horizontalComponent.xAlign("center");
         verticalComponent.yAlign("bottom");
         assertBBoxNonIntersection(verticalComponent._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
-        assertBBoxInclusion(t.boxContainer.select(".bounding-box"), horizontalComponent._element.select(".bounding-box"));
+        assertBBoxInclusion(t._boxContainer.select(".bounding-box"), horizontalComponent._element.select(".bounding-box"));
         svg.remove();
     });
     it("Components will not translate if they are fixed width/height and request more space than offered", function () {
@@ -6913,7 +6913,7 @@ describe("Interactions", function () {
             ki.on(aCode, aCallback);
             ki.on(bCode, bCallback);
             component.registerInteraction(ki);
-            var $hitbox = $(component.hitBox.node());
+            var $hitbox = $(component._hitBox.node());
             $hitbox.simulate("mouseover");
             $hitbox.simulate("keydown", { keyCode: aCode });
             assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");

@@ -3619,15 +3619,15 @@ var Plottable;
                 this._fixedWidthFlag = false;
                 this._isSetup = false;
                 this._isAnchored = false;
-                this.interactionsToRegister = [];
-                this.boxes = [];
-                this.isTopLevelComponent = false;
+                this._interactionsToRegister = [];
+                this._boxes = [];
+                this._isTopLevelComponent = false;
                 this._width = 0; // Width and height of the component. Used to size the hitbox, bounding box, etc
                 this._height = 0;
                 this._xOffset = 0; // Offset from Origin, used for alignment and floating positioning
                 this._yOffset = 0;
-                this.cssClasses = ["component"];
-                this.removed = false;
+                this._cssClasses = ["component"];
+                this._removed = false;
                 this._autoResize = AbstractComponent.AUTORESIZE_BY_DEFAULT;
             }
             /**
@@ -3636,16 +3636,16 @@ var Plottable;
              * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
              */
             AbstractComponent.prototype._anchor = function (element) {
-                if (this.removed) {
+                if (this._removed) {
                     throw new Error("Can't reuse remove()-ed components!");
                 }
                 if (element.node().nodeName === "svg") {
                     // svg node gets the "plottable" CSS class
-                    this.rootSVG = element;
-                    this.rootSVG.classed("plottable", true);
+                    this._rootSVG = element;
+                    this._rootSVG.classed("plottable", true);
                     // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
-                    this.rootSVG.style("overflow", "visible");
-                    this.isTopLevelComponent = true;
+                    this._rootSVG.style("overflow", "visible");
+                    this._isTopLevelComponent = true;
                 }
                 if (this._element != null) {
                     // reattach existing element
@@ -3667,22 +3667,22 @@ var Plottable;
                 if (this._isSetup) {
                     return;
                 }
-                this.cssClasses.forEach(function (cssClass) {
+                this._cssClasses.forEach(function (cssClass) {
                     _this._element.classed(cssClass, true);
                 });
-                this.cssClasses = null;
+                this._cssClasses = null;
                 this._backgroundContainer = this._element.append("g").classed("background-container", true);
                 this._content = this._element.append("g").classed("content", true);
                 this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
-                this.boxContainer = this._element.append("g").classed("box-container", true);
+                this._boxContainer = this._element.append("g").classed("box-container", true);
                 if (this.clipPathEnabled) {
                     this.generateClipPath();
                 }
                 ;
                 this.addBox("bounding-box");
-                this.interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
-                this.interactionsToRegister = null;
-                if (this.isTopLevelComponent) {
+                this._interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
+                this._interactionsToRegister = null;
+                if (this._isTopLevelComponent) {
                     this.autoResize(this._autoResize);
                 }
                 this._isSetup = true;
@@ -3695,31 +3695,31 @@ var Plottable;
              * If no parameters are supplied and the component is a root node,
              * they are inferred from the size of the component's element.
              *
-             * @param {number} xOrigin x-coordinate of the origin of the component
-             * @param {number} yOrigin y-coordinate of the origin of the component
+             * @param {number} _xOrigin x-coordinate of the origin of the component
+             * @param {number} _yOrigin y-coordinate of the origin of the component
              * @param {number} availableWidth available width for the component to render in
              * @param {number} availableHeight available height for the component to render in
              */
-            AbstractComponent.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
+            AbstractComponent.prototype._computeLayout = function (_xOrigin, _yOrigin, availableWidth, availableHeight) {
                 var _this = this;
-                if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
+                if (_xOrigin == null || _yOrigin == null || availableWidth == null || availableHeight == null) {
                     if (this._element == null) {
                         throw new Error("anchor must be called before computeLayout");
                     }
-                    else if (this.isTopLevelComponent) {
+                    else if (this._isTopLevelComponent) {
                         // we are the root node, retrieve height/width from root SVG
-                        xOrigin = 0;
-                        yOrigin = 0;
+                        _xOrigin = 0;
+                        _yOrigin = 0;
                         // Set width/height to 100% if not specified, to allow accurate size calculation
                         // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
                         // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
-                        if (this.rootSVG.attr("width") == null) {
-                            this.rootSVG.attr("width", "100%");
+                        if (this._rootSVG.attr("width") == null) {
+                            this._rootSVG.attr("width", "100%");
                         }
-                        if (this.rootSVG.attr("height") == null) {
-                            this.rootSVG.attr("height", "100%");
+                        if (this._rootSVG.attr("height") == null) {
+                            this._rootSVG.attr("height", "100%");
                         }
-                        var elem = this.rootSVG.node();
+                        var elem = this._rootSVG.node();
                         availableWidth = Plottable._Util.DOM.getElementWidth(elem);
                         availableHeight = Plottable._Util.DOM.getElementHeight(elem);
                     }
@@ -3727,17 +3727,17 @@ var Plottable;
                         throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
                     }
                 }
-                this.xOrigin = xOrigin;
-                this.yOrigin = yOrigin;
+                this._xOrigin = _xOrigin;
+                this._yOrigin = _yOrigin;
                 var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
                 this._width = this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth;
                 this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
-                var xPosition = this.xOrigin + this._xOffset;
-                var yPosition = this.yOrigin + this._yOffset;
+                var xPosition = this._xOrigin + this._xOffset;
+                var yPosition = this._yOrigin + this._yOffset;
                 xPosition += (availableWidth - this.width()) * this._xAlignProportion;
                 yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
                 this._element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-                this.boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
+                this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             };
             AbstractComponent.prototype._render = function () {
                 if (this._isAnchored && this._isSetup) {
@@ -3753,7 +3753,7 @@ var Plottable;
             };
             AbstractComponent.prototype._invalidateLayout = function () {
                 if (this._isAnchored && this._isSetup) {
-                    if (this.isTopLevelComponent) {
+                    if (this._isTopLevelComponent) {
                         this._scheduleComputeLayout();
                     }
                     else {
@@ -3796,11 +3796,11 @@ var Plottable;
              * @returns {Component} The calling component.
              */
             AbstractComponent.prototype.resize = function (width, height) {
-                if (!this.isTopLevelComponent) {
+                if (!this._isTopLevelComponent) {
                     throw new Error("Cannot resize on non top-level component");
                 }
                 if (width != null && height != null && this._isAnchored) {
-                    this.rootSVG.attr({ width: width, height: height });
+                    this._rootSVG.attr({ width: width, height: height });
                 }
                 this._invalidateLayout();
                 return this;
@@ -3822,7 +3822,7 @@ var Plottable;
                 else {
                     Plottable.Core.ResizeBroadcaster.deregister(this);
                 }
-                this._autoResize = flag; // if _setup were called by constructor, this var could be removed #591
+                this._autoResize = flag; // if _setup were called by constructor, this var could be _removed #591
                 return this;
             };
             /**
@@ -3911,13 +3911,13 @@ var Plottable;
                 if (this._element == null) {
                     throw new Error("Adding boxes before anchoring is currently disallowed");
                 }
-                parentElement = parentElement == null ? this.boxContainer : parentElement;
+                parentElement = parentElement == null ? this._boxContainer : parentElement;
                 var box = parentElement.append("rect");
                 if (className != null) {
                     box.classed(className, true);
                 }
                 ;
-                this.boxes.push(box);
+                this._boxes.push(box);
                 if (this.width() != null && this.height() != null) {
                     box.attr("width", this.width()).attr("height", this.height());
                 }
@@ -3930,7 +3930,7 @@ var Plottable;
                 var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
                 prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
                 this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this._plottableID + "\")");
-                var clipPathParent = this.boxContainer.append("clipPath").attr("id", "clipPath" + this._plottableID);
+                var clipPathParent = this._boxContainer.append("clipPath").attr("id", "clipPath" + this._plottableID);
                 this.addBox("clip-rect", clipPathParent);
             };
             /**
@@ -3941,17 +3941,17 @@ var Plottable;
              */
             AbstractComponent.prototype.registerInteraction = function (interaction) {
                 // Interactions can be registered before or after anchoring. If registered before, they are
-                // pushed to this.interactionsToRegister and registered during anchoring. If after, they are
+                // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
                 // registered immediately
                 if (this._element) {
-                    if (!this.hitBox) {
-                        this.hitBox = this.addBox("hit-box");
-                        this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
+                    if (!this._hitBox) {
+                        this._hitBox = this.addBox("hit-box");
+                        this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
                     }
-                    interaction._anchor(this, this.hitBox);
+                    interaction._anchor(this, this._hitBox);
                 }
                 else {
-                    this.interactionsToRegister.push(interaction);
+                    this._interactionsToRegister.push(interaction);
                 }
                 return this;
             };
@@ -3961,7 +3961,7 @@ var Plottable;
                         return false;
                     }
                     else if (this._element == null) {
-                        return (this.cssClasses.indexOf(cssClass) !== -1);
+                        return (this._cssClasses.indexOf(cssClass) !== -1);
                     }
                     else {
                         return this._element.classed(cssClass);
@@ -3972,12 +3972,12 @@ var Plottable;
                         return this;
                     }
                     if (this._element == null) {
-                        var classIndex = this.cssClasses.indexOf(cssClass);
+                        var classIndex = this._cssClasses.indexOf(cssClass);
                         if (addClass && classIndex === -1) {
-                            this.cssClasses.push(cssClass);
+                            this._cssClasses.push(cssClass);
                         }
                         else if (!addClass && classIndex !== -1) {
-                            this.cssClasses.splice(classIndex, 1);
+                            this._cssClasses.splice(classIndex, 1);
                         }
                     }
                     else {
@@ -4056,7 +4056,7 @@ var Plottable;
              * listening to (effectively destroying it).
              */
             AbstractComponent.prototype.remove = function () {
-                this.removed = true;
+                this._removed = true;
                 this.detach();
                 Plottable.Core.ResizeBroadcaster.deregister(this);
             };
