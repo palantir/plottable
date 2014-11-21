@@ -333,7 +333,7 @@ export module Component {
       if (this._element == null) {
         throw new Error("Adding boxes before anchoring is currently disallowed");
       }
-      var parentElement = parentElement == null ? this.boxContainer : parentElement;
+      parentElement = parentElement == null ? this.boxContainer : parentElement;
       var box = parentElement.append("rect");
       if (className != null) {box.classed(className, true);};
 
