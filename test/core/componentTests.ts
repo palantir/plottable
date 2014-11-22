@@ -353,12 +353,12 @@ it("components can be offset relative to their alignment, and throw errors if th
     var c = makeFixedSizeComponent(10, 10);
     cg._addComponent(c);
     cg.renderTo(svg);
-    assert.equal(cg.height(), 10, "height() initially 10 for fixed-size component");
-    assert.equal(cg.width(), 10, "width() initially 10 for fixed-size component");
+    assert.equal(cg.height(), 300, "height() is the entire available height");
+    assert.equal(cg.width(), 400, "width() is the entire available width");
     fixComponentSize(c, 50, 50);
     c._invalidateLayout();
-    assert.equal(cg.height(), 50, "invalidateLayout propagated to parent and caused resized height");
-    assert.equal(cg.width(), 50, "invalidateLayout propagated to parent and caused resized width");
+    assert.equal(cg.height(), 300, "height() after resizing is the entire available height");
+    assert.equal(cg.width(), 400, "width() after resizing is the entire available width");
     svg.remove();
   });
 
