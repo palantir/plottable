@@ -26,9 +26,9 @@ export module Plot {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this._defaultFillColor = new Scale.Color().range()[0];
-      this._animators["bars-reset"] = new Animator.Null();
-      this._animators["bars"] = new Animator.Base();
-      this._animators["baseline"] = new Animator.Null();
+      this.animator("bars-reset", new Animator.Null());
+      this.animator("bars", new Animator.Base());
+      this.animator("baseline", new Animator.Null());
       this.baseline(0);
     }
 

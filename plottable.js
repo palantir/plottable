@@ -6327,7 +6327,6 @@ var Plottable;
                 this._projections = {};
                 this._animate = false;
                 this._animators = {};
-                this._ANIMATION_DURATION = 250; // milliseconds
                 this._animateOnNextRender = true;
                 this.clipPathEnabled = true;
                 this.classed("plot", true);
@@ -6917,8 +6916,8 @@ var Plottable;
                 this._closeDetectionRadius = 5;
                 this.classed("scatter-plot", true);
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
-                this._animators["circles-reset"] = new Plottable.Animator.Null();
-                this._animators["circles"] = new Plottable.Animator.Base().duration(250).delay(5);
+                this.animator("circles-reset", new Plottable.Animator.Null());
+                this.animator("circles", new Plottable.Animator.Base().duration(250).delay(5));
             }
             /**
              * @param {string} attrToSet One of ["x", "y", "cx", "cy", "r",
@@ -7049,15 +7048,12 @@ var Plottable;
              */
             function Grid(xScale, yScale, colorScale) {
                 _super.call(this, xScale, yScale);
-                this._animators = {
-                    "cells": new Plottable.Animator.Null()
-                };
                 this.classed("grid-plot", true);
                 // The x and y scales should render in bands with no padding
                 this._xScale.rangeType("bands", 0, 0);
                 this._yScale.rangeType("bands", 0, 0);
                 this._colorScale = colorScale;
-                this._animators["cells"] = new Plottable.Animator.Null();
+                this.animator("cells", new Plottable.Animator.Null());
             }
             Grid.prototype._addDataset = function (key, dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
@@ -7126,9 +7122,9 @@ var Plottable;
                 this._hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
-                this._animators["bars-reset"] = new Plottable.Animator.Null();
-                this._animators["bars"] = new Plottable.Animator.Base();
-                this._animators["baseline"] = new Plottable.Animator.Null();
+                this.animator("bars-reset", new Plottable.Animator.Null());
+                this.animator("bars", new Plottable.Animator.Base());
+                this.animator("baseline", new Plottable.Animator.Null());
                 this.baseline(0);
             }
             AbstractBarPlot.prototype._getDrawer = function (key) {
@@ -7607,8 +7603,8 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._hoverDetectionRadius = 15;
                 this.classed("line-plot", true);
-                this._animators["reset"] = new Plottable.Animator.Null();
-                this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
+                this.animator("reset", new Plottable.Animator.Null());
+                this.animator("main", new Plottable.Animator.Base().duration(600).easing("exp-in-out"));
                 this._defaultStrokeColor = new Plottable.Scale.Color().range()[0];
             }
             Line.prototype._setup = function () {
@@ -7755,8 +7751,8 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.classed("area-plot", true);
                 this.project("y0", 0, yScale); // default
-                this._animators["reset"] = new Plottable.Animator.Null();
-                this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
+                this.animator("reset", new Plottable.Animator.Null());
+                this.animator("main", new Plottable.Animator.Base().duration(600).easing("exp-in-out"));
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
             }
             Area.prototype._onDatasetUpdate = function () {
@@ -8206,8 +8202,8 @@ var Plottable;
             }
             StackedBar.prototype._getAnimator = function (key) {
                 if (this._animate && this._animateOnNextRender) {
-                    if (this._animators[key]) {
-                        return this._animators[key];
+                    if (this.animator(key)) {
+                        return this.animator(key);
                     }
                     else if (key === "stacked-bar") {
                         var primaryScale = this._isVertical ? this._yScale : this._xScale;

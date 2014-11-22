@@ -19,10 +19,10 @@ export module Plot {
     constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
       super(xScale, yScale);
       this.classed("line-plot", true);
-      this._animators["reset"] = new Animator.Null();
-      this._animators["main"] = new Animator.Base()
-                                            .duration(600)
-                                            .easing("exp-in-out");
+      this.animator("reset", new Animator.Null());
+      this.animator("main", new Animator.Base()
+                                         .duration(600)
+                                         .easing("exp-in-out"));
 
       this._defaultStrokeColor = new Scale.Color().range()[0];
     }
