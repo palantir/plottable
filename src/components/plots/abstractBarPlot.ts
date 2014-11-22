@@ -77,17 +77,17 @@ export module Plot {
      * @param {string} alignment The desired alignment.
      * @returns {AbstractBarPlot} The calling AbstractBarPlot.
      */
-     public barAlignment(alignment: string) {
-       var alignmentLC = alignment.toLowerCase();
-       var align2factor = (<typeof AbstractBarPlot> this.constructor)._BarAlignmentToFactor;
-       if (align2factor[alignmentLC] === undefined) {
-         throw new Error("unsupported bar alignment");
-       }
-       this._barAlignmentFactor = align2factor[alignmentLC];
+    public barAlignment(alignment: string) {
+      var alignmentLC = alignment.toLowerCase();
+      var align2factor = (<typeof AbstractBarPlot> this.constructor)._BarAlignmentToFactor;
+      if (align2factor[alignmentLC] === undefined) {
+        throw new Error("unsupported bar alignment");
+      }
+      this._barAlignmentFactor = align2factor[alignmentLC];
 
-       this._render();
-       return this;
-     }
+      this._render();
+      return this;
+    }
 
 
     private _parseExtent(input: any): Extent {

@@ -17,7 +17,6 @@ export module Component {
     private static MARGIN = 5;
 
     private colorScale: Scale.Color;
-    private maxWidth: number;
     private nRowsDrawn: number;
 
     private _toggleCallback: ToggleCallback;
