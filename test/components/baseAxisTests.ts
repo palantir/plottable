@@ -156,7 +156,7 @@ describe("BaseAxis", () => {
     scale.range([0, SVG_WIDTH]);
     var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
     var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    baseAxis._getTickValues = () => tickValues;
+    (<any> baseAxis)._getTickValues = () => tickValues;
     baseAxis.renderTo(svg);
 
     var firstTickMark = svg.selectAll("." + Plottable.Axis.AbstractAxis.END_TICK_MARK_CLASS);

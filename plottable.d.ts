@@ -1975,14 +1975,14 @@ declare module Plottable {
              * The css class applied to each tick label (the text associated with the tick).
              */
             static TICK_LABEL_CLASS: string;
-            _tickMarkContainer: D3.Selection;
-            _tickLabelContainer: D3.Selection;
-            _baseline: D3.Selection;
-            _scale: Scale.AbstractScale<any, number>;
+            protected _tickMarkContainer: D3.Selection;
+            protected _tickLabelContainer: D3.Selection;
+            protected _baseline: D3.Selection;
+            protected _scale: Scale.AbstractScale<any, number>;
             _formatter: Formatter;
             _orientation: string;
-            _computedWidth: number;
-            _computedHeight: number;
+            protected _computedWidth: number;
+            protected _computedHeight: number;
             /**
              * Constructs an axis. An axis is a wrapper around a scale for rendering.
              *
@@ -1996,31 +1996,31 @@ declare module Plottable {
              */
             constructor(scale: Scale.AbstractScale<any, number>, orientation: string, formatter?: (d: any) => string);
             remove(): void;
-            _isHorizontal(): boolean;
-            _computeWidth(): number;
-            _computeHeight(): number;
+            protected _isHorizontal(): boolean;
+            protected _computeWidth(): number;
+            protected _computeHeight(): number;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _isFixedHeight(): boolean;
             _isFixedWidth(): boolean;
-            _rescale(): void;
+            protected _rescale(): void;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             protected setup(): void;
-            _getTickValues(): any[];
+            protected _getTickValues(): any[];
             _doRender(): void;
-            _generateBaselineAttrHash(): {
+            protected _generateBaselineAttrHash(): {
                 x1: number;
                 y1: number;
                 x2: number;
                 y2: number;
             };
-            _generateTickMarkAttrHash(isEndTickMark?: boolean): {
+            protected _generateTickMarkAttrHash(isEndTickMark?: boolean): {
                 x1: any;
                 y1: any;
                 x2: any;
                 y2: any;
             };
             _invalidateLayout(): void;
-            _setDefaultAlignment(): void;
+            protected _setDefaultAlignment(): void;
             /**
              * Gets the current formatter on the axis. Data is passed through the
              * formatter before being displayed.
@@ -2063,7 +2063,7 @@ declare module Plottable {
              * @returns {BaseAxis} The calling Axis.
              */
             endTickLength(length: number): AbstractAxis;
-            _maxLabelTickLength(): number;
+            protected _maxLabelTickLength(): number;
             /**
              * Gets the padding between each tick mark and its associated label.
              *
@@ -2125,8 +2125,8 @@ declare module Plottable {
              * @returns {Axis} The calling Axis.
              */
             showEndTickLabels(show: boolean): AbstractAxis;
-            _hideEndTickLabels(): void;
-            _hideOverlappingTickLabels(): void;
+            protected _hideEndTickLabels(): void;
+            protected _hideOverlappingTickLabels(): void;
         }
     }
 }
@@ -2155,7 +2155,7 @@ declare module Plottable {
             tierConfigurations: TimeAxisTierConfiguration[];
         }
         class Time extends AbstractAxis {
-            _scale: Scale.Time;
+            protected _scale: Scale.Time;
             /**
              * Constructs a TimeAxis.
              *
@@ -2185,8 +2185,8 @@ declare module Plottable {
             orient(orientation: string): Time;
             _computeHeight(): number;
             protected setup(): void;
-            _getTickValues(): any[];
-            _measureTextHeight(): number;
+            protected _getTickValues(): any[];
+            protected _measureTextHeight(): number;
             _doRender(): Time;
         }
     }
@@ -2196,7 +2196,7 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Numeric extends AbstractAxis {
-            _scale: Scale.AbstractQuantitative<number>;
+            protected _scale: Scale.AbstractQuantitative<number>;
             /**
              * Constructs a NumericAxis.
              *
@@ -2212,8 +2212,8 @@ declare module Plottable {
             protected setup(): void;
             _computeWidth(): number;
             _computeHeight(): number;
-            _getTickValues(): any[];
-            _rescale(): void;
+            protected _getTickValues(): any[];
+            protected _rescale(): void;
             _doRender(): void;
             /**
              * Gets the tick label position relative to the tick marks.
@@ -2263,7 +2263,7 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Category extends AbstractAxis {
-            _scale: Scale.Ordinal;
+            protected _scale: Scale.Ordinal;
             /**
              * Constructs a CategoryAxis.
              *
@@ -2278,9 +2278,9 @@ declare module Plottable {
              */
             constructor(scale: Scale.Ordinal, orientation?: string, formatter?: (d: any) => string);
             protected setup(): void;
-            _rescale(): void;
+            protected _rescale(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _getTickValues(): string[];
+            protected _getTickValues(): string[];
             /**
              * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
              * @param {number} angle The angle for the ticks

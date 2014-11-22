@@ -3,7 +3,7 @@
 module Plottable {
 export module Axis {
   export class Numeric extends AbstractAxis {
-    public _scale: Scale.AbstractQuantitative<number>;
+    protected _scale: Scale.AbstractQuantitative<number>;
     private tickLabelPositioning = "center";
     // Whether or not first/last tick label will still be displayed even if
     // the label is cut off.
@@ -61,11 +61,11 @@ export module Axis {
       return this._computedHeight;
     }
 
-    public _getTickValues(): any[] {
+    protected _getTickValues(): any[] {
       return this._scale.ticks();
     }
 
-    public _rescale() {
+    protected _rescale() {
       if (!this._isSetup) {
         return;
       }
