@@ -105,7 +105,7 @@ export module Plot {
       return this;
     }
 
-    public _addDataset(key: string, dataset: Dataset) {
+    private _addDataset(key: string, dataset: Dataset) {
       if (this._key2PlotDatasetKey.has(key)) {
         this.removeDataset(key);
       };
@@ -345,7 +345,7 @@ export module Plot {
       return this._removeDataset(key);
     }
 
-    public _removeDataset(key: string): AbstractPlot {
+    private _removeDataset(key: string): AbstractPlot {
       if (key != null && this._key2PlotDatasetKey.has(key)) {
         var pdk = this._key2PlotDatasetKey.get(key);
         pdk.drawer.remove();
