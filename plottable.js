@@ -3700,16 +3700,16 @@ var Plottable;
              * @param {number} availableWidth available width for the component to render in
              * @param {number} availableHeight available height for the component to render in
              */
-            AbstractComponent.prototype._computeLayout = function (_xOrigin, _yOrigin, availableWidth, availableHeight) {
+            AbstractComponent.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
                 var _this = this;
-                if (_xOrigin == null || _yOrigin == null || availableWidth == null || availableHeight == null) {
+                if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
                     if (this._element == null) {
                         throw new Error("anchor must be called before computeLayout");
                     }
                     else if (this._isTopLevelComponent) {
                         // we are the root node, retrieve height/width from root SVG
-                        _xOrigin = 0;
-                        _yOrigin = 0;
+                        xOrigin = 0;
+                        yOrigin = 0;
                         // Set width/height to 100% if not specified, to allow accurate size calculation
                         // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
                         // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
@@ -3727,8 +3727,8 @@ var Plottable;
                         throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
                     }
                 }
-                this._xOrigin = _xOrigin;
-                this._yOrigin = _yOrigin;
+                this._xOrigin = xOrigin;
+                this._yOrigin = yOrigin;
                 var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
                 this._width = this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth;
                 this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;

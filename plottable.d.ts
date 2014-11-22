@@ -1754,7 +1754,7 @@ declare module Plottable {
              * @param {number} availableWidth available width for the component to render in
              * @param {number} availableHeight available height for the component to render in
              */
-            _computeLayout(_xOrigin?: number, _yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             _render(): void;
             _scheduleComputeLayout(): void;
             _doRender(): void;
