@@ -6,8 +6,8 @@ export module Plot {
    * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
    */
   export class Area<X> extends Line<X> {
-    private areaPath: D3.Selection;
-    private defaultFillColor: string;
+    private _areaPath: D3.Selection;
+    private _defaultFillColor: string;
 
     /**
      * Constructs an AreaPlot.
@@ -25,7 +25,7 @@ export module Plot {
       this._animators["main"]  = new Animator.Base()
                                              .duration(600)
                                              .easing("exp-in-out");
-      this.defaultFillColor = new Scale.Color().range()[0];
+      this._defaultFillColor = new Scale.Color().range()[0];
     }
 
     public _onDatasetUpdate() {
@@ -86,8 +86,8 @@ export module Plot {
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
-      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultFillColor);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultFillColor);
       return attrToProjector;
     }
   }

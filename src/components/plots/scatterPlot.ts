@@ -3,8 +3,8 @@
 module Plottable {
 export module Plot {
   export class Scatter<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
-    private closeDetectionRadius = 5;
-    private defaultFillColor: string;
+    private _closeDetectionRadius = 5;
+    private _defaultFillColor: string;
 
     /**
      * Constructs a ScatterPlot.
@@ -16,7 +16,7 @@ export module Plot {
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
       super(xScale, yScale);
       this.classed("scatter-plot", true);
-      this.defaultFillColor = new Scale.Color().range()[0];
+      this._defaultFillColor = new Scale.Color().range()[0];
 
       this._animators["circles-reset"] = new Animator.Null();
       this._animators["circles"] = new Animator.Base()
@@ -48,7 +48,7 @@ export module Plot {
       delete attrToProjector["y"];
       attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
       attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
       return attrToProjector;
     }
 
@@ -130,7 +130,7 @@ export module Plot {
     }
 
     public _doHover(p: Point): Interaction.HoverData {
-      return this._getClosestStruckPoint(p, this.closeDetectionRadius);
+      return this._getClosestStruckPoint(p, this._closeDetectionRadius);
     }
     //===== /Hover logic =====
   }
