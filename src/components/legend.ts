@@ -14,19 +14,18 @@ export module Component {
      * The css class applied to each legend row
      */
     public static SUBELEMENT_CLASS = "legend-row";
-    private static MARGIN = 5;
+    private static _MARGIN = 5;
 
-    private colorScale: Scale.Color;
-    private maxWidth: number;
-    private nRowsDrawn: number;
+    private _colorScale: Scale.Color;
+    private _nRowsDrawn: number;
 
     private _toggleCallback: ToggleCallback;
     private _hoverCallback: HoverCallback;
 
-    private datumCurrentlyFocusedOn: string;
+    private _datumCurrentlyFocusedOn: string;
 
     // this is the set of all legend domain strings that are currently toggled off
-    private isOff: D3.Set<string>;
+    private _isOff: D3.Set<string>;
 
     /**
      * Constructs a Legend.
@@ -51,8 +50,8 @@ export module Component {
 
     public remove() {
       super.remove();
-      if (this.colorScale != null) {
-        this.colorScale.broadcaster.deregisterListener(this);
+      if (this._colorScale != null) {
+        this._colorScale.broadcaster.deregisterListener(this);
       }
     }
 
@@ -82,9 +81,9 @@ export module Component {
     public toggleCallback(callback?: ToggleCallback): any {
       if (callback !== undefined) {
         this._toggleCallback = callback;
-        this.isOff = d3.set();
-        this.updateListeners();
-        this.updateClasses();
+        this._isOff = d3.set();
+        this._updateListeners();
+        this._updateClasses();
         return this;
       } else {
         return this._toggleCallback;
@@ -117,9 +116,9 @@ export module Component {
     public hoverCallback(callback?: HoverCallback): any {
       if (callback !== undefined) {
         this._hoverCallback = callback;
-        this.datumCurrentlyFocusedOn = undefined;
-        this.updateListeners();
-        this.updateClasses();
+        this._datumCurrentlyFocusedOn = undefined;
+        this._updateListeners();
+        this._updateClasses();
         return this;
       } else {
         return this._hoverCallback;
@@ -141,47 +140,47 @@ export module Component {
     public scale(scale: Scale.Color): Legend;
     public scale(scale?: Scale.Color): any {
       if (scale != null) {
-        if (this.colorScale != null) {
-          this.colorScale.broadcaster.deregisterListener(this);
+        if (this._colorScale != null) {
+          this._colorScale.broadcaster.deregisterListener(this);
         }
-        this.colorScale = scale;
-        this.colorScale.broadcaster.registerListener(this, () => this.updateDomain());
-        this.updateDomain();
+        this._colorScale = scale;
+        this._colorScale.broadcaster.registerListener(this, () => this._updateDomain());
+        this._updateDomain();
         return this;
       } else {
-        return this.colorScale;
+        return this._colorScale;
       }
     }
 
-    private updateDomain() {
+    private _updateDomain() {
       if (this._toggleCallback != null) {
-        this.isOff = _Util.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
+        this._isOff = _Util.Methods.intersection(this._isOff, d3.set(this.scale().domain()));
       }
       if (this._hoverCallback != null) {
-        this.datumCurrentlyFocusedOn = this.scale().domain().indexOf(this.datumCurrentlyFocusedOn) >= 0 ?
-          this.datumCurrentlyFocusedOn : undefined;
+        this._datumCurrentlyFocusedOn = this.scale().domain().indexOf(this._datumCurrentlyFocusedOn) >= 0 ?
+          this._datumCurrentlyFocusedOn : undefined;
       }
       this._invalidateLayout();
     }
 
     public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
-      var textHeight = this.measureTextHeight();
-      var totalNumRows = this.colorScale.domain().length;
-      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.height() / textHeight));
+      var textHeight = this._measureTextHeight();
+      var totalNumRows = this._colorScale.domain().length;
+      this._nRowsDrawn = Math.min(totalNumRows, Math.floor(this.height() / textHeight));
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var textHeight = this.measureTextHeight();
-      var totalNumRows = this.colorScale.domain().length;
-      var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend.MARGIN) / textHeight));
+      var textHeight = this._measureTextHeight();
+      var totalNumRows = this._colorScale.domain().length;
+      var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend._MARGIN) / textHeight));
       var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var measure = _Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
-      var maxWidth = _Util.Methods.max<string, number>(this.colorScale.domain(), (d: string) => measure(d).width, 0);
+      var maxWidth = _Util.Methods.max<string, number>(this._colorScale.domain(), (d: string) => measure(d).width, 0);
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
-      var desiredWidth  = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;
-      var desiredHeight = rowsICanFit === 0 ? 0 : totalNumRows * textHeight + 2 * Legend.MARGIN;
+      var desiredWidth  = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend._MARGIN;
+      var desiredHeight = rowsICanFit === 0 ? 0 : totalNumRows * textHeight + 2 * Legend._MARGIN;
       return {
         width : desiredWidth,
         height: desiredHeight,
@@ -190,7 +189,7 @@ export module Component {
       };
     }
 
-    private measureTextHeight(): number {
+    private _measureTextHeight(): number {
       // note: can't be called before anchoring atm
       var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var textHeight = _Util.Text.getTextMeasurer(fakeLegendEl.append("text"))(_Util.Text.HEIGHT_TEXT).height;
@@ -204,9 +203,9 @@ export module Component {
 
     public _doRender() {
       super._doRender();
-      var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
-      var textHeight = this.measureTextHeight();
-      var availableWidth  = this.width()  - textHeight - Legend.MARGIN;
+      var domain = this._colorScale.domain().slice(0, this._nRowsDrawn);
+      var textHeight = this._measureTextHeight();
+      var availableWidth  = this.width()  - textHeight - Legend._MARGIN;
       var r = textHeight * 0.3;
       var legend: D3.UpdateSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, (d) => d);
       var legendEnter = legend.enter()
@@ -225,7 +224,7 @@ export module Component {
         .attr("cx", textHeight / 2)
         .attr("cy", textHeight / 2)
         .attr("r",  r)
-        .attr("fill", this.colorScale._d3Scale);
+        .attr("fill", this._colorScale._d3Scale);
       legend.selectAll("g.text-container")
         .text("")
         .attr("transform", "translate(" + textHeight + ", 0)")
@@ -238,14 +237,14 @@ export module Component {
         });
 
       legend.attr("transform", (d: string) => {
-        return "translate(" + Legend.MARGIN + "," + (domain.indexOf(d) * textHeight + Legend.MARGIN) + ")";
+        return "translate(" + Legend._MARGIN + "," + (domain.indexOf(d) * textHeight + Legend._MARGIN) + ")";
       });
 
-      this.updateClasses();
-      this.updateListeners();
+      this._updateClasses();
+      this._updateListeners();
     }
 
-    private updateListeners() {
+    private _updateListeners() {
       if (!this._isSetup) {
         return;
       }
@@ -254,9 +253,9 @@ export module Component {
         // tag the element that is being hovered over with the class "focus"
         // this callback will trigger with the specific element being hovered over.
         var hoverRow = (mouseover: boolean) => (datum: string) => {
-          this.datumCurrentlyFocusedOn = mouseover ? datum : undefined;
-          this._hoverCallback(this.datumCurrentlyFocusedOn);
-          this.updateClasses();
+          this._datumCurrentlyFocusedOn = mouseover ? datum : undefined;
+          this._hoverCallback(this._datumCurrentlyFocusedOn);
+          this._updateClasses();
         };
         dataSelection.on("mouseover", hoverRow(true));
         dataSelection.on("mouseout", hoverRow(false));
@@ -268,14 +267,14 @@ export module Component {
 
       if (this._toggleCallback != null) {
         dataSelection.on("click", (datum: string) => {
-          var turningOn = this.isOff.has(datum);
+          var turningOn = this._isOff.has(datum);
           if (turningOn) {
-            this.isOff.remove(datum);
+            this._isOff.remove(datum);
           } else {
-            this.isOff.add(datum);
+            this._isOff.add(datum);
           }
           this._toggleCallback(datum, turningOn);
-          this.updateClasses();
+          this._updateClasses();
         });
       } else {
         // remove all click listeners
@@ -283,21 +282,21 @@ export module Component {
       }
     }
 
-    private updateClasses() {
+    private _updateClasses() {
       if (!this._isSetup) {
         return;
       }
       var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
       if (this._hoverCallback != null) {
-        dataSelection.classed("focus", (d: string) => this.datumCurrentlyFocusedOn === d);
-        dataSelection.classed("hover", this.datumCurrentlyFocusedOn !== undefined);
+        dataSelection.classed("focus", (d: string) => this._datumCurrentlyFocusedOn === d);
+        dataSelection.classed("hover", this._datumCurrentlyFocusedOn !== undefined);
       } else {
         dataSelection.classed("hover", false);
         dataSelection.classed("focus", false);
       }
       if (this._toggleCallback != null) {
-        dataSelection.classed("toggled-on", (d: string) => !this.isOff.has(d));
-        dataSelection.classed("toggled-off", (d: string) => this.isOff.has(d));
+        dataSelection.classed("toggled-on", (d: string) => !this._isOff.has(d));
+        dataSelection.classed("toggled-off", (d: string) => this._isOff.has(d));
       } else {
         dataSelection.classed("toggled-on", false);
         dataSelection.classed("toggled-off", false);

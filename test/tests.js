@@ -4368,9 +4368,9 @@ describe("ComponentGroups", function () {
         var cg = new Plottable.Component.Group([c1, c2, c3]);
         var svg = generateSVG(400, 400);
         cg._anchor(svg);
-        c1.addBox("test-box1");
-        c2.addBox("test-box2");
-        c3.addBox("test-box3");
+        c1._addBox("test-box1");
+        c2._addBox("test-box2");
+        c3._addBox("test-box3");
         cg._computeLayout()._render();
         var t1 = svg.select(".test-box1");
         var t2 = svg.select(".test-box2");
@@ -4387,15 +4387,15 @@ describe("ComponentGroups", function () {
         var cg = new Plottable.Component.Group([c1]);
         var svg = generateSVG(400, 400);
         cg.merge(c2)._anchor(svg);
-        c1.addBox("test-box1");
-        c2.addBox("test-box2");
+        c1._addBox("test-box1");
+        c2._addBox("test-box2");
         cg._computeLayout()._render();
         var t1 = svg.select(".test-box1");
         var t2 = svg.select(".test-box2");
         assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
         assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
         cg.merge(c3);
-        c3.addBox("test-box3");
+        c3._addBox("test-box3");
         cg._computeLayout()._render();
         var t3 = svg.select(".test-box3");
         assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
@@ -4589,14 +4589,14 @@ describe("Component behavior", function () {
             c._computeLayout();
             assert.equal(c.width(), SVG_WIDTH, "computeLayout defaulted width to svg width");
             assert.equal(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
-            assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
-            assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
+            assert.equal(c._xOrigin, 0, "xOrigin defaulted to 0");
+            assert.equal(c._yOrigin, 0, "yOrigin defaulted to 0");
             svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
             c._computeLayout();
             assert.equal(c.width(), 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
             assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
-            assert.equal(c.xOrigin, 0, "xOrigin is still 0");
-            assert.equal(c.yOrigin, 0, "yOrigin is still 0");
+            assert.equal(c._xOrigin, 0, "xOrigin is still 0");
+            assert.equal(c._yOrigin, 0, "yOrigin is still 0");
             svg.remove();
         });
         it("computeLayout works with CSS layouts", function () {
@@ -4610,20 +4610,20 @@ describe("Component behavior", function () {
             c._computeLayout();
             assert.equal(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
             assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
-            assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
-            assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
+            assert.equal(c._xOrigin, 0, "xOrigin defaulted to 0");
+            assert.equal(c._yOrigin, 0, "yOrigin defaulted to 0");
             svg.style("width", "50%").style("height", "50%");
             c._computeLayout();
             assert.equal(c.width(), 200, "computeLayout defaulted width to svg width");
             assert.equal(c.height(), 100, "computeLayout defaulted height to svg height");
-            assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
-            assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
+            assert.equal(c._xOrigin, 0, "xOrigin defaulted to 0");
+            assert.equal(c._yOrigin, 0, "yOrigin defaulted to 0");
             svg.style("width", "25%").style("height", "25%");
             c._computeLayout();
             assert.equal(c.width(), 100, "computeLayout updated width to new svg width");
             assert.equal(c.height(), 50, "computeLayout updated height to new svg height");
-            assert.equal(c.xOrigin, 0, "xOrigin is still 0");
-            assert.equal(c.yOrigin, 0, "yOrigin is still 0");
+            assert.equal(c._xOrigin, 0, "xOrigin is still 0");
+            assert.equal(c._yOrigin, 0, "yOrigin is still 0");
             // reset test page DOM
             parent.style("width", "auto");
             parent.style("height", "auto");
@@ -4724,7 +4724,7 @@ describe("Component behavior", function () {
         // IE 9 has clipPath like 'url("#clipPath")', must accomodate
         var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
         assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
-        var clipRect = c.boxContainer.select(".clip-rect");
+        var clipRect = c._boxContainer.select(".clip-rect");
         assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
         assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");
         svg.remove();
@@ -4738,9 +4738,9 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("boxes work as expected", function () {
-        assert.throws(function () { return c.addBox("pre-anchor"); }, Error, "Adding boxes before anchoring is currently disallowed");
+        assert.throws(function () { return c._addBox("pre-anchor"); }, Error, "Adding boxes before anchoring is currently disallowed");
         c.renderTo(svg);
-        c.addBox("post-anchor");
+        c._addBox("post-anchor");
         var e = c._element;
         var boxContainer = e.select(".box-container");
         var boxStrings = [".bounding-box", ".post-anchor"];
@@ -4755,7 +4755,7 @@ describe("Component behavior", function () {
     });
     it("hitboxes are created iff there are registered interactions", function () {
         function verifyHitbox(component) {
-            var hitBox = component.hitBox;
+            var hitBox = component._hitBox;
             assert.isNotNull(hitBox, "the hitbox was created");
             var hitBoxFill = hitBox.style("fill");
             var hitBoxFilled = hitBoxFill === "#ffffff" || hitBoxFill === "rgb(255, 255, 255)";
@@ -4763,7 +4763,7 @@ describe("Component behavior", function () {
             assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
         }
         c._anchor(svg);
-        assert.isUndefined(c.hitBox, "no hitBox was created when there were no registered interactions");
+        assert.isUndefined(c._hitBox, "no hitBox was created when there were no registered interactions");
         svg.remove();
         svg = generateSVG();
         c = new Plottable.Component.AbstractComponent();
@@ -4788,7 +4788,7 @@ describe("Component behavior", function () {
         c.registerInteraction(interaction1);
         c.renderTo(svg);
         c.registerInteraction(interaction2);
-        var hitNode = c.hitBox.node();
+        var hitNode = c._hitBox.node();
         assert.equal(hitBox1, hitNode, "hitBox1 was registerd");
         assert.equal(hitBox2, hitNode, "hitBox2 was registerd");
         svg.remove();
@@ -4868,7 +4868,7 @@ describe("Component behavior", function () {
         horizontalComponent.xAlign("center");
         verticalComponent.yAlign("bottom");
         assertBBoxNonIntersection(verticalComponent._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
-        assertBBoxInclusion(t.boxContainer.select(".bounding-box"), horizontalComponent._element.select(".bounding-box"));
+        assertBBoxInclusion(t._boxContainer.select(".bounding-box"), horizontalComponent._element.select(".bounding-box"));
         svg.remove();
     });
     it("Components will not translate if they are fixed width/height and request more space than offered", function () {
@@ -5017,15 +5017,15 @@ describe("Tables", function () {
     });
     it("padTableToSize works properly", function () {
         var t = new Plottable.Component.Table();
-        assert.deepEqual(t.rows, [], "the table rows is an empty list");
-        t.padTableToSize(1, 1);
-        var rows = t.rows;
+        assert.deepEqual(t._rows, [], "the table rows is an empty list");
+        t._padTableToSize(1, 1);
+        var rows = t._rows;
         var row = rows[0];
         var firstComponent = row[0];
         assert.lengthOf(rows, 1, "there is one row");
         assert.lengthOf(row, 1, "the row has one element");
         assert.isNull(firstComponent, "the row only has a null component");
-        t.padTableToSize(5, 2);
+        t._padTableToSize(5, 2);
         assert.lengthOf(rows, 5, "there are five rows");
         rows.forEach(function (r) { return assert.lengthOf(r, 2, "there are two columsn per row"); });
         assert.equal(rows[0][0], firstComponent, "the first component is unchanged");
@@ -5035,10 +5035,10 @@ describe("Tables", function () {
         var row1 = [null, c0];
         var row2 = [new Plottable.Component.AbstractComponent(), null];
         var table = new Plottable.Component.Table([row1, row2]);
-        assert.equal(table.rows[0][1], c0, "the component is in the right spot");
+        assert.equal(table._rows[0][1], c0, "the component is in the right spot");
         var c1 = new Plottable.Component.AbstractComponent();
         table.addComponent(2, 2, c1);
-        assert.equal(table.rows[2][2], c1, "the inserted component went to the right spot");
+        assert.equal(table._rows[2][2], c1, "the inserted component went to the right spot");
     });
     it("tables can be constructed by adding components in matrix style", function () {
         var table = new Plottable.Component.Table();
@@ -5046,7 +5046,7 @@ describe("Tables", function () {
         var c2 = new Plottable.Component.AbstractComponent();
         table.addComponent(0, 0, c1);
         table.addComponent(1, 1, c2);
-        var rows = table.rows;
+        var rows = table._rows;
         assert.lengthOf(rows, 2, "there are two rows");
         assert.lengthOf(rows[0], 2, "two cols in first row");
         assert.lengthOf(rows[1], 2, "two cols in second row");
@@ -5175,7 +5175,7 @@ describe("Tables", function () {
         spaceRequest = table._requestedSpace(200, 200);
         verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
     });
-    describe("table.iterateLayout works properly", function () {
+    describe("table._iterateLayout works properly", function () {
         // This test battery would have caught #405
         function verifyLayoutResult(result, cPS, rPS, gW, gH, wW, wH, id) {
             assert.deepEqual(result.colProportionalSpace, cPS, "colProportionalSpace:" + id);
@@ -5196,12 +5196,12 @@ describe("Tables", function () {
         it("iterateLayout works in the easy case where there is plenty of space and everything is satisfied on first go", function () {
             fixComponentSize(c1, 50, 50);
             fixComponentSize(c4, 20, 10);
-            var result = table.iterateLayout(500, 500);
+            var result = table._iterateLayout(500, 500);
             verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "");
         });
         it.skip("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", function () {
             fixComponentSize(c1, 490, 50);
-            var result = table.iterateLayout(500, 500);
+            var result = table._iterateLayout(500, 500);
             verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "");
         });
         it("iterateLayout works in the case where all components are fixed-size", function () {
@@ -5209,11 +5209,11 @@ describe("Tables", function () {
             fixComponentSize(c2, 50, 50);
             fixComponentSize(c3, 50, 50);
             fixComponentSize(c4, 50, 50);
-            var result = table.iterateLayout(100, 100);
+            var result = table._iterateLayout(100, 100);
             verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's exactly enough space");
-            result = table.iterateLayout(80, 80);
+            result = table._iterateLayout(80, 80);
             verifyLayoutResult(result, [0, 0], [0, 0], [40, 40], [40, 40], true, true, "..when there's not enough space");
-            result = table.iterateLayout(120, 120);
+            result = table._iterateLayout(120, 120);
             // If there is extra space in a fixed-size table, the extra space should not be allocated to proportional space
             verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's extra space");
         });
@@ -5228,9 +5228,9 @@ describe("Tables", function () {
                     wantsHeight: h < 200
                 };
             };
-            var result = table.iterateLayout(200, 200);
+            var result = table._iterateLayout(200, 200);
             verifyLayoutResult(result, [0, 0], [0], [0, 200], [200], false, false, "when there's sufficient space");
-            result = table.iterateLayout(150, 200);
+            result = table._iterateLayout(150, 200);
             verifyLayoutResult(result, [150, 0], [0], [0, 0], [200], true, false, "when there's insufficient space");
         });
     });
@@ -5245,24 +5245,24 @@ describe("Tables", function () {
         it("table._removeComponent works in basic case", function () {
             table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
             table._removeComponent(c4);
-            assert.deepEqual(table.rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
+            assert.deepEqual(table._rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
         });
         it("table._removeComponent does nothing when component is not found", function () {
             table = new Plottable.Component.Table([[c1, c2], [c3, c4]]);
             table._removeComponent(c5);
-            assert.deepEqual(table.rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
+            assert.deepEqual(table._rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
         });
         it("table._removeComponent removing component twice should have same effect as removing it once", function () {
             table = new Plottable.Component.Table([[c1, c2, c3], [c4, c5, c6]]);
             table._removeComponent(c1);
-            assert.deepEqual(table.rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
+            assert.deepEqual(table._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
             table._removeComponent(c1);
-            assert.deepEqual(table.rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
+            assert.deepEqual(table._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
         });
         it("table._removeComponent doesn't do anything weird when called with null", function () {
             table = new Plottable.Component.Table([[c1, null], [c2, c3]]);
             table._removeComponent(null);
-            assert.deepEqual(table.rows, [[c1, null], [c2, c3]]);
+            assert.deepEqual(table._rows, [[c1, null], [c2, c3]]);
         });
     });
 });
@@ -6913,7 +6913,7 @@ describe("Interactions", function () {
             ki.on(aCode, aCallback);
             ki.on(bCode, bCallback);
             component.registerInteraction(ki);
-            var $hitbox = $(component.hitBox.node());
+            var $hitbox = $(component._hitBox.node());
             $hitbox.simulate("mouseover");
             $hitbox.simulate("keydown", { keyCode: aCode });
             assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");

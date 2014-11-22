@@ -10,8 +10,8 @@ export module Component {
     public _backgroundContainer: D3.Selection;
     public _foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
-    private xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
-    private yOrigin: number;
+    private _xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
+    private _yOrigin: number;
 
     public _parent: AbstractComponentContainer;
     public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
@@ -21,18 +21,18 @@ export module Component {
     public _isSetup = false;
     public _isAnchored = false;
 
-    private hitBox: D3.Selection;
-    private interactionsToRegister: Interaction.AbstractInteraction[] = [];
-    private boxes: D3.Selection[] = [];
-    private boxContainer: D3.Selection;
-    private rootSVG: D3.Selection;
-    private isTopLevelComponent = false;
+    private _hitBox: D3.Selection;
+    private _interactionsToRegister: Interaction.AbstractInteraction[] = [];
+    private _boxes: D3.Selection[] = [];
+    private _boxContainer: D3.Selection;
+    private _rootSVG: D3.Selection;
+    private _isTopLevelComponent = false;
     private _width = 0; // Width and height of the component. Used to size the hitbox, bounding box, etc
     private _height = 0;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
-    private cssClasses: string[] = ["component"];
-    private removed = false;
+    private _cssClasses: string[] = ["component"];
+    private _removed = false;
     private _autoResize = AbstractComponent.AUTORESIZE_BY_DEFAULT;
 
     /**
@@ -41,17 +41,17 @@ export module Component {
      * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
      */
     public _anchor(element: D3.Selection) {
-      if (this.removed) {
+      if (this._removed) {
         throw new Error("Can't reuse remove()-ed components!");
       }
 
       if (element.node().nodeName === "svg") {
         // svg node gets the "plottable" CSS class
-        this.rootSVG = element;
-        this.rootSVG.classed("plottable", true);
+        this._rootSVG = element;
+        this._rootSVG.classed("plottable", true);
         // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
-        this.rootSVG.style("overflow", "visible");
-        this.isTopLevelComponent = true;
+        this._rootSVG.style("overflow", "visible");
+        this._isTopLevelComponent = true;
       }
 
       if (this._element != null) {
@@ -73,25 +73,25 @@ export module Component {
       if (this._isSetup) {
         return;
       }
-      this.cssClasses.forEach((cssClass: string) => {
+      this._cssClasses.forEach((cssClass: string) => {
         this._element.classed(cssClass, true);
       });
-      this.cssClasses = null;
+      this._cssClasses = null;
 
       this._backgroundContainer = this._element.append("g").classed("background-container", true);
       this._content = this._element.append("g").classed("content", true);
       this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
-      this.boxContainer = this._element.append("g").classed("box-container", true);
+      this._boxContainer = this._element.append("g").classed("box-container", true);
 
       if (this.clipPathEnabled) {
-        this.generateClipPath();
+        this._generateClipPath();
       };
 
-      this.addBox("bounding-box");
+      this._addBox("bounding-box");
 
-      this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
-      this.interactionsToRegister = null;
-      if (this.isTopLevelComponent) {
+      this._interactionsToRegister.forEach((r) => this.registerInteraction(r));
+      this._interactionsToRegister = null;
+      if (this._isTopLevelComponent) {
         this.autoResize(this._autoResize);
       }
       this._isSetup = true;
@@ -115,7 +115,7 @@ export module Component {
       if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
         if (this._element == null) {
           throw new Error("anchor must be called before computeLayout");
-        } else if (this.isTopLevelComponent) {
+        } else if (this._isTopLevelComponent) {
           // we are the root node, retrieve height/width from root SVG
           xOrigin = 0;
           yOrigin = 0;
@@ -123,33 +123,33 @@ export module Component {
           // Set width/height to 100% if not specified, to allow accurate size calculation
           // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
           // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
-          if (this.rootSVG.attr("width") == null) {
-            this.rootSVG.attr("width", "100%");
+          if (this._rootSVG.attr("width") == null) {
+            this._rootSVG.attr("width", "100%");
           }
-          if (this.rootSVG.attr("height") == null) {
-            this.rootSVG.attr("height", "100%");
+          if (this._rootSVG.attr("height") == null) {
+            this._rootSVG.attr("height", "100%");
           }
 
-          var elem: HTMLScriptElement = (<HTMLScriptElement> this.rootSVG.node());
+          var elem: HTMLScriptElement = (<HTMLScriptElement> this._rootSVG.node());
           availableWidth  = _Util.DOM.getElementWidth(elem);
           availableHeight = _Util.DOM.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }
       }
-      this.xOrigin = xOrigin;
-      this.yOrigin = yOrigin;
+      this._xOrigin = xOrigin;
+      this._yOrigin = yOrigin;
       var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
       this._width  = this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.width)  : availableWidth ;
       this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
 
-      var xPosition = this.xOrigin + this._xOffset;
-      var yPosition = this.yOrigin + this._yOffset;
+      var xPosition = this._xOrigin + this._xOffset;
+      var yPosition = this._yOrigin + this._yOffset;
       xPosition += (availableWidth - this.width()) * this._xAlignProportion;
       yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
 
       this._element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
+      this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
     }
 
     public _render() {
@@ -168,7 +168,7 @@ export module Component {
 
     public _invalidateLayout() {
       if (this._isAnchored && this._isSetup) {
-        if (this.isTopLevelComponent) {
+        if (this._isTopLevelComponent) {
           this._scheduleComputeLayout();
         } else {
           this._parent._invalidateLayout();
@@ -219,11 +219,11 @@ export module Component {
      * @returns {Component} The calling component.
      */
     public resize(width?: number, height?: number): AbstractComponent {
-      if (!this.isTopLevelComponent) {
+      if (!this._isTopLevelComponent) {
         throw new Error("Cannot resize on non top-level component");
       }
       if (width != null && height != null && this._isAnchored) {
-        this.rootSVG.attr({width: width, height: height});
+        this._rootSVG.attr({width: width, height: height});
       }
       this._invalidateLayout();
       return this;
@@ -245,7 +245,7 @@ export module Component {
       } else {
         Core.ResizeBroadcaster.deregister(this);
       }
-      this._autoResize = flag; // if _setup were called by constructor, this var could be removed #591
+      this._autoResize = flag; // if _setup were called by constructor, this var could be _removed #591
       return this;
     }
 
@@ -329,31 +329,31 @@ export module Component {
       return this;
     }
 
-    private addBox(className?: string, parentElement?: D3.Selection) {
+    private _addBox(className?: string, parentElement?: D3.Selection) {
       if (this._element == null) {
         throw new Error("Adding boxes before anchoring is currently disallowed");
       }
-      parentElement = parentElement == null ? this.boxContainer : parentElement;
+      parentElement = parentElement == null ? this._boxContainer : parentElement;
       var box = parentElement.append("rect");
       if (className != null) {box.classed(className, true);};
 
-      this.boxes.push(box);
+      this._boxes.push(box);
       if (this.width() != null && this.height() != null) {
         box.attr("width", this.width()).attr("height", this.height());
       }
       return box;
     }
 
-    private generateClipPath() {
+    private _generateClipPath() {
       // The clip path will prevent content from overflowing its component space.
       // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
       // They don't need the current URL in the clip path reference.
       var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
       prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
       this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this._plottableID + "\")");
-      var clipPathParent = this.boxContainer.append("clipPath")
+      var clipPathParent = this._boxContainer.append("clipPath")
                                       .attr("id", "clipPath" + this._plottableID);
-      this.addBox("clip-rect", clipPathParent);
+      this._addBox("clip-rect", clipPathParent);
     }
 
     /**
@@ -364,16 +364,16 @@ export module Component {
      */
     public registerInteraction(interaction: Interaction.AbstractInteraction) {
       // Interactions can be registered before or after anchoring. If registered before, they are
-      // pushed to this.interactionsToRegister and registered during anchoring. If after, they are
+      // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
       // registered immediately
       if (this._element) {
-        if (!this.hitBox) {
-            this.hitBox = this.addBox("hit-box");
-            this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
+        if (!this._hitBox) {
+            this._hitBox = this._addBox("hit-box");
+            this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
         }
-        interaction._anchor(this, this.hitBox);
+        interaction._anchor(this, this._hitBox);
       } else {
-        this.interactionsToRegister.push(interaction);
+        this._interactionsToRegister.push(interaction);
       }
       return this;
     }
@@ -393,7 +393,7 @@ export module Component {
         if (cssClass == null) {
           return false;
         } else if (this._element == null) {
-          return (this.cssClasses.indexOf(cssClass) !== -1);
+          return (this._cssClasses.indexOf(cssClass) !== -1);
         } else {
           return this._element.classed(cssClass);
         }
@@ -402,11 +402,11 @@ export module Component {
           return this;
         }
         if (this._element == null) {
-          var classIndex = this.cssClasses.indexOf(cssClass);
+          var classIndex = this._cssClasses.indexOf(cssClass);
           if (addClass && classIndex === -1) {
-            this.cssClasses.push(cssClass);
+            this._cssClasses.push(cssClass);
           } else if (!addClass && classIndex !== -1) {
-            this.cssClasses.splice(classIndex, 1);
+            this._cssClasses.splice(classIndex, 1);
           }
         } else {
           this._element.classed(cssClass, addClass);
@@ -488,7 +488,7 @@ export module Component {
      * listening to (effectively destroying it).
      */
     public remove() {
-      this.removed = true;
+      this._removed = true;
       this.detach();
       Core.ResizeBroadcaster.deregister(this);
     }
