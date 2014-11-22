@@ -7,10 +7,6 @@ export module Plot {
     public _xScale: Scale.Ordinal;
     public _yScale: Scale.Ordinal;
 
-    public _animators: Animator.PlotAnimatorMap = {
-      "cells" : new Animator.Null()
-    };
-
     /**
      * Constructs a GridPlot.
      *
@@ -32,7 +28,7 @@ export module Plot {
       this._yScale.rangeType("bands", 0, 0);
 
       this._colorScale = colorScale;
-      this._animators["cells"] = new Animator.Null();
+      this.animator("cells", new Animator.Null());
     }
 
     public _addDataset(key: string, dataset: Dataset) {

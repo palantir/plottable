@@ -28,8 +28,8 @@ export module Plot {
 
     public _getAnimator(key: string): Animator.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
-        if (this._animators[key]) {
-          return this._animators[key];
+        if (this.animator(key)) {
+          return this.animator(key);
         } else if (key === "stacked-bar") {
           var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
           var scaledBaseline = primaryScale.scale(this._baselineValue);

@@ -21,10 +21,10 @@ export module Plot {
       this.classed("area-plot", true);
       this.project("y0", 0, yScale); // default
 
-      this._animators["reset"] = new Animator.Null();
-      this._animators["main"]  = new Animator.Base()
-                                             .duration(600)
-                                             .easing("exp-in-out");
+      this.animator("reset", new Animator.Null());
+      this.animator("main", new Animator.Base()
+                                        .duration(600)
+                                        .easing("exp-in-out"));
       this._defaultFillColor = new Scale.Color().range()[0];
     }
 

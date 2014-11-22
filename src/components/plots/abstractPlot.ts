@@ -25,8 +25,7 @@ export module Plot {
     public _projections: { [attrToSet: string]: _Projection; } = {};
 
     public _animate: boolean = false;
-    public _animators: Animator.PlotAnimatorMap = {};
-    public _ANIMATION_DURATION = 250; // milliseconds
+    private _animators: Animator.PlotAnimatorMap = {};
     public _animateOnNextRender = true;
     private _nextSeriesIndex: number;
 

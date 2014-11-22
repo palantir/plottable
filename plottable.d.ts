@@ -2660,8 +2660,6 @@ declare module Plottable {
                 [x: string]: _Projection;
             };
             _animate: boolean;
-            _animators: Animator.PlotAnimatorMap;
-            _ANIMATION_DURATION: number;
             _animateOnNextRender: boolean;
             /**
              * Constructs a Plot.
@@ -2918,7 +2916,6 @@ declare module Plottable {
             _colorScale: Scale.AbstractScale<any, string>;
             _xScale: Scale.Ordinal;
             _yScale: Scale.Ordinal;
-            _animators: Animator.PlotAnimatorMap;
             /**
              * Constructs a GridPlot.
              *
