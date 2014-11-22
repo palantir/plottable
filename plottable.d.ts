@@ -1979,6 +1979,8 @@ declare module Plottable {
             _tickLabelContainer: D3.Selection;
             _baseline: D3.Selection;
             _scale: Scale.AbstractScale<any, number>;
+            _formatter: Formatter;
+            _orientation: string;
             _computedWidth: number;
             _computedHeight: number;
             /**

@@ -34,7 +34,7 @@ export module Axis {
     public _computeWidth() {
       var tickValues = this._getTickValues();
       var textLengths = tickValues.map((v: any) => {
-        var formattedValue = this.formatter()(v);
+        var formattedValue = this._formatter(v);
         return this.measurer(formattedValue).width;
       });
 
@@ -135,7 +135,7 @@ export module Axis {
       }
 
       var tickMarkAttrHash = this._generateTickMarkAttrHash();
-      switch(this.orient()) {
+      switch(this._orientation) {
         case "bottom":
           tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
           tickLabelAttrHash["dy"] = "0.95em";
@@ -171,7 +171,7 @@ export module Axis {
       tickLabels.style("text-anchor", tickLabelTextAnchor)
                 .style("visibility", "visible")
                 .attr(tickLabelAttrHash)
-                .text(this.formatter());
+                .text(this._formatter);
 
       var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);

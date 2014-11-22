@@ -314,7 +314,7 @@ export module Axis {
       var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
-      var yTranslate = (this.orient() === "bottom" ? (this._maxLabelTickLength() / 2 * height) :
+      var yTranslate = (this._orientation === "bottom" ? (this._maxLabelTickLength() / 2 * height) :
           (this.height() - this._maxLabelTickLength() / 2 * height + 2 * this.tickLabelPadding()));
       var textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
@@ -352,7 +352,7 @@ export module Axis {
         // thus, we convert them to values first, then do the comparison
           tickValues.map((x: Date) => x.valueOf()).indexOf(d.valueOf()) >= 0
       );
-      if (this.orient() === "top") {
+      if (this._orientation === "top") {
         height = this.height() - height;
       }
       selection.attr("y2", height);
