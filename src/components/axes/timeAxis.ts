@@ -256,8 +256,8 @@ export module Axis {
       return Math.min(this.getIntervalLength(config), this.width()) >= worstWidth;
     }
 
-    protected setup() {
-      super.setup();
+    protected _setup() {
+      super._setup();
       this.tierLabelContainers = [];
       for(var i = 0; i < Time.NUM_TIERS; ++i) {
         this.tierLabelContainers.push(this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true));
