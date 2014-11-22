@@ -98,7 +98,7 @@ describe("Plots", () => {
         assert.equal(numAttr(bar1, "x"), 300, "bar1 x is correct");
 
         assert.throws(() => barPlot.barAlignment("blargh"), Error);
-        assert.equal(barPlot._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
+        assert.equal((<any> barPlot)._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
         svg.remove();
       });
 
