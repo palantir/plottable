@@ -3151,11 +3151,11 @@ declare module Plottable {
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             protected setup(): void;
             _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
-            _getDrawer(key: string): _Drawer.Line;
-            _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
+            protected _getDrawer(key: string): _Drawer.Line;
+            protected _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
             _generateDrawSteps(): _Drawer.DrawStep[];
-            _generateAttrToProjector(): AttributeToProjector;
-            _wholeDatumAttributes(): string[];
+            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _wholeDatumAttributes(): string[];
             _getClosestWithinRange(p: Point, range: number): {
                 closestValue: any;
                 closestPoint: Point;
@@ -3183,12 +3183,12 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _onDatasetUpdate(): void;
-            _getDrawer(key: string): _Drawer.Area;
-            _updateYDomainer(): void;
+            protected _getDrawer(key: string): _Drawer.Area;
+            protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Area<X>;
-            _getResetYFunction(): _Projector;
-            _wholeDatumAttributes(): string[];
-            _generateAttrToProjector(): AttributeToProjector;
+            protected _getResetYFunction(): _Projector;
+            protected _wholeDatumAttributes(): string[];
+            protected _generateAttrToProjector(): AttributeToProjector;
         }
     }
 }

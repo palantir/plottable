@@ -39,11 +39,11 @@ export module Plot {
       return value != null && value === value;
     }
 
-     public _getDrawer(key: string) {
+    protected _getDrawer(key: string) {
       return new Plottable._Drawer.Line(key);
     }
 
-    public _getResetYFunction() {
+    protected _getResetYFunction() {
       // gets the y-value generator for the animation start point
       var yDomain = this._yScale.domain();
       var domainMax = Math.max(yDomain[0], yDomain[1]);
@@ -68,7 +68,7 @@ export module Plot {
       return drawSteps;
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       var wholeDatumAttributes = this._wholeDatumAttributes();
       var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
@@ -90,7 +90,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _wholeDatumAttributes() {
+    protected _wholeDatumAttributes() {
       return ["x", "y"];
     }
 
