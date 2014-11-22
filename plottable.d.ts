@@ -3290,11 +3290,11 @@ declare module Plottable {
              * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale?: Scale.AbstractScale<X, number>, yScale?: Scale.AbstractScale<Y, number>, isVertical?: boolean);
-            _getAnimator(key: string): Animator.PlotAnimator;
-            _generateAttrToProjector(): AttributeToProjector;
-            _generateDrawSteps(): _Drawer.DrawStep[];
+            protected _getAnimator(key: string): Animator.PlotAnimator;
+            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _generateDrawSteps(): _Drawer.DrawStep[];
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedBar<X, Y>;
-            _onDatasetUpdate(): StackedBar<X, Y>;
+            protected _onDatasetUpdate(): StackedBar<X, Y>;
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
             _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
