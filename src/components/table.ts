@@ -23,8 +23,6 @@ export module Component {
     private colPadding = 0;
 
     private rows: AbstractComponent[][] = [];
-    private minimumHeights: number[];
-    private minimumWidths: number[];
 
     private rowWeights: number[] = [];
     private colWeights: number[] = [];
@@ -291,15 +289,15 @@ export module Component {
      *
      * A common case would be to have one row take up 2/3rds of the space,
      * and the other row take up 1/3rd.
-     * 
+     *
      * Example:
-     * 
+     *
      * ```JavaScript
      * plot = new Plottable.Component.Table([
      *  [row1],
      *  [row2]
      * ]);
-     * 
+     *
      * // assign twice as much space to the first row
      * plot
      *  .rowWeight(0, 2)
@@ -319,7 +317,7 @@ export module Component {
     /**
      * Sets the layout weight of a particular column.
      * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
-     * 
+     *
      * Please see `rowWeight` docs for an example.
      *
      * @param {number} index The index of the column.
