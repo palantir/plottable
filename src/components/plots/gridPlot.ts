@@ -4,8 +4,8 @@ module Plottable {
 export module Plot {
   export class Grid extends AbstractXYPlot<string,string> {
     public _colorScale: Scale.AbstractScale<any, string>;
-    public _xScale: Scale.Ordinal;
-    public _yScale: Scale.Ordinal;
+    protected _xScale: Scale.Ordinal;
+    protected _yScale: Scale.Ordinal;
 
     public _animators: Animator.PlotAnimatorMap = {
       "cells" : new Animator.Null()
@@ -43,7 +43,7 @@ export module Plot {
       super._addDataset(key, dataset);
     }
 
-    public _getDrawer(key: string) {
+    protected _getDrawer(key: string) {
       return new _Drawer.Element(key).svgElement("rect");
     }
 
@@ -59,7 +59,7 @@ export module Plot {
       return this;
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       var xStep = this._xScale.rangeBand();
       var yStep = this._yScale.rangeBand();
@@ -68,7 +68,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): _Drawer.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
     }
   }

@@ -2914,8 +2914,8 @@ declare module Plottable {
     module Plot {
         class Grid extends AbstractXYPlot<string, string> {
             _colorScale: Scale.AbstractScale<any, string>;
-            _xScale: Scale.Ordinal;
-            _yScale: Scale.Ordinal;
+            protected _xScale: Scale.Ordinal;
+            protected _yScale: Scale.Ordinal;
             _animators: Animator.PlotAnimatorMap;
             /**
              * Constructs a GridPlot.
@@ -2931,14 +2931,14 @@ declare module Plottable {
              */
             constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>);
             _addDataset(key: string, dataset: Dataset): void;
-            _getDrawer(key: string): _Drawer.Element;
+            protected _getDrawer(key: string): _Drawer.Element;
             /**
              * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
              * the data should return a valid CSS color.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Grid;
-            _generateAttrToProjector(): AttributeToProjector;
-            _generateDrawSteps(): _Drawer.DrawStep[];
+            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _generateDrawSteps(): _Drawer.DrawStep[];
         }
     }
 }
