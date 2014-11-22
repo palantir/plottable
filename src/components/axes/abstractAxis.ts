@@ -125,8 +125,8 @@ export module Axis {
       }
     }
 
-    protected setup() {
-      super.setup();
+    protected _setup() {
+      super._setup();
       this._tickMarkContainer = this._content.append("g")
                                             .classed(AbstractAxis.TICK_MARK_CLASS + "-container", true);
       this._tickLabelContainer = this._content.append("g")

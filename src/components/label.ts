@@ -73,8 +73,8 @@ export module Component {
       };
     }
 
-    protected setup() {
-      super.setup();
+    protected _setup() {
+      super._setup();
       this.textContainer = this._content.append("g");
       this.measurer = _Util.Text.getTextMeasurer(this.textContainer.append("text"));
       this.text(this._text);

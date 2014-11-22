@@ -27,8 +27,8 @@ export module Plot {
       this._defaultStrokeColor = new Scale.Color().range()[0];
     }
 
-    protected setup() {
-      super.setup();
+    protected _setup() {
+      super._setup();
       this._hoverTarget = this._foregroundContainer.append("circle")
                                           .classed("hover-target", true)
                                           .style("visibility", "hidden");
