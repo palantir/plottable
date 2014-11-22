@@ -5,9 +5,9 @@ export module Plot {
   export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public static _DEFAULT_WIDTH = 10;
-    public _baseline: D3.Selection;
-    public _baselineValue: number;
-    public _barAlignmentFactor = 0.5;
+    private _baseline: D3.Selection;
+    private _baselineValue: number;
+    private _barAlignmentFactor = 0.5;
     public _isVertical: boolean;
     private _barLabelFormatter: Formatter = Formatters.identity();
     private _barLabelsEnabled = false;

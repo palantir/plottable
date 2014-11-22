@@ -8199,10 +8199,9 @@ var Plottable;
             function StackedBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
                 this._isVertical = isVertical; // Has to be set before super()
-                this._baselineValue = 0;
                 _super.call(this, xScale, yScale);
                 this.classed("bar-plot", true);
-                this.baseline(this._baselineValue);
+                this.baseline(0);
                 this._isVertical = isVertical;
             }
             StackedBar.prototype._getAnimator = function (key) {
@@ -8212,7 +8211,7 @@ var Plottable;
                     }
                     else if (key === "stacked-bar") {
                         var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                        var scaledBaseline = primaryScale.scale(this._baselineValue);
+                        var scaledBaseline = primaryScale.scale(this.baseline());
                         return new Plottable.Animator.MovingRect(scaledBaseline, this._isVertical);
                     }
                 }

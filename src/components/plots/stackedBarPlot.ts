@@ -3,9 +3,6 @@
 module Plottable {
 export module Plot {
   export class StackedBar<X,Y> extends AbstractBarPlot<X, Y> {
-    public _baselineValue: number;
-    public _baseline: D3.Selection;
-    public _barAlignmentFactor: number;
 
     /**
      * Constructs a StackedBar plot.
@@ -18,11 +15,10 @@ export module Plot {
      */
     constructor(xScale?: Scale.AbstractScale<X,number>, yScale?: Scale.AbstractScale<Y,number>, isVertical = true) {
       this._isVertical = isVertical; // Has to be set before super()
-      this._baselineValue = 0;
       super(xScale, yScale);
       this.classed("bar-plot", true);
 
-      this.baseline(this._baselineValue);
+      this.baseline(0);
       this._isVertical = isVertical;
     }
 
@@ -32,7 +28,7 @@ export module Plot {
           return this._animators[key];
         } else if (key === "stacked-bar") {
           var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-          var scaledBaseline = primaryScale.scale(this._baselineValue);
+          var scaledBaseline = primaryScale.scale(this.baseline());
           return new Animator.MovingRect(scaledBaseline, this._isVertical);
         }
       }

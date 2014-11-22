@@ -2953,9 +2953,6 @@ declare module Plottable {
                 [x: string]: number;
             };
             static _DEFAULT_WIDTH: number;
-            _baseline: D3.Selection;
-            _baselineValue: number;
-            _barAlignmentFactor: number;
             _isVertical: boolean;
             /**
              * Constructs a BarPlot.
@@ -3280,9 +3277,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class StackedBar<X, Y> extends AbstractBarPlot<X, Y> {
-            _baselineValue: number;
-            _baseline: D3.Selection;
-            _barAlignmentFactor: number;
             /**
              * Constructs a StackedBar plot.
              * A StackedBarPlot is a plot that plots several bar plots stacking on top of each
