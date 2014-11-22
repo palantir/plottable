@@ -6333,7 +6333,7 @@ var Plottable;
                 this.classed("plot", true);
                 this._key2PlotDatasetKey = d3.map();
                 this._datasetKeysInOrder = [];
-                this.nextSeriesIndex = 0;
+                this._nextSeriesIndex = 0;
             }
             AbstractPlot.prototype._anchor = function (element) {
                 _super.prototype._anchor.call(this, element);
@@ -6368,7 +6368,7 @@ var Plottable;
                 if (typeof (keyOrDataset) === "string" && keyOrDataset[0] === "_") {
                     Plottable._Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
                 }
-                var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
+                var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this._nextSeriesIndex++;
                 var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
                 dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
                 this._addDataset(key, dataset);
@@ -6471,7 +6471,7 @@ var Plottable;
             };
             AbstractPlot.prototype._doRender = function () {
                 if (this._isAnchored) {
-                    this.paint();
+                    this._paint();
                     this._dataChanged = false;
                     this._animateOnNextRender = false;
                 }
@@ -6606,7 +6606,7 @@ var Plottable;
                     datasetKey: key
                 };
             };
-            AbstractPlot.prototype.paint = function () {
+            AbstractPlot.prototype._paint = function () {
                 var _this = this;
                 var drawSteps = this._generateDrawSteps();
                 var dataToDraw = this._getDataToDraw();
@@ -6652,7 +6652,7 @@ var Plottable;
              */
             function Pie() {
                 _super.call(this);
-                this.colorScale = new Plottable.Scale.Color();
+                this._colorScale = new Plottable.Scale.Color();
                 this.classed("pie-plot", true);
             }
             Pie.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
@@ -6671,7 +6671,7 @@ var Plottable;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
                 attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
-                var defaultFillFunction = function (d, i) { return _this.colorScale.scale(String(i)); };
+                var defaultFillFunction = function (d, i) { return _this._colorScale.scale(String(i)); };
                 attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
                 return attrToProjector;
             };
@@ -6720,9 +6720,9 @@ var Plottable;
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._updateXDomainer();
-                xScale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this.adjustYDomainOnChangeFromX(); });
+                xScale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this._adjustYDomainOnChangeFromX(); });
                 this._updateYDomainer();
-                yScale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this.adjustXDomainOnChangeFromY(); });
+                yScale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this._adjustXDomainOnChangeFromY(); });
             }
             /**
              * @param {string} attrToSet One of ["x", "y"] which determines the point's
@@ -6738,7 +6738,7 @@ var Plottable;
                     }
                     this._xScale = scale;
                     this._updateXDomainer();
-                    scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this.adjustYDomainOnChangeFromX(); });
+                    scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this._adjustYDomainOnChangeFromX(); });
                 }
                 if (attrToSet === "y" && scale) {
                     if (this._yScale) {
@@ -6746,7 +6746,7 @@ var Plottable;
                     }
                     this._yScale = scale;
                     this._updateYDomainer();
-                    scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this.adjustXDomainOnChangeFromY(); });
+                    scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this._adjustXDomainOnChangeFromY(); });
                 }
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
@@ -6771,7 +6771,7 @@ var Plottable;
              */
             AbstractXYPlot.prototype.automaticallyAdjustYScaleOverVisiblePoints = function (autoAdjustment) {
                 this._autoAdjustYScaleDomain = autoAdjustment;
-                this.adjustYDomainOnChangeFromX();
+                this._adjustYDomainOnChangeFromX();
                 return this;
             };
             /**
@@ -6784,7 +6784,7 @@ var Plottable;
              */
             AbstractXYPlot.prototype.automaticallyAdjustXScaleOverVisiblePoints = function (autoAdjustment) {
                 this._autoAdjustXScaleDomain = autoAdjustment;
-                this.adjustXDomainOnChangeFromY();
+                this._adjustXDomainOnChangeFromY();
                 return this;
             };
             AbstractXYPlot.prototype._generateAttrToProjector = function () {
@@ -6835,27 +6835,27 @@ var Plottable;
                     this._yScale.autoDomain();
                 }
             };
-            AbstractXYPlot.prototype.adjustYDomainOnChangeFromX = function () {
+            AbstractXYPlot.prototype._adjustYDomainOnChangeFromX = function () {
                 if (!this._projectorsReady()) {
                     return;
                 }
                 if (this._autoAdjustYScaleDomain) {
-                    this.adjustDomainToVisiblePoints(this._xScale, this._yScale, true);
+                    this._adjustDomainToVisiblePoints(this._xScale, this._yScale, true);
                 }
             };
-            AbstractXYPlot.prototype.adjustXDomainOnChangeFromY = function () {
+            AbstractXYPlot.prototype._adjustXDomainOnChangeFromY = function () {
                 if (!this._projectorsReady()) {
                     return;
                 }
                 if (this._autoAdjustXScaleDomain) {
-                    this.adjustDomainToVisiblePoints(this._yScale, this._xScale, false);
+                    this._adjustDomainToVisiblePoints(this._yScale, this._xScale, false);
                 }
             };
-            AbstractXYPlot.prototype.adjustDomainToVisiblePoints = function (fromScale, toScale, fromX) {
+            AbstractXYPlot.prototype._adjustDomainToVisiblePoints = function (fromScale, toScale, fromX) {
                 if (toScale instanceof Plottable.Scale.AbstractQuantitative) {
                     var toScaleQ = toScale;
-                    var normalizedData = this.normalizeDatasets(fromX);
-                    var adjustedDomain = this.adjustDomainOverVisiblePoints(normalizedData, fromScale.domain());
+                    var normalizedData = this._normalizeDatasets(fromX);
+                    var adjustedDomain = this._adjustDomainOverVisiblePoints(normalizedData, fromScale.domain());
                     if (adjustedDomain.length === 0) {
                         return;
                     }
@@ -6863,7 +6863,7 @@ var Plottable;
                     toScaleQ.domain(adjustedDomain);
                 }
             };
-            AbstractXYPlot.prototype.normalizeDatasets = function (fromX) {
+            AbstractXYPlot.prototype._normalizeDatasets = function (fromX) {
                 var _this = this;
                 var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
                 var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
@@ -6875,7 +6875,7 @@ var Plottable;
                     });
                 }));
             };
-            AbstractXYPlot.prototype.adjustDomainOverVisiblePoints = function (values, fromDomain) {
+            AbstractXYPlot.prototype._adjustDomainOverVisiblePoints = function (values, fromDomain) {
                 var bVals = values.filter(function (v) { return fromDomain[0] <= v.a && v.a <= fromDomain[1]; }).map(function (v) { return v.b; });
                 var retVal = [];
                 if (bVals.length !== 0) {
@@ -6914,9 +6914,9 @@ var Plottable;
              */
             function Scatter(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this.closeDetectionRadius = 5;
+                this._closeDetectionRadius = 5;
                 this.classed("scatter-plot", true);
-                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
+                this._defaultFillColor = new Plottable.Scale.Color().range()[0];
                 this._animators["circles-reset"] = new Plottable.Animator.Null();
                 this._animators["circles"] = new Plottable.Animator.Base().duration(250).delay(5);
             }
@@ -6942,7 +6942,7 @@ var Plottable;
                 delete attrToProjector["y"];
                 attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
-                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {
@@ -7014,7 +7014,7 @@ var Plottable;
                 // no-op
             };
             Scatter.prototype._doHover = function (p) {
-                return this._getClosestStruckPoint(p, this.closeDetectionRadius);
+                return this._getClosestStruckPoint(p, this._closeDetectionRadius);
             };
             return Scatter;
         })(Plot.AbstractXYPlot);
@@ -7123,9 +7123,9 @@ var Plottable;
                 this._barLabelFormatter = Plottable.Formatters.identity();
                 this._barLabelsEnabled = false;
                 this._hoverMode = "point";
-                this.hideBarsIfAnyAreTooWide = true;
+                this._hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
-                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
+                this._defaultFillColor = new Plottable.Scale.Color().range()[0];
                 this._animators["bars-reset"] = new Plottable.Animator.Null();
                 this._animators["bars"] = new Plottable.Animator.Base();
                 this._animators["baseline"] = new Plottable.Animator.Null();
@@ -7166,7 +7166,7 @@ var Plottable;
                 this._render();
                 return this;
             };
-            AbstractBarPlot.prototype.parseExtent = function (input) {
+            AbstractBarPlot.prototype._parseExtent = function (input) {
                 if (typeof (input) === "number") {
                     return { min: input, max: input };
                 }
@@ -7210,8 +7210,8 @@ var Plottable;
                     return d3.select();
                 }
                 var bars = [];
-                var xExtent = this.parseExtent(xValOrExtent);
-                var yExtent = this.parseExtent(yValOrExtent);
+                var xExtent = this._parseExtent(xValOrExtent);
+                var yExtent = this._parseExtent(yValOrExtent);
                 // the SVGRects are positioned with sub-pixel accuracy (the default unit
                 // for the x, y, height & width attributes), but user selections (e.g. via
                 // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
@@ -7293,7 +7293,7 @@ var Plottable;
                 var attrToProjector = this._generateAttrToProjector();
                 var dataToDraw = this._getDataToDraw();
                 this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).plotMetadata); });
-                if (this.hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._someLabelsTooWide; })) {
+                if (this._hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._someLabelsTooWide; })) {
                     drawers.forEach(function (d) { return d.removeLabels(); });
                 }
             };
@@ -7353,7 +7353,7 @@ var Plottable;
                     };
                     attrToProjector["positive"] = function (d, i, u, m) { return originalPositionFn(d, i, u, m) <= scaledBaseline; };
                 }
-                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
                 return attrToProjector;
             };
             /**
@@ -7418,7 +7418,7 @@ var Plottable;
                 this._hoverMode = modeLC;
                 return this;
             };
-            AbstractBarPlot.prototype.clearHoverSelection = function () {
+            AbstractBarPlot.prototype._clearHoverSelection = function () {
                 this._getDrawersInOrder().forEach(function (d, i) {
                     d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
                 });
@@ -7428,7 +7428,7 @@ var Plottable;
                 // no-op
             };
             AbstractBarPlot.prototype._hoverOutComponent = function (p) {
-                this.clearHoverSelection();
+                this._clearHoverSelection();
             };
             // HACKHACK User and plot metadata should be applied here - #1306.
             AbstractBarPlot.prototype._doHover = function (p) {
@@ -7452,7 +7452,7 @@ var Plottable;
                     bars.classed({ "hovered": true, "not-hovered": false });
                 }
                 else {
-                    this.clearHoverSelection();
+                    this._clearHoverSelection();
                     return {
                         data: null,
                         pixelPositions: null,
@@ -7605,15 +7605,15 @@ var Plottable;
              */
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this.hoverDetectionRadius = 15;
+                this._hoverDetectionRadius = 15;
                 this.classed("line-plot", true);
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
-                this.defaultStrokeColor = new Plottable.Scale.Color().range()[0];
+                this._defaultStrokeColor = new Plottable.Scale.Color().range()[0];
             }
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this.hoverTarget = this._foregroundContainer.append("circle").classed("hover-target", true).style("visibility", "hidden");
+                this._hoverTarget = this._foregroundContainer.append("circle").classed("hover-target", true).style("visibility", "hidden");
             };
             Line.prototype._rejectNullsAndNaNs = function (d, i, userMetdata, plotMetadata, accessor) {
                 var value = accessor(d, i, userMetdata, plotMetadata);
@@ -7656,7 +7656,7 @@ var Plottable;
                 var xFunction = attrToProjector["x"];
                 var yFunction = attrToProjector["y"];
                 attrToProjector["defined"] = function (d, i, u, m) { return _this._rejectNullsAndNaNs(d, i, u, m, xFunction) && _this._rejectNullsAndNaNs(d, i, u, m, yFunction); };
-                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultStrokeColor);
+                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
                 attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
                 return attrToProjector;
             };
@@ -7702,7 +7702,7 @@ var Plottable;
                 // no-op
             };
             Line.prototype._doHover = function (p) {
-                var closestInfo = this._getClosestWithinRange(p, this.hoverDetectionRadius);
+                var closestInfo = this._getClosestWithinRange(p, this._hoverDetectionRadius);
                 var closestValue = closestInfo.closestValue;
                 if (closestValue === undefined) {
                     return {
@@ -7712,14 +7712,14 @@ var Plottable;
                     };
                 }
                 var closestPoint = closestInfo.closestPoint;
-                this.hoverTarget.attr({
+                this._hoverTarget.attr({
                     "cx": closestInfo.closestPoint.x,
                     "cy": closestInfo.closestPoint.y
                 });
                 return {
                     data: [closestValue],
                     pixelPositions: [closestPoint],
-                    selection: this.hoverTarget
+                    selection: this._hoverTarget
                 };
             };
             return Line;
@@ -7757,7 +7757,7 @@ var Plottable;
                 this.project("y0", 0, yScale); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
-                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
+                this._defaultFillColor = new Plottable.Scale.Color().range()[0];
             }
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
@@ -7811,8 +7811,8 @@ var Plottable;
             Area.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
-                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
-                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultFillColor);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultFillColor);
                 return attrToProjector;
             };
             return Area;
@@ -7853,7 +7853,7 @@ var Plottable;
             ClusteredBar.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 // the width is constant, so set the inner scale range to that
-                var innerScale = this.makeInnerScale();
+                var innerScale = this._makeInnerScale();
                 var innerWidthF = function (d, i) { return innerScale.rangeBand(); };
                 var heightF = attrToProjector["height"];
                 attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
@@ -7866,7 +7866,7 @@ var Plottable;
             ClusteredBar.prototype._getDataToDraw = function () {
                 var _this = this;
                 var accessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
-                var innerScale = this.makeInnerScale();
+                var innerScale = this._makeInnerScale();
                 var clusters = d3.map();
                 this._datasetKeysInOrder.forEach(function (key) {
                     var dataset = _this._key2PlotDatasetKey.get(key).dataset;
@@ -7882,7 +7882,7 @@ var Plottable;
                 });
                 return clusters;
             };
-            ClusteredBar.prototype.makeInnerScale = function () {
+            ClusteredBar.prototype._makeInnerScale = function () {
                 var innerScale = new Plottable.Scale.Ordinal();
                 innerScale.domain(this._datasetKeysInOrder);
                 // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
@@ -7923,7 +7923,7 @@ var Plottable;
             __extends(AbstractStacked, _super);
             function AbstractStacked() {
                 _super.apply(this, arguments);
-                this.stackedExtent = [0, 0];
+                this._stackedExtent = [0, 0];
             }
             AbstractStacked.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
@@ -7973,7 +7973,7 @@ var Plottable;
                         return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
                     }, 0);
                 }, 0);
-                this.stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
+                this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
             };
             /**
              * Feeds the data through d3's stack layout function which will calculate
@@ -8056,8 +8056,8 @@ var Plottable;
                 if (!primaryScale) {
                     return;
                 }
-                if (this._isAnchored && this.stackedExtent.length > 0) {
-                    primaryScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+                if (this._isAnchored && this._stackedExtent.length > 0) {
+                    primaryScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
                 }
                 else {
                     primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
@@ -8100,7 +8100,7 @@ var Plottable;
                 this._baselineValue = 0;
                 this.classed("area-plot", true);
                 this._isVertical = true;
-                this.defaultFillColor = new Plottable.Scale.Color().range()[0];
+                this._defaultFillColor = new Plottable.Scale.Color().range()[0];
             }
             StackedArea.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Area(key).drawLine(false);
@@ -8162,7 +8162,7 @@ var Plottable;
                 var yAccessor = this._projections["y"].accessor;
                 attrToProjector["y"] = function (d, i, u, m) { return _this._yScale.scale(+yAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 attrToProjector["y0"] = function (d, i, u, m) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
                 return attrToProjector;
             };
             StackedArea.prototype._wholeDatumAttributes = function () {
