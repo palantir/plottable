@@ -3,7 +3,7 @@
 module Plottable {
 export module Axis {
   export class Category extends AbstractAxis {
-    public _scale: Scale.Ordinal;
+    protected _scale: Scale.Ordinal;
     private _tickLabelAngle = 0;
     private measurer: _Util.Text.CachingCharacterMeasurer;
 
@@ -29,7 +29,7 @@ export module Axis {
       this.measurer = new _Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
     }
 
-    public _rescale() {
+    protected _rescale() {
       return this._invalidateLayout();
     }
 
@@ -57,7 +57,7 @@ export module Axis {
       };
     }
 
-    public _getTickValues(): string[] {
+    protected _getTickValues(): string[] {
       return this._scale.domain();
     }
 
