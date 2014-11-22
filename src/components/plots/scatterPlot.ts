@@ -36,11 +36,11 @@ export module Plot {
       return this;
     }
 
-    public _getDrawer(key: string) {
+    protected _getDrawer(key: string) {
       return new Plottable._Drawer.Element(key).svgElement("circle");
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       attrToProjector["cx"] = attrToProjector["x"];
       delete attrToProjector["x"];
@@ -52,7 +52,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): _Drawer.DrawStep[] {
       var drawSteps: _Drawer.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
@@ -65,7 +65,7 @@ export module Plot {
     }
 
     // HACKHACK User and plot metada should be applied - #1306.
-    public _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
+    protected _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
       var drawers = <_Drawer.Element[]> this._getDrawersInOrder();
       var attrToProjector = this._generateAttrToProjector();
       var getDistSq = (d: any, i: number) => {

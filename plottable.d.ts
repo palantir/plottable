@@ -2898,10 +2898,10 @@ declare module Plottable {
              * radius, and "fill" is the CSS color of the datum.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Scatter<X, Y>;
-            _getDrawer(key: string): _Drawer.Element;
-            _generateAttrToProjector(): AttributeToProjector;
-            _generateDrawSteps(): _Drawer.DrawStep[];
-            _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData;
+            protected _getDrawer(key: string): _Drawer.Element;
+            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _generateDrawSteps(): _Drawer.DrawStep[];
+            protected _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
