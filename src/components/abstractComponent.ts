@@ -106,8 +106,8 @@ export module Component {
      * If no parameters are supplied and the component is a root node,
      * they are inferred from the size of the component's element.
      *
-     * @param {number} _xOrigin x-coordinate of the origin of the component
-     * @param {number} _yOrigin y-coordinate of the origin of the component
+     * @param {number} xOrigin x-coordinate of the origin of the component
+     * @param {number} yOrigin y-coordinate of the origin of the component
      * @param {number} availableWidth available width for the component to render in
      * @param {number} availableHeight available height for the component to render in
      */
