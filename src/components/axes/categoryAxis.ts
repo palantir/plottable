@@ -3,7 +3,7 @@
 module Plottable {
 export module Axis {
   export class Category extends AbstractAxis {
-    public _scale: Scale.Ordinal;
+    protected _scale: Scale.Ordinal;
     private _tickLabelAngle = 0;
     private measurer: _Util.Text.CachingCharacterMeasurer;
 
@@ -29,7 +29,7 @@ export module Axis {
       this.measurer = new _Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
     }
 
-    public _rescale() {
+    protected _rescale() {
       return this._invalidateLayout();
     }
 
@@ -57,7 +57,7 @@ export module Axis {
       };
     }
 
-    public _getTickValues(): string[] {
+    protected _getTickValues(): string[] {
       return this._scale.domain();
     }
 
@@ -132,7 +132,7 @@ export module Axis {
         var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
 
         var textWriteResult: _Util.Text.IWriteTextResult;
-        var formatter = self._formatter;
+        var formatter = self.formatter();
 
         if (draw) {
           var d3this = d3.select(this);
@@ -140,8 +140,8 @@ export module Axis {
           var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
           textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation(), {
                                                     g: d3this,
-                                                    xAlign: xAlign[self._orientation],
-                                                    yAlign: yAlign[self._orientation]
+                                                    xAlign: xAlign[self.orient()],
+                                                    yAlign: yAlign[self.orient()]
           });
         } else {
           textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation());
@@ -178,8 +178,8 @@ export module Axis {
       this.drawTicks(this.width(), this.height(), this._scale, tickLabels);
       var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
-      var xTranslate = this._orientation === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      var yTranslate = this._orientation === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       _Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       _Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
       return this;

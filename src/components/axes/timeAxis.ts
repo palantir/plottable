@@ -26,7 +26,7 @@ export module Axis {
 
   export class Time extends AbstractAxis {
 
-    public _scale: Scale.Time;
+    protected _scale: Scale.Time;
 
     /*
      * Default possible axis configurations.
@@ -269,14 +269,14 @@ export module Axis {
       return this._scale._tickInterval(config.interval, config.step);
     }
 
-    public _getTickValues(): any[] {
+    protected _getTickValues(): any[] {
       return this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations.reduce(
           (ticks: any[], config: TimeAxisTierConfiguration) => ticks.concat(this.getTickIntervalValues(config)),
           []
         );
     }
 
-    public _measureTextHeight(): number {
+    protected _measureTextHeight(): number {
       return this.measurer(_Util.Text.HEIGHT_TEXT).height;
     }
 
@@ -314,7 +314,7 @@ export module Axis {
       var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
-      var yTranslate = (this._orientation === "bottom" ? (this._maxLabelTickLength() / 2 * height) :
+      var yTranslate = (this.orient() === "bottom" ? (this._maxLabelTickLength() / 2 * height) :
           (this.height() - this._maxLabelTickLength() / 2 * height + 2 * this.tickLabelPadding()));
       var textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
@@ -352,7 +352,7 @@ export module Axis {
         // thus, we convert them to values first, then do the comparison
           tickValues.map((x: Date) => x.valueOf()).indexOf(d.valueOf()) >= 0
       );
-      if (this._orientation === "top") {
+      if (this.orient() === "top") {
         height = this.height() - height;
       }
       selection.attr("y2", height);
