@@ -16,7 +16,7 @@ describe("Plots", () => {
       piePlot.addDataset(simpleDataset);
       piePlot.project("value", "value");
       piePlot.renderTo(svg);
-      renderArea = piePlot._renderArea;
+      renderArea = (<any> piePlot)._renderArea;
     });
 
     it("sectors divided evenly", () => {

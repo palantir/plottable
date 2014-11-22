@@ -33,7 +33,7 @@ describe("Plots", () => {
               .project("stroke", colorAccessor)
               .addDataset(simpleDataset)
               .renderTo(svg);
-      renderArea = linePlot._renderArea;
+      renderArea = (<any> linePlot)._renderArea;
     });
 
     it("draws a line correctly", () => {

@@ -20,7 +20,7 @@ describe("Plots", () => {
                                   .project("y", yAccessor);
       plot.addDataset(dataset);
       plot.renderTo(svg);
-      var circles = plot._renderArea.selectAll("circle");
+      var circles = (<any> plot)._renderArea.selectAll("circle");
       var c1 = d3.select(circles[0][0]);
       var c2 = d3.select(circles[0][1]);
       assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
@@ -102,7 +102,7 @@ describe("Plots", () => {
         // creates a function that verifies that circles are drawn properly after accounting for svg transform
         // and then modifies circlesInArea to contain the number of circles that were discovered in the plot area
         circlesInArea = 0;
-        var renderArea = circlePlot._renderArea;
+        var renderArea = (<any> circlePlot)._renderArea;
         var renderAreaTransform = d3.transform(renderArea.attr("transform"));
         var translate = renderAreaTransform.translate;
         var scale     = renderAreaTransform.scale;
@@ -138,7 +138,7 @@ describe("Plots", () => {
       it("setup is handled properly", () => {
         assert.deepEqual(xScale.range(), [0, SVG_WIDTH], "xScale range was set by the renderer");
         assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "yScale range was set by the renderer");
-        circlePlot._renderArea.selectAll("circle").each(getCirclePlotVerifier());
+        (<any> circlePlot)._renderArea.selectAll("circle").each(getCirclePlotVerifier());
         assert.equal(circlesInArea, 10, "10 circles were drawn");
         svg.remove();
       });
@@ -146,7 +146,7 @@ describe("Plots", () => {
       it("rendering is idempotent", () => {
         circlePlot._render();
         circlePlot._render();
-        circlePlot._renderArea.selectAll("circle").each(getCirclePlotVerifier());
+        (<any> circlePlot)._renderArea.selectAll("circle").each(getCirclePlotVerifier());
         assert.equal(circlesInArea, 10, "10 circles were drawn");
         svg.remove();
       });
@@ -160,7 +160,7 @@ describe("Plots", () => {
         });
 
         it("the circles re-rendered properly", () => {
-          var renderArea = circlePlot._renderArea;
+          var renderArea = (<any> circlePlot)._renderArea;
           var circles = renderArea.selectAll("circle");
           circles.each(getCirclePlotVerifier());
           assert.equal(circlesInArea, 4, "four circles were found in the render area");

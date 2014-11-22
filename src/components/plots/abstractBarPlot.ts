@@ -3,12 +3,12 @@
 module Plottable {
 export module Plot {
   export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
-    public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
-    public static _DEFAULT_WIDTH = 10;
+    protected static _BarAlignmentToFactor: {[alignment: string]: number} = {};
+    protected static _DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
     public _baselineValue: number;
     public _barAlignmentFactor = 0.5;
-    public _isVertical: boolean;
+    protected _isVertical: boolean;
     private _barLabelFormatter: Formatter = Formatters.identity();
     private _barLabelsEnabled = false;
     private _hoverMode = "point";
@@ -32,7 +32,7 @@ export module Plot {
       this.baseline(0);
     }
 
-    public _getDrawer(key: string) {
+    protected _getDrawer(key: string) {
       return new Plottable._Drawer.Rect(key, this._isVertical);
     }
 
@@ -210,7 +210,7 @@ export module Plot {
       return this;
     }
 
-    public _updateDomainer(scale: Scale.AbstractScale<any, number>) {
+    protected _updateDomainer(scale: Scale.AbstractScale<any, number>) {
       if (scale instanceof Scale.AbstractQuantitative) {
         var qscale = <Scale.AbstractQuantitative<any>> scale;
         if (!qscale._userSetDomainer) {
@@ -230,7 +230,7 @@ export module Plot {
       }
     }
 
-    public _updateYDomainer() {
+    protected _updateYDomainer() {
       if (this._isVertical) {
         this._updateDomainer(this._yScale);
       } else {
@@ -238,7 +238,7 @@ export module Plot {
       }
     }
 
-    public _updateXDomainer() {
+    protected _updateXDomainer() {
       if (!this._isVertical) {
         this._updateDomainer(this._xScale);
       } else {
@@ -246,7 +246,7 @@ export module Plot {
       }
     }
 
-    public _additionalPaint(time: number) {
+    protected _additionalPaint(time: number) {
       var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 
@@ -266,7 +266,7 @@ export module Plot {
       }
     }
 
-    public _drawLabels() {
+    protected _drawLabels() {
       var drawers: _Drawer.Rect[] = <any> this._getDrawersInOrder();
       var attrToProjector = this._generateAttrToProjector();
       var dataToDraw = this._getDataToDraw();
@@ -280,7 +280,7 @@ export module Plot {
       }
     }
 
-    public _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): _Drawer.DrawStep[] {
       var drawSteps: _Drawer.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
@@ -296,7 +296,7 @@ export module Plot {
       return drawSteps;
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
@@ -356,7 +356,7 @@ export module Plot {
      *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
      * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
      */
-    public _getBarPixelWidth(): number {
+    protected _getBarPixelWidth(): number {
       var barPixelWidth: number;
       var barScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
       if (barScale instanceof Plottable.Scale.Ordinal) {

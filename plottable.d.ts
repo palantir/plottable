@@ -2652,14 +2652,14 @@ declare module Plottable {
             datasetKey: string;
         }
         class AbstractPlot extends Component.AbstractComponent {
-            _dataChanged: boolean;
-            _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
-            _datasetKeysInOrder: string[];
-            _renderArea: D3.Selection;
-            _projections: {
+            protected _dataChanged: boolean;
+            protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
+            protected _datasetKeysInOrder: string[];
+            protected _renderArea: D3.Selection;
+            protected _projections: {
                 [x: string]: _Projection;
             };
-            _animate: boolean;
+            protected _animate: boolean;
             _animators: Animator.PlotAnimatorMap;
             _ANIMATION_DURATION: number;
             _animateOnNextRender: boolean;
@@ -2692,7 +2692,7 @@ declare module Plottable {
             addDataset(dataset: Dataset): AbstractPlot;
             addDataset(dataset: any[]): AbstractPlot;
             _addDataset(key: string, dataset: Dataset): void;
-            _getDrawer(key: string): _Drawer.AbstractDrawer;
+            protected _getDrawer(key: string): _Drawer.AbstractDrawer;
             _getAnimator(key: string): Animator.PlotAnimator;
             _onDatasetUpdate(): void;
             /**
@@ -2723,7 +2723,7 @@ declare module Plottable {
              * Identical to plot.attr
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractPlot;
-            _generateAttrToProjector(): AttributeToProjector;
+            protected _generateAttrToProjector(): AttributeToProjector;
             _doRender(): void;
             /**
              * Enables or disables animation.
@@ -2792,8 +2792,8 @@ declare module Plottable {
             _removeDataset(key: string): AbstractPlot;
             datasets(): Dataset[];
             _getDrawersInOrder(): _Drawer.AbstractDrawer[];
-            _generateDrawSteps(): _Drawer.DrawStep[];
-            _additionalPaint(time: number): void;
+            protected _generateDrawSteps(): _Drawer.DrawStep[];
+            protected _additionalPaint(time: number): void;
             _getDataToDraw(): D3.Map<any[]>;
             /**
              * Gets the new plot metadata for new dataset with provided key
@@ -2827,10 +2827,8 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class AbstractXYPlot<X, Y> extends AbstractPlot {
-            _xScale: Scale.AbstractScale<X, number>;
-            _yScale: Scale.AbstractScale<Y, number>;
-            _autoAdjustXScaleDomain: boolean;
-            _autoAdjustYScaleDomain: boolean;
+            protected _xScale: Scale.AbstractScale<X, number>;
+            protected _yScale: Scale.AbstractScale<Y, number>;
             /**
              * Constructs an XYPlot.
              *
@@ -2867,10 +2865,10 @@ declare module Plottable {
              * @returns {AbstractXYPlot} The calling AbstractXYPlot.
              */
             automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y>;
-            _generateAttrToProjector(): AttributeToProjector;
+            protected _generateAttrToProjector(): AttributeToProjector;
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
-            _updateXDomainer(): void;
-            _updateYDomainer(): void;
+            protected _updateXDomainer(): void;
+            protected _updateYDomainer(): void;
             /**
              * Adjusts both domains' extents to show all datasets.
              *
@@ -2949,14 +2947,14 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class AbstractBarPlot<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
-            static _BarAlignmentToFactor: {
+            protected static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
-            static _DEFAULT_WIDTH: number;
+            protected static _DEFAULT_WIDTH: number;
             _baseline: D3.Selection;
             _baselineValue: number;
             _barAlignmentFactor: number;
-            _isVertical: boolean;
+            protected _isVertical: boolean;
             /**
              * Constructs a BarPlot.
              *
@@ -2965,7 +2963,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
-            _getDrawer(key: string): _Drawer.Rect;
+            protected _getDrawer(key: string): _Drawer.Rect;
             protected setup(): void;
             /**
              * Gets the baseline value for the bars
@@ -3044,13 +3042,13 @@ declare module Plottable {
              * @returns {AbstractBarPlot} The calling AbstractBarPlot.
              */
             deselectAll(): AbstractBarPlot<X, Y>;
-            _updateDomainer(scale: Scale.AbstractScale<any, number>): void;
-            _updateYDomainer(): void;
-            _updateXDomainer(): void;
-            _additionalPaint(time: number): void;
-            _drawLabels(): void;
-            _generateDrawSteps(): _Drawer.DrawStep[];
-            _generateAttrToProjector(): AttributeToProjector;
+            protected _updateDomainer(scale: Scale.AbstractScale<any, number>): void;
+            protected _updateYDomainer(): void;
+            protected _updateXDomainer(): void;
+            protected _additionalPaint(time: number): void;
+            protected _drawLabels(): void;
+            protected _generateDrawSteps(): _Drawer.DrawStep[];
+            protected _generateAttrToProjector(): AttributeToProjector;
             /**
              * Computes the barPixelWidth of all the bars in the plot.
              *
@@ -3059,7 +3057,7 @@ declare module Plottable {
              *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
              * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
-            _getBarPixelWidth(): number;
+            protected _getBarPixelWidth(): number;
             hoverMode(): string;
             /**
              * Sets the hover mode for hover interactions. There are two modes:
@@ -3281,7 +3279,6 @@ declare module Plottable {
     module Plot {
         class StackedBar<X, Y> extends AbstractBarPlot<X, Y> {
             _baselineValue: number;
-            _baseline: D3.Selection;
             _barAlignmentFactor: number;
             /**
              * Constructs a StackedBar plot.

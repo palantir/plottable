@@ -21,8 +21,8 @@ describe("Metadata", () => {
                               .addDataset( d1)
                               .addDataset("d2", [])
                               .addDataset([]);
-    r._datasetKeysInOrder.forEach((key: string) => {
-      var plotMetadata = r._key2PlotDatasetKey.get(key).plotMetadata;
+    (<any> r)._datasetKeysInOrder.forEach((key: string) => {
+      var plotMetadata = (<any> r)._key2PlotDatasetKey.get(key).plotMetadata;
       assert.propertyVal(plotMetadata, "datasetKey", key, "metadata has correct dataset key");
     });
   });
@@ -38,7 +38,7 @@ describe("Metadata", () => {
                                 .project("y", yAccessor);
     plot.addDataset(dataset);
     plot.renderTo(svg);
-    var circles = plot._renderArea.selectAll("circle");
+    var circles = (<any> plot)._renderArea.selectAll("circle");
     var c1 = d3.select(circles[0][0]);
     var c2 = d3.select(circles[0][1]);
     assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
@@ -70,7 +70,7 @@ describe("Metadata", () => {
     plot.addDataset(dataset1);
     plot.addDataset(dataset2);
     plot.renderTo(svg);
-    var circles = plot._renderArea.selectAll("circle");
+    var circles = (<any> plot)._renderArea.selectAll("circle");
     var c1 = d3.select(circles[0][0]);
     var c2 = d3.select(circles[0][1]);
     var c3 = d3.select(circles[0][2]);
@@ -99,7 +99,7 @@ describe("Metadata", () => {
     plot.addDataset(data1);
     plot.addDataset(data2);
     plot.renderTo(svg);
-    var circles = plot._renderArea.selectAll("circle");
+    var circles = (<any> plot)._renderArea.selectAll("circle");
     var c1 = d3.select(circles[0][0]);
     var c2 = d3.select(circles[0][1]);
     var c3 = d3.select(circles[0][2]);
@@ -140,7 +140,7 @@ describe("Metadata", () => {
     plot2.addDataset(data2);
     plot1.renderTo(svg);
     plot2.renderTo(svg);
-    var circles = plot1._renderArea.selectAll("circle");
+    var circles = (<any> plot1)._renderArea.selectAll("circle");
     var c1 = d3.select(circles[0][0]);
     var c2 = d3.select(circles[0][1]);
     var c3 = d3.select(circles[0][2]);
@@ -150,7 +150,7 @@ describe("Metadata", () => {
     assert.closeTo(parseFloat(c3.attr("cx")), 12, 0.01, "third circle is correct for first plot");
     assert.closeTo(parseFloat(c4.attr("cx")), 23, 0.01, "fourth circle is correct for first plot");
 
-    circles = plot2._renderArea.selectAll("circle");
+    circles = (<any> plot2)._renderArea.selectAll("circle");
     c1 = d3.select(circles[0][0]);
     c2 = d3.select(circles[0][1]);
     c3 = d3.select(circles[0][2]);

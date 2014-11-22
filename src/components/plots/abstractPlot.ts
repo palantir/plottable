@@ -17,14 +17,14 @@ export module Plot {
   }
 
   export class AbstractPlot extends Component.AbstractComponent {
-    public _dataChanged = false;
-    public _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
-    public _datasetKeysInOrder: string[];
+    protected _dataChanged = false;
+    protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
+    protected _datasetKeysInOrder: string[];
 
-    public _renderArea: D3.Selection;
-    public _projections: { [attrToSet: string]: _Projection; } = {};
+    protected _renderArea: D3.Selection;
+    protected _projections: { [attrToSet: string]: _Projection; } = {};
 
-    public _animate: boolean = false;
+    protected _animate: boolean = false;
     public _animators: Animator.PlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
     public _animateOnNextRender = true;
@@ -122,7 +122,7 @@ export module Plot {
       this._onDatasetUpdate();
     }
 
-    public _getDrawer(key: string): _Drawer.AbstractDrawer {
+    protected _getDrawer(key: string): _Drawer.AbstractDrawer {
       return new _Drawer.AbstractDrawer(key);
     }
 
@@ -193,7 +193,7 @@ export module Plot {
       return this;
     }
 
-    public _generateAttrToProjector(): AttributeToProjector {
+    protected _generateAttrToProjector(): AttributeToProjector {
       var h: AttributeToProjector = {};
       d3.keys(this._projections).forEach((a) => {
         var projection = this._projections[a];
@@ -374,11 +374,11 @@ export module Plot {
       return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).drawer);
     }
 
-    public _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): _Drawer.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: new Animator.Null()}];
     }
 
-    public _additionalPaint(time: number) {
+    protected _additionalPaint(time: number) {
       // no-op
     }
 

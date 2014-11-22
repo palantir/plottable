@@ -4,7 +4,6 @@ module Plottable {
 export module Plot {
   export class StackedBar<X,Y> extends AbstractBarPlot<X, Y> {
     public _baselineValue: number;
-    public _baseline: D3.Selection;
     public _barAlignmentFactor: number;
 
     /**
