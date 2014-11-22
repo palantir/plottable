@@ -3209,8 +3209,8 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
-            _generateAttrToProjector(): AttributeToProjector;
-            _getDataToDraw(): D3.Map<any[]>;
+            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _getDataToDraw(): D3.Map<any[]>;
         }
     }
 }

@@ -20,7 +20,7 @@ export module Plot {
       super(xScale, yScale);
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       // the width is constant, so set the inner scale range to that
       var innerScale = this.makeInnerScale();
@@ -36,7 +36,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _getDataToDraw() {
+    protected _getDataToDraw() {
       var accessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
       var innerScale = this.makeInnerScale();
       var clusters: D3.Map<any[]> = d3.map();
