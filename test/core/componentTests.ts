@@ -49,15 +49,15 @@ describe("Component behavior", () => {
       c._computeLayout();
       assert.equal(c.width() , SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.equal(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
-      assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
-      assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
+      assert.equal((<any> c)._xOrigin, 0 ,"xOrigin defaulted to 0");
+      assert.equal((<any> c)._yOrigin, 0 ,"yOrigin defaulted to 0");
 
       svg.attr("width", 2*SVG_WIDTH).attr("height", 2*SVG_HEIGHT);
       c._computeLayout();
       assert.equal(c.width() , 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
       assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
-      assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
-      assert.equal((<any> c).yOrigin, 0 ,"yOrigin is still 0");
+      assert.equal((<any> c)._xOrigin, 0 ,"xOrigin is still 0");
+      assert.equal((<any> c)._yOrigin, 0 ,"yOrigin is still 0");
 
       svg.remove();
     });
@@ -74,8 +74,8 @@ describe("Component behavior", () => {
       c._computeLayout();
       assert.equal(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
       assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
-      assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
-      assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
+      assert.equal((<any> c)._xOrigin, 0 ,"xOrigin defaulted to 0");
+      assert.equal((<any> c)._yOrigin, 0 ,"yOrigin defaulted to 0");
 
 
       svg.style("width", "50%").style("height", "50%");
@@ -83,8 +83,8 @@ describe("Component behavior", () => {
 
       assert.equal(c.width(), 200, "computeLayout defaulted width to svg width");
       assert.equal(c.height(), 100, "computeLayout defaulted height to svg height");
-      assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
-      assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
+      assert.equal((<any> c)._xOrigin, 0 ,"xOrigin defaulted to 0");
+      assert.equal((<any> c)._yOrigin, 0 ,"yOrigin defaulted to 0");
 
       svg.style("width", "25%").style("height", "25%");
 
@@ -92,8 +92,8 @@ describe("Component behavior", () => {
 
       assert.equal(c.width(), 100, "computeLayout updated width to new svg width");
       assert.equal(c.height(), 50, "computeLayout updated height to new svg height");
-      assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
-      assert.equal((<any> c).yOrigin, 0 ,"yOrigin is still 0");
+      assert.equal((<any> c)._xOrigin, 0 ,"xOrigin is still 0");
+      assert.equal((<any> c)._yOrigin, 0 ,"yOrigin is still 0");
 
       // reset test page DOM
       parent.style("width", "auto");
@@ -211,7 +211,7 @@ it("components can be offset relative to their alignment, and throw errors if th
     var normalizeClipPath = (s: string) => s.replace(/"/g, "");
     assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL,
                   "the element has clip-path url attached");
-    var clipRect = (<any> c).boxContainer.select(".clip-rect");
+    var clipRect = (<any> c)._boxContainer.select(".clip-rect");
     assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
     assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");
     svg.remove();
@@ -227,9 +227,9 @@ it("components can be offset relative to their alignment, and throw errors if th
   });
 
   it("boxes work as expected", () => {
-    assert.throws(() => (<any> c).addBox("pre-anchor"), Error, "Adding boxes before anchoring is currently disallowed");
+    assert.throws(() => (<any> c)._addBox("pre-anchor"), Error, "Adding boxes before anchoring is currently disallowed");
     c.renderTo(svg);
-    (<any> c).addBox("post-anchor");
+    (<any> c)._addBox("post-anchor");
     var e = c._element;
     var boxContainer = e.select(".box-container");
     var boxStrings = [".bounding-box", ".post-anchor"];
@@ -246,7 +246,7 @@ it("components can be offset relative to their alignment, and throw errors if th
 
   it("hitboxes are created iff there are registered interactions", () => {
     function verifyHitbox(component: Plottable.Component.AbstractComponent) {
-      var hitBox = (<any> component).hitBox;
+      var hitBox = (<any> component)._hitBox;
       assert.isNotNull(hitBox, "the hitbox was created");
       var hitBoxFill = hitBox.style("fill");
       var hitBoxFilled = hitBoxFill === "#ffffff" || hitBoxFill === "rgb(255, 255, 255)";
@@ -255,7 +255,7 @@ it("components can be offset relative to their alignment, and throw errors if th
     }
 
     c._anchor(svg);
-    assert.isUndefined((<any> c).hitBox, "no hitBox was created when there were no registered interactions");
+    assert.isUndefined((<any> c)._hitBox, "no hitBox was created when there were no registered interactions");
     svg.remove();
     svg = generateSVG();
 
@@ -283,7 +283,7 @@ it("components can be offset relative to their alignment, and throw errors if th
     c.registerInteraction(interaction1);
     c.renderTo(svg);
     c.registerInteraction(interaction2);
-    var hitNode = (<any> c).hitBox.node();
+    var hitNode = (<any> c)._hitBox.node();
     assert.equal(hitBox1, hitNode, "hitBox1 was registerd");
     assert.equal(hitBox2, hitNode, "hitBox2 was registerd");
     svg.remove();
@@ -381,7 +381,7 @@ it("components can be offset relative to their alignment, and throw errors if th
     verticalComponent.yAlign("bottom");
 
     assertBBoxNonIntersection(verticalComponent._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
-    assertBBoxInclusion((<any> t).boxContainer.select(".bounding-box"), horizontalComponent._element.select(".bounding-box"));
+    assertBBoxInclusion((<any> t)._boxContainer.select(".bounding-box"), horizontalComponent._element.select(".bounding-box"));
 
     svg.remove();
   });
