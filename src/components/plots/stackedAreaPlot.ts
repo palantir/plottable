@@ -23,7 +23,7 @@ export module Plot {
       this.defaultFillColor = new Scale.Color().range()[0];
     }
 
-    public _getDrawer(key: string) {
+    protected _getDrawer(key: string) {
       return new Plottable._Drawer.Area(key).drawLine(false);
     }
 
@@ -48,7 +48,7 @@ export module Plot {
       super._updateStackOffsets();
     }
 
-    public _additionalPaint() {
+    protected _additionalPaint() {
       var scaledBaseline = this._yScale.scale(this._baselineValue);
       var baselineAttr: any = {
         "x1": 0,
@@ -60,7 +60,7 @@ export module Plot {
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);
     }
 
-    public _updateYDomainer() {
+    protected _updateYDomainer() {
       super._updateYDomainer();
       var scale = <Scale.AbstractQuantitative<any>> this._yScale;
       if (!scale._userSetDomainer) {
@@ -75,7 +75,7 @@ export module Plot {
       Plot.Area.prototype._onDatasetUpdate.apply(this);
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
 
       var wholeDatumAttributes = this._wholeDatumAttributes();
@@ -98,7 +98,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _wholeDatumAttributes() {
+    protected _wholeDatumAttributes() {
       return ["x", "y", "defined"];
     }
   }

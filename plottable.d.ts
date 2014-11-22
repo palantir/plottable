@@ -3262,14 +3262,14 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
-            _getDrawer(key: string): _Drawer.Area;
+            protected _getDrawer(key: string): _Drawer.Area;
             protected setup(): void;
             _updateStackOffsets(): void;
-            _additionalPaint(): void;
-            _updateYDomainer(): void;
+            protected _additionalPaint(): void;
+            protected _updateYDomainer(): void;
             _onDatasetUpdate(): void;
-            _generateAttrToProjector(): AttributeToProjector;
-            _wholeDatumAttributes(): string[];
+            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _wholeDatumAttributes(): string[];
         }
     }
 }
