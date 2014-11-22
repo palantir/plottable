@@ -12,7 +12,7 @@ export module Plot {
    *  - "y" - the vertical position of a bar
    */
   export class HorizontalBar<Y> extends AbstractBarPlot<number,Y> {
-    public static _BarAlignmentToFactor: {[alignment: string]: number} = {"top": 0, "center": 0.5, "bottom": 1};
+    protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"top": 0, "center": 0.5, "bottom": 1};
 
     /**
      * Constructs a HorizontalBarPlot.
@@ -25,11 +25,11 @@ export module Plot {
       super(xScale, yScale);
     }
 
-    public _updateXDomainer() {
+    protected _updateXDomainer() {
       this._updateDomainer(this._xScale);
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       // by convention, for API users the 2ndary dimension of a bar is always called its "width", so
       // the "width" of a horziontal bar plot is actually its "height" from the perspective of a svg rect

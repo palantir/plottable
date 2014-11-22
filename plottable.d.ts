@@ -3119,7 +3119,7 @@ declare module Plottable {
          *  - "y" - the vertical position of a bar
          */
         class HorizontalBar<Y> extends AbstractBarPlot<number, Y> {
-            static _BarAlignmentToFactor: {
+            protected static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
             /**
@@ -3130,8 +3130,8 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractQuantitative<number>, yScale: Scale.AbstractScale<Y, number>);
-            _updateXDomainer(): void;
-            _generateAttrToProjector(): AttributeToProjector;
+            protected _updateXDomainer(): void;
+            protected _generateAttrToProjector(): AttributeToProjector;
         }
     }
 }
