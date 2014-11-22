@@ -2817,8 +2817,8 @@ declare module Plottable {
             constructor();
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _addDataset(key: string, dataset: Dataset): void;
-            _generateAttrToProjector(): AttributeToProjector;
-            _getDrawer(key: string): _Drawer.AbstractDrawer;
+            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _getDrawer(key: string): _Drawer.AbstractDrawer;
         }
     }
 }
