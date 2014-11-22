@@ -60,16 +60,4 @@ describe("ComponentContainer", () => {
 
     assert.deepEqual(container.components(), [], "container was cleared of components");
   });
-
-  it("components() returns a shallow copy", () => {
-    var container = new Plottable.Component.AbstractComponentContainer();
-    var c1 = new Plottable.Component.AbstractComponent();
-    var c2 = new Plottable.Component.AbstractComponent();
-    container._addComponent(c1);
-    container._addComponent(c2);
-
-    var componentList = container.components();
-    componentList.pop();
-    assert.deepEqual(container.components(), [c1, c2], "internal list of components was not changed");
-  });
 });

@@ -1979,8 +1979,6 @@ declare module Plottable {
             _tickLabelContainer: D3.Selection;
             _baseline: D3.Selection;
             _scale: Scale.AbstractScale<any, number>;
-            _formatter: Formatter;
-            _orientation: string;
             _computedWidth: number;
             _computedHeight: number;
             /**
@@ -2660,8 +2658,6 @@ declare module Plottable {
                 [x: string]: _Projection;
             };
             _animate: boolean;
-            _animators: Animator.PlotAnimatorMap;
-            _ANIMATION_DURATION: number;
             _animateOnNextRender: boolean;
             /**
              * Constructs a Plot.
@@ -2918,7 +2914,6 @@ declare module Plottable {
             _colorScale: Scale.AbstractScale<any, string>;
             _xScale: Scale.Ordinal;
             _yScale: Scale.Ordinal;
-            _animators: Animator.PlotAnimatorMap;
             /**
              * Constructs a GridPlot.
              *
@@ -2953,9 +2948,6 @@ declare module Plottable {
                 [x: string]: number;
             };
             static _DEFAULT_WIDTH: number;
-            _baseline: D3.Selection;
-            _baselineValue: number;
-            _barAlignmentFactor: number;
             _isVertical: boolean;
             /**
              * Constructs a BarPlot.
@@ -3280,9 +3272,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class StackedBar<X, Y> extends AbstractBarPlot<X, Y> {
-            _baselineValue: number;
-            _baseline: D3.Selection;
-            _barAlignmentFactor: number;
             /**
              * Constructs a StackedBar plot.
              * A StackedBarPlot is a plot that plots several bar plots stacking on top of each
