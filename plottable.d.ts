@@ -3140,7 +3140,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Line<X> extends AbstractXYPlot<X, number> implements Interaction.Hoverable {
-            _yScale: Scale.AbstractQuantitative<number>;
+            protected _yScale: Scale.AbstractQuantitative<number>;
             /**
              * Constructs a LinePlot.
              *
@@ -3150,13 +3150,13 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             protected setup(): void;
-            _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
+            protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
             protected _getDrawer(key: string): _Drawer.Line;
             protected _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
-            _generateDrawSteps(): _Drawer.DrawStep[];
+            protected _generateDrawSteps(): _Drawer.DrawStep[];
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _wholeDatumAttributes(): string[];
-            _getClosestWithinRange(p: Point, range: number): {
+            protected _getClosestWithinRange(p: Point, range: number): {
                 closestValue: any;
                 closestPoint: Point;
             };

@@ -7,7 +7,7 @@ export module Plot {
     private hoverTarget: D3.Selection;
     private defaultStrokeColor: string;
 
-    public _yScale: Scale.AbstractQuantitative<number>;
+    protected _yScale: Scale.AbstractQuantitative<number>;
 
     /**
      * Constructs a LinePlot.
@@ -34,7 +34,7 @@ export module Plot {
                                           .style("visibility", "hidden");
     }
 
-    public _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor) {
+    protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor) {
       var value = accessor(d, i, userMetdata, plotMetadata);
       return value != null && value === value;
     }
@@ -55,7 +55,7 @@ export module Plot {
       return (d: any, i: number, u: any, m: PlotMetadata) => scaledStartValue;
     }
 
-    public _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): _Drawer.DrawStep[] {
       var drawSteps: _Drawer.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var attrToProjector = this._generateAttrToProjector();
@@ -95,7 +95,7 @@ export module Plot {
     }
 
     // HACKHACK User and plot metadata should be applied here - #1306.
-    public _getClosestWithinRange(p: Point, range: number) {
+    protected _getClosestWithinRange(p: Point, range: number) {
       var attrToProjector = this._generateAttrToProjector();
       var xProjector = attrToProjector["x"];
       var yProjector = attrToProjector["y"];
