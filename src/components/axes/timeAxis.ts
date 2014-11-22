@@ -26,7 +26,7 @@ export module Axis {
 
   export class Time extends AbstractAxis {
 
-    public _scale: Scale.Time;
+    protected _scale: Scale.Time;
 
     /*
      * Default possible axis configurations.
@@ -269,14 +269,14 @@ export module Axis {
       return this._scale._tickInterval(config.interval, config.step);
     }
 
-    public _getTickValues(): any[] {
+    protected _getTickValues(): any[] {
       return this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex].tierConfigurations.reduce(
           (ticks: any[], config: TimeAxisTierConfiguration) => ticks.concat(this.getTickIntervalValues(config)),
           []
         );
     }
 
-    public _measureTextHeight(): number {
+    protected _measureTextHeight(): number {
       return this.measurer(_Util.Text.HEIGHT_TEXT).height;
     }
 
