@@ -40,7 +40,7 @@ describe("Plots", () => {
     it("Datasets are listened to appropriately", () => {
       var callbackCounter = 0;
       var callback = () => callbackCounter++;
-      p._onDatasetUpdate = callback;
+      (<any> p)._onDatasetUpdate = callback;
       var d = new Plottable.Dataset([1,2,3]);
       p.addDataset("foo", d);
       assert.equal(callbackCounter, 1, "adding dataset triggers listener");

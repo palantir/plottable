@@ -2693,8 +2693,8 @@ declare module Plottable {
             addDataset(dataset: any[]): AbstractPlot;
             _addDataset(key: string, dataset: Dataset): void;
             protected _getDrawer(key: string): _Drawer.AbstractDrawer;
-            _getAnimator(key: string): Animator.PlotAnimator;
-            _onDatasetUpdate(): void;
+            protected _getAnimator(key: string): Animator.PlotAnimator;
+            protected _onDatasetUpdate(): void;
             /**
              * Sets an attribute of every data point.
              *
@@ -2736,7 +2736,7 @@ declare module Plottable {
              * This function makes sure that all of the scales in this._projections
              * have an extent that includes all the data that is projected onto them.
              */
-            _updateScaleExtents(): void;
+            protected _updateScaleExtents(): void;
             _updateScaleExtent(attr: string): void;
             /**
              * Get the animator associated with the specified Animator key.
@@ -2791,16 +2791,16 @@ declare module Plottable {
             removeDataset(dataArray: any[]): AbstractPlot;
             _removeDataset(key: string): AbstractPlot;
             datasets(): Dataset[];
-            _getDrawersInOrder(): _Drawer.AbstractDrawer[];
+            protected _getDrawersInOrder(): _Drawer.AbstractDrawer[];
             protected _generateDrawSteps(): _Drawer.DrawStep[];
             protected _additionalPaint(time: number): void;
-            _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): D3.Map<any[]>;
             /**
              * Gets the new plot metadata for new dataset with provided key
              *
              * @param {string} key The key of new dataset
              */
-            _getPlotMetadataForDataset(key: string): PlotMetadata;
+            protected _getPlotMetadataForDataset(key: string): PlotMetadata;
         }
     }
 }

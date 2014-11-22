@@ -90,7 +90,7 @@ describe("Metadata", () => {
     var plot = new Plottable.Plot.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
                                 .project("y", yAccessor);
-    plot._getPlotMetadataForDataset = (key: string) => {
+    (<any> plot)._getPlotMetadataForDataset = (key: string) => {
       return {
         datasetKey: key,
         foo: 10
@@ -119,7 +119,7 @@ describe("Metadata", () => {
     var plot1 = new Plottable.Plot.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
                                 .project("y", yAccessor);
-    plot1._getPlotMetadataForDataset = (key: string) => {
+    (<any> plot1)._getPlotMetadataForDataset = (key: string) => {
       return {
         datasetKey: key,
         foo: 10
@@ -130,7 +130,7 @@ describe("Metadata", () => {
     var plot2 = new Plottable.Plot.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
                                 .project("y", yAccessor);
-    plot2._getPlotMetadataForDataset = (key: string) => {
+    (<any> plot2)._getPlotMetadataForDataset = (key: string) => {
       return {
         datasetKey: key,
         foo: 20
@@ -170,7 +170,7 @@ describe("Metadata", () => {
     var dataset = new Plottable.Dataset(data1, metadata);
     var a = (d: any, i: number, u: any, m: any) => d.x + u.foo + m.foo;
     var plot = new Plottable.Plot.AbstractPlot().project("a", a, xScale);
-    plot._getPlotMetadataForDataset = (key: string) => {
+    (<any> plot)._getPlotMetadataForDataset = (key: string) => {
       return {
         datasetKey: key,
         foo: 5

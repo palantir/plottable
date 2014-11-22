@@ -126,7 +126,7 @@ export module Plot {
       return new _Drawer.AbstractDrawer(key);
     }
 
-    public _getAnimator(key: string): Animator.PlotAnimator {
+    protected _getAnimator(key: string): Animator.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
         return this._animators[key] || new Animator.Null();
       } else {
@@ -134,7 +134,7 @@ export module Plot {
       }
     }
 
-    public _onDatasetUpdate() {
+    protected _onDatasetUpdate() {
       this._updateScaleExtents();
       this._animateOnNextRender = true;
       this._dataChanged = true;
@@ -234,7 +234,7 @@ export module Plot {
      * This function makes sure that all of the scales in this._projections
      * have an extent that includes all the data that is projected onto them.
      */
-    public _updateScaleExtents() {
+    protected _updateScaleExtents() {
       d3.keys(this._projections).forEach((attr: string) => this._updateScaleExtent(attr));
     }
 
@@ -370,7 +370,7 @@ export module Plot {
       return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).dataset);
     }
 
-    public _getDrawersInOrder(): _Drawer.AbstractDrawer[] {
+    protected _getDrawersInOrder(): _Drawer.AbstractDrawer[] {
       return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).drawer);
     }
 
@@ -382,7 +382,7 @@ export module Plot {
       // no-op
     }
 
-    public _getDataToDraw() {
+    protected _getDataToDraw() {
       var datasets: D3.Map<any[]> = d3.map();
       this._datasetKeysInOrder.forEach((key: string) => {
         datasets.set(key, this._key2PlotDatasetKey.get(key).dataset.data());
@@ -395,7 +395,7 @@ export module Plot {
      *
      * @param {string} key The key of new dataset
      */
-    public _getPlotMetadataForDataset(key: string): PlotMetadata {
+    protected _getPlotMetadataForDataset(key: string): PlotMetadata {
       return {
         datasetKey: key
       };
