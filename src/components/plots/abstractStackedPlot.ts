@@ -10,7 +10,7 @@ export module Plot {
 
   export class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
     private stackedExtent = [0, 0];
-    public _isVertical: boolean;
+    protected _isVertical: boolean;
 
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);

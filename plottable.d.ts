@@ -2875,7 +2875,7 @@ declare module Plottable {
              * This call does not override auto domain adjustment behavior over visible points.
              */
             showAllData(): void;
-            _projectorsReady(): _Projection;
+            protected _projectorsReady(): _Projection;
         }
     }
 }
@@ -3224,7 +3224,7 @@ declare module Plottable {
             offset?: number;
         }
         class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
-            _isVertical: boolean;
+            protected _isVertical: boolean;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractStacked<X, Y>;
             _onDatasetUpdate(): void;
             _updateStackOffsets(): void;

@@ -205,7 +205,7 @@ export module Plot {
       return retVal;
     }
 
-    public _projectorsReady() {
+    protected _projectorsReady() {
       return this._projections["x"] && this._projections["y"];
     }
   }
