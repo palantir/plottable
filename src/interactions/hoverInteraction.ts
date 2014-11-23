@@ -45,25 +45,11 @@ export module Interaction {
 
     public _anchor(component: Hoverable, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
+
       this.dispatcher = new Dispatcher.Mouse(this._hitBox);
-
-      this.dispatcher.mouseover((p: Point) => {
-        this._componentToListenTo._hoverOverComponent(p);
-        this.handleHoverOver(p);
-      });
-
-      this.dispatcher.mouseout((p: Point) => {
-        this._componentToListenTo._hoverOutComponent(p);
-        this.safeHoverOut(this.currentHoverData);
-        this.currentHoverData = {
-          data: null,
-          pixelPositions: null,
-          selection: null
-        };
-      });
-
-      this.dispatcher.mousemove((p: Point) => this.handleHoverOver(p));
-
+      this.dispatcher.mouseover((p: Point) => this._handleHoverBegin(p));
+      this.dispatcher.mouseout((p: Point) => this._handleHoverEnd(p));
+      this.dispatcher.mousemove((p: Point) => this._handleHoverOver(p));
       this.dispatcher.connect();
     }
 
@@ -101,7 +87,24 @@ export module Interaction {
       };
     }
 
-    private handleHoverOver(p: Point) {
+    private safeHoverOut(outData: HoverData) {
+      if (this.hoverOutCallback && outData.data) {
+        this.hoverOutCallback(outData);
+      }
+    }
+
+    private safeHoverOver(overData: HoverData) {
+      if (this.hoverOverCallback && overData.data) {
+        this.hoverOverCallback(overData);
+      }
+    }
+
+    public _handleHoverBegin(p: Point) {
+      this._componentToListenTo._hoverOverComponent(p);
+      this._handleHoverOver(p);
+    }
+
+    public _handleHoverOver(p: Point) {
       var lastHoverData = this.currentHoverData;
       var newHoverData = this._componentToListenTo._doHover(p);
 
@@ -114,16 +117,14 @@ export module Interaction {
       this.safeHoverOver(overData);
     }
 
-    private safeHoverOut(outData: HoverData) {
-      if (this.hoverOutCallback && outData.data) {
-        this.hoverOutCallback(outData);
-      }
-    }
-
-    private safeHoverOver(overData: HoverData) {
-      if (this.hoverOverCallback && overData.data) {
-        this.hoverOverCallback(overData);
-      }
+    public _handleHoverEnd(p: Point) {
+      this._componentToListenTo._hoverOutComponent(p);
+      this.safeHoverOut(this.currentHoverData);
+      this.currentHoverData = {
+        data: null,
+        pixelPositions: null,
+        selection: null
+      };
     }
 
     /**

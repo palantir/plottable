@@ -92,3 +92,7 @@
 /// <reference path="interactions/drag/xyDragBoxInteraction.ts" />
 /// <reference path="interactions/drag/yDragBoxInteraction.ts" />
 /// <reference path="interactions/hoverInteraction.ts" />
+/// <reference path="interactions/crosshairInteraction.ts" />
+
+/// <reference path="dispatchers/abstractDispatcher.ts" />
+/// <reference path="dispatchers/mouseDispatcher.ts" />
