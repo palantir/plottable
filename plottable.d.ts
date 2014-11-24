@@ -3500,8 +3500,8 @@ declare module Plottable {
 declare module Plottable {
     module Dispatcher {
         class AbstractDispatcher extends Core.PlottableObject {
-            _target: D3.Selection;
-            _event2Callback: {
+            protected _target: D3.Selection;
+            protected _event2Callback: {
                 [x: string]: () => any;
             };
             /**
@@ -3527,7 +3527,7 @@ declare module Plottable {
             /**
              * Gets a namespaced version of the event name.
              */
-            _getEventString(eventName: string): string;
+            protected _getEventString(eventName: string): string;
             /**
              * Attaches the Dispatcher's listeners to the Dispatcher's target element.
              *
