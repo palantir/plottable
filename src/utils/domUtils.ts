@@ -40,7 +40,7 @@ export module _Util {
 
     export function isSelectionRemovedFromSVG(selection: D3.Selection) {
       var n = (<Node> selection.node());
-      while (n !== null && n.nodeName !== "svg") {
+      while (n !== null && n.nodeName.toLowerCase() !== "svg") {
         n = n.parentNode;
       }
       return (n == null);
