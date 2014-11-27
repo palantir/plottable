@@ -298,7 +298,7 @@ export module _Util {
       colorTester.classed(className, true);
       // Use regex to get the text inside the rgb parentheses
       var colorStyle = colorTester.style("background-color");
-      if (colorStyle === "transparent") {
+      if (colorStyle === "transparent" || colorStyle === "") {
         return null;
       }
       var rgb = /\((.+)\)/.exec(colorStyle)[1]
