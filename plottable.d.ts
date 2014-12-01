@@ -2687,7 +2687,6 @@ declare module Plottable {
             addDataset(key: string, dataset: any[]): AbstractPlot;
             addDataset(dataset: Dataset): AbstractPlot;
             addDataset(dataset: any[]): AbstractPlot;
-            _addDataset(key: string, dataset: Dataset): void;
             _getDrawer(key: string): _Drawer.AbstractDrawer;
             _getAnimator(key: string): Animator.PlotAnimator;
             _onDatasetUpdate(): void;
@@ -2785,7 +2784,6 @@ declare module Plottable {
              * @return {Plot} The calling Plot.
              */
             removeDataset(dataArray: any[]): AbstractPlot;
-            _removeDataset(key: string): AbstractPlot;
             datasets(): Dataset[];
             _getDrawersInOrder(): _Drawer.AbstractDrawer[];
             _generateDrawSteps(): _Drawer.DrawStep[];
@@ -2812,7 +2810,7 @@ declare module Plottable {
              */
             constructor();
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
-            _addDataset(key: string, dataset: Dataset): void;
+            addDataset(keyOrDataset: any, dataset?: any): Pie;
             _generateAttrToProjector(): AttributeToProjector;
             _getDrawer(key: string): _Drawer.AbstractDrawer;
         }
@@ -2927,7 +2925,7 @@ declare module Plottable {
              * to use for each grid cell.
              */
             constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>);
-            _addDataset(key: string, dataset: Dataset): void;
+            addDataset(keyOrDataset: any, dataset?: any): Grid;
             _getDrawer(key: string): _Drawer.Element;
             /**
              * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,

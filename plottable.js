@@ -6658,12 +6658,13 @@ var Plottable;
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
             };
-            Pie.prototype._addDataset = function (key, dataset) {
+            Pie.prototype.addDataset = function (keyOrDataset, dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
                     Plottable._Util.Methods.warn("Only one dataset is supported in Pie plots");
-                    return;
+                    return this;
                 }
-                _super.prototype._addDataset.call(this, key, dataset);
+                _super.prototype.addDataset.call(this, keyOrDataset, dataset);
+                return this;
             };
             Pie.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -7055,12 +7056,13 @@ var Plottable;
                 this._colorScale = colorScale;
                 this.animator("cells", new Plottable.Animator.Null());
             }
-            Grid.prototype._addDataset = function (key, dataset) {
+            Grid.prototype.addDataset = function (keyOrDataset, dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
                     Plottable._Util.Methods.warn("Only one dataset is supported in Grid plots");
-                    return;
+                    return this;
                 }
-                _super.prototype._addDataset.call(this, key, dataset);
+                _super.prototype.addDataset.call(this, keyOrDataset, dataset);
+                return this;
             };
             Grid.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Element(key).svgElement("rect");
