@@ -1024,7 +1024,7 @@ declare module Plottable {
 declare module Plottable {
     module Scale {
         class AbstractScale<D, R> extends Core.PlottableObject implements Core.Listenable {
-            _d3Scale: D3.Scale.Scale;
+            protected _d3Scale: D3.Scale.Scale;
             _autoDomainAutomatically: boolean;
             broadcaster: Core.Broadcaster;
             _rendererAttrID2Extent: {
@@ -1043,8 +1043,8 @@ declare module Plottable {
              * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
              */
             constructor(scale: D3.Scale.Scale);
-            _getAllExtents(): D[][];
-            _getExtent(): D[];
+            protected _getAllExtents(): D[][];
+            protected _getExtent(): D[];
             /**
              * Modifies the domain on the scale so that it includes the extent of all
              * perspectives it depends on. This will normally happen automatically, but
@@ -1086,8 +1086,8 @@ declare module Plottable {
              * @returns {Scale} The calling Scale.
              */
             domain(values: D[]): AbstractScale<D, R>;
-            _getDomain(): any[];
-            _setDomain(values: D[]): void;
+            protected _getDomain(): any[];
+            protected _setDomain(values: D[]): void;
             /**
              * Gets the range.
              *
