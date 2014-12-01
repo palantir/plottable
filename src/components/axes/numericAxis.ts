@@ -26,8 +26,8 @@ export module Axis {
       super(scale, orientation, formatter);
     }
 
-    protected setup() {
-      super.setup();
+    protected _setup() {
+      super._setup();
       this.measurer = _Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(AbstractAxis.TICK_LABEL_CLASS, true));
     }
 
