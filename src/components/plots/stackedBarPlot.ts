@@ -22,7 +22,7 @@ export module Plot {
       this._isVertical = isVertical;
     }
 
-    public _getAnimator(key: string): Animator.PlotAnimator {
+    protected _getAnimator(key: string): Animator.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
         if (this.animator(key)) {
           return this.animator(key);
@@ -36,7 +36,7 @@ export module Plot {
       return new Animator.Null();
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
 
       var primaryAttr = this._isVertical ? "y" : "x";
@@ -60,7 +60,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): _Drawer.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar")}];
     }
 
@@ -70,7 +70,7 @@ export module Plot {
       return this;
     }
 
-    public _onDatasetUpdate() {
+    protected _onDatasetUpdate() {
       super._onDatasetUpdate();
       AbstractStacked.prototype._onDatasetUpdate.apply(this);
       return this;

@@ -17,7 +17,7 @@ describe("Plots", () => {
       stackedPlot.project("y", "y", yScale);
 
       (<any> stackedPlot)._getDrawer = (key: string) => new Plottable._Drawer.AbstractDrawer(key);
-      stackedPlot._isVertical = true;
+      (<any> stackedPlot)._isVertical = true;
     });
 
     it("uses positive offset on stacking the 0 value", () => {
