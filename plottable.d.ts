@@ -1462,7 +1462,7 @@ declare module Plottable {
             constructor();
             constructor(scale: D3.Scale.LinearScale);
             _tickInterval(interval: D3.Time.Interval, step?: number): any[];
-            _setDomain(values: any[]): void;
+            protected _setDomain(values: any[]): void;
             copy(): Time;
             _defaultExtent(): any[];
         }
