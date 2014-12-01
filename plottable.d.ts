@@ -3806,9 +3806,6 @@ declare module Plottable {
              * null.
              */
             dragBox: D3.Selection;
-            _boxIsDrawn: boolean;
-            _resizeXEnabled: boolean;
-            _resizeYEnabled: boolean;
             /**
              * Gets whether resizing is enabled or not.
              *
