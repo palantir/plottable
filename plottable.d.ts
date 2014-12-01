@@ -1379,7 +1379,7 @@ declare module Plottable {
 declare module Plottable {
     module Scale {
         class Ordinal extends AbstractScale<string, number> {
-            _d3Scale: D3.Scale.OrdinalScale;
+            protected _d3Scale: D3.Scale.OrdinalScale;
             _typeCoercer: (d: any) => any;
             /**
              * Creates an OrdinalScale.
@@ -1393,7 +1393,7 @@ declare module Plottable {
             _getExtent(): string[];
             domain(): string[];
             domain(values: string[]): Ordinal;
-            _setDomain(values: string[]): void;
+            protected _setDomain(values: string[]): void;
             range(): number[];
             range(values: number[]): Ordinal;
             /**
