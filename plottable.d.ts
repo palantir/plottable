@@ -3696,8 +3696,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class PanZoom extends AbstractInteraction {
-            _xScale: Scale.AbstractQuantitative<any>;
-            _yScale: Scale.AbstractQuantitative<any>;
             /**
              * Creates a PanZoomInteraction.
              *
