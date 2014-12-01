@@ -30,8 +30,9 @@ export module Plot {
     public _setup() {
       super._setup();
       this._hoverTarget = this._foregroundContainer.append("circle")
-                                          .classed("hover-target", true)
-                                          .style("visibility", "hidden");
+                                                   .classed("hover-target", true)
+                                                   .attr("radius", this._hoverDetectionRadius)
+                                                   .style("visibility", "hidden");
     }
 
     public _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor) {
