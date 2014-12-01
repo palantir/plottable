@@ -1170,7 +1170,7 @@ declare module Plottable {
             copy(): AbstractQuantitative<D>;
             domain(): D[];
             domain(values: D[]): AbstractQuantitative<D>;
-            _setDomain(values: D[]): void;
+            protected _setDomain(values: D[]): void;
             /**
              * Sets or gets the QuantitativeScale's output interpolator
              *
@@ -1350,8 +1350,8 @@ declare module Plottable {
             constructor(base?: number);
             scale(x: number): number;
             invert(x: number): number;
-            _getDomain(): number[];
-            _setDomain(values: number[]): void;
+            protected _getDomain(): number[];
+            protected _setDomain(values: number[]): void;
             ticks(count?: number): number[];
             copy(): ModifiedLog;
             _niceDomain(domain: any[], count?: number): any[];
