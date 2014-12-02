@@ -55,7 +55,7 @@ export module Scale {
       return super.domain(values); // need to override type sig to enable method chaining :/
     }
 
-    public _setDomain(values: D[]) {
+    protected _setDomain(values: D[]) {
         var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
         if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
             _Util.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");

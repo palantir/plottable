@@ -28,7 +28,7 @@ export module Scale {
       return tempScale.ticks(interval.range, step);
     }
 
-    public _setDomain(values: any[]) {
+    protected _setDomain(values: any[]) {
       // attempt to parse dates
       values = values.map(this._typeCoercer);
       return super._setDomain(values);

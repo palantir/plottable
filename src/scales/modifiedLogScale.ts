@@ -88,11 +88,11 @@ export module Scale {
       return this.invertedAdjustedLog(this._d3Scale.invert(x));
     }
 
-    public _getDomain() {
+    protected _getDomain() {
       return this.untransformedDomain;
     }
 
-    public _setDomain(values: number[]) {
+    protected _setDomain(values: number[]) {
       this.untransformedDomain = values;
       var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
       this._d3Scale.domain(transformedDomain);
