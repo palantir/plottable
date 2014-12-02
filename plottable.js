@@ -3212,7 +3212,7 @@ var Plottable;
             AbstractDrawer.prototype._numberOfAnimationIterations = function (data) {
                 return data.length;
             };
-            AbstractDrawer.prototype.applyMetadata = function (attrToProjector, userMetadata, plotMetadata) {
+            AbstractDrawer.prototype._applyMetadata = function (attrToProjector, userMetadata, plotMetadata) {
                 var modifiedAttrToProjector = {};
                 d3.keys(attrToProjector).forEach(function (attr) {
                     modifiedAttrToProjector[attr] = function (datum, index) { return attrToProjector[attr](datum, index, userMetadata, plotMetadata); };
@@ -3237,7 +3237,7 @@ var Plottable;
                 var _this = this;
                 var appliedDrawSteps = drawSteps.map(function (dr) {
                     return {
-                        attrToProjector: _this.applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
+                        attrToProjector: _this._applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
                         animator: dr.animator
                     };
                 });
