@@ -8528,14 +8528,14 @@ var Plottable;
             function AbstractDispatcher(target) {
                 _super.call(this);
                 this._event2Callback = {};
-                this.connected = false;
+                this._connected = false;
                 this._target = target;
             }
             AbstractDispatcher.prototype.target = function (targetElement) {
                 if (targetElement == null) {
                     return this._target;
                 }
-                var wasConnected = this.connected;
+                var wasConnected = this._connected;
                 this.disconnect();
                 this._target = targetElement;
                 if (wasConnected) {
@@ -8557,11 +8557,11 @@ var Plottable;
              */
             AbstractDispatcher.prototype.connect = function () {
                 var _this = this;
-                if (this.connected) {
+                if (this._connected) {
                     throw new Error("Can't connect dispatcher twice!");
                 }
                 if (this._target) {
-                    this.connected = true;
+                    this._connected = true;
                     Object.keys(this._event2Callback).forEach(function (event) {
                         var callback = _this._event2Callback[event];
                         _this._target.on(_this._getEventString(event), callback);
@@ -8576,7 +8576,7 @@ var Plottable;
              */
             AbstractDispatcher.prototype.disconnect = function () {
                 var _this = this;
-                this.connected = false;
+                this._connected = false;
                 if (this._target) {
                     Object.keys(this._event2Callback).forEach(function (event) {
                         _this._target.on(_this._getEventString(event), null);
