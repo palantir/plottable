@@ -7003,7 +7003,7 @@ describe("DragBoxInteractions", function () {
         });
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
+            var dragBoxClass = "." + Plottable.Interaction.XYDragBox._CLASS_DRAG_BOX;
             var dragBox = plot._backgroundContainer.select(dragBoxClass);
             assert.isNotNull(dragBox, "the dragbox was created");
             var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
@@ -7126,7 +7126,7 @@ describe("DragBoxInteractions", function () {
         });
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
+            var dragBoxClass = "." + Plottable.Interaction.XYDragBox._CLASS_DRAG_BOX;
             var dragBox = plot._backgroundContainer.select(dragBoxClass);
             assert.isNotNull(dragBox, "the dragbox was created");
             var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };

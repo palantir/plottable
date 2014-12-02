@@ -8827,20 +8827,19 @@ var Plottable;
              */
             function Key() {
                 _super.call(this);
-                this.activated = false;
-                this.keyCode2Callback = {};
-                this.dispatcher = new Plottable.Dispatcher.Keypress();
+                this._keyCode2Callback = {};
+                this._dispatcher = new Plottable.Dispatcher.Keypress();
             }
             Key.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
-                this.dispatcher.target(this._hitBox);
-                this.dispatcher.onKeyDown(function (e) {
-                    if (_this.keyCode2Callback[e.keyCode]) {
-                        _this.keyCode2Callback[e.keyCode]();
+                this._dispatcher.target(this._hitBox);
+                this._dispatcher.onKeyDown(function (e) {
+                    if (_this._keyCode2Callback[e.keyCode]) {
+                        _this._keyCode2Callback[e.keyCode]();
                     }
                 });
-                this.dispatcher.connect();
+                this._dispatcher.connect();
             };
             /**
              * Sets a callback to be called when the key with the given keyCode is
@@ -8851,7 +8850,7 @@ var Plottable;
              * @returns The calling Interaction.Key.
              */
             Key.prototype.on = function (keyCode, callback) {
-                this.keyCode2Callback[keyCode] = callback;
+                this._keyCode2Callback[keyCode] = callback;
                 return this;
             };
             return Key;
@@ -8894,10 +8893,10 @@ var Plottable;
                 }
                 this._xScale = xScale;
                 this._yScale = yScale;
-                this.zoom = d3.behavior.zoom();
-                this.zoom.x(this._xScale._d3Scale);
-                this.zoom.y(this._yScale._d3Scale);
-                this.zoom.on("zoom", function () { return _this.rerenderZoomed(); });
+                this._zoom = d3.behavior.zoom();
+                this._zoom.x(this._xScale._d3Scale);
+                this._zoom.y(this._yScale._d3Scale);
+                this._zoom.on("zoom", function () { return _this._rerenderZoomed(); });
             }
             /**
              * Sets the scales back to their original domains.
@@ -8905,17 +8904,17 @@ var Plottable;
             PanZoom.prototype.resetZoom = function () {
                 var _this = this;
                 // HACKHACK #254
-                this.zoom = d3.behavior.zoom();
-                this.zoom.x(this._xScale._d3Scale);
-                this.zoom.y(this._yScale._d3Scale);
-                this.zoom.on("zoom", function () { return _this.rerenderZoomed(); });
-                this.zoom(this._hitBox);
+                this._zoom = d3.behavior.zoom();
+                this._zoom.x(this._xScale._d3Scale);
+                this._zoom.y(this._yScale._d3Scale);
+                this._zoom.on("zoom", function () { return _this._rerenderZoomed(); });
+                this._zoom(this._hitBox);
             };
             PanZoom.prototype._anchor = function (component, hitBox) {
                 _super.prototype._anchor.call(this, component, hitBox);
-                this.zoom(hitBox);
+                this._zoom(hitBox);
             };
-            PanZoom.prototype.rerenderZoomed = function () {
+            PanZoom.prototype._rerenderZoomed = function () {
                 // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
                 // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
                 var xDomain = this._xScale._d3Scale.domain();
@@ -8948,21 +8947,20 @@ var Plottable;
             function Drag() {
                 var _this = this;
                 _super.call(this);
-                this.dragInitialized = false;
-                this.origin = [0, 0];
-                this.location = [0, 0];
+                this._origin = [0, 0];
+                this._location = [0, 0];
                 this._isDragging = false;
-                this.dragBehavior = d3.behavior.drag();
-                this.dragBehavior.on("dragstart", function () { return _this._dragstart(); });
-                this.dragBehavior.on("drag", function () { return _this._drag(); });
-                this.dragBehavior.on("dragend", function () { return _this._dragend(); });
+                this._dragBehavior = d3.behavior.drag();
+                this._dragBehavior.on("dragstart", function () { return _this._dragstart(); });
+                this._dragBehavior.on("drag", function () { return _this._drag(); });
+                this._dragBehavior.on("dragend", function () { return _this._dragend(); });
             }
             Drag.prototype.dragstart = function (cb) {
                 if (cb === undefined) {
-                    return this.ondragstart;
+                    return this._ondragstart;
                 }
                 else {
-                    this.ondragstart = cb;
+                    this._ondragstart = cb;
                     return this;
                 }
             };
@@ -8970,32 +8968,32 @@ var Plottable;
             // we always have the uncontrolled dimension of the box extending across the entire component
             // this ensures that the callback values are synchronized with the actual box being drawn
             Drag.prototype._setOrigin = function (x, y) {
-                this.origin = [x, y];
+                this._origin = [x, y];
             };
             Drag.prototype._getOrigin = function () {
-                return this.origin.slice();
+                return this._origin.slice();
             };
             Drag.prototype._setLocation = function (x, y) {
-                this.location = [x, y];
+                this._location = [x, y];
             };
             Drag.prototype._getLocation = function () {
-                return this.location.slice();
+                return this._location.slice();
             };
             Drag.prototype.drag = function (cb) {
                 if (cb === undefined) {
-                    return this.ondrag;
+                    return this._ondrag;
                 }
                 else {
-                    this.ondrag = cb;
+                    this._ondrag = cb;
                     return this;
                 }
             };
             Drag.prototype.dragend = function (cb) {
                 if (cb === undefined) {
-                    return this.ondragend;
+                    return this._ondragend;
                 }
                 else {
-                    this.ondragend = cb;
+                    this._ondragend = cb;
                     return this;
                 }
             };
@@ -9012,8 +9010,8 @@ var Plottable;
                 this._doDragstart();
             };
             Drag.prototype._doDragstart = function () {
-                if (this.ondragstart != null) {
-                    this.ondragstart({ x: this._getOrigin()[0], y: this._getOrigin()[1] });
+                if (this._ondragstart != null) {
+                    this._ondragstart({ x: this._getOrigin()[0], y: this._getOrigin()[1] });
                 }
             };
             Drag.prototype._drag = function () {
@@ -9021,10 +9019,10 @@ var Plottable;
                 this._doDrag();
             };
             Drag.prototype._doDrag = function () {
-                if (this.ondrag != null) {
+                if (this._ondrag != null) {
                     var start = { x: this._getOrigin()[0], y: this._getOrigin()[1] };
                     var end = { x: this._getLocation()[0], y: this._getLocation()[1] };
-                    this.ondrag(start, end);
+                    this._ondrag(start, end);
                 }
             };
             Drag.prototype._dragend = function () {
@@ -9034,15 +9032,15 @@ var Plottable;
                 this._doDragend();
             };
             Drag.prototype._doDragend = function () {
-                if (this.ondragend != null) {
+                if (this._ondragend != null) {
                     var start = { x: this._getOrigin()[0], y: this._getOrigin()[1] };
                     var end = { x: this._getLocation()[0], y: this._getLocation()[1] };
-                    this.ondragend(start, end);
+                    this._ondragend(start, end);
                 }
             };
             Drag.prototype._anchor = function (component, hitBox) {
                 _super.prototype._anchor.call(this, component, hitBox);
-                hitBox.call(this.dragBehavior);
+                hitBox.call(this._dragBehavior);
                 return this;
             };
             /**
@@ -9108,7 +9106,7 @@ var Plottable;
                 this._boxIsDrawn = false;
                 this._resizeXEnabled = false;
                 this._resizeYEnabled = false;
-                this.cursorStyle = "";
+                this._cursorStyle = "";
             }
             DragBox.prototype.resizeEnabled = function (enabled) {
                 if (enabled == null) {
@@ -9126,7 +9124,7 @@ var Plottable;
              * @returns {boolean}
              */
             DragBox.prototype.isResizingX = function () {
-                return !!this.xResizing;
+                return !!this._xResizing;
             };
             /**
              * Return true if box is resizing on the Y dimension.
@@ -9134,7 +9132,7 @@ var Plottable;
              * @returns {boolean}
              */
             DragBox.prototype.isResizingY = function () {
-                return !!this.yResizing;
+                return !!this._yResizing;
             };
             /**
              * Whether or not dragBox has been rendered in a visible area.
@@ -9155,9 +9153,9 @@ var Plottable;
             DragBox.prototype._dragstart = function () {
                 var mouse = d3.mouse(this._hitBox[0][0].parentNode);
                 if (this.boxIsDrawn()) {
-                    var resizeInfo = this.getResizeInfo(mouse[0], mouse[1]);
-                    this.xResizing = resizeInfo.xResizing;
-                    this.yResizing = resizeInfo.yResizing;
+                    var resizeInfo = this._getResizeInfo(mouse[0], mouse[1]);
+                    this._xResizing = resizeInfo.xResizing;
+                    this._yResizing = resizeInfo.yResizing;
                     if (this.isResizing()) {
                         // we are resizing; don't clear the box, don't call the dragstart callback
                         return;
@@ -9166,7 +9164,7 @@ var Plottable;
                 _super.prototype._dragstart.call(this);
                 this.clearBox();
             };
-            DragBox.prototype.getResizeInfo = function (xPosition, yPosition) {
+            DragBox.prototype._getResizeInfo = function (xPosition, yPosition) {
                 var xResizing = null;
                 var yResizing = null;
                 var xStart = this._getOrigin()[0];
@@ -9204,13 +9202,13 @@ var Plottable;
                     // Eases the mouse into the center of the dragging line, in case dragging started with the mouse
                     // away from the center due to `DragBox.RESIZE_PADDING`.
                     if (this.isResizingX()) {
-                        var diffX = this.xResizing.offset;
+                        var diffX = this._xResizing.offset;
                         var x = d3.event.x;
                         if (diffX !== 0) {
                             x += diffX;
-                            this.xResizing.offset += diffX > 0 ? -1 : 1;
+                            this._xResizing.offset += diffX > 0 ? -1 : 1;
                         }
-                        if (this.xResizing.origin) {
+                        if (this._xResizing.origin) {
                             this._setOrigin(this._constrainX(x), this._getOrigin()[1]);
                         }
                         else {
@@ -9218,13 +9216,13 @@ var Plottable;
                         }
                     }
                     if (this.isResizingY()) {
-                        var diffY = this.yResizing.offset;
+                        var diffY = this._yResizing.offset;
                         var y = d3.event.y;
                         if (diffY !== 0) {
                             y += diffY;
-                            this.yResizing.offset += diffY > 0 ? -1 : 1;
+                            this._yResizing.offset += diffY > 0 ? -1 : 1;
                         }
-                        if (this.yResizing.origin) {
+                        if (this._yResizing.origin) {
                             this._setOrigin(this._getOrigin()[0], this._constrainY(y));
                         }
                         else {
@@ -9239,8 +9237,8 @@ var Plottable;
                 this.setBox(this._getOrigin()[0], this._getLocation()[0], this._getOrigin()[1], this._getLocation()[1]);
             };
             DragBox.prototype._dragend = function () {
-                this.xResizing = null;
-                this.yResizing = null;
+                this._xResizing = null;
+                this._yResizing = null;
                 _super.prototype._dragend.call(this);
             };
             /**
@@ -9281,7 +9279,7 @@ var Plottable;
             DragBox.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
-                var cname = DragBox.CLASS_DRAG_BOX;
+                var cname = DragBox._CLASS_DRAG_BOX;
                 var background = this._componentToListenTo._backgroundContainer;
                 this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
                 hitBox.on("mousemove", function () { return _this._hover(); });
@@ -9290,15 +9288,15 @@ var Plottable;
             DragBox.prototype._hover = function () {
                 if (this.resizeEnabled() && !this._isDragging && this._boxIsDrawn) {
                     var position = d3.mouse(this._hitBox[0][0].parentNode);
-                    this.cursorStyle = this.getCursorStyle(position[0], position[1]);
+                    this._cursorStyle = this._getCursorStyle(position[0], position[1]);
                 }
                 else if (!this._boxIsDrawn) {
-                    this.cursorStyle = "";
+                    this._cursorStyle = "";
                 }
-                this._hitBox.style("cursor", this.cursorStyle);
+                this._hitBox.style("cursor", this._cursorStyle);
             };
-            DragBox.prototype.getCursorStyle = function (xOrigin, yOrigin) {
-                var resizeInfo = this.getResizeInfo(xOrigin, yOrigin);
+            DragBox.prototype._getCursorStyle = function (xOrigin, yOrigin) {
+                var resizeInfo = this._getResizeInfo(xOrigin, yOrigin);
                 var left = resizeInfo.xResizing && !resizeInfo.xResizing.positive;
                 var right = resizeInfo.xResizing && resizeInfo.xResizing.positive;
                 var top = resizeInfo.yResizing && !resizeInfo.yResizing.positive;
@@ -9319,7 +9317,7 @@ var Plottable;
                     return "";
                 }
             };
-            DragBox.CLASS_DRAG_BOX = "drag-box";
+            DragBox._CLASS_DRAG_BOX = "drag-box";
             DragBox.RESIZE_PADDING = 10;
             DragBox._CAN_RESIZE_X = true;
             DragBox._CAN_RESIZE_Y = true;
@@ -9425,7 +9423,7 @@ var Plottable;
             __extends(Hover, _super);
             function Hover() {
                 _super.apply(this, arguments);
-                this.currentHoverData = {
+                this._currentHoverData = {
                     data: null,
                     pixelPositions: null,
                     selection: null
@@ -9434,22 +9432,22 @@ var Plottable;
             Hover.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
-                this.dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
-                this.dispatcher.mouseover(function (p) {
+                this._dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
+                this._dispatcher.mouseover(function (p) {
                     _this._componentToListenTo._hoverOverComponent(p);
                     _this.handleHoverOver(p);
                 });
-                this.dispatcher.mouseout(function (p) {
+                this._dispatcher.mouseout(function (p) {
                     _this._componentToListenTo._hoverOutComponent(p);
-                    _this.safeHoverOut(_this.currentHoverData);
-                    _this.currentHoverData = {
+                    _this.safeHoverOut(_this._currentHoverData);
+                    _this._currentHoverData = {
                         data: null,
                         pixelPositions: null,
                         selection: null
                     };
                 });
-                this.dispatcher.mousemove(function (p) { return _this.handleHoverOver(p); });
-                this.dispatcher.connect();
+                this._dispatcher.mousemove(function (p) { return _this.handleHoverOver(p); });
+                this._dispatcher.connect();
             };
             /**
              * Returns a HoverData consisting of all data and selections in a but not in b.
@@ -9482,22 +9480,22 @@ var Plottable;
                 };
             };
             Hover.prototype.handleHoverOver = function (p) {
-                var lastHoverData = this.currentHoverData;
+                var lastHoverData = this._currentHoverData;
                 var newHoverData = this._componentToListenTo._doHover(p);
-                this.currentHoverData = newHoverData;
+                this._currentHoverData = newHoverData;
                 var outData = Hover.diffHoverData(lastHoverData, newHoverData);
                 this.safeHoverOut(outData);
                 var overData = Hover.diffHoverData(newHoverData, lastHoverData);
                 this.safeHoverOver(overData);
             };
             Hover.prototype.safeHoverOut = function (outData) {
-                if (this.hoverOutCallback && outData.data) {
-                    this.hoverOutCallback(outData);
+                if (this._hoverOutCallback && outData.data) {
+                    this._hoverOutCallback(outData);
                 }
             };
             Hover.prototype.safeHoverOver = function (overData) {
-                if (this.hoverOverCallback && overData.data) {
-                    this.hoverOverCallback(overData);
+                if (this._hoverOverCallback && overData.data) {
+                    this._hoverOverCallback(overData);
                 }
             };
             /**
@@ -9508,7 +9506,7 @@ var Plottable;
              * @return {Interaction.Hover} The calling Interaction.Hover.
              */
             Hover.prototype.onHoverOver = function (callback) {
-                this.hoverOverCallback = callback;
+                this._hoverOverCallback = callback;
                 return this;
             };
             /**
@@ -9519,7 +9517,7 @@ var Plottable;
              * @return {Interaction.Hover} The calling Interaction.Hover.
              */
             Hover.prototype.onHoverOut = function (callback) {
-                this.hoverOutCallback = callback;
+                this._hoverOutCallback = callback;
                 return this;
             };
             /**
@@ -9529,7 +9527,7 @@ var Plottable;
              *                     the user is currently hovering over.
              */
             Hover.prototype.getCurrentHoverData = function () {
-                return this.currentHoverData;
+                return this._currentHoverData;
             };
             return Hover;
         })(Interaction.AbstractInteraction);
