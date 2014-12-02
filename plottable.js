@@ -491,13 +491,13 @@ var Plottable;
              */
             function Cache(compute, canonicalKey, valueEq) {
                 if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
-                this.cache = d3.map();
-                this.canonicalKey = null;
-                this.compute = compute;
-                this.canonicalKey = canonicalKey;
-                this.valueEq = valueEq;
+                this._cache = d3.map();
+                this._canonicalKey = null;
+                this._compute = compute;
+                this._canonicalKey = canonicalKey;
+                this._valueEq = valueEq;
                 if (canonicalKey !== undefined) {
-                    this.cache.set(this.canonicalKey, this.compute(this.canonicalKey));
+                    this._cache.set(this._canonicalKey, this._compute(this._canonicalKey));
                 }
             }
             /**
@@ -508,10 +508,10 @@ var Plottable;
              * @return {T} The value associated with k; the result of compute(k).
              */
             Cache.prototype.get = function (k) {
-                if (!this.cache.has(k)) {
-                    this.cache.set(k, this.compute(k));
+                if (!this._cache.has(k)) {
+                    this._cache.set(k, this._compute(k));
                 }
-                return this.cache.get(k);
+                return this._cache.get(k);
             };
             /**
              * Reset the cache empty.
@@ -523,8 +523,8 @@ var Plottable;
              * @return {Cache<T>} The calling Cache.
              */
             Cache.prototype.clear = function () {
-                if (this.canonicalKey === undefined || !this.valueEq(this.cache.get(this.canonicalKey), this.compute(this.canonicalKey))) {
-                    this.cache = d3.map();
+                if (this._canonicalKey === undefined || !this._valueEq(this._cache.get(this._canonicalKey), this._compute(this._canonicalKey))) {
+                    this._cache = d3.map();
                 }
                 return this;
             };
