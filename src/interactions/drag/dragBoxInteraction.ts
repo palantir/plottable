@@ -23,9 +23,9 @@ export module Interaction {
      * null.
      */
     public dragBox: D3.Selection;
-    public _boxIsDrawn = false;
-    public _resizeXEnabled = false;
-    public _resizeYEnabled = false;
+    private _boxIsDrawn = false;
+    private _resizeXEnabled = false;
+    private _resizeYEnabled = false;
     private xResizing: ResizeDimension;
     private yResizing: ResizeDimension;
     private cursorStyle = "";
