@@ -8827,20 +8827,19 @@ var Plottable;
              */
             function Key() {
                 _super.call(this);
-                this.activated = false;
-                this.keyCode2Callback = {};
-                this.dispatcher = new Plottable.Dispatcher.Keypress();
+                this._keyCode2Callback = {};
+                this._dispatcher = new Plottable.Dispatcher.Keypress();
             }
             Key.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
-                this.dispatcher.target(this._hitBox);
-                this.dispatcher.onKeyDown(function (e) {
-                    if (_this.keyCode2Callback[e.keyCode]) {
-                        _this.keyCode2Callback[e.keyCode]();
+                this._dispatcher.target(this._hitBox);
+                this._dispatcher.onKeyDown(function (e) {
+                    if (_this._keyCode2Callback[e.keyCode]) {
+                        _this._keyCode2Callback[e.keyCode]();
                     }
                 });
-                this.dispatcher.connect();
+                this._dispatcher.connect();
             };
             /**
              * Sets a callback to be called when the key with the given keyCode is
@@ -8851,7 +8850,7 @@ var Plottable;
              * @returns The calling Interaction.Key.
              */
             Key.prototype.on = function (keyCode, callback) {
-                this.keyCode2Callback[keyCode] = callback;
+                this._keyCode2Callback[keyCode] = callback;
                 return this;
             };
             return Key;
