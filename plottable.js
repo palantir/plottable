@@ -2781,7 +2781,7 @@ var Plottable;
                 switch (scaleType) {
                     case null:
                     case undefined:
-                        scale = d3.scale.ordinal().range(Color.getPlottableColors());
+                        scale = d3.scale.ordinal().range(Color._getPlottableColors());
                         break;
                     case "Category10":
                     case "category10":
@@ -2817,7 +2817,7 @@ var Plottable;
                 });
                 return Plottable._Util.Methods.uniq(concatenatedExtents);
             };
-            Color.getPlottableColors = function () {
+            Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];
                 var colorTester = d3.select("body").append("div");
                 var i = 0;
