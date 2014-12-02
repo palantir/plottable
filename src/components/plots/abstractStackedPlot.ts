@@ -9,7 +9,7 @@ export module Plot {
   }
 
   export class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
-    private stackedExtent = [0, 0];
+    private _stackedExtent = [0, 0];
     public _isVertical: boolean;
 
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
@@ -67,7 +67,7 @@ export module Plot {
         }, 0);
       }, 0);
 
-      this.stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
+      this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
     }
 
     /**
@@ -164,8 +164,8 @@ export module Plot {
       if (!primaryScale) {
         return;
       }
-      if (this._isAnchored && this.stackedExtent.length > 0) {
-        primaryScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+      if (this._isAnchored && this._stackedExtent.length > 0) {
+        primaryScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
       } else {
         primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
       }

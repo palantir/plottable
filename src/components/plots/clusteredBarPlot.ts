@@ -27,7 +27,7 @@ export module Plot {
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       // the width is constant, so set the inner scale range to that
-      var innerScale = this.makeInnerScale();
+      var innerScale = this._makeInnerScale();
       var innerWidthF = (d: any, i: number) => innerScale.rangeBand();
       var heightF = attrToProjector["height"];
       attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
@@ -45,14 +45,14 @@ export module Plot {
     }
 
     public _updateClusterPosition() {
-      var innerScale = this.makeInnerScale();
+      var innerScale = this._makeInnerScale();
       this._datasetKeysInOrder.forEach((key: string) => {
         var plotMetadata = <ClusteredPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
         plotMetadata.position = innerScale.scale(key);
       });
     }
 
-    private makeInnerScale() {
+    private _makeInnerScale(){
       var innerScale = new Scale.Ordinal();
       innerScale.domain(this._datasetKeysInOrder);
       // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
