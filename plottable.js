@@ -1577,7 +1577,7 @@ var Plottable;
             this.broadcaster = new Plottable.Core.Broadcaster(this);
             this._data = data;
             this._metadata = metadata;
-            this.accessor2cachedExtent = new Plottable._Util.StrictEqualityAssociativeArray();
+            this._accessor2cachedExtent = new Plottable._Util.StrictEqualityAssociativeArray();
         }
         Dataset.prototype.data = function (data) {
             if (data == null) {
@@ -1585,7 +1585,7 @@ var Plottable;
             }
             else {
                 this._data = data;
-                this.accessor2cachedExtent = new Plottable._Util.StrictEqualityAssociativeArray();
+                this._accessor2cachedExtent = new Plottable._Util.StrictEqualityAssociativeArray();
                 this.broadcaster.broadcast();
                 return this;
             }
@@ -1596,21 +1596,21 @@ var Plottable;
             }
             else {
                 this._metadata = metadata;
-                this.accessor2cachedExtent = new Plottable._Util.StrictEqualityAssociativeArray();
+                this._accessor2cachedExtent = new Plottable._Util.StrictEqualityAssociativeArray();
                 this.broadcaster.broadcast();
                 return this;
             }
         };
         Dataset.prototype._getExtent = function (accessor, typeCoercer, plotMetadata) {
             if (plotMetadata === void 0) { plotMetadata = {}; }
-            var cachedExtent = this.accessor2cachedExtent.get(accessor);
+            var cachedExtent = this._accessor2cachedExtent.get(accessor);
             if (cachedExtent === undefined) {
-                cachedExtent = this.computeExtent(accessor, typeCoercer, plotMetadata);
-                this.accessor2cachedExtent.set(accessor, cachedExtent);
+                cachedExtent = this._computeExtent(accessor, typeCoercer, plotMetadata);
+                this._accessor2cachedExtent.set(accessor, cachedExtent);
             }
             return cachedExtent;
         };
-        Dataset.prototype.computeExtent = function (accessor, typeCoercer, plotMetadata) {
+        Dataset.prototype._computeExtent = function (accessor, typeCoercer, plotMetadata) {
             var _this = this;
             var appliedAccessor = function (d, i) { return accessor(d, i, _this._metadata, plotMetadata); };
             var mappedData = this._data.map(appliedAccessor).map(typeCoercer);
