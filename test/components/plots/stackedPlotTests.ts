@@ -137,7 +137,7 @@ describe("Plots", () => {
       assert.strictEqual(ds5PlotMetadata.offsets.get("1"), 8, "stacking on data1 + data3 numerical y values");
       assert.strictEqual(ds6PlotMetadata.offsets.get("1"), -3, "stacking on data2 + data4 numerical y values");
 
-      assert.deepEqual((<any> stackedPlot).stackedExtent, [-4, 9], "stacked extent is as normal");
+      assert.deepEqual((<any> stackedPlot)._stackedExtent, [-4, 9], "stacked extent is as normal");
     });
 
     it("stacks correctly on empty data", () => {
