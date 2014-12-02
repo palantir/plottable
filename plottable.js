@@ -8893,10 +8893,10 @@ var Plottable;
                 }
                 this._xScale = xScale;
                 this._yScale = yScale;
-                this.zoom = d3.behavior.zoom();
-                this.zoom.x(this._xScale._d3Scale);
-                this.zoom.y(this._yScale._d3Scale);
-                this.zoom.on("zoom", function () { return _this.rerenderZoomed(); });
+                this._zoom = d3.behavior.zoom();
+                this._zoom.x(this._xScale._d3Scale);
+                this._zoom.y(this._yScale._d3Scale);
+                this._zoom.on("zoom", function () { return _this._rerenderZoomed(); });
             }
             /**
              * Sets the scales back to their original domains.
@@ -8904,17 +8904,17 @@ var Plottable;
             PanZoom.prototype.resetZoom = function () {
                 var _this = this;
                 // HACKHACK #254
-                this.zoom = d3.behavior.zoom();
-                this.zoom.x(this._xScale._d3Scale);
-                this.zoom.y(this._yScale._d3Scale);
-                this.zoom.on("zoom", function () { return _this.rerenderZoomed(); });
-                this.zoom(this._hitBox);
+                this._zoom = d3.behavior.zoom();
+                this._zoom.x(this._xScale._d3Scale);
+                this._zoom.y(this._yScale._d3Scale);
+                this._zoom.on("zoom", function () { return _this._rerenderZoomed(); });
+                this._zoom(this._hitBox);
             };
             PanZoom.prototype._anchor = function (component, hitBox) {
                 _super.prototype._anchor.call(this, component, hitBox);
-                this.zoom(hitBox);
+                this._zoom(hitBox);
             };
-            PanZoom.prototype.rerenderZoomed = function () {
+            PanZoom.prototype._rerenderZoomed = function () {
                 // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
                 // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
                 var xDomain = this._xScale._d3Scale.domain();
