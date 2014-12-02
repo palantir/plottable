@@ -9,7 +9,7 @@ export module _Drawer {
       this._svgElement = "path";
     }
 
-    private createArc(innerRadiusF: _AppliedProjector, outerRadiusF: _AppliedProjector) {
+    private _createArc(innerRadiusF: _AppliedProjector, outerRadiusF: _AppliedProjector) {
       return d3.svg.arc()
                    .innerRadius(innerRadiusF)
                    .outerRadius(outerRadiusF);
@@ -31,7 +31,7 @@ export module _Drawer {
       delete attrToProjector["inner-radius"];
       delete attrToProjector["outer-radius"];
 
-      attrToProjector["d"] = this.createArc(innerRadiusF, outerRadiusF);
+      attrToProjector["d"] = this._createArc(innerRadiusF, outerRadiusF);
       return super._drawStep({attrToProjector: attrToProjector, animator: step.animator});
     }
 

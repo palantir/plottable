@@ -3564,7 +3564,7 @@ var Plottable;
                 _super.call(this, key);
                 this._svgElement = "path";
             }
-            Arc.prototype.createArc = function (innerRadiusF, outerRadiusF) {
+            Arc.prototype._createArc = function (innerRadiusF, outerRadiusF) {
                 return d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
             };
             Arc.prototype.retargetProjectors = function (attrToProjector) {
@@ -3581,7 +3581,7 @@ var Plottable;
                 var outerRadiusF = attrToProjector["outer-radius"];
                 delete attrToProjector["inner-radius"];
                 delete attrToProjector["outer-radius"];
-                attrToProjector["d"] = this.createArc(innerRadiusF, outerRadiusF);
+                attrToProjector["d"] = this._createArc(innerRadiusF, outerRadiusF);
                 return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
             };
             Arc.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
