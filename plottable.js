@@ -8613,21 +8613,21 @@ var Plottable;
                 _super.call(this, target);
                 this._event2Callback["mouseover"] = function () {
                     if (_this._mouseover != null) {
-                        _this._mouseover(_this.getMousePosition());
+                        _this._mouseover(_this._getMousePosition());
                     }
                 };
                 this._event2Callback["mousemove"] = function () {
                     if (_this._mousemove != null) {
-                        _this._mousemove(_this.getMousePosition());
+                        _this._mousemove(_this._getMousePosition());
                     }
                 };
                 this._event2Callback["mouseout"] = function () {
                     if (_this._mouseout != null) {
-                        _this._mouseout(_this.getMousePosition());
+                        _this._mouseout(_this._getMousePosition());
                     }
                 };
             }
-            Mouse.prototype.getMousePosition = function () {
+            Mouse.prototype._getMousePosition = function () {
                 var xy = d3.mouse(this._target.node());
                 return {
                     x: xy[0],
