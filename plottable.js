@@ -5188,15 +5188,15 @@ var Plottable;
                 if (this._scale.domain().length === 0) {
                     return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
                 }
-                var ordScale = this._scale;
-                var fakeScale = ordScale.copy();
+                var ordinalScale = this._scale;
+                var fakeScale = ordinalScale.copy();
                 if (this._isHorizontal()) {
                     fakeScale.range([0, offeredWidth]);
                 }
                 else {
                     fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, ordScale.domain());
+                var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, ordinalScale.domain());
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
                     height: textResult.usedHeight + heightRequiredByTicks,

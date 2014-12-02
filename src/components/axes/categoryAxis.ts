@@ -40,14 +40,14 @@ export module Axis {
         return {width: 0, height: 0, wantsWidth: false, wantsHeight: false };
       }
 
-      var ordScale: Scale.Ordinal = <Scale.Ordinal> this._scale;
-      var fakeScale = ordScale.copy();
+      var ordinalScale: Scale.Ordinal = <Scale.Ordinal> this._scale;
+      var fakeScale = ordinalScale.copy();
       if (this._isHorizontal()) {
         fakeScale.range([0, offeredWidth]);
       } else {
         fakeScale.range([offeredHeight, 0]);
       }
-      var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, ordScale.domain());
+      var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, ordinalScale.domain());
 
       return {
         width : textResult.usedWidth  + widthRequiredByTicks,
