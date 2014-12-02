@@ -1928,7 +1928,7 @@ var Plottable;
             this._paddingExceptions = d3.map();
             this._unregisteredPaddingExceptions = d3.set();
             this._includedValues = d3.map();
-            // includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
+            // _includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
             this._unregisteredIncludedValues = d3.map();
             this._combineExtents = combineExtents;
         }

@@ -9,7 +9,7 @@ module Plottable {
     private _paddingExceptions: D3.Map<any> = d3.map();
     private _unregisteredPaddingExceptions: D3.Set<any> = d3.set();
     private _includedValues: D3.Map<any> = d3.map();
-    // includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
+    // _includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
     private _unregisteredIncludedValues: D3.Map<any> = d3.map();
     private _combineExtents: (extents: any[][]) => any[];
     private static _PADDING_FOR_IDENTICAL_DOMAIN = 1;
