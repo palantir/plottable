@@ -3341,7 +3341,7 @@ var Plottable;
                 else {
                     _Drawer.AbstractDrawer.prototype._enterData.call(this, data);
                 }
-                this.areaSelection.datum(data);
+                this._areaSelection.datum(data);
             };
             /**
              * Sets the value determining if line should be drawn.
@@ -3353,7 +3353,7 @@ var Plottable;
                 return this;
             };
             Area.prototype.setup = function (area) {
-                this.areaSelection = area.append("path").classed("area", true).style({ "stroke": "none" });
+                this._areaSelection = area.append("path").classed("area", true).style({ "stroke": "none" });
                 if (this._drawLine) {
                     _super.prototype.setup.call(this, area);
                 }
@@ -3361,7 +3361,7 @@ var Plottable;
                     _Drawer.AbstractDrawer.prototype.setup.call(this, area);
                 }
             };
-            Area.prototype.createArea = function (xFunction, y0Function, y1Function, definedFunction) {
+            Area.prototype._createArea = function (xFunction, y0Function, y1Function, definedFunction) {
                 if (!definedFunction) {
                     definedFunction = function () { return true; };
                 }
@@ -3385,11 +3385,11 @@ var Plottable;
                 if (attrToProjector["defined"]) {
                     delete attrToProjector["defined"];
                 }
-                attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function, definedFunction);
+                attrToProjector["d"] = this._createArea(xFunction, y0Function, y1Function, definedFunction);
                 if (attrToProjector["fill"]) {
-                    this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                    this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
-                step.animator.animate(this.areaSelection, attrToProjector);
+                step.animator.animate(this._areaSelection, attrToProjector);
             };
             return Area;
         })(_Drawer.Line);
