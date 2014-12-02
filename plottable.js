@@ -8828,7 +8828,6 @@ var Plottable;
              */
             function Key() {
                 _super.call(this);
-                this.activated = false;
                 this.keyCode2Callback = {};
                 this.dispatcher = new Plottable.Dispatcher.Keypress();
             }
@@ -8949,7 +8948,6 @@ var Plottable;
             function Drag() {
                 var _this = this;
                 _super.call(this);
-                this.dragInitialized = false;
                 this.origin = [0, 0];
                 this.location = [0, 0];
                 this._isDragging = false;

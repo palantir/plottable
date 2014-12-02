@@ -3,7 +3,6 @@
 module Plottable {
 export module Interaction {
   export class Drag extends AbstractInteraction {
-    private dragInitialized = false;
     private dragBehavior: D3.Behavior.Drag;
     private      origin = [0,0];
     private    location = [0,0];
