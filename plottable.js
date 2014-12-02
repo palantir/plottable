@@ -8100,31 +8100,16 @@ var Plottable;
                 this._baselineValue = 0;
                 this.classed("area-plot", true);
                 this._isVertical = true;
-                this._defaultFillColor = new Plottable.Scale.Color().range()[0];
             }
             StackedArea.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Area(key).drawLine(false);
             };
+            StackedArea.prototype._getAnimator = function (key) {
+                return new Plottable.Animator.Null();
+            };
             StackedArea.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
-            };
-            StackedArea.prototype._updateStackOffsets = function () {
-                var _this = this;
-                if (!this._projectorsReady()) {
-                    return;
-                }
-                var domainKeys = this._getDomainKeys();
-                var keyAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
-                var keySets = this._datasetKeysInOrder.map(function (k) {
-                    var dataset = _this._key2PlotDatasetKey.get(k).dataset;
-                    var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
-                    return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i, dataset.metadata(), plotMetadata).toString(); })).values();
-                });
-                if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
-                    Plottable._Util.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
-                }
-                _super.prototype._updateStackOffsets.call(this);
             };
             StackedArea.prototype._additionalPaint = function () {
                 var scaledBaseline = this._yScale.scale(this._baselineValue);
@@ -8145,31 +8130,74 @@ var Plottable;
                     scale._autoDomainIfAutomaticMode();
                 }
             };
+            StackedArea.prototype.project = function (attrToSet, accessor, scale) {
+                _super.prototype.project.call(this, attrToSet, accessor, scale);
+                Plot.AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
+                return this;
+            };
             StackedArea.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-                Plot.Area.prototype._onDatasetUpdate.apply(this);
+                Plot.AbstractStacked.prototype._onDatasetUpdate.apply(this);
+                return this;
             };
             StackedArea.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var wholeDatumAttributes = this._wholeDatumAttributes();
-                var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
-                var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
-                singleDatumAttributes.forEach(function (attribute) {
-                    var projector = attrToProjector[attribute];
-                    attrToProjector[attribute] = function (data, i, u, m) { return data.length > 0 ? projector(data[0], i, u, m) : null; };
-                });
+                if (this._projections["fill-opacity"] == null) {
+                    attrToProjector["fill-opacity"] = d3.functor(1);
+                }
                 var yAccessor = this._projections["y"].accessor;
                 attrToProjector["y"] = function (d, i, u, m) { return _this._yScale.scale(+yAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 attrToProjector["y0"] = function (d, i, u, m) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
                 return attrToProjector;
             };
             StackedArea.prototype._wholeDatumAttributes = function () {
                 return ["x", "y", "defined"];
             };
+            //===== Stack logic from AbstractStackedPlot =====
+            StackedArea.prototype._updateStackOffsets = function () {
+                var _this = this;
+                if (!this._projectorsReady()) {
+                    return;
+                }
+                var domainKeys = this._getDomainKeys();
+                var keyAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+                var keySets = this._datasetKeysInOrder.map(function (k) {
+                    var dataset = _this._key2PlotDatasetKey.get(k).dataset;
+                    var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
+                    return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i, dataset.metadata(), plotMetadata).toString(); })).values();
+                });
+                if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
+                    Plottable._Util.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
+                }
+                Plot.AbstractStacked.prototype._updateStackOffsets.call(this);
+            };
+            StackedArea.prototype._updateStackExtents = function () {
+                Plot.AbstractStacked.prototype._updateStackExtents.call(this);
+            };
+            StackedArea.prototype._stack = function (dataArray) {
+                return Plot.AbstractStacked.prototype._stack.call(this, dataArray);
+            };
+            StackedArea.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
+                Plot.AbstractStacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+            };
+            StackedArea.prototype._getDomainKeys = function () {
+                return Plot.AbstractStacked.prototype._getDomainKeys.call(this);
+            };
+            StackedArea.prototype._generateDefaultMapArray = function () {
+                return Plot.AbstractStacked.prototype._generateDefaultMapArray.call(this);
+            };
+            StackedArea.prototype._updateScaleExtents = function () {
+                Plot.AbstractStacked.prototype._updateScaleExtents.call(this);
+            };
+            StackedArea.prototype._keyAccessor = function () {
+                return Plot.AbstractStacked.prototype._keyAccessor.call(this);
+            };
+            StackedArea.prototype._valueAccessor = function () {
+                return Plot.AbstractStacked.prototype._valueAccessor.call(this);
+            };
             return StackedArea;
-        })(Plot.AbstractStacked);
+        })(Plot.Area);
         Plot.StackedArea = StackedArea;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;

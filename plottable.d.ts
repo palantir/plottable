@@ -3238,7 +3238,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class StackedArea<X> extends AbstractStacked<X, number> {
+        class StackedArea<X> extends Area<X> {
             _baseline: D3.Selection;
             _baselineValue: number;
             /**
@@ -3250,13 +3250,23 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _getDrawer(key: string): _Drawer.Area;
+            _getAnimator(key: string): Animator.PlotAnimator;
             _setup(): void;
-            _updateStackOffsets(): void;
             _additionalPaint(): void;
             _updateYDomainer(): void;
-            _onDatasetUpdate(): void;
+            project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedArea<X>;
+            _onDatasetUpdate(): StackedArea<X>;
             _generateAttrToProjector(): AttributeToProjector;
             _wholeDatumAttributes(): string[];
+            _updateStackOffsets(): void;
+            _updateStackExtents(): void;
+            _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
+            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
+            _getDomainKeys(): any;
+            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
+            _updateScaleExtents(): void;
+            _keyAccessor(): _Accessor;
+            _valueAccessor(): _Accessor;
         }
     }
 }
