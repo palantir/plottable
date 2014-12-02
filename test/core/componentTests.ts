@@ -218,7 +218,7 @@ it("components can be offset relative to their alignment, and throw errors if th
   });
 
   it("componentID works as expected", () => {
-    var expectedID = (<any> Plottable.Core.PlottableObject).nextID;
+    var expectedID = (<any> Plottable.Core.PlottableObject)._nextID;
     var c1 = new Plottable.Component.AbstractComponent();
     assert.equal(c1._plottableID, expectedID, "component id on next component was as expected");
     var c2 = new Plottable.Component.AbstractComponent();

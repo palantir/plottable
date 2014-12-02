@@ -1455,9 +1455,9 @@ var Plottable;
          */
         var PlottableObject = (function () {
             function PlottableObject() {
-                this._plottableID = PlottableObject.nextID++;
+                this._plottableID = PlottableObject._nextID++;
             }
-            PlottableObject.nextID = 0;
+            PlottableObject._nextID = 0;
             return PlottableObject;
         })();
         Core.PlottableObject = PlottableObject;
@@ -1493,7 +1493,7 @@ var Plottable;
              */
             function Broadcaster(listenable) {
                 _super.call(this);
-                this.key2callback = new Plottable._Util.StrictEqualityAssociativeArray();
+                this._key2callback = new Plottable._Util.StrictEqualityAssociativeArray();
                 this.listenable = listenable;
             }
             /**
@@ -1506,7 +1506,7 @@ var Plottable;
              * @returns {Broadcaster} this object
              */
             Broadcaster.prototype.registerListener = function (key, callback) {
-                this.key2callback.set(key, callback);
+                this._key2callback.set(key, callback);
                 return this;
             };
             /**
@@ -1521,7 +1521,7 @@ var Plottable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
-                this.key2callback.values().forEach(function (callback) { return callback(_this.listenable, args); });
+                this._key2callback.values().forEach(function (callback) { return callback(_this.listenable, args); });
                 return this;
             };
             /**
@@ -1531,7 +1531,7 @@ var Plottable;
              * @returns {Broadcaster} this object
              */
             Broadcaster.prototype.deregisterListener = function (key) {
-                this.key2callback.delete(key);
+                this._key2callback.delete(key);
                 return this;
             };
             /**
@@ -1540,7 +1540,7 @@ var Plottable;
              * @returns {Broadcaster} this object
              */
             Broadcaster.prototype.deregisterAllListeners = function () {
-                this.key2callback = new Plottable._Util.StrictEqualityAssociativeArray();
+                this._key2callback = new Plottable._Util.StrictEqualityAssociativeArray();
             };
             return Broadcaster;
         })(Core.PlottableObject);
@@ -1577,7 +1577,7 @@ var Plottable;
             this.broadcaster = new Plottable.Core.Broadcaster(this);
             this._data = data;
             this._metadata = metadata;
-            this.accessor2cachedExtent = new Plottable._Util.StrictEqualityAssociativeArray();
+            this._accessor2cachedExtent = new Plottable._Util.StrictEqualityAssociativeArray();
         }
         Dataset.prototype.data = function (data) {
             if (data == null) {
@@ -1585,7 +1585,7 @@ var Plottable;
             }
             else {
                 this._data = data;
-                this.accessor2cachedExtent = new Plottable._Util.StrictEqualityAssociativeArray();
+                this._accessor2cachedExtent = new Plottable._Util.StrictEqualityAssociativeArray();
                 this.broadcaster.broadcast();
                 return this;
             }
@@ -1596,21 +1596,21 @@ var Plottable;
             }
             else {
                 this._metadata = metadata;
-                this.accessor2cachedExtent = new Plottable._Util.StrictEqualityAssociativeArray();
+                this._accessor2cachedExtent = new Plottable._Util.StrictEqualityAssociativeArray();
                 this.broadcaster.broadcast();
                 return this;
             }
         };
         Dataset.prototype._getExtent = function (accessor, typeCoercer, plotMetadata) {
             if (plotMetadata === void 0) { plotMetadata = {}; }
-            var cachedExtent = this.accessor2cachedExtent.get(accessor);
+            var cachedExtent = this._accessor2cachedExtent.get(accessor);
             if (cachedExtent === undefined) {
-                cachedExtent = this.computeExtent(accessor, typeCoercer, plotMetadata);
-                this.accessor2cachedExtent.set(accessor, cachedExtent);
+                cachedExtent = this._computeExtent(accessor, typeCoercer, plotMetadata);
+                this._accessor2cachedExtent.set(accessor, cachedExtent);
             }
             return cachedExtent;
         };
-        Dataset.prototype.computeExtent = function (accessor, typeCoercer, plotMetadata) {
+        Dataset.prototype._computeExtent = function (accessor, typeCoercer, plotMetadata) {
             var _this = this;
             var appliedAccessor = function (d, i) { return accessor(d, i, _this._metadata, plotMetadata); };
             var mappedData = this._data.map(appliedAccessor).map(typeCoercer);
@@ -1923,14 +1923,14 @@ var Plottable;
          *        the min of the first elements and the max of the second arguments.
          */
         function Domainer(combineExtents) {
-            this.doNice = false;
-            this.padProportion = 0.0;
-            this.paddingExceptions = d3.map();
-            this.unregisteredPaddingExceptions = d3.set();
-            this.includedValues = d3.map();
-            // includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
-            this.unregisteredIncludedValues = d3.map();
-            this.combineExtents = combineExtents;
+            this._doNice = false;
+            this._padProportion = 0.0;
+            this._paddingExceptions = d3.map();
+            this._unregisteredPaddingExceptions = d3.set();
+            this._includedValues = d3.map();
+            // _includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
+            this._unregisteredIncludedValues = d3.map();
+            this._combineExtents = combineExtents;
         }
         /**
          * @param {any[][]} extents The list of extents to be reduced to a single
@@ -1943,8 +1943,8 @@ var Plottable;
          */
         Domainer.prototype.computeDomain = function (extents, scale) {
             var domain;
-            if (this.combineExtents != null) {
-                domain = this.combineExtents(extents);
+            if (this._combineExtents != null) {
+                domain = this._combineExtents(extents);
             }
             else if (extents.length === 0) {
                 domain = scale._defaultExtent();
@@ -1973,7 +1973,7 @@ var Plottable;
          */
         Domainer.prototype.pad = function (padProportion) {
             if (padProportion === void 0) { padProportion = 0.05; }
-            this.padProportion = padProportion;
+            this._padProportion = padProportion;
             return this;
         };
         /**
@@ -1989,10 +1989,10 @@ var Plottable;
          */
         Domainer.prototype.addPaddingException = function (exception, key) {
             if (key != null) {
-                this.paddingExceptions.set(key, exception);
+                this._paddingExceptions.set(key, exception);
             }
             else {
-                this.unregisteredPaddingExceptions.add(exception);
+                this._unregisteredPaddingExceptions.add(exception);
             }
             return this;
         };
@@ -2007,10 +2007,10 @@ var Plottable;
          */
         Domainer.prototype.removePaddingException = function (keyOrException) {
             if (typeof (keyOrException) === "string") {
-                this.paddingExceptions.remove(keyOrException);
+                this._paddingExceptions.remove(keyOrException);
             }
             else {
-                this.unregisteredPaddingExceptions.remove(keyOrException);
+                this._unregisteredPaddingExceptions.remove(keyOrException);
             }
             return this;
         };
@@ -2027,10 +2027,10 @@ var Plottable;
          */
         Domainer.prototype.addIncludedValue = function (value, key) {
             if (key != null) {
-                this.includedValues.set(key, value);
+                this._includedValues.set(key, value);
             }
             else {
-                this.unregisteredIncludedValues.set(value, value);
+                this._unregisteredIncludedValues.set(value, value);
             }
             return this;
         };
@@ -2045,10 +2045,10 @@ var Plottable;
          */
         Domainer.prototype.removeIncludedValue = function (valueOrKey) {
             if (typeof (valueOrKey) === "string") {
-                this.includedValues.remove(valueOrKey);
+                this._includedValues.remove(valueOrKey);
             }
             else {
-                this.unregisteredIncludedValues.remove(valueOrKey);
+                this._unregisteredIncludedValues.remove(valueOrKey);
             }
             return this;
         };
@@ -2059,8 +2059,8 @@ var Plottable;
          * @return {Domainer} The calling Domainer.
          */
         Domainer.prototype.nice = function (count) {
-            this.doNice = true;
-            this.niceCount = count;
+            this._doNice = true;
+            this._niceCount = count;
             return this;
         };
         Domainer.defaultCombineExtents = function (extents) {
@@ -2069,24 +2069,24 @@ var Plottable;
         Domainer.prototype.padDomain = function (scale, domain) {
             var min = domain[0];
             var max = domain[1];
-            if (min === max && this.padProportion > 0.0) {
+            if (min === max && this._padProportion > 0.0) {
                 var d = min.valueOf(); // valueOf accounts for dates properly
                 if (min instanceof Date) {
-                    return [d - Domainer.ONE_DAY, d + Domainer.ONE_DAY];
+                    return [d - Domainer._ONE_DAY, d + Domainer._ONE_DAY];
                 }
                 else {
-                    return [d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN, d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
+                    return [d - Domainer._PADDING_FOR_IDENTICAL_DOMAIN, d + Domainer._PADDING_FOR_IDENTICAL_DOMAIN];
                 }
             }
             if (scale.domain()[0] === scale.domain()[1]) {
                 return domain;
             }
-            var p = this.padProportion / 2;
+            var p = this._padProportion / 2;
             // This scaling is done to account for log scales and other non-linear
             // scales. A log scale should be padded more on the max than on the min.
             var newMin = scale.invert(scale.scale(min) - (scale.scale(max) - scale.scale(min)) * p);
             var newMax = scale.invert(scale.scale(max) + (scale.scale(max) - scale.scale(min)) * p);
-            var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
+            var exceptionValues = this._paddingExceptions.values().concat(this._unregisteredPaddingExceptions.values());
             var exceptionSet = d3.set(exceptionValues);
             if (exceptionSet.has(min)) {
                 newMin = min;
@@ -2097,19 +2097,19 @@ var Plottable;
             return [newMin, newMax];
         };
         Domainer.prototype.niceDomain = function (scale, domain) {
-            if (this.doNice) {
-                return scale._niceDomain(domain, this.niceCount);
+            if (this._doNice) {
+                return scale._niceDomain(domain, this._niceCount);
             }
             else {
                 return domain;
             }
         };
         Domainer.prototype.includeDomain = function (domain) {
-            var includedValues = this.includedValues.values().concat(this.unregisteredIncludedValues.values());
+            var includedValues = this._includedValues.values().concat(this._unregisteredIncludedValues.values());
             return includedValues.reduce(function (domain, value) { return [Math.min(domain[0], value), Math.max(domain[1], value)]; }, domain);
         };
-        Domainer.PADDING_FOR_IDENTICAL_DOMAIN = 1;
-        Domainer.ONE_DAY = 1000 * 60 * 60 * 24;
+        Domainer._PADDING_FOR_IDENTICAL_DOMAIN = 1;
+        Domainer._ONE_DAY = 1000 * 60 * 60 * 24;
         return Domainer;
     })();
     Plottable.Domainer = Domainer;
