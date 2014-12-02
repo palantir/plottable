@@ -5188,14 +5188,15 @@ var Plottable;
                 if (this._scale.domain().length === 0) {
                     return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
                 }
-                var fakeScale = this._scale.copy();
+                var ordinalScale = this._scale;
+                var fakeScale = ordinalScale.copy();
                 if (this._isHorizontal()) {
                     fakeScale.range([0, offeredWidth]);
                 }
                 else {
                     fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
+                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, ordinalScale.domain());
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
                     height: textResult.usedHeight + heightRequiredByTicks,
@@ -5282,9 +5283,10 @@ var Plottable;
             Category.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
+                var ordScale = this._scale;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
-                    var startAndWidth = _this._scale.fullBandStartAndWidth(d);
+                    var startAndWidth = ordScale.fullBandStartAndWidth(d);
                     var bandStartPosition = startAndWidth[0];
                     var x = _this._isHorizontal() ? bandStartPosition : 0;
                     var y = _this._isHorizontal() ? 0 : bandStartPosition;
@@ -5295,8 +5297,8 @@ var Plottable;
                 tickLabels.attr("transform", getTickLabelTransform);
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this._drawTicks(this.width(), this.height(), this._scale, tickLabels);
-                var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
+                this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
+                var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
                 var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 Plottable._Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
@@ -6659,12 +6661,13 @@ var Plottable;
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
             };
-            Pie.prototype._addDataset = function (key, dataset) {
+            Pie.prototype.addDataset = function (keyOrDataset, dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
                     Plottable._Util.Methods.warn("Only one dataset is supported in Pie plots");
-                    return;
+                    return this;
                 }
-                _super.prototype._addDataset.call(this, key, dataset);
+                _super.prototype.addDataset.call(this, keyOrDataset, dataset);
+                return this;
             };
             Pie.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -7056,12 +7059,13 @@ var Plottable;
                 this._colorScale = colorScale;
                 this.animator("cells", new Plottable.Animator.Null());
             }
-            Grid.prototype._addDataset = function (key, dataset) {
+            Grid.prototype.addDataset = function (keyOrDataset, dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
                     Plottable._Util.Methods.warn("Only one dataset is supported in Grid plots");
-                    return;
+                    return this;
                 }
-                _super.prototype._addDataset.call(this, key, dataset);
+                _super.prototype.addDataset.call(this, keyOrDataset, dataset);
+                return this;
             };
             Grid.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Element(key).svgElement("rect");

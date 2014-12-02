@@ -3,7 +3,6 @@
 module Plottable {
 export module Axis {
   export class Category extends AbstractAxis {
-    public _scale: Scale.Ordinal;
     private _tickLabelAngle = 0;
     private _measurer: _Util.Text.CachingCharacterMeasurer;
 
@@ -41,13 +40,14 @@ export module Axis {
         return {width: 0, height: 0, wantsWidth: false, wantsHeight: false };
       }
 
-      var fakeScale = this._scale.copy();
+      var ordinalScale: Scale.Ordinal = <Scale.Ordinal> this._scale;
+      var fakeScale = ordinalScale.copy();
       if (this._isHorizontal()) {
         fakeScale.range([0, offeredWidth]);
       } else {
         fakeScale.range([offeredHeight, 0]);
       }
-      var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
+      var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, ordinalScale.domain());
 
       return {
         width : textResult.usedWidth  + widthRequiredByTicks,
@@ -161,10 +161,11 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
+      var ordScale = <Scale.Ordinal> this._scale;
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
-        var startAndWidth = this._scale.fullBandStartAndWidth(d);
+        var startAndWidth = ordScale.fullBandStartAndWidth(d);
         var bandStartPosition = startAndWidth[0];
         var x = this._isHorizontal() ? bandStartPosition : 0;
         var y = this._isHorizontal() ? 0 : bandStartPosition;
@@ -175,8 +176,8 @@ export module Axis {
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
       tickLabels.text("");
-      this._drawTicks(this.width(), this.height(), this._scale, tickLabels);
-      var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
+      this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
+      var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
 
       var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;

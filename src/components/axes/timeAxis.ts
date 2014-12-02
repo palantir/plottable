@@ -26,8 +26,6 @@ export module Axis {
 
   export class Time extends AbstractAxis {
 
-    public _scale: Scale.Time;
-
     /*
      * Default possible axis configurations.
      */
@@ -265,8 +263,9 @@ export module Axis {
       this._measurer = _Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
     }
 
+
     private _getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
-      return this._scale._tickInterval(config.interval, config.step);
+      return (<Scale.Time> this._scale)._tickInterval(config.interval, config.step);
     }
 
     public _getTickValues(): any[] {
@@ -285,7 +284,7 @@ export module Axis {
     }
 
     private _renderTierLabels(container: D3.Selection, config: TimeAxisTierConfiguration, height: number) {
-      var tickPos = this._scale._tickInterval(config.interval, config.step);
+      var tickPos = (<Scale.Time> this._scale)._tickInterval(config.interval, config.step);
       tickPos.splice(0, 0, this._scale.domain()[0]);
       tickPos.push(this._scale.domain()[1]);
       var shouldCenterText = config.step === 1;

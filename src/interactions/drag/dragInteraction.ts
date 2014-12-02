@@ -3,10 +3,12 @@
 module Plottable {
 export module Interaction {
   export class Drag extends AbstractInteraction {
+
     private _dragBehavior: D3.Behavior.Drag;
     private      _origin = [0,0];
     private    _location = [0,0];
     public   _isDragging = false;
+
     public  _constrainX: (n: number) => number;
     public  _constrainY: (n: number) => number;
     private _ondragstart: (start: Point) => void;
