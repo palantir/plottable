@@ -334,24 +334,24 @@ var Plottable;
     (function (_Util) {
         var IDCounter = (function () {
             function IDCounter() {
-                this.counter = {};
+                this._counter = {};
             }
-            IDCounter.prototype.setDefault = function (id) {
-                if (this.counter[id] == null) {
-                    this.counter[id] = 0;
+            IDCounter.prototype._setDefault = function (id) {
+                if (this._counter[id] == null) {
+                    this._counter[id] = 0;
                 }
             };
             IDCounter.prototype.increment = function (id) {
-                this.setDefault(id);
-                return ++this.counter[id];
+                this._setDefault(id);
+                return ++this._counter[id];
             };
             IDCounter.prototype.decrement = function (id) {
-                this.setDefault(id);
-                return --this.counter[id];
+                this._setDefault(id);
+                return --this._counter[id];
             };
             IDCounter.prototype.get = function (id) {
-                this.setDefault(id);
-                return this.counter[id];
+                this._setDefault(id);
+                return this._counter[id];
             };
             return IDCounter;
         })();
@@ -371,7 +371,7 @@ var Plottable;
          */
         var StrictEqualityAssociativeArray = (function () {
             function StrictEqualityAssociativeArray() {
-                this.keyValuePairs = [];
+                this._keyValuePairs = [];
             }
             /**
              * Set a new key/value pair in the store.
@@ -384,13 +384,13 @@ var Plottable;
                 if (key !== key) {
                     throw new Error("NaN may not be used as a key to the StrictEqualityAssociativeArray");
                 }
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
-                        this.keyValuePairs[i][1] = value;
+                for (var i = 0; i < this._keyValuePairs.length; i++) {
+                    if (this._keyValuePairs[i][0] === key) {
+                        this._keyValuePairs[i][1] = value;
                         return true;
                     }
                 }
-                this.keyValuePairs.push([key, value]);
+                this._keyValuePairs.push([key, value]);
                 return false;
             };
             /**
@@ -400,9 +400,9 @@ var Plottable;
              * @return {any} Value if found, undefined otherwise
              */
             StrictEqualityAssociativeArray.prototype.get = function (key) {
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
-                        return this.keyValuePairs[i][1];
+                for (var i = 0; i < this._keyValuePairs.length; i++) {
+                    if (this._keyValuePairs[i][0] === key) {
+                        return this._keyValuePairs[i][1];
                     }
                 }
                 return undefined;
@@ -417,8 +417,8 @@ var Plottable;
              * @return {boolean} Whether there was a matching entry for that key
              */
             StrictEqualityAssociativeArray.prototype.has = function (key) {
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
+                for (var i = 0; i < this._keyValuePairs.length; i++) {
+                    if (this._keyValuePairs[i][0] === key) {
                         return true;
                     }
                 }
@@ -430,7 +430,7 @@ var Plottable;
              * @return {any[]} The values in the store
              */
             StrictEqualityAssociativeArray.prototype.values = function () {
-                return this.keyValuePairs.map(function (x) { return x[1]; });
+                return this._keyValuePairs.map(function (x) { return x[1]; });
             };
             /**
              * Return an array of keys in the key-value store
@@ -438,7 +438,7 @@ var Plottable;
              * @return {any[]} The keys in the store
              */
             StrictEqualityAssociativeArray.prototype.keys = function () {
-                return this.keyValuePairs.map(function (x) { return x[0]; });
+                return this._keyValuePairs.map(function (x) { return x[0]; });
             };
             /**
              * Execute a callback for each entry in the array.
@@ -447,7 +447,7 @@ var Plottable;
              * @return {any[]} The results of mapping the callback over the entries
              */
             StrictEqualityAssociativeArray.prototype.map = function (cb) {
-                return this.keyValuePairs.map(function (kv, index) {
+                return this._keyValuePairs.map(function (kv, index) {
                     return cb(kv[0], kv[1], index);
                 });
             };
@@ -458,9 +458,9 @@ var Plottable;
              * @return {boolean} Whether a matching entry was found and removed
              */
             StrictEqualityAssociativeArray.prototype.delete = function (key) {
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
-                        this.keyValuePairs.splice(i, 1);
+                for (var i = 0; i < this._keyValuePairs.length; i++) {
+                    if (this._keyValuePairs[i][0] === key) {
+                        this._keyValuePairs.splice(i, 1);
                         return true;
                     }
                 }
@@ -491,13 +491,13 @@ var Plottable;
              */
             function Cache(compute, canonicalKey, valueEq) {
                 if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
-                this.cache = d3.map();
-                this.canonicalKey = null;
-                this.compute = compute;
-                this.canonicalKey = canonicalKey;
-                this.valueEq = valueEq;
+                this._cache = d3.map();
+                this._canonicalKey = null;
+                this._compute = compute;
+                this._canonicalKey = canonicalKey;
+                this._valueEq = valueEq;
                 if (canonicalKey !== undefined) {
-                    this.cache.set(this.canonicalKey, this.compute(this.canonicalKey));
+                    this._cache.set(this._canonicalKey, this._compute(this._canonicalKey));
                 }
             }
             /**
@@ -508,10 +508,10 @@ var Plottable;
              * @return {T} The value associated with k; the result of compute(k).
              */
             Cache.prototype.get = function (k) {
-                if (!this.cache.has(k)) {
-                    this.cache.set(k, this.compute(k));
+                if (!this._cache.has(k)) {
+                    this._cache.set(k, this._compute(k));
                 }
-                return this.cache.get(k);
+                return this._cache.get(k);
             };
             /**
              * Reset the cache empty.
@@ -523,8 +523,8 @@ var Plottable;
              * @return {Cache<T>} The calling Cache.
              */
             Cache.prototype.clear = function () {
-                if (this.canonicalKey === undefined || !this.valueEq(this.cache.get(this.canonicalKey), this.compute(this.canonicalKey))) {
-                    this.cache = d3.map();
+                if (this._canonicalKey === undefined || !this._valueEq(this._cache.get(this._canonicalKey), this._compute(this._canonicalKey))) {
+                    this._cache = d3.map();
                 }
                 return this;
             };
@@ -629,14 +629,14 @@ var Plottable;
                  */
                 function CachingCharacterMeasurer(textSelection) {
                     var _this = this;
-                    this.cache = new _Util.Cache(getTextMeasurer(textSelection), CANONICAL_CHR, _Util.Methods.objEq);
-                    this.measure = combineWhitespace(measureByCharacter(wrapWhitespace(function (s) { return _this.cache.get(s); })));
+                    this._cache = new _Util.Cache(getTextMeasurer(textSelection), CANONICAL_CHR, _Util.Methods.objEq);
+                    this.measure = combineWhitespace(measureByCharacter(wrapWhitespace(function (s) { return _this._cache.get(s); })));
                 }
                 /**
                  * Clear the cache, if it seems that the text has changed size.
                  */
                 CachingCharacterMeasurer.prototype.clear = function () {
-                    this.cache.clear();
+                    this._cache.clear();
                     return this;
                 };
                 return CachingCharacterMeasurer;
