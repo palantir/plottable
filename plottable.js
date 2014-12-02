@@ -629,14 +629,14 @@ var Plottable;
                  */
                 function CachingCharacterMeasurer(textSelection) {
                     var _this = this;
-                    this.cache = new _Util.Cache(getTextMeasurer(textSelection), CANONICAL_CHR, _Util.Methods.objEq);
-                    this.measure = combineWhitespace(measureByCharacter(wrapWhitespace(function (s) { return _this.cache.get(s); })));
+                    this._cache = new _Util.Cache(getTextMeasurer(textSelection), CANONICAL_CHR, _Util.Methods.objEq);
+                    this.measure = combineWhitespace(measureByCharacter(wrapWhitespace(function (s) { return _this._cache.get(s); })));
                 }
                 /**
                  * Clear the cache, if it seems that the text has changed size.
                  */
                 CachingCharacterMeasurer.prototype.clear = function () {
-                    this.cache.clear();
+                    this._cache.clear();
                     return this;
                 };
                 return CachingCharacterMeasurer;
