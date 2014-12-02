@@ -2781,7 +2781,7 @@ var Plottable;
                 switch (scaleType) {
                     case null:
                     case undefined:
-                        scale = d3.scale.ordinal().range(Color.getPlottableColors());
+                        scale = d3.scale.ordinal().range(Color._getPlottableColors());
                         break;
                     case "Category10":
                     case "category10":
@@ -2817,7 +2817,7 @@ var Plottable;
                 });
                 return Plottable._Util.Methods.uniq(concatenatedExtents);
             };
-            Color.getPlottableColors = function () {
+            Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];
                 var colorTester = d3.select("body").append("div");
                 var i = 0;
@@ -2918,7 +2918,7 @@ var Plottable;
                 if (scaleType === void 0) { scaleType = "linear"; }
                 this._colorRange = this._resolveColorValues(colorRange);
                 this._scaleType = scaleType;
-                _super.call(this, InterpolatedColor.getD3InterpolatedScale(this._colorRange, this._scaleType));
+                _super.call(this, InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType));
             }
             /**
              * Converts the string array into a d3 scale.
@@ -2929,7 +2929,7 @@ var Plottable;
              *     type ("linear"/"log"/"sqrt"/"pow")
              * @returns {D3.Scale.QuantitativeScale} The converted Quantitative d3 scale.
              */
-            InterpolatedColor.getD3InterpolatedScale = function (colors, scaleType) {
+            InterpolatedColor._getD3InterpolatedScale = function (colors, scaleType) {
                 var scale;
                 switch (scaleType) {
                     case "linear":
@@ -2948,7 +2948,7 @@ var Plottable;
                 if (scale == null) {
                     throw new Error("unknown Quantitative scale type " + scaleType);
                 }
-                return scale.range([0, 1]).interpolate(InterpolatedColor.interpolateColors(colors));
+                return scale.range([0, 1]).interpolate(InterpolatedColor._interpolateColors(colors));
             };
             /**
              * Creates a d3 interpolator given the color array.
@@ -2959,7 +2959,7 @@ var Plottable;
              *     values in hex ("#FFFFFF") or keywords ("white").
              * @returns {D3.Transition.Interpolate} The d3 interpolator for colors.
              */
-            InterpolatedColor.interpolateColors = function (colors) {
+            InterpolatedColor._interpolateColors = function (colors) {
                 if (colors.length < 2) {
                     throw new Error("Color scale arrays must have at least two elements.");
                 }
@@ -2995,7 +2995,7 @@ var Plottable;
                 return this;
             };
             InterpolatedColor.prototype._resetScale = function () {
-                this._d3Scale = InterpolatedColor.getD3InterpolatedScale(this._colorRange, this._scaleType);
+                this._d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
                 this._autoDomainIfAutomaticMode();
                 this.broadcaster.broadcast();
             };
@@ -3003,11 +3003,11 @@ var Plottable;
                 if (colorRange instanceof Array) {
                     return colorRange;
                 }
-                else if (InterpolatedColor.COLOR_SCALES[colorRange] != null) {
-                    return InterpolatedColor.COLOR_SCALES[colorRange];
+                else if (InterpolatedColor._COLOR_SCALES[colorRange] != null) {
+                    return InterpolatedColor._COLOR_SCALES[colorRange];
                 }
                 else {
-                    return InterpolatedColor.COLOR_SCALES["reds"];
+                    return InterpolatedColor._COLOR_SCALES["reds"];
                 }
             };
             InterpolatedColor.prototype.autoDomain = function () {
@@ -3018,7 +3018,7 @@ var Plottable;
                 }
                 return this;
             };
-            InterpolatedColor.COLOR_SCALES = {
+            InterpolatedColor._COLOR_SCALES = {
                 reds: [
                     "#FFFFFF",
                     "#FFF6E1",
@@ -3085,21 +3085,21 @@ var Plottable;
                 It registers event listeners for when one of its scales changes its domain. When the scale
                 does change its domain, it re-propogates the change to every linked scale.
                 */
-                this.rescaleInProgress = false;
+                this._rescaleInProgress = false;
                 if (scales == null) {
                     throw new Error("ScaleDomainCoordinator requires scales to coordinate");
                 }
-                this.scales = scales;
-                this.scales.forEach(function (s) { return s.broadcaster.registerListener(_this, function (sx) { return _this.rescale(sx); }); });
+                this._scales = scales;
+                this._scales.forEach(function (s) { return s.broadcaster.registerListener(_this, function (sx) { return _this.rescale(sx); }); });
             }
             ScaleDomainCoordinator.prototype.rescale = function (scale) {
-                if (this.rescaleInProgress) {
+                if (this._rescaleInProgress) {
                     return;
                 }
-                this.rescaleInProgress = true;
+                this._rescaleInProgress = true;
                 var newDomain = scale.domain();
-                this.scales.forEach(function (s) { return s.domain(newDomain); });
-                this.rescaleInProgress = false;
+                this._scales.forEach(function (s) { return s.domain(newDomain); });
+                this._rescaleInProgress = false;
             };
             return ScaleDomainCoordinator;
         })();
