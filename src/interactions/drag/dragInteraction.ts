@@ -3,26 +3,25 @@
 module Plottable {
 export module Interaction {
   export class Drag extends AbstractInteraction {
-    private dragInitialized = false;
-    private dragBehavior: D3.Behavior.Drag;
-    private      origin = [0,0];
-    private    location = [0,0];
-    public  _isDragging = false;
+    private _dragBehavior: D3.Behavior.Drag;
+    private      _origin = [0,0];
+    private    _location = [0,0];
+    public   _isDragging = false;
     public  _constrainX: (n: number) => number;
     public  _constrainY: (n: number) => number;
-    private ondragstart: (start: Point) => void;
-    private      ondrag: (start: Point, end: Point) => void;
-    private   ondragend: (start: Point, end: Point) => void;
+    private _ondragstart: (start: Point) => void;
+    private      _ondrag: (start: Point, end: Point) => void;
+    private   _ondragend: (start: Point, end: Point) => void;
 
     /**
      * Constructs a Drag. A Drag will signal its callbacks on mouse drag.
      */
     constructor() {
       super();
-      this.dragBehavior = d3.behavior.drag();
-      this.dragBehavior.on("dragstart", () => this._dragstart());
-      this.dragBehavior.on("drag",      () => this._drag     ());
-      this.dragBehavior.on("dragend",   () => this._dragend  ());
+      this._dragBehavior = d3.behavior.drag();
+      this._dragBehavior.on("dragstart", () => this._dragstart());
+      this._dragBehavior.on("drag",      () => this._drag     ());
+      this._dragBehavior.on("dragend",   () => this._dragend  ());
     }
 
     /**
@@ -40,9 +39,9 @@ export module Interaction {
     public dragstart(cb: (start: Point) => any): Drag;
     public dragstart(cb?: (start: Point) => any): any {
       if (cb === undefined) {
-        return this.ondragstart;
+        return this._ondragstart;
       } else {
-        this.ondragstart = cb;
+        this._ondragstart = cb;
         return this;
       }
     }
@@ -51,16 +50,16 @@ export module Interaction {
     // we always have the uncontrolled dimension of the box extending across the entire component
     // this ensures that the callback values are synchronized with the actual box being drawn
     public _setOrigin(x: number, y: number) {
-      this.origin = [x, y];
+      this._origin = [x, y];
     }
     public _getOrigin(): number[] {
-      return this.origin.slice();
+      return this._origin.slice();
     }
     public _setLocation(x: number, y: number) {
-      this.location = [x, y];
+      this._location = [x, y];
     }
     public _getLocation(): number[] {
-      return this.location.slice();
+      return this._location.slice();
     }
 
     /**
@@ -78,9 +77,9 @@ export module Interaction {
     public drag(cb: (start: Point, end: Point) => any): Drag;
     public drag(cb?: (start: Point, end: Point) => any): any {
       if (cb === undefined) {
-        return this.ondrag;
+        return this._ondrag;
       } else {
-        this.ondrag = cb;
+        this._ondrag = cb;
         return this;
       }
     }
@@ -100,9 +99,9 @@ export module Interaction {
     public dragend(cb: (start: Point, end: Point) => any): Drag;
     public dragend(cb?: (start: Point, end: Point) => any): any {
       if (cb === undefined) {
-        return this.ondragend;
+        return this._ondragend;
       } else {
-        this.ondragend = cb;
+        this._ondragend = cb;
         return this;
       }
     }
@@ -121,8 +120,8 @@ export module Interaction {
     }
 
     public _doDragstart() {
-      if (this.ondragstart != null) {
-        this.ondragstart({x: this._getOrigin()[0], y: this._getOrigin()[1]});
+      if (this._ondragstart != null) {
+        this._ondragstart({x: this._getOrigin()[0], y: this._getOrigin()[1]});
       }
     }
 
@@ -132,10 +131,10 @@ export module Interaction {
     }
 
     public _doDrag() {
-      if (this.ondrag != null) {
+      if (this._ondrag != null) {
         var start = {x: this._getOrigin()[0]  , y: this._getOrigin()[1]};
         var end   = {x: this._getLocation()[0], y: this._getLocation()[1]};
-        this.ondrag(start, end);
+        this._ondrag(start, end);
       }
     }
 
@@ -147,16 +146,16 @@ export module Interaction {
     }
 
     public _doDragend() {
-      if (this.ondragend != null) {
+      if (this._ondragend != null) {
         var start = {x: this._getOrigin()[0], y: this._getOrigin()[1]};
         var end = {x: this._getLocation()[0], y: this._getLocation()[1]};
-        this.ondragend(start, end);
+        this._ondragend(start, end);
       }
     }
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
-      hitBox.call(this.dragBehavior);
+      hitBox.call(this._dragBehavior);
       return this;
     }
 
