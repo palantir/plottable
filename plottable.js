@@ -1455,9 +1455,9 @@ var Plottable;
          */
         var PlottableObject = (function () {
             function PlottableObject() {
-                this._plottableID = PlottableObject.nextID++;
+                this._plottableID = PlottableObject._nextID++;
             }
-            PlottableObject.nextID = 0;
+            PlottableObject._nextID = 0;
             return PlottableObject;
         })();
         Core.PlottableObject = PlottableObject;
