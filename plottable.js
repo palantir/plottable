@@ -3276,16 +3276,16 @@ var Plottable;
             }
             Line.prototype._enterData = function (data) {
                 _super.prototype._enterData.call(this, data);
-                this.pathSelection.datum(data);
+                this._pathSelection.datum(data);
             };
             Line.prototype.setup = function (area) {
-                this.pathSelection = area.append("path").classed("line", true).style({
+                this._pathSelection = area.append("path").classed("line", true).style({
                     "fill": "none",
                     "vector-effect": "non-scaling-stroke"
                 });
                 _super.prototype.setup.call(this, area);
             };
-            Line.prototype.createLine = function (xFunction, yFunction, definedFunction) {
+            Line.prototype._createLine = function (xFunction, yFunction, definedFunction) {
                 if (!definedFunction) {
                     definedFunction = function (d, i) { return true; };
                 }
@@ -3305,11 +3305,11 @@ var Plottable;
                 if (attrToProjector["defined"]) {
                     delete attrToProjector["defined"];
                 }
-                attrToProjector["d"] = this.createLine(xFunction, yFunction, definedFunction);
+                attrToProjector["d"] = this._createLine(xFunction, yFunction, definedFunction);
                 if (attrToProjector["fill"]) {
-                    this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                    this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
-                step.animator.animate(this.pathSelection, attrToProjector);
+                step.animator.animate(this._pathSelection, attrToProjector);
             };
             return Line;
         })(_Drawer.AbstractDrawer);
