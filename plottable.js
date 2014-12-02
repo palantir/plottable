@@ -3442,7 +3442,7 @@ var Plottable;
                 }
                 dataElements.exit().remove();
             };
-            Element.prototype.filterDefinedData = function (data, definedFunction) {
+            Element.prototype._filterDefinedData = function (data, definedFunction) {
                 return definedFunction ? data.filter(definedFunction) : data;
             };
             // HACKHACK To prevent populating undesired attribute to d3, we delete them here.
@@ -3456,7 +3456,7 @@ var Plottable;
             };
             Element.prototype._prepareData = function (data, drawSteps) {
                 var _this = this;
-                return drawSteps.reduce(function (data, drawStep) { return _this.filterDefinedData(data, drawStep.attrToProjector["defined"]); }, _super.prototype._prepareData.call(this, data, drawSteps));
+                return drawSteps.reduce(function (data, drawStep) { return _this._filterDefinedData(data, drawStep.attrToProjector["defined"]); }, _super.prototype._prepareData.call(this, data, drawSteps));
             };
             return Element;
         })(_Drawer.AbstractDrawer);
