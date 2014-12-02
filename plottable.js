@@ -334,24 +334,24 @@ var Plottable;
     (function (_Util) {
         var IDCounter = (function () {
             function IDCounter() {
-                this.counter = {};
+                this._counter = {};
             }
-            IDCounter.prototype.setDefault = function (id) {
-                if (this.counter[id] == null) {
-                    this.counter[id] = 0;
+            IDCounter.prototype._setDefault = function (id) {
+                if (this._counter[id] == null) {
+                    this._counter[id] = 0;
                 }
             };
             IDCounter.prototype.increment = function (id) {
-                this.setDefault(id);
-                return ++this.counter[id];
+                this._setDefault(id);
+                return ++this._counter[id];
             };
             IDCounter.prototype.decrement = function (id) {
-                this.setDefault(id);
-                return --this.counter[id];
+                this._setDefault(id);
+                return --this._counter[id];
             };
             IDCounter.prototype.get = function (id) {
-                this.setDefault(id);
-                return this.counter[id];
+                this._setDefault(id);
+                return this._counter[id];
             };
             return IDCounter;
         })();
