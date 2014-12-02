@@ -8528,14 +8528,14 @@ var Plottable;
             function AbstractDispatcher(target) {
                 _super.call(this);
                 this._event2Callback = {};
-                this.connected = false;
+                this._connected = false;
                 this._target = target;
             }
             AbstractDispatcher.prototype.target = function (targetElement) {
                 if (targetElement == null) {
                     return this._target;
                 }
-                var wasConnected = this.connected;
+                var wasConnected = this._connected;
                 this.disconnect();
                 this._target = targetElement;
                 if (wasConnected) {
@@ -8557,11 +8557,11 @@ var Plottable;
              */
             AbstractDispatcher.prototype.connect = function () {
                 var _this = this;
-                if (this.connected) {
+                if (this._connected) {
                     throw new Error("Can't connect dispatcher twice!");
                 }
                 if (this._target) {
-                    this.connected = true;
+                    this._connected = true;
                     Object.keys(this._event2Callback).forEach(function (event) {
                         var callback = _this._event2Callback[event];
                         _this._target.on(_this._getEventString(event), callback);
@@ -8576,7 +8576,7 @@ var Plottable;
              */
             AbstractDispatcher.prototype.disconnect = function () {
                 var _this = this;
-                this.connected = false;
+                this._connected = false;
                 if (this._target) {
                     Object.keys(this._event2Callback).forEach(function (event) {
                         _this._target.on(_this._getEventString(event), null);
@@ -8613,21 +8613,21 @@ var Plottable;
                 _super.call(this, target);
                 this._event2Callback["mouseover"] = function () {
                     if (_this._mouseover != null) {
-                        _this._mouseover(_this.getMousePosition());
+                        _this._mouseover(_this._getMousePosition());
                     }
                 };
                 this._event2Callback["mousemove"] = function () {
                     if (_this._mousemove != null) {
-                        _this._mousemove(_this.getMousePosition());
+                        _this._mousemove(_this._getMousePosition());
                     }
                 };
                 this._event2Callback["mouseout"] = function () {
                     if (_this._mouseout != null) {
-                        _this._mouseout(_this.getMousePosition());
+                        _this._mouseout(_this._getMousePosition());
                     }
                 };
             }
-            Mouse.prototype.getMousePosition = function () {
+            Mouse.prototype._getMousePosition = function () {
                 var xy = d3.mouse(this._target.node());
                 return {
                     x: xy[0],
@@ -8683,23 +8683,23 @@ var Plottable;
             function Keypress(target) {
                 var _this = this;
                 _super.call(this, target);
-                this.mousedOverTarget = false;
+                this._mousedOverTarget = false;
                 // Can't attach the key listener to the target (a sub-svg element)
                 // because "focusable" is only in SVG 1.2 / 2, which most browsers don't
                 // yet implement
-                this.keydownListenerTarget = d3.select(document);
+                this._keydownListenerTarget = d3.select(document);
                 this._event2Callback["mouseover"] = function () {
-                    _this.mousedOverTarget = true;
+                    _this._mousedOverTarget = true;
                 };
                 this._event2Callback["mouseout"] = function () {
-                    _this.mousedOverTarget = false;
+                    _this._mousedOverTarget = false;
                 };
             }
             Keypress.prototype.connect = function () {
                 var _this = this;
                 _super.prototype.connect.call(this);
-                this.keydownListenerTarget.on(this._getEventString("keydown"), function () {
-                    if (_this.mousedOverTarget && _this._onKeyDown) {
+                this._keydownListenerTarget.on(this._getEventString("keydown"), function () {
+                    if (_this._mousedOverTarget && _this._onKeyDown) {
                         _this._onKeyDown(d3.event);
                     }
                 });
@@ -8707,7 +8707,7 @@ var Plottable;
             };
             Keypress.prototype.disconnect = function () {
                 _super.prototype.disconnect.call(this);
-                this.keydownListenerTarget.on(this._getEventString("keydown"), null);
+                this._keydownListenerTarget.on(this._getEventString("keydown"), null);
                 return this;
             };
             Keypress.prototype.onKeyDown = function (callback) {
