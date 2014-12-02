@@ -371,7 +371,7 @@ var Plottable;
          */
         var StrictEqualityAssociativeArray = (function () {
             function StrictEqualityAssociativeArray() {
-                this.keyValuePairs = [];
+                this._keyValuePairs = [];
             }
             /**
              * Set a new key/value pair in the store.
@@ -384,13 +384,13 @@ var Plottable;
                 if (key !== key) {
                     throw new Error("NaN may not be used as a key to the StrictEqualityAssociativeArray");
                 }
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
-                        this.keyValuePairs[i][1] = value;
+                for (var i = 0; i < this._keyValuePairs.length; i++) {
+                    if (this._keyValuePairs[i][0] === key) {
+                        this._keyValuePairs[i][1] = value;
                         return true;
                     }
                 }
-                this.keyValuePairs.push([key, value]);
+                this._keyValuePairs.push([key, value]);
                 return false;
             };
             /**
@@ -400,9 +400,9 @@ var Plottable;
              * @return {any} Value if found, undefined otherwise
              */
             StrictEqualityAssociativeArray.prototype.get = function (key) {
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
-                        return this.keyValuePairs[i][1];
+                for (var i = 0; i < this._keyValuePairs.length; i++) {
+                    if (this._keyValuePairs[i][0] === key) {
+                        return this._keyValuePairs[i][1];
                     }
                 }
                 return undefined;
@@ -417,8 +417,8 @@ var Plottable;
              * @return {boolean} Whether there was a matching entry for that key
              */
             StrictEqualityAssociativeArray.prototype.has = function (key) {
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
+                for (var i = 0; i < this._keyValuePairs.length; i++) {
+                    if (this._keyValuePairs[i][0] === key) {
                         return true;
                     }
                 }
@@ -430,7 +430,7 @@ var Plottable;
              * @return {any[]} The values in the store
              */
             StrictEqualityAssociativeArray.prototype.values = function () {
-                return this.keyValuePairs.map(function (x) { return x[1]; });
+                return this._keyValuePairs.map(function (x) { return x[1]; });
             };
             /**
              * Return an array of keys in the key-value store
@@ -438,7 +438,7 @@ var Plottable;
              * @return {any[]} The keys in the store
              */
             StrictEqualityAssociativeArray.prototype.keys = function () {
-                return this.keyValuePairs.map(function (x) { return x[0]; });
+                return this._keyValuePairs.map(function (x) { return x[0]; });
             };
             /**
              * Execute a callback for each entry in the array.
@@ -447,7 +447,7 @@ var Plottable;
              * @return {any[]} The results of mapping the callback over the entries
              */
             StrictEqualityAssociativeArray.prototype.map = function (cb) {
-                return this.keyValuePairs.map(function (kv, index) {
+                return this._keyValuePairs.map(function (kv, index) {
                     return cb(kv[0], kv[1], index);
                 });
             };
@@ -458,9 +458,9 @@ var Plottable;
              * @return {boolean} Whether a matching entry was found and removed
              */
             StrictEqualityAssociativeArray.prototype.delete = function (key) {
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
-                        this.keyValuePairs.splice(i, 1);
+                for (var i = 0; i < this._keyValuePairs.length; i++) {
+                    if (this._keyValuePairs[i][0] === key) {
+                        this._keyValuePairs.splice(i, 1);
                         return true;
                     }
                 }
