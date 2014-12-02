@@ -9424,7 +9424,7 @@ var Plottable;
             __extends(Hover, _super);
             function Hover() {
                 _super.apply(this, arguments);
-                this.currentHoverData = {
+                this._currentHoverData = {
                     data: null,
                     pixelPositions: null,
                     selection: null
@@ -9433,22 +9433,22 @@ var Plottable;
             Hover.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
-                this.dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
-                this.dispatcher.mouseover(function (p) {
+                this._dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
+                this._dispatcher.mouseover(function (p) {
                     _this._componentToListenTo._hoverOverComponent(p);
                     _this.handleHoverOver(p);
                 });
-                this.dispatcher.mouseout(function (p) {
+                this._dispatcher.mouseout(function (p) {
                     _this._componentToListenTo._hoverOutComponent(p);
-                    _this.safeHoverOut(_this.currentHoverData);
-                    _this.currentHoverData = {
+                    _this.safeHoverOut(_this._currentHoverData);
+                    _this._currentHoverData = {
                         data: null,
                         pixelPositions: null,
                         selection: null
                     };
                 });
-                this.dispatcher.mousemove(function (p) { return _this.handleHoverOver(p); });
-                this.dispatcher.connect();
+                this._dispatcher.mousemove(function (p) { return _this.handleHoverOver(p); });
+                this._dispatcher.connect();
             };
             /**
              * Returns a HoverData consisting of all data and selections in a but not in b.
@@ -9481,22 +9481,22 @@ var Plottable;
                 };
             };
             Hover.prototype.handleHoverOver = function (p) {
-                var lastHoverData = this.currentHoverData;
+                var lastHoverData = this._currentHoverData;
                 var newHoverData = this._componentToListenTo._doHover(p);
-                this.currentHoverData = newHoverData;
+                this._currentHoverData = newHoverData;
                 var outData = Hover.diffHoverData(lastHoverData, newHoverData);
                 this.safeHoverOut(outData);
                 var overData = Hover.diffHoverData(newHoverData, lastHoverData);
                 this.safeHoverOver(overData);
             };
             Hover.prototype.safeHoverOut = function (outData) {
-                if (this.hoverOutCallback && outData.data) {
-                    this.hoverOutCallback(outData);
+                if (this._hoverOutCallback && outData.data) {
+                    this._hoverOutCallback(outData);
                 }
             };
             Hover.prototype.safeHoverOver = function (overData) {
-                if (this.hoverOverCallback && overData.data) {
-                    this.hoverOverCallback(overData);
+                if (this._hoverOverCallback && overData.data) {
+                    this._hoverOverCallback(overData);
                 }
             };
             /**
@@ -9507,7 +9507,7 @@ var Plottable;
              * @return {Interaction.Hover} The calling Interaction.Hover.
              */
             Hover.prototype.onHoverOver = function (callback) {
-                this.hoverOverCallback = callback;
+                this._hoverOverCallback = callback;
                 return this;
             };
             /**
@@ -9518,7 +9518,7 @@ var Plottable;
              * @return {Interaction.Hover} The calling Interaction.Hover.
              */
             Hover.prototype.onHoverOut = function (callback) {
-                this.hoverOutCallback = callback;
+                this._hoverOutCallback = callback;
                 return this;
             };
             /**
@@ -9528,7 +9528,7 @@ var Plottable;
              *                     the user is currently hovering over.
              */
             Hover.prototype.getCurrentHoverData = function () {
-                return this.currentHoverData;
+                return this._currentHoverData;
             };
             return Hover;
         })(Interaction.AbstractInteraction);
