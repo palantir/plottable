@@ -40,7 +40,7 @@ export module Axis {
         return {width: 0, height: 0, wantsWidth: false, wantsHeight: false };
       }
 
-      var ordScale: Scale.Ordinal = (<Scale.Ordinal> this._scale);
+      var ordScale: Scale.Ordinal = <Scale.Ordinal> this._scale;
       var fakeScale = ordScale.copy();
       if (this._isHorizontal()) {
         fakeScale.range([0, offeredWidth]);
