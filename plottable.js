@@ -3085,21 +3085,21 @@ var Plottable;
                 It registers event listeners for when one of its scales changes its domain. When the scale
                 does change its domain, it re-propogates the change to every linked scale.
                 */
-                this.rescaleInProgress = false;
+                this._rescaleInProgress = false;
                 if (scales == null) {
                     throw new Error("ScaleDomainCoordinator requires scales to coordinate");
                 }
-                this.scales = scales;
-                this.scales.forEach(function (s) { return s.broadcaster.registerListener(_this, function (sx) { return _this.rescale(sx); }); });
+                this._scales = scales;
+                this._scales.forEach(function (s) { return s.broadcaster.registerListener(_this, function (sx) { return _this.rescale(sx); }); });
             }
             ScaleDomainCoordinator.prototype.rescale = function (scale) {
-                if (this.rescaleInProgress) {
+                if (this._rescaleInProgress) {
                     return;
                 }
-                this.rescaleInProgress = true;
+                this._rescaleInProgress = true;
                 var newDomain = scale.domain();
-                this.scales.forEach(function (s) { return s.domain(newDomain); });
-                this.rescaleInProgress = false;
+                this._scales.forEach(function (s) { return s.domain(newDomain); });
+                this._rescaleInProgress = false;
             };
             return ScaleDomainCoordinator;
         })();
