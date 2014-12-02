@@ -1624,9 +1624,9 @@ declare module Plottable {
              * @param{AppliedDrawStep} step The step, how data should be drawn.
              */
             _drawStep(step: AppliedDrawStep): void;
-            _numberOfAnimationIterations(data: any[]): number;
-            _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
-            _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
+            protected _numberOfAnimationIterations(data: any[]): number;
+            protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
+            protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             /**
              * Draws the data into the renderArea using the spefic steps and metadata
              *
@@ -1646,7 +1646,7 @@ declare module Plottable {
         class Line extends AbstractDrawer {
             _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
-            _numberOfAnimationIterations(data: any[]): number;
+            protected _numberOfAnimationIterations(data: any[]): number;
             _drawStep(step: AppliedDrawStep): void;
         }
     }
@@ -1683,8 +1683,8 @@ declare module Plottable {
             _getDrawSelection(): D3.Selection;
             _drawStep(step: AppliedDrawStep): void;
             _enterData(data: any[]): void;
-            _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
-            _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
+            protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
+            protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
         }
     }
 }

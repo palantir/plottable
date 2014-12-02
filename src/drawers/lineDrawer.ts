@@ -31,7 +31,7 @@ export module _Drawer {
                    .defined(definedFunction);
     }
 
-    public _numberOfAnimationIterations(data: any[]): number {
+    protected _numberOfAnimationIterations(data: any[]): number {
       return 1;
     }
 

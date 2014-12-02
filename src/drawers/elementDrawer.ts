@@ -43,7 +43,7 @@ export module _Drawer {
     }
 
     // HACKHACK To prevent populating undesired attribute to d3, we delete them here.
-    public _prepareDrawSteps(drawSteps: AppliedDrawStep[]) {
+    protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]) {
       super._prepareDrawSteps(drawSteps);
       drawSteps.forEach((d: DrawStep) => {
         if (d.attrToProjector["defined"]) {
@@ -52,7 +52,7 @@ export module _Drawer {
       });
     }
 
-     public _prepareData(data: any[], drawSteps: AppliedDrawStep[]) {
+    protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]) {
       return drawSteps.reduce((data: any[], drawStep: AppliedDrawStep) =>
               this.filterDefinedData(data, drawStep.attrToProjector["defined"]), super._prepareData(data, drawSteps));
     }
