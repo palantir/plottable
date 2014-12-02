@@ -1493,7 +1493,7 @@ var Plottable;
              */
             function Broadcaster(listenable) {
                 _super.call(this);
-                this.key2callback = new Plottable._Util.StrictEqualityAssociativeArray();
+                this._key2callback = new Plottable._Util.StrictEqualityAssociativeArray();
                 this.listenable = listenable;
             }
             /**
@@ -1506,7 +1506,7 @@ var Plottable;
              * @returns {Broadcaster} this object
              */
             Broadcaster.prototype.registerListener = function (key, callback) {
-                this.key2callback.set(key, callback);
+                this._key2callback.set(key, callback);
                 return this;
             };
             /**
@@ -1521,7 +1521,7 @@ var Plottable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
-                this.key2callback.values().forEach(function (callback) { return callback(_this.listenable, args); });
+                this._key2callback.values().forEach(function (callback) { return callback(_this.listenable, args); });
                 return this;
             };
             /**
@@ -1531,7 +1531,7 @@ var Plottable;
              * @returns {Broadcaster} this object
              */
             Broadcaster.prototype.deregisterListener = function (key) {
-                this.key2callback.delete(key);
+                this._key2callback.delete(key);
                 return this;
             };
             /**
@@ -1540,7 +1540,7 @@ var Plottable;
              * @returns {Broadcaster} this object
              */
             Broadcaster.prototype.deregisterAllListeners = function () {
-                this.key2callback = new Plottable._Util.StrictEqualityAssociativeArray();
+                this._key2callback = new Plottable._Util.StrictEqualityAssociativeArray();
             };
             return Broadcaster;
         })(Core.PlottableObject);
