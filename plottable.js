@@ -8683,23 +8683,23 @@ var Plottable;
             function Keypress(target) {
                 var _this = this;
                 _super.call(this, target);
-                this.mousedOverTarget = false;
+                this._mousedOverTarget = false;
                 // Can't attach the key listener to the target (a sub-svg element)
                 // because "focusable" is only in SVG 1.2 / 2, which most browsers don't
                 // yet implement
-                this.keydownListenerTarget = d3.select(document);
+                this._keydownListenerTarget = d3.select(document);
                 this._event2Callback["mouseover"] = function () {
-                    _this.mousedOverTarget = true;
+                    _this._mousedOverTarget = true;
                 };
                 this._event2Callback["mouseout"] = function () {
-                    _this.mousedOverTarget = false;
+                    _this._mousedOverTarget = false;
                 };
             }
             Keypress.prototype.connect = function () {
                 var _this = this;
                 _super.prototype.connect.call(this);
-                this.keydownListenerTarget.on(this._getEventString("keydown"), function () {
-                    if (_this.mousedOverTarget && _this._onKeyDown) {
+                this._keydownListenerTarget.on(this._getEventString("keydown"), function () {
+                    if (_this._mousedOverTarget && _this._onKeyDown) {
                         _this._onKeyDown(d3.event);
                     }
                 });
@@ -8707,7 +8707,7 @@ var Plottable;
             };
             Keypress.prototype.disconnect = function () {
                 _super.prototype.disconnect.call(this);
-                this.keydownListenerTarget.on(this._getEventString("keydown"), null);
+                this._keydownListenerTarget.on(this._getEventString("keydown"), null);
                 return this;
             };
             Keypress.prototype.onKeyDown = function (callback) {
