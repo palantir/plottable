@@ -4748,11 +4748,11 @@ var Plottable;
             /**
              * Gets the index of the most precise TimeAxisConfiguration that will fit in the current width.
              */
-            Time.prototype.getMostPreciseConfigurationIndex = function () {
+            Time.prototype._getMostPreciseConfigurationIndex = function () {
                 var _this = this;
                 var mostPreciseIndex = this._possibleTimeAxisConfigurations.length;
                 this._possibleTimeAxisConfigurations.forEach(function (interval, index) {
-                    if (index < mostPreciseIndex && interval.tierConfigurations.every(function (tier) { return _this.checkTimeAxisTierConfigurationWidth(tier); })) {
+                    if (index < mostPreciseIndex && interval.tierConfigurations.every(function (tier) { return _this._checkTimeAxisTierConfigurationWidth(tier); })) {
                         mostPreciseIndex = index;
                     }
                 });
@@ -4778,7 +4778,7 @@ var Plottable;
                 this._computedHeight = this._maxLabelTickLength() + 2 * this.tickLabelPadding();
                 return this._computedHeight;
             };
-            Time.prototype.getIntervalLength = function (config) {
+            Time.prototype._getIntervalLength = function (config) {
                 var startDate = this._scale.domain()[0];
                 var endDate = config.interval.offset(startDate, config.step);
                 if (endDate > this._scale.domain()[1]) {
@@ -4789,15 +4789,15 @@ var Plottable;
                 var stepLength = Math.abs(this._scale.scale(endDate) - this._scale.scale(startDate));
                 return stepLength;
             };
-            Time.prototype.maxWidthForInterval = function (config) {
+            Time.prototype._maxWidthForInterval = function (config) {
                 return this._measurer(config.formatter(Time._LONG_DATE)).width;
             };
             /**
              * Check if tier configuration fits in the current width.
              */
-            Time.prototype.checkTimeAxisTierConfigurationWidth = function (config) {
-                var worstWidth = this.maxWidthForInterval(config) + 2 * this.tickLabelPadding();
-                return Math.min(this.getIntervalLength(config), this.width()) >= worstWidth;
+            Time.prototype._checkTimeAxisTierConfigurationWidth = function (config) {
+                var worstWidth = this._maxWidthForInterval(config) + 2 * this.tickLabelPadding();
+                return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
             };
             Time.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -4807,20 +4807,20 @@ var Plottable;
                 }
                 this._measurer = Plottable._Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
             };
-            Time.prototype.getTickIntervalValues = function (config) {
+            Time.prototype._getTickIntervalValues = function (config) {
                 return this._scale._tickInterval(config.interval, config.step);
             };
             Time.prototype._getTickValues = function () {
                 var _this = this;
-                return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations.reduce(function (ticks, config) { return ticks.concat(_this.getTickIntervalValues(config)); }, []);
+                return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations.reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
             };
             Time.prototype._measureTextHeight = function () {
                 return this._measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
             };
-            Time.prototype.cleanContainer = function (container) {
+            Time.prototype._cleanContainer = function (container) {
                 container.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
             };
-            Time.prototype.renderTierLabels = function (container, config, height) {
+            Time.prototype._renderTierLabels = function (container, config, height) {
                 var _this = this;
                 var tickPos = this._scale._tickInterval(config.interval, config.step);
                 tickPos.splice(0, 0, this._scale.domain()[0]);
@@ -4841,7 +4841,7 @@ var Plottable;
                 }
                 var filteredTicks = [];
                 labelPos = labelPos.filter(function (d, i) {
-                    var fits = _this.canFitLabelFilter(container, d, tickPos.slice(i, i + 2), config.formatter(d), shouldCenterText);
+                    var fits = _this._canFitLabelFilter(container, d, tickPos.slice(i, i + 2), config.formatter(d), shouldCenterText);
                     if (fits) {
                         filteredTicks.push(tickPos[i]);
                     }
@@ -4862,7 +4862,7 @@ var Plottable;
                 tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
                 return filteredTicks;
             };
-            Time.prototype.canFitLabelFilter = function (container, position, bounds, label, isCentered) {
+            Time.prototype._canFitLabelFilter = function (container, position, bounds, label, isCentered) {
                 var endPosition;
                 var startPosition;
                 var width = this._measurer(label).width + this.tickLabelPadding();
@@ -4878,20 +4878,20 @@ var Plottable;
                 }
                 return endPosition <= rightBound && startPosition >= leftBound;
             };
-            Time.prototype.adjustTickLength = function (tickValues, height) {
+            Time.prototype._adjustTickLength = function (tickValues, height) {
                 var selection = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).filter(function (d) { return tickValues.map(function (x) { return x.valueOf(); }).indexOf(d.valueOf()) >= 0; });
                 if (this.orient() === "top") {
                     height = this.height() - height;
                 }
                 selection.attr("y2", height);
             };
-            Time.prototype.generateLabellessTicks = function () {
+            Time.prototype._generateLabellessTicks = function () {
                 if (this._mostPreciseConfigIndex < 1) {
                     return [];
                 }
-                return this.getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1].tierConfigurations[0]);
+                return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1].tierConfigurations[0]);
             };
-            Time.prototype.createTickMarks = function (ticks) {
+            Time.prototype._createTickMarks = function (ticks) {
                 var tickMarks = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).data(ticks);
                 tickMarks.enter().append("line").classed(Axis.AbstractAxis.TICK_MARK_CLASS, true);
                 tickMarks.attr(this._generateTickMarkAttrHash());
@@ -4899,22 +4899,22 @@ var Plottable;
             };
             Time.prototype._doRender = function () {
                 var _this = this;
-                this._mostPreciseConfigIndex = this.getMostPreciseConfigurationIndex();
+                this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
                 _super.prototype._doRender.call(this);
                 var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations;
-                this._tierLabelContainers.forEach(this.cleanContainer);
-                var tierTicks = tierConfigs.map(function (config, i) { return _this.renderTierLabels(_this._tierLabelContainers[i], config, i + 1); });
+                this._tierLabelContainers.forEach(this._cleanContainer);
+                var tierTicks = tierConfigs.map(function (config, i) { return _this._renderTierLabels(_this._tierLabelContainers[i], config, i + 1); });
                 var ticks = tierTicks.slice();
                 var labelLessTicks = [];
                 var domain = this._scale.domain();
                 var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
-                if (this.getIntervalLength(tierConfigs[0]) * 1.5 >= totalLength) {
-                    labelLessTicks = this.generateLabellessTicks();
+                if (this._getIntervalLength(tierConfigs[0]) * 1.5 >= totalLength) {
+                    labelLessTicks = this._generateLabellessTicks();
                 }
                 ticks.push(labelLessTicks);
-                this.createTickMarks(Plottable._Util.Methods.flatten(ticks));
-                this.adjustTickLength(labelLessTicks, this.tickLabelPadding());
-                tierConfigs.forEach(function (config, i) { return _this.adjustTickLength(tierTicks[i], _this._maxLabelTickLength() * (i + 1) / Time._NUM_TIERS); });
+                this._createTickMarks(Plottable._Util.Methods.flatten(ticks));
+                this._adjustTickLength(labelLessTicks, this.tickLabelPadding());
+                tierConfigs.forEach(function (config, i) { return _this._adjustTickLength(tierTicks[i], _this._maxLabelTickLength() * (i + 1) / Time._NUM_TIERS); });
                 return this;
             };
             Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
