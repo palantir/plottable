@@ -26,8 +26,6 @@ export module Axis {
 
   export class Time extends AbstractAxis {
 
-    public _scale: Scale.Time;
-
     /*
      * Default possible axis configurations.
      */
@@ -266,7 +264,7 @@ export module Axis {
     }
 
     private getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
-      return this._scale._tickInterval(config.interval, config.step);
+      return (<Scale.Time> this._scale)._tickInterval(config.interval, config.step);
     }
 
     public _getTickValues(): any[] {
@@ -285,7 +283,7 @@ export module Axis {
     }
 
     private renderTierLabels(container: D3.Selection, config: TimeAxisTierConfiguration, height: number) {
-      var tickPos = this._scale._tickInterval(config.interval, config.step);
+      var tickPos = (<Scale.Time> this._scale)._tickInterval(config.interval, config.step);
       tickPos.splice(0, 0, this._scale.domain()[0]);
       tickPos.push(this._scale.domain()[1]);
       var shouldCenterText = config.step === 1;
@@ -314,7 +312,7 @@ export module Axis {
       var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
-      var yTranslate = (this._orientation === "bottom" ? (this._maxLabelTickLength() / 2 * height) :
+      var yTranslate = (this.orient() === "bottom" ? (this._maxLabelTickLength() / 2 * height) :
           (this.height() - this._maxLabelTickLength() / 2 * height + 2 * this.tickLabelPadding()));
       var textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
@@ -352,7 +350,7 @@ export module Axis {
         // thus, we convert them to values first, then do the comparison
           tickValues.map((x: Date) => x.valueOf()).indexOf(d.valueOf()) >= 0
       );
-      if (this._orientation === "top") {
+      if (this.orient() === "top") {
         height = this.height() - height;
       }
       selection.attr("y2", height);

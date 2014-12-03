@@ -1725,8 +1725,6 @@ declare module Plottable {
             _foregroundContainer: D3.Selection;
             clipPathEnabled: boolean;
             _parent: AbstractComponentContainer;
-            _xAlignProportion: number;
-            _yAlignProportion: number;
             _fixedHeightFlag: boolean;
             _fixedWidthFlag: boolean;
             _isSetup: boolean;
@@ -1909,7 +1907,6 @@ declare module Plottable {
 declare module Plottable {
     module Component {
         class AbstractComponentContainer extends AbstractComponent {
-            _components: AbstractComponent[];
             _anchor(element: D3.Selection): void;
             _render(): void;
             _removeComponent(c: AbstractComponent): void;
@@ -1982,8 +1979,6 @@ declare module Plottable {
             _tickLabelContainer: D3.Selection;
             _baseline: D3.Selection;
             _scale: Scale.AbstractScale<any, number>;
-            _formatter: Formatter;
-            _orientation: string;
             _computedWidth: number;
             _computedHeight: number;
             /**
@@ -2158,7 +2153,6 @@ declare module Plottable {
             tierConfigurations: TimeAxisTierConfiguration[];
         }
         class Time extends AbstractAxis {
-            _scale: Scale.Time;
             /**
              * Constructs a TimeAxis.
              *
@@ -2199,7 +2193,6 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Numeric extends AbstractAxis {
-            _scale: Scale.AbstractQuantitative<number>;
             /**
              * Constructs a NumericAxis.
              *
@@ -2266,7 +2259,6 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Category extends AbstractAxis {
-            _scale: Scale.Ordinal;
             /**
              * Constructs a CategoryAxis.
              *
@@ -2663,8 +2655,6 @@ declare module Plottable {
                 [x: string]: _Projection;
             };
             _animate: boolean;
-            _animators: Animator.PlotAnimatorMap;
-            _ANIMATION_DURATION: number;
             _animateOnNextRender: boolean;
             /**
              * Constructs a Plot.
@@ -2694,7 +2684,6 @@ declare module Plottable {
             addDataset(key: string, dataset: any[]): AbstractPlot;
             addDataset(dataset: Dataset): AbstractPlot;
             addDataset(dataset: any[]): AbstractPlot;
-            _addDataset(key: string, dataset: Dataset): void;
             _getDrawer(key: string): _Drawer.AbstractDrawer;
             _getAnimator(key: string): Animator.PlotAnimator;
             _onDatasetUpdate(): void;
@@ -2792,7 +2781,6 @@ declare module Plottable {
              * @return {Plot} The calling Plot.
              */
             removeDataset(dataArray: any[]): AbstractPlot;
-            _removeDataset(key: string): AbstractPlot;
             datasets(): Dataset[];
             _getDrawersInOrder(): _Drawer.AbstractDrawer[];
             _generateDrawSteps(): _Drawer.DrawStep[];
@@ -2819,7 +2807,7 @@ declare module Plottable {
              */
             constructor();
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
-            _addDataset(key: string, dataset: Dataset): void;
+            addDataset(keyOrDataset: any, dataset?: any): Pie;
             _generateAttrToProjector(): AttributeToProjector;
             _getDrawer(key: string): _Drawer.AbstractDrawer;
         }
@@ -2919,9 +2907,6 @@ declare module Plottable {
     module Plot {
         class Grid extends AbstractXYPlot<string, string> {
             _colorScale: Scale.AbstractScale<any, string>;
-            _xScale: Scale.Ordinal;
-            _yScale: Scale.Ordinal;
-            _animators: Animator.PlotAnimatorMap;
             /**
              * Constructs a GridPlot.
              *
@@ -2935,7 +2920,7 @@ declare module Plottable {
              * to use for each grid cell.
              */
             constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>);
-            _addDataset(key: string, dataset: Dataset): void;
+            addDataset(keyOrDataset: any, dataset?: any): Grid;
             _getDrawer(key: string): _Drawer.Element;
             /**
              * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
@@ -2956,9 +2941,6 @@ declare module Plottable {
                 [x: string]: number;
             };
             static _DEFAULT_WIDTH: number;
-            _baseline: D3.Selection;
-            _baselineValue: number;
-            _barAlignmentFactor: number;
             _isVertical: boolean;
             /**
              * Constructs a BarPlot.
@@ -3283,9 +3265,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class StackedBar<X, Y> extends AbstractBarPlot<X, Y> {
-            _baselineValue: number;
-            _baseline: D3.Selection;
-            _barAlignmentFactor: number;
             /**
              * Constructs a StackedBar plot.
              * A StackedBarPlot is a plot that plots several bar plots stacking on top of each
@@ -3712,8 +3691,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class PanZoom extends AbstractInteraction {
-            _xScale: Scale.AbstractQuantitative<any>;
-            _yScale: Scale.AbstractQuantitative<any>;
             /**
              * Creates a PanZoomInteraction.
              *
@@ -3820,9 +3797,6 @@ declare module Plottable {
              * null.
              */
             dragBox: D3.Selection;
-            _boxIsDrawn: boolean;
-            _resizeXEnabled: boolean;
-            _resizeYEnabled: boolean;
             /**
              * Gets whether resizing is enabled or not.
              *

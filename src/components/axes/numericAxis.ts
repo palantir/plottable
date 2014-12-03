@@ -3,7 +3,6 @@
 module Plottable {
 export module Axis {
   export class Numeric extends AbstractAxis {
-    public _scale: Scale.AbstractQuantitative<number>;
     private tickLabelPositioning = "center";
     // Whether or not first/last tick label will still be displayed even if
     // the label is cut off.
@@ -34,7 +33,7 @@ export module Axis {
     public _computeWidth() {
       var tickValues = this._getTickValues();
       var textLengths = tickValues.map((v: any) => {
-        var formattedValue = this._formatter(v);
+        var formattedValue = this.formatter()(v);
         return this.measurer(formattedValue).width;
       });
 
@@ -62,7 +61,7 @@ export module Axis {
     }
 
     public _getTickValues(): any[] {
-      return this._scale.ticks();
+      return (<Scale.AbstractQuantitative<number>> this._scale).ticks();
     }
 
     public _rescale() {
@@ -135,7 +134,7 @@ export module Axis {
       }
 
       var tickMarkAttrHash = this._generateTickMarkAttrHash();
-      switch(this._orientation) {
+      switch(this.orient()) {
         case "bottom":
           tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
           tickLabelAttrHash["dy"] = "0.95em";
@@ -171,7 +170,7 @@ export module Axis {
       tickLabels.style("text-anchor", tickLabelTextAnchor)
                 .style("visibility", "visible")
                 .attr(tickLabelAttrHash)
-                .text(this._formatter);
+                .text(this.formatter());
 
       var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);

@@ -3,8 +3,6 @@
 module Plottable {
 export module Interaction {
   export class Key extends AbstractInteraction {
-    private activated = false;
-    private keyCode: number;
     private dispatcher: Plottable.Dispatcher.Keypress;
     private keyCode2Callback: { [keyCode: string]: () => void; } = {};
 
