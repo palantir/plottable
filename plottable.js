@@ -5188,14 +5188,15 @@ var Plottable;
                 if (this._scale.domain().length === 0) {
                     return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
                 }
-                var fakeScale = this._scale.copy();
+                var ordinalScale = this._scale;
+                var fakeScale = ordinalScale.copy();
                 if (this._isHorizontal()) {
                     fakeScale.range([0, offeredWidth]);
                 }
                 else {
                     fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
+                var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, ordinalScale.domain());
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
                     height: textResult.usedHeight + heightRequiredByTicks,
@@ -5282,9 +5283,10 @@ var Plottable;
             Category.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
+                var ordScale = this._scale;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
-                    var startAndWidth = _this._scale.fullBandStartAndWidth(d);
+                    var startAndWidth = ordScale.fullBandStartAndWidth(d);
                     var bandStartPosition = startAndWidth[0];
                     var x = _this._isHorizontal() ? bandStartPosition : 0;
                     var y = _this._isHorizontal() ? 0 : bandStartPosition;
@@ -5295,8 +5297,8 @@ var Plottable;
                 tickLabels.attr("transform", getTickLabelTransform);
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this.drawTicks(this.width(), this.height(), this._scale, tickLabels);
-                var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
+                this.drawTicks(this.width(), this.height(), ordScale, tickLabels);
+                var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
                 var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 Plottable._Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
@@ -7611,7 +7613,7 @@ var Plottable;
             }
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._hoverTarget = this._foregroundContainer.append("circle").classed("hover-target", true).style("visibility", "hidden");
+                this._hoverTarget = this._foregroundContainer.append("circle").classed("hover-target", true).attr("radius", this._hoverDetectionRadius).style("visibility", "hidden");
             };
             Line.prototype._rejectNullsAndNaNs = function (d, i, userMetdata, plotMetadata, accessor) {
                 var value = accessor(d, i, userMetdata, plotMetadata);
@@ -8068,6 +8070,23 @@ var Plottable;
                     primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
             };
+            AbstractStacked.prototype._normalizeDatasets = function (fromX) {
+                var _this = this;
+                var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
+                var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
+                var aStackedAccessor = function (d, i, u, m) { return aAccessor(d, i, u, m) + ((_this._isVertical ? !fromX : fromX) ? m.offsets.get(bAccessor(d, i, u, m)) : 0); };
+                var bStackedAccessor = function (d, i, u, m) { return bAccessor(d, i, u, m) + ((_this._isVertical ? fromX : !fromX) ? m.offsets.get(aAccessor(d, i, u, m)) : 0); };
+                return Plottable._Util.Methods.flatten(this._datasetKeysInOrder.map(function (key) {
+                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                    var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
+                    return dataset.data().map(function (d, i) {
+                        return {
+                            a: aStackedAccessor(d, i, dataset.metadata(), plotMetadata),
+                            b: bStackedAccessor(d, i, dataset.metadata(), plotMetadata)
+                        };
+                    });
+                }));
+            };
             AbstractStacked.prototype._keyAccessor = function () {
                 return this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
             };
@@ -8256,6 +8275,9 @@ var Plottable;
             };
             StackedBar.prototype._getPlotMetadataForDataset = function (key) {
                 return Plot.AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
+            };
+            StackedBar.prototype._normalizeDatasets = function (fromX) {
+                return Plot.AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
             };
             //===== Stack logic from AbstractStackedPlot =====
             StackedBar.prototype._updateStackOffsets = function () {
@@ -8841,7 +8863,6 @@ var Plottable;
              */
             function Key() {
                 _super.call(this);
-                this.activated = false;
                 this.keyCode2Callback = {};
                 this.dispatcher = new Plottable.Dispatcher.Keypress();
             }
@@ -8962,7 +8983,6 @@ var Plottable;
             function Drag() {
                 var _this = this;
                 _super.call(this);
-                this.dragInitialized = false;
                 this.origin = [0, 0];
                 this.location = [0, 0];
                 this._isDragging = false;

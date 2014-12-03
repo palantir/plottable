@@ -2153,7 +2153,6 @@ declare module Plottable {
             tierConfigurations: TimeAxisTierConfiguration[];
         }
         class Time extends AbstractAxis {
-            _scale: Scale.Time;
             /**
              * Constructs a TimeAxis.
              *
@@ -2194,7 +2193,6 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Numeric extends AbstractAxis {
-            _scale: Scale.AbstractQuantitative<number>;
             /**
              * Constructs a NumericAxis.
              *
@@ -2261,7 +2259,6 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Category extends AbstractAxis {
-            _scale: Scale.Ordinal;
             /**
              * Constructs a CategoryAxis.
              *
@@ -2871,6 +2868,10 @@ declare module Plottable {
              * This call does not override auto domain adjustment behavior over visible points.
              */
             showAllData(): void;
+            _normalizeDatasets<A, B>(fromX: boolean): {
+                a: A;
+                b: B;
+            }[];
             _projectorsReady(): _Projection;
         }
     }
@@ -2910,8 +2911,6 @@ declare module Plottable {
     module Plot {
         class Grid extends AbstractXYPlot<string, string> {
             _colorScale: Scale.AbstractScale<any, string>;
-            _xScale: Scale.Ordinal;
-            _yScale: Scale.Ordinal;
             /**
              * Constructs a GridPlot.
              *
@@ -3238,6 +3237,10 @@ declare module Plottable {
             _getDomainKeys(): string[];
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             _updateScaleExtents(): void;
+            _normalizeDatasets<A, B>(fromX: boolean): {
+                a: A;
+                b: B;
+            }[];
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
         }
@@ -3290,6 +3293,10 @@ declare module Plottable {
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedBar<X, Y>;
             _onDatasetUpdate(): StackedBar<X, Y>;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
+            _normalizeDatasets<A, B>(fromX: boolean): {
+                a: A;
+                b: B;
+            }[];
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
             _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
@@ -3701,8 +3708,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class PanZoom extends AbstractInteraction {
-            _xScale: Scale.AbstractQuantitative<any>;
-            _yScale: Scale.AbstractQuantitative<any>;
             /**
              * Creates a PanZoomInteraction.
              *
@@ -3809,9 +3814,6 @@ declare module Plottable {
              * null.
              */
             dragBox: D3.Selection;
-            _boxIsDrawn: boolean;
-            _resizeXEnabled: boolean;
-            _resizeYEnabled: boolean;
             /**
              * Gets whether resizing is enabled or not.
              *

@@ -3309,6 +3309,43 @@ describe("Plots", function () {
             assert.doesNotThrow(function () { return stackedPlot.removeDataset("a"); }, Error);
         });
     });
+    describe("auto scale domain", function () {
+        var svg;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var yScale;
+        var xScale;
+        var data1;
+        var data2;
+        beforeEach(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Linear().domain([1, 2]);
+            ;
+            yScale = new Plottable.Scale.Linear();
+            data1 = [
+                { x: 1, y: 1 },
+                { x: 2, y: 2 },
+                { x: 3, y: 1 }
+            ];
+            data2 = [
+                { x: 1, y: 2 },
+                { x: 2, y: 3 },
+                { x: 3, y: 3 }
+            ];
+        });
+        it("auto scales correctly on stacked area", function () {
+            var plot = new Plottable.Plot.StackedArea(xScale, yScale).automaticallyAdjustYScaleOverVisiblePoints(true).addDataset(data1).addDataset(data2).project("x", "x", xScale).project("y", "y", yScale);
+            plot.renderTo(svg);
+            assert.deepEqual(yScale.domain(), [0, 5.5], "auto scales takes stacking into account");
+            svg.remove();
+        });
+        it("auto scales correctly on stacked bar", function () {
+            var plot = new Plottable.Plot.StackedBar(yScale, xScale, false).automaticallyAdjustXScaleOverVisiblePoints(true).addDataset(data1).addDataset(data2).project("x", "y", yScale).project("y", "x", xScale);
+            plot.renderTo(svg);
+            assert.deepEqual(yScale.domain(), [0, 5.125], "auto scales takes stacking into account");
+            svg.remove();
+        });
+    });
 });
 
 ///<reference path="../../testReference.ts" />
