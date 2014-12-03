@@ -1,5 +1,6 @@
 body {
   margin: 0;
+  font-family: sans-serif;
 }
 
 svg {
@@ -28,10 +29,10 @@ input:not([type=checkbox]) {
   border-radius: 5;
   width: 150px;
   height: 30px;
-  font-family: sans-serif;
   font-weight: 100;
   font-size: 13px;
   text-align: center;
+  font-family: sans-serif;
 }
 
 #render {
@@ -85,5 +86,39 @@ input:not([type=checkbox]) {
   text-decoration: none;
 }
 
+#help{
+  width: 30px;
+  height: 30px;
+  float: right;
+  margin-right: 10px;
+}
 
+.button{
+  background-color: white;
+}
 
+.button:hover{
+  background-color: whitesmoke;
+}
+
+.button:active{
+  background-color: white;
+}
+
+#help-description{
+  width: 300px;
+  display: none;
+  position: absolute;
+  z-index: 2;
+  border:1px solid #333;
+  background-color:#161616;
+  border-radius:5px;
+  padding:10px;
+  color:#fff;
+  font-size: 13px;
+  font-weight: lighter;
+}
+
+.single-plot{
+  display: inline-block;
+}

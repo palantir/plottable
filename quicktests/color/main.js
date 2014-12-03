@@ -52,21 +52,32 @@ setupBindings();
 
 function togglePlotDisplay(className){
   var classSelector = "."+className;
-  var displayStatus = $(classSelector).css("display") == "none" ? "block" : "none";
+  var displayStatus = $(classSelector).css("display") == "none" ? "inline-block" : "none";
   $(classSelector).css("display", displayStatus);
 }
 
 function setupBindings(){
+  //checkbox check handler
   $(".quicktest-checkbox").change(function(){
     togglePlotDisplay(this.parentNode.innerText);
-
   });
 
+  //help button tooltip
+  $("#help").hover(function(){
+    $("#help-description").fadeIn('fast');
+  }, function() {
+      // Hover out code
+      $("#help-description").css("display", "none");
+  }).mousemove(function(e) {
+      var mouseX = e.pageX; //Get X coordinates
+      var mouseY = e.pageY; //Get Y coordinates
+      $("#help-description").css({ top: mouseY + 20, left: mouseX - 330 });
+  });
 }
 
 function populatePlotList(){
   plots.forEach(function(plot){
-    div.append("div").attr("class", plot.name);
+    div.append("div").attr("class","single-plot " + plot.name);
   });
 }
 
@@ -82,7 +93,7 @@ function populateSidebarList(){
 }
 
 function renderPlots(plottablePlots){
-    plottablePlots.forEach(function(plot){
+  plottablePlots.forEach(function(plot){
     var plotDivName = "." + plot.constructor.name;
     var plotDiv = d3.select(plotDivName); 
     var box = plotDiv.append("svg").attr("height", plotheight).attr("width", plotwidth);
