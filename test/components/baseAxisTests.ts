@@ -208,4 +208,35 @@ describe("BaseAxis", () => {
     baseAxis = new Plottable.Axis.AbstractAxis(scale, "right");
     assert.equal((<any> baseAxis)._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
   });
+
+  it("hide long labels", () => {
+    var data = [
+      { x: "A", y: 500000000 },
+      { x: "B", y:  400000000 }
+    ];
+    var SVG_WIDTH = 120;
+    var SVG_HEIGHT = 300;
+    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
+    var xScale = new Plottable.Scale.Ordinal();
+    var yScale = new Plottable.Scale.Linear();
+    var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+    var yLabel = new Plottable.Component.AxisLabel("LABEL", "left");
+    var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+    barPlot.project("x", "x", xScale);
+    barPlot.project("y", "y", yScale);
+    barPlot.addDataset(data);
+
+    var chart = new Plottable.Component.Table([
+        [ yLabel, yAxis, barPlot ]
+    ]);
+    chart.renderTo(svg);
+
+    var labelContainer = d3.select(".tick-label-container");
+    d3.selectAll(".tick-label").each(function() {
+      var label = d3.select(this);
+      assert.equal(label.style("visibility"), "hidden", "long label is hidden");
+    });
+    svg.remove();
+  });
 });
