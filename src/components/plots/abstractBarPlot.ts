@@ -199,17 +199,6 @@ export module Plot {
       return d3.selectAll(bars);
     }
 
-    /**
-     * Deselects all bars.
-     * @returns {AbstractBarPlot} The calling AbstractBarPlot.
-     */
-    public deselectAll() {
-      if (this._isSetup) {
-        this._getDrawersInOrder().forEach((d) => d._renderArea.selectAll("rect").classed("selected", false));
-      }
-      return this;
-    }
-
     public _updateDomainer(scale: Scale.AbstractScale<any, number>) {
       if (scale instanceof Scale.AbstractQuantitative) {
         var qscale = <Scale.AbstractQuantitative<any>> scale;

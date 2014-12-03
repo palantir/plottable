@@ -7228,16 +7228,6 @@ var Plottable;
                 });
                 return d3.selectAll(bars);
             };
-            /**
-             * Deselects all bars.
-             * @returns {AbstractBarPlot} The calling AbstractBarPlot.
-             */
-            AbstractBarPlot.prototype.deselectAll = function () {
-                if (this._isSetup) {
-                    this._getDrawersInOrder().forEach(function (d) { return d._renderArea.selectAll("rect").classed("selected", false); });
-                }
-                return this;
-            };
             AbstractBarPlot.prototype._updateDomainer = function (scale) {
                 if (scale instanceof Plottable.Scale.AbstractQuantitative) {
                     var qscale = scale;
