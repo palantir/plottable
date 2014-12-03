@@ -1,4 +1,4 @@
-  ///<reference path="../reference.ts" />
+///<reference path="../reference.ts" />
 
 module Plottable {
 export module Component {
@@ -22,9 +22,15 @@ export module Component {
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var requests = this.components().map((c: AbstractComponent) => c._requestedSpace(offeredWidth, offeredHeight));
+      requests.push({
+        width: offeredWidth,
+        height: offeredHeight,
+        wantsWidth: false,
+        wantsHeight: false
+      });
       return {
-        width : Math.max(_Util.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.width, 0), offeredWidth),
-        height: Math.max(_Util.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.height, 0), offeredHeight),
+        width : _Util.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.width, 0),
+        height: _Util.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.height, 0),
         wantsWidth : requests.map((r: _SpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
         wantsHeight: requests.map((r: _SpaceRequest) => r.wantsHeight).some((x: boolean) => x)
       };
