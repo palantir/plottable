@@ -64,10 +64,9 @@ input:not([type=checkbox]) {
   padding-top: 50px;
 }
 
-.sidebar span {
-  float: right;
+.sidebar input{
+  margin: 10px;
 }
-
 .sidebar-quicktest {
   padding: 10px;
   font-family: sans-serif;

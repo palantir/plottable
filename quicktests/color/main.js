@@ -1,4 +1,5 @@
 //show svg width & height setting
+
 function expandSidebar(){
 
   "use strict";
@@ -30,7 +31,6 @@ function expandSidebar(){
 (function iife(){
 
 "use strict";
-
 var P = Plottable.Plot;
 var singlePlots = [P.VerticalBar];
 var singleHorizontalPlots = [P.HorizontalBar];
@@ -45,11 +45,47 @@ var div = d3.select(".results");
 var plotwidth;
 var plotheight;
 
+populateSidebarList();
+populatePlotList();
+setupBindings();
 //functions
 
+function togglePlotDisplay(className){
+  var classSelector = "."+className;
+  var displayStatus = $(classSelector).css("display") == "none" ? "block" : "none";
+  $(classSelector).css("display", displayStatus);
+}
+
+function setupBindings(){
+  $(".quicktest-checkbox").change(function(){
+    togglePlotDisplay(this.parentNode.innerText);
+
+  });
+
+}
+
+function populatePlotList(){
+  plots.forEach(function(plot){
+    div.append("div").attr("class", plot.name);
+  });
+}
+
+function populateSidebarList(){
+  //use plots
+  var startString = "<div class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
+  var endString = "</div>";
+  plots.forEach(function(plot){
+    var finalstring = startString + plot.name + endString;
+    $(".sidebar").append(finalstring);
+  });
+  $(".quicktest-checkbox").attr("checked", true);
+}
+
 function renderPlots(plottablePlots){
-  plottablePlots.forEach(function(plot){
-    var box = div.append("svg").attr("height", plotheight).attr("width", plotwidth);
+    plottablePlots.forEach(function(plot){
+    var plotDivName = "." + plot.constructor.name;
+    var plotDiv = d3.select(plotDivName); 
+    var box = plotDiv.append("svg").attr("height", plotheight).attr("width", plotwidth);
     var chart = new Plottable.Component.Table([[plot]]);
     chart.renderTo(box);
   });
