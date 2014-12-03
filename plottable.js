@@ -7223,10 +7223,10 @@ var Plottable;
                 var xExtent = this.parseExtent(xValOrExtent);
                 var yExtent = this.parseExtent(yValOrExtent);
                 // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-                var bars = this._datasetKeysInOrder.reduce(function (bars, key) { return bars.concat(_this.getBarsFromDataset(key, xExtent, yExtent)); }, []);
+                var bars = this._datasetKeysInOrder.reduce(function (bars, key) { return bars.concat(_this._getBarsFromDataset(key, xExtent, yExtent)); }, []);
                 return d3.selectAll(bars);
             };
-            AbstractBarPlot.prototype.getBarsFromDataset = function (key, xExtent, yExtent) {
+            AbstractBarPlot.prototype._getBarsFromDataset = function (key, xExtent, yExtent) {
                 // the SVGRects are positioned with sub-pixel accuracy (the default unit
                 // for the x, y, height & width attributes), but user selections (e.g. via
                 // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
@@ -7465,7 +7465,7 @@ var Plottable;
                 this._datasetKeysInOrder.forEach(function (key) {
                     var dataset = _this._key2PlotDatasetKey.get(key).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
-                    var barsFromDataset = _this.getBarsFromDataset(key, xExtent, yExtent);
+                    var barsFromDataset = _this._getBarsFromDataset(key, xExtent, yExtent);
                     d3.selectAll(barsFromDataset).each(function (d, i) {
                         if (_this._isVertical) {
                             points.push({

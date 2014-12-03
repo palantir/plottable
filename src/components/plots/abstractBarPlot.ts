@@ -179,14 +179,14 @@ export module Plot {
 
       // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
       var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) =>
-        bars.concat(this.getBarsFromDataset(key, xExtent, yExtent))
+        bars.concat(this._getBarsFromDataset(key, xExtent, yExtent))
       , []);
 
       return d3.selectAll(bars);
     }
 
-    private getBarsFromDataset(key: string, xExtent: Extent, yExtent: Extent): any[] {
-       // the SVGRects are positioned with sub-pixel accuracy (the default unit
+    private _getBarsFromDataset(key: string, xExtent: Extent, yExtent: Extent): any[] {
+      // the SVGRects are positioned with sub-pixel accuracy (the default unit
       // for the x, y, height & width attributes), but user selections (e.g. via
       // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
       // seems appropriate:
@@ -475,7 +475,7 @@ export module Plot {
       this._datasetKeysInOrder.forEach((key: string) => {
         var dataset = this._key2PlotDatasetKey.get(key).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
-        var barsFromDataset = this.getBarsFromDataset(key, xExtent, yExtent);
+        var barsFromDataset = this._getBarsFromDataset(key, xExtent, yExtent);
         d3.selectAll(barsFromDataset).each((d, i) => {
           if (this._isVertical) {
             points.push({
