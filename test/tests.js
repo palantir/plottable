@@ -2529,16 +2529,6 @@ describe("Plots", function () {
                 assert.equal(bar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
                 svg.remove();
             });
-            it("shouldn't blow up if members called before the first render", function () {
-                var brandNew = new Plottable.Plot.VerticalBar(xScale, yScale);
-                brandNew.addDataset(dataset);
-                assert.isNotNull(brandNew.deselectAll(), "deselects return self");
-                assert.isTrue(brandNew.getBars(0, 0).empty(), "getBars returns empty selection");
-                brandNew._anchor(d3.select(document.createElement("svg"))); // calls `_setup()`
-                assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
-                assert.isTrue(brandNew.getBars(0, 0).empty(), "getBars returns empty selection after setup");
-                svg.remove();
-            });
             it("don't show points from outside of domain", function () {
                 xScale.domain(["C"]);
                 var bars = barPlot._renderArea.selectAll("rect");

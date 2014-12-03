@@ -3024,11 +3024,6 @@ declare module Plottable {
             getBars(xValOrExtent: number, yValOrExtent: Extent): D3.Selection;
             getBars(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
             getBars(xValOrExtent: number, yValOrExtent: number): D3.Selection;
-            /**
-             * Deselects all bars.
-             * @returns {AbstractBarPlot} The calling AbstractBarPlot.
-             */
-            deselectAll(): AbstractBarPlot<X, Y>;
             _updateDomainer(scale: Scale.AbstractScale<any, number>): void;
             _updateYDomainer(): void;
             _updateXDomainer(): void;
