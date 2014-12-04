@@ -41,7 +41,7 @@ function run(div, data, Plottable) {
 
 
   var title1 = new Plottable.Component.TitleLabel( "Four Data Series", "horizontal");
-  var legend1 = new Plottable.Component.HorizontalLegend(colorScale1);
+  var legend1 = new Plottable.Component.HorizontalLegend(colorScale1).maxEntryPerRow(1);
   var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
   .addComponent(0,1, legend1);
 
@@ -50,9 +50,5 @@ function run(div, data, Plottable) {
               .addComponent(1, 2, renderAreas)
               .addComponent(2, 2, xAxis);
 
-
-
-
   basicTable.renderTo(svg);
-
 }

@@ -13,7 +13,7 @@ export module Component {
     public static LEGEND_ENTRY_CLASS = "legend-entry";
 
     private padding = 5;
-    private scale: Scale.Color;
+    private _scale: Scale.Color;
 
     private _maxEntryPerRow: number;
 
@@ -29,20 +29,30 @@ export module Component {
     constructor(colorScale: Scale.Color) {
       super();
       this.classed("legend", true);
-
-      this.scale = colorScale;
       this.maxEntryPerRow(Infinity);
-      this.scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+
+      this._scale = colorScale;
+      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
 
       this.xAlign("left").yAlign("center");
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
     }
 
+    /**
+     * Gets the current max number of entries in HorizontalLegend row.
+     * @returns {number} The current max number of entries in row.
+     */
     public maxEntryPerRow(): number;
+    /**
+     * Sets a new max number of entries in HorizontalLegend row.
+     *
+     * @param {number} numEntries If provided, the new max number of entries in ow.
+     * @returns {HorizontalLegend} The calling HorizontalLegend.
+     */
     public maxEntryPerRow(numEntries: number): HorizontalLegend;
     public maxEntryPerRow(numEntries?: number): any {
-      if (maxEntryPerRow == null) {
+      if (numEntries == null) {
         return this._maxEntryPerRow;
       } else {
         this._maxEntryPerRow = numEntries;
@@ -52,35 +62,35 @@ export module Component {
     }
 
     /**
-     * Gets the current color scale from the Legend.
+     * Gets the current color scale from the HorizontalLegend.
      *
      * @returns {ColorScale} The current color scale.
      */
     public scale(): Scale.Color;
     /**
-     * Assigns a new color scale to the Legend.
+     * Assigns a new color scale to the HorizontalLegend.
      *
      * @param {Scale.Color} scale If provided, the new scale.
-     * @returns {Legend} The calling Legend.
+     * @returns {HorizontalLegend} The calling HorizontalLegend.
      */
     public scale(scale: Scale.Color): HorizontalLegend;
     public scale(scale?: Scale.Color): any {
       if (scale != null) {
-        if (this.scale != null) {
-          this.scale.broadcaster.deregisterListener(this);
+        if (this._scale != null) {
+          this._scale.broadcaster.deregisterListener(this);
         }
-        this.scale = scale;
-        this.scale.broadcaster.registerListener(this, () => this.updateDomain());
-        this.updateDomain();
+        this._scale = scale;
+        this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+        this._invalidateLayout();
         return this;
       } else {
-        return this.scale;
+        return this._scale;
       }
     }
 
     public remove() {
       super.remove();
-      this.scale.broadcaster.deregisterListener(this);
+      this._scale.broadcaster.deregisterListener(this);
     }
 
     private calculateLayoutInfo(availableWidth: number, availableHeight: number) {
@@ -96,7 +106,7 @@ export module Component {
         return Math.min(originalEntryLength, availableWidthForEntries);
       };
 
-      var entries = this.scale.domain();
+      var entries = this._scale.domain();
       var entryLengths = _Util.Methods.populateMap(entries, measureEntry);
       fakeLegendRow.remove();
 
@@ -152,6 +162,32 @@ export module Component {
       return rows;
     }
 
+    public getLegend(position: Point): D3.Selection {
+      if (!this._isSetup) {
+        return d3.select();
+      }
+
+      var legends: any[] = [];
+      var layout = this.calculateLayoutInfo(this.width(), this.height());
+      var legendPadding = this.padding;
+      this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {
+        var yShift = i * layout.textHeight + legendPadding;
+        var xShift = legendPadding;
+        d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).each(function(value: string) {
+          var bbox = this.getBBox();
+          bbox.x += xShift;
+          bbox.y += yShift;
+          if (bbox.x + bbox.width >= position.x && bbox.x <= position.x &&
+              bbox.y + bbox.height >= position.y && bbox.y <= position.y) {
+            legends.push(this);
+          }
+          xShift += layout.entryLengths.get(value);
+        });
+      });
+
+      return d3.selectAll(legends);
+    }
+
     public _doRender() {
       super._doRender();
 
@@ -188,7 +224,7 @@ export module Component {
           .attr("cx", layout.textHeight / 2)
           .attr("cy", layout.textHeight / 2)
           .attr("r",  layout.textHeight * 0.3)
-          .attr("fill", (value: string) => this.scale.scale(value) );
+          .attr("fill", (value: string) => this._scale.scale(value) );
 
       var padding = this.padding;
       var textContainers = entries.select("g.text-container");
