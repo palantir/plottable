@@ -15,6 +15,8 @@ export module Component {
     private padding = 5;
     private scale: Scale.Color;
 
+    private _maxEntryPerRow: number;
+
     /**
      * Creates a Horizontal Legend.
      *
@@ -29,11 +31,51 @@ export module Component {
       this.classed("legend", true);
 
       this.scale = colorScale;
+      this.maxEntryPerRow(Infinity);
       this.scale.broadcaster.registerListener(this, () => this._invalidateLayout());
 
       this.xAlign("left").yAlign("center");
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
+    }
+
+    public maxEntryPerRow(): number;
+    public maxEntryPerRow(numEntries: number): HorizontalLegend;
+    public maxEntryPerRow(numEntries?: number): any {
+      if (maxEntryPerRow == null) {
+        return this._maxEntryPerRow;
+      } else {
+        this._maxEntryPerRow = numEntries;
+        this._invalidateLayout();
+        return this;
+      }
+    }
+
+    /**
+     * Gets the current color scale from the Legend.
+     *
+     * @returns {ColorScale} The current color scale.
+     */
+    public scale(): Scale.Color;
+    /**
+     * Assigns a new color scale to the Legend.
+     *
+     * @param {Scale.Color} scale If provided, the new scale.
+     * @returns {Legend} The calling Legend.
+     */
+    public scale(scale: Scale.Color): HorizontalLegend;
+    public scale(scale?: Scale.Color): any {
+      if (scale != null) {
+        if (this.scale != null) {
+          this.scale.broadcaster.deregisterListener(this);
+        }
+        this.scale = scale;
+        this.scale.broadcaster.registerListener(this, () => this.updateDomain());
+        this.updateDomain();
+        return this;
+      } else {
+        return this.scale;
+      }
     }
 
     public remove() {
@@ -80,7 +122,6 @@ export module Component {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
       });
       var longestRowLength = _Util.Methods.max(rowLengths, 0);
-      longestRowLength = longestRowLength === undefined ? 0 : longestRowLength; // HACKHACK: #843
       var desiredWidth = this.padding + longestRowLength;
 
       var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this.padding;
@@ -100,7 +141,7 @@ export module Component {
       var spaceLeft = availableWidth;
       entries.forEach((e: string) => {
         var entryLength = entryLengths.get(e);
-        if (entryLength > spaceLeft) {
+        if (entryLength > spaceLeft || currentRow.length === this._maxEntryPerRow) {
           currentRow = [];
           rows.push(currentRow);
           spaceLeft = availableWidth;

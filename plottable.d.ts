@@ -2153,6 +2153,7 @@ declare module Plottable {
             tierConfigurations: TimeAxisTierConfiguration[];
         }
         class Time extends AbstractAxis {
+            _scale: Scale.Time;
             /**
              * Constructs a TimeAxis.
              *
@@ -2193,6 +2194,7 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Numeric extends AbstractAxis {
+            _scale: Scale.AbstractQuantitative<number>;
             /**
              * Constructs a NumericAxis.
              *
@@ -2259,6 +2261,7 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Category extends AbstractAxis {
+            _scale: Scale.Ordinal;
             /**
              * Constructs a CategoryAxis.
              *
@@ -2907,6 +2910,8 @@ declare module Plottable {
     module Plot {
         class Grid extends AbstractXYPlot<string, string> {
             _colorScale: Scale.AbstractScale<any, string>;
+            _xScale: Scale.Ordinal;
+            _yScale: Scale.Ordinal;
             /**
              * Constructs a GridPlot.
              *
@@ -3024,6 +3029,11 @@ declare module Plottable {
             getBars(xValOrExtent: number, yValOrExtent: Extent): D3.Selection;
             getBars(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
             getBars(xValOrExtent: number, yValOrExtent: number): D3.Selection;
+            /**
+             * Deselects all bars.
+             * @returns {AbstractBarPlot} The calling AbstractBarPlot.
+             */
+            deselectAll(): AbstractBarPlot<X, Y>;
             _updateDomainer(scale: Scale.AbstractScale<any, number>): void;
             _updateYDomainer(): void;
             _updateXDomainer(): void;
@@ -3686,6 +3696,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class PanZoom extends AbstractInteraction {
+            _xScale: Scale.AbstractQuantitative<any>;
+            _yScale: Scale.AbstractQuantitative<any>;
             /**
              * Creates a PanZoomInteraction.
              *
@@ -3792,6 +3804,9 @@ declare module Plottable {
              * null.
              */
             dragBox: D3.Selection;
+            _boxIsDrawn: boolean;
+            _resizeXEnabled: boolean;
+            _resizeYEnabled: boolean;
             /**
              * Gets whether resizing is enabled or not.
              *
