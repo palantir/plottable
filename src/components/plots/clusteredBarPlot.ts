@@ -33,13 +33,15 @@ export module Plot {
       attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
       attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
 
-      var positionF = (d: any, i: number, u: any, m: ClusteredPlotMetadata) => m.position;
       var xAttr = attrToProjector["x"];
       var yAttr = attrToProjector["y"];
+      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._xScale : this._yScale;
+      var accessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+
       attrToProjector["x"] = (d: any, i: number, u: any, m: ClusteredPlotMetadata) =>
-        xAttr(d, i, u, m) + (this._isVertical ? positionF(d, i, u, m) : 0);
+        this._isVertical ? primaryScale.scale(accessor(d, i, u, m)) + m.position : xAttr(d, u, u, m);
       attrToProjector["y"] = (d: any, i: number, u: any, m: ClusteredPlotMetadata) =>
-        yAttr(d, i, u, m) + (this._isVertical ? 0 : positionF(d, i, u, m));
+        this._isVertical ? yAttr(d, i, u, m) : primaryScale.scale(accessor(d, i, u, m)) + m.position;
 
       return attrToProjector;
     }

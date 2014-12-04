@@ -7857,11 +7857,12 @@ var Plottable;
                 var heightF = attrToProjector["height"];
                 attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
                 attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
-                var positionF = function (d, i, u, m) { return m.position; };
                 var xAttr = attrToProjector["x"];
                 var yAttr = attrToProjector["y"];
-                attrToProjector["x"] = function (d, i, u, m) { return xAttr(d, i, u, m) + (_this._isVertical ? positionF(d, i, u, m) : 0); };
-                attrToProjector["y"] = function (d, i, u, m) { return yAttr(d, i, u, m) + (_this._isVertical ? 0 : positionF(d, i, u, m)); };
+                var primaryScale = this._isVertical ? this._xScale : this._yScale;
+                var accessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+                attrToProjector["x"] = function (d, i, u, m) { return _this._isVertical ? primaryScale.scale(accessor(d, i, u, m)) + m.position : xAttr(d, u, u, m); };
+                attrToProjector["y"] = function (d, i, u, m) { return _this._isVertical ? yAttr(d, i, u, m) : primaryScale.scale(accessor(d, i, u, m)) + m.position; };
                 return attrToProjector;
             };
             ClusteredBar.prototype._updateClusterPosition = function () {
