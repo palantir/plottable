@@ -3024,11 +3024,6 @@ declare module Plottable {
             getBars(xValOrExtent: number, yValOrExtent: Extent): D3.Selection;
             getBars(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
             getBars(xValOrExtent: number, yValOrExtent: number): D3.Selection;
-            /**
-             * Deselects all bars.
-             * @returns {AbstractBarPlot} The calling AbstractBarPlot.
-             */
-            deselectAll(): AbstractBarPlot<X, Y>;
             _updateDomainer(scale: Scale.AbstractScale<any, number>): void;
             _updateYDomainer(): void;
             _updateXDomainer(): void;
@@ -3205,6 +3200,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        interface StackedPlotMetadata extends PlotMetadata {
+            offsets: D3.Map<number>;
+        }
         interface StackedDatum {
             key: any;
             value: number;
@@ -3212,6 +3210,7 @@ declare module Plottable {
         }
         class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
             _isVertical: boolean;
+            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractStacked<X, Y>;
             _onDatasetUpdate(): void;
             _updateStackOffsets(): void;
@@ -3267,6 +3266,7 @@ declare module Plottable {
             _updateScaleExtents(): void;
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
+            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
         }
     }
 }
@@ -3290,6 +3290,7 @@ declare module Plottable {
             _generateDrawSteps(): _Drawer.DrawStep[];
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedBar<X, Y>;
             _onDatasetUpdate(): StackedBar<X, Y>;
+            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
             _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];

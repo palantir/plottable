@@ -14,7 +14,7 @@ export module Scale {
    * By default it generates a linear scale internally.
    */
   export class InterpolatedColor extends AbstractScale<number, string> {
-    private static COLOR_SCALES: ColorGroups = {
+    private static _COLOR_SCALES: ColorGroups = {
       reds : [
         "#FFFFFF", // white
         "#FFF6E1",
@@ -67,7 +67,7 @@ export module Scale {
      *     type ("linear"/"log"/"sqrt"/"pow")
      * @returns {D3.Scale.QuantitativeScale} The converted Quantitative d3 scale.
      */
-    private static getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitativeScale {
+    private static _getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitativeScale {
       var scale: D3.Scale.QuantitativeScale;
       switch(scaleType){
         case "linear":
@@ -88,7 +88,7 @@ export module Scale {
       }
       return scale
                   .range([0, 1])
-                  .interpolate(InterpolatedColor.interpolateColors(colors));
+                  .interpolate(InterpolatedColor._interpolateColors(colors));
     }
 
     /**
@@ -100,7 +100,7 @@ export module Scale {
      *     values in hex ("#FFFFFF") or keywords ("white").
      * @returns {D3.Transition.Interpolate} The d3 interpolator for colors.
      */
-    private static interpolateColors(colors: string[]): D3.Transition.Interpolate {
+    private static _interpolateColors(colors: string[]): D3.Transition.Interpolate {
       if (colors.length < 2) {
         throw new Error("Color scale arrays must have at least two elements.");
       };
@@ -140,7 +140,7 @@ export module Scale {
     constructor(colorRange: any = "reds", scaleType: string = "linear") {
       this._colorRange = this._resolveColorValues(colorRange);
       this._scaleType = scaleType;
-      super(InterpolatedColor.getD3InterpolatedScale(this._colorRange, this._scaleType));
+      super(InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType));
     }
 
     /**
@@ -192,7 +192,7 @@ export module Scale {
     }
 
     private _resetScale(): any {
-      this._d3Scale = InterpolatedColor.getD3InterpolatedScale(this._colorRange, this._scaleType);
+      this._d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
       this._autoDomainIfAutomaticMode();
       this.broadcaster.broadcast();
     }
@@ -200,10 +200,10 @@ export module Scale {
     private _resolveColorValues(colorRange: any): string[] {
       if (colorRange instanceof Array) {
         return colorRange;
-      } else if (InterpolatedColor.COLOR_SCALES[colorRange] != null) {
-        return InterpolatedColor.COLOR_SCALES[colorRange];
+      } else if (InterpolatedColor._COLOR_SCALES[colorRange] != null) {
+        return InterpolatedColor._COLOR_SCALES[colorRange];
       } else {
-        return InterpolatedColor.COLOR_SCALES["reds"];
+        return InterpolatedColor._COLOR_SCALES["reds"];
       }
     }
 

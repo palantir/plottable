@@ -2,6 +2,10 @@
 
 module Plottable {
 export module Plot {
+  export interface StackedPlotMetadata extends PlotMetadata {
+    offsets: D3.Map<number>;
+  }
+
   export interface StackedDatum {
     key: any;
     value: number;
@@ -11,6 +15,12 @@ export module Plot {
   export class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
     private _stackedExtent = [0, 0];
     public _isVertical: boolean;
+
+    public _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
+      var metadata = <StackedPlotMetadata> super._getPlotMetadataForDataset(key);
+      metadata.offsets = d3.map();
+      return metadata;
+    }
 
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
@@ -51,19 +61,22 @@ export module Plot {
     public _updateStackExtents() {
       var datasets = this.datasets();
       var valueAccessor = this._valueAccessor();
+      var keyAccessor = this._keyAccessor();
       var maxStackExtent = _Util.Methods.max<string, number>(this._datasetKeysInOrder, (k: string) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+        var plotMetadata = <StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
         return _Util.Methods.max<any, number>(dataset.data(), (datum: any, i: number) => {
-          return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+          return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) +
+            plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
         }, 0);
       }, 0);
 
       var minStackExtent = _Util.Methods.min<string, number>(this._datasetKeysInOrder, (k: string) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+        var plotMetadata = <StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
         return _Util.Methods.min<any, number>(dataset.data(), (datum: any, i: number) => {
-          return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+          return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) +
+            plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
         }, 0);
       }, 0);
 
@@ -98,21 +111,24 @@ export module Plot {
 
       this._datasetKeysInOrder.forEach((k, index) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+        var plotMetadata = <StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
         var positiveDataMap = positiveDataMapArray[index];
         var negativeDataMap = negativeDataMapArray[index];
         var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset.metadata(), plotMetadata) <= 0);
 
         dataset.data().forEach((datum: any, datumIndex: number) => {
-          var positiveOffset = positiveDataMap.get(keyAccessor(datum, datumIndex, dataset.metadata(), plotMetadata)).offset;
-          var negativeOffset = negativeDataMap.get(keyAccessor(datum, datumIndex, dataset.metadata(), plotMetadata)).offset;
+          var key = keyAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
+          var positiveOffset = positiveDataMap.get(key).offset;
+          var negativeOffset = negativeDataMap.get(key).offset;
 
           var value = valueAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
+          var offset: number;
           if (value === 0) {
-            datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = isAllNegativeValues ? negativeOffset : positiveOffset;
+            offset = isAllNegativeValues ? negativeOffset : positiveOffset;
           } else {
-            datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = value > 0 ? positiveOffset : negativeOffset;
+            offset = value > 0 ? positiveOffset : negativeOffset;
           }
+          plotMetadata.offsets.set(key, offset);
         });
       });
     }
@@ -120,7 +136,6 @@ export module Plot {
     public _getDomainKeys(): string[] {
       var keyAccessor = this._keyAccessor();
       var domainKeys = d3.set();
-      var datasets = this.datasets();
 
       this._datasetKeysInOrder.forEach((k) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
@@ -136,10 +151,9 @@ export module Plot {
     public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
       var keyAccessor = this._keyAccessor();
       var valueAccessor = this._valueAccessor();
-      var datasets = this.datasets();
       var domainKeys = this._getDomainKeys();
 
-      var dataMapArray = datasets.map(() => {
+      var dataMapArray = this._datasetKeysInOrder.map(() => {
         return _Util.Methods.populateMap(domainKeys, (domainKey) => {
           return {key: domainKey, value: 0};
         });

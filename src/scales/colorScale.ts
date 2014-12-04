@@ -17,7 +17,7 @@ export module Scale {
       switch (scaleType) {
         case null:
         case undefined:
-          scale = d3.scale.ordinal().range(Color.getPlottableColors());
+          scale = d3.scale.ordinal().range(Color._getPlottableColors());
           break;
         case "Category10":
         case "category10":
@@ -55,7 +55,7 @@ export module Scale {
       return _Util.Methods.uniq(concatenatedExtents);
     }
 
-    private static getPlottableColors(): string[] {
+    private static _getPlottableColors(): string[] {
       var plottableDefaultColors: string[] = [];
       var colorTester = d3.select("body").append("div");
       var i = 0;
