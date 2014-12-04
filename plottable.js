@@ -1057,7 +1057,7 @@ var Plottable;
             }
             function isSelectionRemovedFromSVG(selection) {
                 var n = selection.node();
-                while (n !== null && n.nodeName !== "svg") {
+                while (n !== null && n.nodeName.toLowerCase() !== "svg") {
                     n = n.parentNode;
                 }
                 return (n == null);
@@ -3639,7 +3639,7 @@ var Plottable;
                 if (this._removed) {
                     throw new Error("Can't reuse remove()-ed components!");
                 }
-                if (element.node().nodeName === "svg") {
+                if (element.node().nodeName.toLowerCase() === "svg") {
                     // svg node gets the "plottable" CSS class
                     this._rootSVG = element;
                     this._rootSVG.classed("plottable", true);
@@ -3770,7 +3770,7 @@ var Plottable;
                     else {
                         selection = d3.select(element);
                     }
-                    if (!selection.node() || selection.node().nodeName !== "svg") {
+                    if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
                         throw new Error("Plottable requires a valid SVG to renderTo");
                     }
                     this._anchor(selection);
