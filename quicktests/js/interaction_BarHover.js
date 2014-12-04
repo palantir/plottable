@@ -14,9 +14,11 @@ function run(div, data, Plottable) {
   var title = new Plottable.Component.TitleLabel("Hover over bars");
   var colorScale = new Plottable.Scale.Color();
 
+  var ds = new Plottable.Dataset(data, { foo: "!" });
+
   var plot = new Plottable.Plot.VerticalBar(xScale, yScale)
-    .addDataset(data)
-    .project("x", "name", xScale)
+    .addDataset(ds)
+    .project("x", function (d, i, u) { return d.name + u.foo; }, xScale)
     .project("y", "y", yScale)
     .project("fill", "name", colorScale);
 

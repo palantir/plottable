@@ -174,29 +174,35 @@ export module Plot {
         return d3.select();
       }
 
-      var bars: any[] = [];
-
       var xExtent: Extent = this._parseExtent(xValOrExtent);
       var yExtent: Extent = this._parseExtent(yValOrExtent);
 
+      // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
+      var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) =>
+        bars.concat(this._getBarsFromDataset(key, xExtent, yExtent))
+      , []);
+
+      return d3.selectAll(bars);
+    }
+
+    private _getBarsFromDataset(key: string, xExtent: Extent, yExtent: Extent): any[] {
       // the SVGRects are positioned with sub-pixel accuracy (the default unit
       // for the x, y, height & width attributes), but user selections (e.g. via
       // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
       // seems appropriate:
       var tolerance: number = 0.5;
 
-      // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-      this._getDrawersInOrder().forEach((d) => {
-        d._renderArea.selectAll("rect").each(function(d: any) {
-          var bbox = this.getBBox();
-          if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
-              bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
-            bars.push(this);
-          }
-        });
-      });
+      var bars: any[] = [];
 
-      return d3.selectAll(bars);
+      var drawer = <_Drawer.Element>this._key2PlotDatasetKey.get(key).drawer;
+      drawer._renderArea.selectAll("rect").each(function(d) {
+        var bbox = this.getBBox();
+        if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
+            bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
+          bars.push(this);
+        }
+      });
+      return bars;
     }
 
     public _updateDomainer(scale: Scale.AbstractScale<any, number>) {
@@ -436,7 +442,6 @@ export module Plot {
       this._clearHoverSelection();
     }
 
-    // HACKHACK User and plot metadata should be applied here - #1306.
     public _doHover(p: Point): Interaction.HoverData {
       var xPositionOrExtent: any = p.x;
       var yPositionOrExtent: any = p.y;
@@ -448,13 +453,45 @@ export module Plot {
           xPositionOrExtent = maxExtent;
         }
       }
-      var bars = this.getBars(xPositionOrExtent, yPositionOrExtent);
 
-      if (!bars.empty()) {
+      var xExtent: Extent = this._parseExtent(xPositionOrExtent);
+      var yExtent: Extent = this._parseExtent(yPositionOrExtent);
+
+      var bars: any[] = [];
+      var points: Point[] = [];
+      var projectors = this._generateAttrToProjector();
+
+      this._datasetKeysInOrder.forEach((key: string) => {
+        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
+        var barsFromDataset = this._getBarsFromDataset(key, xExtent, yExtent);
+        d3.selectAll(barsFromDataset).each((d, i) => {
+          if (this._isVertical) {
+            points.push({
+              x: projectors["x"](d, i, dataset.metadata(), plotMetadata) + projectors["width"](d, i, dataset.metadata(), plotMetadata) / 2,
+              y: projectors["y"](d, i, dataset.metadata(), plotMetadata) +
+                (projectors["positive"](d, i, dataset.metadata(), plotMetadata) ?
+                  0 : projectors["height"](d, i, dataset.metadata(), plotMetadata))
+            });
+          } else {
+            points.push({
+              x: projectors["x"](d, i, dataset.metadata(), plotMetadata) + projectors["height"](d, i, dataset.metadata(), plotMetadata) / 2,
+              y: projectors["y"](d, i, dataset.metadata(), plotMetadata) +
+                (projectors["positive"](d, i, dataset.metadata(), plotMetadata) ?
+                  0 : projectors["width"](d, i, dataset.metadata(), plotMetadata))
+            });
+          }
+        });
+        bars = bars.concat(barsFromDataset);
+      });
+
+      var barsSelection = d3.selectAll(bars);
+
+      if (!barsSelection.empty()) {
         this._getDrawersInOrder().forEach((d, i) => {
           d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
         });
-        bars.classed({ "hovered": true, "not-hovered": false });
+        barsSelection.classed({ "hovered": true, "not-hovered": false });
       } else {
         this._clearHoverSelection();
         return {
@@ -464,26 +501,10 @@ export module Plot {
         };
       }
 
-      var points: Point[] = [];
-      var projectors = this._generateAttrToProjector();
-      bars.each((d, i) => {
-        if (this._isVertical) {
-          points.push({
-            x: projectors["x"](d, i, null, null) + projectors["width"](d, i, null, null)/2,
-            y: projectors["y"](d, i, null, null) + (projectors["positive"](d, i, null, null) ? 0 : projectors["height"](d, i, null, null))
-          });
-        } else {
-          points.push({
-            x: projectors["x"](d, i, null, null) + (projectors["positive"](d, i, null, null) ? 0 : projectors["width"](d, i, null, null)),
-            y: projectors["y"](d, i, null, null) + projectors["height"](d, i, null, null)/2
-          });
-        }
-      });
-
       return {
-        data: bars.data(),
+        data: barsSelection.data(),
         pixelPositions: points,
-        selection: bars
+        selection: barsSelection
       };
     }
     //===== /Hover logic =====
