@@ -5,15 +5,15 @@ export module Plot {
   export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public static _DEFAULT_WIDTH = 10;
-    public _baseline: D3.Selection;
-    public _baselineValue: number;
-    public _barAlignmentFactor = 0.5;
+    private _baseline: D3.Selection;
+    private _baselineValue: number;
+    private _barAlignmentFactor = 0.5;
     public _isVertical: boolean;
     private _barLabelFormatter: Formatter = Formatters.identity();
     private _barLabelsEnabled = false;
     private _hoverMode = "point";
-    private hideBarsIfAnyAreTooWide = true;
-    private defaultFillColor: string;
+    private _hideBarsIfAnyAreTooWide = true;
+    private _defaultFillColor: string;
 
     /**
      * Constructs a BarPlot.
@@ -25,10 +25,10 @@ export module Plot {
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
-      this.defaultFillColor = new Scale.Color().range()[0];
-      this._animators["bars-reset"] = new Animator.Null();
-      this._animators["bars"] = new Animator.Base();
-      this._animators["baseline"] = new Animator.Null();
+      this._defaultFillColor = new Scale.Color().range()[0];
+      this.animator("bars-reset", new Animator.Null());
+      this.animator("bars", new Animator.Base());
+      this.animator("baseline", new Animator.Null());
       this.baseline(0);
     }
 
@@ -77,20 +77,20 @@ export module Plot {
      * @param {string} alignment The desired alignment.
      * @returns {AbstractBarPlot} The calling AbstractBarPlot.
      */
-     public barAlignment(alignment: string) {
-       var alignmentLC = alignment.toLowerCase();
-       var align2factor = (<typeof AbstractBarPlot> this.constructor)._BarAlignmentToFactor;
-       if (align2factor[alignmentLC] === undefined) {
-         throw new Error("unsupported bar alignment");
-       }
-       this._barAlignmentFactor = align2factor[alignmentLC];
+    public barAlignment(alignment: string) {
+      var alignmentLC = alignment.toLowerCase();
+      var align2factor = (<typeof AbstractBarPlot> this.constructor)._BarAlignmentToFactor;
+      if (align2factor[alignmentLC] === undefined) {
+        throw new Error("unsupported bar alignment");
+      }
+      this._barAlignmentFactor = align2factor[alignmentLC];
 
-       this._render();
-       return this;
-     }
+      this._render();
+      return this;
+    }
 
 
-    private parseExtent(input: any): Extent {
+    private _parseExtent(input: any): Extent {
       if (typeof(input) === "number") {
         return {min: input, max: input};
       } else if (input instanceof Object && "min" in input && "max" in input) {
@@ -176,8 +176,8 @@ export module Plot {
 
       var bars: any[] = [];
 
-      var xExtent: Extent = this.parseExtent(xValOrExtent);
-      var yExtent: Extent = this.parseExtent(yValOrExtent);
+      var xExtent: Extent = this._parseExtent(xValOrExtent);
+      var yExtent: Extent = this._parseExtent(yValOrExtent);
 
       // the SVGRects are positioned with sub-pixel accuracy (the default unit
       // for the x, y, height & width attributes), but user selections (e.g. via
@@ -197,17 +197,6 @@ export module Plot {
       });
 
       return d3.selectAll(bars);
-    }
-
-    /**
-     * Deselects all bars.
-     * @returns {AbstractBarPlot} The calling AbstractBarPlot.
-     */
-    public deselectAll() {
-      if (this._isSetup) {
-        this._getDrawersInOrder().forEach((d) => d._renderArea.selectAll("rect").classed("selected", false));
-      }
-      return this;
     }
 
     public _updateDomainer(scale: Scale.AbstractScale<any, number>) {
@@ -275,7 +264,7 @@ export module Plot {
                             attrToProjector,
                             this._key2PlotDatasetKey.get(k).dataset.metadata(),
                             this._key2PlotDatasetKey.get(k).plotMetadata));
-      if (this.hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._someLabelsTooWide)) {
+      if (this._hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._someLabelsTooWide)) {
         drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
       }
     }
@@ -344,7 +333,7 @@ export module Plot {
           originalPositionFn(d, i, u, m) <= scaledBaseline;
       }
 
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
       return attrToProjector;
     }
 
@@ -432,7 +421,7 @@ export module Plot {
       return this;
     }
 
-    private clearHoverSelection() {
+    private _clearHoverSelection() {
       this._getDrawersInOrder().forEach((d, i) => {
         d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
       });
@@ -444,7 +433,7 @@ export module Plot {
     }
 
     public _hoverOutComponent(p: Point) {
-      this.clearHoverSelection();
+      this._clearHoverSelection();
     }
 
     // HACKHACK User and plot metadata should be applied here - #1306.
@@ -467,7 +456,7 @@ export module Plot {
         });
         bars.classed({ "hovered": true, "not-hovered": false });
       } else {
-        this.clearHoverSelection();
+        this._clearHoverSelection();
         return {
           data: null,
           pixelPositions: null,

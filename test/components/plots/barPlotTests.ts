@@ -98,7 +98,7 @@ describe("Plots", () => {
         assert.equal(numAttr(bar1, "x"), 300, "bar1 x is correct");
 
         assert.throws(() => barPlot.barAlignment("blargh"), Error);
-        assert.equal(barPlot._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
+        assert.equal((<any> barPlot)._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
         svg.remove();
       });
 
@@ -130,21 +130,6 @@ describe("Plots", () => {
         assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
         assert.equal(bar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
         assert.equal(bar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
-
-        svg.remove();
-      });
-
-      it("shouldn't blow up if members called before the first render", () => {
-        var brandNew = new Plottable.Plot.VerticalBar(xScale, yScale);
-        brandNew.addDataset(dataset);
-
-        assert.isNotNull(brandNew.deselectAll(), "deselects return self");
-        assert.isTrue(brandNew.getBars(0, 0).empty(), "getBars returns empty selection");
-
-        brandNew._anchor(d3.select(document.createElement("svg"))); // calls `_setup()`
-
-        assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
-        assert.isTrue(brandNew.getBars(0, 0).empty(), "getBars returns empty selection after setup");
 
         svg.remove();
       });

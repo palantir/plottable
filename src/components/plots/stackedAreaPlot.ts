@@ -7,7 +7,7 @@ export module Plot {
     public _baseline: D3.Selection;
     public _baselineValue = 0;
 
-    private defaultFillColor: string;
+    private _defaultFillColor: string;
 
     /**
      * Constructs a StackedArea plot.
@@ -20,7 +20,7 @@ export module Plot {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this._isVertical = true;
-      this.defaultFillColor = new Scale.Color().range()[0];
+      this._defaultFillColor = new Scale.Color().range()[0];
     }
 
     public _getDrawer(key: string) {
@@ -93,7 +93,7 @@ export module Plot {
       attrToProjector["y0"] = (d: any, i: number, u: any, m: PlotMetadata) =>
         this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
 
       return attrToProjector;
     }
