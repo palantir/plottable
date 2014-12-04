@@ -7109,8 +7109,8 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Plot) {
-        var AbstractBarPlot = (function (_super) {
-            __extends(AbstractBarPlot, _super);
+        var Bar = (function (_super) {
+            __extends(Bar, _super);
             /**
              * Constructs a BarPlot.
              *
@@ -7118,7 +7118,7 @@ var Plottable;
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
-            function AbstractBarPlot(xScale, yScale, isVertical) {
+            function Bar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale);
                 this._barAlignmentFactor = 0.5;
@@ -7134,14 +7134,14 @@ var Plottable;
                 this.baseline(0);
                 this._isVertical = isVertical;
             }
-            AbstractBarPlot.prototype._getDrawer = function (key) {
+            Bar.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Rect(key, this._isVertical);
             };
-            AbstractBarPlot.prototype._setup = function () {
+            Bar.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
-            AbstractBarPlot.prototype.baseline = function (value) {
+            Bar.prototype.baseline = function (value) {
                 if (value == null) {
                     return this._baselineValue;
                 }
@@ -7157,9 +7157,9 @@ var Plottable;
              * HorizontalBarPlot supports "top", "center", "bottom"
              *
              * @param {string} alignment The desired alignment.
-             * @returns {AbstractBarPlot} The calling AbstractBarPlot.
+             * @returns {Bar} The calling Bar.
              */
-            AbstractBarPlot.prototype.barAlignment = function (alignment) {
+            Bar.prototype.barAlignment = function (alignment) {
                 var alignmentLC = alignment.toLowerCase();
                 var align2factor = this.constructor._BarAlignmentToFactor;
                 if (align2factor[alignmentLC] === undefined) {
@@ -7169,7 +7169,7 @@ var Plottable;
                 this._render();
                 return this;
             };
-            AbstractBarPlot.prototype._parseExtent = function (input) {
+            Bar.prototype._parseExtent = function (input) {
                 if (typeof (input) === "number") {
                     return { min: input, max: input };
                 }
@@ -7180,7 +7180,7 @@ var Plottable;
                     throw new Error("input '" + input + "' can't be parsed as an Extent");
                 }
             };
-            AbstractBarPlot.prototype.barLabelsEnabled = function (enabled) {
+            Bar.prototype.barLabelsEnabled = function (enabled) {
                 if (enabled === undefined) {
                     return this._barLabelsEnabled;
                 }
@@ -7190,7 +7190,7 @@ var Plottable;
                     return this;
                 }
             };
-            AbstractBarPlot.prototype.barLabelFormatter = function (formatter) {
+            Bar.prototype.barLabelFormatter = function (formatter) {
                 if (formatter == null) {
                     return this._barLabelFormatter;
                 }
@@ -7205,10 +7205,10 @@ var Plottable;
              *
              * @returns {D3.Selection} All of the bars in the bar plot.
              */
-            AbstractBarPlot.prototype.getAllBars = function () {
+            Bar.prototype.getAllBars = function () {
                 return this._renderArea.selectAll("rect");
             };
-            AbstractBarPlot.prototype.getBars = function (xValOrExtent, yValOrExtent) {
+            Bar.prototype.getBars = function (xValOrExtent, yValOrExtent) {
                 if (!this._isSetup) {
                     return d3.select();
                 }
@@ -7231,7 +7231,7 @@ var Plottable;
                 });
                 return d3.selectAll(bars);
             };
-            AbstractBarPlot.prototype._updateDomainer = function (scale) {
+            Bar.prototype._updateDomainer = function (scale) {
                 if (scale instanceof Plottable.Scale.AbstractQuantitative) {
                     var qscale = scale;
                     if (!qscale._userSetDomainer) {
@@ -7247,7 +7247,7 @@ var Plottable;
                     qscale._autoDomainIfAutomaticMode();
                 }
             };
-            AbstractBarPlot.prototype._updateYDomainer = function () {
+            Bar.prototype._updateYDomainer = function () {
                 if (this._isVertical) {
                     this._updateDomainer(this._yScale);
                 }
@@ -7255,7 +7255,7 @@ var Plottable;
                     _super.prototype._updateYDomainer.call(this);
                 }
             };
-            AbstractBarPlot.prototype._updateXDomainer = function () {
+            Bar.prototype._updateXDomainer = function () {
                 if (!this._isVertical) {
                     this._updateDomainer(this._xScale);
                 }
@@ -7263,7 +7263,7 @@ var Plottable;
                     _super.prototype._updateXDomainer.call(this);
                 }
             };
-            AbstractBarPlot.prototype._additionalPaint = function (time) {
+            Bar.prototype._additionalPaint = function (time) {
                 var _this = this;
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -7280,7 +7280,7 @@ var Plottable;
                     Plottable._Util.Methods.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
             };
-            AbstractBarPlot.prototype._drawLabels = function () {
+            Bar.prototype._drawLabels = function () {
                 var _this = this;
                 var drawers = this._getDrawersInOrder();
                 var attrToProjector = this._generateAttrToProjector();
@@ -7290,7 +7290,7 @@ var Plottable;
                     drawers.forEach(function (d) { return d.removeLabels(); });
                 }
             };
-            AbstractBarPlot.prototype._generateDrawSteps = function () {
+            Bar.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
                 if (this._dataChanged && this._animate) {
                     var resetAttrToProjector = this._generateAttrToProjector();
@@ -7305,7 +7305,7 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("bars") });
                 return drawSteps;
             };
-            AbstractBarPlot.prototype._generateAttrToProjector = function () {
+            Bar.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 // Primary scale/direction: the "length" of the bars
                 // Secondary scale/direction: the "width" of the bars
@@ -7357,7 +7357,7 @@ var Plottable;
              *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
              * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
-            AbstractBarPlot.prototype._getBarPixelWidth = function () {
+            Bar.prototype._getBarPixelWidth = function () {
                 var _this = this;
                 var barPixelWidth;
                 var barScale = this._isVertical ? this._xScale : this._yScale;
@@ -7400,7 +7400,7 @@ var Plottable;
                 }
                 return barPixelWidth;
             };
-            AbstractBarPlot.prototype.hoverMode = function (mode) {
+            Bar.prototype.hoverMode = function (mode) {
                 if (mode == null) {
                     return this._hoverMode;
                 }
@@ -7411,20 +7411,20 @@ var Plottable;
                 this._hoverMode = modeLC;
                 return this;
             };
-            AbstractBarPlot.prototype._clearHoverSelection = function () {
+            Bar.prototype._clearHoverSelection = function () {
                 this._getDrawersInOrder().forEach(function (d, i) {
                     d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
                 });
             };
             //===== Hover logic =====
-            AbstractBarPlot.prototype._hoverOverComponent = function (p) {
+            Bar.prototype._hoverOverComponent = function (p) {
                 // no-op
             };
-            AbstractBarPlot.prototype._hoverOutComponent = function (p) {
+            Bar.prototype._hoverOutComponent = function (p) {
                 this._clearHoverSelection();
             };
             // HACKHACK User and plot metadata should be applied here - #1306.
-            AbstractBarPlot.prototype._doHover = function (p) {
+            Bar.prototype._doHover = function (p) {
                 var _this = this;
                 var xPositionOrExtent = p.x;
                 var yPositionOrExtent = p.y;
@@ -7474,11 +7474,11 @@ var Plottable;
                     selection: bars
                 };
             };
-            AbstractBarPlot._BarAlignmentToFactor = {};
-            AbstractBarPlot._DEFAULT_WIDTH = 10;
-            return AbstractBarPlot;
+            Bar._BarAlignmentToFactor = {};
+            Bar._DEFAULT_WIDTH = 10;
+            return Bar;
         })(Plot.AbstractXYPlot);
-        Plot.AbstractBarPlot = AbstractBarPlot;
+        Plot.Bar = Bar;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
@@ -7512,15 +7512,14 @@ var Plottable;
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             function VerticalBar(xScale, yScale) {
-                this._isVertical = true; // Has to be set before super()
-                _super.call(this, xScale, yScale);
+                _super.call(this, xScale, yScale, true);
             }
             VerticalBar.prototype._updateYDomainer = function () {
                 this._updateDomainer(this._yScale);
             };
             VerticalBar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             return VerticalBar;
-        })(Plot.AbstractBarPlot);
+        })(Plot.Bar);
         Plot.VerticalBar = VerticalBar;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
@@ -7571,7 +7570,7 @@ var Plottable;
             };
             HorizontalBar._BarAlignmentToFactor = { "top": 0, "center": 0.5, "bottom": 1 };
             return HorizontalBar;
-        })(Plot.AbstractBarPlot);
+        })(Plot.Bar);
         Plot.HorizontalBar = HorizontalBar;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
@@ -7881,7 +7880,7 @@ var Plottable;
                 if (!this._projections["width"]) {
                     var secondaryScale = this._isVertical ? this._xScale : this._yScale;
                     var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
-                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : Plot.AbstractBarPlot._DEFAULT_WIDTH;
+                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : Plot.Bar._DEFAULT_WIDTH;
                     innerScale.range([0, constantWidth]);
                 }
                 else {
@@ -7895,7 +7894,7 @@ var Plottable;
                 return innerScale;
             };
             return ClusteredBar;
-        })(Plot.AbstractBarPlot);
+        })(Plot.Bar);
         Plot.ClusteredBar = ClusteredBar;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
@@ -8267,7 +8266,7 @@ var Plottable;
                 return Plot.AbstractStacked.prototype._valueAccessor.call(this);
             };
             return StackedBar;
-        })(Plot.AbstractBarPlot);
+        })(Plot.Bar);
         Plot.StackedBar = StackedBar;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class StackedBar<X,Y> extends AbstractBarPlot<X, Y> {
+  export class StackedBar<X,Y> extends Bar<X, Y> {
 
     /**
      * Constructs a StackedBar plot.

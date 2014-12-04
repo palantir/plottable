@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class ClusteredBar<X,Y> extends AbstractBarPlot<X,Y> {
+  export class ClusteredBar<X,Y> extends Bar<X,Y> {
 
     /**
      * Creates a ClusteredBarPlot.
@@ -63,7 +63,7 @@ export module Plot {
         var secondaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._xScale : this._yScale;
         var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
                       && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
-        var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
+        var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : Bar._DEFAULT_WIDTH;
         innerScale.range([0, constantWidth]);
       } else {
         var projection = this._projections["width"];
