@@ -299,7 +299,7 @@ describe("Scales", () => {
       assert.deepEqual(scale.range(), colorArray);
     });
 
-    it("colors outside the range length are not exactly the looped version", () => {
+    it("uses altered colors if size of domain exceeds size of range", () => {
       var scale = new Plottable.Scale.Color();
       scale.range(["#5279c7", "#fd373e"]);
       scale.domain(["a", "b", "c"]);

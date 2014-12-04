@@ -5434,7 +5434,7 @@ describe("Scales", function () {
             var colorArray = ["#5279c7", "#fd373e", "#63c261", "#fad419", "#2c2b6f", "#ff7939", "#db2e65", "#99ce50", "#962565", "#06cccc"];
             assert.deepEqual(scale.range(), colorArray);
         });
-        it("colors outside the range length are not exactly the looped version", function () {
+        it("uses altered colors if size of domain exceeds size of range", function () {
             var scale = new Plottable.Scale.Color();
             scale.range(["#5279c7", "#fd373e"]);
             scale.domain(["a", "b", "c"]);
