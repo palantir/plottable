@@ -24,9 +24,8 @@ export module Plot {
       // the width is constant, so set the inner scale range to that
       var innerScale = this._makeInnerScale();
       var innerWidthF = (d: any, i: number) => innerScale.rangeBand();
-      var heightF = attrToProjector["height"];
-      attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
-      attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
+      attrToProjector["width"] = this._isVertical ? innerWidthF : attrToProjector["width"];
+      attrToProjector["height"] = !this._isVertical ? innerWidthF : attrToProjector["height"];
 
       var positionF = (d: any) => d._PLOTTABLE_PROTECTED_FIELD_POSITION;
       attrToProjector["x"] = this._isVertical ? positionF : attrToProjector["x"];

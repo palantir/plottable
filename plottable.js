@@ -7315,11 +7315,17 @@ var Plottable;
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var secondaryAttr = this._isVertical ? "x" : "y";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
-                if (!attrToProjector["width"]) {
-                    attrToProjector["width"] = function () { return _this._getBarPixelWidth(); };
-                }
                 var positionF = attrToProjector[secondaryAttr];
                 var widthF = attrToProjector["width"];
+                if (widthF == null) {
+                    widthF = function () { return _this._getBarPixelWidth(); };
+                }
+                var originalPositionFn = attrToProjector[primaryAttr];
+                var heightF = function (d, i, u, m) {
+                    return Math.abs(scaledBaseline - originalPositionFn(d, i, u, m));
+                };
+                attrToProjector["width"] = this._isVertical ? widthF : heightF;
+                attrToProjector["height"] = this._isVertical ? heightF : widthF;
                 var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                 if (!bandsMode) {
                     attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) * _this._barAlignmentFactor; };
@@ -7328,16 +7334,12 @@ var Plottable;
                     var bandWidth = secondaryScale.rangeBand();
                     attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) / 2 + bandWidth / 2; };
                 }
-                var originalPositionFn = attrToProjector[primaryAttr];
                 attrToProjector[primaryAttr] = function (d, i, u, m) {
                     var originalPos = originalPositionFn(d, i, u, m);
                     // If it is past the baseline, it should start at the baselin then width/height
                     // carries it over. If it's not past the baseline, leave it at original position and
                     // then width/height carries it to baseline
                     return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
-                };
-                attrToProjector["height"] = function (d, i, u, m) {
-                    return Math.abs(scaledBaseline - originalPositionFn(d, i, u, m));
                 };
                 var primaryAccessor = this._projections[primaryAttr].accessor;
                 if (this.barLabelsEnabled && this.barLabelFormatter) {
@@ -7347,11 +7349,6 @@ var Plottable;
                     attrToProjector["positive"] = function (d, i, u, m) { return originalPositionFn(d, i, u, m) <= scaledBaseline; };
                 }
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-                if (!this._isVertical) {
-                    var widthF = attrToProjector["width"];
-                    attrToProjector["width"] = attrToProjector["height"];
-                    attrToProjector["height"] = widthF;
-                }
                 return attrToProjector;
             };
             /**
@@ -7842,9 +7839,8 @@ var Plottable;
                 // the width is constant, so set the inner scale range to that
                 var innerScale = this._makeInnerScale();
                 var innerWidthF = function (d, i) { return innerScale.rangeBand(); };
-                var heightF = attrToProjector["height"];
-                attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
-                attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
+                attrToProjector["width"] = this._isVertical ? innerWidthF : attrToProjector["width"];
+                attrToProjector["height"] = !this._isVertical ? innerWidthF : attrToProjector["height"];
                 var positionF = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_POSITION; };
                 attrToProjector["x"] = this._isVertical ? positionF : attrToProjector["x"];
                 attrToProjector["y"] = this._isVertical ? attrToProjector["y"] : positionF;

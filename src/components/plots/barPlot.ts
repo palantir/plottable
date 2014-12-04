@@ -295,12 +295,18 @@ export module Plot {
       var primaryAttr     = this._isVertical ? "y" : "x";
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
-      if (!attrToProjector["width"]) {
-        attrToProjector["width"] = () => this._getBarPixelWidth();
-      }
 
       var positionF = attrToProjector[secondaryAttr];
       var widthF = attrToProjector["width"];
+      if (widthF == null) { widthF = () => this._getBarPixelWidth(); }
+      var originalPositionFn = attrToProjector[primaryAttr];
+      var heightF = (d: any, i: number, u: any, m: PlotMetadata) => {
+        return Math.abs(scaledBaseline - originalPositionFn(d, i, u, m));
+      };
+
+      attrToProjector["width"] = this._isVertical ? widthF : heightF;
+      attrToProjector["height"] = this._isVertical ? heightF : widthF;
+
       var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
                       && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
       if (!bandsMode) {
@@ -312,17 +318,12 @@ export module Plot {
           positionF(d, i, u, m) - widthF(d, i, u, m) / 2 + bandWidth / 2;
       }
 
-      var originalPositionFn = attrToProjector[primaryAttr];
       attrToProjector[primaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) => {
         var originalPos = originalPositionFn(d, i, u, m);
         // If it is past the baseline, it should start at the baselin then width/height
         // carries it over. If it's not past the baseline, leave it at original position and
         // then width/height carries it to baseline
         return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
-      };
-
-      attrToProjector["height"] = (d: any, i: number, u: any, m: PlotMetadata) => {
-        return Math.abs(scaledBaseline - originalPositionFn(d, i, u, m));
       };
 
       var primaryAccessor = this._projections[primaryAttr].accessor;
@@ -336,11 +337,6 @@ export module Plot {
 
       attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
 
-      if (!this._isVertical) {
-        var widthF = attrToProjector["width"];
-        attrToProjector["width"] = attrToProjector["height"];
-        attrToProjector["height"] = widthF;
-      }
       return attrToProjector;
     }
 
