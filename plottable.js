@@ -4563,17 +4563,14 @@ var Plottable;
                 }
             };
             AbstractAxis.prototype._hideOverlappingTickLabels = function () {
-                var _this = this;
                 var visibleTickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
                     return d3.select(this).style("visibility") === "visible";
                 });
                 var lastLabelClientRect;
-                var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
-                var isInsideBBox = function (tickBox) { return Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.width()) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.height()); };
                 visibleTickLabels.each(function (d) {
                     var clientRect = this.getBoundingClientRect();
                     var tickLabel = d3.select(this);
-                    if ((lastLabelClientRect != null && Plottable._Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) || !isInsideBBox(clientRect)) {
+                    if (lastLabelClientRect != null && Plottable._Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
                         tickLabel.style("visibility", "hidden");
                     }
                     else {
@@ -5011,6 +5008,7 @@ var Plottable;
                 this._render();
             };
             Numeric.prototype._doRender = function () {
+                var _this = this;
                 _super.prototype._doRender.call(this);
                 var tickLabelAttrHash = {
                     x: 0,
@@ -5086,7 +5084,15 @@ var Plottable;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(tickLabelValues);
                 tickLabels.enter().append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();
-                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(this._formatter);
+                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash);
+                if (this._isHorizontal()) {
+                    tickLabels.text(this._formatter);
+                }
+                else {
+                    var availableTextSpace = this.width() - this.tickLabelPadding();
+                    availableTextSpace -= this.tickLabelPositioning === "center" ? this._maxLabelTickLength() : 0;
+                    tickLabels.text(function (s) { return Plottable._Util.Text.getTruncatedText(_this._formatter(s), availableTextSpace, _this.measurer); });
+                }
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
                 if (!this.showEndTickLabels()) {
