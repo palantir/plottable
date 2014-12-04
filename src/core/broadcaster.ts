@@ -38,7 +38,7 @@ export module Core {
    * The listeners are called synchronously.
    */
   export class Broadcaster extends Core.PlottableObject {
-    private key2callback = new _Util.StrictEqualityAssociativeArray();
+    private _key2callback = new _Util.StrictEqualityAssociativeArray();
     public listenable: Listenable;
 
     /**
@@ -62,7 +62,7 @@ export module Core {
      * @returns {Broadcaster} this object
      */
     public registerListener(key: any, callback: BroadcasterCallback) {
-      this.key2callback.set(key, callback);
+      this._key2callback.set(key, callback);
       return this;
     }
 
@@ -73,7 +73,7 @@ export module Core {
      * @returns {Broadcaster} this object
      */
     public broadcast(...args: any[]) {
-      this.key2callback.values().forEach((callback) => callback(this.listenable, args));
+      this._key2callback.values().forEach((callback) => callback(this.listenable, args));
       return this;
     }
 
@@ -84,7 +84,7 @@ export module Core {
      * @returns {Broadcaster} this object
      */
     public deregisterListener(key: any) {
-      this.key2callback.delete(key);
+      this._key2callback.delete(key);
       return this;
     }
 
@@ -94,7 +94,7 @@ export module Core {
      * @returns {Broadcaster} this object
      */
     public deregisterAllListeners() {
-      this.key2callback = new _Util.StrictEqualityAssociativeArray();
+      this._key2callback = new _Util.StrictEqualityAssociativeArray();
     }
   }
 }
