@@ -275,7 +275,7 @@ var Plottable;
                 colorTester.classed(className, true);
                 // Use regex to get the text inside the rgb parentheses
                 var colorStyle = colorTester.style("background-color");
-                if (colorStyle === "transparent") {
+                if (colorStyle === "transparent" || colorStyle === "") {
                     return null;
                 }
                 var rgb = /\((.+)\)/.exec(colorStyle)[1].split(",").map(function (colorValue) {
@@ -1057,7 +1057,7 @@ var Plottable;
             }
             function isSelectionRemovedFromSVG(selection) {
                 var n = selection.node();
-                while (n !== null && n.nodeName !== "svg") {
+                while (n !== null && !isSvg(selection)) {
                     n = n.parentNode;
                 }
                 return (n == null);
@@ -1124,6 +1124,10 @@ var Plottable;
                 return true;
             }
             DOM.boxesOverlap = boxesOverlap;
+            function isSvg(selection) {
+                return selection.node().nodeName.toLowerCase() === "svg";
+            }
+            DOM.isSvg = isSvg;
         })(_Util.DOM || (_Util.DOM = {}));
         var DOM = _Util.DOM;
     })(Plottable._Util || (Plottable._Util = {}));
@@ -3639,7 +3643,7 @@ var Plottable;
                 if (this._removed) {
                     throw new Error("Can't reuse remove()-ed components!");
                 }
-                if (element.node().nodeName === "svg") {
+                if (Plottable._Util.DOM.isSvg(element)) {
                     // svg node gets the "plottable" CSS class
                     this._rootSVG = element;
                     this._rootSVG.classed("plottable", true);
@@ -3770,7 +3774,7 @@ var Plottable;
                     else {
                         selection = d3.select(element);
                     }
-                    if (!selection.node() || selection.node().nodeName !== "svg") {
+                    if (!selection.node() || !Plottable._Util.DOM.isSvg(selection)) {
                         throw new Error("Plottable requires a valid SVG to renderTo");
                     }
                     this._anchor(selection);
@@ -9529,3 +9533,23 @@ var Plottable;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
+
+///<reference path="../typings/d3/d3.d.ts" />
+///<reference path="./reference.ts" />
+//declarations required to use Plottable in Node
+var window;
+var document;
+var navigator;
+if (typeof module === 'object' && module.exports) {
+    module.exports = function (windowObj, documentObj, navigatorObj) {
+        window = windowObj;
+        document = documentObj;
+        navigator = navigatorObj;
+        return Plottable;
+    };
+}
+else if (typeof define === 'function' && define.amd) {
+    define(function () {
+        return Plottable;
+    });
+}
