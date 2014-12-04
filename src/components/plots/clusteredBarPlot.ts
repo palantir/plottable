@@ -16,8 +16,7 @@ export module Plot {
      * @param {Scale} yScale The y scale to use.
      */
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
-      this._isVertical = isVertical; // Has to be set before super()
-      super(xScale, yScale);
+      super(xScale, yScale, isVertical);
     }
 
     public _generateAttrToProjector() {

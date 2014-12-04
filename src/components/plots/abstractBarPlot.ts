@@ -22,7 +22,7 @@ export module Plot {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
+    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this._defaultFillColor = new Scale.Color().range()[0];
@@ -30,6 +30,7 @@ export module Plot {
       this.animator("bars", new Animator.Base());
       this.animator("baseline", new Animator.Null());
       this.baseline(0);
+      this._isVertical = isVertical;
     }
 
     public _getDrawer(key: string) {

@@ -1057,7 +1057,7 @@ var Plottable;
             }
             function isSelectionRemovedFromSVG(selection) {
                 var n = selection.node();
-                while (n !== null && n.nodeName !== "svg") {
+                while (n !== null && n.nodeName.toLowerCase() !== "svg") {
                     n = n.parentNode;
                 }
                 return (n == null);
@@ -3639,7 +3639,7 @@ var Plottable;
                 if (this._removed) {
                     throw new Error("Can't reuse remove()-ed components!");
                 }
-                if (element.node().nodeName === "svg") {
+                if (element.node().nodeName.toLowerCase() === "svg") {
                     // svg node gets the "plottable" CSS class
                     this._rootSVG = element;
                     this._rootSVG.classed("plottable", true);
@@ -3770,7 +3770,7 @@ var Plottable;
                     else {
                         selection = d3.select(element);
                     }
-                    if (!selection.node() || selection.node().nodeName !== "svg") {
+                    if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
                         throw new Error("Plottable requires a valid SVG to renderTo");
                     }
                     this._anchor(selection);
@@ -7118,7 +7118,8 @@ var Plottable;
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
-            function AbstractBarPlot(xScale, yScale) {
+            function AbstractBarPlot(xScale, yScale, isVertical) {
+                if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale);
                 this._barAlignmentFactor = 0.5;
                 this._barLabelFormatter = Plottable.Formatters.identity();
@@ -7131,6 +7132,7 @@ var Plottable;
                 this.animator("bars", new Plottable.Animator.Base());
                 this.animator("baseline", new Plottable.Animator.Null());
                 this.baseline(0);
+                this._isVertical = isVertical;
             }
             AbstractBarPlot.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Rect(key, this._isVertical);
@@ -7553,7 +7555,7 @@ var Plottable;
              * @param {Scale} yScale The y scale to use.
              */
             function HorizontalBar(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+                _super.call(this, xScale, yScale, false);
             }
             HorizontalBar.prototype._updateXDomainer = function () {
                 this._updateDomainer(this._xScale);
@@ -7838,8 +7840,7 @@ var Plottable;
              */
             function ClusteredBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
-                this._isVertical = isVertical; // Has to be set before super()
-                _super.call(this, xScale, yScale);
+                _super.call(this, xScale, yScale, isVertical);
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);

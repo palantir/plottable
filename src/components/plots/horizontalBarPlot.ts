@@ -22,7 +22,7 @@ export module Plot {
      * @param {Scale} yScale The y scale to use.
      */
     constructor(xScale: Scale.AbstractQuantitative<number>, yScale: Scale.AbstractScale<Y,number>) {
-      super(xScale, yScale);
+      super(xScale, yScale, false);
     }
 
     public _updateXDomainer() {
