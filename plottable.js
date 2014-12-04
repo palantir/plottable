@@ -7347,6 +7347,11 @@ var Plottable;
                     attrToProjector["positive"] = function (d, i, u, m) { return originalPositionFn(d, i, u, m) <= scaledBaseline; };
                 }
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+                if (!this._isVertical) {
+                    var widthF = attrToProjector["width"];
+                    attrToProjector["width"] = attrToProjector["height"];
+                    attrToProjector["height"] = widthF;
+                }
                 return attrToProjector;
             };
             /**
@@ -7558,15 +7563,6 @@ var Plottable;
             }
             HorizontalBar.prototype._updateXDomainer = function () {
                 this._updateDomainer(this._xScale);
-            };
-            HorizontalBar.prototype._generateAttrToProjector = function () {
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                // by convention, for API users the 2ndary dimension of a bar is always called its "width", so
-                // the "width" of a horziontal bar plot is actually its "height" from the perspective of a svg rect
-                var widthF = attrToProjector["width"];
-                attrToProjector["width"] = attrToProjector["height"];
-                attrToProjector["height"] = widthF;
-                return attrToProjector;
             };
             HorizontalBar._BarAlignmentToFactor = { "top": 0, "center": 0.5, "bottom": 1 };
             return HorizontalBar;
@@ -8217,9 +8213,12 @@ var Plottable;
                 var getStart = function (d, i, u, m) { return primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 var getEnd = function (d, i, u, m) { return primaryScale.scale(+primaryAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
                 var heightF = function (d, i, u, m) { return Math.abs(getEnd(d, i, u, m) - getStart(d, i, u, m)); };
-                var widthF = attrToProjector["width"];
-                attrToProjector["height"] = this._isVertical ? heightF : widthF;
-                attrToProjector["width"] = this._isVertical ? widthF : heightF;
+                if (this._isVertical) {
+                    attrToProjector["height"] = heightF;
+                }
+                else {
+                    attrToProjector["width"] = heightF;
+                }
                 var attrFunction = function (d, i, u, m) { return +primaryAccessor(d, i, u, m) < 0 ? getStart(d, i, u, m) : getEnd(d, i, u, m); };
                 attrToProjector[primaryAttr] = function (d, i, u, m) { return _this._isVertical ? attrFunction(d, i, u, m) : attrFunction(d, i, u, m) - heightF(d, i, u, m); };
                 return attrToProjector;

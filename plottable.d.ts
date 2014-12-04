@@ -3113,7 +3113,6 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<number>, yScale: Scale.AbstractScale<Y, number>);
             _updateXDomainer(): void;
-            _generateAttrToProjector(): AttributeToProjector;
         }
     }
 }

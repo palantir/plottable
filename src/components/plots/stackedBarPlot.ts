@@ -48,9 +48,11 @@ export module Plot {
         primaryScale.scale(+primaryAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
       var heightF = (d: any, i: number, u: any, m: PlotMetadata) => Math.abs(getEnd(d, i, u, m) - getStart(d, i, u, m));
-      var widthF = attrToProjector["width"];
-      attrToProjector["height"] = this._isVertical ? heightF : widthF;
-      attrToProjector["width"] = this._isVertical ? widthF : heightF;
+      if (this._isVertical) {
+        attrToProjector["height"] = heightF;
+      } else {
+        attrToProjector["width"] = heightF;
+      }
 
       var attrFunction = (d: any, i: number, u: any, m: PlotMetadata) =>
         +primaryAccessor(d, i, u, m) < 0 ? getStart(d, i, u, m) : getEnd(d, i, u, m);

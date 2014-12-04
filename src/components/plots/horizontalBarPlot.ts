@@ -29,15 +29,6 @@ export module Plot {
       this._updateDomainer(this._xScale);
     }
 
-    public _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
-      // by convention, for API users the 2ndary dimension of a bar is always called its "width", so
-      // the "width" of a horziontal bar plot is actually its "height" from the perspective of a svg rect
-      var widthF = attrToProjector["width"];
-      attrToProjector["width"] = attrToProjector["height"];
-      attrToProjector["height"] = widthF;
-      return attrToProjector;
-    }
   }
 }
 }

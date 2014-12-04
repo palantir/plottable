@@ -335,6 +335,12 @@ export module Plot {
       }
 
       attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+
+      if (!this._isVertical) {
+        var widthF = attrToProjector["width"];
+        attrToProjector["width"] = attrToProjector["height"];
+        attrToProjector["height"] = widthF;
+      }
       return attrToProjector;
     }
 
