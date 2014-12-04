@@ -45,14 +45,11 @@ var div = d3.select(".results");
 var plotwidth;
 var plotheight;
 
-populateSidebarList();
-populatePlotList();
-setupBindings();
 //functions
 
 function togglePlotDisplay(className){
   var classSelector = "."+className;
-  var displayStatus = $(classSelector).css("display") == "none" ? "inline-block" : "none";
+  var displayStatus = $(classSelector).css("display") === "none" ? "inline-block" : "none";
   $(classSelector).css("display", displayStatus);
 }
 
@@ -82,7 +79,6 @@ function populatePlotList(){
 }
 
 function populateSidebarList(){
-  //use plots
   var startString = "<div class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
   var endString = "</div>";
   plots.forEach(function(plot){
@@ -251,6 +247,12 @@ function initialize(){
   generatePlots(plots, dataArray);
 }
 
+//setup page
+populateSidebarList();
+populatePlotList();
+setupBindings();
+
+//render button click triggers initialize
 var button = document.getElementById("render");
 button.onclick = initialize;
 
