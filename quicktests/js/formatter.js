@@ -37,6 +37,7 @@ function run(div, data, Plottable) {
   var custFormatter = function(d) { return "= ' w ' ="; };
 
   var plot = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries1);
+  plot.project("x", "x", xScale).project("y", "y", yScale);
   var basicTable = new Plottable.Component.Table([[yAxis, plot], [null, xAxis]]);
   var formatChoices = new Plottable.Component.Table([[IdTitle, GenTitle, FixTitle],[CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);
   var bigTable = new Plottable.Component.Table([[basicTable],[formatChoices]]);

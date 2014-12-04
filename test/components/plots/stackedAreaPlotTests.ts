@@ -33,6 +33,8 @@ describe("Plots", () => {
       renderer = new Plottable.Plot.StackedArea(xScale, yScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
+      renderer.project("x", "x", xScale);
+      renderer.project("y", "y", yScale);
       renderer.project("fill", "type", colorScale);
       var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
@@ -81,6 +83,8 @@ describe("Plots", () => {
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
+      renderer.project("x", "x", xScale);
+      renderer.project("y", "y", yScale);
       new Plottable.Component.Table([[renderer]]).renderTo(svg);
     });
 
@@ -125,6 +129,8 @@ describe("Plots", () => {
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
+      renderer.project("x", "x", xScale);
+      renderer.project("y", "y", yScale);
       renderer.renderTo(svg);
     });
 
@@ -196,6 +202,8 @@ describe("Plots", () => {
         {x: 3, y: 1, type: "e"}
       ];
       renderer.addDataset("c", new Plottable.Dataset(data));
+      renderer.project("x", "x", xScale);
+      renderer.project("y", "y", yScale);
 
       renderer.renderTo(svg);
 
@@ -236,6 +244,8 @@ describe("Plots", () => {
       ];
       var dataset = new Plottable.Dataset(data);
       renderer.addDataset(dataset);
+      renderer.project("x", "x", xScale);
+      renderer.project("y", "y", yScale);
       renderer.renderTo(svg);
 
       assert.strictEqual(oldLowerBound, yScale.domain()[0], "lower bound doesn't change with 0 added");
@@ -323,6 +333,7 @@ describe("Plots", () => {
 
       renderer = new Plottable.Plot.StackedArea(xScale, yScale);
       renderer.project("y", "yTest", yScale);
+      renderer.project("x", "x", xScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
@@ -345,6 +356,17 @@ describe("Plots", () => {
       var domain = yScale.domain();
       assert.strictEqual(0, domain[0], "domain starts at a min value at 0");
       assert.strictEqual(4, domain[1], "highest area stacking is at upper limit of yScale domain");
+      svg.remove();
+    });
+
+    it("project works correctly", () => {
+      renderer.project("check", "type");
+      var areas = renderer._renderArea.selectAll(".area");
+      var area0 = d3.select(areas[0][0]);
+      assert.strictEqual(area0.attr("check"), "a", "projector has been applied to first area");
+
+      var area1 = d3.select(areas[0][1]);
+      assert.strictEqual(area1.attr("check"), "b", "projector has been applied to second area");
       svg.remove();
     });
 

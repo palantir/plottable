@@ -9,35 +9,31 @@ describe("TimeAxis", () => {
     scale = new Plottable.Scale.Time();
     axis = new Plottable.Axis.Time(scale, "bottom");
   });
-    it("can not initialize vertical time axis", () => {
-        assert.throws(() => new Plottable.Axis.Time(scale, "left"), "horizontal");
-        assert.throws(() => new Plottable.Axis.Time(scale, "right"), "horizontal");
-    });
 
-    it("cannot change time axis orientation to vertical", () => {
-        assert.throws(() => axis.orient("left"), "horizontal");
-        assert.throws(() => axis.orient("right"), "horizontal");
-        assert.equal(axis.orient(), "bottom", "orientation unchanged");
-    });
+  it("can not initialize vertical time axis", () => {
+      assert.throws(() => new Plottable.Axis.Time(scale, "left"), "horizontal");
+      assert.throws(() => new Plottable.Axis.Time(scale, "right"), "horizontal");
+  });
 
-    it("major and minor intervals arrays are the same length", () => {
-        assert.equal(Plottable.Axis.Time._majorIntervals.length, Plottable.Axis.Time._minorIntervals.length,
-                "major and minor interval arrays must be same size");
-    });
+  it("cannot change time axis orientation to vertical", () => {
+      assert.throws(() => axis.orient("left"), "horizontal");
+      assert.throws(() => axis.orient("right"), "horizontal");
+      assert.equal(axis.orient(), "bottom", "orientation unchanged");
+  });
 
-    it("Computing the default ticks doesn't error out for edge cases", () => {
-      var svg = generateSVG(400, 100);
-      scale.range([0, 400]);
+  it("Computing the default ticks doesn't error out for edge cases", () => {
+    var svg = generateSVG(400, 100);
+    scale.range([0, 400]);
 
-      // very large time span
-      assert.doesNotThrow(() => scale.domain([new Date(0, 0, 1, 0, 0, 0, 0), new Date(50000, 0, 1, 0, 0, 0, 0)]));
-      axis.renderTo(svg);
+    // very large time span
+    assert.doesNotThrow(() => scale.domain([new Date(0, 0, 1, 0, 0, 0, 0), new Date(50000, 0, 1, 0, 0, 0, 0)]));
+    axis.renderTo(svg);
 
-      // very small time span
-      assert.doesNotThrow(() => scale.domain([new Date(0, 0, 1, 0, 0, 0, 0), new Date(0, 0, 1, 0, 0, 0, 100)]));
-      axis.renderTo(svg);
+    // very small time span
+    assert.doesNotThrow(() => scale.domain([new Date(0, 0, 1, 0, 0, 0, 0), new Date(0, 0, 1, 0, 0, 0, 100)]));
+    axis.renderTo(svg);
 
-      svg.remove();
+    svg.remove();
   });
 
   it("Tick labels don't overlap", () => {
@@ -67,8 +63,7 @@ describe("TimeAxis", () => {
         }
       }
 
-      checkLabelsForContainer(axis._minorTickLabels);
-      checkLabelsForContainer(axis._majorTickLabels);
+      (<any>axis)._tierLabelContainers.forEach(checkLabelsForContainer);
     }
     // 100 year span
     checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
@@ -85,6 +80,29 @@ describe("TimeAxis", () => {
     // 1 second span
     checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 0, 1, 0)]);
 
+    svg.remove();
+  });
+
+  it("custom possible axis configurations", () => {
+    var svg = generateSVG(800, 100);
+    var scale = new Plottable.Scale.Time();
+    var axis = new Plottable.Axis.Time(scale, "bottom");
+    var configurations = axis.axisConfigurations();
+    var newPossibleConfigurations = configurations.slice(0, 3);
+    newPossibleConfigurations.forEach(axisConfig => axisConfig.tierConfigurations.forEach(tierConfig => {
+      tierConfig.interval = d3.time.minute;
+      tierConfig.step += 3;
+    }));
+    axis.axisConfigurations(newPossibleConfigurations);
+    var now = new Date();
+    var twoMinutesBefore = new Date(now.getTime());
+    twoMinutesBefore.setMinutes(now.getMinutes() - 2);
+    scale.domain([twoMinutesBefore, now]);
+    scale.range([0, 800]);
+    axis.renderTo(svg);
+    var configs = newPossibleConfigurations[(<any> axis)._mostPreciseConfigIndex].tierConfigurations;
+    assert.deepEqual(configs[0].interval, d3.time.minute, "axis used new time unit");
+    assert.deepEqual(configs[0].step, 4, "axis used new step");
     svg.remove();
   });
 });

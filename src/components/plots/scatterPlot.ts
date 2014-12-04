@@ -3,7 +3,8 @@
 module Plottable {
 export module Plot {
   export class Scatter<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
-    private closeDetectionRadius = 5;
+    private _closeDetectionRadius = 5;
+    private _defaultFillColor: string;
 
     /**
      * Constructs a ScatterPlot.
@@ -15,13 +16,12 @@ export module Plot {
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
       super(xScale, yScale);
       this.classed("scatter-plot", true);
-      this.project("r", 3); // default
-      this.project("opacity", 0.6); // default
-      this.project("fill", () => new Scale.Color().range()[0]); // default
-      this._animators["circles-reset"] = new Animator.Null();
-      this._animators["circles"] = new Animator.Base()
-                                               .duration(250)
-                                               .delay(5);
+      this._defaultFillColor = new Scale.Color().range()[0];
+
+      this.animator("circles-reset", new Animator.Null());
+      this.animator("circles", new Animator.Base()
+                                           .duration(250)
+                                           .delay(5));
     }
 
     /**
@@ -46,12 +46,15 @@ export module Plot {
       delete attrToProjector["x"];
       attrToProjector["cy"] = attrToProjector["y"];
       delete attrToProjector["y"];
+      attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
+      attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
       return attrToProjector;
     }
 
     public _generateDrawSteps(): _Drawer.DrawStep[] {
       var drawSteps: _Drawer.DrawStep[] = [];
-      if (this._dataChanged) {
+      if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
         resetAttrToProjector["r"] = () => 0;
         drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("circles-reset")});
@@ -61,13 +64,13 @@ export module Plot {
       return drawSteps;
     }
 
+    // HACKHACK User and plot metada should be applied - #1306.
     public _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
       var drawers = <_Drawer.Element[]> this._getDrawersInOrder();
       var attrToProjector = this._generateAttrToProjector();
-
       var getDistSq = (d: any, i: number) => {
-        var dx = attrToProjector["cx"](d, i) - p.x;
-        var dy = attrToProjector["cy"](d, i) - p.y;
+        var dx = attrToProjector["cx"](d, i, null, null) - p.x;
+        var dy = attrToProjector["cy"](d, i, null, null) - p.y;
         return (dx * dx + dy * dy);
       };
 
@@ -79,7 +82,7 @@ export module Plot {
       drawers.forEach((drawer) => {
         drawer._getDrawSelection().each(function (d, i) {
           var distSq = getDistSq(d, i);
-          var r = attrToProjector["r"](d, i);
+          var r = attrToProjector["r"](d, i, null, null);
 
           if (distSq < r * r) { // cursor is over this point
             if (!overAPoint || distSq < minDistSq) {
@@ -107,8 +110,8 @@ export module Plot {
       var closestSelection = d3.select(closestElement);
       var closestData = closestSelection.data();
       var closestPoint = {
-        x: attrToProjector["cx"](closestData[0], closestIndex),
-        y: attrToProjector["cy"](closestData[0], closestIndex)
+        x: attrToProjector["cx"](closestData[0], closestIndex, null, null),
+        y: attrToProjector["cy"](closestData[0], closestIndex, null, null)
       };
       return {
         selection: closestSelection,
@@ -127,7 +130,7 @@ export module Plot {
     }
 
     public _doHover(p: Point): Interaction.HoverData {
-      return this._getClosestStruckPoint(p, this.closeDetectionRadius);
+      return this._getClosestStruckPoint(p, this._closeDetectionRadius);
     }
     //===== /Hover logic =====
   }

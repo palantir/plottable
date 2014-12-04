@@ -7,6 +7,8 @@ export module Plot {
     public _baseline: D3.Selection;
     public _baselineValue = 0;
 
+    private _defaultFillColor: string;
+
     /**
      * Constructs a StackedArea plot.
      *
@@ -17,8 +19,8 @@ export module Plot {
     constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
-      this.project("fill", () => new Scale.Color().range()[0]);
       this._isVertical = true;
+      this._defaultFillColor = new Scale.Color().range()[0];
     }
 
     public _getDrawer(key: string) {
@@ -31,9 +33,14 @@ export module Plot {
     }
 
     public _updateStackOffsets() {
+      if (!this._projectorsReady()) { return; }
       var domainKeys = this._getDomainKeys();
-      var keyAccessor = this._isVertical ? this._projectors["x"].accessor : this._projectors["y"].accessor;
-      var keySets = this.datasets().map((dataset) => d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i).toString())).values());
+      var keyAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+      var keySets = this._datasetKeysInOrder.map((k) => {
+        var dataset = this._key2PlotDatasetKey.get(k).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+        return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset.metadata(), plotMetadata).toString())).values();
+      });
 
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
         _Util.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
@@ -70,15 +77,30 @@ export module Plot {
 
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      var yAccessor = this._projectors["y"].accessor;
-      attrToProjector["y"] = (d: any) => this._yScale.scale(+yAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      attrToProjector["y0"] = (d: any) => this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
 
-      // Align fill with first index
-      var fillProjector = attrToProjector["fill"];
-      attrToProjector["fill"] = (d, i) => (d && d[0]) ? fillProjector(d[0], i) : null;
+      var wholeDatumAttributes = this._wholeDatumAttributes();
+      var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
+      var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
+      singleDatumAttributes.forEach((attribute: string) => {
+        var projector = attrToProjector[attribute];
+        attrToProjector[attribute] = (data: any[], i: number, u: any, m: PlotMetadata) =>
+                                        data.length > 0 ? projector(data[0], i, u, m) : null;
+      });
+
+      var yAccessor = this._projections["y"].accessor;
+      var xAccessor = this._projections["x"].accessor;
+      attrToProjector["y"] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
+        this._yScale.scale(+yAccessor(d, i, u, m) + m.offsets.get(xAccessor(d, i, u, m)));
+      attrToProjector["y0"] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
+        this._yScale.scale(m.offsets.get(xAccessor(d, i, u, m)));
+
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
 
       return attrToProjector;
+    }
+
+    public _wholeDatumAttributes() {
+      return ["x", "y", "defined"];
     }
   }
 }

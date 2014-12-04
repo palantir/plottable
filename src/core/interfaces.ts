@@ -1,20 +1,29 @@
 module Plottable {
+  /**
+   * Access specific datum property.
+   */
   export interface _Accessor {
-    (datum: any, index?: number, metadata?: any): any;
+    (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plot.PlotMetadata): any;
   };
 
   /**
-   * A function to map across the data in a DataSource. For example, if your
-   * data looked like `{foo: 5, bar: 6}`, then a popular function might be
-   * `function(d) { return d.foo; }`.
-   *
-   * Index, if used, will be the index of the datum in the array.
+   * Retrieves scaled datum property.
    */
-  export interface AppliedAccessor {
-    (datum?: any, index?: number) : any;
+  export interface _Projector {
+    (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata) : any;
   }
 
-  export interface _Projector {
+  /**
+   * Projector with applied user and plot metadata
+   */
+  export interface _AppliedProjector {
+    (datum: any, index: number) : any;
+  }
+
+  /**
+   * Defines a way how specific attribute needs be retrieved before rendering.
+   */
+  export interface _Projection {
     accessor: _Accessor;
     scale?: Scale.AbstractScale<any, any>;
     attribute: string;
@@ -29,7 +38,11 @@ module Plottable {
    * function(d) { return foo + bar; }`.
    */
   export interface AttributeToProjector {
-    [attrToSet: string]: AppliedAccessor;
+    [attrToSet: string]: _Projector;
+  }
+
+  export interface _AttributeToAppliedProjector {
+    [attrToSet: string]: _AppliedProjector;
   }
 
   /**
@@ -74,14 +87,5 @@ module Plottable {
   export interface Point {
     x: number;
     y: number;
-  }
-
-  /**
-   * A key that is also coupled with a dataset and a drawer.
-   */
-  export interface DatasetDrawerKey {
-    dataset: Dataset;
-    drawer: _Drawer.AbstractDrawer;
-    key: string;
   }
 }

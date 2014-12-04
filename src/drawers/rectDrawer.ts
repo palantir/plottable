@@ -27,16 +27,16 @@ export module _Drawer {
       this.textArea.selectAll("g").remove();
     }
 
-    public drawText(data: any[], attrToProjector: AttributeToProjector) {
+    public drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata) {
       var labelTooWide: boolean[] = data.map((d, i) => {
-        var text = attrToProjector["label"](d, i).toString();
-        var w = attrToProjector["width"](d, i);
-        var h = attrToProjector["height"](d, i);
-        var x = attrToProjector["x"](d, i);
-        var y = attrToProjector["y"](d, i);
-        var positive = attrToProjector["positive"](d, i);
+        var text = attrToProjector["label"](d, i, userMetadata, plotMetadata).toString();
+        var w = attrToProjector["width"](d, i, userMetadata, plotMetadata);
+        var h = attrToProjector["height"](d, i, userMetadata, plotMetadata);
+        var x = attrToProjector["x"](d, i, userMetadata, plotMetadata);
+        var y = attrToProjector["y"](d, i, userMetadata, plotMetadata);
+        var positive = attrToProjector["positive"](d, i, userMetadata, plotMetadata);
         var measurement = this.measurer(text);
-        var color = attrToProjector["fill"](d, i);
+        var color = attrToProjector["fill"](d, i, userMetadata, plotMetadata);
         var dark = _Util.Color.contrast("white", color) * 1.6 < _Util.Color.contrast("black", color);
         var primary = this._isVertical ? h : w;
         var primarySpace = this._isVertical ? measurement.height : measurement.width;

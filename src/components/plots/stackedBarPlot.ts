@@ -3,9 +3,6 @@
 module Plottable {
 export module Plot {
   export class StackedBar<X,Y> extends AbstractBarPlot<X, Y> {
-    public _baselineValue: number;
-    public _baseline: D3.Selection;
-    public _barAlignmentFactor: number;
 
     /**
      * Constructs a StackedBar plot.
@@ -18,21 +15,20 @@ export module Plot {
      */
     constructor(xScale?: Scale.AbstractScale<X,number>, yScale?: Scale.AbstractScale<Y,number>, isVertical = true) {
       this._isVertical = isVertical; // Has to be set before super()
-      this._baselineValue = 0;
       super(xScale, yScale);
       this.classed("bar-plot", true);
-      this.project("fill", () => new Scale.Color().range()[0]);
-      this.baseline(this._baselineValue);
+
+      this.baseline(0);
       this._isVertical = isVertical;
     }
 
     public _getAnimator(key: string): Animator.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
-        if (this._animators[key]) {
-          return this._animators[key];
+        if (this.animator(key)) {
+          return this.animator(key);
         } else if (key === "stacked-bar") {
           var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-          var scaledBaseline = primaryScale.scale(this._baselineValue);
+          var scaledBaseline = primaryScale.scale(this.baseline());
           return new Animator.MovingRect(scaledBaseline, this._isVertical);
         }
       }
@@ -41,21 +37,28 @@ export module Plot {
     }
 
     public _generateAttrToProjector() {
-      var attrToProjector = AbstractBarPlot.prototype._generateAttrToProjector.apply(this);
+      var attrToProjector = super._generateAttrToProjector();
 
-      var primaryAttr = this._isVertical ? "y" : "x";
+      var valueAttr = this._isVertical ? "y" : "x";
+      var keyAttr = this._isVertical ? "x" : "y";
       var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
-      var primaryAccessor = this._projectors[primaryAttr].accessor;
-      var getStart = (d: any) => primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
-      var getEnd = (d: any) => primaryScale.scale(+primaryAccessor(d) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]);
+      var primaryAccessor = this._projections[valueAttr].accessor;
+      var keyAccessor = this._projections[keyAttr].accessor;
+      var getStart = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
+        primaryScale.scale(m.offsets.get(keyAccessor(d, i, u, m)));
+      var getEnd = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
+        primaryScale.scale(+primaryAccessor(d, i, u, m) + m.offsets.get(keyAccessor(d, i, u, m)));
 
-      var heightF = (d: any) => Math.abs(getEnd(d) - getStart(d));
+      var heightF = (d: any, i: number, u: any, m: StackedPlotMetadata) => Math.abs(getEnd(d, i, u, m) - getStart(d, i, u, m));
       var widthF = attrToProjector["width"];
       attrToProjector["height"] = this._isVertical ? heightF : widthF;
       attrToProjector["width"] = this._isVertical ? widthF : heightF;
 
-      var attrFunction = (d: any) => +primaryAccessor(d) < 0 ? getStart(d) : getEnd(d);
-      attrToProjector[primaryAttr] = (d: any) => this._isVertical ? attrFunction(d) : attrFunction(d) - heightF(d);
+      var attrFunction = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
+        +primaryAccessor(d, i, u, m) < 0 ? getStart(d, i, u, m) : getEnd(d, i, u, m);
+      attrToProjector[valueAttr] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
+        this._isVertical ? attrFunction(d, i, u, m) : attrFunction(d, i, u, m) - heightF(d, i, u, m);
+
       return attrToProjector;
     }
 
@@ -73,6 +76,10 @@ export module Plot {
       super._onDatasetUpdate();
       AbstractStacked.prototype._onDatasetUpdate.apply(this);
       return this;
+    }
+
+    public _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
+      return AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
     }
 
     //===== Stack logic from AbstractStackedPlot =====
@@ -104,18 +111,14 @@ export module Plot {
       AbstractStacked.prototype._updateScaleExtents.call(this);
     }
 
-    public _keyAccessor(): AppliedAccessor {
+    public _keyAccessor(): _Accessor {
       return AbstractStacked.prototype._keyAccessor.call(this);
     }
 
-    public _valueAccessor(): AppliedAccessor {
+    public _valueAccessor(): _Accessor {
       return AbstractStacked.prototype._valueAccessor.call(this);
     }
     //===== /Stack logic =====
-
-    public _getBarPixelWidth() {
-      return AbstractBarPlot.prototype._getBarPixelWidth.apply(this);
-    }
   }
 }
 }

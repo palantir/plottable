@@ -16,7 +16,8 @@ function run(div, data, Plottable) {
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
   var linePlot = new Plottable.Plot.Line(xScale, yScale).automaticallyAdjustYScaleOverVisiblePoints(true).addDataset(ds);
-  
+  linePlot.project("x", "x", xScale).project("y", "y", yScale);
+
   var focusXLabel = new Plottable.Component.Label("focus X");
 
   var basicTable = new Plottable.Component.Table([

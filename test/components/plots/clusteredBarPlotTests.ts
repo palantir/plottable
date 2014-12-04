@@ -35,6 +35,8 @@ describe("Plots", () => {
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.baseline(0);
+      renderer.project("x", "x", xScale);
+      renderer.project("y", "y", yScale);
       var xAxis = new Plottable.Axis.Category(xScale, "bottom");
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
@@ -66,7 +68,7 @@ describe("Plots", () => {
       assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
 
       // check that clustering is correct
-      var off = (<any>renderer).makeInnerScale().scale("_0");
+      var off = (<any>renderer)._makeInnerScale().scale("_0");
       assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) + bandWidth / 2 - off, 0.01
           , "x pos correct for bar0");
       assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2 - off, 0.01
@@ -111,6 +113,8 @@ describe("Plots", () => {
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.baseline(0);
+      renderer.project("x", "x", xScale);
+      renderer.project("y", "y", yScale);
       var yAxis = new Plottable.Axis.Category(yScale, "left");
       var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
       rendererWidth = renderer.width();
@@ -143,7 +147,7 @@ describe("Plots", () => {
       var bar3Y = bar3.data()[0].y;
 
       // check that clustering is correct
-      var off = (<any>renderer).makeInnerScale().scale("_0");
+      var off = (<any>renderer)._makeInnerScale().scale("_0");
       assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2 - off, 0.01
             , "y pos correct for bar0");
       assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2 - off, 0.01
@@ -178,6 +182,8 @@ describe("Plots", () => {
       plot.addDataset(data2);
       plot.addDataset(data3);
       plot.baseline(0);
+      plot.project("x", "x", xScale);
+      plot.project("y", "y", yScale);
       var xAxis = new Plottable.Axis.Category(xScale, "bottom");
       new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
     });

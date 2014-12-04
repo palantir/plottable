@@ -223,6 +223,10 @@ module.exports = function(grunt) {
       "tests": {
         "tasks": ["test-compile"],
         "files": ["test/**/*.ts"]
+      },
+      "quicktests": {
+        "tasks": ["update-qt"],
+        "files": ["quicktests/overlaying/tests/**/*.js"]
       }
     },
     blanket_mocha: {
@@ -333,7 +337,8 @@ module.exports = function(grunt) {
       "test-compile",
       "concat:plottable_multifile",
       "sed:plottable_multifile",
-      "clean:tscommand"
+      "clean:tscommand",
+      "update-qt"
   ];
 
   grunt.registerTask("dev-compile", compile_task);
@@ -368,5 +373,18 @@ module.exports = function(grunt) {
                                   "shell:sublime",
                                   "sed:sublime",
                                   ]);
+
+  var updateQuickTestsJSON = function() {
+    var qtJSON = [];
+    var rawtests = grunt.file.expand("quicktests/overlaying/tests/**/*.js");
+    rawtests.forEach(function(value, index, array){
+      qtJSON.push({path: value});
+    });
+    qtJSON = JSON.stringify(qtJSON);
+    qtJSON = qtJSON.split(",").join(",\n") + "\n";
+    grunt.file.write("quicktests/overlaying/list_of_quicktests.json", qtJSON);
+  };
+
+  grunt.registerTask("update-qt", updateQuickTestsJSON);
 
 };

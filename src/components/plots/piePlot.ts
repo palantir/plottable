@@ -14,7 +14,7 @@ export module Plot {
    */
   export class Pie extends AbstractPlot {
 
-    private colorScale: Scale.Color;
+    private _colorScale: Scale.Color;
 
     /**
      * Constructs a PiePlot.
@@ -23,7 +23,7 @@ export module Plot {
      */
     constructor() {
       super();
-      this.colorScale = new Scale.Color();
+      this._colorScale = new Scale.Color();
       this.classed("pie-plot", true);
     }
 
@@ -32,12 +32,13 @@ export module Plot {
       this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
     }
 
-    public _addDataset(key: string, dataset: Dataset) {
+    public addDataset(keyOrDataset: any, dataset?: any) {
       if (this._datasetKeysInOrder.length === 1) {
         _Util.Methods.warn("Only one dataset is supported in Pie plots");
-        return;
+        return this;
       }
-      super._addDataset(key, dataset);
+      super.addDataset(keyOrDataset, dataset);
+      return this;
     }
 
 
@@ -46,13 +47,8 @@ export module Plot {
       attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
       attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
 
-      if (attrToProjector["fill"] == null) {
-        attrToProjector["fill"] = (d: any, i: number) => this.colorScale.scale(String(i));
-      }
-
-      var defaultAccessor = (d: any) => d.value;
-      var valueProjector = this._projectors["value"];
-      attrToProjector["value"] = valueProjector ? valueProjector.accessor : defaultAccessor;
+      var defaultFillFunction = (d: any, i: number) => this._colorScale.scale(String(i));
+      attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
 
       return attrToProjector;
     }
