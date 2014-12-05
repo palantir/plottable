@@ -162,4 +162,56 @@ describe("Plots", () => {
       assert.doesNotThrow(() => stackedPlot.removeDataset("a"), Error);
     });
   });
+
+  describe("auto scale domain", () => {
+    var svg: D3.Selection;
+    var SVG_WIDTH = 600;
+    var SVG_HEIGHT = 400;
+    var yScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scale.Linear;
+    var data1: any[];
+    var data2: any[];
+
+    beforeEach(() => {
+      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      xScale = new Plottable.Scale.Linear().domain([1, 2]);;
+      yScale = new Plottable.Scale.Linear();
+
+      data1 = [
+        {x: 1, y: 1},
+        {x: 2, y: 2},
+        {x: 3, y: 1}
+      ];
+
+      data2 = [
+        {x: 1, y: 2},
+        {x: 2, y: 3},
+        {x: 3, y: 3}
+      ];
+    });
+
+    it("auto scales correctly on stacked area", () => {
+      var plot = new Plottable.Plot.StackedArea(xScale, yScale)
+                               .automaticallyAdjustYScaleOverVisiblePoints(true)
+                               .addDataset(data1)
+                               .addDataset(data2)
+                               .project("x", "x", xScale)
+                               .project("y", "y", yScale);
+      plot.renderTo(svg);
+      assert.deepEqual(yScale.domain(), [0, 5.5], "auto scales takes stacking into account");
+      svg.remove();
+    });
+
+    it("auto scales correctly on stacked bar", () => {
+      var plot = new Plottable.Plot.StackedBar(yScale, xScale, false)
+                               .automaticallyAdjustXScaleOverVisiblePoints(true)
+                               .addDataset(data1)
+                               .addDataset(data2)
+                               .project("x", "y", yScale)
+                               .project("y", "x", xScale);
+      plot.renderTo(svg);
+      assert.deepEqual(yScale.domain(), [0, 5.125], "auto scales takes stacking into account");
+      svg.remove();
+    });
+  });
 });
