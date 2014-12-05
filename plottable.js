@@ -4216,7 +4216,7 @@ var Plottable;
              *
              * @return {D3.Selection} foreground selection for the component
              */
-            AbstractComponent.prototype.getForeground = function () {
+            AbstractComponent.prototype.foreground = function () {
                 return this._foregroundContainer;
             };
             /**
@@ -4227,7 +4227,7 @@ var Plottable;
              *
              * @return {D3.Selection} background selection for the component
              */
-            AbstractComponent.prototype.getBackground = function () {
+            AbstractComponent.prototype.background = function () {
                 return this._backgroundContainer;
             };
             /**
@@ -4238,7 +4238,7 @@ var Plottable;
              *
              * @return {D3.Selection} hitbox selection for the component
              */
-            AbstractComponent.prototype.getHitBox = function () {
+            AbstractComponent.prototype.hitBox = function () {
                 return this._hitBox;
             };
             AbstractComponent.AUTORESIZE_BY_DEFAULT = true;

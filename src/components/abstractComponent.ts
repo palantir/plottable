@@ -519,7 +519,7 @@ export module Component {
      *
      * @return {D3.Selection} foreground selection for the component
      */
-    public getForeground(): D3.Selection {
+    public foreground(): D3.Selection {
       return this._foregroundContainer;
     }
 
@@ -531,7 +531,7 @@ export module Component {
      *
      * @return {D3.Selection} background selection for the component
      */
-    public getBackground(): D3.Selection {
+    public background(): D3.Selection {
       return this._backgroundContainer;
     }
 
@@ -543,7 +543,7 @@ export module Component {
      *
      * @return {D3.Selection} hitbox selection for the component
      */
-    public getHitBox(): D3.Selection {
+    public hitBox(): D3.Selection {
       return this._hitBox;
     }
   }

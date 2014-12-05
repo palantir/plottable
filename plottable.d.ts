@@ -1936,7 +1936,7 @@ declare module Plottable {
              *
              * @return {D3.Selection} foreground selection for the component
              */
-            getForeground(): D3.Selection;
+            foreground(): D3.Selection;
             /**
              * Returns the background selection for the component
              * (A selection appearing behind of the component)
@@ -1945,7 +1945,7 @@ declare module Plottable {
              *
              * @return {D3.Selection} background selection for the component
              */
-            getBackground(): D3.Selection;
+            background(): D3.Selection;
             /**
              * Returns the hitbox selection for the component
              * (A selection in front of the foreground used mainly for interactions)
@@ -1954,7 +1954,7 @@ declare module Plottable {
              *
              * @return {D3.Selection} hitbox selection for the component
              */
-            getHitBox(): D3.Selection;
+            hitBox(): D3.Selection;
         }
     }
 }
