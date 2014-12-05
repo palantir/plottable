@@ -5877,12 +5877,39 @@ var Plottable;
                 _super.call(this);
                 this._padding = 5;
                 this.classed("legend", true);
+                this.maxEntriesPerRow(Infinity);
+                if (colorScale == null) {
+                    throw new Error("HorizontalLegend requires a colorScale");
+                }
                 this._scale = colorScale;
                 this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
                 this.xAlign("left").yAlign("center");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
             }
+            HorizontalLegend.prototype.maxEntriesPerRow = function (numEntries) {
+                if (numEntries == null) {
+                    return this._maxEntriesPerRow;
+                }
+                else {
+                    this._maxEntriesPerRow = numEntries;
+                    this._invalidateLayout();
+                    return this;
+                }
+            };
+            HorizontalLegend.prototype.scale = function (scale) {
+                var _this = this;
+                if (scale != null) {
+                    this._scale.broadcaster.deregisterListener(this);
+                    this._scale = scale;
+                    this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
+                    this._invalidateLayout();
+                    return this;
+                }
+                else {
+                    return this._scale;
+                }
+            };
             HorizontalLegend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 this._scale.broadcaster.deregisterListener(this);
@@ -5919,7 +5946,6 @@ var Plottable;
                     return d3.sum(row, function (entry) { return estimatedLayout.entryLengths.get(entry); });
                 });
                 var longestRowLength = Plottable._Util.Methods.max(rowLengths, 0);
-                longestRowLength = longestRowLength === undefined ? 0 : longestRowLength; // HACKHACK: #843
                 var desiredWidth = this._padding + longestRowLength;
                 var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
                 var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
@@ -5931,12 +5957,13 @@ var Plottable;
                 };
             };
             HorizontalLegend.prototype._packRows = function (availableWidth, entries, entryLengths) {
+                var _this = this;
                 var rows = [[]];
                 var currentRow = rows[0];
                 var spaceLeft = availableWidth;
                 entries.forEach(function (e) {
                     var entryLength = entryLengths.get(e);
-                    if (entryLength > spaceLeft) {
+                    if (entryLength > spaceLeft || currentRow.length === _this._maxEntriesPerRow) {
                         currentRow = [];
                         rows.push(currentRow);
                         spaceLeft = availableWidth;
@@ -5945,6 +5972,34 @@ var Plottable;
                     spaceLeft -= entryLength;
                 });
                 return rows;
+            };
+            /**
+             * Gets the legend entry under the given pixel position.
+             *
+             * @param {Point} position The pixel position.
+             * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
+             */
+            HorizontalLegend.prototype.getEntry = function (position) {
+                if (!this._isSetup) {
+                    return d3.select();
+                }
+                var entry;
+                var layout = this._calculateLayoutInfo(this.width(), this.height());
+                var legendPadding = this._padding;
+                this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).each(function (d, i) {
+                    var lowY = i * layout.textHeight + legendPadding;
+                    var highY = (i + 1) * layout.textHeight + legendPadding;
+                    var lowX = legendPadding;
+                    var highX = legendPadding;
+                    d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).each(function (value) {
+                        highX += layout.entryLengths.get(value);
+                        if (highX >= position.x && lowX <= position.x && highY >= position.y && lowY <= position.y) {
+                            entry = this;
+                        }
+                        lowX += layout.entryLengths.get(value);
+                    });
+                });
+                return d3.select(entry);
             };
             HorizontalLegend.prototype._doRender = function () {
                 var _this = this;

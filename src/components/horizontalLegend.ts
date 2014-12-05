@@ -14,6 +14,7 @@ export module Component {
 
     private _padding = 5;
     private _scale: Scale.Color;
+    private _maxEntriesPerRow: number;
 
     /**
      * Creates a Horizontal Legend.
@@ -27,6 +28,11 @@ export module Component {
     constructor(colorScale: Scale.Color) {
       super();
       this.classed("legend", true);
+      this.maxEntriesPerRow(Infinity);
+
+      if (colorScale == null ) {
+        throw new Error("HorizontalLegend requires a colorScale");
+      }
 
       this._scale = colorScale;
       this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
@@ -34,6 +40,53 @@ export module Component {
       this.xAlign("left").yAlign("center");
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
+    }
+
+    /**
+     * Gets the current max number of entries in HorizontalLegend row.
+     * @returns {number} The current max number of entries in row.
+     */
+    public maxEntriesPerRow(): number;
+    /**
+     * Sets a new max number of entries in HorizontalLegend row.
+     *
+     * @param {number} numEntries If provided, the new max number of entries in row.
+     * @returns {HorizontalLegend} The calling HorizontalLegend.
+     */
+    public maxEntriesPerRow(numEntries: number): HorizontalLegend;
+    public maxEntriesPerRow(numEntries?: number): any {
+      if (numEntries == null) {
+        return this._maxEntriesPerRow;
+      } else {
+        this._maxEntriesPerRow = numEntries;
+        this._invalidateLayout();
+        return this;
+      }
+    }
+
+    /**
+     * Gets the current color scale from the HorizontalLegend.
+     *
+     * @returns {ColorScale} The current color scale.
+     */
+    public scale(): Scale.Color;
+    /**
+     * Assigns a new color scale to the HorizontalLegend.
+     *
+     * @param {Scale.Color} scale If provided, the new scale.
+     * @returns {HorizontalLegend} The calling HorizontalLegend.
+     */
+    public scale(scale: Scale.Color): HorizontalLegend;
+    public scale(scale?: Scale.Color): any {
+      if (scale != null) {
+        this._scale.broadcaster.deregisterListener(this);
+        this._scale = scale;
+        this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+        this._invalidateLayout();
+        return this;
+      } else {
+        return this._scale;
+      }
     }
 
     public remove() {
@@ -80,7 +133,6 @@ export module Component {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
       });
       var longestRowLength = _Util.Methods.max(rowLengths, 0);
-      longestRowLength = longestRowLength === undefined ? 0 : longestRowLength; // HACKHACK: #843
       var desiredWidth = this._padding + longestRowLength;
 
       var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
@@ -100,7 +152,7 @@ export module Component {
       var spaceLeft = availableWidth;
       entries.forEach((e: string) => {
         var entryLength = entryLengths.get(e);
-        if (entryLength > spaceLeft) {
+        if (entryLength > spaceLeft || currentRow.length === this._maxEntriesPerRow) {
           currentRow = [];
           rows.push(currentRow);
           spaceLeft = availableWidth;
@@ -109,6 +161,38 @@ export module Component {
         spaceLeft -= entryLength;
       });
       return rows;
+    }
+
+    /**
+     * Gets the legend entry under the given pixel position.
+     *
+     * @param {Point} position The pixel position.
+     * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
+     */
+    public getEntry(position: Point): D3.Selection {
+      if (!this._isSetup) {
+        return d3.select();
+      }
+
+      var entry: EventTarget;
+      var layout = this._calculateLayoutInfo(this.width(), this.height());
+      var legendPadding = this._padding;
+      this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {
+        var lowY = i * layout.textHeight + legendPadding;
+        var highY = (i + 1) * layout.textHeight + legendPadding;
+        var lowX = legendPadding;
+        var highX = legendPadding;
+        d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).each(function(value: string) {
+          highX += layout.entryLengths.get(value);
+          if (highX >= position.x && lowX <= position.x &&
+              highY >= position.y && lowY <= position.y) {
+            entry = this;
+          }
+          lowX += layout.entryLengths.get(value);
+        });
+      });
+
+      return d3.select(entry);
     }
 
     public _doRender() {
