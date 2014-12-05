@@ -306,4 +306,27 @@ describe("Legend", () => {
 
     svg.remove();
   });
+
+  it("maxEntriesPerRow() works as expected", () => {
+    colorScale.domain(["AA", "BB", "CC", "DD", "EE", "FF"]);
+    var svg = generateSVG(300, 300);
+    horizLegend.renderTo(svg);
+
+    var verifyMaxEntriesInRow = (n: number) => {
+      horizLegend.maxEntriesPerRow(n);
+      var rows = horizLegend._element.selectAll(rowSelector);
+      assert.lengthOf(rows[0], (6 / n), "number of rows is correct");
+      rows.each(function(d: any) {
+        var entries = d3.select(this).selectAll(entrySelector);
+        assert.lengthOf(entries[0], n, "number of entries in row is correct");
+      });
+    };
+
+    verifyMaxEntriesInRow(1);
+    verifyMaxEntriesInRow(2);
+    verifyMaxEntriesInRow(3);
+    verifyMaxEntriesInRow(6);
+
+    svg.remove();
+  });
 });
