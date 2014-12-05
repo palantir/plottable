@@ -5084,15 +5084,15 @@ var Plottable;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(tickLabelValues);
                 tickLabels.enter().append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();
-                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash);
-                if (this._isHorizontal()) {
-                    tickLabels.text(this.formatter());
-                }
-                else {
-                    var availableTextSpace = this.width() - this.tickLabelPadding();
-                    availableTextSpace -= this.tickLabelPositioning === "center" ? this._maxLabelTickLength() : 0;
-                    tickLabels.text(function (s) { return Plottable._Util.Text.getTruncatedText(_this.formatter()(s), availableTextSpace, _this.measurer); });
-                }
+                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(function (s) {
+                    var formattedText = _this.formatter()(s);
+                    if (!_this._isHorizontal()) {
+                        var availableTextSpace = _this.width() - _this.tickLabelPadding();
+                        availableTextSpace -= _this.tickLabelPositioning === "center" ? _this._maxLabelTickLength() : 0;
+                        formattedText = Plottable._Util.Text.getTruncatedText(formattedText, availableTextSpace, _this.measurer);
+                    }
+                    return formattedText;
+                });
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
                 if (!this.showEndTickLabels()) {

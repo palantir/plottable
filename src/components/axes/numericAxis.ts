@@ -169,15 +169,16 @@ export module Axis {
 
       tickLabels.style("text-anchor", tickLabelTextAnchor)
                 .style("visibility", "visible")
-                .attr(tickLabelAttrHash);
-
-      if (this._isHorizontal()) {
-        tickLabels.text(this.formatter());
-      } else {
-        var availableTextSpace = this.width() - this.tickLabelPadding();
-        availableTextSpace -= this.tickLabelPositioning === "center" ? this._maxLabelTickLength() : 0;
-        tickLabels.text((s: any) => _Util.Text.getTruncatedText(this.formatter()(s), availableTextSpace, this.measurer));
-      }
+                .attr(tickLabelAttrHash)
+                .text((s: any) => {
+                  var formattedText = this.formatter()(s);
+                  if (!this._isHorizontal()) {
+                    var availableTextSpace = this.width() - this.tickLabelPadding();
+                    availableTextSpace -= this.tickLabelPositioning === "center" ? this._maxLabelTickLength() : 0;
+                    formattedText = _Util.Text.getTruncatedText(formattedText, availableTextSpace, this.measurer);
+                  }
+                  return formattedText;
+                });
 
       var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);
