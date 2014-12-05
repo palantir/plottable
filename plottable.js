@@ -7866,6 +7866,7 @@ var Plottable;
                 _super.call(this, xScale, yScale);
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
+                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 // the width is constant, so set the inner scale range to that
                 var innerScale = this._makeInnerScale();
@@ -7873,29 +7874,21 @@ var Plottable;
                 var heightF = attrToProjector["height"];
                 attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
                 attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
-                var positionF = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_POSITION; };
-                attrToProjector["x"] = this._isVertical ? positionF : attrToProjector["x"];
-                attrToProjector["y"] = this._isVertical ? attrToProjector["y"] : positionF;
+                var xAttr = attrToProjector["x"];
+                var yAttr = attrToProjector["y"];
+                var primaryScale = this._isVertical ? this._xScale : this._yScale;
+                var accessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+                attrToProjector["x"] = function (d, i, u, m) { return _this._isVertical ? primaryScale.scale(accessor(d, i, u, m)) + m.position : xAttr(d, u, u, m); };
+                attrToProjector["y"] = function (d, i, u, m) { return _this._isVertical ? yAttr(d, i, u, m) : primaryScale.scale(accessor(d, i, u, m)) + m.position; };
                 return attrToProjector;
             };
-            ClusteredBar.prototype._getDataToDraw = function () {
+            ClusteredBar.prototype._updateClusterPosition = function () {
                 var _this = this;
-                var accessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
                 var innerScale = this._makeInnerScale();
-                var clusters = d3.map();
                 this._datasetKeysInOrder.forEach(function (key) {
-                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
-                    clusters.set(key, dataset.data().map(function (d, i) {
-                        var val = accessor(d, i, dataset.metadata(), plotMetadata);
-                        var primaryScale = _this._isVertical ? _this._xScale : _this._yScale;
-                        // TODO: store position information in metadata.
-                        var copyD = Plottable._Util.Methods.copyMap(d);
-                        copyD["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + innerScale.scale(key);
-                        return copyD;
-                    }));
+                    plotMetadata.position = innerScale.scale(key);
                 });
-                return clusters;
             };
             ClusteredBar.prototype._makeInnerScale = function () {
                 var innerScale = new Plottable.Scale.Ordinal();
@@ -7916,6 +7909,15 @@ var Plottable;
                     innerScale.range([0, fn(null, 0, null, null)]);
                 }
                 return innerScale;
+            };
+            ClusteredBar.prototype._getDataToDraw = function () {
+                this._updateClusterPosition();
+                return _super.prototype._getDataToDraw.call(this);
+            };
+            ClusteredBar.prototype._getPlotMetadataForDataset = function (key) {
+                var metadata = _super.prototype._getPlotMetadataForDataset.call(this, key);
+                metadata.position = 0;
+                return metadata;
             };
             return ClusteredBar;
         })(Plot.AbstractBarPlot);
