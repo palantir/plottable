@@ -4208,6 +4208,39 @@ var Plottable;
             AbstractComponent.prototype.height = function () {
                 return this._height;
             };
+            /**
+             * Returns the foreground selection for the component
+             * (A selection covering the front of the component)
+             *
+             * Will return undefined if the component has not been anchored
+             *
+             * @return {D3.Selection} foreground selection for the component
+             */
+            AbstractComponent.prototype.getForeground = function () {
+                return this._foregroundContainer;
+            };
+            /**
+             * Returns the background selection for the component
+             * (A selection appearing behind of the component)
+             *
+             * Will return undefined if the component has not been anchored
+             *
+             * @return {D3.Selection} background selection for the component
+             */
+            AbstractComponent.prototype.getBackground = function () {
+                return this._backgroundContainer;
+            };
+            /**
+             * Returns the hitbox selection for the component
+             * (A selection in front of the foreground used mainly for interactions)
+             *
+             * Will return undefined if the component has not been anchored
+             *
+             * @return {D3.Selection} hitbox selection for the component
+             */
+            AbstractComponent.prototype.getHitbox = function () {
+                return this._hitBox;
+            };
             AbstractComponent.AUTORESIZE_BY_DEFAULT = true;
             return AbstractComponent;
         })(Plottable.Core.PlottableObject);
