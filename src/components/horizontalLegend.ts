@@ -174,7 +174,7 @@ export module Component {
         return d3.select();
       }
 
-      var entry: EventTarget;
+      var entry = d3.select();
       var layout = this._calculateLayoutInfo(this.width(), this.height());
       var legendPadding = this._padding;
       this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {
@@ -186,13 +186,13 @@ export module Component {
           highX += layout.entryLengths.get(value);
           if (highX >= position.x && lowX <= position.x &&
               highY >= position.y && lowY <= position.y) {
-            entry = this;
+            entry = d3.select(this);
           }
           lowX += layout.entryLengths.get(value);
         });
       });
 
-      return d3.select(entry);
+      return entry;
     }
 
     public _doRender() {
