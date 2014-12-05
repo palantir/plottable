@@ -128,7 +128,6 @@ export module Component {
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
-
       var rowLengths = estimatedLayout.rows.map((row: string[]) => {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
       });
@@ -147,19 +146,23 @@ export module Component {
     }
 
     private _packRows(availableWidth: number, entries: string[], entryLengths: D3.Map<number>) {
-      var rows: string[][] = [[]];
-      var currentRow = rows[0];
+      var rows: string[][] = [];
+      var currentRow: string[] = [];
       var spaceLeft = availableWidth;
       entries.forEach((e: string) => {
         var entryLength = entryLengths.get(e);
         if (entryLength > spaceLeft || currentRow.length === this._maxEntriesPerRow) {
-          currentRow = [];
           rows.push(currentRow);
+          currentRow = [];
           spaceLeft = availableWidth;
         }
         currentRow.push(e);
         spaceLeft -= entryLength;
       });
+
+      if(currentRow.length !== 0) {
+        rows.push(currentRow);
+      }
       return rows;
     }
 
