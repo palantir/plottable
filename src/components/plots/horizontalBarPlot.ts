@@ -14,6 +14,8 @@ export module Plot {
   export class HorizontalBar<Y> extends Bar<number,Y> {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {"top": 0, "center": 0.5, "bottom": 1};
 
+    private static WARNED = false;
+
     /**
      * Constructs a HorizontalBarPlot.
      *
@@ -23,6 +25,10 @@ export module Plot {
      */
     constructor(xScale: Scale.AbstractQuantitative<number>, yScale: Scale.AbstractScale<Y,number>) {
       super(xScale, yScale, false);
+      if (!HorizontalBar.WARNED) {
+        HorizontalBar.WARNED = true;
+        _Util.Methods.warn("Plottable.Plot.VerticalBar is deprecated. Please use Plottable.Plot.Bar with isVertical = true.");
+      }
     }
 
     public _updateXDomainer() {

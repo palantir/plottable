@@ -7515,11 +7515,16 @@ var Plottable;
              */
             function VerticalBar(xScale, yScale) {
                 _super.call(this, xScale, yScale, true);
+                if (!VerticalBar.WARNED) {
+                    VerticalBar.WARNED = true;
+                    Plottable._Util.Methods.warn("Plottable.Plot.VerticalBar is deprecated. Please use Plottable.Plot.Bar with isVertical = true.");
+                }
             }
             VerticalBar.prototype._updateYDomainer = function () {
                 this._updateDomainer(this._yScale);
             };
             VerticalBar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
+            VerticalBar.WARNED = false;
             return VerticalBar;
         })(Plot.Bar);
         Plot.VerticalBar = VerticalBar;
@@ -7557,11 +7562,16 @@ var Plottable;
              */
             function HorizontalBar(xScale, yScale) {
                 _super.call(this, xScale, yScale, false);
+                if (!HorizontalBar.WARNED) {
+                    HorizontalBar.WARNED = true;
+                    Plottable._Util.Methods.warn("Plottable.Plot.VerticalBar is deprecated. Please use Plottable.Plot.Bar with isVertical = true.");
+                }
             }
             HorizontalBar.prototype._updateXDomainer = function () {
                 this._updateDomainer(this._xScale);
             };
             HorizontalBar._BarAlignmentToFactor = { "top": 0, "center": 0.5, "bottom": 1 };
+            HorizontalBar.WARNED = false;
             return HorizontalBar;
         })(Plot.Bar);
         Plot.HorizontalBar = HorizontalBar;
