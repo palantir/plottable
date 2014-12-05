@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Component {
-  export class HorizontalLegend extends AbstractComponent {
+  export class Legend extends AbstractComponent {
     /**
      * The css class applied to each legend row
      */
@@ -31,7 +31,7 @@ export module Component {
       this.maxEntriesPerRow(Infinity);
 
       if (colorScale == null ) {
-        throw new Error("HorizontalLegend requires a colorScale");
+        throw new Error("Legend requires a colorScale");
       }
 
       this._scale = colorScale;
@@ -43,17 +43,17 @@ export module Component {
     }
 
     /**
-     * Gets the current max number of entries in HorizontalLegend row.
+     * Gets the current max number of entries in Legend row.
      * @returns {number} The current max number of entries in row.
      */
     public maxEntriesPerRow(): number;
     /**
-     * Sets a new max number of entries in HorizontalLegend row.
+     * Sets a new max number of entries in Legend row.
      *
      * @param {number} numEntries If provided, the new max number of entries in row.
-     * @returns {HorizontalLegend} The calling HorizontalLegend.
+     * @returns {Legend} The calling Legend.
      */
-    public maxEntriesPerRow(numEntries: number): HorizontalLegend;
+    public maxEntriesPerRow(numEntries: number): Legend;
     public maxEntriesPerRow(numEntries?: number): any {
       if (numEntries == null) {
         return this._maxEntriesPerRow;
@@ -65,18 +65,18 @@ export module Component {
     }
 
     /**
-     * Gets the current color scale from the HorizontalLegend.
+     * Gets the current color scale from the Legend.
      *
      * @returns {ColorScale} The current color scale.
      */
     public scale(): Scale.Color;
     /**
-     * Assigns a new color scale to the HorizontalLegend.
+     * Assigns a new color scale to the Legend.
      *
      * @param {Scale.Color} scale If provided, the new scale.
-     * @returns {HorizontalLegend} The calling HorizontalLegend.
+     * @returns {Legend} The calling Legend.
      */
-    public scale(scale: Scale.Color): HorizontalLegend;
+    public scale(scale: Scale.Color): Legend;
     public scale(scale?: Scale.Color): any {
       if (scale != null) {
         this._scale.broadcaster.deregisterListener(this);
@@ -95,8 +95,8 @@ export module Component {
     }
 
     private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {
-      var fakeLegendRow = this._content.append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
-      var fakeLegendEntry = fakeLegendRow.append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
+      var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+      var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
       var measure = _Util.Text.getTextMeasurer(fakeLegendRow.append("text"));
 
       var textHeight = measure(_Util.Text.HEIGHT_TEXT).height;
@@ -180,12 +180,12 @@ export module Component {
       var entry: EventTarget;
       var layout = this._calculateLayoutInfo(this.width(), this.height());
       var legendPadding = this._padding;
-      this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {
+      this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {
         var lowY = i * layout.textHeight + legendPadding;
         var highY = (i + 1) * layout.textHeight + legendPadding;
         var lowX = legendPadding;
         var highX = legendPadding;
-        d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).each(function(value: string) {
+        d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS).each(function(value: string) {
           highX += layout.entryLengths.get(value);
           if (highX >= position.x && lowX <= position.x &&
               highY >= position.y && lowY <= position.y) {
@@ -204,14 +204,14 @@ export module Component {
       var layout = this._calculateLayoutInfo(this.width(), this.height());
 
       var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
-      var rows = this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).data(rowsToDraw);
-      rows.enter().append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
+      var rows = this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
+      rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
       rows.exit().remove();
 
       rows.attr("transform", (d: any, i: number) => "translate(0, " + (i * layout.textHeight + this._padding) + ")");
 
-      var entries = rows.selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).data((d) => d);
-      var entriesEnter = entries.enter().append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
+      var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data((d) => d);
+      var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
       entries.each(function(d: string) {
         d3.select(this).classed(d.replace(" ", "-"), true);
       });
@@ -222,7 +222,7 @@ export module Component {
       var legendPadding = this._padding;
       rows.each(function (values: string[]) {
         var xShift = legendPadding;
-        var entriesInRow = d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS);
+        var entriesInRow = d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS);
         entriesInRow.attr("transform", (value: string, i: number) => {
           var translateString = "translate(" + xShift + ", 0)";
           xShift += layout.entryLengths.get(value);

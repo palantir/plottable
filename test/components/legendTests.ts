@@ -6,12 +6,12 @@ var assert = chai.assert;
 describe("Legends", () => {
   var svg: D3.Selection;
   var color: Plottable.Scale.Color;
-  var legend: Plottable.Component.HorizontalLegend;
+  var legend: Plottable.Component.Legend;
 
   beforeEach(() => {
     svg = generateSVG(400, 400);
     color = new Plottable.Scale.Color("Category10");
-    legend = new Plottable.Component.HorizontalLegend(color).maxEntriesPerRow(1);
+    legend = new Plottable.Component.Legend(color).maxEntriesPerRow(1);
   });
 
   it("a basic legend renders", () => {
@@ -174,12 +174,12 @@ describe("Legends", () => {
   });
 });
 
-describe("HorizontalLegend", () => {
+describe("Legend", () => {
   var colorScale: Plottable.Scale.Color;
-  var horizLegend: Plottable.Component.HorizontalLegend;
+  var horizLegend: Plottable.Component.Legend;
 
-  var entrySelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ENTRY_CLASS;
-  var rowSelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ROW_CLASS;
+  var entrySelector = "." + Plottable.Component.Legend.LEGEND_ENTRY_CLASS;
+  var rowSelector = "." + Plottable.Component.Legend.LEGEND_ROW_CLASS;
 
   beforeEach(() => {
     colorScale = new Plottable.Scale.Color();
@@ -189,7 +189,7 @@ describe("HorizontalLegend", () => {
       "Jefferson",
     ]);
 
-    horizLegend = new Plottable.Component.HorizontalLegend(colorScale);
+    horizLegend = new Plottable.Component.Legend(colorScale);
   });
 
   it("renders an entry for each item in the domain", () => {

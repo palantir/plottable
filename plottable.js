@@ -5636,8 +5636,8 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Component) {
-        var HorizontalLegend = (function (_super) {
-            __extends(HorizontalLegend, _super);
+        var Legend = (function (_super) {
+            __extends(Legend, _super);
             /**
              * Creates a Horizontal Legend.
              *
@@ -5647,14 +5647,14 @@ var Plottable;
              * @constructor
              * @param {Scale.Color} colorScale
              */
-            function HorizontalLegend(colorScale) {
+            function Legend(colorScale) {
                 var _this = this;
                 _super.call(this);
                 this._padding = 5;
                 this.classed("legend", true);
                 this.maxEntriesPerRow(Infinity);
                 if (colorScale == null) {
-                    throw new Error("HorizontalLegend requires a colorScale");
+                    throw new Error("Legend requires a colorScale");
                 }
                 this._scale = colorScale;
                 this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
@@ -5662,7 +5662,7 @@ var Plottable;
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
             }
-            HorizontalLegend.prototype.maxEntriesPerRow = function (numEntries) {
+            Legend.prototype.maxEntriesPerRow = function (numEntries) {
                 if (numEntries == null) {
                     return this._maxEntriesPerRow;
                 }
@@ -5672,7 +5672,7 @@ var Plottable;
                     return this;
                 }
             };
-            HorizontalLegend.prototype.scale = function (scale) {
+            Legend.prototype.scale = function (scale) {
                 var _this = this;
                 if (scale != null) {
                     this._scale.broadcaster.deregisterListener(this);
@@ -5685,14 +5685,14 @@ var Plottable;
                     return this._scale;
                 }
             };
-            HorizontalLegend.prototype.remove = function () {
+            Legend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 this._scale.broadcaster.deregisterListener(this);
             };
-            HorizontalLegend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
+            Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
-                var fakeLegendRow = this._content.append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
-                var fakeLegendEntry = fakeLegendRow.append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
+                var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+                var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
                 var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendRow.append("text"));
                 var textHeight = measure(Plottable._Util.Text.HEIGHT_TEXT).height;
                 var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
@@ -5715,7 +5715,7 @@ var Plottable;
                     numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0)
                 };
             };
-            HorizontalLegend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
                 var rowLengths = estimatedLayout.rows.map(function (row) {
                     return d3.sum(row, function (entry) { return estimatedLayout.entryLengths.get(entry); });
@@ -5731,7 +5731,7 @@ var Plottable;
                     wantsHeight: offeredHeight < desiredHeight
                 };
             };
-            HorizontalLegend.prototype._packRows = function (availableWidth, entries, entryLengths) {
+            Legend.prototype._packRows = function (availableWidth, entries, entryLengths) {
                 var _this = this;
                 var rows = [];
                 var currentRow = [];
@@ -5757,19 +5757,19 @@ var Plottable;
              * @param {Point} position The pixel position.
              * @returns {D3.Selection} The selected entry, or null if no entry was selected.
              */
-            HorizontalLegend.prototype.getEntry = function (position) {
+            Legend.prototype.getEntry = function (position) {
                 if (!this._isSetup) {
                     return d3.select();
                 }
                 var entry;
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var legendPadding = this._padding;
-                this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).each(function (d, i) {
+                this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function (d, i) {
                     var lowY = i * layout.textHeight + legendPadding;
                     var highY = (i + 1) * layout.textHeight + legendPadding;
                     var lowX = legendPadding;
                     var highX = legendPadding;
-                    d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).each(function (value) {
+                    d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS).each(function (value) {
                         highX += layout.entryLengths.get(value);
                         if (highX >= position.x && lowX <= position.x && highY >= position.y && lowY <= position.y) {
                             entry = this;
@@ -5779,17 +5779,17 @@ var Plottable;
                 });
                 return d3.select(entry);
             };
-            HorizontalLegend.prototype._doRender = function () {
+            Legend.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
-                var rows = this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).data(rowsToDraw);
-                rows.enter().append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
+                var rows = this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
+                rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
                 rows.exit().remove();
                 rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this._padding) + ")"; });
-                var entries = rows.selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
-                var entriesEnter = entries.enter().append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
+                var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
+                var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
                 entries.each(function (d) {
                     d3.select(this).classed(d.replace(" ", "-"), true);
                 });
@@ -5799,7 +5799,7 @@ var Plottable;
                 var legendPadding = this._padding;
                 rows.each(function (values) {
                     var xShift = legendPadding;
-                    var entriesInRow = d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS);
+                    var entriesInRow = d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS);
                     entriesInRow.attr("transform", function (value, i) {
                         var translateString = "translate(" + xShift + ", 0)";
                         xShift += layout.entryLengths.get(value);
@@ -5824,14 +5824,14 @@ var Plottable;
             /**
              * The css class applied to each legend row
              */
-            HorizontalLegend.LEGEND_ROW_CLASS = "legend-row";
+            Legend.LEGEND_ROW_CLASS = "legend-row";
             /**
              * The css class applied to each legend entry
              */
-            HorizontalLegend.LEGEND_ENTRY_CLASS = "legend-entry";
-            return HorizontalLegend;
+            Legend.LEGEND_ENTRY_CLASS = "legend-entry";
+            return Legend;
         })(Component.AbstractComponent);
-        Component.HorizontalLegend = HorizontalLegend;
+        Component.Legend = Legend;
     })(Plottable.Component || (Plottable.Component = {}));
     var Component = Plottable.Component;
 })(Plottable || (Plottable = {}));

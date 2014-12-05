@@ -2423,7 +2423,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
-        class HorizontalLegend extends AbstractComponent {
+        class Legend extends AbstractComponent {
             /**
              * The css class applied to each legend row
              */
@@ -2443,30 +2443,30 @@ declare module Plottable {
              */
             constructor(colorScale: Scale.Color);
             /**
-             * Gets the current max number of entries in HorizontalLegend row.
+             * Gets the current max number of entries in Legend row.
              * @returns {number} The current max number of entries in row.
              */
             maxEntriesPerRow(): number;
             /**
-             * Sets a new max number of entries in HorizontalLegend row.
+             * Sets a new max number of entries in Legend row.
              *
              * @param {number} numEntries If provided, the new max number of entries in row.
-             * @returns {HorizontalLegend} The calling HorizontalLegend.
+             * @returns {Legend} The calling Legend.
              */
-            maxEntriesPerRow(numEntries: number): HorizontalLegend;
+            maxEntriesPerRow(numEntries: number): Legend;
             /**
-             * Gets the current color scale from the HorizontalLegend.
+             * Gets the current color scale from the Legend.
              *
              * @returns {ColorScale} The current color scale.
              */
             scale(): Scale.Color;
             /**
-             * Assigns a new color scale to the HorizontalLegend.
+             * Assigns a new color scale to the Legend.
              *
              * @param {Scale.Color} scale If provided, the new scale.
-             * @returns {HorizontalLegend} The calling HorizontalLegend.
+             * @returns {Legend} The calling Legend.
              */
-            scale(scale: Scale.Color): HorizontalLegend;
+            scale(scale: Scale.Color): Legend;
             remove(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             /**

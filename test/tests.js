@@ -1146,7 +1146,7 @@ describe("Legends", function () {
     beforeEach(function () {
         svg = generateSVG(400, 400);
         color = new Plottable.Scale.Color("Category10");
-        legend = new Plottable.Component.HorizontalLegend(color).maxEntriesPerRow(1);
+        legend = new Plottable.Component.Legend(color).maxEntriesPerRow(1);
     });
     it("a basic legend renders", function () {
         color.domain(["foo", "bar", "baz"]);
@@ -1286,11 +1286,11 @@ describe("Legends", function () {
         svg.remove();
     });
 });
-describe("HorizontalLegend", function () {
+describe("Legend", function () {
     var colorScale;
     var horizLegend;
-    var entrySelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ENTRY_CLASS;
-    var rowSelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ROW_CLASS;
+    var entrySelector = "." + Plottable.Component.Legend.LEGEND_ENTRY_CLASS;
+    var rowSelector = "." + Plottable.Component.Legend.LEGEND_ROW_CLASS;
     beforeEach(function () {
         colorScale = new Plottable.Scale.Color();
         colorScale.domain([
@@ -1298,7 +1298,7 @@ describe("HorizontalLegend", function () {
             "Adams",
             "Jefferson",
         ]);
-        horizLegend = new Plottable.Component.HorizontalLegend(colorScale);
+        horizLegend = new Plottable.Component.Legend(colorScale);
     });
     it("renders an entry for each item in the domain", function () {
         var svg = generateSVG(400, 100);
