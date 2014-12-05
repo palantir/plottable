@@ -27,7 +27,7 @@ export module Plot {
       super(xScale, yScale, false);
       if (!HorizontalBar.WARNED) {
         HorizontalBar.WARNED = true;
-        _Util.Methods.warn("Plottable.Plot.VerticalBar is deprecated. Please use Plottable.Plot.Bar with isVertical = true.");
+        _Util.Methods.warn("Plottable.Plot.HorizontalBar is deprecated. Please use Plottable.Plot.Bar with isVertical = false.");
       }
     }
 

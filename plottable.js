@@ -7564,7 +7564,7 @@ var Plottable;
                 _super.call(this, xScale, yScale, false);
                 if (!HorizontalBar.WARNED) {
                     HorizontalBar.WARNED = true;
-                    Plottable._Util.Methods.warn("Plottable.Plot.VerticalBar is deprecated. Please use Plottable.Plot.Bar with isVertical = true.");
+                    Plottable._Util.Methods.warn("Plottable.Plot.HorizontalBar is deprecated. Please use Plottable.Plot.Bar with isVertical = false.");
                 }
             }
             HorizontalBar.prototype._updateXDomainer = function () {
