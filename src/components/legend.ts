@@ -17,7 +17,7 @@ export module Component {
     private _maxEntriesPerRow: number;
 
     /**
-     * Creates a Horizontal Legend.
+     * Creates a Legend.
      *
      * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
      * The entries will be displayed in the order of the `colorScale` domain.

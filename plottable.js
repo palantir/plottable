@@ -5639,7 +5639,7 @@ var Plottable;
         var Legend = (function (_super) {
             __extends(Legend, _super);
             /**
-             * Creates a Horizontal Legend.
+             * Creates a Legend.
              *
              * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
              * The entries will be displayed in the order of the `colorScale` domain.
