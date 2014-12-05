@@ -2510,14 +2510,14 @@ declare module Plottable {
              * Gets the current max number of entries in HorizontalLegend row.
              * @returns {number} The current max number of entries in row.
              */
-            maxEntryPerRow(): number;
+            maxEntriesPerRow(): number;
             /**
              * Sets a new max number of entries in HorizontalLegend row.
              *
              * @param {number} numEntries If provided, the new max number of entries in ow.
              * @returns {HorizontalLegend} The calling HorizontalLegend.
              */
-            maxEntryPerRow(numEntries: number): HorizontalLegend;
+            maxEntriesPerRow(numEntries: number): HorizontalLegend;
             /**
              * Gets the current color scale from the HorizontalLegend.
              *
@@ -2533,7 +2533,7 @@ declare module Plottable {
             scale(scale: Scale.Color): HorizontalLegend;
             remove(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            getLegend(position: Point): D3.Selection;
+            getEntry(position: Point): D3.Selection;
             _doRender(): void;
         }
     }

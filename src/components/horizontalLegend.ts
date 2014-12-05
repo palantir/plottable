@@ -15,7 +15,7 @@ export module Component {
     private padding = 5;
     private _scale: Scale.Color;
 
-    private _maxEntryPerRow: number;
+    private _maxEntriesPerRow: number;
 
     /**
      * Creates a Horizontal Legend.
@@ -29,7 +29,7 @@ export module Component {
     constructor(colorScale: Scale.Color) {
       super();
       this.classed("legend", true);
-      this.maxEntryPerRow(Infinity);
+      this.maxEntriesPerRow(Infinity);
 
       this._scale = colorScale;
       this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
@@ -43,19 +43,19 @@ export module Component {
      * Gets the current max number of entries in HorizontalLegend row.
      * @returns {number} The current max number of entries in row.
      */
-    public maxEntryPerRow(): number;
+    public maxEntriesPerRow(): number;
     /**
      * Sets a new max number of entries in HorizontalLegend row.
      *
      * @param {number} numEntries If provided, the new max number of entries in ow.
      * @returns {HorizontalLegend} The calling HorizontalLegend.
      */
-    public maxEntryPerRow(numEntries: number): HorizontalLegend;
-    public maxEntryPerRow(numEntries?: number): any {
+    public maxEntriesPerRow(numEntries: number): HorizontalLegend;
+    public maxEntriesPerRow(numEntries?: number): any {
       if (numEntries == null) {
-        return this._maxEntryPerRow;
+        return this._maxEntriesPerRow;
       } else {
-        this._maxEntryPerRow = numEntries;
+        this._maxEntriesPerRow = numEntries;
         this._invalidateLayout();
         return this;
       }
@@ -151,7 +151,7 @@ export module Component {
       var spaceLeft = availableWidth;
       entries.forEach((e: string) => {
         var entryLength = entryLengths.get(e);
-        if (entryLength > spaceLeft || currentRow.length === this._maxEntryPerRow) {
+        if (entryLength > spaceLeft || currentRow.length === this._maxEntriesPerRow) {
           currentRow = [];
           rows.push(currentRow);
           spaceLeft = availableWidth;
@@ -162,7 +162,7 @@ export module Component {
       return rows;
     }
 
-    public getLegend(position: Point): D3.Selection {
+    public getEntry(position: Point): D3.Selection {
       if (!this._isSetup) {
         return d3.select();
       }
@@ -171,17 +171,17 @@ export module Component {
       var layout = this.calculateLayoutInfo(this.width(), this.height());
       var legendPadding = this.padding;
       this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {
-        var yShift = i * layout.textHeight + legendPadding;
-        var xShift = legendPadding;
+        var lowY = i * layout.textHeight + legendPadding;
+        var highY = (i + 1) * layout.textHeight + legendPadding;
+        var lowX = legendPadding;
+        var highX = legendPadding;
         d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).each(function(value: string) {
-          var bbox = this.getBBox();
-          bbox.x += xShift;
-          bbox.y += yShift;
-          if (bbox.x + bbox.width >= position.x && bbox.x <= position.x &&
-              bbox.y + bbox.height >= position.y && bbox.y <= position.y) {
+          highX += layout.entryLengths.get(value);
+          if (highX >= position.x && lowX <= position.x &&
+              highY >= position.y && lowY <= position.y) {
             legends.push(this);
           }
-          xShift += layout.entryLengths.get(value);
+          lowX += layout.entryLengths.get(value);
         });
       });
 

@@ -1652,27 +1652,23 @@ describe("HorizontalLegend", function () {
         assert.operator(smallCircleHeight, "<", origCircleHeight, "icon size decreased with font size");
         svg.remove();
     });
-    it("getLegend() horizontal", function () {
+    it("getEntry() horizontal", function () {
         colorScale.domain(["AA", "BB", "CC"]);
         var svg = generateSVG(300, 300);
         horizLegend.renderTo(svg);
-        var entries = svg.selectAll("g." + Plottable.Component.HorizontalLegend.LEGEND_ENTRY_CLASS);
-        var firstEntryBBox = Plottable._Util.DOM.getBBox(d3.select(entries[0][0]));
-        assert.deepEqual(horizLegend.getLegend({ x: firstEntryBBox.x + 10, y: firstEntryBBox.y + 10 }).data(), ["AA"], "get first entry");
-        // assert.deepEqual(horizLegend.getLegend({x: 50, y: 10}).data(), ["BB"], "get second entry");
-        // assert.lengthOf(horizLegend.getLegend({x: 150, y: 10}).data(), 0, "no entries at location outside legend");
+        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
+        assert.deepEqual(horizLegend.getEntry({ x: 50, y: 10 }).data(), ["BB"], "get second entry");
+        assert.lengthOf(horizLegend.getEntry({ x: 150, y: 10 }).data(), 0, "no entries at location outside legend");
         svg.remove();
     });
-    it("getLegend() vertical", function () {
+    it("getEntry() vertical", function () {
         colorScale.domain(["AA", "BB", "CC"]);
         var svg = generateSVG(300, 300);
-        horizLegend.maxEntryPerRow(1);
+        horizLegend.maxEntriesPerRow(1);
         horizLegend.renderTo(svg);
-        var entries = svg.selectAll("g." + Plottable.Component.HorizontalLegend.LEGEND_ENTRY_CLASS);
-        var firstEntryBBox = Plottable._Util.DOM.getBBox(d3.select(entries[0][0]));
-        assert.deepEqual(horizLegend.getLegend({ x: firstEntryBBox.x + 10, y: firstEntryBBox.y + 10 }).data(), ["AA"], "get first entry");
-        // assert.deepEqual(horizLegend.getLegend({x: 10, y: 30}).data(), ["BB"], "get second entry");
-        // assert.lengthOf(horizLegend.getLegend({x: 10, y: 150}).data(), 0, "no entries at location outside legend");
+        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
+        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 30 }).data(), ["BB"], "get second entry");
+        assert.lengthOf(horizLegend.getEntry({ x: 10, y: 150 }).data(), 0, "no entries at location outside legend");
         svg.remove();
     });
 });

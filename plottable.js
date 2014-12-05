@@ -5744,19 +5744,19 @@ var Plottable;
                 _super.call(this);
                 this.padding = 5;
                 this.classed("legend", true);
-                this.maxEntryPerRow(Infinity);
+                this.maxEntriesPerRow(Infinity);
                 this._scale = colorScale;
                 this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
                 this.xAlign("left").yAlign("center");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
             }
-            HorizontalLegend.prototype.maxEntryPerRow = function (numEntries) {
+            HorizontalLegend.prototype.maxEntriesPerRow = function (numEntries) {
                 if (numEntries == null) {
-                    return this._maxEntryPerRow;
+                    return this._maxEntriesPerRow;
                 }
                 else {
-                    this._maxEntryPerRow = numEntries;
+                    this._maxEntriesPerRow = numEntries;
                     this._invalidateLayout();
                     return this;
                 }
@@ -5829,7 +5829,7 @@ var Plottable;
                 var spaceLeft = availableWidth;
                 entries.forEach(function (e) {
                     var entryLength = entryLengths.get(e);
-                    if (entryLength > spaceLeft || currentRow.length === _this._maxEntryPerRow) {
+                    if (entryLength > spaceLeft || currentRow.length === _this._maxEntriesPerRow) {
                         currentRow = [];
                         rows.push(currentRow);
                         spaceLeft = availableWidth;
@@ -5839,7 +5839,7 @@ var Plottable;
                 });
                 return rows;
             };
-            HorizontalLegend.prototype.getLegend = function (position) {
+            HorizontalLegend.prototype.getEntry = function (position) {
                 if (!this._isSetup) {
                     return d3.select();
                 }
@@ -5847,16 +5847,16 @@ var Plottable;
                 var layout = this.calculateLayoutInfo(this.width(), this.height());
                 var legendPadding = this.padding;
                 this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).each(function (d, i) {
-                    var yShift = i * layout.textHeight + legendPadding;
-                    var xShift = legendPadding;
+                    var lowY = i * layout.textHeight + legendPadding;
+                    var highY = (i + 1) * layout.textHeight + legendPadding;
+                    var lowX = legendPadding;
+                    var highX = legendPadding;
                     d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).each(function (value) {
-                        var bbox = this.getBBox();
-                        bbox.x += xShift;
-                        bbox.y += yShift;
-                        if (bbox.x + bbox.width >= position.x && bbox.x <= position.x && bbox.y + bbox.height >= position.y && bbox.y <= position.y) {
+                        highX += layout.entryLengths.get(value);
+                        if (highX >= position.x && lowX <= position.x && highY >= position.y && lowY <= position.y) {
                             legends.push(this);
                         }
-                        xShift += layout.entryLengths.get(value);
+                        lowX += layout.entryLengths.get(value);
                     });
                 });
                 return d3.selectAll(legends);
