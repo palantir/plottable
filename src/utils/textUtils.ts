@@ -97,7 +97,7 @@ export module _Util {
      * letter.
      */
     export class CachingCharacterMeasurer {
-      private cache: Cache<Dimensions>;
+      private _cache: Cache<Dimensions>;
       /**
        * @param {string} s The string to be measured.
        * @return {Dimensions} The width and height of the measured text.
@@ -110,18 +110,18 @@ export module _Util {
        *        this element will to the text being measured.
        */
       constructor(textSelection: D3.Selection) {
-        this.cache = new Cache(getTextMeasurer(textSelection), CANONICAL_CHR, Methods.objEq);
+        this._cache = new Cache(getTextMeasurer(textSelection), CANONICAL_CHR, Methods.objEq);
         this.measure = combineWhitespace(
                           measureByCharacter(
                             wrapWhitespace(
-                              (s: string) => this.cache.get(s))));
+                              (s: string) => this._cache.get(s))));
       }
 
       /**
        * Clear the cache, if it seems that the text has changed size.
        */
       clear() {
-        this.cache.clear();
+        this._cache.clear();
         return this;
       }
     }

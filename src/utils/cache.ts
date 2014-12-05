@@ -3,10 +3,10 @@
 module Plottable {
 export module _Util {
   export class Cache<T> {
-    private cache: D3.Map<T> = d3.map();
-    private compute: (k: string) => T;
-    private canonicalKey: string = null;
-    private valueEq: (v: T, w: T) => boolean;
+    private _cache: D3.Map<T> = d3.map();
+    private _compute: (k: string) => T;
+    private _canonicalKey: string = null;
+    private _valueEq: (v: T, w: T) => boolean;
 
     /**
      * @constructor
@@ -23,11 +23,11 @@ export module _Util {
                 canonicalKey?: string,
                 valueEq: (v: T, w: T) => boolean =
                          (v: T, w: T) => v === w) {
-      this.compute = compute;
-      this.canonicalKey = canonicalKey;
-      this.valueEq = valueEq;
+      this._compute = compute;
+      this._canonicalKey = canonicalKey;
+      this._valueEq = valueEq;
       if (canonicalKey !== undefined) {
-        this.cache.set(this.canonicalKey, this.compute(this.canonicalKey));
+        this._cache.set(this._canonicalKey, this._compute(this._canonicalKey));
       }
     }
 
@@ -39,10 +39,10 @@ export module _Util {
      * @return {T} The value associated with k; the result of compute(k).
      */
     public get(k: string): T {
-      if (!this.cache.has(k)) {
-        this.cache.set(k, this.compute(k));
+      if (!this._cache.has(k)) {
+        this._cache.set(k, this._compute(k));
       }
-      return this.cache.get(k);
+      return this._cache.get(k);
     }
 
     /**
@@ -55,10 +55,10 @@ export module _Util {
      * @return {Cache<T>} The calling Cache.
      */
     public clear(): Cache<T> {
-      if (this.canonicalKey === undefined ||
-          !this.valueEq(this.cache.get(this.canonicalKey),
-                        this.compute(this.canonicalKey))) {
-        this.cache = d3.map();
+      if (this._canonicalKey === undefined ||
+          !this._valueEq(this._cache.get(this._canonicalKey),
+                        this._compute(this._canonicalKey))) {
+        this._cache = d3.map();
       }
       return this;
     }
