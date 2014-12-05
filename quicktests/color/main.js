@@ -10,7 +10,7 @@ function expandSidebar(){
   if(sidebar.position().left !== 0){
     sidebar.css("visibility", "visible");
     sidebar.animate({
-      left: 0,
+      left: 0
     });
     content.animate({
       left: 300
@@ -18,7 +18,7 @@ function expandSidebar(){
   }
   else{
     sidebar.animate({
-      left: -300,
+      left: -300
     });
     content.animate({
       left: 0
@@ -55,9 +55,16 @@ function togglePlotDisplay(className){
 
 function setupBindings(){
   //checkbox check handler
-  $(".quicktest-checkbox").change(function(){
-    togglePlotDisplay(this.parentNode.innerText);
+  $( "input[type=checkbox]" ).on( "click", function(){
+    var plotName = this.parentNode.textContent;
+    plotName = plotName.replace(" ", "");
+    togglePlotDisplay(plotName);
   });
+
+  // $(".quicktest-checkbox").change(function(){
+  //   debugger;
+  //   togglePlotDisplay(this.parentNode.innerText);
+  // });
 
   //help button tooltip
   $("#help").hover(function(){
