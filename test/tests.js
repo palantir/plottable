@@ -5787,6 +5787,12 @@ describe("Scales", function () {
             var colorArray = ["#5279c7", "#fd373e", "#63c261", "#fad419", "#2c2b6f", "#ff7939", "#db2e65", "#99ce50", "#962565", "#06cccc"];
             assert.deepEqual(scale.range(), colorArray);
         });
+        it("uses altered colors if size of domain exceeds size of range", function () {
+            var scale = new Plottable.Scale.Color();
+            scale.range(["#5279c7", "#fd373e"]);
+            scale.domain(["a", "b", "c"]);
+            assert.notEqual(scale.scale("c"), "#5279c7");
+        });
     });
     describe("Interpolated Color Scales", function () {
         it("default scale uses reds and a linear scale type", function () {
@@ -6903,6 +6909,20 @@ describe("_Util.Methods", function () {
         var nullHexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-11");
         assert.strictEqual(nullHexcode, null, "null hexcode returned");
         colorTester.remove();
+    });
+    it("lightenColor()", function () {
+        var color = "#12fced";
+        var lightenedColor = Plottable._Util.Methods.lightenColor(color, 1, 0.1);
+        var lColor = Plottable._Util.Color.rgbToHsl(parseInt("12", 16), parseInt("fc", 16), parseInt("ed", 16))[2];
+        var lLightenedColor = Plottable._Util.Color.rgbToHsl(parseInt(lightenedColor.substring(1, 3), 16), parseInt(lightenedColor.substring(3, 5), 16), parseInt(lightenedColor.substring(5, 7), 16))[2];
+        assert.operator(lLightenedColor, ">", lColor, "color got lighter");
+    });
+    it("darkenColor()", function () {
+        var color = "#12fced";
+        var darkenedColor = Plottable._Util.Methods.darkenColor(color, 1, 0.1);
+        var lColor = Plottable._Util.Color.rgbToHsl(parseInt("12", 16), parseInt("fc", 16), parseInt("ed", 16))[2];
+        var lDarkenedColor = Plottable._Util.Color.rgbToHsl(parseInt(darkenedColor.substring(1, 3), 16), parseInt(darkenedColor.substring(3, 5), 16), parseInt(darkenedColor.substring(5, 7), 16))[2];
+        assert.operator(lDarkenedColor, "<", lColor, "color got darker");
     });
 });
 
