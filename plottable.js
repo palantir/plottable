@@ -5878,6 +5878,9 @@ var Plottable;
                 this._padding = 5;
                 this.classed("legend", true);
                 this.maxEntriesPerRow(Infinity);
+                if (colorScale == null) {
+                    throw new Error("HorizontalLegend requires a colorScale");
+                }
                 this._scale = colorScale;
                 this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
                 this.xAlign("left").yAlign("center");
@@ -5897,9 +5900,7 @@ var Plottable;
             HorizontalLegend.prototype.scale = function (scale) {
                 var _this = this;
                 if (scale != null) {
-                    if (this._scale != null) {
-                        this._scale.broadcaster.deregisterListener(this);
-                    }
+                    this._scale.broadcaster.deregisterListener(this);
                     this._scale = scale;
                     this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
                     this._invalidateLayout();
@@ -5972,11 +5973,17 @@ var Plottable;
                 });
                 return rows;
             };
+            /**
+             * Gets the legend entry under the given pixel position.
+             *
+             * @param {Point} position The pixel position.
+             * @returns {D3.Selection} The selected entry, or null if no entry was selected.
+             */
             HorizontalLegend.prototype.getEntry = function (position) {
                 if (!this._isSetup) {
                     return d3.select();
                 }
-                var legends = [];
+                var entry;
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var legendPadding = this._padding;
                 this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).each(function (d, i) {
@@ -5987,12 +5994,12 @@ var Plottable;
                     d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).each(function (value) {
                         highX += layout.entryLengths.get(value);
                         if (highX >= position.x && lowX <= position.x && highY >= position.y && lowY <= position.y) {
-                            legends.push(this);
+                            entry = this;
                         }
                         lowX += layout.entryLengths.get(value);
                     });
                 });
-                return d3.selectAll(legends);
+                return d3.select(entry);
             };
             HorizontalLegend.prototype._doRender = function () {
                 var _this = this;

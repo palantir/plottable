@@ -30,6 +30,10 @@ export module Component {
       this.classed("legend", true);
       this.maxEntriesPerRow(Infinity);
 
+      if (colorScale == null ) {
+        throw new Error("HorizontalLegend requires a colorScale");
+      }
+
       this._scale = colorScale;
       this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
 
@@ -46,7 +50,7 @@ export module Component {
     /**
      * Sets a new max number of entries in HorizontalLegend row.
      *
-     * @param {number} numEntries If provided, the new max number of entries in ow.
+     * @param {number} numEntries If provided, the new max number of entries in row.
      * @returns {HorizontalLegend} The calling HorizontalLegend.
      */
     public maxEntriesPerRow(numEntries: number): HorizontalLegend;
@@ -75,9 +79,7 @@ export module Component {
     public scale(scale: Scale.Color): HorizontalLegend;
     public scale(scale?: Scale.Color): any {
       if (scale != null) {
-        if (this._scale != null) {
-          this._scale.broadcaster.deregisterListener(this);
-        }
+        this._scale.broadcaster.deregisterListener(this);
         this._scale = scale;
         this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
         this._invalidateLayout();
@@ -161,12 +163,18 @@ export module Component {
       return rows;
     }
 
+    /**
+     * Gets the legend entry under the given pixel position.
+     *
+     * @param {Point} position The pixel position.
+     * @returns {D3.Selection} The selected entry, or null if no entry was selected.
+     */
     public getEntry(position: Point): D3.Selection {
       if (!this._isSetup) {
         return d3.select();
       }
 
-      var legends: any[] = [];
+      var entry: EventTarget;
       var layout = this._calculateLayoutInfo(this.width(), this.height());
       var legendPadding = this._padding;
       this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {
@@ -178,13 +186,13 @@ export module Component {
           highX += layout.entryLengths.get(value);
           if (highX >= position.x && lowX <= position.x &&
               highY >= position.y && lowY <= position.y) {
-            legends.push(this);
+            entry = this;
           }
           lowX += layout.entryLengths.get(value);
         });
       });
 
-      return d3.selectAll(legends);
+      return d3.select(entry);
     }
 
     public _doRender() {

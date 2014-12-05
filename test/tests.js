@@ -1658,7 +1658,7 @@ describe("HorizontalLegend", function () {
         horizLegend.renderTo(svg);
         assert.deepEqual(horizLegend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
         assert.deepEqual(horizLegend.getEntry({ x: 50, y: 10 }).data(), ["BB"], "get second entry");
-        assert.lengthOf(horizLegend.getEntry({ x: 150, y: 10 }).data(), 0, "no entries at location outside legend");
+        assert.deepEqual(horizLegend.getEntry({ x: 150, y: 10 }), d3.select(), "no entries at location outside legend");
         svg.remove();
     });
     it("getEntry() vertical", function () {
@@ -1668,7 +1668,7 @@ describe("HorizontalLegend", function () {
         horizLegend.renderTo(svg);
         assert.deepEqual(horizLegend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
         assert.deepEqual(horizLegend.getEntry({ x: 10, y: 30 }).data(), ["BB"], "get second entry");
-        assert.lengthOf(horizLegend.getEntry({ x: 10, y: 150 }).data(), 0, "no entries at location outside legend");
+        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 150 }), d3.select(), "no entries at location outside legend");
         svg.remove();
     });
 });
