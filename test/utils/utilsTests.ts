@@ -194,7 +194,7 @@ describe("_Util.Methods", () => {
 
   it("lightenColor()", () => {
     var color = "#12fced";
-    var lightenedColor = Plottable._Util.Methods.lightenColor(color, 1);
+    var lightenedColor = Plottable._Util.Methods.lightenColor(color, 1, 0.1);
     var lColor = Plottable._Util.Color.rgbToHsl(parseInt("12", 16), parseInt("fc", 16), parseInt("ed", 16))[2];
     var lLightenedColor = Plottable._Util.Color.rgbToHsl(parseInt(lightenedColor.substring(1, 3), 16),
                                                          parseInt(lightenedColor.substring(3, 5), 16),
@@ -204,7 +204,7 @@ describe("_Util.Methods", () => {
 
   it("darkenColor()", () => {
     var color = "#12fced";
-    var darkenedColor = Plottable._Util.Methods.darkenColor(color, 1);
+    var darkenedColor = Plottable._Util.Methods.darkenColor(color, 1, 0.1);
     var lColor = Plottable._Util.Color.rgbToHsl(parseInt("12", 16), parseInt("fc", 16), parseInt("ed", 16))[2];
     var lDarkenedColor = Plottable._Util.Color.rgbToHsl(parseInt(darkenedColor.substring(1, 3), 16),
                                                          parseInt(darkenedColor.substring(3, 5), 16),
