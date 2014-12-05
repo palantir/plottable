@@ -510,6 +510,42 @@ export module Component {
     public height(): number {
       return this._height;
     }
+
+    /**
+     * Returns the foreground selection for the component
+     * (A selection covering the front of the component)
+     *
+     * Will return undefined if the component has not been anchored
+     *
+     * @return {D3.Selection} foreground selection for the component
+     */
+    public foreground(): D3.Selection {
+      return this._foregroundContainer;
+    }
+
+    /**
+     * Returns the background selection for the component
+     * (A selection appearing behind of the component)
+     *
+     * Will return undefined if the component has not been anchored
+     *
+     * @return {D3.Selection} background selection for the component
+     */
+    public background(): D3.Selection {
+      return this._backgroundContainer;
+    }
+
+    /**
+     * Returns the hitbox selection for the component
+     * (A selection in front of the foreground used mainly for interactions)
+     *
+     * Will return undefined if the component has not been anchored
+     *
+     * @return {D3.Selection} hitbox selection for the component
+     */
+    public hitBox(): D3.Selection {
+      return this._hitBox;
+    }
   }
 }
 }

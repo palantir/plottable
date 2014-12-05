@@ -291,6 +291,40 @@ var Plottable;
                 return hexCode;
             }
             Methods.colorTest = colorTest;
+            // Code adapted from https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+            function lightenColor(color, factor, lightenAmount) {
+                var r = parseInt(color.substring(1, 3), 16);
+                var g = parseInt(color.substring(3, 5), 16);
+                var b = parseInt(color.substring(5, 7), 16);
+                var hsl = _Util.Color.rgbToHsl(r, g, b);
+                var newL = Math.min(hsl[2] + lightenAmount * factor, 1);
+                var newRgb = _Util.Color.hslToRgb(hsl[0], hsl[1], newL);
+                var rHex = newRgb[0].toString(16);
+                var gHex = newRgb[1].toString(16);
+                var bHex = newRgb[2].toString(16);
+                rHex = rHex.length < 2 ? "0" + rHex : rHex;
+                gHex = gHex.length < 2 ? "0" + gHex : gHex;
+                bHex = bHex.length < 2 ? "0" + bHex : bHex;
+                return "#" + rHex + gHex + bHex;
+            }
+            Methods.lightenColor = lightenColor;
+            // Code adapted from https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+            function darkenColor(color, factor, darkenAmount) {
+                var r = parseInt(color.substring(1, 3), 16);
+                var g = parseInt(color.substring(3, 5), 16);
+                var b = parseInt(color.substring(5, 7), 16);
+                var hsl = _Util.Color.rgbToHsl(r, g, b);
+                var newL = Math.max(hsl[2] - darkenAmount * factor, 0);
+                var newRgb = _Util.Color.hslToRgb(hsl[0], hsl[1], newL);
+                var rHex = newRgb[0].toString(16);
+                var gHex = newRgb[1].toString(16);
+                var bHex = newRgb[2].toString(16);
+                rHex = rHex.length < 2 ? "0" + rHex : rHex;
+                gHex = gHex.length < 2 ? "0" + gHex : gHex;
+                bHex = bHex.length < 2 ? "0" + bHex : bHex;
+                return "#" + rHex + gHex + bHex;
+            }
+            Methods.darkenColor = darkenColor;
         })(_Util.Methods || (_Util.Methods = {}));
         var Methods = _Util.Methods;
     })(Plottable._Util || (Plottable._Util = {}));
@@ -1165,6 +1199,94 @@ var Plottable;
                 return l1 > l2 ? l1 / l2 : l2 / l1;
             }
             Color.contrast = contrast;
+            /**
+             * Converts an RGB color value to HSL. Conversion formula
+             * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+             * Assumes r, g, and b are contained in the set [0, 255] and
+             * returns h, s, and l in the set [0, 1].
+             * Source: https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
+             *
+             * @param   Number  r       The red color value
+             * @param   Number  g       The green color value
+             * @param   Number  b       The blue color value
+             * @return  Array           The HSL representation
+             */
+            function rgbToHsl(r, g, b) {
+                r /= 255, g /= 255, b /= 255;
+                var max = Math.max(r, g, b);
+                var min = Math.min(r, g, b);
+                var h;
+                var s;
+                var l = (max + min) / 2;
+                if (max === min) {
+                    h = s = 0; // achromatic
+                }
+                else {
+                    var d = max - min;
+                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                    switch (max) {
+                        case r:
+                            h = (g - b) / d + (g < b ? 6 : 0);
+                            break;
+                        case g:
+                            h = (b - r) / d + 2;
+                            break;
+                        case b:
+                            h = (r - g) / d + 4;
+                            break;
+                    }
+                    h /= 6;
+                }
+                return [h, s, l];
+            }
+            Color.rgbToHsl = rgbToHsl;
+            /**
+             * Converts an HSL color value to RGB. Conversion formula
+             * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+             * Assumes h, s, and l are contained in the set [0, 1] and
+             * returns r, g, and b in the set [0, 255].
+             * Source: https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
+             *
+             * @param   Number  h       The hue
+             * @param   Number  s       The saturation
+             * @param   Number  l       The lightness
+             * @return  Array           The RGB representation
+             */
+            function hslToRgb(h, s, l) {
+                var r;
+                var g;
+                var b;
+                if (s === 0) {
+                    r = g = b = l; // achromatic
+                }
+                else {
+                    function hue2rgb(p, q, t) {
+                        if (t < 0) {
+                            t += 1;
+                        }
+                        if (t > 1) {
+                            t -= 1;
+                        }
+                        if (t < 1 / 6) {
+                            return p + (q - p) * 6 * t;
+                        }
+                        if (t < 1 / 2) {
+                            return q;
+                        }
+                        if (t < 2 / 3) {
+                            return p + (q - p) * (2 / 3 - t) * 6;
+                        }
+                        return p;
+                    }
+                    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                    var p = 2 * l - q;
+                    r = hue2rgb(p, q, h + 1 / 3);
+                    g = hue2rgb(p, q, h);
+                    b = hue2rgb(p, q, h - 1 / 3);
+                }
+                return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+            }
+            Color.hslToRgb = hslToRgb;
         })(_Util.Color || (_Util.Color = {}));
         var Color = _Util.Color;
     })(Plottable._Util || (Plottable._Util = {}));
@@ -2807,6 +2929,7 @@ var Plottable;
                         throw new Error("Unsupported ColorScale type");
                 }
                 _super.call(this, scale);
+                this._lightenAmount = 0.16;
             }
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
@@ -2829,6 +2952,15 @@ var Plottable;
                 colorTester.remove();
                 return plottableDefaultColors;
             };
+            // Modifying the original scale method so that colors that are looped are lightened according
+            // to how many times they are looped.
+            Color.prototype.scale = function (value) {
+                var color = _super.prototype.scale.call(this, value);
+                var index = this.domain().indexOf(value);
+                var modifyFactor = Math.floor(index / this.range().length);
+                return Plottable._Util.Methods.lightenColor(color, modifyFactor, this._lightenAmount);
+            };
+            Color.HEX_SCALE_FACTOR = 20;
             return Color;
         })(Scale.AbstractScale);
         Scale.Color = Color;
@@ -4075,6 +4207,39 @@ var Plottable;
              */
             AbstractComponent.prototype.height = function () {
                 return this._height;
+            };
+            /**
+             * Returns the foreground selection for the component
+             * (A selection covering the front of the component)
+             *
+             * Will return undefined if the component has not been anchored
+             *
+             * @return {D3.Selection} foreground selection for the component
+             */
+            AbstractComponent.prototype.foreground = function () {
+                return this._foregroundContainer;
+            };
+            /**
+             * Returns the background selection for the component
+             * (A selection appearing behind of the component)
+             *
+             * Will return undefined if the component has not been anchored
+             *
+             * @return {D3.Selection} background selection for the component
+             */
+            AbstractComponent.prototype.background = function () {
+                return this._backgroundContainer;
+            };
+            /**
+             * Returns the hitbox selection for the component
+             * (A selection in front of the foreground used mainly for interactions)
+             *
+             * Will return undefined if the component has not been anchored
+             *
+             * @return {D3.Selection} hitbox selection for the component
+             */
+            AbstractComponent.prototype.hitBox = function () {
+                return this._hitBox;
             };
             AbstractComponent.AUTORESIZE_BY_DEFAULT = true;
             return AbstractComponent;
@@ -5616,6 +5781,7 @@ var Plottable;
                 return textHeight;
             };
             Legend.prototype._doRender = function () {
+                var _this = this;
                 _super.prototype._doRender.call(this);
                 var domain = this._colorScale.domain().slice(0, this._nRowsDrawn);
                 var textHeight = this._measureTextHeight();
@@ -5629,7 +5795,7 @@ var Plottable;
                 legendEnter.append("circle");
                 legendEnter.append("g").classed("text-container", true);
                 legend.exit().remove();
-                legend.selectAll("circle").attr("cx", textHeight / 2).attr("cy", textHeight / 2).attr("r", r).attr("fill", this._colorScale._d3Scale);
+                legend.selectAll("circle").attr("cx", textHeight / 2).attr("cy", textHeight / 2).attr("r", r).attr("fill", function (d) { return _this._colorScale.scale(d); });
                 legend.selectAll("g.text-container").text("").attr("transform", "translate(" + textHeight + ", 0)").each(function (d) {
                     var d3this = d3.select(this);
                     var measure = Plottable._Util.Text.getTextMeasurer(d3this.append("text"));
@@ -6958,28 +7124,36 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("circles") });
                 return drawSteps;
             };
-            // HACKHACK User and plot metada should be applied - #1306.
             Scatter.prototype._getClosestStruckPoint = function (p, range) {
-                var drawers = this._getDrawersInOrder();
+                var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
-                var getDistSq = function (d, i) {
-                    var dx = attrToProjector["cx"](d, i, null, null) - p.x;
-                    var dy = attrToProjector["cy"](d, i, null, null) - p.y;
+                var xProjector = attrToProjector["x"];
+                var yProjector = attrToProjector["y"];
+                var getDistSq = function (d, i, userMetdata, plotMetadata) {
+                    var dx = attrToProjector["cx"](d, i, userMetdata, plotMetadata) - p.x;
+                    var dy = attrToProjector["cy"](d, i, userMetdata, plotMetadata) - p.y;
                     return (dx * dx + dy * dy);
                 };
                 var overAPoint = false;
                 var closestElement;
+                var closestElementUserMetadata;
+                var closestElementPlotMetadata;
                 var closestIndex;
                 var minDistSq = range * range;
-                drawers.forEach(function (drawer) {
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                    var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
+                    var drawer = _this._key2PlotDatasetKey.get(key).drawer;
                     drawer._getDrawSelection().each(function (d, i) {
-                        var distSq = getDistSq(d, i);
-                        var r = attrToProjector["r"](d, i, null, null);
+                        var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
+                        var r = attrToProjector["r"](d, i, dataset.metadata(), plotMetadata);
                         if (distSq < r * r) {
                             if (!overAPoint || distSq < minDistSq) {
                                 closestElement = this;
                                 closestIndex = i;
                                 minDistSq = distSq;
+                                closestElementUserMetadata = dataset.metadata();
+                                closestElementPlotMetadata = plotMetadata;
                             }
                             overAPoint = true;
                         }
@@ -6987,6 +7161,8 @@ var Plottable;
                             closestElement = this;
                             closestIndex = i;
                             minDistSq = distSq;
+                            closestElementUserMetadata = dataset.metadata();
+                            closestElementPlotMetadata = plotMetadata;
                         }
                     });
                 });
@@ -7000,8 +7176,8 @@ var Plottable;
                 var closestSelection = d3.select(closestElement);
                 var closestData = closestSelection.data();
                 var closestPoint = {
-                    x: attrToProjector["cx"](closestData[0], closestIndex, null, null),
-                    y: attrToProjector["cy"](closestData[0], closestIndex, null, null)
+                    x: attrToProjector["cx"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata),
+                    y: attrToProjector["cy"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata)
                 };
                 return {
                     selection: closestSelection,
@@ -7209,27 +7385,31 @@ var Plottable;
                 return this._renderArea.selectAll("rect");
             };
             Bar.prototype.getBars = function (xValOrExtent, yValOrExtent) {
+                var _this = this;
                 if (!this._isSetup) {
                     return d3.select();
                 }
-                var bars = [];
                 var xExtent = this._parseExtent(xValOrExtent);
                 var yExtent = this._parseExtent(yValOrExtent);
+                // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
+                var bars = this._datasetKeysInOrder.reduce(function (bars, key) { return bars.concat(_this._getBarsFromDataset(key, xExtent, yExtent)); }, []);
+                return d3.selectAll(bars);
+            };
+            Bar.prototype._getBarsFromDataset = function (key, xExtent, yExtent) {
                 // the SVGRects are positioned with sub-pixel accuracy (the default unit
                 // for the x, y, height & width attributes), but user selections (e.g. via
                 // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
                 // seems appropriate:
                 var tolerance = 0.5;
-                // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-                this._getDrawersInOrder().forEach(function (d) {
-                    d._renderArea.selectAll("rect").each(function (d) {
-                        var bbox = this.getBBox();
-                        if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
-                            bars.push(this);
-                        }
-                    });
+                var bars = [];
+                var drawer = this._key2PlotDatasetKey.get(key).drawer;
+                drawer._renderArea.selectAll("rect").each(function (d) {
+                    var bbox = this.getBBox();
+                    if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
+                        bars.push(this);
+                    }
                 });
-                return d3.selectAll(bars);
+                return bars;
             };
             Bar.prototype._updateDomainer = function (scale) {
                 if (scale instanceof Plottable.Scale.AbstractQuantitative) {
@@ -7425,7 +7605,6 @@ var Plottable;
             Bar.prototype._hoverOutComponent = function (p) {
                 this._clearHoverSelection();
             };
-            // HACKHACK User and plot metadata should be applied here - #1306.
             Bar.prototype._doHover = function (p) {
                 var _this = this;
                 var xPositionOrExtent = p.x;
@@ -7439,12 +7618,37 @@ var Plottable;
                         xPositionOrExtent = maxExtent;
                     }
                 }
-                var bars = this.getBars(xPositionOrExtent, yPositionOrExtent);
-                if (!bars.empty()) {
+                var xExtent = this._parseExtent(xPositionOrExtent);
+                var yExtent = this._parseExtent(yPositionOrExtent);
+                var bars = [];
+                var points = [];
+                var projectors = this._generateAttrToProjector();
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                    var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
+                    var barsFromDataset = _this._getBarsFromDataset(key, xExtent, yExtent);
+                    d3.selectAll(barsFromDataset).each(function (d, i) {
+                        if (_this._isVertical) {
+                            points.push({
+                                x: projectors["x"](d, i, dataset.metadata(), plotMetadata) + projectors["width"](d, i, dataset.metadata(), plotMetadata) / 2,
+                                y: projectors["y"](d, i, dataset.metadata(), plotMetadata) + (projectors["positive"](d, i, dataset.metadata(), plotMetadata) ? 0 : projectors["height"](d, i, dataset.metadata(), plotMetadata))
+                            });
+                        }
+                        else {
+                            points.push({
+                                x: projectors["x"](d, i, dataset.metadata(), plotMetadata) + projectors["height"](d, i, dataset.metadata(), plotMetadata) / 2,
+                                y: projectors["y"](d, i, dataset.metadata(), plotMetadata) + (projectors["positive"](d, i, dataset.metadata(), plotMetadata) ? 0 : projectors["width"](d, i, dataset.metadata(), plotMetadata))
+                            });
+                        }
+                    });
+                    bars = bars.concat(barsFromDataset);
+                });
+                var barsSelection = d3.selectAll(bars);
+                if (!barsSelection.empty()) {
                     this._getDrawersInOrder().forEach(function (d, i) {
                         d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
                     });
-                    bars.classed({ "hovered": true, "not-hovered": false });
+                    barsSelection.classed({ "hovered": true, "not-hovered": false });
                 }
                 else {
                     this._clearHoverSelection();
@@ -7454,26 +7658,10 @@ var Plottable;
                         selection: null
                     };
                 }
-                var points = [];
-                var projectors = this._generateAttrToProjector();
-                bars.each(function (d, i) {
-                    if (_this._isVertical) {
-                        points.push({
-                            x: projectors["x"](d, i, null, null) + projectors["width"](d, i, null, null) / 2,
-                            y: projectors["y"](d, i, null, null) + (projectors["positive"](d, i, null, null) ? 0 : projectors["height"](d, i, null, null))
-                        });
-                    }
-                    else {
-                        points.push({
-                            x: projectors["x"](d, i, null, null) + (projectors["positive"](d, i, null, null) ? 0 : projectors["width"](d, i, null, null)),
-                            y: projectors["y"](d, i, null, null) + projectors["height"](d, i, null, null) / 2
-                        });
-                    }
-                });
                 return {
-                    data: bars.data(),
+                    data: barsSelection.data(),
                     pixelPositions: points,
-                    selection: bars
+                    selection: barsSelection
                 };
             };
             Bar._BarAlignmentToFactor = {};
@@ -7659,27 +7847,29 @@ var Plottable;
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
             };
-            // HACKHACK User and plot metadata should be applied here - #1306.
             Line.prototype._getClosestWithinRange = function (p, range) {
+                var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
                 var xProjector = attrToProjector["x"];
                 var yProjector = attrToProjector["y"];
-                var getDistSq = function (d, i) {
-                    var dx = +xProjector(d, i, null, null) - p.x;
-                    var dy = +yProjector(d, i, null, null) - p.y;
+                var getDistSq = function (d, i, userMetdata, plotMetadata) {
+                    var dx = +xProjector(d, i, userMetdata, plotMetadata) - p.x;
+                    var dy = +yProjector(d, i, userMetdata, plotMetadata) - p.y;
                     return (dx * dx + dy * dy);
                 };
                 var closestOverall;
                 var closestPoint;
                 var closestDistSq = range * range;
-                this.datasets().forEach(function (dataset) {
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                    var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
                     dataset.data().forEach(function (d, i) {
-                        var distSq = getDistSq(d, i);
+                        var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
                         if (distSq < closestDistSq) {
                             closestOverall = d;
                             closestPoint = {
-                                x: xProjector(d, i, null, null),
-                                y: yProjector(d, i, null, null)
+                                x: xProjector(d, i, dataset.metadata(), plotMetadata),
+                                y: yProjector(d, i, dataset.metadata(), plotMetadata)
                             };
                             closestDistSq = distSq;
                         }
@@ -7846,35 +8036,28 @@ var Plottable;
                 _super.call(this, xScale, yScale, isVertical);
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
+                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 // the width is constant, so set the inner scale range to that
                 var innerScale = this._makeInnerScale();
                 var innerWidthF = function (d, i) { return innerScale.rangeBand(); };
                 attrToProjector["width"] = this._isVertical ? innerWidthF : attrToProjector["width"];
                 attrToProjector["height"] = !this._isVertical ? innerWidthF : attrToProjector["height"];
-                var positionF = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_POSITION; };
-                attrToProjector["x"] = this._isVertical ? positionF : attrToProjector["x"];
-                attrToProjector["y"] = this._isVertical ? attrToProjector["y"] : positionF;
+                var xAttr = attrToProjector["x"];
+                var yAttr = attrToProjector["y"];
+                var primaryScale = this._isVertical ? this._xScale : this._yScale;
+                var accessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+                attrToProjector["x"] = function (d, i, u, m) { return _this._isVertical ? primaryScale.scale(accessor(d, i, u, m)) + m.position : xAttr(d, u, u, m); };
+                attrToProjector["y"] = function (d, i, u, m) { return _this._isVertical ? yAttr(d, i, u, m) : primaryScale.scale(accessor(d, i, u, m)) + m.position; };
                 return attrToProjector;
             };
-            ClusteredBar.prototype._getDataToDraw = function () {
+            ClusteredBar.prototype._updateClusterPosition = function () {
                 var _this = this;
-                var accessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
                 var innerScale = this._makeInnerScale();
-                var clusters = d3.map();
                 this._datasetKeysInOrder.forEach(function (key) {
-                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
-                    clusters.set(key, dataset.data().map(function (d, i) {
-                        var val = accessor(d, i, dataset.metadata(), plotMetadata);
-                        var primaryScale = _this._isVertical ? _this._xScale : _this._yScale;
-                        // TODO: store position information in metadata.
-                        var copyD = Plottable._Util.Methods.copyMap(d);
-                        copyD["_PLOTTABLE_PROTECTED_FIELD_POSITION"] = primaryScale.scale(val) + innerScale.scale(key);
-                        return copyD;
-                    }));
+                    plotMetadata.position = innerScale.scale(key);
                 });
-                return clusters;
             };
             ClusteredBar.prototype._makeInnerScale = function () {
                 var innerScale = new Plottable.Scale.Ordinal();
@@ -7895,6 +8078,15 @@ var Plottable;
                     innerScale.range([0, fn(null, 0, null, null)]);
                 }
                 return innerScale;
+            };
+            ClusteredBar.prototype._getDataToDraw = function () {
+                this._updateClusterPosition();
+                return _super.prototype._getDataToDraw.call(this);
+            };
+            ClusteredBar.prototype._getPlotMetadataForDataset = function (key) {
+                var metadata = _super.prototype._getPlotMetadataForDataset.call(this, key);
+                metadata.position = 0;
+                return metadata;
             };
             return ClusteredBar;
         })(Plot.Bar);
@@ -7919,6 +8111,11 @@ var Plottable;
                 _super.apply(this, arguments);
                 this._stackedExtent = [0, 0];
             }
+            AbstractStacked.prototype._getPlotMetadataForDataset = function (key) {
+                var metadata = _super.prototype._getPlotMetadataForDataset.call(this, key);
+                metadata.offsets = d3.map();
+                return metadata;
+            };
             AbstractStacked.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 if (this._projections["x"] && this._projections["y"] && (attrToSet === "x" || attrToSet === "y")) {
@@ -7953,18 +8150,19 @@ var Plottable;
                 var _this = this;
                 var datasets = this.datasets();
                 var valueAccessor = this._valueAccessor();
+                var keyAccessor = this._keyAccessor();
                 var maxStackExtent = Plottable._Util.Methods.max(this._datasetKeysInOrder, function (k) {
                     var dataset = _this._key2PlotDatasetKey.get(k).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
                     return Plottable._Util.Methods.max(dataset.data(), function (datum, i) {
-                        return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                        return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
                     }, 0);
                 }, 0);
                 var minStackExtent = Plottable._Util.Methods.min(this._datasetKeysInOrder, function (k) {
                     var dataset = _this._key2PlotDatasetKey.get(k).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
                     return Plottable._Util.Methods.min(dataset.data(), function (datum, i) {
-                        return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"];
+                        return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
                     }, 0);
                 }, 0);
                 this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
@@ -7996,15 +8194,18 @@ var Plottable;
                     var negativeDataMap = negativeDataMapArray[index];
                     var isAllNegativeValues = dataset.data().every(function (datum, i) { return valueAccessor(datum, i, dataset.metadata(), plotMetadata) <= 0; });
                     dataset.data().forEach(function (datum, datumIndex) {
-                        var positiveOffset = positiveDataMap.get(keyAccessor(datum, datumIndex, dataset.metadata(), plotMetadata)).offset;
-                        var negativeOffset = negativeDataMap.get(keyAccessor(datum, datumIndex, dataset.metadata(), plotMetadata)).offset;
+                        var key = keyAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
+                        var positiveOffset = positiveDataMap.get(key).offset;
+                        var negativeOffset = negativeDataMap.get(key).offset;
                         var value = valueAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
+                        var offset;
                         if (value === 0) {
-                            datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = isAllNegativeValues ? negativeOffset : positiveOffset;
+                            offset = isAllNegativeValues ? negativeOffset : positiveOffset;
                         }
                         else {
-                            datum["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"] = value > 0 ? positiveOffset : negativeOffset;
+                            offset = value > 0 ? positiveOffset : negativeOffset;
                         }
+                        plotMetadata.offsets.set(key, offset);
                     });
                 });
             };
@@ -8012,7 +8213,6 @@ var Plottable;
                 var _this = this;
                 var keyAccessor = this._keyAccessor();
                 var domainKeys = d3.set();
-                var datasets = this.datasets();
                 this._datasetKeysInOrder.forEach(function (k) {
                     var dataset = _this._key2PlotDatasetKey.get(k).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
@@ -8026,9 +8226,8 @@ var Plottable;
                 var _this = this;
                 var keyAccessor = this._keyAccessor();
                 var valueAccessor = this._valueAccessor();
-                var datasets = this.datasets();
                 var domainKeys = this._getDomainKeys();
-                var dataMapArray = datasets.map(function () {
+                var dataMapArray = this._datasetKeysInOrder.map(function () {
                     return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: 0 };
                     });
@@ -8056,6 +8255,23 @@ var Plottable;
                 else {
                     primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
+            };
+            AbstractStacked.prototype._normalizeDatasets = function (fromX) {
+                var _this = this;
+                var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
+                var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
+                var aStackedAccessor = function (d, i, u, m) { return aAccessor(d, i, u, m) + ((_this._isVertical ? !fromX : fromX) ? m.offsets.get(bAccessor(d, i, u, m)) : 0); };
+                var bStackedAccessor = function (d, i, u, m) { return bAccessor(d, i, u, m) + ((_this._isVertical ? fromX : !fromX) ? m.offsets.get(aAccessor(d, i, u, m)) : 0); };
+                return Plottable._Util.Methods.flatten(this._datasetKeysInOrder.map(function (key) {
+                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                    var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
+                    return dataset.data().map(function (d, i) {
+                        return {
+                            a: aStackedAccessor(d, i, dataset.metadata(), plotMetadata),
+                            b: bStackedAccessor(d, i, dataset.metadata(), plotMetadata)
+                        };
+                    });
+                }));
             };
             AbstractStacked.prototype._keyAccessor = function () {
                 return this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
@@ -8094,31 +8310,16 @@ var Plottable;
                 this._baselineValue = 0;
                 this.classed("area-plot", true);
                 this._isVertical = true;
-                this._defaultFillColor = new Plottable.Scale.Color().range()[0];
             }
             StackedArea.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Area(key).drawLine(false);
             };
+            StackedArea.prototype._getAnimator = function (key) {
+                return new Plottable.Animator.Null();
+            };
             StackedArea.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
-            };
-            StackedArea.prototype._updateStackOffsets = function () {
-                var _this = this;
-                if (!this._projectorsReady()) {
-                    return;
-                }
-                var domainKeys = this._getDomainKeys();
-                var keyAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
-                var keySets = this._datasetKeysInOrder.map(function (k) {
-                    var dataset = _this._key2PlotDatasetKey.get(k).dataset;
-                    var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
-                    return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i, dataset.metadata(), plotMetadata).toString(); })).values();
-                });
-                if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
-                    Plottable._Util.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
-                }
-                _super.prototype._updateStackOffsets.call(this);
             };
             StackedArea.prototype._additionalPaint = function () {
                 var scaledBaseline = this._yScale.scale(this._baselineValue);
@@ -8139,31 +8340,78 @@ var Plottable;
                     scale._autoDomainIfAutomaticMode();
                 }
             };
+            StackedArea.prototype.project = function (attrToSet, accessor, scale) {
+                _super.prototype.project.call(this, attrToSet, accessor, scale);
+                Plot.AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
+                return this;
+            };
             StackedArea.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-                Plot.Area.prototype._onDatasetUpdate.apply(this);
+                Plot.AbstractStacked.prototype._onDatasetUpdate.apply(this);
+                return this;
             };
             StackedArea.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var wholeDatumAttributes = this._wholeDatumAttributes();
-                var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
-                var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
-                singleDatumAttributes.forEach(function (attribute) {
-                    var projector = attrToProjector[attribute];
-                    attrToProjector[attribute] = function (data, i, u, m) { return data.length > 0 ? projector(data[0], i, u, m) : null; };
-                });
+                if (this._projections["fill-opacity"] == null) {
+                    attrToProjector["fill-opacity"] = d3.functor(1);
+                }
                 var yAccessor = this._projections["y"].accessor;
-                attrToProjector["y"] = function (d, i, u, m) { return _this._yScale.scale(+yAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                attrToProjector["y0"] = function (d, i, u, m) { return _this._yScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+                var xAccessor = this._projections["x"].accessor;
+                attrToProjector["y"] = function (d, i, u, m) { return _this._yScale.scale(+yAccessor(d, i, u, m) + m.offsets.get(xAccessor(d, i, u, m))); };
+                attrToProjector["y0"] = function (d, i, u, m) { return _this._yScale.scale(m.offsets.get(xAccessor(d, i, u, m))); };
                 return attrToProjector;
             };
             StackedArea.prototype._wholeDatumAttributes = function () {
                 return ["x", "y", "defined"];
             };
+            //===== Stack logic from AbstractStackedPlot =====
+            StackedArea.prototype._updateStackOffsets = function () {
+                var _this = this;
+                if (!this._projectorsReady()) {
+                    return;
+                }
+                var domainKeys = this._getDomainKeys();
+                var keyAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+                var keySets = this._datasetKeysInOrder.map(function (k) {
+                    var dataset = _this._key2PlotDatasetKey.get(k).dataset;
+                    var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
+                    return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i, dataset.metadata(), plotMetadata).toString(); })).values();
+                });
+                if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
+                    Plottable._Util.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
+                }
+                Plot.AbstractStacked.prototype._updateStackOffsets.call(this);
+            };
+            StackedArea.prototype._updateStackExtents = function () {
+                Plot.AbstractStacked.prototype._updateStackExtents.call(this);
+            };
+            StackedArea.prototype._stack = function (dataArray) {
+                return Plot.AbstractStacked.prototype._stack.call(this, dataArray);
+            };
+            StackedArea.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
+                Plot.AbstractStacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+            };
+            StackedArea.prototype._getDomainKeys = function () {
+                return Plot.AbstractStacked.prototype._getDomainKeys.call(this);
+            };
+            StackedArea.prototype._generateDefaultMapArray = function () {
+                return Plot.AbstractStacked.prototype._generateDefaultMapArray.call(this);
+            };
+            StackedArea.prototype._updateScaleExtents = function () {
+                Plot.AbstractStacked.prototype._updateScaleExtents.call(this);
+            };
+            StackedArea.prototype._keyAccessor = function () {
+                return Plot.AbstractStacked.prototype._keyAccessor.call(this);
+            };
+            StackedArea.prototype._valueAccessor = function () {
+                return Plot.AbstractStacked.prototype._valueAccessor.call(this);
+            };
+            StackedArea.prototype._getPlotMetadataForDataset = function (key) {
+                return Plot.AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
+            };
             return StackedArea;
-        })(Plot.AbstractStacked);
+        })(Plot.Area);
         Plot.StackedArea = StackedArea;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
@@ -8214,14 +8462,16 @@ var Plottable;
             StackedBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var primaryAttr = this._isVertical ? "y" : "x";
+                var valueAttr = this._isVertical ? "y" : "x";
+                var keyAttr = this._isVertical ? "x" : "y";
                 var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                var primaryAccessor = this._projections[primaryAttr].accessor;
-                var getStart = function (d, i, u, m) { return primaryScale.scale(d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
-                var getEnd = function (d, i, u, m) { return primaryScale.scale(+primaryAccessor(d, i, u, m) + d["_PLOTTABLE_PROTECTED_FIELD_STACK_OFFSET"]); };
+                var primaryAccessor = this._projections[valueAttr].accessor;
+                var keyAccessor = this._projections[keyAttr].accessor;
+                var getStart = function (d, i, u, m) { return primaryScale.scale(m.offsets.get(keyAccessor(d, i, u, m))); };
+                var getEnd = function (d, i, u, m) { return primaryScale.scale(+primaryAccessor(d, i, u, m) + m.offsets.get(keyAccessor(d, i, u, m))); };
                 var heightF = function (d, i, u, m) { return Math.abs(getEnd(d, i, u, m) - getStart(d, i, u, m)); };
                 var attrFunction = function (d, i, u, m) { return +primaryAccessor(d, i, u, m) < 0 ? getStart(d, i, u, m) : getEnd(d, i, u, m); };
-                attrToProjector[primaryAttr] = function (d, i, u, m) { return _this._isVertical ? attrFunction(d, i, u, m) : attrFunction(d, i, u, m) - heightF(d, i, u, m); };
+                attrToProjector[valueAttr] = function (d, i, u, m) { return _this._isVertical ? attrFunction(d, i, u, m) : attrFunction(d, i, u, m) - heightF(d, i, u, m); };
                 return attrToProjector;
             };
             StackedBar.prototype._generateDrawSteps = function () {
@@ -8236,6 +8486,12 @@ var Plottable;
                 _super.prototype._onDatasetUpdate.call(this);
                 Plot.AbstractStacked.prototype._onDatasetUpdate.apply(this);
                 return this;
+            };
+            StackedBar.prototype._getPlotMetadataForDataset = function (key) {
+                return Plot.AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
+            };
+            StackedBar.prototype._normalizeDatasets = function (fromX) {
+                return Plot.AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
             };
             //===== Stack logic from AbstractStackedPlot =====
             StackedBar.prototype._updateStackOffsets = function () {
