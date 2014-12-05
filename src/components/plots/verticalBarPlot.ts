@@ -24,6 +24,7 @@ export module Plot {
      * @param {QuantitativeScale} yScale The y scale to use.
      */
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractQuantitative<number>) {
+      this._isVertical = true;
       super(xScale, yScale, true);
       if (!VerticalBar.WARNED) {
         VerticalBar.WARNED = true;

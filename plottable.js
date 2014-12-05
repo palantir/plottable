@@ -7514,6 +7514,7 @@ var Plottable;
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             function VerticalBar(xScale, yScale) {
+                this._isVertical = true;
                 _super.call(this, xScale, yScale, true);
                 if (!VerticalBar.WARNED) {
                     VerticalBar.WARNED = true;
