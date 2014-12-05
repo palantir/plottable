@@ -2566,7 +2566,7 @@ declare module Plottable {
              * Gets the legend entry under the given pixel position.
              *
              * @param {Point} position The pixel position.
-             * @returns {D3.Selection} The selected entry, or null if no entry was selected.
+             * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
              */
             getEntry(position: Point): D3.Selection;
             _doRender(): void;
