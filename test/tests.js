@@ -1652,6 +1652,25 @@ describe("HorizontalLegend", function () {
         assert.operator(smallCircleHeight, "<", origCircleHeight, "icon size decreased with font size");
         svg.remove();
     });
+    it("getEntry() horizontal", function () {
+        colorScale.domain(["AA", "BB", "CC"]);
+        var svg = generateSVG(300, 300);
+        horizLegend.renderTo(svg);
+        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
+        assert.deepEqual(horizLegend.getEntry({ x: 50, y: 10 }).data(), ["BB"], "get second entry");
+        assert.deepEqual(horizLegend.getEntry({ x: 150, y: 10 }), d3.select(), "no entries at location outside legend");
+        svg.remove();
+    });
+    it("getEntry() vertical", function () {
+        colorScale.domain(["AA", "BB", "CC"]);
+        var svg = generateSVG(300, 300);
+        horizLegend.maxEntriesPerRow(1);
+        horizLegend.renderTo(svg);
+        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
+        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 30 }).data(), ["BB"], "get second entry");
+        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 150 }), d3.select(), "no entries at location outside legend");
+        svg.remove();
+    });
 });
 
 ///<reference path="../../testReference.ts" />

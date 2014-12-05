@@ -2535,8 +2535,40 @@ declare module Plottable {
              * @param {Scale.Color} colorScale
              */
             constructor(colorScale: Scale.Color);
+            /**
+             * Gets the current max number of entries in HorizontalLegend row.
+             * @returns {number} The current max number of entries in row.
+             */
+            maxEntriesPerRow(): number;
+            /**
+             * Sets a new max number of entries in HorizontalLegend row.
+             *
+             * @param {number} numEntries If provided, the new max number of entries in row.
+             * @returns {HorizontalLegend} The calling HorizontalLegend.
+             */
+            maxEntriesPerRow(numEntries: number): HorizontalLegend;
+            /**
+             * Gets the current color scale from the HorizontalLegend.
+             *
+             * @returns {ColorScale} The current color scale.
+             */
+            scale(): Scale.Color;
+            /**
+             * Assigns a new color scale to the HorizontalLegend.
+             *
+             * @param {Scale.Color} scale If provided, the new scale.
+             * @returns {HorizontalLegend} The calling HorizontalLegend.
+             */
+            scale(scale: Scale.Color): HorizontalLegend;
             remove(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            /**
+             * Gets the legend entry under the given pixel position.
+             *
+             * @param {Point} position The pixel position.
+             * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
+             */
+            getEntry(position: Point): D3.Selection;
             _doRender(): void;
         }
     }
