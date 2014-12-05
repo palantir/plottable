@@ -5755,13 +5755,13 @@ var Plottable;
              * Gets the legend entry under the given pixel position.
              *
              * @param {Point} position The pixel position.
-             * @returns {D3.Selection} The selected entry, or null if no entry was selected.
+             * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
              */
             Legend.prototype.getEntry = function (position) {
                 if (!this._isSetup) {
                     return d3.select();
                 }
-                var entry;
+                var entry = d3.select();
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var legendPadding = this._padding;
                 this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function (d, i) {
@@ -5772,12 +5772,12 @@ var Plottable;
                     d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS).each(function (value) {
                         highX += layout.entryLengths.get(value);
                         if (highX >= position.x && lowX <= position.x && highY >= position.y && lowY <= position.y) {
-                            entry = this;
+                            entry = d3.select(this);
                         }
                         lowX += layout.entryLengths.get(value);
                     });
                 });
-                return d3.select(entry);
+                return entry;
             };
             Legend.prototype._doRender = function () {
                 var _this = this;
