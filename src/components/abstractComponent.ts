@@ -543,7 +543,7 @@ export module Component {
      *
      * @return {D3.Selection} hitbox selection for the component
      */
-    public getHitbox(): D3.Selection {
+    public getHitBox(): D3.Selection {
       return this._hitBox;
     }
   }

@@ -1954,7 +1954,7 @@ declare module Plottable {
              *
              * @return {D3.Selection} hitbox selection for the component
              */
-            getHitbox(): D3.Selection;
+            getHitBox(): D3.Selection;
         }
     }
 }

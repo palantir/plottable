@@ -4238,7 +4238,7 @@ var Plottable;
              *
              * @return {D3.Selection} hitbox selection for the component
              */
-            AbstractComponent.prototype.getHitbox = function () {
+            AbstractComponent.prototype.getHitBox = function () {
                 return this._hitBox;
             };
             AbstractComponent.AUTORESIZE_BY_DEFAULT = true;
