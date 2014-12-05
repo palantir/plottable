@@ -2,126 +2,65 @@
 
 module Plottable {
 export module Component {
-  export interface ToggleCallback {
-      (datum: string, newState: boolean): any;
-  }
-  export interface HoverCallback {
-      (datum?: string): any;
-  }
-
   export class Legend extends AbstractComponent {
     /**
      * The css class applied to each legend row
      */
-    public static SUBELEMENT_CLASS = "legend-row";
-    private static _MARGIN = 5;
+    public static LEGEND_ROW_CLASS = "legend-row";
+    /**
+     * The css class applied to each legend entry
+     */
+    public static LEGEND_ENTRY_CLASS = "legend-entry";
 
-    private _colorScale: Scale.Color;
-    private _nRowsDrawn: number;
-
-    private _toggleCallback: ToggleCallback;
-    private _hoverCallback: HoverCallback;
-
-    private _datumCurrentlyFocusedOn: string;
-
-    // this is the set of all legend domain strings that are currently toggled off
-    private _isOff: D3.Set<string>;
+    private _padding = 5;
+    private _scale: Scale.Color;
+    private _maxEntriesPerRow: number;
 
     /**
-     * Constructs a Legend.
+     * Creates a Legend.
      *
-     * A legend consists of a series of legend rows, each with a color and label taken from the `colorScale`.
-     * The rows will be displayed in the order of the `colorScale` domain.
-     * This legend also allows interactions, through the functions `toggleCallback` and `hoverCallback`
-     * Setting a callback will also put classes on the individual rows.
+     * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
+     * The entries will be displayed in the order of the `colorScale` domain.
      *
      * @constructor
-     * @param {ColorScale} colorScale
+     * @param {Scale.Color} colorScale
      */
-    constructor(colorScale?: Scale.Color) {
+    constructor(colorScale: Scale.Color) {
       super();
       this.classed("legend", true);
-      this.scale(colorScale);
-      this.xAlign("RIGHT").yAlign("TOP");
-      this.xOffset(5).yOffset(5);
+      this.maxEntriesPerRow(Infinity);
+
+      if (colorScale == null ) {
+        throw new Error("Legend requires a colorScale");
+      }
+
+      this._scale = colorScale;
+      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+
+      this.xAlign("left").yAlign("center");
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
     }
 
-    public remove() {
-      super.remove();
-      if (this._colorScale != null) {
-        this._colorScale.broadcaster.deregisterListener(this);
-      }
-    }
-
     /**
-     * Gets the toggle callback from the Legend.
-     *
-     * This callback is associated with toggle events, which trigger when a legend row is clicked.
-     * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
-     * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
-     * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
-     *
-     * @returns {ToggleCallback} The current toggle callback.
+     * Gets the current max number of entries in Legend row.
+     * @returns {number} The current max number of entries in row.
      */
-    public toggleCallback(): ToggleCallback;
+    public maxEntriesPerRow(): number;
     /**
-     * Assigns a toggle callback to the Legend.
+     * Sets a new max number of entries in Legend row.
      *
-     * This callback is associated with toggle events, which trigger when a legend row is clicked.
-     * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
-     * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
-     * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
-     *
-     * @param {ToggleCallback} callback The new callback function.
+     * @param {number} numEntries If provided, the new max number of entries in row.
      * @returns {Legend} The calling Legend.
      */
-    public toggleCallback(callback: ToggleCallback): Legend;
-    public toggleCallback(callback?: ToggleCallback): any {
-      if (callback !== undefined) {
-        this._toggleCallback = callback;
-        this._isOff = d3.set();
-        this._updateListeners();
-        this._updateClasses();
-        return this;
+    public maxEntriesPerRow(numEntries: number): Legend;
+    public maxEntriesPerRow(numEntries?: number): any {
+      if (numEntries == null) {
+        return this._maxEntriesPerRow;
       } else {
-        return this._toggleCallback;
-      }
-    }
-
-    /**
-     * Gets the hover callback from the Legend.
-     *
-     * This callback is associated with hover events, which trigger when the mouse enters or leaves a legend row
-     * Setting a callback will also set the class "hover" to all legend row,
-     * as well as the class "focus" to the legend row being hovered over.
-     * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
-     *
-     * @returns {HoverCallback} The new current hover callback.
-     */
-    public hoverCallback(): HoverCallback;
-    /**
-     * Assigns a hover callback to the Legend.
-     *
-     * This callback is associated with hover events, which trigger when the mouse enters or leaves a legend row
-     * Setting a callback will also set the class "hover" to all legend row,
-     * as well as the class "focus" to the legend row being hovered over.
-     * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
-     *
-     * @param {HoverCallback} callback If provided, the new callback function.
-     * @returns {Legend} The calling Legend.
-     */
-    public hoverCallback(callback: HoverCallback): Legend;
-    public hoverCallback(callback?: HoverCallback): any {
-      if (callback !== undefined) {
-        this._hoverCallback = callback;
-        this._datumCurrentlyFocusedOn = undefined;
-        this._updateListeners();
-        this._updateClasses();
+        this._maxEntriesPerRow = numEntries;
+        this._invalidateLayout();
         return this;
-      } else {
-        return this._hoverCallback;
       }
     }
 
@@ -140,167 +79,177 @@ export module Component {
     public scale(scale: Scale.Color): Legend;
     public scale(scale?: Scale.Color): any {
       if (scale != null) {
-        if (this._colorScale != null) {
-          this._colorScale.broadcaster.deregisterListener(this);
-        }
-        this._colorScale = scale;
-        this._colorScale.broadcaster.registerListener(this, () => this._updateDomain());
-        this._updateDomain();
+        this._scale.broadcaster.deregisterListener(this);
+        this._scale = scale;
+        this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+        this._invalidateLayout();
         return this;
       } else {
-        return this._colorScale;
+        return this._scale;
       }
     }
 
-    private _updateDomain() {
-      if (this._toggleCallback != null) {
-        this._isOff = _Util.Methods.intersection(this._isOff, d3.set(this.scale().domain()));
-      }
-      if (this._hoverCallback != null) {
-        this._datumCurrentlyFocusedOn = this.scale().domain().indexOf(this._datumCurrentlyFocusedOn) >= 0 ?
-          this._datumCurrentlyFocusedOn : undefined;
-      }
-      this._invalidateLayout();
+    public remove() {
+      super.remove();
+      this._scale.broadcaster.deregisterListener(this);
     }
 
-    public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
-      var textHeight = this._measureTextHeight();
-      var totalNumRows = this._colorScale.domain().length;
-      this._nRowsDrawn = Math.min(totalNumRows, Math.floor(this.height() / textHeight));
+    private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {
+      var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+      var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+      var measure = _Util.Text.getTextMeasurer(fakeLegendRow.append("text"));
+
+      var textHeight = measure(_Util.Text.HEIGHT_TEXT).height;
+
+      var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
+      var measureEntry = (entryText: string) => {
+        var originalEntryLength = (textHeight + measure(entryText).width + this._padding);
+        return Math.min(originalEntryLength, availableWidthForEntries);
+      };
+
+      var entries = this._scale.domain();
+      var entryLengths = _Util.Methods.populateMap(entries, measureEntry);
+      fakeLegendRow.remove();
+
+      var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
+
+      var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
+      if (rowsAvailable !== rowsAvailable) { // rowsAvailable can be NaN if this.textHeight = 0
+        rowsAvailable = 0;
+      }
+
+      return {
+        textHeight: textHeight,
+        entryLengths: entryLengths,
+        rows: rows,
+        numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0)
+      };
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var textHeight = this._measureTextHeight();
-      var totalNumRows = this._colorScale.domain().length;
-      var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend._MARGIN) / textHeight));
-      var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-      var measure = _Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
-      var maxWidth = _Util.Methods.max<string, number>(this._colorScale.domain(), (d: string) => measure(d).width, 0);
-      fakeLegendEl.remove();
-      maxWidth = maxWidth === undefined ? 0 : maxWidth;
-      var desiredWidth  = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend._MARGIN;
-      var desiredHeight = rowsICanFit === 0 ? 0 : totalNumRows * textHeight + 2 * Legend._MARGIN;
+      var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
+      var rowLengths = estimatedLayout.rows.map((row: string[]) => {
+        return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
+      });
+      var longestRowLength = _Util.Methods.max(rowLengths, 0);
+      var desiredWidth = this._padding + longestRowLength;
+
+      var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
+      var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
+
       return {
         width : desiredWidth,
-        height: desiredHeight,
+        height: acceptableHeight,
         wantsWidth: offeredWidth < desiredWidth,
         wantsHeight: offeredHeight < desiredHeight
       };
     }
 
-    private _measureTextHeight(): number {
-      // note: can't be called before anchoring atm
-      var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-      var textHeight = _Util.Text.getTextMeasurer(fakeLegendEl.append("text"))(_Util.Text.HEIGHT_TEXT).height;
-      // HACKHACK
-      if (textHeight === 0) {
-        textHeight = 1;
+    private _packRows(availableWidth: number, entries: string[], entryLengths: D3.Map<number>) {
+      var rows: string[][] = [];
+      var currentRow: string[] = [];
+      var spaceLeft = availableWidth;
+      entries.forEach((e: string) => {
+        var entryLength = entryLengths.get(e);
+        if (entryLength > spaceLeft || currentRow.length === this._maxEntriesPerRow) {
+          rows.push(currentRow);
+          currentRow = [];
+          spaceLeft = availableWidth;
+        }
+        currentRow.push(e);
+        spaceLeft -= entryLength;
+      });
+
+      if(currentRow.length !== 0) {
+        rows.push(currentRow);
       }
-      fakeLegendEl.remove();
-      return textHeight;
+      return rows;
+    }
+
+    /**
+     * Gets the legend entry under the given pixel position.
+     *
+     * @param {Point} position The pixel position.
+     * @returns {D3.Selection} The selected entry, or null if no entry was selected.
+     */
+    public getEntry(position: Point): D3.Selection {
+      if (!this._isSetup) {
+        return d3.select();
+      }
+
+      var entry: EventTarget;
+      var layout = this._calculateLayoutInfo(this.width(), this.height());
+      var legendPadding = this._padding;
+      this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {
+        var lowY = i * layout.textHeight + legendPadding;
+        var highY = (i + 1) * layout.textHeight + legendPadding;
+        var lowX = legendPadding;
+        var highX = legendPadding;
+        d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS).each(function(value: string) {
+          highX += layout.entryLengths.get(value);
+          if (highX >= position.x && lowX <= position.x &&
+              highY >= position.y && lowY <= position.y) {
+            entry = this;
+          }
+          lowX += layout.entryLengths.get(value);
+        });
+      });
+
+      return d3.select(entry);
     }
 
     public _doRender() {
       super._doRender();
-      var domain = this._colorScale.domain().slice(0, this._nRowsDrawn);
-      var textHeight = this._measureTextHeight();
-      var availableWidth  = this.width()  - textHeight - Legend._MARGIN;
-      var r = textHeight * 0.3;
-      var legend: D3.UpdateSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, (d) => d);
-      var legendEnter = legend.enter()
-          .append("g").classed(Legend.SUBELEMENT_CLASS, true);
 
-      legendEnter.each(function(d: String) {
+      var layout = this._calculateLayoutInfo(this.width(), this.height());
+
+      var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
+      var rows = this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
+      rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+      rows.exit().remove();
+
+      rows.attr("transform", (d: any, i: number) => "translate(0, " + (i * layout.textHeight + this._padding) + ")");
+
+      var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data((d) => d);
+      var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+      entries.each(function(d: string) {
         d3.select(this).classed(d.replace(" ", "-"), true);
       });
+      entriesEnter.append("circle");
+      entriesEnter.append("g").classed("text-container", true);
+      entries.exit().remove();
 
-      legendEnter.append("circle");
-      legendEnter.append("g").classed("text-container", true);
-
-      legend.exit().remove();
-
-      legend.selectAll("circle")
-        .attr("cx", textHeight / 2)
-        .attr("cy", textHeight / 2)
-        .attr("r",  r)
-        .attr("fill", (d: string) => this._colorScale.scale(d));
-      legend.selectAll("g.text-container")
-        .text("")
-        .attr("transform", "translate(" + textHeight + ", 0)")
-        .each(function(d: string) {
-          var d3this = d3.select(this);
-          var measure = _Util.Text.getTextMeasurer(d3this.append("text"));
-          var writeLine = _Util.Text.getTruncatedText(d, availableWidth, measure);
-          var writeLineMeasure = measure(writeLine);
-          _Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
+      var legendPadding = this._padding;
+      rows.each(function (values: string[]) {
+        var xShift = legendPadding;
+        var entriesInRow = d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS);
+        entriesInRow.attr("transform", (value: string, i: number) => {
+          var translateString = "translate(" + xShift + ", 0)";
+          xShift += layout.entryLengths.get(value);
+          return translateString;
         });
-
-      legend.attr("transform", (d: string) => {
-        return "translate(" + Legend._MARGIN + "," + (domain.indexOf(d) * textHeight + Legend._MARGIN) + ")";
       });
 
-      this._updateClasses();
-      this._updateListeners();
-    }
+      entries.select("circle")
+          .attr("cx", layout.textHeight / 2)
+          .attr("cy", layout.textHeight / 2)
+          .attr("r",  layout.textHeight * 0.3)
+          .attr("fill", (value: string) => this._scale.scale(value) );
 
-    private _updateListeners() {
-      if (!this._isSetup) {
-        return;
-      }
-      var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
-      if (this._hoverCallback != null) {
-        // tag the element that is being hovered over with the class "focus"
-        // this callback will trigger with the specific element being hovered over.
-        var hoverRow = (mouseover: boolean) => (datum: string) => {
-          this._datumCurrentlyFocusedOn = mouseover ? datum : undefined;
-          this._hoverCallback(this._datumCurrentlyFocusedOn);
-          this._updateClasses();
-        };
-        dataSelection.on("mouseover", hoverRow(true));
-        dataSelection.on("mouseout", hoverRow(false));
-      } else {
-        // remove all mouseover/mouseout listeners
-        dataSelection.on("mouseover", null);
-        dataSelection.on("mouseout", null);
-      }
-
-      if (this._toggleCallback != null) {
-        dataSelection.on("click", (datum: string) => {
-          var turningOn = this._isOff.has(datum);
-          if (turningOn) {
-            this._isOff.remove(datum);
-          } else {
-            this._isOff.add(datum);
-          }
-          this._toggleCallback(datum, turningOn);
-          this._updateClasses();
-        });
-      } else {
-        // remove all click listeners
-        dataSelection.on("click", null);
-      }
-    }
-
-    private _updateClasses() {
-      if (!this._isSetup) {
-        return;
-      }
-      var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
-      if (this._hoverCallback != null) {
-        dataSelection.classed("focus", (d: string) => this._datumCurrentlyFocusedOn === d);
-        dataSelection.classed("hover", this._datumCurrentlyFocusedOn !== undefined);
-      } else {
-        dataSelection.classed("hover", false);
-        dataSelection.classed("focus", false);
-      }
-      if (this._toggleCallback != null) {
-        dataSelection.classed("toggled-on", (d: string) => !this._isOff.has(d));
-        dataSelection.classed("toggled-off", (d: string) => this._isOff.has(d));
-      } else {
-        dataSelection.classed("toggled-on", false);
-        dataSelection.classed("toggled-off", false);
-      }
+      var padding = this._padding;
+      var textContainers = entries.select("g.text-container");
+      textContainers.text(""); // clear out previous results
+      textContainers.append("title").text((value: string) => value);
+      // HACKHACK (translate vertical shift): #864
+      textContainers.attr("transform", "translate(" + layout.textHeight + ", " + (layout.textHeight * 0.1) + ")")
+             .each(function(value: string) {
+               var container = d3.select(this);
+               var measure = _Util.Text.getTextMeasurer(container.append("text"));
+               var maxTextLength = layout.entryLengths.get(value) - layout.textHeight - padding;
+               var textToWrite = _Util.Text.getTruncatedText(value, maxTextLength, measure);
+               var textSize = measure(textToWrite);
+               _Util.Text.writeLineHorizontally(textToWrite, container, textSize.width, textSize.height);
+             });
     }
   }
 }

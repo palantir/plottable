@@ -5639,232 +5639,7 @@ var Plottable;
         var Legend = (function (_super) {
             __extends(Legend, _super);
             /**
-             * Constructs a Legend.
-             *
-             * A legend consists of a series of legend rows, each with a color and label taken from the `colorScale`.
-             * The rows will be displayed in the order of the `colorScale` domain.
-             * This legend also allows interactions, through the functions `toggleCallback` and `hoverCallback`
-             * Setting a callback will also put classes on the individual rows.
-             *
-             * @constructor
-             * @param {ColorScale} colorScale
-             */
-            function Legend(colorScale) {
-                _super.call(this);
-                this.classed("legend", true);
-                this.scale(colorScale);
-                this.xAlign("RIGHT").yAlign("TOP");
-                this.xOffset(5).yOffset(5);
-                this._fixedWidthFlag = true;
-                this._fixedHeightFlag = true;
-            }
-            Legend.prototype.remove = function () {
-                _super.prototype.remove.call(this);
-                if (this._colorScale != null) {
-                    this._colorScale.broadcaster.deregisterListener(this);
-                }
-            };
-            Legend.prototype.toggleCallback = function (callback) {
-                if (callback !== undefined) {
-                    this._toggleCallback = callback;
-                    this._isOff = d3.set();
-                    this._updateListeners();
-                    this._updateClasses();
-                    return this;
-                }
-                else {
-                    return this._toggleCallback;
-                }
-            };
-            Legend.prototype.hoverCallback = function (callback) {
-                if (callback !== undefined) {
-                    this._hoverCallback = callback;
-                    this._datumCurrentlyFocusedOn = undefined;
-                    this._updateListeners();
-                    this._updateClasses();
-                    return this;
-                }
-                else {
-                    return this._hoverCallback;
-                }
-            };
-            Legend.prototype.scale = function (scale) {
-                var _this = this;
-                if (scale != null) {
-                    if (this._colorScale != null) {
-                        this._colorScale.broadcaster.deregisterListener(this);
-                    }
-                    this._colorScale = scale;
-                    this._colorScale.broadcaster.registerListener(this, function () { return _this._updateDomain(); });
-                    this._updateDomain();
-                    return this;
-                }
-                else {
-                    return this._colorScale;
-                }
-            };
-            Legend.prototype._updateDomain = function () {
-                if (this._toggleCallback != null) {
-                    this._isOff = Plottable._Util.Methods.intersection(this._isOff, d3.set(this.scale().domain()));
-                }
-                if (this._hoverCallback != null) {
-                    this._datumCurrentlyFocusedOn = this.scale().domain().indexOf(this._datumCurrentlyFocusedOn) >= 0 ? this._datumCurrentlyFocusedOn : undefined;
-                }
-                this._invalidateLayout();
-            };
-            Legend.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
-                _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
-                var textHeight = this._measureTextHeight();
-                var totalNumRows = this._colorScale.domain().length;
-                this._nRowsDrawn = Math.min(totalNumRows, Math.floor(this.height() / textHeight));
-            };
-            Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var textHeight = this._measureTextHeight();
-                var totalNumRows = this._colorScale.domain().length;
-                var rowsICanFit = Math.min(totalNumRows, Math.floor((offeredHeight - 2 * Legend._MARGIN) / textHeight));
-                var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-                var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
-                var maxWidth = Plottable._Util.Methods.max(this._colorScale.domain(), function (d) { return measure(d).width; }, 0);
-                fakeLegendEl.remove();
-                maxWidth = maxWidth === undefined ? 0 : maxWidth;
-                var desiredWidth = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend._MARGIN;
-                var desiredHeight = rowsICanFit === 0 ? 0 : totalNumRows * textHeight + 2 * Legend._MARGIN;
-                return {
-                    width: desiredWidth,
-                    height: desiredHeight,
-                    wantsWidth: offeredWidth < desiredWidth,
-                    wantsHeight: offeredHeight < desiredHeight
-                };
-            };
-            Legend.prototype._measureTextHeight = function () {
-                // note: can't be called before anchoring atm
-                var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-                var textHeight = Plottable._Util.Text.getTextMeasurer(fakeLegendEl.append("text"))(Plottable._Util.Text.HEIGHT_TEXT).height;
-                // HACKHACK
-                if (textHeight === 0) {
-                    textHeight = 1;
-                }
-                fakeLegendEl.remove();
-                return textHeight;
-            };
-            Legend.prototype._doRender = function () {
-                var _this = this;
-                _super.prototype._doRender.call(this);
-                var domain = this._colorScale.domain().slice(0, this._nRowsDrawn);
-                var textHeight = this._measureTextHeight();
-                var availableWidth = this.width() - textHeight - Legend._MARGIN;
-                var r = textHeight * 0.3;
-                var legend = this._content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, function (d) { return d; });
-                var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true);
-                legendEnter.each(function (d) {
-                    d3.select(this).classed(d.replace(" ", "-"), true);
-                });
-                legendEnter.append("circle");
-                legendEnter.append("g").classed("text-container", true);
-                legend.exit().remove();
-                legend.selectAll("circle").attr("cx", textHeight / 2).attr("cy", textHeight / 2).attr("r", r).attr("fill", function (d) { return _this._colorScale.scale(d); });
-                legend.selectAll("g.text-container").text("").attr("transform", "translate(" + textHeight + ", 0)").each(function (d) {
-                    var d3this = d3.select(this);
-                    var measure = Plottable._Util.Text.getTextMeasurer(d3this.append("text"));
-                    var writeLine = Plottable._Util.Text.getTruncatedText(d, availableWidth, measure);
-                    var writeLineMeasure = measure(writeLine);
-                    Plottable._Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
-                });
-                legend.attr("transform", function (d) {
-                    return "translate(" + Legend._MARGIN + "," + (domain.indexOf(d) * textHeight + Legend._MARGIN) + ")";
-                });
-                this._updateClasses();
-                this._updateListeners();
-            };
-            Legend.prototype._updateListeners = function () {
-                var _this = this;
-                if (!this._isSetup) {
-                    return;
-                }
-                var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
-                if (this._hoverCallback != null) {
-                    // tag the element that is being hovered over with the class "focus"
-                    // this callback will trigger with the specific element being hovered over.
-                    var hoverRow = function (mouseover) { return function (datum) {
-                        _this._datumCurrentlyFocusedOn = mouseover ? datum : undefined;
-                        _this._hoverCallback(_this._datumCurrentlyFocusedOn);
-                        _this._updateClasses();
-                    }; };
-                    dataSelection.on("mouseover", hoverRow(true));
-                    dataSelection.on("mouseout", hoverRow(false));
-                }
-                else {
-                    // remove all mouseover/mouseout listeners
-                    dataSelection.on("mouseover", null);
-                    dataSelection.on("mouseout", null);
-                }
-                if (this._toggleCallback != null) {
-                    dataSelection.on("click", function (datum) {
-                        var turningOn = _this._isOff.has(datum);
-                        if (turningOn) {
-                            _this._isOff.remove(datum);
-                        }
-                        else {
-                            _this._isOff.add(datum);
-                        }
-                        _this._toggleCallback(datum, turningOn);
-                        _this._updateClasses();
-                    });
-                }
-                else {
-                    // remove all click listeners
-                    dataSelection.on("click", null);
-                }
-            };
-            Legend.prototype._updateClasses = function () {
-                var _this = this;
-                if (!this._isSetup) {
-                    return;
-                }
-                var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
-                if (this._hoverCallback != null) {
-                    dataSelection.classed("focus", function (d) { return _this._datumCurrentlyFocusedOn === d; });
-                    dataSelection.classed("hover", this._datumCurrentlyFocusedOn !== undefined);
-                }
-                else {
-                    dataSelection.classed("hover", false);
-                    dataSelection.classed("focus", false);
-                }
-                if (this._toggleCallback != null) {
-                    dataSelection.classed("toggled-on", function (d) { return !_this._isOff.has(d); });
-                    dataSelection.classed("toggled-off", function (d) { return _this._isOff.has(d); });
-                }
-                else {
-                    dataSelection.classed("toggled-on", false);
-                    dataSelection.classed("toggled-off", false);
-                }
-            };
-            /**
-             * The css class applied to each legend row
-             */
-            Legend.SUBELEMENT_CLASS = "legend-row";
-            Legend._MARGIN = 5;
-            return Legend;
-        })(Component.AbstractComponent);
-        Component.Legend = Legend;
-    })(Plottable.Component || (Plottable.Component = {}));
-    var Component = Plottable.Component;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Component) {
-        var HorizontalLegend = (function (_super) {
-            __extends(HorizontalLegend, _super);
-            /**
-             * Creates a Horizontal Legend.
+             * Creates a Legend.
              *
              * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
              * The entries will be displayed in the order of the `colorScale` domain.
@@ -5872,14 +5647,14 @@ var Plottable;
              * @constructor
              * @param {Scale.Color} colorScale
              */
-            function HorizontalLegend(colorScale) {
+            function Legend(colorScale) {
                 var _this = this;
                 _super.call(this);
                 this._padding = 5;
                 this.classed("legend", true);
                 this.maxEntriesPerRow(Infinity);
                 if (colorScale == null) {
-                    throw new Error("HorizontalLegend requires a colorScale");
+                    throw new Error("Legend requires a colorScale");
                 }
                 this._scale = colorScale;
                 this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
@@ -5887,7 +5662,7 @@ var Plottable;
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
             }
-            HorizontalLegend.prototype.maxEntriesPerRow = function (numEntries) {
+            Legend.prototype.maxEntriesPerRow = function (numEntries) {
                 if (numEntries == null) {
                     return this._maxEntriesPerRow;
                 }
@@ -5897,7 +5672,7 @@ var Plottable;
                     return this;
                 }
             };
-            HorizontalLegend.prototype.scale = function (scale) {
+            Legend.prototype.scale = function (scale) {
                 var _this = this;
                 if (scale != null) {
                     this._scale.broadcaster.deregisterListener(this);
@@ -5910,14 +5685,14 @@ var Plottable;
                     return this._scale;
                 }
             };
-            HorizontalLegend.prototype.remove = function () {
+            Legend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 this._scale.broadcaster.deregisterListener(this);
             };
-            HorizontalLegend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
+            Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
-                var fakeLegendRow = this._content.append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
-                var fakeLegendEntry = fakeLegendRow.append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
+                var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+                var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
                 var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendRow.append("text"));
                 var textHeight = measure(Plottable._Util.Text.HEIGHT_TEXT).height;
                 var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
@@ -5940,7 +5715,7 @@ var Plottable;
                     numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0)
                 };
             };
-            HorizontalLegend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
                 var rowLengths = estimatedLayout.rows.map(function (row) {
                     return d3.sum(row, function (entry) { return estimatedLayout.entryLengths.get(entry); });
@@ -5956,21 +5731,24 @@ var Plottable;
                     wantsHeight: offeredHeight < desiredHeight
                 };
             };
-            HorizontalLegend.prototype._packRows = function (availableWidth, entries, entryLengths) {
+            Legend.prototype._packRows = function (availableWidth, entries, entryLengths) {
                 var _this = this;
-                var rows = [[]];
-                var currentRow = rows[0];
+                var rows = [];
+                var currentRow = [];
                 var spaceLeft = availableWidth;
                 entries.forEach(function (e) {
                     var entryLength = entryLengths.get(e);
                     if (entryLength > spaceLeft || currentRow.length === _this._maxEntriesPerRow) {
-                        currentRow = [];
                         rows.push(currentRow);
+                        currentRow = [];
                         spaceLeft = availableWidth;
                     }
                     currentRow.push(e);
                     spaceLeft -= entryLength;
                 });
+                if (currentRow.length !== 0) {
+                    rows.push(currentRow);
+                }
                 return rows;
             };
             /**
@@ -5979,19 +5757,19 @@ var Plottable;
              * @param {Point} position The pixel position.
              * @returns {D3.Selection} The selected entry, or null if no entry was selected.
              */
-            HorizontalLegend.prototype.getEntry = function (position) {
+            Legend.prototype.getEntry = function (position) {
                 if (!this._isSetup) {
                     return d3.select();
                 }
                 var entry;
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var legendPadding = this._padding;
-                this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).each(function (d, i) {
+                this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function (d, i) {
                     var lowY = i * layout.textHeight + legendPadding;
                     var highY = (i + 1) * layout.textHeight + legendPadding;
                     var lowX = legendPadding;
                     var highX = legendPadding;
-                    d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).each(function (value) {
+                    d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS).each(function (value) {
                         highX += layout.entryLengths.get(value);
                         if (highX >= position.x && lowX <= position.x && highY >= position.y && lowY <= position.y) {
                             entry = this;
@@ -6001,17 +5779,17 @@ var Plottable;
                 });
                 return d3.select(entry);
             };
-            HorizontalLegend.prototype._doRender = function () {
+            Legend.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
-                var rows = this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).data(rowsToDraw);
-                rows.enter().append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
+                var rows = this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
+                rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
                 rows.exit().remove();
                 rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this._padding) + ")"; });
-                var entries = rows.selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
-                var entriesEnter = entries.enter().append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
+                var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
+                var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
                 entries.each(function (d) {
                     d3.select(this).classed(d.replace(" ", "-"), true);
                 });
@@ -6021,7 +5799,7 @@ var Plottable;
                 var legendPadding = this._padding;
                 rows.each(function (values) {
                     var xShift = legendPadding;
-                    var entriesInRow = d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS);
+                    var entriesInRow = d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS);
                     entriesInRow.attr("transform", function (value, i) {
                         var translateString = "translate(" + xShift + ", 0)";
                         xShift += layout.entryLengths.get(value);
@@ -6046,14 +5824,14 @@ var Plottable;
             /**
              * The css class applied to each legend row
              */
-            HorizontalLegend.LEGEND_ROW_CLASS = "legend-row";
+            Legend.LEGEND_ROW_CLASS = "legend-row";
             /**
              * The css class applied to each legend entry
              */
-            HorizontalLegend.LEGEND_ENTRY_CLASS = "legend-entry";
-            return HorizontalLegend;
+            Legend.LEGEND_ENTRY_CLASS = "legend-entry";
+            return Legend;
         })(Component.AbstractComponent);
-        Component.HorizontalLegend = HorizontalLegend;
+        Component.Legend = Legend;
     })(Plottable.Component || (Plottable.Component = {}));
     var Component = Plottable.Component;
 })(Plottable || (Plottable = {}));

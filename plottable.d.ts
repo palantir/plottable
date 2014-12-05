@@ -2423,76 +2423,37 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
-        interface ToggleCallback {
-            (datum: string, newState: boolean): any;
-        }
-        interface HoverCallback {
-            (datum?: string): any;
-        }
         class Legend extends AbstractComponent {
             /**
              * The css class applied to each legend row
              */
-            static SUBELEMENT_CLASS: string;
+            static LEGEND_ROW_CLASS: string;
             /**
-             * Constructs a Legend.
+             * The css class applied to each legend entry
+             */
+            static LEGEND_ENTRY_CLASS: string;
+            /**
+             * Creates a Legend.
              *
-             * A legend consists of a series of legend rows, each with a color and label taken from the `colorScale`.
-             * The rows will be displayed in the order of the `colorScale` domain.
-             * This legend also allows interactions, through the functions `toggleCallback` and `hoverCallback`
-             * Setting a callback will also put classes on the individual rows.
+             * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
+             * The entries will be displayed in the order of the `colorScale` domain.
              *
              * @constructor
-             * @param {ColorScale} colorScale
+             * @param {Scale.Color} colorScale
              */
-            constructor(colorScale?: Scale.Color);
-            remove(): void;
+            constructor(colorScale: Scale.Color);
             /**
-             * Gets the toggle callback from the Legend.
-             *
-             * This callback is associated with toggle events, which trigger when a legend row is clicked.
-             * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
-             * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
-             * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
-             *
-             * @returns {ToggleCallback} The current toggle callback.
+             * Gets the current max number of entries in Legend row.
+             * @returns {number} The current max number of entries in row.
              */
-            toggleCallback(): ToggleCallback;
+            maxEntriesPerRow(): number;
             /**
-             * Assigns a toggle callback to the Legend.
+             * Sets a new max number of entries in Legend row.
              *
-             * This callback is associated with toggle events, which trigger when a legend row is clicked.
-             * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
-             * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
-             * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
-             *
-             * @param {ToggleCallback} callback The new callback function.
+             * @param {number} numEntries If provided, the new max number of entries in row.
              * @returns {Legend} The calling Legend.
              */
-            toggleCallback(callback: ToggleCallback): Legend;
-            /**
-             * Gets the hover callback from the Legend.
-             *
-             * This callback is associated with hover events, which trigger when the mouse enters or leaves a legend row
-             * Setting a callback will also set the class "hover" to all legend row,
-             * as well as the class "focus" to the legend row being hovered over.
-             * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
-             *
-             * @returns {HoverCallback} The new current hover callback.
-             */
-            hoverCallback(): HoverCallback;
-            /**
-             * Assigns a hover callback to the Legend.
-             *
-             * This callback is associated with hover events, which trigger when the mouse enters or leaves a legend row
-             * Setting a callback will also set the class "hover" to all legend row,
-             * as well as the class "focus" to the legend row being hovered over.
-             * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
-             *
-             * @param {HoverCallback} callback If provided, the new callback function.
-             * @returns {Legend} The calling Legend.
-             */
-            hoverCallback(callback: HoverCallback): Legend;
+            maxEntriesPerRow(numEntries: number): Legend;
             /**
              * Gets the current color scale from the Legend.
              *
@@ -2506,60 +2467,6 @@ declare module Plottable {
              * @returns {Legend} The calling Legend.
              */
             scale(scale: Scale.Color): Legend;
-            _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _doRender(): void;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Component {
-        class HorizontalLegend extends AbstractComponent {
-            /**
-             * The css class applied to each legend row
-             */
-            static LEGEND_ROW_CLASS: string;
-            /**
-             * The css class applied to each legend entry
-             */
-            static LEGEND_ENTRY_CLASS: string;
-            /**
-             * Creates a Horizontal Legend.
-             *
-             * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
-             * The entries will be displayed in the order of the `colorScale` domain.
-             *
-             * @constructor
-             * @param {Scale.Color} colorScale
-             */
-            constructor(colorScale: Scale.Color);
-            /**
-             * Gets the current max number of entries in HorizontalLegend row.
-             * @returns {number} The current max number of entries in row.
-             */
-            maxEntriesPerRow(): number;
-            /**
-             * Sets a new max number of entries in HorizontalLegend row.
-             *
-             * @param {number} numEntries If provided, the new max number of entries in row.
-             * @returns {HorizontalLegend} The calling HorizontalLegend.
-             */
-            maxEntriesPerRow(numEntries: number): HorizontalLegend;
-            /**
-             * Gets the current color scale from the HorizontalLegend.
-             *
-             * @returns {ColorScale} The current color scale.
-             */
-            scale(): Scale.Color;
-            /**
-             * Assigns a new color scale to the HorizontalLegend.
-             *
-             * @param {Scale.Color} scale If provided, the new scale.
-             * @returns {HorizontalLegend} The calling HorizontalLegend.
-             */
-            scale(scale: Scale.Color): HorizontalLegend;
             remove(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             /**
