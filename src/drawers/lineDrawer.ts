@@ -3,15 +3,15 @@
 module Plottable {
 export module _Drawer {
   export class Line extends AbstractDrawer {
-    private pathSelection: D3.Selection;
+    private _pathSelection: D3.Selection;
 
     public _enterData(data: any[]) {
       super._enterData(data);
-      this.pathSelection.datum(data);
+      this._pathSelection.datum(data);
     }
 
     public setup(area: D3.Selection) {
-      this.pathSelection = area.append("path")
+      this._pathSelection = area.append("path")
                                .classed("line", true)
                                .style({
                                  "fill": "none",
@@ -20,7 +20,7 @@ export module _Drawer {
       super.setup(area);
     }
 
-    private createLine(xFunction: _AppliedProjector, yFunction: _AppliedProjector, definedFunction: _AppliedProjector) {
+    private _createLine(xFunction: _AppliedProjector, yFunction: _AppliedProjector, definedFunction: _AppliedProjector) {
       if(!definedFunction) {
         definedFunction = (d, i) => true;
       }
@@ -47,12 +47,12 @@ export module _Drawer {
         delete attrToProjector["defined"];
       }
 
-      attrToProjector["d"] = this.createLine(xFunction, yFunction, definedFunction);
+      attrToProjector["d"] = this._createLine(xFunction, yFunction, definedFunction);
 
       if (attrToProjector["fill"]) {
-        this.pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+        this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
-      step.animator.animate(this.pathSelection, attrToProjector);
+      step.animator.animate(this._pathSelection, attrToProjector);
     }
   }
 }
