@@ -39,7 +39,9 @@ function run(div, data, Plottable) {
       .addDataset(d4)
       .attr("fill", "color", colorScale)
       .attr("stroke", "color", colorScale)
-      .attr("r", function(d) {return d.x * 12;});
+      .attr("r", function(d) {return d.x * 12;})
+      .project("x", "x", xScale)
+      .project("y", "y", yScale);
 
   //title + legend
   var title1 = new Plottable.Component.TitleLabel( "Two Data Series", "horizontal");

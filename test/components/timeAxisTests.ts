@@ -63,7 +63,7 @@ describe("TimeAxis", () => {
         }
       }
 
-      (<any>axis).tierLabelContainers.forEach(checkLabelsForContainer);
+      (<any>axis)._tierLabelContainers.forEach(checkLabelsForContainer);
     }
     // 100 year span
     checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
@@ -100,7 +100,7 @@ describe("TimeAxis", () => {
     scale.domain([twoMinutesBefore, now]);
     scale.range([0, 800]);
     axis.renderTo(svg);
-    var configs = newPossibleConfigurations[(<any> axis).mostPreciseConfigIndex].tierConfigurations;
+    var configs = newPossibleConfigurations[(<any> axis)._mostPreciseConfigIndex].tierConfigurations;
     assert.deepEqual(configs[0].interval, d3.time.minute, "axis used new time unit");
     assert.deepEqual(configs[0].step, 4, "axis used new step");
     svg.remove();

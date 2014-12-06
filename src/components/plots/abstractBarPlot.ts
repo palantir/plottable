@@ -5,14 +5,15 @@ export module Plot {
   export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public static _DEFAULT_WIDTH = 10;
-    public _baseline: D3.Selection;
-    public _baselineValue: number;
-    public _barAlignmentFactor = 0.5;
+    private _baseline: D3.Selection;
+    private _baselineValue: number;
+    private _barAlignmentFactor = 0.5;
     public _isVertical: boolean;
     private _barLabelFormatter: Formatter = Formatters.identity();
     private _barLabelsEnabled = false;
     private _hoverMode = "point";
-    private hideBarsIfAnyAreTooWide = true;
+    private _hideBarsIfAnyAreTooWide = true;
+    private _defaultFillColor: string;
 
     /**
      * Constructs a BarPlot.
@@ -24,11 +25,10 @@ export module Plot {
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
-      var defaultColor = new Scale.Color().range()[0];
-      this.project("fill", () => defaultColor);
-      this._animators["bars-reset"] = new Animator.Null();
-      this._animators["bars"] = new Animator.Base();
-      this._animators["baseline"] = new Animator.Null();
+      this._defaultFillColor = new Scale.Color().range()[0];
+      this.animator("bars-reset", new Animator.Null());
+      this.animator("bars", new Animator.Base());
+      this.animator("baseline", new Animator.Null());
       this.baseline(0);
     }
 
@@ -77,20 +77,20 @@ export module Plot {
      * @param {string} alignment The desired alignment.
      * @returns {AbstractBarPlot} The calling AbstractBarPlot.
      */
-     public barAlignment(alignment: string) {
-       var alignmentLC = alignment.toLowerCase();
-       var align2factor = (<typeof AbstractBarPlot> this.constructor)._BarAlignmentToFactor;
-       if (align2factor[alignmentLC] === undefined) {
-         throw new Error("unsupported bar alignment");
-       }
-       this._barAlignmentFactor = align2factor[alignmentLC];
+    public barAlignment(alignment: string) {
+      var alignmentLC = alignment.toLowerCase();
+      var align2factor = (<typeof AbstractBarPlot> this.constructor)._BarAlignmentToFactor;
+      if (align2factor[alignmentLC] === undefined) {
+        throw new Error("unsupported bar alignment");
+      }
+      this._barAlignmentFactor = align2factor[alignmentLC];
 
-       this._render();
-       return this;
-     }
+      this._render();
+      return this;
+    }
 
 
-    private parseExtent(input: any): Extent {
+    private _parseExtent(input: any): Extent {
       if (typeof(input) === "number") {
         return {min: input, max: input};
       } else if (input instanceof Object && "min" in input && "max" in input) {
@@ -174,40 +174,35 @@ export module Plot {
         return d3.select();
       }
 
-      var bars: any[] = [];
+      var xExtent: Extent = this._parseExtent(xValOrExtent);
+      var yExtent: Extent = this._parseExtent(yValOrExtent);
 
-      var xExtent: Extent = this.parseExtent(xValOrExtent);
-      var yExtent: Extent = this.parseExtent(yValOrExtent);
+      // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
+      var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) =>
+        bars.concat(this._getBarsFromDataset(key, xExtent, yExtent))
+      , []);
 
+      return d3.selectAll(bars);
+    }
+
+    private _getBarsFromDataset(key: string, xExtent: Extent, yExtent: Extent): any[] {
       // the SVGRects are positioned with sub-pixel accuracy (the default unit
       // for the x, y, height & width attributes), but user selections (e.g. via
       // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
       // seems appropriate:
       var tolerance: number = 0.5;
 
-      // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-      this._getDrawersInOrder().forEach((d) => {
-        d._renderArea.selectAll("rect").each(function(d: any) {
-          var bbox = this.getBBox();
-          if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
-              bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
-            bars.push(this);
-          }
-        });
+      var bars: any[] = [];
+
+      var drawer = <_Drawer.Element>this._key2PlotDatasetKey.get(key).drawer;
+      drawer._renderArea.selectAll("rect").each(function(d) {
+        var bbox = this.getBBox();
+        if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
+            bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
+          bars.push(this);
+        }
       });
-
-      return d3.selectAll(bars);
-    }
-
-    /**
-     * Deselects all bars.
-     * @returns {AbstractBarPlot} The calling AbstractBarPlot.
-     */
-    public deselectAll() {
-      if (this._isSetup) {
-        this._getDrawersInOrder().forEach((d) => d._renderArea.selectAll("rect").classed("selected", false));
-      }
-      return this;
+      return bars;
     }
 
     public _updateDomainer(scale: Scale.AbstractScale<any, number>) {
@@ -275,7 +270,7 @@ export module Plot {
                             attrToProjector,
                             this._key2PlotDatasetKey.get(k).dataset.metadata(),
                             this._key2PlotDatasetKey.get(k).plotMetadata));
-      if (this.hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._someLabelsTooWide)) {
+      if (this._hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._someLabelsTooWide)) {
         drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
       }
     }
@@ -343,6 +338,8 @@ export module Plot {
         attrToProjector["positive"] = (d: any, i: number, u: any, m: PlotMetadata) =>
           originalPositionFn(d, i, u, m) <= scaledBaseline;
       }
+
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
       return attrToProjector;
     }
 
@@ -430,7 +427,7 @@ export module Plot {
       return this;
     }
 
-    private clearHoverSelection() {
+    private _clearHoverSelection() {
       this._getDrawersInOrder().forEach((d, i) => {
         d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
       });
@@ -442,10 +439,9 @@ export module Plot {
     }
 
     public _hoverOutComponent(p: Point) {
-      this.clearHoverSelection();
+      this._clearHoverSelection();
     }
 
-    // HACKHACK User and plot metadata should be applied here - #1306.
     public _doHover(p: Point): Interaction.HoverData {
       var xPositionOrExtent: any = p.x;
       var yPositionOrExtent: any = p.y;
@@ -457,15 +453,47 @@ export module Plot {
           xPositionOrExtent = maxExtent;
         }
       }
-      var bars = this.getBars(xPositionOrExtent, yPositionOrExtent);
 
-      if (!bars.empty()) {
+      var xExtent: Extent = this._parseExtent(xPositionOrExtent);
+      var yExtent: Extent = this._parseExtent(yPositionOrExtent);
+
+      var bars: any[] = [];
+      var points: Point[] = [];
+      var projectors = this._generateAttrToProjector();
+
+      this._datasetKeysInOrder.forEach((key: string) => {
+        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
+        var barsFromDataset = this._getBarsFromDataset(key, xExtent, yExtent);
+        d3.selectAll(barsFromDataset).each((d, i) => {
+          if (this._isVertical) {
+            points.push({
+              x: projectors["x"](d, i, dataset.metadata(), plotMetadata) + projectors["width"](d, i, dataset.metadata(), plotMetadata) / 2,
+              y: projectors["y"](d, i, dataset.metadata(), plotMetadata) +
+                (projectors["positive"](d, i, dataset.metadata(), plotMetadata) ?
+                  0 : projectors["height"](d, i, dataset.metadata(), plotMetadata))
+            });
+          } else {
+            points.push({
+              x: projectors["x"](d, i, dataset.metadata(), plotMetadata) + projectors["height"](d, i, dataset.metadata(), plotMetadata) / 2,
+              y: projectors["y"](d, i, dataset.metadata(), plotMetadata) +
+                (projectors["positive"](d, i, dataset.metadata(), plotMetadata) ?
+                  0 : projectors["width"](d, i, dataset.metadata(), plotMetadata))
+            });
+          }
+        });
+        bars = bars.concat(barsFromDataset);
+      });
+
+      var barsSelection = d3.selectAll(bars);
+
+      if (!barsSelection.empty()) {
         this._getDrawersInOrder().forEach((d, i) => {
           d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
         });
-        bars.classed({ "hovered": true, "not-hovered": false });
+        barsSelection.classed({ "hovered": true, "not-hovered": false });
       } else {
-        this.clearHoverSelection();
+        this._clearHoverSelection();
         return {
           data: null,
           pixelPositions: null,
@@ -473,26 +501,10 @@ export module Plot {
         };
       }
 
-      var points: Point[] = [];
-      var projectors = this._generateAttrToProjector();
-      bars.each((d, i) => {
-        if (this._isVertical) {
-          points.push({
-            x: projectors["x"](d, i, null, null) + projectors["width"](d, i, null, null)/2,
-            y: projectors["y"](d, i, null, null) + (projectors["positive"](d, i, null, null) ? 0 : projectors["height"](d, i, null, null))
-          });
-        } else {
-          points.push({
-            x: projectors["x"](d, i, null, null) + (projectors["positive"](d, i, null, null) ? 0 : projectors["width"](d, i, null, null)),
-            y: projectors["y"](d, i, null, null) + projectors["height"](d, i, null, null)/2
-          });
-        }
-      });
-
       return {
-        data: bars.data(),
+        data: barsSelection.data(),
         pixelPositions: points,
-        selection: bars
+        selection: barsSelection
       };
     }
     //===== /Hover logic =====

@@ -3,27 +3,27 @@
 module Plottable {
 export module _Util {
   export class IDCounter {
-    private counter: {[id: string]: number} = {};
+    private _counter: {[id: string]: number} = {};
 
-    private setDefault(id: any) {
-      if (this.counter[id] == null) {
-        this.counter[id] = 0;
+    private _setDefault(id: any) {
+      if (this._counter[id] == null) {
+        this._counter[id] = 0;
       }
     }
 
     public increment(id: any): number {
-      this.setDefault(id);
-      return ++this.counter[id];
+      this._setDefault(id);
+      return ++this._counter[id];
     }
 
     public decrement(id: any): number {
-      this.setDefault(id);
-      return --this.counter[id];
+      this._setDefault(id);
+      return --this._counter[id];
     }
 
     public get(id: any): number {
-      this.setDefault(id);
-      return this.counter[id];
+      this._setDefault(id);
+      return this._counter[id];
     }
   }
 }

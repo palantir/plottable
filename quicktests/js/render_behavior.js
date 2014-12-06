@@ -19,14 +19,15 @@ function run(div, data, Plottable) {
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var barPlot = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries).animate("true");
+  var areaPlot = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries).animate("true");
+  areaPlot.project("x", "x", xScale).project("y", "y", yScale);
 
   var label1  = new Plottable.Component.Label("dataset.data()", "horizontal");
   var label2  = new Plottable.Component.Label("change width + resize", "horizontal");
   var label3  = new Plottable.Component.Label("remove + renderTo", "horizontal");
   var label4  = new Plottable.Component.Label("_render()", "horizontal");
 
-  var basicTable = new Plottable.Component.Table([[yAxis, barPlot],
+  var basicTable = new Plottable.Component.Table([[yAxis, areaPlot],
    [null, xAxis],
    [null, label1],
    [null, label2],

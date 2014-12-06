@@ -24,6 +24,8 @@ function run(div, data, Plottable) {
   var areaRenderer = new Plottable.Plot.Area(xScale, yScale)
             .addDataset(dataset)
             .attr("opacity", 0.75)
+            .project("x", "x", xScale)
+            .project("y", "y", yScale)
             .animate(doAnimate);
 
   var areaChart = new Plottable.Component.Table([[yAxis, areaRenderer],

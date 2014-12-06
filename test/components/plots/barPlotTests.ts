@@ -28,6 +28,8 @@ describe("Plots", () => {
         barPlot.animate(false);
         barPlot.baseline(0);
         yScale.domain([-2, 2]);
+        barPlot.project("x", "x", xScale);
+        barPlot.project("y", "y", yScale);
         barPlot.renderTo(svg);
       });
 
@@ -96,7 +98,7 @@ describe("Plots", () => {
         assert.equal(numAttr(bar1, "x"), 300, "bar1 x is correct");
 
         assert.throws(() => barPlot.barAlignment("blargh"), Error);
-        assert.equal(barPlot._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
+        assert.equal((<any> barPlot)._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
         svg.remove();
       });
 
@@ -128,21 +130,6 @@ describe("Plots", () => {
         assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
         assert.equal(bar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
         assert.equal(bar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
-
-        svg.remove();
-      });
-
-      it("shouldn't blow up if members called before the first render", () => {
-        var brandNew = new Plottable.Plot.VerticalBar(xScale, yScale);
-        brandNew.addDataset(dataset);
-
-        assert.isNotNull(brandNew.deselectAll(), "deselects return self");
-        assert.isTrue(brandNew.getBars(0, 0).empty(), "getBars returns empty selection");
-
-        brandNew._anchor(d3.select(document.createElement("svg"))); // calls `_setup()`
-
-        assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
-        assert.isTrue(brandNew.getBars(0, 0).empty(), "getBars returns empty selection after setup");
 
         svg.remove();
       });
@@ -179,6 +166,8 @@ describe("Plots", () => {
         barPlot.animate(false);
         barPlot.baseline(0);
         yScale.domain([-2, 2]);
+        barPlot.project("x", "x", xScale);
+        barPlot.project("y", "y", yScale);
         barPlot.renderTo(svg);
       });
 
@@ -225,6 +214,8 @@ describe("Plots", () => {
         barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
         barPlot.addDataset(dataset);
         barPlot.baseline(0);
+        barPlot.project("x", "x", xScale);
+        barPlot.project("y", "y", yScale);
         barPlot.renderTo(svg);
       });
 
@@ -327,6 +318,8 @@ describe("Plots", () => {
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
+        barPlot.project("x", "x", xScale);
+        barPlot.project("y", "y", yScale);
         barPlot.renderTo(svg);
       });
 
@@ -427,7 +420,9 @@ describe("Plots", () => {
         barPlot.baseline(0);
         barPlot.animate(false);
         var yAxis = new Plottable.Axis.Category(yScale, "left");
-        var table = new Plottable.Component.Table([[yAxis, barPlot]]).renderTo(svg);
+        barPlot.project("x", "x", xScale);
+        barPlot.project("y", "y", yScale);
+        new Plottable.Component.Table([[yAxis, barPlot]]).renderTo(svg);
         axisWidth = yAxis.width();
         bandWidth = yScale.rangeBand();
         xScale.domainer(xScale.domainer().pad(0));
@@ -484,6 +479,8 @@ describe("Plots", () => {
         yScale = new Plottable.Scale.Linear();
         plot = new Plottable.Plot.VerticalBar<string>(xScale, yScale);
         plot.addDataset(dataset);
+        plot.project("x", "x", xScale);
+        plot.project("y", "y", yScale);
       });
 
       it("bar labels disabled by default", () => {
@@ -559,6 +556,8 @@ describe("Plots", () => {
         var xScale = new Plottable.Scale.Ordinal();
         var yScale = new Plottable.Scale.Linear();
         verticalBarPlot = new Plottable.Plot.VerticalBar<string>(xScale, yScale);
+        verticalBarPlot.project("x", "x", xScale);
+        verticalBarPlot.project("y", "y", yScale);
       });
 
       it("getAllBars works in the normal case", () => {

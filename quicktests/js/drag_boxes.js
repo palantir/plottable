@@ -27,8 +27,11 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
 
   var plot1 = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data[0]);
+  plot1.project("x", "x", xScale).project("y", "y", yScale);
   var plot2 = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data[1]);
+  plot2.project("x", "x", xScale).project("y", "y", yScale);
   var plot3 = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data[2]);
+  plot3.project("x", "x", xScale).project("y", "y", yScale);
 
   var table = new Plottable.Component.Table([[plot1, plot2, plot3]]);
 
