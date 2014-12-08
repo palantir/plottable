@@ -270,6 +270,25 @@ describe("Plots", () => {
       svg.remove();
       assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");
     });
+
+    it("extent calculation done in correct dataset order", () => {
+      var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
+      var ordinalScale = new Plottable.Scale.Ordinal();
+      var dataset1 = [{key: "A"}];
+      var dataset2 = [{key: "B"}];
+      var plot = new Plottable.Plot.AbstractPlot()
+                                   .addDataset("b", dataset2)
+                                   .addDataset("a", dataset1);
+      plot.project("key", "key", ordinalScale);
+
+      plot.datasetOrder(["a", "b"]);
+
+      var svg = generateSVG();
+      plot.renderTo(svg);
+
+      assert.deepEqual(ordinalScale.domain(), ["A", "B"], "extent is in the right order");
+      svg.remove();
+    });
   });
 
   describe("Abstract XY Plot", () => {
