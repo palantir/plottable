@@ -38,7 +38,7 @@ export module _Drawer {
       dataElements.exit().remove();
     }
 
-    private filterDefinedData(data: any[], definedFunction: (d: any, i: number) => boolean): any[] {
+    private _filterDefinedData(data: any[], definedFunction: (d: any, i: number) => boolean): any[] {
       return definedFunction ? data.filter(definedFunction) : data;
     }
 
@@ -52,9 +52,9 @@ export module _Drawer {
       });
     }
 
-     public _prepareData(data: any[], drawSteps: AppliedDrawStep[]) {
+    public _prepareData(data: any[], drawSteps: AppliedDrawStep[]) {
       return drawSteps.reduce((data: any[], drawStep: AppliedDrawStep) =>
-              this.filterDefinedData(data, drawStep.attrToProjector["defined"]), super._prepareData(data, drawSteps));
+              this._filterDefinedData(data, drawStep.attrToProjector["defined"]), super._prepareData(data, drawSteps));
     }
   }
 }

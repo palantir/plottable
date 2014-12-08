@@ -31,7 +31,7 @@ export module Plot {
       super._setup();
       this._hoverTarget = this._foregroundContainer.append("circle")
                                                    .classed("hover-target", true)
-                                                   .attr("radius", this._hoverDetectionRadius)
+                                                   .attr("r", this._hoverDetectionRadius)
                                                    .style("visibility", "hidden");
     }
 

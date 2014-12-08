@@ -240,8 +240,11 @@ export module Plot {
     public _updateScaleExtent(attr: string) {
       var projector = this._projections[attr];
       if (projector.scale) {
-        this._key2PlotDatasetKey.forEach((key, pdk) => {
-          var extent = pdk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer, pdk.plotMetadata);
+        this._datasetKeysInOrder.forEach((key) => {
+          var plotDatasetKey = this._key2PlotDatasetKey.get(key);
+          var dataset = plotDatasetKey.dataset;
+          var plotMetadata = plotDatasetKey.plotMetadata;
+          var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
           var scaleKey = this._plottableID.toString() + "_" + key;
           if (extent.length === 0 || !this._isAnchored) {
             projector.scale._removeExtent(scaleKey, attr);
