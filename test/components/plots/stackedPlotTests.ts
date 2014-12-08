@@ -180,37 +180,37 @@ describe("Plots", () => {
       data1 = [
         {x: 1, y: 1},
         {x: 2, y: 2},
-        {x: 3, y: 1}
+        {x: 3, y: 8}
       ];
 
       data2 = [
         {x: 1, y: 2},
-        {x: 2, y: 3},
+        {x: 2, y: 2},
         {x: 3, y: 3}
       ];
     });
 
     it("auto scales correctly on stacked area", () => {
       var plot = new Plottable.Plot.StackedArea(xScale, yScale)
-                               .automaticallyAdjustYScaleOverVisiblePoints(true)
                                .addDataset(data1)
                                .addDataset(data2)
                                .project("x", "x", xScale)
                                .project("y", "y", yScale);
+      (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
       plot.renderTo(svg);
-      assert.deepEqual(yScale.domain(), [0, 5.5], "auto scales takes stacking into account");
+      assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
       svg.remove();
     });
 
     it("auto scales correctly on stacked bar", () => {
-      var plot = new Plottable.Plot.StackedBar(yScale, xScale, false)
-                               .automaticallyAdjustXScaleOverVisiblePoints(true)
+      var plot = new Plottable.Plot.StackedBar(xScale, yScale)
                                .addDataset(data1)
                                .addDataset(data2)
-                               .project("x", "y", yScale)
-                               .project("y", "x", xScale);
+                               .project("x", "x", xScale)
+                               .project("y", "y", yScale);
+      (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
       plot.renderTo(svg);
-      assert.deepEqual(yScale.domain(), [0, 5.125], "auto scales takes stacking into account");
+      assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
       svg.remove();
     });
   });
