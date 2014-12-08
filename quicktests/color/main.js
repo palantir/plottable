@@ -6,24 +6,31 @@ function expandSidebar(){
 
   var content = $(".content");
   var sidebar = $(".sidebar");
+  var controls = $(".controls");
 
   if(sidebar.position().left !== 0){
     sidebar.css("visibility", "visible");
     sidebar.animate({
-      left: 0
+      left: '0%'
     });
     content.animate({
-      left: 300
+      left: '20%',
+    });
+    controls.animate({
+      width: '80%',
     });
   }
   else{
     sidebar.animate({
-      left: -300
+      left: '-20%'
     });
     content.animate({
-      left: 0
+      left: '0'
     }, function(){
       sidebar.css("visibility", "hidden");
+    });
+    controls.animate({
+      width: '100%',
     });
   }
 }
@@ -75,7 +82,8 @@ function setupBindings(){
   }).mousemove(function(e) {
       var mouseX = e.pageX; //Get X coordinates
       var mouseY = e.pageY; //Get Y coordinates
-      $("#help-description").css({ top: mouseY + 20, left: mouseX - 330 });
+      console.log("x: " + mouseX + " y: " + mouseY)
+      $("#help-description").css({ top: mouseY + 20, left: '75%' });
   });
 }
 
