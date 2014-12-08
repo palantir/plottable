@@ -50,7 +50,8 @@ export module Plot {
       super._updateYDomainer();
       var scale = <Scale.AbstractQuantitative<any>> this._yScale;
       if (!scale._userSetDomainer) {
-        scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
+        scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID)
+                        .addIncludedValue(0, "STACKED_AREA_PLOT+" + this._plottableID);
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         scale._autoDomainIfAutomaticMode();
       }
@@ -140,6 +141,10 @@ export module Plot {
 
     public _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
       return AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
+    }
+
+    public _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
+      return AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
     }
     //===== /Stack logic =====
   }

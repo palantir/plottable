@@ -7419,7 +7419,7 @@ var Plottable;
                         else {
                             qscale.domainer().removePaddingException("BAR_PLOT+" + this._plottableID).removeIncludedValue("BAR_PLOT+" + this._plottableID);
                         }
-                        qscale.domainer().pad();
+                        qscale.domainer().pad().nice();
                     }
                     // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     qscale._autoDomainIfAutomaticMode();
@@ -8332,7 +8332,7 @@ var Plottable;
                 _super.prototype._updateYDomainer.call(this);
                 var scale = this._yScale;
                 if (!scale._userSetDomainer) {
-                    scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
+                    scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID).addIncludedValue(0, "STACKED_AREA_PLOT+" + this._plottableID);
                     // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     scale._autoDomainIfAutomaticMode();
                 }
@@ -8406,6 +8406,9 @@ var Plottable;
             };
             StackedArea.prototype._getPlotMetadataForDataset = function (key) {
                 return Plot.AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
+            };
+            StackedArea.prototype._normalizeDatasets = function (fromX) {
+                return Plot.AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
             };
             return StackedArea;
         })(Plot.Area);
