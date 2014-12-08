@@ -7,6 +7,7 @@ test/tests_multifile.js
 local/
 .tscache/
 quicktests/github_token.txt
+quicktests/overlaying/list_of_quicktests.json
 .idea/
 # Emacs
 .#*

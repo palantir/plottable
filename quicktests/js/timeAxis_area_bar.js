@@ -68,16 +68,19 @@ function run(div, data, Plottable) {
 
   var areaPlot = new Plottable.Plot.Area(xScale, yScale1)
       .addDataset(data[0])
-      .project("x", timeFormat, xScale);
+      .project("x", timeFormat, xScale)
+      .project("y", "y", yScale1);
 
   var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale1)
       .addDataset(data[0])
       .project("x", timeFormat, xScale)
+      .project("y", "y", yScale1)
       .project("width", 40)
       .barAlignment("center");
 
   var stackedArea = new Plottable.Plot.StackedArea(xScale, yScale2)
       .project("x", timeFormat, xScale)
+      .project("y", "y", yScale2)
       .project("fill", "type", colorScale)
       .addDataset(data[0])
       .addDataset(data[1])
@@ -87,6 +90,7 @@ function run(div, data, Plottable) {
 
   var stackedBar = new Plottable.Plot.StackedBar(xScale, yScale2)
       .project("x", timeFormat, xScale)
+      .project("y", "y", yScale2)
       .project("fill", "type", colorScale)
       .project("width", 40)
       .addDataset(data[0])

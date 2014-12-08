@@ -2,10 +2,10 @@
 function makeData() {
   "use strict";
   return [
-    {x: "5/2/2014", y: "category4"},
-    {x: "2/24/2017", y: "category3"},
-    {x: "8/8/2020", y: "category2"},
-    {x: "1/23/2025", y: "category1"}
+    {x: "5/2/2014", y: "category1"},
+    {x: "2/24/2017", y: "category2"},
+    {x: "8/8/2020", y: "category3"},
+    {x: "1/23/2025", y: "category4"}
   ];
 }
 
@@ -18,9 +18,10 @@ function run(div, data, Plottable) {
 
   var hBarPlot = new Plottable.Plot.HorizontalBar(xScale, yScale)
     .addDataset(data)
-    .attr("x", function (d) { return d3.time.format("%x").parse(d.x); }, xScale);
+    .attr("x", function (d) { return d3.time.format("%x").parse(d.x); }, xScale)
+    .project("y", "y", yScale);
 
-  var xAxis = new Plottable.Axis.Time(xScale, "bottom", Plottable.Formatters.time());
+  var xAxis = new Plottable.Axis.Time(xScale, "bottom", Plottable.Formatters.multiTime());
   var yAxis = new Plottable.Axis.Category(yScale, "left");
 
   var gridlines = new Plottable.Component.Gridlines(xScale, null);

@@ -33,11 +33,11 @@ export module Interaction {
 
   export class Hover extends Interaction.AbstractInteraction {
     public _componentToListenTo: Hoverable;
-    private dispatcher: Dispatcher.Mouse;
-    private hoverOverCallback: (hoverData: HoverData) => any;
-    private hoverOutCallback: (hoverData: HoverData) => any;
+    private _dispatcher: Dispatcher.Mouse;
+    private _hoverOverCallback: (hoverData: HoverData) => any;
+    private _hoverOutCallback: (hoverData: HoverData) => any;
 
-    private currentHoverData: HoverData = {
+    private _currentHoverData: HoverData = {
       data: null,
       pixelPositions: null,
       selection: null
@@ -45,26 +45,26 @@ export module Interaction {
 
     public _anchor(component: Hoverable, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
-      this.dispatcher = new Dispatcher.Mouse(this._hitBox);
+      this._dispatcher = new Dispatcher.Mouse(this._hitBox);
 
-      this.dispatcher.mouseover((p: Point) => {
+      this._dispatcher.mouseover((p: Point) => {
         this._componentToListenTo._hoverOverComponent(p);
         this.handleHoverOver(p);
       });
 
-      this.dispatcher.mouseout((p: Point) => {
+      this._dispatcher.mouseout((p: Point) => {
         this._componentToListenTo._hoverOutComponent(p);
-        this.safeHoverOut(this.currentHoverData);
-        this.currentHoverData = {
+        this.safeHoverOut(this._currentHoverData);
+        this._currentHoverData = {
           data: null,
           pixelPositions: null,
           selection: null
         };
       });
 
-      this.dispatcher.mousemove((p: Point) => this.handleHoverOver(p));
+      this._dispatcher.mousemove((p: Point) => this.handleHoverOver(p));
 
-      this.dispatcher.connect();
+      this._dispatcher.connect();
     }
 
     /**
@@ -102,10 +102,10 @@ export module Interaction {
     }
 
     private handleHoverOver(p: Point) {
-      var lastHoverData = this.currentHoverData;
+      var lastHoverData = this._currentHoverData;
       var newHoverData = this._componentToListenTo._doHover(p);
 
-      this.currentHoverData = newHoverData;
+      this._currentHoverData = newHoverData;
 
       var outData = Hover.diffHoverData(lastHoverData, newHoverData);
       this.safeHoverOut(outData);
@@ -115,14 +115,14 @@ export module Interaction {
     }
 
     private safeHoverOut(outData: HoverData) {
-      if (this.hoverOutCallback && outData.data) {
-        this.hoverOutCallback(outData);
+      if (this._hoverOutCallback && outData.data) {
+        this._hoverOutCallback(outData);
       }
     }
 
     private safeHoverOver(overData: HoverData) {
-      if (this.hoverOverCallback && overData.data) {
-        this.hoverOverCallback(overData);
+      if (this._hoverOverCallback && overData.data) {
+        this._hoverOverCallback(overData);
       }
     }
 
@@ -134,7 +134,7 @@ export module Interaction {
      * @return {Interaction.Hover} The calling Interaction.Hover.
      */
     public onHoverOver(callback: (hoverData: HoverData) => any) {
-      this.hoverOverCallback = callback;
+      this._hoverOverCallback = callback;
       return this;
     }
 
@@ -146,7 +146,7 @@ export module Interaction {
      * @return {Interaction.Hover} The calling Interaction.Hover.
      */
     public onHoverOut(callback: (hoverData: HoverData) => any) {
-      this.hoverOutCallback = callback;
+      this._hoverOutCallback = callback;
       return this;
     }
 
@@ -157,7 +157,7 @@ export module Interaction {
      *                     the user is currently hovering over.
      */
     public getCurrentHoverData(): HoverData {
-      return this.currentHoverData;
+      return this._currentHoverData;
     }
   }
 }

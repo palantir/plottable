@@ -3,12 +3,13 @@
 module Plottable {
 export module Component {
   export class Label extends AbstractComponent {
-    private textContainer: D3.Selection;
+    private _textContainer: D3.Selection;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
-    private orientation: string;
-    private measurer: _Util.Text.TextMeasurer;
-    private xAlignment: string;
-    private yAlignment: string;
+    private _orientation: string;
+    private _measurer: _Util.Text.TextMeasurer;
+    private _xAlignment: string;
+    private _yAlignment: string;
+    private _padding: number;
 
     /**
      * Creates a Label.
@@ -28,6 +29,7 @@ export module Component {
       this.xAlign("center").yAlign("center");
       this._fixedHeightFlag = true;
       this._fixedWidthFlag = true;
+      this._padding = 0;
     }
 
     /**
@@ -40,7 +42,7 @@ export module Component {
     public xAlign(alignment: string): Label {
       var alignmentLC = alignment.toLowerCase();
       super.xAlign(alignmentLC);
-      this.xAlignment = alignmentLC;
+      this._xAlignment = alignmentLC;
       return this;
     }
 
@@ -54,14 +56,14 @@ export module Component {
     public yAlign(alignment: string): Label {
       var alignmentLC = alignment.toLowerCase();
       super.yAlign(alignmentLC);
-      this.yAlignment = alignmentLC;
+      this._yAlignment = alignmentLC;
       return this;
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var desiredWH = this.measurer(this._text);
-      var desiredWidth  = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height);
-      var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
+      var desiredWH = this._measurer(this._text);
+      var desiredWidth  = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+      var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
       return {
         width : desiredWidth,
@@ -73,8 +75,8 @@ export module Component {
 
     public _setup() {
       super._setup();
-      this.textContainer = this._content.append("g");
-      this.measurer = _Util.Text.getTextMeasurer(this.textContainer.append("text"));
+      this._textContainer = this._content.append("g");
+      this._measurer = _Util.Text.getTextMeasurer(this._textContainer.append("text"));
       this.text(this._text);
     }
 
@@ -117,11 +119,11 @@ export module Component {
     public orient(newOrientation: string): Label;
     public orient(newOrientation?: string): any {
       if (newOrientation == null) {
-        return this.orientation;
+        return this._orientation;
       } else {
         newOrientation = newOrientation.toLowerCase();
         if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
-          this.orientation = newOrientation;
+          this._orientation = newOrientation;
         } else {
           throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
         }
@@ -130,22 +132,55 @@ export module Component {
       }
     }
 
+    /**
+     * Gets the amount of padding in pixels around the Label.
+     *
+     * @returns {number} the current padding amount.
+     */
+    public padding(): number;
+    /**
+     * Sets the amount of padding in pixels around the Label.
+     *
+     * @param {number} padAmount The desired padding amount in pixel values
+     * @returns {Label} The calling Label.
+     */
+    public padding(padAmount: number): Label;
+    public padding(padAmount?: number): any {
+      if (padAmount == null) {
+        return this._padding;
+      } else {
+        padAmount = +padAmount;
+        if (padAmount < 0) {
+          throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
+        }
+        this._padding = padAmount;
+        this._invalidateLayout();
+        return this;
+      }
+    }
+
     public _doRender() {
       super._doRender();
-      this.textContainer.text("");
-      var dimension = this.orientation === "horizontal" ? this.width() : this.height();
-      var truncatedText = _Util.Text.getTruncatedText(this._text, dimension, this.measurer);
-      if (this.orientation === "horizontal") {
-        _Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.width(), this.height(),
-                                        this.xAlignment, this.yAlignment);
+      var textMeasurement = this._measurer(this._text);
+      var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
+      var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
+      this._textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
+      this._textContainer.text("");
+      var dimension = this.orient() === "horizontal" ? this.width() : this.height();
+      var truncatedText = _Util.Text.getTruncatedText(this._text, dimension, this._measurer);
+      var writeWidth = this.width() - 2 * widthPadding;
+      var writeHeight = this.height() - 2 * heightPadding;
+      if (this.orient() === "horizontal") {
+        _Util.Text.writeLineHorizontally(truncatedText, this._textContainer, writeWidth, writeHeight,
+                                        this._xAlignment, this._yAlignment);
       } else {
-        _Util.Text.writeLineVertically(truncatedText, this.textContainer, this.width(), this.height(),
-                                        this.xAlignment, this.yAlignment, this.orientation);
+        _Util.Text.writeLineVertically(truncatedText, this._textContainer, writeWidth, writeHeight,
+                                        this._xAlignment, this._yAlignment, this.orient());
       }
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-      this.measurer = _Util.Text.getTextMeasurer(this.textContainer.append("text")); // reset it in case fonts have changed
+      this._measurer = _Util.Text.getTextMeasurer(this._textContainer.append("text")); // reset it in case fonts have changed
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       return this;
     }

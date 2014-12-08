@@ -15,6 +15,7 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data);
+  scatterPlot.project("x", "x", xScale).project("y", "y", yScale);
   var explanation = new Plottable.Component.TitleLabel("Press 'a' to reset domain");
 
   var basicTable = new Plottable.Component.Table([[null, explanation],

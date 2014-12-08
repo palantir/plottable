@@ -9,5 +9,6 @@ function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
   new Plottable.Plot.Pie()
                     .addDataset(data)
+                    .project("value", "value")
                     .renderTo(svg);
 }

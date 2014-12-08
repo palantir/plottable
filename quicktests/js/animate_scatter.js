@@ -23,6 +23,8 @@ function run(div, data, Plottable) {
                 .addDataset(d1)
                 .addDataset(d2)
                 .attr("r", 8)
+                .project("x", "x", xScale)
+                .project("y", "y", yScale)
                 .attr("opacity", 0.75)
                 .animate(doAnimate);
 

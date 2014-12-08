@@ -7,8 +7,8 @@ export module _Drawer {
   export class Rect extends Element {
     public _someLabelsTooWide = false;
     public _isVertical: boolean;
-    private textArea: D3.Selection;
-    private measurer: _Util.Text.TextMeasurer;
+    private _textArea: D3.Selection;
+    private _measurer: _Util.Text.TextMeasurer;
 
     constructor(key: string, isVertical: boolean) {
       super(key);
@@ -19,24 +19,24 @@ export module _Drawer {
     public setup(area: D3.Selection) {
       // need to put the bars in a seperate container so we can ensure that they don't cover labels
       super.setup(area.append("g").classed("bar-area", true));
-      this.textArea = area.append("g").classed("bar-label-text-area", true);
-      this.measurer = new _Util.Text.CachingCharacterMeasurer(this.textArea.append("text")).measure;
+      this._textArea = area.append("g").classed("bar-label-text-area", true);
+      this._measurer = new _Util.Text.CachingCharacterMeasurer(this._textArea.append("text")).measure;
     }
 
     public removeLabels() {
-      this.textArea.selectAll("g").remove();
+      this._textArea.selectAll("g").remove();
     }
 
-    public drawText(data: any[], attrToProjector: AttributeToProjector) {
+    public drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata) {
       var labelTooWide: boolean[] = data.map((d, i) => {
-        var text = attrToProjector["label"](d, i).toString();
-        var w = attrToProjector["width"](d, i);
-        var h = attrToProjector["height"](d, i);
-        var x = attrToProjector["x"](d, i);
-        var y = attrToProjector["y"](d, i);
-        var positive = attrToProjector["positive"](d, i);
-        var measurement = this.measurer(text);
-        var color = attrToProjector["fill"](d, i);
+        var text = attrToProjector["label"](d, i, userMetadata, plotMetadata).toString();
+        var w = attrToProjector["width"](d, i, userMetadata, plotMetadata);
+        var h = attrToProjector["height"](d, i, userMetadata, plotMetadata);
+        var x = attrToProjector["x"](d, i, userMetadata, plotMetadata);
+        var y = attrToProjector["y"](d, i, userMetadata, plotMetadata);
+        var positive = attrToProjector["positive"](d, i, userMetadata, plotMetadata);
+        var measurement = this._measurer(text);
+        var color = attrToProjector["fill"](d, i, userMetadata, plotMetadata);
         var dark = _Util.Color.contrast("white", color) * 1.6 < _Util.Color.contrast("black", color);
         var primary = this._isVertical ? h : w;
         var primarySpace = this._isVertical ? measurement.height : measurement.width;
@@ -53,7 +53,7 @@ export module _Drawer {
             x += offset;
           }
 
-          var g = this.textArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+          var g = this._textArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
           var className = dark ? "dark-label" : "light-label";
           g.classed(className, true);
           var xAlign: string;

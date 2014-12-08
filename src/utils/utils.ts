@@ -83,21 +83,6 @@ export module _Util {
     }
 
     /**
-     * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata.
-     * Temporarily always grabs the metadata of the first dataset.
-     * HACKHACK #1089 - The accessor currently only grabs the first dataset's metadata
-     */
-    export function _applyAccessor(accessor: _Accessor, plot: Plot.AbstractPlot) {
-      var activatedAccessor = accessorize(accessor);
-      return (d: any, i: number) => {
-        var datasets = plot.datasets();
-        var dataset = datasets.length > 0 ? datasets[0] : null;
-        var metadata = dataset ? dataset.metadata() : null;
-        return activatedAccessor(d, i, metadata);
-      };
-    }
-
-    /**
      * Takes two sets and returns the union
      *
      * Due to the fact that D3.Sets store strings internally, return type is always a string set
@@ -292,6 +277,72 @@ export module _Util {
       } else {
         return window.setTimeout(f, time, args);
       }
+    }
+
+    export function colorTest(colorTester: D3.Selection, className: string) {
+      colorTester.classed(className, true);
+      // Use regex to get the text inside the rgb parentheses
+      var colorStyle = colorTester.style("background-color");
+      if (colorStyle === "transparent") {
+        return null;
+      }
+      var rgb = /\((.+)\)/.exec(colorStyle)[1]
+                          .split(",")
+                          .map((colorValue: string) => {
+                            var colorNumber = +colorValue;
+                            var hexValue = colorNumber.toString(16);
+                            return colorNumber < 16 ? "0" + hexValue : hexValue;
+                          });
+      if (rgb.length === 4 && rgb[3] === "00") {
+        return null;
+      }
+      var hexCode = "#" + rgb.join("");
+      colorTester.classed(className, false);
+      return hexCode;
+    }
+
+    // Code adapted from https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+    export function lightenColor(color: string, factor: number, lightenAmount: number) {
+      var r = parseInt(color.substring(1, 3), 16);
+      var g = parseInt(color.substring(3, 5), 16);
+      var b = parseInt(color.substring(5, 7), 16);
+
+      var hsl = _Util.Color.rgbToHsl(r, g, b);
+
+      var newL = Math.min(hsl[2] + lightenAmount * factor, 1);
+
+      var newRgb = _Util.Color.hslToRgb(hsl[0], hsl[1], newL);
+      var rHex = newRgb[0].toString(16);
+      var gHex = newRgb[1].toString(16);
+      var bHex = newRgb[2].toString(16);
+
+      rHex = rHex.length < 2 ? "0" + rHex : rHex;
+      gHex = gHex.length < 2 ? "0" + gHex : gHex;
+      bHex = bHex.length < 2 ? "0" + bHex : bHex;
+
+      return "#" + rHex + gHex + bHex;
+    }
+
+    // Code adapted from https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+    export function darkenColor(color: string, factor: number, darkenAmount: number) {
+      var r = parseInt(color.substring(1, 3), 16);
+      var g = parseInt(color.substring(3, 5), 16);
+      var b = parseInt(color.substring(5, 7), 16);
+
+      var hsl = _Util.Color.rgbToHsl(r, g, b);
+
+      var newL = Math.max(hsl[2] - darkenAmount * factor, 0);
+
+      var newRgb = _Util.Color.hslToRgb(hsl[0], hsl[1], newL);
+      var rHex = newRgb[0].toString(16);
+      var gHex = newRgb[1].toString(16);
+      var bHex = newRgb[2].toString(16);
+
+      rHex = rHex.length < 2 ? "0" + rHex : rHex;
+      gHex = gHex.length < 2 ? "0" + gHex : gHex;
+      bHex = bHex.length < 2 ? "0" + bHex : bHex;
+
+      return "#" + rHex + gHex + bHex;
     }
   }
 }

@@ -257,10 +257,20 @@
   {
     "name":"domain_adjustment_algorithm",
     "categories":["Linear Scale", "Numeric Axis", "Line Plot", "Adjustment", "Layout"]
-  }, 
+  },
+
+  {
+    "name": "drag_boxes",
+    "categories": ["Interaction", "Drag Box"]
+  },
 
   {
     "name":"tick_generator",
     "categories":["Linear Scale", "Tick Generation", "Line Plot"]
+  },
+
+  {
+    "name":"metdata",
+    "categories":["Color Scale", "User metadata", "Line Plot", "Plot metadata"]
   }
 ]

@@ -42,6 +42,8 @@ function run(div, data, Plottable) {
                                     .attr("r", widthProjector)
                                     .attr("fill", colorProjector)
                                     .attr("opacity", opacityProjector)
+                                    .project("x", "x", xScale)
+                                    .project("y", "y", yScale)
                                     .animate(true);
 
     //title + legend

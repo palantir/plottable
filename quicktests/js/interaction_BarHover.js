@@ -14,9 +14,11 @@ function run(div, data, Plottable) {
   var title = new Plottable.Component.TitleLabel("Hover over bars");
   var colorScale = new Plottable.Scale.Color();
 
+  var ds = new Plottable.Dataset(data, { foo: "!" });
+
   var plot = new Plottable.Plot.VerticalBar(xScale, yScale)
-    .addDataset(data)
-    .project("x", "name", xScale)
+    .addDataset(ds)
+    .project("x", function (d, i, u) { return d.name + u.foo; }, xScale)
     .project("y", "y", yScale)
     .project("fill", "name", colorScale);
 
@@ -28,16 +30,16 @@ function run(div, data, Plottable) {
   chart.renderTo(svg);
 
   //callbacks
-  var hoverHandler = function(datum, bar) {
-      title.text(datum.name);
+  var hoverHandler = function(hoverData) {
+      title.text(hoverData.data[0].name);
   };
-  var unhoverHandler = function(datum, bar) {
+  var unhoverHandler = function(hoverData) {
       title.text("Who?");
   };
 
   //registering interaction
-  var bhi = new Plottable.Interaction.BarHover()
-        .onHover(hoverHandler)
-        .onUnhover(unhoverHandler);
+  var bhi = new Plottable.Interaction.Hover()
+        .onHoverOver(hoverHandler)
+        .onHoverOut(unhoverHandler);
   plot.registerInteraction(bhi);
 }

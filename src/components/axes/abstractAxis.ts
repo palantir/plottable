@@ -19,8 +19,8 @@ export module Axis {
     public _tickLabelContainer: D3.Selection;
     public _baseline: D3.Selection;
     public _scale: Scale.AbstractScale<any, number>;
-    public _formatter: Formatter;
-    public _orientation: string;
+    private _formatter: Formatter;
+    private _orientation: string;
     public _computedWidth: number;
     public _computedHeight: number;
     private _endTickLength = 5;

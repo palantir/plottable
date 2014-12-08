@@ -173,4 +173,42 @@ describe("_Util.Methods", () => {
     range = Plottable._Util.Methods.range(0.6, 2.2, 0.5);
     assert.deepEqual(range, [0.6, 1.1, 1.6, 2.1], "all entries has been generated with float step");
   });
+
+  it("colorTest works as expected", () => {
+    var colorTester = d3.select("body").append("div").classed("color-tester", true);
+    var style = colorTester.append("style");
+    style.attr("type", "text/css");
+
+    style.text(".plottable-colors-0 { background-color: blue; }");
+    var blueHexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-0");
+    assert.strictEqual(blueHexcode, "#0000ff", "hexcode for blue returned");
+
+    style.text(".plottable-colors-2 { background-color: #13EADF; }");
+    var hexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-2");
+    assert.strictEqual(hexcode, "#13eadf", "hexcode for blue returned");
+
+    var nullHexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-11");
+    assert.strictEqual(nullHexcode, null, "null hexcode returned");
+    colorTester.remove();
+  });
+
+  it("lightenColor()", () => {
+    var color = "#12fced";
+    var lightenedColor = Plottable._Util.Methods.lightenColor(color, 1, 0.1);
+    var lColor = Plottable._Util.Color.rgbToHsl(parseInt("12", 16), parseInt("fc", 16), parseInt("ed", 16))[2];
+    var lLightenedColor = Plottable._Util.Color.rgbToHsl(parseInt(lightenedColor.substring(1, 3), 16),
+                                                         parseInt(lightenedColor.substring(3, 5), 16),
+                                                         parseInt(lightenedColor.substring(5, 7), 16))[2];
+    assert.operator(lLightenedColor, ">", lColor, "color got lighter");
+  });
+
+  it("darkenColor()", () => {
+    var color = "#12fced";
+    var darkenedColor = Plottable._Util.Methods.darkenColor(color, 1, 0.1);
+    var lColor = Plottable._Util.Color.rgbToHsl(parseInt("12", 16), parseInt("fc", 16), parseInt("ed", 16))[2];
+    var lDarkenedColor = Plottable._Util.Color.rgbToHsl(parseInt(darkenedColor.substring(1, 3), 16),
+                                                         parseInt(darkenedColor.substring(3, 5), 16),
+                                                         parseInt(darkenedColor.substring(5, 7), 16))[2];
+    assert.operator(lDarkenedColor, "<", lColor, "color got darker");
+  });
 });

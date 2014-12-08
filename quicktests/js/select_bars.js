@@ -20,6 +20,7 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale).addDataset(dataseries);
+  barPlot.project("x", "x", xScale).project("y", "y", yScale);
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var renderGroup = gridlines.merge(barPlot);
   var title = new Plottable.Component.TitleLabel("reset");
@@ -30,21 +31,22 @@ function run(div, data, Plottable) {
                                             [null,  xAxis]]).renderTo(svg);
 
   //callbacks
-  var dragBox = new Plottable.Interaction.XYDragBox();
+  var dragBox = new Plottable.Interaction.XYDragBox().resizeEnabled(true);
   var cb_drag = function(start, end) {
     var minX = Math.min(start.x, end.x);
     var maxX = Math.max(start.x, end.x);
     var minY = Math.min(start.y, end.y);
     var maxY = Math.max(start.y, end.y);
 
-    barPlot.selectBar({min: minX, max: maxX},
-                      {min: minY, max: maxY},
-                      true);
+    var bars = barPlot.getBars({min: minX, max: maxX},
+                      {min: minY, max: maxY}).classed("selected", true);
+    title.text(String(bars[0].length));
   };
   dragBox.dragend(cb_drag);
 
   var cb_click = function(p) {
-      barPlot.selectBar(p.x, p.y, true);
+    var bars = barPlot.getBars(p.x, p.y).classed("selected", true);
+    title.text(String(bars[0].length));
   };
 
   var cb_reset = function() {
