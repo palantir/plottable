@@ -2239,7 +2239,6 @@ declare module Plottable {
             _computeHeight(): number;
             _setup(): void;
             _getTickValues(): any[];
-            _measureTextHeight(): number;
             _doRender(): Time;
         }
     }

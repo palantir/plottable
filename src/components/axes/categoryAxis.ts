@@ -4,7 +4,7 @@ module Plottable {
 export module Axis {
   export class Category extends AbstractAxis {
     private _tickLabelAngle = 0;
-    private _measurer: _Util.Text.CachingCharacterMeasurer;
+    private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
 
     /**
      * Constructs a CategoryAxis.
@@ -25,7 +25,7 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this._measurer = new _Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
+      this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
     }
 
     public _rescale() {
@@ -191,7 +191,7 @@ export module Axis {
       // When anyone calls _invalidateLayout, _computeLayout will be called
       // on everyone, including this. Since CSS or something might have
       // affected the size of the characters, clear the cache.
-      this._measurer.clear();
+      this._measurer.reset();
       return super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
     }
   }

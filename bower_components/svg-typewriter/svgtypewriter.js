@@ -1,7 +1,7 @@
 /*!
-SVG Typewriter 0.1.0 (https://github.com/palantir/svg-typewriter)
+SVG Typewriter 0.1.2 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
-Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/master/LICENSE)
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
 */
 
 ///<reference path="../reference.ts" />
@@ -944,6 +944,9 @@ var SVGTypewriter;
             };
             CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
                 return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
             };
             return CacheCharacterMeasurer;
         })(Measurers.CharacterMeasurer);

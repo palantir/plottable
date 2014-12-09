@@ -205,5 +205,6 @@ declare module SVGTypewriter.Measurers {
         constructor(area: D3.Selection, className?: string);
         _measureCharacterNotFromCache(c: string): Dimensions;
         _measureCharacter(c: string): Dimensions;
+        reset(): void;
     }
 }
