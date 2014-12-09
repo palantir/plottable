@@ -16,7 +16,7 @@ export module _Drawer {
     }
 
     private _getDrawSelection() {
-      return this._renderArea.selectAll(this._svgElement);
+      return this._getRenderArea().selectAll(this._svgElement);
     }
 
     public _drawStep(step: AppliedDrawStep) {

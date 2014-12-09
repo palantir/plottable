@@ -225,7 +225,7 @@ var MockDrawer = (function (_super) {
         _super.apply(this, arguments);
     }
     MockDrawer.prototype._drawStep = function (step) {
-        step.animator.animate(this._renderArea, step.attrToProjector);
+        step.animator.animate(this._getRenderArea(), step.attrToProjector);
     };
     return MockDrawer;
 })(Plottable._Drawer.AbstractDrawer);
