@@ -2854,7 +2854,7 @@ var Plottable;
                 _super.call(this, scale == null ? d3.time.scale() : scale);
                 this._typeCoercer = function (d) { return d && d._isAMomentObject || d instanceof Date ? d : new Date(d); };
             }
-            Time.prototype._tickInterval = function (interval, step) {
+            Time.prototype.tickInterval = function (interval, step) {
                 // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
                 var tempScale = d3.time.scale();
                 tempScale.domain(this.domain());
@@ -4809,7 +4809,7 @@ var Plottable;
                 this.measurer = Plottable._Util.Text.getTextMeasurer(this.tierLabelContainers[0].append("text"));
             };
             Time.prototype.getTickIntervalValues = function (config) {
-                return this._scale._tickInterval(config.interval, config.step);
+                return this._scale.tickInterval(config.interval, config.step);
             };
             Time.prototype._getTickValues = function () {
                 var _this = this;
@@ -4823,7 +4823,7 @@ var Plottable;
             };
             Time.prototype.renderTierLabels = function (container, config, height) {
                 var _this = this;
-                var tickPos = this._scale._tickInterval(config.interval, config.step);
+                var tickPos = this._scale.tickInterval(config.interval, config.step);
                 tickPos.splice(0, 0, this._scale.domain()[0]);
                 tickPos.push(this._scale.domain()[1]);
                 var shouldCenterText = config.step === 1;
