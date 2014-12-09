@@ -5658,7 +5658,7 @@ var Plottable;
                 }
                 this._scale = colorScale;
                 this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
-                this.xAlign("left").yAlign("center");
+                this.xAlign("right").yAlign("top");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
             }
