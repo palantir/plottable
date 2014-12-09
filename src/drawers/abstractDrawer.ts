@@ -18,7 +18,7 @@ export module _Drawer {
   }
 
   export class AbstractDrawer {
-    public _renderArea: D3.Selection;
+    private _renderArea: D3.Selection;
     public _className: string;
     public key: string;
 
@@ -50,8 +50,8 @@ export module _Drawer {
      * Removes the Drawer and its renderArea
      */
     public remove() {
-      if (this._renderArea != null) {
-        this._renderArea.remove();
+      if (this.renderArea() != null) {
+        this.renderArea().remove();
       }
     }
 
@@ -129,6 +129,14 @@ export module _Drawer {
       return delay;
     }
 
+    /**
+     * Retrieves the renderArea selection for the drawer
+     *
+     * @returns {D3.Selection} the renderArea selection
+     */
+    public renderArea(): D3.Selection {
+      return this._renderArea;
+    }
 
   }
 }

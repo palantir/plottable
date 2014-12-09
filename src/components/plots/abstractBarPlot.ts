@@ -187,7 +187,7 @@ export module Plot {
 
       // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
       this._getDrawersInOrder().forEach((d) => {
-        d._renderArea.selectAll("rect").each(function(d: any) {
+        d.renderArea().selectAll("rect").each(function(d: any) {
           var bbox = this.getBBox();
           if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
               bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
@@ -205,7 +205,7 @@ export module Plot {
      */
     public deselectAll() {
       if (this._isSetup) {
-        this._getDrawersInOrder().forEach((d) => d._renderArea.selectAll("rect").classed("selected", false));
+        this._getDrawersInOrder().forEach((d) => d.renderArea().selectAll("rect").classed("selected", false));
       }
       return this;
     }
@@ -434,7 +434,7 @@ export module Plot {
 
     private _clearHoverSelection() {
       this._getDrawersInOrder().forEach((d, i) => {
-        d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
+        d.renderArea().selectAll("rect").classed("not-hovered hovered", false);
       });
     }
 
@@ -463,7 +463,7 @@ export module Plot {
 
       if (!bars.empty()) {
         this._getDrawersInOrder().forEach((d, i) => {
-          d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
+          d.renderArea().selectAll("rect").classed({ "hovered": false, "not-hovered": true });
         });
         bars.classed({ "hovered": true, "not-hovered": false });
       } else {
