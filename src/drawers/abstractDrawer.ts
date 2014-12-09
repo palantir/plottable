@@ -73,7 +73,7 @@ export module _Drawer {
       // no-op
     }
 
-    public _numberOfAnimationIterations(data: any[]): number {
+    protected _numberOfAnimationIterations(data: any[]): number {
       return data.length;
     }
 
@@ -89,11 +89,11 @@ export module _Drawer {
       return modifiedAttrToProjector;
     }
 
-    public _prepareDrawSteps(drawSteps: AppliedDrawStep[]) {
+    protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]) {
       // no-op
     }
 
-    public _prepareData(data: any[], drawSteps: AppliedDrawStep[]) {
+    protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]) {
       return data;
     }
 

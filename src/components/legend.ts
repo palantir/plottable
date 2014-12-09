@@ -224,7 +224,7 @@ export module Component {
         .attr("cx", textHeight / 2)
         .attr("cy", textHeight / 2)
         .attr("r",  r)
-        .attr("fill", this.colorScale._d3Scale);
+        .attr("fill", (d: any) => this.colorScale.scale(d));
       legend.selectAll("g.text-container")
         .text("")
         .attr("transform", "translate(" + textHeight + ", 0)")

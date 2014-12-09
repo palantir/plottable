@@ -3,7 +3,7 @@
 module Plottable {
 export module Scale {
   export class AbstractScale<D,R> extends Core.PlottableObject implements Core.Listenable {
-    public _d3Scale: D3.Scale.Scale;
+    protected _d3Scale: D3.Scale.Scale;
     public _autoDomainAutomatically = true;
     public broadcaster: Core.Broadcaster;
     public _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
@@ -25,11 +25,11 @@ export module Scale {
       this.broadcaster = new Core.Broadcaster(this);
     }
 
-    public _getAllExtents(): D[][] {
+    protected _getAllExtents(): D[][] {
       return d3.values(this._rendererAttrID2Extent);
     }
 
-    public _getExtent(): D[] {
+    protected _getExtent(): D[] {
       return []; // this should be overwritten
     }
 
@@ -97,11 +97,11 @@ export module Scale {
       }
     }
 
-    public _getDomain() {
+    protected _getDomain() {
       return this._d3Scale.domain();
     }
 
-    public _setDomain(values: D[]) {
+    protected _setDomain(values: D[]) {
       if(!this._domainModificationInProgress) {
         this._domainModificationInProgress = true;
         this._d3Scale.domain(values);

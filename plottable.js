@@ -5623,6 +5623,7 @@ var Plottable;
                 return textHeight;
             };
             Legend.prototype._doRender = function () {
+                var _this = this;
                 _super.prototype._doRender.call(this);
                 var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
                 var textHeight = this.measureTextHeight();
@@ -5636,7 +5637,7 @@ var Plottable;
                 legendEnter.append("circle");
                 legendEnter.append("g").classed("text-container", true);
                 legend.exit().remove();
-                legend.selectAll("circle").attr("cx", textHeight / 2).attr("cy", textHeight / 2).attr("r", r).attr("fill", this.colorScale._d3Scale);
+                legend.selectAll("circle").attr("cx", textHeight / 2).attr("cy", textHeight / 2).attr("r", r).attr("fill", function (d) { return _this.colorScale.scale(d); });
                 legend.selectAll("g.text-container").text("").attr("transform", "translate(" + textHeight + ", 0)").each(function (d) {
                     var d3this = d3.select(this);
                     var measure = Plottable._Util.Text.getTextMeasurer(d3this.append("text"));

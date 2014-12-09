@@ -1024,7 +1024,7 @@ declare module Plottable {
 declare module Plottable {
     module Scale {
         class AbstractScale<D, R> extends Core.PlottableObject implements Core.Listenable {
-            _d3Scale: D3.Scale.Scale;
+            protected _d3Scale: D3.Scale.Scale;
             _autoDomainAutomatically: boolean;
             broadcaster: Core.Broadcaster;
             _rendererAttrID2Extent: {
@@ -1043,8 +1043,8 @@ declare module Plottable {
              * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
              */
             constructor(scale: D3.Scale.Scale);
-            _getAllExtents(): D[][];
-            _getExtent(): D[];
+            protected _getAllExtents(): D[][];
+            protected _getExtent(): D[];
             /**
              * Modifies the domain on the scale so that it includes the extent of all
              * perspectives it depends on. This will normally happen automatically, but
@@ -1086,8 +1086,8 @@ declare module Plottable {
              * @returns {Scale} The calling Scale.
              */
             domain(values: D[]): AbstractScale<D, R>;
-            _getDomain(): any[];
-            _setDomain(values: D[]): void;
+            protected _getDomain(): any[];
+            protected _setDomain(values: D[]): void;
             /**
              * Gets the range.
              *
@@ -1170,7 +1170,7 @@ declare module Plottable {
             copy(): AbstractQuantitative<D>;
             domain(): D[];
             domain(values: D[]): AbstractQuantitative<D>;
-            _setDomain(values: D[]): void;
+            protected _setDomain(values: D[]): void;
             /**
              * Sets or gets the QuantitativeScale's output interpolator
              *
@@ -1350,8 +1350,8 @@ declare module Plottable {
             constructor(base?: number);
             scale(x: number): number;
             invert(x: number): number;
-            _getDomain(): number[];
-            _setDomain(values: number[]): void;
+            protected _getDomain(): number[];
+            protected _setDomain(values: number[]): void;
             ticks(count?: number): number[];
             copy(): ModifiedLog;
             _niceDomain(domain: any[], count?: number): any[];
@@ -1379,7 +1379,7 @@ declare module Plottable {
 declare module Plottable {
     module Scale {
         class Ordinal extends AbstractScale<string, number> {
-            _d3Scale: D3.Scale.OrdinalScale;
+            protected _d3Scale: D3.Scale.OrdinalScale;
             _typeCoercer: (d: any) => any;
             /**
              * Creates an OrdinalScale.
@@ -1393,7 +1393,7 @@ declare module Plottable {
             _getExtent(): string[];
             domain(): string[];
             domain(values: string[]): Ordinal;
-            _setDomain(values: string[]): void;
+            protected _setDomain(values: string[]): void;
             range(): number[];
             range(values: number[]): Ordinal;
             /**
@@ -1462,7 +1462,7 @@ declare module Plottable {
             constructor();
             constructor(scale: D3.Scale.LinearScale);
             _tickInterval(interval: D3.Time.Interval, step?: number): any[];
-            _setDomain(values: any[]): void;
+            protected _setDomain(values: any[]): void;
             copy(): Time;
             _defaultExtent(): any[];
         }
@@ -1623,9 +1623,9 @@ declare module Plottable {
              * @param{AppliedDrawStep} step The step, how data should be drawn.
              */
             _drawStep(step: AppliedDrawStep): void;
-            _numberOfAnimationIterations(data: any[]): number;
-            _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
-            _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
+            protected _numberOfAnimationIterations(data: any[]): number;
+            protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
+            protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             /**
              * Draws the data into the renderArea using the spefic steps and metadata
              *
@@ -1651,7 +1651,7 @@ declare module Plottable {
         class Line extends AbstractDrawer {
             _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
-            _numberOfAnimationIterations(data: any[]): number;
+            protected _numberOfAnimationIterations(data: any[]): number;
             _drawStep(step: AppliedDrawStep): void;
         }
     }
@@ -1688,8 +1688,8 @@ declare module Plottable {
             _getDrawSelection(): D3.Selection;
             _drawStep(step: AppliedDrawStep): void;
             _enterData(data: any[]): void;
-            _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
-            _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
+            protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
+            protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
         }
     }
 }
@@ -3503,8 +3503,8 @@ declare module Plottable {
 declare module Plottable {
     module Dispatcher {
         class AbstractDispatcher extends Core.PlottableObject {
-            _target: D3.Selection;
-            _event2Callback: {
+            protected _target: D3.Selection;
+            protected _event2Callback: {
                 [x: string]: () => any;
             };
             /**
@@ -3530,7 +3530,7 @@ declare module Plottable {
             /**
              * Gets a namespaced version of the event name.
              */
-            _getEventString(eventName: string): string;
+            protected _getEventString(eventName: string): string;
             /**
              * Attaches the Dispatcher's listeners to the Dispatcher's target element.
              *
