@@ -3340,6 +3340,7 @@ var Plottable;
                     _super.prototype._enterData.call(this, data);
                 }
                 else {
+                    // HACKHACK Forced to use anycast to access protected var
                     _Drawer.AbstractDrawer.prototype._enterData.call(this, data);
                 }
                 this.areaSelection.datum(data);
@@ -3373,6 +3374,7 @@ var Plottable;
                     _super.prototype._drawStep.call(this, step);
                 }
                 else {
+                    // HACKHACK Forced to use anycast to access protected var
                     _Drawer.AbstractDrawer.prototype._drawStep.call(this, step);
                 }
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);

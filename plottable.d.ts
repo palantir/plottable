@@ -1617,13 +1617,13 @@ declare module Plottable {
              *
              * @param{any[]} data The data to be drawn
              */
-            _enterData(data: any[]): void;
+            protected _enterData(data: any[]): void;
             /**
              * Draws data using one step
              *
              * @param{AppliedDrawStep} step The step, how data should be drawn.
              */
-            _drawStep(step: AppliedDrawStep): void;
+            protected _drawStep(step: AppliedDrawStep): void;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
