@@ -3190,8 +3190,8 @@ var Plottable;
              * Removes the Drawer and its renderArea
              */
             AbstractDrawer.prototype.remove = function () {
-                if (this._renderArea != null) {
-                    this._renderArea.remove();
+                if (this._getRenderArea() != null) {
+                    this._getRenderArea().remove();
                 }
             };
             /**
@@ -3252,6 +3252,14 @@ var Plottable;
                     delay += drawStep.animator.getTiming(numberOfIterations);
                 });
                 return delay;
+            };
+            /**
+             * Retrieves the renderArea selection for the drawer
+             *
+             * @returns {D3.Selection} the renderArea selection
+             */
+            AbstractDrawer.prototype._getRenderArea = function () {
+                return this._renderArea;
             };
             return AbstractDrawer;
         })();
@@ -3426,7 +3434,7 @@ var Plottable;
                 return this;
             };
             Element.prototype._getDrawSelection = function () {
-                return this._renderArea.selectAll(this._svgElement);
+                return this._getRenderArea().selectAll(this._svgElement);
             };
             Element.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
@@ -6975,7 +6983,7 @@ var Plottable;
                 var closestIndex;
                 var minDistSq = range * range;
                 drawers.forEach(function (drawer) {
-                    drawer._renderArea.selectAll("circle").each(function (d, i) {
+                    drawer._getRenderArea().selectAll("circle").each(function (d, i) {
                         var distSq = getDistSq(d, i);
                         var r = attrToProjector["r"](d, i, null, null);
                         if (distSq < r * r) {
@@ -7222,7 +7230,7 @@ var Plottable;
                 var tolerance = 0.5;
                 // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
                 this._getDrawersInOrder().forEach(function (d) {
-                    d._renderArea.selectAll("rect").each(function (d) {
+                    d._getRenderArea().selectAll("rect").each(function (d) {
                         var bbox = this.getBBox();
                         if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
                             bars.push(this);
@@ -7237,7 +7245,7 @@ var Plottable;
              */
             AbstractBarPlot.prototype.deselectAll = function () {
                 if (this._isSetup) {
-                    this._getDrawersInOrder().forEach(function (d) { return d._renderArea.selectAll("rect").classed("selected", false); });
+                    this._getDrawersInOrder().forEach(function (d) { return d._getRenderArea().selectAll("rect").classed("selected", false); });
                 }
                 return this;
             };
@@ -7423,7 +7431,7 @@ var Plottable;
             };
             AbstractBarPlot.prototype._clearHoverSelection = function () {
                 this._getDrawersInOrder().forEach(function (d, i) {
-                    d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
+                    d._getRenderArea().selectAll("rect").classed("not-hovered hovered", false);
                 });
             };
             //===== Hover logic =====
@@ -7450,7 +7458,7 @@ var Plottable;
                 var bars = this.getBars(xPositionOrExtent, yPositionOrExtent);
                 if (!bars.empty()) {
                     this._getDrawersInOrder().forEach(function (d, i) {
-                        d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
+                        d._getRenderArea().selectAll("rect").classed({ "hovered": false, "not-hovered": true });
                     });
                     bars.classed({ "hovered": true, "not-hovered": false });
                 }

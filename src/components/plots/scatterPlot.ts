@@ -80,7 +80,7 @@ export module Plot {
       var minDistSq = range * range;
 
       drawers.forEach((drawer) => {
-        drawer._renderArea.selectAll("circle").each(function (d, i) {
+        drawer._getRenderArea().selectAll("circle").each(function (d, i) {
           var distSq = getDistSq(d, i);
           var r = attrToProjector["r"](d, i, null, null);
 

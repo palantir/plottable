@@ -1591,7 +1591,6 @@ declare module Plottable {
             animator: Animator.PlotAnimator;
         }
         class AbstractDrawer {
-            _renderArea: D3.Selection;
             protected _className: string;
             key: string;
             /**
@@ -1636,6 +1635,12 @@ declare module Plottable {
              * @param{any} plotMetadata The metadata provided by plot
              */
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
+            /**
+             * Retrieves the renderArea selection for the drawer
+             *
+             * @returns {D3.Selection} the renderArea selection
+             */
+            _getRenderArea(): D3.Selection;
         }
     }
 }
