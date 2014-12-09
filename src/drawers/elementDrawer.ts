@@ -3,7 +3,7 @@
 module Plottable {
 export module _Drawer {
   export class Element extends AbstractDrawer {
-    public _svgElement: string;
+    protected _svgElement: string;
 
     /**
      * Sets the svg element, which needs to be bind to data

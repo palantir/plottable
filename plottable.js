@@ -3484,7 +3484,7 @@ var Plottable;
             __extends(Rect, _super);
             function Rect(key, isVertical) {
                 _super.call(this, key);
-                this._someLabelsTooWide = false;
+                this._ifLabelsTooWide = false;
                 this.svgElement("rect");
                 this._isVertical = isVertical;
             }
@@ -3496,6 +3496,9 @@ var Plottable;
             };
             Rect.prototype.removeLabels = function () {
                 this.textArea.selectAll("g").remove();
+            };
+            Rect.prototype._getIfLabelsTooWide = function () {
+                return this._ifLabelsTooWide;
             };
             Rect.prototype.drawText = function (data, attrToProjector, userMetadata, plotMetadata) {
                 var _this = this;
@@ -3542,7 +3545,7 @@ var Plottable;
                     }
                     return tooWide;
                 });
-                this._someLabelsTooWide = labelTooWide.some(function (d) { return d; });
+                this._ifLabelsTooWide = labelTooWide.some(function (d) { return d; });
             };
             return Rect;
         })(_Drawer.Element);
@@ -7293,7 +7296,7 @@ var Plottable;
                 var attrToProjector = this._generateAttrToProjector();
                 var dataToDraw = this._getDataToDraw();
                 this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).plotMetadata); });
-                if (this._hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._someLabelsTooWide; })) {
+                if (this._hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._getIfLabelsTooWide(); })) {
                     drawers.forEach(function (d) { return d.removeLabels(); });
                 }
             };

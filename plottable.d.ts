@@ -1592,7 +1592,7 @@ declare module Plottable {
         }
         class AbstractDrawer {
             _renderArea: D3.Selection;
-            _className: string;
+            protected _className: string;
             key: string;
             /**
              * Sets the class, which needs to be applied to bound elements.
@@ -1673,7 +1673,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Element extends AbstractDrawer {
-            _svgElement: string;
+            protected _svgElement: string;
             /**
              * Sets the svg element, which needs to be bind to data
              *
@@ -1692,11 +1692,10 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Rect extends Element {
-            _someLabelsTooWide: boolean;
-            _isVertical: boolean;
             constructor(key: string, isVertical: boolean);
             setup(area: D3.Selection): void;
             removeLabels(): void;
+            _getIfLabelsTooWide(): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
         }
     }
