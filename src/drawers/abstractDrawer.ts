@@ -50,8 +50,8 @@ export module _Drawer {
      * Removes the Drawer and its renderArea
      */
     public remove() {
-      if (this.renderArea() != null) {
-        this.renderArea().remove();
+      if (this._getRenderArea() != null) {
+        this._getRenderArea().remove();
       }
     }
 
@@ -134,7 +134,7 @@ export module _Drawer {
      *
      * @returns {D3.Selection} the renderArea selection
      */
-    public renderArea(): D3.Selection {
+    public _getRenderArea(): D3.Selection {
       return this._renderArea;
     }
 

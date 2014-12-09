@@ -1640,7 +1640,7 @@ declare module Plottable {
              *
              * @returns {D3.Selection} the renderArea selection
              */
-            renderArea(): D3.Selection;
+            _getRenderArea(): D3.Selection;
         }
     }
 }
