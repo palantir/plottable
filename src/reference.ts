@@ -1,3 +1,5 @@
+/// <reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
+
 /// <reference path="utils/utils.ts" />
 /// <reference path="utils/osUtils.ts" />
 /// <reference path="utils/idCounter.ts" />
@@ -92,5 +94,3 @@
 /// <reference path="interactions/drag/xyDragBoxInteraction.ts" />
 /// <reference path="interactions/drag/yDragBoxInteraction.ts" />
 /// <reference path="interactions/hoverInteraction.ts" />
-
-///<reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
