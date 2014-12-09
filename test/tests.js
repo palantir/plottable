@@ -2928,6 +2928,21 @@ describe("Plots", function () {
                 svg.remove();
             });
         });
+        it("plot auto domain scale to visible points on ordinal scale", function () {
+            var svg = generateSVG(500, 500);
+            var xAccessor = function (d, i, u) { return d.a; };
+            var yAccessor = function (d, i, u) { return d.b + u.foo; };
+            var simpleDataset = new Plottable.Dataset([{ a: "a", b: 6 }, { a: "b", b: 2 }, { a: "c", b: -2 }, { a: "d", b: -6 }], { foo: 0 });
+            var xScale = new Plottable.Scale.Ordinal();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.AbstractBarPlot(xScale, yScale);
+            plot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).renderTo(svg);
+            xScale.domain(["b", "c"]);
+            assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
+            svg.remove();
+        });
     });
 });
 

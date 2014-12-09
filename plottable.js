@@ -7027,7 +7027,9 @@ var Plottable;
                 if (toScale instanceof Plottable.Scale.AbstractQuantitative) {
                     var toScaleQ = toScale;
                     var normalizedData = this._normalizeDatasets(fromX);
-                    var adjustedDomain = this._adjustDomainOverVisiblePoints(normalizedData, fromScale.domain());
+                    var fromDomain = fromScale.domain();
+                    var filterFn = (fromScale instanceof Plottable.Scale.AbstractQuantitative) ? function (a) { return fromDomain[0] <= a && fromDomain[1] >= a; } : function (a) { return fromDomain.indexOf(a) !== -1; };
+                    var adjustedDomain = this._adjustDomainOverVisiblePoints(normalizedData, filterFn);
                     if (adjustedDomain.length === 0) {
                         return;
                     }
@@ -7047,8 +7049,8 @@ var Plottable;
                     });
                 }));
             };
-            AbstractXYPlot.prototype._adjustDomainOverVisiblePoints = function (values, fromDomain) {
-                var bVals = values.filter(function (v) { return fromDomain[0] <= v.a && v.a <= fromDomain[1]; }).map(function (v) { return v.b; });
+            AbstractXYPlot.prototype._adjustDomainOverVisiblePoints = function (values, filterFn) {
+                var bVals = values.filter(function (v) { return filterFn(v.a); }).map(function (v) { return v.b; });
                 var retVal = [];
                 if (bVals.length !== 0) {
                     retVal = [Plottable._Util.Methods.min(bVals, null), Plottable._Util.Methods.max(bVals, null)];

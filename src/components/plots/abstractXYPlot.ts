@@ -175,7 +175,11 @@ export module Plot {
       if (toScale instanceof Scale.AbstractQuantitative) {
         var toScaleQ = <Scale.AbstractQuantitative<B>> toScale;
         var normalizedData = this._normalizeDatasets<A,B>(fromX);
-        var adjustedDomain = this._adjustDomainOverVisiblePoints<A,B>(normalizedData, fromScale.domain());
+        var fromDomain = fromScale.domain();
+        var filterFn = (fromScale instanceof Scale.AbstractQuantitative) ?
+                        (a: any) => fromDomain[0] <= a && fromDomain[1] >= a :
+                        (a: any) => fromDomain.indexOf(a) !== -1;
+        var adjustedDomain = this._adjustDomainOverVisiblePoints<A,B>(normalizedData, filterFn);
         if(adjustedDomain.length === 0) {
           return;
         }
@@ -196,8 +200,8 @@ export module Plot {
       }));
     }
 
-    private _adjustDomainOverVisiblePoints<A,B>(values: {a: A; b: B}[], fromDomain: A[]): B[] {
-      var bVals = values.filter(v => fromDomain[0] <= v.a && v.a <= fromDomain[1]).map(v => v.b);
+    private _adjustDomainOverVisiblePoints<A,B>(values: {a: A; b: B}[], filterFn: (v: any) => boolean): B[] {
+      var bVals = values.filter(v => filterFn(v.a)).map(v => v.b);
       var retVal: B[] = [];
       if (bVals.length !== 0) {
         retVal = [_Util.Methods.min<B>(bVals, null), _Util.Methods.max<B>(bVals, null)];
