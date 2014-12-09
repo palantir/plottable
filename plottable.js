@@ -7027,8 +7027,15 @@ var Plottable;
                 if (toScale instanceof Plottable.Scale.AbstractQuantitative) {
                     var toScaleQ = toScale;
                     var normalizedData = this._normalizeDatasets(fromX);
-                    var fromDomain = fromScale.domain();
-                    var filterFn = (fromScale instanceof Plottable.Scale.AbstractQuantitative) ? function (a) { return fromDomain[0] <= a && fromDomain[1] >= a; } : function (a) { return fromDomain.indexOf(a) !== -1; };
+                    var filterFn;
+                    if (fromScale instanceof Plottable.Scale.AbstractQuantitative) {
+                        var fromDomain = fromScale.domain();
+                        filterFn = function (a) { return fromDomain[0] <= a && fromDomain[1] >= a; };
+                    }
+                    else {
+                        var fromDomainSet = d3.set(fromScale.domain());
+                        filterFn = function (a) { return fromDomainSet.has(a); };
+                    }
                     var adjustedDomain = this._adjustDomainOverVisiblePoints(normalizedData, filterFn);
                     if (adjustedDomain.length === 0) {
                         return;

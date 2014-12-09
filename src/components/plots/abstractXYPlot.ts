@@ -175,10 +175,16 @@ export module Plot {
       if (toScale instanceof Scale.AbstractQuantitative) {
         var toScaleQ = <Scale.AbstractQuantitative<B>> toScale;
         var normalizedData = this._normalizeDatasets<A,B>(fromX);
-        var fromDomain = fromScale.domain();
-        var filterFn = (fromScale instanceof Scale.AbstractQuantitative) ?
-                        (a: any) => fromDomain[0] <= a && fromDomain[1] >= a :
-                        (a: any) => fromDomain.indexOf(a) !== -1;
+
+        var filterFn: (v: A) => boolean;
+        if (fromScale instanceof Scale.AbstractQuantitative) {
+          var fromDomain = fromScale.domain();
+          filterFn = (a: A) => fromDomain[0] <= a && fromDomain[1] >= a;
+        } else {
+          var fromDomainSet = d3.set(fromScale.domain());
+          filterFn = (a: A) => fromDomainSet.has(a);
+        }
+
         var adjustedDomain = this._adjustDomainOverVisiblePoints<A,B>(normalizedData, filterFn);
         if(adjustedDomain.length === 0) {
           return;
