@@ -8045,10 +8045,8 @@ var Plottable;
                 attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
                 var xAttr = attrToProjector["x"];
                 var yAttr = attrToProjector["y"];
-                var primaryScale = this._isVertical ? this._xScale : this._yScale;
-                var accessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
-                attrToProjector["x"] = function (d, i, u, m) { return _this._isVertical ? primaryScale.scale(accessor(d, i, u, m)) + m.position : xAttr(d, u, u, m); };
-                attrToProjector["y"] = function (d, i, u, m) { return _this._isVertical ? yAttr(d, i, u, m) : primaryScale.scale(accessor(d, i, u, m)) + m.position; };
+                attrToProjector["x"] = function (d, i, u, m) { return _this._isVertical ? xAttr(d, i, u, m) + m.position : xAttr(d, u, u, m); };
+                attrToProjector["y"] = function (d, i, u, m) { return _this._isVertical ? yAttr(d, i, u, m) : yAttr(d, i, u, m) + m.position; };
                 return attrToProjector;
             };
             ClusteredBar.prototype._updateClusterPosition = function () {
@@ -8066,8 +8064,7 @@ var Plottable;
                 if (!this._projections["width"]) {
                     var secondaryScale = this._isVertical ? this._xScale : this._yScale;
                     var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
-                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : Plot.AbstractBarPlot._DEFAULT_WIDTH;
-                    innerScale.range([0, constantWidth]);
+                    innerScale.range([0, this._getBarPixelWidth()]);
                 }
                 else {
                     var projection = this._projections["width"];
