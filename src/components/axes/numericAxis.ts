@@ -9,7 +9,7 @@ export module Axis {
     // the label is cut off.
     private _showFirstTickLabel = false;
     private _showLastTickLabel = false;
-    private _measurer: _Util.Text.TextMeasurer;
+    private _measurer: SVGTypewriter.Measurers.Measurer;
 
     /**
      * Constructs a NumericAxis.
@@ -28,14 +28,14 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this._measurer = _Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(AbstractAxis.TICK_LABEL_CLASS, true));
+      this._measurer = new SVGTypewriter.Measurers.Measurer(this._tickLabelContainer, AbstractAxis.TICK_LABEL_CLASS);
     }
 
     public _computeWidth() {
       var tickValues = this._getTickValues();
       var textLengths = tickValues.map((v: any) => {
         var formattedValue = this.formatter()(v);
-        return this._measurer(formattedValue).width;
+        return this._measurer.measure(formattedValue).width;
       });
 
       var maxTextLength = _Util.Methods.max(textLengths, 0);
@@ -50,7 +50,7 @@ export module Axis {
     }
 
     public _computeHeight() {
-      var textHeight = this._measurer(_Util.Text.HEIGHT_TEXT).height;
+      var textHeight = this._measurer.measure().height;
 
       if (this._tickLabelPositioning === "center") {
         this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;

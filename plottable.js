@@ -4937,7 +4937,7 @@ var Plottable;
                 if (this._computedHeight !== null) {
                     return this._computedHeight;
                 }
-                var textHeight = this._measureTextHeight() * 2;
+                var textHeight = this._measurer.measure().height * 2;
                 this.tickLength(textHeight);
                 this.endTickLength(textHeight);
                 this._computedHeight = this._maxLabelTickLength() + 2 * this.tickLabelPadding();
@@ -4955,7 +4955,7 @@ var Plottable;
                 return stepLength;
             };
             Time.prototype._maxWidthForInterval = function (config) {
-                return this._measurer(config.formatter(Time._LONG_DATE)).width;
+                return this._measurer.measure(config.formatter(Time._LONG_DATE)).width;
             };
             /**
              * Check if tier configuration fits in the current width.
@@ -4970,7 +4970,7 @@ var Plottable;
                 for (var i = 0; i < Time._NUM_TIERS; ++i) {
                     this._tierLabelContainers.push(this._content.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
                 }
-                this._measurer = Plottable._Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
+                this._measurer = new SVGTypewriter.Measurers.Measurer(this._tierLabelContainers[0]);
             };
             Time.prototype._getTickIntervalValues = function (config) {
                 return this._scale._tickInterval(config.interval, config.step);
@@ -4978,9 +4978,6 @@ var Plottable;
             Time.prototype._getTickValues = function () {
                 var _this = this;
                 return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations.reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
-            };
-            Time.prototype._measureTextHeight = function () {
-                return this._measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
             };
             Time.prototype._cleanContainer = function (container) {
                 container.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
@@ -5030,7 +5027,7 @@ var Plottable;
             Time.prototype._canFitLabelFilter = function (container, position, bounds, label, isCentered) {
                 var endPosition;
                 var startPosition;
-                var width = this._measurer(label).width + this.tickLabelPadding();
+                var width = this._measurer.measure(label).width + this.tickLabelPadding();
                 var leftBound = this._scale.scale(bounds[0]);
                 var rightBound = this._scale.scale(bounds[1]);
                 if (isCentered) {
@@ -5128,14 +5125,14 @@ var Plottable;
             }
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._measurer = Plottable._Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
+                this._measurer = new SVGTypewriter.Measurers.Measurer(this._tickLabelContainer, Axis.AbstractAxis.TICK_LABEL_CLASS);
             };
             Numeric.prototype._computeWidth = function () {
                 var _this = this;
                 var tickValues = this._getTickValues();
                 var textLengths = tickValues.map(function (v) {
                     var formattedValue = _this.formatter()(v);
-                    return _this._measurer(formattedValue).width;
+                    return _this._measurer.measure(formattedValue).width;
                 });
                 var maxTextLength = Plottable._Util.Methods.max(textLengths, 0);
                 if (this._tickLabelPositioning === "center") {
@@ -5147,7 +5144,7 @@ var Plottable;
                 return this._computedWidth;
             };
             Numeric.prototype._computeHeight = function () {
-                var textHeight = this._measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
+                var textHeight = this._measurer.measure().height;
                 if (this._tickLabelPositioning === "center") {
                     this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
                 }
@@ -5342,7 +5339,7 @@ var Plottable;
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._measurer = new Plottable._Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
+                this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
             };
             Category.prototype._rescale = function () {
                 return this._invalidateLayout();
@@ -5474,7 +5471,7 @@ var Plottable;
                 // When anyone calls _invalidateLayout, _computeLayout will be called
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
-                this._measurer.clear();
+                this._measurer.reset();
                 return _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
             };
             return Category;
