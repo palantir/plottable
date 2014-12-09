@@ -1680,7 +1680,6 @@ declare module Plottable {
              * @param{string} tag The svg element to be bind
              */
             svgElement(tag: string): Element;
-            _getDrawSelection(): D3.Selection;
             _drawStep(step: AppliedDrawStep): void;
             _enterData(data: any[]): void;
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;

@@ -6972,7 +6972,7 @@ var Plottable;
                 var closestIndex;
                 var minDistSq = range * range;
                 drawers.forEach(function (drawer) {
-                    drawer._getDrawSelection().each(function (d, i) {
+                    drawer._renderArea.selectAll("circle").each(function (d, i) {
                         var distSq = getDistSq(d, i);
                         var r = attrToProjector["r"](d, i, null, null);
                         if (distSq < r * r) {
