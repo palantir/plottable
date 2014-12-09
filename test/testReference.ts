@@ -5,6 +5,7 @@
 ///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
 ///<reference path="testUtils.ts" />
 ///<reference path="../build/plottable.d.ts" />
+///<reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
 
 ///<reference path="globalInitialization.ts" />
 

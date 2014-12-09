@@ -31,7 +31,7 @@ module.exports = function(grunt) {
       }
     },
     verify_d_ts: {
-      src: ["typings/d3/d3.d.ts", "plottable.d.ts"]
+      src: ["typings/d3/d3.d.ts", "plottable.d.ts", "bower_components/svg-typewriter/svgtypewriter.d.ts"]
     }
   };
 
