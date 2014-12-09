@@ -4372,6 +4372,12 @@ var Plottable;
             }
             Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var requests = this.components().map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
+                requests.push({
+                    width: offeredWidth,
+                    height: offeredHeight,
+                    wantsWidth: false,
+                    wantsHeight: false
+                });
                 return {
                     width: Plottable._Util.Methods.max(requests, function (request) { return request.width; }, 0),
                     height: Plottable._Util.Methods.max(requests, function (request) { return request.height; }, 0),
@@ -4392,10 +4398,10 @@ var Plottable;
                 return this;
             };
             Group.prototype._isFixedWidth = function () {
-                return this.components().every(function (c) { return c._isFixedWidth(); });
+                return false;
             };
             Group.prototype._isFixedHeight = function () {
-                return this.components().every(function (c) { return c._isFixedHeight(); });
+                return false;
             };
             return Group;
         })(Component.AbstractComponentContainer);
