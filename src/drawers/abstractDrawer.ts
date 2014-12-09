@@ -19,7 +19,7 @@ export module _Drawer {
 
   export class AbstractDrawer {
     private _renderArea: D3.Selection;
-    public _className: string;
+    protected _className: string;
     public key: string;
 
     /**

@@ -275,7 +275,7 @@ export module Plot {
                             attrToProjector,
                             this._key2PlotDatasetKey.get(k).dataset.metadata(),
                             this._key2PlotDatasetKey.get(k).plotMetadata));
-      if (this._hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._someLabelsTooWide)) {
+      if (this._hideBarsIfAnyAreTooWide && drawers.some((d: _Drawer.Rect) => d._getIfLabelsTooWide())) {
         drawers.forEach((d: _Drawer.Rect) => d.removeLabels());
       }
     }
