@@ -5,7 +5,7 @@ export module _Drawer {
   var LABEL_VERTICAL_PADDING = 5;
   var LABEL_HORIZONTAL_PADDING = 5;
   export class Rect extends Element {
-    private _ifLabelsTooWide = false;
+    private _labelsTooWide = false;
     private _isVertical: boolean;
     private textArea: D3.Selection;
     private measurer: _Util.Text.TextMeasurer;
@@ -28,7 +28,7 @@ export module _Drawer {
     }
 
     public _getIfLabelsTooWide() {
-      return this._ifLabelsTooWide;
+      return this._labelsTooWide;
     }
 
     public drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata) {
@@ -73,7 +73,7 @@ export module _Drawer {
         }
         return tooWide;
       });
-      this._ifLabelsTooWide = labelTooWide.some((d: boolean) => d);
+      this._labelsTooWide = labelTooWide.some((d: boolean) => d);
     }
   }
 

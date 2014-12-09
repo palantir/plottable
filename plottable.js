@@ -3492,7 +3492,7 @@ var Plottable;
             __extends(Rect, _super);
             function Rect(key, isVertical) {
                 _super.call(this, key);
-                this._ifLabelsTooWide = false;
+                this._labelsTooWide = false;
                 this.svgElement("rect");
                 this._isVertical = isVertical;
             }
@@ -3506,7 +3506,7 @@ var Plottable;
                 this.textArea.selectAll("g").remove();
             };
             Rect.prototype._getIfLabelsTooWide = function () {
-                return this._ifLabelsTooWide;
+                return this._labelsTooWide;
             };
             Rect.prototype.drawText = function (data, attrToProjector, userMetadata, plotMetadata) {
                 var _this = this;
@@ -3553,7 +3553,7 @@ var Plottable;
                     }
                     return tooWide;
                 });
-                this._ifLabelsTooWide = labelTooWide.some(function (d) { return d; });
+                this._labelsTooWide = labelTooWide.some(function (d) { return d; });
             };
             return Rect;
         })(_Drawer.Element);
