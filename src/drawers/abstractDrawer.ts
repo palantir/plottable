@@ -60,7 +60,7 @@ export module _Drawer {
      *
      * @param{any[]} data The data to be drawn
      */
-    public _enterData(data: any[]) {
+    protected _enterData(data: any[]) {
       // no-op
     }
 
@@ -69,7 +69,7 @@ export module _Drawer {
      *
      * @param{AppliedDrawStep} step The step, how data should be drawn.
      */
-    public _drawStep(step: AppliedDrawStep) {
+    protected _drawStep(step: AppliedDrawStep) {
       // no-op
     }
 
