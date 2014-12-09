@@ -3,9 +3,9 @@
 module Plottable {
 export module Plot {
   export class Line<X> extends AbstractXYPlot<X,number> implements Interaction.Hoverable {
-    private hoverDetectionRadius = 15;
-    private hoverTarget: D3.Selection;
-    private defaultStrokeColor: string;
+    private _hoverDetectionRadius = 15;
+    private _hoverTarget: D3.Selection;
+    private _defaultStrokeColor: string;
 
     public _yScale: Scale.AbstractQuantitative<number>;
 
@@ -19,19 +19,20 @@ export module Plot {
     constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
       super(xScale, yScale);
       this.classed("line-plot", true);
-      this._animators["reset"] = new Animator.Null();
-      this._animators["main"] = new Animator.Base()
-                                            .duration(600)
-                                            .easing("exp-in-out");
+      this.animator("reset", new Animator.Null());
+      this.animator("main", new Animator.Base()
+                                         .duration(600)
+                                         .easing("exp-in-out"));
 
-      this.defaultStrokeColor = new Scale.Color().range()[0];
+      this._defaultStrokeColor = new Scale.Color().range()[0];
     }
 
     public _setup() {
       super._setup();
-      this.hoverTarget = this._foregroundContainer.append("circle")
-                                          .classed("hover-target", true)
-                                          .style("visibility", "hidden");
+      this._hoverTarget = this._foregroundContainer.append("circle")
+                                                   .classed("hover-target", true)
+                                                   .attr("r", this._hoverDetectionRadius)
+                                                   .style("visibility", "hidden");
     }
 
     public _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor) {
@@ -84,7 +85,7 @@ export module Plot {
 
       attrToProjector["defined"] = (d: any, i: number, u: any, m: any) =>
           this._rejectNullsAndNaNs(d, i, u, m, xFunction) && this._rejectNullsAndNaNs(d, i, u, m, yFunction);
-      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultStrokeColor);
+      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
       attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
 
       return attrToProjector;
@@ -94,15 +95,14 @@ export module Plot {
       return ["x", "y"];
     }
 
-    // HACKHACK User and plot metadata should be applied here - #1306.
     public _getClosestWithinRange(p: Point, range: number) {
       var attrToProjector = this._generateAttrToProjector();
       var xProjector = attrToProjector["x"];
       var yProjector = attrToProjector["y"];
 
-      var getDistSq = (d: any, i: number) => {
-        var dx = +xProjector(d, i, null, null) - p.x;
-        var dy = +yProjector(d, i, null, null) - p.y;
+      var getDistSq = (d: any, i: number, userMetdata: any, plotMetadata: PlotMetadata) => {
+        var dx = +xProjector(d, i, userMetdata, plotMetadata) - p.x;
+        var dy = +yProjector(d, i, userMetdata, plotMetadata) - p.y;
         return (dx * dx + dy * dy);
       };
 
@@ -110,14 +110,16 @@ export module Plot {
       var closestPoint: Point;
       var closestDistSq = range * range;
 
-      this.datasets().forEach((dataset) => {
+       this._datasetKeysInOrder.forEach((key: string) => {
+        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
         dataset.data().forEach((d: any, i: number) => {
-          var distSq = getDistSq(d, i);
+          var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
           if (distSq < closestDistSq) {
             closestOverall = d;
             closestPoint = {
-              x: xProjector(d, i, null, null),
-              y: yProjector(d, i, null, null)
+              x: xProjector(d, i, dataset.metadata(), plotMetadata),
+              y: yProjector(d, i, dataset.metadata(), plotMetadata)
             };
             closestDistSq = distSq;
           }
@@ -140,7 +142,7 @@ export module Plot {
     }
 
     public _doHover(p: Point): Interaction.HoverData {
-      var closestInfo = this._getClosestWithinRange(p, this.hoverDetectionRadius);
+      var closestInfo = this._getClosestWithinRange(p, this._hoverDetectionRadius);
       var closestValue = closestInfo.closestValue;
       if (closestValue === undefined) {
         return {
@@ -151,7 +153,7 @@ export module Plot {
       }
 
       var closestPoint = closestInfo.closestPoint;
-      this.hoverTarget.attr({
+      this._hoverTarget.attr({
         "cx": closestInfo.closestPoint.x,
         "cy": closestInfo.closestPoint.y
       });
@@ -159,7 +161,7 @@ export module Plot {
       return {
         data: [closestValue],
         pixelPositions: [closestPoint],
-        selection: this.hoverTarget
+        selection: this._hoverTarget
       };
     }
     //===== /Hover logic =====

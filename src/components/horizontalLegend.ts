@@ -12,8 +12,8 @@ export module Component {
      */
     public static LEGEND_ENTRY_CLASS = "legend-entry";
 
-    private padding = 5;
-    private scale: Scale.Color;
+    private _padding = 5;
+    private _scale: Scale.Color;
 
     /**
      * Creates a Horizontal Legend.
@@ -28,8 +28,8 @@ export module Component {
       super();
       this.classed("legend", true);
 
-      this.scale = colorScale;
-      this.scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+      this._scale = colorScale;
+      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
 
       this.xAlign("left").yAlign("center");
       this._fixedWidthFlag = true;
@@ -38,29 +38,29 @@ export module Component {
 
     public remove() {
       super.remove();
-      this.scale.broadcaster.deregisterListener(this);
+      this._scale.broadcaster.deregisterListener(this);
     }
 
-    private calculateLayoutInfo(availableWidth: number, availableHeight: number) {
+    private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {
       var fakeLegendRow = this._content.append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
       var fakeLegendEntry = fakeLegendRow.append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
       var measure = _Util.Text.getTextMeasurer(fakeLegendRow.append("text"));
 
       var textHeight = measure(_Util.Text.HEIGHT_TEXT).height;
 
-      var availableWidthForEntries = Math.max(0, (availableWidth - this.padding));
+      var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
       var measureEntry = (entryText: string) => {
-        var originalEntryLength = (textHeight + measure(entryText).width + this.padding);
+        var originalEntryLength = (textHeight + measure(entryText).width + this._padding);
         return Math.min(originalEntryLength, availableWidthForEntries);
       };
 
-      var entries = this.scale.domain();
+      var entries = this._scale.domain();
       var entryLengths = _Util.Methods.populateMap(entries, measureEntry);
       fakeLegendRow.remove();
 
-      var rows = this.packRows(availableWidthForEntries, entries, entryLengths);
+      var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
 
-      var rowsAvailable = Math.floor((availableHeight - 2 * this.padding) / textHeight);
+      var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
       if (rowsAvailable !== rowsAvailable) { // rowsAvailable can be NaN if this.textHeight = 0
         rowsAvailable = 0;
       }
@@ -74,17 +74,17 @@ export module Component {
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var estimatedLayout = this.calculateLayoutInfo(offeredWidth, offeredHeight);
+      var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
 
       var rowLengths = estimatedLayout.rows.map((row: string[]) => {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
       });
       var longestRowLength = _Util.Methods.max(rowLengths, 0);
       longestRowLength = longestRowLength === undefined ? 0 : longestRowLength; // HACKHACK: #843
-      var desiredWidth = this.padding + longestRowLength;
+      var desiredWidth = this._padding + longestRowLength;
 
-      var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this.padding;
-      var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this.padding;
+      var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
+      var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
 
       return {
         width : desiredWidth,
@@ -94,7 +94,7 @@ export module Component {
       };
     }
 
-    private packRows(availableWidth: number, entries: string[], entryLengths: D3.Map<number>) {
+    private _packRows(availableWidth: number, entries: string[], entryLengths: D3.Map<number>) {
       var rows: string[][] = [[]];
       var currentRow = rows[0];
       var spaceLeft = availableWidth;
@@ -114,14 +114,14 @@ export module Component {
     public _doRender() {
       super._doRender();
 
-      var layout = this.calculateLayoutInfo(this.width(), this.height());
+      var layout = this._calculateLayoutInfo(this.width(), this.height());
 
       var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
       var rows = this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).data(rowsToDraw);
       rows.enter().append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
       rows.exit().remove();
 
-      rows.attr("transform", (d: any, i: number) => "translate(0, " + (i * layout.textHeight + this.padding) + ")");
+      rows.attr("transform", (d: any, i: number) => "translate(0, " + (i * layout.textHeight + this._padding) + ")");
 
       var entries = rows.selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).data((d) => d);
       var entriesEnter = entries.enter().append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
@@ -132,7 +132,7 @@ export module Component {
       entriesEnter.append("g").classed("text-container", true);
       entries.exit().remove();
 
-      var legendPadding = this.padding;
+      var legendPadding = this._padding;
       rows.each(function (values: string[]) {
         var xShift = legendPadding;
         var entriesInRow = d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS);
@@ -147,9 +147,9 @@ export module Component {
           .attr("cx", layout.textHeight / 2)
           .attr("cy", layout.textHeight / 2)
           .attr("r",  layout.textHeight * 0.3)
-          .attr("fill", (value: string) => this.scale.scale(value) );
+          .attr("fill", (value: string) => this._scale.scale(value) );
 
-      var padding = this.padding;
+      var padding = this._padding;
       var textContainers = entries.select("g.text-container");
       textContainers.text(""); // clear out previous results
       textContainers.append("title").text((value: string) => value);

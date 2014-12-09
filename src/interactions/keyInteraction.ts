@@ -3,10 +3,9 @@
 module Plottable {
 export module Interaction {
   export class Key extends AbstractInteraction {
-    private activated = false;
-    private keyCode: number;
-    private dispatcher: Plottable.Dispatcher.Keypress;
-    private keyCode2Callback: { [keyCode: string]: () => void; } = {};
+
+    private _dispatcher: Plottable.Dispatcher.Keypress;
+    private _keyCode2Callback: { [keyCode: string]: () => void; } = {};
 
     /**
      * Creates a KeyInteraction.
@@ -18,20 +17,20 @@ export module Interaction {
      */
     constructor() {
       super();
-      this.dispatcher = new Plottable.Dispatcher.Keypress();
+      this._dispatcher = new Plottable.Dispatcher.Keypress();
     }
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
 
-      this.dispatcher.target(this._hitBox);
+      this._dispatcher.target(this._hitBox);
 
-      this.dispatcher.onKeyDown((e: D3.D3Event) => {
-        if (this.keyCode2Callback[e.keyCode]) {
-          this.keyCode2Callback[e.keyCode]();
+      this._dispatcher.onKeyDown((e: D3.D3Event) => {
+        if (this._keyCode2Callback[e.keyCode]) {
+          this._keyCode2Callback[e.keyCode]();
         }
       });
-      this.dispatcher.connect();
+      this._dispatcher.connect();
     }
 
     /**
@@ -43,7 +42,7 @@ export module Interaction {
      * @returns The calling Interaction.Key.
      */
     public on(keyCode: number, callback: () => void): Key {
-      this.keyCode2Callback[keyCode] = callback;
+      this._keyCode2Callback[keyCode] = callback;
       return this;
     }
   }

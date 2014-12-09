@@ -14,11 +14,22 @@ describe("Plots", () => {
     var SVG_HEIGHT = 400;
     var axisHeight = 0;
     var bandWidth = 0;
+    var originalData1: any[];
+    var originalData2: any[];
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Ordinal();
       yScale = new Plottable.Scale.Linear().domain([0, 2]);
+
+      originalData1 = [
+        {x: "A", y: 1},
+        {x: "B", y: 2}
+      ];
+      originalData2 = [
+        {x: "A", y: 2},
+        {x: "B", y: 1}
+      ];
 
       var data1 = [
         {x: "A", y: 1},
@@ -28,12 +39,13 @@ describe("Plots", () => {
         {x: "A", y: 2},
         {x: "B", y: 1}
       ];
+
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
       renderer = new Plottable.Plot.ClusteredBar<string,number>(xScale, yScale);
-      renderer.addDataset(data1);
-      renderer.addDataset(data2);
+      renderer.addDataset(dataset1);
+      renderer.addDataset(dataset2);
       renderer.baseline(0);
       renderer.project("x", "x", xScale);
       renderer.project("y", "y", yScale);
@@ -68,7 +80,7 @@ describe("Plots", () => {
       assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
 
       // check that clustering is correct
-      var off = (<any>renderer).makeInnerScale().scale("_0");
+      var off = (<any>renderer)._makeInnerScale().scale("_0");
       assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) + bandWidth / 2 - off, 0.01
           , "x pos correct for bar0");
       assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2 - off, 0.01
@@ -77,6 +89,9 @@ describe("Plots", () => {
           , "x pos correct for bar2");
       assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2 + off, 0.01
           , "x pos correct for bar3");
+
+      assert.deepEqual(dataset1.data(), originalData1, "underlying data is not modified");
+      assert.deepEqual(dataset2.data(), originalData2, "underlying data is not modified");
       svg.remove();
     });
   });
@@ -147,7 +162,7 @@ describe("Plots", () => {
       var bar3Y = bar3.data()[0].y;
 
       // check that clustering is correct
-      var off = (<any>renderer).makeInnerScale().scale("_0");
+      var off = (<any>renderer)._makeInnerScale().scale("_0");
       assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2 - off, 0.01
             , "y pos correct for bar0");
       assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2 - off, 0.01

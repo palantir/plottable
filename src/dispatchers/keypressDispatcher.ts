@@ -3,8 +3,8 @@
 module Plottable {
 export module Dispatcher {
   export class Keypress extends Dispatcher.AbstractDispatcher {
-    private mousedOverTarget = false;
-    private keydownListenerTarget: D3.Selection;
+    private _mousedOverTarget = false;
+    private _keydownListenerTarget: D3.Selection;
     private _onKeyDown: (e: D3.D3Event) => void;
 
     /**
@@ -19,21 +19,21 @@ export module Dispatcher {
       // Can't attach the key listener to the target (a sub-svg element)
       // because "focusable" is only in SVG 1.2 / 2, which most browsers don't
       // yet implement
-      this.keydownListenerTarget = d3.select(document);
+      this._keydownListenerTarget = d3.select(document);
 
       this._event2Callback["mouseover"] = () => {
-        this.mousedOverTarget = true;
+        this._mousedOverTarget = true;
       };
 
       this._event2Callback["mouseout"] = () => {
-        this.mousedOverTarget = false;
+        this._mousedOverTarget = false;
       };
     }
 
     public connect() {
       super.connect();
-      this.keydownListenerTarget.on(this._getEventString("keydown"), () => {
-        if (this.mousedOverTarget && this._onKeyDown) {
+      this._keydownListenerTarget.on(this._getEventString("keydown"), () => {
+        if (this._mousedOverTarget && this._onKeyDown) {
           this._onKeyDown(d3.event);
         }
       });
@@ -42,7 +42,7 @@ export module Dispatcher {
 
     public disconnect() {
       super.disconnect();
-      this.keydownListenerTarget.on(this._getEventString("keydown"), null);
+      this._keydownListenerTarget.on(this._getEventString("keydown"), null);
       return this;
     }
 
