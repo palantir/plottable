@@ -1461,7 +1461,7 @@ declare module Plottable {
              */
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            _tickInterval(interval: D3.Time.Interval, step?: number): any[];
+            tickInterval(interval: D3.Time.Interval, step?: number): any[];
             protected _setDomain(values: any[]): void;
             copy(): Time;
             _defaultExtent(): any[];
@@ -1616,13 +1616,13 @@ declare module Plottable {
              *
              * @param{any[]} data The data to be drawn
              */
-            _enterData(data: any[]): void;
+            protected _enterData(data: any[]): void;
             /**
              * Draws data using one step
              *
              * @param{AppliedDrawStep} step The step, how data should be drawn.
              */
-            _drawStep(step: AppliedDrawStep): void;
+            protected _drawStep(step: AppliedDrawStep): void;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
@@ -1685,7 +1685,6 @@ declare module Plottable {
              * @param{string} tag The svg element to be bind
              */
             svgElement(tag: string): Element;
-            _getDrawSelection(): D3.Selection;
             _drawStep(step: AppliedDrawStep): void;
             _enterData(data: any[]): void;
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;

@@ -15,7 +15,7 @@ export module _Drawer {
       return this;
     }
 
-    public _getDrawSelection() {
+    private _getDrawSelection() {
       return this._getRenderArea().selectAll(this._svgElement);
     }
 

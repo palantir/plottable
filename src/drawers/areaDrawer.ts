@@ -10,7 +10,8 @@ export module _Drawer {
       if (this._drawLine) {
         super._enterData(data);
       } else {
-        AbstractDrawer.prototype._enterData.call(this, data);
+        // HACKHACK Forced to use anycast to access protected var
+        (<any> AbstractDrawer).prototype._enterData.call(this, data);
       }
       this.areaSelection.datum(data);
     }
@@ -55,7 +56,8 @@ export module _Drawer {
       if (this._drawLine) {
         super._drawStep(step);
       } else {
-        AbstractDrawer.prototype._drawStep.call(this, step);
+        // HACKHACK Forced to use anycast to access protected var
+        (<any> AbstractDrawer).prototype._drawStep.call(this, step);
       }
       var attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
       var xFunction       = attrToProjector["x"];

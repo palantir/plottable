@@ -266,7 +266,7 @@ export module Axis {
     }
 
     private getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
-      return this._scale._tickInterval(config.interval, config.step);
+      return this._scale.tickInterval(config.interval, config.step);
     }
 
     protected _getTickValues(): any[] {
@@ -285,7 +285,7 @@ export module Axis {
     }
 
     private renderTierLabels(container: D3.Selection, config: TimeAxisTierConfiguration, height: number) {
-      var tickPos = this._scale._tickInterval(config.interval, config.step);
+      var tickPos = this._scale.tickInterval(config.interval, config.step);
       tickPos.splice(0, 0, this._scale.domain()[0]);
       tickPos.push(this._scale.domain()[1]);
       var shouldCenterText = config.step === 1;
