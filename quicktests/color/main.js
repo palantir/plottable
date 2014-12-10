@@ -132,6 +132,8 @@ function generatePlots(plots, dataType){
     var colorScale = new Plottable.Scale.Color();
     var plot = new PlotType(xScale, yScale);
       plot.attr("fill", "type", colorScale)
+      .project("x", "x", xScale)
+      .project("y", "y", yScale)
       .animate(true);
 
 
