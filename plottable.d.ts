@@ -3796,9 +3796,9 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Drag extends AbstractInteraction {
-            _isDragging: boolean;
-            _constrainX: (n: number) => number;
-            _constrainY: (n: number) => number;
+            protected _isDragging: boolean;
+            protected _constrainX: (n: number) => number;
+            protected _constrainY: (n: number) => number;
             /**
              * Constructs a Drag. A Drag will signal its callbacks on mouse drag.
              */
@@ -3816,10 +3816,10 @@ declare module Plottable {
              * @returns {Drag} The calling Drag.
              */
             dragstart(cb: (start: Point) => any): Drag;
-            _setOrigin(x: number, y: number): void;
-            _getOrigin(): number[];
-            _setLocation(x: number, y: number): void;
-            _getLocation(): number[];
+            protected _setOrigin(x: number, y: number): void;
+            protected _getOrigin(): number[];
+            protected _setLocation(x: number, y: number): void;
+            protected _getLocation(): number[];
             /**
              * Gets the callback that is called during dragging.
              *
@@ -3846,12 +3846,12 @@ declare module Plottable {
              * @returns {Drag} The calling Drag.
              */
             dragend(cb: (start: Point, end: Point) => any): Drag;
-            _dragstart(): void;
-            _doDragstart(): void;
-            _drag(): void;
-            _doDrag(): void;
-            _dragend(): void;
-            _doDragend(): void;
+            protected _dragstart(): void;
+            protected _doDragstart(): void;
+            protected _drag(): void;
+            protected _doDrag(): void;
+            protected _dragend(): void;
+            protected _doDragend(): void;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): Drag;
             /**
              * Sets up so that the xScale and yScale that are passed have their
@@ -3914,9 +3914,9 @@ declare module Plottable {
              * @returns {boolean}
              */
             isResizing(): boolean;
-            _dragstart(): void;
-            _drag(): void;
-            _dragend(): void;
+            protected _dragstart(): void;
+            protected _drag(): void;
+            protected _dragend(): void;
             /**
              * Clears the highlighted drag-selection box drawn by the DragBox.
              *
@@ -3935,7 +3935,9 @@ declare module Plottable {
              */
             setBox(x0: number, x1: number, y0: number, y1: number): DragBox;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): DragBox;
-            _hover(): void;
+            protected _hover(): void;
+            protected canResizeX(): boolean;
+            protected canResizeY(): boolean;
         }
     }
 }
@@ -3944,9 +3946,9 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XDragBox extends DragBox {
-            static _CAN_RESIZE_Y: boolean;
-            _setOrigin(x: number, y: number): void;
-            _setLocation(x: number, y: number): void;
+            protected _setOrigin(x: number, y: number): void;
+            protected _setLocation(x: number, y: number): void;
+            protected canResizeY(): boolean;
         }
     }
 }
@@ -3964,9 +3966,9 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class YDragBox extends DragBox {
-            static _CAN_RESIZE_X: boolean;
-            _setOrigin(x: number, y: number): void;
-            _setLocation(x: number, y: number): void;
+            protected _setOrigin(x: number, y: number): void;
+            protected _setLocation(x: number, y: number): void;
+            protected canResizeX(): boolean;
         }
     }
 }
