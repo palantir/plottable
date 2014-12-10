@@ -5259,8 +5259,8 @@ var Plottable;
                     var formattedText = _this.formatter()(s);
                     if (!_this._isHorizontal()) {
                         var availableTextSpace = _this.width() - _this.tickLabelPadding();
-                        availableTextSpace -= _this.tickLabelPositioning === "center" ? _this._maxLabelTickLength() : 0;
-                        formattedText = Plottable._Util.Text.getTruncatedText(formattedText, availableTextSpace, _this.measurer);
+                        availableTextSpace -= _this._tickLabelPositioning === "center" ? _this._maxLabelTickLength() : 0;
+                        formattedText = Plottable._Util.Text.getTruncatedText(formattedText, availableTextSpace, _this._measurer);
                     }
                     return formattedText;
                 });
