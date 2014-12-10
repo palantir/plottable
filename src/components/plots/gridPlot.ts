@@ -3,7 +3,7 @@
 module Plottable {
 export module Plot {
   export class Grid extends AbstractXYPlot<string,string> {
-    public _colorScale: Scale.AbstractScale<any, string>;
+    private _colorScale: Scale.AbstractScale<any, string>;
 
     /**
      * Constructs a GridPlot.

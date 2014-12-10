@@ -2966,7 +2966,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Grid extends AbstractXYPlot<string, string> {
-            _colorScale: Scale.AbstractScale<any, string>;
             /**
              * Constructs a GridPlot.
              *
