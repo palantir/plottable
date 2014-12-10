@@ -3255,8 +3255,8 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             protected _generateAttrToProjector(): AttributeToProjector;
-            _getDataToDraw(): D3.Map<any[]>;
-            _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata;
+            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata;
         }
     }
 }

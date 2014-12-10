@@ -75,12 +75,12 @@ export module Plot {
       return innerScale;
     }
 
-    public _getDataToDraw() {
+    protected _getDataToDraw() {
       this._updateClusterPosition();
       return super._getDataToDraw();
     }
 
-    public _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata {
+    protected _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata {
       var metadata = <ClusteredPlotMetadata>super._getPlotMetadataForDataset(key);
       metadata.position = 0;
       return metadata;
