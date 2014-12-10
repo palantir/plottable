@@ -5176,6 +5176,7 @@ var Plottable;
                 this._render();
             };
             Numeric.prototype._doRender = function () {
+                var _this = this;
                 _super.prototype._doRender.call(this);
                 var tickLabelAttrHash = {
                     x: 0,
@@ -5251,7 +5252,15 @@ var Plottable;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(tickLabelValues);
                 tickLabels.enter().append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();
-                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(this.formatter());
+                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(function (s) {
+                    var formattedText = _this.formatter()(s);
+                    if (!_this._isHorizontal()) {
+                        var availableTextSpace = _this.width() - _this.tickLabelPadding();
+                        availableTextSpace -= _this._tickLabelPositioning === "center" ? _this._maxLabelTickLength() : 0;
+                        formattedText = Plottable._Util.Text.getTruncatedText(formattedText, availableTextSpace, _this._measurer);
+                    }
+                    return formattedText;
+                });
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
                 if (!this.showEndTickLabels()) {
