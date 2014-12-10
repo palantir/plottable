@@ -5,8 +5,8 @@ export module Plot {
   export class StackedArea<X> extends Area<X> {
 
     private _isVertical: boolean;
-    public _baseline: D3.Selection;
-    public _baselineValue = 0;
+    private _baseline: D3.Selection;
+    private _baselineValue = 0;
 
     /**
      * Constructs a StackedArea plot.

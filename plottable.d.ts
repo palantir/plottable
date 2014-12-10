@@ -3305,8 +3305,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class StackedArea<X> extends Area<X> {
-            _baseline: D3.Selection;
-            _baselineValue: number;
             /**
              * Constructs a StackedArea plot.
              *
