@@ -8062,8 +8062,6 @@ var Plottable;
                 innerScale.domain(this._datasetKeysInOrder);
                 // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
                 if (!this._projections["width"]) {
-                    var secondaryScale = this._isVertical ? this._xScale : this._yScale;
-                    var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                     innerScale.range([0, this._getBarPixelWidth()]);
                 }
                 else {

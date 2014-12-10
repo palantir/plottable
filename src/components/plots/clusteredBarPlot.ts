@@ -56,9 +56,6 @@ export module Plot {
       innerScale.domain(this._datasetKeysInOrder);
       // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
       if (!this._projections["width"]) {
-        var secondaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._xScale : this._yScale;
-        var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
-                      && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
         innerScale.range([0, this._getBarPixelWidth()]);
       } else {
         var projection = this._projections["width"];
