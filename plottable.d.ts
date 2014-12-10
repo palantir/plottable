@@ -3727,7 +3727,7 @@ declare module Plottable {
     module Interaction {
         class Click extends AbstractInteraction {
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
-            _listenTo(): string;
+            protected _listenTo(): string;
             /**
              * Sets a callback to be called when a click is received.
              *
@@ -3736,7 +3736,7 @@ declare module Plottable {
             callback(cb: (p: Point) => any): Click;
         }
         class DoubleClick extends Click {
-            _listenTo(): string;
+            protected _listenTo(): string;
         }
     }
 }

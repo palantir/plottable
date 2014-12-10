@@ -15,7 +15,7 @@ export module Interaction {
       });
     }
 
-    public _listenTo(): string {
+    protected _listenTo(): string {
       return "click";
     }
 
@@ -31,7 +31,7 @@ export module Interaction {
   }
 
   export class DoubleClick extends Click {
-    public _listenTo(): string {
+    protected _listenTo(): string {
       return "dblclick";
     }
   }
