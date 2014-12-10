@@ -104,7 +104,7 @@ export module Plot {
       return this;
     }
 
-    public _addDataset(key: string, dataset: Dataset) {
+    private _addDataset(key: string, dataset: Dataset) {
       if (this._key2PlotDatasetKey.has(key)) {
         this.removeDataset(key);
       };
@@ -240,8 +240,11 @@ export module Plot {
     public _updateScaleExtent(attr: string) {
       var projector = this._projections[attr];
       if (projector.scale) {
-        this._key2PlotDatasetKey.forEach((key, pdk) => {
-          var extent = pdk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer, pdk.plotMetadata);
+        this._datasetKeysInOrder.forEach((key) => {
+          var plotDatasetKey = this._key2PlotDatasetKey.get(key);
+          var dataset = plotDatasetKey.dataset;
+          var plotMetadata = plotDatasetKey.plotMetadata;
+          var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
           var scaleKey = this._plottableID.toString() + "_" + key;
           if (extent.length === 0 || !this._isAnchored) {
             projector.scale._removeExtent(scaleKey, attr);
@@ -344,7 +347,7 @@ export module Plot {
       return this._removeDataset(key);
     }
 
-    public _removeDataset(key: string): AbstractPlot {
+    private _removeDataset(key: string): AbstractPlot {
       if (key != null && this._key2PlotDatasetKey.has(key)) {
         var pdk = this._key2PlotDatasetKey.get(key);
         pdk.drawer.remove();

@@ -32,12 +32,13 @@ export module Plot {
       this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
     }
 
-    public _addDataset(key: string, dataset: Dataset) {
+    public addDataset(keyOrDataset: any, dataset?: any) {
       if (this._datasetKeysInOrder.length === 1) {
         _Util.Methods.warn("Only one dataset is supported in Pie plots");
-        return;
+        return this;
       }
-      super._addDataset(key, dataset);
+      super.addDataset(keyOrDataset, dataset);
+      return this;
     }
 
 

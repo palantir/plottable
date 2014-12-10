@@ -3,9 +3,8 @@
 module Plottable {
 export module Axis {
   export class Category extends AbstractAxis {
-    public _scale: Scale.Ordinal;
     private _tickLabelAngle = 0;
-    private measurer: _Util.Text.CachingCharacterMeasurer;
+    private _measurer: _Util.Text.CachingCharacterMeasurer;
 
     /**
      * Constructs a CategoryAxis.
@@ -26,7 +25,7 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this.measurer = new _Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
+      this._measurer = new _Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
     }
 
     public _rescale() {
@@ -41,13 +40,14 @@ export module Axis {
         return {width: 0, height: 0, wantsWidth: false, wantsHeight: false };
       }
 
-      var fakeScale = this._scale.copy();
+      var ordinalScale: Scale.Ordinal = <Scale.Ordinal> this._scale;
+      var fakeScale = ordinalScale.copy();
       if (this._isHorizontal()) {
         fakeScale.range([0, offeredWidth]);
       } else {
         fakeScale.range([offeredHeight, 0]);
       }
-      var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
+      var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, ordinalScale.domain());
 
       return {
         width : textResult.usedWidth  + widthRequiredByTicks,
@@ -87,7 +87,7 @@ export module Axis {
       return this;
     }
 
-    private tickLabelOrientation() {
+    private _tickLabelOrientation() {
       switch(this._tickLabelAngle) {
         case 0:
           return "horizontal";
@@ -104,8 +104,8 @@ export module Axis {
      * Measures the size of the ticks while also writing them to the DOM.
      * @param {D3.Selection} ticks The tick elements to be written to.
      */
-    private drawTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection) {
-      return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, true);
+    private _drawTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection) {
+      return this._drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, true);
     }
 
     /**
@@ -114,16 +114,16 @@ export module Axis {
      *
      * @param {string[]} ticks The strings that will be printed on the ticks.
      */
-    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: string[]) {
-      return this.drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, false);
+    private _measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: string[]) {
+      return this._drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, false);
     }
 
 
-    private drawOrMeasureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal,
+    private _drawOrMeasureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal,
                                   dataOrTicks: any, draw: boolean): _Util.Text.IWriteTextResult {
       var self = this;
       var textWriteResults: _Util.Text.IWriteTextResult[] = [];
-      var tm = (s: string) => self.measurer.measure(s);
+      var tm = (s: string) => self._measurer.measure(s);
       var iterator = draw ? (f: Function) => dataOrTicks.each(f) : (f: Function) => dataOrTicks.forEach(f);
 
       iterator(function (d: string) {
@@ -138,13 +138,13 @@ export module Axis {
           var d3this = d3.select(this);
           var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
           var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
-          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation(), {
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self._tickLabelOrientation(), {
                                                     g: d3this,
                                                     xAlign: xAlign[self.orient()],
                                                     yAlign: yAlign[self.orient()]
           });
         } else {
-          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self.tickLabelOrientation());
+          textWriteResult = _Util.Text.writeText(formatter(d), width, height, tm, self._tickLabelOrientation());
         }
 
         textWriteResults.push(textWriteResult);
@@ -161,10 +161,11 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
+      var ordScale = <Scale.Ordinal> this._scale;
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
-        var startAndWidth = this._scale.fullBandStartAndWidth(d);
+        var startAndWidth = ordScale.fullBandStartAndWidth(d);
         var bandStartPosition = startAndWidth[0];
         var x = this._isHorizontal() ? bandStartPosition : 0;
         var y = this._isHorizontal() ? 0 : bandStartPosition;
@@ -175,8 +176,8 @@ export module Axis {
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
       tickLabels.text("");
-      this.drawTicks(this.width(), this.height(), this._scale, tickLabels);
-      var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
+      this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
+      var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
 
       var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
@@ -190,7 +191,7 @@ export module Axis {
       // When anyone calls _invalidateLayout, _computeLayout will be called
       // on everyone, including this. Since CSS or something might have
       // affected the size of the characters, clear the cache.
-      this.measurer.clear();
+      this._measurer.clear();
       return super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
     }
   }

@@ -127,6 +127,8 @@ declare module Plottable {
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
             function colorTest(colorTester: D3.Selection, className: string): string;
+            function lightenColor(color: string, factor: number, lightenAmount: number): string;
+            function darkenColor(color: string, factor: number, darkenAmount: number): string;
         }
     }
 }
@@ -433,6 +435,32 @@ declare module Plottable {
              * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
              */
             function contrast(a: string, b: string): number;
+            /**
+             * Converts an RGB color value to HSL. Conversion formula
+             * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+             * Assumes r, g, and b are contained in the set [0, 255] and
+             * returns h, s, and l in the set [0, 1].
+             * Source: https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
+             *
+             * @param   Number  r       The red color value
+             * @param   Number  g       The green color value
+             * @param   Number  b       The blue color value
+             * @return  Array           The HSL representation
+             */
+            function rgbToHsl(r: number, g: number, b: number): number[];
+            /**
+             * Converts an HSL color value to RGB. Conversion formula
+             * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+             * Assumes h, s, and l are contained in the set [0, 1] and
+             * returns r, g, and b in the set [0, 255].
+             * Source: https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
+             *
+             * @param   Number  h       The hue
+             * @param   Number  s       The saturation
+             * @param   Number  l       The lightness
+             * @return  Array           The RGB representation
+             */
+            function hslToRgb(h: number, s: number, l: number): number[];
         }
     }
 }
@@ -1442,6 +1470,7 @@ declare module Plottable {
              */
             constructor(scaleType?: string);
             _getExtent(): string[];
+            scale(value: string): string;
         }
     }
 }
@@ -1899,6 +1928,33 @@ declare module Plottable {
              * @return {number} height of the component
              */
             height(): number;
+            /**
+             * Returns the foreground selection for the component
+             * (A selection covering the front of the component)
+             *
+             * Will return undefined if the component has not been anchored
+             *
+             * @return {D3.Selection} foreground selection for the component
+             */
+            foreground(): D3.Selection;
+            /**
+             * Returns the background selection for the component
+             * (A selection appearing behind of the component)
+             *
+             * Will return undefined if the component has not been anchored
+             *
+             * @return {D3.Selection} background selection for the component
+             */
+            background(): D3.Selection;
+            /**
+             * Returns the hitbox selection for the component
+             * (A selection in front of the foreground used mainly for interactions)
+             *
+             * Will return undefined if the component has not been anchored
+             *
+             * @return {D3.Selection} hitbox selection for the component
+             */
+            hitBox(): D3.Selection;
         }
     }
 }
@@ -2153,7 +2209,6 @@ declare module Plottable {
             tierConfigurations: TimeAxisTierConfiguration[];
         }
         class Time extends AbstractAxis {
-            _scale: Scale.Time;
             /**
              * Constructs a TimeAxis.
              *
@@ -2194,7 +2249,6 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Numeric extends AbstractAxis {
-            _scale: Scale.AbstractQuantitative<number>;
             /**
              * Constructs a NumericAxis.
              *
@@ -2261,7 +2315,6 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Category extends AbstractAxis {
-            _scale: Scale.Ordinal;
             /**
              * Constructs a CategoryAxis.
              *
@@ -2687,7 +2740,6 @@ declare module Plottable {
             addDataset(key: string, dataset: any[]): AbstractPlot;
             addDataset(dataset: Dataset): AbstractPlot;
             addDataset(dataset: any[]): AbstractPlot;
-            _addDataset(key: string, dataset: Dataset): void;
             _getDrawer(key: string): _Drawer.AbstractDrawer;
             _getAnimator(key: string): Animator.PlotAnimator;
             _onDatasetUpdate(): void;
@@ -2785,7 +2837,6 @@ declare module Plottable {
              * @return {Plot} The calling Plot.
              */
             removeDataset(dataArray: any[]): AbstractPlot;
-            _removeDataset(key: string): AbstractPlot;
             datasets(): Dataset[];
             _getDrawersInOrder(): _Drawer.AbstractDrawer[];
             _generateDrawSteps(): _Drawer.DrawStep[];
@@ -2812,7 +2863,7 @@ declare module Plottable {
              */
             constructor();
             _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
-            _addDataset(key: string, dataset: Dataset): void;
+            addDataset(keyOrDataset: any, dataset?: any): Pie;
             _generateAttrToProjector(): AttributeToProjector;
             _getDrawer(key: string): _Drawer.AbstractDrawer;
         }
@@ -2873,6 +2924,10 @@ declare module Plottable {
              * This call does not override auto domain adjustment behavior over visible points.
              */
             showAllData(): void;
+            _normalizeDatasets<A, B>(fromX: boolean): {
+                a: A;
+                b: B;
+            }[];
             _projectorsReady(): _Projection;
         }
     }
@@ -2912,8 +2967,6 @@ declare module Plottable {
     module Plot {
         class Grid extends AbstractXYPlot<string, string> {
             _colorScale: Scale.AbstractScale<any, string>;
-            _xScale: Scale.Ordinal;
-            _yScale: Scale.Ordinal;
             /**
              * Constructs a GridPlot.
              *
@@ -2927,7 +2980,7 @@ declare module Plottable {
              * to use for each grid cell.
              */
             constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>);
-            _addDataset(key: string, dataset: Dataset): void;
+            addDataset(keyOrDataset: any, dataset?: any): Grid;
             _getDrawer(key: string): _Drawer.Element;
             /**
              * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
@@ -3031,11 +3084,6 @@ declare module Plottable {
             getBars(xValOrExtent: number, yValOrExtent: Extent): D3.Selection;
             getBars(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
             getBars(xValOrExtent: number, yValOrExtent: number): D3.Selection;
-            /**
-             * Deselects all bars.
-             * @returns {AbstractBarPlot} The calling AbstractBarPlot.
-             */
-            deselectAll(): AbstractBarPlot<X, Y>;
             _updateDomainer(scale: Scale.AbstractScale<any, number>): void;
             _updateYDomainer(): void;
             _updateXDomainer(): void;
@@ -3190,6 +3238,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        interface ClusteredPlotMetadata extends PlotMetadata {
+            position: number;
+        }
         class ClusteredBar<X, Y> extends AbstractBarPlot<X, Y> {
             /**
              * Creates a ClusteredBarPlot.
@@ -3204,7 +3255,9 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             _generateAttrToProjector(): AttributeToProjector;
+            _updateClusterPosition(): void;
             _getDataToDraw(): D3.Map<any[]>;
+            _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata;
         }
     }
 }
@@ -3212,6 +3265,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        interface StackedPlotMetadata extends PlotMetadata {
+            offsets: D3.Map<number>;
+        }
         interface StackedDatum {
             key: any;
             value: number;
@@ -3219,6 +3275,7 @@ declare module Plottable {
         }
         class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
             _isVertical: boolean;
+            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractStacked<X, Y>;
             _onDatasetUpdate(): void;
             _updateStackOffsets(): void;
@@ -3236,6 +3293,10 @@ declare module Plottable {
             _getDomainKeys(): string[];
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             _updateScaleExtents(): void;
+            _normalizeDatasets<A, B>(fromX: boolean): {
+                a: A;
+                b: B;
+            }[];
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
         }
@@ -3245,7 +3306,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class StackedArea<X> extends AbstractStacked<X, number> {
+        class StackedArea<X> extends Area<X> {
             _baseline: D3.Selection;
             _baselineValue: number;
             /**
@@ -3257,13 +3318,28 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             _getDrawer(key: string): _Drawer.Area;
+            _getAnimator(key: string): Animator.PlotAnimator;
             _setup(): void;
-            _updateStackOffsets(): void;
             _additionalPaint(): void;
             _updateYDomainer(): void;
-            _onDatasetUpdate(): void;
+            project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedArea<X>;
+            _onDatasetUpdate(): StackedArea<X>;
             _generateAttrToProjector(): AttributeToProjector;
             _wholeDatumAttributes(): string[];
+            _updateStackOffsets(): void;
+            _updateStackExtents(): void;
+            _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
+            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
+            _getDomainKeys(): any;
+            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
+            _updateScaleExtents(): void;
+            _keyAccessor(): _Accessor;
+            _valueAccessor(): _Accessor;
+            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
+            _normalizeDatasets<A, B>(fromX: boolean): {
+                a: A;
+                b: B;
+            }[];
         }
     }
 }
@@ -3287,6 +3363,11 @@ declare module Plottable {
             _generateDrawSteps(): _Drawer.DrawStep[];
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedBar<X, Y>;
             _onDatasetUpdate(): StackedBar<X, Y>;
+            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
+            _normalizeDatasets<A, B>(fromX: boolean): {
+                a: A;
+                b: B;
+            }[];
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
             _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
@@ -3698,8 +3779,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class PanZoom extends AbstractInteraction {
-            _xScale: Scale.AbstractQuantitative<any>;
-            _yScale: Scale.AbstractQuantitative<any>;
             /**
              * Creates a PanZoomInteraction.
              *
@@ -3806,9 +3885,6 @@ declare module Plottable {
              * null.
              */
             dragBox: D3.Selection;
-            _boxIsDrawn: boolean;
-            _resizeXEnabled: boolean;
-            _resizeYEnabled: boolean;
             /**
              * Gets whether resizing is enabled or not.
              *
