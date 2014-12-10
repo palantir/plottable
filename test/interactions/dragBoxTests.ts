@@ -96,7 +96,7 @@ describe("DragBoxInteractions", () => {
 
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
-      var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox).CLASS_DRAG_BOX;
+      var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox)._CLASS_DRAG_BOX;
       var dragBox = plot._backgroundContainer.select(dragBoxClass);
       assert.isNotNull(dragBox, "the dragbox was created");
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};
@@ -237,7 +237,7 @@ describe("DragBoxInteractions", () => {
 
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
-      var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox).CLASS_DRAG_BOX;
+      var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox)._CLASS_DRAG_BOX;
       var dragBox = plot._backgroundContainer.select(dragBoxClass);
       assert.isNotNull(dragBox, "the dragbox was created");
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};

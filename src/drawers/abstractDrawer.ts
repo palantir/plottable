@@ -77,7 +77,7 @@ export module _Drawer {
       return data.length;
     }
 
-    private applyMetadata(attrToProjector: AttributeToProjector,
+    private _applyMetadata(attrToProjector: AttributeToProjector,
                           userMetadata: any,
                           plotMetadata: Plot.PlotMetadata): _AttributeToAppliedProjector {
       var modifiedAttrToProjector: _AttributeToAppliedProjector = {};
@@ -108,7 +108,7 @@ export module _Drawer {
     public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
         return {
-          attrToProjector: this.applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
+          attrToProjector: this._applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
           animator: dr.animator
         };
       });

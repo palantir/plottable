@@ -3,7 +3,7 @@
 module Plottable {
 export module _Drawer {
   export class Area extends Line {
-    private areaSelection: D3.Selection;
+    private _areaSelection: D3.Selection;
     private _drawLine = true;
 
     public _enterData(data: any[]) {
@@ -13,7 +13,7 @@ export module _Drawer {
         // HACKHACK Forced to use anycast to access protected var
         (<any> AbstractDrawer).prototype._enterData.call(this, data);
       }
-      this.areaSelection.datum(data);
+      this._areaSelection.datum(data);
     }
 
     /**
@@ -27,7 +27,7 @@ export module _Drawer {
     }
 
     public setup(area: D3.Selection) {
-      this.areaSelection = area.append("path")
+      this._areaSelection = area.append("path")
                                .classed("area", true)
                                .style({ "stroke": "none" });
       if (this._drawLine) {
@@ -37,7 +37,7 @@ export module _Drawer {
       }
     }
 
-    private createArea(xFunction: _AppliedProjector,
+    private _createArea(xFunction: _AppliedProjector,
                        y0Function: _AppliedProjector,
                        y1Function: _AppliedProjector,
                        definedFunction: _AppliedProjector) {
@@ -71,12 +71,12 @@ export module _Drawer {
         delete attrToProjector["defined"];
       }
 
-      attrToProjector["d"] = this.createArea(xFunction, y0Function, y1Function, definedFunction);
+      attrToProjector["d"] = this._createArea(xFunction, y0Function, y1Function, definedFunction);
 
       if (attrToProjector["fill"]) {
-        this.areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+        this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
-      step.animator.animate(this.areaSelection, attrToProjector);
+      step.animator.animate(this._areaSelection, attrToProjector);
     }
   }
 }

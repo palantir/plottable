@@ -64,37 +64,46 @@ export module Plot {
       return drawSteps;
     }
 
-    // HACKHACK User and plot metada should be applied - #1306.
     protected _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
-      var drawers = <_Drawer.Element[]> this._getDrawersInOrder();
       var attrToProjector = this._generateAttrToProjector();
-      var getDistSq = (d: any, i: number) => {
-        var dx = attrToProjector["cx"](d, i, null, null) - p.x;
-        var dy = attrToProjector["cy"](d, i, null, null) - p.y;
+      var xProjector = attrToProjector["x"];
+      var yProjector = attrToProjector["y"];
+      var getDistSq = (d: any, i: number, userMetdata: any, plotMetadata: PlotMetadata) => {
+        var dx = attrToProjector["cx"](d, i, userMetdata, plotMetadata) - p.x;
+        var dy = attrToProjector["cy"](d, i, userMetdata, plotMetadata) - p.y;
         return (dx * dx + dy * dy);
       };
 
       var overAPoint = false;
       var closestElement: Element;
+      var closestElementUserMetadata: any;
+      var closestElementPlotMetadata: any;
       var closestIndex: number;
       var minDistSq = range * range;
 
-      drawers.forEach((drawer) => {
-        drawer._getRenderArea().selectAll("circle").each(function (d, i) {
-          var distSq = getDistSq(d, i);
-          var r = attrToProjector["r"](d, i, null, null);
+      this._datasetKeysInOrder.forEach((key: string) => {
+        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
+        var drawer = <_Drawer.Element>this._key2PlotDatasetKey.get(key).drawer;
+        drawer._getRenderArea().selectAll("circle").each(function(d, i) {
+          var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
+          var r = attrToProjector["r"](d, i, dataset.metadata(), plotMetadata);
 
           if (distSq < r * r) { // cursor is over this point
             if (!overAPoint || distSq < minDistSq) {
               closestElement = this;
               closestIndex = i;
               minDistSq = distSq;
+              closestElementUserMetadata = dataset.metadata();
+              closestElementPlotMetadata = plotMetadata;
             }
             overAPoint = true;
           } else if (!overAPoint && distSq < minDistSq) {
             closestElement = this;
             closestIndex = i;
             minDistSq = distSq;
+            closestElementUserMetadata = dataset.metadata();
+            closestElementPlotMetadata = plotMetadata;
           }
         });
       });
@@ -110,8 +119,8 @@ export module Plot {
       var closestSelection = d3.select(closestElement);
       var closestData = closestSelection.data();
       var closestPoint = {
-        x: attrToProjector["cx"](closestData[0], closestIndex, null, null),
-        y: attrToProjector["cy"](closestData[0], closestIndex, null, null)
+        x: attrToProjector["cx"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata),
+        y: attrToProjector["cy"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata)
       };
       return {
         selection: closestSelection,

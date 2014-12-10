@@ -30,8 +30,9 @@ export module Plot {
     protected _setup() {
       super._setup();
       this._hoverTarget = this._foregroundContainer.append("circle")
-                                          .classed("hover-target", true)
-                                          .style("visibility", "hidden");
+                                                   .classed("hover-target", true)
+                                                   .attr("r", this._hoverDetectionRadius)
+                                                   .style("visibility", "hidden");
     }
 
     protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor) {
@@ -94,15 +95,14 @@ export module Plot {
       return ["x", "y"];
     }
 
-    // HACKHACK User and plot metadata should be applied here - #1306.
     protected _getClosestWithinRange(p: Point, range: number) {
       var attrToProjector = this._generateAttrToProjector();
       var xProjector = attrToProjector["x"];
       var yProjector = attrToProjector["y"];
 
-      var getDistSq = (d: any, i: number) => {
-        var dx = +xProjector(d, i, null, null) - p.x;
-        var dy = +yProjector(d, i, null, null) - p.y;
+      var getDistSq = (d: any, i: number, userMetdata: any, plotMetadata: PlotMetadata) => {
+        var dx = +xProjector(d, i, userMetdata, plotMetadata) - p.x;
+        var dy = +yProjector(d, i, userMetdata, plotMetadata) - p.y;
         return (dx * dx + dy * dy);
       };
 
@@ -110,14 +110,16 @@ export module Plot {
       var closestPoint: Point;
       var closestDistSq = range * range;
 
-      this.datasets().forEach((dataset) => {
+       this._datasetKeysInOrder.forEach((key: string) => {
+        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
         dataset.data().forEach((d: any, i: number) => {
-          var distSq = getDistSq(d, i);
+          var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
           if (distSq < closestDistSq) {
             closestOverall = d;
             closestPoint = {
-              x: xProjector(d, i, null, null),
-              y: yProjector(d, i, null, null)
+              x: xProjector(d, i, dataset.metadata(), plotMetadata),
+              y: yProjector(d, i, dataset.metadata(), plotMetadata)
             };
             closestDistSq = distSq;
           }

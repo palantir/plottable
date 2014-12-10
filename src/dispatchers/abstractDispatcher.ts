@@ -5,7 +5,7 @@ export module Dispatcher {
   export class AbstractDispatcher extends Core.PlottableObject {
     protected _target: D3.Selection;
     protected _event2Callback: { [eventName: string]: () => any; } = {};
-    private connected = false;
+    private _connected = false;
 
     /**
      * Constructs a Dispatcher with the specified target.
@@ -35,7 +35,7 @@ export module Dispatcher {
       if (targetElement == null) {
         return this._target;
       }
-      var wasConnected = this.connected;
+      var wasConnected = this._connected;
       this.disconnect();
       this._target = targetElement;
       if (wasConnected) {
@@ -58,11 +58,11 @@ export module Dispatcher {
      * @returns {Dispatcher} The calling Dispatcher.
      */
     public connect() {
-      if (this.connected) {
+      if (this._connected) {
         throw new Error("Can't connect dispatcher twice!");
       }
       if (this._target) {
-        this.connected = true;
+        this._connected = true;
         Object.keys(this._event2Callback).forEach((event: string) => {
           var callback = this._event2Callback[event];
           this._target.on(this._getEventString(event), callback);
@@ -78,7 +78,7 @@ export module Dispatcher {
      * @returns {Dispatcher} The calling Dispatcher.
      */
     public disconnect() {
-      this.connected = false;
+      this._connected = false;
       if (this._target) {
         Object.keys(this._event2Callback).forEach((event: string) => {
           this._target.on(this._getEventString(event), null);

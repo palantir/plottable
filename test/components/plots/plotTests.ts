@@ -207,7 +207,7 @@ describe("Plots", () => {
       var s = new Plottable.Scale.Linear();
       r.project("attr", "a", s);
       r.remove();
-      var key2callback = (<any> s).broadcaster.key2callback;
+      var key2callback = (<any> s).broadcaster._key2callback;
       assert.isUndefined(key2callback.get(r), "the plot is no longer attached to the scale");
     });
 
@@ -269,6 +269,25 @@ describe("Plots", () => {
       plot.renderTo(svg);
       svg.remove();
       assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");
+    });
+
+    it("extent calculation done in correct dataset order", () => {
+      var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
+      var ordinalScale = new Plottable.Scale.Ordinal();
+      var dataset1 = [{key: "A"}];
+      var dataset2 = [{key: "B"}];
+      var plot = new Plottable.Plot.AbstractPlot()
+                                   .addDataset("b", dataset2)
+                                   .addDataset("a", dataset1);
+      plot.project("key", "key", ordinalScale);
+
+      plot.datasetOrder(["a", "b"]);
+
+      var svg = generateSVG();
+      plot.renderTo(svg);
+
+      assert.deepEqual(ordinalScale.domain(), ["A", "B"], "extent is in the right order");
+      svg.remove();
     });
   });
 
@@ -371,9 +390,9 @@ describe("Plots", () => {
     it("listeners are deregistered after removal", () => {
       plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       plot.remove();
-      var key2callback = (<any> xScale).broadcaster.key2callback;
+      var key2callback = (<any> xScale).broadcaster._key2callback;
       assert.isUndefined(key2callback.get("yDomainAdjustment" + plot._plottableID), "the plot is no longer attached to the xScale");
-      key2callback = (<any> yScale).broadcaster.key2callback;
+      key2callback = (<any> yScale).broadcaster._key2callback;
       assert.isUndefined(key2callback.get("xDomainAdjustment" + plot._plottableID), "the plot is no longer attached to the yScale");
       svg.remove();
     });

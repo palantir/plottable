@@ -73,7 +73,7 @@ describe("Interactions", () => {
       ki.on(bCode, bCallback);
       component.registerInteraction(ki);
 
-      var $hitbox = $((<any> component).hitBox.node());
+      var $hitbox = $((<any> component)._hitBox.node());
 
       $hitbox.simulate("mouseover");
       $hitbox.simulate("keydown", { keyCode: aCode });

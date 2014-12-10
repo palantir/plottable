@@ -12,9 +12,9 @@ describe("ComponentGroups", () => {
     var cg = new Plottable.Component.Group([c1, c2, c3]);
     var svg = generateSVG(400, 400);
     cg._anchor(svg);
-    (<any> c1).addBox("test-box1");
-    (<any> c2).addBox("test-box2");
-    (<any> c3).addBox("test-box3");
+    (<any> c1)._addBox("test-box1");
+    (<any> c2)._addBox("test-box2");
+    (<any> c3)._addBox("test-box3");
     cg._computeLayout()._render();
     var t1 = svg.select(".test-box1");
     var t2 = svg.select(".test-box2");
@@ -22,6 +22,26 @@ describe("ComponentGroups", () => {
     assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
     assertWidthHeight(t2, 400, 400, "rect2 sized correctly");
     assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
+    svg.remove();
+  });
+
+  it("components in componentGroups occupies all available space", () => {
+    var svg = generateSVG(400, 400);
+    var xAxis = new Plottable.Axis.Numeric(new Plottable.Scale.Linear(), "bottom");
+
+    var leftLabel = new Plottable.Component.Label("LEFT").xAlign("left");
+    var rightLabel = new Plottable.Component.Label("RIGHT").xAlign("right");
+
+    var labelGroup = new Plottable.Component.Group([leftLabel, rightLabel]);
+
+    var table = new Plottable.Component.Table([
+        [labelGroup],
+        [xAxis]
+    ]);
+
+    table.renderTo(svg);
+
+    assertBBoxNonIntersection((<any>leftLabel)._element.select(".bounding-box"), (<any>rightLabel)._element.select(".bounding-box"));
     svg.remove();
   });
 
@@ -33,15 +53,15 @@ describe("ComponentGroups", () => {
     var cg = new Plottable.Component.Group([c1]);
     var svg = generateSVG(400, 400);
     cg.merge(c2)._anchor(svg);
-    (<any> c1).addBox("test-box1");
-    (<any> c2).addBox("test-box2");
+    (<any> c1)._addBox("test-box1");
+    (<any> c2)._addBox("test-box2");
     cg._computeLayout()._render();
     var t1 = svg.select(".test-box1");
     var t2 = svg.select(".test-box2");
     assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
     assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
     cg.merge(c3);
-    (<any> c3).addBox("test-box3");
+    (<any> c3)._addBox("test-box3");
     cg._computeLayout()._render();
     var t3 = svg.select(".test-box3");
     assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
@@ -62,7 +82,7 @@ describe("ComponentGroups", () => {
     assert.isFalse(cg._isFixedWidth(), "width not fixed when one component unfixed");
 
     fixComponentSize(c2, null, 10);
-    assert.isTrue(cg._isFixedHeight(), "height fixed when both components fixed");
+    assert.isFalse(cg._isFixedHeight(), "height unfixed when both components fixed");
     assert.isFalse(cg._isFixedWidth(), "width unfixed when one component unfixed");
   });
 
@@ -148,7 +168,7 @@ describe("ComponentGroups", () => {
     it("_works for an empty ComponentGroup", () => {
         var cg = new Plottable.Component.Group();
         var request = cg._requestedSpace(10, 10);
-        verifySpaceRequest(request, 0, 0, false, false, "");
+        verifySpaceRequest(request, 10, 10, false, false, "");
     });
 
     it("works for a ComponentGroup with only proportional-size components", () => {
@@ -157,7 +177,7 @@ describe("ComponentGroups", () => {
       var c2 = new Plottable.Component.AbstractComponent();
       cg.merge(c1).merge(c2);
       var request = cg._requestedSpace(10, 10);
-      verifySpaceRequest(request, 0, 0, false, false, "");
+      verifySpaceRequest(request, 10, 10, false, false, "");
     });
 
     it("works when there are fixed-size components", () => {
@@ -169,7 +189,7 @@ describe("ComponentGroups", () => {
       fixComponentSize(c1, null, 10);
       fixComponentSize(c2, null, 50);
       var request = cg._requestedSpace(10, 10);
-      verifySpaceRequest(request, 0, 50, false, true, "");
+      verifySpaceRequest(request, 10, 50, false, true, "");
     });
   });
 
