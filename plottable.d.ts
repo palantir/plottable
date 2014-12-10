@@ -1989,7 +1989,8 @@ declare module Plottable {
              */
             detachAll(): AbstractComponentContainer;
             remove(): void;
-            isLayoutCalculated(calculated?: boolean): any;
+            isLayoutCalculated(): boolean;
+            isLayoutCalculated(calculated: boolean): AbstractComponent;
         }
     }
 }

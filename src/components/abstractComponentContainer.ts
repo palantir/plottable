@@ -80,6 +80,8 @@ export module Component {
       this.components().slice().forEach((c: AbstractComponent) => c.remove());
     }
 
+    public isLayoutCalculated(): boolean;
+    public isLayoutCalculated(calculated: boolean) : AbstractComponent;
     public isLayoutCalculated(calculated?: boolean) : any {
       this.components().slice().forEach((c: AbstractComponent) => c.isLayoutCalculated(calculated));
       return super.isLayoutCalculated(calculated);
