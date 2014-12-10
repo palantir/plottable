@@ -158,7 +158,7 @@ export module Component {
       }
     }
 
-    public _scheduleComputeLayout() {
+    private _scheduleComputeLayout() {
       if (this._isAnchored && this._isSetup) {
         Core.RenderController.registerToComputeLayout(this);
       }

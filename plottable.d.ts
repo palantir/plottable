@@ -1784,7 +1784,6 @@ declare module Plottable {
              */
             _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             _render(): void;
-            _scheduleComputeLayout(): void;
             _doRender(): void;
             _invalidateLayout(): void;
             /**
