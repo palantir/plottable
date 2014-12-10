@@ -175,8 +175,8 @@ export module Axis {
                   var formattedText = this.formatter()(s);
                   if (!this._isHorizontal()) {
                     var availableTextSpace = this.width() - this.tickLabelPadding();
-                    availableTextSpace -= this.tickLabelPositioning === "center" ? this._maxLabelTickLength() : 0;
-                    formattedText = _Util.Text.getTruncatedText(formattedText, availableTextSpace, this.measurer);
+                    availableTextSpace -= this._tickLabelPositioning === "center" ? this._maxLabelTickLength() : 0;
+                    formattedText = _Util.Text.getTruncatedText(formattedText, availableTextSpace, this._measurer);
                   }
                   return formattedText;
                 });
