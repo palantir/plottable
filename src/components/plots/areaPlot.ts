@@ -28,7 +28,7 @@ export module Plot {
       this._defaultFillColor = new Scale.Color().range()[0];
     }
 
-    public _onDatasetUpdate() {
+    protected _onDatasetUpdate() {
       super._onDatasetUpdate();
       if (this._yScale != null) {
         this._updateYDomainer();
