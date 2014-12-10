@@ -4,11 +4,11 @@ module Plottable {
 export module Scale {
   export class AbstractScale<D,R> extends Core.PlottableObject implements Core.Listenable {
     protected _d3Scale: D3.Scale.Scale;
-    public _autoDomainAutomatically = true;
+    private _autoDomainAutomatically = true;
     public broadcaster: Core.Broadcaster;
-    public _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
+    private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     public _typeCoercer: (d: any) => any = (d: any) => d;
-    public _domainModificationInProgress: boolean = false;
+    private _domainModificationInProgress: boolean = false;
     /**
      * Constructs a new Scale.
      *

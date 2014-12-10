@@ -5,8 +5,8 @@ export module Plot {
   export class StackedArea<X> extends Area<X> {
 
     private _isVertical: boolean;
-    public _baseline: D3.Selection;
-    public _baselineValue = 0;
+    private _baseline: D3.Selection;
+    private _baselineValue = 0;
 
     /**
      * Constructs a StackedArea plot.
@@ -63,7 +63,7 @@ export module Plot {
       return this;
     }
 
-    public _onDatasetUpdate() {
+    protected _onDatasetUpdate() {
       super._onDatasetUpdate();
       AbstractStacked.prototype._onDatasetUpdate.apply(this);
       return this;
@@ -143,7 +143,7 @@ export module Plot {
       return AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
     }
 
-    public _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
+    protected _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
       return AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
     }
     //===== /Stack logic =====

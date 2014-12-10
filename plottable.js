@@ -7815,7 +7815,7 @@ var Plottable;
             }
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._hoverTarget = this._foregroundContainer.append("circle").classed("hover-target", true).attr("r", this._hoverDetectionRadius).style("visibility", "hidden");
+                this._hoverTarget = this.foreground().append("circle").classed("hover-target", true).attr("r", this._hoverDetectionRadius).style("visibility", "hidden");
             };
             Line.prototype._rejectNullsAndNaNs = function (d, i, userMetdata, plotMetadata, accessor) {
                 var value = accessor(d, i, userMetdata, plotMetadata);
@@ -9389,8 +9389,8 @@ var Plottable;
                     return this._resizeXEnabled || this._resizeYEnabled;
                 }
                 else {
-                    this._resizeXEnabled = enabled && this.constructor._CAN_RESIZE_X;
-                    this._resizeYEnabled = enabled && this.constructor._CAN_RESIZE_Y;
+                    this._resizeXEnabled = enabled && this.canResizeX();
+                    this._resizeYEnabled = enabled && this.canResizeY();
                     return this;
                 }
             };
@@ -9556,7 +9556,7 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 var cname = DragBox._CLASS_DRAG_BOX;
-                var background = this._componentToListenTo._backgroundContainer;
+                var background = this._componentToListenTo.background();
                 this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
                 hitBox.on("mousemove", function () { return _this._hover(); });
                 return this;
@@ -9593,6 +9593,12 @@ var Plottable;
                     return "";
                 }
             };
+            DragBox.prototype.canResizeX = function () {
+                return true;
+            };
+            DragBox.prototype.canResizeY = function () {
+                return true;
+            };
             DragBox._CLASS_DRAG_BOX = "drag-box";
             DragBox.RESIZE_PADDING = 10;
             DragBox._CAN_RESIZE_X = true;
@@ -9625,7 +9631,9 @@ var Plottable;
             XDragBox.prototype._setLocation = function (x, y) {
                 _super.prototype._setLocation.call(this, x, this._componentToListenTo.height());
             };
-            XDragBox._CAN_RESIZE_Y = false;
+            XDragBox.prototype.canResizeY = function () {
+                return false;
+            };
             return XDragBox;
         })(Interaction.DragBox);
         Interaction.XDragBox = XDragBox;
@@ -9677,7 +9685,9 @@ var Plottable;
             YDragBox.prototype._setLocation = function (x, y) {
                 _super.prototype._setLocation.call(this, this._componentToListenTo.width(), y);
             };
-            YDragBox._CAN_RESIZE_X = false;
+            YDragBox.prototype.canResizeX = function () {
+                return false;
+            };
             return YDragBox;
         })(Interaction.DragBox);
         Interaction.YDragBox = YDragBox;
