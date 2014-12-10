@@ -3547,7 +3547,7 @@ declare module Plottable {
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
             animate(selection: any, attrToProjector: AttributeToProjector): any;
-            _startMovingProjector(attrToProjector: AttributeToProjector): _Projector;
+            protected _startMovingProjector(attrToProjector: AttributeToProjector): _Projector;
         }
     }
 }
@@ -3571,7 +3571,7 @@ declare module Plottable {
              * @param {boolean} isVertical If the movement/animation is vertical
              */
             constructor(startPixelValue: number, isVertical?: boolean);
-            _startMovingProjector(attrToProjector: AttributeToProjector): (p: any) => number;
+            protected _startMovingProjector(attrToProjector: AttributeToProjector): (p: any) => number;
         }
     }
 }
