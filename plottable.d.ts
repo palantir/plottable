@@ -1753,8 +1753,6 @@ declare module Plottable {
             static AUTORESIZE_BY_DEFAULT: boolean;
             protected _element: D3.Selection;
             protected _content: D3.Selection;
-            _backgroundContainer: D3.Selection;
-            _foregroundContainer: D3.Selection;
             clipPathEnabled: boolean;
             _parent: AbstractComponentContainer;
             protected _fixedHeightFlag: boolean;

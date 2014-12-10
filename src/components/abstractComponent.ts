@@ -7,8 +7,8 @@ export module Component {
 
     protected _element: D3.Selection;
     protected _content: D3.Selection;
-    public _backgroundContainer: D3.Selection;
-    public _foregroundContainer: D3.Selection;
+    private _backgroundContainer: D3.Selection;
+    private _foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
     private _xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
     private _yOrigin: number;

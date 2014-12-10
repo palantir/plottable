@@ -29,10 +29,10 @@ export module Plot {
 
     protected _setup() {
       super._setup();
-      this._hoverTarget = this._foregroundContainer.append("circle")
-                                                   .classed("hover-target", true)
-                                                   .attr("r", this._hoverDetectionRadius)
-                                                   .style("visibility", "hidden");
+      this._hoverTarget = this.foreground().append("circle")
+                                           .classed("hover-target", true)
+                                           .attr("r", this._hoverDetectionRadius)
+                                           .style("visibility", "hidden");
     }
 
     protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor) {
