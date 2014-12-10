@@ -3715,8 +3715,8 @@ declare module Plottable {
              * "foreground" and "background" elements where it can draw things,
              * e.g. crosshairs.
              */
-            _hitBox: D3.Selection;
-            _componentToListenTo: Component.AbstractComponent;
+            protected _hitBox: D3.Selection;
+            protected _componentToListenTo: Component.AbstractComponent;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
         }
     }
