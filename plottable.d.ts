@@ -2713,7 +2713,7 @@ declare module Plottable {
                 [x: string]: _Projection;
             };
             protected _animate: boolean;
-            _animateOnNextRender: boolean;
+            protected _animateOnNextRender: boolean;
             /**
              * Constructs a Plot.
              *

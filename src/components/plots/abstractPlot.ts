@@ -26,7 +26,7 @@ export module Plot {
 
     protected _animate: boolean = false;
     private _animators: Animator.PlotAnimatorMap = {};
-    public _animateOnNextRender = true;
+    protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
 
     /**
