@@ -829,6 +829,32 @@ describe("NumericAxis", function () {
         });
         svg.remove();
     });
+    it("truncates long labels", function () {
+        var data = [
+            { x: "A", y: 500000000 },
+            { x: "B", y: 400000000 }
+        ];
+        var SVG_WIDTH = 120;
+        var SVG_HEIGHT = 300;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var xScale = new Plottable.Scale.Ordinal();
+        var yScale = new Plottable.Scale.Linear();
+        var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+        var yLabel = new Plottable.Component.AxisLabel("LABEL", "left");
+        var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+        barPlot.project("x", "x", xScale);
+        barPlot.project("y", "y", yScale);
+        barPlot.addDataset(data);
+        var chart = new Plottable.Component.Table([
+            [yLabel, yAxis, barPlot]
+        ]);
+        chart.renderTo(svg);
+        var labelContainer = d3.select(".tick-label-container");
+        d3.selectAll(".tick-label").each(function () {
+            assertBBoxInclusion(labelContainer, d3.select(this));
+        });
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -4446,6 +4472,20 @@ describe("ComponentGroups", function () {
         assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
         svg.remove();
     });
+    it("components in componentGroups occupies all available space", function () {
+        var svg = generateSVG(400, 400);
+        var xAxis = new Plottable.Axis.Numeric(new Plottable.Scale.Linear(), "bottom");
+        var leftLabel = new Plottable.Component.Label("LEFT").xAlign("left");
+        var rightLabel = new Plottable.Component.Label("RIGHT").xAlign("right");
+        var labelGroup = new Plottable.Component.Group([leftLabel, rightLabel]);
+        var table = new Plottable.Component.Table([
+            [labelGroup],
+            [xAxis]
+        ]);
+        table.renderTo(svg);
+        assertBBoxNonIntersection(leftLabel._element.select(".bounding-box"), rightLabel._element.select(".bounding-box"));
+        svg.remove();
+    });
     it("components can be added before and after anchoring", function () {
         var c1 = makeFixedSizeComponent(10, 10);
         var c2 = makeFixedSizeComponent(20, 20);
@@ -4478,7 +4518,7 @@ describe("ComponentGroups", function () {
         assert.isFalse(cg._isFixedHeight(), "height not fixed when one component unfixed");
         assert.isFalse(cg._isFixedWidth(), "width not fixed when one component unfixed");
         fixComponentSize(c2, null, 10);
-        assert.isTrue(cg._isFixedHeight(), "height fixed when both components fixed");
+        assert.isFalse(cg._isFixedHeight(), "height unfixed when both components fixed");
         assert.isFalse(cg._isFixedWidth(), "width unfixed when one component unfixed");
     });
     it("componentGroup subcomponents have xOffset, yOffset of 0", function () {
@@ -4546,7 +4586,7 @@ describe("ComponentGroups", function () {
         it("_works for an empty ComponentGroup", function () {
             var cg = new Plottable.Component.Group();
             var request = cg._requestedSpace(10, 10);
-            verifySpaceRequest(request, 0, 0, false, false, "");
+            verifySpaceRequest(request, 10, 10, false, false, "");
         });
         it("works for a ComponentGroup with only proportional-size components", function () {
             var cg = new Plottable.Component.Group();
@@ -4554,7 +4594,7 @@ describe("ComponentGroups", function () {
             var c2 = new Plottable.Component.AbstractComponent();
             cg.merge(c1).merge(c2);
             var request = cg._requestedSpace(10, 10);
-            verifySpaceRequest(request, 0, 0, false, false, "");
+            verifySpaceRequest(request, 10, 10, false, false, "");
         });
         it("works when there are fixed-size components", function () {
             var cg = new Plottable.Component.Group();
@@ -4565,7 +4605,7 @@ describe("ComponentGroups", function () {
             fixComponentSize(c1, null, 10);
             fixComponentSize(c2, null, 50);
             var request = cg._requestedSpace(10, 10);
-            verifySpaceRequest(request, 0, 50, false, true, "");
+            verifySpaceRequest(request, 10, 50, false, true, "");
         });
     });
     describe("Component.merge works as expected", function () {
@@ -4912,12 +4952,12 @@ describe("Component behavior", function () {
         var c = makeFixedSizeComponent(10, 10);
         cg._addComponent(c);
         cg.renderTo(svg);
-        assert.equal(cg.height(), 10, "height() initially 10 for fixed-size component");
-        assert.equal(cg.width(), 10, "width() initially 10 for fixed-size component");
+        assert.equal(cg.height(), 300, "height() is the entire available height");
+        assert.equal(cg.width(), 400, "width() is the entire available width");
         fixComponentSize(c, 50, 50);
         c._invalidateLayout();
-        assert.equal(cg.height(), 50, "invalidateLayout propagated to parent and caused resized height");
-        assert.equal(cg.width(), 50, "invalidateLayout propagated to parent and caused resized width");
+        assert.equal(cg.height(), 300, "height() after resizing is the entire available height");
+        assert.equal(cg.width(), 400, "width() after resizing is the entire available width");
         svg.remove();
     });
     it("components can be detached even if not anchored", function () {
