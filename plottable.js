@@ -3761,7 +3761,7 @@ var Plottable;
                 this._cssClasses = ["component"];
                 this._removed = false;
                 this._autoResize = AbstractComponent.AUTORESIZE_BY_DEFAULT;
-                this._isLayoutCalculated = false;
+                this._usedLastLayout = false;
             }
             /**
              * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -3884,17 +3884,17 @@ var Plottable;
             };
             AbstractComponent.prototype._doRender = function () {
             };
-            AbstractComponent.prototype.isLayoutCalculated = function (calculated) {
-                if (calculated == null) {
-                    return this._isLayoutCalculated;
+            AbstractComponent.prototype._useLastCalculatedLayout = function (useLast) {
+                if (useLast == null) {
+                    return this._usedLastLayout;
                 }
                 else {
-                    this._isLayoutCalculated = calculated;
+                    this._usedLastLayout = useLast;
                     return this;
                 }
             };
             AbstractComponent.prototype._invalidateLayout = function () {
-                this.isLayoutCalculated(false);
+                this._useLastCalculatedLayout(false);
                 if (this._isAnchored && this._isSetup) {
                     if (this._isTopLevelComponent) {
                         this._scheduleComputeLayout();
@@ -4345,9 +4345,9 @@ var Plottable;
                 _super.prototype.remove.call(this);
                 this.components().slice().forEach(function (c) { return c.remove(); });
             };
-            AbstractComponentContainer.prototype.isLayoutCalculated = function (calculated) {
-                this.components().slice().forEach(function (c) { return c.isLayoutCalculated(calculated); });
-                return _super.prototype.isLayoutCalculated.call(this, calculated);
+            AbstractComponentContainer.prototype._useLastCalculatedLayout = function (calculated) {
+                this.components().slice().forEach(function (c) { return c._useLastCalculatedLayout(calculated); });
+                return _super.prototype._useLastCalculatedLayout.call(this, calculated);
             };
             return AbstractComponentContainer;
         })(Component.AbstractComponent);
@@ -6363,12 +6363,9 @@ var Plottable;
             // xOffset is relative to parent element, not absolute
             Table.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 var _this = this;
-                if (!this.isLayoutCalculated()) {
-                    this.isLayoutCalculated(false);
-                }
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                var layout = this.isLayoutCalculated() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
-                this.isLayoutCalculated(true);
+                var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
+                this._useLastCalculatedLayout(true);
                 var childYOffset = 0;
                 var rowHeights = Plottable._Util.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
                 var colWidths = Plottable._Util.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);

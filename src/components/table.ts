@@ -252,13 +252,10 @@ export module Component {
 
     // xOffset is relative to parent element, not absolute
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
-      if (!this.isLayoutCalculated()) {
-        this.isLayoutCalculated(false);
-      }
       super._computeLayout(xOffset, yOffset, availableWidth , availableHeight);
-      var layout = this.isLayoutCalculated() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
+      var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
 
-      this.isLayoutCalculated(true);
+      this._useLastCalculatedLayout(true);
 
       var childYOffset = 0;
       var rowHeights = _Util.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
