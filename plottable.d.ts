@@ -1053,13 +1053,8 @@ declare module Plottable {
     module Scale {
         class AbstractScale<D, R> extends Core.PlottableObject implements Core.Listenable {
             protected _d3Scale: D3.Scale.Scale;
-            _autoDomainAutomatically: boolean;
             broadcaster: Core.Broadcaster;
-            _rendererAttrID2Extent: {
-                [x: string]: D[];
-            };
             _typeCoercer: (d: any) => any;
-            _domainModificationInProgress: boolean;
             /**
              * Constructs a new Scale.
              *
