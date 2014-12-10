@@ -829,6 +829,32 @@ describe("NumericAxis", function () {
         });
         svg.remove();
     });
+    it("truncates long labels", function () {
+        var data = [
+            { x: "A", y: 500000000 },
+            { x: "B", y: 400000000 }
+        ];
+        var SVG_WIDTH = 120;
+        var SVG_HEIGHT = 300;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var xScale = new Plottable.Scale.Ordinal();
+        var yScale = new Plottable.Scale.Linear();
+        var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+        var yLabel = new Plottable.Component.AxisLabel("LABEL", "left");
+        var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+        barPlot.project("x", "x", xScale);
+        barPlot.project("y", "y", yScale);
+        barPlot.addDataset(data);
+        var chart = new Plottable.Component.Table([
+            [yLabel, yAxis, barPlot]
+        ]);
+        chart.renderTo(svg);
+        var labelContainer = d3.select(".tick-label-container");
+        d3.selectAll(".tick-label").each(function () {
+            assertBBoxInclusion(labelContainer, d3.select(this));
+        });
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
