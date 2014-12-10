@@ -1785,6 +1785,8 @@ declare module Plottable {
             _render(): void;
             _scheduleComputeLayout(): void;
             _doRender(): void;
+            isLayoutCalculated(): boolean;
+            isLayoutCalculated(calculated: boolean): AbstractComponent;
             _invalidateLayout(): void;
             /**
              * Renders the Component into a given DOM element. The element must be as <svg>.
@@ -1987,6 +1989,7 @@ declare module Plottable {
              */
             detachAll(): AbstractComponentContainer;
             remove(): void;
+            isLayoutCalculated(calculated?: boolean): any;
         }
     }
 }

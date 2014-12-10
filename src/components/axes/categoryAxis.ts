@@ -47,13 +47,16 @@ export module Axis {
       } else {
         fakeScale.range([offeredHeight, 0]);
       }
-      var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, ordinalScale.domain());
+      var textResult = this._measureTicks(offeredWidth - widthRequiredByTicks,
+                                          offeredHeight - heightRequiredByTicks,
+                                          fakeScale,
+                                          ordinalScale.domain());
 
       return {
         width : textResult.usedWidth  + widthRequiredByTicks,
         height: textResult.usedHeight + heightRequiredByTicks,
-        wantsWidth : !textResult.textFits || textResult.usedWidth  + widthRequiredByTicks > offeredWidth,
-        wantsHeight: !textResult.textFits || textResult.usedHeight  + heightRequiredByTicks > offeredHeight
+        wantsWidth : !textResult.textFits,
+        wantsHeight: !textResult.textFits
       };
     }
 

@@ -34,6 +34,7 @@ export module Component {
     private _cssClasses: string[] = ["component"];
     private _removed = false;
     private _autoResize = AbstractComponent.AUTORESIZE_BY_DEFAULT;
+    private _isLayoutCalculated = false;
 
     /**
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -166,7 +167,19 @@ export module Component {
 
     public _doRender() {/* overwrite */}
 
+    public isLayoutCalculated(): boolean;
+    public isLayoutCalculated(calculated: boolean) : AbstractComponent;
+    public isLayoutCalculated(calculated?: boolean) : any {
+      if (calculated == null) {
+        return this._isLayoutCalculated;
+      } else {
+        this._isLayoutCalculated = calculated;
+        return this;
+      }
+    }
+
     public _invalidateLayout() {
+      this.isLayoutCalculated(false);
       if (this._isAnchored && this._isSetup) {
         if (this._isTopLevelComponent) {
           this._scheduleComputeLayout();

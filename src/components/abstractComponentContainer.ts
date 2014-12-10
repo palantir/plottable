@@ -79,6 +79,11 @@ export module Component {
       super.remove();
       this.components().slice().forEach((c: AbstractComponent) => c.remove());
     }
+
+    public isLayoutCalculated(calculated?: boolean) : any {
+      this.components().slice().forEach((c: AbstractComponent) => c.isLayoutCalculated(calculated));
+      return super.isLayoutCalculated(calculated);
+    }
   }
 }
 }

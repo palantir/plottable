@@ -3761,6 +3761,7 @@ var Plottable;
                 this._cssClasses = ["component"];
                 this._removed = false;
                 this._autoResize = AbstractComponent.AUTORESIZE_BY_DEFAULT;
+                this._isLayoutCalculated = false;
             }
             /**
              * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -3883,7 +3884,17 @@ var Plottable;
             };
             AbstractComponent.prototype._doRender = function () {
             };
+            AbstractComponent.prototype.isLayoutCalculated = function (calculated) {
+                if (calculated == null) {
+                    return this._isLayoutCalculated;
+                }
+                else {
+                    this._isLayoutCalculated = calculated;
+                    return this;
+                }
+            };
             AbstractComponent.prototype._invalidateLayout = function () {
+                this.isLayoutCalculated(false);
                 if (this._isAnchored && this._isSetup) {
                     if (this._isTopLevelComponent) {
                         this._scheduleComputeLayout();
@@ -4333,6 +4344,10 @@ var Plottable;
             AbstractComponentContainer.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 this.components().slice().forEach(function (c) { return c.remove(); });
+            };
+            AbstractComponentContainer.prototype.isLayoutCalculated = function (calculated) {
+                this.components().slice().forEach(function (c) { return c.isLayoutCalculated(calculated); });
+                return _super.prototype.isLayoutCalculated.call(this, calculated);
             };
             return AbstractComponentContainer;
         })(Component.AbstractComponent);
@@ -5361,12 +5376,12 @@ var Plottable;
                 else {
                     fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, ordinalScale.domain());
+                var textResult = this._measureTicks(offeredWidth - widthRequiredByTicks, offeredHeight - heightRequiredByTicks, fakeScale, ordinalScale.domain());
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
                     height: textResult.usedHeight + heightRequiredByTicks,
-                    wantsWidth: !textResult.textFits || textResult.usedWidth + widthRequiredByTicks > offeredWidth,
-                    wantsHeight: !textResult.textFits || textResult.usedHeight + heightRequiredByTicks > offeredHeight
+                    wantsWidth: !textResult.textFits,
+                    wantsHeight: !textResult.textFits
                 };
             };
             Category.prototype._getTickValues = function () {
@@ -6161,6 +6176,7 @@ var Plottable;
                 this._colWeights = [];
                 this._nRows = 0;
                 this._nCols = 0;
+                this._calculatedLayout = null;
                 this.classed("table", true);
                 rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
@@ -6326,18 +6342,21 @@ var Plottable;
                 return { guaranteedWidths: requestedWidths, guaranteedHeights: requestedHeights, wantsWidthArr: layoutWantsWidth, wantsHeightArr: layoutWantsHeight };
             };
             Table.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var layout = this._iterateLayout(offeredWidth, offeredHeight);
-                return { width: d3.sum(layout.guaranteedWidths), height: d3.sum(layout.guaranteedHeights), wantsWidth: layout.wantsWidth, wantsHeight: layout.wantsHeight };
+                this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
+                return { width: d3.sum(this._calculatedLayout.guaranteedWidths), height: d3.sum(this._calculatedLayout.guaranteedHeights), wantsWidth: this._calculatedLayout.wantsWidth, wantsHeight: this._calculatedLayout.wantsHeight };
             };
             // xOffset is relative to parent element, not absolute
             Table.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 var _this = this;
+                if (!this.isLayoutCalculated()) {
+                    this.isLayoutCalculated(false);
+                }
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                var layout = this._iterateLayout(this.width(), this.height());
-                var sumPair = function (p) { return p[0] + p[1]; };
+                var layout = this.isLayoutCalculated() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
+                this.isLayoutCalculated(true);
+                var childYOffset = 0;
                 var rowHeights = Plottable._Util.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
                 var colWidths = Plottable._Util.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);
-                var childYOffset = 0;
                 this._rows.forEach(function (row, rowIndex) {
                     var childXOffset = 0;
                     row.forEach(function (component, colIndex) {

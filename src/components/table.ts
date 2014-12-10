@@ -30,6 +30,8 @@ export module Component {
     private _nRows = 0;
     private _nCols = 0;
 
+    private _calculatedLayout: _IterateLayoutResult = null;
+
     /**
      * Constructs a Table.
      *
@@ -241,22 +243,26 @@ export module Component {
 
 
     public _requestedSpace(offeredWidth : number, offeredHeight: number): _SpaceRequest {
-      var layout = this._iterateLayout(offeredWidth , offeredHeight);
-      return {width : d3.sum(layout.guaranteedWidths ),
-              height: d3.sum(layout.guaranteedHeights),
-              wantsWidth: layout.wantsWidth,
-              wantsHeight: layout.wantsHeight};
+      this._calculatedLayout = this._iterateLayout(offeredWidth , offeredHeight);
+      return {width : d3.sum(this._calculatedLayout.guaranteedWidths ),
+              height: d3.sum(this._calculatedLayout.guaranteedHeights),
+              wantsWidth: this._calculatedLayout.wantsWidth,
+              wantsHeight: this._calculatedLayout.wantsHeight};
     }
 
     // xOffset is relative to parent element, not absolute
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
+      if (!this.isLayoutCalculated()) {
+        this.isLayoutCalculated(false);
+      }
       super._computeLayout(xOffset, yOffset, availableWidth , availableHeight);
-      var layout = this._iterateLayout(this.width(), this.height());
+      var layout = this.isLayoutCalculated() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
 
-      var sumPair = (p: number[]) => p[0] + p[1];
+      this.isLayoutCalculated(true);
+
+      var childYOffset = 0;
       var rowHeights = _Util.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
       var colWidths  = _Util.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths );
-      var childYOffset = 0;
       this._rows.forEach((row: AbstractComponent[], rowIndex: number) => {
         var childXOffset = 0;
         row.forEach((component: AbstractComponent, colIndex: number) => {
