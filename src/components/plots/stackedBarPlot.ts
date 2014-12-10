@@ -78,11 +78,11 @@ export module Plot {
       return this;
     }
 
-    public _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
+    protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
       return AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
     }
 
-    public _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
+    protected _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
       return AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
     }
 

@@ -2924,7 +2924,7 @@ declare module Plottable {
              * This call does not override auto domain adjustment behavior over visible points.
              */
             showAllData(): void;
-            _normalizeDatasets<A, B>(fromX: boolean): {
+            protected _normalizeDatasets<A, B>(fromX: boolean): {
                 a: A;
                 b: B;
             }[];
@@ -3319,7 +3319,7 @@ declare module Plottable {
             protected _additionalPaint(): void;
             protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedArea<X>;
-            _onDatasetUpdate(): StackedArea<X>;
+            protected _onDatasetUpdate(): StackedArea<X>;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _wholeDatumAttributes(): string[];
             _updateStackOffsets(): void;
@@ -3332,7 +3332,7 @@ declare module Plottable {
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
-            _normalizeDatasets<A, B>(fromX: boolean): {
+            protected _normalizeDatasets<A, B>(fromX: boolean): {
                 a: A;
                 b: B;
             }[];
@@ -3359,8 +3359,8 @@ declare module Plottable {
             protected _generateDrawSteps(): _Drawer.DrawStep[];
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedBar<X, Y>;
             protected _onDatasetUpdate(): StackedBar<X, Y>;
-            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
-            _normalizeDatasets<A, B>(fromX: boolean): {
+            protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
+            protected _normalizeDatasets<A, B>(fromX: boolean): {
                 a: A;
                 b: B;
             }[];
