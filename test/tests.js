@@ -197,117 +197,6 @@ after(function () {
 });
 
 ///<reference path="../testReference.ts" />
-var assert = chai.assert;
-describe("Category Axes", function () {
-    it("re-renders appropriately when data is changed", function () {
-        var svg = generateSVG(400, 400);
-        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
-        var ca = new Plottable.Axis.Category(xScale, "left");
-        ca.renderTo(svg);
-        assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
-        assert.doesNotThrow(function () { return xScale.domain(["bar", "baz", "bam"]); });
-        assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
-        svg.remove();
-    });
-    it("requests appropriate space when the scale has no domain", function () {
-        var svg = generateSVG(400, 400);
-        var scale = new Plottable.Scale.Ordinal();
-        var ca = new Plottable.Axis.Category(scale);
-        ca._anchor(svg);
-        var s = ca._requestedSpace(400, 400);
-        assert.operator(s.width, ">=", 0, "it requested 0 or more width");
-        assert.operator(s.height, ">=", 0, "it requested 0 or more height");
-        assert.isFalse(s.wantsWidth, "it doesn't want width");
-        assert.isFalse(s.wantsHeight, "it doesn't want height");
-        svg.remove();
-    });
-    it("doesnt blow up for non-string data", function () {
-        var svg = generateSVG(1000, 400);
-        var domain = [null, undefined, true, 2, "foo"];
-        var scale = new Plottable.Scale.Ordinal().domain(domain);
-        var axis = new Plottable.Axis.Category(scale);
-        axis.renderTo(svg);
-        var texts = svg.selectAll("text")[0].map(function (s) { return d3.select(s).text(); });
-        assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);
-        svg.remove();
-    });
-    it("width accounts for gutter. ticklength, and padding on vertical axes", function () {
-        var svg = generateSVG(400, 400);
-        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
-        var ca = new Plottable.Axis.Category(xScale, "left");
-        ca.renderTo(svg);
-        var axisWidth = ca.width();
-        ca.tickLabelPadding(ca.tickLabelPadding() + 5);
-        assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing tickLabelPadding increases width");
-        axisWidth = ca.width();
-        ca.gutter(ca.gutter() + 5);
-        assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing gutter increases width");
-        axisWidth = ca.width();
-        ca.tickLength(ca.tickLength() + 5);
-        assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing tickLength increases width");
-        svg.remove();
-    });
-    it("height accounts for gutter. ticklength, and padding on horizontal axes", function () {
-        var svg = generateSVG(400, 400);
-        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
-        var ca = new Plottable.Axis.Category(xScale, "bottom");
-        ca.renderTo(svg);
-        var axisHeight = ca.height();
-        ca.tickLabelPadding(ca.tickLabelPadding() + 5);
-        assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing tickLabelPadding increases height");
-        axisHeight = ca.height();
-        ca.gutter(ca.gutter() + 5);
-        assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing gutter increases height");
-        axisHeight = ca.height();
-        ca.tickLength(ca.tickLength() + 5);
-        assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing ticklength increases height");
-        svg.remove();
-    });
-    it("proper range values for different range types", function () {
-        var SVG_WIDTH = 400;
-        var svg = generateSVG(SVG_WIDTH, 100);
-        var scale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([0, 400]).rangeType("bands", 1, 0);
-        var categoryAxis = new Plottable.Axis.Category(scale, "bottom");
-        categoryAxis.renderTo(svg);
-        // Outer padding is equal to step
-        var step = SVG_WIDTH / 5;
-        var tickMarks = categoryAxis._tickMarkContainer.selectAll(".tick-mark")[0];
-        var ticksNormalizedPosition = tickMarks.map(function (s) { return +d3.select(s).attr("x1") / step; });
-        assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
-        scale.rangeType("points", 1, 0);
-        step = SVG_WIDTH / 4;
-        ticksNormalizedPosition = tickMarks.map(function (s) { return +d3.select(s).attr("x1") / step; });
-        assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
-        svg.remove();
-    });
-    it("vertically aligns short words properly", function () {
-        var SVG_WIDTH = 400;
-        var svg = generateSVG(SVG_WIDTH, 100);
-        var years = ["2000", "2001", "2002", "2003"];
-        var scale = new Plottable.Scale.Ordinal().domain(years).range([0, SVG_WIDTH]);
-        var axis = new Plottable.Axis.Category(scale, "bottom");
-        axis.renderTo(svg);
-        var ticks = axis._content.selectAll("text");
-        var text = ticks[0].map(function (d) { return d3.select(d).text(); });
-        assert.deepEqual(text, years, "text displayed correctly when horizontal");
-        axis.tickLabelAngle(90);
-        text = ticks[0].map(function (d) { return d3.select(d).text(); });
-        assert.deepEqual(text, years, "text displayed correctly when horizontal");
-        assert.operator(axis._content.selectAll(".rotated-right")[0].length, ">=", 4, "the ticks were rotated right");
-        axis.tickLabelAngle(0);
-        text = ticks[0].map(function (d) { return d3.select(d).text(); });
-        assert.deepEqual(text, years, "text displayed correctly when horizontal");
-        assert.lengthOf(axis._content.selectAll(".rotated-left")[0], 0, "the ticks were not rotated left");
-        assert.lengthOf(axis._content.selectAll(".rotated-right")[0], 0, "the ticks were not rotated right");
-        axis.tickLabelAngle(-90);
-        text = ticks[0].map(function (d) { return d3.select(d).text(); });
-        assert.deepEqual(text, years, "text displayed correctly when horizontal");
-        assert.operator(axis._content.selectAll(".rotated-left")[0].length, ">=", 4, "the ticks were rotated left");
-        svg.remove();
-    });
-});
-
-///<reference path="../testReference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -964,6 +853,117 @@ describe("NumericAxis", function () {
         d3.selectAll(".tick-label").each(function () {
             assertBBoxInclusion(labelContainer, d3.select(this));
         });
+        svg.remove();
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Category Axes", function () {
+    it("re-renders appropriately when data is changed", function () {
+        var svg = generateSVG(400, 400);
+        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+        var ca = new Plottable.Axis.Category(xScale, "left");
+        ca.renderTo(svg);
+        assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+        assert.doesNotThrow(function () { return xScale.domain(["bar", "baz", "bam"]); });
+        assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+        svg.remove();
+    });
+    it("requests appropriate space when the scale has no domain", function () {
+        var svg = generateSVG(400, 400);
+        var scale = new Plottable.Scale.Ordinal();
+        var ca = new Plottable.Axis.Category(scale);
+        ca._anchor(svg);
+        var s = ca._requestedSpace(400, 400);
+        assert.operator(s.width, ">=", 0, "it requested 0 or more width");
+        assert.operator(s.height, ">=", 0, "it requested 0 or more height");
+        assert.isFalse(s.wantsWidth, "it doesn't want width");
+        assert.isFalse(s.wantsHeight, "it doesn't want height");
+        svg.remove();
+    });
+    it("doesnt blow up for non-string data", function () {
+        var svg = generateSVG(1000, 400);
+        var domain = [null, undefined, true, 2, "foo"];
+        var scale = new Plottable.Scale.Ordinal().domain(domain);
+        var axis = new Plottable.Axis.Category(scale);
+        axis.renderTo(svg);
+        var texts = svg.selectAll("text")[0].map(function (s) { return d3.select(s).text(); });
+        assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);
+        svg.remove();
+    });
+    it("width accounts for gutter. ticklength, and padding on vertical axes", function () {
+        var svg = generateSVG(400, 400);
+        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+        var ca = new Plottable.Axis.Category(xScale, "left");
+        ca.renderTo(svg);
+        var axisWidth = ca.width();
+        ca.tickLabelPadding(ca.tickLabelPadding() + 5);
+        assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing tickLabelPadding increases width");
+        axisWidth = ca.width();
+        ca.gutter(ca.gutter() + 5);
+        assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing gutter increases width");
+        axisWidth = ca.width();
+        ca.tickLength(ca.tickLength() + 5);
+        assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing tickLength increases width");
+        svg.remove();
+    });
+    it("height accounts for gutter. ticklength, and padding on horizontal axes", function () {
+        var svg = generateSVG(400, 400);
+        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+        var ca = new Plottable.Axis.Category(xScale, "bottom");
+        ca.renderTo(svg);
+        var axisHeight = ca.height();
+        ca.tickLabelPadding(ca.tickLabelPadding() + 5);
+        assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing tickLabelPadding increases height");
+        axisHeight = ca.height();
+        ca.gutter(ca.gutter() + 5);
+        assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing gutter increases height");
+        axisHeight = ca.height();
+        ca.tickLength(ca.tickLength() + 5);
+        assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing ticklength increases height");
+        svg.remove();
+    });
+    it("proper range values for different range types", function () {
+        var SVG_WIDTH = 400;
+        var svg = generateSVG(SVG_WIDTH, 100);
+        var scale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([0, 400]).rangeType("bands", 1, 0);
+        var categoryAxis = new Plottable.Axis.Category(scale, "bottom");
+        categoryAxis.renderTo(svg);
+        // Outer padding is equal to step
+        var step = SVG_WIDTH / 5;
+        var tickMarks = categoryAxis._tickMarkContainer.selectAll(".tick-mark")[0];
+        var ticksNormalizedPosition = tickMarks.map(function (s) { return +d3.select(s).attr("x1") / step; });
+        assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
+        scale.rangeType("points", 1, 0);
+        step = SVG_WIDTH / 4;
+        ticksNormalizedPosition = tickMarks.map(function (s) { return +d3.select(s).attr("x1") / step; });
+        assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
+        svg.remove();
+    });
+    it("vertically aligns short words properly", function () {
+        var SVG_WIDTH = 400;
+        var svg = generateSVG(SVG_WIDTH, 100);
+        var years = ["2000", "2001", "2002", "2003"];
+        var scale = new Plottable.Scale.Ordinal().domain(years).range([0, SVG_WIDTH]);
+        var axis = new Plottable.Axis.Category(scale, "bottom");
+        axis.renderTo(svg);
+        var ticks = axis._content.selectAll("text");
+        var text = ticks[0].map(function (d) { return d3.select(d).text(); });
+        assert.deepEqual(text, years, "text displayed correctly when horizontal");
+        axis.tickLabelAngle(90);
+        text = ticks[0].map(function (d) { return d3.select(d).text(); });
+        assert.deepEqual(text, years, "text displayed correctly when horizontal");
+        assert.operator(axis._content.selectAll(".rotated-right")[0].length, ">=", 4, "the ticks were rotated right");
+        axis.tickLabelAngle(0);
+        text = ticks[0].map(function (d) { return d3.select(d).text(); });
+        assert.deepEqual(text, years, "text displayed correctly when horizontal");
+        assert.lengthOf(axis._content.selectAll(".rotated-left")[0], 0, "the ticks were not rotated left");
+        assert.lengthOf(axis._content.selectAll(".rotated-right")[0], 0, "the ticks were not rotated right");
+        axis.tickLabelAngle(-90);
+        text = ticks[0].map(function (d) { return d3.select(d).text(); });
+        assert.deepEqual(text, years, "text displayed correctly when horizontal");
+        assert.operator(axis._content.selectAll(".rotated-left")[0].length, ">=", 4, "the ticks were rotated left");
         svg.remove();
     });
 });
