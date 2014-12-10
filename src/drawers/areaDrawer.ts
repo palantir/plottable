@@ -6,7 +6,7 @@ export module _Drawer {
     private _areaSelection: D3.Selection;
     private _drawLine = true;
 
-    public _enterData(data: any[]) {
+    protected _enterData(data: any[]) {
       if (this._drawLine) {
         super._enterData(data);
       } else {
@@ -52,7 +52,7 @@ export module _Drawer {
                    .defined(definedFunction);
     }
 
-    public _drawStep(step: AppliedDrawStep) {
+    protected _drawStep(step: AppliedDrawStep) {
       if (this._drawLine) {
         super._drawStep(step);
       } else {

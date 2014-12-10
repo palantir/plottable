@@ -19,7 +19,7 @@ export module _Drawer {
       return this._getRenderArea().selectAll(this._svgElement);
     }
 
-    public _drawStep(step: AppliedDrawStep) {
+    protected _drawStep(step: AppliedDrawStep) {
       super._drawStep(step);
       var drawSelection = this._getDrawSelection();
       if (step.attrToProjector["fill"]) {
@@ -28,7 +28,7 @@ export module _Drawer {
       step.animator.animate(drawSelection, step.attrToProjector);
     }
 
-    public _enterData(data: any[]) {
+    protected _enterData(data: any[]) {
       super._enterData(data);
       var dataElements = this._getDrawSelection().data(data);
       dataElements.enter().append(this._svgElement);

@@ -1678,10 +1678,10 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Line extends AbstractDrawer {
-            _enterData(data: any[]): void;
+            protected _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
             protected _numberOfAnimationIterations(data: any[]): number;
-            _drawStep(step: AppliedDrawStep): void;
+            protected _drawStep(step: AppliedDrawStep): void;
         }
     }
 }
@@ -1690,7 +1690,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Area extends Line {
-            _enterData(data: any[]): void;
+            protected _enterData(data: any[]): void;
             /**
              * Sets the value determining if line should be drawn.
              *
@@ -1698,7 +1698,7 @@ declare module Plottable {
              */
             drawLine(draw: boolean): Area;
             setup(area: D3.Selection): void;
-            _drawStep(step: AppliedDrawStep): void;
+            protected _drawStep(step: AppliedDrawStep): void;
         }
     }
 }
@@ -1714,8 +1714,8 @@ declare module Plottable {
              * @param{string} tag The svg element to be bind
              */
             svgElement(tag: string): Element;
-            _drawStep(step: AppliedDrawStep): void;
-            _enterData(data: any[]): void;
+            protected _drawStep(step: AppliedDrawStep): void;
+            protected _enterData(data: any[]): void;
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
         }
