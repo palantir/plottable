@@ -63,7 +63,7 @@ function run(div, data, Plottable) {
 
   var timeFormat = function (data) { return d3.time.format("%m/%d/%Y").parse(data.date);};
   var colorScale = new Plottable.Scale.Color();
-  var legend = new Plottable.Component.HorizontalLegend(colorScale).xAlign("center");
+  var legend = new Plottable.Component.Legend(colorScale).xAlign("center");
   var title = new Plottable.Component.TitleLabel("Area & Bar on Time Axes");
 
   var areaPlot = new Plottable.Plot.Area(xScale, yScale1)

@@ -391,9 +391,9 @@ describe("Plots", () => {
       plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       plot.remove();
       var key2callback = (<any> xScale).broadcaster._key2callback;
-      assert.isUndefined(key2callback.get("yDomainAdjustment" + plot._plottableID), "the plot is no longer attached to the xScale");
+      assert.isUndefined(key2callback.get("yDomainAdjustment" + plot.getID()), "the plot is no longer attached to the xScale");
       key2callback = (<any> yScale).broadcaster._key2callback;
-      assert.isUndefined(key2callback.get("xDomainAdjustment" + plot._plottableID), "the plot is no longer attached to the yScale");
+      assert.isUndefined(key2callback.get("xDomainAdjustment" + plot.getID()), "the plot is no longer attached to the yScale");
       svg.remove();
     });
 

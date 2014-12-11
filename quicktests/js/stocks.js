@@ -77,6 +77,7 @@ function run(div, data, Plottable) {
           // should be one line plot, pending #917
 
           var legend = new Plottable.Component.Legend(colorScale);
+          legend.maxEntriesPerRow(1);
           legend.yAlign("top").xOffset(-5);
           var plotArea = new Plottable.Component.Group([line_aapl, line_goog, legend]);
 

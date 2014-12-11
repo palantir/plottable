@@ -55,7 +55,6 @@
 
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
-/// <reference path="components/horizontalLegend.ts" />
 /// <reference path="components/gridlines.ts" />
 /// <reference path="components/table.ts" />
 

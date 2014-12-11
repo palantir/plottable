@@ -56,9 +56,9 @@ export module Plot {
 
       if (!this._yScale._userSetDomainer) {
         if (constantBaseline != null) {
-          this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+          this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this.getID());
         } else {
-          this._yScale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
+          this._yScale.domainer().removePaddingException("AREA_PLOT+" + this.getID());
         }
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         this._yScale._autoDomainIfAutomaticMode();

@@ -25,6 +25,26 @@ describe("ComponentGroups", () => {
     svg.remove();
   });
 
+  it("components in componentGroups occupies all available space", () => {
+    var svg = generateSVG(400, 400);
+    var xAxis = new Plottable.Axis.Numeric(new Plottable.Scale.Linear(), "bottom");
+
+    var leftLabel = new Plottable.Component.Label("LEFT").xAlign("left");
+    var rightLabel = new Plottable.Component.Label("RIGHT").xAlign("right");
+
+    var labelGroup = new Plottable.Component.Group([leftLabel, rightLabel]);
+
+    var table = new Plottable.Component.Table([
+        [labelGroup],
+        [xAxis]
+    ]);
+
+    table.renderTo(svg);
+
+    assertBBoxNonIntersection((<any>leftLabel)._element.select(".bounding-box"), (<any>rightLabel)._element.select(".bounding-box"));
+    svg.remove();
+  });
+
   it("components can be added before and after anchoring", () => {
     var c1 = makeFixedSizeComponent(10, 10);
     var c2 = makeFixedSizeComponent(20, 20);
@@ -62,7 +82,7 @@ describe("ComponentGroups", () => {
     assert.isFalse(cg._isFixedWidth(), "width not fixed when one component unfixed");
 
     fixComponentSize(c2, null, 10);
-    assert.isTrue(cg._isFixedHeight(), "height fixed when both components fixed");
+    assert.isFalse(cg._isFixedHeight(), "height unfixed when both components fixed");
     assert.isFalse(cg._isFixedWidth(), "width unfixed when one component unfixed");
   });
 
@@ -147,7 +167,7 @@ describe("ComponentGroups", () => {
     it("_works for an empty ComponentGroup", () => {
         var cg = new Plottable.Component.Group();
         var request = cg._requestedSpace(10, 10);
-        verifySpaceRequest(request, 0, 0, false, false, "");
+        verifySpaceRequest(request, 10, 10, false, false, "");
     });
 
     it("works for a ComponentGroup with only proportional-size components", () => {
@@ -156,7 +176,7 @@ describe("ComponentGroups", () => {
       var c2 = new Plottable.Component.AbstractComponent();
       cg.merge(c1).merge(c2);
       var request = cg._requestedSpace(10, 10);
-      verifySpaceRequest(request, 0, 0, false, false, "");
+      verifySpaceRequest(request, 10, 10, false, false, "");
     });
 
     it("works when there are fixed-size components", () => {
@@ -168,7 +188,7 @@ describe("ComponentGroups", () => {
       fixComponentSize(c1, null, 10);
       fixComponentSize(c2, null, 50);
       var request = cg._requestedSpace(10, 10);
-      verifySpaceRequest(request, 0, 50, false, true, "");
+      verifySpaceRequest(request, 10, 50, false, true, "");
     });
   });
 
