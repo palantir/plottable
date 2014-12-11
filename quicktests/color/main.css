@@ -94,6 +94,10 @@ input:not([type=checkbox]) {
   margin-right: 10px;
 }
 
+#help:hover{
+  background-color: white;
+}
+
 .button{
   background-color: white;
 }
