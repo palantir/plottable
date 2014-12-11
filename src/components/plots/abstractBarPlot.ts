@@ -211,12 +211,12 @@ export module Plot {
         if (!qscale._userSetDomainer) {
           if (this._baselineValue != null) {
             qscale.domainer()
-              .addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID)
-              .addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
+              .addPaddingException(this._baselineValue, "BAR_PLOT+" + this.getID())
+              .addIncludedValue(this._baselineValue, "BAR_PLOT+" + this.getID());
           } else {
             qscale.domainer()
-              .removePaddingException("BAR_PLOT+" + this._plottableID)
-              .removeIncludedValue("BAR_PLOT+" + this._plottableID);
+              .removePaddingException("BAR_PLOT+" + this.getID())
+              .removeIncludedValue("BAR_PLOT+" + this.getID());
           }
           qscale.domainer().pad().nice();
         }
