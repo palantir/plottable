@@ -330,7 +330,7 @@ describe("Legend", () => {
     svg.remove();
   });
 
-  it("entriesCompareFunction() works as expected", () => {
+  it("sortFunction() works as expected", () => {
     var newDomain = ["F", "E", "D", "C", "B", "A"];
     colorScale.domain(newDomain);
     var svg = generateSVG(300, 300);
@@ -340,10 +340,11 @@ describe("Legend", () => {
     assert.deepEqual(elementTexts, newDomain, "entry has not been sorted");
 
     var cmpFn = (a: string, b: string) => a.localeCompare(b);
-    horizLegend.entriesCompareFunction(cmpFn);
+    horizLegend.sortFunction(cmpFn);
     entries = horizLegend._element.selectAll(entrySelector);
     elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
-    assert.deepEqual(elementTexts, newDomain.sort(), "entry has been sorted alfabetically");
+    newDomain.sort();
+    assert.deepEqual(elementTexts, newDomain, "entry has been sorted alfabetically");
 
     svg.remove();
   });

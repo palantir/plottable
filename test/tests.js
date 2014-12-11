@@ -1435,7 +1435,7 @@ describe("Legend", function () {
         verifyMaxEntriesInRow(6);
         svg.remove();
     });
-    it("entriesCompareFunction() works as expected", function () {
+    it("sortFunction() works as expected", function () {
         var newDomain = ["F", "E", "D", "C", "B", "A"];
         colorScale.domain(newDomain);
         var svg = generateSVG(300, 300);
@@ -1444,10 +1444,11 @@ describe("Legend", function () {
         var elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
         assert.deepEqual(elementTexts, newDomain, "entry has not been sorted");
         var cmpFn = function (a, b) { return a.localeCompare(b); };
-        horizLegend.entriesCompareFunction(cmpFn);
+        horizLegend.sortFunction(cmpFn);
         entries = horizLegend._element.selectAll(entrySelector);
         elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
-        assert.deepEqual(elementTexts, newDomain.sort(), "entry has been sorted alfabetically");
+        newDomain.sort();
+        assert.deepEqual(elementTexts, newDomain, "entry has been sorted alfabetically");
         svg.remove();
     });
 });
