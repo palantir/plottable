@@ -2074,9 +2074,9 @@ var Plottable;
             else {
                 domain = [Plottable._Util.Methods.min(extents, function (e) { return e[0]; }, 0), Plottable._Util.Methods.max(extents, function (e) { return e[1]; }, 0)];
             }
-            domain = this.includeDomain(domain);
-            domain = this.padDomain(scale, domain);
-            domain = this.niceDomain(scale, domain);
+            domain = this._includeDomain(domain);
+            domain = this._padDomain(scale, domain);
+            domain = this._niceDomain(scale, domain);
             return domain;
         };
         /**
@@ -2185,10 +2185,7 @@ var Plottable;
             this._niceCount = count;
             return this;
         };
-        Domainer.defaultCombineExtents = function (extents) {
-            return [Plottable._Util.Methods.min(extents, function (e) { return e[0]; }, 0), Plottable._Util.Methods.max(extents, function (e) { return e[1]; }, 1)];
-        };
-        Domainer.prototype.padDomain = function (scale, domain) {
+        Domainer.prototype._padDomain = function (scale, domain) {
             var min = domain[0];
             var max = domain[1];
             if (min === max && this._padProportion > 0.0) {
@@ -2218,7 +2215,7 @@ var Plottable;
             }
             return [newMin, newMax];
         };
-        Domainer.prototype.niceDomain = function (scale, domain) {
+        Domainer.prototype._niceDomain = function (scale, domain) {
             if (this._doNice) {
                 return scale._niceDomain(domain, this._niceCount);
             }
@@ -2226,7 +2223,7 @@ var Plottable;
                 return domain;
             }
         };
-        Domainer.prototype.includeDomain = function (domain) {
+        Domainer.prototype._includeDomain = function (domain) {
             var includedValues = this._includedValues.values().concat(this._unregisteredIncludedValues.values());
             return includedValues.reduce(function (domain, value) { return [Math.min(domain[0], value), Math.max(domain[1], value)]; }, domain);
         };
