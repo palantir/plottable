@@ -1173,6 +1173,12 @@ describe("Legends", function () {
         svg = generateSVG(400, 400);
         color = new Plottable.Scale.Color("Category10");
         legend = new Plottable.Component.Legend(color).maxEntriesPerRow(1);
+        if (navigator.userAgent.toLowerCase().indexOf("phantom") !== -1) {
+            var sortFn = function () {
+                return 1;
+            };
+            legend.sortFunction(sortFn);
+        }
     });
     it("a basic legend renders", function () {
         color.domain(["foo", "bar", "baz"]);
@@ -1325,6 +1331,12 @@ describe("Legend", function () {
             "Jefferson",
         ]);
         horizLegend = new Plottable.Component.Legend(colorScale);
+        if (navigator.userAgent.toLowerCase().indexOf("phantom") !== -1) {
+            var sortFn = function () {
+                return 1;
+            };
+            horizLegend.sortFunction(sortFn);
+        }
     });
     it("renders an entry for each item in the domain", function () {
         var svg = generateSVG(400, 100);
@@ -1443,11 +1455,11 @@ describe("Legend", function () {
         var entries = horizLegend._element.selectAll(entrySelector);
         var elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
         assert.deepEqual(elementTexts, newDomain, "entry has not been sorted");
-        var cmpFn = function (a, b) { return a.localeCompare(b); };
-        horizLegend.sortFunction(cmpFn);
+        var sortFn = function (a, b) { return a.localeCompare(b); };
+        horizLegend.sortFunction(sortFn);
         entries = horizLegend._element.selectAll(entrySelector);
         elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
-        newDomain.sort();
+        newDomain.sort(sortFn);
         assert.deepEqual(elementTexts, newDomain, "entry has been sorted alfabetically");
         svg.remove();
     });
