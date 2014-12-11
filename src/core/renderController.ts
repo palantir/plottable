@@ -60,7 +60,7 @@ export module Core {
       if (_isCurrentlyFlushing) {
         _Util.Methods.warn("Registered to render while other components are flushing: request may be ignored");
       }
-      _componentsNeedingRender[c._plottableID] = c;
+      _componentsNeedingRender[c.getID()] = c;
       requestRender();
     }
 
@@ -71,8 +71,8 @@ export module Core {
      * @param {AbstractComponent} component Any Plottable component.
      */
     export function registerToComputeLayout(c: Component.AbstractComponent) {
-      _componentsNeedingComputeLayout[c._plottableID] = c;
-      _componentsNeedingRender[c._plottableID] = c;
+      _componentsNeedingComputeLayout[c.getID()] = c;
+      _componentsNeedingRender[c.getID()] = c;
       requestRender();
     }
 

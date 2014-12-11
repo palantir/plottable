@@ -177,7 +177,7 @@ export module Plot {
 
       if (existingScale) {
         this._datasetKeysInOrder.forEach((key) => {
-          existingScale._removeExtent(this._plottableID.toString() + "_" + key, attrToSet);
+          existingScale._removeExtent(this.getID().toString() + "_" + key, attrToSet);
           existingScale.broadcaster.deregisterListener(this);
         });
       }
@@ -245,7 +245,7 @@ export module Plot {
           var dataset = plotDatasetKey.dataset;
           var plotMetadata = plotDatasetKey.plotMetadata;
           var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
-          var scaleKey = this._plottableID.toString() + "_" + key;
+          var scaleKey = this.getID().toString() + "_" + key;
           if (extent.length === 0 || !this._isAnchored) {
             projector.scale._removeExtent(scaleKey, attr);
           } else {
@@ -353,7 +353,7 @@ export module Plot {
         pdk.drawer.remove();
 
         var projectors = d3.values(this._projections);
-        var scaleKey = this._plottableID.toString() + "_" + key;
+        var scaleKey = this.getID().toString() + "_" + key;
         projectors.forEach((p) => {
           if (p.scale != null) {
             p.scale._removeExtent(scaleKey, p.attribute);

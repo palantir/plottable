@@ -1579,6 +1579,9 @@ var Plottable;
             function PlottableObject() {
                 this._plottableID = PlottableObject._nextID++;
             }
+            PlottableObject.prototype.getID = function () {
+                return this._plottableID;
+            };
             PlottableObject._nextID = 0;
             return PlottableObject;
         })();
@@ -1870,7 +1873,7 @@ var Plottable;
                 if (_isCurrentlyFlushing) {
                     Plottable._Util.Methods.warn("Registered to render while other components are flushing: request may be ignored");
                 }
-                _componentsNeedingRender[c._plottableID] = c;
+                _componentsNeedingRender[c.getID()] = c;
                 requestRender();
             }
             RenderController.registerToRender = registerToRender;
@@ -1881,8 +1884,8 @@ var Plottable;
              * @param {AbstractComponent} component Any Plottable component.
              */
             function registerToComputeLayout(c) {
-                _componentsNeedingComputeLayout[c._plottableID] = c;
-                _componentsNeedingRender[c._plottableID] = c;
+                _componentsNeedingComputeLayout[c.getID()] = c;
+                _componentsNeedingRender[c.getID()] = c;
                 requestRender();
             }
             RenderController.registerToComputeLayout = registerToComputeLayout;
@@ -1999,7 +2002,7 @@ var Plottable;
              */
             function register(c) {
                 _lazyInitialize();
-                broadcaster.registerListener(c._plottableID, function () { return c._invalidateLayout(); });
+                broadcaster.registerListener(c.getID(), function () { return c._invalidateLayout(); });
             }
             ResizeBroadcaster.register = register;
             /**
@@ -2011,7 +2014,7 @@ var Plottable;
              */
             function deregister(c) {
                 if (broadcaster) {
-                    broadcaster.deregisterListener(c._plottableID);
+                    broadcaster.deregisterListener(c.getID());
                 }
             }
             ResizeBroadcaster.deregister = deregister;
@@ -4058,8 +4061,8 @@ var Plottable;
                 // They don't need the current URL in the clip path reference.
                 var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
                 prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-                this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this._plottableID + "\")");
-                var clipPathParent = this._boxContainer.append("clipPath").attr("id", "clipPath" + this._plottableID);
+                this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this.getID() + "\")");
+                var clipPathParent = this._boxContainer.append("clipPath").attr("id", "clipPath" + this.getID());
                 this._addBox("clip-rect", clipPathParent);
             };
             /**
@@ -6457,7 +6460,7 @@ var Plottable;
                 var existingScale = currentProjection && currentProjection.scale;
                 if (existingScale) {
                     this._datasetKeysInOrder.forEach(function (key) {
-                        existingScale._removeExtent(_this._plottableID.toString() + "_" + key, attrToSet);
+                        existingScale._removeExtent(_this.getID().toString() + "_" + key, attrToSet);
                         existingScale.broadcaster.deregisterListener(_this);
                     });
                 }
@@ -6521,7 +6524,7 @@ var Plottable;
                         var dataset = plotDatasetKey.dataset;
                         var plotMetadata = plotDatasetKey.plotMetadata;
                         var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
-                        var scaleKey = _this._plottableID.toString() + "_" + key;
+                        var scaleKey = _this.getID().toString() + "_" + key;
                         if (extent.length === 0 || !_this._isAnchored) {
                             projector.scale._removeExtent(scaleKey, attr);
                         }
@@ -6577,7 +6580,7 @@ var Plottable;
                     var pdk = this._key2PlotDatasetKey.get(key);
                     pdk.drawer.remove();
                     var projectors = d3.values(this._projections);
-                    var scaleKey = this._plottableID.toString() + "_" + key;
+                    var scaleKey = this.getID().toString() + "_" + key;
                     projectors.forEach(function (p) {
                         if (p.scale != null) {
                             p.scale._removeExtent(scaleKey, p.attribute);
@@ -6737,9 +6740,9 @@ var Plottable;
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._updateXDomainer();
-                xScale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this._adjustYDomainOnChangeFromX(); });
+                xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
                 this._updateYDomainer();
-                yScale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this._adjustXDomainOnChangeFromY(); });
+                yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
             }
             /**
              * @param {string} attrToSet One of ["x", "y"] which determines the point's
@@ -6751,19 +6754,19 @@ var Plottable;
                 // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
                 if (attrToSet === "x" && scale) {
                     if (this._xScale) {
-                        this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this._plottableID);
+                        this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
                     }
                     this._xScale = scale;
                     this._updateXDomainer();
-                    scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this._adjustYDomainOnChangeFromX(); });
+                    scale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
                 }
                 if (attrToSet === "y" && scale) {
                     if (this._yScale) {
-                        this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this._plottableID);
+                        this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
                     }
                     this._yScale = scale;
                     this._updateYDomainer();
-                    scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this._adjustXDomainOnChangeFromY(); });
+                    scale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
                 }
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
@@ -6771,10 +6774,10 @@ var Plottable;
             AbstractXYPlot.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 if (this._xScale) {
-                    this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this._plottableID);
+                    this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
                 }
                 if (this._yScale) {
-                    this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this._plottableID);
+                    this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
                 }
                 return this;
             };
@@ -7262,10 +7265,10 @@ var Plottable;
                     var qscale = scale;
                     if (!qscale._userSetDomainer) {
                         if (this._baselineValue != null) {
-                            qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
+                            qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this.getID()).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this.getID());
                         }
                         else {
-                            qscale.domainer().removePaddingException("BAR_PLOT+" + this._plottableID).removeIncludedValue("BAR_PLOT+" + this._plottableID);
+                            qscale.domainer().removePaddingException("BAR_PLOT+" + this.getID()).removeIncludedValue("BAR_PLOT+" + this.getID());
                         }
                         qscale.domainer().pad().nice();
                     }
@@ -7813,10 +7816,10 @@ var Plottable;
                 }
                 if (!this._yScale._userSetDomainer) {
                     if (constantBaseline != null) {
-                        this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+                        this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this.getID());
                     }
                     else {
-                        this._yScale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
+                        this._yScale.domainer().removePaddingException("AREA_PLOT+" + this.getID());
                     }
                     // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     this._yScale._autoDomainIfAutomaticMode();
@@ -8095,10 +8098,10 @@ var Plottable;
                     return;
                 }
                 if (this._isAnchored && this._stackedExtent.length > 0) {
-                    primaryScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
+                    primaryScale._updateExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
                 }
                 else {
-                    primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+                    primaryScale._removeExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
             };
             AbstractStacked.prototype._normalizeDatasets = function (fromX) {
@@ -8180,7 +8183,7 @@ var Plottable;
                 _super.prototype._updateYDomainer.call(this);
                 var scale = this._yScale;
                 if (!scale._userSetDomainer) {
-                    scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID).addIncludedValue(0, "STACKED_AREA_PLOT+" + this._plottableID);
+                    scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this.getID()).addIncludedValue(0, "STACKED_AREA_PLOT+" + this.getID());
                     // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     scale._autoDomainIfAutomaticMode();
                 }
@@ -8649,7 +8652,7 @@ var Plottable;
              * Gets a namespaced version of the event name.
              */
             AbstractDispatcher.prototype._getEventString = function (eventName) {
-                return eventName + ".dispatcher" + this._plottableID;
+                return eventName + ".dispatcher" + this.getID();
             };
             /**
              * Attaches the Dispatcher's listeners to the Dispatcher's target element.
