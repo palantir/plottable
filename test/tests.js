@@ -1055,10 +1055,10 @@ describe("Labels", function () {
     });
     it("Label text can be changed after label is created", function () {
         var svg = generateSVG(400, 80);
-        var label = new Plottable.Component.TitleLabel();
+        var label = new Plottable.Component.TitleLabel("a");
         label.renderTo(svg);
-        assert.equal(label._content.select("text").text(), "", "the text defaulted to empty string");
-        assert.equal(label.height(), 0, "rowMin is 0 for empty string");
+        assert.equal(label._content.select("text").text(), "a", "the text starts at the specified string");
+        assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
         label.text("hello world");
         label.renderTo(svg);
         assert.equal(label._content.select("text").text(), "hello world", "the label text updated properly");
@@ -2659,9 +2659,8 @@ describe("Plots", function () {
                 assert.equal(texts[1], "12345%", "first label is 12345%");
                 svg.remove();
             });
-            it("bar labels are removed instantly on dataset change, even if animation is enabled", function (done) {
+            it("bar labels are removed instantly on dataset change", function (done) {
                 plot.barLabelsEnabled(true);
-                plot.animate(true);
                 plot.renderTo(svg);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");
@@ -4747,6 +4746,23 @@ describe("Component behavior", function () {
         t.renderTo(svg);
         var transform = d3.transform(c._element.attr("transform"));
         assert.deepEqual(transform.translate, [0, 0], "the element was not translated");
+        svg.remove();
+    });
+    it("components do not render unless allocated space", function () {
+        var renderFlag = false;
+        var c = new Plottable.Component.AbstractComponent();
+        c._doRender = function () { return renderFlag = true; };
+        c._anchor(svg);
+        c._setup();
+        c._render();
+        assert.isFalse(renderFlag, "no render until width/height set to nonzero");
+        c._width = 10;
+        c._height = 0;
+        c._render();
+        assert.isFalse(renderFlag, "render still doesn't occur if one of width/height is zero");
+        c._height = 10;
+        c._render();
+        assert.isTrue(renderFlag, "render occurs if width and height are positive");
         svg.remove();
     });
     describe("resizeBroadcaster testing", function () {

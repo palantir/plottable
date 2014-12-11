@@ -3754,8 +3754,6 @@ var Plottable;
                 this._interactionsToRegister = [];
                 this._boxes = [];
                 this._isTopLevelComponent = false;
-                this._width = 0; // Width and height of the component. Used to size the hitbox, bounding box, etc
-                this._height = 0;
                 this._xOffset = 0; // Offset from Origin, used for alignment and floating positioning
                 this._yOffset = 0;
                 this._cssClasses = ["component"];
@@ -3872,7 +3870,7 @@ var Plottable;
                 this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             };
             AbstractComponent.prototype._render = function () {
-                if (this._isAnchored && this._isSetup) {
+                if (this._isAnchored && this._isSetup && this.width() > 0 && this.height() > 0) {
                     Plottable.Core.RenderController.registerToRender(this);
                 }
             };
