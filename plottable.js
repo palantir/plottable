@@ -4346,7 +4346,9 @@ var Plottable;
                 this.components().slice().forEach(function (c) { return c.remove(); });
             };
             AbstractComponentContainer.prototype._useLastCalculatedLayout = function (calculated) {
-                this.components().slice().forEach(function (c) { return c._useLastCalculatedLayout(calculated); });
+                if (calculated != null) {
+                    this.components().slice().forEach(function (c) { return c._useLastCalculatedLayout(calculated); });
+                }
                 return _super.prototype._useLastCalculatedLayout.call(this, calculated);
             };
             return AbstractComponentContainer;
