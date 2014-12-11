@@ -829,6 +829,32 @@ describe("NumericAxis", function () {
         });
         svg.remove();
     });
+    it("truncates long labels", function () {
+        var data = [
+            { x: "A", y: 500000000 },
+            { x: "B", y: 400000000 }
+        ];
+        var SVG_WIDTH = 120;
+        var SVG_HEIGHT = 300;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var xScale = new Plottable.Scale.Ordinal();
+        var yScale = new Plottable.Scale.Linear();
+        var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+        var yLabel = new Plottable.Component.AxisLabel("LABEL", "left");
+        var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+        barPlot.project("x", "x", xScale);
+        barPlot.project("y", "y", yScale);
+        barPlot.addDataset(data);
+        var chart = new Plottable.Component.Table([
+            [yLabel, yAxis, barPlot]
+        ]);
+        chart.renderTo(svg);
+        var labelContainer = d3.select(".tick-label-container");
+        d3.selectAll(".tick-label").each(function () {
+            assertBBoxInclusion(labelContainer, d3.select(this));
+        });
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -1146,12 +1172,12 @@ describe("Legends", function () {
     beforeEach(function () {
         svg = generateSVG(400, 400);
         color = new Plottable.Scale.Color("Category10");
-        legend = new Plottable.Component.Legend(color);
+        legend = new Plottable.Component.Legend(color).maxEntriesPerRow(1);
     });
     it("a basic legend renders", function () {
         color.domain(["foo", "bar", "baz"]);
         legend.renderTo(svg);
-        var rows = legend._content.selectAll(".legend-row");
+        var rows = legend._content.selectAll(".legend-entry");
         assert.lengthOf(rows[0], 3, "there are 3 legend entries");
         rows.each(function (d, i) {
             assert.equal(d, color.domain()[i], "the data is set properly");
@@ -1166,7 +1192,7 @@ describe("Legends", function () {
     it("legend domain can be updated after initialization, and height updates as well", function () {
         legend.renderTo(svg);
         legend.scale(color);
-        assert.equal(legend._requestedSpace(200, 200).height, 0, "there is no requested height when domain is empty");
+        assert.equal(legend._requestedSpace(200, 200).height, 10, "there is a padding requested height when domain is empty");
         color.domain(["foo", "bar"]);
         var height1 = legend._requestedSpace(400, 400).height;
         var actualHeight1 = legend.height();
@@ -1217,10 +1243,8 @@ describe("Legends", function () {
         legend.renderTo(svg);
         var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
         color.domain(newDomain);
-        // due to how joins work, this is how the elements should be arranged by d3
-        var newDomainActualOrder = ["foo", "baz", "mushu", "persei", "eight"];
-        legend._content.selectAll(".legend-row").each(function (d, i) {
-            assert.equal(d, newDomainActualOrder[i], "the data is set correctly");
+        legend._content.selectAll(".legend-entry").each(function (d, i) {
+            assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
             var fill = d3.select(this).select("circle").attr("fill");
@@ -1236,7 +1260,7 @@ describe("Legends", function () {
         var newColorScale = new Plottable.Scale.Color("20");
         newColorScale.domain(newDomain);
         legend.scale(newColorScale);
-        legend._content.selectAll(".legend-row").each(function (d, i) {
+        legend._content.selectAll(".legend-entry").each(function (d, i) {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
@@ -1254,7 +1278,7 @@ describe("Legends", function () {
         legend.scale(newColorScale);
         var newDomain = ["a", "foo", "d"];
         newColorScale.domain(newDomain);
-        legend._content.selectAll(".legend-row").each(function (d, i) {
+        legend._content.selectAll(".legend-entry").each(function (d, i) {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
@@ -1287,291 +1311,12 @@ describe("Legends", function () {
         verifyCircleHeight();
         svg.remove();
     });
-    describe("Legend toggle tests", function () {
-        var toggleLegend;
-        beforeEach(function () {
-            toggleLegend = new Plottable.Component.Legend(color);
-            toggleLegend.toggleCallback(function (d, b) {
-            });
-        });
-        function verifyState(selection, b, msg) {
-            assert.equal(selection.classed("toggled-on"), b, msg);
-            assert.equal(selection.classed("toggled-off"), !b, msg);
-        }
-        function getSelection(datum) {
-            var selection = toggleLegend._content.selectAll(".legend-row").filter(function (d) { return d === datum; });
-            return selection;
-        }
-        function verifyEntry(datum, b, msg) {
-            verifyState(getSelection(datum), b, msg);
-        }
-        function toggleEntry(datum, index) {
-            getSelection(datum).on("click")(datum, index);
-        }
-        it("basic initialization test", function () {
-            color.domain(["a", "b", "c", "d", "e"]);
-            toggleLegend.renderTo(svg);
-            toggleLegend._content.selectAll(".legend-row").each(function () {
-                var selection = d3.select(this);
-                verifyState(selection, true);
-            });
-            svg.remove();
-        });
-        it("basic toggling test", function () {
-            color.domain(["a"]);
-            toggleLegend.renderTo(svg);
-            toggleLegend._content.selectAll(".legend-row").each(function (d, i) {
-                var selection = d3.select(this);
-                selection.on("click")(d, i);
-                verifyState(selection, false);
-                selection.on("click")(d, i);
-                verifyState(selection, true);
-            });
-            svg.remove();
-        });
-        it("scale() works as intended with toggling", function () {
-            var domain = ["a", "b", "c", "d", "e"];
-            color.domain(domain);
-            toggleLegend.renderTo(svg);
-            toggleEntry("a", 0);
-            toggleEntry("d", 3);
-            toggleEntry("c", 2);
-            var newDomain = ["r", "a", "d", "g"];
-            var newColorScale = new Plottable.Scale.Color("Category10");
-            newColorScale.domain(newDomain);
-            toggleLegend.scale(newColorScale);
-            verifyEntry("r", true);
-            verifyEntry("a", false);
-            verifyEntry("g", true);
-            verifyEntry("d", false);
-            svg.remove();
-        });
-        it("listeners on scale will correctly update states", function () {
-            color.domain(["a", "b", "c", "d", "e"]);
-            toggleLegend.renderTo(svg);
-            toggleEntry("a", 0);
-            toggleEntry("d", 3);
-            toggleEntry("c", 2);
-            color.domain(["e", "d", "b", "a", "c"]);
-            verifyEntry("a", false);
-            verifyEntry("b", true);
-            verifyEntry("c", false);
-            verifyEntry("d", false);
-            verifyEntry("e", true);
-            svg.remove();
-        });
-        it("Testing callback works correctly", function () {
-            var domain = ["a", "b", "c", "d", "e"];
-            color.domain(domain);
-            var state = [true, true, true, true, true];
-            toggleLegend.toggleCallback(function (d, b) {
-                state[domain.indexOf(d)] = b;
-            });
-            toggleLegend.renderTo(svg);
-            toggleEntry("a", 0);
-            verifyEntry("a", false);
-            assert.equal(state[0], false, "callback was successful");
-            toggleEntry("d", 3);
-            verifyEntry("d", false);
-            assert.equal(state[3], false, "callback was successful");
-            toggleEntry("a", 0);
-            verifyEntry("a", true);
-            assert.equal(state[0], true, "callback was successful");
-            toggleEntry("c", 2);
-            verifyEntry("c", false);
-            assert.equal(state[2], false, "callback was successful");
-            svg.remove();
-        });
-        it("Overwriting callback is successfull", function () {
-            var domain = ["a"];
-            color.domain(domain);
-            var state = true;
-            toggleLegend.renderTo(svg);
-            toggleLegend.toggleCallback(function (d, b) {
-                state = b;
-            });
-            toggleEntry("a", 0);
-            assert.equal(state, false, "callback was successful");
-            var count = 0;
-            toggleLegend.toggleCallback(function (d, b) {
-                count++;
-            });
-            toggleEntry("a", 0);
-            assert.equal(state, false, "callback was overwritten");
-            assert.equal(count, 1, "new callback was successfully called");
-            svg.remove();
-        });
-        it("Removing callback is successful", function () {
-            var domain = ["a"];
-            color.domain(domain);
-            var state = true;
-            toggleLegend.renderTo(svg);
-            toggleLegend.toggleCallback(function (d, b) {
-                state = b;
-            });
-            toggleEntry("a", 0);
-            assert.equal(state, false, "callback was successful");
-            toggleLegend.toggleCallback(); // this should not remove the callback
-            toggleEntry("a", 0);
-            assert.equal(state, true, "callback was successful");
-            toggleLegend.toggleCallback(null); // this should remove the callback
-            assert.throws(function () {
-                toggleEntry("a", 0);
-            });
-            var selection = getSelection("a");
-            // should have no classes
-            assert.equal(selection.classed("toggled-on"), false, "is not toggled-on");
-            assert.equal(selection.classed("toggled-off"), false, "is not toggled-off");
-            svg.remove();
-        });
-    });
-    describe("Legend hover tests", function () {
-        var hoverLegend;
-        beforeEach(function () {
-            hoverLegend = new Plottable.Component.Legend(color);
-            hoverLegend.hoverCallback(function (d) {
-            });
-        });
-        function _verifyFocus(selection, b, msg) {
-            assert.equal(selection.classed("hover"), true, msg);
-            assert.equal(selection.classed("focus"), b, msg);
-        }
-        function _verifyEmpty(selection, msg) {
-            assert.equal(selection.classed("hover"), false, msg);
-            assert.equal(selection.classed("focus"), false, msg);
-        }
-        function getSelection(datum) {
-            var selection = hoverLegend._content.selectAll(".legend-row").filter(function (d) { return d === datum; });
-            return selection;
-        }
-        function verifyFocus(datum, b, msg) {
-            _verifyFocus(getSelection(datum), b, msg);
-        }
-        function verifyEmpty(datum, msg) {
-            _verifyEmpty(getSelection(datum), msg);
-        }
-        function hoverEntry(datum, index) {
-            getSelection(datum).on("mouseover")(datum, index);
-        }
-        function leaveEntry(datum, index) {
-            getSelection(datum).on("mouseout")(datum, index);
-        }
-        it("basic initialization test", function () {
-            color.domain(["a", "b", "c", "d", "e"]);
-            hoverLegend.renderTo(svg);
-            hoverLegend._content.selectAll(".legend-row").each(function (d) {
-                verifyEmpty(d);
-            });
-            svg.remove();
-        });
-        it("basic hover test", function () {
-            color.domain(["a"]);
-            hoverLegend.renderTo(svg);
-            hoverEntry("a", 0);
-            verifyFocus("a", true);
-            leaveEntry("a", 0);
-            verifyEmpty("a");
-            svg.remove();
-        });
-        it("scale() works as intended with hovering", function () {
-            var domain = ["a", "b", "c", "d", "e"];
-            color.domain(domain);
-            hoverLegend.renderTo(svg);
-            hoverEntry("a", 0);
-            var newDomain = ["r", "a", "d", "g"];
-            var newColorScale = new Plottable.Scale.Color("Category10");
-            newColorScale.domain(newDomain);
-            hoverLegend.scale(newColorScale);
-            verifyFocus("r", false, "r");
-            verifyFocus("a", true, "a");
-            verifyFocus("g", false, "g");
-            verifyFocus("d", false, "d");
-            leaveEntry("a", 0);
-            verifyEmpty("r");
-            verifyEmpty("a");
-            verifyEmpty("g");
-            verifyEmpty("d");
-            svg.remove();
-        });
-        it("listeners on scale will correctly update states", function () {
-            color.domain(["a", "b", "c", "d", "e"]);
-            hoverLegend.renderTo(svg);
-            hoverEntry("c", 2);
-            color.domain(["e", "d", "b", "a", "c"]);
-            verifyFocus("a", false);
-            verifyFocus("b", false);
-            verifyFocus("c", true);
-            verifyFocus("d", false);
-            verifyFocus("e", false);
-            svg.remove();
-        });
-        it("Testing callback works correctly", function () {
-            var domain = ["a", "b", "c", "d", "e"];
-            color.domain(domain);
-            var focused = undefined;
-            hoverLegend.hoverCallback(function (d) {
-                focused = d;
-            });
-            hoverLegend.renderTo(svg);
-            hoverEntry("a", 0);
-            verifyFocus("a", true);
-            assert.equal(focused, "a", "callback was successful");
-            leaveEntry("a", 0);
-            assert.equal(focused, undefined, "callback was successful");
-            hoverEntry("d", 3);
-            verifyFocus("d", true);
-            assert.equal(focused, "d", "callback was successful");
-            svg.remove();
-        });
-        it("Overwriting callback is successfull", function () {
-            var domain = ["a"];
-            color.domain(domain);
-            var focused = undefined;
-            hoverLegend.renderTo(svg);
-            hoverLegend.hoverCallback(function (d) {
-                focused = d;
-            });
-            hoverEntry("a", 0);
-            assert.equal(focused, "a", "callback was successful");
-            leaveEntry("a", 0);
-            var count = 0;
-            hoverLegend.hoverCallback(function (d) {
-                count++;
-            });
-            hoverEntry("a", 0);
-            assert.equal(focused, undefined, "old callback was not called");
-            assert.equal(count, 1, "new callbcak was called");
-            leaveEntry("a", 0);
-            assert.equal(count, 2, "new callback was called");
-            svg.remove();
-        });
-        it("Removing callback is successful", function () {
-            var domain = ["a"];
-            color.domain(domain);
-            var focused = undefined;
-            hoverLegend.renderTo(svg);
-            hoverLegend.hoverCallback(function (d) {
-                focused = d;
-            });
-            hoverEntry("a", 0);
-            assert.equal(focused, "a", "callback was successful");
-            hoverLegend.hoverCallback(); // this should not remove the callback
-            leaveEntry("a", 0);
-            assert.equal(focused, undefined, "callback was successful");
-            hoverLegend.hoverCallback(null); // this should remove the callback
-            assert.throws(function () {
-                hoverEntry("a", 0);
-            });
-            verifyEmpty("a");
-            svg.remove();
-        });
-    });
 });
-describe("HorizontalLegend", function () {
+describe("Legend", function () {
     var colorScale;
     var horizLegend;
-    var entrySelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ENTRY_CLASS;
-    var rowSelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ROW_CLASS;
+    var entrySelector = "." + Plottable.Component.Legend.LEGEND_ENTRY_CLASS;
+    var rowSelector = "." + Plottable.Component.Legend.LEGEND_ROW_CLASS;
     beforeEach(function () {
         colorScale = new Plottable.Scale.Color();
         colorScale.domain([
@@ -1579,7 +1324,7 @@ describe("HorizontalLegend", function () {
             "Adams",
             "Jefferson",
         ]);
-        horizLegend = new Plottable.Component.HorizontalLegend(colorScale);
+        horizLegend = new Plottable.Component.Legend(colorScale);
     });
     it("renders an entry for each item in the domain", function () {
         var svg = generateSVG(400, 100);
@@ -1650,6 +1395,44 @@ describe("HorizontalLegend", function () {
         horizLegend._invalidateLayout();
         var smallCircleHeight = verifyCircleHeight();
         assert.operator(smallCircleHeight, "<", origCircleHeight, "icon size decreased with font size");
+        svg.remove();
+    });
+    it("getEntry() horizontal", function () {
+        colorScale.domain(["AA", "BB", "CC"]);
+        var svg = generateSVG(300, 300);
+        horizLegend.renderTo(svg);
+        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
+        assert.deepEqual(horizLegend.getEntry({ x: 50, y: 10 }).data(), ["BB"], "get second entry");
+        assert.deepEqual(horizLegend.getEntry({ x: 150, y: 10 }), d3.select(), "no entries at location outside legend");
+        svg.remove();
+    });
+    it("getEntry() vertical", function () {
+        colorScale.domain(["AA", "BB", "CC"]);
+        var svg = generateSVG(300, 300);
+        horizLegend.maxEntriesPerRow(1);
+        horizLegend.renderTo(svg);
+        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
+        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 30 }).data(), ["BB"], "get second entry");
+        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 150 }), d3.select(), "no entries at location outside legend");
+        svg.remove();
+    });
+    it("maxEntriesPerRow() works as expected", function () {
+        colorScale.domain(["AA", "BB", "CC", "DD", "EE", "FF"]);
+        var svg = generateSVG(300, 300);
+        horizLegend.renderTo(svg);
+        var verifyMaxEntriesInRow = function (n) {
+            horizLegend.maxEntriesPerRow(n);
+            var rows = horizLegend._element.selectAll(rowSelector);
+            assert.lengthOf(rows[0], (6 / n), "number of rows is correct");
+            rows.each(function (d) {
+                var entries = d3.select(this).selectAll(entrySelector);
+                assert.lengthOf(entries[0], n, "number of entries in row is correct");
+            });
+        };
+        verifyMaxEntriesInRow(1);
+        verifyMaxEntriesInRow(2);
+        verifyMaxEntriesInRow(3);
+        verifyMaxEntriesInRow(6);
         svg.remove();
     });
 });
@@ -1979,9 +1762,9 @@ describe("Plots", function () {
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             plot.remove();
             var key2callback = xScale.broadcaster._key2callback;
-            assert.isUndefined(key2callback.get("yDomainAdjustment" + plot._plottableID), "the plot is no longer attached to the xScale");
+            assert.isUndefined(key2callback.get("yDomainAdjustment" + plot.getID()), "the plot is no longer attached to the xScale");
             key2callback = yScale.broadcaster._key2callback;
-            assert.isUndefined(key2callback.get("xDomainAdjustment" + plot._plottableID), "the plot is no longer attached to the yScale");
+            assert.isUndefined(key2callback.get("xDomainAdjustment" + plot.getID()), "the plot is no longer attached to the yScale");
             svg.remove();
         });
         it("listeners are deregistered for changed scale", function () {
@@ -4795,7 +4578,7 @@ describe("Component behavior", function () {
     it("clipPath works as expected", function () {
         assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
         c.clipPathEnabled = true;
-        var expectedClipPathID = c._plottableID;
+        var expectedClipPathID = c.getID();
         c._anchor(svg);
         c._computeLayout(0, 0, 100, 100);
         c._render();
@@ -4812,9 +4595,9 @@ describe("Component behavior", function () {
     it("componentID works as expected", function () {
         var expectedID = Plottable.Core.PlottableObject._nextID;
         var c1 = new Plottable.Component.AbstractComponent();
-        assert.equal(c1._plottableID, expectedID, "component id on next component was as expected");
+        assert.equal(c1.getID(), expectedID, "component id on next component was as expected");
         var c2 = new Plottable.Component.AbstractComponent();
-        assert.equal(c2._plottableID, expectedID + 1, "future components increment appropriately");
+        assert.equal(c2.getID(), expectedID + 1, "future components increment appropriately");
         svg.remove();
     });
     it("boxes work as expected", function () {
@@ -4975,10 +4758,10 @@ describe("Component behavior", function () {
             oldRegister = Plottable.Core.ResizeBroadcaster.register;
             oldDeregister = Plottable.Core.ResizeBroadcaster.deregister;
             var mockRegister = function (c) {
-                registeredComponents.add(c._plottableID);
+                registeredComponents.add(c.getID());
             };
             var mockDeregister = function (c) {
-                registeredComponents.remove(c._plottableID);
+                registeredComponents.remove(c.getID());
             };
             Plottable.Core.ResizeBroadcaster.register = mockRegister;
             Plottable.Core.ResizeBroadcaster.deregister = mockDeregister;
@@ -4989,7 +4772,7 @@ describe("Component behavior", function () {
         });
         beforeEach(function () {
             registeredComponents = d3.set();
-            id = c._plottableID;
+            id = c.getID();
         });
         afterEach(function () {
             svg.remove(); // svg contains no useful info

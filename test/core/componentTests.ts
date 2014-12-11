@@ -201,7 +201,7 @@ it("components can be offset relative to their alignment, and throw errors if th
   it("clipPath works as expected", () => {
     assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
     c.clipPathEnabled = true;
-    var expectedClipPathID = c._plottableID;
+    var expectedClipPathID = c.getID();
     c._anchor(svg);
     c._computeLayout(0, 0, 100, 100);
     c._render();
@@ -220,9 +220,9 @@ it("components can be offset relative to their alignment, and throw errors if th
   it("componentID works as expected", () => {
     var expectedID = (<any> Plottable.Core.PlottableObject)._nextID;
     var c1 = new Plottable.Component.AbstractComponent();
-    assert.equal(c1._plottableID, expectedID, "component id on next component was as expected");
+    assert.equal(c1.getID(), expectedID, "component id on next component was as expected");
     var c2 = new Plottable.Component.AbstractComponent();
-    assert.equal(c2._plottableID, expectedID+1, "future components increment appropriately");
+    assert.equal(c2.getID(), expectedID+1, "future components increment appropriately");
     svg.remove();
   });
 
@@ -410,11 +410,11 @@ it("components can be offset relative to their alignment, and throw errors if th
       oldRegister = Plottable.Core.ResizeBroadcaster.register;
       oldDeregister = Plottable.Core.ResizeBroadcaster.deregister;
       var mockRegister = (c: Plottable.Component.AbstractComponent) => {
-        registeredComponents.add(c._plottableID);
+        registeredComponents.add(c.getID());
       };
 
       var mockDeregister = (c: Plottable.Component.AbstractComponent) => {
-        registeredComponents.remove(c._plottableID);
+        registeredComponents.remove(c.getID());
       };
       Plottable.Core.ResizeBroadcaster.register = mockRegister;
       Plottable.Core.ResizeBroadcaster.deregister = mockDeregister;
@@ -427,7 +427,7 @@ it("components can be offset relative to their alignment, and throw errors if th
 
     beforeEach(() => {
       registeredComponents = d3.set();
-      id = c._plottableID;
+      id = c.getID();
     });
 
     afterEach(() => {

@@ -171,7 +171,15 @@ export module Axis {
       tickLabels.style("text-anchor", tickLabelTextAnchor)
                 .style("visibility", "visible")
                 .attr(tickLabelAttrHash)
-                .text(this.formatter());
+                .text((s: any) => {
+                  var formattedText = this.formatter()(s);
+                  if (!this._isHorizontal()) {
+                    var availableTextSpace = this.width() - this.tickLabelPadding();
+                    availableTextSpace -= this._tickLabelPositioning === "center" ? this._maxLabelTickLength() : 0;
+                    formattedText = _Util.Text.getTruncatedText(formattedText, availableTextSpace, this._measurer);
+                  }
+                  return formattedText;
+                });
 
       var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);

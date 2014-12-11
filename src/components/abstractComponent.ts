@@ -350,9 +350,9 @@ export module Component {
       // They don't need the current URL in the clip path reference.
       var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
       prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-      this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this._plottableID + "\")");
+      this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this.getID() + "\")");
       var clipPathParent = this._boxContainer.append("clipPath")
-                                      .attr("id", "clipPath" + this._plottableID);
+                                      .attr("id", "clipPath" + this.getID());
       this._addBox("clip-rect", clipPathParent);
     }
 

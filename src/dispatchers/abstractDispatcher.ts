@@ -49,7 +49,7 @@ export module Dispatcher {
      * Gets a namespaced version of the event name.
      */
     protected _getEventString(eventName: string) {
-      return eventName + ".dispatcher" + this._plottableID;
+      return eventName + ".dispatcher" + this.getID();
     }
 
     /**

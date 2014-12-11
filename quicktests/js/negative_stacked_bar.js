@@ -25,7 +25,7 @@ function run(div, data, Plottable) {
   var xAxis2 = new Plottable.Axis.Numeric(xScale2, "bottom");
   var yAxis2 = new Plottable.Axis.Category(yScale2, "left");
 
-  var legend = new Plottable.Component.HorizontalLegend(colorScale);
+  var legend = new Plottable.Component.Legend(colorScale);
   legend.xAlign("center");
 
   var title = new Plottable.Component.TitleLabel("Sample Net Earnings by Teams");
