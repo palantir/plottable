@@ -54,14 +54,12 @@ export module Plot {
     private _makeInnerScale(){
       var innerScale = new Scale.Ordinal();
       innerScale.domain(this._datasetKeysInOrder);
-      // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
       if (!this._projections["width"]) {
         innerScale.range([0, this._getBarPixelWidth()]);
       } else {
         var projection = this._projections["width"];
         var accessor = projection.accessor;
         var scale = projection.scale;
-        // HACKHACK Metadata should be passed
         var fn = scale ? (d: any, i: number, u: any, m: PlotMetadata) => scale.scale(accessor(d, i, u, m)) : accessor;
         innerScale.range([0, fn(null, 0, null, null)]);
       }

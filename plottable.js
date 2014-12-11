@@ -8060,7 +8060,6 @@ var Plottable;
             ClusteredBar.prototype._makeInnerScale = function () {
                 var innerScale = new Plottable.Scale.Ordinal();
                 innerScale.domain(this._datasetKeysInOrder);
-                // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
                 if (!this._projections["width"]) {
                     innerScale.range([0, this._getBarPixelWidth()]);
                 }
@@ -8068,7 +8067,6 @@ var Plottable;
                     var projection = this._projections["width"];
                     var accessor = projection.accessor;
                     var scale = projection.scale;
-                    // HACKHACK Metadata should be passed
                     var fn = scale ? function (d, i, u, m) { return scale.scale(accessor(d, i, u, m)); } : accessor;
                     innerScale.range([0, fn(null, 0, null, null)]);
                 }
