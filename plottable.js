@@ -1580,6 +1580,9 @@ var Plottable;
             function PlottableObject() {
                 this._plottableID = PlottableObject._nextID++;
             }
+            PlottableObject.prototype.getID = function () {
+                return this._plottableID;
+            };
             PlottableObject._nextID = 0;
             return PlottableObject;
         })();
@@ -1872,7 +1875,7 @@ var Plottable;
                 if (_isCurrentlyFlushing) {
                     Plottable._Util.Methods.warn("Registered to render while other components are flushing: request may be ignored");
                 }
-                _componentsNeedingRender[c._plottableID] = c;
+                _componentsNeedingRender[c.getID()] = c;
                 requestRender();
             }
             RenderController.registerToRender = registerToRender;
@@ -1883,8 +1886,8 @@ var Plottable;
              * @param {AbstractComponent} component Any Plottable component.
              */
             function registerToComputeLayout(c) {
-                _componentsNeedingComputeLayout[c._plottableID] = c;
-                _componentsNeedingRender[c._plottableID] = c;
+                _componentsNeedingComputeLayout[c.getID()] = c;
+                _componentsNeedingRender[c.getID()] = c;
                 requestRender();
             }
             RenderController.registerToComputeLayout = registerToComputeLayout;
@@ -2001,7 +2004,7 @@ var Plottable;
              */
             function register(c) {
                 _lazyInitialize();
-                broadcaster.registerListener(c._plottableID, function () { return c._invalidateLayout(); });
+                broadcaster.registerListener(c.getID(), function () { return c._invalidateLayout(); });
             }
             ResizeBroadcaster.register = register;
             /**
@@ -2013,7 +2016,7 @@ var Plottable;
              */
             function deregister(c) {
                 if (broadcaster) {
-                    broadcaster.deregisterListener(c._plottableID);
+                    broadcaster.deregisterListener(c.getID());
                 }
             }
             ResizeBroadcaster.deregister = deregister;
@@ -2074,9 +2077,9 @@ var Plottable;
             else {
                 domain = [Plottable._Util.Methods.min(extents, function (e) { return e[0]; }, 0), Plottable._Util.Methods.max(extents, function (e) { return e[1]; }, 0)];
             }
-            domain = this.includeDomain(domain);
-            domain = this.padDomain(scale, domain);
-            domain = this.niceDomain(scale, domain);
+            domain = this._includeDomain(domain);
+            domain = this._padDomain(scale, domain);
+            domain = this._niceDomain(scale, domain);
             return domain;
         };
         /**
@@ -2185,10 +2188,7 @@ var Plottable;
             this._niceCount = count;
             return this;
         };
-        Domainer.defaultCombineExtents = function (extents) {
-            return [Plottable._Util.Methods.min(extents, function (e) { return e[0]; }, 0), Plottable._Util.Methods.max(extents, function (e) { return e[1]; }, 1)];
-        };
-        Domainer.prototype.padDomain = function (scale, domain) {
+        Domainer.prototype._padDomain = function (scale, domain) {
             var min = domain[0];
             var max = domain[1];
             if (min === max && this._padProportion > 0.0) {
@@ -2218,7 +2218,7 @@ var Plottable;
             }
             return [newMin, newMax];
         };
-        Domainer.prototype.niceDomain = function (scale, domain) {
+        Domainer.prototype._niceDomain = function (scale, domain) {
             if (this._doNice) {
                 return scale._niceDomain(domain, this._niceCount);
             }
@@ -2226,7 +2226,7 @@ var Plottable;
                 return domain;
             }
         };
-        Domainer.prototype.includeDomain = function (domain) {
+        Domainer.prototype._includeDomain = function (domain) {
             var includedValues = this._includedValues.values().concat(this._unregisteredIncludedValues.values());
             return includedValues.reduce(function (domain, value) { return [Math.min(domain[0], value), Math.max(domain[1], value)]; }, domain);
         };
@@ -4062,8 +4062,8 @@ var Plottable;
                 // They don't need the current URL in the clip path reference.
                 var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
                 prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-                this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this._plottableID + "\")");
-                var clipPathParent = this._boxContainer.append("clipPath").attr("id", "clipPath" + this._plottableID);
+                this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this.getID() + "\")");
+                var clipPathParent = this._boxContainer.append("clipPath").attr("id", "clipPath" + this.getID());
                 this._addBox("clip-rect", clipPathParent);
             };
             /**
@@ -5180,6 +5180,7 @@ var Plottable;
                 this._render();
             };
             Numeric.prototype._doRender = function () {
+                var _this = this;
                 _super.prototype._doRender.call(this);
                 var tickLabelAttrHash = {
                     x: 0,
@@ -5255,7 +5256,15 @@ var Plottable;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(tickLabelValues);
                 tickLabels.enter().append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();
-                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(this.formatter());
+                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(function (s) {
+                    var formattedText = _this.formatter()(s);
+                    if (!_this._isHorizontal()) {
+                        var availableTextSpace = _this.width() - _this.tickLabelPadding();
+                        availableTextSpace -= _this._tickLabelPositioning === "center" ? _this._maxLabelTickLength() : 0;
+                        formattedText = Plottable._Util.Text.getTruncatedText(formattedText, availableTextSpace, _this._measurer);
+                    }
+                    return formattedText;
+                });
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
                 if (!this.showEndTickLabels()) {
@@ -5679,232 +5688,7 @@ var Plottable;
         var Legend = (function (_super) {
             __extends(Legend, _super);
             /**
-             * Constructs a Legend.
-             *
-             * A legend consists of a series of legend rows, each with a color and label taken from the `colorScale`.
-             * The rows will be displayed in the order of the `colorScale` domain.
-             * This legend also allows interactions, through the functions `toggleCallback` and `hoverCallback`
-             * Setting a callback will also put classes on the individual rows.
-             *
-             * @constructor
-             * @param {ColorScale} colorScale
-             */
-            function Legend(colorScale) {
-                _super.call(this);
-                this.classed("legend", true);
-                this.scale(colorScale);
-                this.xAlign("RIGHT").yAlign("TOP");
-                this.xOffset(5).yOffset(5);
-                this._fixedWidthFlag = true;
-                this._fixedHeightFlag = true;
-            }
-            Legend.prototype.remove = function () {
-                _super.prototype.remove.call(this);
-                if (this._colorScale != null) {
-                    this._colorScale.broadcaster.deregisterListener(this);
-                }
-            };
-            Legend.prototype.toggleCallback = function (callback) {
-                if (callback !== undefined) {
-                    this._toggleCallback = callback;
-                    this._isOff = d3.set();
-                    this._updateListeners();
-                    this._updateClasses();
-                    return this;
-                }
-                else {
-                    return this._toggleCallback;
-                }
-            };
-            Legend.prototype.hoverCallback = function (callback) {
-                if (callback !== undefined) {
-                    this._hoverCallback = callback;
-                    this._datumCurrentlyFocusedOn = undefined;
-                    this._updateListeners();
-                    this._updateClasses();
-                    return this;
-                }
-                else {
-                    return this._hoverCallback;
-                }
-            };
-            Legend.prototype.scale = function (scale) {
-                var _this = this;
-                if (scale != null) {
-                    if (this._colorScale != null) {
-                        this._colorScale.broadcaster.deregisterListener(this);
-                    }
-                    this._colorScale = scale;
-                    this._colorScale.broadcaster.registerListener(this, function () { return _this._updateDomain(); });
-                    this._updateDomain();
-                    return this;
-                }
-                else {
-                    return this._colorScale;
-                }
-            };
-            Legend.prototype._updateDomain = function () {
-                if (this._toggleCallback != null) {
-                    this._isOff = Plottable._Util.Methods.intersection(this._isOff, d3.set(this.scale().domain()));
-                }
-                if (this._hoverCallback != null) {
-                    this._datumCurrentlyFocusedOn = this.scale().domain().indexOf(this._datumCurrentlyFocusedOn) >= 0 ? this._datumCurrentlyFocusedOn : undefined;
-                }
-                this._invalidateLayout();
-            };
-            Legend.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
-                _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
-                var textHeight = this._measureTextHeight();
-                var totalNumRows = this._colorScale.domain().length;
-                this._nRowsDrawn = Math.min(totalNumRows, Math.floor(this.height() / textHeight));
-            };
-            Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var textHeight = this._measureTextHeight();
-                var totalNumRows = this._colorScale.domain().length;
-                var rowsICanFit = Math.min(totalNumRows, Math.floor((offeredHeight - 2 * Legend._MARGIN) / textHeight));
-                var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-                var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
-                var maxWidth = Plottable._Util.Methods.max(this._colorScale.domain(), function (d) { return measure(d).width; }, 0);
-                fakeLegendEl.remove();
-                maxWidth = maxWidth === undefined ? 0 : maxWidth;
-                var desiredWidth = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend._MARGIN;
-                var desiredHeight = rowsICanFit === 0 ? 0 : totalNumRows * textHeight + 2 * Legend._MARGIN;
-                return {
-                    width: desiredWidth,
-                    height: desiredHeight,
-                    wantsWidth: offeredWidth < desiredWidth,
-                    wantsHeight: offeredHeight < desiredHeight
-                };
-            };
-            Legend.prototype._measureTextHeight = function () {
-                // note: can't be called before anchoring atm
-                var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-                var textHeight = Plottable._Util.Text.getTextMeasurer(fakeLegendEl.append("text"))(Plottable._Util.Text.HEIGHT_TEXT).height;
-                // HACKHACK
-                if (textHeight === 0) {
-                    textHeight = 1;
-                }
-                fakeLegendEl.remove();
-                return textHeight;
-            };
-            Legend.prototype._doRender = function () {
-                var _this = this;
-                _super.prototype._doRender.call(this);
-                var domain = this._colorScale.domain().slice(0, this._nRowsDrawn);
-                var textHeight = this._measureTextHeight();
-                var availableWidth = this.width() - textHeight - Legend._MARGIN;
-                var r = textHeight * 0.3;
-                var legend = this._content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, function (d) { return d; });
-                var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true);
-                legendEnter.each(function (d) {
-                    d3.select(this).classed(d.replace(" ", "-"), true);
-                });
-                legendEnter.append("circle");
-                legendEnter.append("g").classed("text-container", true);
-                legend.exit().remove();
-                legend.selectAll("circle").attr("cx", textHeight / 2).attr("cy", textHeight / 2).attr("r", r).attr("fill", function (d) { return _this._colorScale.scale(d); });
-                legend.selectAll("g.text-container").text("").attr("transform", "translate(" + textHeight + ", 0)").each(function (d) {
-                    var d3this = d3.select(this);
-                    var measure = Plottable._Util.Text.getTextMeasurer(d3this.append("text"));
-                    var writeLine = Plottable._Util.Text.getTruncatedText(d, availableWidth, measure);
-                    var writeLineMeasure = measure(writeLine);
-                    Plottable._Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
-                });
-                legend.attr("transform", function (d) {
-                    return "translate(" + Legend._MARGIN + "," + (domain.indexOf(d) * textHeight + Legend._MARGIN) + ")";
-                });
-                this._updateClasses();
-                this._updateListeners();
-            };
-            Legend.prototype._updateListeners = function () {
-                var _this = this;
-                if (!this._isSetup) {
-                    return;
-                }
-                var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
-                if (this._hoverCallback != null) {
-                    // tag the element that is being hovered over with the class "focus"
-                    // this callback will trigger with the specific element being hovered over.
-                    var hoverRow = function (mouseover) { return function (datum) {
-                        _this._datumCurrentlyFocusedOn = mouseover ? datum : undefined;
-                        _this._hoverCallback(_this._datumCurrentlyFocusedOn);
-                        _this._updateClasses();
-                    }; };
-                    dataSelection.on("mouseover", hoverRow(true));
-                    dataSelection.on("mouseout", hoverRow(false));
-                }
-                else {
-                    // remove all mouseover/mouseout listeners
-                    dataSelection.on("mouseover", null);
-                    dataSelection.on("mouseout", null);
-                }
-                if (this._toggleCallback != null) {
-                    dataSelection.on("click", function (datum) {
-                        var turningOn = _this._isOff.has(datum);
-                        if (turningOn) {
-                            _this._isOff.remove(datum);
-                        }
-                        else {
-                            _this._isOff.add(datum);
-                        }
-                        _this._toggleCallback(datum, turningOn);
-                        _this._updateClasses();
-                    });
-                }
-                else {
-                    // remove all click listeners
-                    dataSelection.on("click", null);
-                }
-            };
-            Legend.prototype._updateClasses = function () {
-                var _this = this;
-                if (!this._isSetup) {
-                    return;
-                }
-                var dataSelection = this._content.selectAll("." + Legend.SUBELEMENT_CLASS);
-                if (this._hoverCallback != null) {
-                    dataSelection.classed("focus", function (d) { return _this._datumCurrentlyFocusedOn === d; });
-                    dataSelection.classed("hover", this._datumCurrentlyFocusedOn !== undefined);
-                }
-                else {
-                    dataSelection.classed("hover", false);
-                    dataSelection.classed("focus", false);
-                }
-                if (this._toggleCallback != null) {
-                    dataSelection.classed("toggled-on", function (d) { return !_this._isOff.has(d); });
-                    dataSelection.classed("toggled-off", function (d) { return _this._isOff.has(d); });
-                }
-                else {
-                    dataSelection.classed("toggled-on", false);
-                    dataSelection.classed("toggled-off", false);
-                }
-            };
-            /**
-             * The css class applied to each legend row
-             */
-            Legend.SUBELEMENT_CLASS = "legend-row";
-            Legend._MARGIN = 5;
-            return Legend;
-        })(Component.AbstractComponent);
-        Component.Legend = Legend;
-    })(Component = Plottable.Component || (Plottable.Component = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Component;
-    (function (Component) {
-        var HorizontalLegend = (function (_super) {
-            __extends(HorizontalLegend, _super);
-            /**
-             * Creates a Horizontal Legend.
+             * Creates a Legend.
              *
              * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
              * The entries will be displayed in the order of the `colorScale` domain.
@@ -5912,25 +5696,52 @@ var Plottable;
              * @constructor
              * @param {Scale.Color} colorScale
              */
-            function HorizontalLegend(colorScale) {
+            function Legend(colorScale) {
                 var _this = this;
                 _super.call(this);
                 this._padding = 5;
                 this.classed("legend", true);
+                this.maxEntriesPerRow(Infinity);
+                if (colorScale == null) {
+                    throw new Error("Legend requires a colorScale");
+                }
                 this._scale = colorScale;
                 this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
-                this.xAlign("left").yAlign("center");
+                this.xAlign("right").yAlign("top");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
             }
-            HorizontalLegend.prototype.remove = function () {
+            Legend.prototype.maxEntriesPerRow = function (numEntries) {
+                if (numEntries == null) {
+                    return this._maxEntriesPerRow;
+                }
+                else {
+                    this._maxEntriesPerRow = numEntries;
+                    this._invalidateLayout();
+                    return this;
+                }
+            };
+            Legend.prototype.scale = function (scale) {
+                var _this = this;
+                if (scale != null) {
+                    this._scale.broadcaster.deregisterListener(this);
+                    this._scale = scale;
+                    this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
+                    this._invalidateLayout();
+                    return this;
+                }
+                else {
+                    return this._scale;
+                }
+            };
+            Legend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 this._scale.broadcaster.deregisterListener(this);
             };
-            HorizontalLegend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
+            Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
-                var fakeLegendRow = this._content.append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
-                var fakeLegendEntry = fakeLegendRow.append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
+                var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+                var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
                 var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendRow.append("text"));
                 var textHeight = measure(Plottable._Util.Text.HEIGHT_TEXT).height;
                 var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
@@ -5953,13 +5764,12 @@ var Plottable;
                     numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0)
                 };
             };
-            HorizontalLegend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
                 var rowLengths = estimatedLayout.rows.map(function (row) {
                     return d3.sum(row, function (entry) { return estimatedLayout.entryLengths.get(entry); });
                 });
                 var longestRowLength = Plottable._Util.Methods.max(rowLengths, 0);
-                longestRowLength = longestRowLength === undefined ? 0 : longestRowLength; // HACKHACK: #843
                 var desiredWidth = this._padding + longestRowLength;
                 var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
                 var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
@@ -5970,33 +5780,65 @@ var Plottable;
                     wantsHeight: offeredHeight < desiredHeight
                 };
             };
-            HorizontalLegend.prototype._packRows = function (availableWidth, entries, entryLengths) {
-                var rows = [[]];
-                var currentRow = rows[0];
+            Legend.prototype._packRows = function (availableWidth, entries, entryLengths) {
+                var _this = this;
+                var rows = [];
+                var currentRow = [];
                 var spaceLeft = availableWidth;
                 entries.forEach(function (e) {
                     var entryLength = entryLengths.get(e);
-                    if (entryLength > spaceLeft) {
-                        currentRow = [];
+                    if (entryLength > spaceLeft || currentRow.length === _this._maxEntriesPerRow) {
                         rows.push(currentRow);
+                        currentRow = [];
                         spaceLeft = availableWidth;
                     }
                     currentRow.push(e);
                     spaceLeft -= entryLength;
                 });
+                if (currentRow.length !== 0) {
+                    rows.push(currentRow);
+                }
                 return rows;
             };
-            HorizontalLegend.prototype._doRender = function () {
+            /**
+             * Gets the legend entry under the given pixel position.
+             *
+             * @param {Point} position The pixel position.
+             * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
+             */
+            Legend.prototype.getEntry = function (position) {
+                if (!this._isSetup) {
+                    return d3.select();
+                }
+                var entry = d3.select();
+                var layout = this._calculateLayoutInfo(this.width(), this.height());
+                var legendPadding = this._padding;
+                this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function (d, i) {
+                    var lowY = i * layout.textHeight + legendPadding;
+                    var highY = (i + 1) * layout.textHeight + legendPadding;
+                    var lowX = legendPadding;
+                    var highX = legendPadding;
+                    d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS).each(function (value) {
+                        highX += layout.entryLengths.get(value);
+                        if (highX >= position.x && lowX <= position.x && highY >= position.y && lowY <= position.y) {
+                            entry = d3.select(this);
+                        }
+                        lowX += layout.entryLengths.get(value);
+                    });
+                });
+                return entry;
+            };
+            Legend.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
-                var rows = this._content.selectAll("g." + HorizontalLegend.LEGEND_ROW_CLASS).data(rowsToDraw);
-                rows.enter().append("g").classed(HorizontalLegend.LEGEND_ROW_CLASS, true);
+                var rows = this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
+                rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
                 rows.exit().remove();
                 rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this._padding) + ")"; });
-                var entries = rows.selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
-                var entriesEnter = entries.enter().append("g").classed(HorizontalLegend.LEGEND_ENTRY_CLASS, true);
+                var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
+                var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
                 entries.each(function (d) {
                     d3.select(this).classed(d.replace(" ", "-"), true);
                 });
@@ -6006,7 +5848,7 @@ var Plottable;
                 var legendPadding = this._padding;
                 rows.each(function (values) {
                     var xShift = legendPadding;
-                    var entriesInRow = d3.select(this).selectAll("g." + HorizontalLegend.LEGEND_ENTRY_CLASS);
+                    var entriesInRow = d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS);
                     entriesInRow.attr("transform", function (value, i) {
                         var translateString = "translate(" + xShift + ", 0)";
                         xShift += layout.entryLengths.get(value);
@@ -6031,14 +5873,14 @@ var Plottable;
             /**
              * The css class applied to each legend row
              */
-            HorizontalLegend.LEGEND_ROW_CLASS = "legend-row";
+            Legend.LEGEND_ROW_CLASS = "legend-row";
             /**
              * The css class applied to each legend entry
              */
-            HorizontalLegend.LEGEND_ENTRY_CLASS = "legend-entry";
-            return HorizontalLegend;
+            Legend.LEGEND_ENTRY_CLASS = "legend-entry";
+            return Legend;
         })(Component.AbstractComponent);
-        Component.HorizontalLegend = HorizontalLegend;
+        Component.Legend = Legend;
     })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));
 
@@ -6619,7 +6461,7 @@ var Plottable;
                 var existingScale = currentProjection && currentProjection.scale;
                 if (existingScale) {
                     this._datasetKeysInOrder.forEach(function (key) {
-                        existingScale._removeExtent(_this._plottableID.toString() + "_" + key, attrToSet);
+                        existingScale._removeExtent(_this.getID().toString() + "_" + key, attrToSet);
                         existingScale.broadcaster.deregisterListener(_this);
                     });
                 }
@@ -6683,7 +6525,7 @@ var Plottable;
                         var dataset = plotDatasetKey.dataset;
                         var plotMetadata = plotDatasetKey.plotMetadata;
                         var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
-                        var scaleKey = _this._plottableID.toString() + "_" + key;
+                        var scaleKey = _this.getID().toString() + "_" + key;
                         if (extent.length === 0 || !_this._isAnchored) {
                             projector.scale._removeExtent(scaleKey, attr);
                         }
@@ -6739,7 +6581,7 @@ var Plottable;
                     var pdk = this._key2PlotDatasetKey.get(key);
                     pdk.drawer.remove();
                     var projectors = d3.values(this._projections);
-                    var scaleKey = this._plottableID.toString() + "_" + key;
+                    var scaleKey = this.getID().toString() + "_" + key;
                     projectors.forEach(function (p) {
                         if (p.scale != null) {
                             p.scale._removeExtent(scaleKey, p.attribute);
@@ -6899,9 +6741,9 @@ var Plottable;
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._updateXDomainer();
-                xScale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this._adjustYDomainOnChangeFromX(); });
+                xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
                 this._updateYDomainer();
-                yScale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this._adjustXDomainOnChangeFromY(); });
+                yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
             }
             /**
              * @param {string} attrToSet One of ["x", "y"] which determines the point's
@@ -6913,19 +6755,19 @@ var Plottable;
                 // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
                 if (attrToSet === "x" && scale) {
                     if (this._xScale) {
-                        this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this._plottableID);
+                        this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
                     }
                     this._xScale = scale;
                     this._updateXDomainer();
-                    scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, function () { return _this._adjustYDomainOnChangeFromX(); });
+                    scale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
                 }
                 if (attrToSet === "y" && scale) {
                     if (this._yScale) {
-                        this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this._plottableID);
+                        this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
                     }
                     this._yScale = scale;
                     this._updateYDomainer();
-                    scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, function () { return _this._adjustXDomainOnChangeFromY(); });
+                    scale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
                 }
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 return this;
@@ -6933,10 +6775,10 @@ var Plottable;
             AbstractXYPlot.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 if (this._xScale) {
-                    this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this._plottableID);
+                    this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
                 }
                 if (this._yScale) {
-                    this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this._plottableID);
+                    this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
                 }
                 return this;
             };
@@ -7424,10 +7266,10 @@ var Plottable;
                     var qscale = scale;
                     if (!qscale._userSetDomainer) {
                         if (this._baselineValue != null) {
-                            qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
+                            qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this.getID()).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this.getID());
                         }
                         else {
-                            qscale.domainer().removePaddingException("BAR_PLOT+" + this._plottableID).removeIncludedValue("BAR_PLOT+" + this._plottableID);
+                            qscale.domainer().removePaddingException("BAR_PLOT+" + this.getID()).removeIncludedValue("BAR_PLOT+" + this.getID());
                         }
                         qscale.domainer().pad().nice();
                     }
@@ -7975,10 +7817,10 @@ var Plottable;
                 }
                 if (!this._yScale._userSetDomainer) {
                     if (constantBaseline != null) {
-                        this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+                        this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this.getID());
                     }
                     else {
-                        this._yScale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
+                        this._yScale.domainer().removePaddingException("AREA_PLOT+" + this.getID());
                     }
                     // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     this._yScale._autoDomainIfAutomaticMode();
@@ -8257,10 +8099,10 @@ var Plottable;
                     return;
                 }
                 if (this._isAnchored && this._stackedExtent.length > 0) {
-                    primaryScale._updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
+                    primaryScale._updateExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
                 }
                 else {
-                    primaryScale._removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+                    primaryScale._removeExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
             };
             AbstractStacked.prototype._normalizeDatasets = function (fromX) {
@@ -8342,7 +8184,7 @@ var Plottable;
                 _super.prototype._updateYDomainer.call(this);
                 var scale = this._yScale;
                 if (!scale._userSetDomainer) {
-                    scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID).addIncludedValue(0, "STACKED_AREA_PLOT+" + this._plottableID);
+                    scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this.getID()).addIncludedValue(0, "STACKED_AREA_PLOT+" + this.getID());
                     // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     scale._autoDomainIfAutomaticMode();
                 }
@@ -8811,7 +8653,7 @@ var Plottable;
              * Gets a namespaced version of the event name.
              */
             AbstractDispatcher.prototype._getEventString = function (eventName) {
-                return eventName + ".dispatcher" + this._plottableID;
+                return eventName + ".dispatcher" + this.getID();
             };
             /**
              * Attaches the Dispatcher's listeners to the Dispatcher's target element.
