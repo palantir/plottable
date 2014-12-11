@@ -5684,6 +5684,7 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Component) {
+        ;
         var Legend = (function (_super) {
             __extends(Legend, _super);
             /**
@@ -5709,6 +5710,7 @@ var Plottable;
                 this.xAlign("right").yAlign("top");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
+                this._compareFn = function (a, b) { return -1; };
             }
             Legend.prototype.maxEntriesPerRow = function (numEntries) {
                 if (numEntries == null) {
@@ -5719,6 +5721,17 @@ var Plottable;
                     this._invalidateLayout();
                     return this;
                 }
+            };
+            /**
+             * Sets a new compare function to sort Legend's entires.
+             *
+             * @param {CompareFunction} newFn The new compare function.
+             * @returns {Legend} The calling Legend.
+             */
+            Legend.prototype.entriesCompareFunction = function (newFn) {
+                this._compareFn = newFn;
+                this._invalidateLayout();
+                return this;
             };
             Legend.prototype.scale = function (scale) {
                 var _this = this;
@@ -5748,7 +5761,7 @@ var Plottable;
                     var originalEntryLength = (textHeight + measure(entryText).width + _this._padding);
                     return Math.min(originalEntryLength, availableWidthForEntries);
                 };
-                var entries = this._scale.domain();
+                var entries = this._scale.domain().sort(this._compareFn);
                 var entryLengths = Plottable._Util.Methods.populateMap(entries, measureEntry);
                 fakeLegendRow.remove();
                 var rows = this._packRows(availableWidthForEntries, entries, entryLengths);

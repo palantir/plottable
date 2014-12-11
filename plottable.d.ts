@@ -2450,6 +2450,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
+        interface CompareFunction {
+            (a: string, b: string): number;
+        }
         class Legend extends AbstractComponent {
             /**
              * The css class applied to each legend row
@@ -2481,6 +2484,13 @@ declare module Plottable {
              * @returns {Legend} The calling Legend.
              */
             maxEntriesPerRow(numEntries: number): Legend;
+            /**
+             * Sets a new compare function to sort Legend's entires.
+             *
+             * @param {CompareFunction} newFn The new compare function.
+             * @returns {Legend} The calling Legend.
+             */
+            entriesCompareFunction(newFn: CompareFunction): Legend;
             /**
              * Gets the current color scale from the Legend.
              *

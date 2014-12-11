@@ -2,6 +2,10 @@
 
 module Plottable {
 export module Component {
+  export interface CompareFunction {
+    (a: string, b: string): number;
+  };
+
   export class Legend extends AbstractComponent {
     /**
      * The css class applied to each legend row
@@ -15,6 +19,7 @@ export module Component {
     private _padding = 5;
     private _scale: Scale.Color;
     private _maxEntriesPerRow: number;
+    private _compareFn: CompareFunction;
 
     /**
      * Creates a Legend.
@@ -40,6 +45,7 @@ export module Component {
       this.xAlign("right").yAlign("top");
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
+      this._compareFn = (a: string, b: string) => -1;
     }
 
     /**
@@ -62,6 +68,18 @@ export module Component {
         this._invalidateLayout();
         return this;
       }
+    }
+
+    /**
+     * Sets a new compare function to sort Legend's entires.
+     *
+     * @param {CompareFunction} newFn The new compare function.
+     * @returns {Legend} The calling Legend.
+     */
+    public entriesCompareFunction(newFn: CompareFunction): Legend {
+      this._compareFn = newFn;
+      this._invalidateLayout();
+      return this;
     }
 
     /**
@@ -107,7 +125,7 @@ export module Component {
         return Math.min(originalEntryLength, availableWidthForEntries);
       };
 
-      var entries = this._scale.domain();
+      var entries = this._scale.domain().sort(this._compareFn);
       var entryLengths = _Util.Methods.populateMap(entries, measureEntry);
       fakeLegendRow.remove();
 
