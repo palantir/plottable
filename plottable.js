@@ -5796,7 +5796,7 @@ var Plottable;
                 var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
                 var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
                 var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
-                var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > Math.max(this._scale.domain().length / this._maxEntriesPerRow, 1);
+                var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > Math.ceil(this._scale.domain().length / this._maxEntriesPerRow);
                 return {
                     width: this._padding + longestRowLength,
                     height: acceptableHeight,
