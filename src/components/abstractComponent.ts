@@ -5,10 +5,10 @@ export module Component {
   export class AbstractComponent extends Core.PlottableObject {
     public static AUTORESIZE_BY_DEFAULT = true;
 
-    public _element: D3.Selection;
-    public _content: D3.Selection;
-    public _backgroundContainer: D3.Selection;
-    public _foregroundContainer: D3.Selection;
+    protected _element: D3.Selection;
+    protected _content: D3.Selection;
+    private _backgroundContainer: D3.Selection;
+    private _foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
     private _xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
     private _yOrigin: number;
@@ -16,10 +16,10 @@ export module Component {
     public _parent: AbstractComponentContainer;
     private _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
     private _yAlignProportion = 0;
-    public _fixedHeightFlag = false;
-    public _fixedWidthFlag = false;
-    public _isSetup = false;
-    public _isAnchored = false;
+    protected _fixedHeightFlag = false;
+    protected _fixedWidthFlag = false;
+    protected _isSetup = false;
+    protected _isAnchored = false;
 
     private _hitBox: D3.Selection;
     private _interactionsToRegister: Interaction.AbstractInteraction[] = [];
@@ -69,7 +69,7 @@ export module Component {
      * Called during _anchor() if the Component's element has not been created yet.
      * Override in subclasses to provide additional functionality.
      */
-    public _setup() {
+    protected _setup() {
       if (this._isSetup) {
         return;
       }
@@ -158,7 +158,7 @@ export module Component {
       }
     }
 
-    public _scheduleComputeLayout() {
+    private _scheduleComputeLayout() {
       if (this._isAnchored && this._isSetup) {
         Core.RenderController.registerToComputeLayout(this);
       }

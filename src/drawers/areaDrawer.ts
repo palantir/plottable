@@ -6,11 +6,12 @@ export module _Drawer {
     private _areaSelection: D3.Selection;
     private _drawLine = true;
 
-    public _enterData(data: any[]) {
+    protected _enterData(data: any[]) {
       if (this._drawLine) {
         super._enterData(data);
       } else {
-        AbstractDrawer.prototype._enterData.call(this, data);
+        // HACKHACK Forced to use anycast to access protected var
+        (<any> AbstractDrawer).prototype._enterData.call(this, data);
       }
       this._areaSelection.datum(data);
     }
@@ -51,11 +52,12 @@ export module _Drawer {
                    .defined(definedFunction);
     }
 
-    public _drawStep(step: AppliedDrawStep) {
+    protected _drawStep(step: AppliedDrawStep) {
       if (this._drawLine) {
         super._drawStep(step);
       } else {
-        AbstractDrawer.prototype._drawStep.call(this, step);
+        // HACKHACK Forced to use anycast to access protected var
+        (<any> AbstractDrawer).prototype._drawStep.call(this, step);
       }
       var attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
       var xFunction       = attrToProjector["x"];

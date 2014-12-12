@@ -73,7 +73,7 @@ export module Component {
       };
     }
 
-    public _setup() {
+    protected _setup() {
       super._setup();
       this._textContainer = this._content.append("g");
       this._measurer = _Util.Text.getTextMeasurer(this._textContainer.append("text"));

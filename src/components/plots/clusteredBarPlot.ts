@@ -24,7 +24,7 @@ export module Plot {
       super(xScale, yScale);
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       // the width is constant, so set the inner scale range to that
       var innerScale = this._makeInnerScale();
@@ -46,7 +46,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _updateClusterPosition() {
+    private _updateClusterPosition() {
       var innerScale = this._makeInnerScale();
       this._datasetKeysInOrder.forEach((key: string) => {
         var plotMetadata = <ClusteredPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
@@ -75,12 +75,12 @@ export module Plot {
       return innerScale;
     }
 
-    public _getDataToDraw() {
+    protected _getDataToDraw() {
       this._updateClusterPosition();
       return super._getDataToDraw();
     }
 
-    public _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata {
+    protected _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata {
       var metadata = <ClusteredPlotMetadata>super._getPlotMetadataForDataset(key);
       metadata.position = 0;
       return metadata;

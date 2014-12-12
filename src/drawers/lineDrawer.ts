@@ -5,7 +5,7 @@ export module _Drawer {
   export class Line extends AbstractDrawer {
     private _pathSelection: D3.Selection;
 
-    public _enterData(data: any[]) {
+    protected _enterData(data: any[]) {
       super._enterData(data);
       this._pathSelection.datum(data);
     }
@@ -31,11 +31,11 @@ export module _Drawer {
                    .defined(definedFunction);
     }
 
-    public _numberOfAnimationIterations(data: any[]): number {
+    protected _numberOfAnimationIterations(data: any[]): number {
       return 1;
     }
 
-    public _drawStep(step: AppliedDrawStep) {
+    protected _drawStep(step: AppliedDrawStep) {
       var baseTime = super._drawStep(step);
       var attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
       var xFunction       = attrToProjector["x"];

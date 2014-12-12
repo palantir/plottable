@@ -7,10 +7,10 @@ export module Interaction {
     private _dragBehavior: D3.Behavior.Drag;
     private      _origin = [0,0];
     private    _location = [0,0];
-    public   _isDragging = false;
+    protected   _isDragging = false;
 
-    public  _constrainX: (n: number) => number;
-    public  _constrainY: (n: number) => number;
+    protected  _constrainX: (n: number) => number;
+    protected  _constrainY: (n: number) => number;
     private _ondragstart: (start: Point) => void;
     private      _ondrag: (start: Point, end: Point) => void;
     private   _ondragend: (start: Point, end: Point) => void;
@@ -51,16 +51,16 @@ export module Interaction {
     // we access origin and location through setOrigin and setLocation so that on XDragBox and YDragBox we can overwrite so that
     // we always have the uncontrolled dimension of the box extending across the entire component
     // this ensures that the callback values are synchronized with the actual box being drawn
-    public _setOrigin(x: number, y: number) {
+    protected _setOrigin(x: number, y: number) {
       this._origin = [x, y];
     }
-    public _getOrigin(): number[] {
+    protected _getOrigin(): number[] {
       return this._origin.slice();
     }
-    public _setLocation(x: number, y: number) {
+    protected _setLocation(x: number, y: number) {
       this._location = [x, y];
     }
-    public _getLocation(): number[] {
+    protected _getLocation(): number[] {
       return this._location.slice();
     }
 
@@ -108,7 +108,7 @@ export module Interaction {
       }
     }
 
-    public _dragstart(){
+    protected _dragstart(){
       this._isDragging = true;
       var width  = this._componentToListenTo.width();
       var height = this._componentToListenTo.height();
@@ -121,18 +121,18 @@ export module Interaction {
       this._doDragstart();
     }
 
-    public _doDragstart() {
+    protected _doDragstart() {
       if (this._ondragstart != null) {
         this._ondragstart({x: this._getOrigin()[0], y: this._getOrigin()[1]});
       }
     }
 
-    public _drag(){
+    protected _drag(){
       this._setLocation(this._constrainX(d3.event.x), this._constrainY(d3.event.y));
       this._doDrag();
     }
 
-    public _doDrag() {
+    protected _doDrag() {
       if (this._ondrag != null) {
         var start = {x: this._getOrigin()[0]  , y: this._getOrigin()[1]};
         var end   = {x: this._getLocation()[0], y: this._getLocation()[1]};
@@ -140,14 +140,14 @@ export module Interaction {
       }
     }
 
-    public _dragend(){
+    protected _dragend(){
       var location = d3.mouse(this._hitBox[0][0].parentNode);
       this._setLocation(location[0], location[1]);
       this._isDragging = false;
       this._doDragend();
     }
 
-    public _doDragend() {
+    protected _doDragend() {
       if (this._ondragend != null) {
         var start = {x: this._getOrigin()[0], y: this._getOrigin()[1]};
         var end = {x: this._getLocation()[0], y: this._getLocation()[1]};

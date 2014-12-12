@@ -2632,7 +2632,7 @@ var Plottable;
                 this.base = base;
                 this.pivot = this.base;
                 this.untransformedDomain = this._defaultExtent();
-                this._numTicks = 10;
+                this.numTicks(10);
                 if (base <= 1) {
                     throw new Error("ModifiedLogScale: The base must be > 1");
                 }
@@ -2746,7 +2746,7 @@ var Plottable;
                 var adjustedLower = this.adjustedLog(lower);
                 var adjustedUpper = this.adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-                var ticks = Math.ceil(proportion * this._numTicks);
+                var ticks = Math.ceil(proportion * this.numTicks());
                 return ticks;
             };
             ModifiedLog.prototype.copy = function () {
@@ -2986,7 +2986,7 @@ var Plottable;
                 _super.call(this, scale == null ? d3.time.scale() : scale);
                 this._typeCoercer = function (d) { return d && d._isAMomentObject || d instanceof Date ? d : new Date(d); };
             }
-            Time.prototype._tickInterval = function (interval, step) {
+            Time.prototype.tickInterval = function (interval, step) {
                 // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
                 var tempScale = d3.time.scale();
                 tempScale.domain(this.domain());
@@ -3322,8 +3322,8 @@ var Plottable;
              * Removes the Drawer and its renderArea
              */
             AbstractDrawer.prototype.remove = function () {
-                if (this._renderArea != null) {
-                    this._renderArea.remove();
+                if (this._getRenderArea() != null) {
+                    this._getRenderArea().remove();
                 }
             };
             /**
@@ -3384,6 +3384,14 @@ var Plottable;
                     delay += drawStep.animator.getTiming(numberOfIterations);
                 });
                 return delay;
+            };
+            /**
+             * Retrieves the renderArea selection for the drawer
+             *
+             * @returns {D3.Selection} the renderArea selection
+             */
+            AbstractDrawer.prototype._getRenderArea = function () {
+                return this._renderArea;
             };
             return AbstractDrawer;
         })();
@@ -3472,6 +3480,7 @@ var Plottable;
                     _super.prototype._enterData.call(this, data);
                 }
                 else {
+                    // HACKHACK Forced to use anycast to access protected var
                     _Drawer.AbstractDrawer.prototype._enterData.call(this, data);
                 }
                 this._areaSelection.datum(data);
@@ -3505,6 +3514,7 @@ var Plottable;
                     _super.prototype._drawStep.call(this, step);
                 }
                 else {
+                    // HACKHACK Forced to use anycast to access protected var
                     _Drawer.AbstractDrawer.prototype._drawStep.call(this, step);
                 }
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
@@ -3556,7 +3566,7 @@ var Plottable;
                 return this;
             };
             Element.prototype._getDrawSelection = function () {
-                return this._renderArea.selectAll(this._svgElement);
+                return this._getRenderArea().selectAll(this._svgElement);
             };
             Element.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
@@ -3614,7 +3624,7 @@ var Plottable;
             __extends(Rect, _super);
             function Rect(key, isVertical) {
                 _super.call(this, key);
-                this._someLabelsTooWide = false;
+                this._labelsTooWide = false;
                 this.svgElement("rect");
                 this._isVertical = isVertical;
             }
@@ -3626,6 +3636,9 @@ var Plottable;
             };
             Rect.prototype.removeLabels = function () {
                 this._textArea.selectAll("g").remove();
+            };
+            Rect.prototype._getIfLabelsTooWide = function () {
+                return this._labelsTooWide;
             };
             Rect.prototype.drawText = function (data, attrToProjector, userMetadata, plotMetadata) {
                 var _this = this;
@@ -3672,7 +3685,7 @@ var Plottable;
                     }
                     return tooWide;
                 });
-                this._someLabelsTooWide = labelTooWide.some(function (d) { return d; });
+                this._labelsTooWide = labelTooWide.some(function (d) { return d; });
             };
             return Rect;
         })(_Drawer.Element);
@@ -4980,7 +4993,7 @@ var Plottable;
                 this._measurer = Plottable._Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
             };
             Time.prototype._getTickIntervalValues = function (config) {
-                return this._scale._tickInterval(config.interval, config.step);
+                return this._scale.tickInterval(config.interval, config.step);
             };
             Time.prototype._getTickValues = function () {
                 var _this = this;
@@ -4994,7 +5007,7 @@ var Plottable;
             };
             Time.prototype._renderTierLabels = function (container, config, height) {
                 var _this = this;
-                var tickPos = this._scale._tickInterval(config.interval, config.step);
+                var tickPos = this._scale.tickInterval(config.interval, config.step);
                 tickPos.splice(0, 0, this._scale.domain()[0]);
                 tickPos.push(this._scale.domain()[1]);
                 var shouldCenterText = config.step === 1;
@@ -5100,7 +5113,7 @@ var Plottable;
     })(Axis = Plottable.Axis || (Plottable.Axis = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../../reference.ts" />
+//<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -6996,7 +7009,7 @@ var Plottable;
                     var dataset = _this._key2PlotDatasetKey.get(key).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
                     var drawer = _this._key2PlotDatasetKey.get(key).drawer;
-                    drawer._getDrawSelection().each(function (d, i) {
+                    drawer._getRenderArea().selectAll("circle").each(function (d, i) {
                         var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
                         var r = attrToProjector["r"](d, i, dataset.metadata(), plotMetadata);
                         if (distSq < r * r) {
@@ -7253,7 +7266,7 @@ var Plottable;
                 var tolerance = 0.5;
                 var bars = [];
                 var drawer = this._key2PlotDatasetKey.get(key).drawer;
-                drawer._renderArea.selectAll("rect").each(function (d) {
+                drawer._getRenderArea().selectAll("rect").each(function (d) {
                     var bbox = this.getBBox();
                     if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
                         bars.push(this);
@@ -7316,7 +7329,7 @@ var Plottable;
                 var attrToProjector = this._generateAttrToProjector();
                 var dataToDraw = this._getDataToDraw();
                 this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).plotMetadata); });
-                if (this._hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._someLabelsTooWide; })) {
+                if (this._hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._getIfLabelsTooWide(); })) {
                     drawers.forEach(function (d) { return d.removeLabels(); });
                 }
             };
@@ -7443,7 +7456,7 @@ var Plottable;
             };
             AbstractBarPlot.prototype._clearHoverSelection = function () {
                 this._getDrawersInOrder().forEach(function (d, i) {
-                    d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
+                    d._getRenderArea().selectAll("rect").classed("not-hovered hovered", false);
                 });
             };
             //===== Hover logic =====
@@ -7494,7 +7507,7 @@ var Plottable;
                 var barsSelection = d3.selectAll(bars);
                 if (!barsSelection.empty()) {
                     this._getDrawersInOrder().forEach(function (d, i) {
-                        d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
+                        d._getRenderArea().selectAll("rect").classed({ "hovered": false, "not-hovered": true });
                     });
                     barsSelection.classed({ "hovered": true, "not-hovered": false });
                 }
@@ -7644,7 +7657,7 @@ var Plottable;
             }
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._hoverTarget = this._foregroundContainer.append("circle").classed("hover-target", true).attr("r", this._hoverDetectionRadius).style("visibility", "hidden");
+                this._hoverTarget = this.foreground().append("circle").classed("hover-target", true).attr("r", this._hoverDetectionRadius).style("visibility", "hidden");
             };
             Line.prototype._rejectNullsAndNaNs = function (d, i, userMetdata, plotMetadata, accessor) {
                 var value = accessor(d, i, userMetdata, plotMetadata);
@@ -9218,8 +9231,8 @@ var Plottable;
                     return this._resizeXEnabled || this._resizeYEnabled;
                 }
                 else {
-                    this._resizeXEnabled = enabled && this.constructor._CAN_RESIZE_X;
-                    this._resizeYEnabled = enabled && this.constructor._CAN_RESIZE_Y;
+                    this._resizeXEnabled = enabled && this.canResizeX();
+                    this._resizeYEnabled = enabled && this.canResizeY();
                     return this;
                 }
             };
@@ -9385,7 +9398,7 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 var cname = DragBox._CLASS_DRAG_BOX;
-                var background = this._componentToListenTo._backgroundContainer;
+                var background = this._componentToListenTo.background();
                 this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
                 hitBox.on("mousemove", function () { return _this._hover(); });
                 return this;
@@ -9422,6 +9435,12 @@ var Plottable;
                     return "";
                 }
             };
+            DragBox.prototype.canResizeX = function () {
+                return true;
+            };
+            DragBox.prototype.canResizeY = function () {
+                return true;
+            };
             DragBox._CLASS_DRAG_BOX = "drag-box";
             DragBox.RESIZE_PADDING = 10;
             DragBox._CAN_RESIZE_X = true;
@@ -9454,7 +9473,9 @@ var Plottable;
             XDragBox.prototype._setLocation = function (x, y) {
                 _super.prototype._setLocation.call(this, x, this._componentToListenTo.height());
             };
-            XDragBox._CAN_RESIZE_Y = false;
+            XDragBox.prototype.canResizeY = function () {
+                return false;
+            };
             return XDragBox;
         })(Interaction.DragBox);
         Interaction.XDragBox = XDragBox;
@@ -9506,7 +9527,9 @@ var Plottable;
             YDragBox.prototype._setLocation = function (x, y) {
                 _super.prototype._setLocation.call(this, this._componentToListenTo.width(), y);
             };
-            YDragBox._CAN_RESIZE_X = false;
+            YDragBox.prototype.canResizeX = function () {
+                return false;
+            };
             return YDragBox;
         })(Interaction.DragBox);
         Interaction.YDragBox = YDragBox;
