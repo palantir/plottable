@@ -5129,7 +5129,7 @@ var Plottable;
             }
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._measurer = new SVGTypewriter.Measurers.Measurer(this._tickLabelContainer, Axis.AbstractAxis.TICK_LABEL_CLASS);
+                this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer, Axis.AbstractAxis.TICK_LABEL_CLASS);
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
             };
             Numeric.prototype._computeWidth = function () {
@@ -5402,6 +5402,8 @@ var Plottable;
              */
             Category.prototype._drawTicks = function (axisWidth, axisHeight, scale, ticks) {
                 var self = this;
+                var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
+                var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
                 ticks.each(function (d) {
                     var bandWidth = scale.fullBandStartAndWidth(d)[1];
                     var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
@@ -5409,8 +5411,8 @@ var Plottable;
                     var d3this = d3.select(this);
                     var writeOptions = {
                         selection: d3this,
-                        xAlign: "center",
-                        yAlign: "center",
+                        xAlign: xAlign[self.orient()],
+                        yAlign: yAlign[self.orient()],
                         textRotation: self.tickLabelAngle()
                     };
                     self._writer.write(self.formatter()(d), width, height, writeOptions);
