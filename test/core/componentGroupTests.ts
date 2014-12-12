@@ -168,7 +168,7 @@ describe("ComponentGroups", () => {
     it("_works for an empty ComponentGroup", () => {
         var cg = new Plottable.Component.Group();
         var request = cg._requestedSpace(10, 10);
-        verifySpaceRequest(request, 10, 10, false, false, "");
+        verifySpaceRequest(request, 0, 0, false, false, "");
     });
 
     it("works for a ComponentGroup with only proportional-size components", () => {
@@ -177,7 +177,7 @@ describe("ComponentGroups", () => {
       var c2 = new Plottable.Component.AbstractComponent();
       cg.merge(c1).merge(c2);
       var request = cg._requestedSpace(10, 10);
-      verifySpaceRequest(request, 10, 10, false, false, "");
+      verifySpaceRequest(request, 0, 0, false, false, "");
     });
 
     it("works when there are fixed-size components", () => {
@@ -189,7 +189,7 @@ describe("ComponentGroups", () => {
       fixComponentSize(c1, null, 10);
       fixComponentSize(c2, null, 50);
       var request = cg._requestedSpace(10, 10);
-      verifySpaceRequest(request, 10, 50, false, true, "");
+      verifySpaceRequest(request, 0, 50, false, true, "");
     });
   });
 
