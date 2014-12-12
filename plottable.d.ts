@@ -1159,13 +1159,9 @@ declare module Plottable {
 declare module Plottable {
     module Scale {
         class AbstractQuantitative<D> extends AbstractScale<D, number> {
-            _d3Scale: D3.Scale.QuantitativeScale;
-            _numTicks: number;
-            _PADDING_FOR_IDENTICAL_DOMAIN: number;
+            protected _d3Scale: D3.Scale.QuantitativeScale;
             _userSetDomainer: boolean;
-            _domainer: Domainer;
             _typeCoercer: (d: any) => number;
-            _tickGenerator: TickGenerators.TickGenerator<D>;
             /**
              * Constructs a new QuantitativeScale.
              *
@@ -1177,7 +1173,7 @@ declare module Plottable {
              * backing the QuantitativeScale.
              */
             constructor(scale: D3.Scale.QuantitativeScale);
-            _getExtent(): D[];
+            protected _getExtent(): D[];
             /**
              * Retrieves the domain value corresponding to a supplied range value.
              *
@@ -1413,7 +1409,7 @@ declare module Plottable {
              * @constructor
              */
             constructor(scale?: D3.Scale.OrdinalScale);
-            _getExtent(): string[];
+            protected _getExtent(): string[];
             domain(): string[];
             domain(values: string[]): Ordinal;
             protected _setDomain(values: string[]): void;
@@ -1464,7 +1460,7 @@ declare module Plottable {
              * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
              */
             constructor(scaleType?: string);
-            _getExtent(): string[];
+            protected _getExtent(): string[];
             scale(value: string): string;
         }
     }

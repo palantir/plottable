@@ -50,7 +50,7 @@ export module Scale {
     }
 
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
-    public _getExtent(): string[] {
+    protected _getExtent(): string[] {
       var extents = this._getAllExtents();
       var concatenatedExtents: string[] = [];
       extents.forEach((e) => {

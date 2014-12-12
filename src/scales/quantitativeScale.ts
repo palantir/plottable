@@ -3,13 +3,13 @@
 module Plottable {
 export module Scale {
   export class AbstractQuantitative<D> extends AbstractScale<D, number> {
-    public _d3Scale: D3.Scale.QuantitativeScale;
-    public _numTicks = 10;
-    public _PADDING_FOR_IDENTICAL_DOMAIN = 1;
+    protected _d3Scale: D3.Scale.QuantitativeScale;
+    private _numTicks = 10;
+    private _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     public _userSetDomainer: boolean = false;
-    public _domainer: Domainer = new Domainer();
+    private _domainer: Domainer = new Domainer();
     public _typeCoercer = (d: any) => +d;
-    public _tickGenerator: TickGenerators.TickGenerator<D> = (scale: Plottable.Scale.AbstractQuantitative<D>) => scale.getDefaultTicks();
+    private _tickGenerator: TickGenerators.TickGenerator<D> = (scale: Plottable.Scale.AbstractQuantitative<D>) => scale.getDefaultTicks();
 
 
     /**
@@ -26,7 +26,7 @@ export module Scale {
       super(scale);
     }
 
-    public _getExtent(): D[] {
+    protected _getExtent(): D[] {
       return this._domainer.computeDomain(this._getAllExtents(), this);
     }
 
