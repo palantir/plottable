@@ -1,5 +1,5 @@
 /*!
-SVG Typewriter 0.1.2 (https://github.com/palantir/svg-typewriter)
+SVG Typewriter 0.1.3 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
 */
@@ -760,7 +760,6 @@ var SVGTypewriter;
                 var attr = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
                 var box = clipPathParent.append("rect");
                 box.classed("clip-rect", true).attr(attr);
-                box.attr("transform", transform.toString());
             };
             Writer.nextID = 0;
             Writer.SupportedRotation = [-90, 0, 180, 90];
