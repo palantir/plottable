@@ -8,7 +8,6 @@ function run(div, data, Plottable) {
   "use strict";
 
   var svg = div.append("svg").attr("height", 500);
-  data = _.cloneDeep(data);
   var dataseries = data[0].splice(0, 20);
 
   var xScale = new Plottable.Scale.Linear();
