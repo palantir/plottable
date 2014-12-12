@@ -5790,13 +5790,13 @@ var Plottable;
                 var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
                 var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
                 var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendEntry.append("text"));
-                var longestEntryLength = Plottable._Util.Methods.max(this._scale.domain(), function (d) { return measure(d).width; }, 0);
-                longestEntryLength += estimatedLayout.textHeight + 2 * this._padding;
+                var longestUntruncatedEntryLength = Plottable._Util.Methods.max(this._scale.domain(), function (d) { return measure(d).width; }, 0);
+                longestUntruncatedEntryLength += estimatedLayout.textHeight + 2 * this._padding;
                 fakeLegendRow.remove();
-                var desiredWidth = this._padding + Math.max(longestRowLength, longestEntryLength);
+                var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
                 var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
                 var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
-                var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > Math.max(this._scale.domain().length / this._maxEntriesPerRow, 0);
+                var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > Math.max(this._scale.domain().length / this._maxEntriesPerRow, 1);
                 return {
                     width: this._padding + longestRowLength,
                     height: acceptableHeight,
