@@ -14,7 +14,7 @@ export module Plot {
 
   export class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
     private _stackedExtent = [0, 0];
-    public _isVertical: boolean;
+    protected _isVertical: boolean;
 
     public _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
       var metadata = <StackedPlotMetadata> super._getPlotMetadataForDataset(key);

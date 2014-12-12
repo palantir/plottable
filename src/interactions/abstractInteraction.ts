@@ -10,8 +10,8 @@ export module Interaction {
      * "foreground" and "background" elements where it can draw things,
      * e.g. crosshairs.
      */
-    public _hitBox: D3.Selection;
-    public _componentToListenTo: Component.AbstractComponent;
+    protected _hitBox: D3.Selection;
+    protected _componentToListenTo: Component.AbstractComponent;
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       this._componentToListenTo = component;
