@@ -27,8 +27,8 @@ export module Component {
     private _boxContainer: D3.Selection;
     private _rootSVG: D3.Selection;
     private _isTopLevelComponent = false;
-    private _width = 0; // Width and height of the component. Used to size the hitbox, bounding box, etc
-    private _height = 0;
+    private _width: number; // Width and height of the component. Used to size the hitbox, bounding box, etc
+    private _height: number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
     private _cssClasses: string[] = ["component"];
@@ -153,7 +153,7 @@ export module Component {
     }
 
     public _render() {
-      if (this._isAnchored && this._isSetup) {
+      if (this._isAnchored && this._isSetup && this.width() > 0 && this.height() > 0) {
         Core.RenderController.registerToRender(this);
       }
     }

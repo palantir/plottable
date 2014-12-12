@@ -15,6 +15,7 @@ export module Component {
     private _padding = 5;
     private _scale: Scale.Color;
     private _maxEntriesPerRow: number;
+    private _sortFn: (a: string, b: string) => number;
 
     /**
      * Creates a Legend.
@@ -40,6 +41,7 @@ export module Component {
       this.xAlign("right").yAlign("top");
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
+      this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
     }
 
     /**
@@ -59,6 +61,28 @@ export module Component {
         return this._maxEntriesPerRow;
       } else {
         this._maxEntriesPerRow = numEntries;
+        this._invalidateLayout();
+        return this;
+      }
+    }
+
+    /**
+     * Gets the current sort function for Legend's entries.
+     * @returns {(a: string, b: string) => number} The current sort function.
+     */
+    public sortFunction(): (a: string, b: string) => number;
+    /**
+     * Sets a new sort function for Legend's entires.
+     *
+     * @param {(a: string, b: string) => number} newFn If provided, the new compare function.
+     * @returns {Legend} The calling Legend.
+     */
+    public sortFunction(newFn: (a: string, b: string) => number): Legend;
+    public sortFunction(newFn?: (a: string, b: string) => number): any {
+      if (newFn == null) {
+        return this._sortFn;
+      } else {
+        this._sortFn = newFn;
         this._invalidateLayout();
         return this;
       }
@@ -107,7 +131,8 @@ export module Component {
         return Math.min(originalEntryLength, availableWidthForEntries);
       };
 
-      var entries = this._scale.domain();
+      var entries = this._scale.domain().slice();
+      entries.sort(this.sortFunction());
       var entryLengths = _Util.Methods.populateMap(entries, measureEntry);
       fakeLegendRow.remove();
 

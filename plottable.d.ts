@@ -2482,6 +2482,18 @@ declare module Plottable {
              */
             maxEntriesPerRow(numEntries: number): Legend;
             /**
+             * Gets the current sort function for Legend's entries.
+             * @returns {(a: string, b: string) => number} The current sort function.
+             */
+            sortFunction(): (a: string, b: string) => number;
+            /**
+             * Sets a new sort function for Legend's entires.
+             *
+             * @param {(a: string, b: string) => number} newFn If provided, the new compare function.
+             * @returns {Legend} The calling Legend.
+             */
+            sortFunction(newFn: (a: string, b: string) => number): Legend;
+            /**
              * Gets the current color scale from the Legend.
              *
              * @returns {ColorScale} The current color scale.
