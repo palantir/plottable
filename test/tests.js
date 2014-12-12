@@ -4807,7 +4807,7 @@ describe("Component behavior", function () {
         c._width = 10;
         c._height = 0;
         c._render();
-        assert.isFalse(renderFlag, "render still doesn't occur if one of width/height is zero");
+        assert.isTrue(renderFlag, "render still occurs if one of width/height is zero");
         c._height = 10;
         c._render();
         assert.isTrue(renderFlag, "render occurs if width and height are positive");
