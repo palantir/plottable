@@ -82,7 +82,7 @@ function setupBindings(){
   }).mousemove(function(e) {
       var mouseX = e.pageX; //Get X coordinates
       var mouseY = e.pageY; //Get Y coordinates
-      $("#help-description").css({ top: mouseY + 20, left: '75%' });
+      $("#help-description").css({ top: mouseY + 20, left: mouseX - 330 });
   });
 }
 
