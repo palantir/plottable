@@ -5437,7 +5437,7 @@ var Plottable;
                 return {
                     textFits: wrappingResults.every(function (w) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(w.truncatedText); }),
                     usedWidth: widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0),
-                    usedHeight: heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0),
+                    usedHeight: heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0)
                 };
             };
             Category.prototype._doRender = function () {

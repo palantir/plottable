@@ -128,14 +128,14 @@ export module Axis {
 
       var widthFn  = this._isHorizontal() ? d3.sum : _Util.Methods.max;
       var heightFn = this._isHorizontal() ? _Util.Methods.max : d3.sum;
-      
+
       return {
         textFits: wrappingResults.every((w: SVGTypewriter.Wrappers.WrappingResult) =>
                     !SVGTypewriter.Utils.StringMethods.isNotEmptyString(w.truncatedText)),
         usedWidth : widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
                       (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0),
         usedHeight: heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
-                      (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).height, 0),
+                      (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).height, 0)
       };
     }
 
