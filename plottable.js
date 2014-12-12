@@ -4384,12 +4384,6 @@ var Plottable;
             }
             Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var requests = this.components().map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
-                requests.push({
-                    width: offeredWidth,
-                    height: offeredHeight,
-                    wantsWidth: false,
-                    wantsHeight: false
-                });
                 return {
                     width: Plottable._Util.Methods.max(requests, function (request) { return request.width; }, 0),
                     height: Plottable._Util.Methods.max(requests, function (request) { return request.height; }, 0),
