@@ -2632,7 +2632,7 @@ var Plottable;
                 this.base = base;
                 this.pivot = this.base;
                 this.untransformedDomain = this._defaultExtent();
-                this._numTicks = 10;
+                this.numTicks(10);
                 if (base <= 1) {
                     throw new Error("ModifiedLogScale: The base must be > 1");
                 }
@@ -2746,7 +2746,7 @@ var Plottable;
                 var adjustedLower = this.adjustedLog(lower);
                 var adjustedUpper = this.adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-                var ticks = Math.ceil(proportion * this._numTicks);
+                var ticks = Math.ceil(proportion * this.numTicks());
                 return ticks;
             };
             ModifiedLog.prototype.copy = function () {
