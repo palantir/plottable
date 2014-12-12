@@ -9013,7 +9013,7 @@ var Plottable;
                 this._yScale = yScale;
                 this._zoom = d3.behavior.zoom();
                 this._zoom.x(this._xScale._d3Scale);
-                this._zoom.y(this._xScale._d3Scale);
+                this._zoom.y(this._yScale._d3Scale);
                 this._zoom.on("zoom", function () { return _this._rerenderZoomed(); });
             }
             /**
@@ -9024,7 +9024,7 @@ var Plottable;
                 // HACKHACK #254
                 this._zoom = d3.behavior.zoom();
                 this._zoom.x(this._xScale._d3Scale);
-                this._zoom.y(this._xScale._d3Scale);
+                this._zoom.y(this._yScale._d3Scale);
                 this._zoom.on("zoom", function () { return _this._rerenderZoomed(); });
                 this._zoom(this._hitBox);
             };

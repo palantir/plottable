@@ -30,7 +30,7 @@ export module Interaction {
       this._yScale = yScale;
       this._zoom = d3.behavior.zoom();
       this._zoom.x((<any> this._xScale)._d3Scale);
-      this._zoom.y((<any> this._xScale)._d3Scale);
+      this._zoom.y((<any> this._yScale)._d3Scale);
       this._zoom.on("zoom", () => this._rerenderZoomed());
     }
 
@@ -41,7 +41,7 @@ export module Interaction {
       // HACKHACK #254
       this._zoom = d3.behavior.zoom();
       this._zoom.x((<any> this._xScale)._d3Scale);
-      this._zoom.y((<any> this._xScale)._d3Scale);
+      this._zoom.y((<any> this._yScale)._d3Scale);
       this._zoom.on("zoom", () => this._rerenderZoomed());
       this._zoom(this._hitBox);
     }
