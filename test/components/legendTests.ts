@@ -188,7 +188,6 @@ describe("Legend", () => {
       "Adams",
       "Jefferson",
     ]);
-
     horizLegend = new Plottable.Component.Legend(colorScale);
   });
 
@@ -326,6 +325,25 @@ describe("Legend", () => {
     verifyMaxEntriesInRow(2);
     verifyMaxEntriesInRow(3);
     verifyMaxEntriesInRow(6);
+
+    svg.remove();
+  });
+
+  it("sortFunction() works as expected", () => {
+    var newDomain = ["F", "E", "D", "C", "B", "A"];
+    colorScale.domain(newDomain);
+    var svg = generateSVG(300, 300);
+    horizLegend.renderTo(svg);
+    var entries = horizLegend._element.selectAll(entrySelector);
+    var elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
+    assert.deepEqual(elementTexts, newDomain, "entry has not been sorted");
+
+    var sortFn = (a: string, b: string) => a.localeCompare(b);
+    horizLegend.sortFunction(sortFn);
+    entries = horizLegend._element.selectAll(entrySelector);
+    elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
+    newDomain.sort(sortFn);
+    assert.deepEqual(elementTexts, newDomain, "entry has been sorted alfabetically");
 
     svg.remove();
   });

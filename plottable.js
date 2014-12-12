@@ -5707,6 +5707,7 @@ var Plottable;
                 this.xAlign("right").yAlign("top");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
+                this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
             }
             Legend.prototype.maxEntriesPerRow = function (numEntries) {
                 if (numEntries == null) {
@@ -5714,6 +5715,16 @@ var Plottable;
                 }
                 else {
                     this._maxEntriesPerRow = numEntries;
+                    this._invalidateLayout();
+                    return this;
+                }
+            };
+            Legend.prototype.sortFunction = function (newFn) {
+                if (newFn == null) {
+                    return this._sortFn;
+                }
+                else {
+                    this._sortFn = newFn;
                     this._invalidateLayout();
                     return this;
                 }
@@ -5746,7 +5757,8 @@ var Plottable;
                     var originalEntryLength = (textHeight + measure(entryText).width + _this._padding);
                     return Math.min(originalEntryLength, availableWidthForEntries);
                 };
-                var entries = this._scale.domain();
+                var entries = this._scale.domain().slice();
+                entries.sort(this.sortFunction());
                 var entryLengths = Plottable._Util.Methods.populateMap(entries, measureEntry);
                 fakeLegendRow.remove();
                 var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
