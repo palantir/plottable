@@ -156,16 +156,23 @@ export module Component {
       var rowLengths = estimatedLayout.rows.map((row: string[]) => {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
       });
+
       var longestRowLength = _Util.Methods.max(rowLengths, 0);
-      var desiredWidth = this._padding + longestRowLength;
+      var fakeLegendEl = this._content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+      var measure = _Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
+      var longestEntryLength = _Util.Methods.max<string, number>(this._scale.domain(), (d: string) => measure(d).width, 0);
+      longestEntryLength += estimatedLayout.textHeight + 2 * this._padding;
+
+      var desiredWidth = this._padding + Math.max(longestRowLength, longestEntryLength);
 
       var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
       var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
 
       return {
-        width : desiredWidth,
+        width : this._padding + longestRowLength,
         height: acceptableHeight,
-        wantsWidth: offeredWidth < desiredWidth,
+        wantsWidth: offeredWidth < desiredWidth ||
+          estimatedLayout.rows.length > Math.max(this._scale.domain().length / this._maxEntriesPerRow, 0),
         wantsHeight: offeredHeight < desiredHeight
       };
     }
