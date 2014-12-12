@@ -5709,7 +5709,7 @@ var Plottable;
                 this.xAlign("right").yAlign("top");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
-                this._sortFn = function (a, b) { return -1; };
+                this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
             }
             Legend.prototype.maxEntriesPerRow = function (numEntries) {
                 if (numEntries == null) {

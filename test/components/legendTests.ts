@@ -12,11 +12,6 @@ describe("Legends", () => {
     svg = generateSVG(400, 400);
     color = new Plottable.Scale.Color("Category10");
     legend = new Plottable.Component.Legend(color).maxEntriesPerRow(1);
-    if (navigator.userAgent.toLowerCase().indexOf("phantom") !== -1 ||
-        navigator.userAgent.toLowerCase().indexOf("msie") !== -1) {
-      var sortFn = function() { return 1; };
-      legend.sortFunction(sortFn);
-    }
   });
 
   it("a basic legend renders", () => {
@@ -194,11 +189,6 @@ describe("Legend", () => {
       "Jefferson",
     ]);
     horizLegend = new Plottable.Component.Legend(colorScale);
-    if (navigator.userAgent.toLowerCase().indexOf("phantom") !== -1 ||
-        navigator.userAgent.toLowerCase().indexOf("msie") !== -1) {
-      var sortFn = function() { return 1; };
-      horizLegend.sortFunction(sortFn);
-    }
   });
 
   it("renders an entry for each item in the domain", () => {
