@@ -35,13 +35,10 @@ export module Plot {
 
       var xAttr = attrToProjector["x"];
       var yAttr = attrToProjector["y"];
-      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._xScale : this._yScale;
-      var accessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
-
       attrToProjector["x"] = (d: any, i: number, u: any, m: ClusteredPlotMetadata) =>
-        this._isVertical ? primaryScale.scale(accessor(d, i, u, m)) + m.position : xAttr(d, u, u, m);
+        this._isVertical ? xAttr(d, i, u, m) + m.position : xAttr(d, u, u, m);
       attrToProjector["y"] = (d: any, i: number, u: any, m: ClusteredPlotMetadata) =>
-        this._isVertical ? yAttr(d, i, u, m) : primaryScale.scale(accessor(d, i, u, m)) + m.position;
+        this._isVertical ? yAttr(d, i, u, m) : yAttr(d, i, u, m) + m.position;
 
       return attrToProjector;
     }
@@ -57,18 +54,12 @@ export module Plot {
     private _makeInnerScale(){
       var innerScale = new Scale.Ordinal();
       innerScale.domain(this._datasetKeysInOrder);
-      // TODO: it might be replaced with _getBarPixelWidth call after closing #1180.
       if (!this._projections["width"]) {
-        var secondaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._xScale : this._yScale;
-        var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
-                      && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
-        var constantWidth = bandsMode ? (<Scale.Ordinal> <any> secondaryScale).rangeBand() : AbstractBarPlot._DEFAULT_WIDTH;
-        innerScale.range([0, constantWidth]);
+        innerScale.range([0, this._getBarPixelWidth()]);
       } else {
         var projection = this._projections["width"];
         var accessor = projection.accessor;
         var scale = projection.scale;
-        // HACKHACK Metadata should be passed
         var fn = scale ? (d: any, i: number, u: any, m: PlotMetadata) => scale.scale(accessor(d, i, u, m)) : accessor;
         innerScale.range([0, fn(null, 0, null, null)]);
       }

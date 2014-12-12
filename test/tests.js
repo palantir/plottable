@@ -1054,10 +1054,10 @@ describe("Labels", function () {
     });
     it("Label text can be changed after label is created", function () {
         var svg = generateSVG(400, 80);
-        var label = new Plottable.Component.TitleLabel();
+        var label = new Plottable.Component.TitleLabel("a");
         label.renderTo(svg);
-        assert.equal(label._content.select("text").text(), "", "the text defaulted to empty string");
-        assert.equal(label.height(), 0, "rowMin is 0 for empty string");
+        assert.equal(label._content.select("text").text(), "a", "the text starts at the specified string");
+        assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
         label.text("hello world");
         label.renderTo(svg);
         assert.equal(label._content.select("text").text(), "hello world", "the label text updated properly");
@@ -1432,6 +1432,22 @@ describe("Legend", function () {
         verifyMaxEntriesInRow(2);
         verifyMaxEntriesInRow(3);
         verifyMaxEntriesInRow(6);
+        svg.remove();
+    });
+    it("sortFunction() works as expected", function () {
+        var newDomain = ["F", "E", "D", "C", "B", "A"];
+        colorScale.domain(newDomain);
+        var svg = generateSVG(300, 300);
+        horizLegend.renderTo(svg);
+        var entries = horizLegend._element.selectAll(entrySelector);
+        var elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
+        assert.deepEqual(elementTexts, newDomain, "entry has not been sorted");
+        var sortFn = function (a, b) { return a.localeCompare(b); };
+        horizLegend.sortFunction(sortFn);
+        entries = horizLegend._element.selectAll(entrySelector);
+        elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
+        newDomain.sort(sortFn);
+        assert.deepEqual(elementTexts, newDomain, "entry has been sorted alfabetically");
         svg.remove();
     });
 });
@@ -2658,9 +2674,8 @@ describe("Plots", function () {
                 assert.equal(texts[1], "12345%", "first label is 12345%");
                 svg.remove();
             });
-            it("bar labels are removed instantly on dataset change, even if animation is enabled", function (done) {
+            it("bar labels are removed instantly on dataset change", function (done) {
                 plot.barLabelsEnabled(true);
-                plot.animate(true);
                 plot.renderTo(svg);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");
@@ -3795,6 +3810,38 @@ describe("Plots", function () {
             assert.deepEqual(dataset2.data(), originalData2, "underlying data is not modified");
             svg.remove();
         });
+        it("renders correctly under points mode", function () {
+            xScale.rangeType("points");
+            var bars = renderer.getAllBars();
+            var bar0 = d3.select(bars[0][0]);
+            var bar1 = d3.select(bars[0][1]);
+            var bar2 = d3.select(bars[0][2]);
+            var bar3 = d3.select(bars[0][3]);
+            var bar0X = bar0.data()[0].x;
+            var bar1X = bar1.data()[0].x;
+            var bar2X = bar2.data()[0].x;
+            var bar3X = bar3.data()[0].x;
+            // check widths
+            var width = renderer._getBarPixelWidth() / 2 * .518;
+            assert.closeTo(numAttr(bar0, "width"), width, 2);
+            assert.closeTo(numAttr(bar1, "width"), width, 2);
+            assert.closeTo(numAttr(bar2, "width"), width, 2);
+            assert.closeTo(numAttr(bar3, "width"), width, 2);
+            // check heights
+            assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar0");
+            assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight), 0.01, "height is correct for bar1");
+            assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight), 0.01, "height is correct for bar2");
+            assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
+            // check that clustering is correct
+            var off = renderer._makeInnerScale().scale("_0");
+            assert.closeTo(numAttr(bar0, "x"), xScale.scale(bar0X) - width / 2 - off, 0.1, "x pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "x"), xScale.scale(bar1X) - width / 2 - off, 0.1, "x pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "x"), xScale.scale(bar2X) - width / 2 + off, 0.1, "x pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "x"), xScale.scale(bar3X) - width / 2 + off, 0.1, "x pos correct for bar3");
+            assert.deepEqual(dataset1.data(), originalData1, "underlying data is not modified");
+            assert.deepEqual(dataset2.data(), originalData2, "underlying data is not modified");
+            svg.remove();
+        });
     });
     describe("Horizontal Clustered Bar Plot", function () {
         var svg;
@@ -4746,6 +4793,23 @@ describe("Component behavior", function () {
         t.renderTo(svg);
         var transform = d3.transform(c._element.attr("transform"));
         assert.deepEqual(transform.translate, [0, 0], "the element was not translated");
+        svg.remove();
+    });
+    it("components do not render unless allocated space", function () {
+        var renderFlag = false;
+        var c = new Plottable.Component.AbstractComponent();
+        c._doRender = function () { return renderFlag = true; };
+        c._anchor(svg);
+        c._setup();
+        c._render();
+        assert.isFalse(renderFlag, "no render until width/height set to nonzero");
+        c._width = 10;
+        c._height = 0;
+        c._render();
+        assert.isFalse(renderFlag, "render still doesn't occur if one of width/height is zero");
+        c._height = 10;
+        c._render();
+        assert.isTrue(renderFlag, "render occurs if width and height are positive");
         svg.remove();
     });
     describe("resizeBroadcaster testing", function () {
