@@ -153,7 +153,7 @@ export module Component {
     }
 
     public _render() {
-      if (this._isAnchored && this._isSetup && this.width() > 0 && this.height() > 0) {
+      if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
         Core.RenderController.registerToRender(this);
       }
     }
