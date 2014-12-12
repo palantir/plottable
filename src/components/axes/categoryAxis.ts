@@ -23,12 +23,12 @@ export module Axis {
       this.classed("category-axis", true);
     }
 
-    public _setup() {
+    protected _setup() {
       super._setup();
       this._measurer = new _Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
     }
 
-    public _rescale() {
+    protected _rescale() {
       return this._invalidateLayout();
     }
 
@@ -57,7 +57,7 @@ export module Axis {
       };
     }
 
-    public _getTickValues(): string[] {
+    protected _getTickValues(): string[] {
       return this._scale.domain();
     }
 

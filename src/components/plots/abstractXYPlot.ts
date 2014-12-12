@@ -3,10 +3,10 @@
 module Plottable {
 export module Plot {
   export class AbstractXYPlot<X,Y> extends AbstractPlot {
-    public _xScale: Scale.AbstractScale<X, number>;
-    public _yScale: Scale.AbstractScale<Y, number>;
-    public _autoAdjustXScaleDomain = false;
-    public _autoAdjustYScaleDomain = false;
+    protected _xScale: Scale.AbstractScale<X, number>;
+    protected _yScale: Scale.AbstractScale<Y, number>;
+    private _autoAdjustXScaleDomain = false;
+    private _autoAdjustYScaleDomain = false;
 
     /**
      * Constructs an XYPlot.
@@ -103,7 +103,7 @@ export module Plot {
       return this;
     }
 
-    public _generateAttrToProjector(): AttributeToProjector {
+    protected _generateAttrToProjector(): AttributeToProjector {
       var attrToProjector: AttributeToProjector = super._generateAttrToProjector();
       var positionXFn = attrToProjector["x"];
       var positionYFn = attrToProjector["y"];
@@ -126,7 +126,7 @@ export module Plot {
       }
     }
 
-    public _updateXDomainer() {
+    protected _updateXDomainer() {
       if (this._xScale instanceof Scale.AbstractQuantitative) {
         var scale = <Scale.AbstractQuantitative<any>> this._xScale;
         if (!scale._userSetDomainer) {
@@ -135,7 +135,7 @@ export module Plot {
       }
     }
 
-    public _updateYDomainer() {
+    protected _updateYDomainer() {
       if (this._yScale instanceof Scale.AbstractQuantitative) {
         var scale = <Scale.AbstractQuantitative<any>> this._yScale;
         if (!scale._userSetDomainer) {
@@ -184,7 +184,7 @@ export module Plot {
       }
     }
 
-    public _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
+    protected _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
       var aAccessor: (d: any, i: number, u: any, m: PlotMetadata) => A = this._projections[fromX ? "x" : "y"].accessor;
       var bAccessor: (d: any, i: number, u: any, m: PlotMetadata) => B = this._projections[fromX ? "y" : "x"].accessor;
       return _Util.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
@@ -205,7 +205,7 @@ export module Plot {
       return retVal;
     }
 
-    public _projectorsReady() {
+    protected _projectorsReady() {
       return this._projections["x"] && this._projections["y"];
     }
   }

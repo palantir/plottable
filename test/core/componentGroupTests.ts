@@ -96,9 +96,9 @@ describe("ComponentGroups", () => {
     cg._anchor(svg);
     cg._computeLayout(50, 50, 350, 350);
 
-    var cgTranslate = d3.transform(cg._element.attr("transform")).translate;
-    var c1Translate = d3.transform(c1._element.attr("transform")).translate;
-    var c2Translate = d3.transform(c2._element.attr("transform")).translate;
+    var cgTranslate = d3.transform((<any> cg)._element.attr("transform")).translate;
+    var c1Translate = d3.transform((<any> c1)._element.attr("transform")).translate;
+    var c2Translate = d3.transform((<any> c2)._element.attr("transform")).translate;
     assert.equal(cgTranslate[0], 50, "componentGroup has 50 xOffset");
     assert.equal(cgTranslate[1], 50, "componentGroup has 50 yOffset");
     assert.equal(c1Translate[0], 0, "componentGroup has 0 xOffset");
@@ -157,9 +157,10 @@ describe("ComponentGroups", () => {
     assert.isFalse(cg.empty(), "cg not empty after merging components");
     cg.detachAll();
     assert.isTrue(cg.empty(), "cg empty after detachAll()");
-    assert.isFalse(c1._isAnchored, "c1 was detached");
-    assert.isFalse(c2._isAnchored, "c2 was detached");
-    assert.isFalse(c3._isAnchored, "c3 was detached");
+
+    assert.isFalse((<any> c1)._isAnchored, "c1 was detached");
+    assert.isFalse((<any> c2)._isAnchored, "c2 was detached");
+    assert.isFalse((<any> c3)._isAnchored, "c3 was detached");
     assert.lengthOf(cg.components(), 0, "cg has no components");
   });
 

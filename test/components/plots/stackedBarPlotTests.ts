@@ -55,7 +55,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = renderer._renderArea.selectAll("rect");
+      var bars = (<any> renderer)._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -137,7 +137,7 @@ describe("Plots", () => {
     });
 
     it("stacking done correctly for negative values", () => {
-      var bars = plot._renderArea.selectAll("rect");
+      var bars = (<any> plot)._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -204,7 +204,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = renderer._renderArea.selectAll("rect");
+      var bars = (<any> renderer)._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -277,7 +277,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = plot._renderArea.selectAll("rect");
+      var bars = (<any> plot)._renderArea.selectAll("rect");
 
       assert.lengthOf(bars[0], 7, "draws a bar for each datum");
 
