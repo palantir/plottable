@@ -5791,12 +5791,13 @@ var Plottable;
                 var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
                 var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendEntry.append("text"));
                 var longestUntruncatedEntryLength = Plottable._Util.Methods.max(this._scale.domain(), function (d) { return measure(d).width; }, 0);
-                longestUntruncatedEntryLength += estimatedLayout.textHeight + 2 * this._padding;
+                longestUntruncatedEntryLength += estimatedLayout.textHeight + this._padding;
                 fakeLegendRow.remove();
                 var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
                 var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
                 var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
-                var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > Math.ceil(this._scale.domain().length / this._maxEntriesPerRow);
+                var desiredNumRows = Math.max(Math.ceil(this._scale.domain().length / this._maxEntriesPerRow), 1);
+                var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > desiredNumRows;
                 return {
                     width: this._padding + longestRowLength,
                     height: acceptableHeight,
