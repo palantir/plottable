@@ -190,7 +190,7 @@ describe("Legend", () => {
       "Adams",
       "Jefferson",
     ]);
-    horizLegend = new Plottable.Component.Legend(colorScale);
+    horizLegend = new Plottable.Component.Legend(colorScale).maxEntriesPerRow(Infinity);
   });
 
   it("renders an entry for each item in the domain", () => {

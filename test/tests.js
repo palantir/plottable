@@ -1324,7 +1324,7 @@ describe("Legend", function () {
             "Adams",
             "Jefferson",
         ]);
-        horizLegend = new Plottable.Component.Legend(colorScale);
+        horizLegend = new Plottable.Component.Legend(colorScale).maxEntriesPerRow(Infinity);
     });
     it("renders an entry for each item in the domain", function () {
         var svg = generateSVG(400, 100);
