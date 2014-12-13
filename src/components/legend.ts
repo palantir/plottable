@@ -29,7 +29,7 @@ export module Component {
     constructor(colorScale: Scale.Color) {
       super();
       this.classed("legend", true);
-      this.maxEntriesPerRow(Infinity);
+      this.maxEntriesPerRow(1);
 
       if (colorScale == null ) {
         throw new Error("Legend requires a colorScale");
