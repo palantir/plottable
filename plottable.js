@@ -5706,7 +5706,7 @@ var Plottable;
                 _super.call(this);
                 this._padding = 5;
                 this.classed("legend", true);
-                this.maxEntriesPerRow(Infinity);
+                this.maxEntriesPerRow(1);
                 if (colorScale == null) {
                     throw new Error("Legend requires a colorScale");
                 }
