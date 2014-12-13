@@ -121,7 +121,7 @@ export module Component {
     private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {
       var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
       var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-      var measure = _Util.Text.getTextMeasurer(fakeLegendRow.append("text"));
+      var measure = _Util.Text.getTextMeasurer(fakeLegendEntry.append("text"));
 
       var textHeight = measure(_Util.Text.HEIGHT_TEXT).height;
 
@@ -156,16 +156,26 @@ export module Component {
       var rowLengths = estimatedLayout.rows.map((row: string[]) => {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
       });
+
       var longestRowLength = _Util.Methods.max(rowLengths, 0);
-      var desiredWidth = this._padding + longestRowLength;
+
+      var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+      var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+      var measure = _Util.Text.getTextMeasurer(fakeLegendEntry.append("text"));
+      var longestUntruncatedEntryLength = _Util.Methods.max<string, number>(this._scale.domain(), (d: string) => measure(d).width, 0);
+      longestUntruncatedEntryLength += estimatedLayout.textHeight + this._padding;
+      fakeLegendRow.remove();
+
+      var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
 
       var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
       var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
-
+      var desiredNumRows = Math.max(Math.ceil(this._scale.domain().length / this._maxEntriesPerRow), 1);
+      var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > desiredNumRows;
       return {
-        width : desiredWidth,
+        width : this._padding + longestRowLength,
         height: acceptableHeight,
-        wantsWidth: offeredWidth < desiredWidth,
+        wantsWidth: offeredWidth < desiredWidth || wantsFitMoreEntriesInRow,
         wantsHeight: offeredHeight < desiredHeight
       };
     }

@@ -5758,7 +5758,7 @@ var Plottable;
                 var _this = this;
                 var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
                 var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-                var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendRow.append("text"));
+                var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendEntry.append("text"));
                 var textHeight = measure(Plottable._Util.Text.HEIGHT_TEXT).height;
                 var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
                 var measureEntry = function (entryText) {
@@ -5787,13 +5787,21 @@ var Plottable;
                     return d3.sum(row, function (entry) { return estimatedLayout.entryLengths.get(entry); });
                 });
                 var longestRowLength = Plottable._Util.Methods.max(rowLengths, 0);
-                var desiredWidth = this._padding + longestRowLength;
+                var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+                var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+                var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendEntry.append("text"));
+                var longestUntruncatedEntryLength = Plottable._Util.Methods.max(this._scale.domain(), function (d) { return measure(d).width; }, 0);
+                longestUntruncatedEntryLength += estimatedLayout.textHeight + this._padding;
+                fakeLegendRow.remove();
+                var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
                 var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
                 var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
+                var desiredNumRows = Math.max(Math.ceil(this._scale.domain().length / this._maxEntriesPerRow), 1);
+                var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > desiredNumRows;
                 return {
-                    width: desiredWidth,
+                    width: this._padding + longestRowLength,
                     height: acceptableHeight,
-                    wantsWidth: offeredWidth < desiredWidth,
+                    wantsWidth: offeredWidth < desiredWidth || wantsFitMoreEntriesInRow,
                     wantsHeight: offeredHeight < desiredHeight
                 };
             };
