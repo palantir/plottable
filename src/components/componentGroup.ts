@@ -47,11 +47,11 @@ export module Component {
     }
 
     public _isFixedWidth(): boolean {
-      return this.components().every((c) => c._isFixedWidth());
+      return false;
     }
 
     public _isFixedHeight(): boolean {
-      return this.components().every((c) => c._isFixedHeight());
+      return false;
     }
   }
 }

@@ -18,8 +18,8 @@ export module _Drawer {
   }
 
   export class AbstractDrawer {
-    public _renderArea: D3.Selection;
-    public _className: string;
+    private _renderArea: D3.Selection;
+    protected _className: string;
     public key: string;
 
     /**
@@ -50,8 +50,8 @@ export module _Drawer {
      * Removes the Drawer and its renderArea
      */
     public remove() {
-      if (this._renderArea != null) {
-        this._renderArea.remove();
+      if (this._getRenderArea() != null) {
+        this._getRenderArea().remove();
       }
     }
 
@@ -60,7 +60,7 @@ export module _Drawer {
      *
      * @param{any[]} data The data to be drawn
      */
-    public _enterData(data: any[]) {
+    protected _enterData(data: any[]) {
       // no-op
     }
 
@@ -69,15 +69,15 @@ export module _Drawer {
      *
      * @param{AppliedDrawStep} step The step, how data should be drawn.
      */
-    public _drawStep(step: AppliedDrawStep) {
+    protected _drawStep(step: AppliedDrawStep) {
       // no-op
     }
 
-    public _numberOfAnimationIterations(data: any[]): number {
+    protected _numberOfAnimationIterations(data: any[]): number {
       return data.length;
     }
 
-    private applyMetadata(attrToProjector: AttributeToProjector,
+    private _applyMetadata(attrToProjector: AttributeToProjector,
                           userMetadata: any,
                           plotMetadata: Plot.PlotMetadata): _AttributeToAppliedProjector {
       var modifiedAttrToProjector: _AttributeToAppliedProjector = {};
@@ -89,11 +89,11 @@ export module _Drawer {
       return modifiedAttrToProjector;
     }
 
-    public _prepareDrawSteps(drawSteps: AppliedDrawStep[]) {
+    protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]) {
       // no-op
     }
 
-    public _prepareData(data: any[], drawSteps: AppliedDrawStep[]) {
+    protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]) {
       return data;
     }
 
@@ -108,7 +108,7 @@ export module _Drawer {
     public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
         return {
-          attrToProjector: this.applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
+          attrToProjector: this._applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
           animator: dr.animator
         };
       });
@@ -129,6 +129,14 @@ export module _Drawer {
       return delay;
     }
 
+    /**
+     * Retrieves the renderArea selection for the drawer
+     *
+     * @returns {D3.Selection} the renderArea selection
+     */
+    public _getRenderArea(): D3.Selection {
+      return this._renderArea;
+    }
 
   }
 }

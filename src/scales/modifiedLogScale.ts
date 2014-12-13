@@ -38,7 +38,7 @@ export module Scale {
       this.base = base;
       this.pivot = this.base;
       this.untransformedDomain = this._defaultExtent();
-      this._numTicks = 10;
+      this.numTicks(10);
       if (base <= 1) {
         throw new Error("ModifiedLogScale: The base must be > 1");
       }
@@ -88,11 +88,11 @@ export module Scale {
       return this.invertedAdjustedLog(this._d3Scale.invert(x));
     }
 
-    public _getDomain() {
+    protected _getDomain() {
       return this.untransformedDomain;
     }
 
-    public _setDomain(values: number[]) {
+    protected _setDomain(values: number[]) {
       this.untransformedDomain = values;
       var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
       this._d3Scale.domain(transformedDomain);
@@ -170,7 +170,7 @@ export module Scale {
       var adjustedLower = this.adjustedLog(lower);
       var adjustedUpper = this.adjustedLog(upper);
       var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-      var ticks = Math.ceil(proportion * this._numTicks);
+      var ticks = Math.ceil(proportion * this.numTicks());
       return ticks;
     }
 

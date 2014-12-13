@@ -17,16 +17,16 @@ export module Plot {
   }
 
   export class AbstractPlot extends Component.AbstractComponent {
-    public _dataChanged = false;
-    public _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
-    public _datasetKeysInOrder: string[];
+    protected _dataChanged = false;
+    protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
+    protected _datasetKeysInOrder: string[];
 
-    public _renderArea: D3.Selection;
-    public _projections: { [attrToSet: string]: _Projection; } = {};
+    protected _renderArea: D3.Selection;
+    protected _projections: { [attrToSet: string]: _Projection; } = {};
 
-    public _animate: boolean = false;
+    protected _animate: boolean = false;
     private _animators: Animator.PlotAnimatorMap = {};
-    public _animateOnNextRender = true;
+    protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
 
     /**
@@ -56,7 +56,7 @@ export module Plot {
       this._updateScaleExtents();
     }
 
-    public _setup() {
+    protected _setup() {
       super._setup();
       this._renderArea = this._content.append("g").classed("render-area", true);
       // HACKHACK on 591
@@ -121,11 +121,11 @@ export module Plot {
       this._onDatasetUpdate();
     }
 
-    public _getDrawer(key: string): _Drawer.AbstractDrawer {
+    protected _getDrawer(key: string): _Drawer.AbstractDrawer {
       return new _Drawer.AbstractDrawer(key);
     }
 
-    public _getAnimator(key: string): Animator.PlotAnimator {
+    protected _getAnimator(key: string): Animator.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
         return this._animators[key] || new Animator.Null();
       } else {
@@ -133,7 +133,7 @@ export module Plot {
       }
     }
 
-    public _onDatasetUpdate() {
+    protected _onDatasetUpdate() {
       this._updateScaleExtents();
       this._animateOnNextRender = true;
       this._dataChanged = true;
@@ -177,7 +177,7 @@ export module Plot {
 
       if (existingScale) {
         this._datasetKeysInOrder.forEach((key) => {
-          existingScale._removeExtent(this._plottableID.toString() + "_" + key, attrToSet);
+          existingScale._removeExtent(this.getID().toString() + "_" + key, attrToSet);
           existingScale.broadcaster.deregisterListener(this);
         });
       }
@@ -192,7 +192,7 @@ export module Plot {
       return this;
     }
 
-    public _generateAttrToProjector(): AttributeToProjector {
+    protected _generateAttrToProjector(): AttributeToProjector {
       var h: AttributeToProjector = {};
       d3.keys(this._projections).forEach((a) => {
         var projection = this._projections[a];
@@ -233,16 +233,19 @@ export module Plot {
      * This function makes sure that all of the scales in this._projections
      * have an extent that includes all the data that is projected onto them.
      */
-    public _updateScaleExtents() {
+    protected _updateScaleExtents() {
       d3.keys(this._projections).forEach((attr: string) => this._updateScaleExtent(attr));
     }
 
     public _updateScaleExtent(attr: string) {
       var projector = this._projections[attr];
       if (projector.scale) {
-        this._key2PlotDatasetKey.forEach((key, pdk) => {
-          var extent = pdk.dataset._getExtent(projector.accessor, projector.scale._typeCoercer, pdk.plotMetadata);
-          var scaleKey = this._plottableID.toString() + "_" + key;
+        this._datasetKeysInOrder.forEach((key) => {
+          var plotDatasetKey = this._key2PlotDatasetKey.get(key);
+          var dataset = plotDatasetKey.dataset;
+          var plotMetadata = plotDatasetKey.plotMetadata;
+          var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
+          var scaleKey = this.getID().toString() + "_" + key;
           if (extent.length === 0 || !this._isAnchored) {
             projector.scale._removeExtent(scaleKey, attr);
           } else {
@@ -350,7 +353,7 @@ export module Plot {
         pdk.drawer.remove();
 
         var projectors = d3.values(this._projections);
-        var scaleKey = this._plottableID.toString() + "_" + key;
+        var scaleKey = this.getID().toString() + "_" + key;
         projectors.forEach((p) => {
           if (p.scale != null) {
             p.scale._removeExtent(scaleKey, p.attribute);
@@ -369,19 +372,19 @@ export module Plot {
       return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).dataset);
     }
 
-    public _getDrawersInOrder(): _Drawer.AbstractDrawer[] {
+    protected _getDrawersInOrder(): _Drawer.AbstractDrawer[] {
       return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).drawer);
     }
 
-    public _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): _Drawer.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: new Animator.Null()}];
     }
 
-    public _additionalPaint(time: number) {
+    protected _additionalPaint(time: number) {
       // no-op
     }
 
-    public _getDataToDraw() {
+    protected _getDataToDraw() {
       var datasets: D3.Map<any[]> = d3.map();
       this._datasetKeysInOrder.forEach((key: string) => {
         datasets.set(key, this._key2PlotDatasetKey.get(key).dataset.data());
@@ -394,7 +397,7 @@ export module Plot {
      *
      * @param {string} key The key of new dataset
      */
-    public _getPlotMetadataForDataset(key: string): PlotMetadata {
+    protected _getPlotMetadataForDataset(key: string): PlotMetadata {
       return {
         datasetKey: key
       };

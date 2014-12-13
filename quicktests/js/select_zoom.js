@@ -45,6 +45,7 @@ function run(div, data, Plottable) {
 
   var legendLabel = new Plottable.Component.TitleLabel("fat");
   var legend = new Plottable.Component.Legend(colorScale);
+  legend.maxEntriesPerRow(1);
   var legendTable = new Plottable.Component.Table([[legendLabel], [legend]]);
 
   var outerTable = new Plottable.Component.Table([[chart, legendTable]]);

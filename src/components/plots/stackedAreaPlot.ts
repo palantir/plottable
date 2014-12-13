@@ -5,8 +5,8 @@ export module Plot {
   export class StackedArea<X> extends Area<X> {
 
     private _isVertical: boolean;
-    public _baseline: D3.Selection;
-    public _baselineValue = 0;
+    private _baseline: D3.Selection;
+    private _baselineValue = 0;
 
     /**
      * Constructs a StackedArea plot.
@@ -21,7 +21,7 @@ export module Plot {
       this._isVertical = true;
     }
 
-    public _getDrawer(key: string) {
+    protected _getDrawer(key: string) {
       return new Plottable._Drawer.Area(key).drawLine(false);
     }
 
@@ -29,12 +29,12 @@ export module Plot {
       return new Animator.Null();
     }
 
-    public _setup() {
+    protected _setup() {
       super._setup();
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
-    public _additionalPaint() {
+    protected _additionalPaint() {
       var scaledBaseline = this._yScale.scale(this._baselineValue);
       var baselineAttr: any = {
         "x1": 0,
@@ -46,11 +46,12 @@ export module Plot {
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);
     }
 
-    public _updateYDomainer() {
+    protected _updateYDomainer() {
       super._updateYDomainer();
       var scale = <Scale.AbstractQuantitative<any>> this._yScale;
       if (!scale._userSetDomainer) {
-        scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this._plottableID);
+        scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this.getID())
+                        .addIncludedValue(0, "STACKED_AREA_PLOT+" + this.getID());
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         scale._autoDomainIfAutomaticMode();
       }
@@ -62,13 +63,13 @@ export module Plot {
       return this;
     }
 
-    public _onDatasetUpdate() {
+    protected _onDatasetUpdate() {
       super._onDatasetUpdate();
       AbstractStacked.prototype._onDatasetUpdate.apply(this);
       return this;
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
 
       if (this._projections["fill-opacity"] == null) {
@@ -85,7 +86,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _wholeDatumAttributes() {
+    protected _wholeDatumAttributes() {
       return ["x", "y", "defined"];
     }
 
@@ -140,6 +141,10 @@ export module Plot {
 
     public _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
       return AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
+    }
+
+    protected _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
+      return AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
     }
     //===== /Stack logic =====
   }

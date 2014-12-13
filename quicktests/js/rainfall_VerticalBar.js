@@ -45,7 +45,7 @@ function run(div, data, Plottable){
     .project("y", "avg", yScale)
     .project("fill", "city", colorScale);
 
-  var legend = new Plottable.Component.HorizontalLegend(colorScale);
+  var legend = new Plottable.Component.Legend(colorScale);
   var title = new Plottable.Component.TitleLabel("Average Rainfall in Different Cities between 2013-2014", "horizontal" );
   var yUnitLabel = new Plottable.Component.AxisLabel("Inches", "left" );
 

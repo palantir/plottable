@@ -66,7 +66,7 @@ describe("Interactions", () => {
       });
 
       testTarget.registerInteraction(hoverInteraction);
-      hitbox = testTarget._element.select(".hit-box");
+      hitbox = (<any> testTarget)._element.select(".hit-box");
     });
 
     it("correctly triggers onHoverOver() callbacks", () => {

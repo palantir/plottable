@@ -60,7 +60,7 @@ export module Core {
      */
     export function register(c: Component.AbstractComponent) {
       _lazyInitialize();
-      broadcaster.registerListener(c._plottableID, () => c._invalidateLayout());
+      broadcaster.registerListener(c.getID(), () => c._invalidateLayout());
     }
 
     /**
@@ -72,7 +72,7 @@ export module Core {
      */
     export function deregister(c: Component.AbstractComponent) {
       if (broadcaster) {
-        broadcaster.deregisterListener(c._plottableID);
+        broadcaster.deregisterListener(c.getID());
       }
     }
   }

@@ -3,7 +3,7 @@
 module Plottable {
 export module Scale {
   export class Ordinal extends AbstractScale<string, number> {
-    public _d3Scale: D3.Scale.OrdinalScale;
+    protected _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
     private _rangeType: string = "bands";
 
@@ -27,7 +27,7 @@ export module Scale {
       }
     }
 
-    public _getExtent(): string[] {
+    protected _getExtent(): string[] {
       var extents: string[][] = this._getAllExtents();
       return _Util.Methods.uniq(_Util.Methods.flatten(extents));
     }
@@ -38,7 +38,7 @@ export module Scale {
       return super.domain(values);
     }
 
-    public _setDomain(values: string[]) {
+    protected _setDomain(values: string[]) {
       super._setDomain(values);
       this.range(this.range()); // update range
     }
