@@ -103,9 +103,8 @@ export module Axis {
         var bandWidth = scale.fullBandStartAndWidth(d)[1];
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
         var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
-        var d3this = d3.select(this);
         var writeOptions = {
-          selection: d3this,
+          selection: d3.select(this),
           xAlign: xAlign[self.orient()],
           yAlign: yAlign[self.orient()],
           textRotation: self.tickLabelAngle()
