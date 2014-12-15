@@ -206,7 +206,7 @@ $("#help").hover(function(){
 }).mousemove(function(e) {
     var mouseX = e.pageX; //Get X coordinates
     var mouseY = e.pageY; //Get Y coordinates
-    $("#test-category-descriptions").css({ top: mouseY + 20, left: mouseX - 330 });
+    $("#test-category-descriptions").css({ top: 38, left: 1081 });
 });
 
 var button = document.getElementById("render");
