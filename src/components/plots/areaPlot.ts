@@ -28,18 +28,18 @@ export module Plot {
       this._defaultFillColor = new Scale.Color().range()[0];
     }
 
-    public _onDatasetUpdate() {
+    protected _onDatasetUpdate() {
       super._onDatasetUpdate();
       if (this._yScale != null) {
         this._updateYDomainer();
       }
     }
 
-     public _getDrawer(key: string) {
+    protected _getDrawer(key: string) {
       return new Plottable._Drawer.Area(key);
     }
 
-    public _updateYDomainer() {
+    protected _updateYDomainer() {
       super._updateYDomainer();
 
       var constantBaseline: number;
@@ -73,17 +73,17 @@ export module Plot {
       return this;
     }
 
-    public _getResetYFunction() {
+    protected _getResetYFunction() {
       return this._generateAttrToProjector()["y0"];
     }
 
-    public _wholeDatumAttributes() {
+    protected _wholeDatumAttributes() {
       var wholeDatumAttributes = super._wholeDatumAttributes();
       wholeDatumAttributes.push("y0");
       return wholeDatumAttributes;
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
       attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);

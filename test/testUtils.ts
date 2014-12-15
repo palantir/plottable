@@ -67,8 +67,8 @@ function fixComponentSize(c: Plottable.Component.AbstractComponent, fixedWidth?:
       wantsHeight: fixedHeight == null ? false : h < fixedHeight
     };
   };
-  c._fixedWidthFlag  = fixedWidth  == null ? false : true;
-  c._fixedHeightFlag = fixedHeight == null ? false : true;
+  (<any> c)._fixedWidthFlag  = fixedWidth  == null ? false : true;
+  (<any> c)._fixedHeightFlag = fixedHeight == null ? false : true;
   return c;
 }
 

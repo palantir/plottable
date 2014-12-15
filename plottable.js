@@ -1,5 +1,5 @@
 /*!
-Plottable 0.38.0 (https://github.com/palantir/plottable)
+Plottable 0.39.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -7,7 +7,9 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var _Util;
     (function (_Util) {
+        var Methods;
         (function (Methods) {
             /**
              * Checks if x is between a and b.
@@ -325,17 +327,17 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
-        })(_Util.Methods || (_Util.Methods = {}));
-        var Methods = _Util.Methods;
-    })(Plottable._Util || (Plottable._Util = {}));
-    var _Util = Plottable._Util;
+        })(Methods = _Util.Methods || (_Util.Methods = {}));
+    })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 // This file contains open source utilities, along with their copyright notices
 var Plottable;
 (function (Plottable) {
+    var _Util;
     (function (_Util) {
+        var OpenSource;
         (function (OpenSource) {
             function sortedIndex(val, arr, accessor) {
                 var low = 0;
@@ -356,15 +358,14 @@ var Plottable;
             }
             OpenSource.sortedIndex = sortedIndex;
             ;
-        })(_Util.OpenSource || (_Util.OpenSource = {}));
-        var OpenSource = _Util.OpenSource;
-    })(Plottable._Util || (Plottable._Util = {}));
-    var _Util = Plottable._Util;
+        })(OpenSource = _Util.OpenSource || (_Util.OpenSource = {}));
+    })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var _Util;
     (function (_Util) {
         var IDCounter = (function () {
             function IDCounter() {
@@ -390,13 +391,13 @@ var Plottable;
             return IDCounter;
         })();
         _Util.IDCounter = IDCounter;
-    })(Plottable._Util || (Plottable._Util = {}));
-    var _Util = Plottable._Util;
+    })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var _Util;
     (function (_Util) {
         /**
          * An associative array that can be keyed by anything (inc objects).
@@ -503,13 +504,13 @@ var Plottable;
             return StrictEqualityAssociativeArray;
         })();
         _Util.StrictEqualityAssociativeArray = StrictEqualityAssociativeArray;
-    })(Plottable._Util || (Plottable._Util = {}));
-    var _Util = Plottable._Util;
+    })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var _Util;
     (function (_Util) {
         var Cache = (function () {
             /**
@@ -565,14 +566,15 @@ var Plottable;
             return Cache;
         })();
         _Util.Cache = Cache;
-    })(Plottable._Util || (Plottable._Util = {}));
-    var _Util = Plottable._Util;
+    })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var _Util;
     (function (_Util) {
+        var Text;
         (function (Text) {
             Text.HEIGHT_TEXT = "bqpdl";
             ;
@@ -848,16 +850,16 @@ var Plottable;
                 return { textFits: wrappedText.textFits, usedWidth: usedWidth, usedHeight: usedHeight };
             }
             Text.writeText = writeText;
-        })(_Util.Text || (_Util.Text = {}));
-        var Text = _Util.Text;
-    })(Plottable._Util || (Plottable._Util = {}));
-    var _Util = Plottable._Util;
+        })(Text = _Util.Text || (_Util.Text = {}));
+    })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var _Util;
     (function (_Util) {
+        var WordWrap;
         (function (WordWrap) {
             var LINE_BREAKS_BEFORE = /[{\[]/;
             var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
@@ -1040,15 +1042,15 @@ var Plottable;
                 }
                 return true;
             }
-        })(_Util.WordWrap || (_Util.WordWrap = {}));
-        var WordWrap = _Util.WordWrap;
-    })(Plottable._Util || (Plottable._Util = {}));
-    var _Util = Plottable._Util;
+        })(WordWrap = _Util.WordWrap || (_Util.WordWrap = {}));
+    })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
 
 var Plottable;
 (function (Plottable) {
+    var _Util;
     (function (_Util) {
+        var DOM;
         (function (DOM) {
             /**
              * Gets the bounding box of an element.
@@ -1158,16 +1160,16 @@ var Plottable;
                 return true;
             }
             DOM.boxesOverlap = boxesOverlap;
-        })(_Util.DOM || (_Util.DOM = {}));
-        var DOM = _Util.DOM;
-    })(Plottable._Util || (Plottable._Util = {}));
-    var _Util = Plottable._Util;
+        })(DOM = _Util.DOM || (_Util.DOM = {}));
+    })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var _Util;
     (function (_Util) {
+        var Color;
         (function (Color) {
             /**
              * Return relative luminance (defined here: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef)
@@ -1287,16 +1289,15 @@ var Plottable;
                 return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
             }
             Color.hslToRgb = hslToRgb;
-        })(_Util.Color || (_Util.Color = {}));
-        var Color = _Util.Color;
-    })(Plottable._Util || (Plottable._Util = {}));
-    var _Util = Plottable._Util;
+        })(Color = _Util.Color || (_Util.Color = {}));
+    })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
+    var Formatters;
     (function (Formatters) {
         /**
          * Creates a formatter for currency values.
@@ -1506,31 +1507,31 @@ var Plottable;
                 throw new RangeError("Formatter precision must be between 0 and 20");
             }
         }
-    })(Plottable.Formatters || (Plottable.Formatters = {}));
-    var Formatters = Plottable.Formatters;
+    })(Formatters = Plottable.Formatters || (Plottable.Formatters = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var Config;
     (function (Config) {
         /**
          * Specifies if Plottable should show warnings.
          */
         Config.SHOW_WARNINGS = true;
-    })(Plottable.Config || (Plottable.Config = {}));
-    var Config = Plottable.Config;
+    })(Config = Plottable.Config || (Plottable.Config = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.38.0";
+    Plottable.version = "0.39.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var Core;
     (function (Core) {
         /**
          * Colors we use as defaults on a number of graphs.
@@ -1563,13 +1564,13 @@ var Plottable;
             return Colors;
         })();
         Core.Colors = Colors;
-    })(Plottable.Core || (Plottable.Core = {}));
-    var Core = Plottable.Core;
+    })(Core = Plottable.Core || (Plottable.Core = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var Core;
     (function (Core) {
         /**
          * A class most other Plottable classes inherit from, in order to have a
@@ -1586,8 +1587,7 @@ var Plottable;
             return PlottableObject;
         })();
         Core.PlottableObject = PlottableObject;
-    })(Plottable.Core || (Plottable.Core = {}));
-    var Core = Plottable.Core;
+    })(Core = Plottable.Core || (Plottable.Core = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1599,6 +1599,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Core;
     (function (Core) {
         /**
          * The Broadcaster class is owned by an Listenable. Third parties can register and deregister listeners
@@ -1670,8 +1671,7 @@ var Plottable;
             return Broadcaster;
         })(Core.PlottableObject);
         Core.Broadcaster = Broadcaster;
-    })(Plottable.Core || (Plottable.Core = {}));
-    var Core = Plottable.Core;
+    })(Core = Plottable.Core || (Plottable.Core = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1699,10 +1699,10 @@ var Plottable;
             if (data === void 0) { data = []; }
             if (metadata === void 0) { metadata = {}; }
             _super.call(this);
-            this.broadcaster = new Plottable.Core.Broadcaster(this);
             this._data = data;
             this._metadata = metadata;
             this._accessor2cachedExtent = new Plottable._Util.StrictEqualityAssociativeArray();
+            this.broadcaster = new Plottable.Core.Broadcaster(this);
         }
         Dataset.prototype.data = function (data) {
             if (data == null) {
@@ -1763,8 +1763,11 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var Core;
     (function (Core) {
+        var RenderController;
         (function (RenderController) {
+            var RenderPolicy;
             (function (RenderPolicy) {
                 /**
                  * Never queue anything, render everything immediately. Useful for
@@ -1807,17 +1810,15 @@ var Plottable;
                     return Timeout;
                 })();
                 RenderPolicy.Timeout = Timeout;
-            })(RenderController.RenderPolicy || (RenderController.RenderPolicy = {}));
-            var RenderPolicy = RenderController.RenderPolicy;
-        })(Core.RenderController || (Core.RenderController = {}));
-        var RenderController = Core.RenderController;
-    })(Plottable.Core || (Plottable.Core = {}));
-    var Core = Plottable.Core;
+            })(RenderPolicy = RenderController.RenderPolicy || (RenderController.RenderPolicy = {}));
+        })(RenderController = Core.RenderController || (Core.RenderController = {}));
+    })(Core = Plottable.Core || (Plottable.Core = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var Core;
     (function (Core) {
         /**
          * The RenderController is responsible for enqueueing and synchronizing
@@ -1837,6 +1838,7 @@ var Plottable;
          * );
          * ```
          */
+        var RenderController;
         (function (RenderController) {
             var _componentsNeedingRender = {};
             var _componentsNeedingComputeLayout = {};
@@ -1938,15 +1940,14 @@ var Plottable;
                 Core.ResizeBroadcaster.clearResizing();
             }
             RenderController.flush = flush;
-        })(Core.RenderController || (Core.RenderController = {}));
-        var RenderController = Core.RenderController;
-    })(Plottable.Core || (Plottable.Core = {}));
-    var Core = Plottable.Core;
+        })(RenderController = Core.RenderController || (Core.RenderController = {}));
+    })(Core = Plottable.Core || (Plottable.Core = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var Core;
     (function (Core) {
         /**
          * The ResizeBroadcaster will broadcast a notification to any registered
@@ -1958,6 +1959,7 @@ var Plottable;
          * flush of the RenderController. This is used, for example, to disable
          * animations during resize.
          */
+        var ResizeBroadcaster;
         (function (ResizeBroadcaster) {
             var broadcaster;
             var _resizing = false;
@@ -2018,10 +2020,8 @@ var Plottable;
                 }
             }
             ResizeBroadcaster.deregister = deregister;
-        })(Core.ResizeBroadcaster || (Core.ResizeBroadcaster = {}));
-        var ResizeBroadcaster = Core.ResizeBroadcaster;
-    })(Plottable.Core || (Plottable.Core = {}));
-    var Core = Plottable.Core;
+        })(ResizeBroadcaster = Core.ResizeBroadcaster || (Core.ResizeBroadcaster = {}));
+    })(Core = Plottable.Core || (Plottable.Core = {}));
 })(Plottable || (Plottable = {}));
 
 var Plottable;
@@ -2246,6 +2246,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Scale;
     (function (Scale) {
         var AbstractScale = (function (_super) {
             __extends(AbstractScale, _super);
@@ -2262,11 +2263,11 @@ var Plottable;
             function AbstractScale(scale) {
                 _super.call(this);
                 this._autoDomainAutomatically = true;
-                this.broadcaster = new Plottable.Core.Broadcaster(this);
                 this._rendererAttrID2Extent = {};
                 this._typeCoercer = function (d) { return d; };
                 this._domainModificationInProgress = false;
                 this._d3Scale = scale;
+                this.broadcaster = new Plottable.Core.Broadcaster(this);
             }
             AbstractScale.prototype._getAllExtents = function () {
                 return d3.values(this._rendererAttrID2Extent);
@@ -2371,8 +2372,7 @@ var Plottable;
             return AbstractScale;
         })(Plottable.Core.PlottableObject);
         Scale.AbstractScale = AbstractScale;
-    })(Plottable.Scale || (Plottable.Scale = {}));
-    var Scale = Plottable.Scale;
+    })(Scale = Plottable.Scale || (Plottable.Scale = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2384,6 +2384,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Scale;
     (function (Scale) {
         var AbstractQuantitative = (function (_super) {
             __extends(AbstractQuantitative, _super);
@@ -2514,8 +2515,7 @@ var Plottable;
             return AbstractQuantitative;
         })(Scale.AbstractScale);
         Scale.AbstractQuantitative = AbstractQuantitative;
-    })(Plottable.Scale || (Plottable.Scale = {}));
-    var Scale = Plottable.Scale;
+    })(Scale = Plottable.Scale || (Plottable.Scale = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2527,6 +2527,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Scale;
     (function (Scale) {
         var Linear = (function (_super) {
             __extends(Linear, _super);
@@ -2545,8 +2546,7 @@ var Plottable;
             return Linear;
         })(Scale.AbstractQuantitative);
         Scale.Linear = Linear;
-    })(Plottable.Scale || (Plottable.Scale = {}));
-    var Scale = Plottable.Scale;
+    })(Scale = Plottable.Scale || (Plottable.Scale = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2558,6 +2558,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Scale;
     (function (Scale) {
         var Log = (function (_super) {
             __extends(Log, _super);
@@ -2583,8 +2584,7 @@ var Plottable;
             return Log;
         })(Scale.AbstractQuantitative);
         Scale.Log = Log;
-    })(Plottable.Scale || (Plottable.Scale = {}));
-    var Scale = Plottable.Scale;
+    })(Scale = Plottable.Scale || (Plottable.Scale = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2596,6 +2596,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Scale;
     (function (Scale) {
         var ModifiedLog = (function (_super) {
             __extends(ModifiedLog, _super);
@@ -2631,7 +2632,7 @@ var Plottable;
                 this.base = base;
                 this.pivot = this.base;
                 this.untransformedDomain = this._defaultExtent();
-                this._numTicks = 10;
+                this.numTicks(10);
                 if (base <= 1) {
                     throw new Error("ModifiedLogScale: The base must be > 1");
                 }
@@ -2745,7 +2746,7 @@ var Plottable;
                 var adjustedLower = this.adjustedLog(lower);
                 var adjustedUpper = this.adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-                var ticks = Math.ceil(proportion * this._numTicks);
+                var ticks = Math.ceil(proportion * this.numTicks());
                 return ticks;
             };
             ModifiedLog.prototype.copy = function () {
@@ -2765,8 +2766,7 @@ var Plottable;
             return ModifiedLog;
         })(Scale.AbstractQuantitative);
         Scale.ModifiedLog = ModifiedLog;
-    })(Plottable.Scale || (Plottable.Scale = {}));
-    var Scale = Plottable.Scale;
+    })(Scale = Plottable.Scale || (Plottable.Scale = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2778,6 +2778,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Scale;
     (function (Scale) {
         var Ordinal = (function (_super) {
             __extends(Ordinal, _super);
@@ -2874,8 +2875,7 @@ var Plottable;
             return Ordinal;
         })(Scale.AbstractScale);
         Scale.Ordinal = Ordinal;
-    })(Plottable.Scale || (Plottable.Scale = {}));
-    var Scale = Plottable.Scale;
+    })(Scale = Plottable.Scale || (Plottable.Scale = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2887,6 +2887,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Scale;
     (function (Scale) {
         var Color = (function (_super) {
             __extends(Color, _super);
@@ -2964,8 +2965,7 @@ var Plottable;
             return Color;
         })(Scale.AbstractScale);
         Scale.Color = Color;
-    })(Plottable.Scale || (Plottable.Scale = {}));
-    var Scale = Plottable.Scale;
+    })(Scale = Plottable.Scale || (Plottable.Scale = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2977,6 +2977,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Scale;
     (function (Scale) {
         var Time = (function (_super) {
             __extends(Time, _super);
@@ -2985,7 +2986,7 @@ var Plottable;
                 _super.call(this, scale == null ? d3.time.scale() : scale);
                 this._typeCoercer = function (d) { return d && d._isAMomentObject || d instanceof Date ? d : new Date(d); };
             }
-            Time.prototype._tickInterval = function (interval, step) {
+            Time.prototype.tickInterval = function (interval, step) {
                 // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
                 var tempScale = d3.time.scale();
                 tempScale.domain(this.domain());
@@ -3008,8 +3009,7 @@ var Plottable;
             return Time;
         })(Scale.AbstractQuantitative);
         Scale.Time = Time;
-    })(Plottable.Scale || (Plottable.Scale = {}));
-    var Scale = Plottable.Scale;
+    })(Scale = Plottable.Scale || (Plottable.Scale = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3021,6 +3021,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Scale;
     (function (Scale) {
         ;
         /**
@@ -3196,13 +3197,13 @@ var Plottable;
             return InterpolatedColor;
         })(Scale.AbstractScale);
         Scale.InterpolatedColor = InterpolatedColor;
-    })(Plottable.Scale || (Plottable.Scale = {}));
-    var Scale = Plottable.Scale;
+    })(Scale = Plottable.Scale || (Plottable.Scale = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var _Util;
     (function (_Util) {
         var ScaleDomainCoordinator = (function () {
             /**
@@ -3236,14 +3237,15 @@ var Plottable;
             return ScaleDomainCoordinator;
         })();
         _Util.ScaleDomainCoordinator = ScaleDomainCoordinator;
-    })(Plottable._Util || (Plottable._Util = {}));
-    var _Util = Plottable._Util;
+    })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var Scale;
     (function (Scale) {
+        var TickGenerators;
         (function (TickGenerators) {
             /**
              * Creates a tick generator using the specified interval.
@@ -3285,15 +3287,14 @@ var Plottable;
                 };
             }
             TickGenerators.integerTickGenerator = integerTickGenerator;
-        })(Scale.TickGenerators || (Scale.TickGenerators = {}));
-        var TickGenerators = Scale.TickGenerators;
-    })(Plottable.Scale || (Plottable.Scale = {}));
-    var Scale = Plottable.Scale;
+        })(TickGenerators = Scale.TickGenerators || (Scale.TickGenerators = {}));
+    })(Scale = Plottable.Scale || (Plottable.Scale = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var _Drawer;
     (function (_Drawer) {
         var AbstractDrawer = (function () {
             /**
@@ -3321,8 +3322,8 @@ var Plottable;
              * Removes the Drawer and its renderArea
              */
             AbstractDrawer.prototype.remove = function () {
-                if (this._renderArea != null) {
-                    this._renderArea.remove();
+                if (this._getRenderArea() != null) {
+                    this._getRenderArea().remove();
                 }
             };
             /**
@@ -3384,11 +3385,18 @@ var Plottable;
                 });
                 return delay;
             };
+            /**
+             * Retrieves the renderArea selection for the drawer
+             *
+             * @returns {D3.Selection} the renderArea selection
+             */
+            AbstractDrawer.prototype._getRenderArea = function () {
+                return this._renderArea;
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
-    })(Plottable._Drawer || (Plottable._Drawer = {}));
-    var _Drawer = Plottable._Drawer;
+    })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3400,6 +3408,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var _Drawer;
     (function (_Drawer) {
         var Line = (function (_super) {
             __extends(Line, _super);
@@ -3446,8 +3455,7 @@ var Plottable;
             return Line;
         })(_Drawer.AbstractDrawer);
         _Drawer.Line = Line;
-    })(Plottable._Drawer || (Plottable._Drawer = {}));
-    var _Drawer = Plottable._Drawer;
+    })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3459,6 +3467,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var _Drawer;
     (function (_Drawer) {
         var Area = (function (_super) {
             __extends(Area, _super);
@@ -3471,6 +3480,7 @@ var Plottable;
                     _super.prototype._enterData.call(this, data);
                 }
                 else {
+                    // HACKHACK Forced to use anycast to access protected var
                     _Drawer.AbstractDrawer.prototype._enterData.call(this, data);
                 }
                 this._areaSelection.datum(data);
@@ -3504,6 +3514,7 @@ var Plottable;
                     _super.prototype._drawStep.call(this, step);
                 }
                 else {
+                    // HACKHACK Forced to use anycast to access protected var
                     _Drawer.AbstractDrawer.prototype._drawStep.call(this, step);
                 }
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
@@ -3526,8 +3537,7 @@ var Plottable;
             return Area;
         })(_Drawer.Line);
         _Drawer.Area = Area;
-    })(Plottable._Drawer || (Plottable._Drawer = {}));
-    var _Drawer = Plottable._Drawer;
+    })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3539,6 +3549,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var _Drawer;
     (function (_Drawer) {
         var Element = (function (_super) {
             __extends(Element, _super);
@@ -3555,7 +3566,7 @@ var Plottable;
                 return this;
             };
             Element.prototype._getDrawSelection = function () {
-                return this._renderArea.selectAll(this._svgElement);
+                return this._getRenderArea().selectAll(this._svgElement);
             };
             Element.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
@@ -3593,8 +3604,7 @@ var Plottable;
             return Element;
         })(_Drawer.AbstractDrawer);
         _Drawer.Element = Element;
-    })(Plottable._Drawer || (Plottable._Drawer = {}));
-    var _Drawer = Plottable._Drawer;
+    })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3606,6 +3616,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var _Drawer;
     (function (_Drawer) {
         var LABEL_VERTICAL_PADDING = 5;
         var LABEL_HORIZONTAL_PADDING = 5;
@@ -3613,7 +3624,7 @@ var Plottable;
             __extends(Rect, _super);
             function Rect(key, isVertical) {
                 _super.call(this, key);
-                this._someLabelsTooWide = false;
+                this._labelsTooWide = false;
                 this.svgElement("rect");
                 this._isVertical = isVertical;
             }
@@ -3625,6 +3636,9 @@ var Plottable;
             };
             Rect.prototype.removeLabels = function () {
                 this._textArea.selectAll("g").remove();
+            };
+            Rect.prototype._getIfLabelsTooWide = function () {
+                return this._labelsTooWide;
             };
             Rect.prototype.drawText = function (data, attrToProjector, userMetadata, plotMetadata) {
                 var _this = this;
@@ -3671,13 +3685,12 @@ var Plottable;
                     }
                     return tooWide;
                 });
-                this._someLabelsTooWide = labelTooWide.some(function (d) { return d; });
+                this._labelsTooWide = labelTooWide.some(function (d) { return d; });
             };
             return Rect;
         })(_Drawer.Element);
         _Drawer.Rect = Rect;
-    })(Plottable._Drawer || (Plottable._Drawer = {}));
-    var _Drawer = Plottable._Drawer;
+    })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3689,6 +3702,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var _Drawer;
     (function (_Drawer) {
         var Arc = (function (_super) {
             __extends(Arc, _super);
@@ -3726,8 +3740,7 @@ var Plottable;
             return Arc;
         })(_Drawer.Element);
         _Drawer.Arc = Arc;
-    })(Plottable._Drawer || (Plottable._Drawer = {}));
-    var _Drawer = Plottable._Drawer;
+    })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3739,6 +3752,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Component;
     (function (Component) {
         var AbstractComponent = (function (_super) {
             __extends(AbstractComponent, _super);
@@ -3870,7 +3884,7 @@ var Plottable;
                 this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             };
             AbstractComponent.prototype._render = function () {
-                if (this._isAnchored && this._isSetup && this.width() > 0 && this.height() > 0) {
+                if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
                     Plottable.Core.RenderController.registerToRender(this);
                 }
             };
@@ -4243,8 +4257,7 @@ var Plottable;
             return AbstractComponent;
         })(Plottable.Core.PlottableObject);
         Component.AbstractComponent = AbstractComponent;
-    })(Plottable.Component || (Plottable.Component = {}));
-    var Component = Plottable.Component;
+    })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4256,6 +4269,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Component;
     (function (Component) {
         /*
          * An abstract ComponentContainer class to encapsulate Table and ComponentGroup's shared functionality.
@@ -4335,8 +4349,7 @@ var Plottable;
             return AbstractComponentContainer;
         })(Component.AbstractComponent);
         Component.AbstractComponentContainer = AbstractComponentContainer;
-    })(Plottable.Component || (Plottable.Component = {}));
-    var Component = Plottable.Component;
+    })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4348,6 +4361,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Component;
     (function (Component) {
         var Group = (function (_super) {
             __extends(Group, _super);
@@ -4370,12 +4384,6 @@ var Plottable;
             }
             Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var requests = this.components().map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
-                requests.push({
-                    width: offeredWidth,
-                    height: offeredHeight,
-                    wantsWidth: false,
-                    wantsHeight: false
-                });
                 return {
                     width: Plottable._Util.Methods.max(requests, function (request) { return request.width; }, 0),
                     height: Plottable._Util.Methods.max(requests, function (request) { return request.height; }, 0),
@@ -4404,8 +4412,7 @@ var Plottable;
             return Group;
         })(Component.AbstractComponentContainer);
         Component.Group = Group;
-    })(Plottable.Component || (Plottable.Component = {}));
-    var Component = Plottable.Component;
+    })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -4417,6 +4424,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Axis;
     (function (Axis) {
         var AbstractAxis = (function (_super) {
             __extends(AbstractAxis, _super);
@@ -4763,8 +4771,7 @@ var Plottable;
             return AbstractAxis;
         })(Plottable.Component.AbstractComponent);
         Axis.AbstractAxis = AbstractAxis;
-    })(Plottable.Axis || (Plottable.Axis = {}));
-    var Axis = Plottable.Axis;
+    })(Axis = Plottable.Axis || (Plottable.Axis = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -4776,6 +4783,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Axis;
     (function (Axis) {
         ;
         var Time = (function (_super) {
@@ -4991,7 +4999,7 @@ var Plottable;
                 this._measurer = Plottable._Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
             };
             Time.prototype._getTickIntervalValues = function (config) {
-                return this._scale._tickInterval(config.interval, config.step);
+                return this._scale.tickInterval(config.interval, config.step);
             };
             Time.prototype._getTickValues = function () {
                 var _this = this;
@@ -5005,7 +5013,7 @@ var Plottable;
             };
             Time.prototype._renderTierLabels = function (container, config, height) {
                 var _this = this;
-                var tickPos = this._scale._tickInterval(config.interval, config.step);
+                var tickPos = this._scale.tickInterval(config.interval, config.step);
                 tickPos.splice(0, 0, this._scale.domain()[0]);
                 tickPos.push(this._scale.domain()[1]);
                 var shouldCenterText = config.step === 1;
@@ -5108,11 +5116,10 @@ var Plottable;
             return Time;
         })(Axis.AbstractAxis);
         Axis.Time = Time;
-    })(Plottable.Axis || (Plottable.Axis = {}));
-    var Axis = Plottable.Axis;
+    })(Axis = Plottable.Axis || (Plottable.Axis = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../../reference.ts" />
+//<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -5121,6 +5128,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Axis;
     (function (Axis) {
         var Numeric = (function (_super) {
             __extends(Numeric, _super);
@@ -5332,8 +5340,7 @@ var Plottable;
             return Numeric;
         })(Axis.AbstractAxis);
         Axis.Numeric = Numeric;
-    })(Plottable.Axis || (Plottable.Axis = {}));
-    var Axis = Plottable.Axis;
+    })(Axis = Plottable.Axis || (Plottable.Axis = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -5345,6 +5352,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Axis;
     (function (Axis) {
         var Category = (function (_super) {
             __extends(Category, _super);
@@ -5507,8 +5515,7 @@ var Plottable;
             return Category;
         })(Axis.AbstractAxis);
         Axis.Category = Category;
-    })(Plottable.Axis || (Plottable.Axis = {}));
-    var Axis = Plottable.Axis;
+    })(Axis = Plottable.Axis || (Plottable.Axis = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -5520,6 +5527,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Component;
     (function (Component) {
         var Label = (function (_super) {
             __extends(Label, _super);
@@ -5682,8 +5690,7 @@ var Plottable;
             return AxisLabel;
         })(Label);
         Component.AxisLabel = AxisLabel;
-    })(Plottable.Component || (Plottable.Component = {}));
-    var Component = Plottable.Component;
+    })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -5695,6 +5702,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Component;
     (function (Component) {
         var Legend = (function (_super) {
             __extends(Legend, _super);
@@ -5712,7 +5720,7 @@ var Plottable;
                 _super.call(this);
                 this._padding = 5;
                 this.classed("legend", true);
-                this.maxEntriesPerRow(Infinity);
+                this.maxEntriesPerRow(1);
                 if (colorScale == null) {
                     throw new Error("Legend requires a colorScale");
                 }
@@ -5764,7 +5772,7 @@ var Plottable;
                 var _this = this;
                 var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
                 var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-                var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendRow.append("text"));
+                var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendEntry.append("text"));
                 var textHeight = measure(Plottable._Util.Text.HEIGHT_TEXT).height;
                 var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
                 var measureEntry = function (entryText) {
@@ -5793,13 +5801,21 @@ var Plottable;
                     return d3.sum(row, function (entry) { return estimatedLayout.entryLengths.get(entry); });
                 });
                 var longestRowLength = Plottable._Util.Methods.max(rowLengths, 0);
-                var desiredWidth = this._padding + longestRowLength;
+                var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+                var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+                var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendEntry.append("text"));
+                var longestUntruncatedEntryLength = Plottable._Util.Methods.max(this._scale.domain(), function (d) { return measure(d).width; }, 0);
+                longestUntruncatedEntryLength += estimatedLayout.textHeight + this._padding;
+                fakeLegendRow.remove();
+                var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
                 var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
                 var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
+                var desiredNumRows = Math.max(Math.ceil(this._scale.domain().length / this._maxEntriesPerRow), 1);
+                var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > desiredNumRows;
                 return {
-                    width: desiredWidth,
+                    width: this._padding + longestRowLength,
                     height: acceptableHeight,
-                    wantsWidth: offeredWidth < desiredWidth,
+                    wantsWidth: offeredWidth < desiredWidth || wantsFitMoreEntriesInRow,
                     wantsHeight: offeredHeight < desiredHeight
                 };
             };
@@ -5904,8 +5920,7 @@ var Plottable;
             return Legend;
         })(Component.AbstractComponent);
         Component.Legend = Legend;
-    })(Plottable.Component || (Plottable.Component = {}));
-    var Component = Plottable.Component;
+    })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -5917,6 +5932,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Component;
     (function (Component) {
         var Gridlines = (function (_super) {
             __extends(Gridlines, _super);
@@ -5991,8 +6007,7 @@ var Plottable;
             return Gridlines;
         })(Component.AbstractComponent);
         Component.Gridlines = Gridlines;
-    })(Plottable.Component || (Plottable.Component = {}));
-    var Component = Plottable.Component;
+    })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -6004,6 +6019,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Component;
     (function (Component) {
         ;
         var Table = (function (_super) {
@@ -6335,8 +6351,7 @@ var Plottable;
             return Table;
         })(Component.AbstractComponentContainer);
         Component.Table = Table;
-    })(Plottable.Component || (Plottable.Component = {}));
-    var Component = Plottable.Component;
+    })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -6348,6 +6363,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Plot;
     (function (Plot) {
         var AbstractPlot = (function (_super) {
             __extends(AbstractPlot, _super);
@@ -6662,8 +6678,7 @@ var Plottable;
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
         Plot.AbstractPlot = AbstractPlot;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -6675,6 +6690,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Plot;
     (function (Plot) {
         /*
          * A PiePlot is a plot meant to show how much out of a total an attribute's value is.
@@ -6725,8 +6741,7 @@ var Plottable;
             return Pie;
         })(Plot.AbstractPlot);
         Plot.Pie = Pie;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -6738,6 +6753,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Plot;
     (function (Plot) {
         var AbstractXYPlot = (function (_super) {
             __extends(AbstractXYPlot, _super);
@@ -6933,8 +6949,7 @@ var Plottable;
             return AbstractXYPlot;
         })(Plot.AbstractPlot);
         Plot.AbstractXYPlot = AbstractXYPlot;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -6946,6 +6961,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Plot;
     (function (Plot) {
         var Scatter = (function (_super) {
             __extends(Scatter, _super);
@@ -7019,7 +7035,7 @@ var Plottable;
                     var dataset = _this._key2PlotDatasetKey.get(key).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
                     var drawer = _this._key2PlotDatasetKey.get(key).drawer;
-                    drawer._getDrawSelection().each(function (d, i) {
+                    drawer._getRenderArea().selectAll("circle").each(function (d, i) {
                         var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
                         var r = attrToProjector["r"](d, i, dataset.metadata(), plotMetadata);
                         if (distSq < r * r) {
@@ -7073,8 +7089,7 @@ var Plottable;
             return Scatter;
         })(Plot.AbstractXYPlot);
         Plot.Scatter = Scatter;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -7086,6 +7101,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Plot;
     (function (Plot) {
         var Grid = (function (_super) {
             __extends(Grid, _super);
@@ -7146,8 +7162,7 @@ var Plottable;
             return Grid;
         })(Plot.AbstractXYPlot);
         Plot.Grid = Grid;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -7159,6 +7174,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Plot;
     (function (Plot) {
         var AbstractBarPlot = (function (_super) {
             __extends(AbstractBarPlot, _super);
@@ -7276,7 +7292,7 @@ var Plottable;
                 var tolerance = 0.5;
                 var bars = [];
                 var drawer = this._key2PlotDatasetKey.get(key).drawer;
-                drawer._renderArea.selectAll("rect").each(function (d) {
+                drawer._getRenderArea().selectAll("rect").each(function (d) {
                     var bbox = this.getBBox();
                     if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
                         bars.push(this);
@@ -7339,7 +7355,7 @@ var Plottable;
                 var attrToProjector = this._generateAttrToProjector();
                 var dataToDraw = this._getDataToDraw();
                 this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).plotMetadata); });
-                if (this._hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._someLabelsTooWide; })) {
+                if (this._hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._getIfLabelsTooWide(); })) {
                     drawers.forEach(function (d) { return d.removeLabels(); });
                 }
             };
@@ -7466,7 +7482,7 @@ var Plottable;
             };
             AbstractBarPlot.prototype._clearHoverSelection = function () {
                 this._getDrawersInOrder().forEach(function (d, i) {
-                    d._renderArea.selectAll("rect").classed("not-hovered hovered", false);
+                    d._getRenderArea().selectAll("rect").classed("not-hovered hovered", false);
                 });
             };
             //===== Hover logic =====
@@ -7517,7 +7533,7 @@ var Plottable;
                 var barsSelection = d3.selectAll(bars);
                 if (!barsSelection.empty()) {
                     this._getDrawersInOrder().forEach(function (d, i) {
-                        d._renderArea.selectAll("rect").classed({ "hovered": false, "not-hovered": true });
+                        d._getRenderArea().selectAll("rect").classed({ "hovered": false, "not-hovered": true });
                     });
                     barsSelection.classed({ "hovered": true, "not-hovered": false });
                 }
@@ -7540,8 +7556,7 @@ var Plottable;
             return AbstractBarPlot;
         })(Plot.AbstractXYPlot);
         Plot.AbstractBarPlot = AbstractBarPlot;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -7553,6 +7568,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Plot;
     (function (Plot) {
         /**
          * A VerticalBarPlot draws bars vertically.
@@ -7583,8 +7599,7 @@ var Plottable;
             return VerticalBar;
         })(Plot.AbstractBarPlot);
         Plot.VerticalBar = VerticalBar;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -7596,6 +7611,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Plot;
     (function (Plot) {
         /**
          * A HorizontalBarPlot draws bars horizontally.
@@ -7634,8 +7650,7 @@ var Plottable;
             return HorizontalBar;
         })(Plot.AbstractBarPlot);
         Plot.HorizontalBar = HorizontalBar;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -7647,6 +7662,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Plot;
     (function (Plot) {
         var Line = (function (_super) {
             __extends(Line, _super);
@@ -7667,7 +7683,7 @@ var Plottable;
             }
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._hoverTarget = this._foregroundContainer.append("circle").classed("hover-target", true).attr("r", this._hoverDetectionRadius).style("visibility", "hidden");
+                this._hoverTarget = this.foreground().append("circle").classed("hover-target", true).attr("r", this._hoverDetectionRadius).style("visibility", "hidden");
             };
             Line.prototype._rejectNullsAndNaNs = function (d, i, userMetdata, plotMetadata, accessor) {
                 var value = accessor(d, i, userMetdata, plotMetadata);
@@ -7781,8 +7797,7 @@ var Plottable;
             return Line;
         })(Plot.AbstractXYPlot);
         Plot.Line = Line;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -7794,6 +7809,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Plot;
     (function (Plot) {
         /**
          * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
@@ -7874,8 +7890,7 @@ var Plottable;
             return Area;
         })(Plot.Line);
         Plot.Area = Area;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -7887,6 +7902,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Plot;
     (function (Plot) {
         var ClusteredBar = (function (_super) {
             __extends(ClusteredBar, _super);
@@ -7956,8 +7972,7 @@ var Plottable;
             return ClusteredBar;
         })(Plot.AbstractBarPlot);
         Plot.ClusteredBar = ClusteredBar;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -7969,6 +7984,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Plot;
     (function (Plot) {
         var AbstractStacked = (function (_super) {
             __extends(AbstractStacked, _super);
@@ -8147,8 +8163,7 @@ var Plottable;
             return AbstractStacked;
         })(Plot.AbstractXYPlot);
         Plot.AbstractStacked = AbstractStacked;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -8160,6 +8175,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Plot;
     (function (Plot) {
         var StackedArea = (function (_super) {
             __extends(StackedArea, _super);
@@ -8281,8 +8297,7 @@ var Plottable;
             return StackedArea;
         })(Plot.Area);
         Plot.StackedArea = StackedArea;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -8294,6 +8309,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Plot;
     (function (Plot) {
         var StackedBar = (function (_super) {
             __extends(StackedBar, _super);
@@ -8395,8 +8411,7 @@ var Plottable;
             return StackedBar;
         })(Plot.AbstractBarPlot);
         Plot.StackedBar = StackedBar;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8404,6 +8419,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var Animator;
     (function (Animator) {
         /**
          * An animator implementation with no animation. The attributes are
@@ -8421,13 +8437,13 @@ var Plottable;
             return Null;
         })();
         Animator.Null = Null;
-    })(Plottable.Animator || (Plottable.Animator = {}));
-    var Animator = Plottable.Animator;
+    })(Animator = Plottable.Animator || (Plottable.Animator = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var Animator;
     (function (Animator) {
         /**
          * The base animator implementation with easing, duration, and delay.
@@ -8535,8 +8551,7 @@ var Plottable;
             return Base;
         })();
         Animator.Base = Base;
-    })(Plottable.Animator || (Plottable.Animator = {}));
-    var Animator = Plottable.Animator;
+    })(Animator = Plottable.Animator || (Plottable.Animator = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8548,6 +8563,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Animator;
     (function (Animator) {
         /**
          * The default animator implementation with easing, duration, and delay.
@@ -8587,8 +8603,7 @@ var Plottable;
             return Rect;
         })(Animator.Base);
         Animator.Rect = Rect;
-    })(Plottable.Animator || (Plottable.Animator = {}));
-    var Animator = Plottable.Animator;
+    })(Animator = Plottable.Animator || (Plottable.Animator = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8600,6 +8615,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Animator;
     (function (Animator) {
         /**
          * A child class of RectAnimator that will move the rectangle
@@ -8624,8 +8640,7 @@ var Plottable;
             return MovingRect;
         })(Animator.Rect);
         Animator.MovingRect = MovingRect;
-    })(Plottable.Animator || (Plottable.Animator = {}));
-    var Animator = Plottable.Animator;
+    })(Animator = Plottable.Animator || (Plottable.Animator = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8637,6 +8652,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Dispatcher;
     (function (Dispatcher) {
         var AbstractDispatcher = (function (_super) {
             __extends(AbstractDispatcher, _super);
@@ -8708,8 +8724,7 @@ var Plottable;
             return AbstractDispatcher;
         })(Plottable.Core.PlottableObject);
         Dispatcher.AbstractDispatcher = AbstractDispatcher;
-    })(Plottable.Dispatcher || (Plottable.Dispatcher = {}));
-    var Dispatcher = Plottable.Dispatcher;
+    })(Dispatcher = Plottable.Dispatcher || (Plottable.Dispatcher = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8721,6 +8736,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Dispatcher;
     (function (Dispatcher) {
         var Mouse = (function (_super) {
             __extends(Mouse, _super);
@@ -8779,8 +8795,7 @@ var Plottable;
             return Mouse;
         })(Dispatcher.AbstractDispatcher);
         Dispatcher.Mouse = Mouse;
-    })(Plottable.Dispatcher || (Plottable.Dispatcher = {}));
-    var Dispatcher = Plottable.Dispatcher;
+    })(Dispatcher = Plottable.Dispatcher || (Plottable.Dispatcher = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8792,6 +8807,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Dispatcher;
     (function (Dispatcher) {
         var Keypress = (function (_super) {
             __extends(Keypress, _super);
@@ -8841,8 +8857,7 @@ var Plottable;
             return Keypress;
         })(Dispatcher.AbstractDispatcher);
         Dispatcher.Keypress = Keypress;
-    })(Plottable.Dispatcher || (Plottable.Dispatcher = {}));
-    var Dispatcher = Plottable.Dispatcher;
+    })(Dispatcher = Plottable.Dispatcher || (Plottable.Dispatcher = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8854,6 +8869,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Interaction;
     (function (Interaction) {
         var AbstractInteraction = (function (_super) {
             __extends(AbstractInteraction, _super);
@@ -8867,8 +8883,7 @@ var Plottable;
             return AbstractInteraction;
         })(Plottable.Core.PlottableObject);
         Interaction.AbstractInteraction = AbstractInteraction;
-    })(Plottable.Interaction || (Plottable.Interaction = {}));
-    var Interaction = Plottable.Interaction;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8880,6 +8895,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Interaction;
     (function (Interaction) {
         var Click = (function (_super) {
             __extends(Click, _super);
@@ -8922,8 +8938,7 @@ var Plottable;
             return DoubleClick;
         })(Click);
         Interaction.DoubleClick = DoubleClick;
-    })(Plottable.Interaction || (Plottable.Interaction = {}));
-    var Interaction = Plottable.Interaction;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8935,6 +8950,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Interaction;
     (function (Interaction) {
         var Key = (function (_super) {
             __extends(Key, _super);
@@ -8977,8 +8993,7 @@ var Plottable;
             return Key;
         })(Interaction.AbstractInteraction);
         Interaction.Key = Key;
-    })(Plottable.Interaction || (Plottable.Interaction = {}));
-    var Interaction = Plottable.Interaction;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8990,6 +9005,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Interaction;
     (function (Interaction) {
         var PanZoom = (function (_super) {
             __extends(PanZoom, _super);
@@ -9046,8 +9062,7 @@ var Plottable;
             return PanZoom;
         })(Interaction.AbstractInteraction);
         Interaction.PanZoom = PanZoom;
-    })(Plottable.Interaction || (Plottable.Interaction = {}));
-    var Interaction = Plottable.Interaction;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -9059,6 +9074,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Interaction;
     (function (Interaction) {
         var Drag = (function (_super) {
             __extends(Drag, _super);
@@ -9206,8 +9222,7 @@ var Plottable;
             return Drag;
         })(Interaction.AbstractInteraction);
         Interaction.Drag = Drag;
-    })(Plottable.Interaction || (Plottable.Interaction = {}));
-    var Interaction = Plottable.Interaction;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -9219,6 +9234,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Interaction;
     (function (Interaction) {
         var DragBox = (function (_super) {
             __extends(DragBox, _super);
@@ -9234,8 +9250,8 @@ var Plottable;
                     return this._resizeXEnabled || this._resizeYEnabled;
                 }
                 else {
-                    this._resizeXEnabled = enabled && this.constructor._CAN_RESIZE_X;
-                    this._resizeYEnabled = enabled && this.constructor._CAN_RESIZE_Y;
+                    this._resizeXEnabled = enabled && this.canResizeX();
+                    this._resizeYEnabled = enabled && this.canResizeY();
                     return this;
                 }
             };
@@ -9401,7 +9417,7 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 var cname = DragBox._CLASS_DRAG_BOX;
-                var background = this._componentToListenTo._backgroundContainer;
+                var background = this._componentToListenTo.background();
                 this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
                 hitBox.on("mousemove", function () { return _this._hover(); });
                 return this;
@@ -9438,6 +9454,12 @@ var Plottable;
                     return "";
                 }
             };
+            DragBox.prototype.canResizeX = function () {
+                return true;
+            };
+            DragBox.prototype.canResizeY = function () {
+                return true;
+            };
             DragBox._CLASS_DRAG_BOX = "drag-box";
             DragBox.RESIZE_PADDING = 10;
             DragBox._CAN_RESIZE_X = true;
@@ -9445,8 +9467,7 @@ var Plottable;
             return DragBox;
         })(Interaction.Drag);
         Interaction.DragBox = DragBox;
-    })(Plottable.Interaction || (Plottable.Interaction = {}));
-    var Interaction = Plottable.Interaction;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -9458,6 +9479,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Interaction;
     (function (Interaction) {
         var XDragBox = (function (_super) {
             __extends(XDragBox, _super);
@@ -9470,12 +9492,13 @@ var Plottable;
             XDragBox.prototype._setLocation = function (x, y) {
                 _super.prototype._setLocation.call(this, x, this._componentToListenTo.height());
             };
-            XDragBox._CAN_RESIZE_Y = false;
+            XDragBox.prototype.canResizeY = function () {
+                return false;
+            };
             return XDragBox;
         })(Interaction.DragBox);
         Interaction.XDragBox = XDragBox;
-    })(Plottable.Interaction || (Plottable.Interaction = {}));
-    var Interaction = Plottable.Interaction;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -9487,6 +9510,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Interaction;
     (function (Interaction) {
         var XYDragBox = (function (_super) {
             __extends(XYDragBox, _super);
@@ -9497,8 +9521,7 @@ var Plottable;
             return XYDragBox;
         })(Interaction.DragBox);
         Interaction.XYDragBox = XYDragBox;
-    })(Plottable.Interaction || (Plottable.Interaction = {}));
-    var Interaction = Plottable.Interaction;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -9510,6 +9533,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Interaction;
     (function (Interaction) {
         var YDragBox = (function (_super) {
             __extends(YDragBox, _super);
@@ -9522,12 +9546,13 @@ var Plottable;
             YDragBox.prototype._setLocation = function (x, y) {
                 _super.prototype._setLocation.call(this, this._componentToListenTo.width(), y);
             };
-            YDragBox._CAN_RESIZE_X = false;
+            YDragBox.prototype.canResizeX = function () {
+                return false;
+            };
             return YDragBox;
         })(Interaction.DragBox);
         Interaction.YDragBox = YDragBox;
-    })(Plottable.Interaction || (Plottable.Interaction = {}));
-    var Interaction = Plottable.Interaction;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -9539,6 +9564,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Interaction;
     (function (Interaction) {
         var Hover = (function (_super) {
             __extends(Hover, _super);
@@ -9653,6 +9679,5 @@ var Plottable;
             return Hover;
         })(Interaction.AbstractInteraction);
         Interaction.Hover = Hover;
-    })(Plottable.Interaction || (Plottable.Interaction = {}));
-    var Interaction = Plottable.Interaction;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));

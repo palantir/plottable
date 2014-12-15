@@ -8,7 +8,7 @@ describe("Plots", () => {
 
     beforeEach(() => {
       p = new Plottable.Plot.AbstractPlot();
-      p._getDrawer = (k: string) => new Plottable._Drawer.Element(k).svgElement("rect");
+      (<any> p)._getDrawer = (k: string) => new Plottable._Drawer.Element(k).svgElement("rect");
     });
 
     afterEach(() => {
@@ -23,7 +23,7 @@ describe("Plots", () => {
       var d4 = new Plottable.Dataset([10,11,12]);
       p.addDataset(d4);
 
-      assert.deepEqual(p._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
+      assert.deepEqual((<any> p)._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
       var datasets = p.datasets();
       assert.deepEqual(datasets[0].data(), [1,2,3]);
       assert.equal(datasets[1], d2);
@@ -33,14 +33,14 @@ describe("Plots", () => {
       p.removeDataset("foo");
       p.removeDataset("_0");
 
-      assert.deepEqual(p._datasetKeysInOrder, ["bar", "_1"]);
+      assert.deepEqual((<any> p)._datasetKeysInOrder, ["bar", "_1"]);
       assert.lengthOf(p.datasets(), 2);
     });
 
     it("Datasets are listened to appropriately", () => {
       var callbackCounter = 0;
       var callback = () => callbackCounter++;
-      p._onDatasetUpdate = callback;
+      (<any> p)._onDatasetUpdate = callback;
       var d = new Plottable.Dataset([1,2,3]);
       p.addDataset("foo", d);
       assert.equal(callbackCounter, 1, "adding dataset triggers listener");
