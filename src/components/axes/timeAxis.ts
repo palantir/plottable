@@ -140,11 +140,12 @@ export module Axis {
     ];
 
     private _tierLabelContainers: D3.Selection[];
+    private _tierMarkContainers: D3.Selection[];
     private _measurer: _Util.Text.TextMeasurer;
 
     private _mostPreciseConfigIndex: number;
 
-    private _firstTierLabelPosition: string;
+    private _tierLabelPositions: string;
 
     private static _LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
 
@@ -166,19 +167,19 @@ export module Axis {
       super(scale, orientation);
       this.classed("time-axis", true);
       this.tickLabelPadding(5);
-      this.firstTierLabelPosition("between");
+      this.tierLabelPositions(["between", "between"]);
     }
 
-    public firstTierLabelPosition(): string;
-    public firstTierLabelPosition(newPosition: string): Time;
-    public firstTierLabelPosition(newPosition?: string): any {
-      if (newPosition == null) {
-        return this._firstTierLabelPosition;
+    public tierLabelPositions(): string[];
+    public tierLabelPositions(newPositions: string[]): Time;
+    public tierLabelPositions(newPositions?: string[]): any {
+      if (newPositions == null) {
+        return this._tierLabelPositions;
       } else {
-        if (!(newPosition.toLowerCase() === "between" || newPosition.toLowerCase() === "under")) {
-          throw new Error(newPosition + " is not a supported position for first tier labels");
+        if (!newPositions.every((pos: string) => pos.toLowerCase() === "between" || pos.toLowerCase() === "center")) {
+          throw new Error("Unsupported position for tier labels");
         }
-        this._firstTierLabelPosition = newPosition;
+        this._tierLabelPositions = newPositions;
         this._invalidateLayout();
         return this;
       }
@@ -241,10 +242,10 @@ export module Axis {
       if (this._computedHeight !== null) {
         return this._computedHeight;
       }
-      var textHeight = this._measureTextHeight() * 2;
-      this.tickLength(textHeight);
-      this.endTickLength(textHeight);
-      this._computedHeight = this._maxLabelTickLength() + 2 * this.tickLabelPadding();
+      var textHeight = this._measureTextHeight();
+      this._computedHeight = this._tierLabelPositions.reduce((height: number, pos: string) =>
+        height + textHeight + (pos === "between") ? 0 : (this.tickLabelPadding() + this._maxLabelTickLength()),
+        0);
       return this._computedHeight;
     }
 
@@ -275,8 +276,10 @@ export module Axis {
     protected _setup() {
       super._setup();
       this._tierLabelContainers = [];
+      this._tierMarkContainers = [];
       for(var i = 0; i < Time._NUM_TIERS; ++i) {
-        this._tierLabelContainers.push(this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true));
+        this._tierLabelContainers.push(this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS + "-container", true));
+        this._tierMarkContainers.push(this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS + "-container", true));
       }
       this._measurer = _Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
     }
@@ -330,8 +333,9 @@ export module Axis {
       var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
-      var yTranslate = (this.orient() === "bottom" ? (this._maxLabelTickLength() / 2 * height) :
-          (this.height() - this._maxLabelTickLength() / 2 * height + 2 * this.tickLabelPadding()));
+      var markLength = this._measureTextHeight();
+      var yTranslate = (this.orient() === "bottom" ? (markLength * height) :
+          (this.height() - markLength / 2 * height + 2 * this.tickLabelPadding()));
       var textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
         _Util.DOM.translate(textSelection, xTranslate, yTranslate);
@@ -342,6 +346,58 @@ export module Axis {
       tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
 
       return filteredTicks;
+    }
+
+    private _render2(container: D3.Selection, config: TimeAxisTierConfiguration) {
+      var tickLabelAttrHash = {
+        x: <any> 0,
+        y: <any> 0,
+        dx: "0em",
+        dy: "0.3em"
+      };
+
+      var tickMarkLength = this._maxLabelTickLength();
+      var tickLabelPadding = this.tickLabelPadding();
+
+      var tickLabelTextAnchor = "middle";
+
+      var labelGroupTransformX = 0;
+      var labelGroupTransformY = 0;
+      var labelGroupShiftX = 0;
+      var labelGroupShiftY = 0;
+      labelGroupShiftY = tickMarkLength + tickLabelPadding;
+
+      var tickMarkAttrHash = this._generateTickMarkAttrHash();
+      switch(this.orient()) {
+        case "bottom":
+          tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
+          tickLabelAttrHash["dy"] = "0.95em";
+          labelGroupTransformY = tickMarkAttrHash["y1"] + labelGroupShiftY;
+          break;
+
+        case "top":
+          tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
+          tickLabelAttrHash["dy"] = "-.25em";
+          labelGroupTransformY = tickMarkAttrHash["y1"] - labelGroupShiftY;
+          break;
+      }
+
+      var tickPos = (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
+      tickPos.splice(0, 0, this._scale.domain()[0]);
+      tickPos.push(this._scale.domain()[1]);
+      var tickLabels = container
+                           .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
+                           .data(tickPos);
+      tickLabels.enter().append("text").classed(AbstractAxis.TICK_LABEL_CLASS, true);
+      tickLabels.exit().remove();
+
+      tickLabels.style("text-anchor", tickLabelTextAnchor)
+                .style("visibility", "visible")
+                .attr(tickLabelAttrHash)
+                .text(config.formatter);
+
+      var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
+      container.attr("transform", labelGroupTransform);
     }
 
     private _canFitLabelFilter(container: D3.Selection, position: Date, bounds: Date[], label: string, isCentered: boolean): boolean {
@@ -414,8 +470,10 @@ export module Axis {
       this._createTickMarks(_Util.Methods.flatten(ticks));
       this._adjustTickLength(labelLessTicks, this.tickLabelPadding());
 
+      var markLength = this._measureTextHeight();
+
       tierConfigs.forEach((config: TimeAxisTierConfiguration, i: number) =>
-        this._adjustTickLength(tierTicks[i], this._maxLabelTickLength() * (i + 1) / Time._NUM_TIERS)
+        this._adjustTickLength(tierTicks[i], markLength * (i + 1))
       );
 
       return this;

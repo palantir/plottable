@@ -4913,17 +4913,17 @@ var Plottable;
                 ];
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
-                this.firstTierLabelPosition("between");
+                this.tierLabelPositions(["between", "between"]);
             }
-            Time.prototype.firstTierLabelPosition = function (newPosition) {
-                if (newPosition == null) {
-                    return this._firstTierLabelPosition;
+            Time.prototype.tierLabelPositions = function (newPositions) {
+                if (newPositions == null) {
+                    return this._tierLabelPositions;
                 }
                 else {
-                    if (!(newPosition.toLowerCase() === "between" || newPosition.toLowerCase() === "under")) {
-                        throw new Error(newPosition + " is not a supported position for first tier labels");
+                    if (!newPositions.every(function (pos) { return pos.toLowerCase() === "between" || pos.toLowerCase() === "center"; })) {
+                        throw new Error("Unsupported position for tier labels");
                     }
-                    this._firstTierLabelPosition = newPosition;
+                    this._tierLabelPositions = newPositions;
                     this._invalidateLayout();
                     return this;
                 }
@@ -4960,13 +4960,12 @@ var Plottable;
                 return _super.prototype.orient.call(this, orientation); // maintains getter-setter functionality
             };
             Time.prototype._computeHeight = function () {
+                var _this = this;
                 if (this._computedHeight !== null) {
                     return this._computedHeight;
                 }
-                var textHeight = this._measureTextHeight() * 2;
-                this.tickLength(textHeight);
-                this.endTickLength(textHeight);
-                this._computedHeight = this._maxLabelTickLength() + 2 * this.tickLabelPadding();
+                var textHeight = this._measureTextHeight();
+                this._computedHeight = this._tierLabelPositions.reduce(function (height, pos) { return height + textHeight + (pos === "between") ? 0 : (_this.tickLabelPadding() + _this._maxLabelTickLength()); }, 0);
                 return this._computedHeight;
             };
             Time.prototype._getIntervalLength = function (config) {
@@ -4993,8 +4992,10 @@ var Plottable;
             Time.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._tierLabelContainers = [];
+                this._tierMarkContainers = [];
                 for (var i = 0; i < Time._NUM_TIERS; ++i) {
-                    this._tierLabelContainers.push(this._content.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
+                    this._tierLabelContainers.push(this._content.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS + "-container", true));
+                    this._tierMarkContainers.push(this._content.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS + "-container", true));
                 }
                 this._measurer = Plottable._Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
             };
@@ -5042,7 +5043,8 @@ var Plottable;
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
                 var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
-                var yTranslate = (this.orient() === "bottom" ? (this._maxLabelTickLength() / 2 * height) : (this.height() - this._maxLabelTickLength() / 2 * height + 2 * this.tickLabelPadding()));
+                var markLength = this._measureTextHeight();
+                var yTranslate = (this.orient() === "bottom" ? (markLength * height) : (this.height() - markLength / 2 * height + 2 * this.tickLabelPadding()));
                 var textSelection = tickLabels.selectAll("text");
                 if (textSelection.size() > 0) {
                     Plottable._Util.DOM.translate(textSelection, xTranslate, yTranslate);
@@ -5052,6 +5054,44 @@ var Plottable;
                 var anchor = shouldCenterText ? "middle" : "start";
                 tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
                 return filteredTicks;
+            };
+            Time.prototype._render2 = function (container, config) {
+                var tickLabelAttrHash = {
+                    x: 0,
+                    y: 0,
+                    dx: "0em",
+                    dy: "0.3em"
+                };
+                var tickMarkLength = this._maxLabelTickLength();
+                var tickLabelPadding = this.tickLabelPadding();
+                var tickLabelTextAnchor = "middle";
+                var labelGroupTransformX = 0;
+                var labelGroupTransformY = 0;
+                var labelGroupShiftX = 0;
+                var labelGroupShiftY = 0;
+                labelGroupShiftY = tickMarkLength + tickLabelPadding;
+                var tickMarkAttrHash = this._generateTickMarkAttrHash();
+                switch (this.orient()) {
+                    case "bottom":
+                        tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
+                        tickLabelAttrHash["dy"] = "0.95em";
+                        labelGroupTransformY = tickMarkAttrHash["y1"] + labelGroupShiftY;
+                        break;
+                    case "top":
+                        tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
+                        tickLabelAttrHash["dy"] = "-.25em";
+                        labelGroupTransformY = tickMarkAttrHash["y1"] - labelGroupShiftY;
+                        break;
+                }
+                var tickPos = this._scale.tickInterval(config.interval, config.step);
+                tickPos.splice(0, 0, this._scale.domain()[0]);
+                tickPos.push(this._scale.domain()[1]);
+                var tickLabels = container.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(tickPos);
+                tickLabels.enter().append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
+                tickLabels.exit().remove();
+                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(config.formatter);
+                var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
+                container.attr("transform", labelGroupTransform);
             };
             Time.prototype._canFitLabelFilter = function (container, position, bounds, label, isCentered) {
                 var endPosition;
@@ -5105,7 +5145,8 @@ var Plottable;
                 ticks.push(labelLessTicks);
                 this._createTickMarks(Plottable._Util.Methods.flatten(ticks));
                 this._adjustTickLength(labelLessTicks, this.tickLabelPadding());
-                tierConfigs.forEach(function (config, i) { return _this._adjustTickLength(tierTicks[i], _this._maxLabelTickLength() * (i + 1) / Time._NUM_TIERS); });
+                var markLength = this._measureTextHeight();
+                tierConfigs.forEach(function (config, i) { return _this._adjustTickLength(tierTicks[i], markLength * (i + 1)); });
                 return this;
             };
             Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
