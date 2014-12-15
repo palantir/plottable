@@ -4905,7 +4905,21 @@ var Plottable;
                 ];
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
+                this.firstTierLabelPosition("between");
             }
+            Time.prototype.firstTierLabelPosition = function (newPosition) {
+                if (newPosition == null) {
+                    return this._firstTierLabelPosition;
+                }
+                else {
+                    if (!(newPosition.toLowerCase() === "between" || newPosition.toLowerCase() === "under")) {
+                        throw new Error(newPosition + " is not a supported position for first tier labels");
+                    }
+                    this._firstTierLabelPosition = newPosition;
+                    this._invalidateLayout();
+                    return this;
+                }
+            };
             Time.prototype.axisConfigurations = function (configurations) {
                 if (configurations == null) {
                     return this._possibleTimeAxisConfigurations;

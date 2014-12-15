@@ -144,6 +144,8 @@ export module Axis {
 
     private _mostPreciseConfigIndex: number;
 
+    private _firstTierLabelPosition: string;
+
     private static _LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
 
     /**
@@ -164,6 +166,22 @@ export module Axis {
       super(scale, orientation);
       this.classed("time-axis", true);
       this.tickLabelPadding(5);
+      this.firstTierLabelPosition("between");
+    }
+
+    public firstTierLabelPosition(): string;
+    public firstTierLabelPosition(newPosition: string): Time;
+    public firstTierLabelPosition(newPosition?: string): any {
+      if (newPosition == null) {
+        return this._firstTierLabelPosition;
+      } else {
+        if (!(newPosition.toLowerCase() === "between" || newPosition.toLowerCase() === "under")) {
+          throw new Error(newPosition + " is not a supported position for first tier labels");
+        }
+        this._firstTierLabelPosition = newPosition;
+        this._invalidateLayout();
+        return this;
+      }
     }
 
     /**
