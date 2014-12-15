@@ -3,17 +3,17 @@
 module Plottable {
 
   export class Domainer {
-    private doNice = false;
-    private niceCount: number;
-    private padProportion = 0.0;
-    private paddingExceptions: D3.Map<any> = d3.map();
-    private unregisteredPaddingExceptions: D3.Set<any> = d3.set();
-    private includedValues: D3.Map<any> = d3.map();
-    // includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
-    private unregisteredIncludedValues: D3.Map<any> = d3.map();
-    private combineExtents: (extents: any[][]) => any[];
-    private static PADDING_FOR_IDENTICAL_DOMAIN = 1;
-    private static ONE_DAY = 1000 * 60 * 60 * 24;
+    private _doNice = false;
+    private _niceCount: number;
+    private _padProportion = 0.0;
+    private _paddingExceptions: D3.Map<any> = d3.map();
+    private _unregisteredPaddingExceptions: D3.Set<any> = d3.set();
+    private _includedValues: D3.Map<any> = d3.map();
+    // _includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
+    private _unregisteredIncludedValues: D3.Map<any> = d3.map();
+    private _combineExtents: (extents: any[][]) => any[];
+    private static _PADDING_FOR_IDENTICAL_DOMAIN = 1;
+    private static _ONE_DAY = 1000 * 60 * 60 * 24;
 
     /**
      * Constructs a new Domainer.
@@ -30,7 +30,7 @@ module Plottable {
      *        the min of the first elements and the max of the second arguments.
      */
     constructor(combineExtents?: (extents: any[][]) => any[]) {
-      this.combineExtents = combineExtents;
+      this._combineExtents = combineExtents;
     }
 
     /**
@@ -44,16 +44,16 @@ module Plottable {
      */
     public computeDomain(extents: any[][], scale: Scale.AbstractQuantitative<any>): any[] {
       var domain: any[];
-      if (this.combineExtents != null) {
-        domain = this.combineExtents(extents);
+      if (this._combineExtents != null) {
+        domain = this._combineExtents(extents);
       } else if (extents.length === 0) {
         domain = scale._defaultExtent();
       } else {
         domain = [_Util.Methods.min(extents, (e) => e[0], 0), _Util.Methods.max(extents, (e) => e[1], 0)];
       }
-      domain = this.includeDomain(domain);
-      domain = this.padDomain(scale, domain);
-      domain = this.niceDomain(scale, domain);
+      domain = this._includeDomain(domain);
+      domain = this._padDomain(scale, domain);
+      domain = this._niceDomain(scale, domain);
       return domain;
     }
 
@@ -72,7 +72,7 @@ module Plottable {
      * @returns {Domainer} The calling Domainer.
      */
     public pad(padProportion = 0.05): Domainer {
-      this.padProportion = padProportion;
+      this._padProportion = padProportion;
       return this;
     }
 
@@ -89,9 +89,9 @@ module Plottable {
      */
     public addPaddingException(exception: any, key?: string): Domainer {
       if (key != null) {
-        this.paddingExceptions.set(key, exception);
+        this._paddingExceptions.set(key, exception);
       } else {
-        this.unregisteredPaddingExceptions.add(exception);
+        this._unregisteredPaddingExceptions.add(exception);
       }
       return this;
     }
@@ -108,9 +108,9 @@ module Plottable {
      */
     public removePaddingException(keyOrException: any): Domainer {
       if (typeof(keyOrException) === "string") {
-        this.paddingExceptions.remove(keyOrException);
+        this._paddingExceptions.remove(keyOrException);
       } else {
-        this.unregisteredPaddingExceptions.remove(keyOrException);
+        this._unregisteredPaddingExceptions.remove(keyOrException);
       }
       return this;
     }
@@ -128,9 +128,9 @@ module Plottable {
      */
     public addIncludedValue(value: any, key?: string): Domainer {
       if (key != null) {
-        this.includedValues.set(key, value);
+        this._includedValues.set(key, value);
       } else {
-        this.unregisteredIncludedValues.set(value, value);
+        this._unregisteredIncludedValues.set(value, value);
       }
       return this;
     }
@@ -146,9 +146,9 @@ module Plottable {
      */
     public removeIncludedValue(valueOrKey: any) {
       if (typeof(valueOrKey) === "string") {
-        this.includedValues.remove(valueOrKey);
+        this._includedValues.remove(valueOrKey);
       } else {
-        this.unregisteredIncludedValues.remove(valueOrKey);
+        this._unregisteredIncludedValues.remove(valueOrKey);
       }
       return this;
     }
@@ -160,39 +160,35 @@ module Plottable {
      * @return {Domainer} The calling Domainer.
      */
     public nice(count?: number): Domainer {
-      this.doNice = true;
-      this.niceCount = count;
+      this._doNice = true;
+      this._niceCount = count;
       return this;
     }
 
-    private static defaultCombineExtents(extents: any[][]): any[] {
-      return [_Util.Methods.min(extents, (e) => e[0], 0), _Util.Methods.max(extents, (e) => e[1], 1)];
-    }
-
-    private padDomain(scale: Scale.AbstractQuantitative<any>, domain: any[]): any[] {
+    private _padDomain(scale: Scale.AbstractQuantitative<any>, domain: any[]): any[] {
       var min = domain[0];
       var max = domain[1];
-      if (min === max && this.padProportion > 0.0) {
+      if (min === max && this._padProportion > 0.0) {
         var d = min.valueOf(); // valueOf accounts for dates properly
         if (min instanceof Date) {
-          return [d - Domainer.ONE_DAY, d + Domainer.ONE_DAY];
+          return [d - Domainer._ONE_DAY, d + Domainer._ONE_DAY];
         } else {
-          return [d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN,
-                  d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
+          return [d - Domainer._PADDING_FOR_IDENTICAL_DOMAIN,
+                  d + Domainer._PADDING_FOR_IDENTICAL_DOMAIN];
         }
       }
 
       if (scale.domain()[0] === scale.domain()[1]) {
         return domain;
       }
-      var p = this.padProportion / 2;
+      var p = this._padProportion / 2;
       // This scaling is done to account for log scales and other non-linear
       // scales. A log scale should be padded more on the max than on the min.
       var newMin = scale.invert(scale.scale(min) -
                                         (scale.scale(max) - scale.scale(min)) * p);
       var newMax = scale.invert(scale.scale(max) +
                                         (scale.scale(max) - scale.scale(min)) * p);
-      var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
+      var exceptionValues = this._paddingExceptions.values().concat(this._unregisteredPaddingExceptions.values());
       var exceptionSet = d3.set(exceptionValues);
       if (exceptionSet.has(min)) {
         newMin = min;
@@ -203,16 +199,16 @@ module Plottable {
       return [newMin, newMax];
     }
 
-    private niceDomain(scale: Scale.AbstractQuantitative<any>, domain: any[]): any[] {
-      if (this.doNice) {
-        return scale._niceDomain(domain, this.niceCount);
+    private _niceDomain(scale: Scale.AbstractQuantitative<any>, domain: any[]): any[] {
+      if (this._doNice) {
+        return scale._niceDomain(domain, this._niceCount);
       } else {
         return domain;
       }
     }
 
-    private includeDomain(domain: any[]): any[] {
-      var includedValues = this.includedValues.values().concat(this.unregisteredIncludedValues.values());
+    private _includeDomain(domain: any[]): any[] {
+      var includedValues = this._includedValues.values().concat(this._unregisteredIncludedValues.values());
       return includedValues.reduce(
         (domain, value) => [Math.min(domain[0], value), Math.max(domain[1], value)],
         domain

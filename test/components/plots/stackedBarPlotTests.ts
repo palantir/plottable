@@ -14,11 +14,22 @@ describe("Plots", () => {
     var SVG_HEIGHT = 400;
     var axisHeight = 0;
     var bandWidth = 0;
+    var originalData1: any[];
+    var originalData2: any[];
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Ordinal();
       yScale = new Plottable.Scale.Linear().domain([0, 3]);
+
+      originalData1 = [
+        {x: "A", y: 1},
+        {x: "B", y: 2}
+      ];
+      originalData2 = [
+        {x: "A", y: 2},
+        {x: "B", y: 1}
+      ];
 
       var data1 = [
         {x: "A", y: 1},
@@ -32,8 +43,10 @@ describe("Plots", () => {
       dataset2 = new Plottable.Dataset(data2);
 
       renderer = new Plottable.Plot.StackedBar(xScale, yScale);
-      renderer.addDataset(data1);
-      renderer.addDataset(data2);
+      renderer.addDataset(dataset1);
+      renderer.addDataset(dataset2);
+      renderer.project("x", "x", xScale);
+      renderer.project("y", "y", yScale);
       renderer.baseline(0);
       var xAxis = new Plottable.Axis.Category(xScale, "bottom");
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
@@ -42,7 +55,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = renderer._renderArea.selectAll("rect");
+      var bars = (<any> renderer)._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -71,6 +84,9 @@ describe("Plots", () => {
       assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 3, 0.01, "y is correct for bar1");
       assert.closeTo(numAttr(bar2, "y"), 0, 0.01, "y is correct for bar2");
       assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
+
+      assert.deepEqual(dataset1.data(), originalData1, "underlying data is not modified");
+      assert.deepEqual(dataset2.data(), originalData2, "underlying data is not modified");
       svg.remove();
     });
   });
@@ -112,6 +128,8 @@ describe("Plots", () => {
       plot.addDataset(data2);
       plot.addDataset(data3);
       plot.addDataset(data4);
+      plot.project("x", "x", xScale);
+      plot.project("y", "y", yScale);
       plot.baseline(0);
       var xAxis = new Plottable.Axis.Category(xScale, "bottom");
       var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
@@ -119,7 +137,7 @@ describe("Plots", () => {
     });
 
     it("stacking done correctly for negative values", () => {
-      var bars = plot._renderArea.selectAll("rect");
+      var bars = (<any> plot)._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -140,7 +158,7 @@ describe("Plots", () => {
     });
 
     it("stacked extent is set correctly", () => {
-      assert.deepEqual((<any> plot).stackedExtent, [-8, 8], "stacked extent is updated accordingly");
+      assert.deepEqual((<any> plot)._stackedExtent, [-8, 8], "stacked extent is updated accordingly");
       svg.remove();
     });
   });
@@ -186,7 +204,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = renderer._renderArea.selectAll("rect");
+      var bars = (<any> renderer)._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -252,12 +270,14 @@ describe("Plots", () => {
       plot.addDataset(data1);
       plot.addDataset(data2);
       plot.addDataset(data3);
+      plot.project("x", "x", xScale);
+      plot.project("y", "y", yScale);
       var xAxis = new Plottable.Axis.Category(xScale, "bottom");
       var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
     });
 
     it("renders correctly", () => {
-      var bars = plot._renderArea.selectAll("rect");
+      var bars = (<any> plot)._renderArea.selectAll("rect");
 
       assert.lengthOf(bars[0], 7, "draws a bar for each datum");
 

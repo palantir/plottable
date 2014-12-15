@@ -3,13 +3,7 @@
 module Plottable {
 export module Plot {
   export class Grid extends AbstractXYPlot<string,string> {
-    public _colorScale: Scale.AbstractScale<any, string>;
-    public _xScale: Scale.Ordinal;
-    public _yScale: Scale.Ordinal;
-
-    public _animators: Animator.PlotAnimatorMap = {
-      "cells" : new Animator.Null()
-    };
+    private _colorScale: Scale.AbstractScale<any, string>;
 
     /**
      * Constructs a GridPlot.
@@ -28,23 +22,23 @@ export module Plot {
       this.classed("grid-plot", true);
 
       // The x and y scales should render in bands with no padding
-      this._xScale.rangeType("bands", 0, 0);
-      this._yScale.rangeType("bands", 0, 0);
+      (<Scale.Ordinal> this._xScale).rangeType("bands", 0, 0);
+      (<Scale.Ordinal> this._yScale).rangeType("bands", 0, 0);
 
       this._colorScale = colorScale;
-      this.project("fill", "value", colorScale); // default
-      this._animators["cells"] = new Animator.Null();
+      this.animator("cells", new Animator.Null());
     }
 
-    public _addDataset(key: string, dataset: Dataset) {
+    public addDataset(keyOrDataset: any, dataset?: any) {
       if (this._datasetKeysInOrder.length === 1) {
         _Util.Methods.warn("Only one dataset is supported in Grid plots");
-        return;
+        return this;
       }
-      super._addDataset(key, dataset);
+      super.addDataset(keyOrDataset, dataset);
+      return this;
     }
 
-    public _getDrawer(key: string) {
+    protected _getDrawer(key: string) {
       return new _Drawer.Element(key).svgElement("rect");
     }
 
@@ -60,16 +54,16 @@ export module Plot {
       return this;
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      var xStep = this._xScale.rangeBand();
-      var yStep = this._yScale.rangeBand();
+      var xStep = (<Scale.Ordinal> this._xScale).rangeBand();
+      var yStep = (<Scale.Ordinal> this._yScale).rangeBand();
       attrToProjector["width"]  = () => xStep;
       attrToProjector["height"] = () => yStep;
       return attrToProjector;
     }
 
-    public _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): _Drawer.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
     }
   }

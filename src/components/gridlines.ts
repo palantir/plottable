@@ -3,10 +3,10 @@
 module Plottable {
 export module Component {
   export class Gridlines extends AbstractComponent {
-    private xScale: Scale.AbstractQuantitative<any>;
-    private yScale: Scale.AbstractQuantitative<any>;
-    private xLinesContainer: D3.Selection;
-    private yLinesContainer: D3.Selection;
+    private _xScale: Scale.AbstractQuantitative<any>;
+    private _yScale: Scale.AbstractQuantitative<any>;
+    private _xLinesContainer: D3.Selection;
+    private _yLinesContainer: D3.Selection;
 
     /**
      * Creates a set of Gridlines.
@@ -24,44 +24,44 @@ export module Component {
       }
       super();
       this.classed("gridlines", true);
-      this.xScale = xScale;
-      this.yScale = yScale;
-      if (this.xScale) {
-        this.xScale.broadcaster.registerListener(this, () => this._render());
+      this._xScale = xScale;
+      this._yScale = yScale;
+      if (this._xScale) {
+        this._xScale.broadcaster.registerListener(this, () => this._render());
       }
-      if (this.yScale) {
-        this.yScale.broadcaster.registerListener(this, () => this._render());
+      if (this._yScale) {
+        this._yScale.broadcaster.registerListener(this, () => this._render());
       }
     }
 
     public remove() {
       super.remove();
-      if (this.xScale) {
-        this.xScale.broadcaster.deregisterListener(this);
+      if (this._xScale) {
+        this._xScale.broadcaster.deregisterListener(this);
       }
-      if (this.yScale) {
-        this.yScale.broadcaster.deregisterListener(this);
+      if (this._yScale) {
+        this._yScale.broadcaster.deregisterListener(this);
       }
       return this;
     }
 
-    public _setup() {
+    protected _setup() {
       super._setup();
-      this.xLinesContainer = this._content.append("g").classed("x-gridlines", true);
-      this.yLinesContainer = this._content.append("g").classed("y-gridlines", true);
+      this._xLinesContainer = this._content.append("g").classed("x-gridlines", true);
+      this._yLinesContainer = this._content.append("g").classed("y-gridlines", true);
     }
 
     public _doRender() {
       super._doRender();
-      this.redrawXLines();
-      this.redrawYLines();
+      this._redrawXLines();
+      this._redrawYLines();
     }
 
-    private redrawXLines() {
-      if (this.xScale) {
-        var xTicks = this.xScale.ticks();
-        var getScaledXValue = (tickVal: number) => this.xScale.scale(tickVal);
-        var xLines = this.xLinesContainer.selectAll("line").data(xTicks);
+    private _redrawXLines() {
+      if (this._xScale) {
+        var xTicks = this._xScale.ticks();
+        var getScaledXValue = (tickVal: number) => this._xScale.scale(tickVal);
+        var xLines = this._xLinesContainer.selectAll("line").data(xTicks);
         xLines.enter().append("line");
         xLines.attr("x1", getScaledXValue)
               .attr("y1", 0)
@@ -72,11 +72,11 @@ export module Component {
       }
     }
 
-    private redrawYLines() {
-      if (this.yScale) {
-        var yTicks = this.yScale.ticks();
-        var getScaledYValue = (tickVal: number) => this.yScale.scale(tickVal);
-        var yLines = this.yLinesContainer.selectAll("line").data(yTicks);
+    private _redrawYLines() {
+      if (this._yScale) {
+        var yTicks = this._yScale.ticks();
+        var getScaledYValue = (tickVal: number) => this._yScale.scale(tickVal);
+        var yLines = this._yLinesContainer.selectAll("line").data(yTicks);
         yLines.enter().append("line");
         yLines.attr("x1", 0)
               .attr("y1", getScaledYValue)

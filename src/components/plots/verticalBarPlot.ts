@@ -12,7 +12,7 @@ export module Plot {
    *  - "y" - the vertical height of a bar
    */
   export class VerticalBar<X> extends AbstractBarPlot<X,number> {
-    public static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
+    protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
 
     /**
      * Constructs a VerticalBarPlot.
@@ -26,7 +26,7 @@ export module Plot {
       super(xScale, yScale);
     }
 
-    public _updateYDomainer() {
+    protected _updateYDomainer() {
       this._updateDomainer(this._yScale);
     }
   }

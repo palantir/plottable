@@ -53,9 +53,11 @@ describe("Plots", () => {
       var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var gridPlot: Plottable.Plot.Grid = new Plottable.Plot.Grid(xScale, yScale, colorScale);
       gridPlot.addDataset(DATA)
-              .project("fill", "magnitude", colorScale);
+              .project("fill", "magnitude", colorScale)
+              .project("x", "x", xScale)
+              .project("y", "y", yScale);
       gridPlot.renderTo(svg);
-      VERIFY_CELLS(gridPlot._renderArea.selectAll("rect")[0]);
+      VERIFY_CELLS((<any> gridPlot)._renderArea.selectAll("rect")[0]);
       svg.remove();
     });
 
@@ -69,9 +71,11 @@ describe("Plots", () => {
       var gridPlot: Plottable.Plot.Grid = new Plottable.Plot.Grid(xScale, yScale, colorScale);
       gridPlot.addDataset(dataset)
               .project("fill", "magnitude", colorScale)
+              .project("x", "x", xScale)
+              .project("y", "y", yScale)
               .renderTo(svg);
       dataset.data(DATA);
-      VERIFY_CELLS(gridPlot._renderArea.selectAll("rect")[0]);
+      VERIFY_CELLS((<any> gridPlot)._renderArea.selectAll("rect")[0]);
       svg.remove();
     });
 
@@ -83,11 +87,13 @@ describe("Plots", () => {
       var gridPlot: Plottable.Plot.Grid = new Plottable.Plot.Grid(xScale, yScale, colorScale);
       gridPlot.addDataset(DATA)
               .project("fill", "magnitude")
+              .project("x", "x", xScale)
+              .project("y", "y", yScale)
               .renderTo(svg);
 
       yScale.domain(["U", "V"]);
 
-      var cells = gridPlot._renderArea.selectAll("rect")[0];
+      var cells = (<any> gridPlot)._renderArea.selectAll("rect")[0];
       var cellAU = d3.select(cells[0]);
       var cellAV = d3.select(cells[2]);
       cellAU.attr("fill", "#000000");
@@ -99,7 +105,7 @@ describe("Plots", () => {
       cellAV.attr("y", "0");
 
       yScale.domain(["V", "U"]);
-      cells = gridPlot._renderArea.selectAll("rect")[0];
+      cells = (<any> gridPlot)._renderArea.selectAll("rect")[0];
       cellAU = d3.select(cells[0]);
       cellAV = d3.select(cells[2]);
       cellAU.attr("fill", "#000000");

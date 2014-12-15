@@ -8,7 +8,6 @@ function run(div, data, Plottable) {
   "use strict";
 
   var svg = div.append("svg").attr("height", 500);
-  data = _.cloneDeep(data);
   var dataseries = data[0].splice(0, 20);
 
   var xScale = new Plottable.Scale.Linear();
@@ -38,6 +37,7 @@ function run(div, data, Plottable) {
   var yAxisTable2 = new Plottable.Component.Table([[yAxisTop2, yAxisMiddle2, yAxisBottom2]]);
 
   var renderAreaD1 = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries);
+  renderAreaD1.project("x", "x", xScale).project("y", "y", yScale);
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
 
   var basicTable = new Plottable.Component.Table([[null, xAxisTable2, null],

@@ -38,11 +38,15 @@ function run(div, data, Plottable) {
       .addDataset(d3)
       .addDataset(d4)
       .attr("fill", "color", colorScale)
-      .attr("r", function(d) {return d.x * 12;});
+      .attr("r", function(d) {return d.x * 12;})
+      .project("x", "x", xScale)
+      .project("y", "y", yScale);
 
   //title + legend
   var title1 = new Plottable.Component.TitleLabel( "Two Data Series", "horizontal");
   var legend1 = new Plottable.Component.Legend(colorScale);
+  legend1.maxEntriesPerRow(1);
+
   var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
                                         .addComponent(0,1, legend1);
 

@@ -30,20 +30,28 @@ function run(div, data, Plottable) {
   var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale) //0
           .addDataset(dataseries)
           .attr("fill", colorScale1.scale("scatter"))
-          .attr("r", function(){return 10;});
+          .attr("r", function(){return 10;})
+          .project("x", "x", xScale)
+          .project("y", "y", yScale);
 
   var linePlot = new Plottable.Plot.Line(xScale, yScale)
           .addDataset(dataseries) //1
           .attr("stroke", colorScale1.scale("line"))
-          .attr("stroke-width", function(){ return 5;});
+          .attr("stroke-width", function(){ return 5;})
+          .project("x", "x", xScale)
+          .project("y", "y", yScale);
 
   var areaPlot = new Plottable.Plot.Area(xScale, yScale)
           .addDataset(dataseries) //2
-          .attr("fill", colorScale1.scale("area"));
+          .attr("fill", colorScale1.scale("area"))
+          .project("x", "x", xScale)
+          .project("y", "y", yScale);
 
   //title + legend
   var title1 = new Plottable.Component.TitleLabel( "front: areaPlot", "horizontal");
   var legend1 = new Plottable.Component.Legend(colorScale1);
+  legend1.maxEntriesPerRow(1);
+  
   var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
                                         .addComponent(0,1, legend1);
 

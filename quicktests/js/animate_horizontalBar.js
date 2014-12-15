@@ -21,6 +21,8 @@ function run(div, data, Plottable) {
 
   var hBarRenderer = new Plottable.Plot.HorizontalBar(xScale, yScale).addDataset(dataset);
   hBarRenderer.attr("opacity", 0.75);
+  hBarRenderer.project("x", "x", xScale);
+  hBarRenderer.project("y", "y", yScale);
   hBarRenderer.animate(doAnimate);
 
   var hBarChart = new Plottable.Component.Table([[yAxis, hBarRenderer],

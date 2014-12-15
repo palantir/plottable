@@ -20,6 +20,7 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale).addDataset(dataseries);
+  barPlot.project("x", "x", xScale).project("y", "y", yScale);
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var renderGroup = gridlines.merge(barPlot);
   var title = new Plottable.Component.TitleLabel("reset");

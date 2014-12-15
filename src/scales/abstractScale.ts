@@ -3,12 +3,12 @@
 module Plottable {
 export module Scale {
   export class AbstractScale<D,R> extends Core.PlottableObject implements Core.Listenable {
-    public _d3Scale: D3.Scale.Scale;
-    public _autoDomainAutomatically = true;
-    public broadcaster = new Plottable.Core.Broadcaster(this);
-    public _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
+    protected _d3Scale: D3.Scale.Scale;
+    private _autoDomainAutomatically = true;
+    public broadcaster: Core.Broadcaster;
+    private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     public _typeCoercer: (d: any) => any = (d: any) => d;
-    public _domainModificationInProgress: boolean = false;
+    private _domainModificationInProgress: boolean = false;
     /**
      * Constructs a new Scale.
      *
@@ -22,13 +22,14 @@ export module Scale {
     constructor(scale: D3.Scale.Scale) {
       super();
       this._d3Scale = scale;
+      this.broadcaster = new Core.Broadcaster(this);
     }
 
-    public _getAllExtents(): D[][] {
+    protected _getAllExtents(): D[][] {
       return d3.values(this._rendererAttrID2Extent);
     }
 
-    public _getExtent(): D[] {
+    protected _getExtent(): D[] {
       return []; // this should be overwritten
     }
 
@@ -96,11 +97,11 @@ export module Scale {
       }
     }
 
-    public _getDomain() {
+    protected _getDomain() {
       return this._d3Scale.domain();
     }
 
-    public _setDomain(values: D[]) {
+    protected _setDomain(values: D[]) {
       if(!this._domainModificationInProgress) {
         this._domainModificationInProgress = true;
         this._d3Scale.domain(values);

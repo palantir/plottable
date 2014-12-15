@@ -52,6 +52,8 @@ describe("DragBoxInteractions", () => {
       yScale = new Plottable.Scale.Linear();
       plot = new Plottable.Plot.Scatter(xScale, yScale);
       plot.addDataset(dataset);
+      plot.project("x", "x", xScale);
+      plot.project("y", "y", yScale);
       plot.renderTo(svg);
 
       interaction = new Plottable.Interaction.DragBox();
@@ -94,8 +96,8 @@ describe("DragBoxInteractions", () => {
 
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
-      var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox).CLASS_DRAG_BOX;
-      var dragBox = plot._backgroundContainer.select(dragBoxClass);
+      var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox)._CLASS_DRAG_BOX;
+      var dragBox = plot.background().select(dragBoxClass);
       assert.isNotNull(dragBox, "the dragbox was created");
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};
       var expectedStartPosition = {x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY)};
@@ -196,6 +198,8 @@ describe("DragBoxInteractions", () => {
       yScale = new Plottable.Scale.Linear();
       plot = new Plottable.Plot.Scatter(xScale, yScale);
       plot.addDataset(dataset);
+      plot.project("x", "x", xScale);
+      plot.project("y", "y", yScale);
       plot.renderTo(svg);
 
       interaction = new Plottable.Interaction.YDragBox();
@@ -233,8 +237,8 @@ describe("DragBoxInteractions", () => {
 
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
-      var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox).CLASS_DRAG_BOX;
-      var dragBox = plot._backgroundContainer.select(dragBoxClass);
+      var dragBoxClass = "." + (<any> Plottable.Interaction.XYDragBox)._CLASS_DRAG_BOX;
+      var dragBox = plot.background().select(dragBoxClass);
       assert.isNotNull(dragBox, "the dragbox was created");
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};
       var expectedStartPosition = {x: 0, y: Math.min(dragstartY, dragendY)};

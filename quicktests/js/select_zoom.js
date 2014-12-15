@@ -24,6 +24,7 @@ function run(div, data, Plottable) {
   for (var i=0; i<numRenderers; i++) {
     var d = data[0].slice(i*10, i*10 + 10);
     var renderer = new Plottable.Plot.Scatter(xScale, yScale).addDataset(d);
+    renderer.project("x", "x", xScale).project("y", "y", yScale);
     renderers.push(renderer);
   }
 
@@ -44,6 +45,7 @@ function run(div, data, Plottable) {
 
   var legendLabel = new Plottable.Component.TitleLabel("fat");
   var legend = new Plottable.Component.Legend(colorScale);
+  legend.maxEntriesPerRow(1);
   var legendTable = new Plottable.Component.Table([[legendLabel], [legend]]);
 
   var outerTable = new Plottable.Component.Table([[chart, legendTable]]);

@@ -6,7 +6,8 @@ export module Plot {
    * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
    */
   export class Area<X> extends Line<X> {
-    private areaPath: D3.Selection;
+    private _areaPath: D3.Selection;
+    private _defaultFillColor: string;
 
     /**
      * Constructs an AreaPlot.
@@ -19,30 +20,26 @@ export module Plot {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this.project("y0", 0, yScale); // default
-      this.project("fill-opacity", () => 0.25); // default
 
-      var defaultColor = new Scale.Color().range()[0];
-      this.project("fill", () => defaultColor); // default
-      this.project("stroke", () => defaultColor); // default
-
-      this._animators["reset"] = new Animator.Null();
-      this._animators["main"]  = new Animator.Base()
-                                             .duration(600)
-                                             .easing("exp-in-out");
+      this.animator("reset", new Animator.Null());
+      this.animator("main", new Animator.Base()
+                                        .duration(600)
+                                        .easing("exp-in-out"));
+      this._defaultFillColor = new Scale.Color().range()[0];
     }
 
-    public _onDatasetUpdate() {
+    protected _onDatasetUpdate() {
       super._onDatasetUpdate();
       if (this._yScale != null) {
         this._updateYDomainer();
       }
     }
 
-     public _getDrawer(key: string) {
+    protected _getDrawer(key: string) {
       return new Plottable._Drawer.Area(key);
     }
 
-    public _updateYDomainer() {
+    protected _updateYDomainer() {
       super._updateYDomainer();
 
       var constantBaseline: number;
@@ -59,9 +56,9 @@ export module Plot {
 
       if (!this._yScale._userSetDomainer) {
         if (constantBaseline != null) {
-          this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+          this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this.getID());
         } else {
-          this._yScale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
+          this._yScale.domainer().removePaddingException("AREA_PLOT+" + this.getID());
         }
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         this._yScale._autoDomainIfAutomaticMode();
@@ -76,14 +73,22 @@ export module Plot {
       return this;
     }
 
-    public _getResetYFunction() {
+    protected _getResetYFunction() {
       return this._generateAttrToProjector()["y0"];
     }
 
-    public _wholeDatumAttributes() {
+    protected _wholeDatumAttributes() {
       var wholeDatumAttributes = super._wholeDatumAttributes();
       wholeDatumAttributes.push("y0");
       return wholeDatumAttributes;
+    }
+
+    protected _generateAttrToProjector() {
+      var attrToProjector = super._generateAttrToProjector();
+      attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultFillColor);
+      return attrToProjector;
     }
   }
 }

@@ -39,11 +39,17 @@ function run(div, data, Plottable) {
 
   //rendering
   var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries1);
+  scatterPlot.project("x", "x", xScale).project("y", "y", yScale);
   var linePlot = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries2);
+  linePlot.project("x", "x", xScale).project("y", "y", yScale);
   var renderApple = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries3);
+  renderApple.project("x", "x", xScale).project("y", "y", yScale);
   var renderBanana = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries4);
+  renderBanana.project("x", "x", xScale).project("y", "y", yScale);
   var renderOrange = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries5);
+  renderOrange.project("x", "x", xScale).project("y", "y", yScale);
   var renderGrape = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries6);
+  renderGrape.project("x", "x", xScale).project("y", "y", yScale);
 
   scatterPlot.attr("fill", colorProjector);
   linePlot.attr("stroke", colorProjector);
@@ -103,6 +109,7 @@ function run(div, data, Plottable) {
   //title + legend
   var title1 = new Plottable.Component.TitleLabel( "Two Data Series", "horizontal");
   var legend1 = new Plottable.Component.Legend(colorScale1);
+  legend1.maxEntriesPerRow(1);
   var titleTable = new Plottable.Component.Table([[title1, legend1]]);
 
   var noTitleLabel  = new Plottable.Component.Label("no title", "horizontal");

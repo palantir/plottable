@@ -4,6 +4,9 @@ module Plottable {
 export module Scale {
   export class Color extends AbstractScale<string, string> {
 
+    private static HEX_SCALE_FACTOR = 20;
+    private _lightenAmount: number;
+
     /**
      * Constructs a ColorScale.
      *
@@ -17,7 +20,7 @@ export module Scale {
       switch (scaleType) {
         case null:
         case undefined:
-          scale = d3.scale.ordinal().range(Color.getPlottableColors());
+          scale = d3.scale.ordinal().range(Color._getPlottableColors());
           break;
         case "Category10":
         case "category10":
@@ -43,10 +46,11 @@ export module Scale {
           throw new Error("Unsupported ColorScale type");
       }
       super(scale);
+      this._lightenAmount = 0.16;
     }
 
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
-    public _getExtent(): string[] {
+    protected _getExtent(): string[] {
       var extents = this._getAllExtents();
       var concatenatedExtents: string[] = [];
       extents.forEach((e) => {
@@ -55,7 +59,7 @@ export module Scale {
       return _Util.Methods.uniq(concatenatedExtents);
     }
 
-    private static getPlottableColors(): string[] {
+    private static _getPlottableColors(): string[] {
       var plottableDefaultColors: string[] = [];
       var colorTester = d3.select("body").append("div");
       var i = 0;
@@ -66,6 +70,15 @@ export module Scale {
       }
       colorTester.remove();
       return plottableDefaultColors;
+    }
+
+    // Modifying the original scale method so that colors that are looped are lightened according
+    // to how many times they are looped.
+    public scale(value: string): string {
+      var color = super.scale(value);
+      var index = this.domain().indexOf(value);
+      var modifyFactor = Math.floor(index / this.range().length);
+      return _Util.Methods.lightenColor(color, modifyFactor, this._lightenAmount);
     }
   }
 }

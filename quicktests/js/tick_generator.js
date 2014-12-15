@@ -16,12 +16,13 @@ function run(div, data, Plottable) {
   var titleLabel = new Plottable.Component.TitleLabel("Ticks in Increments of 0.2");
 
   var plot = new Plottable.Plot.Line(xScale, yScale);
+  plot.project("x", "x", xScale).project("y", "y", yScale);
     plot.addDataset(data);
 
   var chart = new Plottable.Component.Table([
                                             [null, titleLabel],
-                                            [yAxis, plot], 
+                                            [yAxis, plot],
                                             [null, xAxis]
-                                            ]); 
+                                            ]);
   chart.renderTo(svg);
 }

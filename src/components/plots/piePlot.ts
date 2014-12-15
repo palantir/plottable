@@ -14,7 +14,7 @@ export module Plot {
    */
   export class Pie extends AbstractPlot {
 
-    private colorScale: Scale.Color;
+    private _colorScale: Scale.Color;
 
     /**
      * Constructs a PiePlot.
@@ -23,7 +23,7 @@ export module Plot {
      */
     constructor() {
       super();
-      this.colorScale = new Scale.Color();
+      this._colorScale = new Scale.Color();
       this.classed("pie-plot", true);
     }
 
@@ -32,30 +32,27 @@ export module Plot {
       this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
     }
 
-    public _addDataset(key: string, dataset: Dataset) {
+    public addDataset(keyOrDataset: any, dataset?: any) {
       if (this._datasetKeysInOrder.length === 1) {
         _Util.Methods.warn("Only one dataset is supported in Pie plots");
-        return;
+        return this;
       }
-      super._addDataset(key, dataset);
+      super.addDataset(keyOrDataset, dataset);
+      return this;
     }
 
-
-    public _generateAttrToProjector(): AttributeToProjector {
+    protected _generateAttrToProjector(): AttributeToProjector {
       var attrToProjector = super._generateAttrToProjector();
       attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
       attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
 
-      var defaultFillFunction = (d: any, i: number) => this.colorScale.scale(String(i));
+      var defaultFillFunction = (d: any, i: number) => this._colorScale.scale(String(i));
       attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
-
-      var defaultAccessor = (d: any) => d.value;
-      attrToProjector["value"] = attrToProjector["value"] || defaultAccessor;
 
       return attrToProjector;
     }
 
-    public _getDrawer(key: string): _Drawer.AbstractDrawer {
+    protected _getDrawer(key: string): _Drawer.AbstractDrawer {
       return new Plottable._Drawer.Arc(key).setClass("arc");
     }
   }

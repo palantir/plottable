@@ -15,14 +15,14 @@ export module Axis {
      * The css class applied to each tick label (the text associated with the tick).
      */
     public static TICK_LABEL_CLASS = "tick-label";
-    public _tickMarkContainer: D3.Selection;
-    public _tickLabelContainer: D3.Selection;
-    public _baseline: D3.Selection;
-    public _scale: Scale.AbstractScale<any, number>;
-    public _formatter: Formatter;
-    public _orientation: string;
-    public _computedWidth: number;
-    public _computedHeight: number;
+    protected _tickMarkContainer: D3.Selection;
+    protected _tickLabelContainer: D3.Selection;
+    protected _baseline: D3.Selection;
+    protected _scale: Scale.AbstractScale<any, number>;
+    private _formatter: Formatter;
+    private _orientation: string;
+    protected _computedWidth: number;
+    protected _computedHeight: number;
     private _endTickLength = 5;
     private _tickLength = 5;
     private _tickLabelPadding = 10;
@@ -63,17 +63,17 @@ export module Axis {
       this._scale.broadcaster.deregisterListener(this);
     }
 
-    public _isHorizontal() {
+    protected _isHorizontal() {
       return this._orientation === "top" || this._orientation === "bottom";
     }
 
-    public _computeWidth() {
+    protected _computeWidth() {
       // to be overridden by subclass logic
       this._computedWidth = this._maxLabelTickLength();
       return this._computedWidth;
     }
 
-    public _computeHeight() {
+    protected _computeHeight() {
       // to be overridden by subclass logic
       this._computedHeight = this._maxLabelTickLength();
       return this._computedHeight;
@@ -111,7 +111,7 @@ export module Axis {
       return !this._isHorizontal();
     }
 
-    public _rescale() {
+    protected _rescale() {
       // default implementation; subclasses may call _invalidateLayout() here
       this._render();
     }
@@ -125,7 +125,7 @@ export module Axis {
       }
     }
 
-    public _setup() {
+    protected _setup() {
       super._setup();
       this._tickMarkContainer = this._content.append("g")
                                             .classed(AbstractAxis.TICK_MARK_CLASS + "-container", true);
@@ -138,7 +138,7 @@ export module Axis {
      * Function for generating tick values in data-space (as opposed to pixel values).
      * To be implemented by subclasses.
      */
-    public _getTickValues(): any[] {
+    protected _getTickValues(): any[] {
       return [];
     }
 
@@ -155,7 +155,7 @@ export module Axis {
       this._baseline.attr(this._generateBaselineAttrHash());
     }
 
-    public _generateBaselineAttrHash() {
+    protected _generateBaselineAttrHash() {
       var baselineAttrHash = {
         x1: 0,
         y1: 0,
@@ -188,7 +188,7 @@ export module Axis {
       return baselineAttrHash;
     }
 
-    public _generateTickMarkAttrHash(isEndTickMark = false) {
+    protected _generateTickMarkAttrHash(isEndTickMark = false) {
       var tickMarkAttrHash = {
         x1: <any> 0,
         y1: <any> 0,
@@ -236,7 +236,7 @@ export module Axis {
       super._invalidateLayout();
     }
 
-    public _setDefaultAlignment() {
+    protected _setDefaultAlignment() {
       switch(this._orientation) {
         case "bottom":
           this.yAlign("top");
@@ -333,7 +333,7 @@ export module Axis {
       }
     }
 
-    public _maxLabelTickLength() {
+    protected _maxLabelTickLength() {
       if (this.showEndTickLabels()) {
         return Math.max(this.tickLength(), this.endTickLength());
       } else {
@@ -454,7 +454,7 @@ export module Axis {
       return this;
     }
 
-    public _hideEndTickLabels() {
+    protected _hideEndTickLabels() {
       var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
 
       var isInsideBBox = (tickBox: ClientRect) => {
@@ -480,7 +480,7 @@ export module Axis {
       }
     }
 
-    public _hideOverlappingTickLabels() {
+    protected _hideOverlappingTickLabels() {
       var visibleTickLabels = this._tickLabelContainer
                                     .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
                                     .filter(function(d: any, i: number) {

@@ -21,7 +21,7 @@ export module Component {
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var requests = this._components.map((c: AbstractComponent) => c._requestedSpace(offeredWidth, offeredHeight));
+      var requests = this.components().map((c: AbstractComponent) => c._requestedSpace(offeredWidth, offeredHeight));
       return {
         width : _Util.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.width, 0),
         height: _Util.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.height, 0),
@@ -40,18 +40,18 @@ export module Component {
                    availableWidth?: number,
                   availableHeight?: number): Group {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
-      this._components.forEach((c) => {
+      this.components().forEach((c) => {
         c._computeLayout(0, 0, this.width(), this.height());
       });
       return this;
     }
 
     public _isFixedWidth(): boolean {
-      return this._components.every((c) => c._isFixedWidth());
+      return false;
     }
 
     public _isFixedHeight(): boolean {
-      return this._components.every((c) => c._isFixedHeight());
+      return false;
     }
   }
 }

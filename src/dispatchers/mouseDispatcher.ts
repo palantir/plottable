@@ -17,24 +17,24 @@ export module Dispatcher {
 
       this._event2Callback["mouseover"] = () => {
         if (this._mouseover != null) {
-          this._mouseover(this.getMousePosition());
+          this._mouseover(this._getMousePosition());
         }
       };
 
       this._event2Callback["mousemove"] = () => {
         if (this._mousemove != null) {
-          this._mousemove(this.getMousePosition());
+          this._mousemove(this._getMousePosition());
         }
       };
 
       this._event2Callback["mouseout"] = () => {
         if (this._mouseout != null) {
-          this._mouseout(this.getMousePosition());
+          this._mouseout(this._getMousePosition());
         }
       };
     }
 
-    private getMousePosition(): Point {
+    private _getMousePosition(): Point {
       var xy = d3.mouse(this._target.node());
       return {
             x: xy[0],
