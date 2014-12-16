@@ -75,7 +75,7 @@ describe("Labels", () => {
   });
 
   it("text in a tiny box is truncated to empty string", () => {
-    var svg = generateSVG(5, 5);
+    var svg = generateSVG(10, 10);
     var label = new Plottable.Component.TitleLabel("Yeah, not gonna fit...");
     label.renderTo(svg);
     var text = (<any> label)._content.select("text");

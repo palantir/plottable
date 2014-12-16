@@ -29,7 +29,7 @@
   ],
   "dependencies": {
     "d3": "3.4.13",
-    "svg-typewriter": "0.1.3"
+    "svg-typewriter": "0.1.4"
   },
   "homepage": "plottablejs.org",
   "repository": {

@@ -1,5 +1,5 @@
 /*!
-SVG Typewriter 0.1.3 (https://github.com/palantir/svg-typewriter)
+SVG Typewriter 0.1.4 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
 */
@@ -459,7 +459,7 @@ var SVGTypewriter;
                     wrapping: initialWrappingResult,
                     currentLine: "",
                     availableWidth: width,
-                    availableLines: Math.min(height / measurer.measure().height, this._maxLines),
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
                     canFitText: true
                 };
                 var lines = text.split("\n");
