@@ -5560,7 +5560,7 @@ var Plottable;
             Label.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._textContainer = this._content.append("g");
-                this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._textContainer);
+                this._measurer = new SVGTypewriter.Measurers.Measurer(this._textContainer);
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
                 this.text(this._text);
@@ -5622,11 +5622,6 @@ var Plottable;
                     textRotation: textRotation[this.orient()]
                 };
                 this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
-            };
-            Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                this._measurer.reset();
-                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                return this;
             };
             return Label;
         })(Component.AbstractComponent);

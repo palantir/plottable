@@ -6,7 +6,7 @@ export module Component {
     private _textContainer: D3.Selection;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private _orientation: string;
-    private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
+    private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
     private _xAlignment: string;
@@ -78,7 +78,7 @@ export module Component {
     protected _setup() {
       super._setup();
       this._textContainer = this._content.append("g");
-      this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._textContainer);
+      this._measurer = new SVGTypewriter.Measurers.Measurer(this._textContainer);
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
       this.text(this._text);
@@ -180,12 +180,6 @@ export module Component {
                         textRotation: textRotation[this.orient()]
                     };
       this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
-    }
-
-    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-      this._measurer.reset();
-      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-      return this;
     }
   }
 
