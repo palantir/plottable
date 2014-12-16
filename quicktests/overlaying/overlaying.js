@@ -71,6 +71,60 @@ var secondBranch;
 var svgWidth;
 var svgHeight;
 
+//initializing methods
+function setupBindings(){
+
+  //sidebar checkbox check handler
+  $( "input[type=checkbox]" ).on( "click", function(){
+    var plotName = this.parentNode.textContent;
+    plotName = plotName.replace(" ", "");
+    togglePlotDisplay(plotName);
+  });
+
+  // show/hide according to hotkey events
+  window.onkeyup = function(e){
+    var key = e.keyCode ? e.keyCode : e.which;
+
+    var inputActive = $("#branch1, #branch2, #width, #height").is(':focus');
+    if(inputActive){return;}
+
+    var visibleQuickTests = $(".quicktest").toArray();
+
+    processKeyEvent(key, visibleQuickTests);
+  };
+
+  $("#help").hover(function(){
+    $("#test-category-descriptions").fadeIn('fast');
+  }, function() {
+      // Hover out code
+      $("#test-category-descriptions").css("display", "none");
+  }).mousemove(function(e) {
+      var windowWidth = window.innerWidth;
+      var helpY = $("#help").position().top;
+      
+      $("#test-category-descriptions").css({ top: helpY + 28, left: windowWidth - 360 });
+  });
+
+}//setupBindings
+
+function populatePlotList(){
+  // plots.forEach(function(plot){
+  //   div.append("div").attr("class","single-plot " + plot.name);
+  // });
+}
+
+function populateSidebarList(paths, pathsInCategory, testsInCategory){
+  debugger;
+  // var startString = "<div class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
+  // var endString = "</div>";
+  // plots.forEach(function(plot){
+  //   var finalstring = startString + plot.name + endString;
+  //   $(".sidebar").append(finalstring);
+  // });
+  // $(".quicktest-checkbox").attr("checked", true);
+}
+
+
 //METHODS
 
 function setTestBoxDimensions(){
@@ -120,14 +174,17 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
     
 }
 
-//filter all quicktests by category from list_of_quicktests.json
+//filter all quicktests by category from list_of_quicktests.json & also load sidebar
 function filterQuickTests(category, branchList){
   //filter list of quicktests to list of quicktest names to pass to doSomething
   d3.json("list_of_quicktests.json", function (data){
     var paths = data.map(function(quickTestObj) {return quickTestObj.path;});
     var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1;});
-    var qtestnames = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, '');});
-    loadQuickTestsInCategory(qtestnames, category, branchList[0], branchList[1]);
+    var testsInCategory = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, '');});
+    //
+    loadQuickTestsInCategory(testsInCategory, category, branchList[0], branchList[1]);
+    
+    populateSidebarList(paths, pathsInCategory, testsInCategory);
   });
 }
 
@@ -229,31 +286,9 @@ function processKeyEvent(key, visibleQuickTests){
   return;
 }
 
-
-// show/hide according to hotkey events
-window.onkeyup = function(e){
-  var key = e.keyCode ? e.keyCode : e.which;
-
-  var inputActive = $("#branch1, #branch2, #width, #height").is(':focus');
-  if(inputActive){return;}
-
-  var visibleQuickTests = $(".quicktest").toArray();
-
-  processKeyEvent(key, visibleQuickTests);
-};
-
-$("#help").hover(function(){
-  $("#test-category-descriptions").fadeIn('fast');
-}, function() {
-    // Hover out code
-    $("#test-category-descriptions").css("display", "none");
-}).mousemove(function(e) {
-    var mouseX = e.pageX; //Get X coordinates
-    var mouseY = e.pageY; //Get Y coordinates
-    var helpY = $("#help").position().top;
-    var helpX = $("#help").position().left;
-    $("#test-category-descriptions").css({ top: helpY + 28, left: helpX - 318 });
-});
+// populateSidebarList();
+// populatePlotList();
+setupBindings();
 
 var button = document.getElementById("render");
 button.onclick = initialize;
