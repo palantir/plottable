@@ -1,3 +1,39 @@
+
+function expandSidebar(){
+
+  "use strict";
+
+  var content = $(".content");
+  var sidebar = $(".sidebar");
+  var controls = $(".controls");
+
+  if(sidebar.position().left !== 0){
+    sidebar.css("visibility", "visible");
+    sidebar.animate({
+      left: '0%'
+    });
+    content.animate({
+      left: '20%',
+    });
+    controls.animate({
+      width: '80%',
+    });
+  }
+  else{
+    sidebar.animate({
+      left: '-20%'
+    });
+    content.animate({
+      left: '0'
+    }, function(){
+      sidebar.css("visibility", "hidden");
+    });
+    controls.animate({
+      width: '100%',
+    });
+  }
+}
+
 //show svg width & height setting
 function showSizeControls(){
 
