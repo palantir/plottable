@@ -96,9 +96,9 @@ describe("ComponentGroups", () => {
     cg._anchor(svg);
     cg._computeLayout(50, 50, 350, 350);
 
-    var cgTranslate = d3.transform(cg._element.attr("transform")).translate;
-    var c1Translate = d3.transform(c1._element.attr("transform")).translate;
-    var c2Translate = d3.transform(c2._element.attr("transform")).translate;
+    var cgTranslate = d3.transform((<any> cg)._element.attr("transform")).translate;
+    var c1Translate = d3.transform((<any> c1)._element.attr("transform")).translate;
+    var c2Translate = d3.transform((<any> c2)._element.attr("transform")).translate;
     assert.equal(cgTranslate[0], 50, "componentGroup has 50 xOffset");
     assert.equal(cgTranslate[1], 50, "componentGroup has 50 yOffset");
     assert.equal(c1Translate[0], 0, "componentGroup has 0 xOffset");
@@ -157,9 +157,10 @@ describe("ComponentGroups", () => {
     assert.isFalse(cg.empty(), "cg not empty after merging components");
     cg.detachAll();
     assert.isTrue(cg.empty(), "cg empty after detachAll()");
-    assert.isFalse(c1._isAnchored, "c1 was detached");
-    assert.isFalse(c2._isAnchored, "c2 was detached");
-    assert.isFalse(c3._isAnchored, "c3 was detached");
+
+    assert.isFalse((<any> c1)._isAnchored, "c1 was detached");
+    assert.isFalse((<any> c2)._isAnchored, "c2 was detached");
+    assert.isFalse((<any> c3)._isAnchored, "c3 was detached");
     assert.lengthOf(cg.components(), 0, "cg has no components");
   });
 
@@ -167,7 +168,7 @@ describe("ComponentGroups", () => {
     it("_works for an empty ComponentGroup", () => {
         var cg = new Plottable.Component.Group();
         var request = cg._requestedSpace(10, 10);
-        verifySpaceRequest(request, 10, 10, false, false, "");
+        verifySpaceRequest(request, 0, 0, false, false, "");
     });
 
     it("works for a ComponentGroup with only proportional-size components", () => {
@@ -176,7 +177,7 @@ describe("ComponentGroups", () => {
       var c2 = new Plottable.Component.AbstractComponent();
       cg.merge(c1).merge(c2);
       var request = cg._requestedSpace(10, 10);
-      verifySpaceRequest(request, 10, 10, false, false, "");
+      verifySpaceRequest(request, 0, 0, false, false, "");
     });
 
     it("works when there are fixed-size components", () => {
@@ -188,7 +189,7 @@ describe("ComponentGroups", () => {
       fixComponentSize(c1, null, 10);
       fixComponentSize(c2, null, 50);
       var request = cg._requestedSpace(10, 10);
-      verifySpaceRequest(request, 10, 50, false, true, "");
+      verifySpaceRequest(request, 0, 50, false, true, "");
     });
   });
 

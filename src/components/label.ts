@@ -75,7 +75,7 @@ export module Component {
       };
     }
 
-    public _setup() {
+    protected _setup() {
       super._setup();
       this._textContainer = this._content.append("g");
       this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._textContainer);
@@ -165,6 +165,7 @@ export module Component {
 
     public _doRender() {
       super._doRender();
+      this._textContainer.selectAll("g").remove();
       var textMeasurement = this._measurer.measure(this._text);
       var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
       var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
@@ -178,7 +179,7 @@ export module Component {
                         yAlign: this._yAlignment,
                         textRotation: textRotation[this.orient()]
                     };
-      this._writer.write(this._text, writeWidth, writeHeight, writeOptions)
+      this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {

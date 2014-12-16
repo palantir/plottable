@@ -1,4 +1,4 @@
-///<reference path="../../reference.ts" />
+//<reference path="../../reference.ts" />
 
 module Plottable {
 export module Axis {
@@ -27,7 +27,7 @@ export module Axis {
       super(scale, orientation, formatter);
     }
 
-    public _setup() {
+    protected _setup() {
       super._setup();
       this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer, AbstractAxis.TICK_LABEL_CLASS);
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
@@ -63,11 +63,11 @@ export module Axis {
       return this._computedHeight;
     }
 
-    public _getTickValues(): any[] {
+    protected _getTickValues(): any[] {
       return (<Scale.AbstractQuantitative<number>> this._scale).ticks();
     }
 
-    public _rescale() {
+    protected _rescale() {
       if (!this._isSetup) {
         return;
       }

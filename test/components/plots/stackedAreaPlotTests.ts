@@ -41,7 +41,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var areas = renderer._renderArea.selectAll(".area");
+      var areas = (<any> renderer)._renderArea.selectAll(".area");
       var area0 = d3.select(areas[0][0]);
       var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
       var d0Ys = d0.slice(1, d0.length - 1).map((s) => parseFloat(s.split(",")[1]));
@@ -89,7 +89,7 @@ describe("Plots", () => {
     });
 
     it("path elements rendered correctly", () => {
-      var areas = renderer._renderArea.selectAll(".area");
+      var areas = (<any> renderer)._renderArea.selectAll(".area");
       var area0 = d3.select(areas[0][0]);
       assert.strictEqual(area0.attr("d"), null, "no path string on an empty dataset");
 
@@ -342,7 +342,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var areas = renderer._renderArea.selectAll(".area");
+      var areas = (<any> renderer)._renderArea.selectAll(".area");
       var area0 = d3.select(areas[0][0]);
       var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
       var d0Ys = d0.slice(1, d0.length - 1).map((s) => parseFloat(s.split(",")[1]));
@@ -361,7 +361,7 @@ describe("Plots", () => {
 
     it("project works correctly", () => {
       renderer.project("check", "type");
-      var areas = renderer._renderArea.selectAll(".area");
+      var areas = (<any> renderer)._renderArea.selectAll(".area");
       var area0 = d3.select(areas[0][0]);
       assert.strictEqual(area0.attr("check"), "a", "projector has been applied to first area");
 
