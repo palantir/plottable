@@ -4965,7 +4965,7 @@ var Plottable;
                     return this._computedHeight;
                 }
                 var textHeight = this._measureTextHeight();
-                this._tierHeights = this._tierLabelPositions.map(function (pos) { return textHeight + 2 * _this.tickLabelPadding() + ((pos === "between") ? 0 : _this._maxLabelTickLength()); });
+                this._tierHeights = this._tierLabelPositions.map(function (pos) { return textHeight + _this.tickLabelPadding() + ((pos === "between") ? 0 : (_this.tickLabelPadding() + _this._maxLabelTickLength())); });
                 this._computedHeight = this._tierHeights.reduce(function (height, tier) { return height + tier; }, 0);
                 return this._computedHeight;
             };

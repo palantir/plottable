@@ -245,7 +245,7 @@ export module Axis {
       }
       var textHeight = this._measureTextHeight();
       this._tierHeights = this._tierLabelPositions.map((pos: string) =>
-        textHeight + 2 * this.tickLabelPadding() + ((pos === "between") ? 0 : this._maxLabelTickLength()));
+        textHeight + this.tickLabelPadding() + ((pos === "between") ? 0 : (this.tickLabelPadding() + this._maxLabelTickLength())));
       this._computedHeight = this._tierHeights.reduce((height: number, tier: number) =>
         height + tier,
         0);
