@@ -103,6 +103,10 @@ input, select{
   margin-right: 10px;
 }
 
+#help:hover{
+  background-color: white;
+}
+
 #test-category-descriptions{
   width: 300px;
   display: none;
@@ -115,6 +119,5 @@ input, select{
   color:#fff;
   font-size: 13px;
   font-weight: lighter;
-  background-color: white;
 }
 

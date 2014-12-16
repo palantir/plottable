@@ -8,5 +8,6 @@ function run(svg, data, Plottable) {
 
   new Plottable.Plot.Pie()
                     .addDataset(data)
+                    .project("value", "value")
                     .renderTo(svg);
 }
