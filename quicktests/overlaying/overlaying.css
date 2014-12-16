@@ -80,12 +80,12 @@ input, select{
 
 .size-controls{
   background-color: #41407D;
+  top: 50px;
   width: 100%;
   height: 50px;
   position: fixed;
   text-align: center;
   z-index: 1;
-  left: 0px;
   display:none;
 }
 

@@ -6,6 +6,8 @@ function expandSidebar(){
   var content = $(".content");
   var sidebar = $(".sidebar");
   var controls = $(".controls");
+  var sizeControls = $(".size-controls");
+
 
   if(sidebar.position().left !== 0){
     sidebar.css("visibility", "visible");
@@ -16,6 +18,9 @@ function expandSidebar(){
       left: '20%',
     });
     controls.animate({
+      width: '80%',
+    });
+    sizeControls.animate({
       width: '80%',
     });
   }
@@ -29,6 +34,9 @@ function expandSidebar(){
       sidebar.css("visibility", "hidden");
     });
     controls.animate({
+      width: '100%',
+    });
+    sizeControls.animate({
       width: '100%',
     });
   }
