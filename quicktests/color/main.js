@@ -77,8 +77,9 @@ function setupBindings(){
   }).mousemove(function(e) {
       var mouseX = e.pageX; //Get X coordinates
       var mouseY = e.pageY; //Get Y coordinates
+      var helpY = $("#help").position().top;
       var helpX = $("#help").position().left;
-      $("#help-description").css({ top: 38, left: helpX - 318 });
+      $("#help-description").css({ top: helpY + 28, left: helpX - 318 });
   });
 }
 
