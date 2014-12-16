@@ -5129,7 +5129,8 @@ var Plottable;
             }
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._measurer = new SVGTypewriter.Measurers.Measurer(this._tickLabelContainer, Axis.AbstractAxis.TICK_LABEL_CLASS);
+                this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer, Axis.AbstractAxis.TICK_LABEL_CLASS);
+                this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
             };
             Numeric.prototype._computeWidth = function () {
                 var _this = this;
@@ -5255,7 +5256,7 @@ var Plottable;
                     if (!_this._isHorizontal()) {
                         var availableTextSpace = _this.width() - _this.tickLabelPadding();
                         availableTextSpace -= _this._tickLabelPositioning === "center" ? _this._maxLabelTickLength() : 0;
-                        formattedText = Plottable._Util.Text.getTruncatedText(formattedText, availableTextSpace, _this._measurer);
+                        formattedText = _this._wrapper.wrap(formattedText, _this._measurer, availableTextSpace).wrappedText;
                     }
                     return formattedText;
                 });
@@ -5353,6 +5354,8 @@ var Plottable;
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
+                this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
+                this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
             };
             Category.prototype._rescale = function () {
                 return this._invalidateLayout();
@@ -5393,24 +5396,26 @@ var Plottable;
                 this._invalidateLayout();
                 return this;
             };
-            Category.prototype._tickLabelOrientation = function () {
-                switch (this._tickLabelAngle) {
-                    case 0:
-                        return "horizontal";
-                    case -90:
-                        return "left";
-                    case 90:
-                        return "right";
-                    default:
-                        throw new Error("bad orientation");
-                }
-            };
             /**
              * Measures the size of the ticks while also writing them to the DOM.
              * @param {D3.Selection} ticks The tick elements to be written to.
              */
             Category.prototype._drawTicks = function (axisWidth, axisHeight, scale, ticks) {
-                return this._drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, true);
+                var self = this;
+                var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
+                var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+                ticks.each(function (d) {
+                    var bandWidth = scale.fullBandStartAndWidth(d)[1];
+                    var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
+                    var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
+                    var writeOptions = {
+                        selection: d3.select(this),
+                        xAlign: xAlign[self.orient()],
+                        yAlign: yAlign[self.orient()],
+                        textRotation: self.tickLabelAngle()
+                    };
+                    self._writer.write(self.formatter()(d), width, height, writeOptions);
+                });
             };
             /**
              * Measures the size of the ticks without making any (permanent) DOM
@@ -5419,40 +5424,19 @@ var Plottable;
              * @param {string[]} ticks The strings that will be printed on the ticks.
              */
             Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, ticks) {
-                return this._drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, false);
-            };
-            Category.prototype._drawOrMeasureTicks = function (axisWidth, axisHeight, scale, dataOrTicks, draw) {
-                var self = this;
-                var textWriteResults = [];
-                var tm = function (s) { return self._measurer.measure(s); };
-                var iterator = draw ? function (f) { return dataOrTicks.each(f); } : function (f) { return dataOrTicks.forEach(f); };
-                iterator(function (d) {
-                    var bandWidth = scale.fullBandStartAndWidth(d)[1];
-                    var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
-                    var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
-                    var textWriteResult;
-                    var formatter = self.formatter();
-                    if (draw) {
-                        var d3this = d3.select(this);
-                        var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
-                        var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self._tickLabelOrientation(), {
-                            g: d3this,
-                            xAlign: xAlign[self.orient()],
-                            yAlign: yAlign[self.orient()]
-                        });
-                    }
-                    else {
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self._tickLabelOrientation());
-                    }
-                    textWriteResults.push(textWriteResult);
+                var _this = this;
+                var wrappingResults = ticks.map(function (s) {
+                    var bandWidth = scale.fullBandStartAndWidth(s)[1];
+                    var width = _this._isHorizontal() ? bandWidth : axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
+                    var height = _this._isHorizontal() ? axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding() : bandWidth;
+                    return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
                 });
                 var widthFn = this._isHorizontal() ? d3.sum : Plottable._Util.Methods.max;
                 var heightFn = this._isHorizontal() ? Plottable._Util.Methods.max : d3.sum;
                 return {
-                    textFits: textWriteResults.every(function (t) { return t.textFits; }),
-                    usedWidth: widthFn(textWriteResults, function (t) { return t.usedWidth; }, 0),
-                    usedHeight: heightFn(textWriteResults, function (t) { return t.usedHeight; }, 0)
+                    textFits: wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText); }),
+                    usedWidth: widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0),
+                    usedHeight: heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0)
                 };
             };
             Category.prototype._doRender = function () {

@@ -10,6 +10,7 @@ export module Axis {
     private _showFirstTickLabel = false;
     private _showLastTickLabel = false;
     private _measurer: SVGTypewriter.Measurers.Measurer;
+    private _wrapper: SVGTypewriter.Wrappers.Wrapper;
 
     /**
      * Constructs a NumericAxis.
@@ -28,7 +29,8 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this._measurer = new SVGTypewriter.Measurers.Measurer(this._tickLabelContainer, AbstractAxis.TICK_LABEL_CLASS);
+      this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer, AbstractAxis.TICK_LABEL_CLASS);
+      this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
     }
 
     public _computeWidth() {
@@ -176,7 +178,7 @@ export module Axis {
                   if (!this._isHorizontal()) {
                     var availableTextSpace = this.width() - this.tickLabelPadding();
                     availableTextSpace -= this._tickLabelPositioning === "center" ? this._maxLabelTickLength() : 0;
-                    formattedText = _Util.Text.getTruncatedText(formattedText, availableTextSpace, this._measurer);
+                    formattedText = this._wrapper.wrap(formattedText, this._measurer, availableTextSpace).wrappedText;
                   }
                   return formattedText;
                 });

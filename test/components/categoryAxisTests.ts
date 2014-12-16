@@ -116,18 +116,17 @@ describe("Category Axes", () => {
     axis.tickLabelAngle(90);
     text = ticks[0].map((d: any) => d3.select(d).text());
     assert.deepEqual(text, years, "text displayed correctly when horizontal");
-    assert.operator(axis._content.selectAll(".rotated-right")[0].length, ">=", 4, "the ticks were rotated right");
+    assert.include(axis._content.selectAll(".text-area").attr("transform"), 90, "the ticks were rotated right");
 
     axis.tickLabelAngle(0);
     text = ticks[0].map((d: any) => d3.select(d).text());
     assert.deepEqual(text, years, "text displayed correctly when horizontal");
-    assert.lengthOf(axis._content.selectAll(".rotated-left")[0], 0, "the ticks were not rotated left");
-    assert.lengthOf(axis._content.selectAll(".rotated-right")[0], 0, "the ticks were not rotated right");
+    assert.include(axis._content.selectAll(".text-area").attr("transform"), 0, "the ticks were rotated right");
 
     axis.tickLabelAngle(-90);
     text = ticks[0].map((d: any) => d3.select(d).text());
     assert.deepEqual(text, years, "text displayed correctly when horizontal");
-    assert.operator(axis._content.selectAll(".rotated-left")[0].length, ">=", 4, "the ticks were rotated left");
+    assert.include(axis._content.selectAll(".text-area").attr("transform"), -90, "the ticks were rotated left");
 
     svg.remove();
   });
