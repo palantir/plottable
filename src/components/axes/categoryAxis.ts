@@ -25,14 +25,14 @@ export module Axis {
       this.classed("category-axis", true);
     }
 
-    public _setup() {
+    protected _setup() {
       super._setup();
       this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
     }
 
-    public _rescale() {
+    protected _rescale() {
       return this._invalidateLayout();
     }
 
@@ -61,7 +61,7 @@ export module Axis {
       };
     }
 
-    public _getTickValues(): string[] {
+    protected _getTickValues(): string[] {
       return this._scale.domain();
     }
 

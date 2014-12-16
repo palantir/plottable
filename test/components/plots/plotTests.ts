@@ -23,7 +23,7 @@ describe("Plots", () => {
       var r = new Plottable.Plot.AbstractPlot();
       r._anchor(svg);
       r._computeLayout();
-      var renderArea = r._content.select(".render-area");
+      var renderArea = (<any> r)._content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
       svg.remove();
     });
@@ -113,7 +113,7 @@ describe("Plots", () => {
       var r = new Plottable.Plot.AbstractPlot();
       var s = new Plottable.Scale.Linear().domain([0, 1]).range([0, 10]);
       r.project("attr", "a", s);
-      var attrToProjector = r._generateAttrToProjector();
+      var attrToProjector = (<any> r)._generateAttrToProjector();
       var projector = attrToProjector["attr"];
       assert.equal(projector({"a": 0.5}, 0, null, null), 5, "projector works as intended");
     });
@@ -261,7 +261,7 @@ describe("Plots", () => {
       var additionalPaint = (x: number) => {
         recordedTime = Math.max(x, recordedTime);
       };
-      plot._additionalPaint = additionalPaint;
+      (<any> plot)._additionalPaint = additionalPaint;
       plot.animator("bars", animator);
       var svg = generateSVG();
       plot.project("x", "x", x);

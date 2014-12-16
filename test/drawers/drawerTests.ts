@@ -22,7 +22,7 @@ class MockAnimator implements Plottable.Animator.PlotAnimator {
 
 class MockDrawer extends Plottable._Drawer.AbstractDrawer {
   public _drawStep(step: Plottable._Drawer.DrawStep) {
-    step.animator.animate(this._renderArea, step.attrToProjector);
+    step.animator.animate(this._getRenderArea(), step.attrToProjector);
   }
 }
 

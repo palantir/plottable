@@ -36,11 +36,11 @@ export module Plot {
       return this;
     }
 
-    public _getDrawer(key: string) {
+    protected _getDrawer(key: string) {
       return new Plottable._Drawer.Element(key).svgElement("circle");
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       attrToProjector["cx"] = attrToProjector["x"];
       delete attrToProjector["x"];
@@ -52,7 +52,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): _Drawer.DrawStep[] {
       var drawSteps: _Drawer.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
@@ -64,7 +64,7 @@ export module Plot {
       return drawSteps;
     }
 
-    public _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
+    protected _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
       var attrToProjector = this._generateAttrToProjector();
       var xProjector = attrToProjector["x"];
       var yProjector = attrToProjector["y"];
@@ -81,11 +81,11 @@ export module Plot {
       var closestIndex: number;
       var minDistSq = range * range;
 
-       this._datasetKeysInOrder.forEach((key: string) => {
+      this._datasetKeysInOrder.forEach((key: string) => {
         var dataset = this._key2PlotDatasetKey.get(key).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
         var drawer = <_Drawer.Element>this._key2PlotDatasetKey.get(key).drawer;
-        drawer._getDrawSelection().each(function (d, i) {
+        drawer._getRenderArea().selectAll("circle").each(function(d, i) {
           var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
           var r = attrToProjector["r"](d, i, dataset.metadata(), plotMetadata);
 

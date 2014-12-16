@@ -254,7 +254,7 @@ export module Axis {
       return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
     }
 
-    public _setup() {
+    protected _setup() {
       super._setup();
       this._tierLabelContainers = [];
       for(var i = 0; i < Time._NUM_TIERS; ++i) {
@@ -263,12 +263,11 @@ export module Axis {
       this._measurer = new SVGTypewriter.Measurers.Measurer(this._tierLabelContainers[0]);
     }
 
-
     private _getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
-      return (<Scale.Time> this._scale)._tickInterval(config.interval, config.step);
+      return (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
     }
 
-    public _getTickValues(): any[] {
+    protected _getTickValues(): any[] {
       return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations.reduce(
           (ticks: any[], config: TimeAxisTierConfiguration) => ticks.concat(this._getTickIntervalValues(config)),
           []
@@ -280,7 +279,7 @@ export module Axis {
     }
 
     private _renderTierLabels(container: D3.Selection, config: TimeAxisTierConfiguration, height: number) {
-      var tickPos = (<Scale.Time> this._scale)._tickInterval(config.interval, config.step);
+      var tickPos = (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
       tickPos.splice(0, 0, this._scale.domain()[0]);
       tickPos.push(this._scale.domain()[1]);
       var shouldCenterText = config.step === 1;
