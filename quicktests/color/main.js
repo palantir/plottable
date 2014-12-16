@@ -75,11 +75,10 @@ function setupBindings(){
       // Hover out code
       $("#help-description").css("display", "none");
   }).mousemove(function(e) {
-      var mouseX = e.pageX; //Get X coordinates
-      var mouseY = e.pageY; //Get Y coordinates
+      var windowWidth = window.innerWidth;
       var helpY = $("#help").position().top;
-      var helpX = $("#help").position().left;
-      $("#help-description").css({ top: helpY + 28, left: helpX - 318 });
+      
+      $("#help-description").css({ top: helpY + 28, left: windowWidth - 360 });
   });
 }
 
