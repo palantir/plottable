@@ -14,14 +14,28 @@
 </head>
 
 <body>
+<div class="sidebar"></div>
 
-<div class="navigation">
-    <input id="series" type="text" placeholder="# of Series < 50">
-    <input id="width" type="text" placeholder="Plot Width in Pixels">
-    <input id="height" type="text" placeholder="Plot Height in Pixels">
-    <input id="render" type="submit" value="Plot!">
+<div id="help-description">
+  <p>Test different color schemes with Plottable plots! 
+  <p>Locally change default plottable colors in plottable.css
+  <p>Enter a number of series to render in SVGs of specified width and height
+  <p>Control what plots to hide/show using the sidebar
 </div>
-<div class="results">
+
+<div class="content">
+  <div class="controls">
+      <a id="expand-sidebar" onclick="expandSidebar()" href="#">&#9776;</a>
+      <input id="series" type="text" placeholder="# of Series < 50">
+      <input id="width" type="text" placeholder="Plot Width in Pixels">
+      <input id="height" type="text" placeholder="Plot Height in Pixels">
+      <input id="render" type="button" class="button" value="Plot!">
+      <input id="help" type="button" class="button" value="?">
+
+  </div>
+
+  <div class="results">
+  </div>
 </div>
 
 </body>
