@@ -2230,7 +2230,6 @@ declare module Plottable {
             _computeHeight(): number;
             protected _setup(): void;
             protected _getTickValues(): any[];
-            protected _measureTextHeight(): number;
             _doRender(): Time;
         }
     }
@@ -2416,7 +2415,6 @@ declare module Plottable {
              */
             padding(padAmount: number): Label;
             _doRender(): void;
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
         }
         class TitleLabel extends Label {
             /**

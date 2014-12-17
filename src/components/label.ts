@@ -6,7 +6,9 @@ export module Component {
     private _textContainer: D3.Selection;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private _orientation: string;
-    private _measurer: _Util.Text.TextMeasurer;
+    private _measurer: SVGTypewriter.Measurers.Measurer;
+    private _wrapper: SVGTypewriter.Wrappers.Wrapper;
+    private _writer: SVGTypewriter.Writers.Writer;
     private _xAlignment: string;
     private _yAlignment: string;
     private _padding: number;
@@ -61,7 +63,7 @@ export module Component {
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var desiredWH = this._measurer(this._text);
+      var desiredWH = this._measurer.measure(this._text);
       var desiredWidth  = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
       var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
@@ -76,7 +78,9 @@ export module Component {
     protected _setup() {
       super._setup();
       this._textContainer = this._content.append("g");
-      this._measurer = _Util.Text.getTextMeasurer(this._textContainer.append("text"));
+      this._measurer = new SVGTypewriter.Measurers.Measurer(this._textContainer);
+      this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
+      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
       this.text(this._text);
     }
 
@@ -161,28 +165,21 @@ export module Component {
 
     public _doRender() {
       super._doRender();
-      var textMeasurement = this._measurer(this._text);
+      this._textContainer.selectAll("g").remove();
+      var textMeasurement = this._measurer.measure(this._text);
       var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
       var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
       this._textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
-      this._textContainer.text("");
-      var dimension = this.orient() === "horizontal" ? this.width() : this.height();
-      var truncatedText = _Util.Text.getTruncatedText(this._text, dimension, this._measurer);
       var writeWidth = this.width() - 2 * widthPadding;
       var writeHeight = this.height() - 2 * heightPadding;
-      if (this.orient() === "horizontal") {
-        _Util.Text.writeLineHorizontally(truncatedText, this._textContainer, writeWidth, writeHeight,
-                                        this._xAlignment, this._yAlignment);
-      } else {
-        _Util.Text.writeLineVertically(truncatedText, this._textContainer, writeWidth, writeHeight,
-                                        this._xAlignment, this._yAlignment, this.orient());
-      }
-    }
-
-    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-      this._measurer = _Util.Text.getTextMeasurer(this._textContainer.append("text")); // reset it in case fonts have changed
-      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-      return this;
+      var textRotation: {[s: string]: number} = {horizontal: 0, right: 90, left: -90};
+      var writeOptions = {
+                        selection: this._textContainer,
+                        xAlign: this._xAlignment,
+                        yAlign: this._yAlignment,
+                        textRotation: textRotation[this.orient()]
+                    };
+      this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
     }
   }
 

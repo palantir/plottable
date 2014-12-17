@@ -4949,7 +4949,7 @@ var Plottable;
                 if (this._computedHeight !== null) {
                     return this._computedHeight;
                 }
-                var textHeight = this._measureTextHeight() * 2;
+                var textHeight = this._measurer.measure().height * 2;
                 this.tickLength(textHeight);
                 this.endTickLength(textHeight);
                 this._computedHeight = this._maxLabelTickLength() + 2 * this.tickLabelPadding();
@@ -4967,7 +4967,7 @@ var Plottable;
                 return stepLength;
             };
             Time.prototype._maxWidthForInterval = function (config) {
-                return this._measurer(config.formatter(Time._LONG_DATE)).width;
+                return this._measurer.measure(config.formatter(Time._LONG_DATE)).width;
             };
             /**
              * Check if tier configuration fits in the current width.
@@ -4982,7 +4982,7 @@ var Plottable;
                 for (var i = 0; i < Time._NUM_TIERS; ++i) {
                     this._tierLabelContainers.push(this._content.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
                 }
-                this._measurer = Plottable._Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
+                this._measurer = new SVGTypewriter.Measurers.Measurer(this._tierLabelContainers[0]);
             };
             Time.prototype._getTickIntervalValues = function (config) {
                 return this._scale.tickInterval(config.interval, config.step);
@@ -4990,9 +4990,6 @@ var Plottable;
             Time.prototype._getTickValues = function () {
                 var _this = this;
                 return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations.reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
-            };
-            Time.prototype._measureTextHeight = function () {
-                return this._measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
             };
             Time.prototype._cleanContainer = function (container) {
                 container.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
@@ -5042,7 +5039,7 @@ var Plottable;
             Time.prototype._canFitLabelFilter = function (container, position, bounds, label, isCentered) {
                 var endPosition;
                 var startPosition;
-                var width = this._measurer(label).width + this.tickLabelPadding();
+                var width = this._measurer.measure(label).width + this.tickLabelPadding();
                 var leftBound = this._scale.scale(bounds[0]);
                 var rightBound = this._scale.scale(bounds[1]);
                 if (isCentered) {
@@ -5140,14 +5137,15 @@ var Plottable;
             }
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._measurer = Plottable._Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
+                this._measurer = new SVGTypewriter.Measurers.Measurer(this._tickLabelContainer, Axis.AbstractAxis.TICK_LABEL_CLASS);
+                this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
             };
             Numeric.prototype._computeWidth = function () {
                 var _this = this;
                 var tickValues = this._getTickValues();
                 var textLengths = tickValues.map(function (v) {
                     var formattedValue = _this.formatter()(v);
-                    return _this._measurer(formattedValue).width;
+                    return _this._measurer.measure(formattedValue).width;
                 });
                 var maxTextLength = Plottable._Util.Methods.max(textLengths, 0);
                 if (this._tickLabelPositioning === "center") {
@@ -5159,7 +5157,7 @@ var Plottable;
                 return this._computedWidth;
             };
             Numeric.prototype._computeHeight = function () {
-                var textHeight = this._measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
+                var textHeight = this._measurer.measure().height;
                 if (this._tickLabelPositioning === "center") {
                     this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
                 }
@@ -5266,7 +5264,7 @@ var Plottable;
                     if (!_this._isHorizontal()) {
                         var availableTextSpace = _this.width() - _this.tickLabelPadding();
                         availableTextSpace -= _this._tickLabelPositioning === "center" ? _this._maxLabelTickLength() : 0;
-                        formattedText = Plottable._Util.Text.getTruncatedText(formattedText, availableTextSpace, _this._measurer);
+                        formattedText = _this._wrapper.wrap(formattedText, _this._measurer, availableTextSpace).wrappedText;
                     }
                     return formattedText;
                 });
@@ -5363,7 +5361,9 @@ var Plottable;
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._measurer = new Plottable._Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
+                this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
+                this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
+                this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
             };
             Category.prototype._rescale = function () {
                 return this._invalidateLayout();
@@ -5404,24 +5404,26 @@ var Plottable;
                 this._invalidateLayout();
                 return this;
             };
-            Category.prototype._tickLabelOrientation = function () {
-                switch (this._tickLabelAngle) {
-                    case 0:
-                        return "horizontal";
-                    case -90:
-                        return "left";
-                    case 90:
-                        return "right";
-                    default:
-                        throw new Error("bad orientation");
-                }
-            };
             /**
              * Measures the size of the ticks while also writing them to the DOM.
              * @param {D3.Selection} ticks The tick elements to be written to.
              */
             Category.prototype._drawTicks = function (axisWidth, axisHeight, scale, ticks) {
-                return this._drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, true);
+                var self = this;
+                var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
+                var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+                ticks.each(function (d) {
+                    var bandWidth = scale.fullBandStartAndWidth(d)[1];
+                    var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
+                    var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
+                    var writeOptions = {
+                        selection: d3.select(this),
+                        xAlign: xAlign[self.orient()],
+                        yAlign: yAlign[self.orient()],
+                        textRotation: self.tickLabelAngle()
+                    };
+                    self._writer.write(self.formatter()(d), width, height, writeOptions);
+                });
             };
             /**
              * Measures the size of the ticks without making any (permanent) DOM
@@ -5430,40 +5432,19 @@ var Plottable;
              * @param {string[]} ticks The strings that will be printed on the ticks.
              */
             Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, ticks) {
-                return this._drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, false);
-            };
-            Category.prototype._drawOrMeasureTicks = function (axisWidth, axisHeight, scale, dataOrTicks, draw) {
-                var self = this;
-                var textWriteResults = [];
-                var tm = function (s) { return self._measurer.measure(s); };
-                var iterator = draw ? function (f) { return dataOrTicks.each(f); } : function (f) { return dataOrTicks.forEach(f); };
-                iterator(function (d) {
-                    var bandWidth = scale.fullBandStartAndWidth(d)[1];
-                    var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
-                    var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
-                    var textWriteResult;
-                    var formatter = self.formatter();
-                    if (draw) {
-                        var d3this = d3.select(this);
-                        var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
-                        var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self._tickLabelOrientation(), {
-                            g: d3this,
-                            xAlign: xAlign[self.orient()],
-                            yAlign: yAlign[self.orient()]
-                        });
-                    }
-                    else {
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self._tickLabelOrientation());
-                    }
-                    textWriteResults.push(textWriteResult);
+                var _this = this;
+                var wrappingResults = ticks.map(function (s) {
+                    var bandWidth = scale.fullBandStartAndWidth(s)[1];
+                    var width = _this._isHorizontal() ? bandWidth : axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
+                    var height = _this._isHorizontal() ? axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding() : bandWidth;
+                    return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
                 });
                 var widthFn = this._isHorizontal() ? d3.sum : Plottable._Util.Methods.max;
                 var heightFn = this._isHorizontal() ? Plottable._Util.Methods.max : d3.sum;
                 return {
-                    textFits: textWriteResults.every(function (t) { return t.textFits; }),
-                    usedWidth: widthFn(textWriteResults, function (t) { return t.usedWidth; }, 0),
-                    usedHeight: heightFn(textWriteResults, function (t) { return t.usedHeight; }, 0)
+                    textFits: wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText); }),
+                    usedWidth: widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0),
+                    usedHeight: heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0)
                 };
             };
             Category.prototype._doRender = function () {
@@ -5495,7 +5476,7 @@ var Plottable;
                 // When anyone calls _invalidateLayout, _computeLayout will be called
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
-                this._measurer.clear();
+                this._measurer.reset();
                 return _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
             };
             return Category;
@@ -5566,7 +5547,7 @@ var Plottable;
                 return this;
             };
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var desiredWH = this._measurer(this._text);
+                var desiredWH = this._measurer.measure(this._text);
                 var desiredWidth = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
                 var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
                 return {
@@ -5579,7 +5560,9 @@ var Plottable;
             Label.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._textContainer = this._content.append("g");
-                this._measurer = Plottable._Util.Text.getTextMeasurer(this._textContainer.append("text"));
+                this._measurer = new SVGTypewriter.Measurers.Measurer(this._textContainer);
+                this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
+                this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
                 this.text(this._text);
             };
             Label.prototype.text = function (displayText) {
@@ -5624,26 +5607,21 @@ var Plottable;
             };
             Label.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
-                var textMeasurement = this._measurer(this._text);
+                this._textContainer.selectAll("g").remove();
+                var textMeasurement = this._measurer.measure(this._text);
                 var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
                 var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
                 this._textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
-                this._textContainer.text("");
-                var dimension = this.orient() === "horizontal" ? this.width() : this.height();
-                var truncatedText = Plottable._Util.Text.getTruncatedText(this._text, dimension, this._measurer);
                 var writeWidth = this.width() - 2 * widthPadding;
                 var writeHeight = this.height() - 2 * heightPadding;
-                if (this.orient() === "horizontal") {
-                    Plottable._Util.Text.writeLineHorizontally(truncatedText, this._textContainer, writeWidth, writeHeight, this._xAlignment, this._yAlignment);
-                }
-                else {
-                    Plottable._Util.Text.writeLineVertically(truncatedText, this._textContainer, writeWidth, writeHeight, this._xAlignment, this._yAlignment, this.orient());
-                }
-            };
-            Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                this._measurer = Plottable._Util.Text.getTextMeasurer(this._textContainer.append("text")); // reset it in case fonts have changed
-                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                return this;
+                var textRotation = { horizontal: 0, right: 90, left: -90 };
+                var writeOptions = {
+                    selection: this._textContainer,
+                    xAlign: this._xAlignment,
+                    yAlign: this._yAlignment,
+                    textRotation: textRotation[this.orient()]
+                };
+                this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
             };
             return Label;
         })(Component.AbstractComponent);
