@@ -101,7 +101,6 @@ function setupBindings(){
   }).mousemove(function(e) {
       var windowWidth = window.innerWidth;
       var helpY = $("#help").position().top;
-      
       $("#test-category-descriptions").css({ top: helpY + 28, left: windowWidth - 360 });
   });
 
@@ -114,14 +113,36 @@ function populatePlotList(){
 }
 
 function populateSidebarList(paths, pathsInCategory, testsInCategory){
-  debugger;
-  // var startString = "<div class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
-  // var endString = "</div>";
-  // plots.forEach(function(plot){
-  //   var finalstring = startString + plot.name + endString;
-  //   $(".sidebar").append(finalstring);
-  // });
-  // $(".quicktest-checkbox").attr("checked", true);
+  var testsPaths = paths.map(function(path) {return path.replace(/.*tests\/|\.js/g, '');});
+  //ex. animations/animate_area
+  var hash = {};
+  testsPaths.forEach(function(test){
+    var slashPos = test.indexOf("/");
+    var categoryString = test.substr(0, slashPos)
+    var quicktestString = test.substr(slashPos+1, test.length-1)
+    var quicktestArray = [quicktestString];
+    if (!hash[categoryString]){
+      hash[categoryString] = quicktestArray;
+    }
+    else{
+      hash[categoryString].push(quicktestString)
+    }
+  });
+  
+  console.log(hash)
+  //hash = hash of quicktest categories and quicktests
+
+
+  var allQuickTests = d3.entries(hash);
+  allQuickTests.forEach(function(object){
+    var startString = "<div class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
+    var endString = "</div>";
+    var categoryName = object.key
+
+    var finalstring = startString + categoryName + endString;
+    $(".sidebar").append(finalstring);
+  });
+  $(".quicktest-checkbox").attr("checked", true);
 }
 
 

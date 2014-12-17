@@ -47,7 +47,7 @@ h2{
   font-size: 13px;
 }
 
-input, select{
+select, input:not([type=checkbox]) {
   position: relative;
   border: solid 1px;
   border-radius: 5px;
