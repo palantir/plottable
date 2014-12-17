@@ -210,7 +210,7 @@ describe("Labels", function () {
         assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
         var text = content.select("text");
         var bbox = Plottable._Util.DOM.getBBox(text);
-        assert.closeTo(bbox.height, label.height(), 0.5, "text height === label.minimumHeight()");
+        assert.closeTo(bbox.height, label.height(), 1, "text height === label.minimumHeight()");
         assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
