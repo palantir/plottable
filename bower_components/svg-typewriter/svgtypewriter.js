@@ -698,7 +698,7 @@ var SVGTypewriter;
                 textEl.text(line);
                 var xOffset = width * Writer.XOffsetFactor[xAlign];
                 var anchor = Writer.AnchorConverter[xAlign];
-                textEl.attr("text-anchor", anchor).classed("text-line", true).attr("y", "-0.25em");
+                textEl.attr("text-anchor", anchor).classed("text-line", true).attr("y", "-0.15em");
                 SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset);
             };
             Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
