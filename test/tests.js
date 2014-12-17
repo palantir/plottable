@@ -1030,7 +1030,7 @@ describe("Labels", function () {
         assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
-    it("Left-rotated text is handled properly", function () {
+    it.skip("Left-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "left");
         label.renderTo(svg);
@@ -1041,7 +1041,7 @@ describe("Labels", function () {
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
-    it("Right-rotated text is handled properly", function () {
+    it.skip("Right-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "right");
         label.renderTo(svg);
@@ -1052,7 +1052,7 @@ describe("Labels", function () {
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
-    it("Label text can be changed after label is created", function () {
+    it.skip("Label text can be changed after label is created", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.Component.TitleLabel("a");
         label.renderTo(svg);

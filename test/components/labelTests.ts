@@ -23,7 +23,7 @@ describe("Labels", () => {
     svg.remove();
   });
 
-  it("Left-rotated text is handled properly", () => {
+  it.skip("Left-rotated text is handled properly", () => {
     var svg = generateSVG(100, 400);
     var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "left");
     label.renderTo(svg);
@@ -35,7 +35,7 @@ describe("Labels", () => {
     svg.remove();
   });
 
-  it("Right-rotated text is handled properly", () => {
+  it.skip("Right-rotated text is handled properly", () => {
     var svg = generateSVG(100, 400);
     var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "right");
     label.renderTo(svg);
@@ -47,7 +47,7 @@ describe("Labels", () => {
     svg.remove();
   });
 
-  it("Label text can be changed after label is created", () => {
+  it.skip("Label text can be changed after label is created", () => {
     var svg = generateSVG(400, 80);
     var label = new Plottable.Component.TitleLabel("a");
     label.renderTo(svg);

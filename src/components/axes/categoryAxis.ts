@@ -97,8 +97,8 @@ export module Axis {
      */
     private _drawTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection) {
       var self = this;
-      var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
-      var yAlign: {[s: string]: string} = {left: "center",  right: "center",   top: "bottom", bottom: "top"};
+      var xAlign: {[s: string]: string} = {left: "right",  right: "left", top: "center", bottom: "center"};
+      var yAlign: {[s: string]: string} = {left: "center",  right: "center", top: "bottom", bottom: "top"};
       ticks.each(function (d: string) {
         var bandWidth = scale.fullBandStartAndWidth(d)[1];
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();

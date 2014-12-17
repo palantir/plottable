@@ -1,5 +1,5 @@
 /*!
-SVG Typewriter 0.1.4 (https://github.com/palantir/svg-typewriter)
+SVG Typewriter 0.1.8 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
 */
@@ -502,7 +502,7 @@ var SVGTypewriter;
                 var lineWidth = measurer.measure(truncatedLine).width;
                 var ellipsesWidth = measurer.measure("...").width;
                 if (width <= ellipsesWidth) {
-                    var periodWidth = measurer.measure(".").width;
+                    var periodWidth = ellipsesWidth / 3;
                     var numPeriodsThatFit = Math.floor(width / periodWidth);
                     return {
                         wrappedToken: "...".substr(0, numPeriodsThatFit),
@@ -698,8 +698,9 @@ var SVGTypewriter;
                 textEl.text(line);
                 var xOffset = width * Writer.XOffsetFactor[xAlign];
                 var anchor = Writer.AnchorConverter[xAlign];
-                textEl.attr("text-anchor", anchor).classed("text-line", true).attr("y", "-0.25em");
-                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset);
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
             };
             Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
                 var _this = this;
@@ -813,10 +814,12 @@ var SVGTypewriter;
                     };
                 }
                 else {
-                    var defaultText = area.text();
+                    var parentNode = area.node().parentNode;
+                    area.remove();
                     return function (text) {
+                        parentNode.appendChild(area.node());
                         var areaDimension = _this.measureBBox(area, text);
-                        area.text(defaultText);
+                        area.remove();
                         return areaDimension;
                     };
                 }
@@ -850,8 +853,11 @@ var SVGTypewriter;
     (function (Measurers) {
         var Measurer = (function (_super) {
             __extends(Measurer, _super);
-            function Measurer() {
-                _super.apply(this, arguments);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
             }
             // Guards assures same line height and width of whitespaces on both ends.
             Measurer.prototype._addGuards = function (text) {
@@ -864,9 +870,9 @@ var SVGTypewriter;
                 return this.guardWidth;
             };
             Measurer.prototype._measureLine = function (line) {
-                var measuredLine = this._addGuards(line);
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
                 var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
-                measuredLineDimensions.width -= 2 * this.getGuardWidth();
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
                 return measuredLineDimensions;
             };
             Measurer.prototype.measure = function (text) {

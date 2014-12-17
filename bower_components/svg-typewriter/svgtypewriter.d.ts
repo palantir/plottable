@@ -179,6 +179,7 @@ declare module SVGTypewriter.Measurers {
 
 declare module SVGTypewriter.Measurers {
     class Measurer extends AbstractMeasurer {
+        constructor(area: D3.Selection, className?: string, useGuards?: boolean);
         _addGuards(text: string): string;
         _measureLine(line: string): Dimensions;
         measure(text?: string): {

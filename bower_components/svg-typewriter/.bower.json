@@ -1,7 +1,7 @@
 {
   "name": "svg-typewriter",
   "description": "A library for measuring, manipulating, and writing text on SVG.",
-  "version": "0.1.4",
+  "version": "0.1.8",
   "main": [
     "svgtypewriter.js"
   ],
@@ -39,13 +39,13 @@
     "jquery.simulate": "1.2.0",
     "lodash": "~2.4.1"
   },
-  "_release": "0.1.4",
+  "_release": "0.1.8",
   "_resolution": {
     "type": "version",
-    "tag": "v0.1.4",
-    "commit": "40900f32e1b74e81fcb249a0a1ce7e49d426b17d"
+    "tag": "v0.1.8",
+    "commit": "c49db0f6a173b1335363acf206459dfb1893dace"
   },
   "_source": "git://github.com/palantir/svg-typewriter.git",
-  "_target": "0.1.4",
+  "_target": "0.1.8",
   "_originalSource": "svg-typewriter"
 }
