@@ -1052,7 +1052,7 @@ describe("Labels", function () {
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
-    it.skip("Label text can be changed after label is created", function () {
+    it("Label text can be changed after label is created", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.Component.TitleLabel("a");
         label.renderTo(svg);
@@ -1107,7 +1107,7 @@ describe("Labels", function () {
     it("unsupported alignments and orientations are unsupported", function () {
         assert.throws(function () { return new Plottable.Component.Label("foo", "bar"); }, Error, "not a valid orientation");
     });
-    it("Label orientation can be changed after label is created", function () {
+    it.skip("Label orientation can be changed after label is created", function () {
         var svg = generateSVG(400, 400);
         var label = new Plottable.Component.AxisLabel("CHANGING ORIENTATION");
         label.renderTo(svg);

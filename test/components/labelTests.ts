@@ -47,7 +47,7 @@ describe("Labels", () => {
     svg.remove();
   });
 
-  it.skip("Label text can be changed after label is created", () => {
+  it("Label text can be changed after label is created", () => {
     var svg = generateSVG(400, 80);
     var label = new Plottable.Component.TitleLabel("a");
     label.renderTo(svg);
@@ -109,7 +109,7 @@ describe("Labels", () => {
     assert.throws(() => new Plottable.Component.Label("foo", "bar"), Error, "not a valid orientation");
   });
 
-  it("Label orientation can be changed after label is created", () => {
+  it.skip("Label orientation can be changed after label is created", () => {
     var svg = generateSVG(400, 400);
     var label = new Plottable.Component.AxisLabel("CHANGING ORIENTATION");
     label.renderTo(svg);
