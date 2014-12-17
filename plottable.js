@@ -5137,7 +5137,7 @@ var Plottable;
             }
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer, Axis.AbstractAxis.TICK_LABEL_CLASS);
+                this._measurer = new SVGTypewriter.Measurers.Measurer(this._tickLabelContainer, Axis.AbstractAxis.TICK_LABEL_CLASS);
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
             };
             Numeric.prototype._computeWidth = function () {
@@ -5547,7 +5547,7 @@ var Plottable;
                 return this;
             };
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var desiredWH = this._measurer(this._text);
+                var desiredWH = this._measurer.measure(this._text);
                 var desiredWidth = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
                 var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
                 return {
@@ -5560,7 +5560,9 @@ var Plottable;
             Label.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._textContainer = this._content.append("g");
-                this._measurer = Plottable._Util.Text.getTextMeasurer(this._textContainer.append("text"));
+                this._measurer = new SVGTypewriter.Measurers.Measurer(this._textContainer);
+                this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
+                this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
                 this.text(this._text);
             };
             Label.prototype.text = function (displayText) {
@@ -5605,26 +5607,21 @@ var Plottable;
             };
             Label.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
-                var textMeasurement = this._measurer(this._text);
+                this._textContainer.selectAll("g").remove();
+                var textMeasurement = this._measurer.measure(this._text);
                 var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
                 var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
                 this._textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
-                this._textContainer.text("");
-                var dimension = this.orient() === "horizontal" ? this.width() : this.height();
-                var truncatedText = Plottable._Util.Text.getTruncatedText(this._text, dimension, this._measurer);
                 var writeWidth = this.width() - 2 * widthPadding;
                 var writeHeight = this.height() - 2 * heightPadding;
-                if (this.orient() === "horizontal") {
-                    Plottable._Util.Text.writeLineHorizontally(truncatedText, this._textContainer, writeWidth, writeHeight, this._xAlignment, this._yAlignment);
-                }
-                else {
-                    Plottable._Util.Text.writeLineVertically(truncatedText, this._textContainer, writeWidth, writeHeight, this._xAlignment, this._yAlignment, this.orient());
-                }
-            };
-            Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                this._measurer = Plottable._Util.Text.getTextMeasurer(this._textContainer.append("text")); // reset it in case fonts have changed
-                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                return this;
+                var textRotation = { horizontal: 0, right: 90, left: -90 };
+                var writeOptions = {
+                    selection: this._textContainer,
+                    xAlign: this._xAlignment,
+                    yAlign: this._yAlignment,
+                    textRotation: textRotation[this.orient()]
+                };
+                this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
             };
             return Label;
         })(Component.AbstractComponent);

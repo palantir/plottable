@@ -1,5 +1,5 @@
 /*!
-SVG Typewriter 0.1.3 (https://github.com/palantir/svg-typewriter)
+SVG Typewriter 0.1.7 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
 */
@@ -459,7 +459,7 @@ var SVGTypewriter;
                     wrapping: initialWrappingResult,
                     currentLine: "",
                     availableWidth: width,
-                    availableLines: Math.min(height / measurer.measure().height, this._maxLines),
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
                     canFitText: true
                 };
                 var lines = text.split("\n");
@@ -502,7 +502,7 @@ var SVGTypewriter;
                 var lineWidth = measurer.measure(truncatedLine).width;
                 var ellipsesWidth = measurer.measure("...").width;
                 if (width <= ellipsesWidth) {
-                    var periodWidth = measurer.measure(".").width;
+                    var periodWidth = ellipsesWidth / 3;
                     var numPeriodsThatFit = Math.floor(width / periodWidth);
                     return {
                         wrappedToken: "...".substr(0, numPeriodsThatFit),
@@ -698,8 +698,9 @@ var SVGTypewriter;
                 textEl.text(line);
                 var xOffset = width * Writer.XOffsetFactor[xAlign];
                 var anchor = Writer.AnchorConverter[xAlign];
-                textEl.attr("text-anchor", anchor).classed("text-line", true).attr("y", "-0.25em");
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
                 SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset);
+                return textEl;
             };
             Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
                 var _this = this;
@@ -707,7 +708,10 @@ var SVGTypewriter;
                 var lineHeight = this._measurer.measure().height;
                 var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
                 lines.forEach(function (line, i) {
-                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                    var lineEl = _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                    var yOffsetFactor = { top: 0, center: 0.5, bottom: 1 };
+                    var ems = 0.30 - yOffsetFactor[yAlign];
+                    lineEl.attr("y", ems + "em");
                 });
             };
             Writer.prototype.write = function (text, width, height, options) {
@@ -813,10 +817,12 @@ var SVGTypewriter;
                     };
                 }
                 else {
-                    var defaultText = area.text();
+                    var parentNode = area.node().parentNode;
+                    area.remove();
                     return function (text) {
+                        parentNode.appendChild(area.node());
                         var areaDimension = _this.measureBBox(area, text);
-                        area.text(defaultText);
+                        area.remove();
                         return areaDimension;
                     };
                 }
@@ -850,8 +856,11 @@ var SVGTypewriter;
     (function (Measurers) {
         var Measurer = (function (_super) {
             __extends(Measurer, _super);
-            function Measurer() {
-                _super.apply(this, arguments);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
             }
             // Guards assures same line height and width of whitespaces on both ends.
             Measurer.prototype._addGuards = function (text) {
@@ -864,9 +873,9 @@ var SVGTypewriter;
                 return this.guardWidth;
             };
             Measurer.prototype._measureLine = function (line) {
-                var measuredLine = this._addGuards(line);
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
                 var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
-                measuredLineDimensions.width -= 2 * this.getGuardWidth();
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
                 return measuredLineDimensions;
             };
             Measurer.prototype.measure = function (text) {
