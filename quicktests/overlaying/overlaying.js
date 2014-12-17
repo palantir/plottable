@@ -7,7 +7,9 @@ function expandSidebar(){
   var sidebar = $(".sidebar");
   var controls = $(".controls");
   var sizeControls = $(".size-controls");
+  var windowHeight = window.innerHeight - 100;
 
+  sidebar.css("height", windowHeight);
 
   if(sidebar.position().left !== 0){
     sidebar.css("visibility", "visible");
@@ -70,6 +72,7 @@ var firstBranch;
 var secondBranch;
 var svgWidth;
 var svgHeight;
+var sidebarPopulated = false;
 
 //initializing methods
 function setupBindings(){
@@ -128,21 +131,27 @@ function populateSidebarList(paths, pathsInCategory, testsInCategory){
       hash[categoryString].push(quicktestString)
     }
   });
-  
-  console.log(hash)
   //hash = hash of quicktest categories and quicktests
 
 
   var allQuickTests = d3.entries(hash);
   allQuickTests.forEach(function(object){
-    var startString = "<div class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
-    var endString = "</div>";
-    var categoryName = object.key
+    var categoryName = object.key;
+    var startOlString = "<ol class=\"sidebar-quicktest-category\" id=" + categoryName + "> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
+    var endOlString = "</ol>";
 
-    var finalstring = startString + categoryName + endString;
-    $(".sidebar").append(finalstring);
+    var categoryStringHTML = startOlString + categoryName + endOlString;
+    $(".sidebar").append(categoryStringHTML);
+
+    object.value.forEach(function(singleQuicktest){
+      var startOlString = "<li class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
+      var endOlString = "</li>";
+      var quicktestStringHTML = startOlString + singleQuicktest + endOlString;
+      $("#" + categoryName).append(quicktestStringHTML);
+    })
   });
   $(".quicktest-checkbox").attr("checked", true);
+  sidebarPopulated = true;
 }
 
 
@@ -205,7 +214,9 @@ function filterQuickTests(category, branchList){
     //
     loadQuickTestsInCategory(testsInCategory, category, branchList[0], branchList[1]);
     
-    populateSidebarList(paths, pathsInCategory, testsInCategory);
+    if(!sidebarPopulated){
+      populateSidebarList(paths, pathsInCategory, testsInCategory);
+    }
   });
 }
 
