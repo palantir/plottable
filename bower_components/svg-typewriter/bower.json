@@ -1,7 +1,7 @@
 {
   "name": "svg-typewriter",
   "description": "A library for measuring, manipulating, and writing text on SVG.",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "main": ["svgtypewriter.js"],
   "license": "MIT",
   "ignore": [

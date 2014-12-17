@@ -813,10 +813,12 @@ var SVGTypewriter;
                     };
                 }
                 else {
-                    var defaultText = area.text();
+                    var parentNode = area.node().parentNode;
+                    area.remove();
                     return function (text) {
+                        parentNode.appendChild(area.node());
                         var areaDimension = _this.measureBBox(area, text);
-                        area.text(defaultText);
+                        area.remove();
                         return areaDimension;
                     };
                 }
@@ -850,8 +852,11 @@ var SVGTypewriter;
     (function (Measurers) {
         var Measurer = (function (_super) {
             __extends(Measurer, _super);
-            function Measurer() {
-                _super.apply(this, arguments);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
             }
             // Guards assures same line height and width of whitespaces on both ends.
             Measurer.prototype._addGuards = function (text) {
@@ -864,9 +869,9 @@ var SVGTypewriter;
                 return this.guardWidth;
             };
             Measurer.prototype._measureLine = function (line) {
-                var measuredLine = this._addGuards(line);
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
                 var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
-                measuredLineDimensions.width -= 2 * this.getGuardWidth();
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
                 return measuredLineDimensions;
             };
             Measurer.prototype.measure = function (text) {
