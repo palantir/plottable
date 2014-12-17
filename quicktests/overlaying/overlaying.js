@@ -203,6 +203,33 @@ function runQuickTest(result, svg, data, branch){
   }
 }
 
+function loadAllQuickTests(quicktestsPaths, firstBranch, secondBranch){
+  var div = d3.select("#results");
+  quicktestsPaths.forEach(function(path) { //for each quicktest 
+    var name = path.replace(/\w*\/|\.js/g , '');
+    d3.text("http://localhost:9999/" + path, function(error, text) {
+      if (error !== null) {
+        console.warn("Tried to load nonexistant quicktest ");
+        return;
+      }
+      text = "(function(){" + text +
+          "\nreturn {makeData: makeData, run: run};" +
+               "})();" +
+          "\n////# sourceURL=" + path;
+      var result = eval(text);
+      debugger;
+      var className = "quicktest " + name;
+      var div = d3.select("#results").append("div").attr("class", className);
+      div.insert("label").text(name);
+      var firstsvg = div.append("div").attr("class", "first").append("svg").attr({width: svgWidth, height: svgHeight});
+      var secondsvg = div.append("div").attr("class", "second").append("svg").attr({width: svgWidth, height: svgHeight});
+      var data = result.makeData();
+
+      runQuickTest(result, firstsvg, data, firstBranch);
+      runQuickTest(result, secondsvg, data, secondBranch);
+    });
+  });
+}
 //load each quicktest locally, eval it, then run quicktest
 function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondBranch){
 
@@ -239,13 +266,17 @@ function filterQuickTests(category, branchList){
   //filter list of quicktests to list of quicktest names to pass to doSomething
   d3.json("list_of_quicktests.json", function (data){
     var paths = data.map(function(quickTestObj) {return quickTestObj.path;});
-    var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1;});
-    var testsInCategory = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, '');});
-    //
-    loadQuickTestsInCategory(testsInCategory, category, branchList[0], branchList[1]);
-    
+    if (category !== "all"){
+      var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1;});
+      var testsInCategory = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, '');});
+      //
+      loadQuickTestsInCategory(testsInCategory, category, branchList[0], branchList[1]);
       populateSidebarList(paths, testsInCategory, category);
-    
+    }
+    else{
+      loadAllQuickTests(paths, branchList[0], branchList[1]);
+      //populateSidebarList(paths, testsInCategory, category);
+    }
   });
   
 

@@ -23,16 +23,17 @@
       <a id="expand-sidebar" onclick="expandSidebar()" href="#">&#9776;</a>
       <label>Category:</label>
        <select type="text" id="category" name="category">
-        <option value="basic">Basic</option>
+        <option value="all">All</option>
         <option value="animations">Animations</option>
-        <option value="interactions">Interactions</option>
+        <option value="basic">Basic</option>
         <option value="functional">Functional</option>
+        <option value="interactions">Interactions</option>
         <option value="realistic">Realistic</option>
       </select>
 
       <input type="text" id="branch1" name="branch1" value="master" placeholder="1st branch (ex. master)">
 
-      <input type="text" id="branch2" name="branch2" value="develop" placeholder="2nd branch (ex. develop)">
+      <input type="text" id="branch2" name="branch2" value="#local" placeholder="2nd branch (ex. #local)">
       
       <input id="render" type="submit" class="button" value="Compare!">
 
