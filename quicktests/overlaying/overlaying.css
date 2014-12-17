@@ -122,14 +122,13 @@ select, input:not([type=checkbox]) {
 
 .sidebar {
   width: 20%;
-  height: 100px;
+  height: 100%;
   background-color: #343434;
   position: fixed;
   visibility: hidden;
   color: whitesmoke;
   left: -20%;
   padding-top: 50px;
-  padding-bottom: 200px;
   overflow: auto;
   z-index: 1;
 }
@@ -148,7 +147,9 @@ select, input:not([type=checkbox]) {
 }
 
 .sidebar-quicktest{
-  padding-left: 10px;
+  padding-left: 10px; 
+  list-style-type: none;
+  font-size: 13px;
 }
 
 #expand-sidebar {
