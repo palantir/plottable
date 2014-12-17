@@ -1,5 +1,5 @@
 /*!
-SVG Typewriter 0.1.4 (https://github.com/palantir/svg-typewriter)
+SVG Typewriter 0.1.5 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
 */
@@ -502,7 +502,7 @@ var SVGTypewriter;
                 var lineWidth = measurer.measure(truncatedLine).width;
                 var ellipsesWidth = measurer.measure("...").width;
                 if (width <= ellipsesWidth) {
-                    var periodWidth = measurer.measure(".").width;
+                    var periodWidth = ellipsesWidth / 3;
                     var numPeriodsThatFit = Math.floor(width / periodWidth);
                     return {
                         wrappedToken: "...".substr(0, numPeriodsThatFit),
