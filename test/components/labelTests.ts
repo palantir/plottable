@@ -23,7 +23,8 @@ describe("Labels", () => {
     svg.remove();
   });
 
-  it("Left-rotated text is handled properly", () => {
+  // Skipping due to FF odd client bounding rect computation - #1470.
+  it.skip("Left-rotated text is handled properly", () => {
     var svg = generateSVG(100, 400);
     var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "left");
     label.renderTo(svg);
@@ -35,7 +36,8 @@ describe("Labels", () => {
     svg.remove();
   });
 
-  it("Right-rotated text is handled properly", () => {
+  // Skipping due to FF odd client bounding rect computation - #1470.
+  it.skip("Right-rotated text is handled properly", () => {
     var svg = generateSVG(100, 400);
     var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "right");
     label.renderTo(svg);
@@ -109,7 +111,8 @@ describe("Labels", () => {
     assert.throws(() => new Plottable.Component.Label("foo", "bar"), Error, "not a valid orientation");
   });
 
-  it("Label orientation can be changed after label is created", () => {
+  // Skipping due to FF odd client bounding rect computation - #1470.
+  it.skip("Label orientation can be changed after label is created", () => {
     var svg = generateSVG(400, 400);
     var label = new Plottable.Component.AxisLabel("CHANGING ORIENTATION");
     label.renderTo(svg);

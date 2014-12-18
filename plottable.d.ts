@@ -2415,7 +2415,6 @@ declare module Plottable {
              */
             padding(padAmount: number): Label;
             _doRender(): void;
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
         }
         class TitleLabel extends Label {
             /**

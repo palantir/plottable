@@ -1030,7 +1030,8 @@ describe("Labels", function () {
         assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
-    it("Left-rotated text is handled properly", function () {
+    // Skipping due to FF odd client bounding rect computation - #1470.
+    it.skip("Left-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "left");
         label.renderTo(svg);
@@ -1041,7 +1042,8 @@ describe("Labels", function () {
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
-    it("Right-rotated text is handled properly", function () {
+    // Skipping due to FF odd client bounding rect computation - #1470.
+    it.skip("Right-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "right");
         label.renderTo(svg);
@@ -1107,7 +1109,8 @@ describe("Labels", function () {
     it("unsupported alignments and orientations are unsupported", function () {
         assert.throws(function () { return new Plottable.Component.Label("foo", "bar"); }, Error, "not a valid orientation");
     });
-    it("Label orientation can be changed after label is created", function () {
+    // Skipping due to FF odd client bounding rect computation - #1470.
+    it.skip("Label orientation can be changed after label is created", function () {
         var svg = generateSVG(400, 400);
         var label = new Plottable.Component.AxisLabel("CHANGING ORIENTATION");
         label.renderTo(svg);
