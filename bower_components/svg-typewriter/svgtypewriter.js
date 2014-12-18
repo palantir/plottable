@@ -1,5 +1,5 @@
 /*!
-SVG Typewriter 0.1.8 (https://github.com/palantir/svg-typewriter)
+SVG Typewriter 0.1.9 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
 */
@@ -796,7 +796,7 @@ var SVGTypewriter;
                 this.textMeasurer = this.getTextMeasurer(area, className);
             }
             AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
-                return d[0][0].tagName === "text";
+                return d[0][0].tagName === "text" || !d.select("text").empty();
             };
             AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
                 var _this = this;
@@ -815,10 +815,17 @@ var SVGTypewriter;
                 }
                 else {
                     var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
                     area.remove();
                     return function (text) {
                         parentNode.appendChild(area.node());
-                        var areaDimension = _this.measureBBox(area, text);
+                        var areaDimension = _this.measureBBox(textSelection, text);
                         area.remove();
                         return areaDimension;
                     };
