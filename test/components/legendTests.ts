@@ -11,16 +11,16 @@ describe("Legends", () => {
   beforeEach(() => {
     svg = generateSVG(400, 400);
     color = new Plottable.Scale.Color("Category10");
-    legend = new Plottable.Component.Legend(color);
+    legend = new Plottable.Component.Legend(color).maxEntriesPerRow(1);
   });
 
   it("a basic legend renders", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
-    var rows = legend._content.selectAll(".legend-row");
+    var rows = (<any> legend)._content.selectAll(".legend-entry");
     assert.lengthOf(rows[0], 3, "there are 3 legend entries");
 
-    rows.each(function(d, i) {
+    rows.each(function(d: any, i: number) {
       assert.equal(d, color.domain()[i], "the data is set properly");
       var d3this = d3.select(this);
       var text = d3this.select("text").text();
@@ -34,7 +34,7 @@ describe("Legends", () => {
   it("legend domain can be updated after initialization, and height updates as well", () => {
     legend.renderTo(svg);
     legend.scale(color);
-    assert.equal(legend._requestedSpace(200, 200).height, 0, "there is no requested height when domain is empty");
+    assert.equal(legend._requestedSpace(200, 200).height, 10, "there is a padding requested height when domain is empty");
     color.domain(["foo", "bar"]);
     var height1 = legend._requestedSpace(400, 400).height;
     var actualHeight1 = legend.height();
@@ -43,7 +43,7 @@ describe("Legends", () => {
     assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
     var actualHeight2 = legend.height();
     assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
-    var numRows = legend._content.selectAll(".legend-row")[0].length;
+    var numRows = (<any> legend)._content.selectAll(".legend-row")[0].length;
     assert.equal(numRows, 3, "there are 3 rows");
     svg.remove();
   });
@@ -52,9 +52,9 @@ describe("Legends", () => {
     color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
     legend.renderTo(svg);
 
-    var contentBBox = Plottable._Util.DOM.getBBox(legend._content);
+    var contentBBox = Plottable._Util.DOM.getBBox((<any> legend)._content);
     var contentBottomEdge = contentBBox.y + contentBBox.height;
-    var bboxBBox = Plottable._Util.DOM.getBBox(legend._element.select(".bounding-box"));
+    var bboxBBox = Plottable._Util.DOM.getBBox((<any> legend)._element.select(".bounding-box"));
     var bboxBottomEdge = bboxBBox.y + bboxBBox.height;
 
     assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
@@ -66,10 +66,10 @@ describe("Legends", () => {
     color.domain(["foooboooloonoogoorooboopoo"]);
     svg.attr("width", 100);
     legend.renderTo(svg);
-    var text = legend._content.select("text").text();
+    var text = (<any> legend)._content.select("text").text();
     assert.notEqual(text, "foooboooloonoogoorooboopoo", "the text was truncated");
-    var rightEdge = legend._content.select("text").node().getBoundingClientRect().right;
-    var bbox = legend._element.select(".bounding-box");
+    var rightEdge = (<any> legend)._content.select("text").node().getBoundingClientRect().right;
+    var bbox = (<any> legend)._element.select(".bounding-box");
     var rightEdgeBBox = bbox.node().getBoundingClientRect().right;
     assert.operator(rightEdge, "<=", rightEdgeBBox, "the long text did not overflow the legend");
     svg.remove();
@@ -78,10 +78,10 @@ describe("Legends", () => {
   it("calling legend.render multiple times does not add more elements", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
-    var numRows = legend._content.selectAll(".legend-row")[0].length;
+    var numRows = (<any> legend)._content.selectAll(".legend-row")[0].length;
     assert.equal(numRows, 3, "there are 3 legend rows initially");
     legend._render();
-    numRows = legend._content.selectAll(".legend-row")[0].length;
+    numRows = (<any> legend)._content.selectAll(".legend-row")[0].length;
     assert.equal(numRows, 3, "there are 3 legend rows after second render");
     svg.remove();
   });
@@ -91,16 +91,15 @@ describe("Legends", () => {
     legend.renderTo(svg);
     var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
     color.domain(newDomain);
-    // due to how joins work, this is how the elements should be arranged by d3
-    var newDomainActualOrder = ["foo", "baz", "mushu", "persei", "eight"];
-    legend._content.selectAll(".legend-row").each(function(d, i) {
-      assert.equal(d, newDomainActualOrder[i], "the data is set correctly");
+
+    (<any> legend)._content.selectAll(".legend-entry").each(function(d: any, i: number) {
+      assert.equal(d, newDomain[i], "the data is set correctly");
       var text = d3.select(this).select("text").text();
       assert.equal(text, d, "the text was set properly");
       var fill = d3.select(this).select("circle").attr("fill");
       assert.equal(fill, color.scale(d), "the fill was set properly");
     });
-    assert.lengthOf(legend._content.selectAll(".legend-row")[0], 5, "there are the right number of legend elements");
+    assert.lengthOf((<any> legend)._content.selectAll(".legend-row")[0], 5, "there are the right number of legend elements");
     svg.remove();
   });
 
@@ -113,7 +112,8 @@ describe("Legends", () => {
     newColorScale.domain(newDomain);
     legend.scale(newColorScale);
 
-    legend._content.selectAll(".legend-row").each(function(d, i) {
+
+    (<any> legend)._content.selectAll(".legend-entry").each(function(d: any, i: number) {
       assert.equal(d, newDomain[i], "the data is set correctly");
       var text = d3.select(this).select("text").text();
       assert.equal(text, d, "the text was set properly");
@@ -135,7 +135,7 @@ describe("Legends", () => {
 
     var newDomain = ["a", "foo", "d"];
     newColorScale.domain(newDomain);
-    legend._content.selectAll(".legend-row").each(function(d, i) {
+    (<any> legend)._content.selectAll(".legend-entry").each(function(d: any, i: number) {
       assert.equal(d, newDomain[i], "the data is set correctly");
       var text = d3.select(this).select("text").text();
       assert.equal(text, d, "the text was set properly");
@@ -148,12 +148,12 @@ describe("Legends", () => {
   it("iconHeight / 2 < circleHeight < iconHeight", () => {
     color.domain(["foo"]);
     legend.renderTo(svg);
-    var style = legend._element.append("style");
+    var style = (<any> legend)._element.append("style");
     style.attr("type", "text/css");
 
     function verifyCircleHeight() {
-      var text = legend._content.select("text");
-      var circle = legend._content.select("circle");
+      var text = (<any> legend)._content.select("text");
+      var circle = (<any> legend)._content.select("circle");
       var textHeight = Plottable._Util.DOM.getBBox(text).height;
       var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
       assert.operator(circleHeight, "<", textHeight, "icons too small: iconHeight < circleHeight");
@@ -174,355 +174,14 @@ describe("Legends", () => {
 
     svg.remove();
   });
-
-  describe("Legend toggle tests", () => {
-    var toggleLegend: Plottable.Component.Legend;
-
-    beforeEach(() => {
-      toggleLegend = new Plottable.Component.Legend(color);
-      toggleLegend.toggleCallback(function(d, b) {/* no-op */});
-    });
-
-    function verifyState(selection: D3.Selection, b: boolean, msg?: string) {
-      assert.equal(selection.classed("toggled-on"), b, msg);
-      assert.equal(selection.classed("toggled-off"), !b, msg);
-    }
-
-    function getSelection(datum: any) {
-      var selection = toggleLegend._content.selectAll(".legend-row")
-        .filter((d, i) => d === datum);
-      return selection;
-    }
-
-    function verifyEntry(datum: any, b: boolean, msg?: string) {
-      verifyState(getSelection(datum), b, msg);
-    }
-
-    function toggleEntry(datum: any, index: number) {
-      getSelection(datum).on("click")(datum, index);
-    }
-
-    it("basic initialization test", () => {
-      color.domain(["a", "b", "c", "d", "e"]);
-      toggleLegend.renderTo(svg);
-      toggleLegend._content.selectAll(".legend-row").each(function(d, i) {
-        var selection = d3.select(this);
-        verifyState(selection, true);
-      });
-      svg.remove();
-    });
-
-    it("basic toggling test", () => {
-      color.domain(["a"]);
-      toggleLegend.renderTo(svg);
-      toggleLegend._content.selectAll(".legend-row").each(function(d, i) {
-        var selection = d3.select(this);
-        selection.on("click")(d, i);
-        verifyState(selection, false);
-        selection.on("click")(d, i);
-        verifyState(selection, true);
-      });
-      svg.remove();
-    });
-
-    it("scale() works as intended with toggling", () => {
-      var domain = ["a", "b", "c", "d", "e"];
-      color.domain(domain);
-      toggleLegend.renderTo(svg);
-      toggleEntry("a", 0);
-      toggleEntry("d", 3);
-      toggleEntry("c", 2);
-
-      var newDomain = ["r", "a", "d", "g"];
-      var newColorScale = new Plottable.Scale.Color("Category10");
-      newColorScale.domain(newDomain);
-      toggleLegend.scale(newColorScale);
-
-      verifyEntry("r", true);
-      verifyEntry("a", false);
-      verifyEntry("g", true);
-      verifyEntry("d", false);
-
-      svg.remove();
-    });
-
-    it("listeners on scale will correctly update states", () =>  {
-      color.domain(["a", "b", "c", "d", "e"]);
-      toggleLegend.renderTo(svg);
-      toggleEntry("a", 0);
-      toggleEntry("d", 3);
-      toggleEntry("c", 2);
-
-      color.domain(["e", "d", "b", "a", "c"]);
-      verifyEntry("a", false);
-      verifyEntry("b", true);
-      verifyEntry("c", false);
-      verifyEntry("d", false);
-      verifyEntry("e", true);
-      svg.remove();
-    });
-
-    it("Testing callback works correctly", () =>  {
-      var domain = ["a", "b", "c", "d", "e"];
-      color.domain(domain);
-      var state = [true, true, true, true, true];
-
-      toggleLegend.toggleCallback((d, b) => {
-        state[domain.indexOf(d)] = b;
-      });
-      toggleLegend.renderTo(svg);
-
-      toggleEntry("a", 0);
-      verifyEntry("a", false);
-      assert.equal(state[0], false, "callback was successful");
-
-      toggleEntry("d", 3);
-      verifyEntry("d", false);
-      assert.equal(state[3], false, "callback was successful");
-
-      toggleEntry("a", 0);
-      verifyEntry("a", true);
-      assert.equal(state[0], true, "callback was successful");
-
-      toggleEntry("c", 2);
-      verifyEntry("c", false);
-      assert.equal(state[2], false, "callback was successful");
-      svg.remove();
-    });
-
-    it("Overwriting callback is successfull", () => {
-      var domain = ["a"];
-      color.domain(domain);
-      var state = true;
-      toggleLegend.renderTo(svg);
-
-      toggleLegend.toggleCallback((d, b) => {
-        state = b;
-      });
-
-      toggleEntry("a", 0);
-      assert.equal(state, false, "callback was successful");
-
-      var count = 0;
-      toggleLegend.toggleCallback((d, b) => {
-        count++;
-      });
-
-      toggleEntry("a", 0);
-      assert.equal(state, false, "callback was overwritten");
-      assert.equal(count, 1, "new callback was successfully called");
-      svg.remove();
-    });
-
-    it("Removing callback is successful", () =>  {
-      var domain = ["a"];
-      color.domain(domain);
-      var state = true;
-      toggleLegend.renderTo(svg);
-
-      toggleLegend.toggleCallback((d, b) => {
-        state = b;
-      });
-
-      toggleEntry("a", 0);
-      assert.equal(state, false, "callback was successful");
-
-      toggleLegend.toggleCallback(); // this should not remove the callback
-      toggleEntry("a", 0);
-      assert.equal(state, true, "callback was successful");
-
-      toggleLegend.toggleCallback(null); // this should remove the callback
-      assert.throws(function() {toggleEntry("a", 0);});
-      var selection = getSelection("a");
-      // should have no classes
-      assert.equal(selection.classed("toggled-on"), false, "is not toggled-on");
-      assert.equal(selection.classed("toggled-off"), false, "is not toggled-off");
-
-      svg.remove();
-    });
-  });
-
-  describe("Legend hover tests", () => {
-    var hoverLegend: Plottable.Component.Legend;
-
-    beforeEach(() => {
-      hoverLegend = new Plottable.Component.Legend(color);
-      hoverLegend.hoverCallback(function(d) {/* no-op */});
-    });
-
-    function _verifyFocus(selection: D3.Selection, b: boolean, msg?: string) {
-      assert.equal(selection.classed("hover"), true, msg);
-      assert.equal(selection.classed("focus"), b, msg);
-    }
-
-    function _verifyEmpty(selection: D3.Selection, msg?: string) {
-      assert.equal(selection.classed("hover"), false, msg);
-      assert.equal(selection.classed("focus"), false, msg);
-    }
-
-    function getSelection(datum: any) {
-      var selection = hoverLegend._content.selectAll(".legend-row")
-        .filter((d, i) => d === datum);
-      return selection;
-    }
-
-    function verifyFocus(datum: any, b: boolean, msg?: string) {
-      _verifyFocus(getSelection(datum), b, msg);
-    }
-
-    function verifyEmpty(datum: string, msg?: string) {
-      _verifyEmpty(getSelection(datum), msg);
-    }
-
-    function hoverEntry(datum: any, index: number) {
-      getSelection(datum).on("mouseover")(datum, index);
-    }
-
-    function leaveEntry(datum: any, index: number) {
-      getSelection(datum).on("mouseout")(datum, index);
-    }
-
-    it("basic initialization test", () => {
-      color.domain(["a", "b", "c", "d", "e"]);
-      hoverLegend.renderTo(svg);
-      hoverLegend._content.selectAll(".legend-row").each(function(d, i) {
-        verifyEmpty(d);
-      });
-      svg.remove();
-    });
-
-    it("basic hover test", () => {
-      color.domain(["a"]);
-      hoverLegend.renderTo(svg);
-      hoverEntry("a", 0);
-      verifyFocus("a", true);
-      leaveEntry("a", 0);
-      verifyEmpty("a");
-      svg.remove();
-    });
-
-    it("scale() works as intended with hovering", () => {
-      var domain = ["a", "b", "c", "d", "e"];
-      color.domain(domain);
-      hoverLegend.renderTo(svg);
-
-      hoverEntry("a", 0);
-
-      var newDomain = ["r", "a", "d", "g"];
-      var newColorScale = new Plottable.Scale.Color("Category10");
-      newColorScale.domain(newDomain);
-      hoverLegend.scale(newColorScale);
-
-      verifyFocus("r", false, "r");
-      verifyFocus("a", true, "a");
-      verifyFocus("g", false, "g");
-      verifyFocus("d", false, "d");
-
-      leaveEntry("a", 0);
-      verifyEmpty("r");
-      verifyEmpty("a");
-      verifyEmpty("g");
-      verifyEmpty("d");
-
-      svg.remove();
-    });
-
-    it("listeners on scale will correctly update states", () =>  {
-      color.domain(["a", "b", "c", "d", "e"]);
-      hoverLegend.renderTo(svg);
-      hoverEntry("c", 2);
-
-      color.domain(["e", "d", "b", "a", "c"]);
-      verifyFocus("a", false);
-      verifyFocus("b", false);
-      verifyFocus("c", true);
-      verifyFocus("d", false);
-      verifyFocus("e", false);
-      svg.remove();
-    });
-
-    it("Testing callback works correctly", () =>  {
-      var domain = ["a", "b", "c", "d", "e"];
-      color.domain(domain);
-      var focused: string = undefined;
-
-      hoverLegend.hoverCallback((d) => {
-        focused = d;
-      });
-      hoverLegend.renderTo(svg);
-
-      hoverEntry("a", 0);
-      verifyFocus("a", true);
-      assert.equal(focused, "a", "callback was successful");
-
-      leaveEntry("a", 0);
-      assert.equal(focused, undefined, "callback was successful");
-
-      hoverEntry("d", 3);
-      verifyFocus("d", true);
-      assert.equal(focused, "d", "callback was successful");
-      svg.remove();
-    });
-
-    it("Overwriting callback is successfull", () => {
-      var domain = ["a"];
-      color.domain(domain);
-      var focused: string = undefined;
-      hoverLegend.renderTo(svg);
-
-      hoverLegend.hoverCallback((d) => {
-        focused = d;
-      });
-
-      hoverEntry("a", 0);
-      assert.equal(focused, "a", "callback was successful");
-      leaveEntry("a", 0);
-
-      var count = 0;
-      hoverLegend.hoverCallback((d) => {
-        count++;
-      });
-
-      hoverEntry("a", 0);
-      assert.equal(focused, undefined, "old callback was not called");
-      assert.equal(count, 1, "new callbcak was called");
-      leaveEntry("a", 0);
-      assert.equal(count, 2, "new callback was called");
-      svg.remove();
-    });
-
-    it("Removing callback is successful", () =>  {
-      var domain = ["a"];
-      color.domain(domain);
-      var focused: string = undefined;
-      hoverLegend.renderTo(svg);
-
-      hoverLegend.hoverCallback((d) => {
-        focused = d;
-      });
-
-      hoverEntry("a", 0);
-      assert.equal(focused, "a", "callback was successful");
-
-      hoverLegend.hoverCallback(); // this should not remove the callback
-      leaveEntry("a", 0);
-      assert.equal(focused, undefined, "callback was successful");
-
-      hoverLegend.hoverCallback(null); // this should remove the callback
-      assert.throws(function() {hoverEntry("a", 0);});
-      verifyEmpty("a");
-
-      svg.remove();
-    });
-  });
 });
 
-describe("HorizontalLegend", () => {
+describe("Legend", () => {
   var colorScale: Plottable.Scale.Color;
-  var horizLegend: Plottable.Component.HorizontalLegend;
+  var horizLegend: Plottable.Component.Legend;
 
-  var entrySelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ENTRY_CLASS;
-  var rowSelector = "." + Plottable.Component.HorizontalLegend.LEGEND_ROW_CLASS;
+  var entrySelector = "." + Plottable.Component.Legend.LEGEND_ENTRY_CLASS;
+  var rowSelector = "." + Plottable.Component.Legend.LEGEND_ROW_CLASS;
 
   beforeEach(() => {
     colorScale = new Plottable.Scale.Color();
@@ -531,14 +190,13 @@ describe("HorizontalLegend", () => {
       "Adams",
       "Jefferson",
     ]);
-
-    horizLegend = new Plottable.Component.HorizontalLegend(colorScale);
+    horizLegend = new Plottable.Component.Legend(colorScale).maxEntriesPerRow(Infinity);
   });
 
   it("renders an entry for each item in the domain", () => {
     var svg = generateSVG(400, 100);
     horizLegend.renderTo(svg);
-    var entries = horizLegend._element.selectAll(entrySelector);
+    var entries = (<any> horizLegend)._element.selectAll(entrySelector);
     assert.equal(entries[0].length, colorScale.domain().length, "one entry is created for each item in the domain");
 
     var elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
@@ -548,7 +206,7 @@ describe("HorizontalLegend", () => {
     newDomain.push("Madison");
     colorScale.domain(newDomain);
 
-    entries = horizLegend._element.selectAll(entrySelector);
+    entries = (<any> horizLegend)._element.selectAll(entrySelector);
     assert.equal(entries[0].length, colorScale.domain().length, "Legend updated to include item added to the domain");
 
     svg.remove();
@@ -558,7 +216,7 @@ describe("HorizontalLegend", () => {
     var svg = generateSVG(200, 100);
     horizLegend.renderTo(svg);
 
-    var rows = horizLegend._element.selectAll(rowSelector);
+    var rows = (<any> horizLegend)._element.selectAll(rowSelector);
     assert.lengthOf(rows[0], 2, "Wrapped text on to two rows when space is constrained");
 
     horizLegend.detach();
@@ -566,7 +224,7 @@ describe("HorizontalLegend", () => {
     svg = generateSVG(100, 100);
     horizLegend.renderTo(svg);
 
-    rows = horizLegend._element.selectAll(rowSelector);
+    rows = (<any> horizLegend)._element.selectAll(rowSelector);
     assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
 
     svg.remove();
@@ -576,20 +234,20 @@ describe("HorizontalLegend", () => {
     var svg = generateSVG(70, 400);
     horizLegend.renderTo(svg);
 
-    var textEls = horizLegend._element.selectAll("text");
+    var textEls = (<any> horizLegend)._element.selectAll("text");
     textEls.each(function(d: any) {
       var textEl = d3.select(this);
-      assertBBoxInclusion(horizLegend._element, textEl);
+      assertBBoxInclusion((<any> horizLegend)._element, textEl);
     });
 
     horizLegend.detach();
     svg.remove();
     svg = generateSVG(100, 50);
     horizLegend.renderTo(svg);
-    textEls = horizLegend._element.selectAll("text");
+    textEls = (<any> horizLegend)._element.selectAll("text");
     textEls.each(function(d: any) {
       var textEl = d3.select(this);
-      assertBBoxInclusion(horizLegend._element, textEl);
+      assertBBoxInclusion((<any> horizLegend)._element, textEl);
     });
 
     svg.remove();
@@ -600,12 +258,12 @@ describe("HorizontalLegend", () => {
     var svg = generateSVG(400, 100);
     horizLegend.renderTo(svg);
 
-    var style = horizLegend._element.append("style");
+    var style = (<any> horizLegend)._element.append("style");
     style.attr("type", "text/css");
 
     function verifyCircleHeight() {
-      var text = horizLegend._content.select("text");
-      var circle = horizLegend._content.select("circle");
+      var text = (<any> horizLegend)._content.select("text");
+      var circle = (<any> horizLegend)._content.select("circle");
       var textHeight = Plottable._Util.DOM.getBBox(text).height;
       var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
       assert.operator(circleHeight, "<", textHeight, "Icon is smaller than entry text");
@@ -623,6 +281,71 @@ describe("HorizontalLegend", () => {
     horizLegend._invalidateLayout();
     var smallCircleHeight = verifyCircleHeight();
     assert.operator(smallCircleHeight, "<", origCircleHeight, "icon size decreased with font size");
+
+    svg.remove();
+  });
+
+  it("getEntry() horizontal", () => {
+    colorScale.domain(["AA", "BB", "CC"]);
+    var svg = generateSVG(300, 300);
+    horizLegend.renderTo(svg);
+    assert.deepEqual(horizLegend.getEntry({x: 10, y: 10}).data(), ["AA"], "get first entry");
+    assert.deepEqual(horizLegend.getEntry({x: 50, y: 10}).data(), ["BB"], "get second entry");
+    assert.deepEqual(horizLegend.getEntry({x: 150, y: 10}), d3.select(), "no entries at location outside legend");
+
+    svg.remove();
+  });
+
+  it("getEntry() vertical", () => {
+    colorScale.domain(["AA", "BB", "CC"]);
+    var svg = generateSVG(300, 300);
+    horizLegend.maxEntriesPerRow(1);
+    horizLegend.renderTo(svg);
+    assert.deepEqual(horizLegend.getEntry({x: 10, y: 10}).data(), ["AA"], "get first entry");
+    assert.deepEqual(horizLegend.getEntry({x: 10, y: 30}).data(), ["BB"], "get second entry");
+    assert.deepEqual(horizLegend.getEntry({x: 10, y: 150}), d3.select(), "no entries at location outside legend");
+
+    svg.remove();
+  });
+
+  it("maxEntriesPerRow() works as expected", () => {
+    colorScale.domain(["AA", "BB", "CC", "DD", "EE", "FF"]);
+    var svg = generateSVG(300, 300);
+    horizLegend.renderTo(svg);
+
+    var verifyMaxEntriesInRow = (n: number) => {
+      horizLegend.maxEntriesPerRow(n);
+      var rows = (<any> horizLegend)._element.selectAll(rowSelector);
+      assert.lengthOf(rows[0], (6 / n), "number of rows is correct");
+      rows.each(function(d: any) {
+        var entries = d3.select(this).selectAll(entrySelector);
+        assert.lengthOf(entries[0], n, "number of entries in row is correct");
+      });
+    };
+
+    verifyMaxEntriesInRow(1);
+    verifyMaxEntriesInRow(2);
+    verifyMaxEntriesInRow(3);
+    verifyMaxEntriesInRow(6);
+
+    svg.remove();
+  });
+
+  it("sortFunction() works as expected", () => {
+    var newDomain = ["F", "E", "D", "C", "B", "A"];
+    colorScale.domain(newDomain);
+    var svg = generateSVG(300, 300);
+    horizLegend.renderTo(svg);
+    var entries = (<any> horizLegend)._element.selectAll(entrySelector);
+    var elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
+    assert.deepEqual(elementTexts, newDomain, "entry has not been sorted");
+
+    var sortFn = (a: string, b: string) => a.localeCompare(b);
+    horizLegend.sortFunction(sortFn);
+    entries = (<any> horizLegend)._element.selectAll(entrySelector);
+    elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
+    newDomain.sort(sortFn);
+    assert.deepEqual(elementTexts, newDomain, "entry has been sorted alfabetically");
 
     svg.remove();
   });

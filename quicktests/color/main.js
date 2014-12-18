@@ -1,7 +1,43 @@
+//show svg width & height setting
+
+function expandSidebar(){
+
+  "use strict";
+
+  var content = $(".content");
+  var sidebar = $(".sidebar");
+  var controls = $(".controls");
+
+  if(sidebar.position().left !== 0){
+    sidebar.css("visibility", "visible");
+    sidebar.animate({
+      left: '0%'
+    });
+    content.animate({
+      left: '20%',
+    });
+    controls.animate({
+      width: '80%',
+    });
+  }
+  else{
+    sidebar.animate({
+      left: '-20%'
+    });
+    content.animate({
+      left: '0'
+    }, function(){
+      sidebar.css("visibility", "hidden");
+    });
+    controls.animate({
+      width: '100%',
+    });
+  }
+}
+
 (function iife(){
 
 "use strict";
-
 var P = Plottable.Plot;
 var singlePlots = [P.VerticalBar];
 var singleHorizontalPlots = [P.HorizontalBar];
@@ -18,9 +54,55 @@ var plotheight;
 
 //functions
 
+function togglePlotDisplay(className){
+  var classSelector = "."+className;
+  var displayStatus = $(classSelector).css("display") === "none" ? "inline-block" : "none";
+  $(classSelector).css("display", displayStatus);
+}
+
+function setupBindings(){
+  //checkbox check handler
+  $( "input[type=checkbox]" ).on( "click", function(){
+    var plotName = this.parentNode.textContent;
+    plotName = plotName.replace(" ", "");
+    togglePlotDisplay(plotName);
+  });
+
+  //help button tooltip
+  $("#help").hover(function(){
+    $("#help-description").fadeIn('fast');
+  }, function() {
+      // Hover out code
+      $("#help-description").css("display", "none");
+  }).mousemove(function(e) {
+      var windowWidth = window.innerWidth;
+      var helpY = $("#help").position().top;
+      
+      $("#help-description").css({ top: helpY + 28, left: windowWidth - 360 });
+  });
+}
+
+function populatePlotList(){
+  plots.forEach(function(plot){
+    div.append("div").attr("class","single-plot " + plot.name);
+  });
+}
+
+function populateSidebarList(){
+  var startString = "<div class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
+  var endString = "</div>";
+  plots.forEach(function(plot){
+    var finalstring = startString + plot.name + endString;
+    $(".sidebar").append(finalstring);
+  });
+  $(".quicktest-checkbox").attr("checked", true);
+}
+
 function renderPlots(plottablePlots){
   plottablePlots.forEach(function(plot){
-    var box = div.append("svg").attr("height", plotheight).attr("width", plotwidth);
+    var plotDivName = "." + plot.constructor.name;
+    var plotDiv = d3.select(plotDivName); 
+    var box = plotDiv.append("svg").attr("height", plotheight).attr("width", plotwidth);
     var chart = new Plottable.Component.Table([[plot]]);
     chart.renderTo(box);
   });
@@ -46,6 +128,8 @@ function generatePlots(plots, dataType){
     var colorScale = new Plottable.Scale.Color();
     var plot = new PlotType(xScale, yScale);
       plot.attr("fill", "type", colorScale)
+      .project("x", "x", xScale)
+      .project("y", "y", yScale)
       .animate(true);
 
 
@@ -175,6 +259,12 @@ function initialize(){
   generatePlots(plots, dataArray);
 }
 
+//setup page
+populateSidebarList();
+populatePlotList();
+setupBindings();
+
+//render button click triggers initialize
 var button = document.getElementById("render");
 button.onclick = initialize;
 

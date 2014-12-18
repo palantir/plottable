@@ -22,7 +22,7 @@ export module Plot {
       this._isVertical = isVertical;
     }
 
-    public _getAnimator(key: string): Animator.PlotAnimator {
+    protected _getAnimator(key: string): Animator.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
         if (this.animator(key)) {
           return this.animator(key);
@@ -36,7 +36,7 @@ export module Plot {
       return new Animator.Null();
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
 
       var valueAttr = this._isVertical ? "y" : "x";
@@ -60,7 +60,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): _Drawer.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar")}];
     }
 
@@ -70,17 +70,17 @@ export module Plot {
       return this;
     }
 
-    public _onDatasetUpdate() {
+    protected _onDatasetUpdate() {
       super._onDatasetUpdate();
       AbstractStacked.prototype._onDatasetUpdate.apply(this);
       return this;
     }
 
-    public _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
+    protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
       return AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
     }
 
-    public _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
+    protected _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
       return AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
     }
 

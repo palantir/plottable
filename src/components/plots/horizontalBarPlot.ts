@@ -12,7 +12,7 @@ export module Plot {
    *  - "y" - the vertical position of a bar
    */
   export class HorizontalBar<Y> extends Bar<number,Y> {
-    public static _BarAlignmentToFactor: {[alignment: string]: number} = {"top": 0, "center": 0.5, "bottom": 1};
+    protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"top": 0, "center": 0.5, "bottom": 1};
 
     private static WARNED = false;
 
@@ -31,10 +31,9 @@ export module Plot {
       }
     }
 
-    public _updateXDomainer() {
+    protected _updateXDomainer() {
       this._updateDomainer(this._xScale);
     }
-
   }
 }
 }

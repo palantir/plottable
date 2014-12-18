@@ -28,7 +28,9 @@ function run(div, data, Plottable) {
                                          .addDataset("d3", data[2])
                                          .animate(true);
 
-  var center = stackedBarPlot.merge(new Plottable.Component.Legend(colorScale));
+  var legend= new Plottable.Component.Legend(colorScale);
+  legend.maxEntriesPerRow(1);
+  var center = stackedBarPlot.merge(legend);
 
   var horizChart = new Plottable.Component.Table([
     [yAxis, center], [null, xAxis]

@@ -3,8 +3,8 @@
 module Plottable {
 export module Dispatcher {
   export class AbstractDispatcher extends Core.PlottableObject {
-    public _target: D3.Selection;
-    public _event2Callback: { [eventName: string]: () => any; } = {};
+    protected _target: D3.Selection;
+    protected _event2Callback: { [eventName: string]: () => any; } = {};
     private _connected = false;
 
     /**
@@ -48,8 +48,8 @@ export module Dispatcher {
     /**
      * Gets a namespaced version of the event name.
      */
-    public _getEventString(eventName: string) {
-      return eventName + ".dispatcher" + this._plottableID;
+    protected _getEventString(eventName: string) {
+      return eventName + ".dispatcher" + this.getID();
     }
 
     /**

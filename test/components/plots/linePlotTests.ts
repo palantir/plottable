@@ -33,7 +33,7 @@ describe("Plots", () => {
               .project("stroke", colorAccessor)
               .addDataset(simpleDataset)
               .renderTo(svg);
-      renderArea = linePlot._renderArea;
+      renderArea = (<any> linePlot)._renderArea;
     });
 
     it("draws a line correctly", () => {
@@ -121,19 +121,19 @@ describe("Plots", () => {
       ];
       linePlot.addDataset(dataset2);
 
-      var closestData = linePlot._getClosestWithinRange({ x: 500, y: 0 }, 5);
+      var closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 0 }, 5);
       assert.strictEqual(closestData.closestValue, twoPointData[1], "got closest point from first dataset");
 
-      closestData = linePlot._getClosestWithinRange({ x: 500, y: 25 }, 5);
+      closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 25 }, 5);
       assert.strictEqual(closestData.closestValue, dataset2[1], "got closest point from second dataset");
 
-      closestData = linePlot._getClosestWithinRange({ x: 500, y: 10 }, 5);
+      closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 10 }, 5);
       assert.isUndefined(closestData.closestValue, "returns nothing if no points are within range");
 
-      closestData = linePlot._getClosestWithinRange({ x: 500, y: 10 }, 25);
+      closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 10 }, 25);
       assert.strictEqual(closestData.closestValue, twoPointData[1], "returns the closest point within range");
 
-      closestData = linePlot._getClosestWithinRange({ x: 500, y: 20 }, 25);
+      closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 20 }, 25);
       assert.strictEqual(closestData.closestValue, dataset2[1], "returns the closest point within range");
 
       svg.remove();

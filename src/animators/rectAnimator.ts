@@ -30,7 +30,7 @@ export module Animator {
       return super.animate(selection, attrToProjector);
     }
 
-    public _startMovingProjector(attrToProjector: AttributeToProjector) {
+    protected _startMovingProjector(attrToProjector: AttributeToProjector) {
       if (this.isVertical === this.isReverse) {
         return attrToProjector[this._getMovingAttr()];
       }

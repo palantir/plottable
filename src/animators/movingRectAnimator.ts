@@ -25,7 +25,7 @@ export module Animator {
       this.startPixelValue = startPixelValue;
     }
 
-    public _startMovingProjector(attrToProjector: AttributeToProjector) {
+    protected _startMovingProjector(attrToProjector: AttributeToProjector) {
       return d3.functor(this.startPixelValue);
     }
 

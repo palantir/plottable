@@ -46,8 +46,8 @@ export module Interaction {
       if (enabled == null) {
         return this._resizeXEnabled || this._resizeYEnabled;
       } else {
-        this._resizeXEnabled = enabled && (<typeof DragBox> this.constructor)._CAN_RESIZE_X;
-        this._resizeYEnabled = enabled && (<typeof DragBox> this.constructor)._CAN_RESIZE_Y;
+        this._resizeXEnabled = enabled && this.canResizeX();
+        this._resizeYEnabled = enabled && this.canResizeY();
         return this;
       }
     }
@@ -88,7 +88,7 @@ export module Interaction {
       return this.isResizingX() || this.isResizingY();
     }
 
-    public _dragstart() {
+    protected _dragstart() {
       var mouse = d3.mouse(this._hitBox[0][0].parentNode);
 
       if (this.boxIsDrawn()) {
@@ -143,8 +143,7 @@ export module Interaction {
       return {xResizing: xResizing, yResizing: yResizing};
     }
 
-
-    public _drag() {
+    protected _drag() {
       if (this.isResizing()) {
         // Eases the mouse into the center of the dragging line, in case dragging started with the mouse
         // away from the center due to `DragBox.RESIZE_PADDING`.
@@ -182,7 +181,7 @@ export module Interaction {
       this.setBox(this._getOrigin()[0], this._getLocation()[0], this._getOrigin()[1], this._getLocation()[1]);
     }
 
-    public _dragend() {
+    protected _dragend() {
       this._xResizing = null;
       this._yResizing = null;
       super._dragend();
@@ -224,13 +223,13 @@ export module Interaction {
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       var cname = DragBox._CLASS_DRAG_BOX;
-      var background = this._componentToListenTo._backgroundContainer;
+      var background = this._componentToListenTo.background();
       this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
       hitBox.on("mousemove", () => this._hover());
       return this;
     }
 
-    public _hover() {
+    protected _hover() {
       if (this.resizeEnabled() && !this._isDragging && this._boxIsDrawn) {
         var position = d3.mouse(this._hitBox[0][0].parentNode);
         this._cursorStyle = this._getCursorStyle(position[0], position[1]);
@@ -258,6 +257,14 @@ export module Interaction {
       } else {
         return "";
       }
+    }
+
+    protected canResizeX() {
+      return true;
+    }
+
+    protected canResizeY() {
+      return true;
     }
   }
 }

@@ -30,8 +30,9 @@ function run(div, data, Plottable) {
     .addDataset("d3", data[2])
     .animate(true);
 
-
-  var center = stackedAreaPlot.merge(new Plottable.Component.Legend(colorScale));
+  var legend = new Plottable.Component.Legend(colorScale);
+  legend.maxEntriesPerRow(1);
+  var center = stackedAreaPlot.merge(legend);
 
   new Plottable.Component.Table([
     [yAxis, center], [null, xAxis]
