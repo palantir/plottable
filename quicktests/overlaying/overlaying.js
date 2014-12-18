@@ -182,13 +182,11 @@ function setupBindings(){
 
   // show/hide according to hotkey events
   window.onkeyup = function(e){
-    var key = e.keyCode ? e.keyCode : e.which;
-
+    var key = e.keyCode || e.which;
     var inputActive = $("#branch1, #branch2, #width, #height").is(':focus');
     if(inputActive){return;}
 
     var visibleQuickTests = $(".quicktest").filter(":visible").toArray();
-    console.log(visibleQuickTests);
     processKeyEvent(key, visibleQuickTests);
   };
 
@@ -285,7 +283,6 @@ function filterQuickTests(category, branchList){
     if (category !== "all"){
       var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1;});
       var testsInCategory = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, '');});
-      //
       loadQuickTestsInCategory(testsInCategory, category, branchList[0], branchList[1]);
       populateSidebarList(paths, testsInCategory, category);
     }
