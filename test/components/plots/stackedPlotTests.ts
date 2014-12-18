@@ -163,7 +163,7 @@ describe("Plots", () => {
     });
   });
 
-  describe("auto scale domain", () => {
+  describe("auto scale domain on numeric", () => {
     var svg: D3.Selection;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
@@ -214,4 +214,57 @@ describe("Plots", () => {
       svg.remove();
     });
   });
+
+  describe("auto scale domain on ordinal", () => {
+    var svg: D3.Selection;
+    var SVG_WIDTH = 600;
+    var SVG_HEIGHT = 400;
+    var yScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scale.Linear;
+    var data1: any[];
+    var data2: any[];
+
+    beforeEach(() => {
+      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      xScale = new Plottable.Scale.Ordinal().domain(["a", "b"]);;
+      yScale = new Plottable.Scale.Linear();
+
+      data1 = [
+        {x: "a", y: 1},
+        {x: "b", y: 2},
+        {x: "c", y: 8}
+      ];
+
+      data2 = [
+        {x: "a", y: 2},
+        {x: "b", y: 2},
+        {x: "c", y: 3}
+      ];
+    });
+
+    it("auto scales correctly on stacked area", () => {
+      var plot = new Plottable.Plot.StackedArea(xScale, yScale)
+                               .addDataset(data1)
+                               .addDataset(data2)
+                               .project("x", "x", xScale)
+                               .project("y", "y", yScale);
+      (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
+      plot.renderTo(svg);
+      assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
+      svg.remove();
+    });
+
+    it("auto scales correctly on stacked bar", () => {
+      var plot = new Plottable.Plot.StackedBar(xScale, yScale)
+                               .addDataset(data1)
+                               .addDataset(data2)
+                               .project("x", "x", xScale)
+                               .project("y", "y", yScale);
+      (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
+      plot.renderTo(svg);
+      assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
+      svg.remove();
+    });
+  });
+
 });
