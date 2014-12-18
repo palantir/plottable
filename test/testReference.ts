@@ -48,9 +48,6 @@
 ///<reference path="utils/formattersTests.ts" />
 ///<reference path="utils/idCounterTests.ts" />
 ///<reference path="utils/strictEqualityAssociativeArrayTests.ts" />
-///<reference path="utils/cachingCharacterMeasurerTests.ts" />
-///<reference path="utils/cacheTests.ts" />
-///<reference path="utils/textUtilsTests.ts" />
 ///<reference path="utils/utilsTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />
