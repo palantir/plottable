@@ -1,5 +1,5 @@
 
-function expandSidebar(){
+function toggleSidebar(){
 
   "use strict";
 
@@ -80,15 +80,14 @@ var sidebarPopulated = false;
 
 function togglePlotDisplay(className, checkboxState){
   var classSelector = "." + className;
-  var displayStatus = checkboxState? "inline-block" : "none";
+  var displayStatus = checkboxState ? "inline-block" : "none";
   $(classSelector).css("display", displayStatus);
 }
 
 function setCategoryCheckbox(category, populating){
   var categoryListItem = $("#" + category);
   var categoryQuicktestList = categoryListItem.children().filter("li").toArray();
-  //var categoryQuicktestList = $(this).parent().children().not(this).toArray();
-  var categoryChecked = populating ? true : categoryListItem.children()[0].checked ;
+  var categoryChecked = populating ? true : categoryListItem.children()[0].checked;
   categoryQuicktestList.forEach(function(listItem){
     listItem.children[0].checked = categoryChecked;
     var qtName = listItem.textContent.replace(" ", "");
