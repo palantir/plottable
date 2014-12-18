@@ -171,7 +171,8 @@ describe("Labels", () => {
     var testLabel = new Plottable.Component.Label("testing label").padding(30);
     testLabel.renderTo(svg);
 
-    var measure = Plottable._Util.Text.getTextMeasurer(svg.append("text"))("testing label");
+    var measurer = new SVGTypewriter.Measurers.Measurer(svg);
+    var measure = measurer.measure("testing label");
     assert.operator(testLabel.width(), ">", measure.width, "padding increases size of the component");
     assert.operator(testLabel.width(), "<=", measure.width + 2 * testLabel.padding(), "width at most incorporates full padding amount");
     assert.operator(testLabel.height(), ">", measure.height, "padding increases size of the component");
