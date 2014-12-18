@@ -56,7 +56,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = renderer._renderArea.selectAll("rect");
+      var bars = (<any> renderer)._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -88,6 +88,47 @@ describe("Plots", () => {
       assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2 + off, 0.01
           , "x pos correct for bar2");
       assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2 + off, 0.01
+          , "x pos correct for bar3");
+
+      assert.deepEqual(dataset1.data(), originalData1, "underlying data is not modified");
+      assert.deepEqual(dataset2.data(), originalData2, "underlying data is not modified");
+      svg.remove();
+    });
+
+    it("renders correctly under points mode", () => {
+      xScale.rangeType("points");
+      var bars = renderer.getAllBars();
+      var bar0 = d3.select(bars[0][0]);
+      var bar1 = d3.select(bars[0][1]);
+      var bar2 = d3.select(bars[0][2]);
+      var bar3 = d3.select(bars[0][3]);
+      var bar0X = bar0.data()[0].x;
+      var bar1X = bar1.data()[0].x;
+      var bar2X = bar2.data()[0].x;
+      var bar3X = bar3.data()[0].x;
+
+      // check widths
+      var width = (<any> renderer)._getBarPixelWidth() / 2 * .518;
+      assert.closeTo(numAttr(bar0, "width"), width, 2);
+      assert.closeTo(numAttr(bar1, "width"), width, 2);
+      assert.closeTo(numAttr(bar2, "width"), width, 2);
+      assert.closeTo(numAttr(bar3, "width"), width, 2);
+
+      // check heights
+      assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar0");
+      assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight), 0.01, "height is correct for bar1");
+      assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight), 0.01, "height is correct for bar2");
+      assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
+
+      // check that clustering is correct
+      var off = (<any>renderer)._makeInnerScale().scale("_0");
+      assert.closeTo(numAttr(bar0, "x"), xScale.scale(bar0X) - width / 2 - off, 0.1
+          , "x pos correct for bar0");
+      assert.closeTo(numAttr(bar1, "x"), xScale.scale(bar1X) - width / 2 - off, 0.1
+          , "x pos correct for bar1");
+      assert.closeTo(numAttr(bar2, "x"), xScale.scale(bar2X) - width / 2 + off, 0.1
+          , "x pos correct for bar2");
+      assert.closeTo(numAttr(bar3, "x"), xScale.scale(bar3X) - width / 2 + off, 0.1
           , "x pos correct for bar3");
 
       assert.deepEqual(dataset1.data(), originalData1, "underlying data is not modified");
@@ -137,7 +178,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = renderer._renderArea.selectAll("rect");
+      var bars = (<any> renderer)._renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -204,7 +245,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = plot._renderArea.selectAll("rect");
+      var bars = (<any> plot)._renderArea.selectAll("rect");
 
       assert.lengthOf(bars[0], 7, "Number of bars should be equivalent to number of datum");
 

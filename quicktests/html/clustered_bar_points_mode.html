@@ -1,0 +1,32 @@
+
+<html>
+  <head>
+    <title>Clustered Bar Points Mode</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <style>
+      svg {
+        background-color: #EEE;
+      }
+
+      div {
+        padding: 20px;
+      }
+    </style>
+    <script src="../../bower_components/d3/d3.js" charset="utf-8"></script>
+    <script src="../../plottable.js"></script>
+    <script src="../exampleUtil.js"></script>
+    <script src="../js/clustered_bar_points_mode.js"></script>
+
+    <script>
+      window.onload = function() {
+        var div = d3.select("#testdiv");
+        run(div, makeData(), Plottable);
+      }
+  </script>
+  </head>
+
+  <body>
+    <div id="testdiv"></div>
+  </body>
+
+</html>

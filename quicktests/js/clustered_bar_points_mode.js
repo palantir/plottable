@@ -11,28 +11,26 @@ function run(div, data, Plottable) {
   "use strict";
 
   var svg = div.append("svg").attr("height", 500);
-  var xScale = new Plottable.Scale.Ordinal();
-  var yScale = new Plottable.Scale.Linear();
+  var nameScale = new Plottable.Scale.Ordinal().rangeType("points");
+  var valueScale = new Plottable.Scale.Linear();
   var colorScale = new Plottable.Scale.Color("10");
 
-  var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  var clusteredBarRenderer = new Plottable.Plot.ClusteredBar(xScale, yScale)
+  var nameAxis = new Plottable.Axis.Category(nameScale, "bottom");
+  var valueAxis = new Plottable.Axis.Numeric(valueScale, "left");
+  var clusteredBarRenderer = new Plottable.Plot.ClusteredBar(nameScale, valueScale)
     .addDataset("d1", data[0])
     .addDataset("d2", data[1])
     .addDataset("d3", data[2])
-    .attr("x", "name", xScale)
-    .attr("y", "y", yScale)
+    .attr("x", "name", nameScale)
+    .attr("y", "y", valueScale)
     .attr("fill", "type", colorScale)
     .attr("type", "type")
     .attr("yval", "y")
     .barLabelsEnabled(true);
 
-  var legend = new Plottable.Component.Legend(colorScale);
-  legend.maxEntriesPerRow(1);
-  var center = clusteredBarRenderer.merge(legend);
+  var center = clusteredBarRenderer.merge(new Plottable.Component.Legend(colorScale));
 
   var horizChart = new Plottable.Component.Table([
-    [yAxis, center], [null, xAxis]
+    [valueAxis, center], [null, nameAxis]
     ]).renderTo(svg);
 }

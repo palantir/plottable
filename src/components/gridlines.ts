@@ -45,7 +45,7 @@ export module Component {
       return this;
     }
 
-    public _setup() {
+    protected _setup() {
       super._setup();
       this._xLinesContainer = this._content.append("g").classed("x-gridlines", true);
       this._yLinesContainer = this._content.append("g").classed("y-gridlines", true);
