@@ -3632,7 +3632,8 @@ var Plottable;
                 // need to put the bars in a seperate container so we can ensure that they don't cover labels
                 _super.prototype.setup.call(this, area.append("g").classed("bar-area", true));
                 this._textArea = area.append("g").classed("bar-label-text-area", true);
-                this._measurer = new Plottable._Util.Text.CachingCharacterMeasurer(this._textArea.append("text")).measure;
+                this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._textArea);
+                this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
             };
             Rect.prototype.removeLabels = function () {
                 this._textArea.selectAll("g").remove();
@@ -3649,7 +3650,7 @@ var Plottable;
                     var x = attrToProjector["x"](d, i, userMetadata, plotMetadata);
                     var y = attrToProjector["y"](d, i, userMetadata, plotMetadata);
                     var positive = attrToProjector["positive"](d, i, userMetadata, plotMetadata);
-                    var measurement = _this._measurer(text);
+                    var measurement = _this._measurer.measure(text);
                     var color = attrToProjector["fill"](d, i, userMetadata, plotMetadata);
                     var dark = Plottable._Util.Color.contrast("white", color) * 1.6 < Plottable._Util.Color.contrast("black", color);
                     var primary = _this._isVertical ? h : w;
@@ -3681,7 +3682,13 @@ var Plottable;
                             xAlign = positive ? "left" : "right";
                             yAlign = "center";
                         }
-                        Plottable._Util.Text.writeLineHorizontally(text, g, w, h, xAlign, yAlign);
+                        var writeOptions = {
+                            selection: g,
+                            xAlign: xAlign,
+                            yAlign: yAlign,
+                            textRotation: 0
+                        };
+                        _this._writer.write(text, w, h, writeOptions);
                     }
                     return tooWide;
                 });
