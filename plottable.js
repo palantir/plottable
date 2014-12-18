@@ -5607,6 +5607,7 @@ var Plottable;
             };
             Label.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
+                // HACKHACK SVGTypewriter should remove existing content.
                 this._textContainer.selectAll("g").remove();
                 var textMeasurement = this._measurer.measure(this._text);
                 var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);

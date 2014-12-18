@@ -23,6 +23,7 @@ describe("Labels", () => {
     svg.remove();
   });
 
+  // Issue #1470.
   it.skip("Left-rotated text is handled properly", () => {
     var svg = generateSVG(100, 400);
     var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "left");
@@ -35,6 +36,7 @@ describe("Labels", () => {
     svg.remove();
   });
 
+  // Issue #1470.
   it.skip("Right-rotated text is handled properly", () => {
     var svg = generateSVG(100, 400);
     var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "right");
@@ -109,6 +111,7 @@ describe("Labels", () => {
     assert.throws(() => new Plottable.Component.Label("foo", "bar"), Error, "not a valid orientation");
   });
 
+  // Issue #1470.
   it.skip("Label orientation can be changed after label is created", () => {
     var svg = generateSVG(400, 400);
     var label = new Plottable.Component.AxisLabel("CHANGING ORIENTATION");
