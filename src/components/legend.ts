@@ -16,7 +16,7 @@ export module Component {
     private _scale: Scale.Color;
     private _maxEntriesPerRow: number;
     private _sortFn: (a: string, b: string) => number;
-    private _measurer: SVGTypewriter.Measurers.AbstracMeasurer;
+    private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
 
