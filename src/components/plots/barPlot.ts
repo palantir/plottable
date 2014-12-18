@@ -3,7 +3,7 @@
 module Plottable {
 export module Plot {
   export class Bar<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
-    protected static _BarAlignmentToFactor: {[alignment: string]: number} = {};
+    protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
     protected static _DEFAULT_WIDTH = 10;
     private _baseline: D3.Selection;
     private _baselineValue: number;

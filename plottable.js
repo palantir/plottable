@@ -7541,7 +7541,7 @@ var Plottable;
                     selection: barsSelection
                 };
             };
-            Bar._BarAlignmentToFactor = {};
+            Bar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             Bar._DEFAULT_WIDTH = 10;
             return Bar;
         })(Plot.AbstractXYPlot);
