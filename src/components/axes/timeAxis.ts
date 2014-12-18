@@ -147,7 +147,7 @@ export module Axis {
 
     private _mostPreciseConfigIndex: number;
 
-    private _tierLabelPositions: string;
+    private _tierLabelPositions: string[];
 
     private static _LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
 
@@ -385,7 +385,8 @@ export module Axis {
         attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.tickLength() : this._tierHeights[index]);
       } else {
         attr["y1"] = this.height() - offset;
-        attr["y2"] = this.height() - (offset + (this._tierLabelPositions === "center" ? this.tickLength() : this._tierHeights[index]));
+        attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ?
+                                                  this.tickLength() : this._tierHeights[index]));
       }
       tickMarks.attr(attr);
       if (this.orient() === "bottom") {
@@ -404,7 +405,7 @@ export module Axis {
       tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
       var attr = this._generateTickMarkAttrHash();
       attr["y2"] = (this.orient() === "bottom") ? this.tickLabelPadding() : this.height() - this.tickLabelPadding();
-      tickMarks.attr();
+      tickMarks.attr(attr);
       tickMarks.exit().remove();
     }
 
@@ -432,16 +433,15 @@ export module Axis {
       });
 
       for (i = 0; i < Time._NUM_TIERS; ++i) {
-        this._tierBaselines[i].attr("visibility", "hidden");
+        this._tierBaselines[i].style("visibility", "hidden");
       }
 
       var baselineOffset = 0;
-      for (i = 0; i < tierTicks.length; ++i) {
+      for (i = 0; i < Math.max(tierTicks.length, 1); ++i) {
         var attr = this._generateBaselineAttrHash();
         attr["y1"] += (this.orient() === "bottom") ? baselineOffset : -baselineOffset;
         attr["y2"] = attr["y1"];
-        attr["visibility"] = "visible";
-        this._tierBaselines[i].attr(attr);
+        this._tierBaselines[i].attr(attr).style("visibility", "visible");
         baselineOffset += this._tierHeights[i];
       }
 
