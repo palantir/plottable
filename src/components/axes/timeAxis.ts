@@ -141,6 +141,7 @@ export module Axis {
 
     private _tierLabelContainers: D3.Selection[];
     private _tierMarkContainers: D3.Selection[];
+    private _tierBaselines: D3.Selection[];
     private _tierHeights: number[];
     private _measurer: _Util.Text.TextMeasurer;
 
@@ -280,9 +281,12 @@ export module Axis {
       super._setup();
       this._tierLabelContainers = [];
       this._tierMarkContainers = [];
-      for(var i = 0; i < Time._NUM_TIERS; ++i) {
+      this._tierBaselines = [];
+      var i: number;
+      for (i = 0; i < Time._NUM_TIERS; ++i) {
         this._tierLabelContainers.push(this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS + "-container-time", true));
         this._tierMarkContainers.push(this._content.append("g").classed(AbstractAxis.TICK_MARK_CLASS + "-container-time", true));
+        this._tierBaselines.push(this._content.append("line").classed("baseline", true));
       }
       this._measurer = _Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
     }
@@ -337,7 +341,8 @@ export module Axis {
       var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
       var markLength = this._measureTextHeight();
       var yTranslate = this._tierHeights.slice(0, index + 1).reduce((translate: number, height: number) =>
-                        translate + height - this.tickLabelPadding(), 0);
+                        translate + height, 0);
+      yTranslate -= this.tickLabelPadding();
       var textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
         _Util.DOM.translate(textSelection, xTranslate, yTranslate);
@@ -346,6 +351,7 @@ export module Axis {
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
       var anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
       tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
+      filteredTicks.splice(0, 0, this._scale.domain()[0]);
       return filteredTicks;
     }
 
@@ -382,6 +388,14 @@ export module Axis {
         attr["y2"] = this.height() - (offset + (this._tierLabelPositions === "center" ? this.tickLength() : this._tierHeights[index]));
       }
       tickMarks.attr(attr);
+      if (this.orient() === "bottom") {
+        attr["y1"] = offset;
+        attr["y2"] = offset + this._tierHeights[index];
+      } else {
+        attr["y1"] = this.height() - offset;
+        attr["y2"] = this.height() - (offset + this._tierHeights[index]);
+      }
+      d3.select(tickMarks[0][0]).attr(attr);
       tickMarks.exit().remove();
     }
 
@@ -405,11 +419,9 @@ export module Axis {
 
     public _doRender() {
       this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
-      super._doRender();
-
       var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations;
-
-      for (var i = 0; i < Time._NUM_TIERS; ++i) {
+      var i: number;
+      for (i = 0; i < Time._NUM_TIERS; ++i) {
         this._cleanTier(i);
       }
 
@@ -418,6 +430,20 @@ export module Axis {
         this._hideLabels(i);
         return labels;
       });
+
+      for (i = 0; i < Time._NUM_TIERS; ++i) {
+        this._tierBaselines[i].attr("visibility", "hidden");
+      }
+
+      var baselineOffset = 0;
+      for (i = 0; i < tierTicks.length; ++i) {
+        var attr = this._generateBaselineAttrHash();
+        attr["y1"] += (this.orient() === "bottom") ? baselineOffset : -baselineOffset;
+        attr["y2"] = attr["y1"];
+        attr["visibility"] = "visible";
+        this._tierBaselines[i].attr(attr);
+        baselineOffset += this._tierHeights[i];
+      }
 
       var labelLessTicks: Date[] = [];
       var domain = this._scale.domain();
@@ -447,19 +473,6 @@ export module Axis {
         );
       };
 
-      var tickLabels = this._tierLabelContainers[index].selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
-      if (tickLabels[0].length === 0) {
-        return;
-      }
-      var firstTickLabel = tickLabels[0][0];
-      if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
-        d3.select(firstTickLabel).style("visibility", "hidden");
-      }
-      var lastTickLabel = tickLabels[0][tickLabels[0].length-1];
-      if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
-        d3.select(lastTickLabel).style("visibility", "hidden");
-      }
-
       var visibleTickLabels = this._tierLabelContainers[index]
                                     .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
                                     .filter(function(d: any, i: number) {
@@ -470,7 +483,7 @@ export module Axis {
       visibleTickLabels.each(function (d: any) {
         var clientRect = this.getBoundingClientRect();
         var tickLabel = d3.select(this);
-        if (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
+        if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect))) {
           tickLabel.style("visibility", "hidden");
         } else {
           lastLabelClientRect = clientRect;

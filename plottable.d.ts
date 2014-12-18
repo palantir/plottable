@@ -2210,8 +2210,6 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             constructor(scale: Scale.Time, orientation: string);
-            firstTierLabelPosition(): string;
-            firstTierLabelPosition(newPosition: string): Time;
             /**
              * Gets the possible Axis configurations.
              *
@@ -2232,7 +2230,6 @@ declare module Plottable {
             _computeHeight(): number;
             protected _setup(): void;
             protected _getTickValues(): any[];
-            protected _measureTextHeight(): number;
             _doRender(): Time;
         }
     }
@@ -2418,7 +2415,6 @@ declare module Plottable {
              */
             padding(padAmount: number): Label;
             _doRender(): void;
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
         }
         class TitleLabel extends Label {
             /**
@@ -2461,6 +2457,7 @@ declare module Plottable {
              * @param {Scale.Color} colorScale
              */
             constructor(colorScale: Scale.Color);
+            protected _setup(): void;
             /**
              * Gets the current max number of entries in Legend row.
              * @returns {number} The current max number of entries in row.
