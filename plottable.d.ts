@@ -1628,6 +1628,8 @@ declare module Plottable {
             _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             _render(): void;
             _doRender(): void;
+            _useLastCalculatedLayout(): boolean;
+            _useLastCalculatedLayout(useLast: boolean): AbstractComponent;
             _invalidateLayout(): void;
             /**
              * Renders the Component into a given DOM element. The element must be as <svg>.
@@ -1830,6 +1832,8 @@ declare module Plottable {
              */
             detachAll(): AbstractComponentContainer;
             remove(): void;
+            _useLastCalculatedLayout(): boolean;
+            _useLastCalculatedLayout(calculated: boolean): AbstractComponent;
         }
     }
 }

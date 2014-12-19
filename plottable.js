@@ -3241,6 +3241,7 @@ var Plottable;
                 this._cssClasses = ["component"];
                 this._removed = false;
                 this._autoResize = AbstractComponent.AUTORESIZE_BY_DEFAULT;
+                this._usedLastLayout = false;
             }
             /**
              * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -3363,7 +3364,17 @@ var Plottable;
             };
             AbstractComponent.prototype._doRender = function () {
             };
+            AbstractComponent.prototype._useLastCalculatedLayout = function (useLast) {
+                if (useLast == null) {
+                    return this._usedLastLayout;
+                }
+                else {
+                    this._usedLastLayout = useLast;
+                    return this;
+                }
+            };
             AbstractComponent.prototype._invalidateLayout = function () {
+                this._useLastCalculatedLayout(false);
                 if (this._isAnchored && this._isSetup) {
                     if (this._isTopLevelComponent) {
                         this._scheduleComputeLayout();
@@ -3813,6 +3824,12 @@ var Plottable;
             AbstractComponentContainer.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 this.components().slice().forEach(function (c) { return c.remove(); });
+            };
+            AbstractComponentContainer.prototype._useLastCalculatedLayout = function (calculated) {
+                if (calculated != null) {
+                    this.components().slice().forEach(function (c) { return c._useLastCalculatedLayout(calculated); });
+                }
+                return _super.prototype._useLastCalculatedLayout.call(this, calculated);
             };
             return AbstractComponentContainer;
         })(Component.AbstractComponent);
@@ -5004,7 +5021,7 @@ var Plottable;
                 var widthFn = this._isHorizontal() ? d3.sum : Plottable._Util.Methods.max;
                 var heightFn = this._isHorizontal() ? Plottable._Util.Methods.max : d3.sum;
                 return {
-                    textFits: wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText); }),
+                    textFits: wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; }),
                     usedWidth: widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0),
                     usedHeight: heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0)
                 };
@@ -5581,6 +5598,7 @@ var Plottable;
                 this._colWeights = [];
                 this._nRows = 0;
                 this._nCols = 0;
+                this._calculatedLayout = null;
                 this.classed("table", true);
                 rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
@@ -5705,8 +5723,8 @@ var Plottable;
                     colProportionalSpace = Table._calcProportionalSpace(xWeights, freeWidth);
                     rowProportionalSpace = Table._calcProportionalSpace(yWeights, freeHeight);
                     nIterations++;
-                    var canImproveWidthAllocation = freeWidth > 0 && wantsWidth && freeWidth !== lastFreeWidth;
-                    var canImproveHeightAllocation = freeHeight > 0 && wantsHeight && freeHeight !== lastFreeHeight;
+                    var canImproveWidthAllocation = freeWidth > 0 && freeWidth !== lastFreeWidth;
+                    var canImproveHeightAllocation = freeHeight > 0 && freeHeight !== lastFreeHeight;
                     if (!(canImproveWidthAllocation || canImproveHeightAllocation)) {
                         break;
                     }
@@ -5746,18 +5764,18 @@ var Plottable;
                 return { guaranteedWidths: requestedWidths, guaranteedHeights: requestedHeights, wantsWidthArr: layoutWantsWidth, wantsHeightArr: layoutWantsHeight };
             };
             Table.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var layout = this._iterateLayout(offeredWidth, offeredHeight);
-                return { width: d3.sum(layout.guaranteedWidths), height: d3.sum(layout.guaranteedHeights), wantsWidth: layout.wantsWidth, wantsHeight: layout.wantsHeight };
+                this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
+                return { width: d3.sum(this._calculatedLayout.guaranteedWidths), height: d3.sum(this._calculatedLayout.guaranteedHeights), wantsWidth: this._calculatedLayout.wantsWidth, wantsHeight: this._calculatedLayout.wantsHeight };
             };
             // xOffset is relative to parent element, not absolute
             Table.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 var _this = this;
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                var layout = this._iterateLayout(this.width(), this.height());
-                var sumPair = function (p) { return p[0] + p[1]; };
+                var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
+                this._useLastCalculatedLayout(true);
+                var childYOffset = 0;
                 var rowHeights = Plottable._Util.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
                 var colWidths = Plottable._Util.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);
-                var childYOffset = 0;
                 this._rows.forEach(function (row, rowIndex) {
                     var childXOffset = 0;
                     row.forEach(function (component, colIndex) {

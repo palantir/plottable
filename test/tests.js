@@ -887,8 +887,7 @@ describe("Category Axes", function () {
         var domain = [null, undefined, true, 2, "foo"];
         var scale = new Plottable.Scale.Ordinal().domain(domain);
         var axis = new Plottable.Axis.Category(scale);
-        var table = new Plottable.Component.Table([[axis]]);
-        table.renderTo(svg);
+        axis.renderTo(svg);
         var texts = svg.selectAll("text")[0].map(function (s) { return d3.select(s).text(); });
         assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);
         svg.remove();
