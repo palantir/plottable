@@ -4882,7 +4882,7 @@ var Plottable;
                 var yAlign;
                 switch (this.tickLabelAngle()) {
                     case 0:
-                        xAlign = { left: "left", right: "left", top: "center", bottom: "center" };
+                        xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                         yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
                         break;
                     case 90:
