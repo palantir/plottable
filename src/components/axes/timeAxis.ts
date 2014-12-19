@@ -345,6 +345,13 @@ export module Axis {
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
       var anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
       tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
+      if (filteredTicks.indexOf(this._scale.domain()[0]) === -1) {
+        filteredTicks.splice(0, 0, this._scale.domain()[0]);
+      }
+      if (filteredTicks.indexOf(this._scale.domain()[1]) === -1) {
+        tickPos.push(this._scale.domain()[1]);
+      }
+
       return filteredTicks;
     }
 
