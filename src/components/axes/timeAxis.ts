@@ -140,9 +140,14 @@ export module Axis {
     ];
 
     private _tierLabelContainers: D3.Selection[];
+    private _tierMarkContainers: D3.Selection[];
+    private _tierBaselines: D3.Selection[];
+    private _tierHeights: number[];
     private _measurer: SVGTypewriter.Measurers.Measurer;
 
     private _mostPreciseConfigIndex: number;
+
+    private _tierLabelPositions: string[];
 
     private static _LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
 
@@ -164,6 +169,22 @@ export module Axis {
       super(scale, orientation);
       this.classed("time-axis", true);
       this.tickLabelPadding(5);
+      this.tierLabelPositions(["between", "between"]);
+    }
+
+    public tierLabelPositions(): string[];
+    public tierLabelPositions(newPositions: string[]): Time;
+    public tierLabelPositions(newPositions?: string[]): any {
+      if (newPositions == null) {
+        return this._tierLabelPositions;
+      } else {
+        if (!newPositions.every((pos: string) => pos.toLowerCase() === "between" || pos.toLowerCase() === "center")) {
+          throw new Error("Unsupported position for tier labels");
+        }
+        this._tierLabelPositions = newPositions;
+        this._invalidateLayout();
+        return this;
+      }
     }
 
     /**
@@ -220,13 +241,10 @@ export module Axis {
     }
 
     public _computeHeight() {
-      if (this._computedHeight !== null) {
-        return this._computedHeight;
-      }
-      var textHeight = this._measurer.measure().height * 2;
-      this.tickLength(textHeight);
-      this.endTickLength(textHeight);
-      this._computedHeight = this._maxLabelTickLength() + 2 * this.tickLabelPadding();
+      var textHeight = this._measurer.measure().height;
+      this._tierHeights = this._tierLabelPositions.map((pos: string) =>
+        textHeight + this.tickLabelPadding() + ((pos === "between") ? 0 : this._maxLabelTickLength()));
+      this._computedHeight = d3.sum(this._tierHeights);
       return this._computedHeight;
     }
 
@@ -257,9 +275,17 @@ export module Axis {
     protected _setup() {
       super._setup();
       this._tierLabelContainers = [];
-      for(var i = 0; i < Time._NUM_TIERS; ++i) {
-        this._tierLabelContainers.push(this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true));
+      this._tierMarkContainers = [];
+      this._tierBaselines = [];
+      this._tickLabelContainer.remove();
+      this._baseline.remove();
+      for (var i = 0; i < Time._NUM_TIERS; ++i) {
+        var tierContainer = this._content.append("g").classed("time-axis-tier", true);
+        this._tierLabelContainers.push(tierContainer.append("g").classed(AbstractAxis.TICK_LABEL_CLASS + "-container", true));
+        this._tierMarkContainers.push(tierContainer.append("g").classed(AbstractAxis.TICK_MARK_CLASS + "-container", true));
+        this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
       }
+
       this._measurer = new SVGTypewriter.Measurers.Measurer(this._tierLabelContainers[0]);
     }
 
@@ -274,18 +300,18 @@ export module Axis {
         );
     }
 
-    private _cleanContainer(container: D3.Selection) {
-      container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
+    private _cleanTier(index: number) {
+      this._tierLabelContainers[index].selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
+      this._tierMarkContainers[index].selectAll("." + AbstractAxis.TICK_MARK_CLASS).remove();
+      this._tierBaselines[index].style("visibility", "hidden");
     }
 
-    private _renderTierLabels(container: D3.Selection, config: TimeAxisTierConfiguration, height: number) {
+    private _renderTierLabels(container: D3.Selection, config: TimeAxisTierConfiguration, index: number) {
       var tickPos = (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
       tickPos.splice(0, 0, this._scale.domain()[0]);
       tickPos.push(this._scale.domain()[1]);
-      var shouldCenterText = config.step === 1;
-      // only center when the label should span the whole interval
       var labelPos: Date[] = [];
-      if (shouldCenterText) {
+      if (this._tierLabelPositions[index] === "between" && config.step === 1) {
         tickPos.map((datum: any, index: any) => {
           if (index + 1 >= tickPos.length) {
             return;
@@ -297,7 +323,7 @@ export module Axis {
       }
       var filteredTicks: Date[] = [];
       labelPos = labelPos.filter((d: any, i: number) => {
-        var fits = this._canFitLabelFilter(container, d, tickPos.slice(i, i + 2), config.formatter(d), shouldCenterText);
+        var fits = this._canFitLabelFilter(d, tickPos.slice(i, i + 2), config, this._tierLabelPositions[index]);
         if (fits) {
           filteredTicks.push(tickPos[i]);
         }
@@ -307,28 +333,38 @@ export module Axis {
       var tickLabels = container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
       var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
-      var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
-      var yTranslate = (this.orient() === "bottom" ? (this._maxLabelTickLength() / 2 * height) :
-          (this.height() - this._maxLabelTickLength() / 2 * height + 2 * this.tickLabelPadding()));
+      var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
+      var markLength = this._measurer.measure().height;
+      var yTranslate = d3.sum(this._tierHeights.slice(0, index + 1));
+      yTranslate -= this.tickLabelPadding();
       var textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
         _Util.DOM.translate(textSelection, xTranslate, yTranslate);
       }
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
-      var anchor = shouldCenterText ? "middle" : "start";
+      var anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
       tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
+      if (filteredTicks.indexOf(this._scale.domain()[0]) === -1) {
+        filteredTicks.splice(0, 0, this._scale.domain()[0]);
+      }
+      if (filteredTicks.indexOf(this._scale.domain()[1]) === -1) {
+        tickPos.push(this._scale.domain()[1]);
+      }
 
       return filteredTicks;
     }
 
-    private _canFitLabelFilter(container: D3.Selection, position: Date, bounds: Date[], label: string, isCentered: boolean): boolean {
+    private _canFitLabelFilter(position: Date, bounds: Date[], config: TimeAxisTierConfiguration, labelPosition: string): boolean {
+      if (labelPosition === "center") {
+        return true;
+      }
       var endPosition: number;
       var startPosition: number;
-      var width = this._measurer.measure(label).width + this.tickLabelPadding();
+      var width = this._measurer.measure(config.formatter(position)).width + ((config.step !== 1) ? this.tickLabelPadding() : 0);
       var leftBound = this._scale.scale(bounds[0]);
       var rightBound = this._scale.scale(bounds[1]);
-      if (isCentered) {
+      if (labelPosition === "center" || config.step === 1) {
           endPosition = this._scale.scale(position) + width / 2;
           startPosition = this._scale.scale(position) - width / 2;
       } else {
@@ -339,17 +375,38 @@ export module Axis {
       return endPosition <= rightBound && startPosition >= leftBound;
     }
 
-    private _adjustTickLength(tickValues: Date[], height: number) {
-      var selection = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).filter((d: Date) =>
-        // we want to check if d is in tickValues
-        // however, if two dates a, b, have the same date, it may not be true that a === b.
-        // thus, we convert them to values first, then do the comparison
-          tickValues.map((x: Date) => x.valueOf()).indexOf(d.valueOf()) >= 0
-      );
-      if (this.orient() === "top") {
-        height = this.height() - height;
+    private _renderTickMarks(tickValues: Date[], index: number) {
+      var tickMarks = this._tierMarkContainers[index].selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(tickValues);
+      tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
+      var attr = this._generateTickMarkAttrHash();
+      var offset = this._tierHeights.slice(0, index).reduce((translate: number, height: number) => translate + height, 0);
+      if (this.orient() === "bottom") {
+        attr["y1"] = offset;
+        attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.tickLength() : this._tierHeights[index]);
+      } else {
+        attr["y1"] = this.height() - offset;
+        attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ?
+                                                  this.tickLength() : this._tierHeights[index]));
       }
-      selection.attr("y2", height);
+      tickMarks.attr(attr);
+      if (this.orient() === "bottom") {
+        attr["y1"] = offset;
+        attr["y2"] = offset + this._tierHeights[index];
+      } else {
+        attr["y1"] = this.height() - offset;
+        attr["y2"] = this.height() - (offset + this._tierHeights[index]);
+      }
+      d3.select(tickMarks[0][0]).attr(attr);
+      tickMarks.exit().remove();
+    }
+
+    private _renderLabellessTickMarks(tickValues: Date[]) {
+      var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(tickValues);
+      tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
+      var attr = this._generateTickMarkAttrHash();
+      attr["y2"] = (this.orient() === "bottom") ? this.tickLabelPadding() : this.height() - this.tickLabelPadding();
+      tickMarks.attr(attr);
+      tickMarks.exit().remove();
     }
 
     private _generateLabellessTicks() {
@@ -361,42 +418,72 @@ export module Axis {
                                             tierConfigurations[0]);
     }
 
-    private _createTickMarks(ticks: Date[]) {
-      var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(ticks);
-      tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
-      tickMarks.attr(this._generateTickMarkAttrHash());
-      tickMarks.exit().remove();
-    }
-
     public _doRender() {
       this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
-      super._doRender();
-
       var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations;
-
-      this._tierLabelContainers.forEach(this._cleanContainer);
+      for (var i = 0; i < Time._NUM_TIERS; ++i) {
+        this._cleanTier(i);
+      }
 
       var tierTicks = tierConfigs.map((config: TimeAxisTierConfiguration, i: number) =>
-        this._renderTierLabels(this._tierLabelContainers[i], config, i + 1)
+        this._renderTierLabels(this._tierLabelContainers[i], config, i)
       );
 
-      var ticks = tierTicks.slice();
+      var baselineOffset = 0;
+      for (i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
+        var attr = this._generateBaselineAttrHash();
+        attr["y1"] += (this.orient() === "bottom") ? baselineOffset : -baselineOffset;
+        attr["y2"] = attr["y1"];
+        this._tierBaselines[i].attr(attr).style("visibility", "visible");
+        baselineOffset += this._tierHeights[i];
+      }
+
       var labelLessTicks: Date[] = [];
       var domain = this._scale.domain();
       var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
       if (this._getIntervalLength(tierConfigs[0]) * 1.5 >= totalLength) {
         labelLessTicks = this._generateLabellessTicks();
       }
-      ticks.push(labelLessTicks);
 
-      this._createTickMarks(_Util.Methods.flatten(ticks));
-      this._adjustTickLength(labelLessTicks, this.tickLabelPadding());
+      this._renderLabellessTickMarks(labelLessTicks);
 
-      tierConfigs.forEach((config: TimeAxisTierConfiguration, i: number) =>
-        this._adjustTickLength(tierTicks[i], this._maxLabelTickLength() * (i + 1) / Time._NUM_TIERS)
-      );
+      for (i = 0; i < tierConfigs.length; ++i) {
+        this._renderTickMarks(tierTicks[i], i);
+        this._hideOverlappingAndCutOffLabels(i);
+      }
 
       return this;
+    }
+
+    private _hideOverlappingAndCutOffLabels(index: number) {
+      var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
+
+      var isInsideBBox = (tickBox: ClientRect) => {
+        return (
+          Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
+          Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
+          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.width()) &&
+          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.height())
+        );
+      };
+
+      var visibleTickLabels = this._tierLabelContainers[index]
+                                    .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
+                                    .filter(function(d: any, i: number) {
+                                      return d3.select(this).style("visibility") === "visible";
+                                    });
+      var lastLabelClientRect: ClientRect;
+
+      visibleTickLabels.each(function (d: any) {
+        var clientRect = this.getBoundingClientRect();
+        var tickLabel = d3.select(this);
+        if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect))) {
+          tickLabel.style("visibility", "hidden");
+        } else {
+          lastLabelClientRect = clientRect;
+          tickLabel.style("visibility", "visible");
+        }
+      });
     }
   }
 }

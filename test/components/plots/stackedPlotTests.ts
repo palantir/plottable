@@ -220,7 +220,7 @@ describe("Plots", () => {
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var yScale: Plottable.Scale.Linear;
-    var xScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scale.Ordinal;
     var data1: any[];
     var data2: any[];
 
@@ -243,7 +243,7 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked area", () => {
-      var plot = new Plottable.Plot.StackedArea(xScale, yScale)
+      var plot = new Plottable.Plot.StackedArea(yScale, yScale)
                                .addDataset(data1)
                                .addDataset(data2)
                                .project("x", "x", xScale)

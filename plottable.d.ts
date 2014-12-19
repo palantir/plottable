@@ -2062,6 +2062,8 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             constructor(scale: Scale.Time, orientation: string);
+            tierLabelPositions(): string[];
+            tierLabelPositions(newPositions: string[]): Time;
             /**
              * Gets the possible Axis configurations.
              *
