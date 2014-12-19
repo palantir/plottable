@@ -2803,6 +2803,7 @@ declare module Plottable {
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
+             * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             protected _getDrawer(key: string): _Drawer.Rect;
@@ -3046,6 +3047,7 @@ declare module Plottable {
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
+             * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             protected _generateAttrToProjector(): AttributeToProjector;

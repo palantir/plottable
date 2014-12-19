@@ -21,6 +21,7 @@ export module Plot {
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
+     * @param {boolean} isVertical if the plot if vertical.
      */
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
       super(xScale, yScale);
