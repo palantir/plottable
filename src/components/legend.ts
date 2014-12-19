@@ -54,7 +54,7 @@ export module Component {
       fakeLegendEntry.append("text");
       this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
-      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
+      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(true);
     }
 
     /**
