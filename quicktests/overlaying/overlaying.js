@@ -1,3 +1,49 @@
+
+function toggleSidebar(){
+
+  "use strict";
+
+  var content = $(".content");
+  var sidebar = $(".sidebar");
+  var controls = $(".controls");
+  var sizeControls = $(".size-controls");
+  var windowHeight = window.innerHeight - 50;
+
+  sidebar.css("height", windowHeight);
+
+  if(sidebar.position().left !== 0){
+    sidebar.css("visibility", "visible");
+    sidebar.animate({
+      left: '0%'
+    });
+    content.animate({
+      left: '20%',
+    });
+    controls.animate({
+      width: '80%',
+    });
+    sizeControls.animate({
+      width: '80%',
+    });
+  }
+  else{
+    sidebar.animate({
+      left: '-20%'
+    });
+    content.animate({
+      left: '0'
+    }, function(){
+      sidebar.css("visibility", "hidden");
+    });
+    controls.animate({
+      width: '100%',
+    });
+    sizeControls.animate({
+      width: '100%',
+    });
+  }
+}
+
 //show svg width & height setting
 function showSizeControls(){
 
@@ -26,8 +72,136 @@ var firstBranch;
 var secondBranch;
 var svgWidth;
 var svgHeight;
+var sidebarPopulated = false;
+
 
 //METHODS
+
+
+function togglePlotDisplay(className, checkboxState){
+  var classSelector = "." + className;
+  var displayStatus = checkboxState ? "inline-block" : "none";
+  $(classSelector).css("display", displayStatus);
+}
+
+function setCategoryCheckbox(category, populating){
+  var categoryListItem = $("#" + category);
+  var categoryQuicktestList = categoryListItem.children().filter("li").toArray();
+  var categoryChecked = populating ? true : categoryListItem.children()[0].checked;
+  categoryQuicktestList.forEach(function(listItem){
+    listItem.children[0].checked = categoryChecked;
+    var qtName = listItem.textContent.replace(" ", "");
+    togglePlotDisplay(qtName, categoryChecked);
+  });
+  categoryListItem.children()[0].checked = categoryChecked;
+}
+
+function setupCheckboxBinding(){
+  //sidebar checkbox check handler
+  $( "li input[type=checkbox]" ).on( "click", function(){
+    var plotName = this.parentNode.textContent;
+    var nextState = $(this)[0].checked;
+    plotName = plotName.replace(" ", "");
+    togglePlotDisplay(plotName, nextState);
+  });
+
+  $( "ol .category-checkbox" ).on( "click", function(){
+    setCategoryCheckbox(this.parentNode.id, false);
+  });
+}
+
+function populateTotalSidebarList(paths){
+  //IF CATEGORY IS ALL ******
+  var testsPaths = paths.map(function(path) {return path.replace(/.*tests\/|\.js/g, '');});
+
+  //ex. animations/animate_area
+  var hash = {};
+  testsPaths.forEach(function(test){
+    var slashPos = test.indexOf("/");
+    var categoryString = test.substr(0, slashPos);
+    var quicktestString = test.substr(slashPos+1, test.length-1);
+    var quicktestArray = [quicktestString];
+    if (!hash[categoryString]){
+      hash[categoryString] = quicktestArray;
+    }
+    else{
+      hash[categoryString].push(quicktestString);
+    }
+  });
+  // hash = hash of quicktest categories and quicktests
+
+  var allQuickTests = d3.entries(hash);
+
+  allQuickTests.forEach(function(object){
+    var categoryName = object.key;
+    var startOlString = "<ol class=\"sidebar-quicktest-category\" id=" + categoryName + "> <input class=\"category-checkbox\" type=\"checkbox\">";
+    var endOlString = "</ol>";
+    var categoryStringHTML = startOlString + categoryName + endOlString;
+      $(".sidebar").append(categoryStringHTML);
+
+    object.value.forEach(function(quicktest){
+      var singleQuicktestName = quicktest;
+      var startOlString = "<li class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
+      var endOlString = "</li>";
+      var quicktestStringHTML = startOlString + singleQuicktestName + endOlString;
+      $("#" + categoryName).append(quicktestStringHTML);
+    });
+  });
+
+  setupCheckboxBinding();
+  $(":checkbox").attr("checked" , true);
+  sidebarPopulated = true;
+
+}
+
+function populateSidebarList(paths, testsInCategory, category){
+
+  var allQuickTests = d3.entries(testsInCategory);
+  var categoryName = category;
+  var startOlString = "<ol class=\"sidebar-quicktest-category\" id=" + categoryName + "> <input class=\"category-checkbox\" type=\"checkbox\">";
+  var endOlString = "</ol>";
+
+  var categoryStringHTML = startOlString + categoryName + endOlString;
+    $(".sidebar").append(categoryStringHTML);
+
+    allQuickTests.forEach(function(quicktest){
+      var singleQuicktestName = quicktest.value;
+      var startOlString = "<li class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
+      var endOlString = "</li>";
+      var quicktestStringHTML = startOlString + singleQuicktestName + endOlString;
+      $("#" + categoryName).append(quicktestStringHTML);
+    });
+  $(":checkbox").attr("checked", false);
+  setupCheckboxBinding();
+  setCategoryCheckbox(category, true);
+  sidebarPopulated = true;
+}
+
+//initializing methods
+function setupBindings(){
+
+  // show/hide according to hotkey events
+  window.onkeyup = function(e){
+    var key = e.keyCode || e.which;
+    var inputActive = $("#branch1, #branch2, #width, #height").is(':focus');
+    if(inputActive){return;}
+
+    var visibleQuickTests = $(".quicktest").filter(":visible").toArray();
+    processKeyEvent(key, visibleQuickTests);
+  };
+
+  $("#help").hover(function(){
+    $("#test-category-descriptions").fadeIn('fast');
+  }, function() {
+      // Hover out code
+      $("#test-category-descriptions").css("display", "none");
+  }).mousemove(function(e) {
+      var windowWidth = window.innerWidth;
+      var helpY = $("#help").position().top;
+      $("#test-category-descriptions").css({ top: helpY + 28, left: windowWidth - 360 });
+  });
+
+}//setupBindings
 
 function setTestBoxDimensions(){
   //quicktest class is the black border container div for all svgs
@@ -45,6 +219,32 @@ function runQuickTest(result, svg, data, branch){
   }
 }
 
+function loadAllQuickTests(quicktestsPaths, firstBranch, secondBranch){
+  var div = d3.select("#results");
+  quicktestsPaths.forEach(function(path) { //for each quicktest 
+    var name = path.replace(/\w*\/|\.js/g , '');
+    d3.text("http://localhost:9999/" + path, function(error, text) {
+      if (error !== null) {
+        console.warn("Tried to load nonexistant quicktest ");
+        return;
+      }
+      text = "(function(){" + text +
+          "\nreturn {makeData: makeData, run: run};" +
+               "})();" +
+          "\n////# sourceURL=" + path;
+      var result = eval(text);
+      var className = "quicktest " + name;
+      var div = d3.select("#results").append("div").attr("class", className);
+      div.insert("label").text(name);
+      var firstsvg = div.append("div").attr("class", "first").append("svg").attr({width: svgWidth, height: svgHeight});
+      var secondsvg = div.append("div").attr("class", "second").append("svg").attr({width: svgWidth, height: svgHeight});
+      var data = result.makeData();
+
+      runQuickTest(result, firstsvg, data, firstBranch);
+      runQuickTest(result, secondsvg, data, secondBranch);
+    });
+  });
+}
 //load each quicktest locally, eval it, then run quicktest
 function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondBranch){
 
@@ -73,19 +273,26 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
       runQuickTest(result, secondsvg, data, secondBranch);
     });
   });
-    
 }
 
-//filter all quicktests by category from list_of_quicktests.json
+//filter all quicktests by category from list_of_quicktests.json & also load sidebar
 function filterQuickTests(category, branchList){
   //filter list of quicktests to list of quicktest names to pass to doSomething
   d3.json("list_of_quicktests.json", function (data){
     var paths = data.map(function(quickTestObj) {return quickTestObj.path;});
-    var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1;});
-    var qtestnames = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, '');});
-    loadQuickTestsInCategory(qtestnames, category, branchList[0], branchList[1]);
+    if (category !== "all"){
+      var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1;});
+      var testsInCategory = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, '');});
+      loadQuickTestsInCategory(testsInCategory, category, branchList[0], branchList[1]);
+      populateSidebarList(paths, testsInCategory, category);
+    }
+    else{
+      loadAllQuickTests(paths, branchList[0], branchList[1]);
+      populateTotalSidebarList(paths);
+    }
   });
 }
+  
 
 //retrieve different plottable objects then push to array
 function loadPlottableBranches(category, branchList){
@@ -121,7 +328,6 @@ function loadPlottableBranches(category, branchList){
     else if(textStatus === "error"){
       console.log("could not retrieve Plottable branch, check if branch name " + branch + " is correct!");
     }
-
   });
 }
 
@@ -135,7 +341,8 @@ function resetDisplayProperties(){
 function clearTests(){
   plottableBranches = [];
   resetDisplayProperties();
-  d3.selectAll(".quicktest").remove();
+  d3.selectAll(".quicktest, .sidebar-quicktest-category ").remove();
+  sidebarPopulated = false;
 }
 
 function initialize(){
@@ -160,14 +367,12 @@ function processKeyEvent(key, visibleQuickTests){
   var onePressed = (key === 49 || key === 97); //regular & numpad keys
   var twoPressed = (key === 50 || key === 98);
   var threePressed = (key === 51 || key === 99);
-  var fourPressed = (key === 52 || key === 100);
 
-  if(onePressed || twoPressed || threePressed || fourPressed) {
+  if(onePressed || twoPressed || threePressed) {
     var firstBranchDisplay = onePressed || threePressed ? "block" : "none";
     var secondBranchDisplay = twoPressed || threePressed ? "block" : "none";
     var branchClassBehind = onePressed ? ".second" : ".first";
     var branchClassFront = onePressed ? ".first" : ".second";
-    var quicktestDisplay = fourPressed ? "none" : "inline-block";
     var firstBranchInputColor = onePressed || threePressed ? "mediumaquamarine" : "white";
     var secondBranchInputColor = twoPressed || threePressed ? "mediumaquamarine" : "white";
 
@@ -177,7 +382,6 @@ function processKeyEvent(key, visibleQuickTests){
       $(branchClassBehind, quicktest).before($(branchClassFront, quicktest));
     });
 
-    $(".quicktest").css("display", quicktestDisplay);
     $("#branch1").css("background-color", firstBranchInputColor);
     $("#branch2").css("background-color", secondBranchInputColor);
   }
@@ -185,29 +389,7 @@ function processKeyEvent(key, visibleQuickTests){
   return;
 }
 
-
-// show/hide according to hotkey events
-window.onkeyup = function(e){
-  var key = e.keyCode ? e.keyCode : e.which;
-
-  var inputActive = $("#branch1, #branch2, #width, #height").is(':focus');
-  if(inputActive){return;}
-
-  var visibleQuickTests = $(".quicktest").toArray();
-
-  processKeyEvent(key, visibleQuickTests);
-};
-
-$("#help").hover(function(){
-  $("#test-category-descriptions").fadeIn('fast');
-}, function() {
-    // Hover out code
-    $("#test-category-descriptions").css("display", "none");
-}).mousemove(function(e) {
-    var mouseX = e.pageX; //Get X coordinates
-    var mouseY = e.pageY; //Get Y coordinates
-    $("#test-category-descriptions").css({ top: mouseY + 20, left: mouseX - 330 });
-});
+setupBindings();
 
 var button = document.getElementById("render");
 button.onclick = initialize;

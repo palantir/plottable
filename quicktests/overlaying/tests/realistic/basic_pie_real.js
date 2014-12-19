@@ -25,8 +25,9 @@ function run(svg, data, Plottable) {
   "use strict";
   
   var colorScale = new Plottable.Scale.Color();
-	var legend = new Plottable.Component.Legend(colorScale).xAlign("left");
-	var title = new Plottable.Component.TitleLabel("Sales by Region"); 
+  var legend = new Plottable.Component.Legend(colorScale).xAlign("left");
+  legend.maxEntriesPerRow(1);
+  var title = new Plottable.Component.TitleLabel("Sales by Region"); 
   var Alabel = new Plottable.Component.Label("Product A");
   var Blabel = new Plottable.Component.Label("Product B");
   var ABlabel = new Plottable.Component.Label("Combined");
@@ -69,5 +70,6 @@ function run(svg, data, Plottable) {
       [allPlots]
   ]);
 
+    
   chart.renderTo(svg);
 }

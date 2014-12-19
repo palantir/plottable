@@ -65,16 +65,19 @@ function run(svg, data, Plottable) {
                                   .addDataset("aapl", aaplSource)
                                   .project("x", "Date", xScale)
                                   .project("y", "Adj Close", yScale_aapl)
-                                  .project("stroke", function(d, i, m) { return m.name; }, colorScale);
+                                  .project("stroke", function(d, i, m) { return m.name; }, colorScale)
+                                  .automaticallyAdjustYScaleOverVisiblePoints(true);
           var line_goog = new Plottable.Plot.Line(xScale, yScale_goog).animate(true)
                                   .addDataset("goog", googSource)
                                   .project("x", "Date", xScale)
                                   .project("y", "Adj Close", yScale_goog)
-                                  .project("stroke", function(d, i, m) { return m.name; }, colorScale);
+                                  .project("stroke", function(d, i, m) { return m.name; }, colorScale)
+                                  .automaticallyAdjustYScaleOverVisiblePoints(true);
 
           // should be one line plot, pending #917
 
           var legend = new Plottable.Component.Legend(colorScale);
+          legend.maxEntriesPerRow(1);
           legend.yAlign("top").xOffset(-5);
           var plotArea = new Plottable.Component.Group([line_aapl, line_goog, legend]);
 
@@ -101,9 +104,14 @@ function run(svg, data, Plottable) {
 
           table.renderTo(svg);
 
-          plotArea.registerInteraction(new Plottable.Interaction.PanZoom(xScale, null));
+          var pzi = new Plottable.Interaction.PanZoom(xScale, null);
+          plotArea.registerInteraction(pzi);
           plotArea.registerInteraction(
-            new Plottable.Interaction.Key(65).callback(function() { xScale.autoDomain(); })
+            new Plottable.Interaction.Key()
+                                     .on(65, function() {
+                                       xScale.autoDomain();
+                                       pzi.resetZoom();
+                                     })
           );
 
         });
