@@ -586,7 +586,7 @@ describe("Plots", () => {
       var simpleDataset = new Plottable.Dataset([{a: "a", b: 6}, {a: "b", b: 2}, {a: "c", b: -2}, {a: "d", b: -6}], {foo: 0});
       var xScale = new Plottable.Scale.Ordinal();
       var yScale = new Plottable.Scale.Linear();
-      var plot = new Plottable.Plot.AbstractBarPlot(xScale, yScale);
+      var plot = new Plottable.Plot.Bar(xScale, yScale);
       plot.addDataset(simpleDataset)
           .project("x", xAccessor, xScale)
           .project("y", yAccessor, yScale)

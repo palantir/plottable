@@ -2735,7 +2735,7 @@ describe("Plots", function () {
             var simpleDataset = new Plottable.Dataset([{ a: "a", b: 6 }, { a: "b", b: 2 }, { a: "c", b: -2 }, { a: "d", b: -6 }], { foo: 0 });
             var xScale = new Plottable.Scale.Ordinal();
             var yScale = new Plottable.Scale.Linear();
-            var plot = new Plottable.Plot.AbstractBarPlot(xScale, yScale);
+            var plot = new Plottable.Plot.Bar(xScale, yScale);
             plot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).renderTo(svg);
             xScale.domain(["b", "c"]);
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
@@ -3191,7 +3191,7 @@ describe("Plots", function () {
             ];
         });
         it("auto scales correctly on stacked area", function () {
-            var plot = new Plottable.Plot.StackedArea(xScale, yScale).addDataset(data1).addDataset(data2).project("x", "x", xScale).project("y", "y", yScale);
+            var plot = new Plottable.Plot.StackedArea(yScale, yScale).addDataset(data1).addDataset(data2).project("x", "x", xScale).project("y", "y", yScale);
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
