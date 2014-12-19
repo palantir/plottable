@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class StackedBar<X,Y> extends AbstractBarPlot<X, Y> {
+  export class StackedBar<X,Y> extends Bar<X, Y> {
 
     /**
      * Constructs a StackedBar plot.
@@ -50,11 +50,9 @@ export module Plot {
         primaryScale.scale(+primaryAccessor(d, i, u, m) + m.offsets.get(keyAccessor(d, i, u, m)));
 
       var heightF = (d: any, i: number, u: any, m: StackedPlotMetadata) => Math.abs(getEnd(d, i, u, m) - getStart(d, i, u, m));
-      var widthF = attrToProjector["width"];
-      attrToProjector["height"] = this._isVertical ? heightF : widthF;
-      attrToProjector["width"] = this._isVertical ? widthF : heightF;
 
       var attrFunction = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
+
         +primaryAccessor(d, i, u, m) < 0 ? getStart(d, i, u, m) : getEnd(d, i, u, m);
       attrToProjector[valueAttr] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
         this._isVertical ? attrFunction(d, i, u, m) : attrFunction(d, i, u, m) - heightF(d, i, u, m);

@@ -2934,7 +2934,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class AbstractBarPlot<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
+        class Bar<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
             protected static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
@@ -2947,7 +2947,7 @@ declare module Plottable {
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
-            constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
+            constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             protected _getDrawer(key: string): _Drawer.Rect;
             protected _setup(): void;
             /**
@@ -2964,18 +2964,18 @@ declare module Plottable {
              * The baseline is the line that the bars are drawn from, defaulting to 0.
              *
              * @param {number} value The value to position the baseline at.
-             * @returns {AbstractBarPlot} The calling AbstractBarPlot.
+             * @returns {Bar} The calling Bar.
              */
-            baseline(value: number): AbstractBarPlot<X, Y>;
+            baseline(value: number): Bar<X, Y>;
             /**
              * Sets the bar alignment relative to the independent axis.
              * VerticalBarPlot supports "left", "center", "right"
              * HorizontalBarPlot supports "top", "center", "bottom"
              *
              * @param {string} alignment The desired alignment.
-             * @returns {AbstractBarPlot} The calling AbstractBarPlot.
+             * @returns {Bar} The calling Bar.
              */
-            barAlignment(alignment: string): AbstractBarPlot<X, Y>;
+            barAlignment(alignment: string): Bar<X, Y>;
             /**
              * Get whether bar labels are enabled.
              *
@@ -2986,9 +2986,9 @@ declare module Plottable {
              * Set whether bar labels are enabled.
              * @param {boolean} Whether bars should display labels or not.
              *
-             * @returns {AbstractBarPlot} The calling plot.
+             * @returns {Bar} The calling plot.
              */
-            barLabelsEnabled(enabled: boolean): AbstractBarPlot<X, Y>;
+            barLabelsEnabled(enabled: boolean): Bar<X, Y>;
             /**
              * Get the formatter for bar labels.
              *
@@ -2999,9 +2999,9 @@ declare module Plottable {
              * Change the formatting function for bar labels.
              * @param {Formatter} The formatting function for bar labels.
              *
-             * @returns {AbstractBarPlot} The calling plot.
+             * @returns {Bar} The calling plot.
              */
-            barLabelFormatter(formatter: Formatter): AbstractBarPlot<X, Y>;
+            barLabelFormatter(formatter: Formatter): Bar<X, Y>;
             /**
              * Gets all the bars in the bar plot
              *
@@ -3047,9 +3047,9 @@ declare module Plottable {
              *                the cursor.
              *
              * @param {string} mode The desired hover mode.
-             * @return {AbstractBarPlot} The calling Bar Plot.
+             * @return {Bar} The calling Bar Plot.
              */
-            hoverMode(mode: String): AbstractBarPlot<X, Y>;
+            hoverMode(mode: String): Bar<X, Y>;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
@@ -3069,7 +3069,7 @@ declare module Plottable {
          *  - "x" - the horizontal position of a bar
          *  - "y" - the vertical height of a bar
          */
-        class VerticalBar<X> extends AbstractBarPlot<X, number> {
+        class VerticalBar<X> extends Bar<X, number> {
             protected static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
@@ -3098,7 +3098,7 @@ declare module Plottable {
          *  - "x" - the horizontal length of a bar
          *  - "y" - the vertical position of a bar
          */
-        class HorizontalBar<Y> extends AbstractBarPlot<number, Y> {
+        class HorizontalBar<Y> extends Bar<number, Y> {
             protected static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
@@ -3111,7 +3111,6 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<number>, yScale: Scale.AbstractScale<Y, number>);
             protected _updateXDomainer(): void;
-            protected _generateAttrToProjector(): AttributeToProjector;
         }
     }
 }
@@ -3179,7 +3178,7 @@ declare module Plottable {
         interface ClusteredPlotMetadata extends PlotMetadata {
             position: number;
         }
-        class ClusteredBar<X, Y> extends AbstractBarPlot<X, Y> {
+        class ClusteredBar<X, Y> extends Bar<X, Y> {
             /**
              * Creates a ClusteredBarPlot.
              *
@@ -3282,7 +3281,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class StackedBar<X, Y> extends AbstractBarPlot<X, Y> {
+        class StackedBar<X, Y> extends Bar<X, Y> {
             /**
              * Constructs a StackedBar plot.
              * A StackedBarPlot is a plot that plots several bar plots stacking on top of each

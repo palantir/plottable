@@ -18,7 +18,7 @@ function run(div, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   var dataset = new Plottable.Dataset(data);
-  var verticalBarPlot = new Plottable.Plot.VerticalBar(xScale, yScale)
+  var verticalBarPlot = new Plottable.Plot.Bar(xScale, yScale)
                               .addDataset(dataset)
                               .project("x", "x", xScale)
                               .project("y", "y", yScale)
