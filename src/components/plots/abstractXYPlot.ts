@@ -175,7 +175,17 @@ export module Plot {
       if (toScale instanceof Scale.AbstractQuantitative) {
         var toScaleQ = <Scale.AbstractQuantitative<B>> toScale;
         var normalizedData = this._normalizeDatasets<A,B>(fromX);
-        var adjustedDomain = this._adjustDomainOverVisiblePoints<A,B>(normalizedData, fromScale.domain());
+
+        var filterFn: (v: A) => boolean;
+        if (fromScale instanceof Scale.AbstractQuantitative) {
+          var fromDomain = fromScale.domain();
+          filterFn = (a: A) => fromDomain[0] <= a && fromDomain[1] >= a;
+        } else {
+          var fromDomainSet = d3.set(fromScale.domain());
+          filterFn = (a: A) => fromDomainSet.has(a);
+        }
+
+        var adjustedDomain = this._adjustDomainOverVisiblePoints<A,B>(normalizedData, filterFn);
         if(adjustedDomain.length === 0) {
           return;
         }
@@ -196,8 +206,8 @@ export module Plot {
       }));
     }
 
-    private _adjustDomainOverVisiblePoints<A,B>(values: {a: A; b: B}[], fromDomain: A[]): B[] {
-      var bVals = values.filter(v => fromDomain[0] <= v.a && v.a <= fromDomain[1]).map(v => v.b);
+    private _adjustDomainOverVisiblePoints<A,B>(values: {a: A; b: B}[], filterFn: (v: any) => boolean): B[] {
+      var bVals = values.filter(v => filterFn(v.a)).map(v => v.b);
       var retVal: B[] = [];
       if (bVals.length !== 0) {
         retVal = [_Util.Methods.min<B>(bVals, null), _Util.Methods.max<B>(bVals, null)];

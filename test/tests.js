@@ -2726,6 +2726,21 @@ describe("Plots", function () {
                 svg.remove();
             });
         });
+        it("plot auto domain scale to visible points on ordinal scale", function () {
+            var svg = generateSVG(500, 500);
+            var xAccessor = function (d, i, u) { return d.a; };
+            var yAccessor = function (d, i, u) { return d.b + u.foo; };
+            var simpleDataset = new Plottable.Dataset([{ a: "a", b: 6 }, { a: "b", b: 2 }, { a: "c", b: -2 }, { a: "d", b: -6 }], { foo: 0 });
+            var xScale = new Plottable.Scale.Ordinal();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.AbstractBarPlot(xScale, yScale);
+            plot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).renderTo(svg);
+            xScale.domain(["b", "c"]);
+            assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
+            svg.remove();
+        });
     });
 });
 
@@ -3110,7 +3125,7 @@ describe("Plots", function () {
             assert.doesNotThrow(function () { return stackedPlot.removeDataset("a"); }, Error);
         });
     });
-    describe("auto scale domain", function () {
+    describe("auto scale domain on numeric", function () {
         var svg;
         var SVG_WIDTH = 600;
         var SVG_HEIGHT = 400;
@@ -3132,6 +3147,45 @@ describe("Plots", function () {
                 { x: 1, y: 2 },
                 { x: 2, y: 2 },
                 { x: 3, y: 3 }
+            ];
+        });
+        it("auto scales correctly on stacked area", function () {
+            var plot = new Plottable.Plot.StackedArea(xScale, yScale).addDataset(data1).addDataset(data2).project("x", "x", xScale).project("y", "y", yScale);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.renderTo(svg);
+            assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
+            svg.remove();
+        });
+        it("auto scales correctly on stacked bar", function () {
+            var plot = new Plottable.Plot.StackedBar(xScale, yScale).addDataset(data1).addDataset(data2).project("x", "x", xScale).project("y", "y", yScale);
+            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.renderTo(svg);
+            assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
+            svg.remove();
+        });
+    });
+    describe("auto scale domain on ordinal", function () {
+        var svg;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var yScale;
+        var xScale;
+        var data1;
+        var data2;
+        beforeEach(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            xScale = new Plottable.Scale.Ordinal().domain(["a", "b"]);
+            ;
+            yScale = new Plottable.Scale.Linear();
+            data1 = [
+                { x: "a", y: 1 },
+                { x: "b", y: 2 },
+                { x: "c", y: 8 }
+            ];
+            data2 = [
+                { x: "a", y: 2 },
+                { x: "b", y: 2 },
+                { x: "c", y: 3 }
             ];
         });
         it("auto scales correctly on stacked area", function () {

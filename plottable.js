@@ -6901,7 +6901,16 @@ var Plottable;
                 if (toScale instanceof Plottable.Scale.AbstractQuantitative) {
                     var toScaleQ = toScale;
                     var normalizedData = this._normalizeDatasets(fromX);
-                    var adjustedDomain = this._adjustDomainOverVisiblePoints(normalizedData, fromScale.domain());
+                    var filterFn;
+                    if (fromScale instanceof Plottable.Scale.AbstractQuantitative) {
+                        var fromDomain = fromScale.domain();
+                        filterFn = function (a) { return fromDomain[0] <= a && fromDomain[1] >= a; };
+                    }
+                    else {
+                        var fromDomainSet = d3.set(fromScale.domain());
+                        filterFn = function (a) { return fromDomainSet.has(a); };
+                    }
+                    var adjustedDomain = this._adjustDomainOverVisiblePoints(normalizedData, filterFn);
                     if (adjustedDomain.length === 0) {
                         return;
                     }
@@ -6921,8 +6930,8 @@ var Plottable;
                     });
                 }));
             };
-            AbstractXYPlot.prototype._adjustDomainOverVisiblePoints = function (values, fromDomain) {
-                var bVals = values.filter(function (v) { return fromDomain[0] <= v.a && v.a <= fromDomain[1]; }).map(function (v) { return v.b; });
+            AbstractXYPlot.prototype._adjustDomainOverVisiblePoints = function (values, filterFn) {
+                var bVals = values.filter(function (v) { return filterFn(v.a); }).map(function (v) { return v.b; });
                 var retVal = [];
                 if (bVals.length !== 0) {
                     retVal = [Plottable._Util.Methods.min(bVals, null), Plottable._Util.Methods.max(bVals, null)];
@@ -8127,8 +8136,20 @@ var Plottable;
                 var _this = this;
                 var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
                 var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
-                var aStackedAccessor = function (d, i, u, m) { return aAccessor(d, i, u, m) + ((_this._isVertical ? !fromX : fromX) ? m.offsets.get(bAccessor(d, i, u, m)) : 0); };
-                var bStackedAccessor = function (d, i, u, m) { return bAccessor(d, i, u, m) + ((_this._isVertical ? fromX : !fromX) ? m.offsets.get(aAccessor(d, i, u, m)) : 0); };
+                var aStackedAccessor = function (d, i, u, m) {
+                    var value = aAccessor(d, i, u, m);
+                    if (_this._isVertical ? !fromX : fromX) {
+                        value += m.offsets.get(bAccessor(d, i, u, m));
+                    }
+                    return value;
+                };
+                var bStackedAccessor = function (d, i, u, m) {
+                    var value = bAccessor(d, i, u, m);
+                    if (_this._isVertical ? fromX : !fromX) {
+                        value += m.offsets.get(aAccessor(d, i, u, m));
+                    }
+                    return value;
+                };
                 return Plottable._Util.Methods.flatten(this._datasetKeysInOrder.map(function (key) {
                     var dataset = _this._key2PlotDatasetKey.get(key).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
