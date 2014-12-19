@@ -4948,8 +4948,6 @@ var Plottable;
                     fakeScale.range([offeredHeight, 0]);
                 }
                 var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, ordinalScale.domain());
-                console.log(textResult);
-                debugger;
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
                     height: textResult.usedHeight + heightRequiredByTicks,
