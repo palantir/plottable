@@ -4993,6 +4993,7 @@ var Plottable;
                 this._tierMarkContainers = [];
                 this._tierBaselines = [];
                 this._tickLabelContainer.remove();
+                this._baseline.remove();
                 for (var i = 0; i < Time._NUM_TIERS; ++i) {
                     var tierContainer = this._content.append("g").classed("time-axis-tier", true);
                     this._tierLabelContainers.push(tierContainer.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS + "-container", true));
@@ -5056,7 +5057,6 @@ var Plottable;
                 tickLabels.attr("transform", function (d) { return "translate(" + _this._scale.scale(d) + ",0)"; });
                 var anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
                 tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
-                //filteredTicks.splice(0, 0, this._scale.domain()[0]);
                 return filteredTicks;
             };
             Time.prototype._canFitLabelFilter = function (position, bounds, config, labelPosition) {
