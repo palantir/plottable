@@ -8,7 +8,8 @@ export module _Drawer {
     private _labelsTooWide = false;
     private _isVertical: boolean;
     private _textArea: D3.Selection;
-    private _measurer: _Util.Text.TextMeasurer;
+    private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
+    private _writer: SVGTypewriter.Writers.Writer;
 
     constructor(key: string, isVertical: boolean) {
       super(key);
@@ -20,7 +21,8 @@ export module _Drawer {
       // need to put the bars in a seperate container so we can ensure that they don't cover labels
       super.setup(area.append("g").classed("bar-area", true));
       this._textArea = area.append("g").classed("bar-label-text-area", true);
-      this._measurer = new _Util.Text.CachingCharacterMeasurer(this._textArea.append("text")).measure;
+      this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._textArea);
+      this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
     }
 
     public removeLabels() {
@@ -39,7 +41,7 @@ export module _Drawer {
         var x = attrToProjector["x"](d, i, userMetadata, plotMetadata);
         var y = attrToProjector["y"](d, i, userMetadata, plotMetadata);
         var positive = attrToProjector["positive"](d, i, userMetadata, plotMetadata);
-        var measurement = this._measurer(text);
+        var measurement = this._measurer.measure(text);
         var color = attrToProjector["fill"](d, i, userMetadata, plotMetadata);
         var dark = _Util.Color.contrast("white", color) * 1.6 < _Util.Color.contrast("black", color);
         var primary = this._isVertical ? h : w;
@@ -69,7 +71,13 @@ export module _Drawer {
             xAlign = positive ? "left" : "right";
             yAlign = "center";
           }
-          _Util.Text.writeLineHorizontally(text, g, w, h, xAlign, yAlign);
+          var writeOptions = {
+              selection: g,
+              xAlign: xAlign,
+              yAlign: yAlign,
+              textRotation: 0
+          };
+          this._writer.write(text, w, h, writeOptions);
         }
         return tooWide;
       });

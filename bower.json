@@ -28,7 +28,8 @@
     "plots"
   ],
   "dependencies": {
-    "d3": "3.4.13"
+    "d3": "3.4.13",
+    "svg-typewriter": "0.1.10"
   },
   "homepage": "plottablejs.org",
   "repository": {

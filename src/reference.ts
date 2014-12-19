@@ -1,10 +1,9 @@
+/// <reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
+
 /// <reference path="utils/utils.ts" />
 /// <reference path="utils/osUtils.ts" />
 /// <reference path="utils/idCounter.ts" />
 /// <reference path="utils/strictEqualityAssociativeArray.ts" />
-/// <reference path="utils/cache.ts" />
-/// <reference path="utils/textUtils.ts" />
-/// <reference path="utils/wordWrapUtils.ts" />
 /// <reference path="utils/domUtils.ts" />
 /// <reference path="utils/color.ts" />
 
@@ -61,7 +60,7 @@
 /// <reference path="components/plots/abstractXYPlot.ts" />
 /// <reference path="components/plots/scatterPlot.ts" />
 /// <reference path="components/plots/gridPlot.ts" />
-/// <reference path="components/plots/abstractBarPlot.ts" />
+/// <reference path="components/plots/barPlot.ts" />
 /// <reference path="components/plots/verticalBarPlot.ts" />
 /// <reference path="components/plots/horizontalBarPlot.ts" />
 /// <reference path="components/plots/linePlot.ts" />

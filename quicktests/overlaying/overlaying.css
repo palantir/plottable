@@ -1,5 +1,6 @@
 body{
   font-family: sans-serif;
+  margin: 0px;
 }
 
 h2{
@@ -34,10 +35,8 @@ h2{
   width: 100%;
   height: 50px;
   position: fixed;
-  top: 0px;
-  left: 0px;
   text-align: center;
-  z-index: 1;
+  z-index: 2;
 }
 
 .control-knobs{
@@ -48,7 +47,7 @@ h2{
   font-size: 13px;
 }
 
-input, select{
+select, input:not([type=checkbox]) {
   position: relative;
   border: solid 1px;
   border-radius: 5px;
@@ -81,12 +80,12 @@ input, select{
 
 .size-controls{
   background-color: #41407D;
+  top: 50px;
   width: 100%;
   height: 50px;
   position: fixed;
   text-align: center;
   z-index: 1;
-  left: 0px;
   display:none;
 }
 
@@ -103,6 +102,10 @@ input, select{
   margin-right: 10px;
 }
 
+#help:hover{
+  background-color: white;
+}
+
 #test-category-descriptions{
   width: 300px;
   display: none;
@@ -115,6 +118,55 @@ input, select{
   color:#fff;
   font-size: 13px;
   font-weight: lighter;
-
 }
 
+.sidebar {
+  width: 20%;
+  height: 100%;
+  background-color: #343434;
+  position: fixed;
+  visibility: hidden;
+  color: whitesmoke;
+  left: -20%;
+  padding-top: 50px;
+  overflow: auto;
+  z-index: 1;
+}
+
+.sidebar input{
+  margin: 10px;
+}
+
+.sidebar-quicktest-category {
+  padding: 10px;
+  font-family: sans-serif;
+  font-weight: lighter;
+  font-size: 15px;
+  text-align: left;
+  border-top: 1px solid #494949;
+}
+
+.sidebar-quicktest{
+  padding-left: 10px; 
+  list-style-type: none;
+  font-size: 13px;
+}
+
+#expand-sidebar {
+  float: left;
+  color: white;
+  margin-left: 10px;
+  font-size: 1.3rem;
+  text-decoration: none;
+}
+
+.content {
+  left: 0px;
+  margin: 0 auto;
+  position: absolute;
+}
+
+ol{
+  padding: 0px;
+  margin: 0px;
+}

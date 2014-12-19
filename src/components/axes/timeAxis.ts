@@ -143,7 +143,7 @@ export module Axis {
     private _tierMarkContainers: D3.Selection[];
     private _tierBaselines: D3.Selection[];
     private _tierHeights: number[];
-    private _measurer: _Util.Text.TextMeasurer;
+    private _measurer: SVGTypewriter.Measurers.Measurer;
 
     private _mostPreciseConfigIndex: number;
 
@@ -241,7 +241,7 @@ export module Axis {
     }
 
     public _computeHeight() {
-      var textHeight = this._measureTextHeight();
+      var textHeight = this._measurer.measure().height;
       this._tierHeights = this._tierLabelPositions.map((pos: string) =>
         textHeight + this.tickLabelPadding() + ((pos === "between") ? 0 : this._maxLabelTickLength()));
       this._computedHeight = d3.sum(this._tierHeights);
@@ -261,7 +261,7 @@ export module Axis {
     }
 
     private _maxWidthForInterval(config: TimeAxisTierConfiguration): number {
-      return this._measurer(config.formatter(Time._LONG_DATE)).width;
+      return this._measurer.measure(config.formatter(Time._LONG_DATE)).width;
     }
 
     /**
@@ -286,7 +286,7 @@ export module Axis {
         this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
       }
 
-      this._measurer = _Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
+      this._measurer = new SVGTypewriter.Measurers.Measurer(this._tierLabelContainers[0]);
     }
 
     private _getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
@@ -298,10 +298,6 @@ export module Axis {
           (ticks: any[], config: TimeAxisTierConfiguration) => ticks.concat(this._getTickIntervalValues(config)),
           []
         );
-    }
-
-    protected _measureTextHeight(): number {
-      return this._measurer(_Util.Text.HEIGHT_TEXT).height;
     }
 
     private _cleanTier(index: number) {
@@ -338,7 +334,7 @@ export module Axis {
       var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
-      var markLength = this._measureTextHeight();
+      var markLength = this._measurer.measure().height;
       var yTranslate = d3.sum(this._tierHeights.slice(0, index + 1));
       yTranslate -= this.tickLabelPadding();
       var textSelection = tickLabels.selectAll("text");
@@ -358,7 +354,7 @@ export module Axis {
       }
       var endPosition: number;
       var startPosition: number;
-      var width = this._measurer(config.formatter(position)).width + ((config.step !== 1) ? this.tickLabelPadding() : 0);
+      var width = this._measurer.measure(config.formatter(position)).width + ((config.step !== 1) ? this.tickLabelPadding() : 0);
       var leftBound = this._scale.scale(bounds[0]);
       var rightBound = this._scale.scale(bounds[1]);
       if (labelPosition === "center" || config.step === 1) {

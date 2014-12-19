@@ -24,11 +24,14 @@ function run(svg, data, Plottable) {
     .attr("y", "y", yScale)
     .attr("fill", "type", colorScale)
     .attr("type", "type")
-    .attr("yval", "y");
+    .attr("yval", "y")
+    .barLabelsEnabled(true);
 
-  var center = clusteredBarRenderer.merge(new Plottable.Component.Legend(colorScale));
+  var legend = new Plottable.Component.Legend(colorScale);
+  legend.maxEntriesPerRow(1);
+  var center = clusteredBarRenderer.merge(legend);
 
-  var plot = new Plottable.Component.Table([
+  var horizChart = new Plottable.Component.Table([
     [yAxis, center], [null, xAxis]
     ]).renderTo(svg);
 }
