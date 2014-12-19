@@ -1,5 +1,5 @@
 /*!
-SVG Typewriter 0.1.9 (https://github.com/palantir/svg-typewriter)
+SVG Typewriter 0.1.10 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
 */
@@ -489,7 +489,7 @@ var SVGTypewriter;
             Wrapper.prototype.canFitToken = function (token, width, measurer) {
                 var _this = this;
                 var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
-                return possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
             };
             Wrapper.prototype.addEllipsis = function (line, width, measurer) {
                 if (this._textTrimming === "none") {
@@ -498,14 +498,15 @@ var SVGTypewriter;
                         remainingToken: ""
                     };
                 }
-                var truncatedLine = line.substring(0);
+                var truncatedLine = line.substring(0).trim();
                 var lineWidth = measurer.measure(truncatedLine).width;
                 var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
                 if (width <= ellipsesWidth) {
                     var periodWidth = ellipsesWidth / 3;
                     var numPeriodsThatFit = Math.floor(width / periodWidth);
                     return {
-                        wrappedToken: "...".substr(0, numPeriodsThatFit),
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
                         remainingToken: line
                     };
                 }
@@ -514,7 +515,7 @@ var SVGTypewriter;
                     lineWidth = measurer.measure(truncatedLine).width;
                 }
                 return {
-                    wrappedToken: truncatedLine + "...",
+                    wrappedToken: prefix + truncatedLine + "...",
                     remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
                 };
             };
