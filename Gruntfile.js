@@ -174,6 +174,10 @@ module.exports = function(grunt) {
           }),
         dest: "build/plottable.d.ts",
       },
+      svgtypewriter: {
+        src: ["plottable.js", "bower_components/svg-typewriter/svgtypewriter.js"],
+        dest: "plottable.js",
+      },
     },
     ts: tsJSON,
     tslint: {
@@ -328,6 +332,7 @@ module.exports = function(grunt) {
       "update_test_ts_files",
       "ts:dev",
       "concat:plottable",
+      "concat:svgtypewriter",
       "concat:definitions",
       "sed:definitions",
       "sed:private_definitions",
