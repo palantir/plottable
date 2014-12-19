@@ -4886,11 +4886,11 @@ var Plottable;
                         yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
                         break;
                     case 90:
-                        xAlign = { left: "center", right: "center", top: "left", bottom: "right" };
+                        xAlign = { left: "center", right: "center", top: "right", bottom: "left" };
                         yAlign = { left: "top", right: "bottom", top: "center", bottom: "center" };
                         break;
                     case -90:
-                        xAlign = { left: "center", right: "center", top: "right", bottom: "left" };
+                        xAlign = { left: "center", right: "center", top: "left", bottom: "right" };
                         yAlign = { left: "bottom", right: "top", top: "center", bottom: "center" };
                         break;
                 }
