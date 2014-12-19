@@ -254,154 +254,6 @@ declare module Plottable {
     }
 }
 
-
-declare module Plottable {
-    module _Util {
-        class Cache<T> {
-            /**
-             * @constructor
-             *
-             * @param {string} compute The function whose results will be cached.
-             * @param {string} [canonicalKey] If present, when clear() is called,
-             *        this key will be re-computed. If its result hasn't been changed,
-             *        the cache will not be cleared.
-             * @param {(v: T, w: T) => boolean} [valueEq]
-             *        Used to determine if the value of canonicalKey has changed.
-             *        If omitted, defaults to === comparision.
-             */
-            constructor(compute: (k: string) => T, canonicalKey?: string, valueEq?: (v: T, w: T) => boolean);
-            /**
-             * Attempt to look up k in the cache, computing the result if it isn't
-             * found.
-             *
-             * @param {string} k The key to look up in the cache.
-             * @return {T} The value associated with k; the result of compute(k).
-             */
-            get(k: string): T;
-            /**
-             * Reset the cache empty.
-             *
-             * If canonicalKey was provided at construction, compute(canonicalKey)
-             * will be re-run. If the result matches what is already in the cache,
-             * it will not clear the cache.
-             *
-             * @return {Cache<T>} The calling Cache.
-             */
-            clear(): Cache<T>;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module _Util {
-        module Text {
-            var HEIGHT_TEXT: string;
-            interface Dimensions {
-                width: number;
-                height: number;
-            }
-            interface TextMeasurer {
-                (s: string): Dimensions;
-            }
-            /**
-             * Returns a quasi-pure function of typesignature (t: string) => Dimensions which measures height and width of text
-             * in the given text selection
-             *
-             * @param {D3.Selection} selection: A temporary text selection that the string will be placed into for measurement.
-             *                                  Will be removed on function creation and appended only for measurement.
-             * @returns {Dimensions} width and height of the text
-             */
-            function getTextMeasurer(selection: D3.Selection): TextMeasurer;
-            /**
-             * This class will measure text by measuring each character individually,
-             * then adding up the dimensions. It will also cache the dimensions of each
-             * letter.
-             */
-            class CachingCharacterMeasurer {
-                /**
-                 * @param {string} s The string to be measured.
-                 * @return {Dimensions} The width and height of the measured text.
-                 */
-                measure: TextMeasurer;
-                /**
-                 * @param {D3.Selection} textSelection The element that will have text inserted into
-                 *        it in order to measure text. The styles present for text in
-                 *        this element will to the text being measured.
-                 */
-                constructor(textSelection: D3.Selection);
-                /**
-                 * Clear the cache, if it seems that the text has changed size.
-                 */
-                clear(): CachingCharacterMeasurer;
-            }
-            /**
-             * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
-             *
-             * @param {string} text: The string to be truncated
-             * @param {number} availableWidth: The available width, in pixels
-             * @param {D3.Selection} element: The text element used to measure the text
-             * @returns {string} text - the shortened text
-             */
-            function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;
-            /**
-             * Takes a line, a width to fit it in, and a text measurer. Will attempt to add ellipses to the end of the line,
-             * shortening the line as required to ensure that it fits within width.
-             */
-            function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
-            function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
-                width: number;
-                height: number;
-            };
-            function writeLineVertically(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
-                width: number;
-                height: number;
-            };
-            interface IWriteTextResult {
-                textFits: boolean;
-                usedWidth: number;
-                usedHeight: number;
-            }
-            interface IWriteOptions {
-                g: D3.Selection;
-                xAlign: string;
-                yAlign: string;
-            }
-            /**
-             * @param {write} [IWriteOptions] If supplied, the text will be written
-             *        To the given g. Will align the text vertically if it seems like
-             *        that is appropriate.
-             * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
-             */
-            function writeText(text: string, width: number, height: number, tm: TextMeasurer, orientation?: string, write?: IWriteOptions): IWriteTextResult;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module _Util {
-        module WordWrap {
-            interface WrappedText {
-                originalText: string;
-                lines: string[];
-                textFits: boolean;
-            }
-            /**
-             * Takes a block of text, a width and height to fit it in, and a 2-d text measurement function.
-             * Wraps words and fits as much of the text as possible into the given width and height.
-             */
-            function breakTextToFitRect(text: string, width: number, height: number, measureText: Text.TextMeasurer): WrappedText;
-            /**
-             * Determines if it is possible to fit a given text within width without breaking any of the words.
-             * Simple algorithm, split the text up into tokens, and make sure that the widest token doesn't exceed
-             * allowed width.
-             */
-            function canWrapWithoutBreakingWords(text: string, width: number, widthMeasure: (s: string) => number): boolean;
-        }
-    }
-}
-
 declare module Plottable {
     module _Util {
         module DOM {
@@ -2230,7 +2082,6 @@ declare module Plottable {
             _computeHeight(): number;
             protected _setup(): void;
             protected _getTickValues(): any[];
-            protected _measureTextHeight(): number;
             _doRender(): Time;
         }
     }
@@ -2416,7 +2267,6 @@ declare module Plottable {
              */
             padding(padAmount: number): Label;
             _doRender(): void;
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
         }
         class TitleLabel extends Label {
             /**
@@ -2459,6 +2309,7 @@ declare module Plottable {
              * @param {Scale.Color} colorScale
              */
             constructor(colorScale: Scale.Color);
+            protected _setup(): void;
             /**
              * Gets the current max number of entries in Legend row.
              * @returns {number} The current max number of entries in row.

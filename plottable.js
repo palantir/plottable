@@ -507,545 +507,6 @@ var Plottable;
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var _Util;
-    (function (_Util) {
-        var Cache = (function () {
-            /**
-             * @constructor
-             *
-             * @param {string} compute The function whose results will be cached.
-             * @param {string} [canonicalKey] If present, when clear() is called,
-             *        this key will be re-computed. If its result hasn't been changed,
-             *        the cache will not be cleared.
-             * @param {(v: T, w: T) => boolean} [valueEq]
-             *        Used to determine if the value of canonicalKey has changed.
-             *        If omitted, defaults to === comparision.
-             */
-            function Cache(compute, canonicalKey, valueEq) {
-                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
-                this._cache = d3.map();
-                this._canonicalKey = null;
-                this._compute = compute;
-                this._canonicalKey = canonicalKey;
-                this._valueEq = valueEq;
-                if (canonicalKey !== undefined) {
-                    this._cache.set(this._canonicalKey, this._compute(this._canonicalKey));
-                }
-            }
-            /**
-             * Attempt to look up k in the cache, computing the result if it isn't
-             * found.
-             *
-             * @param {string} k The key to look up in the cache.
-             * @return {T} The value associated with k; the result of compute(k).
-             */
-            Cache.prototype.get = function (k) {
-                if (!this._cache.has(k)) {
-                    this._cache.set(k, this._compute(k));
-                }
-                return this._cache.get(k);
-            };
-            /**
-             * Reset the cache empty.
-             *
-             * If canonicalKey was provided at construction, compute(canonicalKey)
-             * will be re-run. If the result matches what is already in the cache,
-             * it will not clear the cache.
-             *
-             * @return {Cache<T>} The calling Cache.
-             */
-            Cache.prototype.clear = function () {
-                if (this._canonicalKey === undefined || !this._valueEq(this._cache.get(this._canonicalKey), this._compute(this._canonicalKey))) {
-                    this._cache = d3.map();
-                }
-                return this;
-            };
-            return Cache;
-        })();
-        _Util.Cache = Cache;
-    })(_Util = Plottable._Util || (Plottable._Util = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var _Util;
-    (function (_Util) {
-        var Text;
-        (function (Text) {
-            Text.HEIGHT_TEXT = "bqpdl";
-            ;
-            ;
-            /**
-             * Returns a quasi-pure function of typesignature (t: string) => Dimensions which measures height and width of text
-             * in the given text selection
-             *
-             * @param {D3.Selection} selection: A temporary text selection that the string will be placed into for measurement.
-             *                                  Will be removed on function creation and appended only for measurement.
-             * @returns {Dimensions} width and height of the text
-             */
-            function getTextMeasurer(selection) {
-                var parentNode = selection.node().parentNode;
-                selection.remove();
-                return function (s) {
-                    if (s.trim() === "") {
-                        return { width: 0, height: 0 };
-                    }
-                    parentNode.appendChild(selection.node());
-                    selection.text(s);
-                    var bb = _Util.DOM.getBBox(selection);
-                    selection.remove();
-                    return { width: bb.width, height: bb.height };
-                };
-            }
-            Text.getTextMeasurer = getTextMeasurer;
-            /**
-             * @return {TextMeasurer} A test measurer that will treat all sequences
-             *         of consecutive whitespace as a single " ".
-             */
-            function combineWhitespace(tm) {
-                return function (s) { return tm(s.replace(/\s+/g, " ")); };
-            }
-            /**
-             * Returns a text measure that measures each individual character of the
-             * string with tm, then combines all the individual measurements.
-             */
-            function measureByCharacter(tm) {
-                return function (s) {
-                    var whs = s.trim().split("").map(tm);
-                    return {
-                        width: d3.sum(whs, function (wh) { return wh.width; }),
-                        height: _Util.Methods.max(whs, function (wh) { return wh.height; }, 0)
-                    };
-                };
-            }
-            var CANONICAL_CHR = "a";
-            /**
-             * Some TextMeasurers get confused when measuring something that's only
-             * whitespace: only whitespace in a dom node takes up 0 x 0 space.
-             *
-             * @return {TextMeasurer} A function that if its argument is all
-             *         whitespace, it will wrap its argument in CANONICAL_CHR before
-             *         measuring in order to get a non-zero size of the whitespace.
-             */
-            function wrapWhitespace(tm) {
-                return function (s) {
-                    if (/^\s*$/.test(s)) {
-                        var whs = s.split("").map(function (c) {
-                            var wh = tm(CANONICAL_CHR + c + CANONICAL_CHR);
-                            var whWrapping = tm(CANONICAL_CHR);
-                            return {
-                                width: wh.width - 2 * whWrapping.width,
-                                height: wh.height
-                            };
-                        });
-                        return {
-                            width: d3.sum(whs, function (x) { return x.width; }),
-                            height: _Util.Methods.max(whs, function (x) { return x.height; }, 0)
-                        };
-                    }
-                    else {
-                        return tm(s);
-                    }
-                };
-            }
-            /**
-             * This class will measure text by measuring each character individually,
-             * then adding up the dimensions. It will also cache the dimensions of each
-             * letter.
-             */
-            var CachingCharacterMeasurer = (function () {
-                /**
-                 * @param {D3.Selection} textSelection The element that will have text inserted into
-                 *        it in order to measure text. The styles present for text in
-                 *        this element will to the text being measured.
-                 */
-                function CachingCharacterMeasurer(textSelection) {
-                    var _this = this;
-                    this._cache = new _Util.Cache(getTextMeasurer(textSelection), CANONICAL_CHR, _Util.Methods.objEq);
-                    this.measure = combineWhitespace(measureByCharacter(wrapWhitespace(function (s) { return _this._cache.get(s); })));
-                }
-                /**
-                 * Clear the cache, if it seems that the text has changed size.
-                 */
-                CachingCharacterMeasurer.prototype.clear = function () {
-                    this._cache.clear();
-                    return this;
-                };
-                return CachingCharacterMeasurer;
-            })();
-            Text.CachingCharacterMeasurer = CachingCharacterMeasurer;
-            /**
-             * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
-             *
-             * @param {string} text: The string to be truncated
-             * @param {number} availableWidth: The available width, in pixels
-             * @param {D3.Selection} element: The text element used to measure the text
-             * @returns {string} text - the shortened text
-             */
-            function getTruncatedText(text, availableWidth, measurer) {
-                if (measurer(text).width <= availableWidth) {
-                    return text;
-                }
-                else {
-                    return addEllipsesToLine(text, availableWidth, measurer);
-                }
-            }
-            Text.getTruncatedText = getTruncatedText;
-            /**
-             * Takes a line, a width to fit it in, and a text measurer. Will attempt to add ellipses to the end of the line,
-             * shortening the line as required to ensure that it fits within width.
-             */
-            function addEllipsesToLine(line, width, measureText) {
-                var mutatedLine = line.trim(); // Leave original around for debugging utility
-                var widthMeasure = function (s) { return measureText(s).width; };
-                var lineWidth = widthMeasure(line);
-                var ellipsesWidth = widthMeasure("...");
-                if (width < ellipsesWidth) {
-                    var periodWidth = widthMeasure(".");
-                    var numPeriodsThatFit = Math.floor(width / periodWidth);
-                    return "...".substr(0, numPeriodsThatFit);
-                }
-                while (lineWidth + ellipsesWidth > width) {
-                    mutatedLine = mutatedLine.substr(0, mutatedLine.length - 1).trim();
-                    lineWidth = widthMeasure(mutatedLine);
-                }
-                if (widthMeasure(mutatedLine + "...") > width) {
-                    throw new Error("addEllipsesToLine failed :(");
-                }
-                return mutatedLine + "...";
-            }
-            Text.addEllipsesToLine = addEllipsesToLine;
-            function writeLineHorizontally(line, g, width, height, xAlign, yAlign) {
-                if (xAlign === void 0) { xAlign = "left"; }
-                if (yAlign === void 0) { yAlign = "top"; }
-                var xOffsetFactor = { left: 0, center: 0.5, right: 1 };
-                var yOffsetFactor = { top: 0, center: 0.5, bottom: 1 };
-                if (xOffsetFactor[xAlign] === undefined || yOffsetFactor[yAlign] === undefined) {
-                    throw new Error("unrecognized alignment x:" + xAlign + ", y:" + yAlign);
-                }
-                var innerG = g.append("g");
-                var textEl = innerG.append("text");
-                textEl.text(line);
-                var bb = _Util.DOM.getBBox(textEl);
-                var h = bb.height;
-                var w = bb.width;
-                if (w > width || h > height) {
-                    _Util.Methods.warn("Insufficient space to fit text: " + line);
-                    textEl.text("");
-                    return { width: 0, height: 0 };
-                }
-                var anchorConverter = { left: "start", center: "middle", right: "end" };
-                var anchor = anchorConverter[xAlign];
-                var xOff = width * xOffsetFactor[xAlign];
-                var yOff = height * yOffsetFactor[yAlign];
-                var ems = 0.85 - yOffsetFactor[yAlign];
-                textEl.attr("text-anchor", anchor).attr("y", ems + "em");
-                _Util.DOM.translate(innerG, xOff, yOff);
-                return { width: w, height: h };
-            }
-            Text.writeLineHorizontally = writeLineHorizontally;
-            function writeLineVertically(line, g, width, height, xAlign, yAlign, rotation) {
-                if (xAlign === void 0) { xAlign = "left"; }
-                if (yAlign === void 0) { yAlign = "top"; }
-                if (rotation === void 0) { rotation = "right"; }
-                if (rotation !== "right" && rotation !== "left") {
-                    throw new Error("unrecognized rotation: " + rotation);
-                }
-                var isRight = rotation === "right";
-                var rightTranslator = { left: "bottom", right: "top", center: "center", top: "left", bottom: "right" };
-                var leftTranslator = { left: "top", right: "bottom", center: "center", top: "right", bottom: "left" };
-                var alignTranslator = isRight ? rightTranslator : leftTranslator;
-                var innerG = g.append("g");
-                var wh = writeLineHorizontally(line, innerG, height, width, alignTranslator[yAlign], alignTranslator[xAlign]);
-                var xForm = d3.transform("");
-                xForm.rotate = rotation === "right" ? 90 : -90;
-                xForm.translate = [isRight ? width : 0, isRight ? 0 : height];
-                innerG.attr("transform", xForm.toString());
-                innerG.classed("rotated-" + rotation, true);
-                return { width: wh.height, height: wh.width };
-            }
-            Text.writeLineVertically = writeLineVertically;
-            function writeTextHorizontally(brokenText, g, width, height, xAlign, yAlign) {
-                if (xAlign === void 0) { xAlign = "left"; }
-                if (yAlign === void 0) { yAlign = "top"; }
-                var h = getTextMeasurer(g.append("text"))(Text.HEIGHT_TEXT).height;
-                var maxWidth = 0;
-                var blockG = g.append("g");
-                brokenText.forEach(function (line, i) {
-                    var innerG = blockG.append("g");
-                    _Util.DOM.translate(innerG, 0, i * h);
-                    var wh = writeLineHorizontally(line, innerG, width, h, xAlign, yAlign);
-                    if (wh.width > maxWidth) {
-                        maxWidth = wh.width;
-                    }
-                });
-                var usedSpace = h * brokenText.length;
-                var freeSpace = height - usedSpace;
-                var translator = { center: 0.5, top: 0, bottom: 1 };
-                _Util.DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
-                return { width: maxWidth, height: usedSpace };
-            }
-            function writeTextVertically(brokenText, g, width, height, xAlign, yAlign, rotation) {
-                if (xAlign === void 0) { xAlign = "left"; }
-                if (yAlign === void 0) { yAlign = "top"; }
-                if (rotation === void 0) { rotation = "left"; }
-                var h = getTextMeasurer(g.append("text"))(Text.HEIGHT_TEXT).height;
-                var maxHeight = 0;
-                var blockG = g.append("g");
-                brokenText.forEach(function (line, i) {
-                    var innerG = blockG.append("g");
-                    _Util.DOM.translate(innerG, i * h, 0);
-                    var wh = writeLineVertically(line, innerG, h, height, xAlign, yAlign, rotation);
-                    if (wh.height > maxHeight) {
-                        maxHeight = wh.height;
-                    }
-                });
-                var usedSpace = h * brokenText.length;
-                var freeSpace = width - usedSpace;
-                var translator = { center: 0.5, left: 0, right: 1 };
-                _Util.DOM.translate(blockG, freeSpace * translator[xAlign], 0);
-                return { width: usedSpace, height: maxHeight };
-            }
-            ;
-            /**
-             * @param {write} [IWriteOptions] If supplied, the text will be written
-             *        To the given g. Will align the text vertically if it seems like
-             *        that is appropriate.
-             * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
-             */
-            function writeText(text, width, height, tm, orientation, write) {
-                if (orientation === void 0) { orientation = "horizontal"; }
-                if (["left", "right", "horizontal"].indexOf(orientation) === -1) {
-                    throw new Error("Unrecognized orientation to writeText: " + orientation);
-                }
-                var orientHorizontally = orientation === "horizontal";
-                var primaryDimension = orientHorizontally ? width : height;
-                var secondaryDimension = orientHorizontally ? height : width;
-                var wrappedText = _Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
-                if (wrappedText.lines.length === 0) {
-                    return { textFits: wrappedText.textFits, usedWidth: 0, usedHeight: 0 };
-                }
-                var usedWidth, usedHeight;
-                if (write == null) {
-                    var widthFn = orientHorizontally ? _Util.Methods.max : d3.sum;
-                    var heightFn = orientHorizontally ? d3.sum : _Util.Methods.max;
-                    var heightAcc = function (line) { return orientHorizontally ? tm(line).height : tm(line).width; };
-                    var widthAcc = function (line) { return orientHorizontally ? tm(line).width : tm(line).height; };
-                    usedWidth = widthFn(wrappedText.lines, widthAcc, 0);
-                    usedHeight = heightFn(wrappedText.lines, heightAcc, 0);
-                }
-                else {
-                    var innerG = write.g.append("g").classed("writeText-inner-g", true); // unleash your inner G
-                    // the outerG contains general transforms for positining the whole block, the inner g
-                    // will contain transforms specific to orienting the text properly within the block.
-                    var writeTextFn = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-                    var wh = writeTextFn.call(this, wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign, orientation);
-                    usedWidth = wh.width;
-                    usedHeight = wh.height;
-                }
-                return { textFits: wrappedText.textFits, usedWidth: usedWidth, usedHeight: usedHeight };
-            }
-            Text.writeText = writeText;
-        })(Text = _Util.Text || (_Util.Text = {}));
-    })(_Util = Plottable._Util || (Plottable._Util = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var _Util;
-    (function (_Util) {
-        var WordWrap;
-        (function (WordWrap) {
-            var LINE_BREAKS_BEFORE = /[{\[]/;
-            var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
-            var SPACES = /^\s+$/;
-            ;
-            /**
-             * Takes a block of text, a width and height to fit it in, and a 2-d text measurement function.
-             * Wraps words and fits as much of the text as possible into the given width and height.
-             */
-            function breakTextToFitRect(text, width, height, measureText) {
-                var widthMeasure = function (s) { return measureText(s).width; };
-                var lines = breakTextToFitWidth(text, width, widthMeasure);
-                var textHeight = measureText("hello world").height;
-                var nLinesThatFit = Math.floor(height / textHeight);
-                var textFit = nLinesThatFit >= lines.length;
-                if (!textFit) {
-                    lines = lines.splice(0, nLinesThatFit);
-                    if (nLinesThatFit > 0) {
-                        // Overwrite the last line to one that has had a ... appended to the end
-                        lines[nLinesThatFit - 1] = _Util.Text.addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
-                    }
-                }
-                return { originalText: text, lines: lines, textFits: textFit };
-            }
-            WordWrap.breakTextToFitRect = breakTextToFitRect;
-            /**
-             * Splits up the text so that it will fit in width (or splits into a list of single characters if it is impossible
-             * to fit in width). Tries to avoid breaking words on non-linebreak-or-space characters, and will only break a word if
-             * the word is too big to fit within width on its own.
-             */
-            function breakTextToFitWidth(text, width, widthMeasure) {
-                var ret = [];
-                var paragraphs = text.split("\n");
-                for (var i = 0, len = paragraphs.length; i < len; i++) {
-                    var paragraph = paragraphs[i];
-                    if (paragraph !== null) {
-                        ret = ret.concat(breakParagraphToFitWidth(paragraph, width, widthMeasure));
-                    }
-                    else {
-                        ret.push("");
-                    }
-                }
-                return ret;
-            }
-            /**
-             * Determines if it is possible to fit a given text within width without breaking any of the words.
-             * Simple algorithm, split the text up into tokens, and make sure that the widest token doesn't exceed
-             * allowed width.
-             */
-            function canWrapWithoutBreakingWords(text, width, widthMeasure) {
-                var tokens = tokenize(text);
-                var widths = tokens.map(widthMeasure);
-                var maxWidth = _Util.Methods.max(widths, 0);
-                return maxWidth <= width;
-            }
-            WordWrap.canWrapWithoutBreakingWords = canWrapWithoutBreakingWords;
-            /**
-             * A paragraph is a string of text containing no newlines.
-             * Given a paragraph, break it up into lines that are no
-             * wider than width.  widthMeasure is a function that takes
-             * text as input, and returns the width of the text in pixels.
-             */
-            function breakParagraphToFitWidth(text, width, widthMeasure) {
-                var lines = [];
-                var tokens = tokenize(text);
-                var curLine = "";
-                var i = 0;
-                var nextToken;
-                while (nextToken || i < tokens.length) {
-                    if (typeof nextToken === "undefined" || nextToken === null) {
-                        nextToken = tokens[i++];
-                    }
-                    var brokenToken = breakNextTokenToFitInWidth(curLine, nextToken, width, widthMeasure);
-                    var canAdd = brokenToken[0];
-                    var leftOver = brokenToken[1];
-                    if (canAdd !== null) {
-                        curLine += canAdd;
-                    }
-                    nextToken = leftOver;
-                    if (leftOver) {
-                        lines.push(curLine);
-                        curLine = "";
-                    }
-                }
-                if (curLine) {
-                    lines.push(curLine);
-                }
-                return lines;
-            }
-            /**
-             * Breaks up the next token and so that some part of it can be
-             * added to curLine and fits in the width. the return value
-             * is an array with 2 elements, the part that can be added
-             * and the left over part of the token
-             * widthMeasure is a function that takes text as input,
-             * and returns the width of the text in pixels.
-             */
-            function breakNextTokenToFitInWidth(curLine, nextToken, width, widthMeasure) {
-                if (isBlank(nextToken)) {
-                    return [nextToken, null];
-                }
-                if (widthMeasure(curLine + nextToken) <= width) {
-                    return [nextToken, null];
-                }
-                if (!isBlank(curLine)) {
-                    return [null, nextToken];
-                }
-                var i = 0;
-                while (i < nextToken.length) {
-                    if (widthMeasure(curLine + nextToken[i] + "-") <= width) {
-                        curLine += nextToken[i++];
-                    }
-                    else {
-                        break;
-                    }
-                }
-                var append = "-";
-                if (isBlank(curLine) && i === 0) {
-                    i = 1;
-                    append = "";
-                }
-                return [nextToken.substring(0, i) + append, nextToken.substring(i)];
-            }
-            /**
-             * Breaks up into tokens for word wrapping
-             * Each token is comprised of either:
-             *  1) Only word and non line break characters
-             *  2) Only spaces characters
-             *  3) Line break characters such as ":" or ";" or ","
-             *  (will be single character token, unless there is a repeated linebreak character)
-             */
-            function tokenize(text) {
-                var ret = [];
-                var token = "";
-                var lastChar = "";
-                for (var i = 0, len = text.length; i < len; i++) {
-                    var curChar = text[i];
-                    if (token === "" || isTokenizedTogether(token[0], curChar, lastChar)) {
-                        token += curChar;
-                    }
-                    else {
-                        ret.push(token);
-                        token = curChar;
-                    }
-                    lastChar = curChar;
-                }
-                if (token) {
-                    ret.push(token);
-                }
-                return ret;
-            }
-            /**
-             * Returns whether a string is blank.
-             *
-             * @param {string} str: The string to test for blank-ness
-             * @returns {boolean} Whether the string is blank
-             */
-            function isBlank(text) {
-                return text == null ? true : text.trim() === "";
-            }
-            /**
-             * Given a token (ie a string of characters that are similar and shouldn't be broken up) and a character, determine
-             * whether that character should be added to the token. Groups of characters that don't match the space or line break
-             * regex are always tokenzied together. Spaces are always tokenized together. Line break characters are almost always
-             * split into their own token, except that two subsequent identical line break characters are put into the same token.
-             * For isTokenizedTogether(":", ",") == False but isTokenizedTogether("::") == True.
-             */
-            function isTokenizedTogether(text, nextChar, lastChar) {
-                if (!(text && nextChar)) {
-                    false;
-                }
-                if (SPACES.test(text) && SPACES.test(nextChar)) {
-                    return true;
-                }
-                else if (SPACES.test(text) || SPACES.test(nextChar)) {
-                    return false;
-                }
-                if (LINE_BREAKS_AFTER.test(lastChar) || LINE_BREAKS_BEFORE.test(nextChar)) {
-                    return false;
-                }
-                return true;
-            }
-        })(WordWrap = _Util.WordWrap || (_Util.WordWrap = {}));
-    })(_Util = Plottable._Util || (Plottable._Util = {}));
-})(Plottable || (Plottable = {}));
-
 var Plottable;
 (function (Plottable) {
     var _Util;
@@ -3632,7 +3093,8 @@ var Plottable;
                 // need to put the bars in a seperate container so we can ensure that they don't cover labels
                 _super.prototype.setup.call(this, area.append("g").classed("bar-area", true));
                 this._textArea = area.append("g").classed("bar-label-text-area", true);
-                this._measurer = new Plottable._Util.Text.CachingCharacterMeasurer(this._textArea.append("text")).measure;
+                this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._textArea);
+                this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
             };
             Rect.prototype.removeLabels = function () {
                 this._textArea.selectAll("g").remove();
@@ -3649,7 +3111,7 @@ var Plottable;
                     var x = attrToProjector["x"](d, i, userMetadata, plotMetadata);
                     var y = attrToProjector["y"](d, i, userMetadata, plotMetadata);
                     var positive = attrToProjector["positive"](d, i, userMetadata, plotMetadata);
-                    var measurement = _this._measurer(text);
+                    var measurement = _this._measurer.measure(text);
                     var color = attrToProjector["fill"](d, i, userMetadata, plotMetadata);
                     var dark = Plottable._Util.Color.contrast("white", color) * 1.6 < Plottable._Util.Color.contrast("black", color);
                     var primary = _this._isVertical ? h : w;
@@ -3681,7 +3143,13 @@ var Plottable;
                             xAlign = positive ? "left" : "right";
                             yAlign = "center";
                         }
-                        Plottable._Util.Text.writeLineHorizontally(text, g, w, h, xAlign, yAlign);
+                        var writeOptions = {
+                            selection: g,
+                            xAlign: xAlign,
+                            yAlign: yAlign,
+                            textRotation: 0
+                        };
+                        _this._writer.write(text, w, h, writeOptions);
                     }
                     return tooWide;
                 });
@@ -4949,7 +4417,7 @@ var Plottable;
                 if (this._computedHeight !== null) {
                     return this._computedHeight;
                 }
-                var textHeight = this._measureTextHeight() * 2;
+                var textHeight = this._measurer.measure().height * 2;
                 this.tickLength(textHeight);
                 this.endTickLength(textHeight);
                 this._computedHeight = this._maxLabelTickLength() + 2 * this.tickLabelPadding();
@@ -4967,7 +4435,7 @@ var Plottable;
                 return stepLength;
             };
             Time.prototype._maxWidthForInterval = function (config) {
-                return this._measurer(config.formatter(Time._LONG_DATE)).width;
+                return this._measurer.measure(config.formatter(Time._LONG_DATE)).width;
             };
             /**
              * Check if tier configuration fits in the current width.
@@ -4982,7 +4450,7 @@ var Plottable;
                 for (var i = 0; i < Time._NUM_TIERS; ++i) {
                     this._tierLabelContainers.push(this._content.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
                 }
-                this._measurer = Plottable._Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
+                this._measurer = new SVGTypewriter.Measurers.Measurer(this._tierLabelContainers[0]);
             };
             Time.prototype._getTickIntervalValues = function (config) {
                 return this._scale.tickInterval(config.interval, config.step);
@@ -4990,9 +4458,6 @@ var Plottable;
             Time.prototype._getTickValues = function () {
                 var _this = this;
                 return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations.reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
-            };
-            Time.prototype._measureTextHeight = function () {
-                return this._measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
             };
             Time.prototype._cleanContainer = function (container) {
                 container.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
@@ -5042,7 +4507,7 @@ var Plottable;
             Time.prototype._canFitLabelFilter = function (container, position, bounds, label, isCentered) {
                 var endPosition;
                 var startPosition;
-                var width = this._measurer(label).width + this.tickLabelPadding();
+                var width = this._measurer.measure(label).width + this.tickLabelPadding();
                 var leftBound = this._scale.scale(bounds[0]);
                 var rightBound = this._scale.scale(bounds[1]);
                 if (isCentered) {
@@ -5140,14 +4605,15 @@ var Plottable;
             }
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._measurer = Plottable._Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true));
+                this._measurer = new SVGTypewriter.Measurers.Measurer(this._tickLabelContainer, Axis.AbstractAxis.TICK_LABEL_CLASS);
+                this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
             };
             Numeric.prototype._computeWidth = function () {
                 var _this = this;
                 var tickValues = this._getTickValues();
                 var textLengths = tickValues.map(function (v) {
                     var formattedValue = _this.formatter()(v);
-                    return _this._measurer(formattedValue).width;
+                    return _this._measurer.measure(formattedValue).width;
                 });
                 var maxTextLength = Plottable._Util.Methods.max(textLengths, 0);
                 if (this._tickLabelPositioning === "center") {
@@ -5159,7 +4625,7 @@ var Plottable;
                 return this._computedWidth;
             };
             Numeric.prototype._computeHeight = function () {
-                var textHeight = this._measurer(Plottable._Util.Text.HEIGHT_TEXT).height;
+                var textHeight = this._measurer.measure().height;
                 if (this._tickLabelPositioning === "center") {
                     this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
                 }
@@ -5266,7 +4732,7 @@ var Plottable;
                     if (!_this._isHorizontal()) {
                         var availableTextSpace = _this.width() - _this.tickLabelPadding();
                         availableTextSpace -= _this._tickLabelPositioning === "center" ? _this._maxLabelTickLength() : 0;
-                        formattedText = Plottable._Util.Text.getTruncatedText(formattedText, availableTextSpace, _this._measurer);
+                        formattedText = _this._wrapper.wrap(formattedText, _this._measurer, availableTextSpace).wrappedText;
                     }
                     return formattedText;
                 });
@@ -5363,7 +4829,9 @@ var Plottable;
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._measurer = new Plottable._Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
+                this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
+                this._wrapper = new SVGTypewriter.Wrappers.SingleLineWrapper();
+                this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
             };
             Category.prototype._rescale = function () {
                 return this._invalidateLayout();
@@ -5404,24 +4872,40 @@ var Plottable;
                 this._invalidateLayout();
                 return this;
             };
-            Category.prototype._tickLabelOrientation = function () {
-                switch (this._tickLabelAngle) {
-                    case 0:
-                        return "horizontal";
-                    case -90:
-                        return "left";
-                    case 90:
-                        return "right";
-                    default:
-                        throw new Error("bad orientation");
-                }
-            };
             /**
              * Measures the size of the ticks while also writing them to the DOM.
              * @param {D3.Selection} ticks The tick elements to be written to.
              */
             Category.prototype._drawTicks = function (axisWidth, axisHeight, scale, ticks) {
-                return this._drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, true);
+                var self = this;
+                var xAlign;
+                var yAlign;
+                switch (this.tickLabelAngle()) {
+                    case 0:
+                        xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
+                        yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+                        break;
+                    case 90:
+                        xAlign = { left: "center", right: "center", top: "right", bottom: "left" };
+                        yAlign = { left: "top", right: "bottom", top: "center", bottom: "center" };
+                        break;
+                    case -90:
+                        xAlign = { left: "center", right: "center", top: "left", bottom: "right" };
+                        yAlign = { left: "bottom", right: "top", top: "center", bottom: "center" };
+                        break;
+                }
+                ticks.each(function (d) {
+                    var bandWidth = scale.fullBandStartAndWidth(d)[1];
+                    var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
+                    var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
+                    var writeOptions = {
+                        selection: d3.select(this),
+                        xAlign: xAlign[self.orient()],
+                        yAlign: yAlign[self.orient()],
+                        textRotation: self.tickLabelAngle()
+                    };
+                    self._writer.write(self.formatter()(d), width, height, writeOptions);
+                });
             };
             /**
              * Measures the size of the ticks without making any (permanent) DOM
@@ -5430,40 +4914,19 @@ var Plottable;
              * @param {string[]} ticks The strings that will be printed on the ticks.
              */
             Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, ticks) {
-                return this._drawOrMeasureTicks(axisWidth, axisHeight, scale, ticks, false);
-            };
-            Category.prototype._drawOrMeasureTicks = function (axisWidth, axisHeight, scale, dataOrTicks, draw) {
-                var self = this;
-                var textWriteResults = [];
-                var tm = function (s) { return self._measurer.measure(s); };
-                var iterator = draw ? function (f) { return dataOrTicks.each(f); } : function (f) { return dataOrTicks.forEach(f); };
-                iterator(function (d) {
-                    var bandWidth = scale.fullBandStartAndWidth(d)[1];
-                    var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
-                    var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
-                    var textWriteResult;
-                    var formatter = self.formatter();
-                    if (draw) {
-                        var d3this = d3.select(this);
-                        var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
-                        var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self._tickLabelOrientation(), {
-                            g: d3this,
-                            xAlign: xAlign[self.orient()],
-                            yAlign: yAlign[self.orient()]
-                        });
-                    }
-                    else {
-                        textWriteResult = Plottable._Util.Text.writeText(formatter(d), width, height, tm, self._tickLabelOrientation());
-                    }
-                    textWriteResults.push(textWriteResult);
+                var _this = this;
+                var wrappingResults = ticks.map(function (s) {
+                    var bandWidth = scale.fullBandStartAndWidth(s)[1];
+                    var width = _this._isHorizontal() ? bandWidth : axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
+                    var height = _this._isHorizontal() ? axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding() : bandWidth;
+                    return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
                 });
                 var widthFn = this._isHorizontal() ? d3.sum : Plottable._Util.Methods.max;
                 var heightFn = this._isHorizontal() ? Plottable._Util.Methods.max : d3.sum;
                 return {
-                    textFits: textWriteResults.every(function (t) { return t.textFits; }),
-                    usedWidth: widthFn(textWriteResults, function (t) { return t.usedWidth; }, 0),
-                    usedHeight: heightFn(textWriteResults, function (t) { return t.usedHeight; }, 0)
+                    textFits: wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText); }),
+                    usedWidth: widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0),
+                    usedHeight: heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0)
                 };
             };
             Category.prototype._doRender = function () {
@@ -5495,7 +4958,7 @@ var Plottable;
                 // When anyone calls _invalidateLayout, _computeLayout will be called
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
-                this._measurer.clear();
+                this._measurer.reset();
                 return _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
             };
             return Category;
@@ -5566,7 +5029,7 @@ var Plottable;
                 return this;
             };
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var desiredWH = this._measurer(this._text);
+                var desiredWH = this._measurer.measure(this._text);
                 var desiredWidth = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
                 var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
                 return {
@@ -5579,7 +5042,9 @@ var Plottable;
             Label.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._textContainer = this._content.append("g");
-                this._measurer = Plottable._Util.Text.getTextMeasurer(this._textContainer.append("text"));
+                this._measurer = new SVGTypewriter.Measurers.Measurer(this._textContainer);
+                this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
+                this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
                 this.text(this._text);
             };
             Label.prototype.text = function (displayText) {
@@ -5624,26 +5089,22 @@ var Plottable;
             };
             Label.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
-                var textMeasurement = this._measurer(this._text);
+                // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
+                this._textContainer.selectAll("g").remove();
+                var textMeasurement = this._measurer.measure(this._text);
                 var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
                 var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
                 this._textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
-                this._textContainer.text("");
-                var dimension = this.orient() === "horizontal" ? this.width() : this.height();
-                var truncatedText = Plottable._Util.Text.getTruncatedText(this._text, dimension, this._measurer);
                 var writeWidth = this.width() - 2 * widthPadding;
                 var writeHeight = this.height() - 2 * heightPadding;
-                if (this.orient() === "horizontal") {
-                    Plottable._Util.Text.writeLineHorizontally(truncatedText, this._textContainer, writeWidth, writeHeight, this._xAlignment, this._yAlignment);
-                }
-                else {
-                    Plottable._Util.Text.writeLineVertically(truncatedText, this._textContainer, writeWidth, writeHeight, this._xAlignment, this._yAlignment, this.orient());
-                }
-            };
-            Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                this._measurer = Plottable._Util.Text.getTextMeasurer(this._textContainer.append("text")); // reset it in case fonts have changed
-                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                return this;
+                var textRotation = { horizontal: 0, right: 90, left: -90 };
+                var writeOptions = {
+                    selection: this._textContainer,
+                    xAlign: this._xAlignment,
+                    yAlign: this._yAlignment,
+                    textRotation: textRotation[this.orient()]
+                };
+                this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
             };
             return Label;
         })(Component.AbstractComponent);
@@ -5717,6 +5178,15 @@ var Plottable;
                 this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
             }
+            Legend.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+                var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+                fakeLegendEntry.append("text");
+                this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
+                this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
+                this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(true);
+            };
             Legend.prototype.maxEntriesPerRow = function (numEntries) {
                 if (numEntries == null) {
                     return this._maxEntriesPerRow;
@@ -5756,19 +5226,15 @@ var Plottable;
             };
             Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
-                var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
-                var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-                var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendEntry.append("text"));
-                var textHeight = measure(Plottable._Util.Text.HEIGHT_TEXT).height;
+                var textHeight = this._measurer.measure().height;
                 var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
                 var measureEntry = function (entryText) {
-                    var originalEntryLength = (textHeight + measure(entryText).width + _this._padding);
+                    var originalEntryLength = (textHeight + _this._measurer.measure(entryText).width + _this._padding);
                     return Math.min(originalEntryLength, availableWidthForEntries);
                 };
                 var entries = this._scale.domain().slice();
                 entries.sort(this.sortFunction());
                 var entryLengths = Plottable._Util.Methods.populateMap(entries, measureEntry);
-                fakeLegendRow.remove();
                 var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
                 var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
                 if (rowsAvailable !== rowsAvailable) {
@@ -5782,17 +5248,14 @@ var Plottable;
                 };
             };
             Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+                var _this = this;
                 var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
                 var rowLengths = estimatedLayout.rows.map(function (row) {
                     return d3.sum(row, function (entry) { return estimatedLayout.entryLengths.get(entry); });
                 });
                 var longestRowLength = Plottable._Util.Methods.max(rowLengths, 0);
-                var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
-                var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-                var measure = Plottable._Util.Text.getTextMeasurer(fakeLegendEntry.append("text"));
-                var longestUntruncatedEntryLength = Plottable._Util.Methods.max(this._scale.domain(), function (d) { return measure(d).width; }, 0);
+                var longestUntruncatedEntryLength = Plottable._Util.Methods.max(this._scale.domain(), function (d) { return _this._measurer.measure(d).width; }, 0);
                 longestUntruncatedEntryLength += estimatedLayout.textHeight + this._padding;
-                fakeLegendRow.remove();
                 var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
                 var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
                 var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
@@ -5885,14 +5348,17 @@ var Plottable;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
                 textContainers.append("title").text(function (value) { return value; });
-                // HACKHACK (translate vertical shift): #864
-                textContainers.attr("transform", "translate(" + layout.textHeight + ", " + (layout.textHeight * 0.1) + ")").each(function (value) {
+                var self = this;
+                textContainers.attr("transform", "translate(" + layout.textHeight + ", 0)").each(function (value) {
                     var container = d3.select(this);
-                    var measure = Plottable._Util.Text.getTextMeasurer(container.append("text"));
                     var maxTextLength = layout.entryLengths.get(value) - layout.textHeight - padding;
-                    var textToWrite = Plottable._Util.Text.getTruncatedText(value, maxTextLength, measure);
-                    var textSize = measure(textToWrite);
-                    Plottable._Util.Text.writeLineHorizontally(textToWrite, container, textSize.width, textSize.height);
+                    var writeOptions = {
+                        selection: container,
+                        xAlign: "left",
+                        yAlign: "top",
+                        textRotation: 0
+                    };
+                    self._writer.write(value, maxTextLength, self.height(), writeOptions);
                 });
             };
             /**
@@ -9688,3 +9154,973 @@ var Plottable;
         Interaction.Hover = Hover;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
+
+/*!
+SVG Typewriter 0.1.10 (https://github.com/palantir/svg-typewriter)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
+*/
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Utils) {
+        (function (Methods) {
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
+            /**
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
+             *
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
+             */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) { return a[k]; });
+                var valuesB = keysB.map(function (k) { return b[k]; });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
+        })(Utils.Methods || (Utils.Methods = {}));
+        var Methods = Utils.Methods;
+    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+    var Utils = SVGTypewriter.Utils;
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Utils) {
+        (function (DOM) {
+            function transform(s, x, y) {
+                var xform = d3.transform(s.attr("transform"));
+                if (x == null) {
+                    return xform.translate;
+                }
+                else {
+                    y = (y == null) ? 0 : y;
+                    xform.translate[0] = x;
+                    xform.translate[1] = y;
+                    s.attr("transform", xform.toString());
+                    return s;
+                }
+            }
+            DOM.transform = transform;
+            function getBBox(element) {
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
+            }
+            DOM.getBBox = getBBox;
+        })(Utils.DOM || (Utils.DOM = {}));
+        var DOM = Utils.DOM;
+    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+    var Utils = SVGTypewriter.Utils;
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Utils) {
+        var Cache = (function () {
+            /**
+             * @constructor
+             *
+             * @param {string} compute The function whose results will be cached.
+             * @param {(v: T, w: T) => boolean} [valueEq]
+             *        Used to determine if the value of canonicalKey has changed.
+             *        If omitted, defaults to === comparision.
+             */
+            function Cache(compute, valueEq) {
+                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
+                this.cache = d3.map();
+                this.compute = compute;
+                this.valueEq = valueEq;
+            }
+            /**
+             * Attempt to look up k in the cache, computing the result if it isn't
+             * found.
+             *
+             * @param {string} k The key to look up in the cache.
+             * @return {T} The value associated with k; the result of compute(k).
+             */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+            /**
+             * Reset the cache empty.
+             *
+             * @return {Cache<T>} The calling Cache.
+             */
+            Cache.prototype.clear = function () {
+                this.cache = d3.map();
+                return this;
+            };
+            return Cache;
+        })();
+        Utils.Cache = Cache;
+    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+    var Utils = SVGTypewriter.Utils;
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Utils) {
+        var Tokenizer = (function () {
+            function Tokenizer() {
+                this.WordDividerRegExp = new RegExp("\\W");
+                this.WhitespaceRegExp = new RegExp("\\s");
+            }
+            Tokenizer.prototype.tokenize = function (line) {
+                var _this = this;
+                return line.split("").reduce(function (tokens, c) { return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c)); }, [""]);
+            };
+            Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
+                if (!token) {
+                    return [newCharacter];
+                }
+                var lastCharacter = token[token.length - 1];
+                if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token + newCharacter];
+                }
+                else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token, newCharacter];
+                }
+                else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
+                    return [token + newCharacter];
+                }
+                else if (lastCharacter === newCharacter) {
+                    return [token + newCharacter];
+                }
+                else {
+                    return [token, newCharacter];
+                }
+            };
+            return Tokenizer;
+        })();
+        Utils.Tokenizer = Tokenizer;
+    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+    var Utils = SVGTypewriter.Utils;
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Utils) {
+        (function (StringMethods) {
+            /**
+             * Treat all sequences of consecutive whitespace as a single " ".
+             */
+            function combineWhitespace(str) {
+                return str.replace(/\s+/g, " ");
+            }
+            StringMethods.combineWhitespace = combineWhitespace;
+            function isNotEmptyString(str) {
+                return str && str.trim() !== "";
+            }
+            StringMethods.isNotEmptyString = isNotEmptyString;
+            function trimStart(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var chars = str.split("");
+                var reduceFunction = c ? function (s) { return s.split(c).some(isNotEmptyString); } : isNotEmptyString;
+                return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
+            }
+            StringMethods.trimStart = trimStart;
+            function trimEnd(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var reversedChars = str.split("");
+                reversedChars.reverse();
+                reversedChars = trimStart(reversedChars.join(""), c).split("");
+                reversedChars.reverse();
+                return reversedChars.join("");
+            }
+            StringMethods.trimEnd = trimEnd;
+        })(Utils.StringMethods || (Utils.StringMethods = {}));
+        var StringMethods = Utils.StringMethods;
+    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+    var Utils = SVGTypewriter.Utils;
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Animators) {
+        var BaseAnimator = (function () {
+            function BaseAnimator() {
+                this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+                this.delay(0);
+                this.easing(BaseAnimator.DEFAULT_EASING);
+                this.moveX(0);
+                this.moveY(0);
+            }
+            BaseAnimator.prototype.animate = function (selection) {
+                var xForm = d3.transform("");
+                xForm.translate = [this.moveX(), this.moveY()];
+                selection.attr("transform", xForm.toString());
+                xForm.translate = [0, 0];
+                return this._animate(selection, { transform: xForm.toString() });
+            };
+            BaseAnimator.prototype._animate = function (selection, attr) {
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attr);
+            };
+            BaseAnimator.prototype.duration = function (duration) {
+                if (duration == null) {
+                    return this._duration;
+                }
+                else {
+                    this._duration = duration;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveX = function (shift) {
+                if (shift == null) {
+                    return this._moveX;
+                }
+                else {
+                    this._moveX = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveY = function (shift) {
+                if (shift == null) {
+                    return this._moveY;
+                }
+                else {
+                    this._moveY = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.delay = function (delay) {
+                if (delay == null) {
+                    return this._delay;
+                }
+                else {
+                    this._delay = delay;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default easing of the animation
+             */
+            BaseAnimator.DEFAULT_EASING = "exp-out";
+            return BaseAnimator;
+        })();
+        Animators.BaseAnimator = BaseAnimator;
+    })(SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+    var Animators = SVGTypewriter.Animators;
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Animators) {
+        var UnveilAnimator = (function (_super) {
+            __extends(UnveilAnimator, _super);
+            function UnveilAnimator() {
+                this.direction("bottom");
+                _super.call(this);
+            }
+            UnveilAnimator.prototype.direction = function (direction) {
+                if (direction == null) {
+                    return this._direction;
+                }
+                else {
+                    if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
+                        throw new Error("unsupported direction - " + direction);
+                    }
+                    this._direction = direction;
+                    return this;
+                }
+            };
+            UnveilAnimator.prototype.animate = function (selection) {
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection);
+                var mask = selection.select(".clip-rect");
+                mask.attr("width", 0);
+                mask.attr("height", 0);
+                switch (this._direction) {
+                    case "top":
+                        mask.attr("y", attr.y + attr.height);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "bottom":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "left":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("height", attr.height);
+                        break;
+                    case "right":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x + attr.width);
+                        mask.attr("height", attr.height);
+                        break;
+                }
+                this._animate(mask, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
+            return UnveilAnimator;
+        })(Animators.BaseAnimator);
+        Animators.UnveilAnimator = UnveilAnimator;
+    })(SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+    var Animators = SVGTypewriter.Animators;
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Animators) {
+        var OpacityAnimator = (function (_super) {
+            __extends(OpacityAnimator, _super);
+            function OpacityAnimator() {
+                _super.apply(this, arguments);
+            }
+            OpacityAnimator.prototype.animate = function (selection) {
+                var area = selection.select(".text-area");
+                area.attr("opacity", 0);
+                var attr = {
+                    opacity: 1
+                };
+                this._animate(area, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            return OpacityAnimator;
+        })(Animators.BaseAnimator);
+        Animators.OpacityAnimator = OpacityAnimator;
+    })(SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+    var Animators = SVGTypewriter.Animators;
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Wrappers) {
+        var Wrapper = (function () {
+            function Wrapper() {
+                this.maxLines(Infinity);
+                this.textTrimming("ellipsis");
+                this.allowBreakingWords(true);
+                this._tokenizer = new SVGTypewriter.Utils.Tokenizer();
+                this._breakingCharacter = "-";
+            }
+            Wrapper.prototype.maxLines = function (noLines) {
+                if (noLines == null) {
+                    return this._maxLines;
+                }
+                else {
+                    this._maxLines = noLines;
+                    return this;
+                }
+            };
+            Wrapper.prototype.textTrimming = function (option) {
+                if (option == null) {
+                    return this._textTrimming;
+                }
+                else {
+                    if (option !== "ellipsis" && option !== "none") {
+                        throw new Error(option + " - unsupported text trimming option.");
+                    }
+                    this._textTrimming = option;
+                    return this;
+                }
+            };
+            Wrapper.prototype.allowBreakingWords = function (allow) {
+                if (allow == null) {
+                    return this._allowBreakingWords;
+                }
+                else {
+                    this._allowBreakingWords = allow;
+                    return this;
+                }
+            };
+            Wrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var initialWrappingResult = {
+                    originalText: text,
+                    wrappedText: "",
+                    noLines: 0,
+                    noBrokeWords: 0,
+                    truncatedText: ""
+                };
+                var state = {
+                    wrapping: initialWrappingResult,
+                    currentLine: "",
+                    availableWidth: width,
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+                    canFitText: true
+                };
+                var lines = text.split("\n");
+                return lines.reduce(function (state, line, i) { return _this.breakLineToFitWidth(state, line, i !== lines.length - 1, measurer); }, state).wrapping;
+            };
+            Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+                var _this = this;
+                if (!state.canFitText && state.wrapping.truncatedText !== "") {
+                    state.wrapping.truncatedText += "\n";
+                }
+                var tokens = this._tokenizer.tokenize(line);
+                state = tokens.reduce(function (state, token) { return _this.wrapNextToken(token, state, measurer); }, state);
+                var wrappedText = SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                state.wrapping.noLines += +(wrappedText !== "");
+                if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+                    var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken;
+                    state.canFitText = false;
+                }
+                else {
+                    state.wrapping.wrappedText += wrappedText;
+                }
+                state.currentLine = "\n";
+                return state;
+            };
+            Wrapper.prototype.canFitToken = function (token, width, measurer) {
+                var _this = this;
+                var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+            };
+            Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+                if (this._textTrimming === "none") {
+                    return {
+                        wrappedToken: line,
+                        remainingToken: ""
+                    };
+                }
+                var truncatedLine = line.substring(0).trim();
+                var lineWidth = measurer.measure(truncatedLine).width;
+                var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+                if (width <= ellipsesWidth) {
+                    var periodWidth = ellipsesWidth / 3;
+                    var numPeriodsThatFit = Math.floor(width / periodWidth);
+                    return {
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+                        remainingToken: line
+                    };
+                }
+                while (lineWidth + ellipsesWidth > width) {
+                    truncatedLine = SVGTypewriter.Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+                    lineWidth = measurer.measure(truncatedLine).width;
+                }
+                return {
+                    wrappedToken: prefix + truncatedLine + "...",
+                    remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
+                };
+            };
+            Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+                if (!state.canFitText || state.availableLines === state.wrapping.noLines || !this.canFitToken(token, state.availableWidth, measurer)) {
+                    return this.finishWrapping(token, state, measurer);
+                }
+                var remainingToken = token;
+                while (remainingToken) {
+                    var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+                    state.currentLine = result.line;
+                    remainingToken = result.remainingToken;
+                    if (remainingToken != null) {
+                        state.wrapping.noBrokeWords += +result.breakWord;
+                        ++state.wrapping.noLines;
+                        if (state.availableLines === state.wrapping.noLines) {
+                            var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                            state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                            state.currentLine = "\n";
+                            return state;
+                        }
+                        else {
+                            state.wrapping.wrappedText += SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                            state.currentLine = "\n";
+                        }
+                    }
+                }
+                return state;
+            };
+            Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+                // Token is really long, but we have a space to put part of the word.
+                if (state.canFitText && state.availableLines !== state.wrapping.noLines && this._allowBreakingWords && this._textTrimming !== "none") {
+                    var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += res.wrappedToken;
+                    state.wrapping.truncatedText += res.remainingToken;
+                    state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+                    state.wrapping.noLines += +(res.wrappedToken.length > 0);
+                    state.currentLine = "";
+                }
+                else {
+                    state.wrapping.truncatedText += token;
+                }
+                state.canFitText = false;
+                return state;
+            };
+            /**
+             * Breaks single token to fit current line.
+             * If token contains only whitespaces then they will not be populated to next line.
+             */
+            Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+                if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+                if (measurer.measure(line + token).width <= availableWidth) {
+                    return {
+                        remainingToken: null,
+                        line: line + token,
+                        breakWord: false
+                    };
+                }
+                if (token.trim() === "") {
+                    return {
+                        remainingToken: "",
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                if (!this._allowBreakingWords) {
+                    return {
+                        remainingToken: token,
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                var fitTokenLength = 0;
+                while (fitTokenLength < token.length) {
+                    if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                        ++fitTokenLength;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                var suffix = "";
+                if (fitTokenLength > 0) {
+                    suffix = breakingCharacter;
+                }
+                return {
+                    remainingToken: token.substring(fitTokenLength),
+                    line: line + token.substring(0, fitTokenLength) + suffix,
+                    breakWord: fitTokenLength > 0
+                };
+            };
+            return Wrapper;
+        })();
+        Wrappers.Wrapper = Wrapper;
+    })(SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+    var Wrappers = SVGTypewriter.Wrappers;
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Wrappers) {
+        var SingleLineWrapper = (function (_super) {
+            __extends(SingleLineWrapper, _super);
+            function SingleLineWrapper() {
+                _super.apply(this, arguments);
+            }
+            SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var lines = text.split("\n");
+                if (lines.length > 1) {
+                    throw new Error("SingleLineWrapper is designed to work only on single line");
+                }
+                var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
+                var result = wrapFN(width);
+                if (result.noLines < 2) {
+                    return result;
+                }
+                var left = 0;
+                var right = width;
+                for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
+                    var currentWidth = (right + left) / 2;
+                    var currentResult = wrapFN(currentWidth);
+                    if (this.areSameResults(result, currentResult)) {
+                        right = currentWidth;
+                        result = currentResult;
+                    }
+                    else {
+                        left = currentWidth;
+                    }
+                }
+                return result;
+            };
+            SingleLineWrapper.prototype.areSameResults = function (one, two) {
+                return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
+            };
+            SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
+            return SingleLineWrapper;
+        })(Wrappers.Wrapper);
+        Wrappers.SingleLineWrapper = SingleLineWrapper;
+    })(SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+    var Wrappers = SVGTypewriter.Wrappers;
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Writers) {
+        var Writer = (function () {
+            function Writer(measurer, wrapper) {
+                this._writerID = Writer.nextID++;
+                this._elementID = 0;
+                this.measurer(measurer);
+                if (wrapper) {
+                    this.wrapper(wrapper);
+                }
+                this.addTitleElement(false);
+            }
+            Writer.prototype.measurer = function (newMeasurer) {
+                this._measurer = newMeasurer;
+                return this;
+            };
+            Writer.prototype.wrapper = function (newWrapper) {
+                this._wrapper = newWrapper;
+                return this;
+            };
+            Writer.prototype.addTitleElement = function (add) {
+                this._addTitleElement = add;
+                return this;
+            };
+            Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+                var textEl = g.append("text");
+                textEl.text(line);
+                var xOffset = width * Writer.XOffsetFactor[xAlign];
+                var anchor = Writer.AnchorConverter[xAlign];
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
+            };
+            Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+                var _this = this;
+                var lines = text.split("\n");
+                var lineHeight = this._measurer.measure().height;
+                var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
+                lines.forEach(function (line, i) {
+                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                });
+            };
+            Writer.prototype.write = function (text, width, height, options) {
+                if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
+                    throw new Error("unsupported rotation - " + options.textRotation);
+                }
+                var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var textContainer = options.selection.append("g").classed("text-container", true);
+                if (this._addTitleElement) {
+                    textContainer.append("title").text(text);
+                }
+                var textArea = textContainer.append("g").classed("text-area", true);
+                var wrappedText = this._wrapper ? this._wrapper.wrap(text, this._measurer, primaryDimension, secondaryDimension).wrappedText : text;
+                this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+                var xForm = d3.transform("");
+                var xForm2 = d3.transform("");
+                xForm.rotate = options.textRotation;
+                switch (options.textRotation) {
+                    case 90:
+                        xForm.translate = [width, 0];
+                        xForm2.rotate = -90;
+                        xForm2.translate = [0, 200];
+                        break;
+                    case -90:
+                        xForm.translate = [0, height];
+                        xForm2.rotate = 90;
+                        xForm2.translate = [width, 0];
+                        break;
+                    case 180:
+                        xForm.translate = [width, height];
+                        xForm2.translate = [width, height];
+                        xForm2.rotate = 180;
+                        break;
+                }
+                textArea.attr("transform", xForm.toString());
+                this.addClipPath(textContainer, xForm2);
+                if (options.animator) {
+                    options.animator.animate(textContainer);
+                }
+            };
+            Writer.prototype.addClipPath = function (selection, transform) {
+                var elementID = this._elementID++;
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                var clipPathID = "clipPath" + this._writerID + "_" + elementID;
+                selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
+                var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var box = clipPathParent.append("rect");
+                box.classed("clip-rect", true).attr(attr);
+            };
+            Writer.nextID = 0;
+            Writer.SupportedRotation = [-90, 0, 180, 90];
+            Writer.AnchorConverter = {
+                left: "start",
+                center: "middle",
+                right: "end"
+            };
+            Writer.XOffsetFactor = {
+                left: 0,
+                center: 0.5,
+                right: 1
+            };
+            Writer.YOffsetFactor = {
+                top: 0,
+                center: 0.5,
+                bottom: 1
+            };
+            return Writer;
+        })();
+        Writers.Writer = Writer;
+    })(SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
+    var Writers = SVGTypewriter.Writers;
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Measurers) {
+        ;
+        var AbstractMeasurer = (function () {
+            function AbstractMeasurer(area, className) {
+                this.textMeasurer = this.getTextMeasurer(area, className);
+            }
+            AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+                return d[0][0].tagName === "text" || !d.select("text").empty();
+            };
+            AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+                var _this = this;
+                if (!this.checkSelectionIsText(area)) {
+                    var textElement = area.append("text");
+                    if (className) {
+                        textElement.classed(className, true);
+                    }
+                    textElement.remove();
+                    return function (text) {
+                        area.node().appendChild(textElement.node());
+                        var areaDimension = _this.measureBBox(textElement, text);
+                        textElement.remove();
+                        return areaDimension;
+                    };
+                }
+                else {
+                    var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
+                    area.remove();
+                    return function (text) {
+                        parentNode.appendChild(area.node());
+                        var areaDimension = _this.measureBBox(textSelection, text);
+                        area.remove();
+                        return areaDimension;
+                    };
+                }
+            };
+            AbstractMeasurer.prototype.measureBBox = function (d, text) {
+                d.text(text);
+                var bb = SVGTypewriter.Utils.DOM.getBBox(d);
+                return { width: bb.width, height: bb.height };
+            };
+            AbstractMeasurer.prototype.measure = function (text) {
+                if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+                return this.textMeasurer(text);
+            };
+            AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+            return AbstractMeasurer;
+        })();
+        Measurers.AbstractMeasurer = AbstractMeasurer;
+    })(SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+    var Measurers = SVGTypewriter.Measurers;
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Measurers) {
+        var Measurer = (function (_super) {
+            __extends(Measurer, _super);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
+            }
+            // Guards assures same line height and width of whitespaces on both ends.
+            Measurer.prototype._addGuards = function (text) {
+                return Measurers.AbstractMeasurer.HEIGHT_TEXT + text + Measurers.AbstractMeasurer.HEIGHT_TEXT;
+            };
+            Measurer.prototype.getGuardWidth = function () {
+                if (this.guardWidth == null) {
+                    this.guardWidth = _super.prototype.measure.call(this).width;
+                }
+                return this.guardWidth;
+            };
+            Measurer.prototype._measureLine = function (line) {
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
+                var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
+                return measuredLineDimensions;
+            };
+            Measurer.prototype.measure = function (text) {
+                var _this = this;
+                if (text === void 0) { text = Measurers.AbstractMeasurer.HEIGHT_TEXT; }
+                if (text.trim() === "") {
+                    return { width: 0, height: 0 };
+                }
+                var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+                return {
+                    width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+                    height: d3.sum(linesDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return Measurer;
+        })(Measurers.AbstractMeasurer);
+        Measurers.Measurer = Measurer;
+    })(SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+    var Measurers = SVGTypewriter.Measurers;
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Measurers) {
+        var CharacterMeasurer = (function (_super) {
+            __extends(CharacterMeasurer, _super);
+            function CharacterMeasurer() {
+                _super.apply(this, arguments);
+            }
+            CharacterMeasurer.prototype._measureCharacter = function (c) {
+                return _super.prototype._measureLine.call(this, c);
+            };
+            CharacterMeasurer.prototype._measureLine = function (line) {
+                var _this = this;
+                var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+                return {
+                    width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+                    height: d3.max(charactersDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return CharacterMeasurer;
+        })(Measurers.Measurer);
+        Measurers.CharacterMeasurer = CharacterMeasurer;
+    })(SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+    var Measurers = SVGTypewriter.Measurers;
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    (function (Measurers) {
+        var CacheCharacterMeasurer = (function (_super) {
+            __extends(CacheCharacterMeasurer, _super);
+            function CacheCharacterMeasurer(area, className) {
+                var _this = this;
+                _super.call(this, area, className);
+                this.cache = new SVGTypewriter.Utils.Cache(function (c) { return _this._measureCharacterNotFromCache(c); }, SVGTypewriter.Utils.Methods.objEq);
+            }
+            CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+                return _super.prototype._measureCharacter.call(this, c);
+            };
+            CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+                return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
+            };
+            return CacheCharacterMeasurer;
+        })(Measurers.CharacterMeasurer);
+        Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
+    })(SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+    var Measurers = SVGTypewriter.Measurers;
+})(SVGTypewriter || (SVGTypewriter = {}));
