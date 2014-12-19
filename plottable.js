@@ -4830,7 +4830,7 @@ var Plottable;
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
-                this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
+                this._wrapper = new SVGTypewriter.Wrappers.SingleLineWrapper();
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
             };
             Category.prototype._rescale = function () {
@@ -4878,8 +4878,22 @@ var Plottable;
              */
             Category.prototype._drawTicks = function (axisWidth, axisHeight, scale, ticks) {
                 var self = this;
-                var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
-                var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+                var xAlign;
+                var yAlign;
+                switch (this.tickLabelAngle()) {
+                    case 0:
+                        xAlign = { left: "left", right: "left", top: "center", bottom: "center" };
+                        yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+                        break;
+                    case 90:
+                        xAlign = { left: "center", right: "center", top: "left", bottom: "right" };
+                        yAlign = { left: "top", right: "bottom", top: "center", bottom: "center" };
+                        break;
+                    case -90:
+                        xAlign = { left: "center", right: "center", top: "right", bottom: "left" };
+                        yAlign = { left: "bottom", right: "top", top: "center", bottom: "center" };
+                        break;
+                }
                 ticks.each(function (d) {
                     var bandWidth = scale.fullBandStartAndWidth(d)[1];
                     var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();

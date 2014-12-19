@@ -5,7 +5,7 @@ export module Axis {
   export class Category extends AbstractAxis {
     private _tickLabelAngle = 0;
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
-    private _wrapper: SVGTypewriter.Wrappers.Wrapper;
+    private _wrapper: SVGTypewriter.Wrappers.SingleLineWrapper;
     private _writer: SVGTypewriter.Writers.Writer;
 
     /**
@@ -28,7 +28,7 @@ export module Axis {
     protected _setup() {
       super._setup();
       this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
-      this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
+      this._wrapper = new SVGTypewriter.Wrappers.SingleLineWrapper();
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
     }
 
@@ -97,8 +97,22 @@ export module Axis {
      */
     private _drawTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection) {
       var self = this;
-      var xAlign: {[s: string]: string} = {left: "right",  right: "left", top: "center", bottom: "center"};
-      var yAlign: {[s: string]: string} = {left: "center",  right: "center", top: "bottom", bottom: "top"};
+      var xAlign: {[s: string]: string};
+      var yAlign: {[s: string]: string};
+      switch(this.tickLabelAngle()) {
+        case 0:
+          xAlign = {left: "left",  right: "left", top: "center", bottom: "center"};
+          yAlign = {left: "center",  right: "center", top: "bottom", bottom: "top"};
+          break;
+        case 90:
+          xAlign = {left: "center",  right: "center", top: "left", bottom: "right"};
+          yAlign = {left: "top",  right: "bottom", top: "center", bottom: "center"};
+          break;
+        case -90:
+          xAlign = {left: "center",  right: "center", top: "right", bottom: "left"};
+          yAlign = {left: "bottom",  right: "top", top: "center", bottom: "center"};
+          break;
+      }
       ticks.each(function (d: string) {
         var bandWidth = scale.fullBandStartAndWidth(d)[1];
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
