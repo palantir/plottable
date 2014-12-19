@@ -11,8 +11,10 @@ export module Plot {
    *  - "x" - the horizontal length of a bar
    *  - "y" - the vertical position of a bar
    */
-  export class HorizontalBar<Y> extends AbstractBarPlot<number,Y> {
-    public static _BarAlignmentToFactor: {[alignment: string]: number} = {"top": 0, "center": 0.5, "bottom": 1};
+  export class HorizontalBar<Y> extends Bar<number,Y> {
+    protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"top": 0, "center": 0.5, "bottom": 1};
+
+    private static WARNED = false;
 
     /**
      * Constructs a HorizontalBarPlot.
@@ -22,21 +24,15 @@ export module Plot {
      * @param {Scale} yScale The y scale to use.
      */
     constructor(xScale: Scale.AbstractQuantitative<number>, yScale: Scale.AbstractScale<Y,number>) {
-      super(xScale, yScale);
+      super(xScale, yScale, false);
+      if (!HorizontalBar.WARNED) {
+        HorizontalBar.WARNED = true;
+        _Util.Methods.warn("Plottable.Plot.HorizontalBar is deprecated. Please use Plottable.Plot.Bar with isVertical = false.");
+      }
     }
 
-    public _updateXDomainer() {
+    protected _updateXDomainer() {
       this._updateDomainer(this._xScale);
-    }
-
-    public _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
-      // by convention, for API users the 2ndary dimension of a bar is always called its "width", so
-      // the "width" of a horziontal bar plot is actually its "height" from the perspective of a svg rect
-      var widthF = attrToProjector["width"];
-      attrToProjector["width"] = attrToProjector["height"];
-      attrToProjector["height"] = widthF;
-      return attrToProjector;
     }
   }
 }

@@ -13,7 +13,7 @@ module.exports = function(grunt) {
         noImplicitAny: true,
         sourceMap: false,
         declaration: true,
-        compiler: "./node_modules/grunt-ts/customcompiler/tsc",
+        compiler: "./node_modules/typescript/bin/tsc",
         removeComments: false
       }
     },
@@ -26,12 +26,12 @@ module.exports = function(grunt) {
         sourceMap: false,
         noImplicitAny: true,
         declaration: false,
-        compiler: "./node_modules/grunt-ts/customcompiler/tsc",
+        compiler: "./node_modules/typescript/bin/tsc",
         removeComments: false
       }
     },
     verify_d_ts: {
-      src: ["typings/d3/d3.d.ts", "plottable.d.ts"]
+      src: ["typings/d3/d3.d.ts", "plottable.d.ts", "bower_components/svg-typewriter/svgtypewriter.d.ts"]
     }
   };
 
@@ -173,6 +173,10 @@ module.exports = function(grunt) {
               return "build/src/" + s.replace(".ts", ".d.ts");
           }),
         dest: "build/plottable.d.ts",
+      },
+      svgtypewriter: {
+        src: ["plottable.js", "bower_components/svg-typewriter/svgtypewriter.js"],
+        dest: "plottable.js",
       },
     },
     ts: tsJSON,
@@ -328,6 +332,7 @@ module.exports = function(grunt) {
       "update_test_ts_files",
       "ts:dev",
       "concat:plottable",
+      "concat:svgtypewriter",
       "concat:definitions",
       "sed:definitions",
       "sed:private_definitions",

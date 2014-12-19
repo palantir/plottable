@@ -140,7 +140,7 @@ export module Axis {
     ];
 
     private _tierLabelContainers: D3.Selection[];
-    private _measurer: _Util.Text.TextMeasurer;
+    private _measurer: SVGTypewriter.Measurers.Measurer;
 
     private _mostPreciseConfigIndex: number;
 
@@ -223,7 +223,7 @@ export module Axis {
       if (this._computedHeight !== null) {
         return this._computedHeight;
       }
-      var textHeight = this._measureTextHeight() * 2;
+      var textHeight = this._measurer.measure().height * 2;
       this.tickLength(textHeight);
       this.endTickLength(textHeight);
       this._computedHeight = this._maxLabelTickLength() + 2 * this.tickLabelPadding();
@@ -243,7 +243,7 @@ export module Axis {
     }
 
     private _maxWidthForInterval(config: TimeAxisTierConfiguration): number {
-      return this._measurer(config.formatter(Time._LONG_DATE)).width;
+      return this._measurer.measure(config.formatter(Time._LONG_DATE)).width;
     }
 
     /**
@@ -254,29 +254,24 @@ export module Axis {
       return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
     }
 
-    public _setup() {
+    protected _setup() {
       super._setup();
       this._tierLabelContainers = [];
       for(var i = 0; i < Time._NUM_TIERS; ++i) {
         this._tierLabelContainers.push(this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true));
       }
-      this._measurer = _Util.Text.getTextMeasurer(this._tierLabelContainers[0].append("text"));
+      this._measurer = new SVGTypewriter.Measurers.Measurer(this._tierLabelContainers[0]);
     }
-
 
     private _getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
-      return (<Scale.Time> this._scale)._tickInterval(config.interval, config.step);
+      return (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
     }
 
-    public _getTickValues(): any[] {
+    protected _getTickValues(): any[] {
       return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations.reduce(
           (ticks: any[], config: TimeAxisTierConfiguration) => ticks.concat(this._getTickIntervalValues(config)),
           []
         );
-    }
-
-    public _measureTextHeight(): number {
-      return this._measurer(_Util.Text.HEIGHT_TEXT).height;
     }
 
     private _cleanContainer(container: D3.Selection) {
@@ -284,7 +279,7 @@ export module Axis {
     }
 
     private _renderTierLabels(container: D3.Selection, config: TimeAxisTierConfiguration, height: number) {
-      var tickPos = (<Scale.Time> this._scale)._tickInterval(config.interval, config.step);
+      var tickPos = (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
       tickPos.splice(0, 0, this._scale.domain()[0]);
       tickPos.push(this._scale.domain()[1]);
       var shouldCenterText = config.step === 1;
@@ -330,7 +325,7 @@ export module Axis {
     private _canFitLabelFilter(container: D3.Selection, position: Date, bounds: Date[], label: string, isCentered: boolean): boolean {
       var endPosition: number;
       var startPosition: number;
-      var width = this._measurer(label).width + this.tickLabelPadding();
+      var width = this._measurer.measure(label).width + this.tickLabelPadding();
       var leftBound = this._scale.scale(bounds[0]);
       var rightBound = this._scale.scale(bounds[1]);
       if (isCentered) {

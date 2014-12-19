@@ -7,9 +7,9 @@ describe("Category Axes", () => {
     var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
     var ca = new Plottable.Axis.Category(xScale, "left");
     ca.renderTo(svg);
-    assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+    assert.deepEqual((<any> ca)._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
     assert.doesNotThrow(() => xScale.domain(["bar", "baz", "bam"]));
-    assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+    assert.deepEqual((<any> ca)._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
     svg.remove();
   });
 
@@ -88,7 +88,7 @@ describe("Category Axes", () => {
 
     // Outer padding is equal to step
     var step = SVG_WIDTH / 5;
-    var tickMarks = categoryAxis._tickMarkContainer.selectAll(".tick-mark")[0];
+    var tickMarks = (<any> categoryAxis)._tickMarkContainer.selectAll(".tick-mark")[0];
     var ticksNormalizedPosition = tickMarks.map((s: any) => +d3.select(s).attr("x1") / step);
     assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
 
@@ -108,25 +108,24 @@ describe("Category Axes", () => {
     var axis = new Plottable.Axis.Category(scale, "bottom");
     axis.renderTo(svg);
 
-    var ticks = axis._content.selectAll("text");
+    var ticks = (<any> axis)._content.selectAll("text");
     var text = ticks[0].map((d: any) => d3.select(d).text());
     assert.deepEqual(text, years, "text displayed correctly when horizontal");
 
     axis.tickLabelAngle(90);
     text = ticks[0].map((d: any) => d3.select(d).text());
     assert.deepEqual(text, years, "text displayed correctly when horizontal");
-    assert.operator(axis._content.selectAll(".rotated-right")[0].length, ">=", 4, "the ticks were rotated right");
+    assert.include((<any>axis)._content.selectAll(".text-area").attr("transform"), 90, "the ticks were rotated right");
 
     axis.tickLabelAngle(0);
     text = ticks[0].map((d: any) => d3.select(d).text());
     assert.deepEqual(text, years, "text displayed correctly when horizontal");
-    assert.lengthOf(axis._content.selectAll(".rotated-left")[0], 0, "the ticks were not rotated left");
-    assert.lengthOf(axis._content.selectAll(".rotated-right")[0], 0, "the ticks were not rotated right");
+    assert.include((<any>axis)._content.selectAll(".text-area").attr("transform"), 0, "the ticks were rotated right");
 
     axis.tickLabelAngle(-90);
     text = ticks[0].map((d: any) => d3.select(d).text());
     assert.deepEqual(text, years, "text displayed correctly when horizontal");
-    assert.operator(axis._content.selectAll(".rotated-left")[0].length, ">=", 4, "the ticks were rotated left");
+    assert.include((<any>axis)._content.selectAll(".text-area").attr("transform"), -90, "the ticks were rotated left");
 
     svg.remove();
   });

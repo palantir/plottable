@@ -3,7 +3,7 @@
 module Plottable {
 export module Plot {
   export class Grid extends AbstractXYPlot<string,string> {
-    public _colorScale: Scale.AbstractScale<any, string>;
+    private _colorScale: Scale.AbstractScale<any, string>;
 
     /**
      * Constructs a GridPlot.
@@ -38,7 +38,7 @@ export module Plot {
       return this;
     }
 
-    public _getDrawer(key: string) {
+    protected _getDrawer(key: string) {
       return new _Drawer.Element(key).svgElement("rect");
     }
 
@@ -54,7 +54,7 @@ export module Plot {
       return this;
     }
 
-    public _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       var xStep = (<Scale.Ordinal> this._xScale).rangeBand();
       var yStep = (<Scale.Ordinal> this._yScale).rangeBand();
@@ -63,7 +63,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): _Drawer.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
     }
   }

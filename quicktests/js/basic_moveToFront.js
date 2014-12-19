@@ -50,6 +50,8 @@ function run(div, data, Plottable) {
   //title + legend
   var title1 = new Plottable.Component.TitleLabel( "front: areaPlot", "horizontal");
   var legend1 = new Plottable.Component.Legend(colorScale1);
+  legend1.maxEntriesPerRow(1);
+  
   var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
                                         .addComponent(0,1, legend1);
 

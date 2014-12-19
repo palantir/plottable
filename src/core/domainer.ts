@@ -51,9 +51,9 @@ module Plottable {
       } else {
         domain = [_Util.Methods.min(extents, (e) => e[0], 0), _Util.Methods.max(extents, (e) => e[1], 0)];
       }
-      domain = this.includeDomain(domain);
-      domain = this.padDomain(scale, domain);
-      domain = this.niceDomain(scale, domain);
+      domain = this._includeDomain(domain);
+      domain = this._padDomain(scale, domain);
+      domain = this._niceDomain(scale, domain);
       return domain;
     }
 
@@ -165,11 +165,7 @@ module Plottable {
       return this;
     }
 
-    private static defaultCombineExtents(extents: any[][]): any[] {
-      return [_Util.Methods.min(extents, (e) => e[0], 0), _Util.Methods.max(extents, (e) => e[1], 1)];
-    }
-
-    private padDomain(scale: Scale.AbstractQuantitative<any>, domain: any[]): any[] {
+    private _padDomain(scale: Scale.AbstractQuantitative<any>, domain: any[]): any[] {
       var min = domain[0];
       var max = domain[1];
       if (min === max && this._padProportion > 0.0) {
@@ -203,7 +199,7 @@ module Plottable {
       return [newMin, newMax];
     }
 
-    private niceDomain(scale: Scale.AbstractQuantitative<any>, domain: any[]): any[] {
+    private _niceDomain(scale: Scale.AbstractQuantitative<any>, domain: any[]): any[] {
       if (this._doNice) {
         return scale._niceDomain(domain, this._niceCount);
       } else {
@@ -211,7 +207,7 @@ module Plottable {
       }
     }
 
-    private includeDomain(domain: any[]): any[] {
+    private _includeDomain(domain: any[]): any[] {
       var includedValues = this._includedValues.values().concat(this._unregisteredIncludedValues.values());
       return includedValues.reduce(
         (domain, value) => [Math.min(domain[0], value), Math.max(domain[1], value)],

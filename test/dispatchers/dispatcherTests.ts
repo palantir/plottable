@@ -8,7 +8,7 @@ describe("Dispatchers", () => {
 
     var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target);
     var callbackWasCalled = false;
-    dispatcher._event2Callback["click"] = function() { callbackWasCalled = true; };
+    (<any> dispatcher)._event2Callback["click"] = function() { callbackWasCalled = true; };
 
     triggerFakeUIEvent("click", target);
     assert.isFalse(callbackWasCalled, "The callback is not called before the dispatcher connect()s");
@@ -31,7 +31,7 @@ describe("Dispatchers", () => {
 
     var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target1);
     var callbackWasCalled = false;
-    dispatcher._event2Callback["click"] = () => callbackWasCalled = true;
+    (<any> dispatcher)._event2Callback["click"] = () => callbackWasCalled = true;
 
     dispatcher.connect();
     triggerFakeUIEvent("click", target1);
@@ -54,12 +54,12 @@ describe("Dispatchers", () => {
 
     var dispatcher1 = new Plottable.Dispatcher.AbstractDispatcher(target);
     var called1 = false;
-    dispatcher1._event2Callback["click"] = () => called1 = true;
+    (<any> dispatcher1)._event2Callback["click"] = () => called1 = true;
     dispatcher1.connect();
 
     var dispatcher2 = new Plottable.Dispatcher.AbstractDispatcher(target);
     var called2 = false;
-    dispatcher2._event2Callback["click"] = () => called2 = true;
+    (<any> dispatcher2)._event2Callback["click"] = () => called2 = true;
     dispatcher2.connect();
 
     triggerFakeUIEvent("click", target);

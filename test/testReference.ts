@@ -5,6 +5,7 @@
 ///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
 ///<reference path="testUtils.ts" />
 ///<reference path="../build/plottable.d.ts" />
+///<reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
 
 ///<reference path="globalInitialization.ts" />
 
@@ -47,9 +48,6 @@
 ///<reference path="utils/formattersTests.ts" />
 ///<reference path="utils/idCounterTests.ts" />
 ///<reference path="utils/strictEqualityAssociativeArrayTests.ts" />
-///<reference path="utils/cachingCharacterMeasurerTests.ts" />
-///<reference path="utils/cacheTests.ts" />
-///<reference path="utils/textUtilsTests.ts" />
 ///<reference path="utils/utilsTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />

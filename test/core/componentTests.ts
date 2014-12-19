@@ -5,7 +5,7 @@ var assert = chai.assert;
 
 function assertComponentXY(component: Plottable.Component.AbstractComponent, x: number, y: number, message: string) {
   // use <any> to examine the private variables
-  var translate = d3.transform(component._element.attr("transform")).translate;
+  var translate = d3.transform((<any> component)._element.attr("transform")).translate;
   var xActual = translate[0];
   var yActual = translate[1];
   assert.equal(xActual, x, "X: " + message);
@@ -25,7 +25,7 @@ describe("Component behavior", () => {
   describe("anchor", () => {
     it("anchoring works as expected", () => {
       c._anchor(svg);
-      assert.equal(c._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
+      assert.equal((<any> c)._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
       assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
       svg.remove();
     });
@@ -35,7 +35,7 @@ describe("Component behavior", () => {
 
       var svg2 = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c._anchor(svg2);
-      assert.equal(c._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
+      assert.equal((<any> c)._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
       assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
 
       svg.remove();
@@ -121,7 +121,7 @@ describe("Component behavior", () => {
       var height = 200;
       c._anchor(svg);
       c._computeLayout(xOff, yOff, width, height);
-      var translate = getTranslate(c._element);
+      var translate = getTranslate((<any> c)._element);
       assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
       assert.equal(c.width() , width, "the width set properly");
       assert.equal(c.height(), height, "the height set propery");
@@ -131,7 +131,7 @@ describe("Component behavior", () => {
 
   it("subelement containers are ordered properly", () => {
     c.renderTo(svg);
-    var gs = c._element.selectAll("g");
+    var gs = (<any> c)._element.selectAll("g");
     var g0 = d3.select(gs[0][0]);
     var g1 = d3.select(gs[0][1]);
     var g2 = d3.select(gs[0][2]);
@@ -159,7 +159,7 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
-it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
+  it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
     fixComponentSize(c, 100, 100);
     c._anchor(svg);
     c.xOffset(20).yOffset(20);
@@ -201,7 +201,7 @@ it("components can be offset relative to their alignment, and throw errors if th
   it("clipPath works as expected", () => {
     assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
     c.clipPathEnabled = true;
-    var expectedClipPathID = c._plottableID;
+    var expectedClipPathID = c.getID();
     c._anchor(svg);
     c._computeLayout(0, 0, 100, 100);
     c._render();
@@ -209,7 +209,7 @@ it("components can be offset relative to their alignment, and throw errors if th
     var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID+ ")";
     // IE 9 has clipPath like 'url("#clipPath")', must accomodate
     var normalizeClipPath = (s: string) => s.replace(/"/g, "");
-    assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL,
+    assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
                   "the element has clip-path url attached");
     var clipRect = (<any> c)._boxContainer.select(".clip-rect");
     assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
@@ -220,9 +220,9 @@ it("components can be offset relative to their alignment, and throw errors if th
   it("componentID works as expected", () => {
     var expectedID = (<any> Plottable.Core.PlottableObject)._nextID;
     var c1 = new Plottable.Component.AbstractComponent();
-    assert.equal(c1._plottableID, expectedID, "component id on next component was as expected");
+    assert.equal(c1.getID(), expectedID, "component id on next component was as expected");
     var c2 = new Plottable.Component.AbstractComponent();
-    assert.equal(c2._plottableID, expectedID+1, "future components increment appropriately");
+    assert.equal(c2.getID(), expectedID+1, "future components increment appropriately");
     svg.remove();
   });
 
@@ -230,7 +230,7 @@ it("components can be offset relative to their alignment, and throw errors if th
     assert.throws(() => (<any> c)._addBox("pre-anchor"), Error, "Adding boxes before anchoring is currently disallowed");
     c.renderTo(svg);
     (<any> c)._addBox("post-anchor");
-    var e = c._element;
+    var e = (<any> c)._element;
     var boxContainer = e.select(".box-container");
     var boxStrings = [".bounding-box", ".post-anchor"];
 
@@ -380,8 +380,9 @@ it("components can be offset relative to their alignment, and throw errors if th
     horizontalComponent.xAlign("center");
     verticalComponent.yAlign("bottom");
 
-    assertBBoxNonIntersection(verticalComponent._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
-    assertBBoxInclusion((<any> t)._boxContainer.select(".bounding-box"), horizontalComponent._element.select(".bounding-box"));
+    assertBBoxNonIntersection((<any> verticalComponent)._element.select(".bounding-box"),
+                              (<any> placeHolder)._element.select(".bounding-box"));
+    assertBBoxInclusion((<any> t)._boxContainer.select(".bounding-box"), (<any> horizontalComponent)._element.select(".bounding-box"));
 
     svg.remove();
   });
@@ -400,6 +401,28 @@ it("components can be offset relative to their alignment, and throw errors if th
     assert.deepEqual(transform.translate, [0, 0], "the element was not translated");
     svg.remove();
   });
+
+  it("components do not render unless allocated space", () => {
+    var renderFlag = false;
+    var c: any = new Plottable.Component.AbstractComponent();
+    c._doRender = () => renderFlag = true;
+    c._anchor(svg);
+    c._setup();
+    c._render();
+    assert.isFalse(renderFlag, "no render until width/height set to nonzero");
+
+    c._width = 10;
+    c._height = 0;
+    c._render();
+    assert.isTrue(renderFlag, "render still occurs if one of width/height is zero");
+
+    c._height = 10;
+    c._render();
+    assert.isTrue(renderFlag, "render occurs if width and height are positive");
+
+    svg.remove();
+  });
+
   describe("resizeBroadcaster testing", () => {
     var oldRegister: any;
     var oldDeregister: any;
@@ -409,11 +432,11 @@ it("components can be offset relative to their alignment, and throw errors if th
       oldRegister = Plottable.Core.ResizeBroadcaster.register;
       oldDeregister = Plottable.Core.ResizeBroadcaster.deregister;
       var mockRegister = (c: Plottable.Component.AbstractComponent) => {
-        registeredComponents.add(c._plottableID);
+        registeredComponents.add(c.getID());
       };
 
       var mockDeregister = (c: Plottable.Component.AbstractComponent) => {
-        registeredComponents.remove(c._plottableID);
+        registeredComponents.remove(c.getID());
       };
       Plottable.Core.ResizeBroadcaster.register = mockRegister;
       Plottable.Core.ResizeBroadcaster.deregister = mockDeregister;
@@ -426,7 +449,7 @@ it("components can be offset relative to their alignment, and throw errors if th
 
     beforeEach(() => {
       registeredComponents = d3.set();
-      id = c._plottableID;
+      id = c.getID();
     });
 
     afterEach(() => {

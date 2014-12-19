@@ -3,10 +3,10 @@
 module Plottable {
 export module Plot {
   export class AbstractXYPlot<X,Y> extends AbstractPlot {
-    public _xScale: Scale.AbstractScale<X, number>;
-    public _yScale: Scale.AbstractScale<Y, number>;
-    public _autoAdjustXScaleDomain = false;
-    public _autoAdjustYScaleDomain = false;
+    protected _xScale: Scale.AbstractScale<X, number>;
+    protected _yScale: Scale.AbstractScale<Y, number>;
+    private _autoAdjustXScaleDomain = false;
+    private _autoAdjustYScaleDomain = false;
 
     /**
      * Constructs an XYPlot.
@@ -29,9 +29,9 @@ export module Plot {
       this._xScale = xScale;
       this._yScale = yScale;
       this._updateXDomainer();
-      xScale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, () => this._adjustYDomainOnChangeFromX());
+      xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
       this._updateYDomainer();
-      yScale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, () => this._adjustXDomainOnChangeFromY());
+      yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
     }
 
     /**
@@ -43,20 +43,20 @@ export module Plot {
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale) {
         if (this._xScale) {
-          this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this._plottableID);
+          this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
         }
         this._xScale = scale;
         this._updateXDomainer();
-        scale.broadcaster.registerListener("yDomainAdjustment" + this._plottableID, () => this._adjustYDomainOnChangeFromX());
+        scale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
       }
 
       if (attrToSet === "y" && scale) {
         if (this._yScale) {
-          this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this._plottableID);
+          this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
         }
         this._yScale = scale;
         this._updateYDomainer();
-        scale.broadcaster.registerListener("xDomainAdjustment" + this._plottableID, () => this._adjustXDomainOnChangeFromY());
+        scale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
       }
 
       super.project(attrToSet, accessor, scale);
@@ -67,10 +67,10 @@ export module Plot {
     public remove() {
       super.remove();
       if (this._xScale) {
-        this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this._plottableID);
+        this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
       }
       if (this._yScale) {
-        this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this._plottableID);
+        this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
       }
       return this;
     }
@@ -103,7 +103,7 @@ export module Plot {
       return this;
     }
 
-    public _generateAttrToProjector(): AttributeToProjector {
+    protected _generateAttrToProjector(): AttributeToProjector {
       var attrToProjector: AttributeToProjector = super._generateAttrToProjector();
       var positionXFn = attrToProjector["x"];
       var positionYFn = attrToProjector["y"];
@@ -126,7 +126,7 @@ export module Plot {
       }
     }
 
-    public _updateXDomainer() {
+    protected _updateXDomainer() {
       if (this._xScale instanceof Scale.AbstractQuantitative) {
         var scale = <Scale.AbstractQuantitative<any>> this._xScale;
         if (!scale._userSetDomainer) {
@@ -135,7 +135,7 @@ export module Plot {
       }
     }
 
-    public _updateYDomainer() {
+    protected _updateYDomainer() {
       if (this._yScale instanceof Scale.AbstractQuantitative) {
         var scale = <Scale.AbstractQuantitative<any>> this._yScale;
         if (!scale._userSetDomainer) {
@@ -175,7 +175,17 @@ export module Plot {
       if (toScale instanceof Scale.AbstractQuantitative) {
         var toScaleQ = <Scale.AbstractQuantitative<B>> toScale;
         var normalizedData = this._normalizeDatasets<A,B>(fromX);
-        var adjustedDomain = this._adjustDomainOverVisiblePoints<A,B>(normalizedData, fromScale.domain());
+
+        var filterFn: (v: A) => boolean;
+        if (fromScale instanceof Scale.AbstractQuantitative) {
+          var fromDomain = fromScale.domain();
+          filterFn = (a: A) => fromDomain[0] <= a && fromDomain[1] >= a;
+        } else {
+          var fromDomainSet = d3.set(fromScale.domain());
+          filterFn = (a: A) => fromDomainSet.has(a);
+        }
+
+        var adjustedDomain = this._adjustDomainOverVisiblePoints<A,B>(normalizedData, filterFn);
         if(adjustedDomain.length === 0) {
           return;
         }
@@ -184,7 +194,7 @@ export module Plot {
       }
     }
 
-    public _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
+    protected _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
       var aAccessor: (d: any, i: number, u: any, m: PlotMetadata) => A = this._projections[fromX ? "x" : "y"].accessor;
       var bAccessor: (d: any, i: number, u: any, m: PlotMetadata) => B = this._projections[fromX ? "y" : "x"].accessor;
       return _Util.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
@@ -196,8 +206,8 @@ export module Plot {
       }));
     }
 
-    private _adjustDomainOverVisiblePoints<A,B>(values: {a: A; b: B}[], fromDomain: A[]): B[] {
-      var bVals = values.filter(v => fromDomain[0] <= v.a && v.a <= fromDomain[1]).map(v => v.b);
+    private _adjustDomainOverVisiblePoints<A,B>(values: {a: A; b: B}[], filterFn: (v: any) => boolean): B[] {
+      var bVals = values.filter(v => filterFn(v.a)).map(v => v.b);
       var retVal: B[] = [];
       if (bVals.length !== 0) {
         retVal = [_Util.Methods.min<B>(bVals, null), _Util.Methods.max<B>(bVals, null)];
@@ -205,7 +215,7 @@ export module Plot {
       return retVal;
     }
 
-    public _projectorsReady() {
+    protected _projectorsReady() {
       return this._projections["x"] && this._projections["y"];
     }
   }

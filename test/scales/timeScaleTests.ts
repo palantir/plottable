@@ -30,35 +30,35 @@ describe("TimeScale tests", () => {
 		assert.equal(tc(d), d, "date passed thru unchanged");
 	});
 
-	it("_tickInterval produces correct number of ticks", () => {
+	it("tickInterval produces correct number of ticks", () => {
 		var scale = new Plottable.Scale.Time();
 		// 100 year span
 		scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
-		var ticks = scale._tickInterval(d3.time.year);
+		var ticks = scale.tickInterval(d3.time.year);
 		assert.equal(ticks.length, 101, "generated correct number of ticks");
 		// 1 year span
 		scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 11, 31, 0, 0, 0, 0)]);
-		ticks = scale._tickInterval(d3.time.month);
+		ticks = scale.tickInterval(d3.time.month);
 		assert.equal(ticks.length, 12, "generated correct number of ticks");
-		ticks = scale._tickInterval(d3.time.month, 3);
+		ticks = scale.tickInterval(d3.time.month, 3);
 		assert.equal(ticks.length, 4, "generated correct number of ticks");
 		// 1 month span
 		scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 1, 1, 0, 0, 0, 0)]);
-		ticks = scale._tickInterval(d3.time.day);
+		ticks = scale.tickInterval(d3.time.day);
 		assert.equal(ticks.length, 32, "generated correct number of ticks");
 		// 1 day span
 		scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 23, 0, 0, 0)]);
-		ticks = scale._tickInterval(d3.time.hour);
+		ticks = scale.tickInterval(d3.time.hour);
 		assert.equal(ticks.length, 24, "generated correct number of ticks");
 		// 1 hour span
 		scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 1, 0, 0, 0)]);
-		ticks = scale._tickInterval(d3.time.minute);
+		ticks = scale.tickInterval(d3.time.minute);
 		assert.equal(ticks.length, 61, "generated correct number of ticks");
-		ticks = scale._tickInterval(d3.time.minute, 10);
+		ticks = scale.tickInterval(d3.time.minute, 10);
 		assert.equal(ticks.length, 7, "generated correct number of ticks");
 		// 1 minute span
 		scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
-		ticks = scale._tickInterval(d3.time.second);
+		ticks = scale.tickInterval(d3.time.second);
 		assert.equal(ticks.length, 61, "generated correct number of ticks");
 	});
 });
