@@ -5354,7 +5354,7 @@ var Plottable;
                     var maxTextLength = layout.entryLengths.get(value) - layout.textHeight - padding;
                     var writeOptions = {
                         selection: container,
-                        xAlign: "center",
+                        xAlign: "left",
                         yAlign: "top",
                         textRotation: 0
                     };
