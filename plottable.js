@@ -8138,14 +8138,14 @@ var Plottable;
                 var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
                 var aStackedAccessor = function (d, i, u, m) {
                     var value = aAccessor(d, i, u, m);
-                    if ((_this._isVertical ? !fromX : fromX)) {
+                    if (_this._isVertical ? !fromX : fromX) {
                         value += m.offsets.get(bAccessor(d, i, u, m));
                     }
                     return value;
                 };
                 var bStackedAccessor = function (d, i, u, m) {
                     var value = bAccessor(d, i, u, m);
-                    if ((_this._isVertical ? fromX : !fromX)) {
+                    if (_this._isVertical ? fromX : !fromX) {
                         value += m.offsets.get(aAccessor(d, i, u, m));
                     }
                     return value;
