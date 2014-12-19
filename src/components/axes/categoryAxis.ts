@@ -51,11 +51,10 @@ export module Axis {
       } else {
         fakeScale.range([offeredHeight, 0]);
       }
-      var textResult = this._measureTicks(offeredWidth - widthRequiredByTicks,
-                                          offeredHeight - heightRequiredByTicks,
+      var textResult = this._measureTicks(offeredWidth,
+                                          offeredHeight,
                                           fakeScale,
                                           ordinalScale.domain());
-
       return {
         width : textResult.usedWidth  + widthRequiredByTicks,
         height: textResult.usedHeight + heightRequiredByTicks,
@@ -149,7 +148,7 @@ export module Axis {
 
       return {
         textFits: wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
-                    !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText)),
+                    !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1),
         usedWidth : widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
                       (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0),
         usedHeight: heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
