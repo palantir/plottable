@@ -6743,6 +6743,7 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
+             * @param {boolean} isVertical if the plot if vertical.
              */
             function Bar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
@@ -7480,6 +7481,7 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
+             * @param {boolean} isVertical if the plot if vertical.
              */
             function ClusteredBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
