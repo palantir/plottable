@@ -21,7 +21,7 @@ function run(svg, data, Plottable) {
       .project("x", "name", xScale)
       .project("y", "y", yScale)
       .attr("fill", "type", colorScale)
-      .addDataset(data)
+      .addDataset(data);
 
     var chart = new Plottable.Component.Table([
                     [yAxis, grid],

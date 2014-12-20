@@ -18,9 +18,9 @@ function run(svg, data, Plottable) {
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
     var xAxis = new Plottable.Axis.Category(xScale, "bottom");
     var animator = new Plottable.Animator.Base();
-        animator.duration(1000)
-        animator.maxTotalDuration(2000)
-        animator.maxIterativeDelay(100)
+        animator.duration(1000);
+        animator.maxTotalDuration(2000);
+        animator.maxIterativeDelay(100);
         
 
     var vbar = new Plottable.Plot.VerticalBar(xScale, yScale)
@@ -42,7 +42,7 @@ function run(svg, data, Plottable) {
 
     var cb = function(){
       vbar.datasets()[0].data(data);
-    }
+    };
     var click = new Plottable.Interaction.Click().callback(cb);
 
     vbar.registerInteraction(click);

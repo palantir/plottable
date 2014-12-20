@@ -23,7 +23,7 @@ function run(svg, data, Plottable) {
     .addDataset("d1", data[0])
     .addDataset("d2", data[1])
     .addDataset("d3", data[2])
-    .animate(true)
+    .animate(true);
 
   var chart = new Plottable.Component.Table([
                   [yAxis, stackedBarRenderer],
