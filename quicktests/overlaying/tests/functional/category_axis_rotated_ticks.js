@@ -2,66 +2,69 @@
 function makeData() {
   "use strict";
 
-  var data1 = [
-    {date: "2000", y: 100000},
-    {date: "2001", y: 120000},
-    {date: "2002", y: 130000},
-    {date: "2003", y: 150000},
-    {date: "2004", y: 110000},
-    {date: "2005", y: 20000},
-    {date: "2006", y: 200000},
-    {date: "2007", y: 250000},
-    {date: "2008", y: 220000},
-    {date: "2009", y: 300000},
-    {date: "2010", y: 100000},
-    {date: "2011", y: 120000},
-    {date: "2012", y: 130000},
-    {date: "2013", y: 150000},
-    {date: "2014", y: 110000},
-    {date: "2015", y: 20000},
-    {date: "2016", y: 200000},
-    {date: "2017", y: 250000},
-    {date: "2018", y: 220000},
-    {date: "2019", y: 300000},
-    {date: "2020", y: 100000},
-    {date: "2021", y: 120000},
-    {date: "2022", y: 130000},
-    {date: "2023", y: 150000},
-    {date: "2024", y: 110000},
-    {date: "2025", y: 20000},
-    {date: "2026", y: 200000},
-    {date: "2027", y: 250000},
-    {date: "2028", y: 220000},
-    {date: "2029", y: 300000},
-    {date: "2030", y: 100000},
-    {date: "2031", y: 120000},
-    {date: "2032", y: 130000},
-    {date: "2033", y: 150000},
-    {date: "2034", y: 110000},
-    {date: "2035", y: 20000},
-    {date: "2036", y: 200000},
-    {date: "2037", y: 250000},
-    {date: "2038", y: 220000},
-    {date: "2039", y: 300000}
-  ];
+  var data = [{x: "Jan 2015", y: 0}, {x: "Jan 2016", y: 0}, {x: "Jan 2017", y: 0}, {x: "Jan 2018", y: 0}];
 
-  return data1;
+  return data;
 }
 
 function run(svg, data, Plottable) {
   "use strict";
 
-  var xScale = new Plottable.Scale.Ordinal();
-  var yScale = new Plottable.Scale.Linear();
+    var xScale = new Plottable.Scale.Ordinal();
+        xScale.rangeType("points")
+    var yScale = new Plottable.Scale.Linear();
+    var colorScale = new Plottable.Scale.Color();
 
-  var xAxis1 = new Plottable.Axis.Category(xScale, "bottom").tickLabelAngle(-90);
-  var xAxis2 = new Plottable.Axis.Category(xScale, "bottom").tickLabelAngle(0);
-  var xAxis3 = new Plottable.Axis.Category(xScale, "bottom").tickLabelAngle(90);
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+    var yAxis1 = new Plottable.Axis.Numeric(yScale, "left");
+    var xAxis1 = new Plottable.Axis.Category(xScale, "bottom");
+        xAxis1.tickLabelAngle(-90);
+        
+    var yAxis2 = new Plottable.Axis.Numeric(yScale, "left");
+    var xAxis2 = new Plottable.Axis.Category(xScale, "bottom");
+        xAxis2.tickLabelAngle(90);
+        
+    var yAxis3 = new Plottable.Axis.Numeric(yScale, "left");
+    var xAxis3 = new Plottable.Axis.Category(xScale, "bottom");
+        xAxis3.tickLabelAngle(0);
+    
+    var plot1 = new Plottable.Plot.Scatter( xScale, yScale)
+      .project("x", "x", xScale)
+      .project("y", "y", yScale)
+      .project("fill", "type", colorScale)
+      .addDataset(data);
 
-  var plot = new Plottable.Plot.VerticalBar(xScale, yScale)
-                    .addDataset(data)
-                    .project("x", "date", xScale)
-                    .project("y", "y", yScale);
-  var table = new Plottable.Component.Table([[yAxis, plot], [null, xAxis1], [null, xAxis2], [null, xAxis3]]).renderTo(svg);
+    var plot2 = new Plottable.Plot.Scatter( xScale, yScale)
+      .project("x", "x", xScale)
+      .project("y", "y", yScale)
+      .project("fill", "type", colorScale)
+    .addDataset(data);
+    
+    var plot3 = new Plottable.Plot.Scatter( xScale, yScale)
+      .project("x", "x", xScale)
+      .project("y", "y", yScale)
+      .project("fill", "type", colorScale)
+    .addDataset(data);
+        
+    var chart1 = new Plottable.Component.Table([
+                    [yAxis1, plot1],
+                    [null,  xAxis1]
+                  ]);
+        
+    var chart2 = new Plottable.Component.Table([
+                    [yAxis2, plot2],
+                    [null,  xAxis2]
+                  ]);        
+    
+    var chart3 = new Plottable.Component.Table([
+                    [yAxis3, plot3],
+                    [null,  xAxis3]
+                  ]);
+        
+    var chart = new Plottable.Component.Table([
+                    [chart1],
+                    [chart2],
+                    [chart3]
+                  ]);
+        
+    chart.renderTo(svg);
 }
