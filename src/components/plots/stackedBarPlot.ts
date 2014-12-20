@@ -14,12 +14,7 @@ export module Plot {
      * @param {boolean} isVertical if the plot if vertical.
      */
     constructor(xScale?: Scale.AbstractScale<X,number>, yScale?: Scale.AbstractScale<Y,number>, isVertical = true) {
-      this._isVertical = isVertical; // Has to be set before super()
-      super(xScale, yScale);
-      this.classed("bar-plot", true);
-
-      this.baseline(0);
-      this._isVertical = isVertical;
+      super(xScale, yScale, isVertical);
     }
 
     protected _getAnimator(key: string): Animator.PlotAnimator {
