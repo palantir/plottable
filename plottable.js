@@ -1,5 +1,5 @@
 /*!
-Plottable 0.39.0 (https://github.com/palantir/plottable)
+Plottable 0.40.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -986,7 +986,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.39.0";
+    Plottable.version = "0.40.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4529,8 +4529,7 @@ var Plottable;
                 tickLabelsEnter.append("text");
                 var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
                 var markLength = this._measurer.measure().height;
-                var yTranslate = d3.sum(this._tierHeights.slice(0, index + 1));
-                yTranslate -= this.tickLabelPadding();
+                var yTranslate = this.orient() === "bottom" ? d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding() : this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
                 var textSelection = tickLabels.selectAll("text");
                 if (textSelection.size() > 0) {
                     Plottable._Util.DOM.translate(textSelection, xTranslate, yTranslate);
@@ -6743,6 +6742,7 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
+             * @param {boolean} isVertical if the plot if vertical.
              */
             function Bar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
@@ -6757,8 +6757,8 @@ var Plottable;
                 this.animator("bars-reset", new Plottable.Animator.Null());
                 this.animator("bars", new Plottable.Animator.Base());
                 this.animator("baseline", new Plottable.Animator.Null());
-                this.baseline(0);
                 this._isVertical = isVertical;
+                this.baseline(0);
             }
             Bar.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Rect(key, this._isVertical);
@@ -7480,6 +7480,7 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
+             * @param {boolean} isVertical if the plot if vertical.
              */
             function ClusteredBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
@@ -7898,11 +7899,7 @@ var Plottable;
              */
             function StackedBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
-                this._isVertical = isVertical; // Has to be set before super()
-                _super.call(this, xScale, yScale);
-                this.classed("bar-plot", true);
-                this.baseline(0);
-                this._isVertical = isVertical;
+                _super.call(this, xScale, yScale, isVertical);
             }
             StackedBar.prototype._getAnimator = function (key) {
                 if (this._animate && this._animateOnNextRender) {

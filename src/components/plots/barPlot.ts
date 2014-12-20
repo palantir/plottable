@@ -21,6 +21,7 @@ export module Plot {
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
+     * @param {boolean} isVertical if the plot if vertical.
      */
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
       super(xScale, yScale);
@@ -29,8 +30,8 @@ export module Plot {
       this.animator("bars-reset", new Animator.Null());
       this.animator("bars", new Animator.Base());
       this.animator("baseline", new Animator.Null());
-      this.baseline(0);
       this._isVertical = isVertical;
+      this.baseline(0);
     }
 
     protected _getDrawer(key: string) {
