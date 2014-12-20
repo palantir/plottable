@@ -16,6 +16,9 @@ export module Component {
     private _scale: Scale.Color;
     private _maxEntriesPerRow: number;
     private _sortFn: (a: string, b: string) => number;
+    private _measurer: SVGTypewriter.Measurers.Measurer;
+    private _wrapper: SVGTypewriter.Wrappers.Wrapper;
+    private _writer: SVGTypewriter.Writers.Writer;
 
     /**
      * Creates a Legend.
@@ -42,6 +45,16 @@ export module Component {
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
       this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
+    }
+
+    protected _setup() {
+      super._setup();
+      var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+      var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+      fakeLegendEntry.append("text");
+      this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
+      this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
+      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(true);
     }
 
     /**
@@ -119,22 +132,17 @@ export module Component {
     }
 
     private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {
-      var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
-      var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-      var measure = _Util.Text.getTextMeasurer(fakeLegendEntry.append("text"));
-
-      var textHeight = measure(_Util.Text.HEIGHT_TEXT).height;
+      var textHeight = this._measurer.measure().height;
 
       var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
       var measureEntry = (entryText: string) => {
-        var originalEntryLength = (textHeight + measure(entryText).width + this._padding);
+        var originalEntryLength = (textHeight + this._measurer.measure(entryText).width + this._padding);
         return Math.min(originalEntryLength, availableWidthForEntries);
       };
 
       var entries = this._scale.domain().slice();
       entries.sort(this.sortFunction());
       var entryLengths = _Util.Methods.populateMap(entries, measureEntry);
-      fakeLegendRow.remove();
 
       var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
 
@@ -159,13 +167,9 @@ export module Component {
 
       var longestRowLength = _Util.Methods.max(rowLengths, 0);
 
-      var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
-      var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-      var measure = _Util.Text.getTextMeasurer(fakeLegendEntry.append("text"));
-      var longestUntruncatedEntryLength = _Util.Methods.max<string, number>(this._scale.domain(), (d: string) => measure(d).width, 0);
+      var longestUntruncatedEntryLength = _Util.Methods.max<string, number>(this._scale.domain(), (d: string) =>
+                                            this._measurer.measure(d).width, 0);
       longestUntruncatedEntryLength += estimatedLayout.textHeight + this._padding;
-      fakeLegendRow.remove();
-
       var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
 
       var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
@@ -275,16 +279,20 @@ export module Component {
       var textContainers = entries.select("g.text-container");
       textContainers.text(""); // clear out previous results
       textContainers.append("title").text((value: string) => value);
-      // HACKHACK (translate vertical shift): #864
-      textContainers.attr("transform", "translate(" + layout.textHeight + ", " + (layout.textHeight * 0.1) + ")")
-             .each(function(value: string) {
-               var container = d3.select(this);
-               var measure = _Util.Text.getTextMeasurer(container.append("text"));
-               var maxTextLength = layout.entryLengths.get(value) - layout.textHeight - padding;
-               var textToWrite = _Util.Text.getTruncatedText(value, maxTextLength, measure);
-               var textSize = measure(textToWrite);
-               _Util.Text.writeLineHorizontally(textToWrite, container, textSize.width, textSize.height);
-             });
+      var self = this;
+      textContainers.attr("transform", "translate(" + layout.textHeight + ", 0)")
+                    .each(function(value: string) {
+                      var container = d3.select(this);
+                      var maxTextLength = layout.entryLengths.get(value) - layout.textHeight - padding;
+                      var writeOptions = {
+                        selection: container,
+                        xAlign: "left",
+                        yAlign: "top",
+                        textRotation: 0
+                      };
+
+                      self._writer.write(value, maxTextLength, self.height(), writeOptions);
+                    });
     }
   }
 }

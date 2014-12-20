@@ -31,8 +31,7 @@ describe("Category Axes", () => {
     var domain: any[] = [null, undefined, true, 2, "foo"];
     var scale = new Plottable.Scale.Ordinal().domain(domain);
     var axis = new Plottable.Axis.Category(scale);
-    var table = new Plottable.Component.Table([[axis]]);
-    table.renderTo(svg);
+    axis.renderTo(svg);
     var texts = svg.selectAll("text")[0].map((s: any) => d3.select(s).text());
     assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);
     svg.remove();
@@ -116,18 +115,17 @@ describe("Category Axes", () => {
     axis.tickLabelAngle(90);
     text = ticks[0].map((d: any) => d3.select(d).text());
     assert.deepEqual(text, years, "text displayed correctly when horizontal");
-    assert.operator((<any> axis)._content.selectAll(".rotated-right")[0].length, ">=", 4, "the ticks were rotated right");
+    assert.include((<any>axis)._content.selectAll(".text-area").attr("transform"), 90, "the ticks were rotated right");
 
     axis.tickLabelAngle(0);
     text = ticks[0].map((d: any) => d3.select(d).text());
     assert.deepEqual(text, years, "text displayed correctly when horizontal");
-    assert.lengthOf((<any> axis)._content.selectAll(".rotated-left")[0], 0, "the ticks were not rotated left");
-    assert.lengthOf((<any> axis)._content.selectAll(".rotated-right")[0], 0, "the ticks were not rotated right");
+    assert.include((<any>axis)._content.selectAll(".text-area").attr("transform"), 0, "the ticks were rotated right");
 
     axis.tickLabelAngle(-90);
     text = ticks[0].map((d: any) => d3.select(d).text());
     assert.deepEqual(text, years, "text displayed correctly when horizontal");
-    assert.operator((<any> axis)._content.selectAll(".rotated-left")[0].length, ">=", 4, "the ticks were rotated left");
+    assert.include((<any>axis)._content.selectAll(".text-area").attr("transform"), -90, "the ticks were rotated left");
 
     svg.remove();
   });

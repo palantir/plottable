@@ -6,7 +6,7 @@ export module Plot {
     position: number;
   }
 
-  export class ClusteredBar<X,Y> extends AbstractBarPlot<X,Y> {
+  export class ClusteredBar<X,Y> extends Bar<X,Y> {
 
     /**
      * Creates a ClusteredBarPlot.
@@ -18,10 +18,10 @@ export module Plot {
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
+     * @param {boolean} isVertical if the plot if vertical.
      */
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
-      this._isVertical = isVertical; // Has to be set before super()
-      super(xScale, yScale);
+      super(xScale, yScale, isVertical);
     }
 
     protected _generateAttrToProjector() {
@@ -29,9 +29,8 @@ export module Plot {
       // the width is constant, so set the inner scale range to that
       var innerScale = this._makeInnerScale();
       var innerWidthF = (d: any, i: number) => innerScale.rangeBand();
-      var heightF = attrToProjector["height"];
-      attrToProjector["width"] = this._isVertical ? innerWidthF : heightF;
-      attrToProjector["height"] = this._isVertical ? heightF : innerWidthF;
+      attrToProjector["width"] = this._isVertical ? innerWidthF : attrToProjector["width"];
+      attrToProjector["height"] = !this._isVertical ? innerWidthF : attrToProjector["height"];
 
       var xAttr = attrToProjector["x"];
       var yAttr = attrToProjector["y"];

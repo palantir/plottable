@@ -2,8 +2,8 @@
 
 module Plottable {
 export module Plot {
-  export class AbstractBarPlot<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
-    protected static _BarAlignmentToFactor: {[alignment: string]: number} = {};
+  export class Bar<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
+    protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
     protected static _DEFAULT_WIDTH = 10;
     private _baseline: D3.Selection;
     private _baselineValue: number;
@@ -21,14 +21,16 @@ export module Plot {
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
+     * @param {boolean} isVertical if the plot if vertical.
      */
-    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
+    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this._defaultFillColor = new Scale.Color().range()[0];
       this.animator("bars-reset", new Animator.Null());
       this.animator("bars", new Animator.Base());
       this.animator("baseline", new Animator.Null());
+      this._isVertical = isVertical;
       this.baseline(0);
     }
 
@@ -55,9 +57,9 @@ export module Plot {
      * The baseline is the line that the bars are drawn from, defaulting to 0.
      *
      * @param {number} value The value to position the baseline at.
-     * @returns {AbstractBarPlot} The calling AbstractBarPlot.
+     * @returns {Bar} The calling Bar.
      */
-    public baseline(value: number): AbstractBarPlot<X, Y>;
+    public baseline(value: number): Bar<X, Y>;
     public baseline(value?: number): any {
       if (value == null) {
         return this._baselineValue;
@@ -75,11 +77,11 @@ export module Plot {
      * HorizontalBarPlot supports "top", "center", "bottom"
      *
      * @param {string} alignment The desired alignment.
-     * @returns {AbstractBarPlot} The calling AbstractBarPlot.
+     * @returns {Bar} The calling Bar.
      */
     public barAlignment(alignment: string) {
       var alignmentLC = alignment.toLowerCase();
-      var align2factor = (<typeof AbstractBarPlot> this.constructor)._BarAlignmentToFactor;
+      var align2factor = (<typeof Bar> this.constructor)._BarAlignmentToFactor;
       if (align2factor[alignmentLC] === undefined) {
         throw new Error("unsupported bar alignment");
       }
@@ -110,9 +112,9 @@ export module Plot {
      * Set whether bar labels are enabled.
      * @param {boolean} Whether bars should display labels or not.
      *
-     * @returns {AbstractBarPlot} The calling plot.
+     * @returns {Bar} The calling plot.
      */
-    public barLabelsEnabled(enabled: boolean): AbstractBarPlot<X,Y>;
+    public barLabelsEnabled(enabled: boolean): Bar<X,Y>;
     public barLabelsEnabled(enabled?: boolean): any {
       if (enabled === undefined) {
         return this._barLabelsEnabled;
@@ -133,9 +135,9 @@ export module Plot {
      * Change the formatting function for bar labels.
      * @param {Formatter} The formatting function for bar labels.
      *
-     * @returns {AbstractBarPlot} The calling plot.
+     * @returns {Bar} The calling plot.
      */
-    public barLabelFormatter(formatter: Formatter): AbstractBarPlot<X,Y>;
+    public barLabelFormatter(formatter: Formatter): Bar<X,Y>;
     public barLabelFormatter(formatter?: Formatter): any {
       if (formatter == null) {
         return this._barLabelFormatter;
@@ -299,12 +301,18 @@ export module Plot {
       var primaryAttr     = this._isVertical ? "y" : "x";
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
-      if (!attrToProjector["width"]) {
-        attrToProjector["width"] = () => this._getBarPixelWidth();
-      }
 
       var positionF = attrToProjector[secondaryAttr];
       var widthF = attrToProjector["width"];
+      if (widthF == null) { widthF = () => this._getBarPixelWidth(); }
+      var originalPositionFn = attrToProjector[primaryAttr];
+      var heightF = (d: any, i: number, u: any, m: PlotMetadata) => {
+        return Math.abs(scaledBaseline - originalPositionFn(d, i, u, m));
+      };
+
+      attrToProjector["width"] = this._isVertical ? widthF : heightF;
+      attrToProjector["height"] = this._isVertical ? heightF : widthF;
+
       var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
                       && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
       if (!bandsMode) {
@@ -316,17 +324,12 @@ export module Plot {
           positionF(d, i, u, m) - widthF(d, i, u, m) / 2 + bandWidth / 2;
       }
 
-      var originalPositionFn = attrToProjector[primaryAttr];
       attrToProjector[primaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) => {
         var originalPos = originalPositionFn(d, i, u, m);
         // If it is past the baseline, it should start at the baselin then width/height
         // carries it over. If it's not past the baseline, leave it at original position and
         // then width/height carries it to baseline
         return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
-      };
-
-      attrToProjector["height"] = (d: any, i: number, u: any, m: PlotMetadata) => {
-        return Math.abs(scaledBaseline - originalPositionFn(d, i, u, m));
       };
 
       var primaryAccessor = this._projections[primaryAttr].accessor;
@@ -339,6 +342,7 @@ export module Plot {
       }
 
       attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+
       return attrToProjector;
     }
 
@@ -411,9 +415,9 @@ export module Plot {
      *                the cursor.
      *
      * @param {string} mode The desired hover mode.
-     * @return {AbstractBarPlot} The calling Bar Plot.
+     * @return {Bar} The calling Bar Plot.
      */
-    public hoverMode(mode: String): AbstractBarPlot<X, Y>;
+    public hoverMode(mode: String): Bar<X, Y>;
     public hoverMode(mode?: String): any {
       if (mode == null) {
         return this._hoverMode;

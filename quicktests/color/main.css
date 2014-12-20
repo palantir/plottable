@@ -1,46 +1,130 @@
-svg{
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+
+svg {
   float: left;
 }
 
-.navigation{
+.controls {
   background-color: #db2e65;
   width: 100%;
   height: 50px;
   position: fixed;
-  top: 0px;
-  left: 0px;
   text-align: center;
   z-index: 1;
+  min-width: 600px;
 }
 
-.results{
+.results {
   margin-top: 50px;
   position: relative;
 }
 
-input{
+input:not([type=checkbox]) {
   top: 10px;
   position: relative;
   border: solid 1px;
   border-color: white;
-  border-radius: 5;
+  border-radius: 5px;
+  -moz-border-radius: 5px;  
   width: 150px;
   height: 30px;
-  font-family: sans-serif;
   font-weight: 100;
   font-size: 13px;
   text-align: center;
+  font-family: sans-serif;
 }
 
-#render{
+#render {
   background-color: white;
   width: 50px;
 }
 
-#render:hover{
+#render:hover {
   background-color: whitesmoke;
 }
 
-#render:active{
+#render:active {
   background-color: white;
+}
+
+.content {
+  left: 0px;
+  margin: 0 auto;
+  position: absolute;
+}
+
+.sidebar {
+  width: 20%;
+  height: 100%;
+  background-color: #343434;
+  position: fixed;
+  visibility: hidden;
+  color: whitesmoke;
+  left: -20%;
+  padding-top: 50px;
+}
+
+.sidebar input{
+  margin: 10px;
+}
+.sidebar-quicktest {
+  padding: 10px;
+  font-family: sans-serif;
+  font-weight: lighter;
+  font-size: 15px;
+  text-align: left;
+  border-top: 1px solid #494949;
+}
+
+#expand-sidebar {
+  float: left;
+  top: 10px;
+  color: white;
+  margin: 10 0 0 10;
+  font-size: 1.3rem;
+  text-decoration: none;
+}
+
+#help{
+  width: 30px;
+  height: 30px;
+  float: right;
+  margin-right: 10px;
+}
+
+#help:hover{
+  background-color: white;
+}
+
+.button{
+  background-color: white;
+}
+
+.button:hover{
+  background-color: whitesmoke;
+}
+
+.button:active{
+  background-color: white;
+}
+
+#help-description{
+  width: 300px;
+  display: none;
+  position: absolute;
+  z-index: 2;
+  border: 1px solid #333;
+  background-color:#161616;
+  border-radius:5px;
+  padding:10px;
+  color:#fff;
+  font-size: 13px;
+  font-weight: lighter;
+}
+
+.single-plot{
+  display: inline-block;
 }

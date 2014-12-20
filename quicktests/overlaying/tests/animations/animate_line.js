@@ -19,6 +19,8 @@ function run(svg, data, Plottable) {
   var dataset = new Plottable.Dataset(data);
   var lineRenderer = new Plottable.Plot.Line(xScale, yScale)
               .addDataset(dataset)
+              .project("x", "x", xScale)
+              .project("y", "y", yScale)
               .attr("opacity", 0.75)
               .animate(doAnimate);
 

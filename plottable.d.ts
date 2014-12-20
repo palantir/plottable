@@ -254,154 +254,6 @@ declare module Plottable {
     }
 }
 
-
-declare module Plottable {
-    module _Util {
-        class Cache<T> {
-            /**
-             * @constructor
-             *
-             * @param {string} compute The function whose results will be cached.
-             * @param {string} [canonicalKey] If present, when clear() is called,
-             *        this key will be re-computed. If its result hasn't been changed,
-             *        the cache will not be cleared.
-             * @param {(v: T, w: T) => boolean} [valueEq]
-             *        Used to determine if the value of canonicalKey has changed.
-             *        If omitted, defaults to === comparision.
-             */
-            constructor(compute: (k: string) => T, canonicalKey?: string, valueEq?: (v: T, w: T) => boolean);
-            /**
-             * Attempt to look up k in the cache, computing the result if it isn't
-             * found.
-             *
-             * @param {string} k The key to look up in the cache.
-             * @return {T} The value associated with k; the result of compute(k).
-             */
-            get(k: string): T;
-            /**
-             * Reset the cache empty.
-             *
-             * If canonicalKey was provided at construction, compute(canonicalKey)
-             * will be re-run. If the result matches what is already in the cache,
-             * it will not clear the cache.
-             *
-             * @return {Cache<T>} The calling Cache.
-             */
-            clear(): Cache<T>;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module _Util {
-        module Text {
-            var HEIGHT_TEXT: string;
-            interface Dimensions {
-                width: number;
-                height: number;
-            }
-            interface TextMeasurer {
-                (s: string): Dimensions;
-            }
-            /**
-             * Returns a quasi-pure function of typesignature (t: string) => Dimensions which measures height and width of text
-             * in the given text selection
-             *
-             * @param {D3.Selection} selection: A temporary text selection that the string will be placed into for measurement.
-             *                                  Will be removed on function creation and appended only for measurement.
-             * @returns {Dimensions} width and height of the text
-             */
-            function getTextMeasurer(selection: D3.Selection): TextMeasurer;
-            /**
-             * This class will measure text by measuring each character individually,
-             * then adding up the dimensions. It will also cache the dimensions of each
-             * letter.
-             */
-            class CachingCharacterMeasurer {
-                /**
-                 * @param {string} s The string to be measured.
-                 * @return {Dimensions} The width and height of the measured text.
-                 */
-                measure: TextMeasurer;
-                /**
-                 * @param {D3.Selection} textSelection The element that will have text inserted into
-                 *        it in order to measure text. The styles present for text in
-                 *        this element will to the text being measured.
-                 */
-                constructor(textSelection: D3.Selection);
-                /**
-                 * Clear the cache, if it seems that the text has changed size.
-                 */
-                clear(): CachingCharacterMeasurer;
-            }
-            /**
-             * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
-             *
-             * @param {string} text: The string to be truncated
-             * @param {number} availableWidth: The available width, in pixels
-             * @param {D3.Selection} element: The text element used to measure the text
-             * @returns {string} text - the shortened text
-             */
-            function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;
-            /**
-             * Takes a line, a width to fit it in, and a text measurer. Will attempt to add ellipses to the end of the line,
-             * shortening the line as required to ensure that it fits within width.
-             */
-            function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
-            function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
-                width: number;
-                height: number;
-            };
-            function writeLineVertically(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
-                width: number;
-                height: number;
-            };
-            interface IWriteTextResult {
-                textFits: boolean;
-                usedWidth: number;
-                usedHeight: number;
-            }
-            interface IWriteOptions {
-                g: D3.Selection;
-                xAlign: string;
-                yAlign: string;
-            }
-            /**
-             * @param {write} [IWriteOptions] If supplied, the text will be written
-             *        To the given g. Will align the text vertically if it seems like
-             *        that is appropriate.
-             * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
-             */
-            function writeText(text: string, width: number, height: number, tm: TextMeasurer, orientation?: string, write?: IWriteOptions): IWriteTextResult;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module _Util {
-        module WordWrap {
-            interface WrappedText {
-                originalText: string;
-                lines: string[];
-                textFits: boolean;
-            }
-            /**
-             * Takes a block of text, a width and height to fit it in, and a 2-d text measurement function.
-             * Wraps words and fits as much of the text as possible into the given width and height.
-             */
-            function breakTextToFitRect(text: string, width: number, height: number, measureText: Text.TextMeasurer): WrappedText;
-            /**
-             * Determines if it is possible to fit a given text within width without breaking any of the words.
-             * Simple algorithm, split the text up into tokens, and make sure that the widest token doesn't exceed
-             * allowed width.
-             */
-            function canWrapWithoutBreakingWords(text: string, width: number, widthMeasure: (s: string) => number): boolean;
-        }
-    }
-}
-
 declare module Plottable {
     module _Util {
         module DOM {
@@ -1776,6 +1628,8 @@ declare module Plottable {
             _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             _render(): void;
             _doRender(): void;
+            _useLastCalculatedLayout(): boolean;
+            _useLastCalculatedLayout(useLast: boolean): AbstractComponent;
             _invalidateLayout(): void;
             /**
              * Renders the Component into a given DOM element. The element must be as <svg>.
@@ -1978,6 +1832,8 @@ declare module Plottable {
              */
             detachAll(): AbstractComponentContainer;
             remove(): void;
+            _useLastCalculatedLayout(): boolean;
+            _useLastCalculatedLayout(calculated: boolean): AbstractComponent;
         }
     }
 }
@@ -2210,6 +2066,8 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             constructor(scale: Scale.Time, orientation: string);
+            tierLabelPositions(): string[];
+            tierLabelPositions(newPositions: string[]): Time;
             /**
              * Gets the possible Axis configurations.
              *
@@ -2230,7 +2088,6 @@ declare module Plottable {
             _computeHeight(): number;
             protected _setup(): void;
             protected _getTickValues(): any[];
-            protected _measureTextHeight(): number;
             _doRender(): Time;
         }
     }
@@ -2416,7 +2273,6 @@ declare module Plottable {
              */
             padding(padAmount: number): Label;
             _doRender(): void;
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
         }
         class TitleLabel extends Label {
             /**
@@ -2459,6 +2315,7 @@ declare module Plottable {
              * @param {Scale.Color} colorScale
              */
             constructor(colorScale: Scale.Color);
+            protected _setup(): void;
             /**
              * Gets the current max number of entries in Legend row.
              * @returns {number} The current max number of entries in row.
@@ -2934,7 +2791,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class AbstractBarPlot<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
+        class Bar<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
             protected static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
@@ -2946,8 +2803,9 @@ declare module Plottable {
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
+             * @param {boolean} isVertical if the plot if vertical.
              */
-            constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
+            constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             protected _getDrawer(key: string): _Drawer.Rect;
             protected _setup(): void;
             /**
@@ -2964,18 +2822,18 @@ declare module Plottable {
              * The baseline is the line that the bars are drawn from, defaulting to 0.
              *
              * @param {number} value The value to position the baseline at.
-             * @returns {AbstractBarPlot} The calling AbstractBarPlot.
+             * @returns {Bar} The calling Bar.
              */
-            baseline(value: number): AbstractBarPlot<X, Y>;
+            baseline(value: number): Bar<X, Y>;
             /**
              * Sets the bar alignment relative to the independent axis.
              * VerticalBarPlot supports "left", "center", "right"
              * HorizontalBarPlot supports "top", "center", "bottom"
              *
              * @param {string} alignment The desired alignment.
-             * @returns {AbstractBarPlot} The calling AbstractBarPlot.
+             * @returns {Bar} The calling Bar.
              */
-            barAlignment(alignment: string): AbstractBarPlot<X, Y>;
+            barAlignment(alignment: string): Bar<X, Y>;
             /**
              * Get whether bar labels are enabled.
              *
@@ -2986,9 +2844,9 @@ declare module Plottable {
              * Set whether bar labels are enabled.
              * @param {boolean} Whether bars should display labels or not.
              *
-             * @returns {AbstractBarPlot} The calling plot.
+             * @returns {Bar} The calling plot.
              */
-            barLabelsEnabled(enabled: boolean): AbstractBarPlot<X, Y>;
+            barLabelsEnabled(enabled: boolean): Bar<X, Y>;
             /**
              * Get the formatter for bar labels.
              *
@@ -2999,9 +2857,9 @@ declare module Plottable {
              * Change the formatting function for bar labels.
              * @param {Formatter} The formatting function for bar labels.
              *
-             * @returns {AbstractBarPlot} The calling plot.
+             * @returns {Bar} The calling plot.
              */
-            barLabelFormatter(formatter: Formatter): AbstractBarPlot<X, Y>;
+            barLabelFormatter(formatter: Formatter): Bar<X, Y>;
             /**
              * Gets all the bars in the bar plot
              *
@@ -3047,9 +2905,9 @@ declare module Plottable {
              *                the cursor.
              *
              * @param {string} mode The desired hover mode.
-             * @return {AbstractBarPlot} The calling Bar Plot.
+             * @return {Bar} The calling Bar Plot.
              */
-            hoverMode(mode: String): AbstractBarPlot<X, Y>;
+            hoverMode(mode: String): Bar<X, Y>;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
@@ -3069,7 +2927,7 @@ declare module Plottable {
          *  - "x" - the horizontal position of a bar
          *  - "y" - the vertical height of a bar
          */
-        class VerticalBar<X> extends AbstractBarPlot<X, number> {
+        class VerticalBar<X> extends Bar<X, number> {
             protected static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
@@ -3098,7 +2956,7 @@ declare module Plottable {
          *  - "x" - the horizontal length of a bar
          *  - "y" - the vertical position of a bar
          */
-        class HorizontalBar<Y> extends AbstractBarPlot<number, Y> {
+        class HorizontalBar<Y> extends Bar<number, Y> {
             protected static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
@@ -3111,7 +2969,6 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<number>, yScale: Scale.AbstractScale<Y, number>);
             protected _updateXDomainer(): void;
-            protected _generateAttrToProjector(): AttributeToProjector;
         }
     }
 }
@@ -3179,7 +3036,7 @@ declare module Plottable {
         interface ClusteredPlotMetadata extends PlotMetadata {
             position: number;
         }
-        class ClusteredBar<X, Y> extends AbstractBarPlot<X, Y> {
+        class ClusteredBar<X, Y> extends Bar<X, Y> {
             /**
              * Creates a ClusteredBarPlot.
              *
@@ -3190,6 +3047,7 @@ declare module Plottable {
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
+             * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             protected _generateAttrToProjector(): AttributeToProjector;
@@ -3282,7 +3140,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class StackedBar<X, Y> extends AbstractBarPlot<X, Y> {
+        class StackedBar<X, Y> extends Bar<X, Y> {
             /**
              * Constructs a StackedBar plot.
              * A StackedBarPlot is a plot that plots several bar plots stacking on top of each
