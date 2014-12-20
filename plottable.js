@@ -6757,8 +6757,8 @@ var Plottable;
                 this.animator("bars-reset", new Plottable.Animator.Null());
                 this.animator("bars", new Plottable.Animator.Base());
                 this.animator("baseline", new Plottable.Animator.Null());
-                this.baseline(0);
                 this._isVertical = isVertical;
+                this.baseline(0);
             }
             Bar.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Rect(key, this._isVertical);
@@ -7898,11 +7898,7 @@ var Plottable;
              */
             function StackedBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
-                this._isVertical = isVertical; // Has to be set before super()
-                _super.call(this, xScale, yScale);
-                this.classed("bar-plot", true);
-                this.baseline(0);
-                this._isVertical = isVertical;
+                _super.call(this, xScale, yScale, isVertical);
             }
             StackedBar.prototype._getAnimator = function (key) {
                 if (this._animate && this._animateOnNextRender) {

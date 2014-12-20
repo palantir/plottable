@@ -29,8 +29,8 @@ export module Plot {
       this.animator("bars-reset", new Animator.Null());
       this.animator("bars", new Animator.Base());
       this.animator("baseline", new Animator.Null());
-      this.baseline(0);
       this._isVertical = isVertical;
+      this.baseline(0);
     }
 
     protected _getDrawer(key: string) {
