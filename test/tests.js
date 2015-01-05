@@ -841,7 +841,7 @@ describe("NumericAxis", function () {
         var yScale = new Plottable.Scale.Linear();
         var yAxis = new Plottable.Axis.Numeric(yScale, "left");
         var yLabel = new Plottable.Component.AxisLabel("LABEL", "left");
-        var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+        var barPlot = new Plottable.Plot.Bar(xScale, yScale);
         barPlot.project("x", "x", xScale);
         barPlot.project("y", "y", yScale);
         barPlot.addDataset(data);
@@ -1674,7 +1674,7 @@ describe("Plots", function () {
             var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
             var x = new Plottable.Scale.Linear();
             var y = new Plottable.Scale.Linear();
-            var plot = new Plottable.Plot.VerticalBar(x, y).addDataset([]).animate(true);
+            var plot = new Plottable.Plot.Bar(x, y).addDataset([]).animate(true);
             var recordedTime = -1;
             var additionalPaint = function (x) {
                 recordedTime = Math.max(x, recordedTime);
@@ -2250,7 +2250,7 @@ describe("Plots", function () {
                     { x: "B", y: 1 }
                 ];
                 dataset = new Plottable.Dataset(data);
-                barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+                barPlot = new Plottable.Plot.Bar(xScale, yScale);
                 barPlot.addDataset(dataset);
                 barPlot.animate(false);
                 barPlot.baseline(0);
@@ -2368,7 +2368,7 @@ describe("Plots", function () {
                     { x: 100, y: 1 }
                 ];
                 dataset = new Plottable.Dataset(data);
-                barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+                barPlot = new Plottable.Plot.Bar(xScale, yScale);
                 barPlot.addDataset(dataset);
                 barPlot.animate(false);
                 barPlot.baseline(0);
@@ -2413,7 +2413,7 @@ describe("Plots", function () {
                     { x: 100, y: 1 }
                 ];
                 dataset = new Plottable.Dataset(data);
-                barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+                barPlot = new Plottable.Plot.Bar(xScale, yScale);
                 barPlot.addDataset(dataset);
                 barPlot.baseline(0);
                 barPlot.project("x", "x", xScale);
@@ -2466,7 +2466,7 @@ describe("Plots", function () {
                 var data = [{ x: "12/01/92", y: 0, type: "a" }, { x: "12/01/93", y: 1, type: "a" }, { x: "12/01/94", y: 1, type: "a" }, { x: "12/01/95", y: 2, type: "a" }, { x: "12/01/96", y: 2, type: "a" }, { x: "12/01/97", y: 2, type: "a" }];
                 xScale = new Plottable.Scale.Time();
                 var yScale = new Plottable.Scale.Linear();
-                barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+                barPlot = new Plottable.Plot.Bar(xScale, yScale);
                 barPlot.addDataset(data).project("x", function (d) { return d3.time.format("%m/%d/%y").parse(d.x); }, xScale).project("y", "y", yScale).renderTo(svg);
             });
             it("bar width takes an appropriate value", function () {
@@ -2495,7 +2495,7 @@ describe("Plots", function () {
                     { y: "B", x: 1 }
                 ];
                 dataset = new Plottable.Dataset(data);
-                barPlot = new Plottable.Plot.HorizontalBar(xScale, yScale);
+                barPlot = new Plottable.Plot.Bar(xScale, yScale, false);
                 barPlot.addDataset(dataset);
                 barPlot.animate(false);
                 barPlot.baseline(0);
@@ -2551,7 +2551,7 @@ describe("Plots", function () {
                 assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
                 assert.equal(numAttr(bar0, "y"), 50, "bar0 y is correct");
                 assert.equal(numAttr(bar1, "y"), 250, "bar1 y is correct");
-                barPlot.barAlignment("bottom");
+                barPlot.barAlignment("right");
                 renderArea = barPlot._renderArea;
                 bars = renderArea.selectAll("rect");
                 bar0 = d3.select(bars[0][0]);
@@ -2583,7 +2583,7 @@ describe("Plots", function () {
                     { y: "B", x: 2 },
                 ];
                 dataset = new Plottable.Dataset(data);
-                barPlot = new Plottable.Plot.HorizontalBar(xScale, yScale);
+                barPlot = new Plottable.Plot.Bar(xScale, yScale, false);
                 barPlot.addDataset(dataset);
                 barPlot.baseline(0);
                 barPlot.animate(false);
@@ -2639,7 +2639,7 @@ describe("Plots", function () {
                 dataset = new Plottable.Dataset(data);
                 xScale = new Plottable.Scale.Ordinal();
                 yScale = new Plottable.Scale.Linear();
-                plot = new Plottable.Plot.VerticalBar(xScale, yScale);
+                plot = new Plottable.Plot.Bar(xScale, yScale);
                 plot.addDataset(dataset);
                 plot.project("x", "x", xScale);
                 plot.project("y", "y", yScale);
@@ -2708,7 +2708,7 @@ describe("Plots", function () {
                 dataset = new Plottable.Dataset();
                 var xScale = new Plottable.Scale.Ordinal();
                 var yScale = new Plottable.Scale.Linear();
-                verticalBarPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+                verticalBarPlot = new Plottable.Plot.Bar(xScale, yScale);
                 verticalBarPlot.project("x", "x", xScale);
                 verticalBarPlot.project("y", "y", yScale);
             });
@@ -4251,12 +4251,12 @@ describe("Metadata", function () {
         };
         checkPlot(new Plottable.Plot.Area(xScale, yScale));
         checkPlot(new Plottable.Plot.StackedArea(xScale, yScale));
-        checkPlot(new Plottable.Plot.VerticalBar(xScale, yScale));
+        checkPlot(new Plottable.Plot.Bar(xScale, yScale));
         checkPlot(new Plottable.Plot.StackedBar(xScale, yScale));
         checkPlot(new Plottable.Plot.StackedBar(yScale, xScale, false));
         checkPlot(new Plottable.Plot.ClusteredBar(xScale, yScale));
         checkPlot(new Plottable.Plot.Pie().project("value", "x"));
-        checkPlot(new Plottable.Plot.HorizontalBar(xScale, yScale));
+        checkPlot(new Plottable.Plot.Bar(xScale, yScale, false));
         checkPlot(new Plottable.Plot.Scatter(xScale, yScale));
         svg.remove();
     });
@@ -5682,7 +5682,7 @@ describe("Scales", function () {
         var dB = { x: "B", y: 2 };
         var dC = { x: "C", y: 2 };
         var dataset = new Plottable.Dataset([dA, dB]);
-        var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale).addDataset(dataset);
+        var barPlot = new Plottable.Plot.Bar(xScale, yScale).addDataset(dataset);
         barPlot.project("x", "x", xScale);
         barPlot.project("y", "y", yScale);
         var svg = generateSVG();

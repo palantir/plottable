@@ -203,12 +203,12 @@ describe("Metadata", () => {
 
     checkPlot(new Plottable.Plot.Area(xScale, yScale));
     checkPlot(new Plottable.Plot.StackedArea(xScale, yScale));
-    checkPlot(new Plottable.Plot.VerticalBar(xScale, yScale));
+    checkPlot(new Plottable.Plot.Bar(xScale, yScale));
     checkPlot(new Plottable.Plot.StackedBar(xScale, yScale));
     checkPlot(new Plottable.Plot.StackedBar(yScale, xScale, false));
     checkPlot(new Plottable.Plot.ClusteredBar(xScale, yScale));
     checkPlot(new Plottable.Plot.Pie().project("value", "x"));
-    checkPlot(new Plottable.Plot.HorizontalBar(xScale, yScale));
+    checkPlot(new Plottable.Plot.Bar(xScale, yScale, false));
     checkPlot(new Plottable.Plot.Scatter(xScale, yScale));
     svg.remove();
   });
