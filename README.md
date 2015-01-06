@@ -42,4 +42,5 @@ Contributing
 - Add tests for new functionality, and please add some quicktests too
 - Run `grunt test` and verify it completes with no warnings or failures
 - Commit new files, including the updated built files like `plottable.js` and `plottable.d.ts`
+- Fill out the [Personal](https://github.com/palantir/plottable/blob/develop/Plottable_Personal_Contributer_License_Agreement.pdf?raw=true) or [Corporate](https://github.com/palantir/plottable/blob/develop/Plottable_Corporate_Contributor_License_Agreement.pdf?raw=true) Contributor License Agreement and send it to [opensource@palantir.com](mailto:opensource@palantir.com)
 - Submit a pull request
