@@ -2908,6 +2908,7 @@ declare module Plottable {
              * @return {Bar} The calling Bar Plot.
              */
             hoverMode(mode: String): Bar<X, Y>;
+            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;

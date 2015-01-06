@@ -436,6 +436,51 @@ export module Plot {
       });
     }
 
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
+      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+      if (this._isVertical && this._xScale instanceof Plottable.Scale.AbstractQuantitative) {
+        var xAccessor = this._projections["x"].accessor;
+        var xQScale = <Plottable.Scale.AbstractQuantitative<X>> this._xScale;
+        var xMinBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) =>
+          xQScale.invert(xQScale.scale(xAccessor(d, i, u, m)) - this._getBarPixelWidth() / 2);
+        var xMaxBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) =>
+          xQScale.invert(xQScale.scale(xAccessor(d, i, u, m)) + this._getBarPixelWidth() / 2);
+
+        this._datasetKeysInOrder.forEach((key) => {
+          var plotDatasetKey = this._key2PlotDatasetKey.get(key);
+          var dataset = plotDatasetKey.dataset;
+          var plotMetadata = plotDatasetKey.plotMetadata;
+          var extent = [dataset._getExtent(xMinBarAccessor, this._xScale._typeCoercer, plotMetadata)[0],
+                        dataset._getExtent(xMaxBarAccessor, this._xScale._typeCoercer, plotMetadata)[1]];
+          if (extent[0] != null && extent[1] != null) {
+            var scaleKey = this.getID().toString() + "_" + key;
+            this._xScale._updateExtent(scaleKey, "bar-extent", extent);
+          }
+        });
+      }
+
+      if (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative) {
+        var yAccessor = this._projections["y"].accessor;
+        var yQScale = <Plottable.Scale.AbstractQuantitative<Y>> this._yScale;
+        var yMinBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) =>
+          yQScale.invert(yQScale.scale(yAccessor(d, i, u, m)) - this._getBarPixelWidth() / 2);
+        var yMaxBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) =>
+          yQScale.invert(yQScale.scale(yAccessor(d, i, u, m)) + this._getBarPixelWidth() / 2);
+
+        this._datasetKeysInOrder.forEach((key) => {
+          var plotDatasetKey = this._key2PlotDatasetKey.get(key);
+          var dataset = plotDatasetKey.dataset;
+          var plotMetadata = plotDatasetKey.plotMetadata;
+          var extent = [dataset._getExtent(yMinBarAccessor, this._xScale._typeCoercer, plotMetadata)[0],
+                        dataset._getExtent(yMaxBarAccessor, this._xScale._typeCoercer, plotMetadata)[1]];
+          if (extent[0] != null && extent[1] != null) {
+            var scaleKey = this.getID().toString() + "_" + key;
+            this._yScale._updateExtent(scaleKey, "bar-extent", extent);
+          }
+        });
+      }
+    }
+
     //===== Hover logic =====
     public _hoverOverComponent(p: Point) {
       // no-op
