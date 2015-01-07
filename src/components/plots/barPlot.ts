@@ -52,14 +52,18 @@ export module Plot {
 
     public detach() {
       this._datasetKeysInOrder.forEach((key) => {
+        var scaleKey = this.getID().toString() + "_" + key;
         this._xScale._removeExtent(scaleKey, "bar-extent");
       });
+      return this;
     }
 
     public remove() {
       this._datasetKeysInOrder.forEach((key) => {
+        var scaleKey = this.getID().toString() + "_" + key;
         this._xScale._removeExtent(scaleKey, "bar-extent");
       });
+      return this;
     }
 
     private _updateBarExtent() {
@@ -82,9 +86,7 @@ export module Plot {
             this._xScale._updateExtent(scaleKey, "bar-extent", extent);
           }
         });
-      }
-
-      if (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative) {
+      } else if (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative) {
         var yAccessor = this._projections["y"].accessor;
         var yQScale = <Plottable.Scale.AbstractQuantitative<Y>> this._yScale;
         var yMinBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) =>

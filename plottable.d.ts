@@ -2809,6 +2809,8 @@ declare module Plottable {
             protected _getDrawer(key: string): _Drawer.Rect;
             protected _setup(): void;
             protected _onDatasetUpdate(): void;
+            detach(): Bar<X, Y>;
+            remove(): Bar<X, Y>;
             /**
              * Gets the baseline value for the bars
              *

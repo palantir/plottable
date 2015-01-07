@@ -6776,14 +6776,18 @@ var Plottable;
             Bar.prototype.detach = function () {
                 var _this = this;
                 this._datasetKeysInOrder.forEach(function (key) {
+                    var scaleKey = _this.getID().toString() + "_" + key;
                     _this._xScale._removeExtent(scaleKey, "bar-extent");
                 });
+                return this;
             };
             Bar.prototype.remove = function () {
                 var _this = this;
                 this._datasetKeysInOrder.forEach(function (key) {
+                    var scaleKey = _this.getID().toString() + "_" + key;
                     _this._xScale._removeExtent(scaleKey, "bar-extent");
                 });
+                return this;
             };
             Bar.prototype._updateBarExtent = function () {
                 var _this = this;
@@ -6803,7 +6807,7 @@ var Plottable;
                         }
                     });
                 }
-                if (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative) {
+                else if (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative) {
                     var yAccessor = this._projections["y"].accessor;
                     var yQScale = this._yScale;
                     var yMinBarAccessor = function (d, i, u, m) { return yQScale.invert(yQScale.scale(yAccessor(d, i, u, m)) - _this._getBarPixelWidth() / 2); };
