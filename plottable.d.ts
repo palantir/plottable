@@ -2808,6 +2808,7 @@ declare module Plottable {
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             protected _getDrawer(key: string): _Drawer.Rect;
             protected _setup(): void;
+            protected _onDatasetUpdate(): void;
             /**
              * Gets the baseline value for the bars
              *

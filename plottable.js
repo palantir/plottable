@@ -6767,6 +6767,59 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
+            Bar.prototype._onDatasetUpdate = function () {
+                _super.prototype._onDatasetUpdate.call(this);
+                if (this._isAnchored) {
+                    this._updateBarExtent();
+                }
+            };
+            Bar.prototype.detach = function () {
+                var _this = this;
+                this._datasetKeysInOrder.forEach(function (key) {
+                    _this._xScale._removeExtent(scaleKey, "bar-extent");
+                });
+            };
+            Bar.prototype.remove = function () {
+                var _this = this;
+                this._datasetKeysInOrder.forEach(function (key) {
+                    _this._xScale._removeExtent(scaleKey, "bar-extent");
+                });
+            };
+            Bar.prototype._updateBarExtent = function () {
+                var _this = this;
+                if (this._isVertical && this._xScale instanceof Plottable.Scale.AbstractQuantitative) {
+                    var xAccessor = this._projections["x"].accessor;
+                    var xQScale = this._xScale;
+                    var xMinBarAccessor = function (d, i, u, m) { return xQScale.invert(xQScale.scale(xAccessor(d, i, u, m)) - _this._getBarPixelWidth() / 2); };
+                    var xMaxBarAccessor = function (d, i, u, m) { return xQScale.invert(xQScale.scale(xAccessor(d, i, u, m)) + _this._getBarPixelWidth() / 2); };
+                    this._datasetKeysInOrder.forEach(function (key) {
+                        var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
+                        var dataset = plotDatasetKey.dataset;
+                        var plotMetadata = plotDatasetKey.plotMetadata;
+                        var extent = [dataset._getExtent(xMinBarAccessor, _this._xScale._typeCoercer, plotMetadata)[0], dataset._getExtent(xMaxBarAccessor, _this._xScale._typeCoercer, plotMetadata)[1]];
+                        if (extent[0] != null && extent[1] != null) {
+                            var scaleKey = _this.getID().toString() + "_" + key;
+                            _this._xScale._updateExtent(scaleKey, "bar-extent", extent);
+                        }
+                    });
+                }
+                if (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative) {
+                    var yAccessor = this._projections["y"].accessor;
+                    var yQScale = this._yScale;
+                    var yMinBarAccessor = function (d, i, u, m) { return yQScale.invert(yQScale.scale(yAccessor(d, i, u, m)) - _this._getBarPixelWidth() / 2); };
+                    var yMaxBarAccessor = function (d, i, u, m) { return yQScale.invert(yQScale.scale(yAccessor(d, i, u, m)) + _this._getBarPixelWidth() / 2); };
+                    this._datasetKeysInOrder.forEach(function (key) {
+                        var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
+                        var dataset = plotDatasetKey.dataset;
+                        var plotMetadata = plotDatasetKey.plotMetadata;
+                        var extent = [dataset._getExtent(yMinBarAccessor, _this._xScale._typeCoercer, plotMetadata)[0], dataset._getExtent(yMaxBarAccessor, _this._xScale._typeCoercer, plotMetadata)[1]];
+                        if (extent[0] != null && extent[1] != null) {
+                            var scaleKey = _this.getID().toString() + "_" + key;
+                            _this._yScale._updateExtent(scaleKey, "bar-extent", extent);
+                        }
+                    });
+                }
+            };
             Bar.prototype.baseline = function (value) {
                 if (value == null) {
                     return this._baselineValue;
@@ -7049,40 +7102,8 @@ var Plottable;
                 });
             };
             Bar.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                var _this = this;
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                if (this._isVertical && this._xScale instanceof Plottable.Scale.AbstractQuantitative) {
-                    var xAccessor = this._projections["x"].accessor;
-                    var xQScale = this._xScale;
-                    var xMinBarAccessor = function (d, i, u, m) { return xQScale.invert(xQScale.scale(xAccessor(d, i, u, m)) - _this._getBarPixelWidth() / 2); };
-                    var xMaxBarAccessor = function (d, i, u, m) { return xQScale.invert(xQScale.scale(xAccessor(d, i, u, m)) + _this._getBarPixelWidth() / 2); };
-                    this._datasetKeysInOrder.forEach(function (key) {
-                        var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
-                        var dataset = plotDatasetKey.dataset;
-                        var plotMetadata = plotDatasetKey.plotMetadata;
-                        var extent = [dataset._getExtent(xMinBarAccessor, _this._xScale._typeCoercer, plotMetadata)[0], dataset._getExtent(xMaxBarAccessor, _this._xScale._typeCoercer, plotMetadata)[1]];
-                        if (extent[0] != null && extent[1] != null) {
-                            var scaleKey = _this.getID().toString() + "_" + key;
-                            _this._xScale._updateExtent(scaleKey, "bar-extent", extent);
-                        }
-                    });
-                }
-                if (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative) {
-                    var yAccessor = this._projections["y"].accessor;
-                    var yQScale = this._yScale;
-                    var yMinBarAccessor = function (d, i, u, m) { return yQScale.invert(yQScale.scale(yAccessor(d, i, u, m)) - _this._getBarPixelWidth() / 2); };
-                    var yMaxBarAccessor = function (d, i, u, m) { return yQScale.invert(yQScale.scale(yAccessor(d, i, u, m)) + _this._getBarPixelWidth() / 2); };
-                    this._datasetKeysInOrder.forEach(function (key) {
-                        var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
-                        var dataset = plotDatasetKey.dataset;
-                        var plotMetadata = plotDatasetKey.plotMetadata;
-                        var extent = [dataset._getExtent(yMinBarAccessor, _this._xScale._typeCoercer, plotMetadata)[0], dataset._getExtent(yMaxBarAccessor, _this._xScale._typeCoercer, plotMetadata)[1]];
-                        if (extent[0] != null && extent[1] != null) {
-                            var scaleKey = _this.getID().toString() + "_" + key;
-                            _this._yScale._updateExtent(scaleKey, "bar-extent", extent);
-                        }
-                    });
-                }
+                this._updateBarExtent();
             };
             //===== Hover logic =====
             Bar.prototype._hoverOverComponent = function (p) {
