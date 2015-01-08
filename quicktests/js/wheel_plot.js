@@ -20,7 +20,7 @@ function makeWheelPlot() {
     var angularScale = new Plottable.Scale.Ordinal().domain(wheelData.map(sliceAccessor));
     var colorScale = new Plottable.Scale.InterpolatedColor();
 
-    var wheelPlot = new Plottable.Plot.Wheel(radialScale, angularScale, colorScale);
+    var wheelPlot = new Plottable.Plot.Wheel(radialScale, angularScale);
     wheelPlot.project("ring", ringAccessor);
     wheelPlot.project("slice", sliceAccessor);
     wheelPlot.project("value", valueAccessor);

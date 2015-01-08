@@ -6787,7 +6787,7 @@ var Plottable;
              *
              * @constructor
              */
-            function Wheel(ringScale, sliceScale, colorScale) {
+            function Wheel(ringScale, sliceScale) {
                 _super.call(this);
                 this.classed("wheel-plot", true);
                 this._radiusScale = ringScale.copy();

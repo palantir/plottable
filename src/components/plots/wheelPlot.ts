@@ -21,7 +21,7 @@ export module Plot {
      *
      * @constructor
      */
-    constructor(ringScale: Scale.Ordinal, sliceScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>) {
+    constructor(ringScale: Scale.Ordinal, sliceScale: Scale.Ordinal) {
       super();
       this.classed("wheel-plot", true);
 
