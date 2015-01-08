@@ -40,6 +40,7 @@
 /// <reference path="drawers/elementDrawer.ts" />
 /// <reference path="drawers/rectDrawer.ts" />
 /// <reference path="drawers/arcDrawer.ts" />
+/// <reference path="drawers/wheelDrawer.ts" />
 
 /// <reference path="components/abstractComponent.ts" />
 /// <reference path="components/abstractComponentContainer.ts" />
@@ -60,6 +61,7 @@
 /// <reference path="components/plots/abstractXYPlot.ts" />
 /// <reference path="components/plots/scatterPlot.ts" />
 /// <reference path="components/plots/gridPlot.ts" />
+/// <reference path="components/plots/wheelPlot.ts" />
 /// <reference path="components/plots/barPlot.ts" />
 /// <reference path="components/plots/verticalBarPlot.ts" />
 /// <reference path="components/plots/horizontalBarPlot.ts" />

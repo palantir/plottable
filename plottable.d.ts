@@ -1499,7 +1499,7 @@ declare module Plottable {
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             /**
-             * Draws the data into the renderArea using the spefic steps and metadata
+             * Draws the data into the renderArea using the specific steps and metadata
              *
              * @param{any[]} data The data to be drawn
              * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
@@ -1537,7 +1537,7 @@ declare module Plottable {
             /**
              * Sets the value determining if line should be drawn.
              *
-             * @param{boolean} draw The value determing if line should be drawn.
+             * @param{boolean} draw The value determining if line should be drawn.
              */
             drawLine(draw: boolean): Area;
             setup(area: D3.Selection): void;
@@ -1585,6 +1585,16 @@ declare module Plottable {
             constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Wheel extends Element {
+            constructor(key: string);
+            _drawStep(step: DrawStep): void;
         }
     }
 }
@@ -2784,6 +2794,33 @@ declare module Plottable {
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Grid;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _generateDrawSteps(): _Drawer.DrawStep[];
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
+        class Wheel extends AbstractPlot {
+            _colorScale: Scale.AbstractScale<any, string>;
+            _radiusScale: Scale.Ordinal;
+            _angleScale: Scale.Ordinal;
+            _animators: Animator.PlotAnimatorMap;
+            /**
+             * Constructs a WheelPlot.
+             *
+             * @constructor
+             */
+            constructor(ringScale: Scale.Ordinal, sliceScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>);
+            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
+            _addDataset(key: string, dataset: Dataset): void;
+            /**
+             * @param {string} attrToSet One of ["ring", "slice", "inner-radius", "outer-radius", "fill"]. If "fill" is used,
+             * the data should return a valid CSS color.
+             */
+            project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Wheel;
+            _generateAttrToProjector(): AttributeToProjector;
+            _getDrawer(key: string): _Drawer.AbstractDrawer;
         }
     }
 }

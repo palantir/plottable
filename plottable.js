@@ -2820,7 +2820,7 @@ var Plottable;
                 return data;
             };
             /**
-             * Draws the data into the renderArea using the spefic steps and metadata
+             * Draws the data into the renderArea using the specific steps and metadata
              *
              * @param{any[]} data The data to be drawn
              * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
@@ -2949,7 +2949,7 @@ var Plottable;
             /**
              * Sets the value determining if line should be drawn.
              *
-             * @param{boolean} draw The value determing if line should be drawn.
+             * @param{boolean} draw The value determining if line should be drawn.
              */
             Area.prototype.drawLine = function (draw) {
                 this._drawLine = draw;
@@ -3208,6 +3208,42 @@ var Plottable;
             return Arc;
         })(_Drawer.Element);
         _Drawer.Arc = Arc;
+    })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var _Drawer;
+    (function (_Drawer) {
+        var Wheel = (function (_super) {
+            __extends(Wheel, _super);
+            function Wheel(key) {
+                _super.call(this, key);
+                this._svgElement = "path";
+            }
+            Wheel.prototype._drawStep = function (step) {
+                var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
+                var startAngleF = attrToProjector["start-angle"];
+                var endAngleF = attrToProjector["end-angle"];
+                var innerRadiusF = attrToProjector["inner-radius"];
+                var outerRadiusF = attrToProjector["outer-radius"];
+                delete attrToProjector["start-angle"];
+                delete attrToProjector["end-angle"];
+                delete attrToProjector["inner-radius"];
+                delete attrToProjector["outer-radius"];
+                attrToProjector["d"] = d3.svg.arc().startAngle(startAngleF).endAngle(endAngleF).innerRadius(innerRadiusF).outerRadius(outerRadiusF);
+                return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
+            };
+            return Wheel;
+        })(_Drawer.Element);
+        _Drawer.Wheel = Wheel;
     })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
 })(Plottable || (Plottable = {}));
 
@@ -6720,6 +6756,69 @@ var Plottable;
             return Grid;
         })(Plot.AbstractXYPlot);
         Plot.Grid = Grid;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Plot;
+    (function (Plot) {
+        /*
+         * A WheelPlot is the radial analog to a GridPlot. A WheelPlot is used to shade the cells created by radially slicing
+         * a set of concentric circles (rings). Each datum is a cell, and the value can control the color of the cell.
+         *
+         * Primary projection attributes:
+         *   "fill" - Accessor determining the color of each sector
+         *   "ring" - Accessor to extract the value determining the radii of the cell
+         *   "slice" - Accessor to extract the value determining the start and end angles of the cell
+         *   "value" - Accessor to extract the value determining the value of a datum (and thus the fill)
+         */
+        var Wheel = (function (_super) {
+            __extends(Wheel, _super);
+            /**
+             * Constructs a WheelPlot.
+             *
+             * @constructor
+             */
+            function Wheel(ringScale, sliceScale, colorScale) {
+                _super.call(this);
+                this.classed("wheel-plot", true);
+                this._radiusScale = ringScale.copy();
+                this._angleScale = sliceScale.copy();
+                // no padding between adjacent cells
+                this._radiusScale.rangeType("bands", 0, 0);
+                this._angleScale.rangeType("bands", 0, 0);
+                this._angleScale.range([0, 2 * Math.PI]);
+            }
+            Wheel.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+            };
+            Wheel.prototype._generateAttrToProjector = function () {
+                var _this = this;
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                // fill the whole plot with arcs
+                this._radiusScale.range([this._radiusScale.range()[0], Math.min(this.width(), this.height()) / 2]);
+                // radii & angles for each arc segment in the wheel
+                attrToProjector["inner-radius"] = function (d) { return _this._radiusScale.scale(attrToProjector["ring"](d)); };
+                attrToProjector["outer-radius"] = function (d) { return _this._radiusScale.scale(attrToProjector["ring"](d)) + _this._radiusScale.rangeBand(); };
+                attrToProjector["start-angle"] = function (d) { return _this._angleScale.scale(attrToProjector["slice"](d)); };
+                attrToProjector["end-angle"] = function (d) { return _this._angleScale.scale(attrToProjector["slice"](d)) + _this._angleScale.rangeBand(); };
+                return attrToProjector;
+            };
+            Wheel.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Wheel(key).setClass("arc");
+            };
+            return Wheel;
+        })(Plot.AbstractPlot);
+        Plot.Wheel = Wheel;
     })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
