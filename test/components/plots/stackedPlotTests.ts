@@ -267,4 +267,56 @@ describe("Plots", () => {
     });
   });
 
+  describe("scale extent updates", () => {
+    var svg: D3.Selection;
+    var xScale: Plottable.Scale.Ordinal;
+    var yScale: Plottable.Scale.Linear;
+    var stackedBarPlot: Plottable.Plot.StackedBar<string, number>;
+
+    beforeEach(() => {
+      svg = generateSVG(600, 400);
+
+      xScale = new Plottable.Scale.Ordinal();
+      yScale = new Plottable.Scale.Linear();
+
+      stackedBarPlot = new Plottable.Plot.StackedBar(xScale, yScale);
+      stackedBarPlot.project("x", "key", xScale);
+      stackedBarPlot.project("y", "value", yScale);
+
+      stackedBarPlot.renderTo(svg);
+    });
+
+    afterEach(() => {
+      svg.remove();
+    });
+
+    it("extents are updated as datasets are updated", () => {
+      var data1 = [
+        { key: "a", value: 1 },
+        { key: "b", value: -2 }
+      ];
+      var data2 = [
+        { key: "a", value: 3 },
+        { key: "b", value: -4 }
+      ];
+      var data3 = [
+        { key: "a", value: 1 },
+        { key: "b", value: -2 }
+      ];
+
+      var dataset2 = new Plottable.Dataset(data2);
+      stackedBarPlot.addDataset("d1", data1);
+      stackedBarPlot.addDataset("d2", dataset2);
+
+      assert.closeTo(yScale.domain()[0], -6, 1, "test");
+      assert.closeTo(yScale.domain()[1], 4, 1, "test2");
+
+      dataset2.data(data3);
+
+      assert.closeTo(yScale.domain()[0], -4, 1, "test3");
+      assert.closeTo(yScale.domain()[1], 2, 1, "test4");
+    });
+
+  });
+
 });
