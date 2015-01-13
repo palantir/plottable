@@ -31,11 +31,11 @@ export module Plot {
     }
 
     public _onDatasetUpdate() {
-      super._onDatasetUpdate();
       // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
       if (this._datasetKeysInOrder && this._projections["x"]  && this._projections["y"]) {
         this._updateStackOffsets();
       }
+      super._onDatasetUpdate();
     }
 
     public _updateStackOffsets() {
