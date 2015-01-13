@@ -23,7 +23,7 @@ describe("Plots", () => {
           {x: "B", y: 1} // duplicate X-value
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+        barPlot = new Plottable.Plot.Bar(xScale, yScale);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);

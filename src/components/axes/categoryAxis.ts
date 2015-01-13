@@ -162,10 +162,9 @@ export module Axis {
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
-        var startAndWidth = ordScale.fullBandStartAndWidth(d);
-        var bandStartPosition = startAndWidth[0];
-        var x = ordScale.scale(d) - ordScale.rangeBand() / 2;
-        var y = this._isHorizontal() ? 0 : bandStartPosition;
+        var scaledValue = ordScale.scale(d) - ordScale.rangeBand() / 2;
+        var x = this._isHorizontal() ? scaledValue : 0;
+        var y = this._isHorizontal() ? 0 : scaledValue;
         return "translate(" + x + "," + y + ")";
       };
       tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
@@ -176,6 +175,7 @@ export module Axis {
       this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
       var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
 
+      var xTranslate = this.orient() === "left" ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
       var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       _Util.DOM.translate(this._tickLabelContainer, 0, yTranslate);
       return this;

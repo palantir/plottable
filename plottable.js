@@ -2339,6 +2339,9 @@ var Plottable;
                     //scale it to the middle
                     return scaledValue + this.rangeBand() / 2;
                 }
+                else {
+                    return scaledValue;
+                }
             };
             return Ordinal;
         })(Scale.AbstractScale);
@@ -5038,10 +5041,9 @@ var Plottable;
                 var ordScale = this._scale;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
-                    var startAndWidth = ordScale.fullBandStartAndWidth(d);
-                    var bandStartPosition = startAndWidth[0];
-                    var x = ordScale.scale(d) - ordScale.rangeBand() / 2;
-                    var y = _this._isHorizontal() ? 0 : bandStartPosition;
+                    var scaledValue = ordScale.scale(d) - ordScale.rangeBand() / 2;
+                    var x = _this._isHorizontal() ? scaledValue : 0;
+                    var y = _this._isHorizontal() ? 0 : scaledValue;
                     return "translate(" + x + "," + y + ")";
                 };
                 tickLabels.enter().append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
@@ -5051,6 +5053,7 @@ var Plottable;
                 tickLabels.text("");
                 this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
                 var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
+                var xTranslate = this.orient() === "left" ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
                 var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 Plottable._Util.DOM.translate(this._tickLabelContainer, 0, yTranslate);
                 return this;
@@ -7509,7 +7512,7 @@ var Plottable;
                 var innerScale = this._makeInnerScale();
                 this._datasetKeysInOrder.forEach(function (key) {
                     var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
-                    plotMetadata.position = innerScale.scale(key);
+                    plotMetadata.position = innerScale.scale(key) - innerScale.rangeBand() / 2;
                 });
             };
             ClusteredBar.prototype._makeInnerScale = function () {
