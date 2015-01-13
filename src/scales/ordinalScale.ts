@@ -131,6 +131,8 @@ export module Scale {
       if (this.rangeType() === "bands") {
         //scale it to the middle
         return scaledValue + this.rangeBand() / 2;
+      } else {
+        return scaledValue;
       }
     }
   }
