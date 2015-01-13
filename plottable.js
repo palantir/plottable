@@ -2333,6 +2333,13 @@ var Plottable;
             Ordinal.prototype.copy = function () {
                 return new Ordinal(this._d3Scale.copy());
             };
+            Ordinal.prototype.scale = function (value) {
+                var scaledValue = _super.prototype.scale.call(this, value);
+                if (this.rangeType() === "bands") {
+                    //scale it to the middle
+                    return scaledValue + this.rangeBand() / 2;
+                }
+            };
             return Ordinal;
         })(Scale.AbstractScale);
         Scale.Ordinal = Ordinal;
@@ -4991,7 +4998,7 @@ var Plottable;
                         break;
                 }
                 ticks.each(function (d) {
-                    var bandWidth = scale.fullBandStartAndWidth(d)[1];
+                    var bandWidth = scale.rangeBand();
                     var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
                     var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
                     var writeOptions = {
@@ -5033,7 +5040,7 @@ var Plottable;
                 var getTickLabelTransform = function (d, i) {
                     var startAndWidth = ordScale.fullBandStartAndWidth(d);
                     var bandStartPosition = startAndWidth[0];
-                    var x = _this._isHorizontal() ? bandStartPosition : 0;
+                    var x = ordScale.scale(d) - ordScale.rangeBand() / 2;
                     var y = _this._isHorizontal() ? 0 : bandStartPosition;
                     return "translate(" + x + "," + y + ")";
                 };
@@ -5044,10 +5051,8 @@ var Plottable;
                 tickLabels.text("");
                 this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
                 var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
-                var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-                Plottable._Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
-                Plottable._Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
+                Plottable._Util.DOM.translate(this._tickLabelContainer, 0, yTranslate);
                 return this;
             };
             Category.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
@@ -6961,8 +6966,7 @@ var Plottable;
                     attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) * _this._barAlignmentFactor; };
                 }
                 else {
-                    var bandWidth = secondaryScale.rangeBand();
-                    attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) / 2 + bandWidth / 2; };
+                    attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) / 2; };
                 }
                 attrToProjector[primaryAttr] = function (d, i, u, m) {
                     var originalPos = originalPositionFn(d, i, u, m);
