@@ -3231,18 +3231,18 @@ describe("Plots", function () {
                 { key: "a", value: 3 },
                 { key: "b", value: -4 }
             ];
-            var data3 = [
+            var data2_b = [
                 { key: "a", value: 1 },
                 { key: "b", value: -2 }
             ];
             var dataset2 = new Plottable.Dataset(data2);
             stackedBarPlot.addDataset("d1", data1);
             stackedBarPlot.addDataset("d2", dataset2);
-            assert.closeTo(yScale.domain()[0], -6, 1, "test");
-            assert.closeTo(yScale.domain()[1], 4, 1, "test2");
-            dataset2.data(data3);
-            assert.closeTo(yScale.domain()[0], -4, 1, "test3");
-            assert.closeTo(yScale.domain()[1], 2, 1, "test4");
+            assert.closeTo(yScale.domain()[0], -6, 1, "min stacked extent is as normal");
+            assert.closeTo(yScale.domain()[1], 4, 1, "max stacked extent is as normal");
+            dataset2.data(data2_b);
+            assert.closeTo(yScale.domain()[0], -4, 1, "min stacked extent decreases in magnitude");
+            assert.closeTo(yScale.domain()[1], 2, 1, "max stacked extent decreases in magnitude");
         });
     });
 });
