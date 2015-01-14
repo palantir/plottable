@@ -9,5 +9,6 @@ function run(svg, data, Plottable) {
   new Plottable.Plot.Pie()
                     .addDataset(data)
                     .project("value", "value")
+                    .animate(true)
                     .renderTo(svg);
 }

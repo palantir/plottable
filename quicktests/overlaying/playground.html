@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<script type = "text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script type = "text/javascript" src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		<script type = "text/javascript" src="https://rawgithub.com/palantir/plottable/develop/plottable.js"></script>
+		<script type = "text/javascript" src="http://rawgithub.com/palantir/plottable/develop/quicktests/exampleUtil.js"></script>
+		<script type = "text/javascript" src="http://localhost:9999/quicktests/overlaying/playground.js"></script>
+		</style> <link rel="stylesheet" type="text/css" href="https://rawgithub.com/palantir/plottable/master/plottable.css">
+	</head>
+	<body>
+
+		<p> playground </p>
+		<div align="center">
+		<svg id="playground" width="400" height="400"></svg>
+		</div>
+
+		<br>
+
+		<div align="center">
+			<span> width (px): </span>
+			<input type="text" id="svg_w" rows="1" cols="10" value="400"></textarea>
+			<span> height (px): </span>
+			<input type="text" id="svg_h" rows="1" cols="10" value="400"></textarea>
+			<button id="changeSizeButton" onclick="svg_size()"> Change Size </button>
+		</div>
+
+		<br>
+
+		<div align="center">
+			<span> x-axis type </span>
+			<select id="xAxisType">
+			  <option>Time</option>
+			  <option>Category</option>
+			  <option>Numeric(Linear)</option>
+			  <option>Numeric(Log)</option>		
+			</select>
+			<br>
+			<span> y-axis type </span>
+			<select id="yAxisType">
+			  <option>Category</option>
+			  <option>Numeric(Linear)</option>
+			  <option>Numeric(Log)</option>			  
+			</select>
+			<br>
+			<span> plot type </span>
+			<select id="plotType">
+			  <option>Scatter</option>
+			  <option>Line</option>
+			  <option>Area</option>
+			  <option>Bar</option>
+			</select>
+			<br>
+			<span> dataset </span>
+			<select id= "dataset">
+			  <option>SmallRand</option>
+			  <option>SmallCat</option>
+			  <option>SmallLin</option>
+			</select>
+			<br>
+			<button id="makeTestButton" onclick="createTest()"> Create test </button>
+		</div>
+
+		<br>
+
+		<div align="center">
+			<textarea id="code" rows="50" cols="80"></textarea>
+		</div>
+
+	</body>
+</html>
