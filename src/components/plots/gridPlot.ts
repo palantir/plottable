@@ -60,6 +60,10 @@ export module Plot {
       var yStep = (<Scale.Ordinal> this._yScale).rangeBand();
       attrToProjector["width"]  = () => xStep;
       attrToProjector["height"] = () => yStep;
+      var xAttr = attrToProjector["x"];
+      var yAttr = attrToProjector["y"];
+      attrToProjector["x"] = (d, i, u, m) => xAttr(d, i, u, m) - xStep / 2;
+      attrToProjector["y"] = (d, i, u, m) => yAttr(d, i, u, m) - yStep / 2;
       return attrToProjector;
     }
 
