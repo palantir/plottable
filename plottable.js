@@ -7569,8 +7569,7 @@ var Plottable;
             };
             AbstractStacked.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-                // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
-                if (this._datasetKeysInOrder && this._projections["x"] && this._projections["y"]) {
+                if (this._projectorsReady()) {
                     this._updateStackOffsets();
                 }
             };
