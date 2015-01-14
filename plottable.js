@@ -3925,7 +3925,6 @@ var Plottable;
              * displayed.
              */
             function AbstractAxis(scale, orientation, formatter) {
-                var _this = this;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this);
                 this._endTickLength = 5;
@@ -3937,7 +3936,15 @@ var Plottable;
                     throw new Error("Axis requires a scale and orientation");
                 }
                 this._scale = scale;
-                this.orient(orientation);
+                orientation = orientation.toLowerCase();
+                AbstractAxis.verifyAxisOrientation(orientation);
+                this._orientation = orientation;
+                this._formatter = formatter;
+            }
+            AbstractAxis.prototype._anchor = function (element) {
+                var _this = this;
+                _super.prototype._anchor.call(this, element);
+                this._isAnchored = false;
                 this._setDefaultAlignment();
                 this.classed("axis", true);
                 if (this._isHorizontal()) {
@@ -3946,9 +3953,9 @@ var Plottable;
                 else {
                     this.classed("y-axis", true);
                 }
-                this.formatter(formatter);
                 this._scale.broadcaster.registerListener(this, function () { return _this._rescale(); });
-            }
+                this._isAnchored = true;
+            };
             AbstractAxis.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 this._scale.broadcaster.deregisterListener(this);
@@ -4189,12 +4196,15 @@ var Plottable;
                 }
                 else {
                     var newOrientationLC = newOrientation.toLowerCase();
-                    if (newOrientationLC !== "top" && newOrientationLC !== "bottom" && newOrientationLC !== "left" && newOrientationLC !== "right") {
-                        throw new Error("unsupported orientation");
-                    }
+                    AbstractAxis.verifyAxisOrientation(newOrientationLC);
                     this._orientation = newOrientationLC;
                     this._invalidateLayout();
                     return this;
+                }
+            };
+            AbstractAxis.verifyAxisOrientation = function (orientation) {
+                if (["top", "bottom", "left", "right"].indexOf(orientation) === -1) {
+                    throw new Error("unsupported orientation");
                 }
             };
             AbstractAxis.prototype.showEndTickLabels = function (show) {
@@ -4283,7 +4293,6 @@ var Plottable;
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             function Time(scale, orientation) {
-                _super.call(this, scale, orientation);
                 /*
                  * Default possible axis configurations.
                  */
@@ -4396,6 +4405,8 @@ var Plottable;
                         { interval: d3.time.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
                     ] }
                 ];
+                Time.verifyTimeAxisOrientation(orientation);
+                _super.call(this, scale, orientation);
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
                 this.tierLabelPositions(["between", "between"]);
@@ -4439,10 +4450,17 @@ var Plottable;
                 return mostPreciseIndex;
             };
             Time.prototype.orient = function (orientation) {
-                if (orientation && (orientation.toLowerCase() === "right" || orientation.toLowerCase() === "left")) {
-                    throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
+                if (orientation) {
+                    Time.verifyTimeAxisOrientation(orientation);
                 }
                 return _super.prototype.orient.call(this, orientation); // maintains getter-setter functionality
+            };
+            Time.verifyTimeAxisOrientation = function (orientation) {
+                orientation = orientation.toLowerCase();
+                Axis.AbstractAxis.verifyAxisOrientation(orientation);
+                if (["bottom", "top"].indexOf(orientation.toLowerCase()) === -1) {
+                    throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
+                }
             };
             Time.prototype._computeHeight = function () {
                 var _this = this;

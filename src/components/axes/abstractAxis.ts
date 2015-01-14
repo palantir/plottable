@@ -44,7 +44,18 @@ export module Axis {
       super();
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
       this._scale = scale;
-      this.orient(orientation);
+
+      orientation = orientation.toLowerCase();
+      AbstractAxis.verifyAxisOrientation(orientation);
+      this._orientation = orientation;
+
+      this._formatter = formatter;
+    }
+
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
+
+      this._isAnchored = false;
       this._setDefaultAlignment();
       this.classed("axis", true);
       if (this._isHorizontal()) {
@@ -53,9 +64,8 @@ export module Axis {
         this.classed("y-axis", true);
       }
 
-      this.formatter(formatter);
-
       this._scale.broadcaster.registerListener(this, () => this._rescale());
+      this._isAnchored = true;
     }
 
     public remove() {
@@ -416,15 +426,16 @@ export module Axis {
         return this._orientation;
       } else {
         var newOrientationLC = newOrientation.toLowerCase();
-        if (newOrientationLC !== "top" &&
-            newOrientationLC !== "bottom" &&
-            newOrientationLC !== "left" &&
-            newOrientationLC !== "right") {
-          throw new Error("unsupported orientation");
-        }
+        AbstractAxis.verifyAxisOrientation(newOrientationLC);
         this._orientation = newOrientationLC;
         this._invalidateLayout();
         return this;
+      }
+    }
+
+    private static verifyAxisOrientation(orientation: string) {
+      if (["top", "bottom", "left", "right"].indexOf(orientation) === -1) {
+        throw new Error("unsupported orientation");
       }
     }
 
