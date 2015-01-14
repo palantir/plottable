@@ -6720,6 +6720,10 @@ var Plottable;
                 var yStep = this._yScale.rangeBand();
                 attrToProjector["width"] = function () { return xStep; };
                 attrToProjector["height"] = function () { return yStep; };
+                var xAttr = attrToProjector["x"];
+                var yAttr = attrToProjector["y"];
+                attrToProjector["x"] = function (d, i, u, m) { return xAttr(d, i, u, m) - xStep / 2; };
+                attrToProjector["y"] = function (d, i, u, m) { return yAttr(d, i, u, m) - yStep / 2; };
                 return attrToProjector;
             };
             Grid.prototype._generateDrawSteps = function () {

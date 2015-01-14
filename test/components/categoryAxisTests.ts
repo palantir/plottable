@@ -90,12 +90,12 @@ describe("Category Axes", () => {
     var step = SVG_WIDTH / 5;
     var tickMarks = (<any> categoryAxis)._tickMarkContainer.selectAll(".tick-mark")[0];
     var ticksNormalizedPosition = tickMarks.map((s: any) => +d3.select(s).attr("x1") / step);
-    assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
+    assert.deepEqual(ticksNormalizedPosition, [1.5, 2.5, 3.5], "bands");
 
     scale.rangeType("points", 1, 0);
     step = SVG_WIDTH / 4;
     ticksNormalizedPosition = tickMarks.map((s: any) => +d3.select(s).attr("x1") / step);
-    assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
+    assert.deepEqual(ticksNormalizedPosition, [1, 2, 3], "points");
 
     svg.remove();
   });
