@@ -3086,7 +3086,7 @@ var Plottable;
             function Rect(key, isVertical) {
                 _super.call(this, key);
                 this._labelsTooWide = false;
-                this.svgElement("rect");
+                this._svgElement = "rect";
                 this._isVertical = isVertical;
             }
             Rect.prototype.setup = function (area) {
