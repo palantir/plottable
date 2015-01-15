@@ -129,6 +129,7 @@ declare module Plottable {
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number, lightenAmount: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
+            function uniqAdd<T>(arr: T[], item: T): void;
         }
     }
 }
@@ -1602,6 +1603,7 @@ declare module Plottable {
             protected _fixedWidthFlag: boolean;
             protected _isSetup: boolean;
             protected _isAnchored: boolean;
+            protected _cssClasses: string[];
             /**
              * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
              *
@@ -2068,7 +2070,6 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             constructor(scale: Scale.Time, orientation: string);
-            _anchor(element: D3.Selection): void;
             tierLabelPositions(): string[];
             tierLabelPositions(newPositions: string[]): Time;
             /**
@@ -2178,7 +2179,6 @@ declare module Plottable {
              * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
              */
             constructor(scale: Scale.Ordinal, orientation?: string, formatter?: (d: any) => string);
-            _anchor(element: D3.Selection): void;
             protected _setup(): void;
             protected _rescale(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;

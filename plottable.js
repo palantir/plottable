@@ -327,6 +327,12 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
+            function uniqAdd(arr, item) {
+                if (arr.indexOf(item) === -1) {
+                    arr.push(item);
+                }
+            }
+            Methods.uniqAdd = uniqAdd;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -4406,13 +4412,8 @@ var Plottable;
                 ];
                 this._tickLabelPadding = 5;
                 this._tierLabelPositions = ["between", "between"];
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "time-axis");
             }
-            Time.prototype._anchor = function (element) {
-                _super.prototype._anchor.call(this, element);
-                this._isAnchored = false;
-                this.classed("time-axis", true);
-                this._isAnchored = true;
-            };
             Time.prototype.tierLabelPositions = function (newPositions) {
                 if (newPositions == null) {
                     return this._tierLabelPositions;
@@ -4944,13 +4945,8 @@ var Plottable;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
                 this._tickLabelAngle = 0;
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "category-axis");
             }
-            Category.prototype._anchor = function (element) {
-                _super.prototype._anchor.call(this, element);
-                this._isAnchored = false;
-                this.classed("category-axis", true);
-                this._isAnchored = true;
-            };
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);

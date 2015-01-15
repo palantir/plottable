@@ -31,7 +31,7 @@ export module Component {
     private _height: number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
-    private _cssClasses: string[] = ["component"];
+    protected _cssClasses: string[] = ["component"];
     private _removed = false;
     private _autoResize = AbstractComponent.AUTORESIZE_BY_DEFAULT;
     private _usedLastLayout = false;

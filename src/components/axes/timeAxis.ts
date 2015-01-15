@@ -171,13 +171,8 @@ export module Axis {
       this._tickLabelPadding = 5;
 
       this._tierLabelPositions = ["between", "between"];
-    }
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
-      this._isAnchored = false;
-      this.classed("time-axis", true);
-      this._isAnchored = true;
+      _Util.Methods.uniqAdd(this._cssClasses, "time-axis");
     }
 
     public tierLabelPositions(): string[];
