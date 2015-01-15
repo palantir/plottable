@@ -1533,7 +1533,7 @@ var Plottable;
                 domain = this._combineExtents(extents);
             }
             else if (extents.length === 0) {
-                domain = scale._defaultExtent();
+                domain = Plottable.Scale.AbstractQuantitative._defaultExtent();
             }
             else {
                 domain = [Plottable._Util.Methods.min(extents, function (e) { return e[0]; }, 0), Plottable._Util.Methods.max(extents, function (e) { return e[1]; }, 0)];
@@ -1961,7 +1961,7 @@ var Plottable;
                     return this;
                 }
             };
-            AbstractQuantitative.prototype._defaultExtent = function () {
+            AbstractQuantitative._defaultExtent = function () {
                 return [0, 1];
             };
             AbstractQuantitative.prototype.tickGenerator = function (generator) {
@@ -2094,7 +2094,7 @@ var Plottable;
                 _super.call(this, d3.scale.linear());
                 this.base = base;
                 this.pivot = base;
-                this.untransformedDomain = this._defaultExtent();
+                this.untransformedDomain = Scale.AbstractQuantitative._defaultExtent();
                 this._showIntermediateTicks = false;
             }
             /**

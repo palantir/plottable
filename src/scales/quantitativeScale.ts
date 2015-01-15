@@ -186,7 +186,7 @@ export module Scale {
       }
     }
 
-    public _defaultExtent(): any[] {
+    public static _defaultExtent(): any[] {
       return [0, 1];
     }
 

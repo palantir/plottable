@@ -47,7 +47,7 @@ module Plottable {
       if (this._combineExtents != null) {
         domain = this._combineExtents(extents);
       } else if (extents.length === 0) {
-        domain = scale._defaultExtent();
+        domain = Scale.AbstractQuantitative._defaultExtent();
       } else {
         domain = [_Util.Methods.min(extents, (e) => e[0], 0), _Util.Methods.max(extents, (e) => e[1], 0)];
       }

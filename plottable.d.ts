@@ -1116,7 +1116,7 @@ declare module Plottable {
              * @return {AbstractQuantitative} The calling QuantitativeScale.
              */
             domainer(domainer: Domainer): AbstractQuantitative<D>;
-            _defaultExtent(): any[];
+            static _defaultExtent(): any[];
             /**
              * Gets the tick generator of the AbstractQuantitative.
              *
