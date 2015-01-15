@@ -3466,21 +3466,29 @@ var Plottable;
              * @returns {Component} The calling Component.
              */
             AbstractComponent.prototype.xAlign = function (alignment) {
-                alignment = alignment.toLowerCase();
-                if (alignment === "left") {
-                    this._xAlignProportion = 0;
-                }
-                else if (alignment === "center") {
-                    this._xAlignProportion = 0.5;
-                }
-                else if (alignment === "right") {
-                    this._xAlignProportion = 1;
-                }
-                else {
-                    throw new Error("Unsupported alignment");
-                }
+                alignment = AbstractComponent.ensureXAlignment(alignment);
+                this._xAlignProportion = AbstractComponent._xAlignmentToProportion(alignment);
                 this._invalidateLayout();
                 return this;
+            };
+            AbstractComponent.ensureXAlignment = function (alignment) {
+                alignment = alignment.toLowerCase();
+                if (["left", "center", "right"].indexOf(alignment) === -1) {
+                    throw new Error("Unsupported alignment");
+                }
+                return alignment;
+            };
+            AbstractComponent._xAlignmentToProportion = function (alignment) {
+                alignment = alignment.toLowerCase();
+                if (alignment === "left") {
+                    return 0;
+                }
+                else if (alignment === "center") {
+                    return 0.5;
+                }
+                else if (alignment === "right") {
+                    return 1;
+                }
             };
             /**
              * Sets the y alignment of the Component. This will be used if the
@@ -3494,21 +3502,29 @@ var Plottable;
              * @returns {Component} The calling Component.
              */
             AbstractComponent.prototype.yAlign = function (alignment) {
-                alignment = alignment.toLowerCase();
-                if (alignment === "top") {
-                    this._yAlignProportion = 0;
-                }
-                else if (alignment === "center") {
-                    this._yAlignProportion = 0.5;
-                }
-                else if (alignment === "bottom") {
-                    this._yAlignProportion = 1;
-                }
-                else {
-                    throw new Error("Unsupported alignment");
-                }
+                alignment = AbstractComponent.ensureYAlignment(alignment);
+                this._yAlignProportion = AbstractComponent._yAlignmentToProportion(alignment);
                 this._invalidateLayout();
                 return this;
+            };
+            AbstractComponent.ensureYAlignment = function (alignment) {
+                alignment = alignment.toLowerCase();
+                if (["top", "center", "bottom"].indexOf(alignment) === -1) {
+                    throw new Error("Unsupported alignment");
+                }
+                return alignment;
+            };
+            AbstractComponent._yAlignmentToProportion = function (alignment) {
+                alignment = alignment.toLowerCase();
+                if (alignment === "top") {
+                    return 0;
+                }
+                else if (alignment === "center") {
+                    return 0.5;
+                }
+                else if (alignment === "bottom") {
+                    return 1;
+                }
             };
             /**
              * Sets the x offset of the Component. This will be used if the Component
@@ -5104,7 +5120,10 @@ var Plottable;
                 Plottable._Util.Methods.uniqAdd(this._cssClasses, "label");
                 this._text = displayText;
                 this._orientation = Label.ensureLabelOrientation(orientation);
-                this.xAlign("center").yAlign("center");
+                this._xAlignProportion = Component.AbstractComponent._xAlignmentToProportion("center");
+                this._yAlignProportion = Component.AbstractComponent._yAlignmentToProportion("center");
+                this._xAlignment = "center";
+                this._yAlignment = "center";
                 this._fixedHeightFlag = true;
                 this._fixedWidthFlag = true;
                 this._padding = 0;
@@ -5272,16 +5291,16 @@ var Plottable;
              */
             function Legend(colorScale) {
                 var _this = this;
-                _super.call(this);
-                this._padding = 5;
-                this.classed("legend", true);
-                this.maxEntriesPerRow(1);
                 if (colorScale == null) {
                     throw new Error("Legend requires a colorScale");
                 }
+                _super.call(this);
+                this._padding = 5;
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "legend");
+                this._maxEntriesPerRow = 1;
                 this._scale = colorScale;
-                this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
-                this.xAlign("right").yAlign("top");
+                this._xAlignProportion = Component.AbstractComponent._xAlignmentToProportion("center");
+                this._yAlignProportion = Component.AbstractComponent._yAlignmentToProportion("center");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
@@ -5294,6 +5313,11 @@ var Plottable;
                 this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(true);
+            };
+            Legend.prototype._anchor = function (element) {
+                var _this = this;
+                _super.prototype._anchor.call(this, element);
+                this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
             };
             Legend.prototype.maxEntriesPerRow = function (numEntries) {
                 if (numEntries == null) {

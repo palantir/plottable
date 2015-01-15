@@ -1599,6 +1599,8 @@ declare module Plottable {
             protected _content: D3.Selection;
             clipPathEnabled: boolean;
             _parent: AbstractComponentContainer;
+            protected _xAlignProportion: number;
+            protected _yAlignProportion: number;
             protected _fixedHeightFlag: boolean;
             protected _fixedWidthFlag: boolean;
             protected _isSetup: boolean;
@@ -1675,6 +1677,7 @@ declare module Plottable {
              * @returns {Component} The calling Component.
              */
             xAlign(alignment: string): AbstractComponent;
+            static _xAlignmentToProportion(alignment: string): number;
             /**
              * Sets the y alignment of the Component. This will be used if the
              * Component is given more space than it needs.
@@ -1687,6 +1690,7 @@ declare module Plottable {
              * @returns {Component} The calling Component.
              */
             yAlign(alignment: string): AbstractComponent;
+            static _yAlignmentToProportion(alignment: string): number;
             /**
              * Sets the x offset of the Component. This will be used if the Component
              * is given more space than it needs.
@@ -2319,6 +2323,7 @@ declare module Plottable {
              */
             constructor(colorScale: Scale.Color);
             protected _setup(): void;
+            _anchor(element: D3.Selection): void;
             /**
              * Gets the current max number of entries in Legend row.
              * @returns {number} The current max number of entries in row.

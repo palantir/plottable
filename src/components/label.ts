@@ -28,7 +28,10 @@ export module Component {
       _Util.Methods.uniqAdd(this._cssClasses, "label");
       this._text = displayText;
       this._orientation = Label.ensureLabelOrientation(orientation);
-      this.xAlign("center").yAlign("center");
+      this._xAlignProportion = AbstractComponent._xAlignmentToProportion("center");
+      this._yAlignProportion = AbstractComponent._yAlignmentToProportion("center");
+      this._xAlignment = "center";
+      this._yAlignment = "center";
       this._fixedHeightFlag = true;
       this._fixedWidthFlag = true;
       this._padding = 0;
