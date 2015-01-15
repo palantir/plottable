@@ -30,7 +30,7 @@ export module Component {
      * @param {Scale.Color} colorScale
      */
     constructor(colorScale: Scale.Color) {
-      if (colorScale == null ) {
+      if (colorScale == null) {
         throw new Error("Legend requires a colorScale");
       }
 
