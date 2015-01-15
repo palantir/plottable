@@ -5503,7 +5503,6 @@ var Plottable;
              * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
             function Gridlines(xScale, yScale) {
-                var _this = this;
                 if (xScale != null && !(Plottable.Scale.AbstractQuantitative.prototype.isPrototypeOf(xScale))) {
                     throw new Error("xScale needs to inherit from Scale.AbstractQuantitative");
                 }
@@ -5511,16 +5510,16 @@ var Plottable;
                     throw new Error("yScale needs to inherit from Scale.AbstractQuantitative");
                 }
                 _super.call(this);
-                this.classed("gridlines", true);
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "gridlines");
                 this._xScale = xScale;
                 this._yScale = yScale;
-                if (this._xScale) {
-                    this._xScale.broadcaster.registerListener(this, function () { return _this._render(); });
-                }
-                if (this._yScale) {
-                    this._yScale.broadcaster.registerListener(this, function () { return _this._render(); });
-                }
             }
+            Gridlines.prototype._anchor = function (element) {
+                var _this = this;
+                _super.prototype._anchor.call(this, element);
+                this._xScale.broadcaster.registerListener(this, function () { return _this._render(); });
+                this._yScale.broadcaster.registerListener(this, function () { return _this._render(); });
+            };
             Gridlines.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 if (this._xScale) {

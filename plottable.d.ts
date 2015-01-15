@@ -2382,6 +2382,7 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
             constructor(xScale: Scale.AbstractQuantitative<any>, yScale: Scale.AbstractQuantitative<any>);
+            _anchor(element: D3.Selection): void;
             remove(): Gridlines;
             protected _setup(): void;
             _doRender(): void;
