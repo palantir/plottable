@@ -5941,7 +5941,7 @@ var Plottable;
                 this._animators = {};
                 this._animateOnNextRender = true;
                 this.clipPathEnabled = true;
-                this.classed("plot", true);
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "plot");
                 this._key2PlotDatasetKey = d3.map();
                 this._datasetKeysInOrder = [];
                 this._nextSeriesIndex = 0;
