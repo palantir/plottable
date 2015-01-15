@@ -45,9 +45,7 @@ export module Axis {
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
       this._scale = scale;
 
-      orientation = orientation.toLowerCase();
-      AbstractAxis.verifyAxisOrientation(orientation);
-      this._orientation = orientation;
+      this._orientation = AbstractAxis.ensureAxisOrientation(orientation);
 
       this._formatter = formatter;
     }
@@ -425,18 +423,18 @@ export module Axis {
       if (newOrientation == null) {
         return this._orientation;
       } else {
-        var newOrientationLC = newOrientation.toLowerCase();
-        AbstractAxis.verifyAxisOrientation(newOrientationLC);
-        this._orientation = newOrientationLC;
+        this._orientation = AbstractAxis.ensureAxisOrientation(newOrientation);
         this._invalidateLayout();
         return this;
       }
     }
 
-    private static verifyAxisOrientation(orientation: string) {
+    private static ensureAxisOrientation(orientation: string) {
+      orientation = orientation.toLowerCase();
       if (["top", "bottom", "left", "right"].indexOf(orientation) === -1) {
         throw new Error("unsupported orientation");
       }
+      return orientation;
     }
 
     /**

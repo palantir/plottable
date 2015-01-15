@@ -3936,9 +3936,7 @@ var Plottable;
                     throw new Error("Axis requires a scale and orientation");
                 }
                 this._scale = scale;
-                orientation = orientation.toLowerCase();
-                AbstractAxis.verifyAxisOrientation(orientation);
-                this._orientation = orientation;
+                this._orientation = AbstractAxis.ensureAxisOrientation(orientation);
                 this._formatter = formatter;
             }
             AbstractAxis.prototype._anchor = function (element) {
@@ -4195,17 +4193,17 @@ var Plottable;
                     return this._orientation;
                 }
                 else {
-                    var newOrientationLC = newOrientation.toLowerCase();
-                    AbstractAxis.verifyAxisOrientation(newOrientationLC);
-                    this._orientation = newOrientationLC;
+                    this._orientation = AbstractAxis.ensureAxisOrientation(newOrientation);
                     this._invalidateLayout();
                     return this;
                 }
             };
-            AbstractAxis.verifyAxisOrientation = function (orientation) {
+            AbstractAxis.ensureAxisOrientation = function (orientation) {
+                orientation = orientation.toLowerCase();
                 if (["top", "bottom", "left", "right"].indexOf(orientation) === -1) {
                     throw new Error("unsupported orientation");
                 }
+                return orientation;
             };
             AbstractAxis.prototype.showEndTickLabels = function (show) {
                 if (show == null) {
