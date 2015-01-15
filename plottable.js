@@ -3944,13 +3944,13 @@ var Plottable;
                 this._scale = scale;
                 this._orientation = AbstractAxis.ensureAxisOrientation(orientation);
                 this._formatter = formatter;
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "axis");
             }
             AbstractAxis.prototype._anchor = function (element) {
                 var _this = this;
                 _super.prototype._anchor.call(this, element);
                 this._isAnchored = false;
                 this._setDefaultAlignment();
-                this.classed("axis", true);
                 if (this._isHorizontal()) {
                     this.classed("x-axis", true);
                 }

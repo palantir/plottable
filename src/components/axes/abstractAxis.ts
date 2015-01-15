@@ -48,6 +48,8 @@ export module Axis {
       this._orientation = AbstractAxis.ensureAxisOrientation(orientation);
 
       this._formatter = formatter;
+
+      _Util.Methods.uniqAdd(this._cssClasses, "axis");
     }
 
     public _anchor(element: D3.Selection) {
@@ -55,7 +57,6 @@ export module Axis {
 
       this._isAnchored = false;
       this._setDefaultAlignment();
-      this.classed("axis", true);
       if (this._isHorizontal()) {
         this.classed("x-axis", true);
       } else {
