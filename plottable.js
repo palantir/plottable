@@ -327,6 +327,12 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
+            function uniqAdd(arr, item) {
+                if (arr.indexOf(item) === -1) {
+                    arr.push(item);
+                }
+            }
+            Methods.uniqAdd = uniqAdd;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
