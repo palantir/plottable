@@ -5101,9 +5101,9 @@ var Plottable;
                 if (displayText === void 0) { displayText = ""; }
                 if (orientation === void 0) { orientation = "horizontal"; }
                 _super.call(this);
-                this.classed("label", true);
-                this.text(displayText);
-                this.orient(orientation);
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "label");
+                this._text = displayText;
+                this._orientation = Label.ensureLabelOrientation(orientation);
                 this.xAlign("center").yAlign("center");
                 this._fixedHeightFlag = true;
                 this._fixedWidthFlag = true;
@@ -5169,16 +5169,17 @@ var Plottable;
                     return this._orientation;
                 }
                 else {
-                    newOrientation = newOrientation.toLowerCase();
-                    if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
-                        this._orientation = newOrientation;
-                    }
-                    else {
-                        throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
-                    }
+                    this._orientation = Label.ensureLabelOrientation(newOrientation);
                     this._invalidateLayout();
                     return this;
                 }
+            };
+            Label.ensureLabelOrientation = function (orientation) {
+                orientation = orientation.toLowerCase();
+                if (["horizontal", "left", "right"].indexOf(orientation) === -1) {
+                    throw new Error(orientation + " is not a valid orientation for LabelComponent");
+                }
+                return orientation;
             };
             Label.prototype.padding = function (padAmount) {
                 if (padAmount == null) {
