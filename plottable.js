@@ -327,6 +327,12 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
+            function uniqAdd(arr, item) {
+                if (arr.indexOf(item) === -1) {
+                    arr.push(item);
+                }
+            }
+            Methods.uniqAdd = uniqAdd;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -3864,8 +3870,13 @@ var Plottable;
                 var _this = this;
                 if (components === void 0) { components = []; }
                 _super.call(this);
-                this.classed("component-group", true);
-                components.forEach(function (c) { return _this._addComponent(c); });
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "component-group");
+                components.forEach(function (c) {
+                    if (c !== null) {
+                        Plottable._Util.Methods.uniqAdd(_this._components, c);
+                        c._parent = _this;
+                    }
+                });
             }
             Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var requests = this.components().map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });

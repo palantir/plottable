@@ -129,6 +129,7 @@ declare module Plottable {
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number, lightenAmount: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
+            function uniqAdd<T>(arr: T[], item: T): void;
         }
     }
 }
@@ -1602,6 +1603,7 @@ declare module Plottable {
             protected _fixedWidthFlag: boolean;
             protected _isSetup: boolean;
             protected _isAnchored: boolean;
+            protected _cssClasses: string[];
             /**
              * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
              *
@@ -1808,6 +1810,7 @@ declare module Plottable {
 declare module Plottable {
     module Component {
         class AbstractComponentContainer extends AbstractComponent {
+            protected _components: AbstractComponent[];
             _anchor(element: D3.Selection): void;
             _render(): void;
             _removeComponent(c: AbstractComponent): void;
