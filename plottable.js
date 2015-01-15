@@ -4291,7 +4291,7 @@ var Plottable;
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             function Time(scale, orientation) {
-                _super.call(this, scale, orientation);
+                _super.call(this, scale, Time.ensureTimeAxisOrientation(orientation));
                 /*
                  * Default possible axis configurations.
                  */
@@ -4404,7 +4404,6 @@ var Plottable;
                         { interval: d3.time.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
                     ] }
                 ];
-                Time.verifyTimeAxisOrientation(orientation);
                 this._tickLabelPadding = 5;
                 this._tierLabelPositions = ["between", "between"];
             }
@@ -4419,16 +4418,16 @@ var Plottable;
                     return this._tierLabelPositions;
                 }
                 else {
-                    Time.verifyTierLabelPositions(newPositions);
-                    this._tierLabelPositions = newPositions;
+                    this._tierLabelPositions = Time.ensureTierLabelPositions(newPositions);
                     this._invalidateLayout();
                     return this;
                 }
             };
-            Time.verifyTierLabelPositions = function (positions) {
+            Time.ensureTierLabelPositions = function (positions) {
                 if (!positions.every(function (pos) { return pos.toLowerCase() === "between" || pos.toLowerCase() === "center"; })) {
                     throw new Error("Unsupported position for tier labels");
                 }
+                return positions;
             };
             Time.prototype.axisConfigurations = function (configurations) {
                 if (configurations == null) {
@@ -4457,15 +4456,16 @@ var Plottable;
             };
             Time.prototype.orient = function (orientation) {
                 if (orientation) {
-                    Time.verifyTimeAxisOrientation(orientation);
+                    orientation = Time.ensureTimeAxisOrientation(orientation);
                 }
                 return _super.prototype.orient.call(this, orientation); // maintains getter-setter functionality
             };
-            Time.verifyTimeAxisOrientation = function (orientation) {
+            Time.ensureTimeAxisOrientation = function (orientation) {
                 orientation = orientation.toLowerCase();
                 if (["bottom", "top"].indexOf(orientation.toLowerCase()) === -1) {
                     throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
                 }
+                return orientation;
             };
             Time.prototype._computeHeight = function () {
                 var _this = this;

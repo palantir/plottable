@@ -166,8 +166,7 @@ export module Axis {
      * @param {string} orientation The orientation of the Axis (top/bottom)
      */
     constructor(scale: Scale.Time, orientation: string) {
-      super(scale, orientation);
-      Time.verifyTimeAxisOrientation(orientation);
+      super(scale, Time.ensureTimeAxisOrientation(orientation));
 
       this._tickLabelPadding = 5;
 
@@ -187,17 +186,17 @@ export module Axis {
       if (newPositions == null) {
         return this._tierLabelPositions;
       } else {
-        Time.verifyTierLabelPositions(newPositions);
-        this._tierLabelPositions = newPositions;
+        this._tierLabelPositions = Time.ensureTierLabelPositions(newPositions);
         this._invalidateLayout();
         return this;
       }
     }
 
-    private static verifyTierLabelPositions(positions: string[]): void {
+    private static ensureTierLabelPositions(positions: string[]): string[] {
       if (!positions.every((pos: string) => pos.toLowerCase() === "between" || pos.toLowerCase() === "center")) {
         throw new Error("Unsupported position for tier labels");
       }
+      return positions;
     }
 
     /**
@@ -248,16 +247,17 @@ export module Axis {
     public orient(orientation: string): Time;
     public orient(orientation?: string): any {
       if (orientation) {
-        Time.verifyTimeAxisOrientation(orientation);
+        orientation = Time.ensureTimeAxisOrientation(orientation);
       }
       return super.orient(orientation); // maintains getter-setter functionality
     }
 
-    private static verifyTimeAxisOrientation(orientation: string) {
+    private static ensureTimeAxisOrientation(orientation: string) {
       orientation = orientation.toLowerCase();
       if (["bottom", "top"].indexOf(orientation.toLowerCase()) === -1) {
         throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
       }
+      return orientation;
     }
 
     public _computeHeight() {
