@@ -4293,6 +4293,7 @@ var Plottable;
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             function Time(scale, orientation) {
+                _super.call(this, scale, orientation);
                 /*
                  * Default possible axis configurations.
                  */
@@ -4406,22 +4407,29 @@ var Plottable;
                     ] }
                 ];
                 Time.verifyTimeAxisOrientation(orientation);
-                _super.call(this, scale, orientation);
-                this.classed("time-axis", true);
-                this.tickLabelPadding(5);
-                this.tierLabelPositions(["between", "between"]);
+                this._tickLabelPadding = 5;
+                this._tierLabelPositions = ["between", "between"];
             }
+            Time.prototype._anchor = function (element) {
+                _super.prototype._anchor.call(this, element);
+                this._isAnchored = false;
+                this.classed("time-axis", true);
+                this._isAnchored = true;
+            };
             Time.prototype.tierLabelPositions = function (newPositions) {
                 if (newPositions == null) {
                     return this._tierLabelPositions;
                 }
                 else {
-                    if (!newPositions.every(function (pos) { return pos.toLowerCase() === "between" || pos.toLowerCase() === "center"; })) {
-                        throw new Error("Unsupported position for tier labels");
-                    }
+                    Time.verifyTierLabelPositions(newPositions);
                     this._tierLabelPositions = newPositions;
                     this._invalidateLayout();
                     return this;
+                }
+            };
+            Time.verifyTierLabelPositions = function (positions) {
+                if (!positions.every(function (pos) { return pos.toLowerCase() === "between" || pos.toLowerCase() === "center"; })) {
+                    throw new Error("Unsupported position for tier labels");
                 }
             };
             Time.prototype.axisConfigurations = function (configurations) {
@@ -4457,7 +4465,6 @@ var Plottable;
             };
             Time.verifyTimeAxisOrientation = function (orientation) {
                 orientation = orientation.toLowerCase();
-                Axis.AbstractAxis.verifyAxisOrientation(orientation);
                 if (["bottom", "top"].indexOf(orientation.toLowerCase()) === -1) {
                     throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
                 }
@@ -4939,8 +4946,13 @@ var Plottable;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
                 this._tickLabelAngle = 0;
-                this.classed("category-axis", true);
             }
+            Category.prototype._anchor = function (element) {
+                _super.prototype._anchor.call(this, element);
+                this._isAnchored = false;
+                this.classed("category-axis", true);
+                this._isAnchored = true;
+            };
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
