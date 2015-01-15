@@ -167,9 +167,18 @@ export module Axis {
      */
     constructor(scale: Scale.Time, orientation: string) {
       super(scale, orientation);
+      Time.verifyTimeAxisOrientation(orientation);
+
+      this._tickLabelPadding = 5;
+
+      this._tierLabelPositions = ["between", "between"];
+    }
+
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
+      this._isAnchored = false;
       this.classed("time-axis", true);
-      this.tickLabelPadding(5);
-      this.tierLabelPositions(["between", "between"]);
+      this._isAnchored = true;
     }
 
     public tierLabelPositions(): string[];
@@ -178,12 +187,16 @@ export module Axis {
       if (newPositions == null) {
         return this._tierLabelPositions;
       } else {
-        if (!newPositions.every((pos: string) => pos.toLowerCase() === "between" || pos.toLowerCase() === "center")) {
-          throw new Error("Unsupported position for tier labels");
-        }
+        Time.verifyTierLabelPositions(newPositions);
         this._tierLabelPositions = newPositions;
         this._invalidateLayout();
         return this;
+      }
+    }
+
+    private static verifyTierLabelPositions(positions: string[]): void {
+      if (!positions.every((pos: string) => pos.toLowerCase() === "between" || pos.toLowerCase() === "center")) {
+        throw new Error("Unsupported position for tier labels");
       }
     }
 
@@ -234,10 +247,17 @@ export module Axis {
     public orient(): string;
     public orient(orientation: string): Time;
     public orient(orientation?: string): any {
-      if (orientation && (orientation.toLowerCase() === "right" || orientation.toLowerCase() === "left")) {
-        throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
+      if (orientation) {
+        Time.verifyTimeAxisOrientation(orientation);
       }
       return super.orient(orientation); // maintains getter-setter functionality
+    }
+
+    private static verifyTimeAxisOrientation(orientation: string) {
+      orientation = orientation.toLowerCase();
+      if (["bottom", "top"].indexOf(orientation.toLowerCase()) === -1) {
+        throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
+      }
     }
 
     public _computeHeight() {

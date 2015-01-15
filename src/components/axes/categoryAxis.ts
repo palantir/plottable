@@ -22,7 +22,13 @@ export module Axis {
      */
     constructor(scale: Scale.Ordinal, orientation = "bottom", formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
+    }
+
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
+      this._isAnchored = false;
       this.classed("category-axis", true);
+      this._isAnchored = true;
     }
 
     protected _setup() {
