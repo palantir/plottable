@@ -23,11 +23,11 @@ export module Axis {
     private _orientation: string;
     protected _computedWidth: number;
     protected _computedHeight: number;
-    private _endTickLength = 5;
-    private _tickLength = 5;
-    protected _tickLabelPadding = 10;
-    private _gutter = 15;
-    private _showEndTickLabels = false;
+    private _endTickLength: number;
+    private _tickLength: number;
+    protected _tickLabelPadding: number;
+    private _gutter: number;
+    private _showEndTickLabels: boolean;
 
     /**
      * Constructs an axis. An axis is a wrapper around a scale for rendering.
@@ -41,8 +41,10 @@ export module Axis {
      * displayed.
      */
     constructor(scale: Scale.AbstractScale<any, number>, orientation: string, formatter = Formatters.identity()) {
-      super();
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
+
+      super();
+
       this._scale = scale;
 
       this._orientation = AbstractAxis.ensureAxisOrientation(orientation);
@@ -50,6 +52,12 @@ export module Axis {
       this._formatter = formatter;
 
       _Util.Methods.uniqAdd(this._cssClasses, "axis");
+
+      this._endTickLength = 5;
+      this._tickLength = 5;
+      this._tickLabelPadding = 10;
+      this._gutter = 15;
+      this._showEndTickLabels = false;
     }
 
     public _anchor(element: D3.Selection) {

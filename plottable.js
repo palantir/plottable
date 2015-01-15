@@ -3932,19 +3932,19 @@ var Plottable;
              */
             function AbstractAxis(scale, orientation, formatter) {
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
+                if (scale == null || orientation == null) {
+                    throw new Error("Axis requires a scale and orientation");
+                }
                 _super.call(this);
+                this._scale = scale;
+                this._orientation = AbstractAxis.ensureAxisOrientation(orientation);
+                this._formatter = formatter;
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "axis");
                 this._endTickLength = 5;
                 this._tickLength = 5;
                 this._tickLabelPadding = 10;
                 this._gutter = 15;
                 this._showEndTickLabels = false;
-                if (scale == null || orientation == null) {
-                    throw new Error("Axis requires a scale and orientation");
-                }
-                this._scale = scale;
-                this._orientation = AbstractAxis.ensureAxisOrientation(orientation);
-                this._formatter = formatter;
-                Plottable._Util.Methods.uniqAdd(this._cssClasses, "axis");
             }
             AbstractAxis.prototype._anchor = function (element) {
                 var _this = this;
