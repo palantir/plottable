@@ -138,7 +138,7 @@ export module Scale {
      *     for further options.
      */
     constructor(colorRange: any = "reds", scaleType: string = "linear") {
-      this._colorRange = this._resolveColorValues(colorRange);
+      this._colorRange = InterpolatedColor._resolveColorValues(colorRange);
       this._scaleType = scaleType;
       super(InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType));
     }
@@ -164,7 +164,7 @@ export module Scale {
       if (colorRange == null) {
         return this._colorRange;
       }
-      this._colorRange = this._resolveColorValues(colorRange);
+      this._colorRange = InterpolatedColor._resolveColorValues(colorRange);
       this._resetScale();
       return this;
     }
@@ -197,7 +197,7 @@ export module Scale {
       this.broadcaster.broadcast();
     }
 
-    private _resolveColorValues(colorRange: any): string[] {
+    private static _resolveColorValues(colorRange: any): string[] {
       if (colorRange instanceof Array) {
         return colorRange;
       } else if (InterpolatedColor._COLOR_SCALES[colorRange] != null) {
