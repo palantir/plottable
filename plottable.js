@@ -6329,7 +6329,7 @@ var Plottable;
                     throw new Error("XYPlots require an xScale and yScale");
                 }
                 _super.call(this);
-                this.classed("xy-plot", true);
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "xy-plot");
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._updateXDomainer();
@@ -7396,10 +7396,14 @@ var Plottable;
             function Area(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 Plottable._Util.Methods.uniqAdd(this._cssClasses, "area-plot");
-                this.project("y0", 0, yScale); // default
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
+                this._projections["y0"] = {
+                    accessor: d3.functor(0),
+                    scale: yScale,
+                    attribute: "y0"
+                };
             }
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);

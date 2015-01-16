@@ -25,7 +25,7 @@ export module Plot {
       }
 
       super();
-      this.classed("xy-plot", true);
+      _Util.Methods.uniqAdd(this._cssClasses, "xy-plot");
 
       this._xScale = xScale;
       this._yScale = yScale;
