@@ -7395,10 +7395,10 @@ var Plottable;
              */
             function Area(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this.classed("area-plot", true);
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "area-plot");
                 this.project("y0", 0, yScale); // default
-                this.animator("reset", new Plottable.Animator.Null());
-                this.animator("main", new Plottable.Animator.Base().duration(600).easing("exp-in-out"));
+                this._animators["reset"] = new Plottable.Animator.Null();
+                this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
             }
             Area.prototype._onDatasetUpdate = function () {
