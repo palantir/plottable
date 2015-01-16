@@ -23,8 +23,8 @@ export module Plot {
 
       this._animators["reset"] = new Animator.Null();
       this._animators["main"] = new Animator.Base()
-                                          .duration(600)
-                                          .easing("exp-in-out");
+                                            .duration(600)
+                                            .easing("exp-in-out");
       this._defaultFillColor = new Scale.Color().range()[0];
     }
 

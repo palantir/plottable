@@ -25,11 +25,11 @@ export module Plot {
      */
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
       super(xScale, yScale);
-      this.classed("bar-plot", true);
+      _Util.Methods.uniqAdd(this._cssClasses, "bar-plot");
       this._defaultFillColor = new Scale.Color().range()[0];
-      this.animator("bars-reset", new Animator.Null());
-      this.animator("bars", new Animator.Base());
-      this.animator("baseline", new Animator.Null());
+      this._animators["bar-reset"] = new Animator.Null();
+      this._animators["bars"] = new Animator.Base();
+      this._animators["baseline"] = new Animator.Null();
       this._isVertical = isVertical;
       this.baseline(0);
     }

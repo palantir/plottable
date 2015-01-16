@@ -6758,11 +6758,11 @@ var Plottable;
                 this._barLabelsEnabled = false;
                 this._hoverMode = "point";
                 this._hideBarsIfAnyAreTooWide = true;
-                this.classed("bar-plot", true);
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "bar-plot");
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
-                this.animator("bars-reset", new Plottable.Animator.Null());
-                this.animator("bars", new Plottable.Animator.Base());
-                this.animator("baseline", new Plottable.Animator.Null());
+                this._animators["bar-reset"] = new Plottable.Animator.Null();
+                this._animators["bars"] = new Plottable.Animator.Base();
+                this._animators["baseline"] = new Plottable.Animator.Null();
                 this._isVertical = isVertical;
                 this.baseline(0);
             }
