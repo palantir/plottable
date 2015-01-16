@@ -6683,12 +6683,12 @@ var Plottable;
              */
             function Grid(xScale, yScale, colorScale) {
                 _super.call(this, xScale, yScale);
-                this.classed("grid-plot", true);
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "grid-plot");
                 // The x and y scales should render in bands with no padding
                 this._xScale.rangeType("bands", 0, 0);
                 this._yScale.rangeType("bands", 0, 0);
                 this._colorScale = colorScale;
-                this.animator("cells", new Plottable.Animator.Null());
+                this._animators["cells"] = new Plottable.Animator.Null();
             }
             Grid.prototype.addDataset = function (keyOrDataset, dataset) {
                 if (this._datasetKeysInOrder.length === 1) {

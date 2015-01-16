@@ -2511,6 +2511,7 @@ declare module Plottable {
                 [x: string]: _Projection;
             };
             protected _animate: boolean;
+            protected _animators: Animator.PlotAnimatorMap;
             protected _animateOnNextRender: boolean;
             /**
              * Constructs a Plot.

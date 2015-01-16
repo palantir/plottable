@@ -25,7 +25,7 @@ export module Plot {
     protected _projections: { [attrToSet: string]: _Projection; } = {};
 
     protected _animate: boolean = false;
-    private _animators: Animator.PlotAnimatorMap = {};
+    protected _animators: Animator.PlotAnimatorMap = {};
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
 
