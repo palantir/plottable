@@ -31,10 +31,10 @@ export module Plot {
     }
 
     public _onDatasetUpdate() {
-      super._onDatasetUpdate();
       if (this._projectorsReady()) {
         this._updateStackOffsets();
       }
+      super._onDatasetUpdate();
     }
 
     public _updateStackOffsets() {

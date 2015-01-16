@@ -7473,10 +7473,10 @@ var Plottable;
                 return this;
             };
             AbstractStacked.prototype._onDatasetUpdate = function () {
-                _super.prototype._onDatasetUpdate.call(this);
                 if (this._projectorsReady()) {
                     this._updateStackOffsets();
                 }
+                _super.prototype._onDatasetUpdate.call(this);
             };
             AbstractStacked.prototype._updateStackOffsets = function () {
                 var dataMapArray = this._generateDefaultMapArray();

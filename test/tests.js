@@ -3205,6 +3205,46 @@ describe("Plots", function () {
             svg.remove();
         });
     });
+    describe("scale extent updates", function () {
+        var svg;
+        var xScale;
+        var yScale;
+        var stackedBarPlot;
+        beforeEach(function () {
+            svg = generateSVG(600, 400);
+            xScale = new Plottable.Scale.Ordinal();
+            yScale = new Plottable.Scale.Linear();
+            stackedBarPlot = new Plottable.Plot.StackedBar(xScale, yScale);
+            stackedBarPlot.project("x", "key", xScale);
+            stackedBarPlot.project("y", "value", yScale);
+            stackedBarPlot.renderTo(svg);
+        });
+        afterEach(function () {
+            svg.remove();
+        });
+        it("extents are updated as datasets are updated", function () {
+            var data1 = [
+                { key: "a", value: 1 },
+                { key: "b", value: -2 }
+            ];
+            var data2 = [
+                { key: "a", value: 3 },
+                { key: "b", value: -4 }
+            ];
+            var data2_b = [
+                { key: "a", value: 1 },
+                { key: "b", value: -2 }
+            ];
+            var dataset2 = new Plottable.Dataset(data2);
+            stackedBarPlot.addDataset("d1", data1);
+            stackedBarPlot.addDataset("d2", dataset2);
+            assert.closeTo(yScale.domain()[0], -6, 1, "min stacked extent is as normal");
+            assert.closeTo(yScale.domain()[1], 4, 1, "max stacked extent is as normal");
+            dataset2.data(data2_b);
+            assert.closeTo(yScale.domain()[0], -4, 1, "min stacked extent decreases in magnitude");
+            assert.closeTo(yScale.domain()[1], 2, 1, "max stacked extent decreases in magnitude");
+        });
+    });
 });
 
 ///<reference path="../../testReference.ts" />
