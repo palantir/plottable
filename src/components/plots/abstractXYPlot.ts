@@ -29,9 +29,10 @@ export module Plot {
 
       this._xScale = xScale;
       this._yScale = yScale;
-      this._updateXDomainer();
+
+      AbstractXYPlot.updateScaleDomainer(xScale);
       xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
-      this._updateYDomainer();
+      AbstractXYPlot.updateScaleDomainer(yScale);
       yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
 
       this._autoAdjustXScaleDomain = false;
@@ -131,19 +132,18 @@ export module Plot {
     }
 
     protected _updateXDomainer() {
-      if (this._xScale instanceof Scale.AbstractQuantitative) {
-        var scale = <Scale.AbstractQuantitative<any>> this._xScale;
-        if (!scale._userSetDomainer) {
-          scale.domainer().pad().nice();
-        }
-      }
+      AbstractXYPlot.updateScaleDomainer(this._xScale);
     }
 
     protected _updateYDomainer() {
-      if (this._yScale instanceof Scale.AbstractQuantitative) {
-        var scale = <Scale.AbstractQuantitative<any>> this._yScale;
-        if (!scale._userSetDomainer) {
-          scale.domainer().pad().nice();
+      AbstractXYPlot.updateScaleDomainer(this._yScale);
+    }
+
+    private static updateScaleDomainer(scale: Scale.AbstractScale<any, number>) {
+      if (scale instanceof Scale.AbstractQuantitative) {
+        var qScale = <Scale.AbstractQuantitative<any>> scale;
+        if (!qScale._userSetDomainer) {
+          qScale.domainer().pad().nice();
         }
       }
     }

@@ -6332,9 +6332,9 @@ var Plottable;
                 Plottable._Util.Methods.uniqAdd(this._cssClasses, "xy-plot");
                 this._xScale = xScale;
                 this._yScale = yScale;
-                this._updateXDomainer();
+                AbstractXYPlot.updateScaleDomainer(xScale);
                 xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
-                this._updateYDomainer();
+                AbstractXYPlot.updateScaleDomainer(yScale);
                 yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
                 this._autoAdjustXScaleDomain = false;
                 this._autoAdjustYScaleDomain = false;
@@ -6424,18 +6424,16 @@ var Plottable;
                 }
             };
             AbstractXYPlot.prototype._updateXDomainer = function () {
-                if (this._xScale instanceof Plottable.Scale.AbstractQuantitative) {
-                    var scale = this._xScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().pad().nice();
-                    }
-                }
+                AbstractXYPlot.updateScaleDomainer(this._xScale);
             };
             AbstractXYPlot.prototype._updateYDomainer = function () {
-                if (this._yScale instanceof Plottable.Scale.AbstractQuantitative) {
-                    var scale = this._yScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().pad().nice();
+                AbstractXYPlot.updateScaleDomainer(this._yScale);
+            };
+            AbstractXYPlot.updateScaleDomainer = function (scale) {
+                if (scale instanceof Plottable.Scale.AbstractQuantitative) {
+                    var qScale = scale;
+                    if (!qScale._userSetDomainer) {
+                        qScale.domainer().pad().nice();
                     }
                 }
             };
