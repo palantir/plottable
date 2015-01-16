@@ -6762,7 +6762,7 @@ var Plottable;
                 this._animators["bars"] = new Plottable.Animator.Base();
                 this._animators["baseline"] = new Plottable.Animator.Null();
                 this._isVertical = isVertical;
-                this.baseline(0);
+                this._baselineValue = 0;
             }
             Bar.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Rect(key, this._isVertical);
