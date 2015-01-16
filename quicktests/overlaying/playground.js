@@ -1,33 +1,55 @@
 $(document).ready(function(){
 
 	var testCode;
-	var SmallLin = [{x: 2, y: 9}, {x: 4, y: 18}, {x: 6, y: 27}];
-	var SmallCat = [{x: 'A', y: 9}, {x: 'B', y: 18}, {x: 'C', y: 27}];
-	var SmallRand = [{x: 2, y: 9}, {x: 40, y: 12}, {x: -7, y: 3}];
-	var SmallTime = [{x: 2, y: 9}, {x: 4, y: 18}, {x: 6, y: 27}];
-
+	var numXnumY = [{x: 2, y: 9}, {x: 3, y: 13.5}, {x: 4, y: 18}, {x: 5, y: 22.5}, {x: 6, y: 27} ];
+	var catXnumY = [{x: 'A', y: 9}, {x: 'B', y: 5}, {x: 'C', y: 12}, {x: 'D', y: 2}];
+	var timeXnumY = [{x: "5/2/2014", y: 9}, {x: "6/3/2014", y: 13}, {x: "8/3/2014", y: 1}];
+	var numXcatY = [{x: 2, y: 'tiger'}, {x: 3, y: 'lion'}, {x: 4, y: 'tabby'}, {x: 5, y: 'housecat'}, {x: 6, y: 'leopard'} ];
+	var catXcatY = [{x: 'A', y: 'Shire'}, {x: 'B', y: 'Gotham'}, {x: 'C', y: 'Grey Havens'}, {x: 'D', y: 'Gondor'}];
+	var timeXcatY = [{x: "5/2/2014", y: 'ducks'}, {x: "6/3/2014", y: 'swans'}, {x: "8/3/2014", y: 'sparrows'}];
 
 	chooseData = function(){
-		var ds_type = $("#dataset option:selected").text();
+		xAxisType = $("#xAxisType option:selected").text();
+		yAxisType = $("#yAxisType option:selected").text();		
 		var data;
+		var pts;
 
-		switch(ds_type) {
-		    case "SmallLin":
-		        data = SmallLin.slice(0);
+		switch(xAxisType) {
+		    case "Numeric(Linear)":
+		    case "Numeric(Log)":
+		    	if(yAxisType === "Category"){
+					data = numXcatY.slice(0);
+			        pts = "[{x: 2, y: 'tiger'}, {x: 3, y: 'lion'}, {x: 4, y: 'tabby'}, {x: 5, y: 'housecat'}, {x: 6, y: 'leopard'} ]";
+		    	}
+		    	else{
+			    	data = numXnumY.slice(0);
+			        pts = "[{x: 2, y: 9}, {x: 3, y: 13.5}, {x: 4, y: 18}, {x: 5, y: 22.5}, {x: 6, y: 27}]";
+		    	}
+		       break;
+		    case "Category":
+		    	if(yAxisType === "Category"){
+					data = catXcatY.slice(0);
+			        pts = "[{x: 'A', y: 'Shire'}, {x: 'B', y: 'Gotham'}, {x: 'C', y: 'Grey Havens'}, {x: 'D', y: 'Gondor'}]";
+		    	}
+		    	else{
+			    	data = catXnumY.slice(0);
+			        pts = "[[{x: 'A', y: 9}, {x: 'B', y: 5}, {x: 'C', y: 12}, {x: 'D', y: 2}]";
+		    	}
 		        break;
-		    case "SmallCat":
-		        data = SmallCat.slice(0);
-		        break;
-		    case "SmallRand":
-		        data = SmallRand.slice(0);
-		        break;
-		    case "SmallTime":
-		        data = SmallTime.slice(0);
+		    case "Time":
+		        if(yAxisType === "Category"){
+					data = timeXcatY.slice(0);
+			        pts = "[{x: '5/2/2014', y: 'ducks'}, {x: '6/3/2014', y: 'swans'}, {x: '8/3/2014', y: 'sparrows'}]";
+		    	}
+		    	else{
+			    	data = timeXnumY.slice(0);
+			        pts = "[{x: '5/2/2014', y: 9}, {x: '6/3/2014', y: 13}, {x: '8/3/2014', y: 1}]";
+		    	}
 		        break;
 		    default:
 		        return null;
 		}	
-		testCode = testCode + "\tvar data = " + "**put data here** " + "; \n";
+		testCode = testCode + "\tvar data = " + pts + "; \n";
 		testCode = testCode + "\tplot.addDataset(data);\n";
 		return data;
 	}
@@ -141,13 +163,31 @@ $(document).ready(function(){
 	}
 
 	testCode_finish = function(){
-		testCode = testCode + "\tplot.project('x', 'x', xScale).project('y', 'y', yScale);\n";
 	    testCode = testCode + "\tvar table = new Plottable.Component.Table([[yAxis, plot],\n\t\t\t\t\t\t                                      [null, xAxis]])\n";
 	    testCode = testCode + "\ttable.renderTo('#svg');\n}";
 	    $("#code").val(testCode);
 
 	}
 
+	testCode_red = function(){
+		testCode = testCode + "\tplot.attr('fill', function() { return '#ff6666'; })\n"
+	}
+
+	testCode_gridlines = function(){
+		testCode = testCode + "\tvar gridlines = new Plottable.Component.Gridlines(xScale, yScale);\n\tplot = new Plottable.Component.Group([plot, gridlines]);\n";
+	}
+	
+	testCode_project = function(time){
+		if(time){
+			testCode = testCode + "\tplot.project('x',  function (d) { return d3.time.format('%x').parse(d.x); }, xScale)\n\t\t.project('y', 'y', yScale);\n"
+		}
+		else{
+			testCode = testCode + "\tplot.project('x', 'x', xScale).project('y', 'y', yScale);\n";
+		}
+	}
+
+	var rg;
+	var group;
 
 	createTest = function() {
 		testCode_init();
@@ -159,7 +199,26 @@ $(document).ready(function(){
 
 	    var plot = choosePlot(xScale, yScale);
 	    plot.addDataset(chooseData());
-	    plot.project("x", "x", xScale).project("y", "y", yScale);
+	    if($("#xAxisType option:selected").text() === 'Time'){
+	    	plot.project('x',  function (d) { return d3.time.format("%x").parse(d.x); }, xScale)
+	    		.project('y', 'y', yScale);	
+	    	testCode_project(true);	
+	    }
+	    else{
+	    	plot.project("x", "x", xScale).project("y", "y", yScale);
+	    	testCode_project(false);	    	
+	    }
+
+	    if($('#red').is(':checked')){
+	    	plot.attr("fill", function() { return "#ff6666"; });
+	    	plot.attr("stroke", function() { return "#ff6666"; });
+	    	testCode_red();
+	    }
+	    if($('#gridlines').is(':checked')){
+	    	var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+	    	plot = new Plottable.Component.Group([plot, gridlines]);
+	    	testCode_gridlines();
+	    }
 
 	    var table = new Plottable.Component.Table([[yAxis, plot],
 	    											[null, xAxis]]);
@@ -177,6 +236,5 @@ $(document).ready(function(){
 		$('#playground').attr("height", px_h);
 		createTest();
 	}
-
 
 });
