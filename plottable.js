@@ -7770,7 +7770,7 @@ var Plottable;
             function StackedArea(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
-                this.classed("area-plot", true);
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "area-plot");
                 this._isVertical = true;
             }
             StackedArea.prototype._getDrawer = function (key) {

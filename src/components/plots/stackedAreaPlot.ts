@@ -17,7 +17,7 @@ export module Plot {
      */
     constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
       super(xScale, yScale);
-      this.classed("area-plot", true);
+      _Util.Methods.uniqAdd(this._cssClasses, "area-plot");
       this._isVertical = true;
     }
 
