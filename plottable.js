@@ -5542,8 +5542,12 @@ var Plottable;
             Gridlines.prototype._anchor = function (element) {
                 var _this = this;
                 _super.prototype._anchor.call(this, element);
-                this._xScale.broadcaster.registerListener(this, function () { return _this._render(); });
-                this._yScale.broadcaster.registerListener(this, function () { return _this._render(); });
+                if (this._xScale) {
+                    this._xScale.broadcaster.registerListener(this, function () { return _this._render(); });
+                }
+                if (this._yScale) {
+                    this._yScale.broadcaster.registerListener(this, function () { return _this._render(); });
+                }
             };
             Gridlines.prototype.remove = function () {
                 _super.prototype.remove.call(this);
