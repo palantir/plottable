@@ -25,7 +25,7 @@ export module Component {
      */
     constructor(displayText = "", orientation = "horizontal") {
       super();
-      _Util.Methods.uniqAdd(this._cssClasses, "label");
+      _Util.Methods.uniqPush(this._cssClasses, "label");
       this._text = displayText;
       this._orientation = Label.ensureLabelOrientation(orientation);
       this._xAlignProportion = AbstractComponent._xAlignmentToProportion("center");

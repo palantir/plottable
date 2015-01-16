@@ -23,7 +23,7 @@ export module Component {
         throw new Error("yScale needs to inherit from Scale.AbstractQuantitative");
       }
       super();
-      _Util.Methods.uniqAdd(this._cssClasses, "gridlines");
+      _Util.Methods.uniqPush(this._cssClasses, "gridlines");
       this._xScale = xScale;
       this._yScale = yScale;
     }

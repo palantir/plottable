@@ -327,12 +327,12 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
-            function uniqAdd(arr, item) {
+            function uniqPush(arr, item) {
                 if (arr.indexOf(item) === -1) {
                     arr.push(item);
                 }
             }
-            Methods.uniqAdd = uniqAdd;
+            Methods.uniqPush = uniqPush;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -3886,10 +3886,10 @@ var Plottable;
                 var _this = this;
                 if (components === void 0) { components = []; }
                 _super.call(this);
-                Plottable._Util.Methods.uniqAdd(this._cssClasses, "component-group");
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "component-group");
                 components.forEach(function (c) {
                     if (c !== null) {
-                        Plottable._Util.Methods.uniqAdd(_this._components, c);
+                        Plottable._Util.Methods.uniqPush(_this._components, c);
                         c._parent = _this;
                     }
                 });
@@ -5117,7 +5117,7 @@ var Plottable;
                 if (displayText === void 0) { displayText = ""; }
                 if (orientation === void 0) { orientation = "horizontal"; }
                 _super.call(this);
-                Plottable._Util.Methods.uniqAdd(this._cssClasses, "label");
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "label");
                 this._text = displayText;
                 this._orientation = Label.ensureLabelOrientation(orientation);
                 this._xAlignProportion = Component.AbstractComponent._xAlignmentToProportion("center");
@@ -5296,7 +5296,7 @@ var Plottable;
                 }
                 _super.call(this);
                 this._padding = 5;
-                Plottable._Util.Methods.uniqAdd(this._cssClasses, "legend");
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "legend");
                 this._maxEntriesPerRow = 1;
                 this._scale = colorScale;
                 this._xAlignProportion = Component.AbstractComponent._xAlignmentToProportion("center");
@@ -5535,7 +5535,7 @@ var Plottable;
                     throw new Error("yScale needs to inherit from Scale.AbstractQuantitative");
                 }
                 _super.call(this);
-                Plottable._Util.Methods.uniqAdd(this._cssClasses, "gridlines");
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "gridlines");
                 this._xScale = xScale;
                 this._yScale = yScale;
             }

@@ -16,11 +16,11 @@ export module Component {
      */
     constructor(components: AbstractComponent[] = []){
       super();
-      _Util.Methods.uniqAdd(this._cssClasses, "component-group");
+      _Util.Methods.uniqPush(this._cssClasses, "component-group");
 
       components.forEach((c: AbstractComponent) => {
         if (c !== null) {
-          _Util.Methods.uniqAdd(this._components, c);
+          _Util.Methods.uniqPush(this._components, c);
           c._parent = this;
         }
       });

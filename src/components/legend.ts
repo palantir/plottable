@@ -37,7 +37,7 @@ export module Component {
       super();
 
       this._padding = 5;
-      _Util.Methods.uniqAdd(this._cssClasses, "legend");
+      _Util.Methods.uniqPush(this._cssClasses, "legend");
       this._maxEntriesPerRow = 1;
       this._scale = colorScale;
       this._xAlignProportion = AbstractComponent._xAlignmentToProportion("center");

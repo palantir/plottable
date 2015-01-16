@@ -129,7 +129,7 @@ declare module Plottable {
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number, lightenAmount: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
-            function uniqAdd<T>(arr: T[], item: T): void;
+            function uniqPush<T>(arr: T[], item: T): void;
         }
     }
 }
