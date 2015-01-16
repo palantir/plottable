@@ -317,7 +317,7 @@ export module Component {
       return this;
     }
 
-    protected static ensureYAlignment(alignment: string): string {
+    private static ensureYAlignment(alignment: string): string {
       alignment = alignment.toLowerCase();
       if (["top", "center", "bottom"].indexOf(alignment) === -1) {
         throw new Error("Unsupported alignment");
@@ -325,7 +325,7 @@ export module Component {
       return alignment;
     }
 
-    public static _yAlignmentToProportion(alignment: string): number {
+    protected static _yAlignmentToProportion(alignment: string): number {
       alignment = alignment.toLowerCase();
       if (alignment === "top") {
         return 0;
