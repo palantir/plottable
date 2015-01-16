@@ -5,8 +5,8 @@ export module Plot {
   export class AbstractXYPlot<X,Y> extends AbstractPlot {
     protected _xScale: Scale.AbstractScale<X, number>;
     protected _yScale: Scale.AbstractScale<Y, number>;
-    private _autoAdjustXScaleDomain = false;
-    private _autoAdjustYScaleDomain = false;
+    private _autoAdjustXScaleDomain: boolean;
+    private _autoAdjustYScaleDomain: boolean;
 
     /**
      * Constructs an XYPlot.
@@ -20,10 +20,11 @@ export module Plot {
      * @param {Scale} yScale The y scale to use.
      */
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
-      super();
       if (xScale == null || yScale == null) {
         throw new Error("XYPlots require an xScale and yScale");
       }
+
+      super();
       this.classed("xy-plot", true);
 
       this._xScale = xScale;
@@ -32,6 +33,9 @@ export module Plot {
       xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
       this._updateYDomainer();
       yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
+
+      this._autoAdjustXScaleDomain = false;
+      this._autoAdjustYScaleDomain = false;
     }
 
     /**

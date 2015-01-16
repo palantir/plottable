@@ -6325,12 +6325,10 @@ var Plottable;
              */
             function AbstractXYPlot(xScale, yScale) {
                 var _this = this;
-                _super.call(this);
-                this._autoAdjustXScaleDomain = false;
-                this._autoAdjustYScaleDomain = false;
                 if (xScale == null || yScale == null) {
                     throw new Error("XYPlots require an xScale and yScale");
                 }
+                _super.call(this);
                 this.classed("xy-plot", true);
                 this._xScale = xScale;
                 this._yScale = yScale;
@@ -6338,6 +6336,8 @@ var Plottable;
                 xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
                 this._updateYDomainer();
                 yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
+                this._autoAdjustXScaleDomain = false;
+                this._autoAdjustYScaleDomain = false;
             }
             /**
              * @param {string} attrToSet One of ["x", "y"] which determines the point's
