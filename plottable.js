@@ -6539,10 +6539,10 @@ var Plottable;
             function Scatter(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this._closeDetectionRadius = 5;
-                this.classed("scatter-plot", true);
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "scatter-plot");
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
-                this.animator("circles-reset", new Plottable.Animator.Null());
-                this.animator("circles", new Plottable.Animator.Base().duration(250).delay(5));
+                this._animators["circles-reset"] = new Plottable.Animator.Null();
+                this._animators["circles"] = new Plottable.Animator.Base().duration(250).delay(5);
             }
             /**
              * @param {string} attrToSet One of ["x", "y", "cx", "cy", "r",
