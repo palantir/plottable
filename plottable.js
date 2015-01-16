@@ -6267,7 +6267,7 @@ var Plottable;
             function Pie() {
                 _super.call(this);
                 this._colorScale = new Plottable.Scale.Color();
-                this.classed("pie-plot", true);
+                Plottable._Util.Methods.uniqAdd(this._cssClasses, "pie-plot");
             }
             Pie.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
