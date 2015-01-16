@@ -26,9 +26,9 @@ function run(div, data, Plottable) {
                           .addDataset(data);
   var areaPlot = new Plottable.Plot.Area(xScale, yScale)
                           .addDataset(data);
-  var vbarPlot = new Plottable.Plot.VerticalBar(xScale, yScale)
+  var vbarPlot = new Plottable.Plot.Bar(xScale, yScale)
                           .addDataset(data);
-  var hbarPlot = new Plottable.Plot.HorizontalBar(xScale, yScale)
+  var hbarPlot = new Plottable.Plot.Bar(xScale, yScale, false)
                           .addDataset(data);
 
   //title + legend

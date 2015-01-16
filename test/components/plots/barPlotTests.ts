@@ -9,7 +9,7 @@ describe("Plots", () => {
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scale.Ordinal;
       var yScale: Plottable.Scale.Linear;
-      var barPlot: Plottable.Plot.VerticalBar<string>;
+      var barPlot: Plottable.Plot.Bar<string, number>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
@@ -23,7 +23,7 @@ describe("Plots", () => {
           {x: "B", y: 1} // duplicate X-value
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+        barPlot = new Plottable.Plot.Bar(xScale, yScale);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
@@ -147,7 +147,7 @@ describe("Plots", () => {
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scale.ModifiedLog;
       var yScale: Plottable.Scale.Linear;
-      var barPlot: Plottable.Plot.VerticalBar<number>;
+      var barPlot: Plottable.Plot.Bar<number, number>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
@@ -161,7 +161,7 @@ describe("Plots", () => {
           {x: 100, y: 1}
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+        barPlot = new Plottable.Plot.Bar(xScale, yScale);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
@@ -197,7 +197,7 @@ describe("Plots", () => {
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scale.Linear;
       var yScale: Plottable.Scale.Linear;
-      var barPlot: Plottable.Plot.VerticalBar<number>;
+      var barPlot: Plottable.Plot.Bar<number, number>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
@@ -211,7 +211,7 @@ describe("Plots", () => {
           {x: 100, y: 1}
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+        barPlot = new Plottable.Plot.Bar(xScale, yScale);
         barPlot.addDataset(dataset);
         barPlot.baseline(0);
         barPlot.project("x", "x", xScale);
@@ -264,7 +264,7 @@ describe("Plots", () => {
 
     describe("Vertical Bar Plot time scale", () => {
       var svg: D3.Selection;
-      var barPlot: Plottable.Plot.VerticalBar<number>;
+      var barPlot: Plottable.Plot.Bar<number, number>;
       var xScale: Plottable.Scale.Time;
 
       beforeEach(() => {
@@ -277,7 +277,7 @@ describe("Plots", () => {
           { x: "12/01/97", y: 2, type: "a" }];
         xScale = new Plottable.Scale.Time();
         var yScale = new Plottable.Scale.Linear();
-        barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+        barPlot = new Plottable.Plot.Bar(xScale, yScale);
         barPlot.addDataset(data)
                .project("x", (d: any) => d3.time.format("%m/%d/%y").parse(d.x), xScale)
                .project("y", "y", yScale)
@@ -298,7 +298,7 @@ describe("Plots", () => {
       var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
       var xScale: Plottable.Scale.Linear;
-      var barPlot: Plottable.Plot.HorizontalBar<string>;
+      var barPlot: Plottable.Plot.Bar<number, string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       beforeEach(() => {
@@ -314,7 +314,7 @@ describe("Plots", () => {
         ];
         dataset = new Plottable.Dataset(data);
 
-        barPlot = new Plottable.Plot.HorizontalBar(xScale, yScale);
+        barPlot = new Plottable.Plot.Bar(xScale, yScale, false);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
@@ -377,7 +377,7 @@ describe("Plots", () => {
         assert.equal(numAttr(bar0, "y"), 50, "bar0 y is correct");
         assert.equal(numAttr(bar1, "y"), 250, "bar1 y is correct");
 
-        barPlot.barAlignment("bottom");
+        barPlot.barAlignment("right");
         renderArea = (<any> barPlot)._renderArea;
         bars = renderArea.selectAll("rect");
         bar0 = d3.select(bars[0][0]);
@@ -398,7 +398,7 @@ describe("Plots", () => {
       var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
       var xScale: Plottable.Scale.Linear;
-      var barPlot: Plottable.Plot.HorizontalBar<string>;
+      var barPlot: Plottable.Plot.Bar<number, string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       var axisWidth = 0;
@@ -415,7 +415,7 @@ describe("Plots", () => {
         ];
         dataset = new Plottable.Dataset(data);
 
-        barPlot = new Plottable.Plot.HorizontalBar(xScale, yScale);
+        barPlot = new Plottable.Plot.Bar(xScale, yScale, false);
         barPlot.addDataset(dataset);
         barPlot.baseline(0);
         barPlot.animate(false);
@@ -464,7 +464,7 @@ describe("Plots", () => {
     });
 
     describe("Vertical Bar Plot With Bar Labels", () => {
-      var plot: Plottable.Plot.VerticalBar<string>;
+      var plot: Plottable.Plot.Bar<string, number>;
       var data: any[];
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scale.Ordinal;
@@ -477,7 +477,7 @@ describe("Plots", () => {
         dataset = new Plottable.Dataset(data);
         xScale = new Plottable.Scale.Ordinal();
         yScale = new Plottable.Scale.Linear();
-        plot = new Plottable.Plot.VerticalBar<string>(xScale, yScale);
+        plot = new Plottable.Plot.Bar<string, number>(xScale, yScale);
         plot.addDataset(dataset);
         plot.project("x", "x", xScale);
         plot.project("y", "y", yScale);
@@ -545,7 +545,7 @@ describe("Plots", () => {
     });
 
     describe("getAllBars()", () => {
-      var verticalBarPlot: Plottable.Plot.VerticalBar<string>;
+      var verticalBarPlot: Plottable.Plot.Bar<string, number>;
       var dataset: Plottable.Dataset;
       var svg: D3.Selection;
 
@@ -554,7 +554,7 @@ describe("Plots", () => {
         dataset = new Plottable.Dataset();
         var xScale = new Plottable.Scale.Ordinal();
         var yScale = new Plottable.Scale.Linear();
-        verticalBarPlot = new Plottable.Plot.VerticalBar<string>(xScale, yScale);
+        verticalBarPlot = new Plottable.Plot.Bar<string, number>(xScale, yScale);
         verticalBarPlot.project("x", "x", xScale);
         verticalBarPlot.project("y", "y", yScale);
       });

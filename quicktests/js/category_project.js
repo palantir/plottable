@@ -25,7 +25,7 @@ function run(div, data, Plottable) {
   };
 
   //rendering
-  var renderAreaD1 = new Plottable.Plot.VerticalBar(xScale, yScale)
+  var renderAreaD1 = new Plottable.Plot.Bar(xScale, yScale)
                                   .addDataset(dataseries1)
                                   .attr("width", widthProjector)
                                   .project("x", "x", xScale)
