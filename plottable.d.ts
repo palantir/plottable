@@ -1677,7 +1677,7 @@ declare module Plottable {
              * @returns {Component} The calling Component.
              */
             xAlign(alignment: string): AbstractComponent;
-            static _xAlignmentToProportion(alignment: string): number;
+            protected static _xAlignmentToProportion(alignment: string): number;
             /**
              * Sets the y alignment of the Component. This will be used if the
              * Component is given more space than it needs.
@@ -1690,6 +1690,7 @@ declare module Plottable {
              * @returns {Component} The calling Component.
              */
             yAlign(alignment: string): AbstractComponent;
+            protected static ensureYAlignment(alignment: string): string;
             static _yAlignmentToProportion(alignment: string): number;
             /**
              * Sets the x offset of the Component. This will be used if the Component
