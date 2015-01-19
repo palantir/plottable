@@ -21,7 +21,7 @@ function run(svg, data, Plottable) {
     var yScale = new Plottable.Scale.Linear();
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-    var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale)
+    var barPlot = new Plottable.Plot.Bar(xScale, yScale, true)
         .addDataset(ds)
         .attr("x", "name", xScale)
         .attr("y", "age", yScale)
