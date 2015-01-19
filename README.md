@@ -19,10 +19,6 @@ Quick Start
 - Download [plottable.zip](plottable.zip) or get it via Bower: `bower install --save plottable`
 - Check out [examples](http://plottablejs.org/examples/), read the [docs](http://plottablejs.org/tutorials/) and visit the [website](http://plottablejs.org/)
 
-Even Quicker Start
----
-If you just want to create a simple LineChart, ScatterPlot, or BarChart without worrying about `Tables` and `Components`, check out our sister library, [Chartographer.js](https://github.com/palantir/chartographer/). It uses Plottable to create simple charts, and exposes all of the Plottable components so you can use it as a starting point and then add more complexity as desired.
-
 We Want To Help!
 ---
 If you run into any problems using Plottable, please let us know. We want Plottable to be easy-to-use, so if you are getting confused, it is our fault, not yours. [Create an issue](https://github.com/palantir/plottable/issues) and we'll be happy to help you out.

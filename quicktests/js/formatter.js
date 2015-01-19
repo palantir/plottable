@@ -8,17 +8,13 @@ function run(div, data, Plottable) {
   "use strict";
 
   var svg = div.append("svg").attr("height", 500);
-  data = _.cloneDeep(data);
-
-    var large_x = function(d){
-         d.x = d.x*100000000;
+  var big_numbers = data[0].slice(0, 5).map(function(d) {
+    return {
+      x: d.x * 100000000,
+      y: d.y
     };
-
-
-  var big_numbers = data[0].slice(0, 5);
-  big_numbers.forEach(large_x);
+  });
   var dataseries1 = new Plottable.Dataset(big_numbers);
-
 
   //Axis
   var xScale = new Plottable.Scale.Linear();
