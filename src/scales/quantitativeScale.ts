@@ -10,7 +10,7 @@ export module Scale {
     private _domainer: Domainer = new Domainer();
     public _typeCoercer = (d: any) => +d;
     private _tickGenerator: TickGenerators.TickGenerator<D> = (scale: Plottable.Scale.AbstractQuantitative<D>) => scale.getDefaultTicks();
-
+    protected static QUANTITATIVE_SCALE_DEFAULT_EXTENT = [0, 1];
 
     /**
      * Constructs a new QuantitativeScale.
@@ -186,8 +186,8 @@ export module Scale {
       }
     }
 
-    public static _defaultExtent(): any[] {
-      return [0, 1];
+    public _defaultExtent(): any[] {
+      return AbstractQuantitative.QUANTITATIVE_SCALE_DEFAULT_EXTENT;
     }
 
     /**

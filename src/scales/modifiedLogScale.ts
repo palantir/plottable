@@ -41,7 +41,7 @@ export module Scale {
       super(d3.scale.linear());
       this.base = base;
       this.pivot = base;
-      this.untransformedDomain = AbstractQuantitative._defaultExtent();
+      this.untransformedDomain = AbstractQuantitative.QUANTITATIVE_SCALE_DEFAULT_EXTENT;
       this._showIntermediateTicks = false;
     }
 
