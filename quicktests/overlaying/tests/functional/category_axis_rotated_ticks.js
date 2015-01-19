@@ -59,7 +59,7 @@ function run(svg, data, Plottable) {
   var xAxis3 = new Plottable.Axis.Category(xScale, "bottom").tickLabelAngle(90);
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var plot = new Plottable.Plot.VerticalBar(xScale, yScale)
+  var plot = new Plottable.Plot.Bar(xScale, yScale, true)
                     .addDataset(data)
                     .project("x", "date", xScale)
                     .project("y", "y", yScale);
