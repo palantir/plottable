@@ -48,6 +48,13 @@ export module Axis {
       this._scale = scale;
 
       this._orientation = AbstractAxis.ensureAxisOrientation(orientation);
+      if (AbstractAxis._isHorizontalOrientation(orientation)) {
+        var xAlignmentString = orientation === "left" ? "right" : "left";
+        this._xAlignProportion = Component.AbstractComponent._xAlignmentToProportion(xAlignmentString);
+      } else {
+        var yAlignmentString = orientation === "top" ? "bottom" : "top";
+        this._yAlignProportion = Component.AbstractComponent._yAlignmentToProportion(yAlignmentString);
+      }
 
       this._formatter = formatter;
 
@@ -64,7 +71,6 @@ export module Axis {
       super._anchor(element);
 
       this._isAnchored = false;
-      this._setDefaultAlignment();
       if (this._isHorizontal()) {
         this.classed("x-axis", true);
       } else {
@@ -81,7 +87,11 @@ export module Axis {
     }
 
     protected _isHorizontal() {
-      return this._orientation === "top" || this._orientation === "bottom";
+      return AbstractAxis._isHorizontalOrientation(this._orientation);
+    }
+
+    private static _isHorizontalOrientation(orientation: string) {
+      return orientation === "top" || orientation === "bottom";
     }
 
     protected _computeWidth() {

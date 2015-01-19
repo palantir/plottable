@@ -3959,6 +3959,14 @@ var Plottable;
                 _super.call(this);
                 this._scale = scale;
                 this._orientation = AbstractAxis.ensureAxisOrientation(orientation);
+                if (AbstractAxis._isHorizontalOrientation(orientation)) {
+                    var xAlignmentString = orientation === "left" ? "right" : "left";
+                    this._xAlignProportion = Plottable.Component.AbstractComponent._xAlignmentToProportion(xAlignmentString);
+                }
+                else {
+                    var yAlignmentString = orientation === "top" ? "bottom" : "top";
+                    this._yAlignProportion = Plottable.Component.AbstractComponent._yAlignmentToProportion(yAlignmentString);
+                }
                 this._formatter = formatter;
                 Plottable._Util.Methods.uniqPush(this._cssClasses, "axis");
                 this._endTickLength = 5;
@@ -3971,7 +3979,6 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, element);
                 this._isAnchored = false;
-                this._setDefaultAlignment();
                 if (this._isHorizontal()) {
                     this.classed("x-axis", true);
                 }
@@ -3986,7 +3993,10 @@ var Plottable;
                 this._scale.broadcaster.deregisterListener(this);
             };
             AbstractAxis.prototype._isHorizontal = function () {
-                return this._orientation === "top" || this._orientation === "bottom";
+                return AbstractAxis._isHorizontalOrientation(this._orientation);
+            };
+            AbstractAxis._isHorizontalOrientation = function (orientation) {
+                return orientation === "top" || orientation === "bottom";
             };
             AbstractAxis.prototype._computeWidth = function () {
                 // to be overridden by subclass logic
