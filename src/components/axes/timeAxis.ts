@@ -172,7 +172,7 @@ export module Axis {
 
       this._tierLabelPositions = ["between", "between"];
 
-      _Util.Methods.uniqAdd(this._cssClasses, "time-axis");
+      _Util.Methods.uniqPush(this._cssClasses, "time-axis");
     }
 
     public tierLabelPositions(): string[];

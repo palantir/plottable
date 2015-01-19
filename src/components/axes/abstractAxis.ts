@@ -51,7 +51,7 @@ export module Axis {
 
       this._formatter = formatter;
 
-      _Util.Methods.uniqAdd(this._cssClasses, "axis");
+      _Util.Methods.uniqPush(this._cssClasses, "axis");
 
       this._endTickLength = 5;
       this._tickLength = 5;

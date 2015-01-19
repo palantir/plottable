@@ -129,7 +129,7 @@ declare module Plottable {
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number, lightenAmount: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
-            function uniqAdd<T>(arr: T[], item: T): void;
+            function uniqPush<T>(arr: T[], item: T): void;
         }
     }
 }
@@ -1599,6 +1599,8 @@ declare module Plottable {
             protected _content: D3.Selection;
             clipPathEnabled: boolean;
             _parent: AbstractComponentContainer;
+            protected _xAlignProportion: number;
+            protected _yAlignProportion: number;
             protected _fixedHeightFlag: boolean;
             protected _fixedWidthFlag: boolean;
             protected _isSetup: boolean;
@@ -1675,6 +1677,7 @@ declare module Plottable {
              * @returns {Component} The calling Component.
              */
             xAlign(alignment: string): AbstractComponent;
+            protected static _xAlignmentToProportion(alignment: string): number;
             /**
              * Sets the y alignment of the Component. This will be used if the
              * Component is given more space than it needs.
@@ -1687,6 +1690,7 @@ declare module Plottable {
              * @returns {Component} The calling Component.
              */
             yAlign(alignment: string): AbstractComponent;
+            protected static _yAlignmentToProportion(alignment: string): number;
             /**
              * Sets the x offset of the Component. This will be used if the Component
              * is given more space than it needs.
@@ -1810,6 +1814,7 @@ declare module Plottable {
 declare module Plottable {
     module Component {
         class AbstractComponentContainer extends AbstractComponent {
+            protected _components: AbstractComponent[];
             _anchor(element: D3.Selection): void;
             _render(): void;
             _removeComponent(c: AbstractComponent): void;
@@ -2320,6 +2325,7 @@ declare module Plottable {
              */
             constructor(colorScale: Scale.Color);
             protected _setup(): void;
+            _anchor(element: D3.Selection): void;
             /**
              * Gets the current max number of entries in Legend row.
              * @returns {number} The current max number of entries in row.
@@ -2383,6 +2389,7 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
             constructor(xScale: Scale.AbstractQuantitative<any>, yScale: Scale.AbstractQuantitative<any>);
+            _anchor(element: D3.Selection): void;
             remove(): Gridlines;
             protected _setup(): void;
             _doRender(): void;

@@ -22,7 +22,7 @@ export module Axis {
      */
     constructor(scale: Scale.Ordinal, orientation = "bottom", formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
-      _Util.Methods.uniqAdd(this._cssClasses, "category-axis");
+      _Util.Methods.uniqPush(this._cssClasses, "category-axis");
     }
 
     protected _setup() {
