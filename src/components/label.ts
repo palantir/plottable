@@ -25,10 +25,13 @@ export module Component {
      */
     constructor(displayText = "", orientation = "horizontal") {
       super();
-      this.classed("label", true);
-      this.text(displayText);
-      this.orient(orientation);
-      this.xAlign("center").yAlign("center");
+      _Util.Methods.uniqPush(this._cssClasses, "label");
+      this._text = displayText;
+      this._orientation = Label.ensureLabelOrientation(orientation);
+      this._xAlignProportion = AbstractComponent._xAlignmentToProportion("center");
+      this._yAlignProportion = AbstractComponent._yAlignmentToProportion("center");
+      this._xAlignment = "center";
+      this._yAlignment = "center";
       this._fixedHeightFlag = true;
       this._fixedWidthFlag = true;
       this._padding = 0;
@@ -125,15 +128,18 @@ export module Component {
       if (newOrientation == null) {
         return this._orientation;
       } else {
-        newOrientation = newOrientation.toLowerCase();
-        if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
-          this._orientation = newOrientation;
-        } else {
-          throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
-        }
+        this._orientation = Label.ensureLabelOrientation(newOrientation);
         this._invalidateLayout();
         return this;
       }
+    }
+
+    private static ensureLabelOrientation(orientation: string): string {
+      orientation = orientation.toLowerCase();
+      if (["horizontal", "left", "right"].indexOf(orientation) === -1) {
+        throw new Error(orientation + " is not a valid orientation for LabelComponent");
+      }
+      return orientation;
     }
 
     /**

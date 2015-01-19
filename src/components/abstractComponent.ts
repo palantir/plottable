@@ -14,8 +14,8 @@ export module Component {
     private _yOrigin: number;
 
     public _parent: AbstractComponentContainer;
-    private _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
-    private _yAlignProportion = 0;
+    protected _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
+    protected _yAlignProportion = 0;
     protected _fixedHeightFlag = false;
     protected _fixedWidthFlag = false;
     protected _isSetup = false;
@@ -31,7 +31,7 @@ export module Component {
     private _height: number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
-    private _cssClasses: string[] = ["component"];
+    protected _cssClasses: string[] = ["component"];
     private _removed = false;
     private _autoResize = AbstractComponent.AUTORESIZE_BY_DEFAULT;
     private _usedLastLayout = false;
@@ -274,18 +274,29 @@ export module Component {
      * @returns {Component} The calling Component.
      */
     public xAlign(alignment: string): AbstractComponent {
-      alignment = alignment.toLowerCase();
-      if (alignment === "left") {
-        this._xAlignProportion = 0;
-      } else if (alignment === "center") {
-        this._xAlignProportion = 0.5;
-      } else if (alignment === "right") {
-        this._xAlignProportion = 1;
-      } else {
-        throw new Error("Unsupported alignment");
-      }
+      alignment = AbstractComponent.ensureXAlignment(alignment);
+      this._xAlignProportion = AbstractComponent._xAlignmentToProportion(alignment);
       this._invalidateLayout();
       return this;
+    }
+
+    private static ensureXAlignment(alignment: string): string {
+      alignment = alignment.toLowerCase();
+      if (["left", "center", "right"].indexOf(alignment) === -1) {
+        throw new Error("Unsupported alignment");
+      }
+      return alignment;
+    }
+
+    protected static _xAlignmentToProportion(alignment: string): number {
+      alignment = alignment.toLowerCase();
+      if (alignment === "left") {
+        return 0;
+      } else if (alignment === "center") {
+        return 0.5;
+      } else if (alignment === "right") {
+        return 1;
+      }
     }
 
     /**
@@ -300,18 +311,29 @@ export module Component {
      * @returns {Component} The calling Component.
      */
     public yAlign(alignment: string): AbstractComponent {
-      alignment = alignment.toLowerCase();
-      if (alignment === "top") {
-        this._yAlignProportion = 0;
-      } else if (alignment === "center") {
-        this._yAlignProportion = 0.5;
-      } else if (alignment === "bottom") {
-        this._yAlignProportion = 1;
-      } else {
-        throw new Error("Unsupported alignment");
-      }
+      alignment = AbstractComponent.ensureYAlignment(alignment);
+      this._yAlignProportion = AbstractComponent._yAlignmentToProportion(alignment);
       this._invalidateLayout();
       return this;
+    }
+
+    private static ensureYAlignment(alignment: string): string {
+      alignment = alignment.toLowerCase();
+      if (["top", "center", "bottom"].indexOf(alignment) === -1) {
+        throw new Error("Unsupported alignment");
+      }
+      return alignment;
+    }
+
+    protected static _yAlignmentToProportion(alignment: string): number {
+      alignment = alignment.toLowerCase();
+      if (alignment === "top") {
+        return 0;
+      } else if (alignment === "center") {
+        return 0.5;
+      } else if (alignment === "bottom") {
+        return 1;
+      }
     }
 
     /**

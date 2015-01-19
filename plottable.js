@@ -327,6 +327,12 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
+            function uniqPush(arr, item) {
+                if (arr.indexOf(item) === -1) {
+                    arr.push(item);
+                }
+            }
+            Methods.uniqPush = uniqPush;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -3460,21 +3466,29 @@ var Plottable;
              * @returns {Component} The calling Component.
              */
             AbstractComponent.prototype.xAlign = function (alignment) {
-                alignment = alignment.toLowerCase();
-                if (alignment === "left") {
-                    this._xAlignProportion = 0;
-                }
-                else if (alignment === "center") {
-                    this._xAlignProportion = 0.5;
-                }
-                else if (alignment === "right") {
-                    this._xAlignProportion = 1;
-                }
-                else {
-                    throw new Error("Unsupported alignment");
-                }
+                alignment = AbstractComponent.ensureXAlignment(alignment);
+                this._xAlignProportion = AbstractComponent._xAlignmentToProportion(alignment);
                 this._invalidateLayout();
                 return this;
+            };
+            AbstractComponent.ensureXAlignment = function (alignment) {
+                alignment = alignment.toLowerCase();
+                if (["left", "center", "right"].indexOf(alignment) === -1) {
+                    throw new Error("Unsupported alignment");
+                }
+                return alignment;
+            };
+            AbstractComponent._xAlignmentToProportion = function (alignment) {
+                alignment = alignment.toLowerCase();
+                if (alignment === "left") {
+                    return 0;
+                }
+                else if (alignment === "center") {
+                    return 0.5;
+                }
+                else if (alignment === "right") {
+                    return 1;
+                }
             };
             /**
              * Sets the y alignment of the Component. This will be used if the
@@ -3488,21 +3502,29 @@ var Plottable;
              * @returns {Component} The calling Component.
              */
             AbstractComponent.prototype.yAlign = function (alignment) {
-                alignment = alignment.toLowerCase();
-                if (alignment === "top") {
-                    this._yAlignProportion = 0;
-                }
-                else if (alignment === "center") {
-                    this._yAlignProportion = 0.5;
-                }
-                else if (alignment === "bottom") {
-                    this._yAlignProportion = 1;
-                }
-                else {
-                    throw new Error("Unsupported alignment");
-                }
+                alignment = AbstractComponent.ensureYAlignment(alignment);
+                this._yAlignProportion = AbstractComponent._yAlignmentToProportion(alignment);
                 this._invalidateLayout();
                 return this;
+            };
+            AbstractComponent.ensureYAlignment = function (alignment) {
+                alignment = alignment.toLowerCase();
+                if (["top", "center", "bottom"].indexOf(alignment) === -1) {
+                    throw new Error("Unsupported alignment");
+                }
+                return alignment;
+            };
+            AbstractComponent._yAlignmentToProportion = function (alignment) {
+                alignment = alignment.toLowerCase();
+                if (alignment === "top") {
+                    return 0;
+                }
+                else if (alignment === "center") {
+                    return 0.5;
+                }
+                else if (alignment === "bottom") {
+                    return 1;
+                }
             };
             /**
              * Sets the x offset of the Component. This will be used if the Component
@@ -3864,8 +3886,13 @@ var Plottable;
                 var _this = this;
                 if (components === void 0) { components = []; }
                 _super.call(this);
-                this.classed("component-group", true);
-                components.forEach(function (c) { return _this._addComponent(c); });
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "component-group");
+                components.forEach(function (c) {
+                    if (c !== null) {
+                        Plottable._Util.Methods.uniqPush(_this._components, c);
+                        c._parent = _this;
+                    }
+                });
             }
             Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var requests = this.components().map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
@@ -5090,10 +5117,13 @@ var Plottable;
                 if (displayText === void 0) { displayText = ""; }
                 if (orientation === void 0) { orientation = "horizontal"; }
                 _super.call(this);
-                this.classed("label", true);
-                this.text(displayText);
-                this.orient(orientation);
-                this.xAlign("center").yAlign("center");
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "label");
+                this._text = displayText;
+                this._orientation = Label.ensureLabelOrientation(orientation);
+                this._xAlignProportion = Component.AbstractComponent._xAlignmentToProportion("center");
+                this._yAlignProportion = Component.AbstractComponent._yAlignmentToProportion("center");
+                this._xAlignment = "center";
+                this._yAlignment = "center";
                 this._fixedHeightFlag = true;
                 this._fixedWidthFlag = true;
                 this._padding = 0;
@@ -5158,16 +5188,17 @@ var Plottable;
                     return this._orientation;
                 }
                 else {
-                    newOrientation = newOrientation.toLowerCase();
-                    if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
-                        this._orientation = newOrientation;
-                    }
-                    else {
-                        throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
-                    }
+                    this._orientation = Label.ensureLabelOrientation(newOrientation);
                     this._invalidateLayout();
                     return this;
                 }
+            };
+            Label.ensureLabelOrientation = function (orientation) {
+                orientation = orientation.toLowerCase();
+                if (["horizontal", "left", "right"].indexOf(orientation) === -1) {
+                    throw new Error(orientation + " is not a valid orientation for LabelComponent");
+                }
+                return orientation;
             };
             Label.prototype.padding = function (padAmount) {
                 if (padAmount == null) {
@@ -5260,16 +5291,16 @@ var Plottable;
              */
             function Legend(colorScale) {
                 var _this = this;
-                _super.call(this);
-                this._padding = 5;
-                this.classed("legend", true);
-                this.maxEntriesPerRow(1);
                 if (colorScale == null) {
                     throw new Error("Legend requires a colorScale");
                 }
+                _super.call(this);
+                this._padding = 5;
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "legend");
+                this._maxEntriesPerRow = 1;
                 this._scale = colorScale;
-                this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
-                this.xAlign("right").yAlign("top");
+                this._xAlignProportion = Component.AbstractComponent._xAlignmentToProportion("center");
+                this._yAlignProportion = Component.AbstractComponent._yAlignmentToProportion("center");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
@@ -5282,6 +5313,11 @@ var Plottable;
                 this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(true);
+            };
+            Legend.prototype._anchor = function (element) {
+                var _this = this;
+                _super.prototype._anchor.call(this, element);
+                this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
             };
             Legend.prototype.maxEntriesPerRow = function (numEntries) {
                 if (numEntries == null) {
@@ -5492,7 +5528,6 @@ var Plottable;
              * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
             function Gridlines(xScale, yScale) {
-                var _this = this;
                 if (xScale != null && !(Plottable.Scale.AbstractQuantitative.prototype.isPrototypeOf(xScale))) {
                     throw new Error("xScale needs to inherit from Scale.AbstractQuantitative");
                 }
@@ -5500,16 +5535,20 @@ var Plottable;
                     throw new Error("yScale needs to inherit from Scale.AbstractQuantitative");
                 }
                 _super.call(this);
-                this.classed("gridlines", true);
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "gridlines");
                 this._xScale = xScale;
                 this._yScale = yScale;
+            }
+            Gridlines.prototype._anchor = function (element) {
+                var _this = this;
+                _super.prototype._anchor.call(this, element);
                 if (this._xScale) {
                     this._xScale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
                 if (this._yScale) {
                     this._yScale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
-            }
+            };
             Gridlines.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 if (this._xScale) {
