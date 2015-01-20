@@ -7010,14 +7010,6 @@ var Plottable;
                 }
                 else {
                     var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
-                    var barAccessorData = d3.set(Plottable._Util.Methods.flatten(this._datasetKeysInOrder.map(function (k) {
-                        var dataset = _this._key2PlotDatasetKey.get(k).dataset;
-                        var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
-                        return dataset.data().map(function (d, i) { return barAccessor(d, i, dataset.metadata(), plotMetadata); });
-                    }))).values();
-                    if (barAccessorData.some(function (datum) { return datum === "undefined"; })) {
-                        return -1;
-                    }
                     var numberBarAccessorData = d3.set(Plottable._Util.Methods.flatten(this._datasetKeysInOrder.map(function (k) {
                         var dataset = _this._key2PlotDatasetKey.get(k).dataset;
                         var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
