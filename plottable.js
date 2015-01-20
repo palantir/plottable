@@ -3960,12 +3960,12 @@ var Plottable;
                 this._scale = scale;
                 this._orientation = AbstractAxis.ensureAxisOrientation(orientation);
                 if (AbstractAxis._isHorizontalOrientation(orientation)) {
-                    var xAlignmentString = orientation === "left" ? "right" : "left";
-                    this._xAlignProportion = Plottable.Component.AbstractComponent._xAlignmentToProportion(xAlignmentString);
-                }
-                else {
                     var yAlignmentString = orientation === "top" ? "bottom" : "top";
                     this._yAlignProportion = Plottable.Component.AbstractComponent._yAlignmentToProportion(yAlignmentString);
+                }
+                else {
+                    var xAlignmentString = orientation === "left" ? "right" : "left";
+                    this._xAlignProportion = Plottable.Component.AbstractComponent._xAlignmentToProportion(xAlignmentString);
                 }
                 this._formatter = formatter;
                 Plottable._Util.Methods.uniqPush(this._cssClasses, "axis");

@@ -49,11 +49,11 @@ export module Axis {
 
       this._orientation = AbstractAxis.ensureAxisOrientation(orientation);
       if (AbstractAxis._isHorizontalOrientation(orientation)) {
-        var xAlignmentString = orientation === "left" ? "right" : "left";
-        this._xAlignProportion = Component.AbstractComponent._xAlignmentToProportion(xAlignmentString);
-      } else {
         var yAlignmentString = orientation === "top" ? "bottom" : "top";
         this._yAlignProportion = Component.AbstractComponent._yAlignmentToProportion(yAlignmentString);
+      } else {
+        var xAlignmentString = orientation === "left" ? "right" : "left";
+        this._xAlignProportion = Component.AbstractComponent._xAlignmentToProportion(xAlignmentString);
       }
 
       this._formatter = formatter;

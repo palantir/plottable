@@ -459,6 +459,17 @@ describe("BaseAxis", function () {
         assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should not decrease");
         svg.remove();
     });
+    it("default alignment based on orientation", function () {
+        var scale = new Plottable.Scale.Linear();
+        var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
+        assert.equal(baseAxis._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
+        baseAxis = new Plottable.Axis.AbstractAxis(scale, "top");
+        assert.equal(baseAxis._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
+        baseAxis = new Plottable.Axis.AbstractAxis(scale, "left");
+        assert.equal(baseAxis._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
+        baseAxis = new Plottable.Axis.AbstractAxis(scale, "right");
+        assert.equal(baseAxis._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
+    });
 });
 
 ///<reference path="../testReference.ts" />
