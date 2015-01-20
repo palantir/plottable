@@ -18,9 +18,6 @@
     },
     "jquery.simulate/jquery.simulate.d.ts": {
       "commit": "dfa8d86385232fabd220c43a81a0bf4ca418f761"
-    },
-    "requirejs/require.d.ts": {
-      "commit": "2deb7cab5304d20e82407ceab840fd63ddeb999f"
     }
   }
 }
