@@ -1,5 +1,9 @@
 
 declare module Plottable {
+}
+
+
+declare module Plottable {
     module _Util {
         module Methods {
             /**

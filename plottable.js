@@ -7,6 +7,21 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    /**
+     * Covering the case where d3 is being loaded through require
+     */
+    function requireD3() {
+        var d3;
+        var require;
+        if (d3 == null && require != null) {
+            require("d3");
+        }
+    }
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     var _Util;
     (function (_Util) {
         var Methods;
