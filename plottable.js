@@ -1,5 +1,5 @@
 /*!
-Plottable 0.40.0 (https://github.com/palantir/plottable)
+Plottable 0.41.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -986,7 +986,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.40.0";
+    Plottable.version = "0.41.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -7133,101 +7133,6 @@ var Plottable;
 (function (Plottable) {
     var Plot;
     (function (Plot) {
-        /**
-         * A VerticalBarPlot draws bars vertically.
-         * Key projected attributes:
-         *  - "width" - the horizontal width of a bar.
-         *      - if an ordinal scale is attached, this defaults to ordinalScale.rangeBand()
-         *      - if a quantitative scale is attached, this defaults to 10
-         *  - "x" - the horizontal position of a bar
-         *  - "y" - the vertical height of a bar
-         */
-        var VerticalBar = (function (_super) {
-            __extends(VerticalBar, _super);
-            /**
-             * Constructs a VerticalBarPlot.
-             *
-             * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {QuantitativeScale} yScale The y scale to use.
-             */
-            function VerticalBar(xScale, yScale) {
-                this._isVertical = true;
-                _super.call(this, xScale, yScale, true);
-                if (!VerticalBar.WARNED) {
-                    VerticalBar.WARNED = true;
-                    Plottable._Util.Methods.warn("Plottable.Plot.VerticalBar is deprecated. Please use Plottable.Plot.Bar with isVertical = true.");
-                }
-            }
-            VerticalBar.prototype._updateYDomainer = function () {
-                this._updateDomainer(this._yScale);
-            };
-            VerticalBar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
-            VerticalBar.WARNED = false;
-            return VerticalBar;
-        })(Plot.Bar);
-        Plot.VerticalBar = VerticalBar;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Plot;
-    (function (Plot) {
-        /**
-         * A HorizontalBarPlot draws bars horizontally.
-         * Key projected attributes:
-         *  - "width" - the vertical height of a bar (since the bar is rotated horizontally)
-         *      - if an ordinal scale is attached, this defaults to ordinalScale.rangeBand()
-         *      - if a quantitative scale is attached, this defaults to 10
-         *  - "x" - the horizontal length of a bar
-         *  - "y" - the vertical position of a bar
-         */
-        var HorizontalBar = (function (_super) {
-            __extends(HorizontalBar, _super);
-            /**
-             * Constructs a HorizontalBarPlot.
-             *
-             * @constructor
-             * @param {QuantitativeScale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
-             */
-            function HorizontalBar(xScale, yScale) {
-                _super.call(this, xScale, yScale, false);
-                if (!HorizontalBar.WARNED) {
-                    HorizontalBar.WARNED = true;
-                    Plottable._Util.Methods.warn("Plottable.Plot.HorizontalBar is deprecated. Please use Plottable.Plot.Bar with isVertical = false.");
-                }
-            }
-            HorizontalBar.prototype._updateXDomainer = function () {
-                this._updateDomainer(this._xScale);
-            };
-            HorizontalBar._BarAlignmentToFactor = { "top": 0, "center": 0.5, "bottom": 1 };
-            HorizontalBar.WARNED = false;
-            return HorizontalBar;
-        })(Plot.Bar);
-        Plot.HorizontalBar = HorizontalBar;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Plot;
-    (function (Plot) {
         var Line = (function (_super) {
             __extends(Line, _super);
             /**
@@ -7568,11 +7473,10 @@ var Plottable;
                 return this;
             };
             AbstractStacked.prototype._onDatasetUpdate = function () {
-                _super.prototype._onDatasetUpdate.call(this);
-                // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
-                if (this._datasetKeysInOrder && this._projections["x"] && this._projections["y"]) {
+                if (this._projectorsReady()) {
                     this._updateStackOffsets();
                 }
+                _super.prototype._onDatasetUpdate.call(this);
             };
             AbstractStacked.prototype._updateStackOffsets = function () {
                 var dataMapArray = this._generateDefaultMapArray();

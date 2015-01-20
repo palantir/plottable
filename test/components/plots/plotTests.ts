@@ -256,7 +256,7 @@ describe("Plots", () => {
       var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
       var x = new Plottable.Scale.Linear();
       var y = new Plottable.Scale.Linear();
-      var plot = new Plottable.Plot.VerticalBar(x, y).addDataset([]).animate(true);
+      var plot = new Plottable.Plot.Bar(x, y).addDataset([]).animate(true);
       var recordedTime: number = -1;
       var additionalPaint = (x: number) => {
         recordedTime = Math.max(x, recordedTime);
