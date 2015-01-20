@@ -1,6 +1,4 @@
 
-declare module Plottable {
-}
 
 
 declare module Plottable {
