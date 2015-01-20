@@ -3,14 +3,9 @@
 module Plottable {
 
   /**
-   * Covering the case where d3 is being loaded through require
+   * Covering when d3 is being loaded through require
    */
-  function requireD3() {
-    var d3: D3.Base;
-    var require: Require;
-
-    if (d3 == null && require != null) {
-      require("d3");
-    }
+  if (typeof d3 === "undefined" && typeof require !== "undefined") {
+    require("d3");
   }
 }
