@@ -51,6 +51,7 @@ export module Plot {
     }
 
     public detach() {
+      super.detach();
       this._datasetKeysInOrder.forEach((key) => {
         var scaleKey = this.getID().toString() + "_" + key;
         this._xScale._removeExtent(scaleKey, "bar-extent");
@@ -59,6 +60,7 @@ export module Plot {
     }
 
     public remove() {
+      super.remove();
       this._datasetKeysInOrder.forEach((key) => {
         var scaleKey = this.getID().toString() + "_" + key;
         this._xScale._removeExtent(scaleKey, "bar-extent");

@@ -6775,6 +6775,7 @@ var Plottable;
             };
             Bar.prototype.detach = function () {
                 var _this = this;
+                _super.prototype.detach.call(this);
                 this._datasetKeysInOrder.forEach(function (key) {
                     var scaleKey = _this.getID().toString() + "_" + key;
                     _this._xScale._removeExtent(scaleKey, "bar-extent");
@@ -6783,6 +6784,7 @@ var Plottable;
             };
             Bar.prototype.remove = function () {
                 var _this = this;
+                _super.prototype.remove.call(this);
                 this._datasetKeysInOrder.forEach(function (key) {
                     var scaleKey = _this.getID().toString() + "_" + key;
                     _this._xScale._removeExtent(scaleKey, "bar-extent");
