@@ -20,18 +20,16 @@ export module Interaction {
      */
     constructor(xScale?: Scale.AbstractQuantitative<any>, yScale?: Scale.AbstractQuantitative<any>) {
       super();
-      if (xScale == null) {
-        xScale = new Plottable.Scale.Linear();
+      if (xScale) {
+        this._xScale = xScale;
+        // HACKHACK #1388: self-register for resetZoom()
+        this._xScale.broadcaster.registerListener("pziX" + this.getID(), () => this.resetZoom());
       }
-      if (yScale == null) {
-        yScale = new Plottable.Scale.Linear();
+      if (yScale) {
+        this._yScale = yScale;
+        // HACKHACK #1388: self-register for resetZoom()
+        this._xScale.broadcaster.registerListener("pziY" + this.getID(), () => this.resetZoom());
       }
-      this._xScale = xScale;
-      this._yScale = yScale;
-      this._zoom = d3.behavior.zoom();
-      this._zoom.x((<any> this._xScale)._d3Scale);
-      this._zoom.y((<any> this._yScale)._d3Scale);
-      this._zoom.on("zoom", () => this._rerenderZoomed());
     }
 
     /**
@@ -40,24 +38,33 @@ export module Interaction {
     public resetZoom() {
       // HACKHACK #254
       this._zoom = d3.behavior.zoom();
-      this._zoom.x((<any> this._xScale)._d3Scale);
-      this._zoom.y((<any> this._yScale)._d3Scale);
+      if (this._xScale) {
+        this._zoom.x((<any> this._xScale)._d3Scale);
+      }
+      if (this._yScale) {
+        this._zoom.y((<any> this._yScale)._d3Scale);
+      }
       this._zoom.on("zoom", () => this._rerenderZoomed());
       this._zoom(this._hitBox);
     }
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
-      this._zoom(hitBox);
+      this.resetZoom();
     }
 
     private _rerenderZoomed() {
       // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
       // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
-      var xDomain = (<any> this._xScale)._d3Scale.domain();
-      var yDomain = (<any> this._yScale)._d3Scale.domain();
-      this._xScale.domain(xDomain);
-      this._yScale.domain(yDomain);
+      if (this._xScale) {
+        var xDomain = (<any> this._xScale)._d3Scale.domain();
+        this._xScale.domain(xDomain);
+      }
+
+      if (this._yScale) {
+        var yDomain = (<any> this._yScale)._d3Scale.domain();
+        this._yScale.domain(yDomain);
+      }
     }
   }
 }
