@@ -28,7 +28,7 @@ export module Interaction {
       if (yScale) {
         this._yScale = yScale;
         // HACKHACK #1388: self-register for resetZoom()
-        this._xScale.broadcaster.registerListener("pziY" + this.getID(), () => this.resetZoom());
+        this._yScale.broadcaster.registerListener("pziY" + this.getID(), () => this.resetZoom());
       }
     }
 
