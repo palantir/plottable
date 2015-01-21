@@ -7028,7 +7028,18 @@ var Plottable;
                     var barWidthDimension = this._isVertical ? this.width() : this.height();
                     barPixelWidth = Plottable._Util.Methods.min(barAccessorDataPairs, function (pair, i) {
                         return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
-                    }, barWidthDimension * 0.4) * 0.95;
+                    }, barWidthDimension * 0.4);
+                    var scaledData = numberBarAccessorData.map(function (datum) { return barScale.scale(datum); });
+                    var minScaledDatum = Plottable._Util.Methods.min(scaledData, 0);
+                    if (this._barAlignmentFactor !== 0 && minScaledDatum > 0) {
+                        barPixelWidth = Math.min(barPixelWidth, minScaledDatum / this._barAlignmentFactor);
+                    }
+                    var maxScaledDatum = Plottable._Util.Methods.max(scaledData, 0);
+                    if (this._barAlignmentFactor !== 1 && maxScaledDatum < barWidthDimension) {
+                        var margin = barWidthDimension - maxScaledDatum;
+                        barPixelWidth = Math.min(barPixelWidth, margin / (1 - this._barAlignmentFactor));
+                    }
+                    barPixelWidth *= 0.95;
                 }
                 return barPixelWidth;
             };

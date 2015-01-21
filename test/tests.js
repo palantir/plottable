@@ -2378,7 +2378,7 @@ describe("Plots", function () {
                 barPlot.renderTo(svg);
             });
             it("barPixelWidth calculated appropriately", function () {
-                assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+                assert.strictEqual(barPlot._getBarPixelWidth(), xScale.scale(2) * 2 * 0.95);
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
