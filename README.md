@@ -19,10 +19,6 @@ Quick Start
 - Download [plottable.zip](plottable.zip) or get it via Bower: `bower install --save plottable`
 - Check out [examples](http://plottablejs.org/examples/), read the [docs](http://plottablejs.org/tutorials/) and visit the [website](http://plottablejs.org/)
 
-Even Quicker Start
----
-If you just want to create a simple LineChart, ScatterPlot, or BarChart without worrying about `Tables` and `Components`, check out our sister library, [Chartographer.js](https://github.com/palantir/chartographer/). It uses Plottable to create simple charts, and exposes all of the Plottable components so you can use it as a starting point and then add more complexity as desired.
-
 We Want To Help!
 ---
 If you run into any problems using Plottable, please let us know. We want Plottable to be easy-to-use, so if you are getting confused, it is our fault, not yours. [Create an issue](https://github.com/palantir/plottable/issues) and we'll be happy to help you out.
@@ -42,4 +38,5 @@ Contributing
 - Add tests for new functionality, and please add some quicktests too
 - Run `grunt test` and verify it completes with no warnings or failures
 - Commit new files, including the updated built files like `plottable.js` and `plottable.d.ts`
+- Fill out the [Personal](https://github.com/palantir/plottable/blob/develop/Plottable_Personal_Contributer_License_Agreement.pdf?raw=true) or [Corporate](https://github.com/palantir/plottable/blob/develop/Plottable_Corporate_Contributor_License_Agreement.pdf?raw=true) Contributor License Agreement and send it to [opensource@palantir.com](mailto:opensource@palantir.com)
 - Submit a pull request
