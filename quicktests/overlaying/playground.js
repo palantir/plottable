@@ -96,7 +96,7 @@ $(document).ready(function(){
 		        break;
 		    case "Category":
 		    	scaleType = "Ordinal";
-		        scale = new Plottable.Scale.Ordinal()
+		        scale = new Plottable.Scale.Ordinal();
 		        break;
 		    case "Numeric(Linear)":
 		    	scaleType = "Linear";
@@ -129,7 +129,7 @@ $(document).ready(function(){
 	
 		}
 
-		testCode = testCode + "\tvar " + axis + "Axis = new Plottable.Axis." 
+		testCode = testCode + "\tvar " + axis + "Axis = new Plottable.Axis.";
 
 		switch(axisType) {
 		    case "Time":
@@ -167,7 +167,7 @@ $(document).ready(function(){
 	};
 
 	testCode_red = function(){
-		testCode = testCode + "\tplot.attr('fill', function() { return '#ff6666'; })\n"
+		testCode = testCode + "\tplot.attr('fill', function() { return '#ff6666'; })\n";
 	};
 
 	testCode_gridlines = function(){
