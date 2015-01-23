@@ -5,6 +5,14 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
 
 ///<reference path="../reference.ts" />
+/**
+ * Covering when d3 is being loaded through require
+ */
+if (typeof d3 === "undefined" && typeof require !== "undefined") {
+    require("d3");
+}
+
+///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var _Util;

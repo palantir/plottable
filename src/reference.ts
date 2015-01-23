@@ -1,5 +1,7 @@
 /// <reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
 
+/// <reference path="core/init.ts" />
+
 /// <reference path="utils/utils.ts" />
 /// <reference path="utils/osUtils.ts" />
 /// <reference path="utils/idCounter.ts" />
