@@ -1,4 +1,5 @@
 $(document).ready(function(){
+	"use strict";
 
 	var testCode;
 	var numXnumY = [{x: 2, y: 9}, {x: 3, y: 13.5}, {x: 4, y: 18}, {x: 5, y: 22.5}, {x: 6, y: 27} ];
@@ -52,31 +53,27 @@ $(document).ready(function(){
 		testCode = testCode + "\tvar data = " + pts + "; \n";
 		testCode = testCode + "\tplot.addDataset(data);\n";
 		return data;
-	}
+	};
 
 	choosePlot = function(xScale, yScale){
 		var plot_type = $("#plotType option:selected").text();
-		testCode = testCode + "\tvar plot = new Plottable.Plot."
+		testCode = testCode + "\tvar plot = new Plottable.Plot.";
 		testCode = testCode + plot_type;
 		testCode = testCode + "(xScale, yScale); \n";
 		
 		switch(plot_type) {
 		    case "Scatter":
 		        return new Plottable.Plot.Scatter(xScale, yScale);
-		        break;
 		    case "Line":
 		        return new Plottable.Plot.Line(xScale, yScale);
-		        break;
 		    case "Area":
 		        return new Plottable.Plot.Area(xScale, yScale);
-		        break;   
 		    case "Bar":
 		        return new Plottable.Plot.Bar(xScale, yScale);
-		        break;		         
 		    default:
 		        return null;
 		}	
-	}
+	};
 
 	make_scale = function(axis){
 		var axisType, scaleType;
@@ -115,7 +112,7 @@ $(document).ready(function(){
 
 		testCode = testCode + scaleType + "(); \n";
 		return scale;
-	}
+	};
 
 
 	make_axis = function(axis, scale, orientation){
@@ -156,35 +153,35 @@ $(document).ready(function(){
 		}	
 		testCode = testCode + axisTypeString + params + "; \n";		
 		return axisObj;
-	}
+	};
 
 	testCode_init = function(){
 		testCode = "window.onload = function() {\n";
-	}
+	};
 
 	testCode_finish = function(){
 	    testCode = testCode + "\tvar table = new Plottable.Component.Table([[yAxis, plot],\n\t\t\t\t\t\t                                      [null, xAxis]])\n";
 	    testCode = testCode + "\ttable.renderTo('#svg');\n}";
 	    $("#code").val(testCode);
 
-	}
+	};
 
 	testCode_red = function(){
 		testCode = testCode + "\tplot.attr('fill', function() { return '#ff6666'; })\n"
-	}
+	};
 
 	testCode_gridlines = function(){
 		testCode = testCode + "\tvar gridlines = new Plottable.Component.Gridlines(xScale, yScale);\n\tplot = new Plottable.Component.Group([plot, gridlines]);\n";
-	}
+	};
 	
 	testCode_project = function(time){
 		if(time){
-			testCode = testCode + "\tplot.project('x',  function (d) { return d3.time.format('%x').parse(d.x); }, xScale)\n\t\t.project('y', 'y', yScale);\n"
+			testCode = testCode + "\tplot.project('x',  function (d) { return d3.time.format('%x').parse(d.x); }, xScale)\n\t\t.project('y', 'y', yScale);\n";
 		}
 		else{
 			testCode = testCode + "\tplot.project('x', 'x', xScale).project('y', 'y', yScale);\n";
 		}
-	}
+	};
 
 	var rg;
 	var group;
@@ -224,8 +221,8 @@ $(document).ready(function(){
 	    											[null, xAxis]]);
 	    table.renderTo("#playground");
 
-	    testCode_finish()
-	}
+	    testCode_finish();
+	};
 
 	//----------------------------------------------------------------------------------------------
 	//---------------------------------visual-------------------------------------------------------
@@ -235,6 +232,6 @@ $(document).ready(function(){
 		$('#playground').attr("width", px_w);
 		$('#playground').attr("height", px_h);
 		createTest();
-	}
+	};
 
 });
