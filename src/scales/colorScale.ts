@@ -5,7 +5,6 @@ export module Scale {
   export class Color extends AbstractScale<string, string> {
 
     private static HEX_SCALE_FACTOR = 20;
-    private _lightenAmount: number;
 
     /**
      * Constructs a ColorScale.
@@ -46,7 +45,6 @@ export module Scale {
           throw new Error("Unsupported ColorScale type");
       }
       super(scale);
-      this._lightenAmount = 0.16;
     }
 
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
@@ -78,7 +76,7 @@ export module Scale {
       var color = super.scale(value);
       var index = this.domain().indexOf(value);
       var modifyFactor = Math.floor(index / this.range().length);
-      return _Util.Methods.lightenColor(color, modifyFactor, this._lightenAmount);
+      return _Util.Methods.lightenColor(color, modifyFactor);
     }
   }
 }
