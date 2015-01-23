@@ -6782,15 +6782,6 @@ var Plottable;
                 });
                 return this;
             };
-            Bar.prototype.remove = function () {
-                var _this = this;
-                _super.prototype.remove.call(this);
-                this._datasetKeysInOrder.forEach(function (key) {
-                    var scaleKey = _this.getID().toString() + "_" + key;
-                    _this._xScale._removeExtent(scaleKey, "bar-extent");
-                });
-                return this;
-            };
             Bar.prototype._updateBarExtent = function () {
                 var _this = this;
                 if ((this._isVertical && this._xScale instanceof Plottable.Scale.AbstractQuantitative) || (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative)) {

@@ -59,15 +59,6 @@ export module Plot {
       return this;
     }
 
-    public remove() {
-      super.remove();
-      this._datasetKeysInOrder.forEach((key) => {
-        var scaleKey = this.getID().toString() + "_" + key;
-        this._xScale._removeExtent(scaleKey, "bar-extent");
-      });
-      return this;
-    }
-
     private _updateBarExtent() {
       if ((this._isVertical && this._xScale instanceof Plottable.Scale.AbstractQuantitative) ||
           (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative)) {
