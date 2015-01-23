@@ -38,7 +38,7 @@ function run(svg, data, Plottable) {
       "g" : 0xDB, 
       "b" : 0x00
     }
-  ]
+  ];
     
     var xScale = new Plottable.Scale.Linear();
     var yScale = new Plottable.Scale.Linear();

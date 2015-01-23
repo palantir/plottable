@@ -7,8 +7,8 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-   data = [{x: 0, y: 1}, {x: 1, y: 2}, {x: 2, y: 4}, {x: 3, y: 6}, {x: 4, y: 5}, {x: 5, y: 3}, {x: 6, y: .5}];  
-    
+   data = [{x: 0, y: 1}, {x: 1, y: 2}, {x: 2, y: 4}, {x: 3, y: 6}, {x: 4, y: 5}, {x: 5, y: 3}, {x: 6, y: 0.5}];  
+      
   var xScale = new Plottable.Scale.Ordinal();
   var yScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
@@ -36,11 +36,6 @@ function run(svg, data, Plottable) {
 
   bigTable.renderTo(svg);
 
-
-  IdTitle.registerInteraction(new Plottable.Interaction.Click().callback(identity_frmt));
-  DowTitle.registerInteraction(new Plottable.Interaction.Click().callback(dow_frmt));
-  EmpIDTitle.registerInteraction(new Plottable.Interaction.Click().callback(emp_frmt));
-   
   function identity_frmt() {
     xAxis.formatter(Plottable.Formatters.identity());
   }    
@@ -50,5 +45,9 @@ function run(svg, data, Plottable) {
   function emp_frmt() {
      xAxis.formatter(EmpIDFormatter);
   }
+
+  IdTitle.registerInteraction(new Plottable.Interaction.Click().callback(identity_frmt));
+  DowTitle.registerInteraction(new Plottable.Interaction.Click().callback(dow_frmt));
+  EmpIDTitle.registerInteraction(new Plottable.Interaction.Click().callback(emp_frmt));
 
 }
