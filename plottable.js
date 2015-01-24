@@ -8494,18 +8494,16 @@ var Plottable;
             function PanZoom(xScale, yScale) {
                 var _this = this;
                 _super.call(this);
-                if (xScale == null) {
-                    xScale = new Plottable.Scale.Linear();
+                if (xScale) {
+                    this._xScale = xScale;
+                    // HACKHACK #1388: self-register for resetZoom()
+                    this._xScale.broadcaster.registerListener("pziX" + this.getID(), function () { return _this.resetZoom(); });
                 }
-                if (yScale == null) {
-                    yScale = new Plottable.Scale.Linear();
+                if (yScale) {
+                    this._yScale = yScale;
+                    // HACKHACK #1388: self-register for resetZoom()
+                    this._yScale.broadcaster.registerListener("pziY" + this.getID(), function () { return _this.resetZoom(); });
                 }
-                this._xScale = xScale;
-                this._yScale = yScale;
-                this._zoom = d3.behavior.zoom();
-                this._zoom.x(this._xScale._d3Scale);
-                this._zoom.y(this._yScale._d3Scale);
-                this._zoom.on("zoom", function () { return _this._rerenderZoomed(); });
             }
             /**
              * Sets the scales back to their original domains.
@@ -8514,22 +8512,30 @@ var Plottable;
                 var _this = this;
                 // HACKHACK #254
                 this._zoom = d3.behavior.zoom();
-                this._zoom.x(this._xScale._d3Scale);
-                this._zoom.y(this._yScale._d3Scale);
+                if (this._xScale) {
+                    this._zoom.x(this._xScale._d3Scale);
+                }
+                if (this._yScale) {
+                    this._zoom.y(this._yScale._d3Scale);
+                }
                 this._zoom.on("zoom", function () { return _this._rerenderZoomed(); });
                 this._zoom(this._hitBox);
             };
             PanZoom.prototype._anchor = function (component, hitBox) {
                 _super.prototype._anchor.call(this, component, hitBox);
-                this._zoom(hitBox);
+                this.resetZoom();
             };
             PanZoom.prototype._rerenderZoomed = function () {
                 // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
                 // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
-                var xDomain = this._xScale._d3Scale.domain();
-                var yDomain = this._yScale._d3Scale.domain();
-                this._xScale.domain(xDomain);
-                this._yScale.domain(yDomain);
+                if (this._xScale) {
+                    var xDomain = this._xScale._d3Scale.domain();
+                    this._xScale.domain(xDomain);
+                }
+                if (this._yScale) {
+                    var yDomain = this._yScale._d3Scale.domain();
+                    this._yScale.domain(yDomain);
+                }
             };
             return PanZoom;
         })(Interaction.AbstractInteraction);
