@@ -2379,7 +2379,6 @@ var Plottable;
                         throw new Error("Unsupported ColorScale type");
                 }
                 _super.call(this, scale);
-                this._lightenAmount = 0.16;
             }
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
@@ -2408,10 +2407,11 @@ var Plottable;
                 var color = _super.prototype.scale.call(this, value);
                 var index = this.domain().indexOf(value);
                 var numLooped = Math.floor(index / this.range().length);
-                var modifyFactor = Math.log(numLooped * 1.6 + 1);
-                return Plottable._Util.Methods.lightenColor(color, modifyFactor, this._lightenAmount);
+                var modifyFactor = Math.log(numLooped * Color.LOOP_LIGHTEN_FACTOR + 1);
+                return Plottable._Util.Methods.lightenColor(color, modifyFactor);
             };
             Color.HEX_SCALE_FACTOR = 20;
+            Color.LOOP_LIGHTEN_FACTOR = 1.6;
             return Color;
         })(Scale.AbstractScale);
         Scale.Color = Color;
