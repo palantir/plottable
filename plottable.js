@@ -2406,7 +2406,7 @@ var Plottable;
             Color.prototype.scale = function (value) {
                 var color = _super.prototype.scale.call(this, value);
                 var index = this.domain().indexOf(value);
-                var modifyFactor = Math.floor(index / this.range().length);
+                var modifyFactor = Math.floor(index / this.range().length) * Math.pow(0.95, index);
                 return Plottable._Util.Methods.lightenColor(color, modifyFactor);
             };
             Color.HEX_SCALE_FACTOR = 20;

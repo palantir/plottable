@@ -75,7 +75,7 @@ export module Scale {
     public scale(value: string): string {
       var color = super.scale(value);
       var index = this.domain().indexOf(value);
-      var modifyFactor = Math.floor(index / this.range().length);
+      var modifyFactor = Math.floor(index / this.range().length) * Math.pow(0.95, index);
       return _Util.Methods.lightenColor(color, modifyFactor);
     }
   }
