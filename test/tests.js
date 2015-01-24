@@ -6550,6 +6550,24 @@ describe("Interactions", function () {
             assert.closeTo(yDomainAfter[0] - yDomainBefore[0], expectedYDragChange, 1, "y domain changed by the correct amount");
             svg.remove();
         });
+        it("Resets zoom when the scale domain changes", function () {
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var svg = generateSVG();
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var pzi = new Plottable.Interaction.PanZoom(xScale, yScale);
+            c.registerInteraction(pzi);
+            var zoomBeforeX = pzi._zoom;
+            xScale.domain([10, 1000]);
+            var zoomAfterX = pzi._zoom;
+            assert.notStrictEqual(zoomBeforeX, zoomAfterX, "D3 Zoom was regenerated after x scale domain changed");
+            var zoomBeforeY = pzi._zoom;
+            yScale.domain([10, 1000]);
+            var zoomAfterY = pzi._zoom;
+            assert.notStrictEqual(zoomBeforeY, zoomAfterY, "D3 Zoom was regenerated after y scale domain changed");
+            svg.remove();
+        });
     });
     describe("KeyInteraction", function () {
         it("Triggers appropriate callback for the key pressed", function () {
