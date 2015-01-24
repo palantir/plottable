@@ -20,8 +20,8 @@ function run(svg, data, Plottable) {
     var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
     var linePlot = new Plottable.Plot.Line(xScale, yScale).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
     var areaPlot = new Plottable.Plot.Area(xScale, yScale).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
-    var vbarPlot = new Plottable.Plot.VerticalBar(xScale, yScale).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
-    var hbarPlot = new Plottable.Plot.HorizontalBar(xScale, yScale).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
+    var vbarPlot = new Plottable.Plot.Bar(xScale, yScale, true).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
+    var hbarPlot = new Plottable.Plot.Bar(xScale, yScale, false).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
 
     //title + legend
 

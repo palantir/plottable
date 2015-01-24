@@ -15,7 +15,7 @@ function run(svg, data, Plottable) {
   var xScale = new Plottable.Scale.Time();
   var yScale = new Plottable.Scale.Ordinal();
 
-  var hBarPlot = new Plottable.Plot.HorizontalBar(xScale, yScale)
+  var hBarPlot = new Plottable.Plot.Bar(xScale, yScale, false)
     .addDataset(data)
     .attr("x", function (d) { return d3.time.format("%x").parse(d.x); }, xScale)
     .project("y", "y", yScale);
