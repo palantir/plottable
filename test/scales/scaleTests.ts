@@ -311,6 +311,14 @@ describe("Scales", () => {
       scale.domain(["a", "b", "c"]);
       assert.notEqual(scale.scale("c"), "#5279c7");
     });
+
+    it("interprets named color values correctly", () => {
+      var scale = new Plottable.Scale.Color();
+      scale.range(["red", "blue"]);
+      scale.domain(["a", "b"]);
+      assert.equal(scale.scale("a"), "#ff0000");
+      assert.equal(scale.scale("b"), "#0000ff");
+    });
   });
 
   describe("Interpolated Color Scales", () => {

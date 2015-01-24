@@ -5765,6 +5765,13 @@ describe("Scales", function () {
             scale.domain(["a", "b", "c"]);
             assert.notEqual(scale.scale("c"), "#5279c7");
         });
+        it("interprets named color values correctly", function () {
+            var scale = new Plottable.Scale.Color();
+            scale.range(["red", "blue"]);
+            scale.domain(["a", "b"]);
+            assert.equal(scale.scale("a"), "#ff0000");
+            assert.equal(scale.scale("b"), "#0000ff");
+        });
     });
     describe("Interpolated Color Scales", function () {
         it("default scale uses reds and a linear scale type", function () {
@@ -6494,7 +6501,7 @@ describe("_Util.Methods", function () {
     });
     it("lightenColor()", function () {
         var color = "#12fced";
-        var lightenedColor = Plottable._Util.Methods.lightenColor(color, 1, 0.1);
+        var lightenedColor = Plottable._Util.Methods.lightenColor(color, 1);
         var lColor = Plottable._Util.Color.rgbToHsl(parseInt("12", 16), parseInt("fc", 16), parseInt("ed", 16))[2];
         var lLightenedColor = Plottable._Util.Color.rgbToHsl(parseInt(lightenedColor.substring(1, 3), 16), parseInt(lightenedColor.substring(3, 5), 16), parseInt(lightenedColor.substring(5, 7), 16))[2];
         assert.operator(lLightenedColor, ">", lColor, "color got lighter");
