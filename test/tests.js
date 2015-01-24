@@ -1925,10 +1925,11 @@ describe("Plots", function () {
             var oldWarn = Plottable._Util.Methods.warn;
             Plottable._Util.Methods.warn = function (warn) { return message = warn; };
             piePlot.removeDataset("simpleDataset");
-            negativeDataset = new Plottable.Dataset([{ value: -5, value2: 10, type: "A" }, { value: 15, value2: 10, type: "B" }]);
+            var negativeDataset = new Plottable.Dataset([{ value: -5 }, { value: 15 }]);
             piePlot.addDataset("negativeDataset", negativeDataset);
             assert.equal(message, "Negative values will not render correctly in a pie chart.");
             Plottable._Util.Methods.warn = oldWarn;
+            svg.remove();
         });
     });
 });
