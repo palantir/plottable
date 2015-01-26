@@ -7,7 +7,7 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-    var data = [
+    data = [
         {x: "A", y: 1, val: 0.1},
         {x: "B", y: 1, val: 0.2},
         {x: "C", y: 1, val: 0.3},
