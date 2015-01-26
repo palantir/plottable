@@ -70,7 +70,7 @@ function run(svg, data, Plottable) {
       .project("x", timeFormat, xScale)
       .project("y", "y", yScale1);
 
-  var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale1)
+  var barPlot = new Plottable.Plot.Bar(xScale, yScale1, true)
       .addDataset(data[0])
       .project("x", timeFormat, xScale)
       .project("y", "y", yScale1)

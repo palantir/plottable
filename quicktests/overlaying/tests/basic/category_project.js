@@ -24,7 +24,7 @@ function run(svg, data, Plottable) {
   };
 
   //rendering
-  var renderAreaD1 = new Plottable.Plot.VerticalBar(xScale, yScale)
+  var renderAreaD1 = new Plottable.Plot.Bar(xScale, yScale, true)
                                   .addDataset(dataseries1)
                                   .attr("width", widthProjector)
                                   .project("x", "x", xScale)
