@@ -264,7 +264,7 @@ describe("Scales", () => {
     var dB = {x: "B", y: 2};
     var dC = {x: "C", y: 2};
     var dataset = new Plottable.Dataset([dA, dB]);
-    var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale).addDataset(dataset);
+    var barPlot = new Plottable.Plot.Bar(xScale, yScale).addDataset(dataset);
     barPlot.project("x", "x", xScale);
     barPlot.project("y", "y", yScale);
     var svg = generateSVG();

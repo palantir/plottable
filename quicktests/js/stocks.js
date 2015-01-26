@@ -85,7 +85,7 @@ function run(div, data, Plottable) {
           var yAxis_diff = new Plottable.Axis.Numeric(yScale_diff, "left");
 
           var DAY_MILLIS = 24 * 60 * 60 * 1000;
-          var bar_diff = new Plottable.Plot.VerticalBar(xScale, yScale_diff).animate(true)
+          var bar_diff = new Plottable.Plot.Bar(xScale, yScale_diff).animate(true)
                                   .addDataset(diffData)
                                   .project("x", "Date", xScale)
                                   .project("y", "net change", yScale_diff)

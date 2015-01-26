@@ -2918,64 +2918,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        /**
-         * A VerticalBarPlot draws bars vertically.
-         * Key projected attributes:
-         *  - "width" - the horizontal width of a bar.
-         *      - if an ordinal scale is attached, this defaults to ordinalScale.rangeBand()
-         *      - if a quantitative scale is attached, this defaults to 10
-         *  - "x" - the horizontal position of a bar
-         *  - "y" - the vertical height of a bar
-         */
-        class VerticalBar<X> extends Bar<X, number> {
-            protected static _BarAlignmentToFactor: {
-                [x: string]: number;
-            };
-            /**
-             * Constructs a VerticalBarPlot.
-             *
-             * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {QuantitativeScale} yScale The y scale to use.
-             */
-            constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractQuantitative<number>);
-            protected _updateYDomainer(): void;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Plot {
-        /**
-         * A HorizontalBarPlot draws bars horizontally.
-         * Key projected attributes:
-         *  - "width" - the vertical height of a bar (since the bar is rotated horizontally)
-         *      - if an ordinal scale is attached, this defaults to ordinalScale.rangeBand()
-         *      - if a quantitative scale is attached, this defaults to 10
-         *  - "x" - the horizontal length of a bar
-         *  - "y" - the vertical position of a bar
-         */
-        class HorizontalBar<Y> extends Bar<number, Y> {
-            protected static _BarAlignmentToFactor: {
-                [x: string]: number;
-            };
-            /**
-             * Constructs a HorizontalBarPlot.
-             *
-             * @constructor
-             * @param {QuantitativeScale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
-             */
-            constructor(xScale: Scale.AbstractQuantitative<number>, yScale: Scale.AbstractScale<Y, number>);
-            protected _updateXDomainer(): void;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Plot {
         class Line<X> extends AbstractXYPlot<X, number> implements Interaction.Hoverable {
             protected _yScale: Scale.AbstractQuantitative<number>;
             /**
