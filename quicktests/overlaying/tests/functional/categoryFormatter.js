@@ -7,8 +7,10 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-   data = [{x: 0, y: 1}, {x: 1, y: 2}, {x: 2, y: 4}, {x: 3, y: 6}, {x: 4, y: 5}, {x: 5, y: 3}, {x: 6, y: 0.5}];  
-      
+  data = [{x: 0, y: 1}, {x: 1, y: 2}, {x: 2, y: 4}, {x: 3, y: 6}, {x: 4, y: 5}, {x: 5, y: 3}, {x: 6, y: 0.5}];  
+  var DOW = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  var Emp = ["Justin", "Cassie", "Brandon", "Roger", "Dan", "Lewin", "Brian"];
+  
   var xScale = new Plottable.Scale.Ordinal();
   var yScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
@@ -16,14 +18,12 @@ function run(svg, data, Plottable) {
 
   var IdTitle = new Plottable.Component.Label("Identity");
   var DowTitle = new Plottable.Component.Label("Day of Week");
-   var EmpIDTitle = new Plottable.Component.Label("Emp ID");
+  var EmpIDTitle = new Plottable.Component.Label("Emp ID");
 
   var DOWFormatter = function(d) { 
-      var DOW = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
       return DOW[d%7];
   };
   var EmpIDFormatter = function(d) {
-      var Emp = ["Justin", "Cassie", "Brandon", "Roger", "Dan", "Lewin", "Brian"];
       return Emp[d%7];
   };
 
