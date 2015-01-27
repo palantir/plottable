@@ -1015,6 +1015,7 @@ declare module Plottable {
             protected _d3Scale: D3.Scale.QuantitativeScale;
             _userSetDomainer: boolean;
             _typeCoercer: (d: any) => number;
+            protected static QUANTITATIVE_SCALE_DEFAULT_EXTENT: number[];
             /**
              * Constructs a new QuantitativeScale.
              *

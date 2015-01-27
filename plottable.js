@@ -1968,7 +1968,7 @@ var Plottable;
                 }
             };
             AbstractQuantitative.prototype._defaultExtent = function () {
-                return [0, 1];
+                return AbstractQuantitative.QUANTITATIVE_SCALE_DEFAULT_EXTENT;
             };
             AbstractQuantitative.prototype.tickGenerator = function (generator) {
                 if (generator == null) {
@@ -1979,6 +1979,7 @@ var Plottable;
                     return this;
                 }
             };
+            AbstractQuantitative.QUANTITATIVE_SCALE_DEFAULT_EXTENT = [0, 1];
             return AbstractQuantitative;
         })(Scale.AbstractScale);
         Scale.AbstractQuantitative = AbstractQuantitative;
@@ -2094,15 +2095,14 @@ var Plottable;
              */
             function ModifiedLog(base) {
                 if (base === void 0) { base = 10; }
-                _super.call(this, d3.scale.linear());
-                this._showIntermediateTicks = false;
-                this.base = base;
-                this.pivot = this.base;
-                this.untransformedDomain = this._defaultExtent();
-                this.numTicks(10);
                 if (base <= 1) {
                     throw new Error("ModifiedLogScale: The base must be > 1");
                 }
+                _super.call(this, d3.scale.linear());
+                this.base = base;
+                this.pivot = base;
+                this.untransformedDomain = Scale.AbstractQuantitative.QUANTITATIVE_SCALE_DEFAULT_EXTENT;
+                this._showIntermediateTicks = false;
             }
             /**
              * Returns an adjusted log10 value for graphing purposes.  The first
@@ -2516,7 +2516,7 @@ var Plottable;
             function InterpolatedColor(colorRange, scaleType) {
                 if (colorRange === void 0) { colorRange = "reds"; }
                 if (scaleType === void 0) { scaleType = "linear"; }
-                this._colorRange = this._resolveColorValues(colorRange);
+                this._colorRange = InterpolatedColor._resolveColorValues(colorRange);
                 this._scaleType = scaleType;
                 _super.call(this, InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType));
             }
@@ -2582,7 +2582,7 @@ var Plottable;
                 if (colorRange == null) {
                     return this._colorRange;
                 }
-                this._colorRange = this._resolveColorValues(colorRange);
+                this._colorRange = InterpolatedColor._resolveColorValues(colorRange);
                 this._resetScale();
                 return this;
             };
@@ -2599,7 +2599,7 @@ var Plottable;
                 this._autoDomainIfAutomaticMode();
                 this.broadcaster.broadcast();
             };
-            InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
+            InterpolatedColor._resolveColorValues = function (colorRange) {
                 if (colorRange instanceof Array) {
                     return colorRange;
                 }
