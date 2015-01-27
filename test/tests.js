@@ -1808,7 +1808,7 @@ describe("Plots", function () {
             svg = generateSVG(500, 500);
             simpleDataset = new Plottable.Dataset([{ value: 5, value2: 10, type: "A" }, { value: 15, value2: 10, type: "B" }]);
             piePlot = new Plottable.Plot.Pie();
-            piePlot.addDataset(simpleDataset);
+            piePlot.addDataset("simpleDataset", simpleDataset);
             piePlot.project("value", "value");
             piePlot.renderTo(svg);
             renderArea = piePlot._renderArea;
@@ -1919,6 +1919,17 @@ describe("Plots", function () {
                 assert.strictEqual(arcPath1.attr("fill"), "#aec7e8", "second sector filled appropriately");
                 svg.remove();
             });
+        });
+        it("throws warnings on negative data", function () {
+            var message;
+            var oldWarn = Plottable._Util.Methods.warn;
+            Plottable._Util.Methods.warn = function (warn) { return message = warn; };
+            piePlot.removeDataset("simpleDataset");
+            var negativeDataset = new Plottable.Dataset([{ value: -5 }, { value: 15 }]);
+            piePlot.addDataset("negativeDataset", negativeDataset);
+            assert.equal(message, "Negative values will not render correctly in a pie chart.");
+            Plottable._Util.Methods.warn = oldWarn;
+            svg.remove();
         });
     });
 });

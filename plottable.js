@@ -3192,6 +3192,11 @@ var Plottable;
                 var valueAccessor = function (d, i) { return drawSteps[0].attrToProjector["value"](d, i, userMetadata, plotMetadata); };
                 var pie = d3.layout.pie().sort(null).value(valueAccessor)(data);
                 drawSteps.forEach(function (s) { return delete s.attrToProjector["value"]; });
+                pie.forEach(function (slice) {
+                    if (slice.value < 0) {
+                        Plottable._Util.Methods.warn("Negative values will not render correctly in a pie chart.");
+                    }
+                });
                 return _super.prototype.draw.call(this, pie, drawSteps, userMetadata, plotMetadata);
             };
             return Arc;
