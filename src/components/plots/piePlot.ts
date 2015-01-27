@@ -24,7 +24,7 @@ export module Plot {
     constructor() {
       super();
       this._colorScale = new Scale.Color();
-      _Util.Methods.uniqAdd(this._cssClasses, "pie-plot");
+      _Util.Methods.uniqPush(this._cssClasses, "pie-plot");
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {

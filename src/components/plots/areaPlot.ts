@@ -18,7 +18,7 @@ export module Plot {
      */
     constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
       super(xScale, yScale);
-      _Util.Methods.uniqAdd(this._cssClasses, "area-plot");
+      _Util.Methods.uniqPush(this._cssClasses, "area-plot");
 
       this._animators["reset"] = new Animator.Null();
       this._animators["main"] = new Animator.Base()

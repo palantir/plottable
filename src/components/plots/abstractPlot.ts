@@ -43,7 +43,7 @@ export module Plot {
     constructor() {
       super();
       this.clipPathEnabled = true;
-      _Util.Methods.uniqAdd(this._cssClasses, "plot");
+      _Util.Methods.uniqPush(this._cssClasses, "plot");
       this._key2PlotDatasetKey = d3.map();
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;

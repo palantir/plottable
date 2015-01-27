@@ -16,7 +16,7 @@ export module Plot {
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
       super(xScale, yScale);
 
-      _Util.Methods.uniqAdd(this._cssClasses, "scatter-plot");
+      _Util.Methods.uniqPush(this._cssClasses, "scatter-plot");
       this._defaultFillColor = new Scale.Color().range()[0];
 
       this._animators["circles-reset"] = new Animator.Null();

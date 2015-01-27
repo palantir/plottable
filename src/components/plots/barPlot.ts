@@ -25,7 +25,7 @@ export module Plot {
      */
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
       super(xScale, yScale);
-      _Util.Methods.uniqAdd(this._cssClasses, "bar-plot");
+      _Util.Methods.uniqPush(this._cssClasses, "bar-plot");
       this._defaultFillColor = new Scale.Color().range()[0];
       this._animators["bar-reset"] = new Animator.Null();
       this._animators["bars"] = new Animator.Base();

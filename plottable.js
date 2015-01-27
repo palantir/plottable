@@ -327,12 +327,12 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
-            function uniqAdd(arr, item) {
+            function uniqPush(arr, item) {
                 if (arr.indexOf(item) === -1) {
                     arr.push(item);
                 }
             }
-            Methods.uniqAdd = uniqAdd;
+            Methods.uniqPush = uniqPush;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -1968,7 +1968,7 @@ var Plottable;
                 }
             };
             AbstractQuantitative.prototype._defaultExtent = function () {
-                return [0, 1];
+                return AbstractQuantitative.QUANTITATIVE_SCALE_DEFAULT_EXTENT;
             };
             AbstractQuantitative.prototype.tickGenerator = function (generator) {
                 if (generator == null) {
@@ -1979,6 +1979,7 @@ var Plottable;
                     return this;
                 }
             };
+            AbstractQuantitative.QUANTITATIVE_SCALE_DEFAULT_EXTENT = [0, 1];
             return AbstractQuantitative;
         })(Scale.AbstractScale);
         Scale.AbstractQuantitative = AbstractQuantitative;
@@ -2094,15 +2095,14 @@ var Plottable;
              */
             function ModifiedLog(base) {
                 if (base === void 0) { base = 10; }
-                _super.call(this, d3.scale.linear());
-                this._showIntermediateTicks = false;
-                this.base = base;
-                this.pivot = this.base;
-                this.untransformedDomain = this._defaultExtent();
-                this.numTicks(10);
                 if (base <= 1) {
                     throw new Error("ModifiedLogScale: The base must be > 1");
                 }
+                _super.call(this, d3.scale.linear());
+                this.base = base;
+                this.pivot = base;
+                this.untransformedDomain = Scale.AbstractQuantitative.QUANTITATIVE_SCALE_DEFAULT_EXTENT;
+                this._showIntermediateTicks = false;
             }
             /**
              * Returns an adjusted log10 value for graphing purposes.  The first
@@ -2516,7 +2516,7 @@ var Plottable;
             function InterpolatedColor(colorRange, scaleType) {
                 if (colorRange === void 0) { colorRange = "reds"; }
                 if (scaleType === void 0) { scaleType = "linear"; }
-                this._colorRange = this._resolveColorValues(colorRange);
+                this._colorRange = InterpolatedColor._resolveColorValues(colorRange);
                 this._scaleType = scaleType;
                 _super.call(this, InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType));
             }
@@ -2582,7 +2582,7 @@ var Plottable;
                 if (colorRange == null) {
                     return this._colorRange;
                 }
-                this._colorRange = this._resolveColorValues(colorRange);
+                this._colorRange = InterpolatedColor._resolveColorValues(colorRange);
                 this._resetScale();
                 return this;
             };
@@ -2599,7 +2599,7 @@ var Plottable;
                 this._autoDomainIfAutomaticMode();
                 this.broadcaster.broadcast();
             };
-            InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
+            InterpolatedColor._resolveColorValues = function (colorRange) {
                 if (colorRange instanceof Array) {
                     return colorRange;
                 }
@@ -3092,7 +3092,7 @@ var Plottable;
             function Rect(key, isVertical) {
                 _super.call(this, key);
                 this._labelsTooWide = false;
-                this.svgElement("rect");
+                this._svgElement = "rect";
                 this._isVertical = isVertical;
             }
             Rect.prototype.setup = function (area) {
@@ -3466,21 +3466,29 @@ var Plottable;
              * @returns {Component} The calling Component.
              */
             AbstractComponent.prototype.xAlign = function (alignment) {
-                alignment = alignment.toLowerCase();
-                if (alignment === "left") {
-                    this._xAlignProportion = 0;
-                }
-                else if (alignment === "center") {
-                    this._xAlignProportion = 0.5;
-                }
-                else if (alignment === "right") {
-                    this._xAlignProportion = 1;
-                }
-                else {
-                    throw new Error("Unsupported alignment");
-                }
+                alignment = AbstractComponent.ensureXAlignment(alignment);
+                this._xAlignProportion = AbstractComponent._xAlignmentToProportion(alignment);
                 this._invalidateLayout();
                 return this;
+            };
+            AbstractComponent.ensureXAlignment = function (alignment) {
+                alignment = alignment.toLowerCase();
+                if (["left", "center", "right"].indexOf(alignment) === -1) {
+                    throw new Error("Unsupported alignment");
+                }
+                return alignment;
+            };
+            AbstractComponent._xAlignmentToProportion = function (alignment) {
+                alignment = alignment.toLowerCase();
+                if (alignment === "left") {
+                    return 0;
+                }
+                else if (alignment === "center") {
+                    return 0.5;
+                }
+                else if (alignment === "right") {
+                    return 1;
+                }
             };
             /**
              * Sets the y alignment of the Component. This will be used if the
@@ -3494,21 +3502,29 @@ var Plottable;
              * @returns {Component} The calling Component.
              */
             AbstractComponent.prototype.yAlign = function (alignment) {
-                alignment = alignment.toLowerCase();
-                if (alignment === "top") {
-                    this._yAlignProportion = 0;
-                }
-                else if (alignment === "center") {
-                    this._yAlignProportion = 0.5;
-                }
-                else if (alignment === "bottom") {
-                    this._yAlignProportion = 1;
-                }
-                else {
-                    throw new Error("Unsupported alignment");
-                }
+                alignment = AbstractComponent.ensureYAlignment(alignment);
+                this._yAlignProportion = AbstractComponent._yAlignmentToProportion(alignment);
                 this._invalidateLayout();
                 return this;
+            };
+            AbstractComponent.ensureYAlignment = function (alignment) {
+                alignment = alignment.toLowerCase();
+                if (["top", "center", "bottom"].indexOf(alignment) === -1) {
+                    throw new Error("Unsupported alignment");
+                }
+                return alignment;
+            };
+            AbstractComponent._yAlignmentToProportion = function (alignment) {
+                alignment = alignment.toLowerCase();
+                if (alignment === "top") {
+                    return 0;
+                }
+                else if (alignment === "center") {
+                    return 0.5;
+                }
+                else if (alignment === "bottom") {
+                    return 1;
+                }
             };
             /**
              * Sets the x offset of the Component. This will be used if the Component
@@ -3870,8 +3886,13 @@ var Plottable;
                 var _this = this;
                 if (components === void 0) { components = []; }
                 _super.call(this);
-                this.classed("component-group", true);
-                components.forEach(function (c) { return _this._addComponent(c); });
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "component-group");
+                components.forEach(function (c) {
+                    if (c !== null) {
+                        Plottable._Util.Methods.uniqPush(_this._components, c);
+                        c._parent = _this;
+                    }
+                });
             }
             Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var requests = this.components().map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
@@ -3931,36 +3952,51 @@ var Plottable;
              * displayed.
              */
             function AbstractAxis(scale, orientation, formatter) {
-                var _this = this;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
+                if (scale == null || orientation == null) {
+                    throw new Error("Axis requires a scale and orientation");
+                }
                 _super.call(this);
+                this._scale = scale;
+                this._orientation = AbstractAxis.ensureAxisOrientation(orientation);
+                if (AbstractAxis._isHorizontalOrientation(orientation)) {
+                    var yAlignmentString = orientation === "top" ? "bottom" : "top";
+                    this._yAlignProportion = Plottable.Component.AbstractComponent._yAlignmentToProportion(yAlignmentString);
+                }
+                else {
+                    var xAlignmentString = orientation === "left" ? "right" : "left";
+                    this._xAlignProportion = Plottable.Component.AbstractComponent._xAlignmentToProportion(xAlignmentString);
+                }
+                this._formatter = formatter;
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "axis");
                 this._endTickLength = 5;
                 this._tickLength = 5;
                 this._tickLabelPadding = 10;
                 this._gutter = 15;
                 this._showEndTickLabels = false;
-                if (scale == null || orientation == null) {
-                    throw new Error("Axis requires a scale and orientation");
-                }
-                this._scale = scale;
-                this.orient(orientation);
-                this._setDefaultAlignment();
-                this.classed("axis", true);
+            }
+            AbstractAxis.prototype._anchor = function (element) {
+                var _this = this;
+                _super.prototype._anchor.call(this, element);
+                this._isAnchored = false;
                 if (this._isHorizontal()) {
                     this.classed("x-axis", true);
                 }
                 else {
                     this.classed("y-axis", true);
                 }
-                this.formatter(formatter);
                 this._scale.broadcaster.registerListener(this, function () { return _this._rescale(); });
-            }
+                this._isAnchored = true;
+            };
             AbstractAxis.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 this._scale.broadcaster.deregisterListener(this);
             };
             AbstractAxis.prototype._isHorizontal = function () {
-                return this._orientation === "top" || this._orientation === "bottom";
+                return AbstractAxis._isHorizontalOrientation(this._orientation);
+            };
+            AbstractAxis._isHorizontalOrientation = function (orientation) {
+                return orientation === "top" || orientation === "bottom";
             };
             AbstractAxis.prototype._computeWidth = function () {
                 // to be overridden by subclass logic
@@ -4194,14 +4230,17 @@ var Plottable;
                     return this._orientation;
                 }
                 else {
-                    var newOrientationLC = newOrientation.toLowerCase();
-                    if (newOrientationLC !== "top" && newOrientationLC !== "bottom" && newOrientationLC !== "left" && newOrientationLC !== "right") {
-                        throw new Error("unsupported orientation");
-                    }
-                    this._orientation = newOrientationLC;
+                    this._orientation = AbstractAxis.ensureAxisOrientation(newOrientation);
                     this._invalidateLayout();
                     return this;
                 }
+            };
+            AbstractAxis.ensureAxisOrientation = function (orientation) {
+                orientation = orientation.toLowerCase();
+                if (["top", "bottom", "left", "right"].indexOf(orientation) === -1) {
+                    throw new Error("unsupported orientation");
+                }
+                return orientation;
             };
             AbstractAxis.prototype.showEndTickLabels = function (show) {
                 if (show == null) {
@@ -4289,7 +4328,7 @@ var Plottable;
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             function Time(scale, orientation) {
-                _super.call(this, scale, orientation);
+                _super.call(this, scale, Time.ensureTimeAxisOrientation(orientation));
                 /*
                  * Default possible axis configurations.
                  */
@@ -4402,22 +4441,25 @@ var Plottable;
                         { interval: d3.time.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
                     ] }
                 ];
-                this.classed("time-axis", true);
-                this.tickLabelPadding(5);
-                this.tierLabelPositions(["between", "between"]);
+                this._tickLabelPadding = 5;
+                this._tierLabelPositions = ["between", "between"];
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "time-axis");
             }
             Time.prototype.tierLabelPositions = function (newPositions) {
                 if (newPositions == null) {
                     return this._tierLabelPositions;
                 }
                 else {
-                    if (!newPositions.every(function (pos) { return pos.toLowerCase() === "between" || pos.toLowerCase() === "center"; })) {
-                        throw new Error("Unsupported position for tier labels");
-                    }
-                    this._tierLabelPositions = newPositions;
+                    this._tierLabelPositions = Time.ensureTierLabelPositions(newPositions);
                     this._invalidateLayout();
                     return this;
                 }
+            };
+            Time.ensureTierLabelPositions = function (positions) {
+                if (!positions.every(function (pos) { return pos.toLowerCase() === "between" || pos.toLowerCase() === "center"; })) {
+                    throw new Error("Unsupported position for tier labels");
+                }
+                return positions;
             };
             Time.prototype.axisConfigurations = function (configurations) {
                 if (configurations == null) {
@@ -4445,10 +4487,17 @@ var Plottable;
                 return mostPreciseIndex;
             };
             Time.prototype.orient = function (orientation) {
-                if (orientation && (orientation.toLowerCase() === "right" || orientation.toLowerCase() === "left")) {
-                    throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
+                if (orientation) {
+                    orientation = Time.ensureTimeAxisOrientation(orientation);
                 }
                 return _super.prototype.orient.call(this, orientation); // maintains getter-setter functionality
+            };
+            Time.ensureTimeAxisOrientation = function (orientation) {
+                orientation = orientation.toLowerCase();
+                if (["bottom", "top"].indexOf(orientation.toLowerCase()) === -1) {
+                    throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
+                }
+                return orientation;
             };
             Time.prototype._computeHeight = function () {
                 var _this = this;
@@ -4927,7 +4976,7 @@ var Plottable;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
                 this._tickLabelAngle = 0;
-                this.classed("category-axis", true);
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "category-axis");
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5096,10 +5145,13 @@ var Plottable;
                 if (displayText === void 0) { displayText = ""; }
                 if (orientation === void 0) { orientation = "horizontal"; }
                 _super.call(this);
-                this.classed("label", true);
-                this.text(displayText);
-                this.orient(orientation);
-                this.xAlign("center").yAlign("center");
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "label");
+                this._text = displayText;
+                this._orientation = Label.ensureLabelOrientation(orientation);
+                this._xAlignProportion = Component.AbstractComponent._xAlignmentToProportion("center");
+                this._yAlignProportion = Component.AbstractComponent._yAlignmentToProportion("center");
+                this._xAlignment = "center";
+                this._yAlignment = "center";
                 this._fixedHeightFlag = true;
                 this._fixedWidthFlag = true;
                 this._padding = 0;
@@ -5164,16 +5216,17 @@ var Plottable;
                     return this._orientation;
                 }
                 else {
-                    newOrientation = newOrientation.toLowerCase();
-                    if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
-                        this._orientation = newOrientation;
-                    }
-                    else {
-                        throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
-                    }
+                    this._orientation = Label.ensureLabelOrientation(newOrientation);
                     this._invalidateLayout();
                     return this;
                 }
+            };
+            Label.ensureLabelOrientation = function (orientation) {
+                orientation = orientation.toLowerCase();
+                if (["horizontal", "left", "right"].indexOf(orientation) === -1) {
+                    throw new Error(orientation + " is not a valid orientation for LabelComponent");
+                }
+                return orientation;
             };
             Label.prototype.padding = function (padAmount) {
                 if (padAmount == null) {
@@ -5266,16 +5319,16 @@ var Plottable;
              */
             function Legend(colorScale) {
                 var _this = this;
-                _super.call(this);
-                this._padding = 5;
-                this.classed("legend", true);
-                this.maxEntriesPerRow(1);
                 if (colorScale == null) {
                     throw new Error("Legend requires a colorScale");
                 }
+                _super.call(this);
+                this._padding = 5;
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "legend");
+                this._maxEntriesPerRow = 1;
                 this._scale = colorScale;
-                this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
-                this.xAlign("right").yAlign("top");
+                this._xAlignProportion = Component.AbstractComponent._xAlignmentToProportion("center");
+                this._yAlignProportion = Component.AbstractComponent._yAlignmentToProportion("center");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
@@ -5288,6 +5341,11 @@ var Plottable;
                 this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(true);
+            };
+            Legend.prototype._anchor = function (element) {
+                var _this = this;
+                _super.prototype._anchor.call(this, element);
+                this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
             };
             Legend.prototype.maxEntriesPerRow = function (numEntries) {
                 if (numEntries == null) {
@@ -5498,7 +5556,6 @@ var Plottable;
              * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
             function Gridlines(xScale, yScale) {
-                var _this = this;
                 if (xScale != null && !(Plottable.Scale.AbstractQuantitative.prototype.isPrototypeOf(xScale))) {
                     throw new Error("xScale needs to inherit from Scale.AbstractQuantitative");
                 }
@@ -5506,16 +5563,20 @@ var Plottable;
                     throw new Error("yScale needs to inherit from Scale.AbstractQuantitative");
                 }
                 _super.call(this);
-                this.classed("gridlines", true);
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "gridlines");
                 this._xScale = xScale;
                 this._yScale = yScale;
+            }
+            Gridlines.prototype._anchor = function (element) {
+                var _this = this;
+                _super.prototype._anchor.call(this, element);
                 if (this._xScale) {
                     this._xScale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
                 if (this._yScale) {
                     this._yScale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
-            }
+            };
             Gridlines.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 if (this._xScale) {
@@ -5941,7 +6002,7 @@ var Plottable;
                 this._animators = {};
                 this._animateOnNextRender = true;
                 this.clipPathEnabled = true;
-                Plottable._Util.Methods.uniqAdd(this._cssClasses, "plot");
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "plot");
                 this._key2PlotDatasetKey = d3.map();
                 this._datasetKeysInOrder = [];
                 this._nextSeriesIndex = 0;
@@ -6267,7 +6328,7 @@ var Plottable;
             function Pie() {
                 _super.call(this);
                 this._colorScale = new Plottable.Scale.Color();
-                Plottable._Util.Methods.uniqAdd(this._cssClasses, "pie-plot");
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "pie-plot");
             }
             Pie.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
@@ -6329,7 +6390,7 @@ var Plottable;
                     throw new Error("XYPlots require an xScale and yScale");
                 }
                 _super.call(this);
-                Plottable._Util.Methods.uniqAdd(this._cssClasses, "xy-plot");
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "xy-plot");
                 this._xScale = xScale;
                 this._yScale = yScale;
                 AbstractXYPlot.updateScaleDomainer(xScale);
@@ -6537,7 +6598,7 @@ var Plottable;
             function Scatter(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this._closeDetectionRadius = 5;
-                Plottable._Util.Methods.uniqAdd(this._cssClasses, "scatter-plot");
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "scatter-plot");
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
                 this._animators["circles-reset"] = new Plottable.Animator.Null();
                 this._animators["circles"] = new Plottable.Animator.Base().duration(250).delay(5);
@@ -6681,7 +6742,7 @@ var Plottable;
              */
             function Grid(xScale, yScale, colorScale) {
                 _super.call(this, xScale, yScale);
-                Plottable._Util.Methods.uniqAdd(this._cssClasses, "grid-plot");
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "grid-plot");
                 // The x and y scales should render in bands with no padding
                 this._xScale.rangeType("bands", 0, 0);
                 this._yScale.rangeType("bands", 0, 0);
@@ -6756,7 +6817,7 @@ var Plottable;
                 this._barLabelsEnabled = false;
                 this._hoverMode = "point";
                 this._hideBarsIfAnyAreTooWide = true;
-                Plottable._Util.Methods.uniqAdd(this._cssClasses, "bar-plot");
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "bar-plot");
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
                 this._animators["bar-reset"] = new Plottable.Animator.Null();
                 this._animators["bars"] = new Plottable.Animator.Base();
@@ -7244,7 +7305,7 @@ var Plottable;
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this._hoverDetectionRadius = 15;
-                Plottable._Util.Methods.uniqAdd(this._cssClasses, "line-plot");
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "line-plot");
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
                 this._defaultStrokeColor = new Plottable.Scale.Color().range()[0];
@@ -7393,7 +7454,7 @@ var Plottable;
              */
             function Area(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                Plottable._Util.Methods.uniqAdd(this._cssClasses, "area-plot");
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "area-plot");
                 this._animators["reset"] = new Plottable.Animator.Null();
                 this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
@@ -7772,7 +7833,6 @@ var Plottable;
             function StackedArea(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
-                Plottable._Util.Methods.uniqAdd(this._cssClasses, "area-plot");
                 this._isVertical = true;
             }
             StackedArea.prototype._getDrawer = function (key) {

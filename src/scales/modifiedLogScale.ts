@@ -6,7 +6,7 @@ export module Scale {
     private base: number;
     private pivot: number;
     private untransformedDomain: number[];
-    private _showIntermediateTicks = false;
+    private _showIntermediateTicks: boolean;
 
     /**
      * Creates a new Scale.ModifiedLog.
@@ -34,14 +34,15 @@ export module Scale {
      *        For negative values, scale(-x) = -scale(x).
      */
     constructor(base = 10) {
-      super(d3.scale.linear());
-      this.base = base;
-      this.pivot = this.base;
-      this.untransformedDomain = this._defaultExtent();
-      this.numTicks(10);
       if (base <= 1) {
         throw new Error("ModifiedLogScale: The base must be > 1");
       }
+
+      super(d3.scale.linear());
+      this.base = base;
+      this.pivot = base;
+      this.untransformedDomain = AbstractQuantitative.QUANTITATIVE_SCALE_DEFAULT_EXTENT;
+      this._showIntermediateTicks = false;
     }
 
     /**
