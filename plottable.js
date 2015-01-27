@@ -6214,7 +6214,7 @@ var Plottable;
                 this._additionalPaint(maxTime);
             };
             AbstractPlot.prototype.getAllSelections = function () {
-                this._renderArea.selectAll(this._getSelector());
+                return this._renderArea.selectAll(this._getSelector());
             };
             AbstractPlot.prototype._getSelector = function () {
                 return "";

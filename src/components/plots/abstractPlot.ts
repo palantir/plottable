@@ -421,7 +421,7 @@ export module Plot {
     }
 
     public getAllSelections(): D3.Selection {
-      this._renderArea.selectAll(this._getSelector());
+      return this._renderArea.selectAll(this._getSelector());
     }
 
     protected _getSelector(): string {

@@ -2646,7 +2646,7 @@ declare module Plottable {
              * @param {string} key The key of new dataset
              */
             protected _getPlotMetadataForDataset(key: string): PlotMetadata;
-            getAllSelections(): void;
+            getAllSelections(): D3.Selection;
             protected _getSelector(): string;
         }
     }
@@ -2666,6 +2666,7 @@ declare module Plottable {
             addDataset(keyOrDataset: any, dataset?: any): Pie;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): _Drawer.AbstractDrawer;
+            protected _getSelector(): string;
         }
     }
 }
@@ -2753,6 +2754,7 @@ declare module Plottable {
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _generateDrawSteps(): _Drawer.DrawStep[];
             protected _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData;
+            protected _getSelector(): string;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
@@ -2786,6 +2788,7 @@ declare module Plottable {
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Grid;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _generateDrawSteps(): _Drawer.DrawStep[];
+            protected _getSelector(): string;
         }
     }
 }
@@ -2942,6 +2945,7 @@ declare module Plottable {
                 closestValue: any;
                 closestPoint: Point;
             };
+            protected _getSelector(): string;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;

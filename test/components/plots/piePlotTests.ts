@@ -6,12 +6,14 @@ describe("Plots", () => {
   describe("PiePlot", () => {
     var svg: D3.Selection;
     var simpleDataset: Plottable.Dataset;
+    var simpleData: any[];
     var piePlot: Plottable.Plot.Pie;
     var renderArea: D3.Selection;
 
     beforeEach(() => {
       svg = generateSVG(500, 500);
-      simpleDataset = new Plottable.Dataset([{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}]);
+      simpleData = [{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}];
+      simpleDataset = new Plottable.Dataset(simpleData);
       piePlot = new Plottable.Plot.Pie();
       piePlot.addDataset(simpleDataset);
       piePlot.project("value", "value");
@@ -124,6 +126,15 @@ describe("Plots", () => {
       assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
 
       piePlot.project("outer-radius", () => 250);
+      svg.remove();
+    });
+
+    it("getAllSelections retrieves correct selections",() => {
+      var allSectors = piePlot.getAllSelections();
+      assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
+      var selectionData = allSectors.data();
+      assert.includeMembers(selectionData.map((datum) => datum.data), simpleData, "dataset data in selection data");
+
       svg.remove();
     });
 
