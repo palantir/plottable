@@ -1968,7 +1968,7 @@ var Plottable;
                 }
             };
             AbstractQuantitative.prototype._defaultExtent = function () {
-                return [0, 1];
+                return AbstractQuantitative.QUANTITATIVE_SCALE_DEFAULT_EXTENT;
             };
             AbstractQuantitative.prototype.tickGenerator = function (generator) {
                 if (generator == null) {
@@ -1979,6 +1979,7 @@ var Plottable;
                     return this;
                 }
             };
+            AbstractQuantitative.QUANTITATIVE_SCALE_DEFAULT_EXTENT = [0, 1];
             return AbstractQuantitative;
         })(Scale.AbstractScale);
         Scale.AbstractQuantitative = AbstractQuantitative;
@@ -2094,15 +2095,14 @@ var Plottable;
              */
             function ModifiedLog(base) {
                 if (base === void 0) { base = 10; }
-                _super.call(this, d3.scale.linear());
-                this._showIntermediateTicks = false;
-                this.base = base;
-                this.pivot = this.base;
-                this.untransformedDomain = this._defaultExtent();
-                this.numTicks(10);
                 if (base <= 1) {
                     throw new Error("ModifiedLogScale: The base must be > 1");
                 }
+                _super.call(this, d3.scale.linear());
+                this.base = base;
+                this.pivot = base;
+                this.untransformedDomain = Scale.AbstractQuantitative.QUANTITATIVE_SCALE_DEFAULT_EXTENT;
+                this._showIntermediateTicks = false;
             }
             /**
              * Returns an adjusted log10 value for graphing purposes.  The first
@@ -2516,7 +2516,7 @@ var Plottable;
             function InterpolatedColor(colorRange, scaleType) {
                 if (colorRange === void 0) { colorRange = "reds"; }
                 if (scaleType === void 0) { scaleType = "linear"; }
-                this._colorRange = this._resolveColorValues(colorRange);
+                this._colorRange = InterpolatedColor._resolveColorValues(colorRange);
                 this._scaleType = scaleType;
                 _super.call(this, InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType));
             }
@@ -2582,7 +2582,7 @@ var Plottable;
                 if (colorRange == null) {
                     return this._colorRange;
                 }
-                this._colorRange = this._resolveColorValues(colorRange);
+                this._colorRange = InterpolatedColor._resolveColorValues(colorRange);
                 this._resetScale();
                 return this;
             };
@@ -2599,7 +2599,7 @@ var Plottable;
                 this._autoDomainIfAutomaticMode();
                 this.broadcaster.broadcast();
             };
-            InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
+            InterpolatedColor._resolveColorValues = function (colorRange) {
                 if (colorRange instanceof Array) {
                     return colorRange;
                 }
@@ -3092,7 +3092,7 @@ var Plottable;
             function Rect(key, isVertical) {
                 _super.call(this, key);
                 this._labelsTooWide = false;
-                this.svgElement("rect");
+                this._svgElement = "rect";
                 this._isVertical = isVertical;
             }
             Rect.prototype.setup = function (area) {
@@ -3952,36 +3952,51 @@ var Plottable;
              * displayed.
              */
             function AbstractAxis(scale, orientation, formatter) {
-                var _this = this;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
+                if (scale == null || orientation == null) {
+                    throw new Error("Axis requires a scale and orientation");
+                }
                 _super.call(this);
+                this._scale = scale;
+                this._orientation = AbstractAxis.ensureAxisOrientation(orientation);
+                if (AbstractAxis._isHorizontalOrientation(orientation)) {
+                    var yAlignmentString = orientation === "top" ? "bottom" : "top";
+                    this._yAlignProportion = Plottable.Component.AbstractComponent._yAlignmentToProportion(yAlignmentString);
+                }
+                else {
+                    var xAlignmentString = orientation === "left" ? "right" : "left";
+                    this._xAlignProportion = Plottable.Component.AbstractComponent._xAlignmentToProportion(xAlignmentString);
+                }
+                this._formatter = formatter;
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "axis");
                 this._endTickLength = 5;
                 this._tickLength = 5;
                 this._tickLabelPadding = 10;
                 this._gutter = 15;
                 this._showEndTickLabels = false;
-                if (scale == null || orientation == null) {
-                    throw new Error("Axis requires a scale and orientation");
-                }
-                this._scale = scale;
-                this.orient(orientation);
-                this._setDefaultAlignment();
-                this.classed("axis", true);
+            }
+            AbstractAxis.prototype._anchor = function (element) {
+                var _this = this;
+                _super.prototype._anchor.call(this, element);
+                this._isAnchored = false;
                 if (this._isHorizontal()) {
                     this.classed("x-axis", true);
                 }
                 else {
                     this.classed("y-axis", true);
                 }
-                this.formatter(formatter);
                 this._scale.broadcaster.registerListener(this, function () { return _this._rescale(); });
-            }
+                this._isAnchored = true;
+            };
             AbstractAxis.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 this._scale.broadcaster.deregisterListener(this);
             };
             AbstractAxis.prototype._isHorizontal = function () {
-                return this._orientation === "top" || this._orientation === "bottom";
+                return AbstractAxis._isHorizontalOrientation(this._orientation);
+            };
+            AbstractAxis._isHorizontalOrientation = function (orientation) {
+                return orientation === "top" || orientation === "bottom";
             };
             AbstractAxis.prototype._computeWidth = function () {
                 // to be overridden by subclass logic
@@ -4215,14 +4230,17 @@ var Plottable;
                     return this._orientation;
                 }
                 else {
-                    var newOrientationLC = newOrientation.toLowerCase();
-                    if (newOrientationLC !== "top" && newOrientationLC !== "bottom" && newOrientationLC !== "left" && newOrientationLC !== "right") {
-                        throw new Error("unsupported orientation");
-                    }
-                    this._orientation = newOrientationLC;
+                    this._orientation = AbstractAxis.ensureAxisOrientation(newOrientation);
                     this._invalidateLayout();
                     return this;
                 }
+            };
+            AbstractAxis.ensureAxisOrientation = function (orientation) {
+                orientation = orientation.toLowerCase();
+                if (["top", "bottom", "left", "right"].indexOf(orientation) === -1) {
+                    throw new Error("unsupported orientation");
+                }
+                return orientation;
             };
             AbstractAxis.prototype.showEndTickLabels = function (show) {
                 if (show == null) {
@@ -4310,7 +4328,7 @@ var Plottable;
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             function Time(scale, orientation) {
-                _super.call(this, scale, orientation);
+                _super.call(this, scale, Time.ensureTimeAxisOrientation(orientation));
                 /*
                  * Default possible axis configurations.
                  */
@@ -4423,22 +4441,25 @@ var Plottable;
                         { interval: d3.time.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
                     ] }
                 ];
-                this.classed("time-axis", true);
-                this.tickLabelPadding(5);
-                this.tierLabelPositions(["between", "between"]);
+                this._tickLabelPadding = 5;
+                this._tierLabelPositions = ["between", "between"];
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "time-axis");
             }
             Time.prototype.tierLabelPositions = function (newPositions) {
                 if (newPositions == null) {
                     return this._tierLabelPositions;
                 }
                 else {
-                    if (!newPositions.every(function (pos) { return pos.toLowerCase() === "between" || pos.toLowerCase() === "center"; })) {
-                        throw new Error("Unsupported position for tier labels");
-                    }
-                    this._tierLabelPositions = newPositions;
+                    this._tierLabelPositions = Time.ensureTierLabelPositions(newPositions);
                     this._invalidateLayout();
                     return this;
                 }
+            };
+            Time.ensureTierLabelPositions = function (positions) {
+                if (!positions.every(function (pos) { return pos.toLowerCase() === "between" || pos.toLowerCase() === "center"; })) {
+                    throw new Error("Unsupported position for tier labels");
+                }
+                return positions;
             };
             Time.prototype.axisConfigurations = function (configurations) {
                 if (configurations == null) {
@@ -4466,10 +4487,17 @@ var Plottable;
                 return mostPreciseIndex;
             };
             Time.prototype.orient = function (orientation) {
-                if (orientation && (orientation.toLowerCase() === "right" || orientation.toLowerCase() === "left")) {
-                    throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
+                if (orientation) {
+                    orientation = Time.ensureTimeAxisOrientation(orientation);
                 }
                 return _super.prototype.orient.call(this, orientation); // maintains getter-setter functionality
+            };
+            Time.ensureTimeAxisOrientation = function (orientation) {
+                orientation = orientation.toLowerCase();
+                if (["bottom", "top"].indexOf(orientation.toLowerCase()) === -1) {
+                    throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
+                }
+                return orientation;
             };
             Time.prototype._computeHeight = function () {
                 var _this = this;
@@ -4948,7 +4976,7 @@ var Plottable;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
                 this._tickLabelAngle = 0;
-                this.classed("category-axis", true);
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "category-axis");
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
