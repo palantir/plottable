@@ -132,6 +132,10 @@ export module Plot {
       };
     }
 
+    protected _getSelector(): string {
+      return ".line";
+    }
+
     //===== Hover logic =====
     public _hoverOverComponent(p: Point) {
       // no-op

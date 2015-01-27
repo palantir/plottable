@@ -90,6 +90,10 @@ export module Plot {
       attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultFillColor);
       return attrToProjector;
     }
+
+    protected _getSelector(): string {
+      return ".area";
+    }
   }
 }
 }

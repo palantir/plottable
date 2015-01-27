@@ -419,6 +419,14 @@ export module Plot {
       var maxTime = _Util.Methods.max(times, 0);
       this._additionalPaint(maxTime);
     }
+
+    public getAllSelections(): D3.Selection {
+      this._renderArea.selectAll(this._getSelector());
+    }
+
+    protected _getSelector(): string {
+      return "";
+    }
   }
 }
 }

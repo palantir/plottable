@@ -157,6 +157,10 @@ export module Plot {
       return this._renderArea.selectAll("rect");
     }
 
+    protected _getSelector(): string {
+      return "rect";
+    }
+
     /**
      * Gets the bar under the given pixel position (if [xValOrExtent]
      * and [yValOrExtent] are {number}s), under a given line (if only one

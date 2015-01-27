@@ -66,6 +66,10 @@ export module Plot {
     protected _generateDrawSteps(): _Drawer.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
     }
+
+    protected _getSelector(): string {
+      return "rect";
+    }
   }
 }
 }

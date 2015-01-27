@@ -2646,6 +2646,8 @@ declare module Plottable {
              * @param {string} key The key of new dataset
              */
             protected _getPlotMetadataForDataset(key: string): PlotMetadata;
+            getAllSelections(): void;
+            protected _getSelector(): string;
         }
     }
 }
@@ -2866,6 +2868,7 @@ declare module Plottable {
              * @returns {D3.Selection} All of the bars in the bar plot.
              */
             getAllBars(): D3.Selection;
+            protected _getSelector(): string;
             /**
              * Gets the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one
@@ -2968,6 +2971,7 @@ declare module Plottable {
             protected _getResetYFunction(): _Projector;
             protected _wholeDatumAttributes(): string[];
             protected _generateAttrToProjector(): AttributeToProjector;
+            protected _getSelector(): string;
         }
     }
 }

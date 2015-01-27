@@ -6213,6 +6213,12 @@ var Plottable;
                 var maxTime = Plottable._Util.Methods.max(times, 0);
                 this._additionalPaint(maxTime);
             };
+            AbstractPlot.prototype.getAllSelections = function () {
+                this._renderArea.selectAll(this._getSelector());
+            };
+            AbstractPlot.prototype._getSelector = function () {
+                return "";
+            };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
         Plot.AbstractPlot = AbstractPlot;
@@ -6275,6 +6281,9 @@ var Plottable;
             };
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Arc(key).setClass("arc");
+            };
+            Pie.prototype._getSelector = function () {
+                return ".arc";
             };
             return Pie;
         })(Plot.AbstractPlot);
@@ -6623,6 +6632,9 @@ var Plottable;
                     data: closestData
                 };
             };
+            Scatter.prototype._getSelector = function () {
+                return "circle";
+            };
             //===== Hover logic =====
             Scatter.prototype._hoverOverComponent = function (p) {
                 // no-op
@@ -6705,6 +6717,9 @@ var Plottable;
             };
             Grid.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells") }];
+            };
+            Grid.prototype._getSelector = function () {
+                return "rect";
             };
             return Grid;
         })(Plot.AbstractXYPlot);
@@ -6822,6 +6837,9 @@ var Plottable;
              */
             Bar.prototype.getAllBars = function () {
                 return this._renderArea.selectAll("rect");
+            };
+            Bar.prototype._getSelector = function () {
+                return "rect";
             };
             Bar.prototype.getBars = function (xValOrExtent, yValOrExtent) {
                 var _this = this;
@@ -7224,6 +7242,9 @@ var Plottable;
                     closestPoint: closestPoint
                 };
             };
+            Line.prototype._getSelector = function () {
+                return ".line";
+            };
             //===== Hover logic =====
             Line.prototype._hoverOverComponent = function (p) {
                 // no-op
@@ -7344,6 +7365,9 @@ var Plottable;
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
                 attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultFillColor);
                 return attrToProjector;
+            };
+            Area.prototype._getSelector = function () {
+                return ".area";
             };
             return Area;
         })(Plot.Line);

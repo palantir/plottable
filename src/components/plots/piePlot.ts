@@ -55,6 +55,10 @@ export module Plot {
     protected _getDrawer(key: string): _Drawer.AbstractDrawer {
       return new Plottable._Drawer.Arc(key).setClass("arc");
     }
+
+    protected _getSelector(): string {
+      return ".arc";
+    }
   }
 }
 }
