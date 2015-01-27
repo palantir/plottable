@@ -1891,6 +1891,7 @@ declare module Plottable {
             protected _scale: Scale.AbstractScale<any, number>;
             protected _computedWidth: number;
             protected _computedHeight: number;
+            protected _tickLabelPadding: number;
             /**
              * Constructs an axis. An axis is a wrapper around a scale for rendering.
              *
@@ -1903,6 +1904,7 @@ declare module Plottable {
              * displayed.
              */
             constructor(scale: Scale.AbstractScale<any, number>, orientation: string, formatter?: (d: any) => string);
+            _anchor(element: D3.Selection): void;
             remove(): void;
             protected _isHorizontal(): boolean;
             protected _computeWidth(): number;
