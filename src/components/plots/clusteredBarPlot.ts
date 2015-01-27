@@ -46,7 +46,7 @@ export module Plot {
       var innerScale = this._makeInnerScale();
       this._datasetKeysInOrder.forEach((key: string) => {
         var plotMetadata = <ClusteredPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
-        plotMetadata.position = innerScale.scale(key);
+        plotMetadata.position = innerScale.scale(key) - innerScale.rangeBand() / 2;
       });
     }
 

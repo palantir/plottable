@@ -125,6 +125,16 @@ export module Scale {
     public copy(): Ordinal {
       return new Ordinal(this._d3Scale.copy());
     }
+
+    public scale(value: string): number {
+      var scaledValue = super.scale(value);
+      if (this.rangeType() === "bands") {
+        //scale it to the middle
+        return scaledValue + this.rangeBand() / 2;
+      } else {
+        return scaledValue;
+      }
+    }
   }
 }
 }
