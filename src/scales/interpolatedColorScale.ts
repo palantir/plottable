@@ -14,6 +14,7 @@ export module Scale {
    * By default it generates a linear scale internally.
    */
   export class InterpolatedColor extends AbstractScale<number, string> {
+    protected _d3Scale: D3.Scale.QuantitativeScale;
     private static _COLOR_SCALES: ColorGroups = {
       reds : [
         "#FFFFFF", // white
@@ -205,6 +206,15 @@ export module Scale {
       } else {
         return InterpolatedColor._COLOR_SCALES["reds"];
       }
+    }
+
+    /**
+     * Gets a set of tick values spanning the domain.
+     *
+     * @returns {any[]} The generated ticks.
+     */
+    public ticks() {
+      return this._d3Scale.ticks(10);
     }
 
     public autoDomain() {
