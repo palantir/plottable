@@ -541,11 +541,7 @@ var Plottable;
                 return parsedValue;
             }
             function isSelectionRemovedFromSVG(selection) {
-                var n = selection.node();
-                while (n !== null && n.nodeName.toLowerCase() !== "svg") {
-                    n = n.parentNode;
-                }
-                return (n == null);
+                return selection !== getBoundingSVG(selection);
             }
             DOM.isSelectionRemovedFromSVG = isSelectionRemovedFromSVG;
             function getElementWidth(elem) {
@@ -610,23 +606,12 @@ var Plottable;
             }
             DOM.boxesOverlap = boxesOverlap;
             function containedInBoundingBox(container, element) {
-                return (Math.floor(container.left) <= Math.ceil(element.left) && Math.floor(container.top) <= Math.ceil(element.top) && Math.floor(element.right) <= Math.ceil(container.left + container.width) && Math.floor(element.bottom) <= Math.ceil(container.top + container.height));
+                return (Math.floor(container.left) <= Math.ceil(element.left) && Math.floor(container.top) <= Math.ceil(element.top) && Math.floor(element.right) <= Math.ceil(container.right) && Math.floor(element.bottom) <= Math.ceil(container.bottom));
             }
             DOM.containedInBoundingBox = containedInBoundingBox;
             function getBoundingSVG(elem) {
-                var svg;
-                var parent = elem.node().parentNode;
-                while (svg === undefined) {
-                    if (parent.nodeName === "svg") {
-                        // Cast is necessary from Node to Element
-                        svg = parent;
-                    }
-                    else {
-                        parent = parent.parentNode;
-                    }
-                    ;
-                }
-                return svg;
+                var svg = elem[0][0].ownerSVGElement;
+                return (svg == null) ? elem : svg;
             }
             DOM.getBoundingSVG = getBoundingSVG;
         })(DOM = _Util.DOM || (_Util.DOM = {}));
@@ -4221,7 +4206,6 @@ var Plottable;
             };
             AbstractAxis.prototype._hideEndTickLabels = function () {
                 var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
-                var boundingSVG = Plottable._Util.DOM.getBoundingSVG(this._element);
                 var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
                 if (tickLabels[0].length === 0) {
                     return;
@@ -4239,12 +4223,12 @@ var Plottable;
             AbstractAxis.prototype._hideOverflowingTickLabels = function () {
                 var boundingSVG = Plottable._Util.DOM.getBoundingSVG(this._element).getBoundingClientRect();
                 var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
-                if (tickLabels[0].length === 0) {
+                if (tickLabels.empty()) {
                     return;
                 }
-                tickLabels[0].forEach(function (elem) {
-                    if (!Plottable._Util.DOM.containedInBoundingBox(boundingSVG, elem.getBoundingClientRect())) {
-                        d3.select(elem).style("visibility", "hidden");
+                tickLabels.each(function (d, i) {
+                    if (!Plottable._Util.DOM.containedInBoundingBox(boundingSVG, this.getBoundingClientRect())) {
+                        d3.select(this).style("visibility", "hidden");
                     }
                 });
             };

@@ -272,7 +272,7 @@ declare module Plottable {
             function translate(s: D3.Selection, x?: number, y?: number): any;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
             function containedInBoundingBox(container: ClientRect, element: ClientRect): boolean;
-            function getBoundingSVG(elem: D3.Selection): Element;
+            function getBoundingSVG(elem: D3.Selection): any;
         }
     }
 }

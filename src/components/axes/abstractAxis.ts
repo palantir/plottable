@@ -456,7 +456,6 @@ export module Axis {
 
     protected _hideEndTickLabels() {
       var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
-      var boundingSVG = _Util.DOM.getBoundingSVG(this._element);
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
       if (tickLabels[0].length === 0) {
         return;
@@ -475,12 +474,12 @@ export module Axis {
     protected _hideOverflowingTickLabels() {
       var boundingSVG = _Util.DOM.getBoundingSVG(this._element).getBoundingClientRect();
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
-      if (tickLabels[0].length === 0) {
+      if (tickLabels.empty()) {
         return;
       }
-      tickLabels[0].forEach(function(elem: any) {
-        if (!_Util.DOM.containedInBoundingBox(boundingSVG, elem.getBoundingClientRect())) {
-          d3.select(elem).style("visibility", "hidden");
+      tickLabels.each(function(d: any, i: number) {
+        if (!_Util.DOM.containedInBoundingBox(boundingSVG, this.getBoundingClientRect())) {
+          d3.select(this).style("visibility", "hidden");
         }
       });
     }

@@ -39,11 +39,7 @@ export module _Util {
     }
 
     export function isSelectionRemovedFromSVG(selection: D3.Selection) {
-      var n = (<Node> selection.node());
-      while (n !== null && n.nodeName.toLowerCase() !== "svg") {
-        n = n.parentNode;
-      }
-      return (n == null);
+      return selection !== getBoundingSVG(selection);
     }
 
     export function getElementWidth(elem: HTMLScriptElement): number{
@@ -112,22 +108,14 @@ export module _Util {
       return (
         Math.floor(container.left) <= Math.ceil(element.left) &&
         Math.floor(container.top)  <= Math.ceil(element.top)  &&
-        Math.floor(element.right)  <= Math.ceil(container.left + container.width) &&
-        Math.floor(element.bottom) <= Math.ceil(container.top  + container.height)
+        Math.floor(element.right)  <= Math.ceil(container.right) &&
+        Math.floor(element.bottom) <= Math.ceil(container.bottom)
       );
     }
 
     export function getBoundingSVG(elem: D3.Selection) {
-      var svg: Element;
-      var parent = elem.node().parentNode;
-      while (svg === undefined) {
-        if (parent.nodeName === "svg") {
-          // Cast is necessary from Node to Element
-          svg = <Element> parent;
-        } else {
-          parent = parent.parentNode;
-        };
-      } return svg;
+      var svg = elem[0][0].ownerSVGElement;
+      return (svg == null) ? elem : svg;
     }
   }
 }
