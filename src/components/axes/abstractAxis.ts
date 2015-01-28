@@ -492,7 +492,7 @@ export module Axis {
       var interval = 1;
 
       // Get the widths of all the labels
-      var visibleTickLabelRects = [];
+      var visibleTickLabelRects: ClientRect[] = [];
       visibleTickLabels.each(function(d: any) {
         var clientRect = this.getBoundingClientRect();
         visibleTickLabelRects.push(clientRect);
@@ -506,10 +506,12 @@ export module Axis {
           // We increment the variable if the next label's width is greater than the previous one's (one-time)
           // This only applies to the bottom and top orientations
           if (visibleTickLabelRects[i].width > visibleTickLabelRects[i-1].width && !hasSkipped &&
-            (this._orientation == "bottom" || this._orientation == "top")) {
+            (this._orientation === "bottom" || this._orientation === "top")) {
             interval += 1;
             hasSkipped = true;
-          } else break;
+          } else {
+            break;
+          }
         } else {
           interval += 1;
         }
@@ -518,7 +520,7 @@ export module Axis {
       // Set any label that is not part of the interval as hidden
       visibleTickLabels.each(function(d: any, i: number) {
         var tickLabel = d3.select(this);
-        if (i % interval != 0) {
+        if (i % interval !== 0) {
           tickLabel.style("visibility", "hidden");
         }
       });

@@ -4233,12 +4233,13 @@ var Plottable;
                     if (!Plottable._Util.DOM.boxesOverlap(visibleTickLabelRects[i], visibleTickLabelRects[0])) {
                         // We increment the variable if the next label's width is greater than the previous one's (one-time)
                         // This only applies to the bottom and top orientations
-                        if (visibleTickLabelRects[i].width > visibleTickLabelRects[i - 1].width && !hasSkipped && (this._orientation == "bottom" || this._orientation == "top")) {
+                        if (visibleTickLabelRects[i].width > visibleTickLabelRects[i - 1].width && !hasSkipped && (this._orientation === "bottom" || this._orientation === "top")) {
                             interval += 1;
                             hasSkipped = true;
                         }
-                        else
+                        else {
                             break;
+                        }
                     }
                     else {
                         interval += 1;
@@ -4247,7 +4248,7 @@ var Plottable;
                 // Set any label that is not part of the interval as hidden
                 visibleTickLabels.each(function (d, i) {
                     var tickLabel = d3.select(this);
-                    if (i % interval != 0) {
+                    if (i % interval !== 0) {
                         tickLabel.style("visibility", "hidden");
                     }
                 });
