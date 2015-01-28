@@ -6235,9 +6235,6 @@ var Plottable;
                 });
                 return allSelections;
             };
-            AbstractPlot.prototype._getSelector = function () {
-                return "";
-            };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
         Plot.AbstractPlot = AbstractPlot;

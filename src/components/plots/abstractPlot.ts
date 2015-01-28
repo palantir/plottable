@@ -431,10 +431,6 @@ export module Plot {
 
       return allSelections;
     }
-
-    protected _getSelector(): string {
-      return "";
-    }
   }
 }
 }

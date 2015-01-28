@@ -2651,7 +2651,6 @@ declare module Plottable {
              */
             protected _getPlotMetadataForDataset(key: string): PlotMetadata;
             getAllSelections(): D3.Selection;
-            protected _getSelector(): string;
         }
     }
 }
