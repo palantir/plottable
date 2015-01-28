@@ -456,28 +456,33 @@ export module Axis {
 
     protected _hideEndTickLabels() {
       var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
-
-      var isInsideBBox = (tickBox: ClientRect) => {
-        return (
-          Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
-          Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
-          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.width()) &&
-          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.height())
-        );
-      };
-
+      var boundingSVG = _Util.DOM.getBoundingSVG(this._element);
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
       if (tickLabels[0].length === 0) {
         return;
       }
       var firstTickLabel = tickLabels[0][0];
-      if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
+      if (!_Util.DOM.containedInBoundingBox(boundingBox, firstTickLabel.getBoundingClientRect())) {
         d3.select(firstTickLabel).style("visibility", "hidden");
       }
       var lastTickLabel = tickLabels[0][tickLabels[0].length-1];
-      if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
+      if (!_Util.DOM.containedInBoundingBox(boundingBox, lastTickLabel.getBoundingClientRect())) {
         d3.select(lastTickLabel).style("visibility", "hidden");
       }
+    }
+
+    // Responsible for hiding any tick labels that break out of the bounding SVG
+    protected _hideOverflowingTickLabels() {
+      var boundingSVG = _Util.DOM.getBoundingSVG(this._element).getBoundingClientRect();
+      var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
+      if (tickLabels[0].length === 0) {
+        return;
+      }
+      tickLabels[0].forEach(function(elem: any) {
+        if (!_Util.DOM.containedInBoundingBox(boundingSVG, elem.getBoundingClientRect())) {
+          d3.select(elem).style("visibility", "hidden");
+        }
+      });
     }
 
     protected _hideOverlappingTickLabels() {

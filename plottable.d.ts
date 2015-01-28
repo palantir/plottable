@@ -271,6 +271,8 @@ declare module Plottable {
             function getSVGPixelWidth(svg: D3.Selection): number;
             function translate(s: D3.Selection, x?: number, y?: number): any;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
+            function containedInBoundingBox(container: ClientRect, element: ClientRect): boolean;
+            function getBoundingSVG(elem: D3.Selection): HTMLScriptElement;
         }
     }
 }
@@ -2027,6 +2029,7 @@ declare module Plottable {
              */
             showEndTickLabels(show: boolean): AbstractAxis;
             protected _hideEndTickLabels(): void;
+            protected _hideOverflowingTickLabels(): void;
             protected _hideOverlappingTickLabels(): void;
         }
     }

@@ -107,6 +107,25 @@ export module _Util {
       if (boxA.top > boxB.bottom) { return false; }
       return true;
     }
+
+    export function containedInBoundingBox(container: ClientRect, element: ClientRect) {
+      return (
+        Math.floor(container.left) <= Math.ceil(element.left) &&
+        Math.floor(container.top)  <= Math.ceil(element.top)  &&
+        Math.floor(element.right)  <= Math.ceil(container.left + container.width) &&
+        Math.floor(element.bottom) <= Math.ceil(container.top  + container.height)
+      );      
+    }
+
+    export function getBoundingSVG(elem: D3.Selection) {
+      var svg: HTMLScriptElement;
+      var source = elem.node();
+      while (svg == undefined) {
+        if (source.tagName == "svg") {
+          svg = source;
+        } else source = source.parentNode;
+      } return svg;
+    }
   }
 }
 }

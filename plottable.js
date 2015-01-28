@@ -609,6 +609,23 @@ var Plottable;
                 return true;
             }
             DOM.boxesOverlap = boxesOverlap;
+            function containedInBoundingBox(container, element) {
+                return (Math.floor(container.left) <= Math.ceil(element.left) && Math.floor(container.top) <= Math.ceil(element.top) && Math.floor(element.right) <= Math.ceil(container.left + container.width) && Math.floor(element.bottom) <= Math.ceil(container.top + container.height));
+            }
+            DOM.containedInBoundingBox = containedInBoundingBox;
+            function getBoundingSVG(elem) {
+                var svg;
+                var source = elem.node();
+                while (svg == undefined) {
+                    if (source.tagName == "svg") {
+                        svg = source;
+                    }
+                    else
+                        source = source.parentNode;
+                }
+                return svg;
+            }
+            DOM.getBoundingSVG = getBoundingSVG;
         })(DOM = _Util.DOM || (_Util.DOM = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -4200,23 +4217,33 @@ var Plottable;
                 return this;
             };
             AbstractAxis.prototype._hideEndTickLabels = function () {
-                var _this = this;
                 var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
-                var isInsideBBox = function (tickBox) {
-                    return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.width()) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.height()));
-                };
+                var boundingSVG = Plottable._Util.DOM.getBoundingSVG(this._element);
                 var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
                 if (tickLabels[0].length === 0) {
                     return;
                 }
                 var firstTickLabel = tickLabels[0][0];
-                if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
+                if (!Plottable._Util.DOM.containedInBoundingBox(boundingBox, firstTickLabel.getBoundingClientRect())) {
                     d3.select(firstTickLabel).style("visibility", "hidden");
                 }
                 var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
-                if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
+                if (!Plottable._Util.DOM.containedInBoundingBox(boundingBox, lastTickLabel.getBoundingClientRect())) {
                     d3.select(lastTickLabel).style("visibility", "hidden");
                 }
+            };
+            // Responsible for hiding any tick labels that break out of the bounding SVG
+            AbstractAxis.prototype._hideOverflowingTickLabels = function () {
+                var boundingSVG = Plottable._Util.DOM.getBoundingSVG(this._element).getBoundingClientRect();
+                var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
+                if (tickLabels[0].length === 0) {
+                    return;
+                }
+                tickLabels[0].forEach(function (elem) {
+                    if (!Plottable._Util.DOM.containedInBoundingBox(boundingSVG, elem.getBoundingClientRect())) {
+                        d3.select(elem).style("visibility", "hidden");
+                    }
+                });
             };
             AbstractAxis.prototype._hideOverlappingTickLabels = function () {
                 var visibleTickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
@@ -4831,6 +4858,7 @@ var Plottable;
                 if (!this.showEndTickLabels()) {
                     this._hideEndTickLabels();
                 }
+                this._hideOverflowingTickLabels();
                 this._hideOverlappingTickLabels();
             };
             Numeric.prototype.tickLabelPosition = function (position) {
