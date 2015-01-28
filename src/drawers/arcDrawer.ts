@@ -43,6 +43,11 @@ export module _Drawer {
                           .value(valueAccessor)(data);
 
       drawSteps.forEach(s => delete s.attrToProjector["value"]);
+      pie.forEach((slice) => {
+        if (slice.value < 0) {
+          _Util.Methods.warn("Negative values will not render correctly in a pie chart.");
+        }
+      });
       return super.draw(pie, drawSteps, userMetadata, plotMetadata);
     }
   }

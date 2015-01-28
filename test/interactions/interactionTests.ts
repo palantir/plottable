@@ -51,6 +51,30 @@ describe("Interactions", () => {
 
       svg.remove();
     });
+
+    it("Resets zoom when the scale domain changes", () => {
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+
+      var svg = generateSVG();
+      var c = new Plottable.Component.AbstractComponent();
+      c.renderTo(svg);
+
+      var pzi = new Plottable.Interaction.PanZoom(xScale, yScale);
+      c.registerInteraction(pzi);
+
+      var zoomBeforeX = (<any> pzi)._zoom;
+      xScale.domain([10, 1000]);
+      var zoomAfterX = (<any> pzi)._zoom;
+      assert.notStrictEqual(zoomBeforeX, zoomAfterX, "D3 Zoom was regenerated after x scale domain changed");
+
+      var zoomBeforeY = (<any> pzi)._zoom;
+      yScale.domain([10, 1000]);
+      var zoomAfterY = (<any> pzi)._zoom;
+      assert.notStrictEqual(zoomBeforeY, zoomAfterY, "D3 Zoom was regenerated after y scale domain changed");
+
+      svg.remove();
+    });
   });
 
   describe("KeyInteraction", () => {
