@@ -114,16 +114,19 @@ export module _Util {
         Math.floor(container.top)  <= Math.ceil(element.top)  &&
         Math.floor(element.right)  <= Math.ceil(container.left + container.width) &&
         Math.floor(element.bottom) <= Math.ceil(container.top  + container.height)
-      );      
+      );
     }
 
     export function getBoundingSVG(elem: D3.Selection) {
-      var svg: HTMLScriptElement;
-      var source = elem.node();
-      while (svg == undefined) {
-        if (source.tagName == "svg") {
-          svg = source;
-        } else source = source.parentNode;
+      var svg: Element;
+      var parent = elem.node().parentNode;
+      while (svg === undefined) {
+        if (parent.nodeName === "svg") {
+          // Cast is necessary from Node to Element
+          svg = <Element> parent;
+        } else {
+          parent = parent.parentNode;
+        };
       } return svg;
     }
   }

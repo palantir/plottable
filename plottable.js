@@ -615,13 +615,16 @@ var Plottable;
             DOM.containedInBoundingBox = containedInBoundingBox;
             function getBoundingSVG(elem) {
                 var svg;
-                var source = elem.node();
-                while (svg == undefined) {
-                    if (source.tagName == "svg") {
-                        svg = source;
+                var parent = elem.node().parentNode;
+                while (svg === undefined) {
+                    if (parent.nodeName === "svg") {
+                        // Cast is necessary from Node to Element
+                        svg = parent;
                     }
-                    else
-                        source = source.parentNode;
+                    else {
+                        parent = parent.parentNode;
+                    }
+                    ;
                 }
                 return svg;
             }
