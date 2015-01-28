@@ -6840,14 +6840,6 @@ var Plottable;
                     return this;
                 }
             };
-            /**
-             * Gets all the bars in the bar plot
-             *
-             * @returns {D3.Selection} All of the bars in the bar plot.
-             */
-            Bar.prototype.getAllBars = function () {
-                return this._renderArea.selectAll("rect");
-            };
             Bar.prototype.getBars = function (xValOrExtent, yValOrExtent) {
                 var _this = this;
                 if (!this._isSetup) {
