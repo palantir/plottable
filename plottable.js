@@ -2843,6 +2843,9 @@ var Plottable;
             AbstractDrawer.prototype._getRenderArea = function () {
                 return this._renderArea;
             };
+            AbstractDrawer.prototype._getSelector = function () {
+                return "";
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
@@ -2901,6 +2904,9 @@ var Plottable;
                     this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
                 step.animator.animate(this._pathSelection, attrToProjector);
+            };
+            Line.prototype._getSelector = function () {
+                return ".line";
             };
             return Line;
         })(_Drawer.AbstractDrawer);
@@ -2984,6 +2990,9 @@ var Plottable;
                 }
                 step.animator.animate(this._areaSelection, attrToProjector);
             };
+            Area.prototype._getSelector = function () {
+                return ".area";
+            };
             return Area;
         })(_Drawer.Line);
         _Drawer.Area = Area;
@@ -3050,6 +3059,9 @@ var Plottable;
             Element.prototype._prepareData = function (data, drawSteps) {
                 var _this = this;
                 return drawSteps.reduce(function (data, drawStep) { return _this._filterDefinedData(data, drawStep.attrToProjector["defined"]); }, _super.prototype._prepareData.call(this, data, drawSteps));
+            };
+            Element.prototype._getSelector = function () {
+                return this._svgElement;
             };
             return Element;
         })(_Drawer.AbstractDrawer);
@@ -6214,7 +6226,14 @@ var Plottable;
                 this._additionalPaint(maxTime);
             };
             AbstractPlot.prototype.getAllSelections = function () {
-                return this._renderArea.selectAll(this._getSelector());
+                var allSelections = d3.select();
+                allSelections[0] = [];
+                this._getDrawersInOrder().forEach(function (drawer) {
+                    drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach(function (selection) {
+                        allSelections[0].push(selection);
+                    });
+                });
+                return allSelections;
             };
             AbstractPlot.prototype._getSelector = function () {
                 return "";
@@ -6281,9 +6300,6 @@ var Plottable;
             };
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Arc(key).setClass("arc");
-            };
-            Pie.prototype._getSelector = function () {
-                return ".arc";
             };
             return Pie;
         })(Plot.AbstractPlot);
@@ -6632,9 +6648,6 @@ var Plottable;
                     data: closestData
                 };
             };
-            Scatter.prototype._getSelector = function () {
-                return "circle";
-            };
             //===== Hover logic =====
             Scatter.prototype._hoverOverComponent = function (p) {
                 // no-op
@@ -6717,9 +6730,6 @@ var Plottable;
             };
             Grid.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells") }];
-            };
-            Grid.prototype._getSelector = function () {
-                return "rect";
             };
             return Grid;
         })(Plot.AbstractXYPlot);
@@ -6837,9 +6847,6 @@ var Plottable;
              */
             Bar.prototype.getAllBars = function () {
                 return this._renderArea.selectAll("rect");
-            };
-            Bar.prototype._getSelector = function () {
-                return "rect";
             };
             Bar.prototype.getBars = function (xValOrExtent, yValOrExtent) {
                 var _this = this;
@@ -7242,9 +7249,6 @@ var Plottable;
                     closestPoint: closestPoint
                 };
             };
-            Line.prototype._getSelector = function () {
-                return ".line";
-            };
             //===== Hover logic =====
             Line.prototype._hoverOverComponent = function (p) {
                 // no-op
@@ -7365,9 +7369,6 @@ var Plottable;
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
                 attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultFillColor);
                 return attrToProjector;
-            };
-            Area.prototype._getSelector = function () {
-                return ".area";
             };
             return Area;
         })(Plot.Line);

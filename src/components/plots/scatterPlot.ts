@@ -129,10 +129,6 @@ export module Plot {
       };
     }
 
-    protected _getSelector(): string {
-      return "circle";
-    }
-
     //===== Hover logic =====
     public _hoverOverComponent(p: Point) {
       // no-op

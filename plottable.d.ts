@@ -1513,6 +1513,7 @@ declare module Plottable {
              * @returns {D3.Selection} the renderArea selection
              */
             _getRenderArea(): D3.Selection;
+            _getSelector(): string;
         }
     }
 }
@@ -1525,6 +1526,7 @@ declare module Plottable {
             setup(area: D3.Selection): void;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
+            _getSelector(): string;
         }
     }
 }
@@ -1542,6 +1544,7 @@ declare module Plottable {
             drawLine(draw: boolean): Area;
             setup(area: D3.Selection): void;
             protected _drawStep(step: AppliedDrawStep): void;
+            _getSelector(): string;
         }
     }
 }
@@ -1561,6 +1564,7 @@ declare module Plottable {
             protected _enterData(data: any[]): void;
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
+            _getSelector(): string;
         }
     }
 }
@@ -2666,7 +2670,6 @@ declare module Plottable {
             addDataset(keyOrDataset: any, dataset?: any): Pie;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): _Drawer.AbstractDrawer;
-            protected _getSelector(): string;
         }
     }
 }
@@ -2754,7 +2757,6 @@ declare module Plottable {
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _generateDrawSteps(): _Drawer.DrawStep[];
             protected _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData;
-            protected _getSelector(): string;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
@@ -2788,7 +2790,6 @@ declare module Plottable {
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Grid;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _generateDrawSteps(): _Drawer.DrawStep[];
-            protected _getSelector(): string;
         }
     }
 }
@@ -2871,7 +2872,6 @@ declare module Plottable {
              * @returns {D3.Selection} All of the bars in the bar plot.
              */
             getAllBars(): D3.Selection;
-            protected _getSelector(): string;
             /**
              * Gets the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one
@@ -2945,7 +2945,6 @@ declare module Plottable {
                 closestValue: any;
                 closestPoint: Point;
             };
-            protected _getSelector(): string;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
@@ -2975,7 +2974,6 @@ declare module Plottable {
             protected _getResetYFunction(): _Projector;
             protected _wholeDatumAttributes(): string[];
             protected _generateAttrToProjector(): AttributeToProjector;
-            protected _getSelector(): string;
         }
     }
 }

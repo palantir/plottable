@@ -421,7 +421,15 @@ export module Plot {
     }
 
     public getAllSelections(): D3.Selection {
-      return this._renderArea.selectAll(this._getSelector());
+      var allSelections = d3.select();
+      allSelections[0] = [];
+      this._getDrawersInOrder().forEach((drawer) => {
+        drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach((selection: EventTarget) => {
+          allSelections[0].push(selection);
+        });
+      });
+
+      return allSelections;
     }
 
     protected _getSelector(): string {
