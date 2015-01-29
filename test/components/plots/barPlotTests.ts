@@ -612,8 +612,8 @@ describe("Plots", () => {
 
       plot.getAllBars().each(function(selection) {
         var bar = d3.select(this);
-        assert.operator(+bar.attr("x"), ">=", 0, "all rects right of left edge of scale");
-        assert.operator(+bar.attr("x") + +bar.attr("width"), "<=", 500, "all rects left of right edge of scale");
+        assert.operator(+bar.attr("x"), ">=", xScale.range()[0], "all rects right of left edge of scale");
+        assert.operator(+bar.attr("x") + +bar.attr("width"), "<=", xScale.range()[1], "all rects left of right edge of scale");
       });
 
       svg.remove();
