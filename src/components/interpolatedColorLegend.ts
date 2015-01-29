@@ -13,6 +13,7 @@ export module Component {
     private _formatter: Formatter;
 
     private _swatchContainer: D3.Selection;
+    private _swatchBoundingBox: D3.Selection;
     private _lowerLabel: D3.Selection;
     private _upperLabel: D3.Selection;
 
@@ -41,10 +42,11 @@ export module Component {
       this._scale = interpolatedColorScale;
       this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
       this._formatter = formatter;
-      this._orientation = InterpolatedColorLegend._validateOrientation(orientation);
+      this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
 
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
+      this.classed("legend", true).classed("interpolated-color-legend", true);
     }
 
     /**
@@ -69,7 +71,7 @@ export module Component {
       return this;
     }
 
-    private static _validateOrientation(orientation: string) {
+    private static _ensureOrientation(orientation: string) {
       orientation = orientation.toLowerCase();
       if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
         return orientation;
@@ -96,7 +98,7 @@ export module Component {
       if (newOrientation == null) {
         return this._orientation;
       } else {
-        this._orientation = InterpolatedColorLegend._validateOrientation(newOrientation);
+        this._orientation = InterpolatedColorLegend._ensureOrientation(newOrientation);
         this._invalidateLayout();
         return this;
       }
@@ -114,9 +116,9 @@ export module Component {
 
     protected _setup() {
       super._setup();
-      this.classed("legend", true).classed("interpolated-color-legend", true);
 
       this._swatchContainer = this._content.append("g").classed("swatch-container", true);
+      this._swatchBoundingBox = this._content.append("rect").classed("swatch-bounding-box", true);
       this._lowerLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
       this._upperLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
 
@@ -195,8 +197,15 @@ export module Component {
       var swatchX: (d: any, i: number) => number;
       var swatchY: (d: any, i: number) => number;
 
+      var boundingBoxAttr = {
+        x: 0,
+        y: padding,
+        width: 0,
+        height: 0
+      };
+
       if (this._isVertical()) {
-        var longestTextWidth = text1Width > text0Width ? text1Width : text0Width;
+        var longestTextWidth = Math.max(text0Width, text1Width);
         swatchWidth = this.width() - 3 * padding - longestTextWidth;
         swatchHeight = (this.height() - 2 * padding) / numSwatches;
         swatchY = (d: any, i: number) => padding + (numSwatches - (i + 1)) * swatchHeight;
@@ -219,6 +228,8 @@ export module Component {
           lowerWriteOptions.xAlign = "left";
           lowerLabelShift.x = padding + swatchWidth + padding;
         }
+        boundingBoxAttr.width = swatchWidth;
+        boundingBoxAttr.height = numSwatches * swatchHeight;
       } else { // horizontal
         swatchWidth = (this.width() - 4 * padding - text0Width - text1Width) / numSwatches;
         swatchHeight = this.height() - 2 * padding;
@@ -229,7 +240,11 @@ export module Component {
         upperLabelShift.x = -padding;
         lowerWriteOptions.xAlign = "left";
         lowerLabelShift.x = padding;
+
+        boundingBoxAttr.width = numSwatches * swatchWidth;
+        boundingBoxAttr.height = swatchHeight;
       }
+      boundingBoxAttr.x = swatchX(null, 0); // position of the first swatch
 
       this._upperLabel.text(""); // clear the upper label
       this._writer.write(text1, this.width(), this.height(), upperWriteOptions);
@@ -240,6 +255,8 @@ export module Component {
       this._writer.write(text0, this.width(), this.height(), lowerWriteOptions);
       var lowerTranslateString = "translate(" + lowerLabelShift.x + ", " + lowerLabelShift.y + ")";
       this._lowerLabel.attr("transform", lowerTranslateString);
+
+      this._swatchBoundingBox.attr(boundingBoxAttr);
 
       swatchWidth = Math.max(swatchWidth, 0);
       swatchHeight = Math.max(swatchHeight, 0);
