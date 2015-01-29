@@ -208,15 +208,6 @@ export module Scale {
       }
     }
 
-    /**
-     * Gets a set of tick values spanning the domain.
-     *
-     * @returns {any[]} The generated ticks.
-     */
-    public ticks() {
-      return this._d3Scale.ticks(10);
-    }
-
     public autoDomain() {
       // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
       var extents = this._getAllExtents();

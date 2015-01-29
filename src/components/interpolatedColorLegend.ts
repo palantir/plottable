@@ -9,6 +9,7 @@ export module Component {
     private _scale: Scale.InterpolatedColor;
     private _orientation: String ;
     private _padding = 5;
+    private _numSwatches = 10;
     private _formatter: Formatter;
 
     private _swatchContainer: D3.Selection;
@@ -38,8 +39,9 @@ export module Component {
         throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
       }
       this._scale = interpolatedColorScale;
+      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
       this._formatter = formatter;
-      this._orientation = InterpolatedColorLegend.validateOrientation(orientation);
+      this._orientation = InterpolatedColorLegend._validateOrientation(orientation);
 
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
@@ -67,7 +69,7 @@ export module Component {
       return this;
     }
 
-    private static validateOrientation(orientation: string) {
+    private static _validateOrientation(orientation: string) {
       orientation = orientation.toLowerCase();
       if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
         return orientation;
@@ -94,10 +96,20 @@ export module Component {
       if (newOrientation == null) {
         return this._orientation;
       } else {
-        this._orientation = InterpolatedColorLegend.validateOrientation(newOrientation);
+        this._orientation = InterpolatedColorLegend._validateOrientation(newOrientation);
         this._invalidateLayout();
         return this;
       }
+    }
+
+    private _generateTicks() {
+      var domain = this._scale.domain();
+      var slope = (domain[1] - domain[0]) / this._numSwatches;
+      var ticks = [];
+      for (var i = 0; i <= this._numSwatches; i++) {
+        ticks.push(domain[0] + slope * i);
+      }
+      return ticks;
     }
 
     protected _setup() {
@@ -116,7 +128,7 @@ export module Component {
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var textHeight = this._measurer.measure().height;
 
-      var ticks = this._scale.ticks();
+      var ticks = this._generateTicks();
       var numSwatches = ticks.length;
 
       var domain = this._scale.domain();
@@ -159,7 +171,7 @@ export module Component {
       var text1 = this._formatter(domain[1]);
       var text1Width = this._measurer.measure(text1).width;
 
-      var ticks = this._scale.ticks();
+      var ticks = this._generateTicks();
       var numSwatches = ticks.length;
 
       var padding = this._padding;
