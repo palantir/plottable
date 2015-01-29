@@ -6778,15 +6778,14 @@ var Plottable;
             };
             Bar.prototype._updateBarExtent = function () {
                 var _this = this;
-                if ((this._isVertical && this._xScale instanceof Plottable.Scale.AbstractQuantitative) || (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative)) {
+                if (((this._isVertical && this._xScale instanceof Plottable.Scale.AbstractQuantitative) || (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative)) && this._projections["width"]) {
                     var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
                     var barScale = this._isVertical ? this._xScale : this._yScale;
                     var barQScale = barScale;
-                    var barPixelWidthF = (this._projections["width"] && this._projections["width"].accessor) || d3.functor(this._getBarPixelWidth());
-                    var domainExtent = barQScale.domain()[1] - barQScale.domain()[0];
-                    var rangeExtent = barQScale.range()[1] - barQScale.range()[0];
+                    var domainExtent = Math.abs(barQScale.domain()[1] - barQScale.domain()[0]);
+                    var rangeExtent = Math.abs(barQScale.range()[1] - barQScale.range()[0]);
                     var barOffsetF = function (d, i, u, m) {
-                        var barWidth = barPixelWidthF(d, i, u, m);
+                        var barWidth = _this._projections["width"].accessor(d, i, u, m);
                         return (domainExtent * barWidth) / (rangeExtent - barWidth);
                     };
                     var minBarAccessor = function (d, i, u, m) {
