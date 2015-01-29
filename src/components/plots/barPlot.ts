@@ -54,7 +54,7 @@ export module Plot {
       super.detach();
       this._datasetKeysInOrder.forEach((key) => {
         var scaleKey = this.getID().toString() + "_" + key;
-        this._xScale._removeExtent(scaleKey, "bar-extent");
+        this._xScale._removeExtent(this.getID().toString(), "bar-extent");
       });
       return this;
     }
@@ -64,34 +64,35 @@ export module Plot {
           (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative)) {
         var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
         var barScale: Plottable.Scale.AbstractScale<any, number> = this._isVertical ? this._xScale : this._yScale;
+        var barQScale = <Plottable.Scale.AbstractQuantitative<any>> barScale;
 
-        var numberBarAccessorData = d3.set(_Util.Methods.flatten(this._datasetKeysInOrder.map((k) => {
-          var dataset = this._key2PlotDatasetKey.get(k).dataset;
-          var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
-          return dataset.data().map((d, i) => barAccessor(d, i, dataset.metadata(), plotMetadata).valueOf());
-        }))).values().map((value) => +value);
-
-        numberBarAccessorData.sort((a, b) => a - b);
-
-        var minDiff = _Util.Methods.min(d3.pairs(numberBarAccessorData).map((pair: any[]) => pair[1] - pair[0]), 0);
+        var barPixelWidthF = (this._projections["width"] && this._projections["width"].accessor) || d3.functor(this._getBarPixelWidth());
+//        var domainExtent = barQScale.domain()[1] - barQScale.domain()[0];
+//        var rangeExtent = barQScale.range()[1] - barQScale.range()[0];
+//        rangeExtent = 1500;
+//        var factor = Math.abs(rangeExtent / domainExtent);
+//        factor = 1;
+//        factor = 0.5;
 
         var minBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) =>
-          +barAccessor(d, i, u, m) - minDiff;
+          barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) - barPixelWidthF(d, i, u, m) * factor);
         var maxBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) =>
-          +barAccessor(d, i, u, m) + minDiff;
+          barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) + barPixelWidthF(d, i, u, m) * factor);
+
+        var minBarExtent = Infinity;
+        var maxBarExtent = -Infinity;
 
         this._datasetKeysInOrder.forEach((key) => {
           var plotDatasetKey = this._key2PlotDatasetKey.get(key);
           var dataset = plotDatasetKey.dataset;
           var plotMetadata = plotDatasetKey.plotMetadata;
-          var minBarExtent = dataset._getExtent(minBarAccessor, barScale._typeCoercer, plotMetadata)[0];
-          var maxBarExtent = dataset._getExtent(maxBarAccessor, barScale._typeCoercer, plotMetadata)[1];
-          if (minBarExtent != null && maxBarExtent != null) {
-            var scaleKey = this.getID().toString() + "_" + key;
-            barScale._updateExtent(scaleKey, "bar-extent", [minBarExtent, maxBarExtent]);
-          }
-
+          minBarExtent = Math.min(minBarExtent, dataset._getExtent(minBarAccessor, barScale._typeCoercer, plotMetadata)[0]);
+          maxBarExtent = Math.max(maxBarExtent, dataset._getExtent(maxBarAccessor, barScale._typeCoercer, plotMetadata)[1]);
         });
+
+        if (minBarExtent != null && maxBarExtent != null) {
+          barScale._updateExtent(this.getID().toString(), "bar-extent", [minBarExtent, maxBarExtent]);
+        }
       }
     }
 

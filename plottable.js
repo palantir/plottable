@@ -6772,7 +6772,7 @@ var Plottable;
                 _super.prototype.detach.call(this);
                 this._datasetKeysInOrder.forEach(function (key) {
                     var scaleKey = _this.getID().toString() + "_" + key;
-                    _this._xScale._removeExtent(scaleKey, "bar-extent");
+                    _this._xScale._removeExtent(_this.getID().toString(), "bar-extent");
                 });
                 return this;
             };
@@ -6781,26 +6781,28 @@ var Plottable;
                 if ((this._isVertical && this._xScale instanceof Plottable.Scale.AbstractQuantitative) || (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative)) {
                     var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
                     var barScale = this._isVertical ? this._xScale : this._yScale;
-                    var numberBarAccessorData = d3.set(Plottable._Util.Methods.flatten(this._datasetKeysInOrder.map(function (k) {
-                        var dataset = _this._key2PlotDatasetKey.get(k).dataset;
-                        var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
-                        return dataset.data().map(function (d, i) { return barAccessor(d, i, dataset.metadata(), plotMetadata).valueOf(); });
-                    }))).values().map(function (value) { return +value; });
-                    numberBarAccessorData.sort(function (a, b) { return a - b; });
-                    var minDiff = Plottable._Util.Methods.min(d3.pairs(numberBarAccessorData).map(function (pair) { return pair[1] - pair[0]; }), 0);
-                    var minBarAccessor = function (d, i, u, m) { return +barAccessor(d, i, u, m) - minDiff; };
-                    var maxBarAccessor = function (d, i, u, m) { return +barAccessor(d, i, u, m) + minDiff; };
+                    var barQScale = barScale;
+                    var barPixelWidthF = (this._projections["width"] && this._projections["width"].accessor) || d3.functor(this._getBarPixelWidth());
+                    //        var domainExtent = barQScale.domain()[1] - barQScale.domain()[0];
+                    //        var rangeExtent = barQScale.range()[1] - barQScale.range()[0];
+                    //        rangeExtent = 1500;
+                    //        var factor = Math.abs(rangeExtent / domainExtent);
+                    //        factor = 1;
+                    //        factor = 0.5;
+                    var minBarAccessor = function (d, i, u, m) { return barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) - barPixelWidthF(d, i, u, m) * factor); };
+                    var maxBarAccessor = function (d, i, u, m) { return barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) + barPixelWidthF(d, i, u, m) * factor); };
+                    var minBarExtent = Infinity;
+                    var maxBarExtent = -Infinity;
                     this._datasetKeysInOrder.forEach(function (key) {
                         var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                         var dataset = plotDatasetKey.dataset;
                         var plotMetadata = plotDatasetKey.plotMetadata;
-                        var minBarExtent = dataset._getExtent(minBarAccessor, barScale._typeCoercer, plotMetadata)[0];
-                        var maxBarExtent = dataset._getExtent(maxBarAccessor, barScale._typeCoercer, plotMetadata)[1];
-                        if (minBarExtent != null && maxBarExtent != null) {
-                            var scaleKey = _this.getID().toString() + "_" + key;
-                            barScale._updateExtent(scaleKey, "bar-extent", [minBarExtent, maxBarExtent]);
-                        }
+                        minBarExtent = Math.min(minBarExtent, dataset._getExtent(minBarAccessor, barScale._typeCoercer, plotMetadata)[0]);
+                        maxBarExtent = Math.max(maxBarExtent, dataset._getExtent(maxBarAccessor, barScale._typeCoercer, plotMetadata)[1]);
                     });
+                    if (minBarExtent != null && maxBarExtent != null) {
+                        barScale._updateExtent(this.getID().toString(), "bar-extent", [minBarExtent, maxBarExtent]);
+                    }
                 }
             };
             Bar.prototype.baseline = function (value) {
