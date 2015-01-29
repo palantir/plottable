@@ -319,9 +319,8 @@ export module Plot {
         attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
           positionF(d, i, u, m) - widthF(d, i, u, m) * this._barAlignmentFactor;
       } else {
-        var bandWidth = (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeBand();
         attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
-          positionF(d, i, u, m) - widthF(d, i, u, m) / 2 + bandWidth / 2;
+          positionF(d, i, u, m) - widthF(d, i, u, m) / 2;
       }
 
       attrToProjector[primaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) => {

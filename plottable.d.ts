@@ -1295,6 +1295,7 @@ declare module Plottable {
              */
             rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): Ordinal;
             copy(): Ordinal;
+            scale(value: string): number;
         }
     }
 }

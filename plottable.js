@@ -2321,6 +2321,16 @@ var Plottable;
             Ordinal.prototype.copy = function () {
                 return new Ordinal(this._d3Scale.copy());
             };
+            Ordinal.prototype.scale = function (value) {
+                var scaledValue = _super.prototype.scale.call(this, value);
+                if (this.rangeType() === "bands") {
+                    //scale it to the middle
+                    return scaledValue + this.rangeBand() / 2;
+                }
+                else {
+                    return scaledValue;
+                }
+            };
             return Ordinal;
         })(Scale.AbstractScale);
         Scale.Ordinal = Ordinal;
@@ -4985,7 +4995,7 @@ var Plottable;
                         break;
                 }
                 ticks.each(function (d) {
-                    var bandWidth = scale.fullBandStartAndWidth(d)[1];
+                    var bandWidth = scale.rangeBand();
                     var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
                     var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
                     var writeOptions = {
@@ -5025,10 +5035,9 @@ var Plottable;
                 var ordScale = this._scale;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
-                    var startAndWidth = ordScale.fullBandStartAndWidth(d);
-                    var bandStartPosition = startAndWidth[0];
-                    var x = _this._isHorizontal() ? bandStartPosition : 0;
-                    var y = _this._isHorizontal() ? 0 : bandStartPosition;
+                    var scaledValue = ordScale.scale(d) - ordScale.rangeBand() / 2;
+                    var x = _this._isHorizontal() ? scaledValue : 0;
+                    var y = _this._isHorizontal() ? 0 : scaledValue;
                     return "translate(" + x + "," + y + ")";
                 };
                 tickLabels.enter().append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
@@ -5038,10 +5047,9 @@ var Plottable;
                 tickLabels.text("");
                 this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
                 var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
-                var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+                var xTranslate = this.orient() === "left" ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
                 var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-                Plottable._Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
-                Plottable._Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
+                Plottable._Util.DOM.translate(this._tickLabelContainer, 0, yTranslate);
                 return this;
             };
             Category.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
@@ -6706,6 +6714,10 @@ var Plottable;
                 var yStep = this._yScale.rangeBand();
                 attrToProjector["width"] = function () { return xStep; };
                 attrToProjector["height"] = function () { return yStep; };
+                var xAttr = attrToProjector["x"];
+                var yAttr = attrToProjector["y"];
+                attrToProjector["x"] = function (d, i, u, m) { return xAttr(d, i, u, m) - xStep / 2; };
+                attrToProjector["y"] = function (d, i, u, m) { return yAttr(d, i, u, m) - yStep / 2; };
                 return attrToProjector;
             };
             Grid.prototype._generateDrawSteps = function () {
@@ -6955,8 +6967,7 @@ var Plottable;
                     attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) * _this._barAlignmentFactor; };
                 }
                 else {
-                    var bandWidth = secondaryScale.rangeBand();
-                    attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) / 2 + bandWidth / 2; };
+                    attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) / 2; };
                 }
                 attrToProjector[primaryAttr] = function (d, i, u, m) {
                     var originalPos = originalPositionFn(d, i, u, m);
@@ -7396,7 +7407,7 @@ var Plottable;
                 var innerScale = this._makeInnerScale();
                 this._datasetKeysInOrder.forEach(function (key) {
                     var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
-                    plotMetadata.position = innerScale.scale(key);
+                    plotMetadata.position = innerScale.scale(key) - innerScale.rangeBand() / 2;
                 });
             };
             ClusteredBar.prototype._makeInnerScale = function () {

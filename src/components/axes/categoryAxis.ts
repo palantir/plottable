@@ -116,7 +116,7 @@ export module Axis {
           break;
       }
       ticks.each(function (d: string) {
-        var bandWidth = scale.fullBandStartAndWidth(d)[1];
+        var bandWidth = scale.rangeBand();
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
         var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
         var writeOptions = {
@@ -162,10 +162,9 @@ export module Axis {
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
-        var startAndWidth = ordScale.fullBandStartAndWidth(d);
-        var bandStartPosition = startAndWidth[0];
-        var x = this._isHorizontal() ? bandStartPosition : 0;
-        var y = this._isHorizontal() ? 0 : bandStartPosition;
+        var scaledValue = ordScale.scale(d) - ordScale.rangeBand() / 2;
+        var x = this._isHorizontal() ? scaledValue : 0;
+        var y = this._isHorizontal() ? 0 : scaledValue;
         return "translate(" + x + "," + y + ")";
       };
       tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
@@ -176,10 +175,9 @@ export module Axis {
       this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
       var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
 
-      var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      var xTranslate = this.orient() === "left" ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
       var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      _Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
-      _Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
+      _Util.DOM.translate(this._tickLabelContainer, 0, yTranslate);
       return this;
     }
 
