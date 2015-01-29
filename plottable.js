@@ -6789,10 +6789,10 @@ var Plottable;
                         return (domainExtent * barWidth) / (rangeExtent - barWidth);
                     };
                     var minBarAccessor = function (d, i, u, m) {
-                        return barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) - barOffsetF(d, i, u, m));
+                        return barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) - _this._barAlignmentFactor * 2 * barOffsetF(d, i, u, m));
                     };
                     var maxBarAccessor = function (d, i, u, m) {
-                        return barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) + barOffsetF(d, i, u, m));
+                        return barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) + (1 - _this._barAlignmentFactor) * 2 * barOffsetF(d, i, u, m));
                     };
                     var minBarExtent = Infinity;
                     var maxBarExtent = -Infinity;
