@@ -49,6 +49,11 @@ export module Component {
       this.classed("legend", true).classed("interpolated-color-legend", true);
     }
 
+    public remove() {
+      super.remove();
+      this._scale.broadcaster.deregisterListener(this);
+    }
+
     /**
      * Gets the current formatter on the InterpolatedColorLegend.
      *
@@ -206,8 +211,8 @@ export module Component {
 
       if (this._isVertical()) {
         var longestTextWidth = Math.max(text0Width, text1Width);
-        swatchWidth = this.width() - 3 * padding - longestTextWidth;
-        swatchHeight = (this.height() - 2 * padding) / numSwatches;
+        swatchWidth = Math.max( (this.width() - 3 * padding - longestTextWidth), 0);
+        swatchHeight = Math.max( ((this.height() - 2 * padding) / numSwatches), 0);
         swatchY = (d: any, i: number) => padding + (numSwatches - (i + 1)) * swatchHeight;
 
         upperWriteOptions.yAlign = "top";
@@ -231,8 +236,8 @@ export module Component {
         boundingBoxAttr.width = swatchWidth;
         boundingBoxAttr.height = numSwatches * swatchHeight;
       } else { // horizontal
-        swatchWidth = (this.width() - 4 * padding - text0Width - text1Width) / numSwatches;
-        swatchHeight = this.height() - 2 * padding;
+        swatchWidth = Math.max( ((this.width() - 4 * padding - text0Width - text1Width) / numSwatches), 0);
+        swatchHeight = Math.max( (this.height() - 2 * padding), 0);
         swatchX = (d: any, i: number) => (padding + text0Width + padding) + i * swatchWidth;
         swatchY = (d: any, i: number) => padding;
 
@@ -258,8 +263,6 @@ export module Component {
 
       this._swatchBoundingBox.attr(boundingBoxAttr);
 
-      swatchWidth = Math.max(swatchWidth, 0);
-      swatchHeight = Math.max(swatchHeight, 0);
       var swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
       swatches.enter().append("rect").classed("swatch", true);
       swatches.exit().remove();

@@ -5503,6 +5503,10 @@ var Plottable;
                 this._fixedHeightFlag = true;
                 this.classed("legend", true).classed("interpolated-color-legend", true);
             }
+            InterpolatedColorLegend.prototype.remove = function () {
+                _super.prototype.remove.call(this);
+                this._scale.broadcaster.deregisterListener(this);
+            };
             InterpolatedColorLegend.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
                     return this._formatter;
@@ -5615,8 +5619,8 @@ var Plottable;
                 };
                 if (this._isVertical()) {
                     var longestTextWidth = Math.max(text0Width, text1Width);
-                    swatchWidth = this.width() - 3 * padding - longestTextWidth;
-                    swatchHeight = (this.height() - 2 * padding) / numSwatches;
+                    swatchWidth = Math.max((this.width() - 3 * padding - longestTextWidth), 0);
+                    swatchHeight = Math.max(((this.height() - 2 * padding) / numSwatches), 0);
                     swatchY = function (d, i) { return padding + (numSwatches - (i + 1)) * swatchHeight; };
                     upperWriteOptions.yAlign = "top";
                     upperLabelShift.y = padding;
@@ -5640,8 +5644,8 @@ var Plottable;
                     boundingBoxAttr.height = numSwatches * swatchHeight;
                 }
                 else {
-                    swatchWidth = (this.width() - 4 * padding - text0Width - text1Width) / numSwatches;
-                    swatchHeight = this.height() - 2 * padding;
+                    swatchWidth = Math.max(((this.width() - 4 * padding - text0Width - text1Width) / numSwatches), 0);
+                    swatchHeight = Math.max((this.height() - 2 * padding), 0);
                     swatchX = function (d, i) { return (padding + text0Width + padding) + i * swatchWidth; };
                     swatchY = function (d, i) { return padding; };
                     upperWriteOptions.xAlign = "right";
@@ -5661,8 +5665,6 @@ var Plottable;
                 var lowerTranslateString = "translate(" + lowerLabelShift.x + ", " + lowerLabelShift.y + ")";
                 this._lowerLabel.attr("transform", lowerTranslateString);
                 this._swatchBoundingBox.attr(boundingBoxAttr);
-                swatchWidth = Math.max(swatchWidth, 0);
-                swatchHeight = Math.max(swatchHeight, 0);
                 var swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
                 swatches.enter().append("rect").classed("swatch", true);
                 swatches.exit().remove();

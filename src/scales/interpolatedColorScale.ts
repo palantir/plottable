@@ -14,7 +14,6 @@ export module Scale {
    * By default it generates a linear scale internally.
    */
   export class InterpolatedColor extends AbstractScale<number, string> {
-    protected _d3Scale: D3.Scale.QuantitativeScale;
     private static _COLOR_SCALES: ColorGroups = {
       reds : [
         "#FFFFFF", // white

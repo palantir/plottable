@@ -1352,7 +1352,6 @@ declare module Plottable {
          * By default it generates a linear scale internally.
          */
         class InterpolatedColor extends AbstractScale<number, string> {
-            protected _d3Scale: D3.Scale.QuantitativeScale;
             /**
              * Constructs an InterpolatedColorScale.
              *
@@ -2389,6 +2388,7 @@ declare module Plottable {
              * @param {Formatter} The labels are formatted using this function.
              */
             constructor(interpolatedColorScale: Scale.InterpolatedColor, orientation?: string, formatter?: (d: any) => string);
+            remove(): void;
             /**
              * Gets the current formatter on the InterpolatedColorLegend.
              *
