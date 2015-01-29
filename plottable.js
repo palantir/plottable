@@ -6783,14 +6783,18 @@ var Plottable;
                     var barScale = this._isVertical ? this._xScale : this._yScale;
                     var barQScale = barScale;
                     var barPixelWidthF = (this._projections["width"] && this._projections["width"].accessor) || d3.functor(this._getBarPixelWidth());
-                    //        var domainExtent = barQScale.domain()[1] - barQScale.domain()[0];
-                    //        var rangeExtent = barQScale.range()[1] - barQScale.range()[0];
-                    //        rangeExtent = 1500;
-                    //        var factor = Math.abs(rangeExtent / domainExtent);
-                    //        factor = 1;
-                    //        factor = 0.5;
-                    var minBarAccessor = function (d, i, u, m) { return barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) - barPixelWidthF(d, i, u, m) * factor); };
-                    var maxBarAccessor = function (d, i, u, m) { return barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) + barPixelWidthF(d, i, u, m) * factor); };
+                    var domainExtent = barQScale.domain()[1] - barQScale.domain()[0];
+                    var rangeExtent = barQScale.range()[1] - barQScale.range()[0];
+                    var barOffsetF = function (d, i, u, m) {
+                        var barWidth = barPixelWidthF(d, i, u, m);
+                        return (domainExtent * barWidth) / (rangeExtent - barWidth);
+                    };
+                    var minBarAccessor = function (d, i, u, m) {
+                        return barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) - barOffsetF(d, i, u, m));
+                    };
+                    var maxBarAccessor = function (d, i, u, m) {
+                        return barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) + barOffsetF(d, i, u, m));
+                    };
                     var minBarExtent = Infinity;
                     var maxBarExtent = -Infinity;
                     this._datasetKeysInOrder.forEach(function (key) {
@@ -6800,7 +6804,7 @@ var Plottable;
                         minBarExtent = Math.min(minBarExtent, dataset._getExtent(minBarAccessor, barScale._typeCoercer, plotMetadata)[0]);
                         maxBarExtent = Math.max(maxBarExtent, dataset._getExtent(maxBarAccessor, barScale._typeCoercer, plotMetadata)[1]);
                     });
-                    if (minBarExtent != null && maxBarExtent != null) {
+                    if (minBarExtent !== Infinity && !isNaN(minBarExtent) && maxBarExtent !== -Infinity && !isNaN(maxBarExtent)) {
                         barScale._updateExtent(this.getID().toString(), "bar-extent", [minBarExtent, maxBarExtent]);
                     }
                 }

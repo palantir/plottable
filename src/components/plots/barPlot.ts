@@ -67,17 +67,21 @@ export module Plot {
         var barQScale = <Plottable.Scale.AbstractQuantitative<any>> barScale;
 
         var barPixelWidthF = (this._projections["width"] && this._projections["width"].accessor) || d3.functor(this._getBarPixelWidth());
-//        var domainExtent = barQScale.domain()[1] - barQScale.domain()[0];
-//        var rangeExtent = barQScale.range()[1] - barQScale.range()[0];
-//        rangeExtent = 1500;
-//        var factor = Math.abs(rangeExtent / domainExtent);
-//        factor = 1;
-//        factor = 0.5;
+        var domainExtent = barQScale.domain()[1] - barQScale.domain()[0];
+        var rangeExtent = barQScale.range()[1] - barQScale.range()[0];
 
-        var minBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) =>
-          barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) - barPixelWidthF(d, i, u, m) * factor);
-        var maxBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) =>
-          barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) + barPixelWidthF(d, i, u, m) * factor);
+        var barOffsetF = (d: any, i: number, u: PlotMetadata, m: any) => {
+          var barWidth = barPixelWidthF(d, i, u, m);
+          return (domainExtent * barWidth) / (rangeExtent - barWidth);
+        };
+
+        var minBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) => {
+          return barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) - barOffsetF(d, i, u, m));
+        };
+
+        var maxBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) => {
+          return barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) + barOffsetF(d, i, u, m));
+        };
 
         var minBarExtent = Infinity;
         var maxBarExtent = -Infinity;
@@ -90,7 +94,7 @@ export module Plot {
           maxBarExtent = Math.max(maxBarExtent, dataset._getExtent(maxBarAccessor, barScale._typeCoercer, plotMetadata)[1]);
         });
 
-        if (minBarExtent != null && maxBarExtent != null) {
+        if (minBarExtent !== Infinity && !isNaN(minBarExtent) && maxBarExtent !== -Infinity && !isNaN(maxBarExtent)) {
           barScale._updateExtent(this.getID().toString(), "bar-extent", [minBarExtent, maxBarExtent]);
         }
       }
