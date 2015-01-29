@@ -1397,14 +1397,6 @@ declare module Plottable {
              * @returns {InterpolatedColor} The calling InterpolatedColor.
              */
             scaleType(scaleType: string): InterpolatedColor;
-            /**
-             * Gets a set of tick values spanning the domain.
-             *
-             * @param {number} numTicks: The approximate number of ticks to generate.
-             *
-             * @returns {any[]} The generated ticks.
-             */
-            ticks(numTicks?: number): any[];
             autoDomain(): InterpolatedColor;
         }
     }

@@ -5563,7 +5563,6 @@ var Plottable;
                     desiredHeight = this._padding + numSwatches * textHeight + this._padding;
                 }
                 else {
-                    var totalWidth = labelWidths[0] + labelWidths[1];
                     desiredHeight = this._padding + textHeight + this._padding;
                     desiredWidth = this._padding + labelWidths[0] + this._padding + numSwatches * textHeight + this._padding + labelWidths[1] + this._padding;
                 }

@@ -105,7 +105,7 @@ export module Component {
     private _generateTicks() {
       var domain = this._scale.domain();
       var slope = (domain[1] - domain[0]) / this._numSwatches;
-      var ticks = [];
+      var ticks: number[] = [];
       for (var i = 0; i <= this._numSwatches; i++) {
         ticks.push(domain[0] + slope * i);
       }
@@ -141,7 +141,6 @@ export module Component {
         desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
         desiredHeight = this._padding + numSwatches * textHeight + this._padding;
       } else {
-        var totalWidth = labelWidths[0] + labelWidths[1];
         desiredHeight = this._padding + textHeight + this._padding;
         desiredWidth = this._padding + labelWidths[0] + this._padding
                         + numSwatches * textHeight
