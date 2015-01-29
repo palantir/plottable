@@ -1808,7 +1808,7 @@ describe("Plots", function () {
             svg = generateSVG(500, 500);
             simpleDataset = new Plottable.Dataset([{ value: 5, value2: 10, type: "A" }, { value: 15, value2: 10, type: "B" }]);
             piePlot = new Plottable.Plot.Pie();
-            piePlot.addDataset(simpleDataset);
+            piePlot.addDataset("simpleDataset", simpleDataset);
             piePlot.project("value", "value");
             piePlot.renderTo(svg);
             renderArea = piePlot._renderArea;
@@ -1919,6 +1919,17 @@ describe("Plots", function () {
                 assert.strictEqual(arcPath1.attr("fill"), "#aec7e8", "second sector filled appropriately");
                 svg.remove();
             });
+        });
+        it("throws warnings on negative data", function () {
+            var message;
+            var oldWarn = Plottable._Util.Methods.warn;
+            Plottable._Util.Methods.warn = function (warn) { return message = warn; };
+            piePlot.removeDataset("simpleDataset");
+            var negativeDataset = new Plottable.Dataset([{ value: -5 }, { value: 15 }]);
+            piePlot.addDataset("negativeDataset", negativeDataset);
+            assert.equal(message, "Negative values will not render correctly in a pie chart.");
+            Plottable._Util.Methods.warn = oldWarn;
+            svg.remove();
         });
     });
 });
@@ -5765,6 +5776,13 @@ describe("Scales", function () {
             scale.domain(["a", "b", "c"]);
             assert.notEqual(scale.scale("c"), "#5279c7");
         });
+        it("interprets named color values correctly", function () {
+            var scale = new Plottable.Scale.Color();
+            scale.range(["red", "blue"]);
+            scale.domain(["a", "b"]);
+            assert.equal(scale.scale("a"), "#ff0000");
+            assert.equal(scale.scale("b"), "#0000ff");
+        });
     });
     describe("Interpolated Color Scales", function () {
         it("default scale uses reds and a linear scale type", function () {
@@ -6494,7 +6512,7 @@ describe("_Util.Methods", function () {
     });
     it("lightenColor()", function () {
         var color = "#12fced";
-        var lightenedColor = Plottable._Util.Methods.lightenColor(color, 1, 0.1);
+        var lightenedColor = Plottable._Util.Methods.lightenColor(color, 1);
         var lColor = Plottable._Util.Color.rgbToHsl(parseInt("12", 16), parseInt("fc", 16), parseInt("ed", 16))[2];
         var lLightenedColor = Plottable._Util.Color.rgbToHsl(parseInt(lightenedColor.substring(1, 3), 16), parseInt(lightenedColor.substring(3, 5), 16), parseInt(lightenedColor.substring(5, 7), 16))[2];
         assert.operator(lLightenedColor, ">", lColor, "color got lighter");
@@ -6548,6 +6566,24 @@ describe("Interactions", function () {
             var expectedYDragChange = -dragDistancePixelY * getSlope(yScale);
             assert.closeTo(xDomainAfter[0] - xDomainBefore[0], expectedXDragChange, 1, "x domain changed by the correct amount");
             assert.closeTo(yDomainAfter[0] - yDomainBefore[0], expectedYDragChange, 1, "y domain changed by the correct amount");
+            svg.remove();
+        });
+        it("Resets zoom when the scale domain changes", function () {
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var svg = generateSVG();
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var pzi = new Plottable.Interaction.PanZoom(xScale, yScale);
+            c.registerInteraction(pzi);
+            var zoomBeforeX = pzi._zoom;
+            xScale.domain([10, 1000]);
+            var zoomAfterX = pzi._zoom;
+            assert.notStrictEqual(zoomBeforeX, zoomAfterX, "D3 Zoom was regenerated after x scale domain changed");
+            var zoomBeforeY = pzi._zoom;
+            yScale.domain([10, 1000]);
+            var zoomAfterY = pzi._zoom;
+            assert.notStrictEqual(zoomBeforeY, zoomAfterY, "D3 Zoom was regenerated after y scale domain changed");
             svg.remove();
         });
     });

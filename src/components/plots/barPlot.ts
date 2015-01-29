@@ -375,14 +375,6 @@ export module Plot {
       } else {
         var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
 
-        var barAccessorData = d3.set(_Util.Methods.flatten(this._datasetKeysInOrder.map((k) => {
-          var dataset = this._key2PlotDatasetKey.get(k).dataset;
-          var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
-          return dataset.data().map((d, i) => barAccessor(d, i, dataset.metadata(), plotMetadata));
-        }))).values();
-
-        if (barAccessorData.some((datum) => datum === "undefined")) { return -1; }
-
         var numberBarAccessorData = d3.set(_Util.Methods.flatten(this._datasetKeysInOrder.map((k) => {
           var dataset = this._key2PlotDatasetKey.get(k).dataset;
           var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;

@@ -56,4 +56,13 @@ function run(svg, data, Plottable) {
 
     basicTable.renderTo(svg);
 
+    var cb = function(x, y){
+      var d = dataseries1.data();
+      dataseries1.data(d);
+    };
+
+    renderAreaD1.registerInteraction(
+      new Plottable.Interaction.Click(renderAreaD1).callback(cb)
+    );
+
 }

@@ -113,9 +113,9 @@ declare module Plottable {
              * @returns {[{ [key: string]: any }} coppied map.
              */
             function copyMap<T>(oldMap: {
-                [x: string]: T;
+                [key: string]: T;
             }): {
-                [x: string]: T;
+                [key: string]: T;
             };
             function range(start: number, stop: number, step?: number): number[];
             /** Is like setTimeout, but activates synchronously if time=0
@@ -127,7 +127,7 @@ declare module Plottable {
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
             function colorTest(colorTester: D3.Selection, className: string): string;
-            function lightenColor(color: string, factor: number, lightenAmount: number): string;
+            function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
         }
     }
@@ -493,7 +493,7 @@ declare module Plottable {
          *
          * The listeners are called synchronously.
          */
-        class Broadcaster extends PlottableObject {
+        class Broadcaster extends Core.PlottableObject {
             listenable: Listenable;
             /**
              * Constructs a broadcaster, taking the Listenable that the broadcaster will be attached to.
@@ -1422,7 +1422,7 @@ declare module Plottable {
     module Scale {
         module TickGenerators {
             interface TickGenerator<D> {
-                (scale: AbstractQuantitative<D>): D[];
+                (scale: Plottable.Scale.AbstractQuantitative<D>): D[];
             }
             /**
              * Creates a tick generator using the specified interval.
@@ -1746,7 +1746,7 @@ declare module Plottable {
              * @param {Component} c The component to merge in.
              * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
              */
-            merge(c: AbstractComponent): Group;
+            merge(c: AbstractComponent): Component.Group;
             /**
              * Detaches a Component from the DOM. The component can be reused.
              *
@@ -2506,7 +2506,7 @@ declare module Plottable {
             protected _datasetKeysInOrder: string[];
             protected _renderArea: D3.Selection;
             protected _projections: {
-                [x: string]: _Projection;
+                [attrToSet: string]: _Projection;
             };
             protected _animate: boolean;
             protected _animateOnNextRender: boolean;
@@ -2793,7 +2793,7 @@ declare module Plottable {
     module Plot {
         class Bar<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
             protected static _BarAlignmentToFactor: {
-                [x: string]: number;
+                [alignment: string]: number;
             };
             protected static _DEFAULT_WIDTH: number;
             protected _isVertical: boolean;
@@ -3318,7 +3318,7 @@ declare module Plottable {
         class AbstractDispatcher extends Core.PlottableObject {
             protected _target: D3.Selection;
             protected _event2Callback: {
-                [x: string]: () => any;
+                [eventName: string]: () => any;
             };
             /**
              * Constructs a Dispatcher with the specified target.
@@ -3363,7 +3363,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        class Mouse extends AbstractDispatcher {
+        class Mouse extends Dispatcher.AbstractDispatcher {
             /**
              * Constructs a Mouse Dispatcher with the specified target.
              *
@@ -3419,7 +3419,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        class Keypress extends AbstractDispatcher {
+        class Keypress extends Dispatcher.AbstractDispatcher {
             /**
              * Constructs a Keypress Dispatcher with the specified target.
              *
@@ -3745,7 +3745,7 @@ declare module Plottable {
              */
             _doHover(p: Point): HoverData;
         }
-        class Hover extends AbstractInteraction {
+        class Hover extends Interaction.AbstractInteraction {
             _componentToListenTo: Hoverable;
             _anchor(component: Hoverable, hitBox: D3.Selection): void;
             /**
