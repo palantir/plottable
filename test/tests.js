@@ -1454,6 +1454,9 @@ describe("Legend", function () {
         svg.remove();
     });
 });
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("InterpolatedColorLegend", function () {
     var svg;
     var colorScale;
