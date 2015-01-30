@@ -313,13 +313,12 @@ export module Plot {
       attrToProjector["width"] = this._isVertical ? widthF : heightF;
       attrToProjector["height"] = this._isVertical ? heightF : widthF;
 
-      var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal);
-      if (!bandsMode) {
-        attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
-          positionF(d, i, u, m) - widthF(d, i, u, m) * this._barAlignmentFactor;
-      } else {
+      if (secondaryScale instanceof Plottable.Scale.Ordinal) {
         attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
           positionF(d, i, u, m) - widthF(d, i, u, m) / 2;
+      } else {
+        attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
+          positionF(d, i, u, m) - widthF(d, i, u, m) * this._barAlignmentFactor;
       }
 
       attrToProjector[primaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) => {
