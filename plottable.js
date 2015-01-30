@@ -541,7 +541,11 @@ var Plottable;
                 return parsedValue;
             }
             function isSelectionRemovedFromSVG(selection) {
-                return selection !== getBoundingSVG(selection);
+                var n = selection.node();
+                while (n !== null && n.nodeName.toLowerCase() !== "svg") {
+                    n = n.parentNode;
+                }
+                return (n == null);
             }
             DOM.isSelectionRemovedFromSVG = isSelectionRemovedFromSVG;
             function getElementWidth(elem) {
@@ -609,11 +613,6 @@ var Plottable;
                 return (Math.floor(container.left) <= Math.ceil(element.left) && Math.floor(container.top) <= Math.ceil(element.top) && Math.floor(element.right) <= Math.ceil(container.right) && Math.floor(element.bottom) <= Math.ceil(container.bottom));
             }
             DOM.containedInBoundingBox = containedInBoundingBox;
-            function getBoundingSVG(elem) {
-                var svg = elem[0][0].ownerSVGElement;
-                return (svg == null) ? elem : svg;
-            }
-            DOM.getBoundingSVG = getBoundingSVG;
         })(DOM = _Util.DOM || (_Util.DOM = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -3291,7 +3290,7 @@ var Plottable;
                     this._generateClipPath();
                 }
                 ;
-                this._addBox("bounding-box");
+                this._boundingBox = this._addBox("bounding-box");
                 this._interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
                 this._interactionsToRegister = null;
                 if (this._isTopLevelComponent) {
@@ -4205,7 +4204,7 @@ var Plottable;
                 return this;
             };
             AbstractAxis.prototype._hideEndTickLabels = function () {
-                var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
+                var boundingBox = this._boundingBox.node().getBoundingClientRect();
                 var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
                 if (tickLabels[0].length === 0) {
                     return;
@@ -4221,7 +4220,7 @@ var Plottable;
             };
             // Responsible for hiding any tick labels that break out of the bounding container
             AbstractAxis.prototype._hideOverflowingTickLabels = function () {
-                var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
+                var boundingBox = this._boundingBox.node().getBoundingClientRect();
                 var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
                 if (tickLabels.empty()) {
                     return;

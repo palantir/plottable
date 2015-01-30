@@ -856,29 +856,13 @@ describe("NumericAxis", function () {
         svg.remove();
     });
     it("confines labels to the bounding box for the axis", function () {
-        var data = [
-            { x: "05/02/2014", y: 2 },
-            { x: "05/03/2014", y: 3 },
-            { x: "05/06/2014", y: 4 }
-        ];
         var SVG_WIDTH = 500;
-        var SVG_HEIGHT = 500;
+        var SVG_HEIGHT = 100;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var xScale = new Plottable.Scale.Time();
-        var yScale = new Plottable.Scale.Linear();
-        var linePlot = new Plottable.Plot.Line(xScale, yScale);
-        var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-        var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-        linePlot.attr("x", function (d) {
-            return d3.time.format("%x").parse(d.x);
-        }, xScale);
-        linePlot.project("y", "y", yScale);
-        linePlot.addDataset(data);
-        var chart = new Plottable.Component.Table([
-            [yAxis, linePlot],
-            [null, xAxis]
-        ]);
-        chart.renderTo(svg);
+        var scale = new Plottable.Scale.Linear();
+        var axis = new Plottable.Axis.Numeric(scale, "bottom");
+        axis.formatter(function (d) { return "longstringsareverylong"; });
+        axis.renderTo(svg);
         var boundingBox = d3.select(".x-axis .bounding-box");
         d3.selectAll(".x-axis .tick-label").each(function () {
             var tickLabel = d3.select(this);

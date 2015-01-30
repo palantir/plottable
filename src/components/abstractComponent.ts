@@ -7,6 +7,7 @@ export module Component {
 
     protected _element: D3.Selection;
     protected _content: D3.Selection;
+    protected _boundingBox: D3.Selection;
     private _backgroundContainer: D3.Selection;
     private _foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
@@ -88,7 +89,7 @@ export module Component {
         this._generateClipPath();
       };
 
-      this._addBox("bounding-box");
+      this._boundingBox = this._addBox("bounding-box");
 
       this._interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this._interactionsToRegister = null;

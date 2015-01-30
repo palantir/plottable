@@ -272,7 +272,6 @@ declare module Plottable {
             function translate(s: D3.Selection, x?: number, y?: number): any;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
             function containedInBoundingBox(container: ClientRect, element: ClientRect): boolean;
-            function getBoundingSVG(elem: D3.Selection): any;
         }
     }
 }
@@ -1598,6 +1597,7 @@ declare module Plottable {
             static AUTORESIZE_BY_DEFAULT: boolean;
             protected _element: D3.Selection;
             protected _content: D3.Selection;
+            protected _boundingBox: D3.Selection;
             clipPathEnabled: boolean;
             _parent: AbstractComponentContainer;
             protected _fixedHeightFlag: boolean;

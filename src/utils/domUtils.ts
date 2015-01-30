@@ -39,7 +39,11 @@ export module _Util {
     }
 
     export function isSelectionRemovedFromSVG(selection: D3.Selection) {
-      return selection !== getBoundingSVG(selection);
+      var n = (<Node> selection.node());
+      while (n !== null && n.nodeName.toLowerCase() !== "svg") {
+        n = n.parentNode;
+      }
+      return (n == null);
     }
 
     export function getElementWidth(elem: HTMLScriptElement): number{
@@ -111,11 +115,6 @@ export module _Util {
         Math.floor(element.right)  <= Math.ceil(container.right) &&
         Math.floor(element.bottom) <= Math.ceil(container.bottom)
       );
-    }
-
-    export function getBoundingSVG(elem: D3.Selection) {
-      var svg = elem[0][0].ownerSVGElement;
-      return (svg == null) ? elem : svg;
     }
   }
 }

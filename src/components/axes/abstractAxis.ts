@@ -455,7 +455,7 @@ export module Axis {
     }
 
     protected _hideEndTickLabels() {
-      var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
+      var boundingBox = this._boundingBox.node().getBoundingClientRect();
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
       if (tickLabels[0].length === 0) {
         return;
@@ -472,7 +472,7 @@ export module Axis {
 
     // Responsible for hiding any tick labels that break out of the bounding container
     protected _hideOverflowingTickLabels() {
-      var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
+      var boundingBox = this._boundingBox.node().getBoundingClientRect();
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
       if (tickLabels.empty()) {
         return;
