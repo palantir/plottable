@@ -68,14 +68,14 @@ export module Scale {
       return this._d3Scale.rangeBand();
     }
 
-    public innerPadding(): number {
-      var d = this.domain();
-      if (d.length < 2) {
-        return 0;
-      }
-      var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
-      return step - this.rangeBand();
-    }
+//    public innerPadding(): number {
+//      var d = this.domain();
+//      if (d.length < 2) {
+//        return 0;
+//      }
+//      var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
+//      return step - this.rangeBand();
+//    }
 
     public fullBandStartAndWidth(v: string) {
       var start = this.scale(v) - this.innerPadding() / 2;
@@ -83,43 +83,28 @@ export module Scale {
       return [start, width];
     }
 
-    /**
-     * Get the range type.
-     *
-     * @returns {string} The current range type.
-     */
-    public rangeType() : string;
-    /**
-     * Set the range type.
-     *
-     * @param {string} rangeType If provided, either "points" or "bands" indicating the
-     *     d3 method used to generate range bounds.
-     * @param {number} [outerPadding] If provided, the padding outside the range,
-     *     proportional to the range step.
-     * @param {number} [innerPadding] If provided, the padding between bands in the range,
-     *     proportional to the range step. This parameter is only used in
-     *     "bands" type ranges.
-     * @returns {Ordinal} The calling Ordinal.
-     */
-    public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number) : Ordinal;
-    public rangeType(rangeType?: string, outerPadding?: number, innerPadding?: number) : any {
-      if (rangeType == null) {
-        return this._rangeType;
-      } else {
-        if(!(rangeType === "points" || rangeType === "bands")) {
-          throw new Error("Unsupported range type: " + rangeType);
+    public innerPadding(): number;
+    public innerPadding(innerPadding: number): Ordinal;
+    public innerPadding(innerPadding?: number): any {
+      if (innerPadding == null) {
+        var d = this.domain();
+        if (d.length < 2) {
+          return 0;
         }
-        this._rangeType = rangeType;
-        if (outerPadding != null) {
-          this._outerPadding = outerPadding;
-        }
-        if (innerPadding != null) {
-          this._innerPadding = innerPadding;
-        }
-        this.range(this.range());
-        this.broadcaster.broadcast();
-        return this;
+        var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
+        return step - this.rangeBand();
       }
+      this._innerPadding = innerPadding;
+      this.range(this.range());
+      this.broadcaster.broadcast();
+      return this;
+    }
+
+    public outerPadding(outerPadding: number): Ordinal {
+      this._outerPadding = outerPadding;
+      this.range(this.range());
+      this.broadcaster.broadcast();
+      return this;
     }
 
     public copy(): Ordinal {
@@ -127,13 +112,8 @@ export module Scale {
     }
 
     public scale(value: string): number {
-      var scaledValue = super.scale(value);
-      if (this.rangeType() === "bands") {
-        //scale it to the middle
-        return scaledValue + this.rangeBand() / 2;
-      } else {
-        return scaledValue;
-      }
+      //scale it to the middle
+      return super.scale(value) + this.rangeBand() / 2;
     }
   }
 }

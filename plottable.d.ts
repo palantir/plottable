@@ -1273,27 +1273,10 @@ declare module Plottable {
              * @returns {number} The range band width or 0 if rangeType isn't "bands".
              */
             rangeBand(): number;
-            innerPadding(): number;
             fullBandStartAndWidth(v: string): number[];
-            /**
-             * Get the range type.
-             *
-             * @returns {string} The current range type.
-             */
-            rangeType(): string;
-            /**
-             * Set the range type.
-             *
-             * @param {string} rangeType If provided, either "points" or "bands" indicating the
-             *     d3 method used to generate range bounds.
-             * @param {number} [outerPadding] If provided, the padding outside the range,
-             *     proportional to the range step.
-             * @param {number} [innerPadding] If provided, the padding between bands in the range,
-             *     proportional to the range step. This parameter is only used in
-             *     "bands" type ranges.
-             * @returns {Ordinal} The calling Ordinal.
-             */
-            rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): Ordinal;
+            innerPadding(): number;
+            innerPadding(innerPadding: number): Ordinal;
+            outerPadding(outerPadding: number): Ordinal;
             copy(): Ordinal;
             scale(value: string): number;
         }
