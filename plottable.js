@@ -2285,14 +2285,6 @@ var Plottable;
             Ordinal.prototype.rangeBand = function () {
                 return this._d3Scale.rangeBand();
             };
-            //    public innerPadding(): number {
-            //      var d = this.domain();
-            //      if (d.length < 2) {
-            //        return 0;
-            //      }
-            //      var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
-            //      return step - this.rangeBand();
-            //    }
             Ordinal.prototype.fullBandStartAndWidth = function (v) {
                 var start = this.scale(v) - this.innerPadding() / 2;
                 var width = this.rangeBand() + this.innerPadding();
