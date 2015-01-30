@@ -4219,15 +4219,15 @@ var Plottable;
                     d3.select(lastTickLabel).style("visibility", "hidden");
                 }
             };
-            // Responsible for hiding any tick labels that break out of the bounding SVG
+            // Responsible for hiding any tick labels that break out of the bounding container
             AbstractAxis.prototype._hideOverflowingTickLabels = function () {
-                var boundingSVG = Plottable._Util.DOM.getBoundingSVG(this._element).getBoundingClientRect();
+                var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
                 var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
                 if (tickLabels.empty()) {
                     return;
                 }
                 tickLabels.each(function (d, i) {
-                    if (!Plottable._Util.DOM.containedInBoundingBox(boundingSVG, this.getBoundingClientRect())) {
+                    if (!Plottable._Util.DOM.containedInBoundingBox(boundingBox, this.getBoundingClientRect())) {
                         d3.select(this).style("visibility", "hidden");
                     }
                 });

@@ -470,15 +470,15 @@ export module Axis {
       }
     }
 
-    // Responsible for hiding any tick labels that break out of the bounding SVG
+    // Responsible for hiding any tick labels that break out of the bounding container
     protected _hideOverflowingTickLabels() {
-      var boundingSVG = _Util.DOM.getBoundingSVG(this._element).getBoundingClientRect();
+      var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
       if (tickLabels.empty()) {
         return;
       }
       tickLabels.each(function(d: any, i: number) {
-        if (!_Util.DOM.containedInBoundingBox(boundingSVG, this.getBoundingClientRect())) {
+        if (!_Util.DOM.containedInBoundingBox(boundingBox, this.getBoundingClientRect())) {
           d3.select(this).style("visibility", "hidden");
         }
       });
