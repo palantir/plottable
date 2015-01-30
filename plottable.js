@@ -609,6 +609,10 @@ var Plottable;
                 return true;
             }
             DOM.boxesOverlap = boxesOverlap;
+            function boxIsInside(inner, outer) {
+                return (Math.floor(outer.left) <= Math.ceil(inner.left) && Math.floor(outer.top) <= Math.ceil(inner.top) && Math.floor(inner.right) <= Math.ceil(outer.right) && Math.floor(inner.bottom) <= Math.ceil(outer.bottom));
+            }
+            DOM.boxIsInside = boxIsInside;
         })(DOM = _Util.DOM || (_Util.DOM = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));

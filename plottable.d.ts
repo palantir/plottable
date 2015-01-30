@@ -271,6 +271,7 @@ declare module Plottable {
             function getSVGPixelWidth(svg: D3.Selection): number;
             function translate(s: D3.Selection, x?: number, y?: number): any;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
+            function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
         }
     }
 }
