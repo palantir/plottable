@@ -20,11 +20,8 @@ export module Scale {
      *
      * @constructor
      */
-    constructor(scale?: D3.Scale.OrdinalScale) {
-      super(scale == null ? d3.scale.ordinal() : scale);
-      if (this._innerPadding > this._outerPadding) {
-        throw new Error("outerPadding must be >= innerPadding so cat axis bands work out reasonably");
-      }
+    constructor(scale: D3.Scale.OrdinalScale = d3.scale.ordinal()) {
+      super(scale);
     }
 
     protected _getExtent(): string[] {
