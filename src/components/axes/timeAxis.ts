@@ -348,10 +348,10 @@ export module Axis {
       var anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
       tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
       if (filteredTicks.indexOf(this._scale.domain()[0]) === -1) {
-        filteredTicks.splice(0, 0, this._scale.domain()[0]);
+        filteredTicks.splice(0, 1, this._scale.domain()[0]);
       }
       if (filteredTicks.indexOf(this._scale.domain()[1]) === -1) {
-        tickPos.push(this._scale.domain()[1]);
+        filteredTicks.push(this._scale.domain()[1]);
       }
 
       return filteredTicks;
