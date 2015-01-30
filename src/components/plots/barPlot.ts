@@ -356,8 +356,7 @@ export module Plot {
       var barPixelWidth: number;
       var barScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
       if (barScale instanceof Plottable.Scale.Ordinal) {
-        var ordScale = <Plottable.Scale.Ordinal> barScale;
-        barPixelWidth = ordScale.rangeBand();
+        barPixelWidth = (<Plottable.Scale.Ordinal> barScale).rangeBand();
       } else {
         var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
 
