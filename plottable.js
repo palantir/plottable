@@ -4218,31 +4218,33 @@ var Plottable;
                     return d3.select(this).style("visibility") === "visible";
                 });
                 var lastLabelClientRect;
-                // Base interval value between labels
-                var interval = 1;
                 // Get the widths of all the labels
                 var visibleTickLabelRects = [];
-                visibleTickLabels.each(function (d) {
+                visibleTickLabels.each(function () {
                     var clientRect = this.getBoundingClientRect();
                     visibleTickLabelRects.push(clientRect);
                 });
                 // Figure out the appropriate interval for overlap
                 var hasSkipped = false;
-                for (var i = 1; i < visibleTickLabelRects.length; i++) {
-                    // Checks to see if there is any overlap between the first element and the current element
-                    if (!Plottable._Util.DOM.boxesOverlap(visibleTickLabelRects[i], visibleTickLabelRects[0])) {
-                        // We increment the variable if the next label's width is greater than the previous one's (one-time)
-                        // This only applies to the bottom and top orientations
-                        if (visibleTickLabelRects[i].width > visibleTickLabelRects[i - 1].width && !hasSkipped && (this._orientation === "bottom" || this._orientation === "top")) {
-                            interval += 1;
-                            hasSkipped = true;
+                var interval = 1;
+                // Only do interval modifications for bottom and top orientations
+                if (this._orientation === "bottom" || this._orientation === "top") {
+                    for (var i = 1; i < visibleTickLabelRects.length; i++) {
+                        // Checks to see if there is any overlap between the first element and the current element
+                        if (!Plottable._Util.DOM.boxesOverlap(visibleTickLabelRects[i], visibleTickLabelRects[0])) {
+                            // We increment the variable if the next label's width is greater than the previous one's (one-time)
+                            // This only applies to the bottom and top orientations
+                            if (visibleTickLabelRects[i].width > visibleTickLabelRects[i - 1].width && !hasSkipped) {
+                                interval += 1;
+                                hasSkipped = true;
+                            }
+                            else {
+                                break;
+                            }
                         }
                         else {
-                            break;
+                            interval += 1;
                         }
-                    }
-                    else {
-                        interval += 1;
                     }
                 }
                 // Set any label that is not part of the interval as hidden
