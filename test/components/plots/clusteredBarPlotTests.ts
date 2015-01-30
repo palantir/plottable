@@ -97,7 +97,7 @@ describe("Plots", () => {
 
     it("renders correctly under points mode", () => {
       xScale.rangeType("points");
-      var bars = renderer.getAllBars();
+      var bars = renderer.getAllSelections();
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
