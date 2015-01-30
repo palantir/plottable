@@ -68,12 +68,6 @@ export module Scale {
       return this._d3Scale.rangeBand();
     }
 
-    public fullBandStartAndWidth(v: string) {
-      var start = this.scale(v) - this.innerPadding() / 2;
-      var width = this.rangeBand() + this.innerPadding();
-      return [start, width];
-    }
-
     public innerPadding(): number;
     public innerPadding(innerPadding: number): Ordinal;
     public innerPadding(innerPadding?: number): any {

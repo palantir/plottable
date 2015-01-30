@@ -2285,11 +2285,6 @@ var Plottable;
             Ordinal.prototype.rangeBand = function () {
                 return this._d3Scale.rangeBand();
             };
-            Ordinal.prototype.fullBandStartAndWidth = function (v) {
-                var start = this.scale(v) - this.innerPadding() / 2;
-                var width = this.rangeBand() + this.innerPadding();
-                return [start, width];
-            };
             Ordinal.prototype.innerPadding = function (innerPadding) {
                 if (innerPadding == null) {
                     var d = this.domain();

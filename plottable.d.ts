@@ -1273,7 +1273,6 @@ declare module Plottable {
              * @returns {number} The range band width or 0 if rangeType isn't "bands".
              */
             rangeBand(): number;
-            fullBandStartAndWidth(v: string): number[];
             innerPadding(): number;
             innerPadding(innerPadding: number): Ordinal;
             outerPadding(outerPadding: number): Ordinal;
