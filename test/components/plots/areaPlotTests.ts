@@ -113,5 +113,18 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("getAllSelections retrieves correct selections", () => {
+      var newTwoPointData = [{foo: 2, bar: 1}, {foo: 3, bar: 2}];
+      var newDataset = new Plottable.Dataset(twoPointData);
+      areaPlot.addDataset(new Plottable.Dataset(newTwoPointData));
+      var allAreas = areaPlot.getAllSelections();
+      assert.strictEqual(allAreas.size(), 2, "all areas retrieved");
+      var selectionData = allAreas.data();
+      assert.include(selectionData, twoPointData, "first dataset data in selection data");
+      assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+
+      svg.remove();
+    });
+
   });
 });

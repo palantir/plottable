@@ -2847,6 +2847,9 @@ var Plottable;
             AbstractDrawer.prototype._getRenderArea = function () {
                 return this._renderArea;
             };
+            AbstractDrawer.prototype._getSelector = function () {
+                return "";
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
@@ -2905,6 +2908,9 @@ var Plottable;
                     this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
                 step.animator.animate(this._pathSelection, attrToProjector);
+            };
+            Line.prototype._getSelector = function () {
+                return ".line";
             };
             return Line;
         })(_Drawer.AbstractDrawer);
@@ -2988,6 +2994,9 @@ var Plottable;
                 }
                 step.animator.animate(this._areaSelection, attrToProjector);
             };
+            Area.prototype._getSelector = function () {
+                return ".area";
+            };
             return Area;
         })(_Drawer.Line);
         _Drawer.Area = Area;
@@ -3054,6 +3063,9 @@ var Plottable;
             Element.prototype._prepareData = function (data, drawSteps) {
                 var _this = this;
                 return drawSteps.reduce(function (data, drawStep) { return _this._filterDefinedData(data, drawStep.attrToProjector["defined"]); }, _super.prototype._prepareData.call(this, data, drawSteps));
+            };
+            Element.prototype._getSelector = function () {
+                return this._svgElement;
             };
             return Element;
         })(_Drawer.AbstractDrawer);
@@ -6232,6 +6244,16 @@ var Plottable;
                 var maxTime = Plottable._Util.Methods.max(times, 0);
                 this._additionalPaint(maxTime);
             };
+            AbstractPlot.prototype.getAllSelections = function () {
+                var allSelections = d3.select();
+                allSelections[0] = [];
+                this._getDrawersInOrder().forEach(function (drawer) {
+                    drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach(function (selection) {
+                        allSelections[0].push(selection);
+                    });
+                });
+                return allSelections;
+            };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
         Plot.AbstractPlot = AbstractPlot;
@@ -6833,14 +6855,6 @@ var Plottable;
                     this._render();
                     return this;
                 }
-            };
-            /**
-             * Gets all the bars in the bar plot
-             *
-             * @returns {D3.Selection} All of the bars in the bar plot.
-             */
-            Bar.prototype.getAllBars = function () {
-                return this._renderArea.selectAll("rect");
             };
             Bar.prototype.getBars = function (xValOrExtent, yValOrExtent) {
                 var _this = this;

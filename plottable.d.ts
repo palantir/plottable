@@ -1514,6 +1514,7 @@ declare module Plottable {
              * @returns {D3.Selection} the renderArea selection
              */
             _getRenderArea(): D3.Selection;
+            _getSelector(): string;
         }
     }
 }
@@ -1526,6 +1527,7 @@ declare module Plottable {
             setup(area: D3.Selection): void;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
+            _getSelector(): string;
         }
     }
 }
@@ -1543,6 +1545,7 @@ declare module Plottable {
             drawLine(draw: boolean): Area;
             setup(area: D3.Selection): void;
             protected _drawStep(step: AppliedDrawStep): void;
+            _getSelector(): string;
         }
     }
 }
@@ -1562,6 +1565,7 @@ declare module Plottable {
             protected _enterData(data: any[]): void;
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
+            _getSelector(): string;
         }
     }
 }
@@ -2649,6 +2653,7 @@ declare module Plottable {
              * @param {string} key The key of new dataset
              */
             protected _getPlotMetadataForDataset(key: string): PlotMetadata;
+            getAllSelections(): D3.Selection;
         }
     }
 }
@@ -2863,12 +2868,6 @@ declare module Plottable {
              * @returns {Bar} The calling plot.
              */
             barLabelFormatter(formatter: Formatter): Bar<X, Y>;
-            /**
-             * Gets all the bars in the bar plot
-             *
-             * @returns {D3.Selection} All of the bars in the bar plot.
-             */
-            getAllBars(): D3.Selection;
             /**
              * Gets the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one
