@@ -5,7 +5,6 @@ export module Scale {
   export class Ordinal extends AbstractScale<string, number> {
     protected _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
-    private _rangeType: string = "bands";
 
     // Padding as a proportion of the spacing between domain values
     private _innerPadding: number = 0.3;
@@ -50,11 +49,7 @@ export module Scale {
         return this._range;
       } else {
         this._range = values;
-        if (this._rangeType === "points") {
-          this._d3Scale.rangePoints(values, 2*this._outerPadding); // d3 scale takes total padding
-        } else if (this._rangeType === "bands") {
-          this._d3Scale.rangeBands(values, this._innerPadding, this._outerPadding);
-        }
+        this._d3Scale.rangeBands(values, this._innerPadding, this._outerPadding);
         return this;
       }
     }

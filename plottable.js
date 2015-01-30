@@ -2242,7 +2242,6 @@ var Plottable;
             function Ordinal(scale) {
                 _super.call(this, scale == null ? d3.scale.ordinal() : scale);
                 this._range = [0, 1];
-                this._rangeType = "bands";
                 // Padding as a proportion of the spacing between domain values
                 this._innerPadding = 0.3;
                 this._outerPadding = 0.5;
@@ -2268,12 +2267,7 @@ var Plottable;
                 }
                 else {
                     this._range = values;
-                    if (this._rangeType === "points") {
-                        this._d3Scale.rangePoints(values, 2 * this._outerPadding); // d3 scale takes total padding
-                    }
-                    else if (this._rangeType === "bands") {
-                        this._d3Scale.rangeBands(values, this._innerPadding, this._outerPadding);
-                    }
+                    this._d3Scale.rangeBands(values, this._innerPadding, this._outerPadding);
                     return this;
                 }
             };
