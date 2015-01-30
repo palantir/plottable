@@ -108,12 +108,12 @@ export module _Util {
       return true;
     }
 
-    export function containedInBoundingBox(container: ClientRect, element: ClientRect) {
+    export function boxIsInside(inner: ClientRect, outer: ClientRect) {
       return (
-        Math.floor(container.left) <= Math.ceil(element.left) &&
-        Math.floor(container.top)  <= Math.ceil(element.top)  &&
-        Math.floor(element.right)  <= Math.ceil(container.right) &&
-        Math.floor(element.bottom) <= Math.ceil(container.bottom)
+        Math.floor(outer.left) <= Math.ceil(inner.left) &&
+        Math.floor(outer.top)  <= Math.ceil(inner.top)  &&
+        Math.floor(inner.right)  <= Math.ceil(outer.right) &&
+        Math.floor(inner.bottom) <= Math.ceil(outer.bottom)
       );
     }
   }

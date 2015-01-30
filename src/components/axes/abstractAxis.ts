@@ -461,11 +461,11 @@ export module Axis {
         return;
       }
       var firstTickLabel = tickLabels[0][0];
-      if (!_Util.DOM.containedInBoundingBox(boundingBox, firstTickLabel.getBoundingClientRect())) {
+      if (!_Util.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(firstTickLabel).style("visibility", "hidden");
       }
       var lastTickLabel = tickLabels[0][tickLabels[0].length-1];
-      if (!_Util.DOM.containedInBoundingBox(boundingBox, lastTickLabel.getBoundingClientRect())) {
+      if (!_Util.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(lastTickLabel).style("visibility", "hidden");
       }
     }
@@ -478,7 +478,7 @@ export module Axis {
         return;
       }
       tickLabels.each(function(d: any, i: number) {
-        if (!_Util.DOM.containedInBoundingBox(boundingBox, this.getBoundingClientRect())) {
+        if (!_Util.DOM.boxIsInside(this.getBoundingClientRect(), boundingBox)) {
           d3.select(this).style("visibility", "hidden");
         }
       });

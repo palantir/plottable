@@ -271,7 +271,7 @@ declare module Plottable {
             function getSVGPixelWidth(svg: D3.Selection): number;
             function translate(s: D3.Selection, x?: number, y?: number): any;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
-            function containedInBoundingBox(container: ClientRect, element: ClientRect): boolean;
+            function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
         }
     }
 }
@@ -2369,6 +2369,62 @@ declare module Plottable {
              * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
              */
             getEntry(position: Point): D3.Selection;
+            _doRender(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        class InterpolatedColorLegend extends AbstractComponent {
+            /**
+             * The css class applied to the legend labels.
+             */
+            static LEGEND_LABEL_CLASS: string;
+            /**
+             * Creates an InterpolatedColorLegend.
+             *
+             * The InterpolatedColorLegend consists of a sequence of swatches, showing the
+             * associated Scale.InterpolatedColor sampled at various points. Two labels
+             * show the maximum and minimum values of the Scale.InterpolatedColor.
+             *
+             * @constructor
+             * @param {Scale.InterpolatedColor} interpolatedColorScale
+             * @param {string} orientation (horizontal/left/right).
+             * @param {Formatter} The labels are formatted using this function.
+             */
+            constructor(interpolatedColorScale: Scale.InterpolatedColor, orientation?: string, formatter?: (d: any) => string);
+            remove(): void;
+            /**
+             * Gets the current formatter on the InterpolatedColorLegend.
+             *
+             * @returns {Formatter} The current Formatter.
+             */
+            formatter(): Formatter;
+            /**
+             * Sets the current formatter on the InterpolatedColorLegend.
+             *
+             * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
+             * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
+             */
+            formatter(formatter: Formatter): InterpolatedColorLegend;
+            /**
+             * Gets the orientation of the InterpolatedColorLegend.
+             *
+             * @returns {string} The current orientation.
+             */
+            orient(): string;
+            /**
+             * Sets the orientation of the InterpolatedColorLegend.
+             *
+             * @param {string} newOrientation The desired orientation (horizontal/left/right).
+             *
+             * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
+             */
+            orient(newOrientation: string): InterpolatedColorLegend;
+            protected _setup(): void;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _doRender(): void;
         }
     }
