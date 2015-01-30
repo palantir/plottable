@@ -55,9 +55,9 @@ export module Scale {
     }
 
     /**
-     * Returns the width of the range band. Only valid when rangeType is set to "bands".
+     * Returns the width of the range band.
      *
-     * @returns {number} The range band width or 0 if rangeType isn't "bands".
+     * @returns {number} The range band width
      */
     public rangeBand() : number {
       return this._d3Scale.rangeBand();
