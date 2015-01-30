@@ -54,6 +54,10 @@ export module _Drawer {
       }
       step.animator.animate(this._pathSelection, attrToProjector);
     }
+
+    public _getSelector() {
+      return ".line";
+    }
   }
 }
 }

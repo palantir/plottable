@@ -271,6 +271,7 @@ declare module Plottable {
             function getSVGPixelWidth(svg: D3.Selection): number;
             function translate(s: D3.Selection, x?: number, y?: number): any;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
+            function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
         }
     }
 }
@@ -1513,6 +1514,7 @@ declare module Plottable {
              * @returns {D3.Selection} the renderArea selection
              */
             _getRenderArea(): D3.Selection;
+            _getSelector(): string;
         }
     }
 }
@@ -1525,6 +1527,7 @@ declare module Plottable {
             setup(area: D3.Selection): void;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
+            _getSelector(): string;
         }
     }
 }
@@ -1542,6 +1545,7 @@ declare module Plottable {
             drawLine(draw: boolean): Area;
             setup(area: D3.Selection): void;
             protected _drawStep(step: AppliedDrawStep): void;
+            _getSelector(): string;
         }
     }
 }
@@ -1561,6 +1565,7 @@ declare module Plottable {
             protected _enterData(data: any[]): void;
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
+            _getSelector(): string;
         }
     }
 }
@@ -2370,6 +2375,62 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
+        class InterpolatedColorLegend extends AbstractComponent {
+            /**
+             * The css class applied to the legend labels.
+             */
+            static LEGEND_LABEL_CLASS: string;
+            /**
+             * Creates an InterpolatedColorLegend.
+             *
+             * The InterpolatedColorLegend consists of a sequence of swatches, showing the
+             * associated Scale.InterpolatedColor sampled at various points. Two labels
+             * show the maximum and minimum values of the Scale.InterpolatedColor.
+             *
+             * @constructor
+             * @param {Scale.InterpolatedColor} interpolatedColorScale
+             * @param {string} orientation (horizontal/left/right).
+             * @param {Formatter} The labels are formatted using this function.
+             */
+            constructor(interpolatedColorScale: Scale.InterpolatedColor, orientation?: string, formatter?: (d: any) => string);
+            remove(): void;
+            /**
+             * Gets the current formatter on the InterpolatedColorLegend.
+             *
+             * @returns {Formatter} The current Formatter.
+             */
+            formatter(): Formatter;
+            /**
+             * Sets the current formatter on the InterpolatedColorLegend.
+             *
+             * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
+             * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
+             */
+            formatter(formatter: Formatter): InterpolatedColorLegend;
+            /**
+             * Gets the orientation of the InterpolatedColorLegend.
+             *
+             * @returns {string} The current orientation.
+             */
+            orient(): string;
+            /**
+             * Sets the orientation of the InterpolatedColorLegend.
+             *
+             * @param {string} newOrientation The desired orientation (horizontal/left/right).
+             *
+             * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
+             */
+            orient(newOrientation: string): InterpolatedColorLegend;
+            protected _setup(): void;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            _doRender(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
         class Gridlines extends AbstractComponent {
             /**
              * Creates a set of Gridlines.
@@ -2646,6 +2707,7 @@ declare module Plottable {
              * @param {string} key The key of new dataset
              */
             protected _getPlotMetadataForDataset(key: string): PlotMetadata;
+            getAllSelections(): D3.Selection;
         }
     }
 }
@@ -2860,12 +2922,6 @@ declare module Plottable {
              * @returns {Bar} The calling plot.
              */
             barLabelFormatter(formatter: Formatter): Bar<X, Y>;
-            /**
-             * Gets all the bars in the bar plot
-             *
-             * @returns {D3.Selection} All of the bars in the bar plot.
-             */
-            getAllBars(): D3.Selection;
             /**
              * Gets the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one

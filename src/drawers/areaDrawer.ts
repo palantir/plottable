@@ -78,6 +78,10 @@ export module _Drawer {
       }
       step.animator.animate(this._areaSelection, attrToProjector);
     }
+
+    public _getSelector(): string {
+      return ".area";
+    }
   }
 }
 }

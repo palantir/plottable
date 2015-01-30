@@ -419,6 +419,18 @@ export module Plot {
       var maxTime = _Util.Methods.max(times, 0);
       this._additionalPaint(maxTime);
     }
+
+    public getAllSelections(): D3.Selection {
+      var allSelections = d3.select();
+      allSelections[0] = [];
+      this._getDrawersInOrder().forEach((drawer) => {
+        drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach((selection: EventTarget) => {
+          allSelections[0].push(selection);
+        });
+      });
+
+      return allSelections;
+    }
   }
 }
 }

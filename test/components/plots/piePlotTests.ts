@@ -6,14 +6,16 @@ describe("Plots", () => {
   describe("PiePlot", () => {
     var svg: D3.Selection;
     var simpleDataset: Plottable.Dataset;
+    var simpleData: any[];
     var piePlot: Plottable.Plot.Pie;
     var renderArea: D3.Selection;
 
     beforeEach(() => {
       svg = generateSVG(500, 500);
-      simpleDataset = new Plottable.Dataset([{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}]);
+      simpleData = [{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}];
+      simpleDataset = new Plottable.Dataset(simpleData);
       piePlot = new Plottable.Plot.Pie();
-      piePlot.addDataset(simpleDataset);
+      piePlot.addDataset("simpleDataset", simpleDataset);
       piePlot.project("value", "value");
       piePlot.renderTo(svg);
       renderArea = (<any> piePlot)._renderArea;
@@ -127,6 +129,15 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("getAllSelections retrieves correct selections",() => {
+      var allSectors = piePlot.getAllSelections();
+      assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
+      var selectionData = allSectors.data();
+      assert.includeMembers(selectionData.map((datum) => datum.data), simpleData, "dataset data in selection data");
+
+      svg.remove();
+    });
+
     describe("Fill", () => {
 
       it("sectors are filled in according to defaults", () => {
@@ -163,6 +174,18 @@ describe("Plots", () => {
         svg.remove();
       });
 
+    });
+
+    it("throws warnings on negative data", () => {
+      var message: String;
+      var oldWarn = Plottable._Util.Methods.warn;
+      Plottable._Util.Methods.warn = (warn) => message = warn;
+      piePlot.removeDataset("simpleDataset");
+      var negativeDataset = new Plottable.Dataset([{value: -5}, {value: 15}]);
+      piePlot.addDataset("negativeDataset", negativeDataset);
+      assert.equal(message, "Negative values will not render correctly in a pie chart.");
+      Plottable._Util.Methods.warn = oldWarn;
+      svg.remove();
     });
   });
 });

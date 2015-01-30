@@ -138,6 +138,10 @@ export module _Drawer {
       return this._renderArea;
     }
 
+    public _getSelector(): string {
+      return "";
+    }
+
   }
 }
 }
