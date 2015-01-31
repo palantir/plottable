@@ -105,4 +105,18 @@ describe("TimeAxis", () => {
     assert.deepEqual(configs[0].step, 4, "axis used new step");
     svg.remove();
   });
+
+  it("renders end ticks on either side", () => {
+    var width = 500;
+    var svg = generateSVG(width, 100);
+    scale.domain(["2010", "2014"]);
+    axis.renderTo(svg);
+    var firstTick = d3.select(".tick-mark");
+    assert.equal(0, firstTick.attr("x1"));
+    assert.equal(0, firstTick.attr("x2"));
+    var lastTick = d3.select(d3.selectAll(".tick-mark")[0].pop());
+    assert.equal(width, lastTick.attr("x1"));
+    assert.equal(width, lastTick.attr("x2"));
+    svg.remove();
+  });
 });
