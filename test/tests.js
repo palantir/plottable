@@ -568,11 +568,11 @@ describe("TimeAxis", function () {
         scale.domain(["2010", "2014"]);
         axis.renderTo(svg);
         var firstTick = d3.select(".tick-mark");
-        assert.equal(0, firstTick.attr("x1"));
-        assert.equal(0, firstTick.attr("x2"));
+        assert.equal(0, firstTick.attr("x1"), "xPos (x1) of first end tick is not at the beginning of the axis container");
+        assert.equal(0, firstTick.attr("x2"), "xPos (x2) of first end tick is not at the beginning of the axis container");
         var lastTick = d3.select(d3.selectAll(".tick-mark")[0].pop());
-        assert.equal(width, lastTick.attr("x1"));
-        assert.equal(width, lastTick.attr("x2"));
+        assert.equal(width, lastTick.attr("x1"), "xPos (x1) of last end tick is not at the end of the axis container");
+        assert.equal(width, lastTick.attr("x2"), "xPos (x2) of last end tick is not at the end of the axis container");
         svg.remove();
     });
 });
