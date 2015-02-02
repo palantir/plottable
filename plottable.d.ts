@@ -1601,6 +1601,7 @@ declare module Plottable {
             static AUTORESIZE_BY_DEFAULT: boolean;
             protected _element: D3.Selection;
             protected _content: D3.Selection;
+            protected _boundingBox: D3.Selection;
             clipPathEnabled: boolean;
             _parent: AbstractComponentContainer;
             protected _fixedHeightFlag: boolean;
@@ -2032,6 +2033,7 @@ declare module Plottable {
              */
             showEndTickLabels(show: boolean): AbstractAxis;
             protected _hideEndTickLabels(): void;
+            protected _hideOverflowingTickLabels(): void;
             protected _hideOverlappingTickLabels(): void;
         }
     }

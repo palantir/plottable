@@ -331,4 +331,22 @@ describe("NumericAxis", () => {
     });
     svg.remove();
   });
+
+  it("confines labels to the bounding box for the axis", () => {
+    var SVG_WIDTH = 500;
+    var SVG_HEIGHT = 100;
+    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var scale = new Plottable.Scale.Linear();
+    var axis = new Plottable.Axis.Numeric(scale, "bottom");
+    axis.formatter((d: any) => "longstringsareverylong");
+    axis.renderTo(svg);
+    var boundingBox = d3.select(".x-axis .bounding-box");
+    d3.selectAll(".x-axis .tick-label").each(function() {
+      var tickLabel = d3.select(this);
+      if (tickLabel.style("visibility") === "visible") {
+        assertBBoxInclusion(boundingBox, tickLabel);
+      }
+    });
+    svg.remove();
+  });
 });

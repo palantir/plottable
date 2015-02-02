@@ -455,29 +455,33 @@ export module Axis {
     }
 
     protected _hideEndTickLabels() {
-      var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
-
-      var isInsideBBox = (tickBox: ClientRect) => {
-        return (
-          Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
-          Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
-          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.width()) &&
-          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.height())
-        );
-      };
-
+      var boundingBox = this._boundingBox.node().getBoundingClientRect();
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
       if (tickLabels[0].length === 0) {
         return;
       }
       var firstTickLabel = tickLabels[0][0];
-      if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
+      if (!_Util.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(firstTickLabel).style("visibility", "hidden");
       }
       var lastTickLabel = tickLabels[0][tickLabels[0].length-1];
-      if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
+      if (!_Util.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(lastTickLabel).style("visibility", "hidden");
       }
+    }
+
+    // Responsible for hiding any tick labels that break out of the bounding container
+    protected _hideOverflowingTickLabels() {
+      var boundingBox = this._boundingBox.node().getBoundingClientRect();
+      var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
+      if (tickLabels.empty()) {
+        return;
+      }
+      tickLabels.each(function(d: any, i: number) {
+        if (!_Util.DOM.boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+          d3.select(this).style("visibility", "hidden");
+        }
+      });
     }
 
     protected _hideOverlappingTickLabels() {
