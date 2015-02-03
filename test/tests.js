@@ -562,6 +562,19 @@ describe("TimeAxis", function () {
         assert.deepEqual(configs[0].step, 4, "axis used new step");
         svg.remove();
     });
+    it("renders end ticks on either side", function () {
+        var width = 500;
+        var svg = generateSVG(width, 100);
+        scale.domain(["2010", "2014"]);
+        axis.renderTo(svg);
+        var firstTick = d3.select(".tick-mark");
+        assert.equal(firstTick.attr("x1"), 0, "xPos (x1) of first end tick is at the beginning of the axis container");
+        assert.equal(firstTick.attr("x2"), 0, "xPos (x2) of first end tick is at the beginning of the axis container");
+        var lastTick = d3.select(d3.selectAll(".tick-mark")[0].pop());
+        assert.equal(lastTick.attr("x1"), width, "xPos (x1) of last end tick is at the end of the axis container");
+        assert.equal(lastTick.attr("x2"), width, "xPos (x2) of last end tick is at the end of the axis container");
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
