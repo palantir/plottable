@@ -137,7 +137,7 @@ export module Axis {
      */
     private _measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: string[]) {
       var wrappingResults = ticks.map((s: string) => {
-        var bandWidth = scale.rangeBand();
+        var bandWidth = scale.fullBandWidth();
         var width  = this._isHorizontal() ? bandWidth  : axisWidth - this._maxLabelTickLength() - this.tickLabelPadding();
         var height = this._isHorizontal() ? axisHeight - this._maxLabelTickLength() - this.tickLabelPadding() : bandWidth;
         return this._wrapper.wrap(this.formatter()(s), this._measurer, width, height);

@@ -1274,6 +1274,14 @@ declare module Plottable {
              */
             rangeBand(): number;
             /**
+             * Returns the full band width of the scale.
+             *
+             * TODO: Come up with a proper explanation of the full band width
+             *
+             * @returns {number} the full band width of the scale
+             */
+            fullBandWidth(): number;
+            /**
              * Returns the inner padding of the scale.
              *
              * TODO: Come up with a proper explanation of innerPadding

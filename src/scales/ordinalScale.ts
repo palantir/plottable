@@ -64,6 +64,17 @@ export module Scale {
     }
 
     /**
+     * Returns the full band width of the scale.
+     *
+     * TODO: Come up with a proper explanation of the full band width
+     *
+     * @returns {number} the full band width of the scale
+     */
+    public fullBandWidth(): number {
+      return this.rangeBand() + this.innerPadding();
+    }
+
+    /**
      * Returns the inner padding of the scale.
      *
      * TODO: Come up with a proper explanation of innerPadding

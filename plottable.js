@@ -2279,6 +2279,16 @@ var Plottable;
             Ordinal.prototype.rangeBand = function () {
                 return this._d3Scale.rangeBand();
             };
+            /**
+             * Returns the full band width of the scale.
+             *
+             * TODO: Come up with a proper explanation of the full band width
+             *
+             * @returns {number} the full band width of the scale
+             */
+            Ordinal.prototype.fullBandWidth = function () {
+                return this.rangeBand() + this.innerPadding();
+            };
             Ordinal.prototype.innerPadding = function (innerPadding) {
                 if (innerPadding == null) {
                     var d = this.domain();
@@ -4994,7 +5004,7 @@ var Plottable;
             Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, ticks) {
                 var _this = this;
                 var wrappingResults = ticks.map(function (s) {
-                    var bandWidth = scale.rangeBand();
+                    var bandWidth = scale.fullBandWidth();
                     var width = _this._isHorizontal() ? bandWidth : axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
                     var height = _this._isHorizontal() ? axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding() : bandWidth;
                     return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
