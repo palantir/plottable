@@ -2480,8 +2480,8 @@ describe("Plots", function () {
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
-                assert.equal(numAttr(bar0, "height"), yScale.rangeBand(), "bar0 height is correct");
-                assert.equal(numAttr(bar1, "height"), yScale.rangeBand(), "bar1 height is correct");
+                assert.closeTo(numAttr(bar0, "height"), yScale.rangeBand(), 1, "bar0 height is correct");
+                assert.closeTo(numAttr(bar1, "height"), yScale.rangeBand(), 1, "bar1 height is correct");
                 assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
                 assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
                 assert.closeTo(numAttr(bar0, "y"), 74, 1, "bar0 y is correct");
