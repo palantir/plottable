@@ -63,7 +63,21 @@ export module Scale {
       return this._d3Scale.rangeBand();
     }
 
+    /**
+     * Returns the inner padding of the scale.
+     *
+     * TODO: Come up with a proper explanation of innerPadding
+     *
+     * @returns {number} The inner padding of the scale
+     */
     public innerPadding(): number;
+    /**
+     * Sets the inner padding of the scale.
+     *
+     * TODO:
+     *
+     * @returns {Ordinal} The calling Scale.Ordinal
+     */
     public innerPadding(innerPadding: number): Ordinal;
     public innerPadding(innerPadding?: number): any {
       if (innerPadding == null) {
@@ -80,7 +94,26 @@ export module Scale {
       return this;
     }
 
-    public outerPadding(outerPadding: number): Ordinal {
+    /**
+     * Returns the outer padding of the scale.
+     *
+     * TODO: Come up with a proper explanation of outerPadding
+     *
+     * @returns {number} The outer padding of the scale
+     */
+    public outerPadding(): number;
+    /**
+     * Sets the outer padding of the scale.
+     *
+     * TODO:
+     *
+     * @returns {Ordinal} The calling Scale.Ordinal
+     */
+    public outerPadding(outerPadding: number): Ordinal;
+    public outerPadding(outerPadding?: number): any {
+      if (outerPadding == null) {
+        return this._outerPadding;
+      }
       this._outerPadding = outerPadding;
       this.range(this.range());
       this.broadcaster.broadcast();

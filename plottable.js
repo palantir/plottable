@@ -2294,6 +2294,9 @@ var Plottable;
                 return this;
             };
             Ordinal.prototype.outerPadding = function (outerPadding) {
+                if (outerPadding == null) {
+                    return this._outerPadding;
+                }
                 this._outerPadding = outerPadding;
                 this.range(this.range());
                 this.broadcaster.broadcast();

@@ -1273,8 +1273,37 @@ declare module Plottable {
              * @returns {number} The range band width
              */
             rangeBand(): number;
+            /**
+             * Returns the inner padding of the scale.
+             *
+             * TODO: Come up with a proper explanation of innerPadding
+             *
+             * @returns {number} The inner padding of the scale
+             */
             innerPadding(): number;
+            /**
+             * Sets the inner padding of the scale.
+             *
+             * TODO:
+             *
+             * @returns {Ordinal} The calling Scale.Ordinal
+             */
             innerPadding(innerPadding: number): Ordinal;
+            /**
+             * Returns the outer padding of the scale.
+             *
+             * TODO: Come up with a proper explanation of outerPadding
+             *
+             * @returns {number} The outer padding of the scale
+             */
+            outerPadding(): number;
+            /**
+             * Sets the outer padding of the scale.
+             *
+             * TODO:
+             *
+             * @returns {Ordinal} The calling Scale.Ordinal
+             */
             outerPadding(outerPadding: number): Ordinal;
             copy(): Ordinal;
             scale(value: string): number;
