@@ -386,9 +386,11 @@ export module Plot {
         var barAccessorDataPairs = d3.pairs(numberBarAccessorData);
         var barWidthDimension = this._isVertical ? this.width() : this.height();
 
+        var singleBarWidthDimensionRatio = 0.4;
+
         barPixelWidth = _Util.Methods.min(barAccessorDataPairs, (pair: any[], i: number) => {
           return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
-        }, barWidthDimension * 0.4);
+        }, barWidthDimension * singleBarWidthDimensionRatio);
 
         var scaledData = numberBarAccessorData.map((datum: number) => barScale.scale(datum));
         var minScaledDatum = _Util.Methods.min(scaledData, 0);
@@ -401,7 +403,8 @@ export module Plot {
           barPixelWidth = Math.min(barPixelWidth, margin / (1 - this._barAlignmentFactor));
         }
 
-        barPixelWidth *= 0.95;
+        var barWidthRatio = 0.95;
+        barPixelWidth *= barWidthRatio;
       }
       return barPixelWidth;
     }
