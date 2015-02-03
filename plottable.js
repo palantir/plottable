@@ -3350,16 +3350,13 @@ var Plottable;
                         throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
                     }
                 }
-                this._xOrigin = xOrigin;
-                this._yOrigin = yOrigin;
                 var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
                 this._width = this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth;
                 this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
-                var xPosition = this._xOrigin + this._xOffset;
-                var yPosition = this._yOrigin + this._yOffset;
-                xPosition += (availableWidth - this.width()) * this._xAlignProportion;
-                yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
-                this._element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
+                this._xOrigin = xOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
+                this._yOrigin = yOrigin + this._yOffset + (availableHeight - requestedSpace.height) * this._yAlignProportion;
+                ;
+                this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
                 this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             };
             AbstractComponent.prototype._render = function () {
@@ -3708,6 +3705,33 @@ var Plottable;
              */
             AbstractComponent.prototype.height = function () {
                 return this._height;
+            };
+            /**
+             * Gets the origin of the Component relative to its parent.
+             *
+             * @return {Point} The x-y position of the Component relative to its parent.
+             */
+            AbstractComponent.prototype.origin = function () {
+                return {
+                    x: this._xOrigin,
+                    y: this._yOrigin
+                };
+            };
+            /**
+             * Gets the origin of the Component relative to the root <svg>.
+             *
+             * @return {Point} The x-y position of the Component relative to the root <svg>
+             */
+            AbstractComponent.prototype.originToSVG = function () {
+                var origin = this.origin();
+                var ancestor = this._parent;
+                while (ancestor != null) {
+                    var ancestorOrigin = ancestor.origin();
+                    origin.x += ancestorOrigin.x;
+                    origin.y += ancestorOrigin.y;
+                    ancestor = ancestor._parent;
+                }
+                return origin;
             };
             /**
              * Returns the foreground selection for the component

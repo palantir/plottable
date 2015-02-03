@@ -1779,6 +1779,18 @@ declare module Plottable {
              */
             height(): number;
             /**
+             * Gets the origin of the Component relative to its parent.
+             *
+             * @return {Point} The x-y position of the Component relative to its parent.
+             */
+            origin(): Point;
+            /**
+             * Gets the origin of the Component relative to the root <svg>.
+             *
+             * @return {Point} The x-y position of the Component relative to the root <svg>
+             */
+            originToSVG(): Point;
+            /**
              * Returns the foreground selection for the component
              * (A selection covering the front of the component)
              *

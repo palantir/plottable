@@ -423,6 +423,132 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
+  describe("origin methods", () => {
+    var cWidth = 100;
+    var cHeight = 100;
+    it("origin() (top-level component)", () => {
+      fixComponentSize(c, cWidth, cHeight);
+      c.renderTo(svg);
+
+      c.xAlign("left").yAlign("top");
+      var origin = c.origin();
+      assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
+      assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
+
+      c.xAlign("center").yAlign("center");
+      origin = c.origin();
+      assert.strictEqual(origin.x, (SVG_WIDTH - cWidth)/2, "returns correct value (xAlign center)");
+      assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight)/2, "returns correct value (yAlign center)");
+
+      c.xAlign("right").yAlign("bottom");
+      origin = c.origin();
+      assert.strictEqual(origin.x, SVG_WIDTH - cWidth, "returns correct value (xAlign right)");
+      assert.strictEqual(origin.y, SVG_HEIGHT - cHeight, "returns correct value (yAlign bottom)");
+
+      c.xAlign("left").yAlign("top");
+      var xOffsetValue = 40;
+      var yOffsetValue = 30;
+      c.xOffset(xOffsetValue);
+      c.yOffset(yOffsetValue);
+      origin = c.origin();
+      assert.strictEqual(origin.x, xOffsetValue, "accounts for xOffset");
+      assert.strictEqual(origin.y, yOffsetValue, "accounts for yOffset");
+
+      svg.remove();
+    });
+
+    it("origin() (nested)", () => {
+      fixComponentSize(c, cWidth, cHeight);
+      var group = new Plottable.Component.Group([c]);
+      var groupXOffset = 40;
+      var groupYOffset = 30;
+      group.xOffset(groupXOffset);
+      group.yOffset(groupYOffset);
+      group.renderTo(svg);
+
+      var groupWidth = group.width();
+      var groupHeight = group.height();
+
+      c.xAlign("left").yAlign("top");
+      var origin = c.origin();
+      assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
+      assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
+
+      c.xAlign("center").yAlign("center");
+      origin = c.origin();
+      assert.strictEqual(origin.x, (groupWidth - cWidth)/2, "returns correct value (xAlign center)");
+      assert.strictEqual(origin.y, (groupHeight - cHeight)/2, "returns correct value (yAlign center)");
+
+      c.xAlign("right").yAlign("bottom");
+      origin = c.origin();
+      assert.strictEqual(origin.x, groupWidth - cWidth, "returns correct value (xAlign right)");
+      assert.strictEqual(origin.y, groupHeight - cHeight, "returns correct value (yAlign bottom)");
+
+      svg.remove();
+    });
+
+    it("originToSVG() (top-level component)", () => {
+      fixComponentSize(c, cWidth, cHeight);
+      c.renderTo(svg);
+
+      c.xAlign("left").yAlign("top");
+      var origin = c.originToSVG();
+      assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
+      assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
+
+      c.xAlign("center").yAlign("center");
+      origin = c.originToSVG();
+      assert.strictEqual(origin.x, (SVG_WIDTH - cWidth)/2, "returns correct value (xAlign center)");
+      assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight)/2, "returns correct value (yAlign center)");
+
+      c.xAlign("right").yAlign("bottom");
+      origin = c.originToSVG();
+      assert.strictEqual(origin.x, SVG_WIDTH - cWidth, "returns correct value (xAlign right)");
+      assert.strictEqual(origin.y, SVG_HEIGHT - cHeight, "returns correct value (yAlign bottom)");
+
+      c.xAlign("left").yAlign("top");
+      var xOffsetValue = 40;
+      var yOffsetValue = 30;
+      c.xOffset(xOffsetValue);
+      c.yOffset(yOffsetValue);
+      origin = c.originToSVG();
+      assert.strictEqual(origin.x, xOffsetValue, "accounts for xOffset");
+      assert.strictEqual(origin.y, yOffsetValue, "accounts for yOffset");
+
+      svg.remove();
+    });
+
+    it("originToSVG() (nested)", () => {
+      fixComponentSize(c, cWidth, cHeight);
+      var group = new Plottable.Component.Group([c]);
+      var groupXOffset = 40;
+      var groupYOffset = 30;
+      group.xOffset(groupXOffset);
+      group.yOffset(groupYOffset);
+      group.renderTo(svg);
+
+      var groupWidth = group.width();
+      var groupHeight = group.height();
+
+      c.xAlign("left").yAlign("top");
+      var origin = c.originToSVG();
+      assert.strictEqual(origin.x, groupXOffset, "returns correct value (xAlign left)");
+      assert.strictEqual(origin.y, groupYOffset, "returns correct value (yAlign top)");
+
+      c.xAlign("center").yAlign("center");
+      origin = c.originToSVG();
+      assert.strictEqual(origin.x, (groupWidth - cWidth)/2 + groupXOffset, "returns correct value (xAlign center)");
+      assert.strictEqual(origin.y, (groupHeight - cHeight)/2 + groupYOffset, "returns correct value (yAlign center)");
+
+      c.xAlign("right").yAlign("bottom");
+      origin = c.originToSVG();
+      assert.strictEqual(origin.x, groupWidth - cWidth + groupXOffset, "returns correct value (xAlign right)");
+      assert.strictEqual(origin.y, groupHeight - cHeight + groupYOffset, "returns correct value (yAlign bottom)");
+
+      svg.remove();
+    });
+  });
+
   describe("resizeBroadcaster testing", () => {
     var oldRegister: any;
     var oldDeregister: any;
