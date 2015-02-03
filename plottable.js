@@ -2240,16 +2240,14 @@ var Plottable;
              * @constructor
              */
             function Ordinal(scale) {
-                _super.call(this, scale == null ? d3.scale.ordinal() : scale);
+                if (scale === void 0) { scale = d3.scale.ordinal(); }
+                _super.call(this, scale);
                 this._range = [0, 1];
                 this._rangeType = "bands";
                 // Padding as a proportion of the spacing between domain values
                 this._innerPadding = 0.3;
                 this._outerPadding = 0.5;
                 this._typeCoercer = function (d) { return d != null && d.toString ? d.toString() : d; };
-                if (this._innerPadding > this._outerPadding) {
-                    throw new Error("outerPadding must be >= innerPadding so cat axis bands work out reasonably");
-                }
             }
             Ordinal.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
