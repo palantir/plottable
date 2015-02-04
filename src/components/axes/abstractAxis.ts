@@ -116,8 +116,8 @@ export module Axis {
       this._render();
     }
 
-    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
       if (this._isHorizontal()) {
         this._scale.range([0, this.width()]);
       } else {

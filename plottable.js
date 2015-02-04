@@ -3315,24 +3315,24 @@ var Plottable;
             };
             /**
              * Computes the size, position, and alignment from the specified values.
-             * If no parameters are supplied and the component is a root node,
-             * they are inferred from the size of the component's element.
+             * If no parameters are supplied and the Component is a root node,
+             * they are inferred from the size of the Component's element.
              *
-             * @param {number} xOrigin x-coordinate of the origin of the component
-             * @param {number} yOrigin y-coordinate of the origin of the component
-             * @param {number} availableWidth available width for the component to render in
-             * @param {number} availableHeight available height for the component to render in
+             * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
+             * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
+             * @param {number} availableWidth available width for the Component to render in
+             * @param {number} availableHeight available height for the Component to render in
              */
-            AbstractComponent.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
+            AbstractComponent.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
                 var _this = this;
-                if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
+                if (offeredXOrigin == null || offeredYOrigin == null || availableWidth == null || availableHeight == null) {
                     if (this._element == null) {
                         throw new Error("anchor must be called before computeLayout");
                     }
                     else if (this._isTopLevelComponent) {
                         // we are the root node, retrieve height/width from root SVG
-                        xOrigin = 0;
-                        yOrigin = 0;
+                        offeredXOrigin = 0;
+                        offeredYOrigin = 0;
                         // Set width/height to 100% if not specified, to allow accurate size calculation
                         // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
                         // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
@@ -3350,16 +3350,13 @@ var Plottable;
                         throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
                     }
                 }
-                this._xOrigin = xOrigin;
-                this._yOrigin = yOrigin;
                 var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
                 this._width = this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth;
                 this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
-                var xPosition = this._xOrigin + this._xOffset;
-                var yPosition = this._yOrigin + this._yOffset;
-                xPosition += (availableWidth - this.width()) * this._xAlignProportion;
-                yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
-                this._element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
+                this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
+                this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
+                ;
+                this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
                 this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             };
             AbstractComponent.prototype._render = function () {
@@ -3710,6 +3707,33 @@ var Plottable;
                 return this._height;
             };
             /**
+             * Gets the origin of the Component relative to its parent.
+             *
+             * @return {Point} The x-y position of the Component relative to its parent.
+             */
+            AbstractComponent.prototype.origin = function () {
+                return {
+                    x: this._xOrigin,
+                    y: this._yOrigin
+                };
+            };
+            /**
+             * Gets the origin of the Component relative to the root <svg>.
+             *
+             * @return {Point} The x-y position of the Component relative to the root <svg>
+             */
+            AbstractComponent.prototype.originToSVG = function () {
+                var origin = this.origin();
+                var ancestor = this._parent;
+                while (ancestor != null) {
+                    var ancestorOrigin = ancestor.origin();
+                    origin.x += ancestorOrigin.x;
+                    origin.y += ancestorOrigin.y;
+                    ancestor = ancestor._parent;
+                }
+                return origin;
+            };
+            /**
              * Returns the foreground selection for the component
              * (A selection covering the front of the component)
              *
@@ -3890,9 +3914,9 @@ var Plottable;
                 this._addComponent(c);
                 return this;
             };
-            Group.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
+            Group.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
                 var _this = this;
-                _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
+                _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
                 this.components().forEach(function (c) {
                     c._computeLayout(0, 0, _this.width(), _this.height());
                 });
@@ -4008,8 +4032,8 @@ var Plottable;
                 // default implementation; subclasses may call _invalidateLayout() here
                 this._render();
             };
-            AbstractAxis.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+            AbstractAxis.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
                 if (this._isHorizontal()) {
                     this._scale.range([0, this.width()]);
                 }
@@ -5070,12 +5094,12 @@ var Plottable;
                 Plottable._Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
                 return this;
             };
-            Category.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
+            Category.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
                 // When anyone calls _invalidateLayout, _computeLayout will be called
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
                 this._measurer.reset();
-                return _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
+                return _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
             };
             return Category;
         })(Axis.AbstractAxis);
@@ -6012,25 +6036,24 @@ var Plottable;
                 this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
                 return { width: d3.sum(this._calculatedLayout.guaranteedWidths), height: d3.sum(this._calculatedLayout.guaranteedHeights), wantsWidth: this._calculatedLayout.wantsWidth, wantsHeight: this._calculatedLayout.wantsHeight };
             };
-            // xOffset is relative to parent element, not absolute
-            Table.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+            Table.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
                 var _this = this;
-                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
                 var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
                 this._useLastCalculatedLayout(true);
-                var childYOffset = 0;
+                var childYOrigin = 0;
                 var rowHeights = Plottable._Util.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
                 var colWidths = Plottable._Util.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);
                 this._rows.forEach(function (row, rowIndex) {
-                    var childXOffset = 0;
+                    var childXOrigin = 0;
                     row.forEach(function (component, colIndex) {
                         // recursively compute layout
                         if (component != null) {
-                            component._computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
+                            component._computeLayout(childXOrigin, childYOrigin, colWidths[colIndex], rowHeights[rowIndex]);
                         }
-                        childXOffset += colWidths[colIndex] + _this._colPadding;
+                        childXOrigin += colWidths[colIndex] + _this._colPadding;
                     });
-                    childYOffset += rowHeights[rowIndex] + _this._rowPadding;
+                    childYOrigin += rowHeights[rowIndex] + _this._rowPadding;
                 });
             };
             /**
@@ -6519,8 +6542,8 @@ var Plottable;
                 this._colorScale = new Plottable.Scale.Color();
                 this.classed("pie-plot", true);
             }
-            Pie.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+            Pie.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
                 this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
             };
             Pie.prototype.addDataset = function (keyOrDataset, dataset) {
@@ -6663,8 +6686,8 @@ var Plottable;
                 };
                 return attrToProjector;
             };
-            AbstractXYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+            AbstractXYPlot.prototype._computeLayout = function (offeredXOrigin, offeredYOffset, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
                 this._xScale.range([0, this.width()]);
                 if (this._yScale instanceof Plottable.Scale.Ordinal) {
                     this._yScale.range([0, this.height()]);
