@@ -495,10 +495,8 @@ export module Axis {
       var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
       var interval = 1;
 
-      if (this._isHorizontal()) {
-        while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
-          interval += 1;
-        }
+      while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
+        interval += 1;
       }
 
       visibleTickLabels.each(function (d: string, i: number) {
@@ -513,8 +511,14 @@ export module Axis {
       for (var i = 0; i < rects.length - (interval); i += interval) {
         var currRect = rects[i];
         var nextRect = rects[i + interval];
-        if (currRect.left + currRect.width + this._tickLabelPadding >= nextRect.left) {
-          return false;
+        if (this._isHorizontal()) {
+          if (currRect.right + this._tickLabelPadding >= nextRect.left) {
+            return false;
+          }
+        } else {
+          if (currRect.top - this._tickLabelPadding <= nextRect.bottom) {
+            return false;
+          }
         }
       }
       return true;
