@@ -2,8 +2,7 @@
 
 var assert = chai.assert;
 
-class TestHoverable extends Plottable.Component.AbstractComponent
-                    implements Plottable.Interaction.Hoverable {
+class TestHoverable extends Plottable.Component.AbstractComponent implements Plottable.Interaction.Hoverable {
   public leftPoint = { x: 100, y: 200 };
   public rightPoint = { x: 300, y: 200 };
 

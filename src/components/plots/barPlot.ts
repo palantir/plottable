@@ -76,11 +76,11 @@ export module Plot {
         };
 
         var minBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) => {
-          return barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) - this._barAlignmentFactor * 2 * barOffsetF(d, i, u, m));
+          return barAccessor(d, i, u, m) - this._barAlignmentFactor * barOffsetF(d, i, u, m);
         };
 
         var maxBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) => {
-          return barQScale.invert(barQScale.scale(barAccessor(d, i, u, m)) + (1 - this._barAlignmentFactor) * 2 * barOffsetF(d, i, u, m));
+          return barAccessor(d, i, u, m) + (1 - this._barAlignmentFactor) * barOffsetF(d, i, u, m);
         };
 
         var minBarExtent = Infinity;
