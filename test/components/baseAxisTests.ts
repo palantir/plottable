@@ -3,14 +3,6 @@
 var assert = chai.assert;
 
 describe("BaseAxis", () => {
-  function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
-    if (boxA.right < boxB.left) { return false; }
-    if (boxA.left > boxB.right) { return false; }
-    if (boxA.bottom < boxB.top) { return false; }
-    if (boxA.top > boxB.bottom) { return false; }
-    return true;
-  }
-
   it("orientation", () => {
     var scale = new Plottable.Scale.Linear();
     assert.throws(() => new Plottable.Axis.AbstractAxis(scale, "blargh"), "unsupported");
