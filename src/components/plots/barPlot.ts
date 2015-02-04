@@ -65,10 +65,9 @@ export module Plot {
           this._projections["width"]) {
         var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
         var barScale: Plottable.Scale.AbstractScale<any, number> = this._isVertical ? this._xScale : this._yScale;
-        var barQScale = <Plottable.Scale.AbstractQuantitative<any>> barScale;
 
-        var domainExtent = Math.abs(barQScale.domain()[1] - barQScale.domain()[0]);
-        var rangeExtent = Math.abs(barQScale.range()[1] - barQScale.range()[0]);
+        var domainExtent = Math.abs(barScale.domain()[1] - barScale.domain()[0]);
+        var rangeExtent = Math.abs(barScale.range()[1] - barScale.range()[0]);
 
         var barOffsetF = (d: any, i: number, u: PlotMetadata, m: any) => {
           var barWidth = this._projections["width"].accessor(d, i, u, m);

@@ -6781,9 +6781,8 @@ var Plottable;
                 if (((this._isVertical && this._xScale instanceof Plottable.Scale.AbstractQuantitative) || (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative)) && this._projections["width"]) {
                     var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
                     var barScale = this._isVertical ? this._xScale : this._yScale;
-                    var barQScale = barScale;
-                    var domainExtent = Math.abs(barQScale.domain()[1] - barQScale.domain()[0]);
-                    var rangeExtent = Math.abs(barQScale.range()[1] - barQScale.range()[0]);
+                    var domainExtent = Math.abs(barScale.domain()[1] - barScale.domain()[0]);
+                    var rangeExtent = Math.abs(barScale.range()[1] - barScale.range()[0]);
                     var barOffsetF = function (d, i, u, m) {
                         var barWidth = _this._projections["width"].accessor(d, i, u, m);
                         return (domainExtent * barWidth) / (rangeExtent - barWidth);
