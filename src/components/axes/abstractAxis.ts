@@ -495,7 +495,7 @@ export module Axis {
       var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
       var interval = 1;
 
-      if (this._orientation === "bottom" || this._orientation === "top") {
+      if (this._isHorizontal()) {
         while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
           interval += 1;
         }

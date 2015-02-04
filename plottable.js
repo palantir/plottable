@@ -4250,7 +4250,7 @@ var Plottable;
                 var lastLabelClientRect;
                 var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
                 var interval = 1;
-                if (this._orientation === "bottom" || this._orientation === "top") {
+                if (this._isHorizontal()) {
                     while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
                         interval += 1;
                     }
