@@ -492,16 +492,36 @@ export module Axis {
                                     });
       var lastLabelClientRect: ClientRect;
 
-      visibleTickLabels.each(function (d: any) {
-        var clientRect = this.getBoundingClientRect();
+      var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
+      var interval = 1;
+
+      while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
+        interval += 1;
+      }
+
+      visibleTickLabels.each(function (d: string, i: number) {
         var tickLabel = d3.select(this);
-        if (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
+        if (i % interval !== 0) {
           tickLabel.style("visibility", "hidden");
-        } else {
-          lastLabelClientRect = clientRect;
-          tickLabel.style("visibility", "visible");
         }
       });
+    }
+
+    private _hasOverlapWithInterval(interval: number, rects: ClientRect[]): boolean {
+      for (var i = 0; i < rects.length - (interval); i += interval) {
+        var currRect = rects[i];
+        var nextRect = rects[i + interval];
+        if (this._isHorizontal()) {
+          if (currRect.right + this._tickLabelPadding >= nextRect.left) {
+            return false;
+          }
+        } else {
+          if (currRect.top - this._tickLabelPadding <= nextRect.bottom) {
+            return false;
+          }
+        }
+      }
+      return true;
     }
   }
 }
