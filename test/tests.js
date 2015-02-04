@@ -297,6 +297,21 @@ describe("Drawers", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("BaseAxis", function () {
+    function boxesOverlap(boxA, boxB) {
+        if (boxA.right < boxB.left) {
+            return false;
+        }
+        if (boxA.left > boxB.right) {
+            return false;
+        }
+        if (boxA.bottom < boxB.top) {
+            return false;
+        }
+        if (boxA.top > boxB.bottom) {
+            return false;
+        }
+        return true;
+    }
     it("orientation", function () {
         var scale = new Plottable.Scale.Linear();
         assert.throws(function () { return new Plottable.Axis.AbstractAxis(scale, "blargh"); }, "unsupported");
@@ -469,6 +484,23 @@ describe("BaseAxis", function () {
         assert.equal(baseAxis._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
         baseAxis = new Plottable.Axis.AbstractAxis(scale, "right");
         assert.equal(baseAxis._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
+    });
+    it("tick labels do not overlap with each other", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.domain([0, 1000000000000]);
+        var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
+        baseAxis.renderTo(svg);
+        var visibleTickLabels = d3.selectAll(".x-axis .tick-label").filter(function (d, i) {
+            return d3.select(this).style("visibility") === "visible";
+        });
+        var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
+        for (var i = 0; i < visibleTickLabelRects.length - 1; i++) {
+            assert.isFalse(Plottable._Util.DOM.boxesOverlap(visibleTickLabelRects[i], visibleTickLabelRects[i + 1]), "bounding boxes for label do not overlap");
+        }
+        svg.remove();
     });
 });
 
