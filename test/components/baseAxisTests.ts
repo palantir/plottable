@@ -216,29 +216,4 @@ describe("BaseAxis", () => {
     baseAxis = new Plottable.Axis.AbstractAxis(scale, "right");
     assert.equal((<any> baseAxis)._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
   });
-
-  it("tick labels do not overlap with each other", () => {
-    var SVG_WIDTH = 500;
-    var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-
-    var scale = new Plottable.Scale.Linear();
-    scale.domain([0, 1000000000000]);
-
-    var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
-    baseAxis.renderTo(svg);
-
-    var visibleTickLabels = d3.selectAll(".x-axis .tick-label")
-      .filter(function(d: any, i: number) {
-        return d3.select(this).style("visibility") === "visible";
-      });
-
-    var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
-    for (var i = 0; i < visibleTickLabelRects.length - 1; i++) {
-      assert.isFalse(Plottable._Util.DOM.boxesOverlap(visibleTickLabelRects[i], visibleTickLabelRects[i+1]),
-        "bounding boxes for label do not overlap");
-    }
-
-    svg.remove();
-  });
 });
