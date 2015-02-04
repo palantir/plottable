@@ -4248,15 +4248,40 @@ var Plottable;
                     return d3.select(this).style("visibility") === "visible";
                 });
                 var lastLabelClientRect;
-                visibleTickLabels.each(function (d) {
+                // Get the widths of all the labels
+                var visibleTickLabelRects = [];
+                visibleTickLabels.each(function () {
                     var clientRect = this.getBoundingClientRect();
-                    var tickLabel = d3.select(this);
-                    if (lastLabelClientRect != null && Plottable._Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
-                        tickLabel.style("visibility", "hidden");
+                    visibleTickLabelRects.push(clientRect);
+                });
+                // Figure out the appropriate interval for overlap
+                var hasSkipped = false;
+                var interval = 1;
+                // Only do interval modifications for bottom and top orientations
+                if (this._orientation === "bottom" || this._orientation === "top") {
+                    for (var i = 1; i < visibleTickLabelRects.length; i++) {
+                        // Checks to see if there is any overlap between the first element and the current element
+                        if (!Plottable._Util.DOM.boxesOverlap(visibleTickLabelRects[i], visibleTickLabelRects[0])) {
+                            // We increment the variable if the next label's width is greater than the previous one's (one-time)
+                            // This only applies to the bottom and top orientations
+                            if (visibleTickLabelRects[i].width > visibleTickLabelRects[i - 1].width && !hasSkipped) {
+                                interval += 1;
+                                hasSkipped = true;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        else {
+                            interval += 1;
+                        }
                     }
-                    else {
-                        lastLabelClientRect = clientRect;
-                        tickLabel.style("visibility", "visible");
+                }
+                // Set any label that is not part of the interval as hidden
+                visibleTickLabels.each(function (d, i) {
+                    var tickLabel = d3.select(this);
+                    if (i % interval !== 0) {
+                        tickLabel.style("visibility", "hidden");
                     }
                 });
             };
