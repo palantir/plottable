@@ -313,14 +313,12 @@ export module Plot {
       attrToProjector["width"] = this._isVertical ? widthF : heightF;
       attrToProjector["height"] = this._isVertical ? heightF : widthF;
 
-      var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
-                      && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
-      if (!bandsMode) {
-        attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
-          positionF(d, i, u, m) - widthF(d, i, u, m) * this._barAlignmentFactor;
-      } else {
+      if (secondaryScale instanceof Plottable.Scale.Ordinal) {
         attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
           positionF(d, i, u, m) - widthF(d, i, u, m) / 2;
+      } else {
+        attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
+          positionF(d, i, u, m) - widthF(d, i, u, m) * this._barAlignmentFactor;
       }
 
       attrToProjector[primaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) => {
@@ -357,20 +355,7 @@ export module Plot {
       var barPixelWidth: number;
       var barScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
       if (barScale instanceof Plottable.Scale.Ordinal) {
-        var ordScale = <Plottable.Scale.Ordinal> barScale;
-        if (ordScale.rangeType() === "bands") {
-          barPixelWidth = ordScale.rangeBand();
-        } else {
-          // padding is defined as 2 * the ordinal scale's _outerPadding variable
-          // HACKHACK need to use _outerPadding for formula as above
-          var padding = (<any> ordScale)._outerPadding * 2;
-
-          // step is defined as the range_interval / (padding + number of bars)
-          var secondaryDimension = this._isVertical ? this.width() : this.height();
-          var step = secondaryDimension / (padding + ordScale.domain().length - 1);
-
-          barPixelWidth = step * padding * 0.5;
-        }
+        barPixelWidth = (<Plottable.Scale.Ordinal> barScale).rangeBand();
       } else {
         var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
 

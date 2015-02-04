@@ -22,8 +22,8 @@ export module Plot {
       this.classed("grid-plot", true);
 
       // The x and y scales should render in bands with no padding
-      (<Scale.Ordinal> this._xScale).rangeType("bands", 0, 0);
-      (<Scale.Ordinal> this._yScale).rangeType("bands", 0, 0);
+      xScale.innerPadding(0).outerPadding(0);
+      yScale.innerPadding(0).outerPadding(0);
 
       this._colorScale = colorScale;
       this.animator("cells", new Animator.Null());

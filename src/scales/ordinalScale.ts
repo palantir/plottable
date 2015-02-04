@@ -5,7 +5,6 @@ export module Scale {
   export class Ordinal extends AbstractScale<string, number> {
     protected _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
-    private _rangeType: string = "bands";
 
     // Padding as a proportion of the spacing between domain values
     private _innerPadding: number = 0.3;
@@ -47,76 +46,86 @@ export module Scale {
         return this._range;
       } else {
         this._range = values;
-        if (this._rangeType === "points") {
-          this._d3Scale.rangePoints(values, 2*this._outerPadding); // d3 scale takes total padding
-        } else if (this._rangeType === "bands") {
-          this._d3Scale.rangeBands(values, this._innerPadding, this._outerPadding);
-        }
+        this._d3Scale.rangeBands(values, this._innerPadding, this._outerPadding);
         return this;
       }
     }
 
     /**
-     * Returns the width of the range band. Only valid when rangeType is set to "bands".
+     * Returns the width of the range band.
      *
-     * @returns {number} The range band width or 0 if rangeType isn't "bands".
+     * @returns {number} The range band width
      */
     public rangeBand() : number {
       return this._d3Scale.rangeBand();
     }
 
-    public innerPadding(): number {
-      var d = this.domain();
-      if (d.length < 2) {
-        return 0;
-      }
-      var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
-      return step - this.rangeBand();
-    }
-
-    public fullBandStartAndWidth(v: string) {
-      var start = this.scale(v) - this.innerPadding() / 2;
-      var width = this.rangeBand() + this.innerPadding();
-      return [start, width];
+    /**
+     * Returns the full band width of the scale.
+     *
+     * TODO: Come up with a proper explanation of the full band width
+     *
+     * @returns {number} the full band width of the scale
+     */
+    public fullBandWidth(): number {
+      return this.rangeBand() + this.innerPadding();
     }
 
     /**
-     * Get the range type.
+     * Returns the inner padding of the scale.
      *
-     * @returns {string} The current range type.
+     * TODO: Come up with a proper explanation of innerPadding
+     *
+     * @returns {number} The inner padding of the scale
      */
-    public rangeType() : string;
+    public innerPadding(): number;
     /**
-     * Set the range type.
+     * Sets the inner padding of the scale.
      *
-     * @param {string} rangeType If provided, either "points" or "bands" indicating the
-     *     d3 method used to generate range bounds.
-     * @param {number} [outerPadding] If provided, the padding outside the range,
-     *     proportional to the range step.
-     * @param {number} [innerPadding] If provided, the padding between bands in the range,
-     *     proportional to the range step. This parameter is only used in
-     *     "bands" type ranges.
-     * @returns {Ordinal} The calling Ordinal.
+     * TODO:
+     *
+     * @returns {Ordinal} The calling Scale.Ordinal
      */
-    public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number) : Ordinal;
-    public rangeType(rangeType?: string, outerPadding?: number, innerPadding?: number) : any {
-      if (rangeType == null) {
-        return this._rangeType;
-      } else {
-        if(!(rangeType === "points" || rangeType === "bands")) {
-          throw new Error("Unsupported range type: " + rangeType);
+    public innerPadding(innerPadding: number): Ordinal;
+    public innerPadding(innerPadding?: number): any {
+      if (innerPadding == null) {
+        var d = this.domain();
+        if (d.length < 2) {
+          return 0;
         }
-        this._rangeType = rangeType;
-        if (outerPadding != null) {
-          this._outerPadding = outerPadding;
-        }
-        if (innerPadding != null) {
-          this._innerPadding = innerPadding;
-        }
-        this.range(this.range());
-        this.broadcaster.broadcast();
-        return this;
+        var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
+        return step - this.rangeBand();
       }
+      this._innerPadding = innerPadding;
+      this.range(this.range());
+      this.broadcaster.broadcast();
+      return this;
+    }
+
+    /**
+     * Returns the outer padding of the scale.
+     *
+     * TODO: Come up with a proper explanation of outerPadding
+     *
+     * @returns {number} The outer padding of the scale
+     */
+    public outerPadding(): number;
+    /**
+     * Sets the outer padding of the scale.
+     *
+     * TODO:
+     *
+     * @returns {Ordinal} The calling Scale.Ordinal
+     */
+    public outerPadding(outerPadding: number): Ordinal;
+    public outerPadding(outerPadding?: number): any {
+      if (outerPadding == null) {
+        return this._outerPadding;
+      }
+      this._outerPadding = outerPadding;
+      this.range(this.range());
+      this.broadcaster.broadcast();
+      return this;
     }
 
     public copy(): Ordinal {
@@ -124,13 +133,8 @@ export module Scale {
     }
 
     public scale(value: string): number {
-      var scaledValue = super.scale(value);
-      if (this.rangeType() === "bands") {
-        //scale it to the middle
-        return scaledValue + this.rangeBand() / 2;
-      } else {
-        return scaledValue;
-      }
+      //scale it to the middle
+      return super.scale(value) + this.rangeBand() / 2;
     }
   }
 }

@@ -2243,7 +2243,6 @@ var Plottable;
                 if (scale === void 0) { scale = d3.scale.ordinal(); }
                 _super.call(this, scale);
                 this._range = [0, 1];
-                this._rangeType = "bands";
                 // Padding as a proportion of the spacing between domain values
                 this._innerPadding = 0.3;
                 this._outerPadding = 0.5;
@@ -2266,68 +2265,57 @@ var Plottable;
                 }
                 else {
                     this._range = values;
-                    if (this._rangeType === "points") {
-                        this._d3Scale.rangePoints(values, 2 * this._outerPadding); // d3 scale takes total padding
-                    }
-                    else if (this._rangeType === "bands") {
-                        this._d3Scale.rangeBands(values, this._innerPadding, this._outerPadding);
-                    }
+                    this._d3Scale.rangeBands(values, this._innerPadding, this._outerPadding);
                     return this;
                 }
             };
             /**
-             * Returns the width of the range band. Only valid when rangeType is set to "bands".
+             * Returns the width of the range band.
              *
-             * @returns {number} The range band width or 0 if rangeType isn't "bands".
+             * @returns {number} The range band width
              */
             Ordinal.prototype.rangeBand = function () {
                 return this._d3Scale.rangeBand();
             };
-            Ordinal.prototype.innerPadding = function () {
-                var d = this.domain();
-                if (d.length < 2) {
-                    return 0;
-                }
-                var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
-                return step - this.rangeBand();
+            /**
+             * Returns the full band width of the scale.
+             *
+             * TODO: Come up with a proper explanation of the full band width
+             *
+             * @returns {number} the full band width of the scale
+             */
+            Ordinal.prototype.fullBandWidth = function () {
+                return this.rangeBand() + this.innerPadding();
             };
-            Ordinal.prototype.fullBandStartAndWidth = function (v) {
-                var start = this.scale(v) - this.innerPadding() / 2;
-                var width = this.rangeBand() + this.innerPadding();
-                return [start, width];
+            Ordinal.prototype.innerPadding = function (innerPadding) {
+                if (innerPadding == null) {
+                    var d = this.domain();
+                    if (d.length < 2) {
+                        return 0;
+                    }
+                    var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
+                    return step - this.rangeBand();
+                }
+                this._innerPadding = innerPadding;
+                this.range(this.range());
+                this.broadcaster.broadcast();
+                return this;
             };
-            Ordinal.prototype.rangeType = function (rangeType, outerPadding, innerPadding) {
-                if (rangeType == null) {
-                    return this._rangeType;
+            Ordinal.prototype.outerPadding = function (outerPadding) {
+                if (outerPadding == null) {
+                    return this._outerPadding;
                 }
-                else {
-                    if (!(rangeType === "points" || rangeType === "bands")) {
-                        throw new Error("Unsupported range type: " + rangeType);
-                    }
-                    this._rangeType = rangeType;
-                    if (outerPadding != null) {
-                        this._outerPadding = outerPadding;
-                    }
-                    if (innerPadding != null) {
-                        this._innerPadding = innerPadding;
-                    }
-                    this.range(this.range());
-                    this.broadcaster.broadcast();
-                    return this;
-                }
+                this._outerPadding = outerPadding;
+                this.range(this.range());
+                this.broadcaster.broadcast();
+                return this;
             };
             Ordinal.prototype.copy = function () {
                 return new Ordinal(this._d3Scale.copy());
             };
             Ordinal.prototype.scale = function (value) {
-                var scaledValue = _super.prototype.scale.call(this, value);
-                if (this.rangeType() === "bands") {
-                    //scale it to the middle
-                    return scaledValue + this.rangeBand() / 2;
-                }
-                else {
-                    return scaledValue;
-                }
+                //scale it to the middle
+                return _super.prototype.scale.call(this, value) + this.rangeBand() / 2;
             };
             return Ordinal;
         })(Scale.AbstractScale);
@@ -5014,7 +5002,7 @@ var Plottable;
             Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, ticks) {
                 var _this = this;
                 var wrappingResults = ticks.map(function (s) {
-                    var bandWidth = scale.fullBandStartAndWidth(s)[1];
+                    var bandWidth = scale.fullBandWidth();
                     var width = _this._isHorizontal() ? bandWidth : axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
                     var height = _this._isHorizontal() ? axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding() : bandWidth;
                     return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
@@ -6679,8 +6667,8 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.classed("grid-plot", true);
                 // The x and y scales should render in bands with no padding
-                this._xScale.rangeType("bands", 0, 0);
-                this._yScale.rangeType("bands", 0, 0);
+                xScale.innerPadding(0).outerPadding(0);
+                yScale.innerPadding(0).outerPadding(0);
                 this._colorScale = colorScale;
                 this.animator("cells", new Plottable.Animator.Null());
             }
@@ -6960,12 +6948,11 @@ var Plottable;
                 };
                 attrToProjector["width"] = this._isVertical ? widthF : heightF;
                 attrToProjector["height"] = this._isVertical ? heightF : widthF;
-                var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
-                if (!bandsMode) {
-                    attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) * _this._barAlignmentFactor; };
+                if (secondaryScale instanceof Plottable.Scale.Ordinal) {
+                    attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) / 2; };
                 }
                 else {
-                    attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) / 2; };
+                    attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) * _this._barAlignmentFactor; };
                 }
                 attrToProjector[primaryAttr] = function (d, i, u, m) {
                     var originalPos = originalPositionFn(d, i, u, m);
@@ -6997,19 +6984,7 @@ var Plottable;
                 var barPixelWidth;
                 var barScale = this._isVertical ? this._xScale : this._yScale;
                 if (barScale instanceof Plottable.Scale.Ordinal) {
-                    var ordScale = barScale;
-                    if (ordScale.rangeType() === "bands") {
-                        barPixelWidth = ordScale.rangeBand();
-                    }
-                    else {
-                        // padding is defined as 2 * the ordinal scale's _outerPadding variable
-                        // HACKHACK need to use _outerPadding for formula as above
-                        var padding = ordScale._outerPadding * 2;
-                        // step is defined as the range_interval / (padding + number of bars)
-                        var secondaryDimension = this._isVertical ? this.width() : this.height();
-                        var step = secondaryDimension / (padding + ordScale.domain().length - 1);
-                        barPixelWidth = step * padding * 0.5;
-                    }
+                    barPixelWidth = barScale.rangeBand();
                 }
                 else {
                     var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
