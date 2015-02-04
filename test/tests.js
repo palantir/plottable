@@ -297,21 +297,6 @@ describe("Drawers", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("BaseAxis", function () {
-    function boxesOverlap(boxA, boxB) {
-        if (boxA.right < boxB.left) {
-            return false;
-        }
-        if (boxA.left > boxB.right) {
-            return false;
-        }
-        if (boxA.bottom < boxB.top) {
-            return false;
-        }
-        if (boxA.top > boxB.bottom) {
-            return false;
-        }
-        return true;
-    }
     it("orientation", function () {
         var scale = new Plottable.Scale.Linear();
         assert.throws(function () { return new Plottable.Axis.AbstractAxis(scale, "blargh"); }, "unsupported");
@@ -904,7 +889,7 @@ describe("NumericAxis", function () {
         var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
         var interval = getClientRectCenter(visibleTickLabelRects[1]) - getClientRectCenter(visibleTickLabelRects[0]);
         for (var i = 0; i < visibleTickLabelRects.length - 1; i++) {
-            assert.equal(getClientRectCenter(visibleTickLabelRects[i + 1]) - getClientRectCenter(visibleTickLabelRects[i]), interval, "intervals are all spaced the same");
+            assert.strictEqual(getClientRectCenter(visibleTickLabelRects[i + 1]) - getClientRectCenter(visibleTickLabelRects[i]), interval, "intervals are all spaced the same");
         }
         svg.remove();
     });
