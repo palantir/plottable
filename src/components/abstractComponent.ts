@@ -104,22 +104,22 @@ export module Component {
 
     /**
      * Computes the size, position, and alignment from the specified values.
-     * If no parameters are supplied and the component is a root node,
-     * they are inferred from the size of the component's element.
+     * If no parameters are supplied and the Component is a root node,
+     * they are inferred from the size of the Component's element.
      *
-     * @param {number} xOrigin x-coordinate of the origin of the component
-     * @param {number} yOrigin y-coordinate of the origin of the component
-     * @param {number} availableWidth available width for the component to render in
-     * @param {number} availableHeight available height for the component to render in
+     * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
+     * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
+     * @param {number} availableWidth available width for the Component to render in
+     * @param {number} availableHeight available height for the Component to render in
      */
-    public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
+    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      if (offeredXOrigin == null || offeredYOrigin == null || availableWidth == null || availableHeight == null) {
         if (this._element == null) {
           throw new Error("anchor must be called before computeLayout");
         } else if (this._isTopLevelComponent) {
           // we are the root node, retrieve height/width from root SVG
-          xOrigin = 0;
-          yOrigin = 0;
+          offeredXOrigin = 0;
+          offeredYOrigin = 0;
 
           // Set width/height to 100% if not specified, to allow accurate size calculation
           // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
@@ -142,8 +142,8 @@ export module Component {
       this._width  = this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.width)  : availableWidth ;
       this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
 
-      this._xOrigin = xOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
-      this._yOrigin = yOrigin + this._yOffset + (availableHeight - requestedSpace.height) * this._yAlignProportion;;
+      this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
+      this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - requestedSpace.height) * this._yAlignProportion;;
 
       this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
       this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
