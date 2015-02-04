@@ -4248,17 +4248,29 @@ var Plottable;
                     return d3.select(this).style("visibility") === "visible";
                 });
                 var lastLabelClientRect;
-                visibleTickLabels.each(function (d) {
-                    var clientRect = this.getBoundingClientRect();
+                var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
+                var interval = 1;
+                if (this._orientation === "bottom" || this._orientation === "top") {
+                    while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
+                        interval += 1;
+                    }
+                }
+                visibleTickLabels.each(function (d, i) {
                     var tickLabel = d3.select(this);
-                    if (lastLabelClientRect != null && Plottable._Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
+                    if (i % interval !== 0) {
                         tickLabel.style("visibility", "hidden");
                     }
-                    else {
-                        lastLabelClientRect = clientRect;
-                        tickLabel.style("visibility", "visible");
-                    }
                 });
+            };
+            AbstractAxis.prototype._hasOverlapWithInterval = function (interval, rects) {
+                for (var i = 0; i < rects.length - (interval); i += interval) {
+                    var currRect = rects[i];
+                    var nextRect = rects[i + interval];
+                    if (currRect.left + currRect.width + this._tickLabelPadding >= nextRect.left) {
+                        return false;
+                    }
+                }
+                return true;
             };
             /**
              * The css class applied to each end tick mark (the line on the end tick).
