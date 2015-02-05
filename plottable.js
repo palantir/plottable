@@ -2265,7 +2265,9 @@ var Plottable;
                 }
                 else {
                     this._range = values;
-                    this._d3Scale.rangeBands(values, this._innerPadding, this._outerPadding);
+                    var d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
+                    var d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
+                    this._d3Scale.rangeBands(values, d3InnerPadding, d3OuterPadding);
                     return this;
                 }
             };
@@ -2280,7 +2282,8 @@ var Plottable;
             /**
              * Returns the full band width of the scale.
              *
-             * TODO: Come up with a proper explanation of the full band width
+             * The full band width is defined as the entire space for a band to occupy,
+             * not accounting for any padding in between the bands.
              *
              * @returns {number} the full band width of the scale
              */
@@ -2289,12 +2292,13 @@ var Plottable;
             };
             Ordinal.prototype.innerPadding = function (innerPadding) {
                 if (innerPadding == null) {
-                    var d = this.domain();
-                    if (d.length < 2) {
-                        return 0;
-                    }
-                    var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
-                    return step - this.rangeBand();
+                    //        var d = this.domain();
+                    //        if (d.length < 2) {
+                    //          return 0;
+                    //        }
+                    //        var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
+                    //        return step - this.rangeBand();
+                    return this._innerPadding;
                 }
                 this._innerPadding = innerPadding;
                 this.range(this.range());

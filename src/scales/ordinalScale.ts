@@ -46,7 +46,9 @@ export module Scale {
         return this._range;
       } else {
         this._range = values;
-        this._d3Scale.rangeBands(values, this._innerPadding, this._outerPadding);
+        var d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
+        var d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
+        this._d3Scale.rangeBands(values, d3InnerPadding, d3OuterPadding);
         return this;
       }
     }
@@ -63,7 +65,8 @@ export module Scale {
     /**
      * Returns the full band width of the scale.
      *
-     * TODO: Come up with a proper explanation of the full band width
+     * The full band width is defined as the entire space for a band to occupy,
+     * not accounting for any padding in between the bands.
      *
      * @returns {number} the full band width of the scale
      */
@@ -74,7 +77,8 @@ export module Scale {
     /**
      * Returns the inner padding of the scale.
      *
-     * TODO: Come up with a proper explanation of innerPadding
+     * The inner padding is defined as the padding in between bands on the scale.
+     * Units are a proportion of the band width (value returned by rangeBand()).
      *
      * @returns {number} The inner padding of the scale
      */
@@ -82,19 +86,21 @@ export module Scale {
     /**
      * Sets the inner padding of the scale.
      *
-     * TODO:
+     * The inner padding of the scale is defined as the padding in between bands on the scale.
+     * Units are a proportion of the band width (value returned by rangeBand()).
      *
      * @returns {Ordinal} The calling Scale.Ordinal
      */
     public innerPadding(innerPadding: number): Ordinal;
     public innerPadding(innerPadding?: number): any {
       if (innerPadding == null) {
-        var d = this.domain();
-        if (d.length < 2) {
-          return 0;
-        }
-        var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
-        return step - this.rangeBand();
+//        var d = this.domain();
+//        if (d.length < 2) {
+//          return 0;
+//        }
+//        var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
+//        return step - this.rangeBand();
+        return this._innerPadding;
       }
       this._innerPadding = innerPadding;
       this.range(this.range());
@@ -105,7 +111,8 @@ export module Scale {
     /**
      * Returns the outer padding of the scale.
      *
-     * TODO: Come up with a proper explanation of outerPadding
+     * The outer padding is defined as the padding in between the outer bands and the edges on the scale.
+     * Units are a proportion of the band width (value returned by rangeBand()).
      *
      * @returns {number} The outer padding of the scale
      */
@@ -113,7 +120,8 @@ export module Scale {
     /**
      * Sets the outer padding of the scale.
      *
-     * TODO:
+     * The inner padding of the scale is defined as the padding in between bands on the scale.
+     * Units are a proportion of the band width (value returned by rangeBand()).
      *
      * @returns {Ordinal} The calling Scale.Ordinal
      */

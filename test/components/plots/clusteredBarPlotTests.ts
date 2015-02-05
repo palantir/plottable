@@ -67,11 +67,10 @@ describe("Plots", () => {
       var bar3X = bar3.data()[0].x;
 
       // check widths
-      var width = bandWidth / 2 * .518;
-      assert.closeTo(numAttr(bar0, "width"), width, 2);
-      assert.closeTo(numAttr(bar1, "width"), width, 2);
-      assert.closeTo(numAttr(bar2, "width"), width, 2);
-      assert.closeTo(numAttr(bar3, "width"), width, 2);
+      assert.closeTo(numAttr(bar0, "width"), 55, 2);
+      assert.closeTo(numAttr(bar1, "width"), 55, 2);
+      assert.closeTo(numAttr(bar2, "width"), 55, 2);
+      assert.closeTo(numAttr(bar3, "width"), 55, 2);
 
       // check heights
       assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar0");
@@ -81,14 +80,14 @@ describe("Plots", () => {
 
       // check that clustering is correct
       var innerScale = (<any>renderer)._makeInnerScale();
-      var off = innerScale.scale("_0") - innerScale.rangeBand() / 2;
-      assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) - off, 0.01
+      var off = innerScale.scale("_0");
+      assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) - xScale.rangeBand() / 2 + off, 0.01
           , "x pos correct for bar0");
-      assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) - off, 0.01
+      assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) - xScale.rangeBand() / 2 + off, 0.01
           , "x pos correct for bar1");
-      assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + off, 0.01
+      assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + xScale.rangeBand() / 2 - off, 0.01
           , "x pos correct for bar2");
-      assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + off, 0.01
+      assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + xScale.rangeBand() / 2 - off, 0.01
           , "x pos correct for bar3");
 
       assert.deepEqual(dataset1.data(), originalData1, "underlying data is not modified");
@@ -145,11 +144,10 @@ describe("Plots", () => {
       var bar3 = d3.select(bars[0][3]);
 
       // check widths
-      var width = bandWidth / 2 * .518;
-      assert.closeTo(numAttr(bar0, "height"), width, 2, "height is correct for bar0");
-      assert.closeTo(numAttr(bar1, "height"), width, 2, "height is correct for bar1");
-      assert.closeTo(numAttr(bar2, "height"), width, 2, "height is correct for bar2");
-      assert.closeTo(numAttr(bar3, "height"), width, 2, "height is correct for bar3");
+      assert.closeTo(numAttr(bar0, "height"), 36, 2, "height is correct for bar0");
+      assert.closeTo(numAttr(bar1, "height"), 36, 2, "height is correct for bar1");
+      assert.closeTo(numAttr(bar2, "height"), 36, 2, "height is correct for bar2");
+      assert.closeTo(numAttr(bar3, "height"), 36, 2, "height is correct for bar3");
 
       // check heights
       assert.closeTo(numAttr(bar0, "width"), rendererWidth / 2, 0.01, "width is correct for bar0");
@@ -164,14 +162,14 @@ describe("Plots", () => {
 
       // check that clustering is correct
       var innerScale = (<any>renderer)._makeInnerScale();
-      var off = innerScale.scale("_0") - innerScale.rangeBand() / 2;
-      assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) - off, 0.01
+      var off = innerScale.scale("_0");
+      assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) - yScale.rangeBand() / 2 + off, 0.01
             , "y pos correct for bar0");
-      assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) - off, 0.01
+      assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) - yScale.rangeBand() / 2 + off, 0.01
             , "y pos correct for bar1");
-      assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + off, 0.01
+      assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + yScale.rangeBand() / 2 - off, 0.01
             , "y pos correct for bar2");
-      assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + off, 0.01
+      assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + yScale.rangeBand() / 2 - off, 0.01
             , "y pos correct for bar3");
       svg.remove();
     });

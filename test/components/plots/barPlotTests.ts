@@ -43,8 +43,8 @@ describe("Plots", () => {
         assert.closeTo(numAttr(bar1, "width"), xScale.rangeBand(), 1, "bar1 width is correct");
         assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
         assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
-        assert.closeTo(numAttr(bar0, "x"), 111, 1, "bar0 x is correct");
-        assert.closeTo(numAttr(bar1, "x"), 333, 1, "bar1 x is correct");
+        assert.closeTo(numAttr(bar0, "x"), 91, 1, "bar0 x is correct");
+        assert.closeTo(numAttr(bar1, "x"), 327, 1, "bar1 x is correct");
         assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
         assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
 
@@ -307,8 +307,8 @@ describe("Plots", () => {
         assert.closeTo(numAttr(bar1, "height"), yScale.rangeBand(), 1, "bar1 height is correct");
         assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
         assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-        assert.closeTo(numAttr(bar0, "y"), 74, 1, "bar0 y is correct");
-        assert.closeTo(numAttr(bar1, "y"), 222, 1, "bar1 y is correct");
+        assert.closeTo(numAttr(bar0, "y"), 61, 1, "bar0 y is correct");
+        assert.closeTo(numAttr(bar1, "y"), 218, 1, "bar1 y is correct");
         assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
         assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
 
