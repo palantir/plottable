@@ -1,5 +1,3 @@
-$(document).ready(function(){
-	"use strict";
 
 	var testCode;
 	var numXnumY = [{x: 2, y: 9}, {x: 3, y: 13.5}, {x: 4, y: 18}, {x: 5, y: 22.5}, {x: 6, y: 27} ];
@@ -233,5 +231,9 @@ $(document).ready(function(){
 		$('#playground').attr("height", px_h);
 		createTest();
 	};
+
+$(document).ready(function(){
+	"use strict";
+	createTest();
 
 });
