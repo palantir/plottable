@@ -2292,12 +2292,6 @@ var Plottable;
             };
             Ordinal.prototype.innerPadding = function (innerPadding) {
                 if (innerPadding == null) {
-                    //        var d = this.domain();
-                    //        if (d.length < 2) {
-                    //          return 0;
-                    //        }
-                    //        var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
-                    //        return step - this.rangeBand();
                     return this._innerPadding;
                 }
                 this._innerPadding = innerPadding;
