@@ -6,9 +6,8 @@ export module Scale {
     protected _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
 
-    // Padding as a proportion of the spacing between domain values
-    private _innerPadding: number = 0.3;
-    private _outerPadding: number = 0.5;
+    private _innerPadding: number;
+    private _outerPadding: number;
     public _typeCoercer: (d: any) => any = (d: any) => d != null && d.toString ? d.toString() : d;
 
     /**
@@ -21,6 +20,10 @@ export module Scale {
      */
     constructor(scale: D3.Scale.OrdinalScale = d3.scale.ordinal()) {
       super(scale);
+
+      var d3InnerPadding = 0.3;
+      this._innerPadding = Ordinal.convertToPlottableInnerPadding(d3InnerPadding);
+      this._outerPadding = Ordinal.convertToPlottableOuterPadding(0.5, d3InnerPadding);
     }
 
     protected _getExtent(): string[] {
@@ -51,6 +54,14 @@ export module Scale {
         this._d3Scale.rangeBands(values, d3InnerPadding, d3OuterPadding);
         return this;
       }
+    }
+
+    private static convertToPlottableInnerPadding(d3InnerPadding: number): number {
+      return 1 / (1 - d3InnerPadding) - 1;
+    }
+
+    private static convertToPlottableOuterPadding(d3OuterPadding: number, d3InnerPadding: number): number {
+      return d3OuterPadding / (1 - d3InnerPadding);
     }
 
     /**

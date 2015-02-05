@@ -2263,8 +2263,8 @@ describe("Plots", function () {
                 assert.closeTo(numAttr(bar1, "width"), xScale.rangeBand(), 1, "bar1 width is correct");
                 assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
                 assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
-                assert.closeTo(numAttr(bar0, "x"), 91, 1, "bar0 x is correct");
-                assert.closeTo(numAttr(bar1, "x"), 327, 1, "bar1 x is correct");
+                assert.closeTo(numAttr(bar0, "x"), 111, 1, "bar0 x is correct");
+                assert.closeTo(numAttr(bar1, "x"), 333, 1, "bar1 x is correct");
                 assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
                 assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
                 var baseline = renderArea.select(".baseline");
@@ -2484,8 +2484,8 @@ describe("Plots", function () {
                 assert.closeTo(numAttr(bar1, "height"), yScale.rangeBand(), 1, "bar1 height is correct");
                 assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
                 assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-                assert.closeTo(numAttr(bar0, "y"), 61, 1, "bar0 y is correct");
-                assert.closeTo(numAttr(bar1, "y"), 218, 1, "bar1 y is correct");
+                assert.closeTo(numAttr(bar0, "y"), 74, 1, "bar0 y is correct");
+                assert.closeTo(numAttr(bar1, "y"), 222, 1, "bar1 y is correct");
                 assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
                 assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
                 var baseline = renderArea.select(".baseline");
@@ -3789,10 +3789,10 @@ describe("Plots", function () {
             var bar2X = bar2.data()[0].x;
             var bar3X = bar3.data()[0].x;
             // check widths
-            assert.closeTo(numAttr(bar0, "width"), 55, 2);
-            assert.closeTo(numAttr(bar1, "width"), 55, 2);
-            assert.closeTo(numAttr(bar2, "width"), 55, 2);
-            assert.closeTo(numAttr(bar3, "width"), 55, 2);
+            assert.closeTo(numAttr(bar0, "width"), 40, 2);
+            assert.closeTo(numAttr(bar1, "width"), 40, 2);
+            assert.closeTo(numAttr(bar2, "width"), 40, 2);
+            assert.closeTo(numAttr(bar3, "width"), 40, 2);
             // check heights
             assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar0");
             assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight), 0.01, "height is correct for bar1");
@@ -3853,10 +3853,10 @@ describe("Plots", function () {
             var bar2 = d3.select(bars[0][2]);
             var bar3 = d3.select(bars[0][3]);
             // check widths
-            assert.closeTo(numAttr(bar0, "height"), 36, 2, "height is correct for bar0");
-            assert.closeTo(numAttr(bar1, "height"), 36, 2, "height is correct for bar1");
-            assert.closeTo(numAttr(bar2, "height"), 36, 2, "height is correct for bar2");
-            assert.closeTo(numAttr(bar3, "height"), 36, 2, "height is correct for bar3");
+            assert.closeTo(numAttr(bar0, "height"), 26, 2, "height is correct for bar0");
+            assert.closeTo(numAttr(bar1, "height"), 26, 2, "height is correct for bar1");
+            assert.closeTo(numAttr(bar2, "height"), 26, 2, "height is correct for bar2");
+            assert.closeTo(numAttr(bar3, "height"), 26, 2, "height is correct for bar3");
             // check heights
             assert.closeTo(numAttr(bar0, "width"), rendererWidth / 2, 0.01, "width is correct for bar0");
             assert.closeTo(numAttr(bar1, "width"), rendererWidth, 0.01, "width is correct for bar1");
@@ -5547,9 +5547,9 @@ describe("Scales", function () {
             var scale = new Plottable.Scale.Ordinal();
             scale.range([0, 2679]);
             scale.domain(["1", "2", "3", "4"]);
-            assert.closeTo(scale.rangeBand(), 454, 1);
+            assert.closeTo(scale.rangeBand(), 399, 1);
             scale.domain(["1", "2", "3", "4", "5"]);
-            assert.closeTo(scale.rangeBand(), 372, 1);
+            assert.closeTo(scale.rangeBand(), 329, 1);
         });
     });
     it("OrdinalScale + BarPlot combo works as expected when the data is swapped", function () {

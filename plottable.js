@@ -2243,10 +2243,10 @@ var Plottable;
                 if (scale === void 0) { scale = d3.scale.ordinal(); }
                 _super.call(this, scale);
                 this._range = [0, 1];
-                // Padding as a proportion of the spacing between domain values
-                this._innerPadding = 0.3;
-                this._outerPadding = 0.5;
                 this._typeCoercer = function (d) { return d != null && d.toString ? d.toString() : d; };
+                var d3InnerPadding = 0.3;
+                this._innerPadding = Ordinal.convertToPlottableInnerPadding(d3InnerPadding);
+                this._outerPadding = Ordinal.convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
             Ordinal.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
@@ -2270,6 +2270,12 @@ var Plottable;
                     this._d3Scale.rangeBands(values, d3InnerPadding, d3OuterPadding);
                     return this;
                 }
+            };
+            Ordinal.convertToPlottableInnerPadding = function (d3InnerPadding) {
+                return 1 / (1 - d3InnerPadding) - 1;
+            };
+            Ordinal.convertToPlottableOuterPadding = function (d3OuterPadding, d3InnerPadding) {
+                return d3OuterPadding / (1 - d3InnerPadding);
             };
             /**
              * Returns the width of the range band.

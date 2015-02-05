@@ -212,10 +212,10 @@ describe("Scales", () => {
       scale.range([0, 2679]);
 
       scale.domain(["1","2","3","4"]);
-      assert.closeTo(scale.rangeBand(), 454, 1);
+      assert.closeTo(scale.rangeBand(), 399, 1);
 
       scale.domain(["1","2","3","4","5"]);
-      assert.closeTo(scale.rangeBand(), 372, 1);
+      assert.closeTo(scale.rangeBand(), 329, 1);
     });
   });
 

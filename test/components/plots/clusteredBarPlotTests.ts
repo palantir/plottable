@@ -67,10 +67,10 @@ describe("Plots", () => {
       var bar3X = bar3.data()[0].x;
 
       // check widths
-      assert.closeTo(numAttr(bar0, "width"), 55, 2);
-      assert.closeTo(numAttr(bar1, "width"), 55, 2);
-      assert.closeTo(numAttr(bar2, "width"), 55, 2);
-      assert.closeTo(numAttr(bar3, "width"), 55, 2);
+      assert.closeTo(numAttr(bar0, "width"), 40, 2);
+      assert.closeTo(numAttr(bar1, "width"), 40, 2);
+      assert.closeTo(numAttr(bar2, "width"), 40, 2);
+      assert.closeTo(numAttr(bar3, "width"), 40, 2);
 
       // check heights
       assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar0");
@@ -144,10 +144,10 @@ describe("Plots", () => {
       var bar3 = d3.select(bars[0][3]);
 
       // check widths
-      assert.closeTo(numAttr(bar0, "height"), 36, 2, "height is correct for bar0");
-      assert.closeTo(numAttr(bar1, "height"), 36, 2, "height is correct for bar1");
-      assert.closeTo(numAttr(bar2, "height"), 36, 2, "height is correct for bar2");
-      assert.closeTo(numAttr(bar3, "height"), 36, 2, "height is correct for bar3");
+      assert.closeTo(numAttr(bar0, "height"), 26, 2, "height is correct for bar0");
+      assert.closeTo(numAttr(bar1, "height"), 26, 2, "height is correct for bar1");
+      assert.closeTo(numAttr(bar2, "height"), 26, 2, "height is correct for bar2");
+      assert.closeTo(numAttr(bar3, "height"), 26, 2, "height is correct for bar3");
 
       // check heights
       assert.closeTo(numAttr(bar0, "width"), rendererWidth / 2, 0.01, "width is correct for bar0");
