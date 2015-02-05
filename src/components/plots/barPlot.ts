@@ -5,6 +5,8 @@ export module Plot {
   export class Bar<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
     protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
     protected static _DEFAULT_WIDTH = 10;
+    private static BAR_WIDTH_RATIO = 0.95;
+    private static SINGLE_BAR_DIMENSION_RATIO = 0.4;
     private _baseline: D3.Selection;
     private _baselineValue: number;
     private _barAlignmentFactor = 0.5;
@@ -386,11 +388,9 @@ export module Plot {
         var barAccessorDataPairs = d3.pairs(numberBarAccessorData);
         var barWidthDimension = this._isVertical ? this.width() : this.height();
 
-        var singleBarWidthDimensionRatio = 0.4;
-
         barPixelWidth = _Util.Methods.min(barAccessorDataPairs, (pair: any[], i: number) => {
           return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
-        }, barWidthDimension * singleBarWidthDimensionRatio);
+        }, barWidthDimension * Bar.SINGLE_BAR_DIMENSION_RATIO);
 
         var scaledData = numberBarAccessorData.map((datum: number) => barScale.scale(datum));
         var minScaledDatum = _Util.Methods.min(scaledData, 0);
@@ -403,8 +403,7 @@ export module Plot {
           barPixelWidth = Math.min(barPixelWidth, margin / (1 - this._barAlignmentFactor));
         }
 
-        var barWidthRatio = 0.95;
-        barPixelWidth *= barWidthRatio;
+        barPixelWidth *= Bar.BAR_WIDTH_RATIO;
       }
       return barPixelWidth;
     }

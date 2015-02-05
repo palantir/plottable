@@ -7012,10 +7012,9 @@ var Plottable;
                     numberBarAccessorData.sort(function (a, b) { return a - b; });
                     var barAccessorDataPairs = d3.pairs(numberBarAccessorData);
                     var barWidthDimension = this._isVertical ? this.width() : this.height();
-                    var singleBarWidthDimensionRatio = 0.4;
                     barPixelWidth = Plottable._Util.Methods.min(barAccessorDataPairs, function (pair, i) {
                         return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
-                    }, barWidthDimension * singleBarWidthDimensionRatio);
+                    }, barWidthDimension * Bar.SINGLE_BAR_DIMENSION_RATIO);
                     var scaledData = numberBarAccessorData.map(function (datum) { return barScale.scale(datum); });
                     var minScaledDatum = Plottable._Util.Methods.min(scaledData, 0);
                     if (this._barAlignmentFactor !== 0 && minScaledDatum > 0) {
@@ -7026,8 +7025,7 @@ var Plottable;
                         var margin = barWidthDimension - maxScaledDatum;
                         barPixelWidth = Math.min(barPixelWidth, margin / (1 - this._barAlignmentFactor));
                     }
-                    var barWidthRatio = 0.95;
-                    barPixelWidth *= barWidthRatio;
+                    barPixelWidth *= Bar.BAR_WIDTH_RATIO;
                 }
                 return barPixelWidth;
             };
@@ -7115,6 +7113,8 @@ var Plottable;
             };
             Bar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             Bar._DEFAULT_WIDTH = 10;
+            Bar.BAR_WIDTH_RATIO = 0.95;
+            Bar.SINGLE_BAR_DIMENSION_RATIO = 0.4;
             return Bar;
         })(Plot.AbstractXYPlot);
         Plot.Bar = Bar;
