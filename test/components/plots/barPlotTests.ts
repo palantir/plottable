@@ -172,7 +172,7 @@ describe("Plots", () => {
       });
 
       it("barPixelWidth calculated appropriately", () => {
-        assert.strictEqual((<any> barPlot)._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+        assert.strictEqual((<any> barPlot)._getBarPixelWidth(), xScale.scale(2) * 2 * 0.95);
         svg.remove();
       });
 
