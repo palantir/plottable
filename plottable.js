@@ -7308,7 +7308,7 @@ var Plottable;
                     var barWidthDimension = this._isVertical ? this.width() : this.height();
                     barPixelWidth = Plottable._Util.Methods.min(barAccessorDataPairs, function (pair, i) {
                         return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
-                    }, barWidthDimension * Bar.SINGLE_BAR_DIMENSION_RATIO);
+                    }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
                     var scaledData = numberBarAccessorData.map(function (datum) { return barScale.scale(datum); });
                     var minScaledDatum = Plottable._Util.Methods.min(scaledData, 0);
                     if (this._barAlignmentFactor !== 0 && minScaledDatum > 0) {
@@ -7319,7 +7319,7 @@ var Plottable;
                         var margin = barWidthDimension - maxScaledDatum;
                         barPixelWidth = Math.min(barPixelWidth, margin / (1 - this._barAlignmentFactor));
                     }
-                    barPixelWidth *= Bar.BAR_WIDTH_RATIO;
+                    barPixelWidth *= Bar._BAR_WIDTH_RATIO;
                 }
                 return barPixelWidth;
             };
@@ -7407,8 +7407,8 @@ var Plottable;
             };
             Bar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             Bar._DEFAULT_WIDTH = 10;
-            Bar.BAR_WIDTH_RATIO = 0.95;
-            Bar.SINGLE_BAR_DIMENSION_RATIO = 0.4;
+            Bar._BAR_WIDTH_RATIO = 0.95;
+            Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
             return Bar;
         })(Plot.AbstractXYPlot);
         Plot.Bar = Bar;
