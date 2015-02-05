@@ -2245,8 +2245,8 @@ var Plottable;
                 this._range = [0, 1];
                 this._typeCoercer = function (d) { return d != null && d.toString ? d.toString() : d; };
                 var d3InnerPadding = 0.3;
-                this._innerPadding = Ordinal.convertToPlottableInnerPadding(d3InnerPadding);
-                this._outerPadding = Ordinal.convertToPlottableOuterPadding(0.5, d3InnerPadding);
+                this._innerPadding = Ordinal._convertToPlottableInnerPadding(d3InnerPadding);
+                this._outerPadding = Ordinal._convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
             Ordinal.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
@@ -2271,10 +2271,10 @@ var Plottable;
                     return this;
                 }
             };
-            Ordinal.convertToPlottableInnerPadding = function (d3InnerPadding) {
+            Ordinal._convertToPlottableInnerPadding = function (d3InnerPadding) {
                 return 1 / (1 - d3InnerPadding) - 1;
             };
-            Ordinal.convertToPlottableOuterPadding = function (d3OuterPadding, d3InnerPadding) {
+            Ordinal._convertToPlottableOuterPadding = function (d3OuterPadding, d3InnerPadding) {
                 return d3OuterPadding / (1 - d3InnerPadding);
             };
             /**

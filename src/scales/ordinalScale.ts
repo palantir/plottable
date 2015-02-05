@@ -22,8 +22,8 @@ export module Scale {
       super(scale);
 
       var d3InnerPadding = 0.3;
-      this._innerPadding = Ordinal.convertToPlottableInnerPadding(d3InnerPadding);
-      this._outerPadding = Ordinal.convertToPlottableOuterPadding(0.5, d3InnerPadding);
+      this._innerPadding = Ordinal._convertToPlottableInnerPadding(d3InnerPadding);
+      this._outerPadding = Ordinal._convertToPlottableOuterPadding(0.5, d3InnerPadding);
     }
 
     protected _getExtent(): string[] {
@@ -56,11 +56,11 @@ export module Scale {
       }
     }
 
-    private static convertToPlottableInnerPadding(d3InnerPadding: number): number {
+    private static _convertToPlottableInnerPadding(d3InnerPadding: number): number {
       return 1 / (1 - d3InnerPadding) - 1;
     }
 
-    private static convertToPlottableOuterPadding(d3OuterPadding: number, d3InnerPadding: number): number {
+    private static _convertToPlottableOuterPadding(d3OuterPadding: number, d3InnerPadding: number): number {
       return d3OuterPadding / (1 - d3InnerPadding);
     }
 
