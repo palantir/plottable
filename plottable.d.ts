@@ -2325,6 +2325,10 @@ declare module Plottable {
              */
             static LEGEND_ENTRY_CLASS: string;
             /**
+             * The css class that prepends every legend entry
+             */
+            static LEGEND_ENTRY_PREFIX: string;
+            /**
              * Creates a Legend.
              *
              * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
