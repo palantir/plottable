@@ -1643,8 +1643,7 @@ declare module Plottable {
              * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
              * @returns {Component} The calling component.
              */
-            renderTo(selector: String): AbstractComponent;
-            renderTo(element: D3.Selection): AbstractComponent;
+            renderTo(element: String | D3.Selection): AbstractComponent;
             /**
              * Causes the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
              *

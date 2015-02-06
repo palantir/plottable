@@ -3391,14 +3391,20 @@ var Plottable;
                     }
                 }
             };
+            /**
+             * Renders the Component into a given DOM element. The element must be as <svg>.
+             *
+             * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
+             * @returns {Component} The calling component.
+             */
             AbstractComponent.prototype.renderTo = function (element) {
                 if (element != null) {
                     var selection;
-                    if (typeof (element.node) === "function") {
-                        selection = element;
+                    if (typeof (element) === "string") {
+                        selection = d3.select(element);
                     }
                     else {
-                        selection = d3.select(element);
+                        selection = element;
                     }
                     if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
                         throw new Error("Plottable requires a valid SVG to renderTo");
