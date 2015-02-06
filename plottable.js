@@ -2290,15 +2290,15 @@ var Plottable;
                 return this._d3Scale.rangeBand();
             };
             /**
-             * Returns the full band width of the scale.
+             * Returns the step width of the scale.
              *
-             * The full band width is defined as the entire space for a band to occupy,
-             * not accounting for any padding in between the bands.
+             * The step width is defined as the entire space for a band to occupy,
+             * including the padding in between the bands.
              *
              * @returns {number} the full band width of the scale
              */
-            Ordinal.prototype.fullBandWidth = function () {
-                return this.rangeBand() + this.innerPadding();
+            Ordinal.prototype.stepWidth = function () {
+                return this.rangeBand() * (1 + this.innerPadding());
             };
             Ordinal.prototype.innerPadding = function (innerPadding) {
                 if (innerPadding == null) {
@@ -5052,7 +5052,7 @@ var Plottable;
                         break;
                 }
                 ticks.each(function (d) {
-                    var bandWidth = scale.rangeBand();
+                    var bandWidth = scale.stepWidth();
                     var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
                     var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
                     var writeOptions = {
@@ -5073,7 +5073,7 @@ var Plottable;
             Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, ticks) {
                 var _this = this;
                 var wrappingResults = ticks.map(function (s) {
-                    var bandWidth = scale.fullBandWidth();
+                    var bandWidth = scale.stepWidth();
                     var width = _this._isHorizontal() ? bandWidth : axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
                     var height = _this._isHorizontal() ? axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding() : bandWidth;
                     return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
@@ -5092,7 +5092,8 @@ var Plottable;
                 var ordScale = this._scale;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
-                    var scaledValue = ordScale.scale(d) - ordScale.rangeBand() / 2;
+                    var innerPaddingWidth = ordScale.stepWidth() - ordScale.rangeBand();
+                    var scaledValue = ordScale.scale(d) - ordScale.rangeBand() / 2 - innerPaddingWidth / 2;
                     var x = _this._isHorizontal() ? scaledValue : 0;
                     var y = _this._isHorizontal() ? 0 : scaledValue;
                     return "translate(" + x + "," + y + ")";
