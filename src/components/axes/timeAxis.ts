@@ -401,8 +401,8 @@ export module Axis {
       d3.select(tickMarks[0][0]).attr(attr);
 
       // Add end-tick classes to first and last tick for CSS customization purposes
-      d3.select(tickMarks[0][0]).classed("end-tick", true);
-      d3.select(tickMarks[0][tickMarks.size() - 1]).classed("end-tick", true);
+      d3.select(tickMarks[0][0]).classed("end-tick-mark", true);
+      d3.select(tickMarks[0][tickMarks.size() - 1]).classed("end-tick-mark", true);
 
       tickMarks.exit().remove();
     }
