@@ -2290,15 +2290,15 @@ var Plottable;
                 return this._d3Scale.rangeBand();
             };
             /**
-             * Returns the full band width of the scale.
+             * Returns the step width of the scale.
              *
-             * The full band width is defined as the entire space for a band to occupy,
-             * not accounting for any padding in between the bands.
+             * The step width is defined as the entire space for a band to occupy,
+             * including the padding in between the bands.
              *
              * @returns {number} the full band width of the scale
              */
-            Ordinal.prototype.fullBandWidth = function () {
-                return this.rangeBand() + this.innerPadding();
+            Ordinal.prototype.stepWidth = function () {
+                return this.rangeBand() * (1 + this.innerPadding());
             };
             Ordinal.prototype.innerPadding = function (innerPadding) {
                 if (innerPadding == null) {
@@ -5073,7 +5073,7 @@ var Plottable;
             Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, ticks) {
                 var _this = this;
                 var wrappingResults = ticks.map(function (s) {
-                    var bandWidth = scale.fullBandWidth();
+                    var bandWidth = scale.stepWidth();
                     var width = _this._isHorizontal() ? bandWidth : axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
                     var height = _this._isHorizontal() ? axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding() : bandWidth;
                     return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);

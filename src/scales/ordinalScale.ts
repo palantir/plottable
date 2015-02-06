@@ -74,15 +74,15 @@ export module Scale {
     }
 
     /**
-     * Returns the full band width of the scale.
+     * Returns the step width of the scale.
      *
-     * The full band width is defined as the entire space for a band to occupy,
-     * not accounting for any padding in between the bands.
+     * The step width is defined as the entire space for a band to occupy,
+     * including the padding in between the bands.
      *
      * @returns {number} the full band width of the scale
      */
-    public fullBandWidth(): number {
-      return this.rangeBand() + this.innerPadding();
+    public stepWidth(): number {
+      return this.rangeBand() * (1 + this.innerPadding());
     }
 
     /**
