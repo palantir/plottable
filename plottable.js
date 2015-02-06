@@ -143,6 +143,13 @@ var Plottable;
                 return result;
             }
             Methods.uniq = uniq;
+            /**
+             * Creates an array of length `count`, filled with value or (if value is a function), value()
+             *
+             * @param {any} value The value to fill the array with, or, if a function, a generator for values (called with index as arg)
+             * @param {number} count The length of the array to generate
+             * @return {any[]}
+             */
             function createFilledArray(value, count) {
                 var out = [];
                 for (var i = 0; i < count; i++) {

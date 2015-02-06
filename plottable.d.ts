@@ -72,8 +72,7 @@ declare module Plottable {
              * @param {number} count The length of the array to generate
              * @return {any[]}
              */
-            function createFilledArray<T>(value: T, count: number): T[];
-            function createFilledArray<T>(func: (index?: number) => T, count: number): T[];
+            function createFilledArray<T>(value: T | ((index?: number) => T), count: number): T[];
             /**
              * @param {T[][]} a The 2D array that will have its elements joined together.
              * @return {T[]} Every array in a, concatenated together in the order they appear.
