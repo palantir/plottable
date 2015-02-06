@@ -252,7 +252,8 @@ export module Component {
       var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data((d) => d);
       var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
       entries.each(function(d: string) {
-        d3.select(this).classed(d.replace(" ", "-"), true);
+        var entryClass = [Legend.LEGEND_ENTRY_CLASS, d.replace(" ", "-")].join("-");
+        d3.select(this).classed(entryClass, true);
       });
       entriesEnter.append("circle");
       entriesEnter.append("g").classed("text-container", true);
