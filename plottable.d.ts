@@ -113,9 +113,9 @@ declare module Plottable {
              * @returns {[{ [key: string]: any }} coppied map.
              */
             function copyMap<T>(oldMap: {
-                [key: string]: T;
+                [x: string]: T;
             }): {
-                [key: string]: T;
+                [x: string]: T;
             };
             function range(start: number, stop: number, step?: number): number[];
             /** Is like setTimeout, but activates synchronously if time=0
@@ -494,7 +494,7 @@ declare module Plottable {
          *
          * The listeners are called synchronously.
          */
-        class Broadcaster extends Core.PlottableObject {
+        class Broadcaster extends PlottableObject {
             listenable: Listenable;
             /**
              * Constructs a broadcaster, taking the Listenable that the broadcaster will be attached to.
@@ -1423,7 +1423,7 @@ declare module Plottable {
     module Scale {
         module TickGenerators {
             interface TickGenerator<D> {
-                (scale: Plottable.Scale.AbstractQuantitative<D>): D[];
+                (scale: AbstractQuantitative<D>): D[];
             }
             /**
              * Creates a tick generator using the specified interval.
@@ -1752,7 +1752,7 @@ declare module Plottable {
              * @param {Component} c The component to merge in.
              * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
              */
-            merge(c: AbstractComponent): Component.Group;
+            merge(c: AbstractComponent): Group;
             /**
              * Detaches a Component from the DOM. The component can be reused.
              *
@@ -2581,7 +2581,7 @@ declare module Plottable {
             protected _datasetKeysInOrder: string[];
             protected _renderArea: D3.Selection;
             protected _projections: {
-                [attrToSet: string]: _Projection;
+                [x: string]: _Projection;
             };
             protected _animate: boolean;
             protected _animateOnNextRender: boolean;
@@ -2869,7 +2869,7 @@ declare module Plottable {
     module Plot {
         class Bar<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
             protected static _BarAlignmentToFactor: {
-                [alignment: string]: number;
+                [x: string]: number;
             };
             protected static _DEFAULT_WIDTH: number;
             protected _isVertical: boolean;
@@ -3388,7 +3388,7 @@ declare module Plottable {
         class AbstractDispatcher extends Core.PlottableObject {
             protected _target: D3.Selection;
             protected _event2Callback: {
-                [eventName: string]: () => any;
+                [x: string]: () => any;
             };
             /**
              * Constructs a Dispatcher with the specified target.
@@ -3433,7 +3433,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        class Mouse extends Dispatcher.AbstractDispatcher {
+        class Mouse extends AbstractDispatcher {
             /**
              * Constructs a Mouse Dispatcher with the specified target.
              *
@@ -3489,7 +3489,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        class Keypress extends Dispatcher.AbstractDispatcher {
+        class Keypress extends AbstractDispatcher {
             /**
              * Constructs a Keypress Dispatcher with the specified target.
              *
@@ -3815,7 +3815,7 @@ declare module Plottable {
              */
             _doHover(p: Point): HoverData;
         }
-        class Hover extends Interaction.AbstractInteraction {
+        class Hover extends AbstractInteraction {
             _componentToListenTo: Hoverable;
             _anchor(component: Hoverable, hitBox: D3.Selection): void;
             /**
