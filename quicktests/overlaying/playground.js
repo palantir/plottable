@@ -1,5 +1,9 @@
 
 	var testCode;
+	var rg;
+	var group;
+	var ord;
+
 	var numXnumY = [{x: 2, y: 9}, {x: 3, y: 13.5}, {x: 4, y: 18}, {x: 5, y: 22.5}, {x: 6, y: 27} ];
 	var catXnumY = [{x: 'A', y: 9}, {x: 'B', y: 5}, {x: 'C', y: 12}, {x: 'D', y: 2}];
 	var timeXnumY = [{x: "5/2/2014", y: 9}, {x: "6/3/2014", y: 13}, {x: "8/3/2014", y: 1}];
@@ -193,10 +197,6 @@
 			testCode = testCode + "\tplot.project('x', 'x', xScale).project('y', 'y', yScale);\n";
 		}
 	};
-
-	var rg;
-	var group;
-	var ord;
 
 	createTest = function() {
 		"use strict";
