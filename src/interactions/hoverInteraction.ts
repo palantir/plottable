@@ -36,6 +36,7 @@ export module Interaction {
     private _dispatcher: Dispatcher.Mouse;
     private _hoverOverCallback: (hoverData: HoverData) => any;
     private _hoverOutCallback: (hoverData: HoverData) => any;
+    private _overComponent = false;
 
     private _currentHoverData: HoverData = {
       data: null,
@@ -45,14 +46,21 @@ export module Interaction {
 
     public _anchor(component: Hoverable, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
-      this._dispatcher = new Dispatcher.Mouse(this._hitBox);
+      this._dispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
 
-      this._dispatcher.mouseover((p: Point) => {
-        this._componentToListenTo._hoverOverComponent(p);
+      this._dispatcher.broadcaster.registerListener("hover"+this.getID(), () => this._handleMouseEvent());
+    }
+
+    private _handleMouseEvent() {
+      var p = this._translateToComponentSpace(this._dispatcher.getLastMousePosition());
+
+      if (this._isInsideComponent(p)) {
+        if (!this._overComponent) {
+          this._componentToListenTo._hoverOverComponent(p);
+        }
         this.handleHoverOver(p);
-      });
-
-      this._dispatcher.mouseout((p: Point) => {
+        this._overComponent = true;
+      } else {
         this._componentToListenTo._hoverOutComponent(p);
         this.safeHoverOut(this._currentHoverData);
         this._currentHoverData = {
@@ -60,11 +68,8 @@ export module Interaction {
           pixelPositions: null,
           selection: null
         };
-      });
-
-      this._dispatcher.mousemove((p: Point) => this.handleHoverOver(p));
-
-      this._dispatcher.connect();
+        this._overComponent = false;
+      }
     }
 
     /**

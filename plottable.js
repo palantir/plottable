@@ -613,6 +613,17 @@ var Plottable;
                 return (Math.floor(outer.left) <= Math.ceil(inner.left) && Math.floor(outer.top) <= Math.ceil(inner.top) && Math.floor(inner.right) <= Math.ceil(outer.right) && Math.floor(inner.bottom) <= Math.ceil(outer.bottom));
             }
             DOM.boxIsInside = boxIsInside;
+            function getBoundingSVG(elem) {
+                var ownerSVG = elem.ownerSVGElement;
+                if (ownerSVG != null) {
+                    return ownerSVG;
+                }
+                if (elem.nodeName.toLowerCase() === "svg") {
+                    return elem;
+                }
+                return null; // not in the DOM
+            }
+            DOM.getBoundingSVG = getBoundingSVG;
         })(DOM = _Util.DOM || (_Util.DOM = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -8480,72 +8491,88 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var Plottable;
 (function (Plottable) {
     var Dispatcher;
     (function (Dispatcher) {
-        var Mouse = (function (_super) {
-            __extends(Mouse, _super);
+        var Mouse = (function () {
             /**
-             * Constructs a Mouse Dispatcher with the specified target.
+             * Creates a Dispatcher.Mouse.
+             * This constructor not be invoked directly under most circumstances.
              *
-             * @param {D3.Selection} target The selection to listen for events on.
+             * @param {SVGElement} svg The root <svg> element to attach to.
              */
-            function Mouse(target) {
+            function Mouse(svg) {
                 var _this = this;
-                _super.call(this, target);
-                this._event2Callback["mouseover"] = function () {
-                    if (_this._mouseover != null) {
-                        _this._mouseover(_this._getMousePosition());
-                    }
-                };
-                this._event2Callback["mousemove"] = function () {
-                    if (_this._mousemove != null) {
-                        _this._mousemove(_this._getMousePosition());
-                    }
-                };
-                this._event2Callback["mouseout"] = function () {
-                    if (_this._mouseout != null) {
-                        _this._mouseout(_this._getMousePosition());
-                    }
-                };
+                this._svg = svg;
+                this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
+                this._measureRect.setAttribute("class", "measure-rect");
+                this._measureRect.setAttribute("style", "opacity: 0;");
+                this._measureRect.setAttribute("width", "1");
+                this._measureRect.setAttribute("height", "1");
+                this._svg.appendChild(this._measureRect);
+                this._lastMousePosition = { x: -1, y: -1 };
+                this.broadcaster = new Plottable.Core.Broadcaster(this);
+                svg.addEventListener("mouseover", function (e) { return _this._computeMousePosition(e.clientX, e.clientY); });
+                svg.addEventListener("mousemove", function (e) { return _this._computeMousePosition(e.clientX, e.clientY); });
+                svg.addEventListener("mouseout", function (e) { return _this._computeMousePosition(e.clientX, e.clientY); });
             }
-            Mouse.prototype._getMousePosition = function () {
-                var xy = d3.mouse(this._target.node());
-                return {
-                    x: xy[0],
-                    y: xy[1]
+            /**
+             * Computes the mouse position relative to the <svg> in svg-coordinate-space.
+             */
+            Mouse.prototype._computeMousePosition = function (clientX, clientY) {
+                // get the origin
+                this._measureRect.setAttribute("x", "0");
+                this._measureRect.setAttribute("y", "0");
+                var mrBCR = this._measureRect.getBoundingClientRect();
+                var origin = { x: mrBCR.left, y: mrBCR.top };
+                // caculate the scale
+                this._measureRect.setAttribute("x", "100");
+                this._measureRect.setAttribute("y", "100");
+                mrBCR = this._measureRect.getBoundingClientRect();
+                var testPoint = { x: mrBCR.left, y: mrBCR.top };
+                var scaleX = (testPoint.x - origin.x) / 100;
+                var scaleY = (testPoint.y - origin.y) / 100;
+                // get the true cursor position
+                this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
+                this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
+                mrBCR = this._measureRect.getBoundingClientRect();
+                var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
+                var scaledPosition = {
+                    x: (trueCursorPosition.x - origin.x) / scaleX,
+                    y: (trueCursorPosition.y - origin.y) / scaleY
                 };
+                this._lastMousePosition = scaledPosition;
+                this.broadcaster.broadcast();
             };
-            Mouse.prototype.mouseover = function (callback) {
-                if (callback === undefined) {
-                    return this._mouseover;
+            /**
+             * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
+             * on that <svg>, it will be returned; otherwise, a new one will be created.
+             *
+             * @param {SVGElement} elem A svg DOM element.
+             *
+             * @return {Dispatcher.Mouse} A Dispatcher.Mouse
+             */
+            Mouse.getDispatcher = function (elem) {
+                var svg = Plottable._Util.DOM.getBoundingSVG(elem);
+                var dispatcher = svg[Mouse.dispatcherKey];
+                if (dispatcher == null) {
+                    dispatcher = new Mouse(svg);
+                    svg[Mouse.dispatcherKey] = dispatcher;
                 }
-                this._mouseover = callback;
-                return this;
+                return dispatcher;
             };
-            Mouse.prototype.mousemove = function (callback) {
-                if (callback === undefined) {
-                    return this._mousemove;
-                }
-                this._mousemove = callback;
-                return this;
+            /**
+             * Returns the last computed mouse position.
+             *
+             * @return {Point} The last known mouse position in <svg> coordinate space.
+             */
+            Mouse.prototype.getLastMousePosition = function () {
+                return this._lastMousePosition;
             };
-            Mouse.prototype.mouseout = function (callback) {
-                if (callback === undefined) {
-                    return this._mouseout;
-                }
-                this._mouseout = callback;
-                return this;
-            };
+            Mouse.dispatcherKey = "__Plottable_Dispatcher_Mouse";
             return Mouse;
-        })(Dispatcher.AbstractDispatcher);
+        })();
         Dispatcher.Mouse = Mouse;
     })(Dispatcher = Plottable.Dispatcher || (Plottable.Dispatcher = {}));
 })(Plottable || (Plottable = {}));
@@ -8631,6 +8658,30 @@ var Plottable;
             AbstractInteraction.prototype._anchor = function (component, hitBox) {
                 this._componentToListenTo = component;
                 this._hitBox = hitBox;
+            };
+            /**
+             * Translates an <svg>-coordinate-space point to Component-space coordinates.
+             *
+             * @param {Point} p A Point in <svg>-space coordinates.
+             *
+             * @return {Point} The same location in Component-space coordinates.
+             */
+            AbstractInteraction.prototype._translateToComponentSpace = function (p) {
+                var origin = this._componentToListenTo.originToSVG();
+                return {
+                    x: p.x - origin.x,
+                    y: p.y - origin.y
+                };
+            };
+            /**
+             * Checks whether a Component-coordinate-space Point is inside the Component.
+             *
+             * @param {Point} p A Point in Coordinate-space coordinates.
+             *
+             * @return {boolean} Whether or not the point is inside the Component.
+             */
+            AbstractInteraction.prototype._isInsideComponent = function (p) {
+                return 0 <= p.x && 0 <= p.y && p.x <= this._componentToListenTo.width() && p.y <= this._componentToListenTo.height();
             };
             return AbstractInteraction;
         })(Plottable.Core.PlottableObject);
@@ -9328,6 +9379,7 @@ var Plottable;
             __extends(Hover, _super);
             function Hover() {
                 _super.apply(this, arguments);
+                this._overComponent = false;
                 this._currentHoverData = {
                     data: null,
                     pixelPositions: null,
@@ -9337,22 +9389,28 @@ var Plottable;
             Hover.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
-                this._dispatcher = new Plottable.Dispatcher.Mouse(this._hitBox);
-                this._dispatcher.mouseover(function (p) {
-                    _this._componentToListenTo._hoverOverComponent(p);
-                    _this.handleHoverOver(p);
-                });
-                this._dispatcher.mouseout(function (p) {
-                    _this._componentToListenTo._hoverOutComponent(p);
-                    _this.safeHoverOut(_this._currentHoverData);
-                    _this._currentHoverData = {
+                this._dispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo._element.node());
+                this._dispatcher.broadcaster.registerListener("hover" + this.getID(), function () { return _this._handleMouseEvent(); });
+            };
+            Hover.prototype._handleMouseEvent = function () {
+                var p = this._translateToComponentSpace(this._dispatcher.getLastMousePosition());
+                if (this._isInsideComponent(p)) {
+                    if (!this._overComponent) {
+                        this._componentToListenTo._hoverOverComponent(p);
+                    }
+                    this.handleHoverOver(p);
+                    this._overComponent = true;
+                }
+                else {
+                    this._componentToListenTo._hoverOutComponent(p);
+                    this.safeHoverOut(this._currentHoverData);
+                    this._currentHoverData = {
                         data: null,
                         pixelPositions: null,
                         selection: null
                     };
-                });
-                this._dispatcher.mousemove(function (p) { return _this.handleHoverOver(p); });
-                this._dispatcher.connect();
+                    this._overComponent = false;
+                }
             };
             /**
              * Returns a HoverData consisting of all data and selections in a but not in b.

@@ -2,110 +2,96 @@
 
 module Plottable {
 export module Dispatcher {
-  export class Mouse extends Dispatcher.AbstractDispatcher {
-    private _mouseover: (location: Point) => any;
-    private _mousemove: (location: Point) => any;
-    private _mouseout: (location: Point) => any;
+  export class Mouse {
+    static dispatcherKey = "__Plottable_Dispatcher_Mouse";
+    private _svg: SVGElement;
+    private _measureRect: SVGElement;
+    private _lastMousePosition: Point;
+    public broadcaster: Core.Broadcaster;
 
     /**
-     * Constructs a Mouse Dispatcher with the specified target.
+     * Creates a Dispatcher.Mouse.
+     * This constructor not be invoked directly under most circumstances.
      *
-     * @param {D3.Selection} target The selection to listen for events on.
+     * @param {SVGElement} svg The root <svg> element to attach to.
      */
-    constructor(target: D3.Selection) {
-      super(target);
+    constructor(svg: SVGElement) {
+      this._svg = svg;
+      this._measureRect = <SVGElement> <any>document.createElementNS(svg.namespaceURI, "rect");
+      this._measureRect.setAttribute("class", "measure-rect");
+      this._measureRect.setAttribute("style", "opacity: 0;");
+      this._measureRect.setAttribute("width", "1");
+      this._measureRect.setAttribute("height", "1");
+      this._svg.appendChild(this._measureRect);
 
-      this._event2Callback["mouseover"] = () => {
-        if (this._mouseover != null) {
-          this._mouseover(this._getMousePosition());
-        }
+      this._lastMousePosition = { x: -1, y: -1 };
+      this.broadcaster = new Core.Broadcaster(this);
+
+      svg.addEventListener("mouseover", (e) => this._computeMousePosition(e.clientX, e.clientY));
+      svg.addEventListener("mousemove", (e) => this._computeMousePosition(e.clientX, e.clientY));
+      svg.addEventListener("mouseout", (e) => this._computeMousePosition(e.clientX, e.clientY));
+    }
+
+    /**
+     * Computes the mouse position relative to the <svg> in svg-coordinate-space.
+     */
+    private _computeMousePosition(clientX: number, clientY: number) {
+      // get the origin
+      this._measureRect.setAttribute("x", "0");
+      this._measureRect.setAttribute("y", "0");
+      var mrBCR = this._measureRect.getBoundingClientRect();
+      var origin = { x: mrBCR.left, y: mrBCR.top };
+
+      // caculate the scale
+      this._measureRect.setAttribute("x", "100");
+      this._measureRect.setAttribute("y", "100");
+      mrBCR = this._measureRect.getBoundingClientRect();
+      var testPoint = { x: mrBCR.left, y: mrBCR.top };
+
+      var scaleX = (testPoint.x - origin.x) / 100;
+      var scaleY = (testPoint.y - origin.y) / 100;
+
+      // get the true cursor position
+      this._measureRect.setAttribute("x", String((clientX - origin.x)/scaleX) );
+      this._measureRect.setAttribute("y", String((clientY - origin.y)/scaleY) );
+      mrBCR = this._measureRect.getBoundingClientRect();
+      var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
+
+      var scaledPosition = {
+        x: (trueCursorPosition.x - origin.x) / scaleX,
+        y: (trueCursorPosition.y - origin.y) / scaleY
       };
 
-      this._event2Callback["mousemove"] = () => {
-        if (this._mousemove != null) {
-          this._mousemove(this._getMousePosition());
-        }
-      };
-
-      this._event2Callback["mouseout"] = () => {
-        if (this._mouseout != null) {
-          this._mouseout(this._getMousePosition());
-        }
-      };
-    }
-
-    private _getMousePosition(): Point {
-      var xy = d3.mouse(this._target.node());
-      return {
-            x: xy[0],
-            y: xy[1]
-          };
+      this._lastMousePosition = scaledPosition;
+      this.broadcaster.broadcast();
     }
 
     /**
-     * Gets the current callback to be called on mouseover.
+     * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
+     * on that <svg>, it will be returned; otherwise, a new one will be created.
      *
-     * @return {(location: Point) => any} The current mouseover callback.
-     */
-    public mouseover(): (location: Point) => any;
-    /**
-     * Attaches a callback to be called on mouseover.
+     * @param {SVGElement} elem A svg DOM element.
      *
-     * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
-     *                                            Pass in null to remove the callback.
-     * @return {Mouse} The calling Mouse Handler.
+     * @return {Dispatcher.Mouse} A Dispatcher.Mouse
      */
-    public mouseover(callback: (location: Point) => any): Mouse;
-    public mouseover(callback?: (location: Point) => any): any {
-      if (callback === undefined) {
-        return this._mouseover;
+    public static getDispatcher(elem: SVGElement): Dispatcher.Mouse {
+      var svg = _Util.DOM.getBoundingSVG(elem);
+
+      var dispatcher: Mouse = (<any> svg)[Mouse.dispatcherKey];
+      if (dispatcher == null) {
+        dispatcher = new Mouse(svg);
+        (<any> svg)[Mouse.dispatcherKey] = dispatcher;
       }
-      this._mouseover = callback;
-      return this;
+      return dispatcher;
     }
 
     /**
-     * Gets the current callback to be called on mousemove.
+     * Returns the last computed mouse position.
      *
-     * @return {(location: Point) => any} The current mousemove callback.
+     * @return {Point} The last known mouse position in <svg> coordinate space.
      */
-    public mousemove(): (location: Point) => any;
-    /**
-     * Attaches a callback to be called on mousemove.
-     *
-     * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
-     *                                            Pass in null to remove the callback.
-     * @return {Mouse} The calling Mouse Handler.
-     */
-    public mousemove(callback: (location: Point) => any): Mouse;
-    public mousemove(callback?: (location: Point) => any): any {
-      if (callback === undefined) {
-        return this._mousemove;
-      }
-      this._mousemove = callback;
-      return this;
-    }
-
-    /**
-     * Gets the current callback to be called on mouseout.
-     *
-     * @return {(location: Point) => any} The current mouseout callback.
-     */
-    public mouseout(): (location: Point) => any;
-    /**
-     * Attaches a callback to be called on mouseout.
-     *
-     * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
-     *                                            Pass in null to remove the callback.
-     * @return {Mouse} The calling Mouse Handler.
-     */
-    public mouseout(callback: (location: Point) => any): Mouse;
-    public mouseout(callback?: (location: Point) => any): any {
-      if (callback === undefined) {
-        return this._mouseout;
-      }
-      this._mouseout = callback;
-      return this;
+    public getLastMousePosition() {
+      return this._lastMousePosition;
     }
   }
 }

@@ -90,7 +90,7 @@ describe("Interactions", () => {
       assert.deepEqual(overData.data, ["right"],
                         "onHoverOver was called with the new data only (left --> center)");
 
-      triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+      triggerFakeMouseEvent("mouseout", hitbox, 401, 200);
       overCallbackCalled = false;
       triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
       assert.deepEqual(overData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint],
@@ -117,7 +117,7 @@ describe("Interactions", () => {
                         "onHoverOut was called with the correct data (center --> right)");
 
       outCallbackCalled = false;
-      triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+      triggerFakeMouseEvent("mouseout", hitbox, 401, 200);
       assert.isTrue(outCallbackCalled, "onHoverOut is called on mousing out of the Component");
       assert.deepEqual(outData.pixelPositions, [testTarget.rightPoint],
                         "onHoverOut was called with the correct pixel position");
@@ -125,7 +125,7 @@ describe("Interactions", () => {
 
       outCallbackCalled = false;
       triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
-      triggerFakeMouseEvent("mouseout", hitbox, 200, 400);
+      triggerFakeMouseEvent("mouseout", hitbox, 200, 401);
       assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint],
                         "onHoverOut was called with the correct pixel positions");
       assert.deepEqual(outData.data, ["left", "right"], "onHoverOut is called with the correct data");
@@ -148,7 +148,7 @@ describe("Interactions", () => {
       assert.deepEqual(currentlyHovered.data, ["left", "right"],
                        "retrieves data corresponding to the current position");
 
-      triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+      triggerFakeMouseEvent("mouseout", hitbox, 401, 200);
       currentlyHovered = hoverInteraction.getCurrentHoverData();
       assert.isNull(currentlyHovered.data, "returns null if not currently hovering");
 

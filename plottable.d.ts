@@ -272,6 +272,7 @@ declare module Plottable {
             function translate(s: D3.Selection, x?: number, y?: number): any;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
             function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
+            function getBoundingSVG(elem: SVGElement): SVGElement;
         }
     }
 }
@@ -3433,55 +3434,31 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        class Mouse extends Dispatcher.AbstractDispatcher {
+        class Mouse {
+            static dispatcherKey: string;
+            broadcaster: Core.Broadcaster;
             /**
-             * Constructs a Mouse Dispatcher with the specified target.
+             * Creates a Dispatcher.Mouse.
+             * This constructor not be invoked directly under most circumstances.
              *
-             * @param {D3.Selection} target The selection to listen for events on.
+             * @param {SVGElement} svg The root <svg> element to attach to.
              */
-            constructor(target: D3.Selection);
+            constructor(svg: SVGElement);
             /**
-             * Gets the current callback to be called on mouseover.
+             * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
+             * on that <svg>, it will be returned; otherwise, a new one will be created.
              *
-             * @return {(location: Point) => any} The current mouseover callback.
+             * @param {SVGElement} elem A svg DOM element.
+             *
+             * @return {Dispatcher.Mouse} A Dispatcher.Mouse
              */
-            mouseover(): (location: Point) => any;
+            static getDispatcher(elem: SVGElement): Dispatcher.Mouse;
             /**
-             * Attaches a callback to be called on mouseover.
+             * Returns the last computed mouse position.
              *
-             * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
-             *                                            Pass in null to remove the callback.
-             * @return {Mouse} The calling Mouse Handler.
+             * @return {Point} The last known mouse position in <svg> coordinate space.
              */
-            mouseover(callback: (location: Point) => any): Mouse;
-            /**
-             * Gets the current callback to be called on mousemove.
-             *
-             * @return {(location: Point) => any} The current mousemove callback.
-             */
-            mousemove(): (location: Point) => any;
-            /**
-             * Attaches a callback to be called on mousemove.
-             *
-             * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
-             *                                            Pass in null to remove the callback.
-             * @return {Mouse} The calling Mouse Handler.
-             */
-            mousemove(callback: (location: Point) => any): Mouse;
-            /**
-             * Gets the current callback to be called on mouseout.
-             *
-             * @return {(location: Point) => any} The current mouseout callback.
-             */
-            mouseout(): (location: Point) => any;
-            /**
-             * Attaches a callback to be called on mouseout.
-             *
-             * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
-             *                                            Pass in null to remove the callback.
-             * @return {Mouse} The calling Mouse Handler.
-             */
-            mouseout(callback: (location: Point) => any): Mouse;
+            getLastMousePosition(): Point;
         }
     }
 }
@@ -3530,6 +3507,22 @@ declare module Plottable {
             protected _hitBox: D3.Selection;
             protected _componentToListenTo: Component.AbstractComponent;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            /**
+             * Translates an <svg>-coordinate-space point to Component-space coordinates.
+             *
+             * @param {Point} p A Point in <svg>-space coordinates.
+             *
+             * @return {Point} The same location in Component-space coordinates.
+             */
+            protected _translateToComponentSpace(p: Point): Point;
+            /**
+             * Checks whether a Component-coordinate-space Point is inside the Component.
+             *
+             * @param {Point} p A Point in Coordinate-space coordinates.
+             *
+             * @return {boolean} Whether or not the point is inside the Component.
+             */
+            protected _isInsideComponent(p: Point): boolean;
         }
     }
 }
