@@ -3200,7 +3200,7 @@ declare module Plottable {
              *     transition object so that plots may chain the transitions between
              *     animators.
              */
-            animate(selection: any, attrToProjector: AttributeToProjector): any;
+            animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection | D3.Transition.Transition;
             /**
              * Given the number of elements, return the total time the animation requires
              * @param number numberofIterations The number of elements that will be drawn
@@ -3223,7 +3223,7 @@ declare module Plottable {
          */
         class Null implements PlotAnimator {
             getTiming(selection: any): number;
-            animate(selection: any, attrToProjector: AttributeToProjector): any;
+            animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection;
         }
     }
 }
@@ -3271,7 +3271,7 @@ declare module Plottable {
              */
             constructor();
             getTiming(numberOfIterations: number): number;
-            animate(selection: any, attrToProjector: AttributeToProjector): any;
+            animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition;
             /**
              * Gets the duration of the animation in milliseconds.
              *
@@ -3352,7 +3352,7 @@ declare module Plottable {
             isVertical: boolean;
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
-            animate(selection: any, attrToProjector: AttributeToProjector): any;
+            animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition;
             protected _startMovingProjector(attrToProjector: AttributeToProjector): _Projector;
         }
     }
