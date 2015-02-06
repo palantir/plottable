@@ -45,6 +45,62 @@ export module Plot {
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
+    protected _onDatasetUpdate() {
+      super._onDatasetUpdate();
+      if (this._isAnchored) {
+        this._updateBarExtent();
+      }
+    }
+
+    public detach() {
+      super.detach();
+      this._datasetKeysInOrder.forEach((key) => {
+        var scaleKey = this.getID().toString() + "_" + key;
+        this._xScale._removeExtent(this.getID().toString(), "bar-extent");
+      });
+      return this;
+    }
+
+    private _updateBarExtent() {
+      if (((this._isVertical && this._xScale instanceof Plottable.Scale.AbstractQuantitative) ||
+          (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative)) &&
+          this._projections["width"]) {
+        var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+        var barScale: Plottable.Scale.AbstractScale<any, number> = this._isVertical ? this._xScale : this._yScale;
+
+        var domainExtent = Math.abs(barScale.domain()[1] - barScale.domain()[0]);
+        var rangeExtent = Math.abs(barScale.range()[1] - barScale.range()[0]);
+
+        var barOffsetF = (d: any, i: number, u: PlotMetadata, m: any) => {
+          var barWidth = this._projections["width"].accessor(d, i, u, m);
+          return (domainExtent * barWidth) / (rangeExtent - barWidth);
+        };
+
+        var minBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) => {
+          return barAccessor(d, i, u, m) - this._barAlignmentFactor * barOffsetF(d, i, u, m);
+        };
+
+        var maxBarAccessor = (d: any, i: number, u: PlotMetadata, m: any) => {
+          return barAccessor(d, i, u, m) + (1 - this._barAlignmentFactor) * barOffsetF(d, i, u, m);
+        };
+
+        var minBarExtent = Infinity;
+        var maxBarExtent = -Infinity;
+
+        this._datasetKeysInOrder.forEach((key) => {
+          var plotDatasetKey = this._key2PlotDatasetKey.get(key);
+          var dataset = plotDatasetKey.dataset;
+          var plotMetadata = plotDatasetKey.plotMetadata;
+          minBarExtent = Math.min(minBarExtent, dataset._getExtent(minBarAccessor, barScale._typeCoercer, plotMetadata)[0]);
+          maxBarExtent = Math.max(maxBarExtent, dataset._getExtent(maxBarAccessor, barScale._typeCoercer, plotMetadata)[1]);
+        });
+
+        if (minBarExtent !== Infinity && !isNaN(minBarExtent) && maxBarExtent !== -Infinity && !isNaN(maxBarExtent)) {
+          barScale._updateExtent(this.getID().toString(), "bar-extent", [minBarExtent, maxBarExtent]);
+        }
+      }
+    }
+
     /**
      * Gets the baseline value for the bars
      *
@@ -432,6 +488,11 @@ export module Plot {
       this._getDrawersInOrder().forEach((d, i) => {
         d._getRenderArea().selectAll("rect").classed("not-hovered hovered", false);
       });
+    }
+
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
+      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+      this._updateBarExtent();
     }
 
     //===== Hover logic =====

@@ -7063,6 +7063,52 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
+            Bar.prototype._onDatasetUpdate = function () {
+                _super.prototype._onDatasetUpdate.call(this);
+                if (this._isAnchored) {
+                    this._updateBarExtent();
+                }
+            };
+            Bar.prototype.detach = function () {
+                var _this = this;
+                _super.prototype.detach.call(this);
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var scaleKey = _this.getID().toString() + "_" + key;
+                    _this._xScale._removeExtent(_this.getID().toString(), "bar-extent");
+                });
+                return this;
+            };
+            Bar.prototype._updateBarExtent = function () {
+                var _this = this;
+                if (((this._isVertical && this._xScale instanceof Plottable.Scale.AbstractQuantitative) || (!this._isVertical && this._yScale instanceof Plottable.Scale.AbstractQuantitative)) && this._projections["width"]) {
+                    var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+                    var barScale = this._isVertical ? this._xScale : this._yScale;
+                    var domainExtent = Math.abs(barScale.domain()[1] - barScale.domain()[0]);
+                    var rangeExtent = Math.abs(barScale.range()[1] - barScale.range()[0]);
+                    var barOffsetF = function (d, i, u, m) {
+                        var barWidth = _this._projections["width"].accessor(d, i, u, m);
+                        return (domainExtent * barWidth) / (rangeExtent - barWidth);
+                    };
+                    var minBarAccessor = function (d, i, u, m) {
+                        return barAccessor(d, i, u, m) - _this._barAlignmentFactor * barOffsetF(d, i, u, m);
+                    };
+                    var maxBarAccessor = function (d, i, u, m) {
+                        return barAccessor(d, i, u, m) + (1 - _this._barAlignmentFactor) * barOffsetF(d, i, u, m);
+                    };
+                    var minBarExtent = Infinity;
+                    var maxBarExtent = -Infinity;
+                    this._datasetKeysInOrder.forEach(function (key) {
+                        var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
+                        var dataset = plotDatasetKey.dataset;
+                        var plotMetadata = plotDatasetKey.plotMetadata;
+                        minBarExtent = Math.min(minBarExtent, dataset._getExtent(minBarAccessor, barScale._typeCoercer, plotMetadata)[0]);
+                        maxBarExtent = Math.max(maxBarExtent, dataset._getExtent(maxBarAccessor, barScale._typeCoercer, plotMetadata)[1]);
+                    });
+                    if (minBarExtent !== Infinity && !isNaN(minBarExtent) && maxBarExtent !== -Infinity && !isNaN(maxBarExtent)) {
+                        barScale._updateExtent(this.getID().toString(), "bar-extent", [minBarExtent, maxBarExtent]);
+                    }
+                }
+            };
             Bar.prototype.baseline = function (value) {
                 if (value == null) {
                     return this._baselineValue;
@@ -7338,6 +7384,10 @@ var Plottable;
                 this._getDrawersInOrder().forEach(function (d, i) {
                     d._getRenderArea().selectAll("rect").classed("not-hovered hovered", false);
                 });
+            };
+            Bar.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                this._updateBarExtent();
             };
             //===== Hover logic =====
             Bar.prototype._hoverOverComponent = function (p) {

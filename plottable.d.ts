@@ -2884,6 +2884,8 @@ declare module Plottable {
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             protected _getDrawer(key: string): _Drawer.Rect;
             protected _setup(): void;
+            protected _onDatasetUpdate(): void;
+            detach(): Bar<X, Y>;
             /**
              * Gets the baseline value for the bars
              *
@@ -2978,6 +2980,7 @@ declare module Plottable {
              * @return {Bar} The calling Bar Plot.
              */
             hoverMode(mode: String): Bar<X, Y>;
+            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
