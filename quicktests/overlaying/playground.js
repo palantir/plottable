@@ -240,6 +240,7 @@
 	    table.renderTo("#playground");
 
 	    testCode_finish();
+	    $("#updateButton").attr('disabled','disabled');
 	};
 
 	//----------------------------------------------------------------------------------------------
@@ -256,5 +257,8 @@
 $(document).ready(function(){
 	"use strict";
 	createTest();
+	$( ".changable" ).on( "change", function() {
+	  $("#updateButton").removeAttr('disabled');
+	});
 
 });

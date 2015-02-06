@@ -19,18 +19,20 @@
         <br>
 
         <div align="center">
+            <button id="updateButton" onclick="svg_size()"> Update </button>
+            <br>
+            <br>        
             <span> width (px): </span>
-            <input type="text" id="svg_w" rows="1" cols="10" value="400"></textarea>
+            <input type="text" id="svg_w" rows="1" cols="10" value="400" class="changable"></textarea>
             <span> height (px): </span>
-            <input type="text" id="svg_h" rows="1" cols="10" value="400"></textarea>
-            <button id="changeSizeButton" onclick="svg_size()"> Change Size </button>
+            <input type="text" id="svg_h" rows="1" cols="10" value="400" class="changable"></textarea>
         </div>
 
         <br>
 
         <div align="center">
             <span> x-axis type </span>
-            <select id="xAxisType">
+            <select id="xAxisType" class="changable">
               <option>Numeric(Linear)</option>
               <option>Numeric(Log)</option>   
               <option>Time</option>
@@ -38,29 +40,27 @@
             </select>
             <br>
             <span> y-axis type </span>
-            <select id="yAxisType">
+            <select id="yAxisType" class="changable">
               <option>Numeric(Linear)</option>
               <option>Numeric(Log)</option>  
               <option>Category</option>
             </select>
             <br>
             <span> plot type </span>
-            <select id="plotType">
+            <select id="plotType" class="changable">
               <option>Scatter</option>
               <option>Line</option>
               <option>Area</option>
               <option>Bar</option>
             </select>
-            <br>
-            <button id="makeTestButton" onclick="createTest()"> Create test </button>
         </div>
 
         <br>
 
         <div align="center">
           <form action="">
-          <input type="checkbox" id="red" name="projections" value="Color">Color the graph red<br>
-          <input type="checkbox" id="gridlines" name="projections" value="Gridlines">Add gridlines
+          <input type="checkbox" id="red" name="projections" value="Color" class="changable">Color the graph red<br>
+          <input type="checkbox" id="gridlines" name="projections" value="Gridlines" class="changable">Add gridlines
           </form>
 
         </div>
