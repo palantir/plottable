@@ -116,7 +116,7 @@ export module Axis {
           break;
       }
       ticks.each(function (d: string) {
-        var bandWidth = scale.rangeBand();
+        var bandWidth = scale.stepWidth();
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
         var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
         var writeOptions = {
@@ -137,7 +137,7 @@ export module Axis {
      */
     private _measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: string[]) {
       var wrappingResults = ticks.map((s: string) => {
-        var bandWidth = scale.fullBandWidth();
+        var bandWidth = scale.stepWidth();
         var width  = this._isHorizontal() ? bandWidth  : axisWidth - this._maxLabelTickLength() - this.tickLabelPadding();
         var height = this._isHorizontal() ? axisHeight - this._maxLabelTickLength() - this.tickLabelPadding() : bandWidth;
         return this._wrapper.wrap(this.formatter()(s), this._measurer, width, height);
@@ -162,7 +162,8 @@ export module Axis {
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
-        var scaledValue = ordScale.scale(d) - ordScale.rangeBand() / 2;
+        var innerPaddingWidth = ordScale.stepWidth() - ordScale.rangeBand();
+        var scaledValue = ordScale.scale(d) - ordScale.rangeBand() / 2 - innerPaddingWidth / 2;
         var x = this._isHorizontal() ? scaledValue : 0;
         var y = this._isHorizontal() ? 0 : scaledValue;
         return "translate(" + x + "," + y + ")";
