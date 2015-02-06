@@ -399,6 +399,11 @@ export module Axis {
         attr["y2"] = this.height() - (offset + this._tierHeights[index]);
       }
       d3.select(tickMarks[0][0]).attr(attr);
+
+      // Add end-tick classes to first and last tick for CSS customization purposes
+      d3.select(tickMarks[0][0]).classed("end-tick", true);
+      d3.select(tickMarks[0][tickMarks.size() - 1]).classed("end-tick", true);
+
       tickMarks.exit().remove();
     }
 

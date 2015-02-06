@@ -119,4 +119,16 @@ describe("TimeAxis", () => {
     assert.equal(lastTick.attr("x2"), width, "xPos (x2) of last end tick is at the end of the axis container");
     svg.remove();
   });
+
+  it("adds a class corresponding to the end-tick for the first and last ticks", () => {
+    var width = 500;
+    var svg = generateSVG(width, 100);
+    scale.domain(["2010", "2014"]);
+    axis.renderTo(svg);
+    var firstTick = d3.select(".tick-mark");
+    assert.isTrue(firstTick.classed("end-tick"), "first end tick has the end-tick class");
+    var lastTick = d3.select(d3.selectAll(".tick-mark")[0].pop());
+    assert.isTrue(lastTick.classed("end-tick"), "last end tick has the end-tick class");
+    svg.remove();
+  });
 });
