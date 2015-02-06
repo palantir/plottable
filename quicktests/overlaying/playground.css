@@ -1,0 +1,15 @@
+#updateButton {
+  color: #FFF;
+  background-color: #00aa00;
+  font-weight: bold;
+  border-radius: 15px;
+  padding: 10px 20px;
+}
+
+#updateButton:disabled{
+  color: #BBB;
+  background-color: #345;
+  font-weight: bold;	
+  border-radius: 15px;
+  padding: 10px 20px;
+}
