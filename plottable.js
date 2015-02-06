@@ -2587,7 +2587,7 @@ var Plottable;
                 this.broadcaster.broadcast();
             };
             InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
-                if (colorRange instanceof Array) {
+                if (typeof (colorRange) === "object") {
                     return colorRange;
                 }
                 else if (InterpolatedColor._COLOR_SCALES[colorRange] != null) {

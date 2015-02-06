@@ -1382,7 +1382,7 @@ declare module Plottable {
              * values across the domain.
              * @returns {InterpolatedColor} The calling InterpolatedColor.
              */
-            colorRange(colorRange: any): InterpolatedColor;
+            colorRange(colorRange: string | string[]): InterpolatedColor;
             /**
              * Gets the internal scale type.
              *
