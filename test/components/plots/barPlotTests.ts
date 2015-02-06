@@ -4,7 +4,7 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("Bar Plot", () => {
-    describe("Vertical Bar Plot in points mode", () => {
+    describe("Vertical Bar Plot", () => {
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scale.Ordinal;
@@ -15,7 +15,7 @@ describe("Plots", () => {
 
       beforeEach(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+        xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
         yScale = new Plottable.Scale.Linear();
         var data = [
           {x: "A", y: 1},
@@ -39,12 +39,12 @@ describe("Plots", () => {
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
-        assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
+        assert.closeTo(numAttr(bar0, "width"), xScale.rangeBand(), 1, "bar0 width is correct");
+        assert.closeTo(numAttr(bar1, "width"), xScale.rangeBand(), 1, "bar1 width is correct");
         assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
         assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
-        assert.equal(bar0.attr("x"), "75", "bar0 x is correct");
-        assert.equal(bar1.attr("x"), "375", "bar1 x is correct");
+        assert.closeTo(numAttr(bar0, "x"), 111, 1, "bar0 x is correct");
+        assert.closeTo(numAttr(bar1, "x"), 333, 1, "bar1 x is correct");
         assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
         assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
 
@@ -73,32 +73,6 @@ describe("Plots", () => {
         assert.equal(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
         assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
         assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
-        svg.remove();
-      });
-
-      it("bar alignment can be changed; barPlot updates appropriately", () => {
-        barPlot.barAlignment("center");
-        var renderArea = (<any> barPlot)._renderArea;
-        var bars = renderArea.selectAll("rect");
-        var bar0 = d3.select(bars[0][0]);
-        var bar1 = d3.select(bars[0][1]);
-        assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
-        assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
-        assert.equal(numAttr(bar0, "x"), 75, "bar0 x is correct");
-        assert.equal(numAttr(bar1, "x"), 375, "bar1 x is correct");
-
-        barPlot.barAlignment("right");
-        renderArea = (<any> barPlot)._renderArea;
-        bars = renderArea.selectAll("rect");
-        bar0 = d3.select(bars[0][0]);
-        bar1 = d3.select(bars[0][1]);
-        assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
-        assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
-        assert.equal(numAttr(bar0, "x"), 0, "bar0 x is correct");
-        assert.equal(numAttr(bar1, "x"), 300, "bar1 x is correct");
-
-        assert.throws(() => barPlot.barAlignment("blargh"), Error);
-        assert.equal((<any> barPlot)._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
         svg.remove();
       });
 
@@ -172,7 +146,7 @@ describe("Plots", () => {
       });
 
       it("barPixelWidth calculated appropriately", () => {
-        assert.strictEqual((<any> barPlot)._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+        assert.strictEqual((<any> barPlot)._getBarPixelWidth(), xScale.scale(2) * 2 * 0.95);
         svg.remove();
       });
 
@@ -293,7 +267,7 @@ describe("Plots", () => {
 
     });
 
-    describe("Horizontal Bar Plot in Points Mode", () => {
+    describe("Horizontal Bar Plot", () => {
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;
       var yScale: Plottable.Scale.Ordinal;
@@ -303,7 +277,7 @@ describe("Plots", () => {
       var SVG_HEIGHT = 400;
       beforeEach(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+        yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
         xScale = new Plottable.Scale.Linear();
         xScale.domain([-3, 3]);
 
@@ -329,12 +303,12 @@ describe("Plots", () => {
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
-        assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
+        assert.closeTo(numAttr(bar0, "height"), yScale.rangeBand(), 1, "bar0 height is correct");
+        assert.closeTo(numAttr(bar1, "height"), yScale.rangeBand(), 1, "bar1 height is correct");
         assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
         assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-        assert.equal(bar0.attr("y"), "50", "bar0 y is correct");
-        assert.equal(bar1.attr("y"), "250", "bar1 y is correct");
+        assert.closeTo(numAttr(bar0, "y"), 74, 1, "bar0 y is correct");
+        assert.closeTo(numAttr(bar1, "y"), 222, 1, "bar1 y is correct");
         assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
         assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
 
@@ -366,86 +340,6 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("bar alignment can be changed; barPlot updates appropriately", () => {
-        barPlot.barAlignment("center");
-        var renderArea = (<any> barPlot)._renderArea;
-        var bars = renderArea.selectAll("rect");
-        var bar0 = d3.select(bars[0][0]);
-        var bar1 = d3.select(bars[0][1]);
-        assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
-        assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
-        assert.equal(numAttr(bar0, "y"), 50, "bar0 y is correct");
-        assert.equal(numAttr(bar1, "y"), 250, "bar1 y is correct");
-
-        barPlot.barAlignment("right");
-        renderArea = (<any> barPlot)._renderArea;
-        bars = renderArea.selectAll("rect");
-        bar0 = d3.select(bars[0][0]);
-        bar1 = d3.select(bars[0][1]);
-        assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
-        assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
-        assert.equal(numAttr(bar0, "y"), 0, "bar0 y is correct");
-        assert.equal(numAttr(bar1, "y"), 200, "bar1 y is correct");
-
-        assert.throws(() => barPlot.barAlignment("blargh"), Error);
-
-        svg.remove();
-      });
-    });
-
-    describe("Horizontal Bar Plot in Bands mode", () => {
-      var svg: D3.Selection;
-      var dataset: Plottable.Dataset;
-      var yScale: Plottable.Scale.Ordinal;
-      var xScale: Plottable.Scale.Linear;
-      var barPlot: Plottable.Plot.Bar<number, string>;
-      var SVG_WIDTH = 600;
-      var SVG_HEIGHT = 400;
-      var axisWidth = 0;
-      var bandWidth = 0;
-
-      beforeEach(() => {
-        svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
-        xScale = new Plottable.Scale.Linear();
-
-        var data = [
-          {y: "A", x: 1},
-          {y: "B", x: 2},
-        ];
-        dataset = new Plottable.Dataset(data);
-
-        barPlot = new Plottable.Plot.Bar(xScale, yScale, false);
-        barPlot.addDataset(dataset);
-        barPlot.baseline(0);
-        barPlot.animate(false);
-        var yAxis = new Plottable.Axis.Category(yScale, "left");
-        barPlot.project("x", "x", xScale);
-        barPlot.project("y", "y", yScale);
-        new Plottable.Component.Table([[yAxis, barPlot]]).renderTo(svg);
-        axisWidth = yAxis.width();
-        bandWidth = yScale.rangeBand();
-        xScale.domainer(xScale.domainer().pad(0));
-      });
-
-      it("renders correctly", () => {
-        var bars = (<any> barPlot)._renderArea.selectAll("rect");
-        var bar0 = d3.select(bars[0][0]);
-        var bar1 = d3.select(bars[0][1]);
-        var bar0y = bar0.data()[0].y;
-        var bar1y = bar1.data()[0].y;
-        assert.closeTo(numAttr(bar0, "height"), 104, 2);
-        assert.closeTo(numAttr(bar1, "height"), 104, 2);
-        assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "width is correct for bar0");
-        assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "width is correct for bar1");
-        // check that bar is aligned on the center of the scale
-        assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01
-                    , "y pos correct for bar0");
-        assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01
-                    , "y pos correct for bar1");
-        svg.remove();
-      });
-
       it("width projector may be overwritten, and calling project queues rerender", () => {
         var bars = (<any> barPlot)._renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
@@ -455,10 +349,10 @@ describe("Plots", () => {
         barPlot.project("width", 10);
         assert.closeTo(numAttr(bar0, "height"), 10, 0.01, "bar0 height");
         assert.closeTo(numAttr(bar1, "height"), 10, 0.01, "bar1 height");
-        assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "bar0 width");
-        assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "bar1 width");
-        assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "bar0 ypos");
-        assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "bar1 ypos");
+        assert.closeTo(numAttr(bar0, "width"), 100, 0.01, "bar0 width");
+        assert.closeTo(numAttr(bar1, "width"), 150, 0.01, "bar1 width");
+        assert.closeTo(numAttr(bar0, "y"), yScale.scale(bar0y) - numAttr(bar0, "height") / 2, 0.01, "bar0 ypos");
+        assert.closeTo(numAttr(bar1, "y"), yScale.scale(bar1y) - numAttr(bar1, "height") / 2, 0.01, "bar1 ypos");
         svg.remove();
       });
     });

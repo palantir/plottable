@@ -562,6 +562,19 @@ describe("TimeAxis", function () {
         assert.deepEqual(configs[0].step, 4, "axis used new step");
         svg.remove();
     });
+    it("renders end ticks on either side", function () {
+        var width = 500;
+        var svg = generateSVG(width, 100);
+        scale.domain(["2010", "2014"]);
+        axis.renderTo(svg);
+        var firstTick = d3.select(".tick-mark");
+        assert.equal(firstTick.attr("x1"), 0, "xPos (x1) of first end tick is at the beginning of the axis container");
+        assert.equal(firstTick.attr("x2"), 0, "xPos (x2) of first end tick is at the beginning of the axis container");
+        var lastTick = d3.select(d3.selectAll(".tick-mark")[0].pop());
+        assert.equal(lastTick.attr("x1"), width, "xPos (x1) of last end tick is at the end of the axis container");
+        assert.equal(lastTick.attr("x2"), width, "xPos (x2) of last end tick is at the end of the axis container");
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -855,6 +868,44 @@ describe("NumericAxis", function () {
         });
         svg.remove();
     });
+    it("confines labels to the bounding box for the axis", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        var axis = new Plottable.Axis.Numeric(scale, "bottom");
+        axis.formatter(function (d) { return "longstringsareverylong"; });
+        axis.renderTo(svg);
+        var boundingBox = d3.select(".x-axis .bounding-box");
+        d3.selectAll(".x-axis .tick-label").each(function () {
+            var tickLabel = d3.select(this);
+            if (tickLabel.style("visibility") === "visible") {
+                assertBBoxInclusion(boundingBox, tickLabel);
+            }
+        });
+        svg.remove();
+    });
+    function getClientRectCenter(rect) {
+        return rect.left + rect.width / 2;
+    }
+    it("tick labels follow a sensible interval", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.domain([-2500000, 2500000]);
+        var baseAxis = new Plottable.Axis.Numeric(scale, "bottom");
+        baseAxis.renderTo(svg);
+        var visibleTickLabels = baseAxis._element.selectAll(".tick-label").filter(function (d, i) {
+            return d3.select(this).style("visibility") === "visible";
+        });
+        var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
+        var interval = getClientRectCenter(visibleTickLabelRects[1]) - getClientRectCenter(visibleTickLabelRects[0]);
+        for (var i = 0; i < visibleTickLabelRects.length - 1; i++) {
+            assert.closeTo(getClientRectCenter(visibleTickLabelRects[i + 1]) - getClientRectCenter(visibleTickLabelRects[i]), interval, 0.5, "intervals are all spaced the same");
+        }
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -922,23 +973,6 @@ describe("Category Axes", function () {
         axisHeight = ca.height();
         ca.tickLength(ca.tickLength() + 5);
         assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing ticklength increases height");
-        svg.remove();
-    });
-    it("proper range values for different range types", function () {
-        var SVG_WIDTH = 400;
-        var svg = generateSVG(SVG_WIDTH, 100);
-        var scale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([0, 400]).rangeType("bands", 1, 0);
-        var categoryAxis = new Plottable.Axis.Category(scale, "bottom");
-        categoryAxis.renderTo(svg);
-        // Outer padding is equal to step
-        var step = SVG_WIDTH / 5;
-        var tickMarks = categoryAxis._tickMarkContainer.selectAll(".tick-mark")[0];
-        var ticksNormalizedPosition = tickMarks.map(function (s) { return +d3.select(s).attr("x1") / step; });
-        assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
-        scale.rangeType("points", 1, 0);
-        step = SVG_WIDTH / 4;
-        ticksNormalizedPosition = tickMarks.map(function (s) { return +d3.select(s).attr("x1") / step; });
-        assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
         svg.remove();
     });
     it("vertically aligns short words properly", function () {
@@ -1167,20 +1201,22 @@ describe("Labels", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("Legends", function () {
+describe("Legend", function () {
     var svg;
     var color;
     var legend;
+    var entrySelector = "." + Plottable.Component.Legend.LEGEND_ENTRY_CLASS;
+    var rowSelector = "." + Plottable.Component.Legend.LEGEND_ROW_CLASS;
     beforeEach(function () {
         svg = generateSVG(400, 400);
-        color = new Plottable.Scale.Color("Category10");
-        legend = new Plottable.Component.Legend(color).maxEntriesPerRow(1);
+        color = new Plottable.Scale.Color();
+        legend = new Plottable.Component.Legend(color);
     });
     it("a basic legend renders", function () {
         color.domain(["foo", "bar", "baz"]);
         legend.renderTo(svg);
-        var rows = legend._content.selectAll(".legend-entry");
-        assert.lengthOf(rows[0], 3, "there are 3 legend entries");
+        var rows = legend._content.selectAll(entrySelector);
+        assert.lengthOf(rows[0], color.domain().length, "one entry is created for each item in the domain");
         rows.each(function (d, i) {
             assert.equal(d, color.domain()[i], "the data is set properly");
             var d3this = d3.select(this);
@@ -1203,7 +1239,7 @@ describe("Legends", function () {
         assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
         var actualHeight2 = legend.height();
         assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
-        var numRows = legend._content.selectAll(".legend-row")[0].length;
+        var numRows = legend._content.selectAll(rowSelector)[0].length;
         assert.equal(numRows, 3, "there are 3 rows");
         svg.remove();
     });
@@ -1233,10 +1269,10 @@ describe("Legends", function () {
     it("calling legend.render multiple times does not add more elements", function () {
         color.domain(["foo", "bar", "baz"]);
         legend.renderTo(svg);
-        var numRows = legend._content.selectAll(".legend-row")[0].length;
+        var numRows = legend._content.selectAll(rowSelector)[0].length;
         assert.equal(numRows, 3, "there are 3 legend rows initially");
         legend._render();
-        numRows = legend._content.selectAll(".legend-row")[0].length;
+        numRows = legend._content.selectAll(rowSelector)[0].length;
         assert.equal(numRows, 3, "there are 3 legend rows after second render");
         svg.remove();
     });
@@ -1245,14 +1281,14 @@ describe("Legends", function () {
         legend.renderTo(svg);
         var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
         color.domain(newDomain);
-        legend._content.selectAll(".legend-entry").each(function (d, i) {
+        legend._content.selectAll(entrySelector).each(function (d, i) {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
             var fill = d3.select(this).select("circle").attr("fill");
             assert.equal(fill, color.scale(d), "the fill was set properly");
         });
-        assert.lengthOf(legend._content.selectAll(".legend-row")[0], 5, "there are the right number of legend elements");
+        assert.lengthOf(legend._content.selectAll(rowSelector)[0], 5, "there are the right number of legend elements");
         svg.remove();
     });
     it("legend.scale() replaces domain", function () {
@@ -1262,7 +1298,7 @@ describe("Legends", function () {
         var newColorScale = new Plottable.Scale.Color("20");
         newColorScale.domain(newDomain);
         legend.scale(newColorScale);
-        legend._content.selectAll(".legend-entry").each(function (d, i) {
+        legend._content.selectAll(entrySelector).each(function (d, i) {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
@@ -1280,7 +1316,7 @@ describe("Legends", function () {
         legend.scale(newColorScale);
         var newDomain = ["a", "foo", "d"];
         newColorScale.domain(newDomain);
-        legend._content.selectAll(".legend-entry").each(function (d, i) {
+        legend._content.selectAll(entrySelector).each(function (d, i) {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
@@ -1289,7 +1325,7 @@ describe("Legends", function () {
         });
         svg.remove();
     });
-    it("iconHeight / 2 < circleHeight < iconHeight", function () {
+    it("scales icon sizes properly with font size (iconHeight / 2 < circleHeight < iconHeight)", function () {
         color.domain(["foo"]);
         legend.renderTo(svg);
         var style = legend._element.append("style");
@@ -1313,118 +1349,12 @@ describe("Legends", function () {
         verifyCircleHeight();
         svg.remove();
     });
-});
-describe("Legend", function () {
-    var colorScale;
-    var horizLegend;
-    var entrySelector = "." + Plottable.Component.Legend.LEGEND_ENTRY_CLASS;
-    var rowSelector = "." + Plottable.Component.Legend.LEGEND_ROW_CLASS;
-    beforeEach(function () {
-        colorScale = new Plottable.Scale.Color();
-        colorScale.domain([
-            "Washington",
-            "Adams",
-            "Jefferson",
-        ]);
-        horizLegend = new Plottable.Component.Legend(colorScale).maxEntriesPerRow(Infinity);
-    });
-    it("renders an entry for each item in the domain", function () {
-        var svg = generateSVG(400, 100);
-        horizLegend.renderTo(svg);
-        var entries = horizLegend._element.selectAll(entrySelector);
-        assert.equal(entries[0].length, colorScale.domain().length, "one entry is created for each item in the domain");
-        var elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
-        assert.deepEqual(elementTexts, colorScale.domain(), "entry texts match scale domain");
-        var newDomain = colorScale.domain();
-        newDomain.push("Madison");
-        colorScale.domain(newDomain);
-        entries = horizLegend._element.selectAll(entrySelector);
-        assert.equal(entries[0].length, colorScale.domain().length, "Legend updated to include item added to the domain");
-        svg.remove();
-    });
-    it("wraps entries onto extra rows if necessary", function () {
-        var svg = generateSVG(200, 100);
-        horizLegend.renderTo(svg);
-        var rows = horizLegend._element.selectAll(rowSelector);
-        assert.lengthOf(rows[0], 2, "Wrapped text on to two rows when space is constrained");
-        horizLegend.detach();
-        svg.remove();
-        svg = generateSVG(100, 100);
-        horizLegend.renderTo(svg);
-        rows = horizLegend._element.selectAll(rowSelector);
-        assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
-        svg.remove();
-    });
-    it("truncates and hides entries if space is constrained", function () {
-        var svg = generateSVG(70, 400);
-        horizLegend.renderTo(svg);
-        var textEls = horizLegend._element.selectAll("text");
-        textEls.each(function (d) {
-            var textEl = d3.select(this);
-            assertBBoxInclusion(horizLegend._element, textEl);
-        });
-        horizLegend.detach();
-        svg.remove();
-        svg = generateSVG(100, 50);
-        horizLegend.renderTo(svg);
-        textEls = horizLegend._element.selectAll("text");
-        textEls.each(function (d) {
-            var textEl = d3.select(this);
-            assertBBoxInclusion(horizLegend._element, textEl);
-        });
-        svg.remove();
-    });
-    it("scales icon size with entry font size", function () {
-        colorScale.domain(["A"]);
-        var svg = generateSVG(400, 100);
-        horizLegend.renderTo(svg);
-        var style = horizLegend._element.append("style");
-        style.attr("type", "text/css");
-        function verifyCircleHeight() {
-            var text = horizLegend._content.select("text");
-            var circle = horizLegend._content.select("circle");
-            var textHeight = Plottable._Util.DOM.getBBox(text).height;
-            var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
-            assert.operator(circleHeight, "<", textHeight, "Icon is smaller than entry text");
-            return circleHeight;
-        }
-        var origCircleHeight = verifyCircleHeight();
-        style.text(".plottable .legend text { font-size: 30px; }");
-        horizLegend._invalidateLayout();
-        var bigCircleHeight = verifyCircleHeight();
-        assert.operator(bigCircleHeight, ">", origCircleHeight, "icon size increased with font size");
-        style.text(".plottable .legend text { font-size: 6px; }");
-        horizLegend._invalidateLayout();
-        var smallCircleHeight = verifyCircleHeight();
-        assert.operator(smallCircleHeight, "<", origCircleHeight, "icon size decreased with font size");
-        svg.remove();
-    });
-    it("getEntry() horizontal", function () {
-        colorScale.domain(["AA", "BB", "CC"]);
-        var svg = generateSVG(300, 300);
-        horizLegend.renderTo(svg);
-        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
-        assert.deepEqual(horizLegend.getEntry({ x: 50, y: 10 }).data(), ["BB"], "get second entry");
-        assert.deepEqual(horizLegend.getEntry({ x: 150, y: 10 }), d3.select(), "no entries at location outside legend");
-        svg.remove();
-    });
-    it("getEntry() vertical", function () {
-        colorScale.domain(["AA", "BB", "CC"]);
-        var svg = generateSVG(300, 300);
-        horizLegend.maxEntriesPerRow(1);
-        horizLegend.renderTo(svg);
-        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
-        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 30 }).data(), ["BB"], "get second entry");
-        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 150 }), d3.select(), "no entries at location outside legend");
-        svg.remove();
-    });
     it("maxEntriesPerRow() works as expected", function () {
-        colorScale.domain(["AA", "BB", "CC", "DD", "EE", "FF"]);
-        var svg = generateSVG(300, 300);
-        horizLegend.renderTo(svg);
+        color.domain(["AA", "BB", "CC", "DD", "EE", "FF"]);
+        legend.renderTo(svg);
         var verifyMaxEntriesInRow = function (n) {
-            horizLegend.maxEntriesPerRow(n);
-            var rows = horizLegend._element.selectAll(rowSelector);
+            legend.maxEntriesPerRow(n);
+            var rows = legend._element.selectAll(rowSelector);
             assert.lengthOf(rows[0], (6 / n), "number of rows is correct");
             rows.each(function (d) {
                 var entries = d3.select(this).selectAll(entrySelector);
@@ -1437,20 +1367,72 @@ describe("Legend", function () {
         verifyMaxEntriesInRow(6);
         svg.remove();
     });
+    it("wraps entries onto extra rows if necessary for horizontal legends", function () {
+        color.domain(["George Waaaaaashington", "John Adaaaams", "Thomaaaaas Jefferson"]);
+        legend.maxEntriesPerRow(Infinity);
+        legend.renderTo(svg);
+        var rows = legend._element.selectAll(rowSelector);
+        assert.lengthOf(rows[0], 2, "Wrapped text on to two rows when space is constrained");
+        legend.detach();
+        svg.remove();
+        svg = generateSVG(100, 100);
+        legend.renderTo(svg);
+        rows = legend._element.selectAll(rowSelector);
+        assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
+        svg.remove();
+    });
+    it("getEntry() retrieves the correct entry for vertical legends", function () {
+        color.domain(["AA", "BB", "CC"]);
+        legend.maxEntriesPerRow(1);
+        legend.renderTo(svg);
+        assert.deepEqual(legend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
+        assert.deepEqual(legend.getEntry({ x: 10, y: 30 }).data(), ["BB"], "get second entry");
+        assert.deepEqual(legend.getEntry({ x: 10, y: 150 }), d3.select(), "no entries at location outside legend");
+        svg.remove();
+    });
+    it("getEntry() retrieves the correct entry for horizontal legends", function () {
+        color.domain(["AA", "BB", "CC"]);
+        legend.maxEntriesPerRow(Infinity);
+        legend.renderTo(svg);
+        assert.deepEqual(legend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
+        assert.deepEqual(legend.getEntry({ x: 50, y: 10 }).data(), ["BB"], "get second entry");
+        assert.deepEqual(legend.getEntry({ x: 150, y: 10 }), d3.select(), "no entries at location outside legend");
+        svg.remove();
+    });
     it("sortFunction() works as expected", function () {
         var newDomain = ["F", "E", "D", "C", "B", "A"];
-        colorScale.domain(newDomain);
-        var svg = generateSVG(300, 300);
-        horizLegend.renderTo(svg);
-        var entries = horizLegend._element.selectAll(entrySelector);
+        color.domain(newDomain);
+        legend.renderTo(svg);
+        var entries = legend._element.selectAll(entrySelector);
         var elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
         assert.deepEqual(elementTexts, newDomain, "entry has not been sorted");
         var sortFn = function (a, b) { return a.localeCompare(b); };
-        horizLegend.sortFunction(sortFn);
-        entries = horizLegend._element.selectAll(entrySelector);
+        legend.sortFunction(sortFn);
+        entries = legend._element.selectAll(entrySelector);
         elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
         newDomain.sort(sortFn);
-        assert.deepEqual(elementTexts, newDomain, "entry has been sorted alfabetically");
+        assert.deepEqual(elementTexts, newDomain, "entry has been sorted alphabetically");
+        svg.remove();
+    });
+    it("truncates and hides entries if space is constrained for a horizontal legend", function () {
+        svg.remove();
+        svg = generateSVG(70, 400);
+        legend.maxEntriesPerRow(Infinity);
+        legend.renderTo(svg);
+        var textEls = legend._element.selectAll("text");
+        textEls.each(function (d) {
+            var textEl = d3.select(this);
+            assertBBoxInclusion(legend._element, textEl);
+        });
+        legend.detach();
+        svg.remove();
+        svg = generateSVG(100, 50);
+        legend.renderTo(svg);
+        textEls = legend._element.selectAll("text");
+        textEls.each(function (d) {
+            var textEl = d3.select(this);
+            assertBBoxInclusion(legend._element, textEl);
+        });
         svg.remove();
     });
 });
@@ -2416,7 +2398,7 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("Bar Plot", function () {
-        describe("Vertical Bar Plot in points mode", function () {
+        describe("Vertical Bar Plot", function () {
             var svg;
             var dataset;
             var xScale;
@@ -2426,7 +2408,7 @@ describe("Plots", function () {
             var SVG_HEIGHT = 400;
             beforeEach(function () {
                 svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+                xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
                 yScale = new Plottable.Scale.Linear();
                 var data = [
                     { x: "A", y: 1 },
@@ -2449,12 +2431,12 @@ describe("Plots", function () {
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
-                assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
-                assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
+                assert.closeTo(numAttr(bar0, "width"), xScale.rangeBand(), 1, "bar0 width is correct");
+                assert.closeTo(numAttr(bar1, "width"), xScale.rangeBand(), 1, "bar1 width is correct");
                 assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
                 assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
-                assert.equal(bar0.attr("x"), "75", "bar0 x is correct");
-                assert.equal(bar1.attr("x"), "375", "bar1 x is correct");
+                assert.closeTo(numAttr(bar0, "x"), 111, 1, "bar0 x is correct");
+                assert.closeTo(numAttr(bar1, "x"), 333, 1, "bar1 x is correct");
                 assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
                 assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
                 var baseline = renderArea.select(".baseline");
@@ -2479,29 +2461,6 @@ describe("Plots", function () {
                 assert.equal(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
                 assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
                 assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
-                svg.remove();
-            });
-            it("bar alignment can be changed; barPlot updates appropriately", function () {
-                barPlot.barAlignment("center");
-                var renderArea = barPlot._renderArea;
-                var bars = renderArea.selectAll("rect");
-                var bar0 = d3.select(bars[0][0]);
-                var bar1 = d3.select(bars[0][1]);
-                assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
-                assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
-                assert.equal(numAttr(bar0, "x"), 75, "bar0 x is correct");
-                assert.equal(numAttr(bar1, "x"), 375, "bar1 x is correct");
-                barPlot.barAlignment("right");
-                renderArea = barPlot._renderArea;
-                bars = renderArea.selectAll("rect");
-                bar0 = d3.select(bars[0][0]);
-                bar1 = d3.select(bars[0][1]);
-                assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
-                assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
-                assert.equal(numAttr(bar0, "x"), 0, "bar0 x is correct");
-                assert.equal(numAttr(bar1, "x"), 300, "bar1 x is correct");
-                assert.throws(function () { return barPlot.barAlignment("blargh"); }, Error);
-                assert.equal(barPlot._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
                 svg.remove();
             });
             it("getBar()", function () {
@@ -2562,7 +2521,7 @@ describe("Plots", function () {
                 barPlot.renderTo(svg);
             });
             it("barPixelWidth calculated appropriately", function () {
-                assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+                assert.strictEqual(barPlot._getBarPixelWidth(), xScale.scale(2) * 2 * 0.95);
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
@@ -2660,7 +2619,7 @@ describe("Plots", function () {
                 svg.remove();
             });
         });
-        describe("Horizontal Bar Plot in Points Mode", function () {
+        describe("Horizontal Bar Plot", function () {
             var svg;
             var dataset;
             var yScale;
@@ -2670,7 +2629,7 @@ describe("Plots", function () {
             var SVG_HEIGHT = 400;
             beforeEach(function () {
                 svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+                yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
                 xScale = new Plottable.Scale.Linear();
                 xScale.domain([-3, 3]);
                 var data = [
@@ -2693,12 +2652,12 @@ describe("Plots", function () {
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
-                assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
-                assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
+                assert.closeTo(numAttr(bar0, "height"), yScale.rangeBand(), 1, "bar0 height is correct");
+                assert.closeTo(numAttr(bar1, "height"), yScale.rangeBand(), 1, "bar1 height is correct");
                 assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
                 assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-                assert.equal(bar0.attr("y"), "50", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "250", "bar1 y is correct");
+                assert.closeTo(numAttr(bar0, "y"), 74, 1, "bar0 y is correct");
+                assert.closeTo(numAttr(bar1, "y"), 222, 1, "bar1 y is correct");
                 assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
                 assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
                 var baseline = renderArea.select(".baseline");
@@ -2725,75 +2684,6 @@ describe("Plots", function () {
                 assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
                 svg.remove();
             });
-            it("bar alignment can be changed; barPlot updates appropriately", function () {
-                barPlot.barAlignment("center");
-                var renderArea = barPlot._renderArea;
-                var bars = renderArea.selectAll("rect");
-                var bar0 = d3.select(bars[0][0]);
-                var bar1 = d3.select(bars[0][1]);
-                assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
-                assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
-                assert.equal(numAttr(bar0, "y"), 50, "bar0 y is correct");
-                assert.equal(numAttr(bar1, "y"), 250, "bar1 y is correct");
-                barPlot.barAlignment("right");
-                renderArea = barPlot._renderArea;
-                bars = renderArea.selectAll("rect");
-                bar0 = d3.select(bars[0][0]);
-                bar1 = d3.select(bars[0][1]);
-                assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
-                assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
-                assert.equal(numAttr(bar0, "y"), 0, "bar0 y is correct");
-                assert.equal(numAttr(bar1, "y"), 200, "bar1 y is correct");
-                assert.throws(function () { return barPlot.barAlignment("blargh"); }, Error);
-                svg.remove();
-            });
-        });
-        describe("Horizontal Bar Plot in Bands mode", function () {
-            var svg;
-            var dataset;
-            var yScale;
-            var xScale;
-            var barPlot;
-            var SVG_WIDTH = 600;
-            var SVG_HEIGHT = 400;
-            var axisWidth = 0;
-            var bandWidth = 0;
-            beforeEach(function () {
-                svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
-                xScale = new Plottable.Scale.Linear();
-                var data = [
-                    { y: "A", x: 1 },
-                    { y: "B", x: 2 },
-                ];
-                dataset = new Plottable.Dataset(data);
-                barPlot = new Plottable.Plot.Bar(xScale, yScale, false);
-                barPlot.addDataset(dataset);
-                barPlot.baseline(0);
-                barPlot.animate(false);
-                var yAxis = new Plottable.Axis.Category(yScale, "left");
-                barPlot.project("x", "x", xScale);
-                barPlot.project("y", "y", yScale);
-                new Plottable.Component.Table([[yAxis, barPlot]]).renderTo(svg);
-                axisWidth = yAxis.width();
-                bandWidth = yScale.rangeBand();
-                xScale.domainer(xScale.domainer().pad(0));
-            });
-            it("renders correctly", function () {
-                var bars = barPlot._renderArea.selectAll("rect");
-                var bar0 = d3.select(bars[0][0]);
-                var bar1 = d3.select(bars[0][1]);
-                var bar0y = bar0.data()[0].y;
-                var bar1y = bar1.data()[0].y;
-                assert.closeTo(numAttr(bar0, "height"), 104, 2);
-                assert.closeTo(numAttr(bar1, "height"), 104, 2);
-                assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "width is correct for bar0");
-                assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "width is correct for bar1");
-                // check that bar is aligned on the center of the scale
-                assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "y pos correct for bar0");
-                assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "y pos correct for bar1");
-                svg.remove();
-            });
             it("width projector may be overwritten, and calling project queues rerender", function () {
                 var bars = barPlot._renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
@@ -2803,10 +2693,10 @@ describe("Plots", function () {
                 barPlot.project("width", 10);
                 assert.closeTo(numAttr(bar0, "height"), 10, 0.01, "bar0 height");
                 assert.closeTo(numAttr(bar1, "height"), 10, 0.01, "bar1 height");
-                assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "bar0 width");
-                assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "bar1 width");
-                assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "bar0 ypos");
-                assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "bar1 ypos");
+                assert.closeTo(numAttr(bar0, "width"), 100, 0.01, "bar0 width");
+                assert.closeTo(numAttr(bar1, "width"), 150, 0.01, "bar1 width");
+                assert.closeTo(numAttr(bar0, "y"), yScale.scale(bar0y) - numAttr(bar0, "height") / 2, 0.01, "bar0 ypos");
+                assert.closeTo(numAttr(bar1, "y"), yScale.scale(bar1y) - numAttr(bar1, "height") / 2, 0.01, "bar1 ypos");
                 svg.remove();
             });
         });
@@ -3840,10 +3730,10 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight) / 3 * 2, 0.01, "height is correct for bar2");
             assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 3, 0.01, "height is correct for bar3");
             // check that bar is aligned on the center of the scale
-            assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) + bandWidth / 2, 0.01, "x pos correct for bar0");
-            assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2, 0.01, "x pos correct for bar1");
-            assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2, 0.01, "x pos correct for bar2");
-            assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2, 0.01, "x pos correct for bar3");
+            assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X), 0.01, "x pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X), 0.01, "x pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X), 0.01, "x pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X), 0.01, "x pos correct for bar3");
             // now check y values to ensure they do indeed stack
             assert.closeTo(numAttr(bar0, "y"), (400 - axisHeight) / 3 * 2, 0.01, "y is correct for bar0");
             assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 3, 0.01, "y is correct for bar1");
@@ -3975,10 +3865,10 @@ describe("Plots", function () {
             var bar2Y = bar2.data()[0].name;
             var bar3Y = bar3.data()[0].name;
             // check that bar is aligned on the center of the scale
-            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2, 0.01, "y pos correct for bar0");
-            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2, 0.01, "y pos correct for bar1");
-            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + bandWidth / 2, 0.01, "y pos correct for bar2");
-            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + bandWidth / 2, 0.01, "y pos correct for bar3");
+            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y), 0.01, "y pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y), 0.01, "y pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y), 0.01, "y pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y), 0.01, "y pos correct for bar3");
             // now check x values to ensure they do indeed stack
             assert.closeTo(numAttr(bar0, "x"), 0, 0.01, "x is correct for bar0");
             assert.closeTo(numAttr(bar1, "x"), 0, 0.01, "x is correct for bar1");
@@ -4098,54 +3988,22 @@ describe("Plots", function () {
             var bar2X = bar2.data()[0].x;
             var bar3X = bar3.data()[0].x;
             // check widths
-            var width = bandWidth / 2 * .518;
-            assert.closeTo(numAttr(bar0, "width"), width, 2);
-            assert.closeTo(numAttr(bar1, "width"), width, 2);
-            assert.closeTo(numAttr(bar2, "width"), width, 2);
-            assert.closeTo(numAttr(bar3, "width"), width, 2);
+            assert.closeTo(numAttr(bar0, "width"), 40, 2);
+            assert.closeTo(numAttr(bar1, "width"), 40, 2);
+            assert.closeTo(numAttr(bar2, "width"), 40, 2);
+            assert.closeTo(numAttr(bar3, "width"), 40, 2);
             // check heights
             assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar0");
             assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight), 0.01, "height is correct for bar1");
             assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight), 0.01, "height is correct for bar2");
             assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
             // check that clustering is correct
-            var off = renderer._makeInnerScale().scale("_0");
-            assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) + bandWidth / 2 - off, 0.01, "x pos correct for bar0");
-            assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2 - off, 0.01, "x pos correct for bar1");
-            assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2 + off, 0.01, "x pos correct for bar2");
-            assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2 + off, 0.01, "x pos correct for bar3");
-            assert.deepEqual(dataset1.data(), originalData1, "underlying data is not modified");
-            assert.deepEqual(dataset2.data(), originalData2, "underlying data is not modified");
-            svg.remove();
-        });
-        it("renders correctly under points mode", function () {
-            xScale.rangeType("points");
-            var bars = renderer.getAllSelections();
-            var bar0 = d3.select(bars[0][0]);
-            var bar1 = d3.select(bars[0][1]);
-            var bar2 = d3.select(bars[0][2]);
-            var bar3 = d3.select(bars[0][3]);
-            var bar0X = bar0.data()[0].x;
-            var bar1X = bar1.data()[0].x;
-            var bar2X = bar2.data()[0].x;
-            var bar3X = bar3.data()[0].x;
-            // check widths
-            var width = renderer._getBarPixelWidth() / 2 * .518;
-            assert.closeTo(numAttr(bar0, "width"), width, 2);
-            assert.closeTo(numAttr(bar1, "width"), width, 2);
-            assert.closeTo(numAttr(bar2, "width"), width, 2);
-            assert.closeTo(numAttr(bar3, "width"), width, 2);
-            // check heights
-            assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar0");
-            assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight), 0.01, "height is correct for bar1");
-            assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight), 0.01, "height is correct for bar2");
-            assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
-            // check that clustering is correct
-            var off = renderer._makeInnerScale().scale("_0");
-            assert.closeTo(numAttr(bar0, "x"), xScale.scale(bar0X) - width / 2 - off, 0.1, "x pos correct for bar0");
-            assert.closeTo(numAttr(bar1, "x"), xScale.scale(bar1X) - width / 2 - off, 0.1, "x pos correct for bar1");
-            assert.closeTo(numAttr(bar2, "x"), xScale.scale(bar2X) - width / 2 + off, 0.1, "x pos correct for bar2");
-            assert.closeTo(numAttr(bar3, "x"), xScale.scale(bar3X) - width / 2 + off, 0.1, "x pos correct for bar3");
+            var innerScale = renderer._makeInnerScale();
+            var off = innerScale.scale("_0");
+            assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) - xScale.rangeBand() / 2 + off, 0.01, "x pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) - xScale.rangeBand() / 2 + off, 0.01, "x pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + xScale.rangeBand() / 2 - off, 0.01, "x pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + xScale.rangeBand() / 2 - off, 0.01, "x pos correct for bar3");
             assert.deepEqual(dataset1.data(), originalData1, "underlying data is not modified");
             assert.deepEqual(dataset2.data(), originalData2, "underlying data is not modified");
             svg.remove();
@@ -4194,11 +4052,10 @@ describe("Plots", function () {
             var bar2 = d3.select(bars[0][2]);
             var bar3 = d3.select(bars[0][3]);
             // check widths
-            var width = bandWidth / 2 * .518;
-            assert.closeTo(numAttr(bar0, "height"), width, 2, "height is correct for bar0");
-            assert.closeTo(numAttr(bar1, "height"), width, 2, "height is correct for bar1");
-            assert.closeTo(numAttr(bar2, "height"), width, 2, "height is correct for bar2");
-            assert.closeTo(numAttr(bar3, "height"), width, 2, "height is correct for bar3");
+            assert.closeTo(numAttr(bar0, "height"), 26, 2, "height is correct for bar0");
+            assert.closeTo(numAttr(bar1, "height"), 26, 2, "height is correct for bar1");
+            assert.closeTo(numAttr(bar2, "height"), 26, 2, "height is correct for bar2");
+            assert.closeTo(numAttr(bar3, "height"), 26, 2, "height is correct for bar3");
             // check heights
             assert.closeTo(numAttr(bar0, "width"), rendererWidth / 2, 0.01, "width is correct for bar0");
             assert.closeTo(numAttr(bar1, "width"), rendererWidth, 0.01, "width is correct for bar1");
@@ -4209,11 +4066,12 @@ describe("Plots", function () {
             var bar2Y = bar2.data()[0].y;
             var bar3Y = bar3.data()[0].y;
             // check that clustering is correct
-            var off = renderer._makeInnerScale().scale("_0");
-            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar0");
-            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar1");
-            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + bandWidth / 2 + off, 0.01, "y pos correct for bar2");
-            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + bandWidth / 2 + off, 0.01, "y pos correct for bar3");
+            var innerScale = renderer._makeInnerScale();
+            var off = innerScale.scale("_0");
+            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) - yScale.rangeBand() / 2 + off, 0.01, "y pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) - yScale.rangeBand() / 2 + off, 0.01, "y pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + yScale.rangeBand() / 2 - off, 0.01, "y pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + yScale.rangeBand() / 2 - off, 0.01, "y pos correct for bar3");
             svg.remove();
         });
     });
@@ -5120,6 +4978,108 @@ describe("Component behavior", function () {
         assert.isTrue(renderFlag, "render occurs if width and height are positive");
         svg.remove();
     });
+    describe("origin methods", function () {
+        var cWidth = 100;
+        var cHeight = 100;
+        it("origin() (top-level component)", function () {
+            fixComponentSize(c, cWidth, cHeight);
+            c.renderTo(svg);
+            c.xAlign("left").yAlign("top");
+            var origin = c.origin();
+            assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
+            assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
+            c.xAlign("center").yAlign("center");
+            origin = c.origin();
+            assert.strictEqual(origin.x, (SVG_WIDTH - cWidth) / 2, "returns correct value (xAlign center)");
+            assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight) / 2, "returns correct value (yAlign center)");
+            c.xAlign("right").yAlign("bottom");
+            origin = c.origin();
+            assert.strictEqual(origin.x, SVG_WIDTH - cWidth, "returns correct value (xAlign right)");
+            assert.strictEqual(origin.y, SVG_HEIGHT - cHeight, "returns correct value (yAlign bottom)");
+            c.xAlign("left").yAlign("top");
+            var xOffsetValue = 40;
+            var yOffsetValue = 30;
+            c.xOffset(xOffsetValue);
+            c.yOffset(yOffsetValue);
+            origin = c.origin();
+            assert.strictEqual(origin.x, xOffsetValue, "accounts for xOffset");
+            assert.strictEqual(origin.y, yOffsetValue, "accounts for yOffset");
+            svg.remove();
+        });
+        it("origin() (nested)", function () {
+            fixComponentSize(c, cWidth, cHeight);
+            var group = new Plottable.Component.Group([c]);
+            var groupXOffset = 40;
+            var groupYOffset = 30;
+            group.xOffset(groupXOffset);
+            group.yOffset(groupYOffset);
+            group.renderTo(svg);
+            var groupWidth = group.width();
+            var groupHeight = group.height();
+            c.xAlign("left").yAlign("top");
+            var origin = c.origin();
+            assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
+            assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
+            c.xAlign("center").yAlign("center");
+            origin = c.origin();
+            assert.strictEqual(origin.x, (groupWidth - cWidth) / 2, "returns correct value (xAlign center)");
+            assert.strictEqual(origin.y, (groupHeight - cHeight) / 2, "returns correct value (yAlign center)");
+            c.xAlign("right").yAlign("bottom");
+            origin = c.origin();
+            assert.strictEqual(origin.x, groupWidth - cWidth, "returns correct value (xAlign right)");
+            assert.strictEqual(origin.y, groupHeight - cHeight, "returns correct value (yAlign bottom)");
+            svg.remove();
+        });
+        it("originToSVG() (top-level component)", function () {
+            fixComponentSize(c, cWidth, cHeight);
+            c.renderTo(svg);
+            c.xAlign("left").yAlign("top");
+            var origin = c.originToSVG();
+            assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
+            assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
+            c.xAlign("center").yAlign("center");
+            origin = c.originToSVG();
+            assert.strictEqual(origin.x, (SVG_WIDTH - cWidth) / 2, "returns correct value (xAlign center)");
+            assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight) / 2, "returns correct value (yAlign center)");
+            c.xAlign("right").yAlign("bottom");
+            origin = c.originToSVG();
+            assert.strictEqual(origin.x, SVG_WIDTH - cWidth, "returns correct value (xAlign right)");
+            assert.strictEqual(origin.y, SVG_HEIGHT - cHeight, "returns correct value (yAlign bottom)");
+            c.xAlign("left").yAlign("top");
+            var xOffsetValue = 40;
+            var yOffsetValue = 30;
+            c.xOffset(xOffsetValue);
+            c.yOffset(yOffsetValue);
+            origin = c.originToSVG();
+            assert.strictEqual(origin.x, xOffsetValue, "accounts for xOffset");
+            assert.strictEqual(origin.y, yOffsetValue, "accounts for yOffset");
+            svg.remove();
+        });
+        it("originToSVG() (nested)", function () {
+            fixComponentSize(c, cWidth, cHeight);
+            var group = new Plottable.Component.Group([c]);
+            var groupXOffset = 40;
+            var groupYOffset = 30;
+            group.xOffset(groupXOffset);
+            group.yOffset(groupYOffset);
+            group.renderTo(svg);
+            var groupWidth = group.width();
+            var groupHeight = group.height();
+            c.xAlign("left").yAlign("top");
+            var origin = c.originToSVG();
+            assert.strictEqual(origin.x, groupXOffset, "returns correct value (xAlign left)");
+            assert.strictEqual(origin.y, groupYOffset, "returns correct value (yAlign top)");
+            c.xAlign("center").yAlign("center");
+            origin = c.originToSVG();
+            assert.strictEqual(origin.x, (groupWidth - cWidth) / 2 + groupXOffset, "returns correct value (xAlign center)");
+            assert.strictEqual(origin.y, (groupHeight - cHeight) / 2 + groupYOffset, "returns correct value (yAlign center)");
+            c.xAlign("right").yAlign("bottom");
+            origin = c.originToSVG();
+            assert.strictEqual(origin.x, groupWidth - cWidth + groupXOffset, "returns correct value (xAlign right)");
+            assert.strictEqual(origin.y, groupHeight - cHeight + groupYOffset, "returns correct value (yAlign bottom)");
+            svg.remove();
+        });
+    });
     describe("resizeBroadcaster testing", function () {
         var oldRegister;
         var oldDeregister;
@@ -5884,45 +5844,13 @@ describe("Scales", function () {
         });
     });
     describe("Ordinal Scales", function () {
-        it("defaults to \"bands\" range type", function () {
+        it("rangeBand is updated when domain changes", function () {
             var scale = new Plottable.Scale.Ordinal();
-            assert.deepEqual(scale.rangeType(), "bands");
-        });
-        it("rangeBand returns 0 when in \"points\" mode", function () {
-            var scale = new Plottable.Scale.Ordinal().rangeType("points");
-            assert.deepEqual(scale.rangeType(), "points");
-            assert.deepEqual(scale.rangeBand(), 0);
-        });
-        it("rangeBand is updated when domain changes in \"bands\" mode", function () {
-            var scale = new Plottable.Scale.Ordinal();
-            scale.rangeType("bands");
-            assert.deepEqual(scale.rangeType(), "bands");
             scale.range([0, 2679]);
             scale.domain(["1", "2", "3", "4"]);
-            assert.deepEqual(scale.rangeBand(), 399);
+            assert.closeTo(scale.rangeBand(), 399, 1);
             scale.domain(["1", "2", "3", "4", "5"]);
-            assert.deepEqual(scale.rangeBand(), 329);
-        });
-        it("rangeBand is updated when mode is changed", function () {
-            var scale = new Plottable.Scale.Ordinal();
-            scale.rangeType("bands");
-            assert.deepEqual(scale.rangeType(), "bands");
-            scale.range([0, 2679]);
-            scale.domain(["1", "2", "3", "4"]);
-            assert.deepEqual(scale.rangeBand(), 399);
-            scale.rangeType("points");
-            assert.deepEqual(scale.rangeBand(), 0, "Band width should be 0 in points mode");
-        });
-        it("rangeType triggers broadcast", function () {
-            var scale = new Plottable.Scale.Ordinal();
-            var callbackWasCalled = false;
-            var testCallback = function (listenable) {
-                assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
-                callbackWasCalled = true;
-            };
-            scale.broadcaster.registerListener(null, testCallback);
-            scale.rangeType("points");
-            assert.isTrue(callbackWasCalled, "The registered callback was called");
+            assert.closeTo(scale.rangeBand(), 329, 1);
         });
     });
     it("OrdinalScale + BarPlot combo works as expected when the data is swapped", function () {

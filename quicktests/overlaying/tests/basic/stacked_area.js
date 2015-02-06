@@ -15,8 +15,6 @@ function run(svg, data, Plottable) {
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  xScale.rangeType("points");
-
   // if (!Plottable.Plot.Area) {
   //   return;
   // }

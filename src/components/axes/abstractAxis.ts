@@ -116,8 +116,8 @@ export module Axis {
       this._render();
     }
 
-    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
       if (this._isHorizontal()) {
         this._scale.range([0, this.width()]);
       } else {
@@ -455,29 +455,33 @@ export module Axis {
     }
 
     protected _hideEndTickLabels() {
-      var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
-
-      var isInsideBBox = (tickBox: ClientRect) => {
-        return (
-          Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
-          Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
-          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.width()) &&
-          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.height())
-        );
-      };
-
+      var boundingBox = this._boundingBox.node().getBoundingClientRect();
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
       if (tickLabels[0].length === 0) {
         return;
       }
       var firstTickLabel = tickLabels[0][0];
-      if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
+      if (!_Util.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(firstTickLabel).style("visibility", "hidden");
       }
       var lastTickLabel = tickLabels[0][tickLabels[0].length-1];
-      if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
+      if (!_Util.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(lastTickLabel).style("visibility", "hidden");
       }
+    }
+
+    // Responsible for hiding any tick labels that break out of the bounding container
+    protected _hideOverflowingTickLabels() {
+      var boundingBox = this._boundingBox.node().getBoundingClientRect();
+      var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
+      if (tickLabels.empty()) {
+        return;
+      }
+      tickLabels.each(function(d: any, i: number) {
+        if (!_Util.DOM.boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+          d3.select(this).style("visibility", "hidden");
+        }
+      });
     }
 
     protected _hideOverlappingTickLabels() {
@@ -488,16 +492,36 @@ export module Axis {
                                     });
       var lastLabelClientRect: ClientRect;
 
-      visibleTickLabels.each(function (d: any) {
-        var clientRect = this.getBoundingClientRect();
+      var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
+      var interval = 1;
+
+      while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
+        interval += 1;
+      }
+
+      visibleTickLabels.each(function (d: string, i: number) {
         var tickLabel = d3.select(this);
-        if (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
+        if (i % interval !== 0) {
           tickLabel.style("visibility", "hidden");
-        } else {
-          lastLabelClientRect = clientRect;
-          tickLabel.style("visibility", "visible");
         }
       });
+    }
+
+    private _hasOverlapWithInterval(interval: number, rects: ClientRect[]): boolean {
+      for (var i = 0; i < rects.length - (interval); i += interval) {
+        var currRect = rects[i];
+        var nextRect = rects[i + interval];
+        if (this._isHorizontal()) {
+          if (currRect.right + this._tickLabelPadding >= nextRect.left) {
+            return false;
+          }
+        } else {
+          if (currRect.top - this._tickLabelPadding <= nextRect.bottom) {
+            return false;
+          }
+        }
+      }
+      return true;
     }
   }
 }

@@ -1269,33 +1269,58 @@ declare module Plottable {
             range(): number[];
             range(values: number[]): Ordinal;
             /**
-             * Returns the width of the range band. Only valid when rangeType is set to "bands".
+             * Returns the width of the range band.
              *
-             * @returns {number} The range band width or 0 if rangeType isn't "bands".
+             * @returns {number} The range band width
              */
             rangeBand(): number;
+            /**
+             * Returns the full band width of the scale.
+             *
+             * The full band width is defined as the entire space for a band to occupy,
+             * not accounting for any padding in between the bands.
+             *
+             * @returns {number} the full band width of the scale
+             */
+            fullBandWidth(): number;
+            /**
+             * Returns the inner padding of the scale.
+             *
+             * The inner padding is defined as the padding in between bands on the scale.
+             * Units are a proportion of the band width (value returned by rangeBand()).
+             *
+             * @returns {number} The inner padding of the scale
+             */
             innerPadding(): number;
-            fullBandStartAndWidth(v: string): number[];
             /**
-             * Get the range type.
+             * Sets the inner padding of the scale.
              *
-             * @returns {string} The current range type.
+             * The inner padding of the scale is defined as the padding in between bands on the scale.
+             * Units are a proportion of the band width (value returned by rangeBand()).
+             *
+             * @returns {Ordinal} The calling Scale.Ordinal
              */
-            rangeType(): string;
+            innerPadding(innerPadding: number): Ordinal;
             /**
-             * Set the range type.
+             * Returns the outer padding of the scale.
              *
-             * @param {string} rangeType If provided, either "points" or "bands" indicating the
-             *     d3 method used to generate range bounds.
-             * @param {number} [outerPadding] If provided, the padding outside the range,
-             *     proportional to the range step.
-             * @param {number} [innerPadding] If provided, the padding between bands in the range,
-             *     proportional to the range step. This parameter is only used in
-             *     "bands" type ranges.
-             * @returns {Ordinal} The calling Ordinal.
+             * The outer padding is defined as the padding in between the outer bands and the edges on the scale.
+             * Units are a proportion of the band width (value returned by rangeBand()).
+             *
+             * @returns {number} The outer padding of the scale
              */
-            rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): Ordinal;
+            outerPadding(): number;
+            /**
+             * Sets the outer padding of the scale.
+             *
+             * The inner padding of the scale is defined as the padding in between bands on the scale.
+             * Units are a proportion of the band width (value returned by rangeBand()).
+             *
+             * @returns {Ordinal} The calling Scale.Ordinal
+             */
+            outerPadding(outerPadding: number): Ordinal;
             copy(): Ordinal;
+            scale(value: string): number;
         }
     }
 }
@@ -1601,6 +1626,7 @@ declare module Plottable {
             static AUTORESIZE_BY_DEFAULT: boolean;
             protected _element: D3.Selection;
             protected _content: D3.Selection;
+            protected _boundingBox: D3.Selection;
             clipPathEnabled: boolean;
             _parent: AbstractComponentContainer;
             protected _fixedHeightFlag: boolean;
@@ -1622,15 +1648,15 @@ declare module Plottable {
             _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
             /**
              * Computes the size, position, and alignment from the specified values.
-             * If no parameters are supplied and the component is a root node,
-             * they are inferred from the size of the component's element.
+             * If no parameters are supplied and the Component is a root node,
+             * they are inferred from the size of the Component's element.
              *
-             * @param {number} xOrigin x-coordinate of the origin of the component
-             * @param {number} yOrigin y-coordinate of the origin of the component
-             * @param {number} availableWidth available width for the component to render in
-             * @param {number} availableHeight available height for the component to render in
+             * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
+             * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
+             * @param {number} availableWidth available width for the Component to render in
+             * @param {number} availableHeight available height for the Component to render in
              */
-            _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             _render(): void;
             _doRender(): void;
             _useLastCalculatedLayout(): boolean;
@@ -1779,6 +1805,18 @@ declare module Plottable {
              */
             height(): number;
             /**
+             * Gets the origin of the Component relative to its parent.
+             *
+             * @return {Point} The x-y position of the Component relative to its parent.
+             */
+            origin(): Point;
+            /**
+             * Gets the origin of the Component relative to the root <svg>.
+             *
+             * @return {Point} The x-y position of the Component relative to the root <svg>
+             */
+            originToSVG(): Point;
+            /**
              * Returns the foreground selection for the component
              * (A selection covering the front of the component)
              *
@@ -1860,7 +1898,7 @@ declare module Plottable {
             constructor(components?: AbstractComponent[]);
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             merge(c: AbstractComponent): Group;
-            _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
             _isFixedWidth(): boolean;
             _isFixedHeight(): boolean;
         }
@@ -1909,7 +1947,7 @@ declare module Plottable {
             _isFixedHeight(): boolean;
             _isFixedWidth(): boolean;
             protected _rescale(): void;
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             protected _setup(): void;
             protected _getTickValues(): any[];
             _doRender(): void;
@@ -2032,6 +2070,7 @@ declare module Plottable {
              */
             showEndTickLabels(show: boolean): AbstractAxis;
             protected _hideEndTickLabels(): void;
+            protected _hideOverflowingTickLabels(): void;
             protected _hideOverlappingTickLabels(): void;
         }
     }
@@ -2199,7 +2238,7 @@ declare module Plottable {
              */
             tickLabelAngle(): number;
             _doRender(): Category;
-            _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
         }
     }
 }
@@ -2494,7 +2533,7 @@ declare module Plottable {
             addComponent(row: number, col: number, component: AbstractComponent): Table;
             _removeComponent(component: AbstractComponent): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             /**
              * Sets the row and column padding on the Table.
              *
@@ -2722,7 +2761,7 @@ declare module Plottable {
              * @constructor
              */
             constructor();
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             addDataset(keyOrDataset: any, dataset?: any): Pie;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): _Drawer.AbstractDrawer;
@@ -2773,7 +2812,7 @@ declare module Plottable {
              */
             automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y>;
             protected _generateAttrToProjector(): AttributeToProjector;
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
+            _computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number): void;
             protected _updateXDomainer(): void;
             protected _updateYDomainer(): void;
             /**

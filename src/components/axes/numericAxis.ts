@@ -190,6 +190,7 @@ export module Axis {
         this._hideEndTickLabels();
       }
 
+      this._hideOverflowingTickLabels();
       this._hideOverlappingTickLabels();
     }
 

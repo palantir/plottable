@@ -11,7 +11,6 @@ function run(svg, data, Plottable) {
   "use strict";
 
     var xScale = new Plottable.Scale.Ordinal();
-        xScale.rangeType("points");
     var yScale = new Plottable.Scale.Linear();
     var colorScale = new Plottable.Scale.Color();
 
