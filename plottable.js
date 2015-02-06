@@ -8169,6 +8169,12 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Animator;
+    (function (Animator) {
+    })(Animator = Plottable.Animator || (Plottable.Animator = {}));
+})(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;

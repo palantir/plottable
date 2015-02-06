@@ -3233,9 +3233,9 @@ declare module Plottable {
              */
             getTiming(numberOfIterations: number): number;
         }
-        interface PlotAnimatorMap {
+        type PlotAnimatorMap = {
             [animatorKey: string]: PlotAnimator;
-        }
+        };
     }
 }
 
