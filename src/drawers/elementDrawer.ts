@@ -56,6 +56,10 @@ export module _Drawer {
       return drawSteps.reduce((data: any[], drawStep: AppliedDrawStep) =>
               this._filterDefinedData(data, drawStep.attrToProjector["defined"]), super._prepareData(data, drawSteps));
     }
+
+    public _getSelector(): string {
+      return this._svgElement;
+    }
   }
 }
 }

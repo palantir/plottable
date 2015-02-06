@@ -45,6 +45,27 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("the accessors properly access data, index, and metadata", () => {
+      var svg = generateSVG(400, 400);
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      var data = [{x: 0, y: 0}, {x: 1, y: 1}];
+      var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
+      var plot = new Plottable.Plot.Scatter(xScale, yScale)
+                                   .project("x", "x", xScale)
+                                   .project("y", "y", yScale)
+                                   .addDataset(data)
+                                   .addDataset(data2);
+      plot.renderTo(svg);
+      var allCircles = plot.getAllSelections();
+      assert.strictEqual(allCircles.size(), 4, "all circles retrieved");
+      var selectionData = allCircles.data();
+      assert.includeMembers(selectionData, data, "first dataset data in selection data");
+      assert.includeMembers(selectionData, data2, "second dataset data in selection data");
+
+      svg.remove();
+    });
+
     it("_getClosestStruckPoint()", () => {
       var svg = generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();

@@ -271,6 +271,7 @@ declare module Plottable {
             function getSVGPixelWidth(svg: D3.Selection): number;
             function translate(s: D3.Selection, x?: number, y?: number): any;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
+            function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
         }
     }
 }
@@ -1538,6 +1539,7 @@ declare module Plottable {
              * @returns {D3.Selection} the renderArea selection
              */
             _getRenderArea(): D3.Selection;
+            _getSelector(): string;
         }
     }
 }
@@ -1550,6 +1552,7 @@ declare module Plottable {
             setup(area: D3.Selection): void;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
+            _getSelector(): string;
         }
     }
 }
@@ -1567,6 +1570,7 @@ declare module Plottable {
             drawLine(draw: boolean): Area;
             setup(area: D3.Selection): void;
             protected _drawStep(step: AppliedDrawStep): void;
+            _getSelector(): string;
         }
     }
 }
@@ -1586,6 +1590,7 @@ declare module Plottable {
             protected _enterData(data: any[]): void;
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
+            _getSelector(): string;
         }
     }
 }
@@ -1621,6 +1626,7 @@ declare module Plottable {
             static AUTORESIZE_BY_DEFAULT: boolean;
             protected _element: D3.Selection;
             protected _content: D3.Selection;
+            protected _boundingBox: D3.Selection;
             clipPathEnabled: boolean;
             _parent: AbstractComponentContainer;
             protected _fixedHeightFlag: boolean;
@@ -1642,15 +1648,15 @@ declare module Plottable {
             _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
             /**
              * Computes the size, position, and alignment from the specified values.
-             * If no parameters are supplied and the component is a root node,
-             * they are inferred from the size of the component's element.
+             * If no parameters are supplied and the Component is a root node,
+             * they are inferred from the size of the Component's element.
              *
-             * @param {number} xOrigin x-coordinate of the origin of the component
-             * @param {number} yOrigin y-coordinate of the origin of the component
-             * @param {number} availableWidth available width for the component to render in
-             * @param {number} availableHeight available height for the component to render in
+             * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
+             * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
+             * @param {number} availableWidth available width for the Component to render in
+             * @param {number} availableHeight available height for the Component to render in
              */
-            _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             _render(): void;
             _doRender(): void;
             _useLastCalculatedLayout(): boolean;
@@ -1799,6 +1805,18 @@ declare module Plottable {
              */
             height(): number;
             /**
+             * Gets the origin of the Component relative to its parent.
+             *
+             * @return {Point} The x-y position of the Component relative to its parent.
+             */
+            origin(): Point;
+            /**
+             * Gets the origin of the Component relative to the root <svg>.
+             *
+             * @return {Point} The x-y position of the Component relative to the root <svg>
+             */
+            originToSVG(): Point;
+            /**
              * Returns the foreground selection for the component
              * (A selection covering the front of the component)
              *
@@ -1880,7 +1898,7 @@ declare module Plottable {
             constructor(components?: AbstractComponent[]);
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             merge(c: AbstractComponent): Group;
-            _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
             _isFixedWidth(): boolean;
             _isFixedHeight(): boolean;
         }
@@ -1929,7 +1947,7 @@ declare module Plottable {
             _isFixedHeight(): boolean;
             _isFixedWidth(): boolean;
             protected _rescale(): void;
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             protected _setup(): void;
             protected _getTickValues(): any[];
             _doRender(): void;
@@ -2052,6 +2070,7 @@ declare module Plottable {
              */
             showEndTickLabels(show: boolean): AbstractAxis;
             protected _hideEndTickLabels(): void;
+            protected _hideOverflowingTickLabels(): void;
             protected _hideOverlappingTickLabels(): void;
         }
     }
@@ -2219,7 +2238,7 @@ declare module Plottable {
              */
             tickLabelAngle(): number;
             _doRender(): Category;
-            _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
         }
     }
 }
@@ -2395,6 +2414,62 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
+        class InterpolatedColorLegend extends AbstractComponent {
+            /**
+             * The css class applied to the legend labels.
+             */
+            static LEGEND_LABEL_CLASS: string;
+            /**
+             * Creates an InterpolatedColorLegend.
+             *
+             * The InterpolatedColorLegend consists of a sequence of swatches, showing the
+             * associated Scale.InterpolatedColor sampled at various points. Two labels
+             * show the maximum and minimum values of the Scale.InterpolatedColor.
+             *
+             * @constructor
+             * @param {Scale.InterpolatedColor} interpolatedColorScale
+             * @param {string} orientation (horizontal/left/right).
+             * @param {Formatter} The labels are formatted using this function.
+             */
+            constructor(interpolatedColorScale: Scale.InterpolatedColor, orientation?: string, formatter?: (d: any) => string);
+            remove(): void;
+            /**
+             * Gets the current formatter on the InterpolatedColorLegend.
+             *
+             * @returns {Formatter} The current Formatter.
+             */
+            formatter(): Formatter;
+            /**
+             * Sets the current formatter on the InterpolatedColorLegend.
+             *
+             * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
+             * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
+             */
+            formatter(formatter: Formatter): InterpolatedColorLegend;
+            /**
+             * Gets the orientation of the InterpolatedColorLegend.
+             *
+             * @returns {string} The current orientation.
+             */
+            orient(): string;
+            /**
+             * Sets the orientation of the InterpolatedColorLegend.
+             *
+             * @param {string} newOrientation The desired orientation (horizontal/left/right).
+             *
+             * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
+             */
+            orient(newOrientation: string): InterpolatedColorLegend;
+            protected _setup(): void;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            _doRender(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
         class Gridlines extends AbstractComponent {
             /**
              * Creates a set of Gridlines.
@@ -2458,7 +2533,7 @@ declare module Plottable {
             addComponent(row: number, col: number, component: AbstractComponent): Table;
             _removeComponent(component: AbstractComponent): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             /**
              * Sets the row and column padding on the Table.
              *
@@ -2671,6 +2746,7 @@ declare module Plottable {
              * @param {string} key The key of new dataset
              */
             protected _getPlotMetadataForDataset(key: string): PlotMetadata;
+            getAllSelections(): D3.Selection;
         }
     }
 }
@@ -2685,7 +2761,7 @@ declare module Plottable {
              * @constructor
              */
             constructor();
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             addDataset(keyOrDataset: any, dataset?: any): Pie;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): _Drawer.AbstractDrawer;
@@ -2736,7 +2812,7 @@ declare module Plottable {
              */
             automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y>;
             protected _generateAttrToProjector(): AttributeToProjector;
-            _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): void;
+            _computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number): void;
             protected _updateXDomainer(): void;
             protected _updateYDomainer(): void;
             /**
@@ -2885,12 +2961,6 @@ declare module Plottable {
              * @returns {Bar} The calling plot.
              */
             barLabelFormatter(formatter: Formatter): Bar<X, Y>;
-            /**
-             * Gets all the bars in the bar plot
-             *
-             * @returns {D3.Selection} All of the bars in the bar plot.
-             */
-            getAllBars(): D3.Selection;
             /**
              * Gets the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one

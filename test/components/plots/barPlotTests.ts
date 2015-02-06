@@ -146,7 +146,7 @@ describe("Plots", () => {
       });
 
       it("barPixelWidth calculated appropriately", () => {
-        assert.strictEqual((<any> barPlot)._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+        assert.strictEqual((<any> barPlot)._getBarPixelWidth(), xScale.scale(2) * 2 * 0.95);
         svg.remove();
       });
 
@@ -438,7 +438,7 @@ describe("Plots", () => {
       });
     });
 
-    describe("getAllBars()", () => {
+    describe("getAllSelections", () => {
       var verticalBarPlot: Plottable.Plot.Bar<string, number>;
       var dataset: Plottable.Dataset;
       var svg: D3.Selection;
@@ -453,21 +453,19 @@ describe("Plots", () => {
         verticalBarPlot.project("y", "y", yScale);
       });
 
-      it("getAllBars works in the normal case", () => {
-        dataset.data([{x: "foo", y: 5}, {x: "bar", y: 640}, {x: "zoo", y: 12345}]);
-        verticalBarPlot.addDataset(dataset);
+      it("getAllSelections retrieves correct selections",() => {
+        var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+        var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
+        verticalBarPlot.addDataset(barData);
+        verticalBarPlot.addDataset(barData2);
         verticalBarPlot.renderTo(svg);
-        var bars = verticalBarPlot.getAllBars();
-        assert.lengthOf(bars[0], 3, "three bars in the bar plot");
-        svg.remove();
-      });
 
+        var allBars = verticalBarPlot.getAllSelections();
+        assert.strictEqual(allBars.size(), 6, "all bars retrieved");
+        var selectionData = allBars.data();
+        assert.includeMembers(selectionData, barData, "first dataset data in selection data");
+        assert.includeMembers(selectionData, barData2, "second dataset data in selection data");
 
-      it("getAllBars returns 0 bars if there are no bars", () => {
-        verticalBarPlot.addDataset(dataset);
-        verticalBarPlot.renderTo(svg);
-        var bars = verticalBarPlot.getAllBars();
-        assert.lengthOf(bars[0], 0, "zero bars in the bar plot");
         svg.remove();
       });
 

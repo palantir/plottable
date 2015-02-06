@@ -562,6 +562,19 @@ describe("TimeAxis", function () {
         assert.deepEqual(configs[0].step, 4, "axis used new step");
         svg.remove();
     });
+    it("renders end ticks on either side", function () {
+        var width = 500;
+        var svg = generateSVG(width, 100);
+        scale.domain(["2010", "2014"]);
+        axis.renderTo(svg);
+        var firstTick = d3.select(".tick-mark");
+        assert.equal(firstTick.attr("x1"), 0, "xPos (x1) of first end tick is at the beginning of the axis container");
+        assert.equal(firstTick.attr("x2"), 0, "xPos (x2) of first end tick is at the beginning of the axis container");
+        var lastTick = d3.select(d3.selectAll(".tick-mark")[0].pop());
+        assert.equal(lastTick.attr("x1"), width, "xPos (x1) of last end tick is at the end of the axis container");
+        assert.equal(lastTick.attr("x2"), width, "xPos (x2) of last end tick is at the end of the axis container");
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -853,6 +866,44 @@ describe("NumericAxis", function () {
         d3.selectAll(".tick-label").each(function () {
             assertBBoxInclusion(labelContainer, d3.select(this));
         });
+        svg.remove();
+    });
+    it("confines labels to the bounding box for the axis", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        var axis = new Plottable.Axis.Numeric(scale, "bottom");
+        axis.formatter(function (d) { return "longstringsareverylong"; });
+        axis.renderTo(svg);
+        var boundingBox = d3.select(".x-axis .bounding-box");
+        d3.selectAll(".x-axis .tick-label").each(function () {
+            var tickLabel = d3.select(this);
+            if (tickLabel.style("visibility") === "visible") {
+                assertBBoxInclusion(boundingBox, tickLabel);
+            }
+        });
+        svg.remove();
+    });
+    function getClientRectCenter(rect) {
+        return rect.left + rect.width / 2;
+    }
+    it("tick labels follow a sensible interval", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.domain([-2500000, 2500000]);
+        var baseAxis = new Plottable.Axis.Numeric(scale, "bottom");
+        baseAxis.renderTo(svg);
+        var visibleTickLabels = baseAxis._element.selectAll(".tick-label").filter(function (d, i) {
+            return d3.select(this).style("visibility") === "visible";
+        });
+        var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
+        var interval = getClientRectCenter(visibleTickLabelRects[1]) - getClientRectCenter(visibleTickLabelRects[0]);
+        for (var i = 0; i < visibleTickLabelRects.length - 1; i++) {
+            assert.strictEqual(getClientRectCenter(visibleTickLabelRects[i + 1]) - getClientRectCenter(visibleTickLabelRects[i]), interval, "intervals are all spaced the same");
+        }
         svg.remove();
     });
 });
@@ -1150,20 +1201,22 @@ describe("Labels", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("Legends", function () {
+describe("Legend", function () {
     var svg;
     var color;
     var legend;
+    var entrySelector = "." + Plottable.Component.Legend.LEGEND_ENTRY_CLASS;
+    var rowSelector = "." + Plottable.Component.Legend.LEGEND_ROW_CLASS;
     beforeEach(function () {
         svg = generateSVG(400, 400);
-        color = new Plottable.Scale.Color("Category10");
-        legend = new Plottable.Component.Legend(color).maxEntriesPerRow(1);
+        color = new Plottable.Scale.Color();
+        legend = new Plottable.Component.Legend(color);
     });
     it("a basic legend renders", function () {
         color.domain(["foo", "bar", "baz"]);
         legend.renderTo(svg);
-        var rows = legend._content.selectAll(".legend-entry");
-        assert.lengthOf(rows[0], 3, "there are 3 legend entries");
+        var rows = legend._content.selectAll(entrySelector);
+        assert.lengthOf(rows[0], color.domain().length, "one entry is created for each item in the domain");
         rows.each(function (d, i) {
             assert.equal(d, color.domain()[i], "the data is set properly");
             var d3this = d3.select(this);
@@ -1186,7 +1239,7 @@ describe("Legends", function () {
         assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
         var actualHeight2 = legend.height();
         assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
-        var numRows = legend._content.selectAll(".legend-row")[0].length;
+        var numRows = legend._content.selectAll(rowSelector)[0].length;
         assert.equal(numRows, 3, "there are 3 rows");
         svg.remove();
     });
@@ -1216,10 +1269,10 @@ describe("Legends", function () {
     it("calling legend.render multiple times does not add more elements", function () {
         color.domain(["foo", "bar", "baz"]);
         legend.renderTo(svg);
-        var numRows = legend._content.selectAll(".legend-row")[0].length;
+        var numRows = legend._content.selectAll(rowSelector)[0].length;
         assert.equal(numRows, 3, "there are 3 legend rows initially");
         legend._render();
-        numRows = legend._content.selectAll(".legend-row")[0].length;
+        numRows = legend._content.selectAll(rowSelector)[0].length;
         assert.equal(numRows, 3, "there are 3 legend rows after second render");
         svg.remove();
     });
@@ -1228,14 +1281,14 @@ describe("Legends", function () {
         legend.renderTo(svg);
         var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
         color.domain(newDomain);
-        legend._content.selectAll(".legend-entry").each(function (d, i) {
+        legend._content.selectAll(entrySelector).each(function (d, i) {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
             var fill = d3.select(this).select("circle").attr("fill");
             assert.equal(fill, color.scale(d), "the fill was set properly");
         });
-        assert.lengthOf(legend._content.selectAll(".legend-row")[0], 5, "there are the right number of legend elements");
+        assert.lengthOf(legend._content.selectAll(rowSelector)[0], 5, "there are the right number of legend elements");
         svg.remove();
     });
     it("legend.scale() replaces domain", function () {
@@ -1245,7 +1298,7 @@ describe("Legends", function () {
         var newColorScale = new Plottable.Scale.Color("20");
         newColorScale.domain(newDomain);
         legend.scale(newColorScale);
-        legend._content.selectAll(".legend-entry").each(function (d, i) {
+        legend._content.selectAll(entrySelector).each(function (d, i) {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
@@ -1263,7 +1316,7 @@ describe("Legends", function () {
         legend.scale(newColorScale);
         var newDomain = ["a", "foo", "d"];
         newColorScale.domain(newDomain);
-        legend._content.selectAll(".legend-entry").each(function (d, i) {
+        legend._content.selectAll(entrySelector).each(function (d, i) {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
@@ -1272,7 +1325,7 @@ describe("Legends", function () {
         });
         svg.remove();
     });
-    it("iconHeight / 2 < circleHeight < iconHeight", function () {
+    it("scales icon sizes properly with font size (iconHeight / 2 < circleHeight < iconHeight)", function () {
         color.domain(["foo"]);
         legend.renderTo(svg);
         var style = legend._element.append("style");
@@ -1296,118 +1349,12 @@ describe("Legends", function () {
         verifyCircleHeight();
         svg.remove();
     });
-});
-describe("Legend", function () {
-    var colorScale;
-    var horizLegend;
-    var entrySelector = "." + Plottable.Component.Legend.LEGEND_ENTRY_CLASS;
-    var rowSelector = "." + Plottable.Component.Legend.LEGEND_ROW_CLASS;
-    beforeEach(function () {
-        colorScale = new Plottable.Scale.Color();
-        colorScale.domain([
-            "Washington",
-            "Adams",
-            "Jefferson",
-        ]);
-        horizLegend = new Plottable.Component.Legend(colorScale).maxEntriesPerRow(Infinity);
-    });
-    it("renders an entry for each item in the domain", function () {
-        var svg = generateSVG(400, 100);
-        horizLegend.renderTo(svg);
-        var entries = horizLegend._element.selectAll(entrySelector);
-        assert.equal(entries[0].length, colorScale.domain().length, "one entry is created for each item in the domain");
-        var elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
-        assert.deepEqual(elementTexts, colorScale.domain(), "entry texts match scale domain");
-        var newDomain = colorScale.domain();
-        newDomain.push("Madison");
-        colorScale.domain(newDomain);
-        entries = horizLegend._element.selectAll(entrySelector);
-        assert.equal(entries[0].length, colorScale.domain().length, "Legend updated to include item added to the domain");
-        svg.remove();
-    });
-    it("wraps entries onto extra rows if necessary", function () {
-        var svg = generateSVG(200, 100);
-        horizLegend.renderTo(svg);
-        var rows = horizLegend._element.selectAll(rowSelector);
-        assert.lengthOf(rows[0], 2, "Wrapped text on to two rows when space is constrained");
-        horizLegend.detach();
-        svg.remove();
-        svg = generateSVG(100, 100);
-        horizLegend.renderTo(svg);
-        rows = horizLegend._element.selectAll(rowSelector);
-        assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
-        svg.remove();
-    });
-    it("truncates and hides entries if space is constrained", function () {
-        var svg = generateSVG(70, 400);
-        horizLegend.renderTo(svg);
-        var textEls = horizLegend._element.selectAll("text");
-        textEls.each(function (d) {
-            var textEl = d3.select(this);
-            assertBBoxInclusion(horizLegend._element, textEl);
-        });
-        horizLegend.detach();
-        svg.remove();
-        svg = generateSVG(100, 50);
-        horizLegend.renderTo(svg);
-        textEls = horizLegend._element.selectAll("text");
-        textEls.each(function (d) {
-            var textEl = d3.select(this);
-            assertBBoxInclusion(horizLegend._element, textEl);
-        });
-        svg.remove();
-    });
-    it("scales icon size with entry font size", function () {
-        colorScale.domain(["A"]);
-        var svg = generateSVG(400, 100);
-        horizLegend.renderTo(svg);
-        var style = horizLegend._element.append("style");
-        style.attr("type", "text/css");
-        function verifyCircleHeight() {
-            var text = horizLegend._content.select("text");
-            var circle = horizLegend._content.select("circle");
-            var textHeight = Plottable._Util.DOM.getBBox(text).height;
-            var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
-            assert.operator(circleHeight, "<", textHeight, "Icon is smaller than entry text");
-            return circleHeight;
-        }
-        var origCircleHeight = verifyCircleHeight();
-        style.text(".plottable .legend text { font-size: 30px; }");
-        horizLegend._invalidateLayout();
-        var bigCircleHeight = verifyCircleHeight();
-        assert.operator(bigCircleHeight, ">", origCircleHeight, "icon size increased with font size");
-        style.text(".plottable .legend text { font-size: 6px; }");
-        horizLegend._invalidateLayout();
-        var smallCircleHeight = verifyCircleHeight();
-        assert.operator(smallCircleHeight, "<", origCircleHeight, "icon size decreased with font size");
-        svg.remove();
-    });
-    it("getEntry() horizontal", function () {
-        colorScale.domain(["AA", "BB", "CC"]);
-        var svg = generateSVG(300, 300);
-        horizLegend.renderTo(svg);
-        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
-        assert.deepEqual(horizLegend.getEntry({ x: 50, y: 10 }).data(), ["BB"], "get second entry");
-        assert.deepEqual(horizLegend.getEntry({ x: 150, y: 10 }), d3.select(), "no entries at location outside legend");
-        svg.remove();
-    });
-    it("getEntry() vertical", function () {
-        colorScale.domain(["AA", "BB", "CC"]);
-        var svg = generateSVG(300, 300);
-        horizLegend.maxEntriesPerRow(1);
-        horizLegend.renderTo(svg);
-        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
-        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 30 }).data(), ["BB"], "get second entry");
-        assert.deepEqual(horizLegend.getEntry({ x: 10, y: 150 }), d3.select(), "no entries at location outside legend");
-        svg.remove();
-    });
     it("maxEntriesPerRow() works as expected", function () {
-        colorScale.domain(["AA", "BB", "CC", "DD", "EE", "FF"]);
-        var svg = generateSVG(300, 300);
-        horizLegend.renderTo(svg);
+        color.domain(["AA", "BB", "CC", "DD", "EE", "FF"]);
+        legend.renderTo(svg);
         var verifyMaxEntriesInRow = function (n) {
-            horizLegend.maxEntriesPerRow(n);
-            var rows = horizLegend._element.selectAll(rowSelector);
+            legend.maxEntriesPerRow(n);
+            var rows = legend._element.selectAll(rowSelector);
             assert.lengthOf(rows[0], (6 / n), "number of rows is correct");
             rows.each(function (d) {
                 var entries = d3.select(this).selectAll(entrySelector);
@@ -1420,20 +1367,212 @@ describe("Legend", function () {
         verifyMaxEntriesInRow(6);
         svg.remove();
     });
+    it("wraps entries onto extra rows if necessary for horizontal legends", function () {
+        color.domain(["George Waaaaaashington", "John Adaaaams", "Thomaaaaas Jefferson"]);
+        legend.maxEntriesPerRow(Infinity);
+        legend.renderTo(svg);
+        var rows = legend._element.selectAll(rowSelector);
+        assert.lengthOf(rows[0], 2, "Wrapped text on to two rows when space is constrained");
+        legend.detach();
+        svg.remove();
+        svg = generateSVG(100, 100);
+        legend.renderTo(svg);
+        rows = legend._element.selectAll(rowSelector);
+        assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
+        svg.remove();
+    });
+    it("getEntry() retrieves the correct entry for vertical legends", function () {
+        color.domain(["AA", "BB", "CC"]);
+        legend.maxEntriesPerRow(1);
+        legend.renderTo(svg);
+        assert.deepEqual(legend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
+        assert.deepEqual(legend.getEntry({ x: 10, y: 30 }).data(), ["BB"], "get second entry");
+        assert.deepEqual(legend.getEntry({ x: 10, y: 150 }), d3.select(), "no entries at location outside legend");
+        svg.remove();
+    });
+    it("getEntry() retrieves the correct entry for horizontal legends", function () {
+        color.domain(["AA", "BB", "CC"]);
+        legend.maxEntriesPerRow(Infinity);
+        legend.renderTo(svg);
+        assert.deepEqual(legend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
+        assert.deepEqual(legend.getEntry({ x: 50, y: 10 }).data(), ["BB"], "get second entry");
+        assert.deepEqual(legend.getEntry({ x: 150, y: 10 }), d3.select(), "no entries at location outside legend");
+        svg.remove();
+    });
     it("sortFunction() works as expected", function () {
         var newDomain = ["F", "E", "D", "C", "B", "A"];
-        colorScale.domain(newDomain);
-        var svg = generateSVG(300, 300);
-        horizLegend.renderTo(svg);
-        var entries = horizLegend._element.selectAll(entrySelector);
+        color.domain(newDomain);
+        legend.renderTo(svg);
+        var entries = legend._element.selectAll(entrySelector);
         var elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
         assert.deepEqual(elementTexts, newDomain, "entry has not been sorted");
         var sortFn = function (a, b) { return a.localeCompare(b); };
-        horizLegend.sortFunction(sortFn);
-        entries = horizLegend._element.selectAll(entrySelector);
+        legend.sortFunction(sortFn);
+        entries = legend._element.selectAll(entrySelector);
         elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
         newDomain.sort(sortFn);
-        assert.deepEqual(elementTexts, newDomain, "entry has been sorted alfabetically");
+        assert.deepEqual(elementTexts, newDomain, "entry has been sorted alphabetically");
+        svg.remove();
+    });
+    it("truncates and hides entries if space is constrained for a horizontal legend", function () {
+        svg.remove();
+        svg = generateSVG(70, 400);
+        legend.maxEntriesPerRow(Infinity);
+        legend.renderTo(svg);
+        var textEls = legend._element.selectAll("text");
+        textEls.each(function (d) {
+            var textEl = d3.select(this);
+            assertBBoxInclusion(legend._element, textEl);
+        });
+        legend.detach();
+        svg.remove();
+        svg = generateSVG(100, 50);
+        legend.renderTo(svg);
+        textEls = legend._element.selectAll("text");
+        textEls.each(function (d) {
+            var textEl = d3.select(this);
+            assertBBoxInclusion(legend._element, textEl);
+        });
+        svg.remove();
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("InterpolatedColorLegend", function () {
+    var svg;
+    var colorScale;
+    beforeEach(function () {
+        svg = generateSVG(400, 400);
+        colorScale = new Plottable.Scale.InterpolatedColor();
+    });
+    function assertBasicRendering(legend) {
+        var scaleDomain = colorScale.domain();
+        var legendElement = legend._element;
+        var swatches = legendElement.selectAll(".swatch");
+        assert.strictEqual(d3.select(swatches[0][0]).attr("fill"), colorScale.scale(scaleDomain[0]), "first swatch's color corresponds with first domain value");
+        assert.strictEqual(d3.select(swatches[0][swatches[0].length - 1]).attr("fill"), colorScale.scale(scaleDomain[1]), "last swatch's color corresponds with second domain value");
+        var swatchContainer = legendElement.select(".swatch-container");
+        var swatchContainerBCR = swatchContainer.node().getBoundingClientRect();
+        var swatchBoundingBox = legendElement.select(".swatch-bounding-box");
+        var boundingBoxBCR = swatchBoundingBox.node().getBoundingClientRect();
+        assert.isTrue(Plottable._Util.DOM.boxIsInside(swatchContainerBCR, boundingBoxBCR), "bounding box contains all swatches");
+        var elementBCR = legendElement.node().getBoundingClientRect();
+        assert.isTrue(Plottable._Util.DOM.boxIsInside(swatchContainerBCR, elementBCR), "swatches are drawn within the legend's element");
+        var formattedDomainValues = scaleDomain.map(legend._formatter);
+        var labels = legendElement.selectAll("text");
+        var labelTexts = labels[0].map(function (textNode) { return textNode.textContent; });
+        assert.deepEqual(labelTexts, formattedDomainValues, "formatter is used to format label text");
+    }
+    it("renders correctly (orientation: horizontal)", function () {
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        legend.renderTo(svg);
+        assertBasicRendering(legend);
+        var legendElement = legend._element;
+        var labels = legendElement.selectAll("text");
+        var swatchContainer = legendElement.select(".swatch-container");
+        var swatchContainerBCR = swatchContainer.node().getBoundingClientRect();
+        var lowerLabelBCR = labels[0][0].getBoundingClientRect();
+        var upperLabelBCR = labels[0][1].getBoundingClientRect();
+        assert.operator(lowerLabelBCR.right, "<=", swatchContainerBCR.left, "first label to left of swatches");
+        assert.operator(swatchContainerBCR.right, "<=", upperLabelBCR.left, "second label to right of swatches");
+        svg.remove();
+    });
+    it("renders correctly (orientation: right)", function () {
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "right");
+        legend.renderTo(svg);
+        assertBasicRendering(legend);
+        var legendElement = legend._element;
+        var labels = legendElement.selectAll("text");
+        var swatchContainer = legendElement.select(".swatch-container");
+        var swatchContainerBCR = swatchContainer.node().getBoundingClientRect();
+        var lowerLabelBCR = labels[0][0].getBoundingClientRect();
+        var upperLabelBCR = labels[0][1].getBoundingClientRect();
+        assert.operator(swatchContainerBCR.right, "<=", lowerLabelBCR.left, "first label to right of swatches");
+        assert.operator(swatchContainerBCR.right, "<=", upperLabelBCR.left, "second label to right of swatches");
+        assert.operator(upperLabelBCR.bottom, "<=", lowerLabelBCR.top, "lower label is drawn below upper label");
+        svg.remove();
+    });
+    it("renders correctly (orientation: left)", function () {
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "left");
+        legend.renderTo(svg);
+        assertBasicRendering(legend);
+        var legendElement = legend._element;
+        var labels = legendElement.selectAll("text");
+        var swatchContainer = legendElement.select(".swatch-container");
+        var swatchContainerBCR = swatchContainer.node().getBoundingClientRect();
+        var lowerLabelBCR = labels[0][0].getBoundingClientRect();
+        var upperLabelBCR = labels[0][1].getBoundingClientRect();
+        assert.operator(lowerLabelBCR.left, "<=", swatchContainerBCR.left, "first label to left of swatches");
+        assert.operator(upperLabelBCR.left, "<=", swatchContainerBCR.left, "second label to left of swatches");
+        assert.operator(upperLabelBCR.bottom, "<=", lowerLabelBCR.top, "lower label is drawn below upper label");
+        svg.remove();
+    });
+    it("re-renders when scale domain updates", function () {
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        legend.renderTo(svg);
+        colorScale.domain([0, 85]);
+        assertBasicRendering(legend);
+        svg.remove();
+    });
+    it("orient() input-checking", function () {
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        legend.orient("horizontal"); // should work
+        legend.orient("right"); // should work
+        legend.orient("left"); // should work
+        assert.throws(function () { return legend.orient("blargh"); }, "not a valid orientation");
+        svg.remove();
+    });
+    it("orient() triggers layout computation", function () {
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        legend.renderTo(svg);
+        var widthBefore = legend.width();
+        var heightBefore = legend.height();
+        legend.orient("right");
+        assert.notEqual(legend.width(), widthBefore, "proportions changed (width)");
+        assert.notEqual(legend.height(), heightBefore, "proportions changed (height)");
+        svg.remove();
+    });
+    it("renders correctly when width is constrained (orientation: horizontal)", function () {
+        svg.attr("width", 100);
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        legend.renderTo(svg);
+        assertBasicRendering(legend);
+        svg.remove();
+    });
+    it("renders correctly when height is constrained (orientation: horizontal)", function () {
+        svg.attr("height", 20);
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        legend.renderTo(svg);
+        assertBasicRendering(legend);
+        svg.remove();
+    });
+    it("renders correctly when width is constrained (orientation: right)", function () {
+        svg.attr("width", 30);
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "right");
+        legend.renderTo(svg);
+        assertBasicRendering(legend);
+        svg.remove();
+    });
+    it("renders correctly when height is constrained (orientation: right)", function () {
+        svg.attr("height", 100);
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "right");
+        legend.renderTo(svg);
+        assertBasicRendering(legend);
+        svg.remove();
+    });
+    it("renders correctly when width is constrained (orientation: left)", function () {
+        svg.attr("width", 30);
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "left");
+        legend.renderTo(svg);
+        assertBasicRendering(legend);
+        svg.remove();
+    });
+    it("renders correctly when height is constrained (orientation: left)", function () {
+        svg.attr("height", 100);
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "left");
+        legend.renderTo(svg);
+        assertBasicRendering(legend);
         svg.remove();
     });
 });
@@ -1785,11 +1924,13 @@ describe("Plots", function () {
     describe("PiePlot", function () {
         var svg;
         var simpleDataset;
+        var simpleData;
         var piePlot;
         var renderArea;
         beforeEach(function () {
             svg = generateSVG(500, 500);
-            simpleDataset = new Plottable.Dataset([{ value: 5, value2: 10, type: "A" }, { value: 15, value2: 10, type: "B" }]);
+            simpleData = [{ value: 5, value2: 10, type: "A" }, { value: 15, value2: 10, type: "B" }];
+            simpleDataset = new Plottable.Dataset(simpleData);
             piePlot = new Plottable.Plot.Pie();
             piePlot.addDataset("simpleDataset", simpleDataset);
             piePlot.project("value", "value");
@@ -1876,6 +2017,13 @@ describe("Plots", function () {
             assert.closeTo(outerArcPath0[5], 150, 1, "makes outer arc to right edge");
             assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
             piePlot.project("outer-radius", function () { return 250; });
+            svg.remove();
+        });
+        it("getAllSelections retrieves correct selections", function () {
+            var allSectors = piePlot.getAllSelections();
+            assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
+            var selectionData = allSectors.data();
+            assert.includeMembers(selectionData.map(function (datum) { return datum.data; }), simpleData, "dataset data in selection data");
             svg.remove();
         });
         describe("Fill", function () {
@@ -2126,6 +2274,19 @@ describe("Plots", function () {
             assert.strictEqual(parseFloat(hoverTarget.attr("cy")), yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
             svg.remove();
         });
+        it("getAllSelections retrieves correct selections", function () {
+            var dataset3 = [
+                { foo: 0, bar: 1 },
+                { foo: 1, bar: 0.95 }
+            ];
+            linePlot.addDataset(dataset3);
+            var allLines = linePlot.getAllSelections();
+            assert.strictEqual(allLines.size(), 3, "all lines retrieved");
+            var selectionData = allLines.data();
+            assert.include(selectionData, twoPointData, "first dataset data in selection data");
+            assert.include(selectionData, dataset3, "third dataset data in selection data");
+            svg.remove();
+        });
     });
 });
 
@@ -2217,6 +2378,17 @@ describe("Plots", function () {
             simpleDataset.data(dataWithUndefined);
             areaPathString = normalizePath(areaPath.attr("d"));
             assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=undefined case)");
+            svg.remove();
+        });
+        it("getAllSelections retrieves correct selections", function () {
+            var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
+            var newDataset = new Plottable.Dataset(twoPointData);
+            areaPlot.addDataset(new Plottable.Dataset(newTwoPointData));
+            var allAreas = areaPlot.getAllSelections();
+            assert.strictEqual(allAreas.size(), 2, "all areas retrieved");
+            var selectionData = allAreas.data();
+            assert.include(selectionData, twoPointData, "first dataset data in selection data");
+            assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
             svg.remove();
         });
     });
@@ -2349,7 +2521,7 @@ describe("Plots", function () {
                 barPlot.renderTo(svg);
             });
             it("barPixelWidth calculated appropriately", function () {
-                assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+                assert.strictEqual(barPlot._getBarPixelWidth(), xScale.scale(2) * 2 * 0.95);
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
@@ -2601,7 +2773,7 @@ describe("Plots", function () {
                 assert.lengthOf(texts, 0, "texts were immediately removed");
             });
         });
-        describe("getAllBars()", function () {
+        describe("getAllSelections", function () {
             var verticalBarPlot;
             var dataset;
             var svg;
@@ -2614,19 +2786,17 @@ describe("Plots", function () {
                 verticalBarPlot.project("x", "x", xScale);
                 verticalBarPlot.project("y", "y", yScale);
             });
-            it("getAllBars works in the normal case", function () {
-                dataset.data([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
-                verticalBarPlot.addDataset(dataset);
+            it("getAllSelections retrieves correct selections", function () {
+                var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+                var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
+                verticalBarPlot.addDataset(barData);
+                verticalBarPlot.addDataset(barData2);
                 verticalBarPlot.renderTo(svg);
-                var bars = verticalBarPlot.getAllBars();
-                assert.lengthOf(bars[0], 3, "three bars in the bar plot");
-                svg.remove();
-            });
-            it("getAllBars returns 0 bars if there are no bars", function () {
-                verticalBarPlot.addDataset(dataset);
-                verticalBarPlot.renderTo(svg);
-                var bars = verticalBarPlot.getAllBars();
-                assert.lengthOf(bars[0], 0, "zero bars in the bar plot");
+                var allBars = verticalBarPlot.getAllSelections();
+                assert.strictEqual(allBars.size(), 6, "all bars retrieved");
+                var selectionData = allBars.data();
+                assert.includeMembers(selectionData, barData, "first dataset data in selection data");
+                assert.includeMembers(selectionData, barData2, "second dataset data in selection data");
                 svg.remove();
             });
         });
@@ -2739,6 +2909,20 @@ describe("Plots", function () {
             cellAV.attr("y", "100");
             svg.remove();
         });
+        it("getAllSelections retrieves correct selections", function () {
+            var xScale = new Plottable.Scale.Ordinal();
+            var yScale = new Plottable.Scale.Ordinal();
+            var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+            gridPlot.addDataset(DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
+            gridPlot.renderTo(svg);
+            var allCells = gridPlot.getAllSelections();
+            assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+            var selectionData = allCells.data();
+            assert.includeMembers(selectionData, DATA, "data in selection data");
+            svg.remove();
+        });
     });
 });
 
@@ -2779,6 +2963,21 @@ describe("Plots", function () {
             assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
             assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");
             assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
+            svg.remove();
+        });
+        it("the accessors properly access data, index, and metadata", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+            var data2 = [{ x: 1, y: 2 }, { x: 3, y: 4 }];
+            var plot = new Plottable.Plot.Scatter(xScale, yScale).project("x", "x", xScale).project("y", "y", yScale).addDataset(data).addDataset(data2);
+            plot.renderTo(svg);
+            var allCircles = plot.getAllSelections();
+            assert.strictEqual(allCircles.size(), 4, "all circles retrieved");
+            var selectionData = allCircles.data();
+            assert.includeMembers(selectionData, data, "first dataset data in selection data");
+            assert.includeMembers(selectionData, data2, "second dataset data in selection data");
             svg.remove();
         });
         it("_getClosestStruckPoint()", function () {
@@ -4778,6 +4977,108 @@ describe("Component behavior", function () {
         c._render();
         assert.isTrue(renderFlag, "render occurs if width and height are positive");
         svg.remove();
+    });
+    describe("origin methods", function () {
+        var cWidth = 100;
+        var cHeight = 100;
+        it("origin() (top-level component)", function () {
+            fixComponentSize(c, cWidth, cHeight);
+            c.renderTo(svg);
+            c.xAlign("left").yAlign("top");
+            var origin = c.origin();
+            assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
+            assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
+            c.xAlign("center").yAlign("center");
+            origin = c.origin();
+            assert.strictEqual(origin.x, (SVG_WIDTH - cWidth) / 2, "returns correct value (xAlign center)");
+            assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight) / 2, "returns correct value (yAlign center)");
+            c.xAlign("right").yAlign("bottom");
+            origin = c.origin();
+            assert.strictEqual(origin.x, SVG_WIDTH - cWidth, "returns correct value (xAlign right)");
+            assert.strictEqual(origin.y, SVG_HEIGHT - cHeight, "returns correct value (yAlign bottom)");
+            c.xAlign("left").yAlign("top");
+            var xOffsetValue = 40;
+            var yOffsetValue = 30;
+            c.xOffset(xOffsetValue);
+            c.yOffset(yOffsetValue);
+            origin = c.origin();
+            assert.strictEqual(origin.x, xOffsetValue, "accounts for xOffset");
+            assert.strictEqual(origin.y, yOffsetValue, "accounts for yOffset");
+            svg.remove();
+        });
+        it("origin() (nested)", function () {
+            fixComponentSize(c, cWidth, cHeight);
+            var group = new Plottable.Component.Group([c]);
+            var groupXOffset = 40;
+            var groupYOffset = 30;
+            group.xOffset(groupXOffset);
+            group.yOffset(groupYOffset);
+            group.renderTo(svg);
+            var groupWidth = group.width();
+            var groupHeight = group.height();
+            c.xAlign("left").yAlign("top");
+            var origin = c.origin();
+            assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
+            assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
+            c.xAlign("center").yAlign("center");
+            origin = c.origin();
+            assert.strictEqual(origin.x, (groupWidth - cWidth) / 2, "returns correct value (xAlign center)");
+            assert.strictEqual(origin.y, (groupHeight - cHeight) / 2, "returns correct value (yAlign center)");
+            c.xAlign("right").yAlign("bottom");
+            origin = c.origin();
+            assert.strictEqual(origin.x, groupWidth - cWidth, "returns correct value (xAlign right)");
+            assert.strictEqual(origin.y, groupHeight - cHeight, "returns correct value (yAlign bottom)");
+            svg.remove();
+        });
+        it("originToSVG() (top-level component)", function () {
+            fixComponentSize(c, cWidth, cHeight);
+            c.renderTo(svg);
+            c.xAlign("left").yAlign("top");
+            var origin = c.originToSVG();
+            assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
+            assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
+            c.xAlign("center").yAlign("center");
+            origin = c.originToSVG();
+            assert.strictEqual(origin.x, (SVG_WIDTH - cWidth) / 2, "returns correct value (xAlign center)");
+            assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight) / 2, "returns correct value (yAlign center)");
+            c.xAlign("right").yAlign("bottom");
+            origin = c.originToSVG();
+            assert.strictEqual(origin.x, SVG_WIDTH - cWidth, "returns correct value (xAlign right)");
+            assert.strictEqual(origin.y, SVG_HEIGHT - cHeight, "returns correct value (yAlign bottom)");
+            c.xAlign("left").yAlign("top");
+            var xOffsetValue = 40;
+            var yOffsetValue = 30;
+            c.xOffset(xOffsetValue);
+            c.yOffset(yOffsetValue);
+            origin = c.originToSVG();
+            assert.strictEqual(origin.x, xOffsetValue, "accounts for xOffset");
+            assert.strictEqual(origin.y, yOffsetValue, "accounts for yOffset");
+            svg.remove();
+        });
+        it("originToSVG() (nested)", function () {
+            fixComponentSize(c, cWidth, cHeight);
+            var group = new Plottable.Component.Group([c]);
+            var groupXOffset = 40;
+            var groupYOffset = 30;
+            group.xOffset(groupXOffset);
+            group.yOffset(groupYOffset);
+            group.renderTo(svg);
+            var groupWidth = group.width();
+            var groupHeight = group.height();
+            c.xAlign("left").yAlign("top");
+            var origin = c.originToSVG();
+            assert.strictEqual(origin.x, groupXOffset, "returns correct value (xAlign left)");
+            assert.strictEqual(origin.y, groupYOffset, "returns correct value (yAlign top)");
+            c.xAlign("center").yAlign("center");
+            origin = c.originToSVG();
+            assert.strictEqual(origin.x, (groupWidth - cWidth) / 2 + groupXOffset, "returns correct value (xAlign center)");
+            assert.strictEqual(origin.y, (groupHeight - cHeight) / 2 + groupYOffset, "returns correct value (yAlign center)");
+            c.xAlign("right").yAlign("bottom");
+            origin = c.originToSVG();
+            assert.strictEqual(origin.x, groupWidth - cWidth + groupXOffset, "returns correct value (xAlign right)");
+            assert.strictEqual(origin.y, groupHeight - cHeight + groupYOffset, "returns correct value (yAlign bottom)");
+            svg.remove();
+        });
     });
     describe("resizeBroadcaster testing", function () {
         var oldRegister;
