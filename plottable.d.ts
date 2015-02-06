@@ -2609,10 +2609,8 @@ declare module Plottable {
              * @param {any[]|Dataset} dataset dataset to add.
              * @returns {Plot} The calling Plot.
              */
-            addDataset(key: string, dataset: Dataset): AbstractPlot;
-            addDataset(key: string, dataset: any[]): AbstractPlot;
-            addDataset(dataset: Dataset): AbstractPlot;
-            addDataset(dataset: any[]): AbstractPlot;
+            addDataset(dataset: Dataset | any[]): AbstractPlot;
+            addDataset(key: string, dataset: Dataset | any[]): AbstractPlot;
             protected _getDrawer(key: string): _Drawer.AbstractDrawer;
             protected _getAnimator(key: string): Animator.PlotAnimator;
             protected _onDatasetUpdate(): void;

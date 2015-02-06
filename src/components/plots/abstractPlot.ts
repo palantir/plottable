@@ -85,10 +85,8 @@ export module Plot {
      * @param {any[]|Dataset} dataset dataset to add.
      * @returns {Plot} The calling Plot.
      */
-    public addDataset(key: string, dataset: Dataset): AbstractPlot;
-    public addDataset(key: string, dataset: any[]): AbstractPlot;
-    public addDataset(dataset: Dataset): AbstractPlot;
-    public addDataset(dataset: any[]): AbstractPlot;
+    public addDataset(dataset: Dataset | any[]): AbstractPlot;
+    public addDataset(key: string, dataset: Dataset | any[]): AbstractPlot;
     public addDataset(keyOrDataset: any, dataset?: any): AbstractPlot {
       if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
         throw new Error("invalid input to addDataset");
