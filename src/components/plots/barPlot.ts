@@ -160,11 +160,7 @@ export module Plot {
      * @param {any} yValOrExtent The pixel y position, or range of y values.
      * @returns {D3.Selection} The selected bar, or null if no bar was selected.
      */
-    public getBars(xValOrExtent: Extent, yValOrExtent: Extent): D3.Selection;
-    public getBars(xValOrExtent: number, yValOrExtent: Extent): D3.Selection;
-    public getBars(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
-    public getBars(xValOrExtent: number, yValOrExtent: number): D3.Selection;
-    public getBars(xValOrExtent: any, yValOrExtent: any): D3.Selection {
+    public getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection {
       if (!this._isSetup) {
         return d3.select();
       }
