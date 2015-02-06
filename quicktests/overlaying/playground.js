@@ -8,8 +8,9 @@
 	var timeXcatY = [{x: "5/2/2014", y: 'ducks'}, {x: "6/3/2014", y: 'swans'}, {x: "8/3/2014", y: 'sparrows'}];
 
 	chooseData = function(){
-		xAxisType = $("#xAxisType option:selected").text();
-		yAxisType = $("#yAxisType option:selected").text();		
+		"use strict";
+		var xAxisType = $("#xAxisType option:selected").text();
+		var yAxisType = $("#yAxisType option:selected").text();		
 		var data;
 		var pts;
 
@@ -58,6 +59,7 @@
 	};
 
 	choosePlot = function(xScale, yScale){
+		"use strict";
 		var plot_type = $("#plotType option:selected").text();
 		testCode = testCode + "\tvar plot = new Plottable.Plot.";
 		testCode = testCode + plot_type;
@@ -78,6 +80,7 @@
 	};
 
 	make_scale = function(axis){
+		"use strict";
 		var axisType, scaleType;
 		var scale;
 
@@ -118,6 +121,7 @@
 
 
 	make_axis = function(axis, scale, orientation){
+		"use strict";
 		var axisType, axisTypeString, params;
 		var axisObj;
 
@@ -158,10 +162,12 @@
 	};
 
 	testCode_init = function(){
+		"use strict";
 		testCode = "window.onload = function() {\n";
 	};
 
 	testCode_finish = function(){
+		"use strict";
 	    testCode = testCode + "\tvar table = new Plottable.Component.Table([[yAxis, plot],\n\t\t\t\t\t\t                                      [null, xAxis]])\n";
 	    testCode = testCode + "\ttable.renderTo('#svg');\n}";
 	    $("#code").val(testCode);
@@ -169,14 +175,17 @@
 	};
 
 	testCode_red = function(){
+		"use strict";
 		testCode = testCode + "\tplot.attr('fill', function() { return '#ff6666'; })\n";
 	};
 
 	testCode_gridlines = function(){
+		"use strict";
 		testCode = testCode + "\tvar gridlines = new Plottable.Component.Gridlines(xScale, yScale);\n\tplot = new Plottable.Component.Group([plot, gridlines]);\n";
 	};
 	
 	testCode_project = function(time){
+		"use strict";
 		if(time){
 			testCode = testCode + "\tplot.project('x',  function (d) { return d3.time.format('%x').parse(d.x); }, xScale)\n\t\t.project('y', 'y', yScale);\n";
 		}
@@ -190,6 +199,7 @@
 	var ord;
 
 	createTest = function() {
+		"use strict";
 		testCode_init();
 		$("#playground").empty();
 		ord = false;
@@ -235,6 +245,7 @@
 	//----------------------------------------------------------------------------------------------
 	//---------------------------------visual-------------------------------------------------------
 	svg_size = function(){
+		"use strict";
 		var px_w = $("#svg_w").val();
 		var px_h = $("#svg_h").val();
 		$('#playground').attr("width", px_w);
