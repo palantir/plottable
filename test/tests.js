@@ -897,7 +897,7 @@ describe("NumericAxis", function () {
         var baseAxis = new Plottable.Axis.Numeric(scale, "bottom");
         baseAxis.renderTo(svg);
         var visibleTickLabels = baseAxis._element.selectAll(".tick-label").filter(function (d, i) {
-            return d3.select(this).style("visibility") === "visible";
+            return d3.select(this).style("visibility") === "inherit";
         });
         var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
         var interval = getClientRectCenter(visibleTickLabelRects[1]) - getClientRectCenter(visibleTickLabelRects[0]);
