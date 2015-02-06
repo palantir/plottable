@@ -1276,7 +1276,8 @@ declare module Plottable {
             /**
              * Returns the full band width of the scale.
              *
-             * TODO: Come up with a proper explanation of the full band width
+             * The full band width is defined as the entire space for a band to occupy,
+             * not accounting for any padding in between the bands.
              *
              * @returns {number} the full band width of the scale
              */
@@ -1284,7 +1285,8 @@ declare module Plottable {
             /**
              * Returns the inner padding of the scale.
              *
-             * TODO: Come up with a proper explanation of innerPadding
+             * The inner padding is defined as the padding in between bands on the scale.
+             * Units are a proportion of the band width (value returned by rangeBand()).
              *
              * @returns {number} The inner padding of the scale
              */
@@ -1292,7 +1294,8 @@ declare module Plottable {
             /**
              * Sets the inner padding of the scale.
              *
-             * TODO:
+             * The inner padding of the scale is defined as the padding in between bands on the scale.
+             * Units are a proportion of the band width (value returned by rangeBand()).
              *
              * @returns {Ordinal} The calling Scale.Ordinal
              */
@@ -1300,7 +1303,8 @@ declare module Plottable {
             /**
              * Returns the outer padding of the scale.
              *
-             * TODO: Come up with a proper explanation of outerPadding
+             * The outer padding is defined as the padding in between the outer bands and the edges on the scale.
+             * Units are a proportion of the band width (value returned by rangeBand()).
              *
              * @returns {number} The outer padding of the scale
              */
@@ -1308,7 +1312,8 @@ declare module Plottable {
             /**
              * Sets the outer padding of the scale.
              *
-             * TODO:
+             * The inner padding of the scale is defined as the padding in between bands on the scale.
+             * Units are a proportion of the band width (value returned by rangeBand()).
              *
              * @returns {Ordinal} The calling Scale.Ordinal
              */
