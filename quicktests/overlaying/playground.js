@@ -36,7 +36,7 @@
 		    	}
 		    	else{
 			    	data = catXnumY.slice(0);
-			        pts = "[[{x: 'A', y: 9}, {x: 'B', y: 5}, {x: 'C', y: 12}, {x: 'D', y: 2}]";
+			        pts = "[{x: 'A', y: 9}, {x: 'B', y: 5}, {x: 'C', y: 12}, {x: 'D', y: 2}]";
 		    	}
 		        break;
 		    case "Time":
@@ -218,7 +218,7 @@
 	    if($('#gridlines').is(':checked')){
 	    	if (ord === true){
 	    		alert("Gridlines are not yet supported on Ordinal Scales");
-	    		
+
 	    	}
 	    	var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
 	    	plot = new Plottable.Component.Group([plot, gridlines]);
