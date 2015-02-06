@@ -4649,8 +4649,8 @@ var Plottable;
                 }
                 d3.select(tickMarks[0][0]).attr(attr);
                 // Add end-tick classes to first and last tick for CSS customization purposes
-                d3.select(tickMarks[0][0]).classed("end-tick-mark", true);
-                d3.select(tickMarks[0][tickMarks.size() - 1]).classed("end-tick-mark", true);
+                d3.select(tickMarks[0][0]).classed(Axis.AbstractAxis.END_TICK_MARK_CLASS, true);
+                d3.select(tickMarks[0][tickMarks.size() - 1]).classed(Axis.AbstractAxis.END_TICK_MARK_CLASS, true);
                 tickMarks.exit().remove();
             };
             Time.prototype._renderLabellessTickMarks = function (tickValues) {
