@@ -5485,7 +5485,8 @@ var Plottable;
                 var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
                 var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
                 entries.each(function (d) {
-                    d3.select(this).classed(Legend.LEGEND_ENTRY_PREFIX + d.replace(" ", "-"), true);
+                    var entryClass = [Legend.LEGEND_ENTRY_CLASS, d.replace(" ", "-")].join("-");
+                    d3.select(this).classed(entryClass, true);
                 });
                 entriesEnter.append("circle");
                 entriesEnter.append("g").classed("text-container", true);
@@ -5526,10 +5527,6 @@ var Plottable;
              * The css class applied to each legend entry
              */
             Legend.LEGEND_ENTRY_CLASS = "legend-entry";
-            /**
-             * The css class that prepends every legend entry
-             */
-            Legend.LEGEND_ENTRY_PREFIX = "legend-item-";
             return Legend;
         })(Component.AbstractComponent);
         Component.Legend = Legend;

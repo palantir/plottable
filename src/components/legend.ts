@@ -11,10 +11,6 @@ export module Component {
      * The css class applied to each legend entry
      */
     public static LEGEND_ENTRY_CLASS = "legend-entry";
-    /**
-     * The css class that prepends every legend entry
-     */
-    public static LEGEND_ENTRY_PREFIX = "legend-item-";
 
     private _padding = 5;
     private _scale: Scale.Color;
@@ -256,7 +252,8 @@ export module Component {
       var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data((d) => d);
       var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
       entries.each(function(d: string) {
-        d3.select(this).classed(Legend.LEGEND_ENTRY_PREFIX + d.replace(" ", "-"), true);
+        var entryClass = [Legend.LEGEND_ENTRY_CLASS, d.replace(" ", "-")].join("-");
+        d3.select(this).classed(entryClass, true);
       });
       entriesEnter.append("circle");
       entriesEnter.append("g").classed("text-container", true);
