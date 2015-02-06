@@ -13,6 +13,10 @@
 		var data;
 		var pts;
 
+		if(yAxisType === "Category" || xAxisType === "Category"){
+			ord = true;
+		}
+
 		switch(xAxisType) {
 		    case "Numeric(Linear)":
 		    case "Numeric(Log)":
@@ -183,10 +187,12 @@
 
 	var rg;
 	var group;
+	var ord;
 
 	createTest = function() {
 		testCode_init();
 		$("#playground").empty();
+		ord = false;
 	    var xScale = make_scale('x');
 	    var yScale = make_scale('y');
 	    var xAxis = make_axis('x', xScale, 'bottom');
@@ -210,6 +216,10 @@
 	    	testCode_red();
 	    }
 	    if($('#gridlines').is(':checked')){
+	    	if (ord === true){
+	    		alert("Gridlines are not yet supported on Ordinal Scales");
+	    		
+	    	}
 	    	var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
 	    	plot = new Plottable.Component.Group([plot, gridlines]);
 	    	testCode_gridlines();
