@@ -1269,33 +1269,58 @@ declare module Plottable {
             range(): number[];
             range(values: number[]): Ordinal;
             /**
-             * Returns the width of the range band. Only valid when rangeType is set to "bands".
+             * Returns the width of the range band.
              *
-             * @returns {number} The range band width or 0 if rangeType isn't "bands".
+             * @returns {number} The range band width
              */
             rangeBand(): number;
+            /**
+             * Returns the full band width of the scale.
+             *
+             * The full band width is defined as the entire space for a band to occupy,
+             * not accounting for any padding in between the bands.
+             *
+             * @returns {number} the full band width of the scale
+             */
+            fullBandWidth(): number;
+            /**
+             * Returns the inner padding of the scale.
+             *
+             * The inner padding is defined as the padding in between bands on the scale.
+             * Units are a proportion of the band width (value returned by rangeBand()).
+             *
+             * @returns {number} The inner padding of the scale
+             */
             innerPadding(): number;
-            fullBandStartAndWidth(v: string): number[];
             /**
-             * Get the range type.
+             * Sets the inner padding of the scale.
              *
-             * @returns {string} The current range type.
+             * The inner padding of the scale is defined as the padding in between bands on the scale.
+             * Units are a proportion of the band width (value returned by rangeBand()).
+             *
+             * @returns {Ordinal} The calling Scale.Ordinal
              */
-            rangeType(): string;
+            innerPadding(innerPadding: number): Ordinal;
             /**
-             * Set the range type.
+             * Returns the outer padding of the scale.
              *
-             * @param {string} rangeType If provided, either "points" or "bands" indicating the
-             *     d3 method used to generate range bounds.
-             * @param {number} [outerPadding] If provided, the padding outside the range,
-             *     proportional to the range step.
-             * @param {number} [innerPadding] If provided, the padding between bands in the range,
-             *     proportional to the range step. This parameter is only used in
-             *     "bands" type ranges.
-             * @returns {Ordinal} The calling Ordinal.
+             * The outer padding is defined as the padding in between the outer bands and the edges on the scale.
+             * Units are a proportion of the band width (value returned by rangeBand()).
+             *
+             * @returns {number} The outer padding of the scale
              */
-            rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): Ordinal;
+            outerPadding(): number;
+            /**
+             * Sets the outer padding of the scale.
+             *
+             * The inner padding of the scale is defined as the padding in between bands on the scale.
+             * Units are a proportion of the band width (value returned by rangeBand()).
+             *
+             * @returns {Ordinal} The calling Scale.Ordinal
+             */
+            outerPadding(outerPadding: number): Ordinal;
             copy(): Ordinal;
+            scale(value: string): number;
         }
     }
 }
