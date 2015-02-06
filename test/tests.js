@@ -902,7 +902,7 @@ describe("NumericAxis", function () {
         var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
         var interval = getClientRectCenter(visibleTickLabelRects[1]) - getClientRectCenter(visibleTickLabelRects[0]);
         for (var i = 0; i < visibleTickLabelRects.length - 1; i++) {
-            assert.strictEqual(getClientRectCenter(visibleTickLabelRects[i + 1]) - getClientRectCenter(visibleTickLabelRects[i]), interval, "intervals are all spaced the same");
+            assert.closeTo(getClientRectCenter(visibleTickLabelRects[i + 1]) - getClientRectCenter(visibleTickLabelRects[i]), interval, 0.5, "intervals are all spaced the same");
         }
         svg.remove();
     });
@@ -973,23 +973,6 @@ describe("Category Axes", function () {
         axisHeight = ca.height();
         ca.tickLength(ca.tickLength() + 5);
         assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing ticklength increases height");
-        svg.remove();
-    });
-    it("proper range values for different range types", function () {
-        var SVG_WIDTH = 400;
-        var svg = generateSVG(SVG_WIDTH, 100);
-        var scale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([0, 400]).rangeType("bands", 1, 0);
-        var categoryAxis = new Plottable.Axis.Category(scale, "bottom");
-        categoryAxis.renderTo(svg);
-        // Outer padding is equal to step
-        var step = SVG_WIDTH / 5;
-        var tickMarks = categoryAxis._tickMarkContainer.selectAll(".tick-mark")[0];
-        var ticksNormalizedPosition = tickMarks.map(function (s) { return +d3.select(s).attr("x1") / step; });
-        assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
-        scale.rangeType("points", 1, 0);
-        step = SVG_WIDTH / 4;
-        ticksNormalizedPosition = tickMarks.map(function (s) { return +d3.select(s).attr("x1") / step; });
-        assert.deepEqual(ticksNormalizedPosition, [1, 2, 3]);
         svg.remove();
     });
     it("vertically aligns short words properly", function () {
@@ -2415,7 +2398,7 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("Bar Plot", function () {
-        describe("Vertical Bar Plot in points mode", function () {
+        describe("Vertical Bar Plot", function () {
             var svg;
             var dataset;
             var xScale;
@@ -2425,7 +2408,7 @@ describe("Plots", function () {
             var SVG_HEIGHT = 400;
             beforeEach(function () {
                 svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+                xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
                 yScale = new Plottable.Scale.Linear();
                 var data = [
                     { x: "A", y: 1 },
@@ -2448,12 +2431,12 @@ describe("Plots", function () {
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
-                assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
-                assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
+                assert.closeTo(numAttr(bar0, "width"), xScale.rangeBand(), 1, "bar0 width is correct");
+                assert.closeTo(numAttr(bar1, "width"), xScale.rangeBand(), 1, "bar1 width is correct");
                 assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
                 assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
-                assert.equal(bar0.attr("x"), "75", "bar0 x is correct");
-                assert.equal(bar1.attr("x"), "375", "bar1 x is correct");
+                assert.closeTo(numAttr(bar0, "x"), 111, 1, "bar0 x is correct");
+                assert.closeTo(numAttr(bar1, "x"), 333, 1, "bar1 x is correct");
                 assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
                 assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
                 var baseline = renderArea.select(".baseline");
@@ -2478,29 +2461,6 @@ describe("Plots", function () {
                 assert.equal(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
                 assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
                 assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
-                svg.remove();
-            });
-            it("bar alignment can be changed; barPlot updates appropriately", function () {
-                barPlot.barAlignment("center");
-                var renderArea = barPlot._renderArea;
-                var bars = renderArea.selectAll("rect");
-                var bar0 = d3.select(bars[0][0]);
-                var bar1 = d3.select(bars[0][1]);
-                assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
-                assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
-                assert.equal(numAttr(bar0, "x"), 75, "bar0 x is correct");
-                assert.equal(numAttr(bar1, "x"), 375, "bar1 x is correct");
-                barPlot.barAlignment("right");
-                renderArea = barPlot._renderArea;
-                bars = renderArea.selectAll("rect");
-                bar0 = d3.select(bars[0][0]);
-                bar1 = d3.select(bars[0][1]);
-                assert.equal(numAttr(bar0, "width"), 150, "bar0 width is correct");
-                assert.equal(numAttr(bar1, "width"), 150, "bar1 width is correct");
-                assert.equal(numAttr(bar0, "x"), 0, "bar0 x is correct");
-                assert.equal(numAttr(bar1, "x"), 300, "bar1 x is correct");
-                assert.throws(function () { return barPlot.barAlignment("blargh"); }, Error);
-                assert.equal(barPlot._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
                 svg.remove();
             });
             it("getBar()", function () {
@@ -2659,7 +2619,7 @@ describe("Plots", function () {
                 svg.remove();
             });
         });
-        describe("Horizontal Bar Plot in Points Mode", function () {
+        describe("Horizontal Bar Plot", function () {
             var svg;
             var dataset;
             var yScale;
@@ -2669,7 +2629,7 @@ describe("Plots", function () {
             var SVG_HEIGHT = 400;
             beforeEach(function () {
                 svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+                yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
                 xScale = new Plottable.Scale.Linear();
                 xScale.domain([-3, 3]);
                 var data = [
@@ -2692,12 +2652,12 @@ describe("Plots", function () {
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
-                assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
-                assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
+                assert.closeTo(numAttr(bar0, "height"), yScale.rangeBand(), 1, "bar0 height is correct");
+                assert.closeTo(numAttr(bar1, "height"), yScale.rangeBand(), 1, "bar1 height is correct");
                 assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
                 assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-                assert.equal(bar0.attr("y"), "50", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "250", "bar1 y is correct");
+                assert.closeTo(numAttr(bar0, "y"), 74, 1, "bar0 y is correct");
+                assert.closeTo(numAttr(bar1, "y"), 222, 1, "bar1 y is correct");
                 assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
                 assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
                 var baseline = renderArea.select(".baseline");
@@ -2724,75 +2684,6 @@ describe("Plots", function () {
                 assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
                 svg.remove();
             });
-            it("bar alignment can be changed; barPlot updates appropriately", function () {
-                barPlot.barAlignment("center");
-                var renderArea = barPlot._renderArea;
-                var bars = renderArea.selectAll("rect");
-                var bar0 = d3.select(bars[0][0]);
-                var bar1 = d3.select(bars[0][1]);
-                assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
-                assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
-                assert.equal(numAttr(bar0, "y"), 50, "bar0 y is correct");
-                assert.equal(numAttr(bar1, "y"), 250, "bar1 y is correct");
-                barPlot.barAlignment("right");
-                renderArea = barPlot._renderArea;
-                bars = renderArea.selectAll("rect");
-                bar0 = d3.select(bars[0][0]);
-                bar1 = d3.select(bars[0][1]);
-                assert.equal(numAttr(bar0, "height"), 100, "bar0 height is correct");
-                assert.equal(numAttr(bar1, "height"), 100, "bar1 height is correct");
-                assert.equal(numAttr(bar0, "y"), 0, "bar0 y is correct");
-                assert.equal(numAttr(bar1, "y"), 200, "bar1 y is correct");
-                assert.throws(function () { return barPlot.barAlignment("blargh"); }, Error);
-                svg.remove();
-            });
-        });
-        describe("Horizontal Bar Plot in Bands mode", function () {
-            var svg;
-            var dataset;
-            var yScale;
-            var xScale;
-            var barPlot;
-            var SVG_WIDTH = 600;
-            var SVG_HEIGHT = 400;
-            var axisWidth = 0;
-            var bandWidth = 0;
-            beforeEach(function () {
-                svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
-                xScale = new Plottable.Scale.Linear();
-                var data = [
-                    { y: "A", x: 1 },
-                    { y: "B", x: 2 },
-                ];
-                dataset = new Plottable.Dataset(data);
-                barPlot = new Plottable.Plot.Bar(xScale, yScale, false);
-                barPlot.addDataset(dataset);
-                barPlot.baseline(0);
-                barPlot.animate(false);
-                var yAxis = new Plottable.Axis.Category(yScale, "left");
-                barPlot.project("x", "x", xScale);
-                barPlot.project("y", "y", yScale);
-                new Plottable.Component.Table([[yAxis, barPlot]]).renderTo(svg);
-                axisWidth = yAxis.width();
-                bandWidth = yScale.rangeBand();
-                xScale.domainer(xScale.domainer().pad(0));
-            });
-            it("renders correctly", function () {
-                var bars = barPlot._renderArea.selectAll("rect");
-                var bar0 = d3.select(bars[0][0]);
-                var bar1 = d3.select(bars[0][1]);
-                var bar0y = bar0.data()[0].y;
-                var bar1y = bar1.data()[0].y;
-                assert.closeTo(numAttr(bar0, "height"), 104, 2);
-                assert.closeTo(numAttr(bar1, "height"), 104, 2);
-                assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "width is correct for bar0");
-                assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "width is correct for bar1");
-                // check that bar is aligned on the center of the scale
-                assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "y pos correct for bar0");
-                assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "y pos correct for bar1");
-                svg.remove();
-            });
             it("width projector may be overwritten, and calling project queues rerender", function () {
                 var bars = barPlot._renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
@@ -2802,10 +2693,10 @@ describe("Plots", function () {
                 barPlot.project("width", 10);
                 assert.closeTo(numAttr(bar0, "height"), 10, 0.01, "bar0 height");
                 assert.closeTo(numAttr(bar1, "height"), 10, 0.01, "bar1 height");
-                assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "bar0 width");
-                assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "bar1 width");
-                assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "bar0 ypos");
-                assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "bar1 ypos");
+                assert.closeTo(numAttr(bar0, "width"), 100, 0.01, "bar0 width");
+                assert.closeTo(numAttr(bar1, "width"), 150, 0.01, "bar1 width");
+                assert.closeTo(numAttr(bar0, "y"), yScale.scale(bar0y) - numAttr(bar0, "height") / 2, 0.01, "bar0 ypos");
+                assert.closeTo(numAttr(bar1, "y"), yScale.scale(bar1y) - numAttr(bar1, "height") / 2, 0.01, "bar1 ypos");
                 svg.remove();
             });
         });
@@ -3839,10 +3730,10 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight) / 3 * 2, 0.01, "height is correct for bar2");
             assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 3, 0.01, "height is correct for bar3");
             // check that bar is aligned on the center of the scale
-            assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) + bandWidth / 2, 0.01, "x pos correct for bar0");
-            assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2, 0.01, "x pos correct for bar1");
-            assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2, 0.01, "x pos correct for bar2");
-            assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2, 0.01, "x pos correct for bar3");
+            assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X), 0.01, "x pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X), 0.01, "x pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X), 0.01, "x pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X), 0.01, "x pos correct for bar3");
             // now check y values to ensure they do indeed stack
             assert.closeTo(numAttr(bar0, "y"), (400 - axisHeight) / 3 * 2, 0.01, "y is correct for bar0");
             assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 3, 0.01, "y is correct for bar1");
@@ -3974,10 +3865,10 @@ describe("Plots", function () {
             var bar2Y = bar2.data()[0].name;
             var bar3Y = bar3.data()[0].name;
             // check that bar is aligned on the center of the scale
-            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2, 0.01, "y pos correct for bar0");
-            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2, 0.01, "y pos correct for bar1");
-            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + bandWidth / 2, 0.01, "y pos correct for bar2");
-            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + bandWidth / 2, 0.01, "y pos correct for bar3");
+            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y), 0.01, "y pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y), 0.01, "y pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y), 0.01, "y pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y), 0.01, "y pos correct for bar3");
             // now check x values to ensure they do indeed stack
             assert.closeTo(numAttr(bar0, "x"), 0, 0.01, "x is correct for bar0");
             assert.closeTo(numAttr(bar1, "x"), 0, 0.01, "x is correct for bar1");
@@ -4097,54 +3988,22 @@ describe("Plots", function () {
             var bar2X = bar2.data()[0].x;
             var bar3X = bar3.data()[0].x;
             // check widths
-            var width = bandWidth / 2 * .518;
-            assert.closeTo(numAttr(bar0, "width"), width, 2);
-            assert.closeTo(numAttr(bar1, "width"), width, 2);
-            assert.closeTo(numAttr(bar2, "width"), width, 2);
-            assert.closeTo(numAttr(bar3, "width"), width, 2);
+            assert.closeTo(numAttr(bar0, "width"), 40, 2);
+            assert.closeTo(numAttr(bar1, "width"), 40, 2);
+            assert.closeTo(numAttr(bar2, "width"), 40, 2);
+            assert.closeTo(numAttr(bar3, "width"), 40, 2);
             // check heights
             assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar0");
             assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight), 0.01, "height is correct for bar1");
             assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight), 0.01, "height is correct for bar2");
             assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
             // check that clustering is correct
-            var off = renderer._makeInnerScale().scale("_0");
-            assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) + bandWidth / 2 - off, 0.01, "x pos correct for bar0");
-            assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2 - off, 0.01, "x pos correct for bar1");
-            assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2 + off, 0.01, "x pos correct for bar2");
-            assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2 + off, 0.01, "x pos correct for bar3");
-            assert.deepEqual(dataset1.data(), originalData1, "underlying data is not modified");
-            assert.deepEqual(dataset2.data(), originalData2, "underlying data is not modified");
-            svg.remove();
-        });
-        it("renders correctly under points mode", function () {
-            xScale.rangeType("points");
-            var bars = renderer.getAllSelections();
-            var bar0 = d3.select(bars[0][0]);
-            var bar1 = d3.select(bars[0][1]);
-            var bar2 = d3.select(bars[0][2]);
-            var bar3 = d3.select(bars[0][3]);
-            var bar0X = bar0.data()[0].x;
-            var bar1X = bar1.data()[0].x;
-            var bar2X = bar2.data()[0].x;
-            var bar3X = bar3.data()[0].x;
-            // check widths
-            var width = renderer._getBarPixelWidth() / 2 * .518;
-            assert.closeTo(numAttr(bar0, "width"), width, 2);
-            assert.closeTo(numAttr(bar1, "width"), width, 2);
-            assert.closeTo(numAttr(bar2, "width"), width, 2);
-            assert.closeTo(numAttr(bar3, "width"), width, 2);
-            // check heights
-            assert.closeTo(numAttr(bar0, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar0");
-            assert.closeTo(numAttr(bar1, "height"), (400 - axisHeight), 0.01, "height is correct for bar1");
-            assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight), 0.01, "height is correct for bar2");
-            assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
-            // check that clustering is correct
-            var off = renderer._makeInnerScale().scale("_0");
-            assert.closeTo(numAttr(bar0, "x"), xScale.scale(bar0X) - width / 2 - off, 0.1, "x pos correct for bar0");
-            assert.closeTo(numAttr(bar1, "x"), xScale.scale(bar1X) - width / 2 - off, 0.1, "x pos correct for bar1");
-            assert.closeTo(numAttr(bar2, "x"), xScale.scale(bar2X) - width / 2 + off, 0.1, "x pos correct for bar2");
-            assert.closeTo(numAttr(bar3, "x"), xScale.scale(bar3X) - width / 2 + off, 0.1, "x pos correct for bar3");
+            var innerScale = renderer._makeInnerScale();
+            var off = innerScale.scale("_0");
+            assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) - xScale.rangeBand() / 2 + off, 0.01, "x pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) - xScale.rangeBand() / 2 + off, 0.01, "x pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + xScale.rangeBand() / 2 - off, 0.01, "x pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + xScale.rangeBand() / 2 - off, 0.01, "x pos correct for bar3");
             assert.deepEqual(dataset1.data(), originalData1, "underlying data is not modified");
             assert.deepEqual(dataset2.data(), originalData2, "underlying data is not modified");
             svg.remove();
@@ -4193,11 +4052,10 @@ describe("Plots", function () {
             var bar2 = d3.select(bars[0][2]);
             var bar3 = d3.select(bars[0][3]);
             // check widths
-            var width = bandWidth / 2 * .518;
-            assert.closeTo(numAttr(bar0, "height"), width, 2, "height is correct for bar0");
-            assert.closeTo(numAttr(bar1, "height"), width, 2, "height is correct for bar1");
-            assert.closeTo(numAttr(bar2, "height"), width, 2, "height is correct for bar2");
-            assert.closeTo(numAttr(bar3, "height"), width, 2, "height is correct for bar3");
+            assert.closeTo(numAttr(bar0, "height"), 26, 2, "height is correct for bar0");
+            assert.closeTo(numAttr(bar1, "height"), 26, 2, "height is correct for bar1");
+            assert.closeTo(numAttr(bar2, "height"), 26, 2, "height is correct for bar2");
+            assert.closeTo(numAttr(bar3, "height"), 26, 2, "height is correct for bar3");
             // check heights
             assert.closeTo(numAttr(bar0, "width"), rendererWidth / 2, 0.01, "width is correct for bar0");
             assert.closeTo(numAttr(bar1, "width"), rendererWidth, 0.01, "width is correct for bar1");
@@ -4208,11 +4066,12 @@ describe("Plots", function () {
             var bar2Y = bar2.data()[0].y;
             var bar3Y = bar3.data()[0].y;
             // check that clustering is correct
-            var off = renderer._makeInnerScale().scale("_0");
-            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar0");
-            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) + bandWidth / 2 - off, 0.01, "y pos correct for bar1");
-            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + bandWidth / 2 + off, 0.01, "y pos correct for bar2");
-            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + bandWidth / 2 + off, 0.01, "y pos correct for bar3");
+            var innerScale = renderer._makeInnerScale();
+            var off = innerScale.scale("_0");
+            assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) - yScale.rangeBand() / 2 + off, 0.01, "y pos correct for bar0");
+            assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) - yScale.rangeBand() / 2 + off, 0.01, "y pos correct for bar1");
+            assert.closeTo(numAttr(bar2, "y") + numAttr(bar2, "height") / 2, yScale.scale(bar2Y) + yScale.rangeBand() / 2 - off, 0.01, "y pos correct for bar2");
+            assert.closeTo(numAttr(bar3, "y") + numAttr(bar3, "height") / 2, yScale.scale(bar3Y) + yScale.rangeBand() / 2 - off, 0.01, "y pos correct for bar3");
             svg.remove();
         });
     });
@@ -5985,45 +5844,13 @@ describe("Scales", function () {
         });
     });
     describe("Ordinal Scales", function () {
-        it("defaults to \"bands\" range type", function () {
+        it("rangeBand is updated when domain changes", function () {
             var scale = new Plottable.Scale.Ordinal();
-            assert.deepEqual(scale.rangeType(), "bands");
-        });
-        it("rangeBand returns 0 when in \"points\" mode", function () {
-            var scale = new Plottable.Scale.Ordinal().rangeType("points");
-            assert.deepEqual(scale.rangeType(), "points");
-            assert.deepEqual(scale.rangeBand(), 0);
-        });
-        it("rangeBand is updated when domain changes in \"bands\" mode", function () {
-            var scale = new Plottable.Scale.Ordinal();
-            scale.rangeType("bands");
-            assert.deepEqual(scale.rangeType(), "bands");
             scale.range([0, 2679]);
             scale.domain(["1", "2", "3", "4"]);
-            assert.deepEqual(scale.rangeBand(), 399);
+            assert.closeTo(scale.rangeBand(), 399, 1);
             scale.domain(["1", "2", "3", "4", "5"]);
-            assert.deepEqual(scale.rangeBand(), 329);
-        });
-        it("rangeBand is updated when mode is changed", function () {
-            var scale = new Plottable.Scale.Ordinal();
-            scale.rangeType("bands");
-            assert.deepEqual(scale.rangeType(), "bands");
-            scale.range([0, 2679]);
-            scale.domain(["1", "2", "3", "4"]);
-            assert.deepEqual(scale.rangeBand(), 399);
-            scale.rangeType("points");
-            assert.deepEqual(scale.rangeBand(), 0, "Band width should be 0 in points mode");
-        });
-        it("rangeType triggers broadcast", function () {
-            var scale = new Plottable.Scale.Ordinal();
-            var callbackWasCalled = false;
-            var testCallback = function (listenable) {
-                assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
-                callbackWasCalled = true;
-            };
-            scale.broadcaster.registerListener(null, testCallback);
-            scale.rangeType("points");
-            assert.isTrue(callbackWasCalled, "The registered callback was called");
+            assert.closeTo(scale.rangeBand(), 329, 1);
         });
     });
     it("OrdinalScale + BarPlot combo works as expected when the data is swapped", function () {
