@@ -5852,6 +5852,13 @@ describe("Scales", function () {
             scale.domain(["1", "2", "3", "4", "5"]);
             assert.closeTo(scale.rangeBand(), 329, 1);
         });
+        it("stepWidth operates normally", function () {
+            var scale = new Plottable.Scale.Ordinal();
+            scale.range([0, 3000]);
+            scale.domain(["1", "2", "3", "4"]);
+            var widthSum = scale.rangeBand() * (1 + scale.innerPadding());
+            assert.strictEqual(scale.stepWidth(), widthSum, "step width is the sum of innerPadding width and band width");
+        });
     });
     it("OrdinalScale + BarPlot combo works as expected when the data is swapped", function () {
         // This unit test taken from SLATE, see SLATE-163 a fix for SLATE-102
