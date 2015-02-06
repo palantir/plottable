@@ -368,7 +368,7 @@ describe("NumericAxis", () => {
     var visibleTickLabels = (<any> baseAxis)._element.selectAll(".tick-label")
       .filter(function(d: any, i: number) {
         var visibility = d3.select(this).style("visibility");
-        return visibility === "visible";
+        return (visibility === "visible") || (visibility === "inherit");
       });
 
     var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
