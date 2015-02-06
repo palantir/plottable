@@ -4883,7 +4883,7 @@ var Plottable;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(tickLabelValues);
                 tickLabels.enter().append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();
-                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(function (s) {
+                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "inherit").attr(tickLabelAttrHash).text(function (s) {
                     var formattedText = _this.formatter()(s);
                     if (!_this._isHorizontal()) {
                         var availableTextSpace = _this.width() - _this.tickLabelPadding();
