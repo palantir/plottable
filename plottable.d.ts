@@ -2076,19 +2076,17 @@ declare module Plottable {
          * step - number of intervals between each tick.
          * formatter - formatter used to format tick labels.
          */
-        interface TimeAxisTierConfiguration {
+        type TimeAxisTierConfiguration = {
             interval: D3.Time.Interval;
             step: number;
             formatter: Formatter;
-        }
+        };
         /**
          * An array of linked TimeAxisTierConfigurations.
          * Each configuration will be shown on a different tier.
          * Currently, up to two tiers are supported.
          */
-        interface TimeAxisConfiguration {
-            tierConfigurations: TimeAxisTierConfiguration[];
-        }
+        type TimeAxisConfiguration = TimeAxisTierConfiguration[];
         class Time extends AbstractAxis {
             /**
              * Constructs a TimeAxis.

@@ -546,7 +546,7 @@ describe("TimeAxis", function () {
         var axis = new Plottable.Axis.Time(scale, "bottom");
         var configurations = axis.axisConfigurations();
         var newPossibleConfigurations = configurations.slice(0, 3);
-        newPossibleConfigurations.forEach(function (axisConfig) { return axisConfig.tierConfigurations.forEach(function (tierConfig) {
+        newPossibleConfigurations.forEach(function (axisConfig) { return axisConfig.forEach(function (tierConfig) {
             tierConfig.interval = d3.time.minute;
             tierConfig.step += 3;
         }); });
@@ -557,7 +557,7 @@ describe("TimeAxis", function () {
         scale.domain([twoMinutesBefore, now]);
         scale.range([0, 800]);
         axis.renderTo(svg);
-        var configs = newPossibleConfigurations[axis._mostPreciseConfigIndex].tierConfigurations;
+        var configs = newPossibleConfigurations[axis._mostPreciseConfigIndex];
         assert.deepEqual(configs[0].interval, d3.time.minute, "axis used new time unit");
         assert.deepEqual(configs[0].step, 4, "axis used new step");
         svg.remove();
