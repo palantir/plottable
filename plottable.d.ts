@@ -3824,11 +3824,11 @@ declare module Plottable {
 
 declare module Plottable {
     module Interaction {
-        interface HoverData {
+        type HoverData = {
             data: any[];
             pixelPositions: Point[];
             selection: D3.Selection;
-        }
+        };
         interface Hoverable extends Component.AbstractComponent {
             /**
              * Called when the user first mouses over the Component.

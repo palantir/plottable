@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Interaction {
-  export interface HoverData {
+  export type HoverData = {
     data: any[];
     pixelPositions: Point[];
     selection: D3.Selection;
