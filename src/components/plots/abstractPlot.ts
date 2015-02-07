@@ -82,7 +82,7 @@ export module Plot {
      * A key is automatically generated if not supplied.
      *
      * @param {string} [key] The key of the dataset.
-     * @param {any[]|Dataset} dataset dataset to add.
+     * @param {Dataset | any[]} dataset dataset to add.
      * @returns {Plot} The calling Plot.
      */
     public addDataset(dataset: Dataset | any[]): AbstractPlot;
