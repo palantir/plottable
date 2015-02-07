@@ -31,9 +31,7 @@ module Plottable {
    * with both `foo` and `bar`, an entry in this type might be `{"r":
    * function(d) { return foo + bar; }`.
    */
-  export interface AttributeToProjector {
-    [attrToSet: string]: _Projector;
-  }
+  export type AttributeToProjector = { [attrToSet: string]: _Projector; };
 
   export interface _AttributeToAppliedProjector {
     [attrToSet: string]: _AppliedProjector;

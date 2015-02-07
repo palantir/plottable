@@ -749,9 +749,9 @@ declare module Plottable {
      * with both `foo` and `bar`, an entry in this type might be `{"r":
      * function(d) { return foo + bar; }`.
      */
-    interface AttributeToProjector {
+    type AttributeToProjector = {
         [attrToSet: string]: _Projector;
-    }
+    };
     interface _AttributeToAppliedProjector {
         [attrToSet: string]: _AppliedProjector;
     }
@@ -2841,7 +2841,9 @@ declare module Plottable {
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Scatter<X, Y>;
             protected _getDrawer(key: string): _Drawer.Element;
-            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
             protected _generateDrawSteps(): _Drawer.DrawStep[];
             protected _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData;
             _hoverOverComponent(p: Point): void;
@@ -2875,7 +2877,9 @@ declare module Plottable {
              * the data should return a valid CSS color.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Grid;
-            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
             protected _generateDrawSteps(): _Drawer.DrawStep[];
         }
     }
@@ -2973,7 +2977,9 @@ declare module Plottable {
             protected _additionalPaint(time: number): void;
             protected _drawLabels(): void;
             protected _generateDrawSteps(): _Drawer.DrawStep[];
-            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
             /**
              * Computes the barPixelWidth of all the bars in the plot.
              *
@@ -3020,7 +3026,9 @@ declare module Plottable {
             protected _getDrawer(key: string): _Drawer.Line;
             protected _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
             protected _generateDrawSteps(): _Drawer.DrawStep[];
-            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
             protected _wholeDatumAttributes(): string[];
             protected _getClosestWithinRange(p: Point, range: number): {
                 closestValue: any;
@@ -3054,7 +3062,9 @@ declare module Plottable {
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Area<X>;
             protected _getResetYFunction(): (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             protected _wholeDatumAttributes(): string[];
-            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
         }
     }
 }
@@ -3079,7 +3089,9 @@ declare module Plottable {
              * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
-            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
             protected _getDataToDraw(): D3.Map<any[]>;
             protected _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata;
         }
@@ -3146,7 +3158,9 @@ declare module Plottable {
             protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedArea<X>;
             protected _onDatasetUpdate(): StackedArea<X>;
-            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
             protected _wholeDatumAttributes(): string[];
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
@@ -3181,7 +3195,9 @@ declare module Plottable {
              */
             constructor(xScale?: Scale.AbstractScale<X, number>, yScale?: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             protected _getAnimator(key: string): Animator.PlotAnimator;
-            protected _generateAttrToProjector(): AttributeToProjector;
+            protected _generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
             protected _generateDrawSteps(): _Drawer.DrawStep[];
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedBar<X, Y>;
             protected _onDatasetUpdate(): StackedBar<X, Y>;
