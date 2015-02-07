@@ -2,9 +2,7 @@
 
 module Plottable {
 export module Scale {
-  interface ColorGroups {
-    [key: string]: string[];
-  };
+  type ColorGroups = { [key: string]: string[]; };
 
   /**
    * This class implements a color scale that takes quantitive input and

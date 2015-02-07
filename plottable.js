@@ -2476,7 +2476,6 @@ var Plottable;
 (function (Plottable) {
     var Scale;
     (function (Scale) {
-        ;
         /**
          * This class implements a color scale that takes quantitive input and
          * interpolates between a list of color values. It returns a hex string
