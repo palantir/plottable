@@ -33,9 +33,7 @@ module Plottable {
    */
   export type AttributeToProjector = { [attrToSet: string]: _Projector; };
 
-  export interface _AttributeToAppliedProjector {
-    [attrToSet: string]: _AppliedProjector;
-  }
+  export type _AttributeToAppliedProjector = { [attrToSet: string]: _AppliedProjector; };
 
   /**
    * A simple bounding box.

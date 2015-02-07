@@ -752,9 +752,9 @@ declare module Plottable {
     type AttributeToProjector = {
         [attrToSet: string]: _Projector;
     };
-    interface _AttributeToAppliedProjector {
+    type _AttributeToAppliedProjector = {
         [attrToSet: string]: _AppliedProjector;
-    }
+    };
     /**
      * A simple bounding box.
      */
