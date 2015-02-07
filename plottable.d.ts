@@ -728,9 +728,7 @@ declare module Plottable {
     /**
      * Retrieves scaled datum property.
      */
-    interface _Projector {
-        (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata): any;
-    }
+    type _Projector = (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata) => any;
     /**
      * Projector with applied user and plot metadata
      */
@@ -3056,7 +3054,7 @@ declare module Plottable {
             protected _getDrawer(key: string): _Drawer.Area;
             protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Area<X>;
-            protected _getResetYFunction(): _Projector;
+            protected _getResetYFunction(): (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             protected _wholeDatumAttributes(): string[];
             protected _generateAttrToProjector(): AttributeToProjector;
         }
@@ -3374,7 +3372,7 @@ declare module Plottable {
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
             animate(selection: any, attrToProjector: AttributeToProjector): any;
-            protected _startMovingProjector(attrToProjector: AttributeToProjector): _Projector;
+            protected _startMovingProjector(attrToProjector: AttributeToProjector): (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata) => any;
         }
     }
 }
