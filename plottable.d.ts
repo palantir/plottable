@@ -483,9 +483,7 @@ declare module Plottable {
          * The Listenable is passed as the first argument so that it is easy for the callback to reference the
          * current state of the Listenable in the resolution logic.
          */
-        interface BroadcasterCallback {
-            (listenable: Listenable, ...args: any[]): any;
-        }
+        type BroadcasterCallback = (listenable: Listenable, ...args: any[]) => any;
         /**
          * The Broadcaster class is owned by an Listenable. Third parties can register and deregister listeners
          * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
