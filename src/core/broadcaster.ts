@@ -26,7 +26,6 @@ export module Core {
    */
   export type BroadcasterCallback = (listenable: Listenable, ...args: any[]) => any;
 
-
   /**
    * The Broadcaster class is owned by an Listenable. Third parties can register and deregister listeners
    * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
