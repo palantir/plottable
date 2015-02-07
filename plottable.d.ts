@@ -2579,12 +2579,12 @@ declare module Plottable {
         /**
          * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
          */
-        interface PlotDatasetKey {
+        type PlotDatasetKey = {
             dataset: Dataset;
             drawer: _Drawer.AbstractDrawer;
             plotMetadata: PlotMetadata;
             key: string;
-        }
+        };
         interface PlotMetadata {
             datasetKey: string;
         }
