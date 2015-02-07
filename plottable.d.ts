@@ -734,11 +734,11 @@ declare module Plottable {
     /**
      * Defines a way how specific attribute needs be retrieved before rendering.
      */
-    interface _Projection {
+    type _Projection = {
         accessor: _Accessor;
         scale?: Scale.AbstractScale<any, any>;
         attribute: string;
-    }
+    };
     /**
      * A mapping from attributes ("x", "fill", etc.) to the functions that get
      * that information out of the data.
@@ -756,24 +756,24 @@ declare module Plottable {
     /**
      * A simple bounding box.
      */
-    interface SelectionArea {
+    type SelectionArea = {
         xMin: number;
         xMax: number;
         yMin: number;
         yMax: number;
-    }
-    interface _SpaceRequest {
+    };
+    type _SpaceRequest = {
         width: number;
         height: number;
         wantsWidth: boolean;
         wantsHeight: boolean;
-    }
-    interface _PixelArea {
+    };
+    type _PixelArea = {
         xMin: number;
         xMax: number;
         yMin: number;
         yMax: number;
-    }
+    };
     /**
      * The range of your current data. For example, [1, 2, 6, -5] has the Extent
      * `{min: -5, max: 6}`.
@@ -781,17 +781,17 @@ declare module Plottable {
      * The point of this type is to hopefully replace the less-elegant `[min,
      * max]` extents produced by d3.
      */
-    interface Extent {
+    type Extent = {
         min: number;
         max: number;
-    }
+    };
     /**
      * A simple location on the screen.
      */
-    interface Point {
+    type Point = {
         x: number;
         y: number;
-    }
+    };
 }
 
 
@@ -2813,7 +2813,11 @@ declare module Plottable {
                 a: A;
                 b: B;
             }[];
-            protected _projectorsReady(): _Projection;
+            protected _projectorsReady(): {
+                accessor: (datum: any, index?: number, userMetadata?: any, plotMetadata?: PlotMetadata) => any;
+                scale?: Scale.AbstractScale<any, any>;
+                attribute: string;
+            };
         }
     }
 }
@@ -3028,7 +3032,10 @@ declare module Plottable {
             protected _wholeDatumAttributes(): string[];
             protected _getClosestWithinRange(p: Point, range: number): {
                 closestValue: any;
-                closestPoint: Point;
+                closestPoint: {
+                    x: number;
+                    y: number;
+                };
             };
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;

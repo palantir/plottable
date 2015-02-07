@@ -17,7 +17,7 @@ module Plottable {
   /**
    * Defines a way how specific attribute needs be retrieved before rendering.
    */
-  export interface _Projection {
+  export type _Projection = {
     accessor: _Accessor;
     scale?: Scale.AbstractScale<any, any>;
     attribute: string;
@@ -38,21 +38,21 @@ module Plottable {
   /**
    * A simple bounding box.
    */
-  export interface SelectionArea {
+  export type SelectionArea = {
     xMin: number;
     xMax: number;
     yMin: number;
     yMax: number;
   }
 
-  export interface _SpaceRequest {
+  export type _SpaceRequest = {
     width: number;
     height: number;
     wantsWidth: boolean;
     wantsHeight: boolean;
   }
 
-  export interface _PixelArea {
+  export type _PixelArea = {
     xMin: number;
     xMax: number;
     yMin: number;
@@ -66,7 +66,7 @@ module Plottable {
    * The point of this type is to hopefully replace the less-elegant `[min,
    * max]` extents produced by d3.
    */
-  export interface Extent {
+  export type Extent = {
     min: number;
     max: number;
   }
@@ -74,7 +74,7 @@ module Plottable {
   /**
    * A simple location on the screen.
    */
-  export interface Point {
+  export type Point = {
     x: number;
     y: number;
   }
