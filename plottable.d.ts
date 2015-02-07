@@ -320,9 +320,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    interface Formatter {
-        (d: any): string;
-    }
+    type Formatter = (d: any) => string;
     var MILLISECONDS_IN_ONE_DAY: number;
     module Formatters {
         /**

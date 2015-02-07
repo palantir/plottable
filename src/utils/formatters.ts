@@ -2,9 +2,7 @@
 
 module Plottable {
 
-  export interface Formatter {
-    (d: any): string;
-  }
+  export type Formatter = (d: any) => string;
 
   export var MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
 
@@ -27,7 +25,7 @@ module Plottable {
      */
     export function currency(precision = 2, symbol = "$", prefix = true) {
       var fixedFormatter = Formatters.fixed(precision);
-      return function(d: any) {
+      return (d: any) => {
         var formattedValue = fixedFormatter(Math.abs(d));
         if (formattedValue !== "") {
           if (prefix) {
@@ -54,9 +52,7 @@ module Plottable {
      */
     export function fixed(precision = 3) {
       verifyPrecision(precision);
-      return function(d: any) {
-        return (<number> d).toFixed(precision);
-      };
+      return (d: any) => (<number> d).toFixed(precision);
     }
 
     /**
@@ -70,7 +66,7 @@ module Plottable {
      */
     export function general(precision = 3) {
       verifyPrecision(precision);
-      return function(d: any) {
+      return (d: any) => {
         if (typeof d === "number") {
           var multiplier = Math.pow(10, precision);
           return String(Math.round(d * multiplier) / multiplier);
@@ -86,9 +82,7 @@ module Plottable {
      * @returns {Formatter} A formatter that stringifies its input.
      */
     export function identity() {
-      return function(d: any) {
-        return String(d);
-      };
+      return (d: any) => String(d);
     }
 
     /**
@@ -102,7 +96,7 @@ module Plottable {
      */
     export function percentage(precision = 0) {
       var fixedFormatter = Formatters.fixed(precision);
-      return function(d: any) {
+      return (d: any) => {
         var valToFormat = d * 100;
 
         // Account for float imprecision
@@ -124,9 +118,7 @@ module Plottable {
      */
     export function siSuffix(precision = 3) {
       verifyPrecision(precision);
-      return function(d: any) {
-        return d3.format("." + precision + "s")(d);
-      };
+      return (d: any) => d3.format("." + precision + "s")(d);
     }
 
     /**
@@ -175,7 +167,7 @@ module Plottable {
         filter: () => true
       };
 
-      return function(d: any) {
+      return (d: any) => {
         for (var i = 0; i < numFormats; i++) {
           if (timeFormat[i].filter(d)) {
             return d3.time.format(timeFormat[i].format)(d);
@@ -207,7 +199,7 @@ module Plottable {
      * @returns {Formatter} A formatter for time/date values.
      */
     export function relativeDate(baseValue: number = 0, increment: number = MILLISECONDS_IN_ONE_DAY, label: string = "") {
-      return function (d: any) {
+      return (d: any) => {
         var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
         return relativeDate.toString() + label;
       };

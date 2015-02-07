@@ -795,9 +795,7 @@ var Plottable;
         function fixed(precision) {
             if (precision === void 0) { precision = 3; }
             verifyPrecision(precision);
-            return function (d) {
-                return d.toFixed(precision);
-            };
+            return function (d) { return d.toFixed(precision); };
         }
         Formatters.fixed = fixed;
         /**
@@ -829,9 +827,7 @@ var Plottable;
          * @returns {Formatter} A formatter that stringifies its input.
          */
         function identity() {
-            return function (d) {
-                return String(d);
-            };
+            return function (d) { return String(d); };
         }
         Formatters.identity = identity;
         /**
@@ -867,9 +863,7 @@ var Plottable;
         function siSuffix(precision) {
             if (precision === void 0) { precision = 3; }
             verifyPrecision(precision);
-            return function (d) {
-                return d3.format("." + precision + "s")(d);
-            };
+            return function (d) { return d3.format("." + precision + "s")(d); };
         }
         Formatters.siSuffix = siSuffix;
         /**
