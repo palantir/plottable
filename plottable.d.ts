@@ -1470,14 +1470,14 @@ declare module Plottable {
          *
          * Specifies how AttributeToProjector needs to be animated.
          */
-        interface DrawStep {
+        type DrawStep = {
             attrToProjector: AttributeToProjector;
             animator: Animator.PlotAnimator;
-        }
-        interface AppliedDrawStep {
+        };
+        type AppliedDrawStep = {
             attrToProjector: _AttributeToAppliedProjector;
             animator: Animator.PlotAnimator;
-        }
+        };
         class AbstractDrawer {
             protected _className: string;
             key: string;
