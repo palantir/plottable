@@ -3100,11 +3100,11 @@ declare module Plottable {
         interface StackedPlotMetadata extends PlotMetadata {
             offsets: D3.Map<number>;
         }
-        interface StackedDatum {
+        type StackedDatum = {
             key: any;
             value: number;
             offset?: number;
-        }
+        };
         class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
             protected _isVertical: boolean;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
