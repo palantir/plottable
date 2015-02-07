@@ -724,9 +724,7 @@ declare module Plottable {
     /**
      * Access specific datum property.
      */
-    interface _Accessor {
-        (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plot.PlotMetadata): any;
-    }
+    type _Accessor = (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plot.PlotMetadata) => any;
     /**
      * Retrieves scaled datum property.
      */

@@ -1479,7 +1479,6 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
-    ;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
