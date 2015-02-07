@@ -12,9 +12,7 @@ module Plottable {
   /**
    * Projector with applied user and plot metadata
    */
-  export interface _AppliedProjector {
-    (datum: any, index: number) : any;
-  }
+  export type _AppliedProjector = (datum: any, index: number) => any;
 
   /**
    * Defines a way how specific attribute needs be retrieved before rendering.
