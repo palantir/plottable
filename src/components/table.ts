@@ -2,14 +2,14 @@
 
 module Plottable {
 export module Component {
-  interface _LayoutAllocation {
+  type _LayoutAllocation = {
     guaranteedWidths : number[];
     guaranteedHeights: number[];
     wantsWidthArr : boolean[];
     wantsHeightArr: boolean[];
   }
 
-  export interface _IterateLayoutResult {
+  export type _IterateLayoutResult = {
     colProportionalSpace: number[];
     rowProportionalSpace: number[];
     guaranteedWidths    : number[];

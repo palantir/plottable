@@ -5846,7 +5846,6 @@ var Plottable;
 (function (Plottable) {
     var Component;
     (function (Component) {
-        ;
         var Table = (function (_super) {
             __extends(Table, _super);
             /**
