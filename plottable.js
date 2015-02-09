@@ -795,9 +795,7 @@ var Plottable;
         function fixed(precision) {
             if (precision === void 0) { precision = 3; }
             verifyPrecision(precision);
-            return function (d) {
-                return d.toFixed(precision);
-            };
+            return function (d) { return d.toFixed(precision); };
         }
         Formatters.fixed = fixed;
         /**
@@ -829,9 +827,7 @@ var Plottable;
          * @returns {Formatter} A formatter that stringifies its input.
          */
         function identity() {
-            return function (d) {
-                return String(d);
-            };
+            return function (d) { return String(d); };
         }
         Formatters.identity = identity;
         /**
@@ -867,9 +863,7 @@ var Plottable;
         function siSuffix(precision) {
             if (precision === void 0) { precision = 3; }
             verifyPrecision(precision);
-            return function (d) {
-                return d3.format("." + precision + "s")(d);
-            };
+            return function (d) { return d3.format("." + precision + "s")(d); };
         }
         Formatters.siSuffix = siSuffix;
         /**
@@ -1479,7 +1473,6 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
-    ;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2477,7 +2470,6 @@ var Plottable;
 (function (Plottable) {
     var Scale;
     (function (Scale) {
-        ;
         /**
          * This class implements a color scale that takes quantitive input and
          * interpolates between a list of color values. It returns a hex string
@@ -4331,7 +4323,6 @@ var Plottable;
 (function (Plottable) {
     var Axis;
     (function (Axis) {
-        ;
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
@@ -4349,113 +4340,113 @@ var Plottable;
                  * Default possible axis configurations.
                  */
                 this._possibleTimeAxisConfigurations = [
-                    { tierConfigurations: [
+                    [
                         { interval: d3.time.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.second, step: 5, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.second, step: 10, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.second, step: 15, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.second, step: 30, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.minute, step: 1, formatter: Plottable.Formatters.time("%I:%M %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.minute, step: 5, formatter: Plottable.Formatters.time("%I:%M %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.minute, step: 10, formatter: Plottable.Formatters.time("%I:%M %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.minute, step: 15, formatter: Plottable.Formatters.time("%I:%M %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.minute, step: 30, formatter: Plottable.Formatters.time("%I:%M %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.hour, step: 1, formatter: Plottable.Formatters.time("%I %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.hour, step: 3, formatter: Plottable.Formatters.time("%I %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.hour, step: 6, formatter: Plottable.Formatters.time("%I %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.hour, step: 12, formatter: Plottable.Formatters.time("%I %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%a %e") },
                         { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%e") },
                         { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B") },
                         { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%b") },
                         { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.month, step: 3, formatter: Plottable.Formatters.time("%b") },
                         { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.month, step: 6, formatter: Plottable.Formatters.time("%b") },
                         { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 5, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 25, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 50, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 100, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 200, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 500, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
-                    ] }
+                    ]
                 ];
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
@@ -4489,7 +4480,7 @@ var Plottable;
                 var _this = this;
                 var mostPreciseIndex = this._possibleTimeAxisConfigurations.length;
                 this._possibleTimeAxisConfigurations.forEach(function (interval, index) {
-                    if (index < mostPreciseIndex && interval.tierConfigurations.every(function (tier) { return _this._checkTimeAxisTierConfigurationWidth(tier); })) {
+                    if (index < mostPreciseIndex && interval.every(function (tier) { return _this._checkTimeAxisTierConfigurationWidth(tier); })) {
                         mostPreciseIndex = index;
                     }
                 });
@@ -4553,7 +4544,7 @@ var Plottable;
             };
             Time.prototype._getTickValues = function () {
                 var _this = this;
-                return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations.reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
+                return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
             };
             Time.prototype._cleanTier = function (index) {
                 this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
@@ -4666,12 +4657,12 @@ var Plottable;
                 if (this._mostPreciseConfigIndex < 1) {
                     return [];
                 }
-                return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1].tierConfigurations[0]);
+                return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
             };
             Time.prototype._doRender = function () {
                 var _this = this;
                 this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
-                var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations;
+                var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
                 for (var i = 0; i < Time._NUM_TIERS; ++i) {
                     this._cleanTier(i);
                 }
@@ -5859,7 +5850,6 @@ var Plottable;
 (function (Plottable) {
     var Component;
     (function (Component) {
-        ;
         var Table = (function (_super) {
             __extends(Table, _super);
             /**
@@ -8173,6 +8163,12 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Animator;
+    (function (Animator) {
+    })(Animator = Plottable.Animator || (Plottable.Animator = {}));
+})(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;

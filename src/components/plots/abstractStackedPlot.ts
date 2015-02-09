@@ -6,7 +6,7 @@ export module Plot {
     offsets: D3.Map<number>;
   }
 
-  export interface StackedDatum {
+  export type StackedDatum = {
     key: any;
     value: number;
     offset?: number;

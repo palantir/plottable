@@ -24,9 +24,7 @@ export module Animator {
     getTiming(numberOfIterations: number): number;
   }
 
-  export interface PlotAnimatorMap {
-    [animatorKey: string] : PlotAnimator;
-  }
+  export type PlotAnimatorMap = { [animatorKey: string] : PlotAnimator; };
 
 }
 }
