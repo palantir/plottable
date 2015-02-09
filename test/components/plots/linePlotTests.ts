@@ -178,5 +178,15 @@ describe("Plots", () => {
 
       svg.remove();
     });
+
+    it("retains original classes when class is projected", () => {
+      var newClassProjector = () => "pink";
+      linePlot.project("class", newClassProjector);
+      linePlot.renderTo(svg);
+      var linePath = renderArea.select(".line");
+      assert.isTrue(linePath.classed("pink"));
+      assert.isTrue(linePath.classed("line"));
+      svg.remove();
+    });
   });
 });

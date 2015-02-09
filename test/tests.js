@@ -2287,6 +2287,15 @@ describe("Plots", function () {
             assert.include(selectionData, dataset3, "third dataset data in selection data");
             svg.remove();
         });
+        it("retains original classes when class is projected", function () {
+            var newClassProjector = function () { return "pink"; };
+            linePlot.project("class", newClassProjector);
+            linePlot.renderTo(svg);
+            var linePath = renderArea.select(".line");
+            assert.isTrue(linePath.classed("pink"));
+            assert.isTrue(linePath.classed("line"));
+            svg.remove();
+        });
     });
 });
 

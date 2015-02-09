@@ -5,6 +5,7 @@ export module _Drawer {
   export class Area extends Line {
     private _areaSelection: D3.Selection;
     private _drawLine = true;
+    private _areaClass = "area";
 
     protected _enterData(data: any[]) {
       if (this._drawLine) {
@@ -28,7 +29,7 @@ export module _Drawer {
 
     public setup(area: D3.Selection) {
       this._areaSelection = area.append("path")
-                               .classed("area", true)
+                               .classed(this._areaClass, true)
                                .style({ "stroke": "none" });
       if (this._drawLine) {
         super.setup(area);
@@ -77,10 +78,13 @@ export module _Drawer {
         this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
       step.animator.animate(this._areaSelection, attrToProjector);
+
+      // Restore default classes that may have been wiped out by class projectors
+      this._areaSelection.classed(this._areaClass, true);
     }
 
     public _getSelector(): string {
-      return ".area";
+      return "." + this._areaClass;
     }
   }
 }

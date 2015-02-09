@@ -2871,13 +2871,14 @@ var Plottable;
             __extends(Line, _super);
             function Line() {
                 _super.apply(this, arguments);
+                this._lineClass = "line";
             }
             Line.prototype._enterData = function (data) {
                 _super.prototype._enterData.call(this, data);
                 this._pathSelection.datum(data);
             };
             Line.prototype.setup = function (area) {
-                this._pathSelection = area.append("path").classed("line", true).style({
+                this._pathSelection = area.append("path").classed(this._lineClass, true).style({
                     "fill": "none",
                     "vector-effect": "non-scaling-stroke"
                 });
@@ -2908,9 +2909,11 @@ var Plottable;
                     this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
                 step.animator.animate(this._pathSelection, attrToProjector);
+                // Restore classes that may have been overridden by class projectors
+                this._pathSelection.classed(this._lineClass, true);
             };
             Line.prototype._getSelector = function () {
-                return ".line";
+                return "." + this._lineClass;
             };
             return Line;
         })(_Drawer.AbstractDrawer);
@@ -2934,6 +2937,7 @@ var Plottable;
             function Area() {
                 _super.apply(this, arguments);
                 this._drawLine = true;
+                this._areaClass = "area";
             }
             Area.prototype._enterData = function (data) {
                 if (this._drawLine) {
@@ -2955,7 +2959,7 @@ var Plottable;
                 return this;
             };
             Area.prototype.setup = function (area) {
-                this._areaSelection = area.append("path").classed("area", true).style({ "stroke": "none" });
+                this._areaSelection = area.append("path").classed(this._areaClass, true).style({ "stroke": "none" });
                 if (this._drawLine) {
                     _super.prototype.setup.call(this, area);
                 }
@@ -2993,9 +2997,11 @@ var Plottable;
                     this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
                 step.animator.animate(this._areaSelection, attrToProjector);
+                // Restore default classes that may have been wiped out by class projectors
+                this._areaSelection.classed(this._areaClass, true);
             };
             Area.prototype._getSelector = function () {
-                return ".area";
+                return "." + this._areaClass;
             };
             return Area;
         })(_Drawer.Line);
