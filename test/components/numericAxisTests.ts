@@ -343,7 +343,7 @@ describe("NumericAxis", () => {
     var boundingBox = d3.select(".x-axis .bounding-box");
     d3.selectAll(".x-axis .tick-label").each(function() {
       var tickLabel = d3.select(this);
-      if (tickLabel.style("visibility") === "visible") {
+      if (tickLabel.style("visibility") === "inherit") {
         assertBBoxInclusion(boundingBox, tickLabel);
       }
     });
@@ -367,7 +367,8 @@ describe("NumericAxis", () => {
 
     var visibleTickLabels = (<any> baseAxis)._element.selectAll(".tick-label")
       .filter(function(d: any, i: number) {
-        return d3.select(this).style("visibility") === "visible";
+        var visibility = d3.select(this).style("visibility");
+        return (visibility === "visible") || (visibility === "inherit");
       });
 
     var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
