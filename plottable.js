@@ -146,7 +146,7 @@ var Plottable;
             /**
              * Creates an array of length `count`, filled with value or (if value is a function), value()
              *
-             * @param {any} value The value to fill the array with, or, if a function, a generator for values (called with index as arg)
+             * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
              * @param {number} count The length of the array to generate
              * @return {any[]}
              */
@@ -7141,8 +7141,8 @@ var Plottable;
              * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
              * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
              *
-             * @param {any} xValOrExtent The pixel x position, or range of x values.
-             * @param {any} yValOrExtent The pixel y position, or range of y values.
+             * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
+             * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
              * @returns {D3.Selection} The selected bar, or null if no bar was selected.
              */
             Bar.prototype.getBars = function (xValOrExtent, yValOrExtent) {

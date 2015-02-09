@@ -135,7 +135,7 @@ export module _Util {
     /**
      * Creates an array of length `count`, filled with value or (if value is a function), value()
      *
-     * @param {any} value The value to fill the array with, or, if a function, a generator for values (called with index as arg)
+     * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
      * @param {number} count The length of the array to generate
      * @return {any[]}
      */

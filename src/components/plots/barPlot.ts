@@ -156,8 +156,8 @@ export module Plot {
      * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
      * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
      *
-     * @param {any} xValOrExtent The pixel x position, or range of x values.
-     * @param {any} yValOrExtent The pixel y position, or range of y values.
+     * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
+     * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
      * @returns {D3.Selection} The selected bar, or null if no bar was selected.
      */
     public getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection {
