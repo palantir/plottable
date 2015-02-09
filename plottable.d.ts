@@ -3435,8 +3435,15 @@ declare module Plottable {
 declare module Plottable {
     module Dispatcher {
         class Mouse {
-            static dispatcherKey: string;
             broadcaster: Core.Broadcaster;
+            /**
+             * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
+             * on that <svg>, it will be returned; otherwise, a new one will be created.
+             *
+             * @param {SVGElement} elem A svg DOM element.
+             * @return {Dispatcher.Mouse} A Dispatcher.Mouse
+             */
+            static getDispatcher(elem: SVGElement): Dispatcher.Mouse;
             /**
              * Creates a Dispatcher.Mouse.
              * This constructor not be invoked directly under most circumstances.
@@ -3445,14 +3452,17 @@ declare module Plottable {
              */
             constructor(svg: SVGElement);
             /**
-             * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
-             * on that <svg>, it will be returned; otherwise, a new one will be created.
+             * Registers a callback to be called whenever the mouse position changes,
+             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {SVGElement} elem A svg DOM element.
-             *
-             * @return {Dispatcher.Mouse} A Dispatcher.Mouse
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            static getDispatcher(elem: SVGElement): Dispatcher.Mouse;
+            onMouseMove(key: any, callback: (p: Point) => any): Mouse;
             /**
              * Returns the last computed mouse position.
              *

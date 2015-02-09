@@ -8513,10 +8513,53 @@ var Plottable;
                 this._svg.appendChild(this._measureRect);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this.broadcaster = new Plottable.Core.Broadcaster(this);
-                svg.addEventListener("mouseover", function (e) { return _this._computeMousePosition(e.clientX, e.clientY); });
-                svg.addEventListener("mousemove", function (e) { return _this._computeMousePosition(e.clientX, e.clientY); });
-                svg.addEventListener("mouseout", function (e) { return _this._computeMousePosition(e.clientX, e.clientY); });
+                svg.addEventListener("mouseover", function (e) { return _this._processMoveEvent(e); });
+                svg.addEventListener("mousemove", function (e) { return _this._processMoveEvent(e); });
+                svg.addEventListener("mouseout", function (e) { return _this._processMoveEvent(e); });
             }
+            /**
+             * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
+             * on that <svg>, it will be returned; otherwise, a new one will be created.
+             *
+             * @param {SVGElement} elem A svg DOM element.
+             * @return {Dispatcher.Mouse} A Dispatcher.Mouse
+             */
+            Mouse.getDispatcher = function (elem) {
+                var svg = Plottable._Util.DOM.getBoundingSVG(elem);
+                var dispatcher = svg[Mouse.dispatcherKey];
+                if (dispatcher == null) {
+                    dispatcher = new Mouse(svg);
+                    svg[Mouse.dispatcherKey] = dispatcher;
+                }
+                return dispatcher;
+            };
+            /**
+             * Registers a callback to be called whenever the mouse position changes,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onMouseMove = function (key, callback) {
+                var _this = this;
+                if (callback === null) {
+                    this.broadcaster.deregisterListener(key);
+                }
+                else {
+                    this.broadcaster.registerListener(key, function () {
+                        callback(_this.getLastMousePosition());
+                    });
+                }
+                return this;
+            };
+            Mouse.prototype._processMoveEvent = function (e) {
+                this._computeMousePosition(e.clientX, e.clientY);
+                this.broadcaster.broadcast();
+            };
             /**
              * Computes the mouse position relative to the <svg> in svg-coordinate-space.
              */
@@ -8543,24 +8586,6 @@ var Plottable;
                     y: (trueCursorPosition.y - origin.y) / scaleY
                 };
                 this._lastMousePosition = scaledPosition;
-                this.broadcaster.broadcast();
-            };
-            /**
-             * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
-             * on that <svg>, it will be returned; otherwise, a new one will be created.
-             *
-             * @param {SVGElement} elem A svg DOM element.
-             *
-             * @return {Dispatcher.Mouse} A Dispatcher.Mouse
-             */
-            Mouse.getDispatcher = function (elem) {
-                var svg = Plottable._Util.DOM.getBoundingSVG(elem);
-                var dispatcher = svg[Mouse.dispatcherKey];
-                if (dispatcher == null) {
-                    dispatcher = new Mouse(svg);
-                    svg[Mouse.dispatcherKey] = dispatcher;
-                }
-                return dispatcher;
             };
             /**
              * Returns the last computed mouse position.
@@ -9390,10 +9415,10 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this._dispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo._element.node());
-                this._dispatcher.broadcaster.registerListener("hover" + this.getID(), function () { return _this._handleMouseEvent(); });
+                this._dispatcher.onMouseMove("hover" + this.getID(), function (p) { return _this._handleMouseEvent(p); });
             };
-            Hover.prototype._handleMouseEvent = function () {
-                var p = this._translateToComponentSpace(this._dispatcher.getLastMousePosition());
+            Hover.prototype._handleMouseEvent = function (p) {
+                p = this._translateToComponentSpace(p);
                 if (this._isInsideComponent(p)) {
                     if (!this._overComponent) {
                         this._componentToListenTo._hoverOverComponent(p);

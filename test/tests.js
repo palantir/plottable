@@ -7402,7 +7402,7 @@ describe("Dispatchers", function () {
             assert.isNotNull(p.y, "y value is set");
             svg.remove();
         });
-        it("broadcasts on mouseover, mousemove, and mouseout", function () {
+        it("calls callbacks on mouseover, mousemove, and mouseout", function () {
             var targetWidth = 400, targetHeight = 400;
             var target = generateSVG(targetWidth, targetHeight);
             // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
@@ -7420,11 +7420,11 @@ describe("Dispatchers", function () {
             ;
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (mse) {
+            var callback = function (p) {
                 callbackWasCalled = true;
-                assertPointsClose(mse.getLastMousePosition(), expectedPoint, 0.5, "mouse position is correct");
+                assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
             };
-            md.broadcaster.registerListener("unit test", callback);
+            md.onMouseMove("unit test", callback);
             triggerFakeMouseEvent("mouseover", target, targetX, targetY);
             assert.isTrue(callbackWasCalled, "callback was called on mouseover");
             callbackWasCalled = false;
@@ -7433,6 +7433,28 @@ describe("Dispatchers", function () {
             callbackWasCalled = false;
             triggerFakeMouseEvent("mouseout", target, targetX, targetY);
             assert.isTrue(callbackWasCalled, "callback was called on mouseout");
+            target.remove();
+        });
+        it("can remove callbacks by passing null", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p) {
+                callbackWasCalled = true;
+            };
+            var keyString = "callbackTest";
+            md.onMouseMove(keyString, callback);
+            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+            assert.isTrue(callbackWasCalled, "callback was called on mousemove");
+            callbackWasCalled = false;
+            md.onMouseMove(keyString, null);
+            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+            assert.isFalse(callbackWasCalled, "callback was not called after blanking");
             target.remove();
         });
     });

@@ -48,12 +48,11 @@ export module Interaction {
       super._anchor(component, hitBox);
       this._dispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
 
-      this._dispatcher.broadcaster.registerListener("hover"+this.getID(), () => this._handleMouseEvent());
+      this._dispatcher.onMouseMove("hover"+this.getID(), (p: Point) => this._handleMouseEvent(p));
     }
 
-    private _handleMouseEvent() {
-      var p = this._translateToComponentSpace(this._dispatcher.getLastMousePosition());
-
+    private _handleMouseEvent(p: Point) {
+      p = this._translateToComponentSpace(p);
       if (this._isInsideComponent(p)) {
         if (!this._overComponent) {
           this._componentToListenTo._hoverOverComponent(p);
