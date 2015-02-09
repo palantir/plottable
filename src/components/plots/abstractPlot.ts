@@ -5,7 +5,7 @@ export module Plot {
   /**
    * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
    */
-  export interface PlotDatasetKey {
+  export type PlotDatasetKey = {
     dataset: Dataset;
     drawer: _Drawer.AbstractDrawer;
     plotMetadata: PlotMetadata;

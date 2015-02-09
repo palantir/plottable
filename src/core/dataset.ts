@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  interface CachedExtent {
+  type CachedExtent = {
     accessor: _Accessor;
     extent: any[];
   }

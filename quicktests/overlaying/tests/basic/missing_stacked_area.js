@@ -10,7 +10,7 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var xScale = new Plottable.Scale.Ordinal().rangeType("points");
+  var xScale = new Plottable.Scale.Ordinal();
   var yScale = new Plottable.Scale.Linear();
   var colorScale = new Plottable.Scale.Color("10");
 

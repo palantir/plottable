@@ -41,7 +41,7 @@ function run(svg, data, Plottable) {
     .project("x", "x", xScale)
     .project("y", "y", yScale);  
   
-  var verticalBarRenderer = new Plottable.Plot.VerticalBar( xScale, yScale)
+  var verticalBarRenderer = new Plottable.Plot.Bar( xScale, yScale)
     .animate(true)
     .addDataset(data[0])
     .project("fill", "type", colorScale)

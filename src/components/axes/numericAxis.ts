@@ -171,7 +171,7 @@ export module Axis {
       tickLabels.exit().remove();
 
       tickLabels.style("text-anchor", tickLabelTextAnchor)
-                .style("visibility", "visible")
+                .style("visibility", "inherit")
                 .attr(tickLabelAttrHash)
                 .text((s: any) => {
                   var formattedText = this.formatter()(s);
