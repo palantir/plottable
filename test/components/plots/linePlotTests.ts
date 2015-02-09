@@ -183,9 +183,9 @@ describe("Plots", () => {
       var newClassProjector = () => "pink";
       linePlot.project("class", newClassProjector);
       linePlot.renderTo(svg);
-      var linePath = renderArea.select(".line");
+      var linePath = renderArea.select("." + Plottable._Drawer.Line.LINE_CLASS);
       assert.isTrue(linePath.classed("pink"));
-      assert.isTrue(linePath.classed("line"));
+      assert.isTrue(linePath.classed(Plottable._Drawer.Line.LINE_CLASS));
       svg.remove();
     });
   });

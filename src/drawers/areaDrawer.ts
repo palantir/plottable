@@ -3,9 +3,10 @@
 module Plottable {
 export module _Drawer {
   export class Area extends Line {
+    public static AREA_CLASS = "area";
+
     private _areaSelection: D3.Selection;
     private _drawLine = true;
-    private _areaClass = "area";
 
     protected _enterData(data: any[]) {
       if (this._drawLine) {
@@ -29,7 +30,7 @@ export module _Drawer {
 
     public setup(area: D3.Selection) {
       this._areaSelection = area.append("path")
-                               .classed(this._areaClass, true)
+                               .classed(Area.AREA_CLASS, true)
                                .style({ "stroke": "none" });
       if (this._drawLine) {
         super.setup(area);
@@ -80,11 +81,11 @@ export module _Drawer {
       step.animator.animate(this._areaSelection, attrToProjector);
 
       // Restore default classes that may have been wiped out by class projectors
-      this._areaSelection.classed(this._areaClass, true);
+      this._areaSelection.classed(Area.AREA_CLASS, true);
     }
 
     public _getSelector(): string {
-      return "." + this._areaClass;
+      return "." + Area.AREA_CLASS;
     }
   }
 }

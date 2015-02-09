@@ -3,8 +3,9 @@
 module Plottable {
 export module _Drawer {
   export class Line extends AbstractDrawer {
+    public static LINE_CLASS = "line";
+
     private _pathSelection: D3.Selection;
-    private _lineClass = "line";
 
     protected _enterData(data: any[]) {
       super._enterData(data);
@@ -13,7 +14,7 @@ export module _Drawer {
 
     public setup(area: D3.Selection) {
       this._pathSelection = area.append("path")
-                               .classed(this._lineClass, true)
+                               .classed(Line.LINE_CLASS, true)
                                .style({
                                  "fill": "none",
                                  "vector-effect": "non-scaling-stroke"
@@ -57,11 +58,11 @@ export module _Drawer {
       step.animator.animate(this._pathSelection, attrToProjector);
 
       // Restore classes that may have been overridden by class projectors
-      this._pathSelection.classed(this._lineClass, true);
+      this._pathSelection.classed(Line.LINE_CLASS, true);
     }
 
     public _getSelector() {
-      return "." + this._lineClass;
+      return "." + Line.LINE_CLASS;
     }
   }
 }

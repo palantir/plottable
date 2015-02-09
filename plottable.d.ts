@@ -1548,6 +1548,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Line extends AbstractDrawer {
+            static LINE_CLASS: string;
             protected _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
             protected _numberOfAnimationIterations(data: any[]): number;
@@ -1561,6 +1562,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Area extends Line {
+            static AREA_CLASS: string;
             protected _enterData(data: any[]): void;
             /**
              * Sets the value determining if line should be drawn.

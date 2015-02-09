@@ -126,5 +126,14 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("retains original classes when class is projected", () => {
+      var newClassProjector = () => "pink";
+      areaPlot.project("class", newClassProjector);
+      areaPlot.renderTo(svg);
+      var areaPath = renderArea.select("." + Plottable._Drawer.Area.AREA_CLASS);
+      assert.isTrue(areaPath.classed("pink"));
+      assert.isTrue(areaPath.classed(Plottable._Drawer.Area.AREA_CLASS));
+      svg.remove();
+    });
   });
 });
