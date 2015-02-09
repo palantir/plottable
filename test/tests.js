@@ -2299,6 +2299,15 @@ describe("Plots", function () {
             assert.include(selectionData, dataset3, "third dataset data in selection data");
             svg.remove();
         });
+        it("retains original classes when class is projected", function () {
+            var newClassProjector = function () { return "pink"; };
+            linePlot.project("class", newClassProjector);
+            linePlot.renderTo(svg);
+            var linePath = renderArea.select("." + Plottable._Drawer.Line.LINE_CLASS);
+            assert.isTrue(linePath.classed("pink"));
+            assert.isTrue(linePath.classed(Plottable._Drawer.Line.LINE_CLASS));
+            svg.remove();
+        });
     });
 });
 
@@ -2401,6 +2410,15 @@ describe("Plots", function () {
             var selectionData = allAreas.data();
             assert.include(selectionData, twoPointData, "first dataset data in selection data");
             assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+            svg.remove();
+        });
+        it("retains original classes when class is projected", function () {
+            var newClassProjector = function () { return "pink"; };
+            areaPlot.project("class", newClassProjector);
+            areaPlot.renderTo(svg);
+            var areaPath = renderArea.select("." + Plottable._Drawer.Area.AREA_CLASS);
+            assert.isTrue(areaPath.classed("pink"));
+            assert.isTrue(areaPath.classed(Plottable._Drawer.Area.AREA_CLASS));
             svg.remove();
         });
     });

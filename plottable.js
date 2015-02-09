@@ -2869,7 +2869,7 @@ var Plottable;
                 this._pathSelection.datum(data);
             };
             Line.prototype.setup = function (area) {
-                this._pathSelection = area.append("path").classed("line", true).style({
+                this._pathSelection = area.append("path").classed(Line.LINE_CLASS, true).style({
                     "fill": "none",
                     "vector-effect": "non-scaling-stroke"
                 });
@@ -2900,10 +2900,13 @@ var Plottable;
                     this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
                 step.animator.animate(this._pathSelection, attrToProjector);
+                // Restore classes that may have been overridden by class projectors
+                this._pathSelection.classed(Line.LINE_CLASS, true);
             };
             Line.prototype._getSelector = function () {
-                return ".line";
+                return "." + Line.LINE_CLASS;
             };
+            Line.LINE_CLASS = "line";
             return Line;
         })(_Drawer.AbstractDrawer);
         _Drawer.Line = Line;
@@ -2947,7 +2950,7 @@ var Plottable;
                 return this;
             };
             Area.prototype.setup = function (area) {
-                this._areaSelection = area.append("path").classed("area", true).style({ "stroke": "none" });
+                this._areaSelection = area.append("path").classed(Area.AREA_CLASS, true).style({ "stroke": "none" });
                 if (this._drawLine) {
                     _super.prototype.setup.call(this, area);
                 }
@@ -2985,10 +2988,13 @@ var Plottable;
                     this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
                 step.animator.animate(this._areaSelection, attrToProjector);
+                // Restore default classes that may have been wiped out by class projectors
+                this._areaSelection.classed(Area.AREA_CLASS, true);
             };
             Area.prototype._getSelector = function () {
-                return ".area";
+                return "." + Area.AREA_CLASS;
             };
+            Area.AREA_CLASS = "area";
             return Area;
         })(_Drawer.Line);
         _Drawer.Area = Area;
