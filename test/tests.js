@@ -580,10 +580,10 @@ describe("TimeAxis", function () {
         var svg = generateSVG(width, 100);
         scale.domain(["2010", "2014"]);
         axis.renderTo(svg);
-        var firstTick = d3.select(".tick-mark");
-        assert.isTrue(firstTick.classed("end-tick-mark"), "first end tick has the end-tick-mark class");
-        var lastTick = d3.select(d3.selectAll(".tick-mark")[0].pop());
-        assert.isTrue(lastTick.classed("end-tick-mark"), "last end tick has the end-tick-mark class");
+        var firstTick = d3.select("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
+        assert.isTrue(firstTick.classed(Plottable.Axis.AbstractAxis.END_TICK_MARK_CLASS), "first end tick has the end-tick-mark class");
+        var lastTick = d3.select(d3.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0].pop());
+        assert.isTrue(lastTick.classed(Plottable.Axis.AbstractAxis.END_TICK_MARK_CLASS), "last end tick has the end-tick-mark class");
         svg.remove();
     });
 });
